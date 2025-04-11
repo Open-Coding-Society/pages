@@ -44,7 +44,7 @@ menu: nav/home.html
         // Create the "Please login" message box
         const message = document.createElement('div');
         message.style.position = 'absolute';
-        message.style.top = '50%';
+        message.style.top = '60%';
         message.style.left = '50%';
         message.style.transform = 'translate(-50%, -50%)';
         message.style.backgroundColor = 'black'; // Solid black background
@@ -53,7 +53,7 @@ menu: nav/home.html
         message.style.color = '#fff'; // White text color
         message.style.borderRadius = '10px';
         message.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; // Optional shadow for better visibility
-        message.style.zIndex = '1000'; // Ensure it appears above the overlay
+        message.style.zIndex = '10000000000'; // Ensure it appears above the overlay
         message.innerHTML = 'Please login';
         
         // Add the message on top of the overlay
