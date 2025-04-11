@@ -35,6 +35,10 @@ permalink: /gamify/blackjack
         color: red;
         font-weight: bold;
     }
+    .success {
+        color: green;
+        font-weight: bold;
+    }
     .card {
         display: inline-block;
         width: 50px;
@@ -56,22 +60,40 @@ permalink: /gamify/blackjack
     .clubs, .spades {
         color: black;
     }
+    #balance {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+    input[type="number"] {
+        width: 100px;
+        padding: 8px;
+        margin: 5px;
+        background-color: #333;
+        color: white;
+        border: 1px solid white;
+    }
 </style>
 
 <div class="container">
     <h1>Blackjack Game</h1>
-    <label for="betAmount">Bet Amount:</label>
-    <input type="range" id="betAmount" min="1000" max="1000000" value="1000" step="1000">
+    <div id="balance">Balance: Loading...</div>
+    
+    <label for="betAmount">Bet Amount (Min: $1,000):</label>
+    <input type="number" id="betAmount" min="1000" value="1000" step="1000">
     <span id="betValue">$1,000</span>
-    <button id="startGame">Start Game</button>
-    <button id="hit" disabled>Hit</button>
-    <button id="stand" disabled>Stand</button>
-    <button id="exit">Exit</button>
+    
+    <div>
+        <button id="startGame">Start Game</button>
+        <button id="hit" disabled>Hit</button>
+        <button id="stand" disabled>Stand</button>
+        <button id="exit">Exit</button>
+    </div>
+    
     <h2>Dealer's Hand</h2>
     <div id="dealerHand"></div>
     <h2>Your Hand</h2>
     <div id="playerHand"></div>
-    <p id="gameStatus" class="error"></p>
+    <p id="gameStatus"></p>
 </div>
 
 <script type="module">
@@ -79,6 +101,7 @@ permalink: /gamify/blackjack
 
     const API_URL = `${javaURI}/api/casino/blackjack`;
     let uid = "";
+    let currentBalance = 0;
 
     async function getUID() {
         console.log("Fetching UID...");
@@ -90,6 +113,8 @@ permalink: /gamify/blackjack
             if (!data || !data.uid) throw new Error("UID not found in response");
 
             uid = data.uid;
+            currentBalance = data.balanceDouble || 0;
+            document.getElementById("balance").innerText = `Balance: $${currentBalance.toLocaleString()}`;
             console.log("UID:", uid);
         } catch (error) {
             console.error("Error fetching UID:", error);
@@ -97,20 +122,30 @@ permalink: /gamify/blackjack
         }
     }
 
-    function updateBetDisplay() {
-        let betValue = document.getElementById("betAmount").value;
-        document.getElementById("betValue").innerText = `$${Number(betValue).toLocaleString()}`;
-    }
-
-    // Ensure the event listener is correctly set up
     document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("betAmount").addEventListener("input", updateBetDisplay);
+        getUID();
+        
+        document.getElementById("betAmount").addEventListener("input", function() {
+            let betValue = this.value;
+            if (betValue < 1000) {
+                this.value = 1000;
+                betValue = 1000;
+            }
+            document.getElementById("betValue").innerText = `$${Number(betValue).toLocaleString()}`;
+        });
     });
 
     document.getElementById("startGame").addEventListener("click", async function () {
         try {
             await getUID();
             const bet = parseInt(document.getElementById("betAmount").value);
+            
+            if (bet > currentBalance) {
+                document.getElementById("gameStatus").innerText = "You don't have enough money for this bet!";
+                document.getElementById("gameStatus").className = "error";
+                return;
+            }
+
             const requestData = { uid, betAmount: bet };
 
             const response = await fetch(`${API_URL}/start`, {
@@ -124,6 +159,7 @@ permalink: /gamify/blackjack
             updateUI(data);
         } catch (error) {
             document.getElementById("gameStatus").innerText = error.message;
+            document.getElementById("gameStatus").className = "error";
         }
     });
 
@@ -141,6 +177,7 @@ permalink: /gamify/blackjack
             updateUI(data);
         } catch (error) {
             document.getElementById("gameStatus").innerText = error.message;
+            document.getElementById("gameStatus").className = "error";
         }
     });
 
@@ -158,7 +195,12 @@ permalink: /gamify/blackjack
             updateUI(data);
         } catch (error) {
             document.getElementById("gameStatus").innerText = error.message;
+            document.getElementById("gameStatus").className = "error";
         }
+    });
+
+    document.getElementById("exit").addEventListener("click", function() {
+        window.location.href = "{{site.baseurl}}/gamify";
     });
 
     function updateUI(data) {
@@ -170,45 +212,66 @@ permalink: /gamify/blackjack
         } catch (error) {
             console.error("Failed to parse gameState:", error);
             document.getElementById("gameStatus").innerText = "Error processing game state.";
+            document.getElementById("gameStatus").className = "error";
             return;
         }
 
         if (!gameState || !gameState.playerHand || !gameState.dealerHand) {
             console.error("Invalid gameState format:", gameState);
             document.getElementById("gameStatus").innerText = "Unexpected response format. Please check the API.";
+            document.getElementById("gameStatus").className = "error";
             return;
         }
 
         displayCards(gameState.playerHand, "playerHand");
         displayCards(gameState.dealerHand, "dealerHand");
 
-        document.getElementById("gameStatus").innerText = `Player Score: ${gameState.playerScore} | Dealer Score: ${gameState.dealerScore}`;
+        // Update balance if available
+        if (data.balance !== undefined) {
+            currentBalance = data.balance;
+            document.getElementById("balance").innerText = `Balance: $${currentBalance.toLocaleString()}`;
+        }
+
+        // Enable/disable buttons based on game state
+        document.getElementById("hit").disabled = data.status === "INACTIVE";
+        document.getElementById("stand").disabled = data.status === "INACTIVE";
+        document.getElementById("startGame").disabled = data.status === "ACTIVE";
 
         if (data.status === "INACTIVE") {
             let resultMessage;
-            if (gameState.playerScore > 21) {
-                resultMessage = "💥 You busted! Dealer wins.";
-            } else if (gameState.dealerScore > 21 || gameState.playerScore > gameState.dealerScore) {
+            if (gameState.result === "WIN") {
                 resultMessage = "🎉 You win!";
-            } else if (gameState.playerScore < gameState.dealerScore) {
-                resultMessage = "Dealer wins! 😞";
+                document.getElementById("gameStatus").className = "success";
+            } else if (gameState.result === "LOSE") {
+                resultMessage = "💥 You lost!";
+                document.getElementById("gameStatus").className = "error";
             } else {
-                resultMessage = "It's a draw! 🤝";
+                resultMessage = "🤝 It's a draw!";
+                document.getElementById("gameStatus").className = "";
             }
-            document.getElementById("gameStatus").innerText = resultMessage;
+            document.getElementById("gameStatus").innerText = `${resultMessage} Player: ${gameState.playerScore} | Dealer: ${gameState.dealerScore}`;
+        } else {
+            document.getElementById("gameStatus").innerText = `Player: ${gameState.playerScore} | Dealer: ${gameState.dealerScore}`;
+            document.getElementById("gameStatus").className = "";
         }
-
-        document.getElementById("hit").disabled = data.status === "INACTIVE";
-        document.getElementById("stand").disabled = data.status === "INACTIVE";
     }
 
     function displayCards(cards, elementId) {
         const cardContainer = document.getElementById(elementId);
         cardContainer.innerHTML = "";
 
-        cards.forEach(card => {
+        // If it's dealer's hand and game is active, show first card only
+        const isDealerHidden = elementId === "dealerHand" && !document.getElementById("hit").disabled;
+        
+        cards.forEach((card, index) => {
             const cardElement = document.createElement("div");
             cardElement.classList.add("card");
+
+            if (isDealerHidden && index > 0) {
+                cardElement.innerHTML = "❓";
+                cardContainer.appendChild(cardElement);
+                return;
+            }
 
             let rank = card.slice(0, -1);
             let suit = card.slice(-1);

@@ -1,51 +1,147 @@
 ---
 layout: base
 ---
-<nav class="bank-nav">
-  <div class="nav-container">
-    <a class="nav-link" href="{{ site.baseurl }}/gamify/bankanalytics">Analytics</a>
-    <a class="nav-link" href="{{ site.baseurl }}/leaderboard/overall-leaderboard">Leaderboard</a>
-    <a class="nav-link" href="{{ site.baseurl }}/gamify/loan">Loans</a>
-    <a class="nav-link" href="{{ site.baseurl }}/gamify/casinohomepage">Casino</a>
-    <a class="nav-link" href="{{ site.baseurl }}/stocks/home">Stocks</a>
-    <a class="nav-link" href="{{ site.baseurl }}/media">Media Bias Game</a>
-    <a class="nav-link" href="{{ site.baseurl }}/gamify/adventureGame">Adventure Game</a>
-    <a class="nav-link" href="{{ site.baseurl }}/crypto/mining">Crypto Mining</a>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse justify-content-between" id="navbarContent">
+      <ul class="navbar-nav">
+        <!-- Bank Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="bankDropdown" role="button" data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            Bank
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="bankDropdown">
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/gamify/bankanalytics">Analytics</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/leaderboard/overall-leaderboard">Leaderboard</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/gamify/loan">Loans</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="casinoDropdown" role="button" data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            Casino
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="casinoDropdown">
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/gamify/blackjack">Blackjack</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/gamify/dices">Dice</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/gamify/mines">Mines</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/gamify/poker">Poker</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="stocksDropdown" role="button" data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            Stocks
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="stocksDropdown">
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/stocks/game">Simulation</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/stocks/home">Home</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/stocks/viewer">Viewer</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/stocks/buysell">Buy/Sell</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/stocks/portfolio">Portfolio</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ site.baseurl }}/gamify/adventureGame">Adventure Game</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ site.baseurl }}/media">Media Bias Game</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="cryptoDropdown" role="button" data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            Crypto
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="cryptoDropdown">
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/crypto/portfolio">Portfolio</a></li>
+            <li><a class="dropdown-item" href="{{ site.baseurl }}/crypto/mining">Mining</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- User Info Section -->
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item px-3">
+          <div class="d-flex align-items-center text-light">
+          </div>
+        </li>
+        <li class="nav-item px-3">
+          <div class="d-flex align-items-center text-light">
+            <i class="bi bi-coin me-2"></i>
+            <span id="navbarBalance" class="balance-info">$---.--</span>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 
 {{ content }}
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+// Fetch and display user info in navbar
+async function loadUserInfo() {
+  try {
+    const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+    if (!response.ok) throw new Error("Failed to fetch user data");
+    const userData = await response.json();
+    
+    document.getElementById('navbarUsername').textContent = userData.uid || "Guest";
+    document.getElementById('navbarBalance').textContent = `$${Number(userData.balance).toFixed(2)}`;
+  } catch (error) {
+    console.error("Error loading user info:", error);
+    document.getElementById('navbarUsername').textContent = "Error";
+    document.getElementById('navbarBalance').textContent = "$0.00";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadUserInfo);
+</script>
+
 <style>
-  .bank-nav {
-    background-color: #1c1c1c;
-    padding: 0.75rem 0; /* Reduced vertical padding */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  .dropdown-menu {
+    background-color: #1c1c1c !important;
+    border: none;
   }
-  
-  .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 10px; /* Reduced gap between items */
-    flex-wrap: wrap; /* Allows items to wrap if needed */
-  }
-  
-  .nav-link {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 8px 15px; /* Reduced padding */
-    border-radius: 6px;
+
+  .dropdown-item {
+    color: #ffffff !important;
     transition: all 0.3s ease;
-    font-size: 14px; /* Reduced from 16px */
-    white-space: nowrap; /* Prevents text wrapping */
   }
-  
-  .nav-link:hover {
-    background-color: #ff9800;
-    color: #000000;
-    transform: scale(1.05); /* Reduced scale effect */
+
+  .dropdown-item:hover {
+    background-color: #ff9800 !important;
+    color: #1c1c1c !important;
+    transform: translateX(5px);
   }
-  </style>
+
+  /* User Info Styling */
+  #navbarUsername, #navbarBalance {
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .nav-item:hover #navbarUsername,
+  .nav-item:hover #navbarBalance {
+    color: #ff9800 !important;
+  }
+
+  .bi-person-circle, .bi-coin {
+    font-size: 1.2rem;
+  }
+</style>

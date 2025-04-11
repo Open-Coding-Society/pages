@@ -1,0 +1,116 @@
+/* Market Event Animations */
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+}
+
+/* Frog Animation */
+@keyframes frogBounce {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-10px) rotate(-5deg);
+    }
+}
+
+/* Visual Effect Animations */
+@keyframes red_flash {
+    0% { background: rgba(255, 0, 0, 0.2); }
+    100% { background: rgba(255, 0, 0, 0); }
+}
+
+@keyframes green_flash {
+    0% { background: rgba(0, 255, 0, 0.2); }
+    100% { background: rgba(0, 255, 0, 0); }
+}
+
+@keyframes blue_flash {
+    0% { background: rgba(0, 0, 255, 0.2); }
+    100% { background: rgba(0, 0, 255, 0); }
+}
+
+@keyframes gold_flash {
+    0% { background: rgba(255, 215, 0, 0.2); }
+    100% { background: rgba(255, 215, 0, 0); }
+}
+
+@keyframes purple_flash {
+    0% { background: rgba(128, 0, 128, 0.2); }
+    100% { background: rgba(128, 0, 128, 0); }
+}
+
+@keyframes yellow_flash {
+    0% { background: rgba(255, 255, 0, 0.2); }
+    100% { background: rgba(255, 255, 0, 0); }
+}
+
+@keyframes orange_flash {
+    0% { background: rgba(255, 165, 0, 0.2); }
+    100% { background: rgba(255, 165, 0, 0); }
+}
+
+@keyframes chart_flash {
+    0% { background: rgba(0, 255, 255, 0.2); }
+    100% { background: rgba(0, 255, 255, 0); }
+}
+
+/* Market Event Notification Styles */
+.market-event-notification {
+    font-family: 'Arial', sans-serif;
+    max-width: 300px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.market-event-notification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.market-event-notification h3 {
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.market-event-notification p {
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+/* Visual Effect Container */
+.visual-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    mix-blend-mode: screen;
+}
+
+/* Frog Emoji Styles */
+.frog-emoji {
+    position: absolute;
+    font-size: 24px;
+    pointer-events: none;
+    animation: frogBounce 1s ease infinite;
+    opacity: 0.8;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+} 

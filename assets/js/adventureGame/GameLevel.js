@@ -25,8 +25,9 @@ class GameLevel {
     }
 
     if (typeof this.gameLevel.initialize === "function") {
-      this.gameLevel.initialize()
-
+      console.log('Calling initialize on game level...');
+      this.gameLevel.initialize();
+      console.log('Game level initialization complete');
     }
 
     window.addEventListener("resize", this.resize.bind(this))

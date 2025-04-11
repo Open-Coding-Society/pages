@@ -21,6 +21,7 @@ plugins:
   - jekyll-remote-theme
 header_pages:
   - navigation/kasm.md
+  - navigation/aesthetihawk-guide.md
   - navigation/blog.md
   - navigation/search.md
   - navigation/logintoolkit.md

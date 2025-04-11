@@ -23,13 +23,22 @@ class GameLevelMeteorBlaster {
     this.lasers = []
     this.lastShotTime = 0
     this.shootCooldown = 500
-    this.meteorSpawnRate = 2000
+    this.meteorSpawnRate = 2000  // Time between meteor spawns in milliseconds
     this.meteorSpawnInterval = null
     this.invincibleTime = 0
     this.invincibleDuration = 1500
+    this.questionsAnswered = 0
+    this.totalQuestions = 3  // Set to 3 questions total
+    this.hasKey = false
+    this.meteorsSpawned = 0  // Track number of meteors spawned
+    this.backupQuestions = null  // Store backup questions
+    this.isBackendAvailable = false  // Track backend availability
 
     this.quiz = new Quiz()
     this.quiz.initialize()
+
+    // Initialize questions and check backend availability
+    this.initializeQuestions()
 
     const image_src_space = path + "/images/gamify/space.png"  // be sure to include the path
     const image_data_space = {
@@ -100,12 +109,208 @@ class GameLevelMeteorBlaster {
     this.bindShootKey()
   }
 
+  async initializeQuestions() {
+    try {
+      // Try to fetch questions from backend
+      const response = await fetch('/api/questions')
+      if (response.ok) {
+        const data = await response.json()
+        this.questions = data
+        this.isBackendAvailable = true
+        console.log("Successfully loaded questions from backend")
+      } else {
+        throw new Error("Backend response not ok")
+      }
+    } catch (error) {
+      console.log("Backend not available, using backup questions:", error)
+      this.isBackendAvailable = false
+      this.initializeBackupQuestions()
+    }
+  }
+
+  initializeBackupQuestions() {
+    // Store backup questions
+    this.backupQuestions = [
+      // Multiple choice questions
+      {
+        type: "multiple-choice",
+        question: "What is compound interest?",
+        options: [
+          "Interest earned on both principal and previously earned interest",
+          "Interest earned only on the principal amount",
+          "A fixed interest rate that never changes",
+          "Interest paid at the end of a loan term"
+        ],
+        correctAnswer: 0
+      },
+      {
+        type: "multiple-choice",
+        question: "Which investment typically has the highest risk?",
+        options: [
+          "Government bonds",
+          "Individual stocks",
+          "Savings accounts",
+          "Certificates of deposit"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is diversification in investing?",
+        options: [
+          "Putting all money in one stable stock",
+          "Spreading investments across different assets",
+          "Only investing in real estate",
+          "Keeping all money in a savings account"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is a bear market?",
+        options: [
+          "A market where prices are rising",
+          "A market where prices are falling",
+          "A market with no change",
+          "A market only for commodities"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is an ETF?",
+        options: [
+          "Exchange-Traded Fund",
+          "Electronic Transfer Fee",
+          "Extended Tax Form",
+          "Emergency Trust Fund"
+        ],
+        correctAnswer: 0
+      },
+      {
+        type: "multiple-choice",
+        question: "What is the primary purpose of a budget?",
+        options: [
+          "To spend all your money",
+          "To track and control your spending",
+          "To avoid paying taxes",
+          "To invest in stocks"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is inflation?",
+        options: [
+          "When prices decrease over time",
+          "When prices increase over time",
+          "When the stock market crashes",
+          "When interest rates drop"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is a dividend?",
+        options: [
+          "A type of loan",
+          "A payment made by a company to its shareholders",
+          "A type of tax",
+          "A type of insurance"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is the Dow Jones Industrial Average?",
+        options: [
+          "A type of savings account",
+          "A measure of 30 large US companies' stock prices",
+          "A type of bond",
+          "A government agency"
+        ],
+        correctAnswer: 1
+      },
+      {
+        type: "multiple-choice",
+        question: "What is a credit score?",
+        options: [
+          "Your bank account balance",
+          "A number that represents your creditworthiness",
+          "Your annual income",
+          "Your tax bracket"
+        ],
+        correctAnswer: 1
+      },
+
+      // Free response questions
+      {
+        type: "free-response",
+        question: "What is the most common retirement account type in the US? (Hint: 3 letters)",
+        correctAnswer: "401k",
+        acceptableAnswers: ["401k", "401(k)", "401-k"]
+      },
+      {
+        type: "free-response",
+        question: "What is the name for money you initially put into an investment?",
+        correctAnswer: "principal",
+        acceptableAnswers: ["principal", "principle", "initial investment"]
+      },
+      {
+        type: "free-response",
+        question: "What type of investment pays regular fixed payments? (Hint: 4 letters)",
+        correctAnswer: "bond",
+        acceptableAnswers: ["bond", "bonds"]
+      },
+      {
+        type: "free-response",
+        question: "What's the term for the upward movement of market prices? (Hint: starts with B)",
+        correctAnswer: "bull",
+        acceptableAnswers: ["bull", "bullish", "bull market"]
+      },
+      {
+        type: "free-response",
+        question: "What's the three-letter acronym for a tax-advantaged retirement account?",
+        correctAnswer: "IRA",
+        acceptableAnswers: ["ira", "IRA", "i.r.a."]
+      },
+      {
+        type: "free-response",
+        question: "What's the term for spreading investments across different assets? (Hint: starts with D)",
+        correctAnswer: "diversification",
+        acceptableAnswers: ["diversification", "diversify", "diversified"]
+      },
+      {
+        type: "free-response",
+        question: "What's the term for the percentage of interest charged on borrowed money? (Hint: starts with R)",
+        correctAnswer: "rate",
+        acceptableAnswers: ["rate", "interest rate", "APR"]
+      },
+      {
+        type: "free-response",
+        question: "What's the term for money set aside for future use? (Hint: starts with S)",
+        correctAnswer: "savings",
+        acceptableAnswers: ["savings", "saving", "saved money"]
+      },
+      {
+        type: "free-response",
+        question: "What's the term for the total value of all goods and services produced in a country? (Hint: starts with G)",
+        correctAnswer: "GDP",
+        acceptableAnswers: ["gdp", "GDP", "g.d.p."]
+      },
+      {
+        type: "free-response",
+        question: "What's the term for a company's first sale of stock to the public? (Hint: 3 letters)",
+        correctAnswer: "IPO",
+        acceptableAnswers: ["ipo", "IPO", "i.p.o."]
+      }
+    ]
+    console.log("Initialized backup questions")
+  }
+
   initialize() {
     console.log("Initializing Meteor Blaster game")
     this.startMeteorSpawner()
-    for (let i = 0; i < 3; i++) {
-      this.spawnMeteor()
-    }
   }
 
   startMeteorSpawner() {
@@ -115,10 +320,14 @@ class GameLevelMeteorBlaster {
     }
 
     this.meteorSpawnInterval = setInterval(() => {
-      if (!this.isPaused && !this.gameOver) {
+      if (!this.isPaused && !this.gameOver && this.questionsAnswered < this.totalQuestions) {
         this.spawnMeteor()
+        console.log("Meteor spawned, questions answered:", this.questionsAnswered, "total:", this.totalQuestions)
+      } else if (this.questionsAnswered >= this.totalQuestions) {
+        console.log("All questions answered, stopping spawner")
+        clearInterval(this.meteorSpawnInterval)
       }
-    }, 1500)
+    }, this.meteorSpawnRate)
   }
 
   spawnMeteor() {
@@ -223,13 +432,24 @@ class GameLevelMeteorBlaster {
     this.scoreElement = document.createElement("div")
     this.scoreElement.id = "meteor-score"
     this.scoreElement.style.position = "absolute"
-    this.scoreElement.style.top = "10px"
-    this.scoreElement.style.left = "10px"
-    this.scoreElement.style.color = "white"
-    this.scoreElement.style.fontSize = "24px"
+    this.scoreElement.style.top = "20px"
+    this.scoreElement.style.left = "50%"
+    this.scoreElement.style.transform = "translateX(-50%)"
+    this.scoreElement.style.color = "#FFFFFF"
+    this.scoreElement.style.fontSize = "28px"
     this.scoreElement.style.fontWeight = "bold"
     this.scoreElement.style.zIndex = "1000"
-    this.scoreElement.textContent = "Score: 0"
+    this.scoreElement.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.5)"
+    this.scoreElement.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
+    this.scoreElement.style.padding = "10px 20px"
+    this.scoreElement.style.borderRadius = "15px"
+    this.scoreElement.style.display = "flex"
+    this.scoreElement.style.gap = "20px"
+    this.scoreElement.style.alignItems = "center"
+    this.scoreElement.innerHTML = `
+      <span style="color: #FFD700">Score: ${this.score}</span>
+      <span style="color: #00FF00">Questions: ${this.questionsAnswered}/${this.totalQuestions}</span>
+    `
 
     gameContainer.appendChild(this.scoreElement)
   }
@@ -262,8 +482,24 @@ class GameLevelMeteorBlaster {
 
   updateScore(points) {
     this.score += points
-    if (this.scoreElement) {
-      this.scoreElement.textContent = `Score: ${this.score}`
+    this.updateDisplay()
+  }
+
+  updateQuestions() {
+    this.questionsAnswered++
+    this.updateDisplay()
+  }
+
+  updateDisplay() {
+    const scoreElement = document.getElementById("meteor-score")
+    if (scoreElement) {
+      scoreElement.innerHTML = `
+        <span style="color: #FFD700">Score: ${this.score}</span>
+        <span style="color: #00FF00">Questions: ${this.questionsAnswered}/${this.totalQuestions}</span>
+      `
+      console.log("Display updated - Score:", this.score, "Questions:", this.questionsAnswered, "Total:", this.totalQuestions)
+    } else {
+      this.createScoreDisplay()
     }
   }
 
@@ -279,152 +515,186 @@ class GameLevelMeteorBlaster {
   }
 
   getRandomQuestion() {
-    const questions = [
-      // Multiple choice questions
-      {
+    if (this.isBackendAvailable && this.questions) {
+      // Use backend questions if available
+      return this.questions[Math.floor(Math.random() * this.questions.length)]
+    } else if (this.backupQuestions) {
+      // Fall back to backup questions
+      return this.backupQuestions[Math.floor(Math.random() * this.backupQuestions.length)]
+    } else {
+      // If somehow both are unavailable, return a basic question
+      console.warn("No questions available, using fallback question")
+      return {
         type: "multiple-choice",
-        question: "What does the 'DOM' stand for in web development?",
-        options: ["Document Object Model", "Data Object Model", "Document Oriented Markup", "Digital Object Memory"],
-        correctAnswer: 0,
-      },
-      {
-        type: "multiple-choice",
-        question: "Which of these is NOT a JavaScript data type?",
-        options: ["String", "Boolean", "Integer", "Object"],
-        correctAnswer: 2,
-      },
-      {
-        type: "multiple-choice",
-        question: "What does CSS stand for?",
-        options: ["Computer Style Sheets", "Creative Style System", "Cascading Style Sheets", "Colorful Style Sheets"],
-        correctAnswer: 2,
-      },
-      {
-        type: "multiple-choice",
-        question: "Which symbol is used for single-line comments in JavaScript?",
-        options: ["//", "/* */", "#", "--"],
-        correctAnswer: 0,
-      },
-      {
-        type: "multiple-choice",
-        question: "What is the correct HTML element for the largest heading?",
-        options: ["<h1>", "<heading>", "<head>", "<h6>"],
-        correctAnswer: 0,
-      },
-
-      // Free response questions
-      {
-        type: "free-response",
-        question: "What JavaScript method is used to add an element to the end of an array?",
-        correctAnswer: "push",
-        acceptableAnswers: ["push", "push()", ".push", ".push()"],
-      },
-      {
-        type: "free-response",
-        question: "What HTML tag is used to create a hyperlink?",
-        correctAnswer: "a",
-        acceptableAnswers: ["a", "<a>", "a tag", "anchor", "<a></a>"],
-      },
-      {
-        type: "free-response",
-        question: "What CSS property is used to change the text color?",
-        correctAnswer: "color",
-        acceptableAnswers: ["color", "color:"],
-      },
-      {
-        type: "free-response",
-        question: "What JavaScript method is used to select an HTML element by its id?",
-        correctAnswer: "getElementById",
-        acceptableAnswers: [
-          "getElementById",
-          "document.getElementById",
-          "getElementById()",
-          "document.getElementById()",
+        question: "What is a stock?",
+        options: [
+          "A type of savings account",
+          "A share of ownership in a company",
+          "A type of bond",
+          "A government security"
         ],
-      },
-      {
-        type: "free-response",
-        question: "What is the JavaScript keyword used to declare a variable that cannot be reassigned?",
-        correctAnswer: "const",
-        acceptableAnswers: ["const", "const "],
-      },
-      {
-        type: "free-response",
-        question: "What is the CSS property to make text bold?",
-        correctAnswer: "font-weight",
-        acceptableAnswers: ["font-weight", "font-weight: bold", "font-weight:bold"],
-      },
-      {
-        type: "free-response",
-        question: "What method converts a JavaScript object to a JSON string?",
-        correctAnswer: "JSON.stringify",
-        acceptableAnswers: ["JSON.stringify", "stringify", "JSON.stringify()"],
-      },
-      {
-        type: "free-response",
-        question: "What is the HTML tag for creating a paragraph?",
-        correctAnswer: "p",
-        acceptableAnswers: ["p", "<p>", "p tag", "<p></p>"],
-      },
-    ]
-
-    return questions[Math.floor(Math.random() * questions.length)]
+        correctAnswer: 1
+      }
+    }
   }
 
   showQuiz(meteor) {
     this.isPaused = true
 
+    const question = meteor.spriteData.question
     const quizData = {
-      title: "Coding Challenge",
-      question: meteor.spriteData.question,
+      title: "Finance Challenge",
+      question: question.question,
+      type: question.type,
+      options: question.options,
+      correctAnswer: question.correctAnswer,
+      acceptableAnswers: question.acceptableAnswers
     }
 
-    this.quiz.openPanel(quizData, (isCorrect) => {
-      this.isPaused = false
+    const handleAnswer = (isCorrect) => {
+      console.log("Quiz callback received, isCorrect:", isCorrect) // Debug log
 
-      // Reward for correct answer
       if (isCorrect) {
-        this.updateScore(20) // Extra points for correct answer
+        // Now we can safely remove the meteor
+        const meteorIndex = this.meteors.indexOf(meteor)
+        if (meteorIndex > -1) {
+          this.removeMeteor(meteorIndex)
+        }
+
+        // Update score and questions using the dedicated methods
+        this.updateScore(20)
+        this.updateQuestions()
+        
+        console.log("Updated score:", this.score)
+        console.log("Questions answered:", this.questionsAnswered)
+        
+        // Check if all questions are answered
+        if (this.questionsAnswered >= this.totalQuestions && !this.hasKey) {
+          this.hasKey = true
+          this.showKeyReward()
+        }
 
         // 10% chance to get an extra life (up to max 5 lives)
         if (Math.random() < 0.1 && this.lives < 5) {
           this.updateLives(this.lives + 1)
-
-          // Show life gained message
-          const gameContainer = document.getElementById("gameContainer")
-          if (gameContainer) {
-            const lifeMsg = document.createElement("div")
-            lifeMsg.style.position = "absolute"
-            lifeMsg.style.top = "50%"
-            lifeMsg.style.left = "50%"
-            lifeMsg.style.transform = "translate(-50%, -50%)"
-            lifeMsg.style.color = "#00ff00"
-            lifeMsg.style.fontSize = "36px"
-            lifeMsg.style.fontWeight = "bold"
-            lifeMsg.style.textAlign = "center"
-            lifeMsg.style.zIndex = "1000"
-            lifeMsg.style.textShadow = "0 0 10px #00ff00"
-            lifeMsg.textContent = "EXTRA LIFE!"
-
-            gameContainer.appendChild(lifeMsg)
-
-            // Remove the message after 1.5 seconds
-            setTimeout(() => {
-              lifeMsg.remove()
-            }, 1500)
-          }
+          this.showLifeGainedMessage()
         }
       } else {
-        // No extra points for wrong answer
         this.updateScore(5)
+        
+        // Even if answer is wrong, remove the meteor so player can continue
+        const meteorIndex = this.meteors.indexOf(meteor)
+        if (meteorIndex > -1) {
+          this.removeMeteor(meteorIndex)
+        }
       }
-    })
+
+      // Force a display update
+      this.updateDisplay()
+      
+      // Wait a short moment before unpausing to avoid immediate collision with another meteor
+      setTimeout(() => {
+        this.isPaused = false
+      }, 300)
+    }
+
+    // Pass the pre-fetched question data directly to openPanel
+    this.quiz.openPanel(null, handleAnswer, quizData)
+  }
+
+  showKeyReward() {
+    const gameContainer = document.getElementById("gameContainer")
+    if (!gameContainer) return
+
+    // Set cookie with simpler attributes
+    const cookieValue = "meteorBlasterKey"
+    const cookieName = "gameKey"
+    
+    // Set the cookie with minimal attributes
+    document.cookie = `${cookieName}=${cookieValue}`
+    
+    // Debug log to check cookie
+    console.log("Attempting to set cookie...")
+    console.log("Cookie string:", document.cookie)
+    console.log("All cookies:", document.cookie.split(';'))
+    
+    // Verify cookie was set
+    const cookies = document.cookie.split(';')
+    const gameKeyCookie = cookies.find(cookie => cookie.trim().startsWith('gameKey='))
+    console.log("Game key cookie found:", gameKeyCookie)
+
+    const keyMsg = document.createElement("div")
+    keyMsg.style.position = "absolute"
+    keyMsg.style.top = "50%"
+    keyMsg.style.left = "50%"
+    keyMsg.style.transform = "translate(-50%, -50%)"
+    keyMsg.style.color = "#FFD700"
+    keyMsg.style.fontSize = "36px"
+    keyMsg.style.fontWeight = "bold"
+    keyMsg.style.textAlign = "center"
+    keyMsg.style.zIndex = "1000"
+    keyMsg.style.textShadow = "0 0 10px #FFD700"
+    keyMsg.style.backgroundColor = "rgba(0, 0, 0, 0.8)"
+    keyMsg.style.padding = "20px"
+    keyMsg.style.borderRadius = "10px"
+    keyMsg.style.border = "2px solid #FFD700"
+    keyMsg.innerHTML = `
+      🎉 CONGRATULATIONS! 🎉<br>
+      You've earned the key!<br>
+      <span style="font-size: 24px; color: #00FF00">Key: ${cookieValue}</span><br>
+      <span style="font-size: 20px; color: #FFA500">Page will refresh in 5 seconds...</span>
+    `
+
+    gameContainer.appendChild(keyMsg)
+
+    // Add countdown timer
+    let countdown = 5
+    const countdownInterval = setInterval(() => {
+      countdown--
+      keyMsg.querySelector('span:last-child').textContent = `Page will refresh in ${countdown} seconds...`
+      console.log(`Countdown: ${countdown} seconds remaining`)
+    }, 1000)
+
+    // Refresh the page after 5 seconds
+    console.log("Setting up refresh timer...")
+    setTimeout(() => {
+      console.log("Refresh timer triggered")
+      clearInterval(countdownInterval)
+      window.location.reload()
+    }, 5000)
+  }
+
+  showLifeGainedMessage() {
+    const gameContainer = document.getElementById("gameContainer")
+    if (!gameContainer) return
+
+    const lifeMsg = document.createElement("div")
+    lifeMsg.style.position = "absolute"
+    lifeMsg.style.top = "50%"
+    lifeMsg.style.left = "50%"
+    lifeMsg.style.transform = "translate(-50%, -50%)"
+    lifeMsg.style.color = "#00ff00"
+    lifeMsg.style.fontSize = "36px"
+    lifeMsg.style.fontWeight = "bold"
+    lifeMsg.style.textAlign = "center"
+    lifeMsg.style.zIndex = "1000"
+    lifeMsg.style.textShadow = "0 0 10px #00ff00"
+    lifeMsg.textContent = "EXTRA LIFE!"
+
+    gameContainer.appendChild(lifeMsg)
+
+    setTimeout(() => {
+      lifeMsg.remove()
+    }, 1500)
   }
 
   checkCollisions() {
     // Get player object
     const player = this.gameEnv.gameObjects.find((obj) => obj.spriteData && obj.spriteData.id === "Ufo")
     if (!player) return
+
+    // Don't check for new collisions if quiz is currently open
+    if (this.isPaused) return
 
     // Check for laser-meteor collisions
     for (let i = this.lasers.length - 1; i >= 0; i--) {
@@ -434,12 +704,14 @@ class GameLevelMeteorBlaster {
         const meteor = this.meteors[j]
 
         if (!meteor.isHit && this.isColliding(laser, meteor)) {
-          meteor.isHit = true
-          this.showQuiz(meteor)
-          this.updateScore(10)
-          this.removeMeteor(j)
-          this.removeLaser(i)
-          break
+          meteor.isHit = true;
+          // Remove the laser immediately
+          this.removeLaser(i);
+          // Don't remove the meteor until after the quiz is answered
+          this.showQuiz(meteor);
+          // Add some points for hitting the meteor
+          this.updateScore(10);
+          break;
         }
       }
     }

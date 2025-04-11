@@ -19,7 +19,6 @@ port_venv/
 verifyTools.md
 _notebooks/CSP/big-ideas/big-idea-3-part-1-fundamentals/Period3/2024-9-27-fundamentals-3.6.4.ipynb
 .vscode/
-.gitignore
 .bundle
 vendor/*
 package-lock.json

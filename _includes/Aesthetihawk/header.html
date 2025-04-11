@@ -373,10 +373,14 @@
             font-weight: bold;
         }
 
-        @media screen and (max-width: 800px) {
+        @media screen and (max-width: fit-content) {
             .site-title {
                 padding-right: 45px;
             }
+        }
+
+        .site-header .wrapper {
+            max-width: fit-content !important;
         }
 
         .site-title,

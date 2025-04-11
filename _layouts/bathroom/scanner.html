@@ -468,7 +468,7 @@ window.addEventListener('click', function(event) {
     }
 });
 
-const deleteOptions = { ...fetchOptions2, method: 'DELETE' };
+const deleteOptions = { ...fetchOptions2, method: 'POST' };
 
 function removeFromQueue() {
     fetch(javaURI + "/api/queue/removefront/" + teacherName, deleteOptions)

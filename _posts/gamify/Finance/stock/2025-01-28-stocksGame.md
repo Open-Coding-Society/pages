@@ -1,13 +1,10 @@
 ---
-layout: base
+layout: finance
 permalink: /stocks/game
 title: Stocks Game
 ---
 
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stocks Game - Simulate 5 Years</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -91,20 +88,6 @@ title: Stocks Game
         }
     </style>
 
-</head>
-<body>
-    <nav class="navbar">
-        <div class="nav-buttons">
-            <a href="{{site.baseurl}}/stocks/home">Home</a>
-            <a href="{{site.baseurl}}/crypto/portfolio">Crypto</a>
-            <a href="{{site.baseurl}}/stocks/viewer">Stocks</a>
-            <a href="{{site.baseurl}}/crypto/mining">Mining</a>
-            <a href="{{site.baseurl}}/stocks/buysell">Buy/Sell</a>
-            <a href="{{site.baseurl}}/crypto/leaderboard">Leaderboard</a>
-            <a href="{{site.baseurl}}/stocks/game">Game</a>
-            <a href="{{site.baseurl}}/stocks/portfolio">Portfolio</a>
-        </div>
-    </nav>
     <div class="container">
         <h1>Stock Market Simulation Game</h1>
         <p>Pick stocks and simulate their growth over 5 years!</p>
@@ -299,6 +282,4 @@ window.onload = getUserBalance;
     window.submitStocks = submitStocks;
 
 </script>
-
-</body>
 </html>

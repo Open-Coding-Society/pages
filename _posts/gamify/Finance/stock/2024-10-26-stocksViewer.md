@@ -1,13 +1,10 @@
 ---
-layout: base
+layout: finance
 permalink: /stocks/viewer
 title: Stocks Viewer
 ---
 
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* CSS Styles */
@@ -141,22 +138,7 @@ title: Stocks Viewer
       height: 375px !important; /* Sets the height for the chart */
     }
   </style>
-</head>
-<body>
 
-  <!-- Navigation Bar -->
-<nav class="navbar">
-    <div class="nav-buttons">
-        <a href="{{site.baseurl}}/stocks/home">Home</a>
-        <a href="{{site.baseurl}}/crypto/portfolio">Crypto</a>
-        <a href="{{site.baseurl}}/stocks/viewer">Stocks</a>
-        <a href="{{site.baseurl}}/crypto/mining">Mining</a>
-        <a href="{{site.baseurl}}/stocks/buysell">Buy/Sell</a>
-        <a href="{{site.baseurl}}/crypto/leaderboard">Leaderboard</a>
-        <a href="{{site.baseurl}}/stocks/game">Game</a>
-        <a href="{{site.baseurl}}/stocks/portfolio">Portfolio</a>
-    </div>
-</nav>
 
   <!-- Stock Dashboard -->
   <div class="container">
@@ -392,176 +374,158 @@ title: Stocks Viewer
     let currentlySelectedStock = null; 
     let stockChart;
 
-async function selectStock(stock) {
-    if (currentlySelectedStock) {
-        currentlySelectedStock.classList.remove("selected");
-    }
-
-    const selectedStockElement = document.querySelector(`.stock-item[onclick="selectStock('${stock}')"]`);
-    if (selectedStockElement) {
-        selectedStockElement.classList.add("selected");
-        currentlySelectedStock = selectedStockElement;
-    }
-
-    try {
-        const response = await fetch(javaURI + `/api/stocks/${stock}`);
-        const data = await response.json();
-
-        const stockName = data?.chart?.result?.[0]?.meta?.longName;
-        const stockPrice = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-        const percentChange = await getPercentChange(stock);
-
-        document.getElementById('stock-name').textContent = `${stockName} (${stock})`;
-        document.getElementById('stock-symbol').textContent = `NASDAQ: ${stock}`;
-        document.getElementById('stock-price').textContent = `$${stockPrice.toFixed(2)}`;
-
-        const changeElement = document.getElementById('stock-change');
-        changeElement.textContent = `${percentChange}%`;
-        if (percentChange < 0) {
-            changeElement.classList.add("negative");
-            changeElement.classList.remove("positive");
-        } else {
-            changeElement.classList.add("positive");
-            changeElement.classList.remove("negative");
+    // Make selectStock globally accessible
+    window.selectStock = async function(stock) {
+        if (currentlySelectedStock) {
+            currentlySelectedStock.classList.remove("selected");
         }
 
-        const volume = data?.chart?.result?.[0]?.meta?.regularMarketVolume;
-        const dayHigh = data?.chart?.result?.[0]?.meta?.regularMarketDayHigh;
-        const dayLow = data?.chart?.result?.[0]?.meta?.regularMarketDayLow;
-        const yearHigh = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekHigh;
-        const yearLow = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekLow;
-
-        document.getElementById('volume').textContent = volume ? volume.toLocaleString() : 'N/A';
-
-        document.getElementById('day-high').textContent = dayHigh ? `$${dayHigh.toFixed(2)}` : 'N/A';
-        document.getElementById('year-high').textContent = dayHigh ? `$${yearHigh.toFixed(2)}` : 'N/A';
-
-        document.getElementById('day-low').textContent = dayLow ? `$${dayLow.toFixed(2)}` : 'N/A';
-        document.getElementById('year-low').textContent = dayLow ? `$${yearLow.toFixed(2)}` : 'N/A';
-
-
-
-        const timestamps = data?.chart?.result?.[0]?.timestamp;
-        const prices = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
-        if (timestamps && prices) {
-            const labels = timestamps.map(ts => new Date(ts * 1000).toLocaleString());
-            displayChart(labels, prices, stock);
+        const selectedStockElement = document.querySelector(`.stock-item[onclick="selectStock('${stock}')"]`);
+        if (selectedStockElement) {
+            selectedStockElement.classList.add("selected");
+            currentlySelectedStock = selectedStockElement;
         }
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-    }
-}
 
-
-
-async function getStockData(stockSymbol) {
-    try {
-        const response = await fetch(javaURI + `/api/stocks/${stockSymbol}`);
-        const data = await response.json();
-
-        // Extract relevant information for metrics
-        const volume = data?.chart?.result?.[0]?.meta?.regularMarketVolume || "N/A";
-        const dayHigh = data?.chart?.result?.[0]?.meta?.regularMarketDayHigh || "N/A";
-        const dayLow = data?.chart?.result?.[0]?.meta?.regularMarketDayLow || "N/A";
-        const yearHigh = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekHigh || "N/A";
-        const yearLow = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekLow || "N/A";
-
-        // Update metric elements
-        document.getElementById("volume").textContent = volume;
-        document.getElementById("day-high").textContent = `$${dayHigh}`;
-        document.getElementById("day-low").textContent = `$${dayLow}`;
-        document.getElementById("year-high").textContent = `$${yearHigh}`;
-        document.getElementById("year-low").textContent = `$${yearLow}`;
-
-        // Extract timestamps and prices for chart
-        const timestamps = data?.chart?.result?.[0]?.timestamp || [];
-        const prices = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-
-        if (timestamps.length && prices.length) {
-            const labels = timestamps.map(ts => new Date(ts * 1000).toLocaleString());
-            displayChart(labels, prices, stockSymbol);
-        } else {
-            console.error(`Data not found for ${stockSymbol}`);
-        }
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-    }
-}
-
-function displayChart(labels, prices, tickerSymbol) {
-    const ctx = document.getElementById('stockChart').getContext('2d');
-
-    // Destroy the old chart if it exists
-    if (stockChart) {
-        stockChart.destroy();
-    }
-
-    // Create a gradient fill
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(106, 13, 173, 0.6)'); // Purple start
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)'); // Transparent end
-
-    // Create a new chart
-    stockChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: tickerSymbol.toUpperCase(),
-                data: prices,
-                borderColor: '#001f3f',
-                borderWidth: 2,
-                fill: true,
-                backgroundColor: gradient,
-                spanGaps: true,
-                pointRadius: 0,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { mode: 'index', intersect: false }
-            },
-            scales: {
-                x: {
-                    title: { display: true, text: 'Timestamp' },
-                    ticks: {
-                        callback: function(value) {
-                            return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        }
-                    }
-                },
-                y: {
-                    title: { display: true, text: 'Price (USD)' }
-                }
-            }
-        }
-    });
-}
-
-async function getStockPrice(stock) {
         try {
             const response = await fetch(javaURI + `/api/stocks/${stock}`);
             const data = await response.json();
-            console.log(data);
-            const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-            //const outputElement = document.getElementById("output");
-            if (price !== undefined) {
-                //outputElement.textContent = `The price of ${stock} is: $${price}`;
-                return(price)
+
+            const stockName = data?.chart?.result?.[0]?.meta?.longName;
+            const stockPrice = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+            const percentChange = await getPercentChange(stock);
+
+            document.getElementById('stock-name').textContent = `${stockName} (${stock})`;
+            document.getElementById('stock-symbol').textContent = `NASDAQ: ${stock}`;
+            document.getElementById('stock-price').textContent = `$${stockPrice.toFixed(2)}`;
+
+            const changeElement = document.getElementById('stock-change');
+            changeElement.textContent = `${percentChange}%`;
+            if (percentChange < 0) {
+                changeElement.classList.add("negative");
+                changeElement.classList.remove("positive");
             } else {
-                outputElement.textContent = `Price not found for ${stock}.`;
-                console.error(`Price not found for ${stock}. Response structure:`, data);
+                changeElement.classList.add("positive");
+                changeElement.classList.remove("negative");
+            }
+
+            const volume = data?.chart?.result?.[0]?.meta?.regularMarketVolume;
+            const dayHigh = data?.chart?.result?.[0]?.meta?.regularMarketDayHigh;
+            const dayLow = data?.chart?.result?.[0]?.meta?.regularMarketDayLow;
+            const yearHigh = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekHigh;
+            const yearLow = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekLow;
+
+            document.getElementById('volume').textContent = volume ? volume.toLocaleString() : 'N/A';
+            document.getElementById('day-high').textContent = dayHigh ? `$${dayHigh.toFixed(2)}` : 'N/A';
+            document.getElementById('year-high').textContent = yearHigh ? `$${yearHigh.toFixed(2)}` : 'N/A';
+            document.getElementById('day-low').textContent = dayLow ? `$${dayLow.toFixed(2)}` : 'N/A';
+            document.getElementById('year-low').textContent = yearLow ? `$${yearLow.toFixed(2)}` : 'N/A';
+
+            const timestamps = data?.chart?.result?.[0]?.timestamp;
+            const prices = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+            if (timestamps && prices) {
+                const labels = timestamps.map(ts => new Date(ts * 1000).toLocaleString());
+                displayChart(labels, prices, stock);
             }
         } catch (error) {
             console.error('Error fetching stock data:', error);
-            document.getElementById("output").textContent = "Error fetching stock data. Please try again later.";
         }
-}
-        async function getPercentChange(stock) {
+    };
+
+    // Make other functions globally accessible
+    window.getStockPrice = getStockPrice;
+    window.getPercentChange = getPercentChange;
+    window.updateStockPrices = updateStockPrices;
+    window.initializeStockSelection = initializeStockSelection;
+
+    async function getStockData(stockSymbol) {
+        try {
+            const response = await fetch(javaURI + `/api/stocks/${stockSymbol}`);
+            const data = await response.json();
+
+            // Extract relevant information for metrics
+            const volume = data?.chart?.result?.[0]?.meta?.regularMarketVolume || "N/A";
+            const dayHigh = data?.chart?.result?.[0]?.meta?.regularMarketDayHigh || "N/A";
+            const dayLow = data?.chart?.result?.[0]?.meta?.regularMarketDayLow || "N/A";
+            const yearHigh = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekHigh || "N/A";
+            const yearLow = data?.chart?.result?.[0]?.meta?.fiftyTwoWeekLow || "N/A";
+
+            // Update metric elements
+            document.getElementById("volume").textContent = volume;
+            document.getElementById("day-high").textContent = `$${dayHigh}`;
+            document.getElementById("day-low").textContent = `$${dayLow}`;
+            document.getElementById("year-high").textContent = `$${yearHigh}`;
+            document.getElementById("year-low").textContent = `$${yearLow}`;
+
+            // Extract timestamps and prices for chart
+            const timestamps = data?.chart?.result?.[0]?.timestamp || [];
+            const prices = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+
+            if (timestamps.length && prices.length) {
+                const labels = timestamps.map(ts => new Date(ts * 1000).toLocaleString());
+                displayChart(labels, prices, stockSymbol);
+            } else {
+                console.error(`Data not found for ${stockSymbol}`);
+            }
+        } catch (error) {
+            console.error('Error fetching stock data:', error);
+        }
+    }
+
+    function displayChart(labels, prices, tickerSymbol) {
+        const ctx = document.getElementById('stockChart').getContext('2d');
+
+        // Destroy the old chart if it exists
+        if (stockChart) {
+            stockChart.destroy();
+        }
+
+        // Create a gradient fill
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(106, 13, 173, 0.6)'); // Purple start
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)'); // Transparent end
+
+        // Create a new chart
+        stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: tickerSymbol.toUpperCase(),
+                    data: prices,
+                    borderColor: '#001f3f',
+                    borderWidth: 2,
+                    fill: true,
+                    backgroundColor: gradient,
+                    spanGaps: true,
+                    pointRadius: 0,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Timestamp' },
+                        ticks: {
+                            callback: function(value) {
+                                return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            }
+                        }
+                    },
+                    y: {
+                        title: { display: true, text: 'Price (USD)' }
+                    }
+                }
+            }
+        });
+    }
+
+    async function getPercentChange(stock) {
         try {
             const response = await fetch(javaURI + `/api/stocks/${stock}`);
             const data = await response.json();
@@ -581,70 +545,81 @@ async function getStockPrice(stock) {
             console.error('Error fetching stock data:', error);
             document.getElementById("output").textContent = "Error fetching stock data. Please try again later.";
         }
-
-return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(prices[symbol]);
-                }, 0); // Simulate network delay
-            }); 
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-            updateStockPrices(); // Call the function after DOM is fully loaded
-            initializeStockSelection();
-        });
-        
-function initializeStockSelection() {
-    selectStock('AAPL'); // Automatically selects and loads data for Apple
-}
-
-async function updateStockPrices() {
-  const tickerSymbols = [
-  'AAPL', 'GOOG', 'AMZN', 'MSFT', 'TSLA', 'NFLX', 'META', 'NVDA', 'BABA', 'V', 'IRTC', 'HOLX', 'MA', 'DIS', 'ADBE', 'PYPL', 'INTC', 'ORCL', 'IBM', 'AMD', 'SQ', 'SHOP', 'SPY', 'BA', 'KO', 'PEP', 'XOM', 'CVX', 'WMT', 'T', 'JNJ', 'MRNA', 'PFE', 'COST', 'LULU'];
-  const tickerPrices = [];
-  let counter = 0;
-
-  for (const stock of tickerSymbols) {
-    const price = await getStockPrice(stock);
-    const percentChange = await getPercentChange(stock);
-    tickerPrices.push(price);
-
-    const priceElement = document.getElementById(`${tickerSymbols[counter]}price`);
-    const changeElement = document.getElementById(`${tickerSymbols[counter]}change`);
-
-    if (priceElement) {
-      priceElement.textContent = `$${price}`;
-    } else {
-      console.error(`Element with ID ${stock}price not found.`);
     }
 
-    if (changeElement) {
-      changeElement.textContent = `${percentChange}%`;
-      
-      // Update class based on whether percentChange is positive or negative
-      if (percentChange < 0) {
-        changeElement.classList.add("negative");
-        changeElement.classList.remove("positive");
-      } else {
-        changeElement.classList.add("positive");
-        changeElement.classList.remove("negative");
-      }
-    } else {
-      console.error(`Element with ID ${stock}change not found.`);
-    }
-
-    counter++;
-  }
-}
-async function logout() {
-            userID = "";
-            console.log(userID);
-            localStorage.setItem('userID', userID)
-            return(userID);   
+    async function getStockPrice(stock) {
+        try {
+            const response = await fetch(javaURI + `/api/stocks/${stock}`);
+            const data = await response.json();
+            const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+            if (price !== undefined) {
+                return price;
+            } else {
+                console.error(`Price not found for ${stock}. Response structure:`, data);
+                return "N/A";
+            }
+        } catch (error) {
+            console.error('Error fetching stock data:', error);
+            return "N/A";
         }
+    }
+
+    // Add event listener for when the page loads
+    document.addEventListener("DOMContentLoaded", () => {
+        updateStockPrices(); // Update all stock prices in sidebar
+        initializeStockSelection(); // Select AAPL by default
+    });
+
+    function initializeStockSelection() {
+        selectStock('AAPL'); // Automatically selects and loads data for Apple
+    }
+
+    async function updateStockPrices() {
+      const tickerSymbols = [
+      'AAPL', 'GOOG', 'AMZN', 'MSFT', 'TSLA', 'NFLX', 'META', 'NVDA', 'BABA', 'V', 'IRTC', 'HOLX', 'MA', 'DIS', 'ADBE', 'PYPL', 'INTC', 'ORCL', 'IBM', 'AMD', 'SQ', 'SHOP', 'SPY', 'BA', 'KO', 'PEP', 'XOM', 'CVX', 'WMT', 'T', 'JNJ', 'MRNA', 'PFE', 'COST', 'LULU'];
+      const tickerPrices = [];
+      let counter = 0;
+
+      for (const stock of tickerSymbols) {
+        const price = await getStockPrice(stock);
+        const percentChange = await getPercentChange(stock);
+        tickerPrices.push(price);
+
+        const priceElement = document.getElementById(`${tickerSymbols[counter]}price`);
+        const changeElement = document.getElementById(`${tickerSymbols[counter]}change`);
+
+        if (priceElement) {
+          priceElement.textContent = `$${price}`;
+        } else {
+          console.error(`Element with ID ${stock}price not found.`);
+        }
+
+        if (changeElement) {
+          changeElement.textContent = `${percentChange}%`;
+          
+          // Update class based on whether percentChange is positive or negative
+          if (percentChange < 0) {
+            changeElement.classList.add("negative");
+            changeElement.classList.remove("positive");
+          } else {
+            changeElement.classList.add("positive");
+            changeElement.classList.remove("negative");
+          }
+        } else {
+          console.error(`Element with ID ${stock}change not found.`);
+        }
+
+        counter++;
+      }
+    }
+    async function logout() {
+                userID = "";
+                console.log(userID);
+                localStorage.setItem('userID', userID)
+                return(userID);   
+            }
 
 
   </script>
 
-</body>
 </html>

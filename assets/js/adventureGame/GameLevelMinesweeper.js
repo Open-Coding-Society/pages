@@ -106,7 +106,23 @@ class GameLevelMinesweeper {
     addEventListeners() {
         // Store bound event handlers so we can remove them later
         this.handleClick = (e) => {
-            if (this.gameOver) return;
+            if (this.gameOver) {
+                // Check if click is on Play Again button
+                const buttonWidth = 200;
+                const buttonHeight = 50;
+                const buttonX = this.width/2 - buttonWidth/2;
+                const buttonY = this.height/2 + 80;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (x >= buttonX && x <= buttonX + buttonWidth &&
+                    y >= buttonY && y <= buttonY + buttonHeight) {
+                    this.resetGame();
+                }
+                return;
+            }
             
             const rect = this.canvas.getBoundingClientRect();
             const x = e.clientX - rect.left - this.gridX;
@@ -416,6 +432,17 @@ class GameLevelMinesweeper {
 
     destroy() {
         this.cleanup();
+    }
+
+    resetGame() {
+        // Reset game state
+        this.gameOver = false;
+        this.won = false;
+        this.score = 0;
+        this.firstClick = true;
+        
+        // Reinitialize the grid
+        this.initializeGrid();
     }
 }
 

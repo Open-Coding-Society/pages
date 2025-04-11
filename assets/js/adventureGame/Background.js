@@ -32,7 +32,7 @@ export class Background extends GameObject {
             this.canvas.style.position = "absolute";
             this.canvas.style.zIndex = this.data.zIndex || "0";
             this.canvas.id = data.id || "background";
-            this.ctx = this.canvas.getContext("2d");
+            this.ctx = this.canvas.getContext("2d", { willReadFrequently: true });
             
             // Align the canvas size to the gameCanvas
             this.alignCanvas();

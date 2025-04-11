@@ -1,5 +1,4 @@
-import gameControlInstance from "./GameControl.js";
-
+import Game from "./Game.js";
 class Quiz {
     constructor() {
         this.isOpen = false;
@@ -7,6 +6,7 @@ class Quiz {
         this.currentNpc = null;
         this.currentPage = 0;
         this.injectStyles(); // Inject CSS styles dynamically
+        this.answeredQuestionsByNpc = {}; 
     }
 
     // Inject CSS styles directly into the document
@@ -291,22 +291,36 @@ class Quiz {
             const dimDiv = document.createElement("div");
             dimDiv.id = "dim";
             document.body.append(dimDiv);
-            dimDiv.addEventListener("click", this.backgroundDim.remove); // Click off to close
+            dimDiv.addEventListener("click", () => {
+                this.closePanel();
+            });
         },
 
         remove: () => {
             this.dim = false;
             const dimDiv = document.getElementById("dim");
             if (dimDiv) dimDiv.remove();
-            this.isOpen = false;
-            document.getElementById("promptTitle").style.display = "none";
+            
+            // Don't directly modify isOpen here - let closePanel handle that
+            const promptTitle = document.getElementById("promptTitle");
+            if (promptTitle) promptTitle.style.display = "none";
+            
             const promptDropDown = document.getElementById("promptDropDown");
-            promptDropDown.style.width = "0"; 
-            promptDropDown.style.top = "0";  
-            promptDropDown.style.left = "-100%"; 
-            promptDropDown.style.transition = "all 0.3s ease-in-out";
-            // Also remove the spin class for next time
-            promptDropDown.classList.remove("celebration-spin");
+            if (promptDropDown) {
+                // Reset the position but don't remove it completely
+                promptDropDown.style.opacity = "0";
+                promptDropDown.classList.remove("celebration-spin");
+                
+                // Use setTimeout to ensure the closing animation completes
+                setTimeout(() => {
+                    if (this.isOpen === false) {
+                        // Only reset the position if the panel is actually closed
+                        promptDropDown.style.top = "0";
+                        promptDropDown.style.left = "-100%";
+                        promptDropDown.style.width = "0";
+                    }
+                }, 300);
+            }
         },
     };
 
@@ -325,49 +339,70 @@ class Quiz {
     }
 
     updateTable() {
-        const table = this.createDisplayTable();
-        if (this.currentNpc && this.currentNpc.questions) {
-            this.currentNpc.questions.forEach((question, index) => {
-                const row = document.createElement("tr");
+        const table = document.createElement("table");
+        table.className = "quiz-table";
 
-                const questionCell = document.createElement("td");
-                questionCell.innerText = `${index + 1}. ${question}`;
-                row.appendChild(questionCell);
+        // Create question row
+        const questionRow = document.createElement("tr");
+        const questionCell = document.createElement("td");
+        questionCell.colSpan = 2;
+        questionCell.innerHTML = this.currentNpc?.question || "No question available";
+        questionRow.appendChild(questionCell);
+        table.appendChild(questionRow);
 
-                const inputCell = document.createElement("td");
-                const input = document.createElement("input");
-                input.type = "text";
-                input.placeholder = "Your answer...";
-                input.dataset.questionIndex = index;
-                input.className = "quiz-input";
-                inputCell.appendChild(input);
-                row.appendChild(inputCell);
-                table.appendChild(row);
+        // Create answer input based on question type
+        const answerRow = document.createElement("tr");
+        const answerCell = document.createElement("td");
+        answerCell.colSpan = 2;
+
+        if (this.currentNpc?.type === "multiple-choice") {
+            // Create radio buttons for multiple choice
+            this.currentNpc.options.forEach((option, index) => {
+                const optionDiv = document.createElement("div");
+                optionDiv.style.marginBottom = "10px";
+                
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "answer";
+                radio.value = index;
+                radio.id = `option${index}`;
+                
+                const label = document.createElement("label");
+                label.htmlFor = `option${index}`;
+                label.textContent = option;
+                label.style.marginLeft = "10px";
+                
+                optionDiv.appendChild(radio);
+                optionDiv.appendChild(label);
+                answerCell.appendChild(optionDiv);
             });
-
-            // Submit button row
-            const submitRow = document.createElement("tr");
-            const submitCell = document.createElement("td");
-            submitCell.colSpan = 2;
-            submitCell.style.textAlign = "center";
-
-            const submitButton = document.createElement("button");
-            submitButton.innerText = "Submit";
-            submitButton.className = "quiz-submit";
-            submitButton.addEventListener("click", this.handleSubmit.bind(this));
-
-            submitCell.appendChild(submitButton);
-            submitRow.appendChild(submitCell);
-            table.appendChild(submitRow);
         } else {
-            const row = document.createElement("tr");
-            const noQuestionsCell = document.createElement("td");
-            noQuestionsCell.colSpan = 2;
-            noQuestionsCell.innerText = "No questions available.";
-            row.appendChild(noQuestionsCell);
-            table.appendChild(row);
+            // Create text input for free response
+            const input = document.createElement("input");
+            input.type = "text";
+            input.className = "quiz-input";
+            input.placeholder = "Type your answer here...";
+            answerCell.appendChild(input);
         }
 
+        answerRow.appendChild(answerCell);
+        table.appendChild(answerRow);
+
+        // Create submit button
+        const submitRow = document.createElement("tr");
+        const submitCell = document.createElement("td");
+        submitCell.colSpan = 2;
+        submitCell.style.textAlign = "center";
+
+        const submitButton = document.createElement("button");
+        submitButton.className = "quiz-submit";
+        submitButton.textContent = "Submit Answer";
+        submitButton.onclick = () => this.handleSubmit();
+        submitCell.appendChild(submitButton);
+        submitRow.appendChild(submitCell);
+        table.appendChild(submitRow);
+
+        // Wrap the table in a container div
         const container = document.createElement("div");
         container.className = "quiz-content";
         container.appendChild(table);
@@ -439,50 +474,86 @@ class Quiz {
         // Wait half a second so the star confetti starts
         // after the squares, creating a 2-wave effect
     }
-
-    handleSubmit() {
-        const inputs = document.querySelectorAll(".quiz-input");
-        const answers = Array.from(inputs).map(input => ({
-            questionIndex: input.dataset.questionIndex,
-            answer: input.value.trim()
-        }));
-        console.log("Submitted Answers:", answers);
-
-        // Trigger multi-wave confetti
-        this.triggerConfetti();
-
-        // Make the quiz container do a "celebration spin"
-        const promptDropDown = document.getElementById("promptDropDown");
-        promptDropDown.classList.add("celebration-spin");
-
-        alert("Your answers have been submitted!");
-        this.isOpen = false;
-        this.backgroundDim.remove();
-    }
-
-    openPanel(npc) {
-        const promptDropDown = document.querySelector('.promptDropDown');
-        const promptTitle = document.getElementById("promptTitle");
+    async openPanel(npcData, callback, preFetchedQuestions = null) {
+        console.log("Opening quiz panel with data:", npcData);
     
         if (this.isOpen) {
-            this.backgroundDim.remove();
+            this.closePanel();
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
     
-        // Reset the styles to ensure the panel is visible
-        promptDropDown.style.width = "50%";
-        promptDropDown.style.top = "15%";
-        promptDropDown.style.left = "50%";
-        promptDropDown.style.transition = "none"; // Reset transition if necessary
+        let promptDropDown = document.getElementById("promptDropDown");
+        if (!promptDropDown) {
+            this.initialize();
+            promptDropDown = document.getElementById("promptDropDown");
+        } else {
+            promptDropDown.innerHTML = "";
+        }
     
-        this.currentNpc = npc;
         this.isOpen = true;
-        promptDropDown.innerHTML = "";
     
-        promptTitle.style.display = "block";
-        promptTitle.innerHTML = npc?.title || "Quiz Time!";
-        promptDropDown.appendChild(promptTitle);
+        let formattedQuestion;
+        try {
+            const questionList = preFetchedQuestions ??
+                (await Game.fetchQuestionByCategory(npcData)).questions;
     
-        /* Wrap the entire content in a "scroll-edge" container for theming */
+            if (!questionList || questionList.length === 0) {
+                console.error("No questions found for category:", npcData);
+                this.isOpen = false;
+                return;
+            }
+    
+            if (!this.answeredQuestionsByNpc[npcData]) {
+                this.answeredQuestionsByNpc[npcData] = new Set();
+            }
+            const answered = this.answeredQuestionsByNpc[npcData];
+    
+            const availableQuestions = questionList.filter(
+                q => !answered.has(q.question.id)
+            );
+    
+            if (availableQuestions.length === 0) {
+                alert("You've answered all available questions from this NPC!");
+                this.isOpen = false;
+                return;
+            }
+    
+            const questionEntry = availableQuestions[0];
+    
+            formattedQuestion = {
+                title: npcData + " Quiz",
+                npcCategory: npcData,
+                question: questionEntry.question.content,
+                type: "multiple-choice",
+                options: questionEntry.choices.map(c => c.choice),
+                correctAnswer: questionEntry.choices.findIndex(c => c.is_correct),
+                questionId: questionEntry.question.id,
+                choiceIds: questionEntry.choices.map(c => c.id)
+            };
+        } catch (error) {
+            console.error("Error fetching question:", error);
+            this.isOpen = false;
+            return;
+        }
+    
+        this.currentNpc = formattedQuestion;
+        this.callback = callback;
+    
+        // Setup quiz UI
+        promptDropDown.style.display = "block";
+        promptDropDown.style.position = "fixed";
+        promptDropDown.style.width = "50%";
+        promptDropDown.style.left = "50%";
+        promptDropDown.style.top = "15%";
+        promptDropDown.style.transform = "translateX(-50%)";
+        promptDropDown.style.zIndex = "9999";
+    
+        const newPromptTitle = document.createElement("div");
+        newPromptTitle.id = "promptTitle";
+        newPromptTitle.style.display = "block";
+        newPromptTitle.innerHTML = formattedQuestion.title;
+        promptDropDown.appendChild(newPromptTitle);
+    
         const scrollEdge = document.createElement("div");
         scrollEdge.className = "scroll-edge";
         scrollEdge.appendChild(this.updateTable());
@@ -492,11 +563,131 @@ class Quiz {
         promptDropDown.classList.add("quiz-popup");
     }
     
+    
 
-    initialize() {
+    async handleSubmit() {
+        let isCorrect = false;
+        const submitButton = document.querySelector(".quiz-submit");
+        const questionType = this.currentNpc?.type;
+        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+    
+        if (questionType === "multiple-choice") {
+            if (selectedAnswer) {
+                const answerIndex = parseInt(selectedAnswer.value);
+                isCorrect = answerIndex === this.currentNpc.correctAnswer;
+    
+                const questionId = this.currentNpc.questionId; 
+                const choiceId = this.currentNpc.choiceIds?.[answerIndex]; 
+                const personId = Game.id;
+    
+                try {
+                    if (questionId && choiceId && personId) {
+                        await Game.updateStatsMCQ(questionId, choiceId, personId);
+                        Game.fetchStats(personId); 
+                    } else {
+                        console.error("Missing required data for MCQ submission:", { questionId, choiceId, personId });
+                    }
+                } catch (error) {
+                    console.error("Error updating MCQ stats:", error);
+                }
+            }
+        } else {
+            const answerInput = document.querySelector(".quiz-input");
+            if (answerInput) {
+                const userAnswer = answerInput.value.trim().toLowerCase();
+                isCorrect = this.currentNpc.acceptableAnswers.some(
+                    answer => answer.toLowerCase() === userAnswer
+                );
+            }
+        }
+    
+        // Visual feedback
+        submitButton.style.backgroundColor = isCorrect ? "#2ecc71" : "#e74c3c";
+        submitButton.textContent = isCorrect ? "Correct!" : "Try Again";
+        submitButton.disabled = true;
+    
+        if (isCorrect) this.triggerConfetti();
+    
+        const callback = this.callback;
+        const npcCategory = this.currentNpc?.npcCategory;
+    
+        if (isCorrect && npcCategory) {
+            if (!this.answeredQuestionsByNpc[npcCategory]) {
+                this.answeredQuestionsByNpc[npcCategory] = new Set();
+            }
+            this.answeredQuestionsByNpc[npcCategory].add(this.currentNpc.questionId);
+        }
+        
+    
+        setTimeout(() => {
+            if (callback) callback(isCorrect);
+    
+            // Chain next question if available
+            if (npcCategory) {
+                this.openPanel(npcCategory, callback);
+            } else {
+                this.closePanel();
+            }
+        }, 1500);
+    }
+    
+    
+
+    closePanel() {
+        const promptDropDown = document.querySelector('.promptDropDown');
+        const submitButton = document.querySelector(".quiz-submit");
+        
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.style.backgroundColor = "#2ecc71";
+            submitButton.textContent = "Submit Answer";
+        }
+
+        this.backgroundDim.remove();
+        promptDropDown.classList.remove("quiz-popup");
+        
+        // Clear the content of the promptDropDown
+        promptDropDown.innerHTML = "";
+        
+        // Reset properties so the quiz can be shown again
+        this.isOpen = false;
+        this.callback = null;
+        this.currentNpc = null;
+        
+        // Restore the title element
         const promptTitle = document.createElement("div");
         promptTitle.id = "promptTitle";
-        document.getElementById("promptDropDown").appendChild(promptTitle);
+        promptTitle.style.display = "none";
+        promptDropDown.appendChild(promptTitle);
+    }
+
+    initialize() {
+        // Check if promptDropDown exists, if not create it
+        let promptDropDown = document.getElementById("promptDropDown");
+        if (!promptDropDown) {
+            promptDropDown = document.createElement("div");
+            promptDropDown.id = "promptDropDown";
+            promptDropDown.className = "promptDropDown";
+            promptDropDown.style.zIndex = "9999";
+            document.getElementById("gameContainer").appendChild(promptDropDown);
+        }
+
+        // Ensure promptDropDown has necessary styles
+        promptDropDown.style.position = "fixed";
+        promptDropDown.style.width = "50%";
+        promptDropDown.style.left = "50%";
+        promptDropDown.style.top = "15%";
+        promptDropDown.style.transform = "translateX(-50%)";
+        promptDropDown.style.zIndex = "9999";
+
+        // Create the title element if it doesn't exist
+        let promptTitle = document.getElementById("promptTitle");
+        if (!promptTitle) {
+            promptTitle = document.createElement("div");
+            promptTitle.id = "promptTitle";
+            promptTitle.style.display = "none";
+            promptDropDown.appendChild(promptTitle);
+        }
     }
 }
 

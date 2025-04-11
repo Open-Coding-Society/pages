@@ -269,20 +269,80 @@ class GameLevelDesert {
       interact: function() {
         // Set a primary game reference from the game environment
         let primaryGame = gameEnv.gameControl;
-        // Define the game in game level
         let levelArray = [GameLevelStarWars];
-        // Define a new GameControl instance with the StarWars level
-        let gameInGame = new GameControl(gameEnv.game,levelArray);
-        // Pause the primary game 
+        let gameInGame = new GameControl(gameEnv.game, levelArray);
         primaryGame.pause();
-        // Start the game in game
-        gameInGame.start();
-        // Setup "callback" function to allow transition from game in gaame to the underlying game
-        gameInGame.gameOver = function() {
-          // Call .resume on primary game
-          primaryGame.resume();
-        }
-      }
+    
+        // Create and style the fade overlay
+        const fadeOverlay = document.createElement('div');
+        Object.assign(fadeOverlay.style, {
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            width: width + 'px',
+            height: height + 'px',
+            backgroundColor: '#0a0a1a',
+            opacity: '0',
+            transition: 'opacity 1s ease-in-out',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            fontFamily: "'Orbitron', sans-serif",
+            color: 'white',
+            fontSize: '18px',
+            zIndex: '9999'
+        });
+    
+        const loadingText = document.createElement('div');
+        loadingText.textContent = 'Loading...';
+        fadeOverlay.appendChild(loadingText);
+    
+        const loadingBar = document.createElement('div');
+        loadingBar.style.marginTop = '10px';
+        loadingBar.style.fontFamily = 'monospace';
+        loadingBar.textContent = '';
+        fadeOverlay.appendChild(loadingBar);
+    
+        document.body.appendChild(fadeOverlay);
+    
+        // Fade in
+        requestAnimationFrame(() => {
+            fadeOverlay.style.opacity = '1';
+        });
+    
+        // Simulate loading bar
+        const totalDuration = 1000; // 1 second
+        const interval = 100;
+        const totalSteps = totalDuration / interval;
+        let currentStep = 0;
+    
+        const loadingInterval = setInterval(() => {
+            currentStep++;
+            loadingBar.textContent += '|';
+            if (currentStep >= totalSteps) {
+                clearInterval(loadingInterval);
+            }
+        }, interval);
+    
+        // After loading and fade-in, start the mini-game
+        setTimeout(() => {
+            // Start the new game
+            gameInGame.start();
+    
+            // Setup return to main game after mini-game ends
+            gameInGame.gameOver = function() {
+                primaryGame.resume();
+            };
+    
+            // Fade out
+            fadeOverlay.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(fadeOverlay);
+            }, 1000); // Wait for fade-out to finish
+    
+        }, totalDuration + 200); // Delay a bit after loading bar finishes
+    }
 
     };
 

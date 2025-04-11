@@ -35,11 +35,17 @@ class Player extends Character {
      * The .bind(this) method ensures that 'this' refers to the object object.
      */
     bindMovementKeyListners() {
-        addEventListener('keydown', this.handleKeyDown.bind(this));
-        addEventListener('keyup', this.handleKeyUp.bind(this));
+        // Only add event listeners if we're in a game environment
+        if (this.gameEnv) {
+            addEventListener('keydown', this.handleKeyDown.bind(this));
+            addEventListener('keyup', this.handleKeyUp.bind(this));
+        }
     }
 
     handleKeyDown({ keyCode }) {
+        // Only handle key events if we're in a game environment
+        if (!this.gameEnv) return;
+        
         // capture the pressed key in the active keys array
         this.pressedKeys[keyCode] = true;
         // set the velocity and direction based on the newly pressed key
@@ -54,6 +60,9 @@ class Player extends Character {
      * @param {Object} event - The keyup event object.
      */
     handleKeyUp({ keyCode }) {
+        // Only handle key events if we're in a game environment
+        if (!this.gameEnv) return;
+        
         // remove the lifted key from the active keys array
         if (keyCode in this.pressedKeys) {
             delete this.pressedKeys[keyCode];

@@ -65,7 +65,7 @@ class GameObject {
         this.canvas.id = data.name || "default";
         this.canvas.width = data.pixels.width || 0;
         this.canvas.height = data.pixels.height || 0;
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
         document.getElementById("gameContainer").appendChild(this.canvas);
 
         // Set initial object properties 

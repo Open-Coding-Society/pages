@@ -78,9 +78,9 @@ menu: nav/home.html
       <p>Experience real-time stock market simulation with virtual trading. Monitor popular stocks like Apple, Google, and Microsoft, manage your portfolio, and climb the leaderboard as you learn investment strategies in a risk-free environment.</p>
     </div>
   </a>
-  <a href="{{site.baseurl}}/gamify/adventureGame" class="toolkit-button" data-description="This page contains all the games developed by CSA. It includes an adventure game where you can explore endless opurtunites. Within this game you can learn how to gamble by playing the gambling game or all about stocks and crypto in our investment game!" data-authors="Author: NITD+People">
-    <img src="{{site.baseurl}}/images/toolkit-nav-buttons/adventure.png" alt="Gamify" />
-    <span class="button-name">The Adventure</span>
+  <a href="{{site.baseurl}}/gamify/fortuneFinders" class="toolkit-button" data-description="This page contains all the games developed by CSA. It includes an adventure game where you can explore endless opurtunites. Within this game you can learn how to gamble by playing the gambling game or all about stocks and crypto in our investment game!" data-authors="Author: NITD+People">
+    <img src="{{site.baseurl}}/images/toolkit-nav-buttons/fortune.png" alt="Gamify" />
+    <span class="button-name">Fortune Finders</span>
     <div class="description">
       <p>This page contains all the games developed by CSA. Starting at the adventure game, you can interact with NPCs and answer CS related questions to earn balance. With the balance, you can either gamble it away at the casino game or trade it at stocks. We also have crypto!</p>
     </div>
