@@ -615,23 +615,38 @@ active_tab: profile
 
     window.changeSteve = async function () {
         const name = await window.fetchName();
+        const profileImageBox = document.getElementById('headerPfp');
+    
+        // Check if the name contains "Steve" (case-insensitive)
         if (/steve/i.test(name)) {
-            const profileImageBox = document.getElementById('headerPfp');
             const currentProfilePicture = profileImageBox.querySelector('img')?.src;
-
-            // Check if the profile picture is already set to steve.jpeg
-            if (!currentProfilePicture || !currentProfilePicture.includes('steve.png')) {
-                // Set the profile picture to steve.jpeg
-                const steveImagePath = "{{site.baseurl}}/images/jokes/steve.png";
-                profileImageBox.innerHTML = `<img src="${steveImagePath}" alt="Profile Picture">`;
-
-                // Save the profile picture to the database
-                await window.changeProfilePictureWithPath(steveImagePath);
-                //reload the page
-                location.reload();
+    
+            // Check if the profile picture is already set to steve.png
+            const steveImagePath = "{{site.baseurl}}/images/jokes/steve.png";
+            const isSteveSet = localStorage.getItem('isSteveSet');
+    
+            if (!isSteveSet || isSteveSet !== 'true') {
+                if (!currentProfilePicture || !currentProfilePicture.includes('steve.png')) {
+                    // Set the profile picture to steve.png
+                    profileImageBox.innerHTML = `<img src="${steveImagePath}" alt="Profile Picture">`;
+    
+                    // Save the profile picture to the database
+                    await window.changeProfilePictureWithPath(steveImagePath);
+    
+                    // Mark as updated in localStorage
+                    localStorage.setItem('isSteveSet', 'true');
+                    console.log('Profile picture updated to steve.png');
+    
+                    // wait like 0.5 seconds
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    window.location.reload();
+                }
             }
+        } else {
+            // Reset the flag if the name is not Steve
+            localStorage.removeItem('isSteveSet');
         }
-    }
+    };
 
     window.changeProfilePictureWithPath = async function (imagePath) {
         try {
@@ -803,13 +818,15 @@ active_tab: profile
 
     // UPDATE COMMANDS =======
     window.changeName = async function (event) {
+        event.preventDefault(); // Prevent the form from refreshing the page
+    
         // Ensure the input element is selected
         const nameChangeInput = document.getElementById("nameChangeInput");
         if (!nameChangeInput) {
             console.error("Input element not found.");
             return;
         }
-
+    
         // Get value from the input field
         const name = nameChangeInput.value.trim(); // Trim to remove accidental spaces
         if (!name) {
@@ -818,23 +835,52 @@ active_tab: profile
         } else {
             console.log("Name input:", name);
         }
-
-        // send the post request
-        const URL = pythonURI + "/api/user";
-        const options = {
-            URL,
+    
+        // Define URLs for both backends
+        const pythonURL = pythonURI + "/api/user";
+        const javaURL = javaURI + "/api/person/update";
+    
+        // Define options for both requests
+        const pythonOptions = {
+            URL: pythonURL,
             body: { name },
             message: 'name-message',
             callback: () => {
-                console.log('Name updated successfully!');
-                window.updateNameField(name);
+                console.log('Name updated successfully in Python backend!');
             }
         };
+    
+        const javaOptions = {
+            URL: javaURL,
+            body: { name },
+            callback: () => {
+                console.log('Name updated successfully in Java backend!');
+            }
+        };
+    
         try {
-            await putUpdate(options);
+            // Send requests to both backends
+            await Promise.all([
+                putUpdate(pythonOptions),
+                postUpdate(javaOptions)
+            ]);
+    
+            // Update the name field in the UI
+            window.updateNameField(name);
+            console.log('Name updated successfully in both backends!');
+            window.location.reload();
         } catch (error) {
             console.error('Error updating Name:', error.message);
             document.getElementById('name-message').textContent = 'Error updating Name: ' + error.message;
+        }
+    };
+
+    window.updateNameField = async function (name) {
+        const nameElement = document.getElementById("name");
+        if (nameElement) {
+            nameElement.textContent = name;
+        } else {
+            console.error("Name element not found.");
         }
     };
 
@@ -989,6 +1035,8 @@ active_tab: profile
             console.error('Error uploading profile picture:', error.message);
         }
 
+        await new Promise(resolve => setTimeout(resolve, 250));
+        window.location.reload();
     }
 
     // helper function to convert a file to base64 for payload
