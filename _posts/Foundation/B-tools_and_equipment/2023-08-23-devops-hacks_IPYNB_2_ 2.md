@@ -3,8 +3,6 @@ layout: post
 title: Tool Hacks
 description: These hacks are for tools that are used in the development process. Completing these hacks will help you to understand the tools better and are foundational for the course
 categories: ['DevOps']
-permalink: /devops/hacks
-menu: nav/tools_setup.html
 toc: True
 comments: True
 ---

@@ -1,4 +1,4 @@
-title: Nighthawk Pages 
+title: Open Coding 
 description: "Class of 2025"
 owner_name: John Mortensen
 github_username: nighthawkcoders
@@ -19,10 +19,8 @@ minima:
 # remote_theme: pages-themes/time-machine@v0.2.0
 plugins:
   - jekyll-remote-theme
+  - jekyll-include-cache
 header_pages:
-  - navigation/kasm.md
-  - navigation/aesthetihawk-guide.md
   - navigation/blog.md
   - navigation/search.md
   - navigation/logintoolkit.md
-#use_tailwind: true

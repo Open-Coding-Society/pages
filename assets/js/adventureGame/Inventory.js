@@ -1,4 +1,4 @@
-import gameControlInstance from "./GameControl.js";
+
 
 class Inventory {
     constructor() {

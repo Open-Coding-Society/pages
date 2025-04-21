@@ -1,6 +1,6 @@
-import GameEnvBackground from './GameEnvBackground.js';
-import Npc from './Npc.js';
-import Player from './Player.js';
+import GameEnvBackground from './GameEngine/GameEnvBackground.js';
+import Npc from './GameEngine/Npc.js';
+import Player from './GameEngine/Player.js';
 
 class GameLevelWallstreet {
   /**
@@ -65,7 +65,7 @@ class GameLevelWallstreet {
         },
         // Interact when player presses "E"
         interact: function() {
-            const confirmTeleport = window.confirm("Teleport to sin city?");
+            const confirmTeleport = window.confirm("Teleport to the casino?");
             if (confirmTeleport) {
                 window.location.href = "https://nighthawkcoders.github.io/portfolio_2025/gamify/casinohomepage"; // Replace with your link
             }
@@ -164,12 +164,58 @@ class GameLevelWallstreet {
             alert(sprite_greet_cryptoMining);
         },
         // Interact when player presses "E"
-        interact: function() {
-            const confirmTeleport = window.confirm("Teleport to crypto?");
-            if (confirmTeleport) {
-                window.location.href = "https://nighthawkcoders.github.io/portfolio_2025/crypto/mining"; // Replace with your link
+        interact: function () {
+            // Check if the modal already exists
+            if (document.getElementById('stockModal')) {
+                document.getElementById('stockModal').style.display = 'block';
+                // Reset iframe to reload the stocks viewer
+                const iframe = document.querySelector('#stockModal iframe');
+                iframe.src = '';  // Clear the source
+                iframe.src = 'https://nighthawkcoders.github.io/portfolio_2025/crypto/mining'; // Set it again to force reload
+                return;
             }
-        }
+            
+            // Create modal container
+            const modal = document.createElement('div');
+            modal.id = 'stockModal';
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.backgroundColor = '#fff';
+            modal.style.border = '2px solid #444';
+            modal.style.padding = '0';
+            modal.style.zIndex = '1000';
+            modal.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+            modal.style.borderRadius = '12px';
+            modal.style.width = '90%';
+            modal.style.maxWidth = '1000px';
+            modal.style.height = '80vh';
+            
+            // Responsive iframe wrapper
+            modal.innerHTML = `
+                <div style="position: relative; width: 100%; height: 100%;">
+                    <iframe 
+                        src="https://nighthawkcoders.github.io/portfolio_2025/crypto/mining"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 12px;"
+                        allowfullscreen
+                        loading="lazy"
+                    ></iframe>
+                    <button id="closeStockModal" 
+                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: #ff5252; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        ✖
+                    </button>
+                </div>
+            `;
+            
+            // Append modal to body
+            document.body.appendChild(modal);
+            
+            // Close button functionality
+            document.getElementById('closeStockModal').onclick = () => {
+                modal.style.display = 'none';
+            };
+        }      
     };
 
     const sprite_src_crypto = path + "/images/gamify/bitcoin.png"; // Path to the NPC sprite
@@ -191,12 +237,58 @@ class GameLevelWallstreet {
             alert(sprite_greet_crypto);
         },
         // Interact when player presses "E"
-        interact: function() {
-            const confirmTeleport = window.confirm("Teleport to crypto?");
-            if (confirmTeleport) {
-                window.location.href = "https://nighthawkcoders.github.io/portfolio_2025/crypto/portfolio"; // Replace with your link
+        interact: function () {
+            // Check if the modal already exists
+            if (document.getElementById('cryptoModal')) {
+                document.getElementById('cryptoModal').style.display = 'block';
+                // Reset iframe to reload the stocks viewer
+                const iframe = document.querySelector('#cryptoModal iframe');
+                iframe.src = '';  // Clear the source
+                iframe.src = 'https://nighthawkcoders.github.io/portfolio_2025/crypto/portfolio'; // Set it again to force reload
+                return;
             }
-        }
+            
+            // Create modal container
+            const modal = document.createElement('div');
+            modal.id = 'cryptoModal';
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.backgroundColor = '#fff';
+            modal.style.border = '2px solid #444';
+            modal.style.padding = '0';
+            modal.style.zIndex = '1000';
+            modal.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+            modal.style.borderRadius = '12px';
+            modal.style.width = '90%';
+            modal.style.maxWidth = '1000px';
+            modal.style.height = '80vh';
+            
+            // Responsive iframe wrapper
+            modal.innerHTML = `
+                <div style="position: relative; width: 100%; height: 100%;">
+                    <iframe 
+                        src="https://nighthawkcoders.github.io/portfolio_2025/crypto/portfolio"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 12px;"
+                        allowfullscreen
+                        loading="lazy"
+                    ></iframe>
+                    <button id="closeCryptoModal" 
+                        style="position: absolute; top: 10px; right: 10px; z-index: 10; background: #ff5252; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        ✖
+                    </button>
+                </div>
+            `;
+            
+            // Append modal to body
+            document.body.appendChild(modal);
+            
+            // Close button functionality
+            document.getElementById('closeCryptoModal').onclick = () => {
+                modal.style.display = 'none';
+            };
+        }      
     };
 
    

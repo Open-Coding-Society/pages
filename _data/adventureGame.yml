@@ -1,0 +1,26 @@
+# course illustrations
+Title: "Adventure Game Help"
+Description: "This help guides developers through the steps of creating key elements of the game. This infographic includes visuals and topic highlights, with clickable images that lead to deeper learning and helpful hacks."
+Topics:
+  - title: "Background"
+    image: "/adventureGame/background.jpg"
+    link: "/gamify/adventureGame/topics/backgrounds"
+    alt: "Background"
+    keyPoints:
+      - "Game Environment"
+      - "Top Down View"
+      - "Tile Based"
+      - "Parallax Scrolling"
+    subtitle: "Theme and Style"
+    description: "The background of a game establishes its theme and style, creating the foundation for the player's experience. This is your opportunity to get creative and make your game stand out."
+  - title: "Character"
+    image: "/adventureGame/character.png"
+    link: "/gamify/adventureGame/topics/characters"
+    alt: "Character"
+    keyPoints:
+      - "Player Character"
+      - "NPCs"
+      - "Enemies"
+      - "Blocks"
+    subtitle: "Player and NPCs"
+    description: "Characters are the heart of the game, driving the story, interactions, and adventures. They bring the game world to life and engage the player through their roles and actions."

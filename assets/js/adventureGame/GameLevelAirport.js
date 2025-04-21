@@ -1,11 +1,9 @@
-import GameEnvBackground from './GameEnvBackground.js';
-import Npc from './Npc.js';
-import Player from './Player.js';
-import GameControl from './GameControl.js';
-import GameLevelSiliconValley from './GameLevelSiliconValley.js';
+import GameEnvBackground from './GameEngine/GameEnvBackground.js';
+import Npc from './GameEngine/Npc.js';
+import Player from './GameEngine/Player.js';
+import GameControl from './GameEngine/GameControl.js';
 import HelpPanel from './HelpPanel.js';
 import Game from './Game.js';
-import Quiz from './Quiz.js';
 
 class GameLevelAirport {
   constructor(gameEnv) {

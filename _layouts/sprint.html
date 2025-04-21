@@ -1,0 +1,85 @@
+---
+layout: post 
+---
+
+{%comment%} 
+Setup course data
+{%endcomment%}
+
+{% assign course = site.data[page.course] %} <!-- Load YML data -->
+{% assign units = page.units | split: ',' %}
+
+{%comment%} 
+<!-- Load all posts -->
+{%endcomment%}
+{% assign posts = null | compact %}
+{% assign posts = posts | concat:site.posts | concat:site.pages %}
+
+{%comment%} 
+<!-- Iterate through Course Units -->
+{%endcomment%}
+
+{% for unit in units %}
+{% assign unitKey = "Sprint" | append: unit %}
+{% assign unitData = course[unitKey] %}
+<h2> {{ unitKey }}: {{ unitData.title }} </h2>
+<h3> Weeks: {{ unitData.start }} - {{ unitData.end }} </h3>
+
+<p>  {{ unitData.description }} </p>
+
+{% if unitData.illustration %}
+<details>
+  <summary>Illustration</summary>
+
+  <pre>
+    <p>{{ unitData.illustration }}</p>
+  </pre>
+</details>
+<br/>
+{% endif %}
+
+{% assign start = unitData.start %}
+{% assign end = unitData.end %}
+
+{%comment%} 
+<!-- Column Headings for Blogs -->
+{%endcomment%}
+
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Type</th>
+  </tr>
+  {% assign unitKey = "Sprint" | append: unit %}
+  {% assign unitData = course[unitKey] %}
+  {% assign start = unitData.start %}
+  {% assign end = unitData.end %}
+
+  {% for index in (start..end) -%}
+    {% assign entries = null | compact %}
+
+    {% for post in posts %}
+      {% if post.courses[page.course] %}
+        {% assign week = post.courses[page.course].week | plus: 0 %}
+
+        {% if week == index %}
+          {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: post.type %}
+          {% assign entries = entries | push: entry %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% for entry in entries %}
+      {% assign parts = entry | split: "||" %}
+      <tr>
+        <td>
+          <a href="{{site.baseurl}}{{parts[1]}}">{{parts[0]}}</a>
+        </td>
+        <td>
+          {{ parts[2] }}
+        </td>
+      </tr>
+    {% endfor %}
+  {% endfor %}
+</table>
+{% endfor %}

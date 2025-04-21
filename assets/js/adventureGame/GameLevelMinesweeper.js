@@ -1,4 +1,4 @@
-import Background from './Background.js';
+
 
 class GameLevelMinesweeper {
     constructor(gameEnv) {

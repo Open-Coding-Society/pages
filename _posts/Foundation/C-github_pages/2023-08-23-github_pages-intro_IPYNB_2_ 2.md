@@ -1,11 +1,11 @@
 ---
 layout: post
-title: GitHub Pages Playground
+title: GitHub Pages
 description: The Web Programming topics are focused on learning Frontend programming, GitHub Pages, and Jupyter Notebooks.
 categories: ['JavaScript']
 permalink: /github/pages/intro
 type: ccc
-courses: {'csse': {'week': 1}, 'csp': {'week': 1}, 'csa': {'week': 0}}
+courses: {'csse': {'week': 2}, 'csp': {'week': 1}, 'csa': {'week': 0}}
 author: John Mortensen
 menu: nav/github_pages.html
 ---

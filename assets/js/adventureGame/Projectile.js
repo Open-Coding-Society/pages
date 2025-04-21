@@ -1,4 +1,4 @@
-import Character from './Character.js';
+import Character from "./GameEngine/Character.js";;
 import ProjectileExplosion from './ProjectileExplosion.js';
 
 function newProjectileExplosion(data, gameEnv) {

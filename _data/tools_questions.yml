@@ -1,0 +1,17 @@
+# filepath: /Users/johnmortensen/nighthawk/portfolio_2025/_data/tools_questions.yml
+questions:
+  - id: "tools-familiarity"
+    title: "Tools Familiarity"
+    question: "What are the key tools in the infographic? List its purpose in your own words."
+  - id: "tools-burndown-link"
+    title: "Issue and Burndown List"
+    question: "Provide a link to your GitHub Issue."
+  - id: "tools-setup-time"
+    title: "Tools Setup and Time"
+    question: "How long did it take? Write down your biggest success and biggest challenge."
+  - id: "tools-version-checks"
+    title: "Version Checks"
+    question: "Capture text output of your version checks. Why do you think it is correct?"
+  - id: "tools-vscode-make"
+    title: "VSCode"
+    question: "Capture text output of your VSCode make with a link to the localhost IP address. Why do you think it is correct?"

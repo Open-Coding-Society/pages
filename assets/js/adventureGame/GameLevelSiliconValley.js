@@ -1,8 +1,8 @@
-import GameEnvBackground from './GameEnvBackground.js';
-import Npc from './Npc.js';
-import Player from './Player.js';
-import GameControl from './GameControl.js';
-import Quiz from './Quiz.js';
+import GameEnvBackground from './GameEngine/GameEnvBackground.js';
+import Npc from './GameEngine/Npc.js';
+import Player from './GameEngine/Player.js';
+import GameControl from './GameEngine/GameControl.js';
+
 import GameLevelRetro from './GameLevelRetro.js';
 import Game from './Game.js';
 import StockMoodModal from './StockMoodModal.js';

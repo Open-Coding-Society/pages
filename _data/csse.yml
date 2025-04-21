@@ -42,33 +42,33 @@ introduction_tools: &introduction_tools |
 
 # CSSE course meta data
 Sprint1:
-  title: Tools and Software Development Processes
-  description: By the end of Weeks 0-3, students will have gained practical experience in blogging, coding with Jupyter Notebooks, and GitHub Pages; learning will begin with Linux, Markdown, HTML, and JavaScript. Students will establish a foundation using essential tools and software development processes to support their coding journey.  Weeks 0-3 will provide a quick foundation,  prior to students starting their College Articulation Credit and Game Development journey.
+  title:  Software Engineering and Tools
+  description: By the end of the Sprint, students will have gained practical experience in blogging, coding with Jupyter Notebooks, and GitHub Pages; learning will begin with Linux, Markdown, HTML, and JavaScript. Students will establish a foundation using essential tools and software development processes to support their coding journey.
   illustration: *introduction_tools
   start: 0
   end: 3
 Sprint2:
-  title: Introduction to Development with JavaScript
+  title: JavaScript Development
   description: A key focus of this course is to make Web Games using JavaScript. These next few weeks we start covering object-oriented programming in JavaScript.  Topics include  control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices.
   start: 4
   end: 6
 Sprint3:
-  title: Building a game with GitHub Pages for N@tM
+  title: Building a game for N@tM
   description: Part of the process of becoming technically proficient is going beyond fundamentals by taking on a project challenge while coding. A challenge with some vision, questions, AI research, and more allow amazing things to be accomplished. Our goal is to participate in N@tM with the other CS classes and other classes from the Electives Department.  We should have a blog, progress in a game, and a series of lesson hacks to show off.
   start: 7
   end: 12
 Sprint4:
-  title: Planning, Exploration, and OOP Programming
-  description: Students, in trios, will work on Platformer Game and study OOP. There will be a lot of code, some Tech Talks, and some Teaching assignments provided to learn the code.
+  title: Planning, Tinkering, and OOP
+  description: Students, in trios, will work on Game and study OOP. There will be a lot of code, some Tech Talks, and some Teaching assignments provided to learn the code.
   start: 13
   end: 16
 Sprint5:
-  title: Platformer Game Help System 
+  title: Building a Help System 
   description: The Teacher will be providing topics.  All teams will be building a help system covering the key topics in the platformer game.  The task of forming a help system will help your team become expert in a topic and prepare you for final sprint.  For now, don't try to code in the Platformer game, but try to make Jupyter Notebooks with help and hacks suggestions on your topic.
   start: 17
   end: 18
 Sprint6:
-  title: Create a Final Project, starts with "Student Teaching", concludes with N@tM and qualifies for College Credit 
+  title: An RPG/Platformer game.
   description: Trimester 2 concludes with students presenting their project at N@tM. Each person within "Student Teams" will have their own specialty within the student project. Students should be able to talk about design, make a plan, code, blog, and present features of their portion of the system.
   start: 19
   end: 25

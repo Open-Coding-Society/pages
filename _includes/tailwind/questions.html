@@ -1,0 +1,31 @@
+{% assign data = site.data[page.questions] %}
+
+<div id="questions-container" class="space-y-6 border-t pt-6">
+{% for question in data.questions %}
+    <div class="p-4 rounded-lg shadow-md">
+    <h3 class="text-lg font-semibold mb-2">{{ question.title }}</h3>
+    <p class="text-sm mb-4">{{ question.question }}</p>
+    <textarea id="{{ question.id }}" class="w-full border rounded-lg p-2 text-sm" rows="2" placeholder="Write your response here..."></textarea>
+    </div>
+{% endfor %}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Load saved responses from localStorage
+    const questions = {{site.data[page.questions].questions  | jsonify }};
+    questions.forEach(question => {
+      const textarea = document.getElementById(question.id);
+      if (textarea) {
+        // Load saved response
+        const savedResponse = localStorage.getItem(question.id) || "";
+        textarea.value = savedResponse;
+
+        // Save response on input
+        textarea.addEventListener("input", () => {
+          localStorage.setItem(question.id, textarea.value);
+        });
+      }
+    });
+  });
+</script>

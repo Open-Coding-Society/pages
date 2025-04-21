@@ -1,7 +1,7 @@
-import GameEnvBackground from "./GameEnvBackground.js"
-import Player from "./Player.js"
+import GameEnvBackground from "./GameEngine/GameEnvBackground.js"
+import Player from "./GameEngine/Player.js"
 import Meteor from "./Meteor.js"
-import Character from "./Character.js"
+import Character from "./GameEngine/Character.js";
 import Quiz from "./Quiz.js"
 import { checkGameImages } from "./debug-helper.js"
 

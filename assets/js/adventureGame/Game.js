@@ -1,9 +1,5 @@
-import GameControl from './GameControl.js';
-import GameLevelAirport from "./GameLevelAirport.js";
-import GameLevelSiliconValley from './GameLevelSiliconValley.js';
-import GameLevelWallstreet from './GameLevelWallstreet.js';
+import GameControl from './GameEngine/GameControl.js';
 import Quiz from './Quiz.js';
-import Character from "./Character.js";
 import Inventory from "./Inventory.js";
 import { defaultItems } from "./items.js";
 

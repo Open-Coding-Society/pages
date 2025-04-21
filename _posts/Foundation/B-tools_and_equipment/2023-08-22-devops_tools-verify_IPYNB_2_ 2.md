@@ -3,8 +3,6 @@ layout: post
 title: Tools Verify using Shell
 description: Linux and the shell is used in this example to setup and verify the installation of the tools.  Additionally, a few programming exercises are included.
 categories: ['DevOps']
-permalink: /devops/tools/verify
-menu: nav/tools_setup.html
 toc: True
 comments: True
 ---

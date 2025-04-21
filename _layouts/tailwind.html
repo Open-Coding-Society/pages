@@ -1,9 +1,15 @@
 ---
-layout: base
+layout: base 
 ---
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+{%- if page.infoGraph -%}
+  {% assign info = site.data[page.infoGraph] %}
+  {%- include tailwind/infograph.html -%}
+{%- endif -%}
+
 <script>
   tailwind.config = {
     darkMode: 'class', // Enable dark mode
