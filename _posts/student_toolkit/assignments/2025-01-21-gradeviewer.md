@@ -4,56 +4,7 @@ title: Viewing Grades
 permalink: /student/view-grades
 comments: false
 ---
-<style>
-    .styled-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 25px 0;
-        font-size: 18px;
-        text-align: left;
-    }
 
-    .styled-table th, .styled-table td {
-        padding: 12px 15px;
-        border: 1px solid #ddd;
-    }
-
-    .styled-table th {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .styled-table tbody tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-
-    .styled-table tbody tr:hover {
-        background-color: #ddd;
-    }
-
-    .styled-table td {
-        text-align: center;
-    }
-
-    #gradegetter {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    #gradegetter:hover {
-        background-color: #45a049;
-    }
-
-    .average-row {
-        background-color: #d3d3d3; 
-        font-weight: bold;
-    }
-</style>
 
 <table id="gradesTable" class="styled-table">
     <thead>
