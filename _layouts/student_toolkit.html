@@ -20,36 +20,36 @@ active_tab: toolkit
       }
     }
   
-    window.onload = async function() {
-      const isAuthenticated = await verifyAuthentication();
-      const loadingElement = document.getElementById('loadingElement');
+    // window.onload = async function() {
+    //   const isAuthenticated = await verifyAuthentication();
+    //   const loadingElement = document.getElementById('loadingElement');
       
-      if (isAuthenticated) {
-        loadingElement.style.display = "none";  // Hide the loading screen
-      } else {
-        // Show "Please login" message and delay the redirection
-        const message = document.createElement('div');
-        message.style.position = 'absolute';
-        message.style.top = '50%';
-        message.style.left = '50%';
-        message.style.transform = 'translate(-50%, -50%)';
-        message.style.background = 'rgba(50, 50, 50, 0.5)';
-        message.style.padding = '20px';
-        message.style.fontSize = '20px';
-        message.style.color = 'white';
-        message.style.borderRadius = '10px';
-        message.style.backdropFilter = 'blur(30px)';
-        message.innerHTML = 'Please login first.';
+    //   if (isAuthenticated) {
+    //     loadingElement.style.display = "none";  // Hide the loading screen
+    //   } else {
+    //     // Show "Please login" message and delay the redirection
+    //     const message = document.createElement('div');
+    //     message.style.position = 'absolute';
+    //     message.style.top = '50%';
+    //     message.style.left = '50%';
+    //     message.style.transform = 'translate(-50%, -50%)';
+    //     message.style.background = 'rgba(50, 50, 50, 0.5)';
+    //     message.style.padding = '20px';
+    //     message.style.fontSize = '20px';
+    //     message.style.color = 'white';
+    //     message.style.borderRadius = '10px';
+    //     message.style.backdropFilter = 'blur(30px)';
+    //     message.innerHTML = 'Please login first.';
         
-        // Add the message on top of the loading screen
-        document.body.appendChild(message);
+    //     // Add the message on top of the loading screen
+    //     document.body.appendChild(message);
   
-        // Wait for 2 seconds before redirecting
-        setTimeout(() => {
-          window.location.href = "{{site.baseurl}}/login";  // Redirect to login page
-        }, 2000);  // 2000ms = 2 seconds
-      }
-    }
+    //     // Wait for 2 seconds before redirecting
+    //     setTimeout(() => {
+    //       window.location.href = "{{site.baseurl}}/login";  // Redirect to login page
+    //     }, 2000);  // 2000ms = 2 seconds
+    //   }
+    // }
 </script>
 
 <style>
