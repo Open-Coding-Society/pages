@@ -72,7 +72,8 @@
     <header class="site-header text-white">
         <div class="wrapper flex items-center justify-between px-4 py-3">
             <!-- Left: Site Title -->
-            <a class="site-title text-2xl font-bold" href="{{ site.baseurl | relative_url }}">
+            <a class="site-title" rel="author" href="{{ "{{site.baseurl}}/" | relative_url }}"
+                data-value="{{ site.title | escape }}">
                 {{ site.title | escape }}
             </a>
 
