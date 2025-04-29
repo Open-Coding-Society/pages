@@ -266,7 +266,9 @@ Computer Science is the Wild Card for all Majors and Careers.
   </td>
   <td>
     <div style="flex: 35%; text-align: center;">
-      <img src="{{site.baseurl}}/images/course-brag/qr.png" alt="QR Code" style="width: 100%; max-width: 300px; height: auto; margin-left: 10px;">
+      <img src="{{site.baseurl}}/images/course-brag/qr.png" 
+          alt="QR Code" 
+          style="width: 100%; max-width: 300px; height: auto; margin-left: 10px; display: block;">
     </div>
   </td>
 </tr>
@@ -338,4 +340,3 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
 - Data Structures 1,2 receives Articulated College Credit to Mira Costa CC for "CS 113: Basic Data Structures and Algorithms". Mira Costa CC requires and provides free registration to receive UC college credit.
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
-
