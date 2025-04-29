@@ -40,6 +40,14 @@ menu: nav/home.html
   #mario {
     background-position: calc({{animations[0].col}} * {{pixels}} * -1px) calc({{animations[0].row}} * {{pixels}}* -1px);
   }
+  
+  @media screen and (max-width: 768px) {
+    img {
+      display: block !important; /* Ensure the image is always displayed */
+      max-width: 100%; /* Scale the image to fit the container */
+      height: auto; /* Maintain aspect ratio */
+    }    
+  }
 </style>
 
 <!--- Embedded executable code--->
