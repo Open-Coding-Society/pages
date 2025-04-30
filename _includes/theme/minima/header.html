@@ -8,41 +8,32 @@
             position: relative;
             z-index: 9999; /* Ensures it's above other elements */
         }
-
+    
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #1e1e1e;
-            opacity: 1;
+            background-color: #1e1e1e; /* Solid dark background */
+            opacity: 1; /* Ensure no transparency */
             min-width: 140px; /* Adjusted width */
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 10000; /* Higher z-index ensures it's on top */
             text-align: left; /* Align text to the left */
-            margin-top: 0.06rem;
-            margin-left: -0.5rem;
+            margin-top: 5px; /* Move down by 5px */
+            margin-left: 0; /* Adjusted for better alignment */
         }
-
+    
         .dropdown-content a {
             color: white; /* Ensure text is visible on dark background */
             padding: 4px 6px; /* Reduced padding */
             text-decoration: none;
             display: block;
             font-size: 14px; /* Smaller font size */
-            height: 70px;
         }
-        
+    
         .dropdown-content a:hover {
             background-color: #525252; /* Slightly lighter background on hover */
         }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown:hover .dropdown-button {
-            text-decoration: underline;
-        }
-
+    
         .dropdown-button {
             background-color: transparent;
             border: none; /* Ensure no border */
@@ -51,9 +42,25 @@
             color: inherit;
             outline: none; /* Remove focus outline */
         }
-
+    
         .dropdown-button:focus {
             outline: none; /* Remove outline when focused */
+        }
+    
+        .dropdown.open .dropdown-content {
+            display: block; /* Show dropdown when open */
+        }
+
+        .dropdown-content.hidden {
+            display: none;
+        }
+        
+        .dropdown-content:not(.hidden) {
+            display: block;
+        }
+
+        .login-area {
+            opacity: 1;
         }
 
         /* Use a common breakpoint for mobile */
@@ -100,10 +107,12 @@
                     </a>
                     {%- endif -%}
                     {%- endfor -%}
+                    <!-- this is the dropdown -->
                     <a id="loginArea" href="{{ site.baseurl }}/login"
                         class="block text-white hover:text-gray-400 px-4 py-2 text-center md:px-2 md:py-1">
                         Login
                     </a>
+                    <!-- end of dropdown -->
                 </nav>           
             </div>
         </div>
