@@ -3,129 +3,146 @@ title: Profile
 layout: aesthetihawk
 active_tab: profile
 ---
-<div class="ml-64 p-8">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-bold">Profile Settings</h1>
-        <button id="saveChangesBtn" disabled
-            class="px-6 py-2 bg-gray-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
-            onclick="saveChanges()">
-            Save Changes
-        </button>
-    </div>
 
-    <form id="profileSettingsForm">
-        <!-- Personal Information Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-6">Personal Information</h2>
+<!-- content here -->
+<div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">Profile Settings</h1>
+    <button id="saveChangesBtn" disabled
+        class="px-6 py-2 bg-gray-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
+        onclick="saveChanges()">
+        Save Changes
+    </button>
+</div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Full Name -->
-                <div>
-                    <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
-                        Name</label>
-                    <input type="text" id="fullName" name="fullName"
-                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value="John Doe" onchange="checkForChanges()">
-                </div>
+<form id="profileSettingsForm">
+    <!-- Personal Information Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-6">Personal Information</h2>
 
-                <!-- User ID -->
-                <div>
-                    <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User
-                        ID</label>
-                    <input type="text" id="userId" name="userId"
-                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value="johndoe123" onchange="checkForChanges()">
-                </div>
-
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
-                        Address</label>
-                    <input type="email" id="email" name="email"
-                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value="john.doe@example.com" onchange="checkForChanges()">
-                </div>
-
-                <!-- Student ID -->
-                <div>
-                    <label for="studentId"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student
-                        ID (7
-                        digits)</label>
-                    <input type="text" id="studentId" name="studentId"
-                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        value="1234567" maxlength="7" pattern="\d{7}" onchange="checkForChanges()">
-                </div>
-
-                <!-- Kasm Server Toggle -->
-                <div class="flex items-center">
-                    <label for="kasmToggle" class="flex items-center cursor-pointer">
-                        <div class="relative">
-                            <input type="checkbox" id="kasmToggle" class="sr-only" onchange="checkForChanges()">
-                            <div class="block bg-gray-300 dark:bg-gray-600 w-14 h-8 rounded-full"></div>
-                            <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform">
-                            </div>
-                        </div>
-                        <div class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Enable Kasm Server
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Password Change -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New
-                        Password</label>
-                    <input type="password" id="password" name="password"
-                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="Enter new password" onchange="checkForChanges()">
-                </div>
-            </div>
-        </div>
-
-        <!-- Classes Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Classes</h2>
-                <button type="button" id="addClassBtn"
-                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
-                    onclick="addClass()">
-                    Add Class
-                </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Full Name -->
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
+                    Name</label>
+                <input type="text" id="fullName" name="fullName"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="John Doe" onchange="checkForChanges()">
             </div>
 
-            <div id="classesContainer">
-                <!-- Classes will be added here dynamically -->
-                <div class="class-entry mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                        <div class="flex-grow mb-2 md:mb-0">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class
-                                Name</label>
-                            <input type="text"
-                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                value="Computer Science" onchange="checkForChanges()">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
-                            <select
-                                class="class-year w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                onchange="checkForChanges()">
-                                <option>2025</option>
-                                <option>2026</option>
-                                <option>2027</option>
-                                <option>2028</option>
-                            </select>
+            <!-- User ID -->
+            <div>
+                <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User
+                    ID</label>
+                <input type="text" id="userId" name="userId"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="johndoe123" onchange="checkForChanges()">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
+                    Address</label>
+                <input type="email" id="email" name="email"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="john.doe@example.com" onchange="checkForChanges()">
+            </div>
+
+            <!-- Student ID -->
+            <div>
+                <label for="studentId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student
+                    ID (7
+                    digits)</label>
+                <input type="text" id="studentId" name="studentId"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="1234567" maxlength="7" pattern="\d{7}" onchange="checkForChanges()">
+            </div>
+
+            <!-- Kasm Server Toggle -->
+            <div class="flex items-center">
+                <label for="kasmToggle" class="flex items-center cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" id="kasmToggle" class="sr-only" onchange="checkForChanges()">
+                        <div class="block bg-gray-300 dark:bg-gray-600 w-14 h-8 rounded-full"></div>
+                        <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform">
                         </div>
                     </div>
-                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
-                        onclick="removeClass(this)">
-                        Remove
-                    </button>
-                </div>
+                    <div class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Enable Kasm Server
+                    </div>
+                </label>
+            </div>
+
+            <!-- Password Change -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New
+                    Password</label>
+                <input type="password" id="password" name="password"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Enter new password" onchange="checkForChanges()">
             </div>
         </div>
-    </form>
+    </div>
+
+    <!-- Classes Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Classes</h2>
+            <button type="button" id="addClassBtn"
+                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
+                onclick="addClass()">
+                Add Class
+            </button>
+        </div>
+
+        <div id="classesContainer">
+            <!-- Classes will be added here dynamically -->
+            <div class="class-entry mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
+                    <div class="flex-grow mb-2 md:mb-0">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class
+                            Name</label>
+                        <input type="text"
+                            class="class-name w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            value="Computer Science" onchange="checkForChanges()">
+                    </div>
+                    <div class="w-full md:w-1/3">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                        <select
+                            class="class-year w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            onchange="checkForChanges()">
+                            <option>2025</option>
+                            <option>2026</option>
+                            <option>2027</option>
+                            <option>2028</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
+                    onclick="removeClass(this)">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Unsaved Changes Alert -->
+<div id="unsavedChangesAlert"
+    class="hidden fixed bottom-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md">
+    <div class="flex items-center">
+        <div class="py-1">
+            <svg class="h-6 w-6 text-red-500 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        <div>
+            <p class="font-bold">You have unsaved changes</p>
+            <p class="text-sm">Please save your changes before leaving.</p>
+        </div>
+    </div>
 </div>
+<!-- content here -->
 
 <!-- icons -->
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
