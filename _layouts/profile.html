@@ -423,103 +423,126 @@ active_tab: profile
     }
 </style>
 
-<!-- change class box -->
-<div id="change-class" class="change-info-card" style="visibility: hidden;">
-    <ion-icon name="school-outline" size="large"></ion-icon>
-    <h1>Student Id</h1>
-    <form onsubmit="return changeSid(event)">
-        <input type="text" id="sidInput" placeholder="Enter new Student Id">
-        <input type="submit" value="Save changes">
-    </form>
-    <div class="close" onclick="document.getElementById('change-password').style.visibility = 'hidden'">
-        <ion-icon name="close-outline" size="large" class="close"></ion-icon>
-    </div>
+<div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">Profile Settings</h1>
+    <button id="saveChangesBtn" disabled
+        class="px-6 py-2 bg-gray-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
+        onclick="saveChanges()">
+        Save Changes
+    </button>
 </div>
 
+<form id="profileSettingsForm">
+    <!-- Personal Information Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-6">Personal Information</h2>
 
-<!-- change profile pic box -->
-<div id="change-pfp" class="change-info-card" style="visibility: hidden;">
-    <ion-icon name="image-outline" size="large"></ion-icon>
-    <h1>Profile Picture</h1>
-    <form onsubmit="return changeProfilePicture(event)">
-        <label class="container-checkbox" style="white-space: nowrap; padding-left: 0px;">Click to upload a profile
-            picture.
-            <input type="file" id="profilePictureInput" name="filename" style="visibility: hidden;">
-            <input type="submit" style="visibility: hidden;">
-            <ion-icon name="cloud-upload-outline"></ion-icon>
-        </label>
-        <input type="submit" value="Save changes">
-        <br>
-    </form>
-    <div class="close" onclick="document.getElementById('change-pfp').style.visibility = 'hidden'">
-        <ion-icon name="close-outline" size="large" class="close"></ion-icon>
-    </div>
-</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Full Name -->
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
+                    Name</label>
+                <input type="text" id="fullName" name="fullName"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="John Doe" onchange="checkForChanges()">
+            </div>
 
-<!-- main user info cards -->
-<!-- your personal information -->
-<div class="main-info">
-    <!-- the info header at the top of the page -->
-    <div class="header">
-        <h1>Personal Information (Beta)</h1>
-        <p>Manage your personal information, including name, user ID, email, class specific information, and
-            more.</p>
-    </div>
+            <!-- User ID -->
+            <div>
+                <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User
+                    ID</label>
+                <input type="text" id="userId" name="userId"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="johndoe123" onchange="checkForChanges()">
+            </div>
 
-    <!-- Fancy total panel  -->
-    <div class="userPanel">
-        <div class="userPanel_name">
-            <h2 id="name">Name</h2>
-            <form onsubmit="return changeName(event)">
-                <input type="text" id="nameChangeInput" value="Loading name..." />
-                <input type="submit" value="Save changes" />
-            </form>
-        </div>
-        <div class="userPanel_uid">
-            <h2 id="uid">User ID</h2>
-            <form onsubmit="return changeUid(event)">
-                <input type="text" id="uidChangeInput" value="Loading UID..." />
-                <input type="submit" value="Save changes" />
-            </form>
-        </div>
-        <div class="userPanel_password">
-            <h2 id="password">Password</h2>
-            <form onsubmit="return changePassword(event)">
-                <input type="password" id="passwordChangeInput" placeholder="Enter new password.">
-                <input type="submit" value="Save changes">
-            </form>
-        </div>
-        <div class="userPanel_email">
-            <h2 id="email">Email</h2>
-            <form onsubmit="return changeEmail(event)">
-                <input type="text" id="emailChangeInput" value="Loading email..." />
-                <input type="submit" value="Save changes" />
-            </form>
-        </div>
-        <div class="userPanel_kasm">
-            <h2 id="kasm">Kasm</h2>
-            <form class="kasm-toggle-container">
-                <label class="switch">
-                    <span class="toggle">
-                        <input type="checkbox" id="kasmNeeded" onchange="changeKasmServerStatus(event)">
-                        <span class="slider"></span>
-                    </span>
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
+                    Address</label>
+                <input type="email" id="email" name="email"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="john.doe@example.com" onchange="checkForChanges()">
+            </div>
+
+            <!-- Student ID -->
+            <div>
+                <label for="studentId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student
+                    ID (7
+                    digits)</label>
+                <input type="text" id="studentId" name="studentId"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="1234567" maxlength="7" pattern="\d{7}" onchange="checkForChanges()">
+            </div>
+
+            <!-- Kasm Server Toggle -->
+            <div class="flex items-center">
+                <label for="kasmToggle" class="flex items-center cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" id="kasmToggle" class="sr-only" onchange="checkForChanges()">
+                        <div class="block bg-gray-300 dark:bg-gray-600 w-14 h-8 rounded-full"></div>
+                        <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform">
+                        </div>
+                    </div>
+                    <div class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Enable Kasm Server
+                    </div>
                 </label>
-                <span class="label-text">Kasm Server</span>
-            </form>
-        </div>
-        <div class="userPanel_class">
-            <h2 id="class">Class Info</h2>
-            <div class="class-actions">
-                <div class="class-details">
-                    <a id="classDisplayedInfo">CSA 2025</a>
-                </div>
-                <input type="submit" value="Change class"
-                    onclick="document.getElementById('change-class').style.visibility = 'visible'">
+            </div>
+
+            <!-- Password Change -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New
+                    Password</label>
+                <input type="password" id="password" name="password"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Enter new password" onchange="checkForChanges()">
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Classes Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Classes</h2>
+            <button type="button" id="addClassBtn"
+                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
+                onclick="addClass()">
+                Add Class
+            </button>
+        </div>
+
+        <div id="classesContainer">
+            <!-- Classes will be added here dynamically -->
+            <div class="class-entry mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
+                    <div class="flex-grow mb-2 md:mb-0">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class
+                            Name</label>
+                        <input type="text"
+                            class="class-name w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            value="Computer Science" onchange="checkForChanges()">
+                    </div>
+                    <div class="w-full md:w-1/3">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                        <select
+                            class="class-year w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            onchange="checkForChanges()">
+                            <option>2025</option>
+                            <option>2026</option>
+                            <option>2027</option>
+                            <option>2028</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
+                    onclick="removeClass(this)">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
 
 <!-- icons -->
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>

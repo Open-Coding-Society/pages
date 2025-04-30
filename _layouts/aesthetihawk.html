@@ -96,9 +96,7 @@
         grid-template-areas:
             "sidebar main-info";
 
-        margin: 50px;
-        margin-top: 100px;
-        margin-left: 8rem;
+        margin-top: 50px;
     }
 
     .sidebar {
@@ -106,7 +104,7 @@
     }
 </style>
 
-<body>
+<body class="min-h-screen flex-col flex-auto flex-shrink-0 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 transition-colors">
     <!-- navbar -->
     {%- include Aesthetihawk/header.html -%}
     
@@ -115,17 +113,19 @@
     </div>  
 
     <!-- main content -->
-     
-    <div>
-        <div class="container">
-            <!-- navigation pane on the left (sign in/out, etc.) -->
-            <div class="sidebar">
-                {% include Aesthetihawk/sidebar.html %}
+    <div class="container min-h-screen flex-col flex-auto flex-shrink-0 antialiased bg-gray-50 text-gray-800">
+        <!-- navigation pane on the left (sign in/out, etc.) -->
+        <div class="sidebar">
+            {% include Aesthetihawk/sidebar.html %}
+        </div>
+        
+        <div class="main-info">
+            <div class="ml-64 p-8">
+                {{ content }}
             </div>
-    
-            {{ content }}
         </div>
     </div>
+    
 
 </body>
 
