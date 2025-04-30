@@ -3,546 +3,129 @@ title: Profile
 layout: aesthetihawk
 active_tab: profile
 ---
-
-<style>
-    /* Base styles for the switch */
-    .switch {
-        display: inline-block;
-        position: relative;
-        width: 50px;
-        height: 25px;
-    }
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.4s;
-        border-radius: 25px;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 19px;
-        width: 19px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-    }
-
-    input:checked+.slider {
-        background-color: #2196F3;
-    }
-
-    input:checked+.slider.green {
-        background-color: #4CAF50;
-    }
-
-    input:checked+.slider:before {
-        transform: translateX(25px);
-    }
-
-    .label-text {
-        margin-left: 10px;
-        font-size: 16px;
-        vertical-align: middle;
-    }
-
-    @media (min-width: 1400PX) {
-        .cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .header {
-        grid-area: header;
-    }
-
-    .name-info {
-        display: grid;
-        grid-template-columns: 1fr max-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "name-details name-icon";
-        grid-area: name-info;
-    }
-
-    .name-details {
-        grid-area: name-details;
-    }
-
-    .name-icon {
-        grid-area: name-icon;
-    }
-
-    .uid-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "uid-details uid-icon";
-        grid-area: uid-info;
-    }
-
-    .uid-details {
-        grid-area: uid-details;
-    }
-
-    .uid-icon {
-        grid-area: uid-icon;
-    }
-
-    .email-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "email-details email-icon";
-        grid-area: email-info;
-    }
-
-    .email-details {
-        grid-area: email-details;
-    }
-
-    .email-icon {
-        grid-area: email-icon;
-    }
-
-    .password-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "password-details password-icon";
-        grid-area: password-info;
-    }
-
-    .password-details {
-        grid-area: password-details;
-    }
-
-    .password-icon {
-        grid-area: password-icon;
-    }
-
-    .kasm-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "kasm-details kasm-icon";
-        grid-area: kasm-info;
-    }
-
-    .kasm-details {
-        grid-area: kasm-details;
-    }
-
-    .kasm-icon {
-        grid-area: kasm-icon;
-    }
-
-    .class-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "class-details class-icon";
-        grid-area: class-info;
-    }
-
-    .class-details {
-        grid-area: class-details;
-    }
-
-    .class-icon {
-        grid-area: class-icon;
-    }
-
-    .pfp-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "pfp-details pfp-icon";
-        grid-area: pfp-info;
-    }
-
-    .pfp-details {
-        grid-area: pfp-details;
-    }
-
-    .pfp-icon {
-        grid-area: pfp-icon;
-    }
-
-    .dummy-info {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-auto-flow: row;
-        grid-template-areas:
-            "dummy-details dummy-icon";
-        grid-area: dummy-info;
-    }
-
-    .dummy-details {
-        grid-area: dummy-details;
-    }
-
-    .dummy-icon {
-        grid-area: dummy-icon;
-    }
-
-    .card {
-        /* colors */
-        background-image: linear-gradient(120deg, #1e1e1e 45%, #2a2a2a);
-
-        /* border */
-        border-radius: 10px;
-        border: 1px solid hsla(240, 6%, 30%, 0.63);
-
-        /* shadow */
-        filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
-
-        /* sizing */
-        box-sizing: border-box;
-        height: 100%;
-        overflow: hidden;
-        position: relative;
-        width: 100%;
-        max-width: 100%;
-
-        /* spacing */
-        padding: 30px;
-
-        /* other */
-        cursor: pointer;
-    }
-
-    .change-info-card {
-        /* colors */
-        background-color: hsla(240, 3%, 12%, 0.90);
-
-        /* border */
-        border-radius: 10px;
-        border: 1px solid hsla(240, 6%, 30%, 0.63);
-
-        /* shadow */
-        filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
-
-        /* spacing */
-        padding: 30px;
-        width: min-content;
-        text-align: center;
-
-        /* positioning for centering */
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        /* other */
-        z-index: 999;
-    }
-
-    input {
-        /* colors */
-        background-image: linear-gradient(120deg, #1e1e1e 45%, #2a2a2a);
-        color: white;
-
-        /* border */
-        border-radius: 10px;
-        border: 1px solid hsla(240, 6%, 30%, 0.63);
-
-        /* shadow */
-        filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
-
-        /* spacing */
-        padding: 15px;
-        margin: 10px;
-
-        /* other */
-        font-size: large;
-    }
-
-    .close {
-        position: absolute;
-        top: 5px;
-        left: 5px;
-
-        cursor: pointer;
-    }
-
-    /* CHECKBOX STUFF ================================ */
-    /* The container-checkbox */
-    .container-checkbox {
-        display: block;
-        position: relative;
-        padding-left: 35px;
-        cursor: pointer;
-        font-size: 22px;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    /* Hide the browser's default checkbox */
-    .container-checkbox input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-    }
-
-    /* Create a custom checkbox */
-    .checkmark {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 25px;
-        width: 25px;
-        background-color: #eee;
-        border-radius: 5px;
-    }
-
-    /* On mouse-over, add a grey background color */
-    .container-checkbox:hover input~.checkmark {
-        background-color: #ccc;
-    }
-
-    /* When the checkbox is checked, add a blue background */
-    .container-checkbox input:checked~.checkmark {
-        background-color: #2196F3;
-    }
-
-    /* Create the checkmark/indicator (hidden when not checked) */
-    .checkmark:after {
-        content: "";
-        position: absolute;
-        display: none;
-    }
-
-    /* Show the checkmark when checked */
-    .container-checkbox input:checked~.checkmark:after {
-        display: block;
-    }
-
-    /* Style the checkmark/indicator */
-    .container-checkbox .checkmark:after {
-        left: 9px;
-        top: 5px;
-        width: 5px;
-        height: 10px;
-        border: solid white;
-        border-width: 0 3px 3px 0;
-        -webkit-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-        transform: rotate(45deg);
-    }
-
-    /* fancy user panel css */
-    .userPanel {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        /* 2 columns of equal width */
-        grid-template-rows: repeat(3, auto);
-        /* 3 rows with height based on content */
-        gap: 20px;
-        /* Adjust spacing between items */
-        grid-auto-flow: row;
-        /* Fill rows first */
-        justify-content: center;
-        /* Center the grid horizontally */
-        align-items: start;
-        /* Align items to the top */
-        border: 2px solid hsla(240, 6%, 30%, 0.63);
-        /* Add a visible border */
-        border-radius: 15px;
-        /* Rounded corners */
-        background-color: hsla(240, 3%, 20%, 0.5);
-        /* Subtle background */
-        padding: 20px;
-        /* Some space inside */
-        margin-top: 20px;
-        /* Spacing from other content */
-    }
-
-    .class-actions {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 30px;
-    }
-
-    .kasm-toggle-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        /* Adjust spacing between the toggle and the text */
-    }
-
-    .kasm-toggle-container .label-text {
-        margin: 0;
-        /* Remove any default margin */
-        font-size: 16px;
-        /* Ensure consistent font size */
-        vertical-align: middle;
-        /* Align text vertically with the toggle */
-    }
-</style>
-
-<div class="flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold">Profile Settings</h1>
-    <button id="saveChangesBtn" disabled
-        class="px-6 py-2 bg-gray-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
-        onclick="saveChanges()">
-        Save Changes
-    </button>
-</div>
-
-<form id="profileSettingsForm">
-    <!-- Personal Information Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-6">Personal Information</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Full Name -->
-            <div>
-                <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
-                    Name</label>
-                <input type="text" id="fullName" name="fullName"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="John Doe" onchange="checkForChanges()">
-            </div>
-
-            <!-- User ID -->
-            <div>
-                <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User
-                    ID</label>
-                <input type="text" id="userId" name="userId"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="johndoe123" onchange="checkForChanges()">
-            </div>
-
-            <!-- Email -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
-                    Address</label>
-                <input type="email" id="email" name="email"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="john.doe@example.com" onchange="checkForChanges()">
-            </div>
-
-            <!-- Student ID -->
-            <div>
-                <label for="studentId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student
-                    ID (7
-                    digits)</label>
-                <input type="text" id="studentId" name="studentId"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="1234567" maxlength="7" pattern="\d{7}" onchange="checkForChanges()">
-            </div>
-
-            <!-- Kasm Server Toggle -->
-            <div class="flex items-center">
-                <label for="kasmToggle" class="flex items-center cursor-pointer">
-                    <div class="relative">
-                        <input type="checkbox" id="kasmToggle" class="sr-only" onchange="checkForChanges()">
-                        <div class="block bg-gray-300 dark:bg-gray-600 w-14 h-8 rounded-full"></div>
-                        <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform">
-                        </div>
-                    </div>
-                    <div class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Enable Kasm Server
-                    </div>
-                </label>
-            </div>
-
-            <!-- Password Change -->
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New
-                    Password</label>
-                <input type="password" id="password" name="password"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Enter new password" onchange="checkForChanges()">
-            </div>
-        </div>
+<div class="ml-64 p-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Profile Settings</h1>
+        <button id="saveChangesBtn" disabled
+            class="px-6 py-2 bg-gray-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
+            onclick="saveChanges()">
+            Save Changes
+        </button>
     </div>
 
-    <!-- Classes Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Classes</h2>
-            <button type="button" id="addClassBtn"
-                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
-                onclick="addClass()">
-                Add Class
-            </button>
+    <form id="profileSettingsForm">
+        <!-- Personal Information Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-6">Personal Information</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Full Name -->
+                <div>
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full
+                        Name</label>
+                    <input type="text" id="fullName" name="fullName"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value="John Doe" onchange="checkForChanges()">
+                </div>
+
+                <!-- User ID -->
+                <div>
+                    <label for="userId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User
+                        ID</label>
+                    <input type="text" id="userId" name="userId"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value="johndoe123" onchange="checkForChanges()">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email
+                        Address</label>
+                    <input type="email" id="email" name="email"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value="john.doe@example.com" onchange="checkForChanges()">
+                </div>
+
+                <!-- Student ID -->
+                <div>
+                    <label for="studentId"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student
+                        ID (7
+                        digits)</label>
+                    <input type="text" id="studentId" name="studentId"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value="1234567" maxlength="7" pattern="\d{7}" onchange="checkForChanges()">
+                </div>
+
+                <!-- Kasm Server Toggle -->
+                <div class="flex items-center">
+                    <label for="kasmToggle" class="flex items-center cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" id="kasmToggle" class="sr-only" onchange="checkForChanges()">
+                            <div class="block bg-gray-300 dark:bg-gray-600 w-14 h-8 rounded-full"></div>
+                            <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform">
+                            </div>
+                        </div>
+                        <div class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Enable Kasm Server
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Password Change -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New
+                        Password</label>
+                    <input type="password" id="password" name="password"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Enter new password" onchange="checkForChanges()">
+                </div>
+            </div>
         </div>
 
-        <div id="classesContainer">
-            <!-- Classes will be added here dynamically -->
-            <div class="class-entry mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                    <div class="flex-grow mb-2 md:mb-0">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class
-                            Name</label>
-                        <input type="text"
-                            class="class-name w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            value="Computer Science" onchange="checkForChanges()">
-                    </div>
-                    <div class="w-full md:w-1/3">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
-                        <select
-                            class="class-year w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            onchange="checkForChanges()">
-                            <option>2025</option>
-                            <option>2026</option>
-                            <option>2027</option>
-                            <option>2028</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
-                    onclick="removeClass(this)">
-                    Remove
+        <!-- Classes Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Classes</h2>
+                <button type="button" id="addClassBtn"
+                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
+                    onclick="addClass()">
+                    Add Class
                 </button>
             </div>
+
+            <div id="classesContainer">
+                <!-- Classes will be added here dynamically -->
+                <div class="class-entry mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
+                        <div class="flex-grow mb-2 md:mb-0">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class
+                                Name</label>
+                            <input type="text"
+                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                value="Computer Science" onchange="checkForChanges()">
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+                            <select
+                                class="class-year w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                onchange="checkForChanges()">
+                                <option>2025</option>
+                                <option>2026</option>
+                                <option>2027</option>
+                                <option>2028</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
+                        onclick="removeClass(this)">
+                        Remove
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 <!-- icons -->
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
@@ -639,27 +222,27 @@ active_tab: profile
     window.changeSteve = async function () {
         const name = await window.fetchName();
         const profileImageBox = document.getElementById('headerPfp');
-    
+
         // Check if the name contains "Steve" (case-insensitive)
         if (/steve/i.test(name)) {
             const currentProfilePicture = profileImageBox.querySelector('img')?.src;
-    
+
             // Check if the profile picture is already set to steve.png
             const steveImagePath = "{{site.baseurl}}/images/jokes/steve.png";
             const isSteveSet = localStorage.getItem('isSteveSet');
-    
+
             if (!isSteveSet || isSteveSet !== 'true') {
                 if (!currentProfilePicture || !currentProfilePicture.includes('steve.png')) {
                     // Set the profile picture to steve.png
                     profileImageBox.innerHTML = `<img src="${steveImagePath}" alt="Profile Picture">`;
-    
+
                     // Save the profile picture to the database
                     await window.changeProfilePictureWithPath(steveImagePath);
-    
+
                     // Mark as updated in localStorage
                     localStorage.setItem('isSteveSet', 'true');
                     console.log('Profile picture updated to steve.png');
-    
+
                     // wait like 0.5 seconds
                     await new Promise(resolve => setTimeout(resolve, 500));
                     window.location.reload();
@@ -842,14 +425,14 @@ active_tab: profile
     // UPDATE COMMANDS =======
     window.changeName = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
-    
+
         // Ensure the input element is selected
         const nameChangeInput = document.getElementById("nameChangeInput");
         if (!nameChangeInput) {
             console.error("Input element not found.");
             return;
         }
-    
+
         // Get value from the input field
         const name = nameChangeInput.value.trim(); // Trim to remove accidental spaces
         if (!name) {
@@ -858,11 +441,11 @@ active_tab: profile
         } else {
             console.log("Name input:", name);
         }
-    
+
         // Define URLs for both backends
         const pythonURL = pythonURI + "/api/user";
         const javaURL = javaURI + "/api/person/update";
-    
+
         // Define options for both requests
         const pythonOptions = {
             URL: pythonURL,
@@ -872,7 +455,7 @@ active_tab: profile
                 console.log('Name updated successfully in Python backend!');
             }
         };
-    
+
         const javaOptions = {
             URL: javaURL,
             body: { name },
@@ -880,14 +463,14 @@ active_tab: profile
                 console.log('Name updated successfully in Java backend!');
             }
         };
-    
+
         try {
             // Send requests to both backends
             await Promise.all([
                 putUpdate(pythonOptions),
                 postUpdate(javaOptions)
             ]);
-    
+
             // Update the name field in the UI
             window.updateNameField(name);
             console.log('Name updated successfully in both backends!');
