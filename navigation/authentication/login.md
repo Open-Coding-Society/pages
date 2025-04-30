@@ -40,12 +40,10 @@ show_reading_time: false
         overflow: hidden;
     }
 
-    .login-card h1 {
-        margin-bottom: 20px;
-    }
-
+    .login-card h1,
     .signup-card h1 {
-        margin-bottom: 20px;
+        margin-top: 0px; /* Reduced the top margin */
+        margin-bottom: 20px; /* Keep the bottom margin for spacing */
     }
 
     .form-group {
@@ -57,6 +55,16 @@ show_reading_time: false
         width: 100%;
         box-sizing: border-box;
     }
+
+    .switch {
+        display: inline-flex;
+        align-items: center;
+        padding-bottom: 1.5rem;
+    }
+
+    .toggle {
+        margin-right: 10px;
+    }
 </style>
 <br>
 <div class="login-container">
@@ -65,11 +73,11 @@ show_reading_time: false
         <h1 id="pythonTitle">User Login</h1>
         <hr>
         <form id="pythonForm" onsubmit="loginBoth(event);">
-            <div class="form-group">
-                <input type="text" id="uid" placeholder="GitHub ID" required>
+            <div class="form-group" style="padding-top: 1.5rem;"> <!-- Added padding here -->
+                <input type="text" class="smallInput" id="uid" placeholder="GitHub ID" required>
             </div>
             <div class="form-group">
-                <input type="password" id="password" placeholder="Password" required>
+                <input type="password" class="smallInput" id="password" placeholder="Password" required>
             </div>
             <p>
                 <button type="submit" class="large primary submit-button">Login</button>
@@ -81,20 +89,20 @@ show_reading_time: false
         <h1 id="signupTitle">Sign Up</h1>
         <hr>
         <form id="signupForm" onsubmit="signup(); return false;">
-            <div class="form-group">
-                <input type="text" id="name" placeholder="Name" required>
+            <div class="form-group" style="padding-top: 1.5rem;"> <!-- Added padding here -->
+                <input type="text" class="smallInput" id="name" placeholder="Name" required>
             </div>
             <div class="form-group">
-                <input type="text" id="signupUid" placeholder="GitHub ID" required>
+                <input type="text" class="smallInput" id="signupUid" placeholder="GitHub ID" required>
             </div>
             <div class="form-group">
-                <input type="text" id="signupSid" placeholder="Student ID" required>
+                <input type="text" class="smallInput" id="signupSid" placeholder="Student ID" required>
             </div>
             <div class="form-group">
-                <input type="text" id="signupEmail" placeholder="Email" required>
+                <input type="text" class="smallInput" id="signupEmail" placeholder="Email" required>
             </div>
             <div class="form-group">
-                <input type="password" id="signupPassword" placeholder="Password" required>
+                <input type="password" class="smallInput" id="signupPassword" placeholder="Password" required>
             </div>
             <p>
                 <label class="switch">
