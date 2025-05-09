@@ -7,41 +7,10 @@
     <title>{{ page.title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script>
-        // Function to set active tab
-        function setActiveTab(element) {
-            // Remove active class from all nav items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
-                item.classList.add('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
-            });
-
-            // Add active class to clicked element
-            element.classList.remove('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
-            element.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
-        }
-    </script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <style>
-    /* Toast base (off-screen to the right + invisible) */
-    #unsavedChangesAlert {
-        position: fixed;
-        bottom: 1rem;
-        right: 1rem;
-        transform: translateX(120%);
-        opacity: 0;
-        transition: transform 0.4s ease, opacity 0.4s ease;
-        z-index: 50;
-    }
-
-    /* Toast “show” state (on-screen + visible) */
-    #unsavedChangesAlert.show {
-        transform: translateX(0);
-        opacity: 1;
-    }
-
     /* Shake animation for Save button */
     @keyframes shake {
         0% {
@@ -68,27 +37,33 @@
     .shake-animation {
         animation: shake 0.3s ease-in-out;
     }
-
-    /* Close-button styling */
-    #unsavedChangesAlert button.close {
-        position: absolute;
-        top: 0.25rem;
-        right: 0.25rem;
-        background: transparent;
-        border: none;
-        font-size: 1rem;
-        cursor: pointer;
-    }
 </style>
 
-<!--  -->
+<div class="max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-700"
+    role="alert" tabindex="-1" aria-labelledby="hs-toast-success-example-label">
+    <div class="flex p-4">
+        <div class="shrink-0">
+            <svg class="shrink-0 size-4 text-teal-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                fill="currentColor" viewBox="0 0 16 16">
+                <path
+                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z">
+                </path>
+            </svg>
+        </div>
+        <div class="ms-3">
+            <p id="hs-toast-success-example-label" class="text-sm text-gray-700 dark:text-neutral-400">
+                This is a success message.
+            </p>
+        </div>
+    </div>
+</div>
 
-<body
-    class="min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
+<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
     <!-- navbar -->
     {%- include Aesthetihawk/header.html -%}
 
-    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased text-neutral-50 mt-[53px] bg-neutral-900">
+    <div
+        class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased text-neutral-50 mt-[53px] bg-neutral-900">
         <!-- Sidebar - Fixed container -->
         <div class="fixed left-0 top-[53px] w-64 h-full bg-neutral-800 border-r  border-neutral-700 flex flex-col">
             <!-- Fixed profile pic section - doesn't scroll -->
@@ -276,18 +251,6 @@
     // how long toast stays (ms)
     const toastDuration = 10000;
 
-    // no preventDefault(), no returnValue, no return → no browser popup
-    window.addEventListener('beforeunload', function (e) {
-        if (formChanged) {
-            // show the unsaved changes alert
-            showUnsavedChangesAlert();
-
-            // explicitly set returnValue to trigger the browser's confirmation dialog
-            e.preventDefault();
-            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-        }
-    });
-
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
         // Store original values
@@ -299,19 +262,16 @@
 
         toggle.addEventListener('change', function () {
             if (this.checked) {
-                toggleDot.classList.add('translate-x-6');
+                toggleDot.classList.add('translate-x-3');
             } else {
-                toggleDot.classList.remove('translate-x-6');
+                toggleDot.classList.remove('translate-x-3');
             }
         });
 
         // Set up beforeunload event
         window.addEventListener('beforeunload', function (e) {
             if (formChanged) {
-                // e.preventDefault();
-                // e.returnValue = '';
                 showUnsavedChangesAlert();
-                return '';
             }
         });
     });
@@ -491,71 +451,59 @@
     }
 </script>
 
-<script>
-    function checkForChanges() {
-        document.getElementById('saveChangesBtn').disabled = false;
-        document.getElementById('saveChangesBtn').classList.remove('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-        document.getElementById('saveChangesBtn').classList.add('bg-indigo-500', 'text-white', 'cursor-pointer');
-        document.getElementById('unsavedChangesAlert').style.display = 'block';
-    }
-</script>
+<!-- <script>
+    function removeClass(btn) { btn.closest('.class-entry').remove(); checkForChanges(); }
+</script> -->
 
 <script>
-    // On page load: set theme based on system preference or saved choice
-    document.addEventListener('DOMContentLoaded', () => {
-        const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const savedTheme = localStorage.getItem('theme');
-        const isDark = savedTheme === 'dark' || (!savedTheme && userPrefersDark);
-        updateHtmlClass(isDark);
-        // Update toggle UI
-        const toggle = document.getElementById('kasmToggle');
-        const dot = document.querySelector('.dot');
-        if (toggle) {
-            toggle.checked = isDark;
-            dot.classList.toggle('translate-x-6', isDark);
-        }
+    function tostifyCustomClose(el) {
+        const parent = el.closest('.toastify');
+        const close = parent.querySelector('.toast-close');
+
+        close.click();
+    }
+
+    window.addEventListener('load', () => {
+        (function () {
+            let i = 0;
+            const callToast = document.querySelector("#saveChangesBtn");
+            const toastMarkup2 = `
+                <div class="flex p-4">
+                    <p class="text-sm text-gray-700 dark:text-neutral-400">Changes Saved</p>
+                    <div class="ms-auto">
+                    <button onclick="tostifyCustomClose(this)" type="button" class="inline-flex shrink-0 justify-center items-center size-5 rounded-lg text-gray-800 opacity-50 hover:opacity-100 focus:outline-hidden focus:opacity-100 dark:text-white" aria-label="Close">
+                        <span class="sr-only">Close</span>
+                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                    </button>
+                    </div>
+                </div>
+            `;
+
+            callToast.addEventListener("click", () => {
+                Toastify({
+                    text: toastMarkup1,
+                    className: "hs-toastify-on:opacity-100 opacity-0 fixed -top-37.5 right-5 z-90 transition-all duration-300 w-80 bg-white text-sm text-gray-700 border border-gray-200 rounded-xl shadow-lg [&>.toast-close]:hidden dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400",
+                    duration: 3000,
+                    close: true,
+                    escapeMarkup: false
+                }).showToast();
+            });
+        })();
     });
 
-    function updateHtmlClass(dark) {
-        const html = document.documentElement;
-        if (dark) html.classList.add('dark');
-        else html.classList.remove('dark');
+    // Function to set active tab
+    function setActiveTab(element) {
+        // Remove active class from all nav items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
+            item.classList.add('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
+        });
+
+        // Add active class to clicked element
+        element.classList.remove('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
+        element.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
     }
 </script>
-<script>
-    function setActiveTab(el) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('bg-neutral-900', 'border-indigo-500', 'text-neutral-100'));
-        el.classList.add('bg-neutral-900', 'border-indigo-500', 'text-neutral-100');
-    }
-    function checkForChanges() {
-        document.getElementById('saveChangesBtn').disabled = false;
-        document.getElementById('saveChangesBtn').classList.remove('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-        document.getElementById('saveChangesBtn').classList.add('bg-indigo-500', 'text-white', 'cursor-pointer');
-        document.getElementById('unsavedChangesAlert').style.display = 'block';
-    }
-    function addClass() {
-        const container = document.getElementById('classesContainer');
-        const entry = document.createElement('div'); entry.className = 'class-entry mb-4 p-4 border border-gray-700 rounded-lg';
-        entry.innerHTML = `
-            <div class=\"flex flex-col md:flex-row md:space-x-4 mb-2\">
-              <div class=\"flex-grow mb-2 md:mb-0\">
-                <label class=\"block text-sm font-medium text-neutral-300 mb-1\">Class Name</label>
-                <input type=\"text\" class=\"class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500\" value=\"New Class\" onchange=\"checkForChanges()\">
-              </div>
-              <div class=\"w-full md:w-1/3\">
-                <label class=\"block text-sm font-medium text-neutral-300 mb-1\">Year</label>
-                <select class=\"class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500\" onchange=\"checkForChanges()\">
-                  <option>2025</option>
-                  <option>2026</option>
-                  <option>2027</option>
-                  <option>2028</option>
-                </select>
-              </div>
-            </div>
-            <button type=\"button\" class=\"text-red-500 hover:text-red-700 text-sm font-medium\" onclick=\"removeClass(this)\">Remove</button>`;
-        container.appendChild(entry);
-        checkForChanges();
-    }
-    function removeClass(btn) { btn.closest('.class-entry').remove(); checkForChanges(); }
-    function saveChanges() { /* implement save */ }
-</script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>

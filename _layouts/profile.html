@@ -144,6 +144,63 @@ active_tab: profile
 </div>
 <!-- content here -->
 
+<style>
+    /* Toast base (off-screen to the right + invisible) */
+    #unsavedChangesAlert {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        transform: translateX(120%);
+        opacity: 0;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+        z-index: 50;
+    }
+
+    /* Toast “show” state (on-screen + visible) */
+    #unsavedChangesAlert.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    /* Shake animation for Save button */
+    @keyframes shake {
+        0% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-15px);
+        }
+
+        50% {
+            transform: translateX(15px);
+        }
+
+        75% {
+            transform: translateX(-15px);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    .shake-animation {
+        animation: shake 0.3s ease-in-out;
+    }
+
+    /* Close-button styling */
+    #unsavedChangesAlert button.close {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.25rem;
+        background: transparent;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+</style>
+
 <!-- icons -->
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
@@ -691,5 +748,38 @@ active_tab: profile
             console.error('Error uploading profile picture:', error.message);
         }
     }
+
+    // // show toast, auto-hide, allow manual close
+    // function showUnsavedChangesAlert() {
+    //     const toast = document.getElementById('unsavedChangesAlert');
+    //     const saveButton = document.getElementById('saveChangesBtn');
+
+    //     // trigger reflow so shake always retriggers
+    //     saveButton.classList.remove('shake-animation');
+    //     void saveButton.offsetWidth;
+    //     saveButton.classList.add('shake-animation');
+
+    //     // slide-in toast
+    //     toast.classList.add('show');
+
+    //     // clear any existing timeout
+    //     if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
+
+    //     // auto-hide after duration
+    //     toast.hideTimeout = setTimeout(() => {
+    //         toast.classList.remove('show');
+    //     }, toastDuration);
+    // }
+
+    // // close button handler
+    // document
+    //     .getElementById('unsavedChangesAlert')
+    //     .querySelector('button.close')
+    //     .addEventListener('click', function () {
+    //         const toast = document.getElementById('unsavedChangesAlert');
+    //         toast.classList.remove('show');
+    //         if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
+    //     });
+
 
 </script>
