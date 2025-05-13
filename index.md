@@ -47,6 +47,17 @@ menu: nav/home.html
       max-width: 100%; /* Scale the image to fit the container */
       height: auto; /* Maintain aspect ratio */
     }    
+    table {
+      width: 100%; /* Allow the table to take full width */
+      margin: 0 auto; /* Center the table horizontally */
+      overflow-x: auto; /* Enable horizontal scrolling */
+      display: block; /* Make the table a block element for scrolling */
+    }
+
+    td {
+      padding: 10px; /* Add consistent padding inside table cells */
+      word-wrap: break-word; /* Ensure long text wraps inside cells */
+    }
   }
 </style>
 
