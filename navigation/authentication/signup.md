@@ -6,62 +6,41 @@ search_exclude: true
 menu: nav/home.html
 show_reading_time: false 
 ---
-<style>
-.login-container {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap; /* allows the cards to wrap onto the next line if the screen is too small */
-}
-.signup-card {
-    margin: auto;
-    margin-top: 0; /* remove the top margin */
-    width: 45%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 20px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    margin-bottom: 20px;
-    overflow-x: auto; /* Enable horizontal scrolling */
-}
-.signup-card h1 {
-    margin-bottom: 20px;
-}
-</style>
-<div id="login-container">
-<div class="signup-card">
-        <h1 id="signupTitle">Sign Up</h1>
-        <form id="signupForm" onsubmit="signup(); return false;">
-            <p>
-                <label>
-                    Name:
-                    <input type="text" name="name" id="name" required>
-                </label>
-            </p>
-            <p>
-                <label>
-                    Github Id
-                    <input type="text" name="signupUid" id="signupUid" required>
-                </label>
-            </p>
-            <p>
-                <label>
-                    Password:
-                    <input type="password" name="signupPassword" id="signupPassword" required>
-                </label>
-            </p>
-            <p>
-                <label>
-                    <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
-                    Kasm Server Needed
-                </label>
-            </p>
-            <p>
-                <button type="submit">Sign Up</button>
-            </p>
-            <a style="color: grey !important" href="{{site.baseurl}}/duallogin">login</a>
-            <p id="signupMessage" style="color: green;"></p>
-        </form>
-    </div>
+<div id="login-container" class="flex flex-wrap justify-between">
+  <div class="signup-card mx-auto mt-0 w-2/5 border border-gray-300 rounded-md p-5 shadow-md mb-5 overflow-x-auto">
+    <h1 id="signupTitle" class="mb-5">Sign Up</h1>
+    <form id="signupForm" onsubmit="signup(); return false;">
+      <p>
+        <label>
+          Name:
+          <input type="text" name="name" id="name" class="border border-gray-300 rounded-md p-2 w-full" required>
+        </label>
+      </p>
+      <p>
+        <label>
+          Github Id:
+          <input type="text" name="signupUid" id="signupUid" class="border border-gray-300 rounded-md p-2 w-full" required>
+        </label>
+      </p>
+      <p>
+        <label>
+          Password:
+          <input type="password" name="signupPassword" id="signupPassword" class="border border-gray-300 rounded-md p-2 w-full" required>
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" name="kasmNeeded" id="kasmNeeded" class="mr-2">
+          Kasm Server Needed
+        </label>
+      </p>
+      <p>
+        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">Sign Up</button>
+      </p>
+      <a class="text-gray-500 hover:underline" href="{{site.baseurl}}/duallogin">login</a>
+      <p id="signupMessage" class="text-green-500"></p>
+    </form>
+  </div>
 </div>
 
 <script type="module">

@@ -1,0 +1,19 @@
+// Import Tailwind and Bootstrap utilities if needed
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+// Calendar-specific styles
+.calendar-header {
+  @apply flex justify-between items-center bg-gray-100 p-4 rounded-md shadow-md;
+}
+
+.calendar-days {
+  @apply grid grid-cols-7 gap-2 text-center font-bold text-gray-700;
+}
+
+.calendar-day {
+  @apply p-2 border border-gray-300 rounded-md hover:bg-gray-200;
+}
+
+// Add additional styles as needed
