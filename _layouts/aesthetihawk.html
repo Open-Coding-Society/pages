@@ -57,12 +57,6 @@
                 <h2 class="text-lg font-semibold text-center mb-6">Welcome, User</h2>
             </div>
 
-            <!-- DELETE THIS -->
-            <button id="hs-new-toast" type="button"
-                class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                Call toast
-            </button>
-
             <!-- Scrollable menu section -->
             <div class="overflow-y-auto flex-grow">
                 <!-- the menu side -->
@@ -466,7 +460,7 @@
     window.addEventListener('load', () => {
         (function () {
             let i = 0;
-            const callToast = document.querySelector("#hs-new-toast");
+            const callToast = document.querySelector("#saveChangesBtn");
             
             const toastMarkup2 = `
                 <div class="bottom-4 right-4 max-w-xs bg-neutral-800 border border-neutral-700 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] outline outline-1 outline-white/10"
