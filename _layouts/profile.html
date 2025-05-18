@@ -4,6 +4,35 @@ layout: aesthetihawk
 active_tab: profile
 ---
 
+<style>
+    /* Shake animation for Save button */
+    @keyframes shake {
+        0% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-15px);
+        }
+
+        50% {
+            transform: translateX(15px);
+        }
+
+        75% {
+            transform: translateX(-15px);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    .shake-animation {
+        animation: shake 0.3s ease-in-out;
+    }
+</style>
+
 <!-- content here -->
 <div class="flex justify-between items-center mb-8">
     <h1 class="text-2xl font-bold">Profile Settings</h1>
@@ -16,7 +45,7 @@ active_tab: profile
 
 <form id="profileSettingsForm">
     <!-- Personal Information Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6">
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">Personal Information</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -84,7 +113,7 @@ active_tab: profile
     </div>
 
     <!-- Classes Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6">
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Classes</h2>
             <button type="button" id="addClassBtn"
@@ -96,7 +125,7 @@ active_tab: profile
 
         <div id="classesContainer">
             <!-- Classes will be added here dynamically -->
-            <div class="class-entry mb-4 p-4 border border-gray-700 rounded-lg">
+            <div class="class-entry mb-4 p-4 border rounded-lg border-neutral-700 border">
                 <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
                     <div class="flex-grow mb-2 md:mb-0">
                         <label class="block text-sm font-medium text-gray-300 mb-1">Class
@@ -748,38 +777,212 @@ active_tab: profile
             console.error('Error uploading profile picture:', error.message);
         }
     }
+</script>
 
-    // // show toast, auto-hide, allow manual close
-    // function showUnsavedChangesAlert() {
-    //     const toast = document.getElementById('unsavedChangesAlert');
-    //     const saveButton = document.getElementById('saveChangesBtn');
+<script>
+    // Store original form values
+    let originalValues = {};
+    let formChanged = false;
 
-    //     // trigger reflow so shake always retriggers
-    //     saveButton.classList.remove('shake-animation');
-    //     void saveButton.offsetWidth;
-    //     saveButton.classList.add('shake-animation');
+    // how long toast stays (ms)
+    const toastDuration = 10000;
 
-    //     // slide-in toast
-    //     toast.classList.add('show');
+    // Initialize the form
+    document.addEventListener('DOMContentLoaded', function () {
+        // Store original values
+        saveOriginalValues();
 
-    //     // clear any existing timeout
-    //     if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
+        // Set up toggle switch
+        const toggle = document.querySelector('#kasmToggle');
+        const toggleDot = document.querySelector('.dot');
 
-    //     // auto-hide after duration
-    //     toast.hideTimeout = setTimeout(() => {
-    //         toast.classList.remove('show');
-    //     }, toastDuration);
-    // }
+        toggle.addEventListener('change', function () {
+            if (this.checked) {
+                toggleDot.classList.add('translate-x-3');
+            } else {
+                toggleDot.classList.remove('translate-x-3');
+            }
+        });
 
-    // // close button handler
-    // document
-    //     .getElementById('unsavedChangesAlert')
-    //     .querySelector('button.close')
-    //     .addEventListener('click', function () {
-    //         const toast = document.getElementById('unsavedChangesAlert');
-    //         toast.classList.remove('show');
-    //         if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-    //     });
+        // Set up beforeunload event
+        window.addEventListener('beforeunload', function (e) {
+            if (formChanged) {
+                showUnsavedChangesAlert();
+            }
+        });
+    });
+
+    // Save original form values
+    function saveOriginalValues() {
+        const form = document.getElementById('profileSettingsForm');
+        const inputs = form.querySelectorAll('input, select');
+
+        inputs.forEach(input => {
+            if (input.type === 'checkbox') {
+                originalValues[input.id] = input.checked;
+            } else {
+                originalValues[input.id] = input.value;
+            }
+        });
+
+        // Save original class entries
+        const classEntries = document.querySelectorAll('.class-entry');
+        originalValues.classEntries = [];
+
+        classEntries.forEach((entry, index) => {
+            originalValues.classEntries[index] = {
+                name: entry.querySelector('.class-name').value,
+                year: entry.querySelector('.class-year').value
+            };
+        });
+    }
+
+    // Check if form values have changed
+    function checkForChanges() {
+        const form = document.getElementById('profileSettingsForm');
+        const inputs = form.querySelectorAll('input, select');
+        const saveButton = document.getElementById('saveChangesBtn');
+
+        formChanged = false;
+
+        // Check standard inputs
+        inputs.forEach(input => {
+            if (input.type === 'checkbox') {
+                if (originalValues[input.id] !== input.checked) {
+                    formChanged = true;
+                }
+            } else if (input.id && originalValues[input.id] !== undefined) {
+                if (originalValues[input.id] !== input.value) {
+                    formChanged = true;
+                }
+            }
+        });
+
+        // Check class entries
+        const classEntries = document.querySelectorAll('.class-entry');
+        if (classEntries.length !== originalValues.classEntries.length) {
+            formChanged = true;
+        } else {
+            classEntries.forEach((entry, index) => {
+                const name = entry.querySelector('.class-name').value;
+                const year = entry.querySelector('.class-year').value;
+
+                if (index >= originalValues.classEntries.length ||
+                    originalValues.classEntries[index].name !== name ||
+                    originalValues.classEntries[index].year !== year) {
+                    formChanged = true;
+                }
+            });
+        }
+
+        // Update save button
+        if (formChanged) {
+            saveButton.disabled = false;
+            saveButton.classList.remove('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
+            saveButton.classList.add('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
+        } else {
+            saveButton.disabled = true;
+            saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
+            saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
+        }
+    }
+
+    // Add new class
+    function addClass() {
+        const container = document.getElementById('classesContainer');
+        const classEntry = document.createElement('div');
+        classEntry.className = 'class-entry mb-4 p-4 border border-gray-700 rounded-lg';
+
+        classEntry.innerHTML = `
+                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
+                        <div class="flex-grow mb-2 md:mb-0">
+                            <label class="block text-sm font-medium text-neutral-300 mb-1">Class Name</label>
+                            <input type="text" 
+                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                                placeholder="Enter class name" onchange="checkForChanges()">
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-sm font-medium text-neutral-300 mb-1">Year</label>
+                            <select class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="checkForChanges()">
+                                <option>2025</option>
+                                <option>2026</option>
+                                <option>2027</option>
+                                <option>2028</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
+                        Remove
+                    </button>
+                `;
+
+        container.appendChild(classEntry);
+        checkForChanges();
+    }
+
+    // Remove class
+    function removeClass(button) {
+        const classEntry = button.closest('.class-entry');
+        classEntry.remove();
+        checkForChanges();
+    }
+
+    // show toast, auto-hide, allow manual close
+    function showUnsavedChangesAlert() {
+        const toast = document.getElementById('unsavedChangesAlert');
+        const saveButton = document.getElementById('saveChangesBtn');
+
+        // trigger reflow so shake always retriggers
+        saveButton.classList.remove('shake-animation');
+        void saveButton.offsetWidth;
+        saveButton.classList.add('shake-animation');
+
+        // slide-in toast
+        toast.classList.add('show');
+
+        // clear any existing timeout
+        if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
+
+        // auto-hide after duration
+        toast.hideTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+        }, toastDuration);
+    }
+
+    // close button handler
+    document
+        .getElementById('unsavedChangesAlert')
+        .querySelector('button.close')
+        .addEventListener('click', function () {
+            const toast = document.getElementById('unsavedChangesAlert');
+            toast.classList.remove('show');
+            if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
+        });
 
 
+    // Save changes
+    function saveChanges() {
+        // Here you would typically send data to the server
+        // For now, we'll just update the originalValues
+        saveOriginalValues();
+        formChanged = false;
+
+        const saveButton = document.getElementById('saveChangesBtn');
+        saveButton.disabled = true;
+        saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
+        saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
+
+        // Show success message
+        const originalButtonText = saveButton.innerHTML;
+        saveButton.innerHTML = `
+                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Saved!
+                `;
+
+        setTimeout(() => {
+            saveButton.innerHTML = originalButtonText;
+        }, 2000);
+    }
 </script>

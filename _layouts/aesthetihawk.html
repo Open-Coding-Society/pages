@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -11,34 +11,7 @@
 </head>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-<style>
-    /* Shake animation for Save button */
-    @keyframes shake {
-        0% {
-            transform: translateX(0);
-        }
 
-        25% {
-            transform: translateX(-15px);
-        }
-
-        50% {
-            transform: translateX(15px);
-        }
-
-        75% {
-            transform: translateX(-15px);
-        }
-
-        100% {
-            transform: translateX(0);
-        }
-    }
-
-    .shake-animation {
-        animation: shake 0.3s ease-in-out;
-    }
-</style>
 
 <body class="min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
     <!-- navbar -->
@@ -70,7 +43,7 @@
 
                     <!-- dashboard button -->
                     <li>
-                        <a href="file:///home/administrator/dashboard.html" onclick="setActiveTab(this)"
+                        <a href="{{site.baseurl}}/dashboard" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -86,23 +59,23 @@
 
                     <!-- analytics button -->
                     <li>
-                        <a href="file:///home/administrator/analytics.html" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a href="{{site.baseurl}}/profile" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                 </svg>
                             </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Analytics</span>
+                            <span class="ml-2 text-sm tracking-wide truncate">Profile</span>
                         </a>
                     </li>
 
                     <!-- logout -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -125,7 +98,7 @@
                     <!-- bathroom -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -140,7 +113,7 @@
                     <!-- groups -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -156,12 +129,12 @@
                     <!-- screen queue -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                        d="M12 6h8m-8 6h8m-8 6h8M4 16a2 2 0 1 1 3.321 1.5L4 20h5M4 5l2-1v6m-2 0h4" />
                                 </svg>
                             </span>
                             <span class="ml-2 text-sm tracking-wide truncate">Screen Queue</span>
@@ -171,14 +144,15 @@
                     <!-- assignment submissions -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                        d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m5 6h9m0 0-2-2m2 2-2 2" />
                                 </svg>
                             </span>
+
                             <span class="ml-2 text-sm tracking-wide truncate">Assignment Submissions</span>
                         </a>
                     </li>
@@ -186,7 +160,7 @@
                     <!-- Team Teach Signup -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -201,7 +175,7 @@
                     <!-- View grades -->
                     <li>
                         <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -224,214 +198,6 @@
 </body>
 
 </html>
-
-<script>
-    // Store original form values
-    let originalValues = {};
-    let formChanged = false;
-
-    // how long toast stays (ms)
-    const toastDuration = 10000;
-
-    // Initialize the form
-    document.addEventListener('DOMContentLoaded', function () {
-        // Store original values
-        saveOriginalValues();
-
-        // Set up toggle switch
-        const toggle = document.querySelector('#kasmToggle');
-        const toggleDot = document.querySelector('.dot');
-
-        toggle.addEventListener('change', function () {
-            if (this.checked) {
-                toggleDot.classList.add('translate-x-3');
-            } else {
-                toggleDot.classList.remove('translate-x-3');
-            }
-        });
-
-        // Set up beforeunload event
-        window.addEventListener('beforeunload', function (e) {
-            if (formChanged) {
-                showUnsavedChangesAlert();
-            }
-        });
-    });
-
-    // Save original form values
-    function saveOriginalValues() {
-        const form = document.getElementById('profileSettingsForm');
-        const inputs = form.querySelectorAll('input, select');
-
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                originalValues[input.id] = input.checked;
-            } else {
-                originalValues[input.id] = input.value;
-            }
-        });
-
-        // Save original class entries
-        const classEntries = document.querySelectorAll('.class-entry');
-        originalValues.classEntries = [];
-
-        classEntries.forEach((entry, index) => {
-            originalValues.classEntries[index] = {
-                name: entry.querySelector('.class-name').value,
-                year: entry.querySelector('.class-year').value
-            };
-        });
-    }
-
-    // Check if form values have changed
-    function checkForChanges() {
-        const form = document.getElementById('profileSettingsForm');
-        const inputs = form.querySelectorAll('input, select');
-        const saveButton = document.getElementById('saveChangesBtn');
-
-        formChanged = false;
-
-        // Check standard inputs
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                if (originalValues[input.id] !== input.checked) {
-                    formChanged = true;
-                }
-            } else if (input.id && originalValues[input.id] !== undefined) {
-                if (originalValues[input.id] !== input.value) {
-                    formChanged = true;
-                }
-            }
-        });
-
-        // Check class entries
-        const classEntries = document.querySelectorAll('.class-entry');
-        if (classEntries.length !== originalValues.classEntries.length) {
-            formChanged = true;
-        } else {
-            classEntries.forEach((entry, index) => {
-                const name = entry.querySelector('.class-name').value;
-                const year = entry.querySelector('.class-year').value;
-
-                if (index >= originalValues.classEntries.length ||
-                    originalValues.classEntries[index].name !== name ||
-                    originalValues.classEntries[index].year !== year) {
-                    formChanged = true;
-                }
-            });
-        }
-
-        // Update save button
-        if (formChanged) {
-            saveButton.disabled = false;
-            saveButton.classList.remove('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-            saveButton.classList.add('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
-        } else {
-            saveButton.disabled = true;
-            saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-            saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
-        }
-    }
-
-    // Add new class
-    function addClass() {
-        const container = document.getElementById('classesContainer');
-        const classEntry = document.createElement('div');
-        classEntry.className = 'class-entry mb-4 p-4 border border-gray-700 rounded-lg';
-
-        classEntry.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                        <div class="flex-grow mb-2 md:mb-0">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Class Name</label>
-                            <input type="text" 
-                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                placeholder="Enter class name" onchange="checkForChanges()">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Year</label>
-                            <select class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="checkForChanges()">
-                                <option>2025</option>
-                                <option>2026</option>
-                                <option>2027</option>
-                                <option>2028</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
-                        Remove
-                    </button>
-                `;
-
-        container.appendChild(classEntry);
-        checkForChanges();
-    }
-
-    // Remove class
-    function removeClass(button) {
-        const classEntry = button.closest('.class-entry');
-        classEntry.remove();
-        checkForChanges();
-    }
-
-    // show toast, auto-hide, allow manual close
-    function showUnsavedChangesAlert() {
-        const toast = document.getElementById('unsavedChangesAlert');
-        const saveButton = document.getElementById('saveChangesBtn');
-
-        // trigger reflow so shake always retriggers
-        saveButton.classList.remove('shake-animation');
-        void saveButton.offsetWidth;
-        saveButton.classList.add('shake-animation');
-
-        // slide-in toast
-        toast.classList.add('show');
-
-        // clear any existing timeout
-        if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-
-        // auto-hide after duration
-        toast.hideTimeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, toastDuration);
-    }
-
-    // close button handler
-    document
-        .getElementById('unsavedChangesAlert')
-        .querySelector('button.close')
-        .addEventListener('click', function () {
-            const toast = document.getElementById('unsavedChangesAlert');
-            toast.classList.remove('show');
-            if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-        });
-
-
-    // Save changes
-    function saveChanges() {
-        // Here you would typically send data to the server
-        // For now, we'll just update the originalValues
-        saveOriginalValues();
-        formChanged = false;
-
-        const saveButton = document.getElementById('saveChangesBtn');
-        saveButton.disabled = true;
-        saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-        saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
-
-        // Show success message
-        const originalButtonText = saveButton.innerHTML;
-        saveButton.innerHTML = `
-                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Saved!
-                `;
-
-        setTimeout(() => {
-            saveButton.innerHTML = originalButtonText;
-        }, 2000);
-    }
-</script>
 
 <script>
     // Function to set active tab
