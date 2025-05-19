@@ -4,35 +4,6 @@ layout: aesthetihawk
 active_tab: profile
 ---
 
-<style>
-    /* Shake animation for Save button */
-    @keyframes shake {
-        0% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(-15px);
-        }
-
-        50% {
-            transform: translateX(15px);
-        }
-
-        75% {
-            transform: translateX(-15px);
-        }
-
-        100% {
-            transform: translateX(0);
-        }
-    }
-
-    .shake-animation {
-        animation: shake 0.3s ease-in-out;
-    }
-</style>
-
 
 <form id="profileSettingsForm">
     <!-- Personal Information Section -->
@@ -79,9 +50,9 @@ active_tab: profile
 
             <!-- Kasm Server Toggle -->
             <div class="flex items-center">
-                <label for="kasmToggle" class="flex items-center cursor-pointer">
+                <label for="kasmChangeInput" class="flex items-center cursor-pointer">
                     <div class="relative">
-                        <input type="checkbox" id="kasmToggle" class="sr-only" onchange="checkForChanges()">
+                        <input type="checkbox" id="kasmChangeInput" class="sr-only" onchange="checkForChanges()">
                         <div class="block bg-neutral-600 w-14 h-8 rounded-full"></div>
                         <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform">
                         </div>
@@ -154,42 +125,7 @@ active_tab: profile
     </button>
 </div>
 
-<!-- Unsaved Changes Alert -->
-<div id="unsavedChangesAlert"
-    class="hidden fixed bottom-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md">
-    <div class="flex items-center">
-        <div class="py-1">
-            <svg class="h-6 w-6 text-red-500 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-        </div>
-        <div>
-            <p class="font-bold">You have unsaved changes</p>
-            <p class="text-sm">Please save your changes before leaving.</p>
-        </div>
-    </div>
-</div>
-<!-- content here -->
-
 <style>
-    /* Toast base (off-screen to the right + invisible) */
-    #unsavedChangesAlert {
-        position: fixed;
-        bottom: 1rem;
-        right: 1rem;
-        transform: translateX(120%);
-        opacity: 0;
-        transition: transform 0.4s ease, opacity 0.4s ease;
-        z-index: 50;
-    }
-
-    /* Toast “show” state (on-screen + visible) */
-    #unsavedChangesAlert.show {
-        transform: translateX(0);
-        opacity: 1;
-    }
-
     /* Shake animation for Save button */
     @keyframes shake {
         0% {
@@ -216,25 +152,32 @@ active_tab: profile
     .shake-animation {
         animation: shake 0.3s ease-in-out;
     }
-
-    /* Close-button styling */
-    #unsavedChangesAlert button.close {
-        position: absolute;
-        top: 0.25rem;
-        right: 0.25rem;
-        background: transparent;
-        border: none;
-        font-size: 1rem;
-        cursor: pointer;
-    }
 </style>
-
-<!-- icons -->
-<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
 <!-- js tilt feature -->
 <script src="{{ site.baseurl }}/scripts/tilt.js"></script>
+
+<!-- toasts -->
+<script type="module">
+    // import the toast handler module
+    import { showToast } from "{{site.baseurl}}/assets/js/Aesthetihawk/toastHandler.js";
+
+    window.addEventListener('load', () => {
+        const callToast = document.querySelector("#saveChangesBtn");
+
+        callToast.addEventListener("click", () => {
+            showToast({
+                message: "Changes Saved.",
+                icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                    </svg>`,
+                duration: 3000
+            });
+        });
+    });
+</script>
 
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -339,334 +282,90 @@ active_tab: profile
     // loading the user data to display
     window.loadUserData = async function () {
         try {
-            // Fetch name and UID from Python backend
-            const name = await window.fetchName();
-            const uid = await window.fetchUid();
+            // fetch all profile data at once
+            const [name, uid, email, kasm] = await window.fetchProfileData();
 
-            // Fetch email and Kasm status from Java backend
-            const email = await window.fetchEmail();
-            const kasm = await window.fetchKasmStatus();
-
-            // Update the name and UID placeholders
+            // update the name, uid, and email placeholders
             const nameInput = document.getElementById("nameChangeInput");
             const uidInput = document.getElementById("uidChangeInput");
             const emailInput = document.getElementById("emailChangeInput");
+            const kasmCheckbox = document.getElementById("kasmChangeInput");
 
             if (name) {
                 nameInput.value = name;
-                await window.changeSteve();
             } else {
-                nameInput.value = "Failed to load name";
+                nameInput.value = "Failed to load name. Are you logged in?";
             }
 
             if (uid) {
                 uidInput.value = uid;
             } else {
-                uidInput.value = "Failed to load UID";
+                uidInput.value = "Failed to load uid. Are you logged in?";
             }
 
             if (email) {
                 emailInput.value = email;
             } else {
-                emailInput.value = "Failed to load email";
+                emailInput.value = "Failed to load email. Are you logged in?";
             }
 
-            // Update the Kasm status
-            const kasmCheckbox = document.getElementById("kasmNeeded");
-            if (kasmCheckbox) { // Ensure the checkbox exists
-                kasmCheckbox.checked = kasm; // Set the checkbox state directly
-                document.getElementById("kasm").textContent = kasm ? "Kasm Enabled" : "Kasm Disabled"; // Update the label
+            // update the kasm status
+            
+            if (kasmCheckbox) {
+                kasmCheckbox.checked = kasm;
+                document.getElementById("kasm").textContent = kasm ? "kasm enabled" : "kasm disabled";
             } else {
-                console.error("Kasm checkbox not found in the DOM.");
+                console.error("kasm checkbox not found in the dom.");
             }
         } catch (error) {
-            console.error("Error setting placeholders:", error.message);
+            console.error("error setting placeholders:", error.message);
         }
     };
 
-    // FETCH COMMANDS ========
-    window.fetchName = async function () {
-        const URL = pythonURI + "/api/id"; // Adjusted endpoint
+    // get the data (not the same as loading because the load function changes the html)
+    window.fetchProfileData = async function () {
+        // api urls for fetching data
+        const pythonURL = pythonURI + "/api/id";
+        const javaURL = javaURI + "/api/person/get";
 
+        let name = null;
+        let uid = null;
+        let email = null;
+        let kasmServerNeeded = null;
+
+        // fetch the python data first (name & uid)
         try {
-            const response = await fetch(URL, fetchOptions);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch Name: ${response.status}`);
-            }
+            const pythonResponse = await fetch(pythonURL, fetchOptions);
+            if (pythonResponse.ok) {
+                const pythonData = await pythonResponse.json();
 
-            const data = await response.json();
-            return data.name;
+                // set data
+                name = pythonData.name;
+                uid = pythonData.uid;
+            } else {
+                console.error('error fetching name or uid:', pythonResponse.status);
+            }
         } catch (error) {
-            console.error('Error fetching Name:', error.message);
-            return null;
+            console.error('error fetching name or uid:', error.message);
         }
-    };
 
-    window.fetchUid = async function () {
-        const URL = pythonURI + "/api/id"; // Adjusted endpoint
-
+        // get the java data next (email & kasm)
         try {
-            const response = await fetch(URL, fetchOptions);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch UID: ${response.status}`);
-            }
+            const javaResponse = await fetch(javaURL, fetchOptions);
+            if (javaResponse.ok) {
+                const javaData = await javaResponse.json();
 
-            const data = await response.json();
-            return data.uid;
+                // set the data
+                email = javaData.email;
+                kasmServerNeeded = userData.kasmServerNeeded
+            } else {
+                console.error('error fetching email or kasm:', javaResponse.status);
+            }
         } catch (error) {
-            console.error('Error fetching UID:', error.message);
-            return null;
-        }
-    };
-
-    window.fetchUid = async function () {
-        const URL = pythonURI + "/api/id"; // Adjusted endpoint
-
-        try {
-            const response = await fetch(URL, fetchOptions);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch UID: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.uid;
-        } catch (error) {
-            console.error('Error fetching UID:', error.message);
-            return null;
-        }
-    };
-
-    window.fetchEmail = async function () {
-        const URL = javaURI + "/api/person/get"; // Adjusted endpoint
-
-        try {
-            const response = await fetch(URL, fetchOptions);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch UID: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.email;
-        }
-        catch (error) {
-            document.getElementById("email").textContent = "Failed to load. Are you logged in?";
-            console.error('Error fetching UID:', error.message);
-            return null;
-        }
-    };
-
-    window.fetchKasmStatus = async function () {
-        const URL = javaURI + "/api/person/get"; // Adjusted endpoint
-
-        try {
-            const response = await fetch(URL, fetchOptions);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch kasm_server_needed: ${response.status}`);
-            }
-
-            const userData = await response.json();
-            const kasmServerNeeded = userData.kasmServerNeeded
-
-            // Update checkbox state based on fetched value
-            if (kasmServerNeeded) {
-                document.getElementById("kasm").textContent = "Kasm Enabled";
-                document.getElementById("kasmNeeded").checked = true; // Set checkbox to checked
-            }
-            else {
-                document.getElementById("kasm").textContent = "Kasm Disabled";
-                document.getElementById("kasmNeeded").checked = false; // Set checkbox to unchecked
-            }
-
-            return kasmServerNeeded;
-        } catch (error) {
-            console.error('Error fetching kasm_server_needed:', error.message);
-            return null;
-        }
-    }
-
-
-    // UPDATE COMMANDS =======
-    window.changeName = async function (event) {
-        event.preventDefault(); // Prevent the form from refreshing the page
-
-        // Ensure the input element is selected
-        const nameChangeInput = document.getElementById("nameChangeInput");
-        if (!nameChangeInput) {
-            console.error("Input element not found.");
-            return;
+            console.error('error fetching email or kasm:', error.message);
         }
 
-        // Get value from the input field
-        const name = nameChangeInput.value.trim(); // Trim to remove accidental spaces
-        if (!name) {
-            console.error("Name input is empty.");
-            return;
-        } else {
-            console.log("Name input:", name);
-        }
-
-        // Define URLs for both backends
-        const pythonURL = pythonURI + "/api/user";
-        const javaURL = javaURI + "/api/person/update";
-
-        // Define options for both requests
-        const pythonOptions = {
-            URL: pythonURL,
-            body: { name },
-            message: 'name-message',
-            callback: () => {
-                console.log('Name updated successfully in Python backend!');
-            }
-        };
-
-        const javaOptions = {
-            URL: javaURL,
-            body: { name },
-            callback: () => {
-                console.log('Name updated successfully in Java backend!');
-            }
-        };
-
-        try {
-            // Send requests to both backends
-            await Promise.all([
-                putUpdate(pythonOptions),
-                postUpdate(javaOptions)
-            ]);
-
-            // Update the name field in the UI
-            window.updateNameField(name);
-            console.log('Name updated successfully in both backends!');
-            window.location.reload();
-        } catch (error) {
-            console.error('Error updating Name:', error.message);
-            document.getElementById('name-message').textContent = 'Error updating Name: ' + error.message;
-        }
-    };
-
-    window.updateNameField = async function (name) {
-        const nameElement = document.getElementById("name");
-        if (nameElement) {
-            nameElement.textContent = name;
-        } else {
-            console.error("Name element not found.");
-        }
-    };
-
-    window.changeUid = async function (event) {
-        const uid = document.getElementById("uidChangeInput").value.trim(); // Get and trim input value
-
-        // send the post request
-        if (uid) {
-            const URL = pythonURI + "/api/user"; // Adjusted endpoint
-
-            const options = {
-                URL,
-                body: { uid },
-                message: 'uid-message', // Adjust the message area as needed
-                callback: () => {
-                    alert("You updated your Github ID, so you will automatically be logged out. Be sure to remember your new github id to log in!");
-                    console.log('UID updated successfully!');
-                    window.updateUidField(uid);
-                    window.location.href = '{{site.baseurl}}/duallogin';
-                }
-            };
-
-            try {
-                await putUpdate(options);
-            } catch (error) {
-                console.error('Error updating UID:', error.message);
-                document.getElementById('uid-message').textContent = 'Error updating UID: ' + error.message;
-            }
-        }
-        document.getElementById("uid").textContent = uid; //reload the content
-
-    }
-
-
-    window.changeEmail = async function (event) {
-        event.preventDefault(); // Prevent the form from refreshing the page
-
-        const email = document.getElementById("emailChangeInput").value.trim(); // Get and trim input value
-
-        // send the post request
-        if (email) {
-            const URL = javaURI + "/api/person/update";
-            const options = {
-                URL,
-                body: { email },
-                callback: () => {
-                    console.log('Email updated successfully!');
-                }
-            };
-            try {
-                await postUpdate(options);
-            } catch (error) {
-                console.error('Error updating email:', error.message);
-            }
-        }
-
-        document.getElementById("email").textContent = email; //reload the content
-    }
-
-    window.changePassword = async function (event) {
-        event.preventDefault(); // Prevent the form from refreshing the page
-
-        const password = document.getElementById("passwordChangeInput").value.trim(); // Get and trim input value
-
-        if (password) {
-            const URL = pythonURI + "/api/user"; // Adjusted endpoint
-
-            const options = {
-                URL,
-                body: { password },
-                message: 'password-message', // Adjust the message area as needed
-                callback: () => {
-                    console.log('Password updated successfully!');
-                    window.location.href = '{{site.baseurl}}/duallogin';
-                }
-            };
-
-            try {
-                alert("You updated your password, so you will automatically be logged out. Be sure to remember your password!");
-                await putUpdate(options);
-                await logoutUser();
-            } catch (error) {
-                console.error('Error updating password:', error.message);
-                document.getElementById('password-message').textContent = 'Error updating password: ' + error.message;
-            }
-        }
-    }
-
-    window.changeKasmServerStatus = async function (event) {
-        // select the checkbox and scan for updates (did they check or uncheck it?)
-        const checkbox = event.target;
-        const newKasmServerNeeded = checkbox.checked;
-
-        const URL = javaURI + "/api/person/update"; // Adjusted endpoint
-
-        // newKasmServerNeeded is a boolean, so you can just send it directly
-        const options = {
-            URL,
-            body: { kasmServerNeeded: newKasmServerNeeded },
-            callback: () => {
-                console.log('Kasm Server Needed updated successfully!');
-            }
-        };
-        try {
-            await postUpdate(options);
-        } catch (error) {
-            console.error('Error updating kasm_server_needed:', error.message);
-        }
-
-        // Update checkbox state text based on new value
-        if (newKasmServerNeeded) {
-            document.getElementById("kasm").textContent = "Kasm Enabled";
-        } else {
-            document.getElementById("kasm").textContent = "Kasm Disabled";
-        }
+        return [name, uid, email, kasmServerNeeded]; // return it all in an array
     }
 
     window.changeClass = async function (event) {
@@ -893,7 +592,6 @@ active_tab: profile
 
     // show toast, auto-hide, allow manual close
     function showUnsavedChangesAlert() {
-        const toast = document.getElementById('unsavedChangesAlert');
         const saveButton = document.getElementById('saveChangesBtn');
 
         // trigger reflow so shake always retriggers
@@ -901,33 +599,117 @@ active_tab: profile
         void saveButton.offsetWidth;
         saveButton.classList.add('shake-animation');
 
-        // slide-in toast
-        toast.classList.add('show');
-
-        // clear any existing timeout
-        if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-
-        // auto-hide after duration
-        toast.hideTimeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, toastDuration);
     }
 
-    // close button handler
-    document
-        .getElementById('unsavedChangesAlert')
-        .querySelector('button.close')
-        .addEventListener('click', function () {
-            const toast = document.getElementById('unsavedChangesAlert');
-            toast.classList.remove('show');
-            if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-        });
+    // save all changes in one go
+    async function saveChanges() {
+        // get references to inputs
+        const nameInput = document.getElementById("nameChangeInput");
+        const uidInput = document.getElementById("uidChangeInput");
+        const emailInput = document.getElementById("emailChangeInput");
+        const passwordInput = document.getElementById("password");
+        const kasmInput = document.getElementById("kasmChangeInput");
 
+        // get values
+        const name = nameInput.value.trim();
+        const uid = uidInput.value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        const kasmServerNeeded = kasmInput ? kasmInput.checked : undefined;
 
-    // Save changes
-    function saveChanges() {
-        // Here you would typically send data to the server
-        // For now, we'll just update the originalValues
+        // get class info
+        const classEntries = Array.from(document.querySelectorAll('.class-entry')).map(entry => ({
+            name: entry.querySelector('.class-name').value,
+            year: entry.querySelector('.class-year').value
+        }));
+
+        // import api helpers
+        const { putUpdate, postUpdate } = await import("{{site.baseurl}}/assets/js/api/profile.js");
+        const { javaURI, pythonURI } = await import("{{site.baseurl}}/assets/js/api/config.js");
+
+        // track if we need to reload or logout
+        let needsReload = false;
+        let needsLogout = false;
+
+        // save name (both backends)
+        if (name && name !== originalValues["nameChangeInput"]) {
+            try {
+                await Promise.all([
+                    putUpdate({
+                        URL: pythonURI + "/api/user",
+                        body: { name },
+                        message: 'name-message'
+                    }),
+                    postUpdate({
+                        URL: javaURI + "/api/person/update",
+                        body: { name }
+                    })
+                ]);
+                needsReload = true;
+            } catch (e) {
+                console.error("error saving name:", e.message);
+            }
+        }
+
+        // save uid (python only, logs out)
+        if (uid && uid !== originalValues["uidChangeInput"]) {
+            try {
+                await putUpdate({
+                    URL: pythonURI + "/api/user",
+                    body: { uid },
+                    message: 'uid-message'
+                });
+                needsLogout = true;
+            } catch (e) {
+                console.error("error saving uid:", e.message);
+            }
+        }
+
+        // save email (java only)
+        if (email && email !== originalValues["emailChangeInput"]) {
+            try {
+                await postUpdate({
+                    URL: javaURI + "/api/person/update",
+                    body: { email }
+                });
+            } catch (e) {
+                console.error("error saving email:", e.message);
+            }
+        }
+
+        // save password (python only, logs out)
+        if (password) {
+            try {
+                await putUpdate({
+                    URL: pythonURI + "/api/user",
+                    body: { password },
+                    message: 'password-message'
+                });
+                needsLogout = true;
+            } catch (e) {
+                console.error("error saving password:", e.message);
+            }
+        }
+
+        // save kasm server status (java only)
+        if (
+            typeof kasmServerNeeded !== "undefined" &&
+            kasmServerNeeded !== originalValues["kasmChangeInput"]
+        ) {
+            try {
+                await postUpdate({
+                    URL: javaURI + "/api/person/update",
+                    body: { kasmServerNeeded }
+                });
+            } catch (e) {
+                console.error("error saving kasm server status:", e.message);
+            }
+        }
+
+        // save classes (implement as needed)
+        // you can add your own logic here to send classEntries to backend
+
+        // update original values and ui
         saveOriginalValues();
         formChanged = false;
 
@@ -936,17 +718,25 @@ active_tab: profile
         saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
         saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
 
-        // Show success message
+        // show success message
         const originalButtonText = saveButton.innerHTML;
         saveButton.innerHTML = `
-                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Saved!
-                `;
+            <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Saved!
+        `;
 
         setTimeout(() => {
             saveButton.innerHTML = originalButtonText;
         }, 2000);
+
+        // handle reload or logout if needed
+        if (needsLogout) {
+            alert("you updated your github id or password, so you will be logged out. remember your new credentials!");
+            window.location.href = '{{site.baseurl}}/duallogin';
+        } else if (needsReload) {
+            window.location.reload();
+        }
     }
 </script>

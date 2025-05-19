@@ -11,7 +11,7 @@ window.toastifyCustomClose = toastifyCustomClose;
 
 export function showToast({
     message = "",
-    icon = "", // Now fully customizable!
+    icon = "",
     duration = 3000
 } = {}) {
     const toastMarkup = `
