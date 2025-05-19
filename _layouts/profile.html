@@ -42,29 +42,29 @@ active_tab: profile
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Full Name -->
             <div>
-                <label for="fullName" class="block text-sm font-medium text-gray-300 mb-1">Full
+                <label for="nameChangeInput" class="block text-sm font-medium text-gray-300 mb-1">Full
                     Name</label>
-                <input type="text" id="fullName" name="fullName"
+                <input type="text" id="nameChangeInput" name="fullName"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="John Doe" onchange="checkForChanges()">
+                    value="" onchange="checkForChanges()">
             </div>
 
             <!-- User ID -->
             <div>
-                <label for="userId" class="block text-sm font-medium text-gray-300 mb-1">User
+                <label for="uidChangeInput" class="block text-sm font-medium text-gray-300 mb-1">User
                     ID</label>
-                <input type="text" id="userId" name="userId"
+                <input type="text" id="uidChangeInput" name="userId"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="johndoe123" onchange="checkForChanges()">
+                    value="" onchange="checkForChanges()">
             </div>
 
             <!-- Email -->
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email
+                <label for="emailChangeInput" class="block text-sm font-medium text-gray-300 mb-1">Email
                     Address</label>
-                <input type="email" id="email" name="email"
+                <input type="email" id="emailChangeInput" name="email"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="john.doe@example.com" onchange="checkForChanges()">
+                    value="" onchange="checkForChanges()">
             </div>
 
             <!-- Student ID -->
@@ -238,9 +238,7 @@ active_tab: profile
 
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    // Import fetchOptions from config.js
     import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
-    // Import functions from config.js
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
     // this runs on page load
@@ -321,41 +319,6 @@ active_tab: profile
         }
     };
 
-    window.changeSteve = async function () {
-        const name = await window.fetchName();
-        const profileImageBox = document.getElementById('headerPfp');
-
-        // Check if the name contains "Steve" (case-insensitive)
-        if (/steve/i.test(name)) {
-            const currentProfilePicture = profileImageBox.querySelector('img')?.src;
-
-            // Check if the profile picture is already set to steve.png
-            const steveImagePath = "{{site.baseurl}}/images/jokes/steve.png";
-            const isSteveSet = localStorage.getItem('isSteveSet');
-
-            if (!isSteveSet || isSteveSet !== 'true') {
-                if (!currentProfilePicture || !currentProfilePicture.includes('steve.png')) {
-                    // Set the profile picture to steve.png
-                    profileImageBox.innerHTML = `<img src="${steveImagePath}" alt="Profile Picture">`;
-
-                    // Save the profile picture to the database
-                    await window.changeProfilePictureWithPath(steveImagePath);
-
-                    // Mark as updated in localStorage
-                    localStorage.setItem('isSteveSet', 'true');
-                    console.log('Profile picture updated to steve.png');
-
-                    // wait like 0.5 seconds
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    window.location.reload();
-                }
-            }
-        } else {
-            // Reset the flag if the name is not Steve
-            localStorage.removeItem('isSteveSet');
-        }
-    };
-
     window.changeProfilePictureWithPath = async function (imagePath) {
         try {
             // Fetch the image and convert it to a Blob
@@ -393,19 +356,19 @@ active_tab: profile
                 nameInput.value = name;
                 await window.changeSteve();
             } else {
-                nameInput.placeholder = "Failed to load name";
+                nameInput.value = "Failed to load name";
             }
 
             if (uid) {
-                uidInput.placeholder = uid;
+                uidInput.value = uid;
             } else {
-                uidInput.placeholder = "Failed to load UID";
+                uidInput.value = "Failed to load UID";
             }
 
             if (email) {
-                emailInput.placeholder = email;
+                emailInput.value = email;
             } else {
-                emailInput.placeholder = "Failed to load email";
+                emailInput.value = "Failed to load email";
             }
 
             // Update the Kasm status
@@ -798,8 +761,10 @@ active_tab: profile
         toggle.addEventListener('change', function () {
             if (this.checked) {
                 toggleDot.classList.add('translate-x-3');
+                toggle.classList.add('bg-blue-600');
             } else {
                 toggleDot.classList.remove('translate-x-3');
+                toggle.classList.remove('bg-blue-600');
             }
         });
 
