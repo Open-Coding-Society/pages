@@ -1,12 +1,8 @@
 ---
-title: Profile
+title: Dashboard
 layout: aesthetihawk
 active_tab: Dashboard
 ---
-
-<div class="flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold">Dashboard</h1>
-</div>
 
 <!DOCTYPE html>
 <html lang="en" class="dark">
@@ -46,10 +42,37 @@ active_tab: Dashboard
     <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css">
 </head>
 
-<body class="bg-neutral-900">
+<body class="bg-neutral-900" data-active-tab="{{ page.active_tab }}">
     <!-- Content -->
     <div class="w-full">
         <div class="space-y-4 sm:space-y-6">
+            <div
+                class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700">
+                <ul class="flex flex-wrap -mb-px">
+                    <li class="me-2">
+                        <a href="#"
+                            class="inline-block p-4 border-b-2 rounded-t-lg active text-blue-500 border-blue-500"
+                            aria-current="page">GitHub Analytics</a>
+                    </li>
+                    <li class="me-2">
+                        <a href="#"
+                            class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">Bathroom Analytics</a>
+                    </li>
+                    <li class="me-2">
+                        <a href="#"
+                            class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">More Analytics</a>
+                    </li>
+                    <li class="me-2">
+                        <a href="#"
+                            class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">More Analytics</a>
+                    </li>
+                    <li>
+                        <a
+                            class="inline-block p-4 rounded-t-lg cursor-not-allowed text-neutral-500">Disabled</a>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Grid -->
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <!-- Card -->
@@ -69,7 +92,7 @@ active_tab: Dashboard
                                         <path d="M12 17h.01" />
                                     </svg>
                                     <span
-                                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-gray-900 text-xs font-medium text-white rounded-md shadow-2xs dark:bg-neutral-700 hidden"
+                                        class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-neutral-900 text-xs font-medium text-white rounded-md shadow-2xs dark:bg-neutral-700 hidden"
                                         role="tooltip">
                                         The number of commits you have made
                                     </span>
@@ -244,6 +267,13 @@ active_tab: Dashboard
     <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const activeTab = document.body.dataset.activeTab;
+            setActiveTab(activeTab);
+        });
+    </script>
 
     <script>
         window.addEventListener("load", () => {

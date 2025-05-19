@@ -9,9 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
+
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-
 
 <body class="min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
     <!-- navbar -->
@@ -19,9 +18,11 @@
 
     <div
         class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased text-neutral-50 mt-[53px] bg-neutral-900">
-        <!-- Sidebar - Fixed container -->
+
+        <!-- Sidebar -->
         <div class="fixed left-0 top-[53px] w-64 h-full bg-neutral-800 border-r  border-neutral-700 flex flex-col">
-            <!-- Fixed profile pic section - doesn't scroll -->
+
+            <!-- profile pic section -->
             <div class="p-6 flex flex-col items-center bg-neutral-800">
                 <div class="w-24 h-24 rounded-full overflow-hidden mb-4">
                     <img src="https://static.wikia.nocookie.net/brainrotnew/images/a/ac/Tralalero_tralala.jpg/revision/latest/smart/width/400/height/225?cb=20250321131418"
@@ -32,8 +33,10 @@
 
             <!-- Scrollable menu section -->
             <div class="overflow-y-auto flex-grow">
+
                 <!-- the menu side -->
                 <ul class="flex flex-col py-4 space-y-1">
+
                     <!-- section title -->
                     <li class="px-5">
                         <div class="flex flex-row items-center h-8">
@@ -43,8 +46,8 @@
 
                     <!-- dashboard button -->
                     <li>
-                        <a href="{{site.baseurl}}/dashboard" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="Dashboard" href="{{site.baseurl}}/dashboard" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -59,7 +62,7 @@
 
                     <!-- analytics button -->
                     <li>
-                        <a href="{{site.baseurl}}/profile" onclick="setActiveTab(this)"
+                        <a id="Profile" href="{{site.baseurl}}/profile" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -74,7 +77,7 @@
 
                     <!-- logout -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="Logout" href="#" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -97,7 +100,7 @@
 
                     <!-- bathroom -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="Bathroom" href="{{site.baseurl}}/bathroom" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -112,7 +115,7 @@
 
                     <!-- groups -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="Groups" href="#" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -128,7 +131,7 @@
 
                     <!-- screen queue -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="ScreenQueue" href="#" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -143,7 +146,7 @@
 
                     <!-- assignment submissions -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="AssignmentSubmissions" href="#" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -159,7 +162,7 @@
 
                     <!-- Team Teach Signup -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="TeamTeachSignup" href="#" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -174,7 +177,7 @@
 
                     <!-- View grades -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
+                        <a id="ViewGrades" href="#" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -190,8 +193,12 @@
             </div>
         </div>
 
-        <!-- Main Content Area - Adjust margin to match sidebar width -->
-        <div class="ml-64 p-8">
+        <!-- Main Content Area -->
+        <div class="ml-64 p-8 bg-neutral-900">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold">{{page.title}}</h1>
+            </div>
+
             {{ content }}
         </div>
     </div>
@@ -199,22 +206,57 @@
 
 </html>
 
+<!-- set active sidebar tab -->
 <script>
-    // Function to set active tab
-    function setActiveTab(element) {
-        // Remove active class from all nav items
+    // function to set active tab by element or id
+    function setActiveTab(elementOrId) {
+        // remove active classes from all nav items
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
-            item.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
-            item.classList.add('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
+            item.classList.remove('bg-neutral-700', 'text-neutral-50', 'border-indigo-500');
+            item.classList.add('text-neutral-600', 'border-transparent');
         });
 
-        // Add active class to clicked element
-        element.classList.remove('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
-        element.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
+        // get element if id string is passed
+        let el = elementOrId;
+        if (typeof elementOrId === 'string') {
+            el = document.getElementById(elementOrId);
+        }
+
+        // add active classes to clicked tab
+        if (el) {
+            el.classList.add('bg-neutral-700', 'text-neutral-50', 'border-indigo-500');
+            el.classList.remove('text-neutral-600', 'border-transparent');
+            // store active tab id in localstorage
+            localStorage.setItem('activeTabId', el.id);
+        }
     }
+
+    // on page load, re-apply active tab from localstorage or front matter
+    window.addEventListener('DOMContentLoaded', () => {
+        let activeId = localStorage.getItem('activeTabId');
+        let activeLink = null;
+
+        if (activeId) {
+            activeLink = document.getElementById(activeId);
+        }
+
+        // if no active tab in localstorage, use the one from front matter
+        if (!activeLink) {
+            const fallback = "{{ page.act_tab | escape }}";
+            if (fallback) {
+                setActiveTab(fallback);
+                return;
+            }
+        }
+
+        if (activeLink) {
+            setActiveTab(activeLink);
+        }
+    });
 </script>
 
+<!-- toasts -->
 <script>
     function tostifyCustomClose(el) {
         const parent = el.closest('.toastify');
@@ -227,8 +269,8 @@
         (function () {
             let i = 0;
             const callToast = document.querySelector("#saveChangesBtn");
-            
-            const toastMarkup2 = `
+
+            const toastContent = `
                 <div class="bottom-4 right-4 max-w-xs bg-neutral-800 border border-neutral-700 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] outline outline-1 outline-white/10"
                     role="alert" tabindex="-1" aria-labelledby="hs-toast-success-example-label">
                     <div class="flex items-start p-4 gap-4">
@@ -260,7 +302,7 @@
 
             callToast.addEventListener("click", () => {
                 Toastify({
-                    text: toastMarkup2,
+                    text: toastContent,
                     className: "hs-toastify-on:opacity-100 opacity-0 fixed -bottom-37.5 right-5 z-90 transition-all duration-300 [&>.toast-close]:hidden",
                     duration: 3000,
                     close: true,
@@ -268,7 +310,7 @@
                     style: {
                         background: "none",
                         padding: "0px 0px",
-                        boxShadow: "none"                      
+                        boxShadow: "none"
                     }
 
                 }).showToast();

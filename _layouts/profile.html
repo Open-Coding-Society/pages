@@ -1,5 +1,5 @@
 ---
-title: Profile
+title: Profile Settings
 layout: aesthetihawk
 active_tab: profile
 ---
@@ -33,15 +33,6 @@ active_tab: profile
     }
 </style>
 
-<!-- content here -->
-<div class="flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold">Profile Settings</h1>
-    <button id="saveChangesBtn" disabled
-        class="px-6 py-2 bg-neutral-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
-        onclick="saveChanges()">
-        Save Changes
-    </button>
-</div>
 
 <form id="profileSettingsForm">
     <!-- Personal Information Section -->
@@ -154,6 +145,14 @@ active_tab: profile
         </div>
     </div>
 </form>
+
+<div class="flex justify-between items-center mb-8">
+    <button id="saveChangesBtn" disabled
+        class="px-6 py-2 bg-neutral-300 text-gray-500 cursor-not-allowed rounded-lg transition-all duration-300"
+        onclick="saveChanges()">
+        Save Changes
+    </button>
+</div>
 
 <!-- Unsaved Changes Alert -->
 <div id="unsavedChangesAlert"

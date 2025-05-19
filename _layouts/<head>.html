@@ -1,0 +1,232 @@
+<head>
+    <!-- Include stylesheets -->
+    <link rel="stylesheet" href="{{site.baseurl}}/assets/Bathroom/report-issues.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+</head>
+
+<style>
+    #additionalInfo {
+        display: none;
+    }
+</style>
+<div class="container min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
+    <div class="components">
+        <!-- queue header and your info like ETA -->
+        <div class="div1">
+            <div class="queue-header">
+                <h2 id="teacherName">Mr. Mortensen's Queue</h2>
+            </div>
+            <div class="queue-info">
+                <p id="position">Your position in line: #</p>
+                <p id="estimatedTime">Estimated time: ~ mins</p>
+            </div>
+            <hr>
+        </div>
+        <!-- students in line -->
+        <div class="div2">
+            <div class="queue-list">
+                <p>Students currently in line:</p>
+                <ul id="studentList">
+                    <!-- Students will be listed here -->
+                </ul>
+            </div>
+            <div class="queue-buttons">
+                <button type="button" class="medium primary" onclick="window.addToQueue()">Add Me to Queue</button>
+                <button type="button" class="medium primary" onclick="window.removeFromQueue()">Remove Me from Queue</button>
+                <button type="button" class="medium primary" onclick="window.location.href='{{site.baseurl}}/bathroom/issues'">Issues</button>
+                <button type="button" class="medium primary" onclick="window.location.href='{{site.baseurl}}/student'">Exit</button>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<body class="bg-neutral-900">
+    <!-- Content -->
+    
+    <!-- End Content -->
+
+    <!-- JS Implementing Plugins -->
+
+    <!-- JS PLUGINS -->
+    <!-- Required plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/preline/dist/index.js"></script>
+    <!-- Apexcharts -->
+    <script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
+</body>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+<script type="module">
+    import {javaURI, fetchOptions} from "{{site.baseurl}}/assets/js/api/config.js";
+
+    // Backend API endpoints
+    const queueURI = javaURI + "/api/queue";
+    const approvalURI = javaURI + "/api/approval";
+    const tinkleURI = javaURI + "/api/tinkle";
+    
+    const getUrl = queueURI + "/all";
+    const addUrl = queueURI + "/add";
+    const removeUrl = queueURI + "/remove";
+    const approvalUrl = approvalURI + "/approveRequest";
+
+    const postOptions = {
+        ...fetchOptions,
+        method: "POST",
+    };
+    const deleteOptions = {
+        ...fetchOptions,
+        method: "DELETE",
+    };
+
+    // Global variables
+    const teacherName = "jm1021@gmail.com"; // Replace with dynamic teacher name if needed
+
+    window.studentsInQueue = [];
+    window.isApproving = false; // Prevent duplicate approve calls
+
+    window.addEventListener("load", () => {
+        fetchUser();
+    });
+
+    async function fetchUser() {
+        const response = await fetch(javaURI + "/api/person/get", {
+            method: "GET",
+            cache: "no-cache",
+            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "X-Origin": "client",
+            },
+        });
+        if (response.ok) {
+            const userInfo = await response.json();
+            window.studentName = userInfo.name;
+            window.sid = userInfo.sid;
+            window.roles = userInfo.roles.map(role => role.name).join(", ");
+            console.log("Person: ", userInfo);
+        }
+    }
+
+    window.displayQueue = function() {
+        const studentList = document.getElementById("studentList");
+        studentList.innerHTML = ""; // Clear the list
+
+        window.studentsInQueue.forEach((student, index) => {
+            const listItem = document.createElement("li");
+
+            // Indicate waiting for approval for the first student in line
+            if (index === 0) {
+                listItem.textContent = `${student} (waiting for approval)`;
+            } else {
+                listItem.textContent = student;
+            }
+
+            if (student === window.studentName) listItem.style.color = "red"; // Highlight user's name in red
+            studentList.appendChild(listItem);
+        });
+
+        const addButton = document.querySelector('button[onclick="window.addToQueue()"]');
+        addButton.disabled = window.studentsInQueue.includes(window.studentName);
+
+        const position = window.studentsInQueue.indexOf(window.studentName) + 1;
+        document.getElementById("position").textContent = `Your position in line: #${position}`;
+        document.getElementById("estimatedTime").textContent = `Estimated time: ~${position * 3} mins`;
+    }
+
+    // ✅ Fetch queue data
+    window.fetchQueueData = function() {
+        fetch(getUrl, fetchOptions)
+            .then(response => {
+                if (response.status !== 200) {
+                    console.error("Failed to fetch queue data.");
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                const mortensenQueue = data.find(queue => queue.teacherEmail === teacherName);
+                if (mortensenQueue) {
+                    window.studentsInQueue = mortensenQueue.peopleQueue.split(",");
+                   const isFrontOfQueue = window.studentsInQueue[0] === window.studentName;
+                    if (isFrontOfQueue && !window.isApproving) {
+                        if (mortensenQueue.away === 1 && isFrontOfQueue && !window.isApproving) {
+                            window.location.href = "{{site.baseurl}}/bathroom/hallpass";
+                            return;
+                        }
+                        window.approveStudent();
+                    }
+                }
+                window.displayQueue();
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    };
+
+    // ✅ Add student to queue
+    window.addToQueue = function() {
+        const requestData = {
+            teacherEmail: teacherName,
+            studentName: window.studentName,
+        };
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, "0"); // Ensures 2 digits
+        const seconds = now.getSeconds().toString().padStart(2, "0");
+        const timeIn = `${hours}:${minutes}:${seconds}`;
+        localStorage.setItem("timeIn", timeIn);
+
+        fetch(approvalURI + "/sendApprovalRequest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Approval request sent. Please wait for the teacher’s decision.");
+                console.log(`✅ Approval request sent for: ${window.studentName}`);
+            } else {
+                alert("Failed to request approval.");
+            }
+        })
+        .catch(error => console.error("Error requesting approval:", error));
+    };
+
+    // ✅ Remove student from queue
+    window.removeFromQueue = function() {
+        const queuer = {
+            teacherEmail: teacherName,
+            studentName: window.studentName,
+        };
+
+        fetch(removeUrl, {
+            ...deleteOptions,
+            body: JSON.stringify(queuer),
+        })
+        .then(response => {
+            if (response.ok) {
+                window.fetchQueueData();
+                localStorage.removeItem("approvalSent");
+            } else {
+                alert("Failed to remove from queue.");
+            }
+        })
+        .catch(error => console.error("Error removing from queue:", error));
+    };
+
+    // ✅ Fetch data every 5 seconds
+    setInterval(window.fetchQueueData, 5000);
+
+    // ✅ Initial fetch
+    window.fetchQueueData();
+</script>
+
