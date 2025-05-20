@@ -22,11 +22,10 @@
 
             <!-- profile pic section -->
             <div class="p-6 flex flex-col items-center bg-neutral-800">
-                <div class="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img src="https://static.wikia.nocookie.net/brainrotnew/images/a/ac/Tralalero_tralala.jpg/revision/latest/smart/width/400/height/225?cb=20250321131418"
-                        alt="Profile picture" class="w-full h-full object-cover">
+                <div class="w-24 h-24 rounded-full overflow-hidden mb-4 cursor-pointer" id="sidebarPfpBox">
+                    <img src="" alt="Profile picture" class="w-full h-full object-cover" id="sidebarPfp">
                 </div>
-                <h2 class="text-lg font-semibold text-center mb-6">Welcome, User</h2>
+                <h2 class="text-lg font-semibold text-center mb-6" id="sidebarWelcome">Welcome, User</h2>
             </div>
 
             <!-- Scrollable menu section -->
@@ -204,6 +203,7 @@
 
 </html>
 
+
 <!-- set active sidebar tab -->
 <script>
     // function to set active tab by element or id
@@ -235,9 +235,7 @@
         let activeId = localStorage.getItem('activeTabId');
         let activeLink = null;
 
-        if (activeId) {
-            activeLink = document.getElementById(activeId);
-        }
+        if (activeId) activeLink = document.getElementById(activeId);
 
         // if no active tab in localstorage, use the one from front matter
         if (!activeLink) {
@@ -247,10 +245,10 @@
                 return;
             }
         }
+        activeLink && setActiveTab(activeLink);
 
-        if (activeLink) {
-            setActiveTab(activeLink);
-        }
+        // set sidebar welcome name
+        // try to get from localstorage, or fallback to 'user'
+        document.getElementById('sidebarWelcome').innerHTML = 'Welcome,<br>' + localStorage.getItem('name');
     });
 </script>
-

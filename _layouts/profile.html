@@ -17,7 +17,7 @@ active_tab: profile
                     Name</label>
                 <input type="text" id="nameChangeInput" name="fullName"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="" onchange="checkForChanges()">
+                    value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
             <!-- User ID -->
@@ -26,7 +26,7 @@ active_tab: profile
                     ID</label>
                 <input type="text" id="uidChangeInput" name="userId"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="" onchange="checkForChanges()">
+                    value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
             <!-- Email -->
@@ -35,17 +35,17 @@ active_tab: profile
                     Address</label>
                 <input type="email" id="emailChangeInput" name="email"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="" onchange="checkForChanges()">
+                    value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
             <!-- Student ID -->
             <div>
-                <label for="studentId" class="block text-sm font-medium text-gray-300 mb-1">Student
+                <label for="sidChangeInput" class="block text-sm font-medium text-gray-300 mb-1">Student
                     ID (7
                     digits)</label>
-                <input type="text" id="studentId" name="studentId"
+                <input type="text" id="sidChangeInput" name="studentId"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="1234567" maxlength="7" pattern="\d{7}" onchange="checkForChanges()">
+                    value="" maxlength="7" pattern="\d{7}" onchange="checkForChanges()" autocomplete="off">
             </div>
 
             <!-- Kasm Server Toggle -->
@@ -69,7 +69,7 @@ active_tab: profile
                     Password</label>
                 <input type="password" id="password" name="password"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Enter new password" onchange="checkForChanges()">
+                    placeholder="Enter new password" onchange="checkForChanges()" autocomplete="off">
             </div>
         </div>
     </div>
@@ -193,56 +193,6 @@ active_tab: profile
         }
     });
 
-    // Function to continuously fetch user data until all values are loaded
-    async function continuouslyLoadUserData() {
-        const nameInput = document.getElementById("nameChangeInput");
-        const uidInput = document.getElementById("uidChangeInput");
-        const emailInput = document.getElementById("emailChangeInput");
-
-        // Helper function to check if all values are loaded
-        function isDataLoaded() {
-            return (
-                nameInput.value !== "Loading name..." &&
-                uidInput.value !== "Loading UID..." &&
-                emailInput.value !== "Loading email..."
-            );
-        }
-
-        // Retry logic
-        async function fetchAndUpdateData() {
-            try {
-                // Fetch name and UID from Python backend
-                const name = await window.fetchName();
-                const uid = await window.fetchUid();
-
-                // Fetch email from Java backend
-                const email = await window.fetchEmail();
-
-                // Update placeholders if data is available
-                if (name) nameInput.value = name;
-                if (uid) uidInput.value = uid;
-                if (email) emailInput.value = email;
-
-                // Log success if all data is loaded
-                if (isDataLoaded()) {
-                    console.log("All user data loaded successfully.");
-                    return; // Stop retrying
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error.message);
-            }
-
-            // Retry after 3 seconds if data is still not fully loaded
-            setTimeout(fetchAndUpdateData, 3000);
-        }
-
-        // Start the first fetch attempt
-        fetchAndUpdateData();
-    }
-
-    // Call the function on page load
-    document.addEventListener("DOMContentLoaded", continuouslyLoadUserData);
-
     // make it run constantly to check for esc key press
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
@@ -283,40 +233,29 @@ active_tab: profile
     window.loadUserData = async function () {
         try {
             // fetch all profile data at once
-            const [name, uid, email, kasm] = await window.fetchProfileData();
+            const [name, uid, email, sid, kasm] = await window.fetchProfileData();
 
             // update the name, uid, and email placeholders
-            const nameInput = document.getElementById("nameChangeInput");
-            const uidInput = document.getElementById("uidChangeInput");
-            const emailInput = document.getElementById("emailChangeInput");
-            const kasmCheckbox = document.getElementById("kasmChangeInput");
-
-            if (name) {
-                nameInput.value = name;
-            } else {
-                nameInput.value = "Failed to load name. Are you logged in?";
-            }
-
-            if (uid) {
-                uidInput.value = uid;
-            } else {
-                uidInput.value = "Failed to load uid. Are you logged in?";
-            }
-
-            if (email) {
-                emailInput.value = email;
-            } else {
-                emailInput.value = "Failed to load email. Are you logged in?";
-            }
+            const nameInput = document.getElementById("nameChangeInput");    // full name
+            const uidInput = document.getElementById("uidChangeInput");      // github id
+            const emailInput = document.getElementById("emailChangeInput");  // email
+            const sidInput = document.getElementById("sidChangeInput");      // canvas id
+            const kasmCheckbox = document.getElementById("kasmChangeInput"); // do you need kasm?
+  
+            nameInput.value = name ? name : "Failed to load name. Are you logged in?";     // full name
+            uidInput.value = uid ? uid : "Failed to load uid. Are you logged in?";         // github id
+            emailInput.value = email ? email : "Failed to load email. Are you logged in?"; // email
+            sidInput.value = sid ? sid : "Failed to load sid. Are you logged in?";         // canvas id
 
             // update the kasm status
-            
             if (kasmCheckbox) {
                 kasmCheckbox.checked = kasm;
                 document.getElementById("kasm").textContent = kasm ? "kasm enabled" : "kasm disabled";
-            } else {
+            } 
+            else {
                 console.error("kasm checkbox not found in the dom.");
             }
+
         } catch (error) {
             console.error("error setting placeholders:", error.message);
         }
@@ -325,29 +264,13 @@ active_tab: profile
     // get the data (not the same as loading because the load function changes the html)
     window.fetchProfileData = async function () {
         // api urls for fetching data
-        const pythonURL = pythonURI + "/api/id";
         const javaURL = javaURI + "/api/person/get";
 
         let name = null;
         let uid = null;
         let email = null;
+        let sid = null;
         let kasmServerNeeded = null;
-
-        // fetch the python data first (name & uid)
-        try {
-            const pythonResponse = await fetch(pythonURL, fetchOptions);
-            if (pythonResponse.ok) {
-                const pythonData = await pythonResponse.json();
-
-                // set data
-                name = pythonData.name;
-                uid = pythonData.uid;
-            } else {
-                console.error('error fetching name or uid:', pythonResponse.status);
-            }
-        } catch (error) {
-            console.error('error fetching name or uid:', error.message);
-        }
 
         // get the java data next (email & kasm)
         try {
@@ -356,16 +279,19 @@ active_tab: profile
                 const javaData = await javaResponse.json();
 
                 // set the data
+                name = javaData.name;
+                uid = javaData.uid;
                 email = javaData.email;
-                kasmServerNeeded = userData.kasmServerNeeded
+                sid = javaData.sid;
+                kasmServerNeeded = javaData.kasmServerNeeded
             } else {
-                console.error('error fetching email or kasm:', javaResponse.status);
+                console.error('error fetching data:', javaResponse.status);
             }
         } catch (error) {
-            console.error('error fetching email or kasm:', error.message);
+            console.error('error fetching data:', error.message);
         }
 
-        return [name, uid, email, kasmServerNeeded]; // return it all in an array
+        return [name, uid, email, sid, kasmServerNeeded]; // return it all in an array
     }
 
     window.changeClass = async function (event) {
@@ -651,56 +577,82 @@ active_tab: profile
             }
         }
 
-        // save uid (python only, logs out)
+        // save uid (both backends, logs out)
         if (uid && uid !== originalValues["uidChangeInput"]) {
             try {
-                await putUpdate({
-                    URL: pythonURI + "/api/user",
-                    body: { uid },
-                    message: 'uid-message'
-                });
+                await Promise.all([
+                    putUpdate({
+                        URL: pythonURI + "/api/user",
+                        body: { uid },
+                        message: 'uid-message'
+                    }),
+                    postUpdate({
+                        URL: javaURI + "/api/person/update",
+                        body: { uid }
+                    })
+                ]);
                 needsLogout = true;
             } catch (e) {
                 console.error("error saving uid:", e.message);
             }
         }
 
-        // save email (java only)
+        // save email (both backends)
         if (email && email !== originalValues["emailChangeInput"]) {
             try {
-                await postUpdate({
-                    URL: javaURI + "/api/person/update",
-                    body: { email }
-                });
+                await Promise.all([
+                    putUpdate({
+                        URL: pythonURI + "/api/user",
+                        body: { email },
+                        message: 'email-message'
+                    }),
+                    postUpdate({
+                        URL: javaURI + "/api/person/update",
+                        body: { email }
+                    })
+                ]);
             } catch (e) {
                 console.error("error saving email:", e.message);
             }
         }
 
-        // save password (python only, logs out)
+        // save password (both backends, logs out)
         if (password) {
             try {
-                await putUpdate({
-                    URL: pythonURI + "/api/user",
-                    body: { password },
-                    message: 'password-message'
-                });
+                await Promise.all([
+                    putUpdate({
+                        URL: pythonURI + "/api/user",
+                        body: { password },
+                        message: 'password-message'
+                    }),
+                    postUpdate({
+                        URL: javaURI + "/api/person/update",
+                        body: { password }
+                    })
+                ]);
                 needsLogout = true;
             } catch (e) {
                 console.error("error saving password:", e.message);
             }
         }
 
-        // save kasm server status (java only)
+        // save kasm server status (both backends)
         if (
             typeof kasmServerNeeded !== "undefined" &&
             kasmServerNeeded !== originalValues["kasmChangeInput"]
         ) {
             try {
-                await postUpdate({
-                    URL: javaURI + "/api/person/update",
-                    body: { kasmServerNeeded }
-                });
+                await Promise.all([
+                    putUpdate({
+                        URL: pythonURI + "/api/user",
+                        body: { kasmServerNeeded },
+                        message: 'kasm-message'
+                    }),
+                    postUpdate({
+                        URL: javaURI + "/api/person/update",
+                        body: { kasmServerNeeded }
+                    })
+                ]);
             } catch (e) {
                 console.error("error saving kasm server status:", e.message);
             }
@@ -734,7 +686,7 @@ active_tab: profile
         // handle reload or logout if needed
         if (needsLogout) {
             alert("you updated your github id or password, so you will be logged out. remember your new credentials!");
-            window.location.href = '{{site.baseurl}}/duallogin';
+            window.location.href = '{{site.baseurl}}';
         } else if (needsReload) {
             window.location.reload();
         }
