@@ -213,50 +213,11 @@
                         </a>
                     </li>
 
-                    <!-- assignment submissions -->
-                    <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                            </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Assignment Submissions</span>
-                        </a>
-                    </li>
 
-                    <!-- Team Teach Signup -->
-                    <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                </svg>
-                            </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Team Teach Signup</span>
-                        </a>
-                    </li>
-
-                    <!-- View grades -->
-                    <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                                </svg>
-                            </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">View Grades</span>
-                        </a>
-                    </li>
+    <li id="teacher-toolkit-link">
+        <!-- this only shows if you are a teacher (your user has the teacher role) -->
+        <h3><a href="https://spring2025.nighthawkcodingsociety.com">Teacher Toolkit</a></h3>
+    </li>
 
                     <!-- section sidebar header -->
                     <li class="px-5">
@@ -298,52 +259,114 @@
                     </li>
                 </ul>
 
-                <!-- darkmode button -->
-                <div class="px-6">
-                    <button id="darkToggle" onclick="toggleDarkMode(this)"
-                        class="w-full flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 hidden dark:block" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 block dark:hidden" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                        <span class="block dark:hidden">Dark Mode</span>
-                        <span class="hidden dark:block">Light Mode</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+<!-- link controller (show and hide relevant links depending on the user's login status: logged in or logged out) -->
+<script type="module">
+    // use this to configure the API links depending on if you're running on local host or not
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    </div>
+    // link controller + active tab handler
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the active tab from localStorage
+        const activeTab = localStorage.getItem('activeTab');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-            const savedTheme = localStorage.getItem('theme');
+        if (activeTab) {
+            setActiveTab(activeTab);
+        }
 
-            // function to apply the theme
-            const applyTheme = (isDark) => {
-                document.documentElement.classList.toggle('dark', isDark);
-                const darkToggle = document.getElementById('darkToggle');
-                if (darkToggle) darkToggle.checked = isDark;
-            };
+        getCredentialsJava()
+            .then(data => {
+                // these only show if you ARE logged in
+                const profileLink = document.getElementById('profile-link');
+                const studentToolkitLink = document.getElementById('student-toolkit-link');
+                const teacherToolkitLink = document.getElementById('teacher-toolkit-link');
+                const signOutLink = document.getElementById('sign-out-link');
 
-            // apply saved theme or system preference
-            const isDark = savedTheme === 'dark' || (!savedTheme && userPrefersDark.matches);
-            applyTheme(isDark);
+                // these ones only show if you are NOT logged in
+                const signInLink = document.getElementById('sign-in-link');
+                const signUpLink = document.getElementById('sign-up-link');
 
-            // listen for system theme changes
-            userPrefersDark.addEventListener('change', (e) => {
-                if (!savedTheme) { // only update if no theme is saved
-                    applyTheme(e.matches);
+                // these are the sidebar data which should change
+                const name = document.getElementById('headerName');
+                const pfp = document.getElementById('headerPfp');
+
+                if (data) { // the user is authenticated
+                    // hide sign-in link and sign-up link because the user doesn't need it anymore
+                    signInLink.style.display = 'none';
+                    signUpLink.style.display = 'none';
+
+                    // only when the user is logged in can they access the toolkits
+                    profileLink.style.display = 'block';
+                    studentToolkitLink.style.display = 'block';
+
+                    // if the person who is logged in has the teacher role, display "Teacher Toolkit"
+                    const isTeacher = data.roles.some(role => role.name === 'ROLE_TEACHER');
+                    if (isTeacher) {
+                        // teacherToolkitLink.innerHTML = `<a href="{{site.baseurl}}/teacher">Teacher Toolkit</a>`;
+                        teacherToolkitLink.style.display = 'block';
+                    }
+                    else {
+                        teacherToolkitLink.style.display = 'none';
+                    }
+
+                    // because the user is logged in, show the sign out link
+                    // logoutLink.innerHTML = `<a href="{{site.baseurl}}/logoutjava">Logout of Toolkit</a>`;
+                    signOutLink.style.display = 'block';
+
+                    // now we should change the info in the sidebar like the name and the PFP
+                    name.innerHTML = "Welcome, <br/>" + data.name;
+
+                    // check if the pfp actually exists
+                    if (data.pfp) {
+                        // Check if the profile picture is base64 or an image URL
+                        if (isBase64(data.pfp)) {
+                            // If the pfp is base64 but doesn't include the data:image prefix, add it
+                            if (!data.pfp.startsWith('data:image/')) {
+                                data.pfp = 'data:image/png;base64,' + data.pfp;  // Assume it's PNG, adjust the type as needed
+                            }
+
+                            headerPfp.src = data.pfp; // If it's base64, use the base64 string directly
+                            console.log("DATA BASE64 WAS USED")
+                            console.log(data.pfp)
+                        } else {
+                            headerPfp.src = javaURI + data.pfp; // If it's a URL, append the javaURI
+                            console.log("URI WAS USED")
+                        }
+                    }
+                    else {
+                        // no pfp available; use defailt
+                        headerPfp.src = javaURI + "/images/default.png";
+                    }
+
+
+                    console.log(javaURI);
                 }
+                else { // user isn't authenticated
+                    // show signup and login links
+                    // signupLink.innerHTML = `<a href="{{site.baseurl}}/signup">Signup for Toolkit</a>`;
+                    // loginLink.innerHTML = `<a href="{{site.baseurl}}/toolkit-login">Login to Toolkit</a>`;
+                    signInLink.style.display = 'block';
+                    signUpLink.style.display = 'block';
+
+                    // hide everything else
+                    profileLink.style.display = 'none';
+                    studentToolkitLink.style.display = 'none';
+                    teacherToolkitLink.style.display = 'none';
+                    calendarLink.style.display = 'none';
+                    signOutLink.style.display = 'none';
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching credentials: ", err);
+            });
+        
+        // Add event listeners to links to update the active tab before navigation
+        document.querySelectorAll("ul li a").forEach(link => {
+            link.addEventListener("click", function () {
+                const tabId = this.id.replace("-link_", ""); // Extract tab name from ID
+                setActiveTab(tabId);
             });
         });
+    });
 
         function toggleDarkMode(checkbox) {
             const isDark = checkbox.checked;
