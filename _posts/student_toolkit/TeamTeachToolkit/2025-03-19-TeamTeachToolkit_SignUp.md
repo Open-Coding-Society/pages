@@ -1,6 +1,6 @@
 ---
 toc: false
-layout: post
+layout: aesthetihawk
 title: Sign Up Page
 permalink: /student/TeamTeachToolkit/signup
 description: Sign up for team teach topics
