@@ -74,7 +74,7 @@
 
                     <!-- logout -->
                     <li>
-                        <a id="Logout" href="#" onclick="setActiveTab(this)"
+                        <a id="Logout" href="#" onclick="handleLogout()"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -115,7 +115,7 @@
 
                     <!-- screen queue -->
                     <li>
-                        <a id="ScreenQueue" href="#" onclick="setActiveTab(this)"
+                        <a id="ScreenQueue" href="{{site.baseurl}}/student/queue" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -130,7 +130,7 @@
 
                     <!-- assignment submissions -->
                     <li>
-                        <a id="AssignmentSubmissions" href="#" onclick="setActiveTab(this)"
+                        <a id="AssignmentSubmissions" href="{{site.baseurl}}/student/submissions" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -146,7 +146,7 @@
 
                     <!-- Team Teach Signup -->
                     <li>
-                        <a id="TeamTeachSignup" href="{{site.baseurl}}/student/TeamTeachToolkit/signup" onclick="setActiveTab(this)"
+                        <a id="TeamTeachSignup" href="{{site.baseurl}}/student/teamteachsignup" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -161,7 +161,7 @@
 
                     <!-- View grades -->
                     <li>
-                        <a id="ViewGrades" href="#" onclick="setActiveTab(this)"
+                        <a id="ViewGrades" href="{{site.baseurl}}/student/grades" onclick="setActiveTab(this)"
                             class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -238,4 +238,39 @@
         // try to get from localstorage, or fallback to 'user'
         document.getElementById('sidebarWelcome').innerHTML = 'Welcome,<br>' + localStorage.getItem('name');
     });
+
+    // logout from both java and python backends
+    async function handleLogout() {
+        // import config dynamically since we can't use import in non-module script
+        const configModule = await import('{{site.baseurl}}/assets/js/api/config.js');
+        const fetchOptions = configModule.fetchOptions;
+        const pythonURI = configModule.pythonURI;
+        const javaURI = configModule.javaURI;
+
+        // logout from python backend
+        try {
+            await fetch(pythonURI + '/api/authenticate', {
+                ...fetchOptions,
+                method: 'DELETE'
+            });
+        } catch (e) {
+            // log error but continue
+            console.error('python logout failed:', e);
+        }
+
+        // logout from java backend
+        try {
+            await fetch(javaURI + '/my/logout', {
+                ...fetchOptions,
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (e) {
+            // log error but continue
+            console.error('java logout failed:', e);
+        }
+
+        // redirect to login page
+        window.location.href = "{{site.baseurl}}/login";
+    }
 </script>

@@ -4,6 +4,10 @@ layout: aesthetihawk
 active_tab: profile
 ---
 
+<head>
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/Aesthetihawk/shake.css">
+</head>
+
 
 <form id="profileSettingsForm">
     <!-- Personal Information Section -->
@@ -125,37 +129,28 @@ active_tab: profile
     </button>
 </div>
 
-<style>
-    /* Shake animation for Save button */
-    @keyframes shake {
-        0% {
-            transform: translateX(0);
-        }
 
-        25% {
-            transform: translateX(-15px);
-        }
+<!-- toasts -->
+<script type="module">
+    // import the toast handler module
+    import { showToast } from "{{site.baseurl}}/assets/js/Aesthetihawk/shared/toastHandler.js";
 
-        50% {
-            transform: translateX(15px);
-        }
+    window.addEventListener('load', () => {
+        const callToast = document.querySelector("#saveChangesBtn");
 
-        75% {
-            transform: translateX(-15px);
-        }
-
-        100% {
-            transform: translateX(0);
-        }
-    }
-
-    .shake-animation {
-        animation: shake 0.3s ease-in-out;
-    }
-</style>
-
-<!-- js tilt feature -->
-<script src="{{ site.baseurl }}/scripts/tilt.js"></script>
+        callToast.addEventListener("click", () => {
+            showToast({
+                message: "Changes Saved.",
+                icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                    </svg>`,
+                duration: 3000
+            });
+        });
+    });
+</script>
 
 <!-- toasts -->
 <script type="module">
@@ -184,10 +179,15 @@ active_tab: profile
     import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
+    // external functions
+    import { fetchUserData } from '{{site.baseurl}}/assets/js/Aesthetihawk/profile/fetchUserData.js';
+    import { setUserData } from '{{site.baseurl}}/assets/js/Aesthetihawk/profile/setUserData.js';
+
+
     // this runs on page load
     document.addEventListener("DOMContentLoaded", async () => {
         try {
-            await window.loadUserData();
+            await window.setUserData();
         } catch (error) {
             console.error("Error initializing user data:", error.message);
         }
@@ -229,70 +229,17 @@ active_tab: profile
         }
     };
 
-    // loading the user data to display
-    window.loadUserData = async function () {
+    
+    window.fetchUserData = fetchUserData; // get the data
+    window.setUserData = setUserData; // setting the user data to display
+    document.addEventListener("DOMContentLoaded", async () => {
         try {
-            // fetch all profile data at once
-            const [name, uid, email, sid, kasm] = await window.fetchProfileData();
-
-            // update the name, uid, and email placeholders
-            const nameInput = document.getElementById("nameChangeInput");    // full name
-            const uidInput = document.getElementById("uidChangeInput");      // github id
-            const emailInput = document.getElementById("emailChangeInput");  // email
-            const sidInput = document.getElementById("sidChangeInput");      // canvas id
-            const kasmCheckbox = document.getElementById("kasmChangeInput"); // do you need kasm?
-  
-            nameInput.value = name ? name : "Failed to load name. Are you logged in?";     // full name
-            uidInput.value = uid ? uid : "Failed to load uid. Are you logged in?";         // github id
-            emailInput.value = email ? email : "Failed to load email. Are you logged in?"; // email
-            sidInput.value = sid ? sid : "Failed to load sid. Are you logged in?";         // canvas id
-
-            // update the kasm status
-            if (kasmCheckbox) {
-                kasmCheckbox.checked = kasm;
-                document.getElementById("kasm").textContent = kasm ? "kasm enabled" : "kasm disabled";
-            } 
-            else {
-                console.error("kasm checkbox not found in the dom.");
-            }
-
+            await window.setUserData();
         } catch (error) {
-            console.error("error setting placeholders:", error.message);
+            console.error("Error initializing user data:", error.message);
         }
-    };
+    });
 
-    // get the data (not the same as loading because the load function changes the html)
-    window.fetchProfileData = async function () {
-        // api urls for fetching data
-        const javaURL = javaURI + "/api/person/get";
-
-        let name = null;
-        let uid = null;
-        let email = null;
-        let sid = null;
-        let kasmServerNeeded = null;
-
-        // get the java data next (email & kasm)
-        try {
-            const javaResponse = await fetch(javaURL, fetchOptions);
-            if (javaResponse.ok) {
-                const javaData = await javaResponse.json();
-
-                // set the data
-                name = javaData.name;
-                uid = javaData.uid;
-                email = javaData.email;
-                sid = javaData.sid;
-                kasmServerNeeded = javaData.kasmServerNeeded
-            } else {
-                console.error('error fetching data:', javaResponse.status);
-            }
-        } catch (error) {
-            console.error('error fetching data:', error.message);
-        }
-
-        return [name, uid, email, sid, kasmServerNeeded]; // return it all in an array
-    }
 
     window.changeClass = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page

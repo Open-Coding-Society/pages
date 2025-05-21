@@ -1,5 +1,5 @@
 ---
-toc: false
+layout: aesthetihawk
 title: Submission Page
 permalink: /student/submissions
 search_exclude: true

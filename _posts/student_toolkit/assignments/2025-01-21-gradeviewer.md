@@ -1,21 +1,27 @@
 ---
-layout: base
+layout: aesthetihawk
+active_tab: grades
 title: Viewing Grades
 permalink: /student/view-grades
 comments: false
 ---
 
-
-<table id="gradesTable" class="styled-table">
-    <thead>
-        <tr>
-            <th>Assignment</th>
-            <th>Grade</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold text-white mb-4">Your Grades</h2>
+    <div class="overflow-x-auto">
+        <table id="gradesTable" class="min-w-full table-auto border border-blue-900 bg-transparent">
+            <thead class="bg-transparent text-white font-bold">
+                <tr>
+                    <th class="px-6 py-3 uppercase tracking-wider border-b border-blue-900">Assignment</th>
+                    <th class="px-6 py-3 uppercase tracking-wider border-b border-blue-900">Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Grade rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -24,16 +30,17 @@ comments: false
 
     function populateTable(grades) {
         const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
-        
         tableBody.innerHTML = "";
 
         grades.forEach(stugrade => {
             let row = tableBody.insertRow();
 
             let cell1 = row.insertCell(0);
+            cell1.className = "px-6 py-4 text-white font-semibold";
             cell1.textContent = stugrade[1];
 
             let cell2 = row.insertCell(1);
+            cell2.className = "px-6 py-4 text-white font-semibold";
             cell2.textContent = stugrade[0];
         });
 
@@ -52,13 +59,15 @@ comments: false
 
         const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
         let averageRow = tableBody.insertRow();
+        averageRow.classList.add("border", "border-green-500");
+
         let cell1 = averageRow.insertCell(0);
+        cell1.className = "px-6 py-4 text-white font-semibold";
         cell1.textContent = "Average";
 
         let cell2 = averageRow.insertCell(1);
+        cell2.className = "px-6 py-4 text-white font-semibold";
         cell2.textContent = average;
-
-        averageRow.classList.add("average-row");
     }
 
     async function getUserId() {
