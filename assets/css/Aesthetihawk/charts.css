@@ -1,0 +1,26 @@
+/* apexcharts tooltip custom styles */
+.apexcharts-tooltip.apexcharts-theme-light {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.apexcharts-tooltip {
+    border-radius: 5px;
+    box-shadow: 2px 2px 6px -4px #999;
+    cursor: default;
+    font-size: 14px;
+    left: 62px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+    z-index: 12;
+    transition: .15s ease all;
+    color: #fff;
+    background: rgba(30, 30, 30, .8)
+}

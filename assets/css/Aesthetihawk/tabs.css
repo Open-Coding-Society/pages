@@ -1,0 +1,57 @@
+/* add underline on hover for non-active tabs */
+.tab-btn:not(.active):hover {
+    border-bottom-color: #d1d5db !important;
+}
+
+.tab-content {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 1;
+    z-index: 0;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+.tab-content.animating {
+    pointer-events: none;
+}
+
+.tab-content.slide-out-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.tab-content.slide-out-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.tab-content.slide-in-left {
+    opacity: 0;
+    transform: translateX(-40px);
+}
+
+.tab-content.slide-in-right {
+    opacity: 0;
+    transform: translateX(40px);
+}
+
+.tab-content.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+    z-index: 1;
+}
+
+/* sliding underline styles */
+#tab-underline {
+    will-change: left, width;
+    z-index: 2;
+}

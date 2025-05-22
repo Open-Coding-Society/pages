@@ -84,6 +84,7 @@ active_tab: toolkit
         grid-auto-flow: row;
         grid-template-areas:
             "header"
+            "calendar"
             "bathroom"
             "screen-queue"
             "assignment-submissions"
@@ -95,6 +96,30 @@ active_tab: toolkit
 
     .header {
         grid-area: header;
+    }
+
+    .calendar {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        grid-template-rows: 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+            "calendar-thumbnail calendar-details";
+        grid-area: calendar;
+    }
+
+    .calendar-details {
+        grid-area: calendar-details;
+        padding: 30px;
+    }
+
+    .calendar-thumbnail {
+        grid-area: calendar-thumbnail;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .bathroom {
@@ -395,6 +420,29 @@ active_tab: toolkit
         <h1>Student Toolkit (Beta)</h1>
         <p>Access all student toolkits here.</p>
     </div>
+
+
+    <!-- calendar -->
+    <a href="{{site.baseurl}}/student/calendar">
+        <div class="calendar card">
+            <div class="calendar-details">
+                <h3>Calendar</h3>
+                <p>This tool lets you:</p>
+                <ul>
+                    <li>Add/Edit/Delete events to calendar</li>
+                    <li>View all events</li>
+                    <li>View events specific to each period</li>
+                    <li>Month, week, and day viewing options</li>
+
+                </ul>
+            </div>
+            <div class="calendar-thumbnail">
+                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/calendar.png" alt="Calendar"
+                    class="thumbnail">
+            </div>
+        </div>
+    </a>
+
 
     <!-- bathroom -->
     <a href="{{site.baseurl}}/bathroom">

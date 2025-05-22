@@ -1,0 +1,296 @@
+---
+title: Dashboard
+layout: aesthetihawk
+active_tab: Dashboard
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css">
+    <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/Aesthetihawk/tabs.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/Aesthetihawk/charts.css">
+</head>
+
+<body class="bg-neutral-900" data-active-tab="{{ page.active_tab }}">
+    <!-- Content -->
+    <div class="w-full">
+        <div class="space-y-4 sm:space-y-6">
+            <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
+                <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
+                    <li class="me-2">
+                        <a href="#" id="tab-github"
+                            class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500"
+                            aria-current="page">GitHub Analytics</a>
+                    </li>
+                    <li class="me-2">
+                        <a href="#" id="tab-bathroom"
+                            class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">Bathroom
+                            Analytics</a>
+                    </li>
+                    <!-- <li>
+                        <a class="inline-block p-4 rounded-t-lg cursor-not-allowed text-neutral-500">Disabled</a>
+                    </li> -->
+                </ul>
+                <!-- sliding underline indicator -->
+                <div id="tab-underline"
+                    style="position:absolute;bottom:0;left:0;height:2px;width:0;background:#2563eb;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
+                </div>
+            </div>
+
+            <!-- tab content container -->
+            <div id="tab-content-container" class="relative min-h-[400px]">
+                <!-- github analytics tab content -->
+                <div id="tab-content-github" class="tab-content block">
+                    <!-- Grid -->
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-4 lg:grid-rows-2  gap-4 sm:gap-6">
+                        <!-- Card -->
+                        <div
+                            class="row-span-2 col-start-1 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="p-4 md:p-5">
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <img src="" alt="" id="avatar" class="w-max h-max rounded-xl">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="row-span-2 col-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="p-4 md:p-5">
+                                <div class="flex items-center gap-x-2">
+                                    <p class="text-xs uppercase text-neutral-500">Github Info</p>
+                                </div>
+
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <h3 class="text-xl sm:text-2xl font-medium text-neutral-200" id="username">N/A. Are
+                                        you
+                                        logged in?</h3>
+                                </div>
+
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <h3 class="text-xl sm:text-2xl font-medium text-neutral-200" id="followers">N/A. Are
+                                        you
+                                        logged in?</h3>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Card -->
+                        <div
+                            class="col-start-3 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="p-4 md:p-5">
+                                <div class="flex items-center gap-x-2">
+                                    <p class="text-xs uppercase text-neutral-500">
+                                        Commits
+                                    </p>
+                                    <!-- <div class="hs-tooltip">
+                                        <div class="hs-tooltip-toggle">
+                                            <svg class="shrink-0 size-4 text-neutral-500" xmlns="http://www.w3.org/2000/svg"
+                                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                                <path d="M12 17h.01" />
+                                            </svg>
+                                            <span
+                                                class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible opacity-0 transition-opacity inline-block absolute invisible z-10 py-1 px-2 bg-neutral-900 text-xs font-medium text-white rounded-md shadow-2xs dark:bg-neutral-700 hidden"
+                                                role="tooltip">
+                                                The number of commits you have made
+                                            </span>
+                                        </div>
+                                    </div> -->
+                                </div>
+
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <h3 class="text-xl sm:text-2xl font-medium text-neutral-200" id="commits-count">N/A.
+                                        Are you
+                                        logged in?</h3>
+                                    <!-- <span class="flex items-center gap-x-1 text-green-600">
+                                        <svg class="inline-block size-4 self-center" xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                                            <polyline points="16 7 22 7 22 13" />
+                                        </svg>
+                                        <span class="inline-block text-sm">
+                                            1.7%
+                                        </span>
+                                    </span> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Card -->
+
+                        <!-- Card -->
+                        <div
+                            class="col-start-4 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="p-4 md:p-5">
+                                <div class="flex items-center gap-x-2">
+                                    <p class="text-xs uppercase text-neutral-500">Issues</p>
+                                </div>
+
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <h3 class="text-xl sm:text-2xl font-medium text-neutral-200" id="issues-count">N/A.
+                                        Are you
+                                        logged in?</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Card -->
+
+                        <!-- Card -->
+                        <div
+                            class="col-start-3 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="p-4 md:p-5">
+                                <div class="flex items-center gap-x-2">
+                                    <p class="text-xs uppercase text-neutral-500">
+                                        Pull Requests
+                                    </p>
+                                </div>
+
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <h3 class="text-xl sm:text-2xl font-medium text-neutral-200" id="prs-count">N/A. Are
+                                        you logged in?</h3>
+                                    <!-- <span class="flex items-center gap-x-1 text-red-600">
+                                        <svg class="inline-block size-4 self-center" xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
+                                            <polyline points="16 17 22 17 22 11" />
+                                        </svg>
+                                        <span class="inline-block text-sm">
+                                            1.7%
+                                        </span>
+                                    </span> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Card -->
+
+                        <!-- Card -->
+                        <div
+                            class="col-start-4 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="p-4 md:p-5">
+                                <div class="flex items-center gap-x-2">
+                                    <p class="text-xs uppercase text-neutral-500">
+                                        Public Repos
+                                    </p>
+                                </div>
+
+                                <div class="mt-1 flex items-center gap-x-2">
+                                    <h3 class="text-xl sm:text-2xl font-medium text-neutral-200" id="public-repos">N/A.
+                                        Are you logged in?</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
+                        <div
+                            class="p-4 md:p-5 min-h-102.5 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <div>
+                                    <h2 class="text-sm text-neutral-500">
+                                        Income
+                                    </h2>
+                                    <p class="text-xl sm:text-2xl font-medium text-neutral-200">
+                                        $126,238.49
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span
+                                        class="py-[5px] px-1.5 inline-flex items-center gap-x-1 text-xs font-medium rounded-md bg-teal-800 text-teal-500">
+                                        <svg class="inline-block size-3.5" xmlns="http://www.w3.org/2000/svg" width="24"
+                                            height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 5v14" />
+                                            <path d="m19 12-7 7-7-7" />
+                                        </svg>
+                                        25%
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div id="hs-multiple-bar-charts"></div>
+                        </div>
+                        
+                        <div
+                            class="p-4 md:p-5 min-h-102.5 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <div>
+                                    <h2 class="text-sm text-neutral-500">
+                                        Visitors
+                                    </h2>
+                                    <p class="text-xl sm:text-2xl font-medium text-neutral-200">
+                                        80.3k
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span
+                                        class="py-[5px] px-1.5 inline-flex items-center gap-x-1 text-xs font-medium rounded-md bg-red-800 text-red-500">
+                                        <svg class="inline-block size-3.5" xmlns="http://www.w3.org/2000/svg" width="24"
+                                            height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 5v14" />
+                                            <path d="m19 12-7 7-7-7" />
+                                        </svg>
+                                        2%
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div id="hs-single-area-chart"></div>
+                        </div>
+                    </div> -->
+                </div>
+                <!-- bathroom analytics tab content -->
+                <div id="tab-content-bathroom" class="tab-content hidden">
+                    <div class="items-center justify-center text-neutral-300">
+                        <p>Legally correct, morally questionable: it's bathroom analytics!</p>
+                        <br>
+                        <p>Wow, it's so empty here. Maybe something will come up soon...?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+<!-- Required plugins -->
+<script src="https://cdn.jsdelivr.net/npm/preline/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
+
+<script type="module">
+    // call the function to fetch and update github data
+    import { fetchGithubData } from '{{ site.baseurl }}/assets/js/Aesthetihawk/dashboard/getGithubData.js';
+    fetchGithubData();
+</script>
+
+<!-- JavaScript for tab switching -->
+<script type="module">
+    import { setupTabSwitcher } from '{{ site.baseurl }}/assets/js/Aesthetihawk/shared/tabSwitcher.js';
+
+    // call the function with your tab ids and initial tab
+    document.addEventListener('DOMContentLoaded', function () {
+        setupTabSwitcher(['github', 'bathroom'], 'github');
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const activeTab = document.body.dataset.activeTab;
+        setActiveTab(activeTab);
+    });
+</script>
+
+</html>

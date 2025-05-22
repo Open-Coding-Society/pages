@@ -1,44 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
+
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-<style>
-    /* Shake animation for Save button */
-    @keyframes shake {
-        0% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(-15px);
-        }
-
-        50% {
-            transform: translateX(15px);
-        }
-
-        75% {
-            transform: translateX(-15px);
-        }
-
-        100% {
-            transform: translateX(0);
-        }
-    }
-
-    .shake-animation {
-        animation: shake 0.3s ease-in-out;
-    }
-</style>
 
 <body class="min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
     <!-- navbar -->
@@ -46,27 +16,24 @@
 
     <div
         class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased text-neutral-50 mt-[53px] bg-neutral-900">
-        <!-- Sidebar - Fixed container -->
-        <div class="fixed left-0 top-[53px] w-64 h-full bg-neutral-800 border-r  border-neutral-700 flex flex-col">
-            <!-- Fixed profile pic section - doesn't scroll -->
-            <div class="p-6 flex flex-col items-center bg-neutral-800">
-                <div class="w-24 h-24 rounded-full overflow-hidden mb-4">
-                    <img src="https://static.wikia.nocookie.net/brainrotnew/images/a/ac/Tralalero_tralala.jpg/revision/latest/smart/width/400/height/225?cb=20250321131418"
-                        alt="Profile picture" class="w-full h-full object-cover">
-                </div>
-                <h2 class="text-lg font-semibold text-center mb-6">Welcome, User</h2>
-            </div>
 
-            <!-- DELETE THIS -->
-            <button id="hs-new-toast" type="button"
-                class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                Call toast
-            </button>
+        <!-- Sidebar -->
+        <div class="fixed left-0 top-[53px] w-64 h-full bg-neutral-800 border-r  border-neutral-700 flex flex-col">
+
+            <!-- profile pic section -->
+            <div class="p-6 flex flex-col items-center bg-neutral-800">
+                <div class="w-24 h-24 rounded-full overflow-hidden mb-4 cursor-pointer" id="sidebarPfpBox">
+                    <img src="" alt="Profile picture" class="w-full h-full object-cover" id="sidebarPfp">
+                </div>
+                <h2 class="text-lg font-semibold text-center mb-6" id="sidebarWelcome">Welcome, User</h2>
+            </div>
 
             <!-- Scrollable menu section -->
             <div class="overflow-y-auto flex-grow">
+
                 <!-- the menu side -->
                 <ul class="flex flex-col py-4 space-y-1">
+
                     <!-- section title -->
                     <li class="px-5">
                         <div class="flex flex-row items-center h-8">
@@ -76,8 +43,8 @@
 
                     <!-- dashboard button -->
                     <li>
-                        <a href="file:///home/administrator/dashboard.html" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="Dashboard" href="{{site.baseurl}}/dashboard" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -92,23 +59,23 @@
 
                     <!-- analytics button -->
                     <li>
-                        <a href="file:///home/administrator/analytics.html" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="Profile" href="{{site.baseurl}}/profile" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                 </svg>
                             </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Analytics</span>
+                            <span class="ml-2 text-sm tracking-wide truncate">Profile</span>
                         </a>
                     </li>
 
                     <!-- logout -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="Logout" href="#" onclick="handleLogout()"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -128,25 +95,12 @@
                         </div>
                     </li>
 
-                    <!-- bathroom -->
-                    <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                            </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Bathroom</span>
-                        </a>
-                    </li>
+
 
                     <!-- groups -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="Groups" href="{{site.baseurl}}/student/groups" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -161,13 +115,13 @@
 
                     <!-- screen queue -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="ScreenQueue" href="{{site.baseurl}}/student/queue" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                        d="M12 6h8m-8 6h8m-8 6h8M4 16a2 2 0 1 1 3.321 1.5L4 20h5M4 5l2-1v6m-2 0h4" />
                                 </svg>
                             </span>
                             <span class="ml-2 text-sm tracking-wide truncate">Screen Queue</span>
@@ -176,23 +130,26 @@
 
                     <!-- assignment submissions -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="AssignmentSubmissions" href="{{site.baseurl}}/student/submissions"
+                            onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                        d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m5 6h9m0 0-2-2m2 2-2 2" />
                                 </svg>
                             </span>
+
                             <span class="ml-2 text-sm tracking-wide truncate">Assignment Submissions</span>
                         </a>
                     </li>
 
                     <!-- Team Teach Signup -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="TeamTeachSignup" href="{{site.baseurl}}/student/teamteachsignup"
+                            onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -206,8 +163,8 @@
 
                     <!-- View grades -->
                     <li>
-                        <a href="#" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none hover:bg-neutral-600 text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                        <a id="ViewGrades" href="{{site.baseurl}}/student/grades" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
                             <span class="inline-flex justify-center items-center ml-4">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -222,8 +179,12 @@
             </div>
         </div>
 
-        <!-- Main Content Area - Adjust margin to match sidebar width -->
-        <div class="ml-64 p-8">
+        <!-- Main Content Area -->
+        <div class="ml-64 p-8 bg-neutral-900">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold">{{page.title}}</h1>
+            </div>
+
             {{ content }}
         </div>
     </div>
@@ -231,284 +192,87 @@
 
 </html>
 
+
+<!-- set active sidebar tab -->
 <script>
-    // Store original form values
-    let originalValues = {};
-    let formChanged = false;
-
-    // how long toast stays (ms)
-    const toastDuration = 10000;
-
-    // Initialize the form
-    document.addEventListener('DOMContentLoaded', function () {
-        // Store original values
-        saveOriginalValues();
-
-        // Set up toggle switch
-        const toggle = document.querySelector('#kasmToggle');
-        const toggleDot = document.querySelector('.dot');
-
-        toggle.addEventListener('change', function () {
-            if (this.checked) {
-                toggleDot.classList.add('translate-x-3');
-            } else {
-                toggleDot.classList.remove('translate-x-3');
-            }
-        });
-
-        // Set up beforeunload event
-        window.addEventListener('beforeunload', function (e) {
-            if (formChanged) {
-                showUnsavedChangesAlert();
-            }
-        });
-    });
-
-    // Save original form values
-    function saveOriginalValues() {
-        const form = document.getElementById('profileSettingsForm');
-        const inputs = form.querySelectorAll('input, select');
-
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                originalValues[input.id] = input.checked;
-            } else {
-                originalValues[input.id] = input.value;
-            }
-        });
-
-        // Save original class entries
-        const classEntries = document.querySelectorAll('.class-entry');
-        originalValues.classEntries = [];
-
-        classEntries.forEach((entry, index) => {
-            originalValues.classEntries[index] = {
-                name: entry.querySelector('.class-name').value,
-                year: entry.querySelector('.class-year').value
-            };
-        });
-    }
-
-    // Check if form values have changed
-    function checkForChanges() {
-        const form = document.getElementById('profileSettingsForm');
-        const inputs = form.querySelectorAll('input, select');
-        const saveButton = document.getElementById('saveChangesBtn');
-
-        formChanged = false;
-
-        // Check standard inputs
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                if (originalValues[input.id] !== input.checked) {
-                    formChanged = true;
-                }
-            } else if (input.id && originalValues[input.id] !== undefined) {
-                if (originalValues[input.id] !== input.value) {
-                    formChanged = true;
-                }
-            }
-        });
-
-        // Check class entries
-        const classEntries = document.querySelectorAll('.class-entry');
-        if (classEntries.length !== originalValues.classEntries.length) {
-            formChanged = true;
-        } else {
-            classEntries.forEach((entry, index) => {
-                const name = entry.querySelector('.class-name').value;
-                const year = entry.querySelector('.class-year').value;
-
-                if (index >= originalValues.classEntries.length ||
-                    originalValues.classEntries[index].name !== name ||
-                    originalValues.classEntries[index].year !== year) {
-                    formChanged = true;
-                }
-            });
-        }
-
-        // Update save button
-        if (formChanged) {
-            saveButton.disabled = false;
-            saveButton.classList.remove('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-            saveButton.classList.add('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
-        } else {
-            saveButton.disabled = true;
-            saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-            saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
-        }
-    }
-
-    // Add new class
-    function addClass() {
-        const container = document.getElementById('classesContainer');
-        const classEntry = document.createElement('div');
-        classEntry.className = 'class-entry mb-4 p-4 border border-gray-700 rounded-lg';
-
-        classEntry.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                        <div class="flex-grow mb-2 md:mb-0">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Class Name</label>
-                            <input type="text" 
-                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                placeholder="Enter class name" onchange="checkForChanges()">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Year</label>
-                            <select class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="checkForChanges()">
-                                <option>2025</option>
-                                <option>2026</option>
-                                <option>2027</option>
-                                <option>2028</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
-                        Remove
-                    </button>
-                `;
-
-        container.appendChild(classEntry);
-        checkForChanges();
-    }
-
-    // Remove class
-    function removeClass(button) {
-        const classEntry = button.closest('.class-entry');
-        classEntry.remove();
-        checkForChanges();
-    }
-
-    // show toast, auto-hide, allow manual close
-    function showUnsavedChangesAlert() {
-        const toast = document.getElementById('unsavedChangesAlert');
-        const saveButton = document.getElementById('saveChangesBtn');
-
-        // trigger reflow so shake always retriggers
-        saveButton.classList.remove('shake-animation');
-        void saveButton.offsetWidth;
-        saveButton.classList.add('shake-animation');
-
-        // slide-in toast
-        toast.classList.add('show');
-
-        // clear any existing timeout
-        if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-
-        // auto-hide after duration
-        toast.hideTimeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, toastDuration);
-    }
-
-    // close button handler
-    document
-        .getElementById('unsavedChangesAlert')
-        .querySelector('button.close')
-        .addEventListener('click', function () {
-            const toast = document.getElementById('unsavedChangesAlert');
-            toast.classList.remove('show');
-            if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
-        });
-
-
-    // Save changes
-    function saveChanges() {
-        // Here you would typically send data to the server
-        // For now, we'll just update the originalValues
-        saveOriginalValues();
-        formChanged = false;
-
-        const saveButton = document.getElementById('saveChangesBtn');
-        saveButton.disabled = true;
-        saveButton.classList.add('bg-neutral-300', 'text-neutral-500', 'cursor-not-allowed');
-        saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
-
-        // Show success message
-        const originalButtonText = saveButton.innerHTML;
-        saveButton.innerHTML = `
-                    <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Saved!
-                `;
-
-        setTimeout(() => {
-            saveButton.innerHTML = originalButtonText;
-        }, 2000);
-    }
-</script>
-
-<script>
-    // Function to set active tab
-    function setActiveTab(element) {
-        // Remove active class from all nav items
+    // function to set active tab by element or id
+    function setActiveTab(elementOrId) {
+        // remove active classes from all nav items
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
-            item.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
-            item.classList.add('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
+            item.classList.remove('bg-neutral-700', 'text-neutral-50', 'border-indigo-500');
+            item.classList.add('text-neutral-600', 'border-transparent');
         });
 
-        // Add active class to clicked element
-        element.classList.remove('hover:bg-neutral-600', 'text-neutral-600', 'hover:text-neutral-50', 'border-transparent');
-        element.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-500');
+        // get element if id string is passed
+        let el = elementOrId;
+        if (typeof elementOrId === 'string') {
+            el = document.getElementById(elementOrId);
+        }
+
+        // add active classes to clicked tab
+        if (el) {
+            el.classList.add('bg-neutral-700', 'text-neutral-50', 'border-indigo-500');
+            el.classList.remove('text-neutral-600', 'border-transparent');
+            // store active tab id in localstorage
+            localStorage.setItem('activeTabId', el.id);
+        }
     }
-</script>
 
-<script>
-    function tostifyCustomClose(el) {
-        const parent = el.closest('.toastify');
-        const close = parent.querySelector('.toast-close');
+    // on page load, re-apply active tab from localstorage or front matter
+    window.addEventListener('DOMContentLoaded', () => {
+        let activeId = localStorage.getItem('activeTabId');
+        let activeLink = null;
 
-        close.click();
-    }
+        if (activeId) activeLink = document.getElementById(activeId);
 
-    window.addEventListener('load', () => {
-        (function () {
-            let i = 0;
-            const callToast = document.querySelector("#hs-new-toast");
-            
-            const toastMarkup2 = `
-                <div class="max-w-xs bg-neutral-600 border rounded-xl shadow-lg border-neutral-700" role="alert" tabindex="-1" aria-labelledby="hs-toast-success-example-label">
-                        <div class="flex p-4">
-                            <div class="shrink-0">
-                                <svg class="shrink-0 size-4 text-teal-500 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"></path>
-                                </svg>
-                            </div>
-                            <div class="ms-3">
-                                <p id="hs-toast-success-example-label" class="text-sm text-neutral-400">
-                                Changes Saved.
-                                </p>
-                            </div>
-                            <div class="ms-auto flex items-center space-x-3">
-                                <button type="button" onclick="tostifyCustomClose(this)" class="inline-flex shrink-0 justify-center items-center size-5 rounded-lg text-gray-800 opacity-50 hover:opacity-100 focus:outline-hidden focus:opacity-100 text-white" aria-label="Close">
-                                    <span class="sr-only">Close</span>
-                                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M18 6 6 18"></path>
-                                    <path d="m6 6 12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
+        // if no active tab in localstorage, use the one from front matter
+        if (!activeLink) {
+            const fallback = "{{ page.act_tab | escape }}";
+            if (fallback) {
+                setActiveTab(fallback);
+                return;
+            }
+        }
+        activeLink && setActiveTab(activeLink);
 
-                        </div>
-                </div>
-            `;
-
-            callToast.addEventListener("click", () => {
-                Toastify({
-                    text: toastMarkup2,
-                    className: "hs-toastify-on:opacity-100 opacity-0 fixed -top-37.5 right-5 z-90 transition-all duration-300 [&>.toast-close]:hidden",
-                    duration: 3000,
-                    close: true,
-                    escapeMarkup: false,
-                    style: {
-                        background: "none",
-                        padding: "0px 0px",                        
-                    }
-
-                }).showToast();
-            });
-        })();
+        // set sidebar welcome name
+        // try to get from localstorage, or fallback to 'user'
+        document.getElementById('sidebarWelcome').innerHTML = 'Welcome,<br>' + localStorage.getItem('name');
     });
+
+    // logout from both java and python backends
+    async function handleLogout() {
+        // import config dynamically since we can't use import in non-module script
+        const configModule = await import('{{site.baseurl}}/assets/js/api/config.js');
+        const fetchOptions = configModule.fetchOptions;
+        const pythonURI = configModule.pythonURI;
+        const javaURI = configModule.javaURI;
+
+        // logout from python backend
+        try {
+            await fetch(pythonURI + '/api/authenticate', {
+                ...fetchOptions,
+                method: 'DELETE'
+            });
+        } catch (e) {
+            // log error but continue
+            console.error('python logout failed:', e);
+        }
+
+        // logout from java backend
+        try {
+            await fetch(javaURI + '/my/logout', {
+                ...fetchOptions,
+                method: 'POST',
+                credentials: 'include'
+            });
+        } catch (e) {
+            // log error but continue
+            console.error('java logout failed:', e);
+        }
+
+        // redirect to login page
+        window.location.href = "{{site.baseurl}}/login";
+    }
 </script>
