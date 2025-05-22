@@ -2,7 +2,7 @@
 import { javaURI, fetchOptions } from '../../api/config.js';
 
 // fetches all profile data and returns it as an array
-export async function fetchUserData() {
+export async function getUserData() {
     // api url for fetching data
     const javaURL = javaURI + "/api/person/get";
 
