@@ -1,12 +1,12 @@
-// import the fetchUserData function
-import { fetchUserData } from './fetchUserData.js';
+// import the getUserData function
+import { getUserData } from './getUserData.js';
 
 
 // loads user data and updates the profile form fields
 export async function setUserData() {
     try {
         // fetch all profile data at once
-        const [name, uid, email, sid, kasm] = await fetchUserData();
+        const [name, uid, email, sid, kasm] = await getUserData();
 
         // update the name, uid, and email placeholders
         const nameInput = document.getElementById("nameChangeInput");    // full name
@@ -14,12 +14,15 @@ export async function setUserData() {
         const emailInput = document.getElementById("emailChangeInput");  // email
         const sidInput = document.getElementById("sidChangeInput");      // canvas id
         const kasmCheckbox = document.getElementById("kasmChangeInput"); // do you need kasm?
+        const sidebar = document.getElementById("sidebarWelcome");       // sidebar welcome message
+
 
         nameInput.value = name ? name : "Failed to load name. Are you logged in?";
         uidInput.value = uid ? uid : "Failed to load UID. Are you logged in?";
         emailInput.value = email ? email : "Failed to load email. Are you logged in?";
         sidInput.value = sid ? sid : "Failed to load SID. Are you logged in?";
         kasmCheckbox.checked = kasm;
+        sidebar.innerHTML = 'Welcome,<br>' + name;
     } catch (error) {
         console.error("error setting placeholders:", error.message);
     }

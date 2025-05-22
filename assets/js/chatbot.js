@@ -1,6 +1,6 @@
 import {javaURI} from '{{site.baseurl}}/assets/js/api/config.js';
 
-//fetchUserData();
+//getUserData();
 let chatHistoryMode = false; 
 
 // Define and select essential elements from the DOM for interaction
