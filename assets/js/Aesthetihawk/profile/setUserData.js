@@ -6,7 +6,7 @@ import { getUserData } from './getUserData.js';
 export async function setUserData() {
     try {
         // fetch all profile data at once
-        const [name, uid, email, sid, kasm] = await getUserData();
+        const [name, uid, email, sid, kasm, pfp] = await getUserData();
 
         // update the name, uid, and email placeholders
         const nameInput = document.getElementById("nameChangeInput");    // full name
@@ -15,6 +15,7 @@ export async function setUserData() {
         const sidInput = document.getElementById("sidChangeInput");      // canvas id
         const kasmCheckbox = document.getElementById("kasmChangeInput"); // do you need kasm?
         const sidebar = document.getElementById("sidebarWelcome");       // sidebar welcome message
+        const sidebarPfp = document.getElementById("sidebarPfp");        // sidebar profile picture
 
 
         nameInput.value = name ? name : "Failed to load name. Are you logged in?";
@@ -23,6 +24,7 @@ export async function setUserData() {
         sidInput.value = sid ? sid : "Failed to load SID. Are you logged in?";
         kasmCheckbox.checked = kasm;
         sidebar.innerHTML = 'Welcome,<br>' + name;
+        sidebarPfp.src = pfp ? pfp : "{{site.baseurl}}/images/default.png"
     } catch (error) {
         console.error("error setting placeholders:", error.message);
     }
