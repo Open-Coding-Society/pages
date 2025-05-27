@@ -1,6 +1,6 @@
 // all comments are lowercase
 
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import { pythonURI, fetchOptions } from '../../api/config.js';
 
 // helper to convert json to html with clickable links
 function jsonToHtml(json) {
