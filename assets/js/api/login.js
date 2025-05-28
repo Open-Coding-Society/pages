@@ -9,21 +9,49 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Credentials data:", data); // Debugging line
             const loginArea = document.getElementById('loginArea');
             if (data) { // Update the login area based on the data
-                // User is authenticated, replace "Login" with User's name
                 loginArea.innerHTML = `
                     <div class="dropdown">
                         <button class="dropbtn">${data.name}</button>
-                        <div class="dropdown-content">
+                        <div class="dropdown-content hidden">
+                            ${
+                                data.roles && Array.isArray(data.roles) && data.roles.length > 0
+                                    ? `<div class="roles-list" style="padding: 8px 16px; color: #888; font-size: 0.95em;">
+                                        Roles: ${data.roles.map(role => role.name).join(", ")}
+                                       </div>
+                                       <hr style="margin: 4px 0;">`
+                                    : ''
+                            }
                             <a href="${baseurl}/logout">Logout</a>
-                            <a href="${baseurl}/profile">Profile</a>
                             <a href="${baseurl}/gamify/fortuneFinders">Gamify</a>
                         </div>
                     </div>
                 `;
+
+                // Add click event listener for dropdown toggle
+                const dropdownButton = loginArea.querySelector('.dropbtn');
+                const dropdownContent = loginArea.querySelector('.dropdown-content');
+
+                dropdownButton.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent redirection
+                    if (dropdownContent.classList.contains('hidden')) {
+                        dropdownContent.classList.remove('hidden');
+                    } else {
+                        dropdownContent.classList.add('hidden');
+                    }
+                });
+
+                // Add event listener to hide dropdown when clicking outside
+                document.addEventListener('click', (event) => {
+                    if (!dropdownButton.contains(event.target) && !dropdownContent.contains(event.target)) {
+                        dropdownContent.classList.add('hidden'); // Hide dropdown
+                    }
+                });
             } else {
                 // User is not authenticated, then "Login" link is shown
                 loginArea.innerHTML = `<a href="${baseurl}/login">Login</a>`;
             }
+            // Set loginArea opacity to 1
+            loginArea.style.opacity = "1";
         })
         .catch(err => {
             console.error("Error fetching credentials: ", err);
