@@ -103,7 +103,7 @@ services:
 
 Open the README of the Flask project and read through it. The README is your starting point for understanding and developing the project. It provides essential information and instructions. Note that some familiarity with tools like Python, GitHub, and code editors (e.g., VSCode) is assumed.
 
-If you have support need on this Project, be sure to add Utterance to the bottom of this or other articles in the Flask Intro series. Here is the [Issues Link](https://github.com/nighthawkcoders/flask_2025/issues) for searching, reviewing, and tracking progress on yours and others comments.
+If you have support need on this Project, be sure to add Utterance to the bottom of this or other articles in the Flask Intro series. Here is the [Issues Link](https://github.com/open-coding-society/flask_2025/issues) for searching, reviewing, and tracking progress on yours and others comments.
 
 #### Standards and Practices for a Good README
 

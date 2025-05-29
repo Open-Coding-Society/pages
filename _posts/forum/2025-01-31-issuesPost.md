@@ -188,7 +188,7 @@ title: Issues Post
                 });
             };
             setTimeout(function() {
-                window.location.href = "/portfolio_2025/studentIssue";
+                window.location.href = "/pages/studentIssue";
             }, 3000);
         });
     </script>

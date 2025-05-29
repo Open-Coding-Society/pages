@@ -27,7 +27,7 @@ toc: True
 - From here, a variety of instances will show up. For this project, depending on which class you have, select either "CSP" or "CSA"
 
 ### Unrestricted Gateway to AWS EC2 Terminal
-> At school access csp.nighthawkcodingsociety.com or csa.nighthawkcodingsociety.com to log in to the deployment server.  Observe Cockpit features in section below, but primarily you will be using Terminal in this setup.
+> At school access csp.opencodingsociety.com or csa.opencodingsociety.com to log in to the deployment server.  Observe Cockpit features in section below, but primarily you will be using Terminal in this setup.
     - Username is `ubuntu`. Password hint is 3 Musketeers
 
 ## Application Setup
@@ -48,7 +48,7 @@ In AWS EC2 terminal;
 
 5. After it's done building, type in `http://localhost:8---` in your browser (replace '8---' with your port number you've chosen)
 
-6. If all runs smoothly, push your changes to Github and continue to [AWS setup](https://nighthawkcoders.github.io/APCSP/deploymentGuide#AWS-Setup)
+6. If all runs smoothly, push your changes to Github and continue to [AWS setup](https://open-coding-society.github.io/APCSP/deploymentGuide#AWS-Setup)
 
 
 
@@ -68,7 +68,7 @@ In the AWS EC2 terminal;
 5. Test your site: `curl localhost:8---` (replace '8---' with your port number)
 > This should show you all the html content of your home page. If this provides 500 error you need to check your site on localhost.  If it produces broken pipe error you need to check your ports between docker-compose.yml and Docker files.  If the page does not have your content, you need to check `docker ps` as someone is using your port number.
 
-If all runs smooth, continue to [DNS & NGINX Setup](https://nighthawkcoders.github.io/APCSP/deploymentGuide#DNS-&-NGINX-Setup)
+If all runs smooth, continue to [DNS & NGINX Setup](https://open-coding-society.github.io/APCSP/deploymentGuide#DNS-&-NGINX-Setup)
 
 
 ### Route 53 DNS
@@ -82,8 +82,8 @@ Route 53 DNS Setup:
 
 | Record name | Type | Value/Route traffic to |
 | ----------- | ----------- | ----------- |
-| `projectUniqueName` | CNAME | csp.nighthawkcodingsociety.com |
-| `projectUniqueName` | CNAME | csa.nighthawkcodingsociety.com |
+| `projectUniqueName` | CNAME | csp.opencodingsociety.com |
+| `projectUniqueName` | CNAME | csa.opencodingsociety.com |
 
 
 ### Nginx setup
@@ -100,7 +100,7 @@ Route 53 DNS Setup:
 server {
    listen 80;
     listen [::]:80;
-    server_name -----.stu.nighthawkcodingsociety.com ; # CHANGE SERVER NAME TO YOUR REGISTERED DOMAIN
+    server_name -----.stu.opencodingsociety.com ; # CHANGE SERVER NAME TO YOUR REGISTERED DOMAIN
     location / {
         proxy_pass http://localhost:8---; # CHANGE PORT TO YOUR UNIQUE PORT
         # Simple requests
@@ -128,7 +128,7 @@ server {
 
 8. Test your domain name on your desktop browser now (only http://, not https://)
 
-If all runs smoothly, continue to [Certbot config](https://nighthawkcoders.github.io/APCSP/deploymentGuide#Certbot-Config)
+If all runs smoothly, continue to [Certbot config](https://open-coding-society.github.io/APCSP/deploymentGuide#Certbot-Config)
 
 ### Certbot Config
 
@@ -154,9 +154,9 @@ Plugins selected: Authenticator nginx, Installer nginx
 Which names would you like to activate HTTPS for?
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ...
-28: cars.nighthawkcodingsociety.com
-29: dolphin.nighthawkcodingsociety.com
-30: saakd.nighthawkcodingsociety.com
+28: cars.opencodingsociety.com
+29: dolphin.opencodingsociety.com
+30: saakd.opencodingsociety.com
 ...
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Select the appropriate numbers separated by commas and/or spaces, or leave input
@@ -165,7 +165,7 @@ blank to select all options shown (Enter 'c' to cancel): # ENTER YOUR CORRESPOND
 Cert not yet due for renewal
 
 You have an existing certificate that has exactly the same domains or certificate name you requested and isn't close to expiry.
-(ref: /etc/letsencrypt/renewal/nighthawkcodingsociety.com-0001.conf)
+(ref: /etc/letsencrypt/renewal/opencodingsociety.com-0001.conf)
 
 What would you like to do?
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,10 +175,10 @@ What would you like to do?
 Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
 Renewing an existing certificate
 Performing the following challenges:
-http-01 challenge for nighthawkcodingsociety.com
-http-01 challenge for csa.nighthawkcodingsociety.com
-http-01 challenge for cso.nighthawkcodingsociety.com
-http-01 challenge for flm.nighthawkcodingsociety.com
+http-01 challenge for opencodingsociety.com
+http-01 challenge for csa.opencodingsociety.com
+http-01 challenge for cso.opencodingsociety.com
+http-01 challenge for flm.opencodingsociety.com
 Waiting for verification...
 Cleaning up challenges
 Deploying Certificate to VirtualHost /etc/nginx/sites-enabled/nighthawk_society
@@ -204,23 +204,23 @@ Your existing certificate has been successfully renewed, and the new certificate
 has been installed.
 
 The new certificate covers the following domains:
-https://nighthawkcodingsociety.com, 
-https://csa.nighthawkcodingsociety.com, 
-https://csp.nighthawkcodingsociety.com, and
-https://flm.nighthawkcodingsociety.com,
+https://opencodingsociety.com, 
+https://csa.opencodingsociety.com, 
+https://csp.opencodingsociety.com, and
+https://flm.opencodingsociety.com,
 
 You should test your configuration at:
-https://www.ssllabs.com/ssltest/analyze.html?d=nighthawkcodingsociety.com
-https://www.ssllabs.com/ssltest/analyze.html?d=csa.nighthawkcodingsociety.com
-https://www.ssllabs.com/ssltest/analyze.html?d=csp.nighthawkcodingsociety.com
-https://www.ssllabs.com/ssltest/analyze.html?d=flm.nighthawkcodingsociety.com
+https://www.ssllabs.com/ssltest/analyze.html?d=opencodingsociety.com
+https://www.ssllabs.com/ssltest/analyze.html?d=csa.opencodingsociety.com
+https://www.ssllabs.com/ssltest/analyze.html?d=csp.opencodingsociety.com
+https://www.ssllabs.com/ssltest/analyze.html?d=flm.opencodingsociety.com
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 IMPORTANT NOTES:
  - Congratulations! Your certificate and chain have been saved at:
-   /etc/letsencrypt/live/nighthawkcodingsociety.com-0001/fullchain.pem
+   /etc/letsencrypt/live/opencodingsociety.com-0001/fullchain.pem
    Your key file has been saved at:
-   /etc/letsencrypt/live/nighthawkcodingsociety.com-0001/privkey.pem
+   /etc/letsencrypt/live/opencodingsociety.com-0001/privkey.pem
    Your cert will expire on 2022-03-06. To obtain a new or tweaked
    version of this certificate in the future, simply run certbot again
    with the "certonly" option. To non-interactively renew *all* of

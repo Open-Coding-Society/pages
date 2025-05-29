@@ -79,7 +79,7 @@ def get_github_repository_issues_and_prs(token, owner, repo):
         print("Failed to fetch data:", response.text)
         return None
 
-def create_issues_and_prs_json(owner="nighthawkcoders", repo="portfolio_2025"):
+def create_issues_and_prs_json(owner="open-coding-society", repo="pages"):
     token = os.environ.get('GITHUB_TOKEN')  # via GitHub secrets
 
     data = get_github_repository_issues_and_prs(token, owner, repo)
@@ -124,6 +124,6 @@ def create_issues_and_prs_json(owner="nighthawkcoders", repo="portfolio_2025"):
     generate_json_file(author_data, f"_posts/{repo}-by_author.json")
 
 if __name__ == "__main__":
-    create_issues_and_prs_json(repo="portfolio_2025")
+    create_issues_and_prs_json(repo="pages")
     create_issues_and_prs_json(repo="flask_2025")
     create_issues_and_prs_json(repo="kasm-multi-server")

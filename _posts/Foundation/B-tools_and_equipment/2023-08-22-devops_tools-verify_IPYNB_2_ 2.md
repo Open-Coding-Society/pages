@@ -19,7 +19,7 @@ In this next phase, we will use a Jupyter notebook to perform Linux commands thr
 
 You will be making a personal copy of the course repository. Be sure to have a GitHub account!!!
 
-- Use the **Green "Use this Template"** button on the [portfolio_2025](https://github.com/nighthawkcoders/portfolio_2025) repository page to set up your personal GitHub Pages repository.
+- Use the **Green "Use this Template"** button on the [pages](https://github.com/open-coding-society/pages) repository page to set up your personal GitHub Pages repository.
 - Create a new repository.
 - Fill in the dialog and select the **Repository Name** to be under your GitHub ID ownership.
 
@@ -39,8 +39,8 @@ Here is a full description:
 
 - **Creates a temporary file** `/tmp/variables.sh` to store environment variables.
 - **Sets the `project_dir` variable** to your home directory with a subdirectory named `nighthawk`. You can change `nighthawk` to a different name to test your git clone.
-- **Sets the `project` variable** to a subdirectory within `project_dir` named `portfolio_2025`. You can change `portfolio_2025` to the name of your project.
-- **Sets the `project_repo` variable** to the URL of the GitHub repository. Change this to the project you created from the `portfolio_2025` template.
+- **Sets the `project` variable** to a subdirectory within `project_dir` named `pages`. You can change `pages` to the name of your project.
+- **Sets the `project_repo` variable** to the URL of the GitHub repository. Change this to the project you created from the `pages` template.
 
 **By running this script, you will prepare your environment for cloning** and working on your GitHub project. This is an essential step in setting up your development environment and ensuring that all dependencies are correctly configured.
 
@@ -52,8 +52,8 @@ Here is a full description:
 
 cat <<EOF > /tmp/variables.sh
 export project_dir=$HOME/nighthawk  # change nighthawk to different name to test your git clone
-export project=\$project_dir/portfolio_2025  # change portfolio_2025 to name of project from git clone
-export project_repo="https://github.com/nighthawkcoders/portfolio_2025.git"  # change to project you created from portfolio_2025 template 
+export project=\$project_dir/pages  # change pages to name of project from git clone
+export project_repo="https://github.com/open-coding-society/pages.git"  # change to project you created from pages template 
 EOF
 ```
 

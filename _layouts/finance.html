@@ -101,8 +101,30 @@ async function loadUserInfo() {
     if (!response.ok) throw new Error("Failed to fetch user data");
     const userData = await response.json();
     
-    document.getElementById('navbarUsername').textContent = userData.uid || "Guest";
-    document.getElementById('navbarBalance').textContent = `$${Number(userData.balance).toFixed(2)}`;
+
+    // Ensure the balance element exists
+    const balanceElement = document.getElementById('navbarBalance');
+    if (!balanceElement) {
+      throw new Error("Balance element not found in DOM");
+    }
+    
+    // Format balance with proper decimal places
+    const balance = Number(userData.banks.balance).toFixed(2);
+    balanceElement.textContent = `$${balance}`;
+    
+  } catch (error) {
+    console.error("Error loading balance:", error);
+    const balanceElement = document.getElementById('navbarBalance');
+
+    const usernameElement = document.getElementById('navbarUsername');
+    const balanceElement = document.getElementById('navbarBalance');
+    
+    if (usernameElement) {
+      usernameElement.textContent = userData.uid || "Guest";
+    }
+    if (balanceElement) {
+      balanceElement.textContent = `$${Number(userData.banks.balance).toFixed(2)}`;
+    }
   } catch (error) {
     console.error("Error loading user info:", error);
     document.getElementById('navbarUsername').textContent = "Error";

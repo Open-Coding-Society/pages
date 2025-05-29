@@ -1,4 +1,4 @@
-import {fetchOptions, pythonURI, javaURI } from './config.js';
+import {baseurl, fetchOptions, pythonURI, javaURI } from './config.js';
 
 // Update User Data with "Put"
 export function putUpdate(options) {
@@ -80,7 +80,7 @@ export async function logoutUser() {
         try {
                 const response = await fetch(URL, options);
                 if (response.ok) {
-                    window.location.href = "{{site.baseurl}}/duallogin"; // Redirect to login page
+                    window.location.href = "${baseurl}/duallogin"; // Redirect to login page
                 } else {
                     const errorMessage = await response.text();
                     console.error('Logout failed:', errorMessage);

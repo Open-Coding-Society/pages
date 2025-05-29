@@ -12,7 +12,7 @@ toc: True
 
 Are you finally finished with your feature? Now, it's time to style it! This documentation will guide you through using SASS for styling your frontend, focusing on incorporating different icons for a more interactive and user-friendly interface. We will cover how to style elements like a profile container, custom icons for file upload, editing, deleting, and adding new items using Font Awesome icons.
 
-If you're not familar with SASS, please check out [this guide](https://nighthawkcoders.github.io/portfolio_2025/sass_basics/coding#fundementals-sass) before starting.
+If you're not familar with SASS, please check out [this guide](https://pages.opencodingsociety.com/sass_basics/coding#fundementals-sass) before starting.
 
 ## Basic Styling
 
@@ -143,7 +143,7 @@ To get started, let's go over the user profile example to get started. First, we
 
 ## Converting to SASS
 
-The portfolio_2025 project is attempting to organize style at a project level, minimizing CSS in local files.  Tho follow this path, we have to organize style according to SASS. Since we're developing the nighthawk theme for portfolio_2025, we make a file under the nighthawk directory called profile.css. To convert the CSS to SASS, we start SASS journy by nesting the code in scss file.
+The pages project is attempting to organize style at a project level, minimizing CSS in local files.  Tho follow this path, we have to organize style according to SASS. Since we're developing the nighthawk theme for pages, we make a file under the nighthawk directory called profile.css. To convert the CSS to SASS, we start SASS journy by nesting the code in scss file.
 
 **Note** As an aside style enhancement, if you look closely, you'll won't see the code for buttons is removed. This is because I changed my code to use icons instead of buttons, which we will cover later.
 

@@ -926,7 +926,7 @@ export async function logoutUser() {
         try {
                 const response = await fetch(URL, options);
                 if (response.ok) {
-                    window.location.href = "/portfolio_2025/login"; // Redirect to login page
+                    window.location.href = "/pages/login"; // Redirect to login page
                 } else {
                     const errorMessage = await response.text();
                     console.error('Logout failed:', errorMessage);
@@ -1093,7 +1093,7 @@ window.changeUid = async function(uid) {
            callback: () => {
                console.log('UID updated successfully!');
                window.updateUidField(uid);
-               window.location.href = '/portfolio_2025/login'
+               window.location.href = '/pages/login'
            }
        };
 
@@ -1128,7 +1128,7 @@ window.changePassword = async function(password) {
            callback: () => {
                console.log('Password updated successfully!');
                window.updatePasswordField(password);
-               window.location.href = '/portfolio_2025/login'
+               window.location.href = '/pages/login'
 
 
            }

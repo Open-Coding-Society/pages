@@ -122,7 +122,7 @@ title: Issues Post
 <body>
   <div class="header-container">
         <h1>Issue Home Page</h1>
-        <a href="http://localhost:4100/portfolio_2025/studentIssue/post" class="post-button">Create New Issue</a>
+        <a href="http://localhost:4100/pages/studentIssue/post" class="post-button">Create New Issue</a>
     </div>
 
     <div class="container">
@@ -158,7 +158,7 @@ title: Issues Post
         // Fetching latest issues from the API
         async function fetchLatestIssues() {
             try {
-                const response = await fetch('http://localhost:8085/forum/get');
+                const response = await fetch('http://localhost:8585/forum/get');
                 if (!response.ok) throw new Error('Network error');
                 
                 allIssues = await response.json();
@@ -232,7 +232,7 @@ title: Issues Post
         // Fetching comments for a selected issue
         async function fetchComments(forumId) {
             try {
-                const response = await fetch(`http://localhost:8085/comments/get/${forumId}`);
+                const response = await fetch(`http://localhost:8585/comments/get/${forumId}`);
                 if (!response.ok) throw new Error('Network error');
                 
                 const comments = await response.json();
@@ -283,7 +283,7 @@ title: Issues Post
             };
 
             try {
-                const response = await fetch('http://localhost:8085/comments/post', {
+                const response = await fetch('http://localhost:8585/comments/post', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -319,7 +319,7 @@ title: Issues Post
             }
 
             try {
-                const response = await fetch(`http://localhost:8085/comments/update/${commentId}?username=${loggedInUsername}`, {
+                const response = await fetch(`http://localhost:8585/comments/update/${commentId}?username=${loggedInUsername}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ title: Issues Post
             }
 
             try {
-                const response = await fetch(`http://localhost:8085/comments/delete/${commentId}?username=${loggedInUsername}`, {
+                const response = await fetch(`http://localhost:8585/comments/delete/${commentId}?username=${loggedInUsername}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

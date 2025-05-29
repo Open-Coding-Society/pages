@@ -1,22 +1,17 @@
 title: Open Coding 
 description: "Class of 2025"
 owner_name: John Mortensen
-github_username: nighthawkcoders
-github_repo: "portfolio_2025" 
-baseurl: "/portfolio_2025"
+github_username: jm1021 
+github_repo: "pages" 
+baseurl: "" 
 future: true
 remote_theme: jekyll/minima
 minima:
   skin: dark
   social_links:
-    - { platform: github, user_url: "https://github.com/nighthawkcoders"}
-    - { platform: x, user_url: "https://x.com/NighthawkCoding/" }
-    - { platform: youtube, user_url: "https://www.youtube.com/@nighthawkcodingsociety2868" } 
-# remote_theme: pages-themes/midnight@v0.2.0
-# remote_theme: pages-themes/dinky@v0.2.0
-# remote_theme: pages-themes/minimal@v0.2.0
-# remote_theme: pages-themes/cayman@v0.2.0
-# remote_theme: pages-themes/time-machine@v0.2.0
+    - { platform: github, user_url: "https://github.com/open-coding-society" }
+    - { platform: x, user_url: "https://x.com/Open_Coding" }
+    - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
 plugins:
   - jekyll-remote-theme
   - jekyll-include-cache

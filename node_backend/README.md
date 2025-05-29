@@ -1,7 +1,7 @@
 # Deployment Information
 
 Change the Backend URL in GameEnv.  For a secure `https` connection use `wss` instead of ws
-portfolio_2025/assets/js/multiplayer/GameEnv.js
+pages/assets/js/multiplayer/GameEnv.js
 
 ```nodejs
 static socket = io(`ws://${window.location.host.split(":")[0]}:3000`); 
@@ -12,7 +12,7 @@ In NGINX make sure to forward web socket traffic, here is an NGINX file from ano
 
 ```nginx
 server {
-    server_name platformer_ws.nighthawkcodingsociety.com;
+    server_name platformer_ws.opencodingsociety.com;
     location / {
          proxy_pass http://localhost:300;
 

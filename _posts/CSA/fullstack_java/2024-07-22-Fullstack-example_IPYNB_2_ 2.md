@@ -94,11 +94,11 @@ author: Finn Carpenter
 
 <script>
 if (location.hostname === "localhost") {
-        uri = "http://localhost:8085";
+        uri = "http://localhost:8585";
 } else if (location.hostname === "127.0.0.1") {
-        uri = "http://127.0.0.1:8085";
+        uri = "http://127.0.0.1:8585";
 } else {
-        uri = "https://spring.nighthawkcodingsociety.com";
+        uri = "https://spring.opencodingsociety.com";
 }
 
 function generateAnnouncements() {

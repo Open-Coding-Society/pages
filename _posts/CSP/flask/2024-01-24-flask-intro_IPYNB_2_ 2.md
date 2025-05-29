@@ -117,7 +117,7 @@ In our Teaching we will explore the Flask Jinja2 server side frontend, but we wi
 
 
 
-Explore the [home page](https://nighthawkcoders.github.io/portfolio_2025/) and experiment with  logging in, profile creating,  etc. Here are some sample questions to guide you: Can you create the same user twice? Do you get an error, and if so, what  type  of error do you get? What happens if you enter the wrong username or password for logging in? By experimenting and taking a look at the code, you can be prepared to start your trimester project, and use this knowledge in your Collegeboard Create Performance Task. 
+Explore the [home page](https://pages.opencodingsociety.com/) and experiment with  logging in, profile creating,  etc. Here are some sample questions to guide you: Can you create the same user twice? Do you get an error, and if so, what  type  of error do you get? What happens if you enter the wrong username or password for logging in? By experimenting and taking a look at the code, you can be prepared to start your trimester project, and use this knowledge in your Collegeboard Create Performance Task. 
 
 Happy coding!
 

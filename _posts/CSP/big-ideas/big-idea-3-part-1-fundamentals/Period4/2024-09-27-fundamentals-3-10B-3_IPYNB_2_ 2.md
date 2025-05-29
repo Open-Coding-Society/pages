@@ -70,7 +70,7 @@ Requirements:
 4+= .95 utilizes all the popcorn hacks, and does all the hacks correctly (if not better).
 
 <script src="https://utteranc.es/client.js"
-        repo="nighthawkcoders/portfolio_2025"
+        repo="open-coding-society/pages"
         issue-term="title"
         label="blogpost-comment"
         theme="github-light"
@@ -80,7 +80,7 @@ Requirements:
 
 
 <script src="https://utteranc.es/client.js"
-        repo="nighthawkcoders/portfolio_2025"
+        repo="open-coding-society/pages"
         issue-term="title"
         label="blogpost-comment"
         theme="github-light"

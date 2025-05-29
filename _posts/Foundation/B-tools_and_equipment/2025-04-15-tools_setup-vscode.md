@@ -123,23 +123,23 @@ All students are building a GitHub Pages website.  These steps get your website 
 
 ```bash
 ### Congratulations!!! An output similar to below means tool and equipment success ###
-johnmortensen@Johns-MBP portfolio_2025 % make
+johnmortensen@Johns-MBP pages % make
 Stopping server...
 Stopping logging process...
 Starting server...
 Server PID: 48190
 Terminal logging starting, watching server...
 Server started in 3 seconds
-Configuration file: /Users/johnmortensen/vscode/portfolio_2025/_config.yml
+Configuration file: /Users/johnmortensen/vscode/pages/_config.yml
 To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
-            Source: /Users/johnmortensen/vscode/portfolio_2025
-       Destination: /Users/johnmortensen/vscode/portfolio_2025/_site
+            Source: /Users/johnmortensen/vscode/pages
+       Destination: /Users/johnmortensen/vscode/pages/_site
  Incremental build: disabled. Enable with --incremental
       Generating... 
       Remote Theme: Using theme jekyll/minima
                     done in 2.493 seconds.
- Auto-regeneration: enabled for '/Users/johnmortensen/vscode/portfolio_2025'
-    Server address: http://127.0.0.1:4100/portfolio_2025/
+ Auto-regeneration: enabled for '/Users/johnmortensen/vscode/pages'
+    Server address: http://127.0.0.1:4100/pages/
 ```
 
 #### Make workflow (local build: make, make clean, make stop, make convert)

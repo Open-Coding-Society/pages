@@ -23,7 +23,7 @@ class GameLevelMeteorBlaster {
     this.lasers = []
     this.lastShotTime = 0
     this.shootCooldown = 500
-    this.meteorSpawnRate = 2000  // Time between meteor spawns in milliseconds
+    this.meteorSpawnRate = 2000  
     this.meteorSpawnInterval = null
     this.invincibleTime = 0
     this.invincibleDuration = 1500

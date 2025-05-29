@@ -19,7 +19,7 @@ Key deliverables of this Tech Talk...
 - Build Team Agile Manifesto.
 - Build Team Agile Methodology Diagram, work in Manifesto elements, and add Team Member roles.
 - Establish key development roles
-- [Start design](https://github.com/nighthawkcoders/kasmv2-flask/issues/1)
+- [Start design](https://github.com/open-coding-society/kasmv2-flask/issues/1)
 - Create Individual Issues and a Scrum Board as output of a Team Stand-up Meeting.  
 - Start pull request process
 

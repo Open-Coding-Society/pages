@@ -45,8 +45,8 @@ The `_config.yml` file is the configuration file for Jekyll. It is a YAML file t
 Often in code we use the `site.baseurl` to indentfy the path to files.  GitHub actions uses this location in its build to identify the name of the project.  Be sure the values of these keys match your GitHub Repo.
 
 ```yml
-github_repo: "portfolio_2025" 
-baseurl: "/portfolio_2025"
+github_repo: "pages" 
+baseurl: "/pages"
 ```
 
 Many remote theme files are commented out, you can only have one at a time.  The Teacher is in favor of using the `minima` theme. To change these themes it could require many other changes to make it effective.  Themes and related CSS changes are below, but they are not complete.  IMO, you would need to disable minima or reorganize a lot of files.

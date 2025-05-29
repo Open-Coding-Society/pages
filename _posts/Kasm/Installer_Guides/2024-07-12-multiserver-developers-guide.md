@@ -18,7 +18,7 @@ permalink: /kasm/multiserver/development
 Clone the repository to your computer with the following command:
 
 ```sh
-git clone https://github.com/nighthawkcoders/kasm-multi-server.git
+git clone https://github.com/open-coding-society/kasm-multi-server.git
 ```
 
 ### Prerequisites
@@ -1277,7 +1277,7 @@ This command runs the playbook for the yml file for restart_kasm, which just run
 
 ## (6) Update Kasm
 
-This will update the Kasm framework on the hosts using the install playbook, as ansible skips over what is already configured and adds new things to the system easily (see [https://github.com/nighthawkcoders/kasm-multi-server/issues/4](https://github.com/nighthawkcoders/kasm-multi-server/issues/4)).
+This will update the Kasm framework on the hosts using the install playbook, as ansible skips over what is already configured and adds new things to the system easily (see [https://github.com/open-coding-society/kasm-multi-server/issues/4](https://github.com/open-coding-society/kasm-multi-server/issues/4)).
 
 ### Scaling the deployment
 

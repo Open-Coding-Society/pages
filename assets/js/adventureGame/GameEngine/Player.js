@@ -6,15 +6,7 @@ const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
 const ANIMATION_RATE = 1; // 1/nth of the frame rate
 const INIT_POSITION = { x: 0, y: 0 };
 
-/**
- * Player is a dynamic class that manages the data and events for objects like a player 
- * 
- * This class uses a classic Java class pattern which is nice for managing object data and events.
- * 
- * @method bindEventListeners - Binds key event listeners to handle object movement.
- * @method handleKeyDown - Handles key down events to change the object's velocity.
- * @method handleKeyUp - Handles key up events to stop the object's velocity.
- */
+
 class Player extends Character {
     /**
      * The constructor method is called when a new Player object is created.

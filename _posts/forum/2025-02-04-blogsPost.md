@@ -194,7 +194,7 @@ title: Blogs Post
             };
             //wait 3 seconds then send them back
             setTimeout(function() {
-                window.location.href = "/portfolio_2025/studentBlogs/";
+                window.location.href = "/pages/studentBlogs/";
             }, 3000);
         });
     </script>

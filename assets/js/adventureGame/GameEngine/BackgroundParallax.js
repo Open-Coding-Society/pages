@@ -1,7 +1,6 @@
 import GameObject from './GameObject.js';
 
 /** Parallax Background GameObject
- * - Layered: draw this background images on top of another
  * - Tiling: draw multiple of the image to fill the gameCanvas extents
  * - Scrolling: adds velocity or position updates to the update(), to scroll the background
  */

@@ -22,7 +22,7 @@ Objective: Understand the basics of setting up a development environment and the
 - **In the development process, developers use version control. Annotate in your notes what you have learned about version control during this setup process.**
   - How are the files from GitHub placed on your local machine? How do you navigate to those files?
   - How are the files updated in GitHub? How do you navigate to those files?
-  - How would you update your template of the `portfolio_2025` repository? How would you make it more applicable to your specific course?
+  - How would you update your template of the `pages` repository? How would you make it more applicable to your specific course?
 
 ### Localhost vs. Deployed Server
 

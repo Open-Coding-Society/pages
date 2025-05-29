@@ -214,8 +214,8 @@ def list_org_projects_v2(token, org_login):
     
     ''' 
     GraphQL query to fetch projectsV2 for an organization, 
-        - nightHawkCoders is an example organization
-        - example GitHub Projects: https://github.com/orgs/nighthawkcoders/projects
+        - open-coding-society is an example organization
+        - example GitHub Projects: https://github.com/orgs/open-coding-society/projects
         - the query fetches ID, title, and URL of each project
         - review GraphQL "query" to see the organization and field names
         
@@ -449,7 +449,7 @@ if __name__ == "__main__":
     # Example .env file:
     GITHUB_TOKEN=ghp_1234567890abcdefgh # GitHub Personal Access Token, obtain through GitHub Developer Settings
     GITHUB_TARGET_TYPE=organization  # Use 'organization' or 'user', some items only work for organizations
-    GITHUB_TARGET_NAME=nighthawkcoders # This is a GitHub organization example
+    GITHUB_TARGET_NAME=open-coding-society # This is a GitHub organization example
     '''
 
     # Initialize primary data variables 
@@ -519,7 +519,7 @@ if __name__ == "__main__":
     if profile and target_type == 'user':
         # Look a specific user commits
         usernames = ["rachit-j","tanishapatil1234","TDWolff","iKAN2025","tuckergol"]
-        organization = "nighthawkcoders"
+        organization = "open-coding-society"
         
         for username in usernames:
             print()

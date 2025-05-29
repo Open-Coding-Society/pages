@@ -45,7 +45,7 @@ Commands
 # clean up docker often, before a new run is best
 docker image prune
 # tag name needs to match your docker hub setup, see below, latest could be :1.0 for specific verion
-docker build -t nighthawkcoders/kasm_workspaces:latest -f dockerfile-csse-nighthawk-ubuntu-jammy-desktop .
+docker build -t open-coding-society/kasm_workspaces:latest -f dockerfile-csse-nighthawk-ubuntu-jammy-desktop .
 ````
 
 Logging
@@ -81,9 +81,9 @@ Commands
 ```bash
 # Setup your dockerhub by registering account through docker.io.  This is like GitHub, the public repositories are free.
 docker login
-# if you name is wrong, you can rename it to match: docker tag devops/csse-kasm-workspaces:latest:1.0 nighthawkcoders/kasm_workspaces:latest
-# Tag names need to match the [docker hub](https://hub.docker.com/repository/docker/nighthawkcoders/kasm_workspaces/general).
-docker push nighthawkcoders/kasm_workspaces:latest
+# if you name is wrong, you can rename it to match: docker tag devops/csse-kasm-workspaces:latest:1.0 open-coding-society/kasm_workspaces:latest
+# Tag names need to match the [docker hub](https://hub.docker.com/repository/docker/open-coding-society/kasm_workspaces/general).
+docker push open-coding-society/kasm_workspaces:latest
 ```
 
 Logging
@@ -91,7 +91,7 @@ Logging
 ```bash
 # This can take a long time "hours if highly customized", but seems to recover from interupts, see log
 # Note, screen saver causes job to pause
-The push refers to repository [docker.io/nighthawkcoders/kasm_workspaces]
+The push refers to repository [docker.io/open-coding-society/kasm_workspaces]
 2a1c121ffe10: Preparing
 5f70bf18a086: Preparing
 ba97dcb9b48e: Preparing
@@ -129,8 +129,8 @@ f7e680995ade: Layer already exists
 ```
 
 #### 4. `Test` on Kasm
-- [Registry setup](https://github.com/nighthawkcoders/kasm_registry/tree/1.0/workspaces/CSSE-Ubuntu-Jammy)
-- Goto Kasm Sever (aka kasm.nighthawkcodingsociety.com), login admin@kasm.local.   Select from the left panel "Workspace", then "Workspace Registry".  "Add new" registry if "Del Norte HS Computer Science" is not found. Obtain the Registry Link [here](https://nighthawkcoders.github.io/kasm_registry).
+- [Registry setup](https://github.com/open-coding-society/kasm_registry/tree/1.0/workspaces/CSSE-Ubuntu-Jammy)
+- Goto Kasm Sever (aka kasm.nighthawkcodingsociety.com), login admin@kasm.local.   Select from the left panel "Workspace", then "Workspace Registry".  "Add new" registry if "Del Norte HS Computer Science" is not found. Obtain the Registry Link [here](https://open-coding-society.github.io/kasm_registry).
 - Click on small icons and install "Available Workspace".  This can take some time!!!
 - At the top of the screen select "WORKSPACES" and then install workspace from the registry () is required for the pushed image to be visible on the Kasm workspaces admin panel
 - run workplace

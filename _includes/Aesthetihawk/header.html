@@ -485,9 +485,8 @@
             {%- assign default_paths = site.pages | map: "path" -%}
             {%- assign page_paths = site.header_pages | default: default_paths -%}
             {%- assign titles_size = site.pages | map: 'title' | join: '' | size -%}
-            <a class="site-title glitch" rel="author" href="{{ " {{site.baseurl}}/" | relative_url }}"
-                data-value="{{ site.title | escape }}">
-                {{ site.title | escape }}
+            <a class="site-title" rel="author" href="{{ " /" | relative_url }}" data-value="{{ site.title | escape }}">
+                <img src="{{ site.baseurl }}/images/logo.png" alt="Logo" style="height: 40px; vertical-align: middle; margin-right: 10px;">
             </a>
 
             {%- if titles_size > 0 -%}
@@ -506,7 +505,13 @@
                     {%- for path in site.header_pages -%}
                     {%- assign my_page = site.pages | where: "path", path | first -%}
                     {%- if my_page.title -%}
-                    <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
+                    <a class="page-link" href="{{ my_page.url | relative_url }}">
+                        {%- if my_page.course -%}
+                        {{ my_page.course | upcase | escape }}
+                        {%- else -%}
+                        {{ my_page.title | escape }}
+                        {%- endif -%}
+                    </a>
                     {%- endif -%}
                     {%- endfor -%}
                     <a id="loginArea" href="{{ site.baseurl }}/login">Login</a>

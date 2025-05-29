@@ -1,18 +1,22 @@
-export const baseurl = "/portfolio_2025";
+---
+---
+
+export const baseurl = "{{ site.baseurl }}";
 
 export var pythonURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    pythonURI = "http://localhost:8087";  // Same URI for localhost or 127.0.0.1
+    pythonURI = "http://localhost:8585";  // Same URI for localhost or 127.0.0.1
 } else {
-    pythonURI = "https://flask2025.nighthawkcodingsociety.com";
+    pythonURI = "https://flask.opencodingsociety.com";
+
 }
 
 export var javaURI;
-// 127.0.0.1:8085 does not work for some machines
+// 127.0.0.1:8585 does not work for some machines
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-        javaURI = "http://localhost:8085";
+        javaURI = "http://localhost:8585";
 } else {
-    javaURI = "https://spring2025.nighthawkcodingsociety.com";
+    javaURI = "https://spring.opencodingsociety.com";
 }
 
 export const fetchOptions = {

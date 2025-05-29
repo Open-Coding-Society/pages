@@ -61,7 +61,7 @@ When you're done, submit/show a picture of your console.log.
 4+= .95 Utilizes all the popcorn hacks, and comples the Bonus effectively
 
 <script src="https://utteranc.es/client.js"
-        repo="nighthawkcoders/portfolio_2025"
+        repo="open-coding-society/pages"
         issue-term="title"
         label="blogpost-comment"
         theme="github-light"
@@ -71,7 +71,7 @@ When you're done, submit/show a picture of your console.log.
 
 
 <script src="https://utteranc.es/client.js"
-        repo="nighthawkcoders/portfolio_2025"
+        repo="open-coding-society/pages"
         issue-term="title"
         label="blogpost-comment"
         theme="github-light"

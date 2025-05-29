@@ -145,6 +145,25 @@
     .button{
         z-index:99;
     }
+    .top-right-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 100;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.top-right-button:hover {
+    background-color: #0056b3;
+}
+
 </style>
 </head>
 <!-- <body class="occupied-glow"> -->
@@ -160,7 +179,7 @@
         </div>
     </div>
 
-
+    <button id="flush" class="top-right-button">Flush Queue</button>
 
     <div class="map-container">
         <img src="https://i.ibb.co/tMQ1mTy6/map.png" alt="Map">
@@ -181,8 +200,9 @@ const fetchOptions2 = {
 
 // Constants
 const REFRESH_INTERVAL = 60000; // 1 minute refresh interval
-const teacherName = "jmort1021@gmail.com";
 let teacherEmail = localStorage.getItem('teacherEmail') || teacherName;
+const teacherName = teacherEmail;
+
 const tinkleURL = javaURI + '/api/tinkle/add';
 const deleteOptions = { ...fetchOptions2, method: 'POST' };
 
@@ -191,6 +211,22 @@ function loadUsers() {
     const storedUsers = localStorage.getItem('users');
     return storedUsers ? JSON.parse(storedUsers) : {};
 }
+
+// Flush Queue
+document.getElementById('flush').addEventListener('click', async function() {
+    const currentAway = document.getElementById('current-away').textContent.trim();
+    
+    if (currentAway !== 'Nobody') {
+        // Remove current user from queue
+        await removeFromQueue();
+        removeUser(currentAway);
+        document.getElementById('current-away').innerHTML = 'Nobody';
+        checkStatusAndUpdateUI();
+    } else {
+        // Remove next person from queue
+        await removeFromQueue();
+    }
+});
 
 // Save users to localStorage
 function saveUsers() {
@@ -338,6 +374,7 @@ async function handleReturningUser(currentAway) {
         // Remove from local storage
         removeUser(currentAway);
         console.log(currentAway, 'removed from queue');
+        localStorage.setItem("timeout", getTime());
     } catch (error) {
         console.error("Error handling returning user:", error);
     }

@@ -26,7 +26,7 @@ This code has lot of limitation.
 
 The code below updates the HTML elementID (like or jeer) using the latest data from the backend database.
 
-[Latest GitHub Code](hhttps://github.com/nighthawkcoders/portfolio_2025/blob/main/navigation/jokes.md)
+[Latest GitHub Code](hhttps://github.com/open-coding-society/pages/blob/main/navigation/jokes.md)
 
 ```html
 <!-- HTML table fragment for page -->

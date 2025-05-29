@@ -16,5 +16,5 @@ app.get('/api/assignments/debug', (req, res) => {
 });
 
 app.listen(8085, () => {
-    console.log('Backend running on http://localhost:8085');
+    console.log('Backend running on http://localhost:8585');
 });

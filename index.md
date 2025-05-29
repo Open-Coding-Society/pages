@@ -1,11 +1,9 @@
 ---
 layout: post 
-title: Course Descriptions
-description: An overview of Computer Science pathway at Del Norte High School
-author: John Mortensen, Vivian Ni, Bria Gilliam
+title: Open Coding Society
+description: An Open Pathway to Computer Science
 image: /images/mario_animation.png
 hide: true
-menu: nav/home.html
 ---
 
 <!-- Liquid:  statements-->
@@ -40,24 +38,9 @@ menu: nav/home.html
   #mario {
     background-position: calc({{animations[0].col}} * {{pixels}} * -1px) calc({{animations[0].row}} * {{pixels}}* -1px);
   }
-  
-  @media screen and (max-width: 768px) {
-    img {
-      display: block !important; /* Ensure the image is always displayed */
-      max-width: 100%; /* Scale the image to fit the container */
-      height: auto; /* Maintain aspect ratio */
-    }    
-    table {
-      width: 100%; /* Allow the table to take full width */
-      margin: 0 auto; /* Center the table horizontally */
-      overflow-x: auto; /* Enable horizontal scrolling */
-      display: block; /* Make the table a block element for scrolling */
-    }
 
-    td {
-      padding: 10px; /* Add consistent padding inside table cells */
-      word-wrap: break-word; /* Ensure long text wraps inside cells */
-    }
+  .social-icon {
+    filter: invert(1);
   }
 </style>
 
@@ -261,53 +244,60 @@ menu: nav/home.html
 
 </script>
 
-## Investing in Your Technical Future
+## About
 
-Computer Science is the Wild Card for all Majors and Careers.
+Empower yourself to solve real-world problems, unlock creativity, and open doors to every field—because coding is the language of innovation.
 
-> Explore the Computer Science Pathway at Del Norte High School and invest in your technical skills.
+> Invest in your technical skills through Project-based learning.
 
-<div style="display: flex; align-items: flex-start;">
+<div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px; flex-wrap: wrap;">
 
-<table>
-<tr>
-  <td>
-    <div style="flex: 65%; text-align: left;">
-      <p>All Del Norte CompSci classes are designed to provide real-world development experiences.</p>
-      <ul>
-        <li> Project talks between teachers and students</li>
-        <li> Teaching through Tech talks (versus lectures) </li>
-        <li> Peer collaboration using GitHub Issues and Kanban boards </li>
-        <li> Critical thinking while performing iterative coding </li>
-        <li> Creativity and designs in projects, as well as code </li>
-      </ul>
-    </div>
-  </td>
-  <td>
-    <div style="flex: 35%; text-align: center;">
-      <img src="{{site.baseurl}}/images/course-brag/qr.png" 
-          alt="QR Code" 
-          style="width: 100%; max-width: 300px; height: auto; margin-left: 10px; display: block;">
-    </div>
-  </td>
-</tr>
-</table>
+  <!-- Logo -->
+  <div style="text-align: center;">
+    <img src="{{site.baseurl}}/images/logo-framed.png" alt="Logo" style="width: 180px; max-width: 100%;">
+  </div>
 
+  <!-- QR Code -->
+  <div style="text-align: center;">
+    <img src="{{site.baseurl}}/images/course-brag/qr.png" alt="QR Code" style="width: 180px; max-width: 100%;">
+  </div>
+
+  <!-- Socials -->
+  <div style="min-width: 220px;">
+    <ul style="list-style: none; padding: 0; font-size: 1.1em;">
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="mailto:open.coding.society@gmail.com">open.coding.society@gmail.com</a>
+      </li>
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="https://linkedin.com/company/open-coding-society" target="_blank">LinkedIn</a>
+      </li>
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="https://x.com/Open_Coding" target="_blank">@Open_Coding</a>
+      </li>
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="https://www.youtube.com/@OpenCodingSociety" target="_blank">@OpenCodingSociety</a>
+      </li>
+    </ul>
+  </div>
 </div>
 
 ## Project-based learning
 
-Teacher created projects, project requirements, technical materials, and support.
+Intructor created projects, project requirements, technical materials, and support.
 
-> Grades are based on projects, time invested, engagement, learned concepts, participation with peers, and live reviews between student(s) and teacher.
+> Grades are based on projects, time invested, engagement, learned concepts, participation with peers, and live reviews between student(s) and instructor.
 
 - Performing Agile/Scrum development
-- Coding, frontend, backend, devops, version control, and algorithmic thinking
+- Coding, frontend, backend, devops, version control, and using algorithmic thinking
 - Creativity, research, design, data structures, and utilizing ChatGPT
 - Performing teamwork, team communication and collaboration, peer reviews/grading
 - Focus on technical communications through project presentations and student-led teaching
 
-> Classroom work time is 3-4 hours per week. Homework expectations are approximately 2-3 hours per week. Homework is scheduled over a Sprint, approximately 2-4 weeks. Time lost is extremely hard to make up as all materials are cumulative.
+> Classroom work time is 3-4 hours per week. Homework expectations are approximately 2-3 hours per week. Homework is scheduled over a Sprint, approximately 2-4 weeks. Time lost in class extremely hard to make up as working with team meembers, progressing project,  checkpoint reviews and all the cumulative progress is hard to replicate.
 
 ![ccr]({{site.baseurl}}/images/course-brag/ccr.png)
 
@@ -343,7 +333,7 @@ Computer Science Principles is designed as a college-level introduction to compu
 
 ## Computer Science "A" 1,2 and Data Structures 2; Grades 11-12
 
-AP Computer Science A is an in-depth course that focuses on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, which covers the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion. 
+AP Computer Science A is an in-depth course that focuses on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, which covers the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
 
 > Students will gain understanding through analysis, coding, and individual and team projects. The course will establish fluency in Java, utilize JavaScript, and work with Linux.
 

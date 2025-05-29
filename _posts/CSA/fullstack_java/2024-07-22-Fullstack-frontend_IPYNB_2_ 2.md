@@ -277,7 +277,7 @@ function generateAnnouncements() {
     redirect: 'follow'
   };
     
-  fetch("http://localhost:8085/api/announcements", requestOptions)
+  fetch("http://localhost:8585/api/announcements", requestOptions)
     .then(response => response.json())
     .then(result => {
       result.reverse(); // Reverse the order of announcements
@@ -307,7 +307,7 @@ function createReq() {
   const title = prompt("Enter the title of the announcement:");
 
   if (author && body && tags && title) {
-    const url = `http://localhost:8085/api/announcements/create?author=${encodeURIComponent(author)}&body=${encodeURIComponent(body)}&tags=${encodeURIComponent(tags)}&title=${encodeURIComponent(title)}`;
+    const url = `http://localhost:8585/api/announcements/create?author=${encodeURIComponent(author)}&body=${encodeURIComponent(body)}&tags=${encodeURIComponent(tags)}&title=${encodeURIComponent(title)}`;
 
     fetch(url, {
       method: 'POST',
@@ -355,7 +355,7 @@ function createReq() {
   const title = document.getElementByID("title");
 
   if (author && body && tags && title) {
-    const url = `http://localhost:8085/api/announcements/create?author=${encodeURIComponent(author)}&body=${encodeURIComponent(body)}&tags=${encodeURIComponent(tags)}&title=${encodeURIComponent(title)}`;
+    const url = `http://localhost:8585/api/announcements/create?author=${encodeURIComponent(author)}&body=${encodeURIComponent(body)}&tags=${encodeURIComponent(tags)}&title=${encodeURIComponent(title)}`;
 
     fetch(url, {
       method: 'POST',

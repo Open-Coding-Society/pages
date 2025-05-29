@@ -17,7 +17,7 @@ permalink: /kasm/multiserver/install
 Clone the repository to your computer with the following command:
 
 ```sh
-git clone https://github.com/nighthawkcoders/kasm-multi-server.git
+git clone https://github.com/open-coding-society/kasm-multi-server.git
 ```
 
 ### Prerequisites

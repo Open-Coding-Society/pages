@@ -151,7 +151,7 @@ git clone https://github.com/open-coding-society/pages.git
 ```bash
 #  Most tools have been pre-installed. Run shell command to automatically finish tool setup.
 cd
-cd opencs/portfolio_2025/scripts
+cd opencs/pages/scripts
 ./activate.sh 
 ```
 
@@ -166,7 +166,7 @@ cd opencs/portfolio_2025/scripts
 ```bash
 # Run shell command to automatically install all your tools.
 cd
-cd opencs/portfolio_2025/scripts
+cd opencs/pages/scripts
 ./activate_ubuntu.sh
 
 ```
@@ -180,7 +180,7 @@ cd opencs/portfolio_2025/scripts
 ```bash
 #  Run shell command to automatically install all your tools. 
 cd
-cd opencs/portfolio_2025/scripts
+cd opencs/pages/scripts
 ./activate_macos.sh
 ```
 

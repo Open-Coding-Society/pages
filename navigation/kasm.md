@@ -77,8 +77,8 @@ To get insights into how the Nighthawk Coding Society (NCS) made KasmV2 continue
 
 #### Systems
 
-- Frontend [ncs.github.io](https://nighthawkcoders.github.io/portfolio_2025/duallogin)
-- Backend [flask2025.ncs.com](https://flask2025.nighthawkcodingsociety.com/login?next=/users/table2)
+- Frontend [ncs.github.io](https://pages.opencodingsociety.com/duallogin)
+- Backend [flask2025.ncs.com](https://flask.opencodingsociety.com/login?next=/users/table2)
 
 #### Overview
 
@@ -123,9 +123,9 @@ Essentially, this is like installing all the necessary tools on a single user's 
 #### Workspaces Links
 
 - KASM Admin UI [kasm.ncs.com](https://kasm.nighthawkcodingsociety.com/):
-- Del Norte Registry [ncs.com/registry](https://nighthawkcoders.github.io/kasm_registry/1.0/)
-- DockerHub [docker/ncs/pusd](https://hub.docker.com/repository/docker/nighthawkcoders/pusd-student-ubuntu/general)
-- GitHub CompSci Template [github/kasm-ubuntu](https://github.com/nighthawkcoders/Kasm-Ubuntu22.04-Image-Template)
+- Del Norte Registry [ncs.com/registry](https://open-coding-society.github.io/kasm_registry/1.0/)
+- DockerHub [docker/ncs/pusd](https://hub.docker.com/repository/docker/open-coding-society/pusd-student-ubuntu/general)
+- GitHub CompSci Template [github/kasm-ubuntu](https://github.com/open-coding-society/Kasm-Ubuntu22.04-Image-Template)
 
 #### Workspace Registry
 

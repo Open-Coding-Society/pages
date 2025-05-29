@@ -1,52 +1,36 @@
 ---
-layout: finance
+layout: fortunefinders
 title: Blackjack
 permalink: /gamify/blackjack
 ---
 
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
     body {
-        font-family: Arial, sans-serif;
-        text-align: center;
+        font-family: 'Poppins', sans-serif;
         background-color: #121212;
-        color: white;
+        color: #fff;
     }
-    .container {
-        width: 40%;
-        margin: auto;
-        background-color: #222;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px #fff;
+    .game-container {
+        max-width: 800px;
+        background-color: #1f1f1f;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
     }
-    button {
-        background-color: black;
-        color: white;
-        border: 1px solid white;
-        padding: 10px;
-        margin: 5px;
-        cursor: pointer;
+    .game-title {
+        color: #ff9800;
+        border-left: 4px solid #ff9800;
+        padding-left: 1rem;
     }
-    button:disabled {
-        background-color: grey;
-        cursor: not-allowed;
-    }
-    .error {
-        color: red;
-        font-weight: bold;
-    }
-    .success {
-        color: green;
-        font-weight: bold;
-    }
-    .card {
+    .card-display {
         display: inline-block;
-        width: 50px;
-        height: 75px;
+        width: 60px;
+        height: 90px;
         border-radius: 5px;
         border: 2px solid white;
         text-align: center;
-        line-height: 75px;
+        line-height: 90px;
         font-size: 20px;
         font-weight: bold;
         margin: 5px;
@@ -60,40 +44,83 @@ permalink: /gamify/blackjack
     .clubs, .spades {
         color: black;
     }
-    #balance {
-        font-size: 1.2em;
-        margin-bottom: 15px;
+    .game-status {
+        min-height: 50px;
     }
-    input[type="number"] {
-        width: 100px;
-        padding: 8px;
-        margin: 5px;
-        background-color: #333;
-        color: white;
-        border: 1px solid white;
+    .bet-display {
+        color: #fff;
+        font-weight: bold;
+    }
+    .hand-section {
+        min-height: 130px;
     }
 </style>
 
-<div class="container">
-    <h1>Blackjack Game</h1>
-    <div id="balance">Balance: Loading...</div>
-    
-    <label for="betAmount">Bet Amount (Min: $1,000):</label>
-    <input type="number" id="betAmount" min="1000" value="1000" step="1000">
-    <span id="betValue">$1,000</span>
-    
-    <div>
-        <button id="startGame">Start Game</button>
-        <button id="hit" disabled>Hit</button>
-        <button id="stand" disabled>Stand</button>
-        <button id="exit">Exit</button>
+<body class="m-0 p-0">
+
+<div class="container my-5">
+    <div class="game-container p-4">
+        <h2 class="game-title mb-4">Blackjack</h2>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card bg-dark border-secondary mb-3">
+                    <div class="card-body">
+                        <h3 class="card-title">Balance</h3>
+                        <p id="balance" class="fs-4">Loading...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-dark border-secondary mb-3">
+                    <div class="card-body">
+                        <h3 class="card-title">Place Your Bet</h3>
+                        <div class="input-group mb-3">
+                            <input type="number" id="betAmount" class="form-control text-center" min="1000" value="1000" step="1000">
+                            <span class="input-group-text bet-display" id="betValue">$1,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-body">
+                        <h3 class="card-title">Dealer's Hand</h3>
+                        <div id="dealerHand" class="d-flex flex-wrap justify-content-center hand-section"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-body">
+                        <h3 class="card-title">Your Hand</h3>
+                        <div id="playerHand" class="d-flex flex-wrap justify-content-center hand-section"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="game-status text-center">
+                    <p id="gameStatus" class="fs-5"></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-center gap-2">
+            <button id="startGame" class="btn btn-success">Start Game</button>
+            <button id="hit" class="btn btn-warning" disabled>Hit</button>
+            <button id="stand" class="btn btn-info" disabled>Stand</button>
+            <button id="exit" class="btn btn-danger">Exit</button>
+        </div>
     </div>
-    
-    <h2>Dealer's Hand</h2>
-    <div id="dealerHand"></div>
-    <h2>Your Hand</h2>
-    <div id="playerHand"></div>
-    <p id="gameStatus"></p>
 </div>
 
 <script type="module">
@@ -101,29 +128,44 @@ permalink: /gamify/blackjack
 
     const API_URL = `${javaURI}/api/casino/blackjack`;
     let uid = "";
+    let personId = null;
     let currentBalance = 0;
 
-    async function getUID() {
-        console.log("Fetching UID...");
+    async function fetchUserData() {
+        console.log("Fetching user data...");
         try {
-            const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-            if (!response.ok) throw new Error(`Server response: ${response.status}`);
+            // First get the personId from the user session
+            const personResponse = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (!personResponse.ok) throw new Error(`Server response: ${personResponse.status}`);
 
-            const data = await response.json();
-            if (!data || !data.uid) throw new Error("UID not found in response");
+            const personData = await personResponse.json();
+            if (!personData || !personData.uid) throw new Error("UID not found in response");
 
-            uid = data.uid;
-            currentBalance = data.balanceDouble || 0;
-            document.getElementById("balance").innerText = `Balance: $${currentBalance.toLocaleString()}`;
-            console.log("UID:", uid);
+            uid = personData.uid;
+            personId = personData.id;
+            console.log("UID:", uid, "Person ID:", personId);
+            
+            // Now fetch bank account data using personId
+            const bankResponse = await fetch(`${javaURI}/bank/analytics/person/${personId}`, fetchOptions);
+            if (!bankResponse.ok) throw new Error(`Bank data error: ${bankResponse.status}`);
+            
+            const bankData = await bankResponse.json();
+            if (!bankData.success) {
+                throw new Error("Failed to load bank data");
+            }
+            
+            currentBalance = Number(bankData.data.balance);
+            document.getElementById("balance").innerText = `$${currentBalance.toLocaleString()}`;
+            
         } catch (error) {
-            console.error("Error fetching UID:", error);
-            document.getElementById("gameStatus").innerText = "Error fetching UID. Please log in.";
+            console.error("Error fetching user data:", error);
+            document.getElementById("gameStatus").innerText = "Error fetching user data. Please log in.";
+            document.getElementById("gameStatus").classList.add("text-danger");
         }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        getUID();
+        fetchUserData();
         
         document.getElementById("betAmount").addEventListener("input", function() {
             let betValue = this.value;
@@ -137,12 +179,12 @@ permalink: /gamify/blackjack
 
     document.getElementById("startGame").addEventListener("click", async function () {
         try {
-            await getUID();
+            await fetchUserData();
             const bet = parseInt(document.getElementById("betAmount").value);
             
             if (bet > currentBalance) {
                 document.getElementById("gameStatus").innerText = "You don't have enough money for this bet!";
-                document.getElementById("gameStatus").className = "error";
+                document.getElementById("gameStatus").className = "fs-5 text-danger";
                 return;
             }
 
@@ -159,7 +201,7 @@ permalink: /gamify/blackjack
             updateUI(data);
         } catch (error) {
             document.getElementById("gameStatus").innerText = error.message;
-            document.getElementById("gameStatus").className = "error";
+            document.getElementById("gameStatus").className = "fs-5 text-danger";
         }
     });
 
@@ -177,7 +219,7 @@ permalink: /gamify/blackjack
             updateUI(data);
         } catch (error) {
             document.getElementById("gameStatus").innerText = error.message;
-            document.getElementById("gameStatus").className = "error";
+            document.getElementById("gameStatus").className = "fs-5 text-danger";
         }
     });
 
@@ -195,7 +237,7 @@ permalink: /gamify/blackjack
             updateUI(data);
         } catch (error) {
             document.getElementById("gameStatus").innerText = error.message;
-            document.getElementById("gameStatus").className = "error";
+            document.getElementById("gameStatus").className = "fs-5 text-danger";
         }
     });
 
@@ -212,24 +254,27 @@ permalink: /gamify/blackjack
         } catch (error) {
             console.error("Failed to parse gameState:", error);
             document.getElementById("gameStatus").innerText = "Error processing game state.";
-            document.getElementById("gameStatus").className = "error";
+            document.getElementById("gameStatus").className = "fs-5 text-danger";
             return;
         }
 
         if (!gameState || !gameState.playerHand || !gameState.dealerHand) {
             console.error("Invalid gameState format:", gameState);
             document.getElementById("gameStatus").innerText = "Unexpected response format. Please check the API.";
-            document.getElementById("gameStatus").className = "error";
+            document.getElementById("gameStatus").className = "fs-5 text-danger";
             return;
         }
 
         displayCards(gameState.playerHand, "playerHand");
         displayCards(gameState.dealerHand, "dealerHand");
 
-        // Update balance if available
-        if (data.balance !== undefined) {
-            currentBalance = data.balance;
-            document.getElementById("balance").innerText = `Balance: $${currentBalance.toLocaleString()}`;
+        // Update balance when game results come back
+        if (data.success && data.bank) {
+            currentBalance = data.bank.balance;
+            document.getElementById("balance").innerText = `$${currentBalance.toLocaleString()}`;
+        } else {
+            // Refresh the balance from the bank API directly
+            fetchUserData();
         }
 
         // Enable/disable buttons based on game state
@@ -239,20 +284,22 @@ permalink: /gamify/blackjack
 
         if (data.status === "INACTIVE") {
             let resultMessage;
+            let statusClass;
             if (gameState.result === "WIN") {
                 resultMessage = "🎉 You win!";
-                document.getElementById("gameStatus").className = "success";
+                statusClass = "fs-5 text-success fw-bold";
             } else if (gameState.result === "LOSE") {
                 resultMessage = "💥 You lost!";
-                document.getElementById("gameStatus").className = "error";
+                statusClass = "fs-5 text-danger fw-bold";
             } else {
                 resultMessage = "🤝 It's a draw!";
-                document.getElementById("gameStatus").className = "";
+                statusClass = "fs-5 text-warning fw-bold";
             }
             document.getElementById("gameStatus").innerText = `${resultMessage} Player: ${gameState.playerScore} | Dealer: ${gameState.dealerScore}`;
+            document.getElementById("gameStatus").className = statusClass;
         } else {
             document.getElementById("gameStatus").innerText = `Player: ${gameState.playerScore} | Dealer: ${gameState.dealerScore}`;
-            document.getElementById("gameStatus").className = "";
+            document.getElementById("gameStatus").className = "fs-5";
         }
     }
 
@@ -265,7 +312,7 @@ permalink: /gamify/blackjack
         
         cards.forEach((card, index) => {
             const cardElement = document.createElement("div");
-            cardElement.classList.add("card");
+            cardElement.classList.add("card-display");
 
             if (isDealerHidden && index > 0) {
                 cardElement.innerHTML = "❓";
@@ -290,3 +337,4 @@ permalink: /gamify/blackjack
         });
     }
 </script>
+</body>

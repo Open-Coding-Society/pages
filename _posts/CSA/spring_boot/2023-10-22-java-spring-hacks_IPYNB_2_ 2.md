@@ -36,7 +36,7 @@ This will be beginnings of and **ideation phase** for your Trimester 1 N@tM fina
   - Add to blog.
 
 ### Make a new API endpoint
-An endpoint will require POJO, JPA, and REST controller.  [Test your API using Postman](https://www.geeksforgeeks.org/basics-of-api-testing-using-postman/).  You should be able to test with localhost:8085 using the spring project.
+An endpoint will require POJO, JPA, and REST controller.  [Test your API using Postman](https://www.geeksforgeeks.org/basics-of-api-testing-using-postman/).  You should be able to test with localhost:8585 using the spring project.
 
   - Build @RESTController
   - Build custom methods extending JPARepository

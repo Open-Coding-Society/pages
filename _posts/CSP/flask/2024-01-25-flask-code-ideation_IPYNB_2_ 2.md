@@ -36,11 +36,11 @@ The ideation phase involves defining the application's objectives, designing its
 
 Once you have a clear ideation plan, it's time to start coding. Here’s an overview of the key steps involved in the code process for a Flask full-stack application:
 
-1. **Set Up the Flask Project**:  Generate a template using flask_2025 or flask_portfolio to start your backend repository. Review  the Flask Anatomy/Play tabs, [Python and Flask](https://nighthawkcoders.github.io/portfolio_2025/python%20flask/2023/08/21/python_flask.html) and the READMEs for either flask_2025 and flask_portfolio  to get started with setting up your flask app.
+1. **Set Up the Flask Project**:  Generate a template using flask_2025 or flask_portfolio to start your backend repository. Review  the Flask Anatomy/Play tabs, [Python and Flask](https://pages.opencodingsociety.com/python%20flask/2023/08/21/python_flask.html) and the READMEs for either flask_2025 and flask_portfolio  to get started with setting up your flask app.
 
 2. **Create the Backend Logic**: Develop the backend components, including routing, request handling, and database interactions. Define API endpoints for various functionalities, such as user authentication and data retrieval. 
 
-3. **Develop the Frontend**: Build the frontend components using HTML, SASS, and JavaScript. Create forms, buttons, and other UI elements that will interact with your backend through API calls. We can generate a template using portfolio_2025 to start your frontend repository. 
+3. **Develop the Frontend**: Build the frontend components using HTML, SASS, and JavaScript. Create forms, buttons, and other UI elements that will interact with your backend through API calls. We can generate a template using pages to start your frontend repository. 
 
 4. **Integrate Frontend and Backend**: Connect the frontend with the backend by making HTTP requests to your API endpoints. Ensure that data flows correctly between the client and server, and handle any necessary data transformations.
 
@@ -71,7 +71,7 @@ Well, when we talk about "full stack" in web development, we're referring to the
 
 - Deployment and DevOps (Putting the Sandwich in a Bag)
 
-    - Once your sandwich (or web app) is ready, you need to put it in a bag (deploy it) so that people can enjoy it (use it). This involves setting up servers, making sure the app runs smoothly, and updating it as needed. The deployment tab in the navigation bar will be helpful for your backend deployment. For frontend deployment, check out [Tools and Equipment](https://nighthawkcoders.github.io/portfolio_2025/devops/tools/setup) and [Github](https://docs.github.com/en/pages)
+    - Once your sandwich (or web app) is ready, you need to put it in a bag (deploy it) so that people can enjoy it (use it). This involves setting up servers, making sure the app runs smoothly, and updating it as needed. The deployment tab in the navigation bar will be helpful for your backend deployment. For frontend deployment, check out [Tools and Equipment](https://pages.opencodingsociety.com/devops/tools/setup) and [Github](https://docs.github.com/en/pages)
     
 So, building a full stack application means creating all parts of the "sandwich" so that it’s tasty and functional from top to bottom. You design the user interface, handle the logic and data storage, and make sure everything works together smoothly. 
 
@@ -271,15 +271,15 @@ It's important to note that you're not limited to just three features. This is j
 Here's an example of the Canva my team and I created, excluding the create user, profile and login pages. There may be some terms you will see  on the Canva pages that you won't understand yet-that's okay! We are just beginning the process. 
 
 
-![createusersaeeemple.png](/portfolio_2025/images/food.png)
-![createusersaeeemple.png](/portfolio_2025/images/sleep.png)
-![createusersaeeemple.png](/portfolio_2025/images/stress.png)
-![createusersaeeemple.png](/portfolio_2025/images/tracker1.png)
-![createusersaeeemple.png](/portfolio_2025/images/waterfood.png)
+![createusersaeeemple.png](/pages/images/food.png)
+![createusersaeeemple.png](/pages/images/sleep.png)
+![createusersaeeemple.png](/pages/images/stress.png)
+![createusersaeeemple.png](/pages/images/tracker1.png)
+![createusersaeeemple.png](/pages/images/waterfood.png)
 
 
 
-If your team has decided on their features and roles in the team, we can move on to the next part-translating raw ideas into practical outlines we can use! If you need help with organizing and working with your team, check out [Agile Methodology](https://nighthawkcoders.github.io/portfolio_2025/collaboration/2023/08/30/agile_methodolgy.html) and click on the Scrum tab in the navigation bar for more information.
+If your team has decided on their features and roles in the team, we can move on to the next part-translating raw ideas into practical outlines we can use! If you need help with organizing and working with your team, check out [Agile Methodology](https://pages.opencodingsociety.com/collaboration/2023/08/30/agile_methodolgy.html) and click on the Scrum tab in the navigation bar for more information.
 
 # Database Planning for Users: Teacher Example
 
@@ -606,21 +606,21 @@ By using CRUD operations, we ensure that user inputs on the profile page are acc
 - **Description**: This operation creates new data.
 - **Functionality**:
   - **Creates new user with input data**: When a client sends a POST request, the server receives the data (e.g., user information) and processes it. The code for sending the request should be on  the frontend repository (flask_2025).
-  - **Performs error checking**: The server validates the input data to ensure it meets all necessary requirements (e.g., no missing fields, correct data types). The  files under the api directory in the backend repository handle this(portfolio_2025).
+  - **Performs error checking**: The server validates the input data to ensure it meets all necessary requirements (e.g., no missing fields, correct data types). The  files under the api directory in the backend repository handle this(pages).
   - **Sets up user object -> adds to user database**: After validation, the server creates a new user object and stores it in the database. The  files under the api directory in the backend repository handle this.
 
 ### Read: GET Requests
 
 - **Description**: This operation retrieves data.
 - **Functionality**:
-  - **Handles user retrieval requests**: When a client sends a GET request, the server fetches the requested data from the database. The code for sending the request should be  on the frontend repository (portfolio_2025).
+  - **Handles user retrieval requests**: When a client sends a GET request, the server fetches the requested data from the database. The code for sending the request should be  on the frontend repository (pages).
   - **Data -> JSON + response**: The server converts the data into JSON format and sends it back to the client as a response. This makes it easy for the client to parse and use the data.  The  files under the api directory in the backend repository handle this (flask_2025).
 
 ### Update: PUT/PATCH Requests
 
 - **Description**: This operation updates existing data.
 - **Functionality**:
-  - **Updates based on user input**: When a client sends a PUT or PATCH request, the server receives the updated data and processes it. The code for sending the request should be  on the frontend repository (portfolio_2025)
+  - **Updates based on user input**: When a client sends a PUT or PATCH request, the server receives the updated data and processes it. The code for sending the request should be  on the frontend repository (pages)
   - **Commits changes to user database**: The server validates the input data and updates the existing user record in the database with the new information.
  The  files under the api directory in the backend repository handle this (flask_2025).
 
@@ -628,7 +628,7 @@ By using CRUD operations, we ensure that user inputs on the profile page are acc
 
 - **Description**: This operation deletes data.
 - **Functionality**:
-  - **Handles user delete requests**: When a client sends a DELETE request, the server identifies the user to be deleted. The code for sending the request should be  on the frontend repository (portfolio_2025).
+  - **Handles user delete requests**: When a client sends a DELETE request, the server identifies the user to be deleted. The code for sending the request should be  on the frontend repository (pages).
   - **Deletes user from database**: The server removes the specified user from the database.  The  files under the api directory in the backend repository handle this (flask_2025).
 
 ### Example Workflow
@@ -745,7 +745,7 @@ By following this process, you gradually build the app, making sure each part wo
 
 The iterative coding process helps beginners stay organized, make steady progress, and learn from each step, making the whole development experience more manageable and less overwhelming.
 
-Even I used an iterative coding process and talked to Teacher for every step  to build the login, signup, and profile! Check out pull requests for iKAN2025 for portfolio_2025 as an example. As you can see, the new design for the profile is much more streamlined than the old one because I changed and updated the form throughout the coding process.
+Even I used an iterative coding process and talked to Teacher for every step  to build the login, signup, and profile! Check out pull requests for iKAN2025 for pages as an example. As you can see, the new design for the profile is much more streamlined than the old one because I changed and updated the form throughout the coding process.
 
 # Conclusion
 

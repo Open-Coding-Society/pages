@@ -20,36 +20,36 @@ active_tab: toolkit
       }
     }
   
-    // window.onload = async function() {
-    //   const isAuthenticated = await verifyAuthentication();
-    //   const loadingElement = document.getElementById('loadingElement');
+    window.onload = async function() {
+      const isAuthenticated = await verifyAuthentication();
+      const loadingElement = document.getElementById('loadingElement');
       
-    //   if (isAuthenticated) {
-    //     loadingElement.style.display = "none";  // Hide the loading screen
-    //   } else {
-    //     // Show "Please login" message and delay the redirection
-    //     const message = document.createElement('div');
-    //     message.style.position = 'absolute';
-    //     message.style.top = '50%';
-    //     message.style.left = '50%';
-    //     message.style.transform = 'translate(-50%, -50%)';
-    //     message.style.background = 'rgba(50, 50, 50, 0.5)';
-    //     message.style.padding = '20px';
-    //     message.style.fontSize = '20px';
-    //     message.style.color = 'white';
-    //     message.style.borderRadius = '10px';
-    //     message.style.backdropFilter = 'blur(30px)';
-    //     message.innerHTML = 'Please login first.';
+      if (isAuthenticated) {
+        loadingElement.style.display = "none";  // Hide the loading screen
+      } else {
+        // Show "Please login" message and delay the redirection
+        const message = document.createElement('div');
+        message.style.position = 'absolute';
+        message.style.top = '50%';
+        message.style.left = '50%';
+        message.style.transform = 'translate(-50%, -50%)';
+        message.style.backgroundColor = 'rgba(72, 72, 74, 1)';
+        message.style.padding = '20px';
+        message.style.fontSize = '20px';
+        message.style.color = '#000';
+        message.style.borderRadius = '10px';
+        message.style.backdropFilter = 'blur(30px)';
+        message.innerHTML = 'You need to login first.';
         
-    //     // Add the message on top of the loading screen
-    //     document.body.appendChild(message);
+        // Add the message on top of the loading screen
+        document.body.appendChild(message);
   
-    //     // Wait for 2 seconds before redirecting
-    //     setTimeout(() => {
-    //       window.location.href = "{{site.baseurl}}/login";  // Redirect to login page
-    //     }, 2000);  // 2000ms = 2 seconds
-    //   }
-    // }
+        // Wait for 2 seconds before redirecting
+        setTimeout(() => {
+          window.location.href = "{{site.baseurl}}/login";  // Redirect to login page
+        }, 2000);  // 2000ms = 2 seconds
+      }
+    }
 </script>
 
 <style>
@@ -79,18 +79,18 @@ active_tab: toolkit
     .main-info {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto auto auto auto;
+        grid-template-rows: auto auto auto auto auto auto auto auto;
         gap: 30px 0px;
         grid-auto-flow: row;
         grid-template-areas:
             "header"
             "calendar"
             "bathroom"
-            "screen-queue"
-            "assignment-submissions"
-            "seed-tracker"
-            "sagai"
-            "view-grades";
+            "groups"
+            "queue"
+            "submissions"
+            "teamteach"
+            "grades";
         grid-area: main-info;
     }
 
@@ -146,120 +146,144 @@ active_tab: toolkit
         align-items: center;
     }
 
-    .screen-queue {
+    .groups {
         display: grid;
         grid-template-columns: 150px 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-auto-flow: row;
         grid-template-areas:
-            "screen-queue-thumbnail screen-queue-details";
-        grid-area: screen-queue;
+            "groups-thumbnail groups-details";
+        grid-area: groups;
     }
 
-    .screen-queue-details {
-        grid-area: screen-queue-details;
+    .groups-details {
+        grid-area: groups-details;
         padding: 30px;
     }
 
-    .screen-queue-thumbnail {
-        grid-area: screen-queue-thumbnail;
+    .groups-thumbnail {
+        grid-area: groups-thumbnail;
         background-color: white;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
-    .assignment-submissions {
+    .queue {
         display: grid;
         grid-template-columns: 150px 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-auto-flow: row;
         grid-template-areas:
-            "assignment-submissions-thumbnail assignment-submissions-details";
-        grid-area: assignment-submissions;
+            "queue-thumbnail queue-details";
+        grid-area: queue;
     }
 
-    .assignment-submissions-details {
-        grid-area: assignment-submissions-details;
+    .queue-details {
+        grid-area: queue-details;
         padding: 30px;
     }
 
-    .assignment-submissions-thumbnail {
-        grid-area: assignment-submissions-thumbnail;
+    .queue-thumbnail {
+        grid-area: queue-thumbnail;
         background-color: white;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
-    .seed-tracker {
+    .submissions {
         display: grid;
         grid-template-columns: 150px 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-auto-flow: row;
         grid-template-areas:
-            "seed-tracker-thumbnail seed-tracker-details";
-        grid-area: seed-tracker;
+            "submissions-thumbnail submissions-details";
+        grid-area: submissions;
     }
 
-    .seed-tracker-details {
-        grid-area: seed-tracker-details;
+    .submissions-details {
+        grid-area: submissions-details;
         padding: 30px;
     }
 
-    .seed-tracker-thumbnail {
-        grid-area: seed-tracker-thumbnail;
+    .submissions-thumbnail {
+        grid-area: submissions-thumbnail;
         background-color: white;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
-    .sagai {
+    .teamteach {
         display: grid;
         grid-template-columns: 150px 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-auto-flow: row;
         grid-template-areas:
-            "sagai-thumbnail sagai-details";
-        grid-area: sagai;
+            "teamteach-thumbnail teamteach-details";
+        grid-area: teamteach;
     }
 
-    .sagai-details {
-        grid-area: sagai-details;
+    .teamteach-details {
+        grid-area: teamteach-details;
         padding: 30px;
     }
 
-    .sagai-thumbnail {
-        grid-area: sagai-thumbnail;
+    .teamteach-thumbnail {
+        grid-area: teamteach-thumbnail;
         background-color: white;
         display: flex;
         justify-content: center;
         align-items: center;
     }
 
-    .view-grades {
+    .grades {
         display: grid;
         grid-template-columns: 150px 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-auto-flow: row;
         grid-template-areas:
-            "view-grades-thumbnail view-grades-details";
-        grid-area: view-grades;
+            "grades-thumbnail grades-details";
+        grid-area: grades;
     }
 
-    .view-grades-details {
-        grid-area: view-grades-details;
+    .grades-details {
+        grid-area: grades-details;
         padding: 30px;
     }
 
-    .view-grades-thumbnail {
-        grid-area: view-grades-thumbnail;
+    .grades-thumbnail {
+        grid-area: grades-thumbnail;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .graderview {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        grid-template-rows: 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+            "graderview-thumbnail graderview-details";
+        grid-area: graderview;
+    }
+
+    .graderview-details {
+        grid-area: graderview-details;
+        padding: 30px;
+    }
+
+    .graderview-thumbnail {
+        grid-area: graderview-thumbnail;
         background-color: white;
         display: flex;
         justify-content: center;
@@ -421,137 +445,25 @@ active_tab: toolkit
         <p>Access all student toolkits here.</p>
     </div>
 
-
-    <!-- calendar -->
-    <a href="{{site.baseurl}}/student/calendar">
-        <div class="calendar card">
-            <div class="calendar-details">
-                <h3>Calendar</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>Add/Edit/Delete events to calendar</li>
-                    <li>View all events</li>
-                    <li>View events specific to each period</li>
-                    <li>Month, week, and day viewing options</li>
-
-                </ul>
+    {% for link in site.data.toolkit.links %}
+        <a href="{{ site.baseurl }}/{{ link.href }}">
+            <div class="{{ link.id }} card">
+                <div class="{{ link.id }}-details">
+                    <h3>{{ link.label }}</h3>
+                    <p>This tool lets you:</p>
+                    {% if link.description %}
+                        <ul>
+                            {% for bullet in link.description %}
+                                <li>{{ bullet }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="{{ link.id }}-thumbnail">
+                    <img src="{{ site.baseurl }}/{{ link.icon }}" alt="{{ link.label }}"
+                        class="thumbnail">
+                </div>
             </div>
-            <div class="calendar-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/calendar.png" alt="Calendar"
-                    class="thumbnail">
-            </div>
-        </div>
-    </a>
-
-
-    <!-- bathroom -->
-    <a href="{{site.baseurl}}/bathroom">
-        <div class="bathroom card">
-            <div class="bathroom-details">
-                <h3>Bathroom</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>Add yourself to a queue to go to the bathroom</li>
-                    <li>Track how many people have already left the class to go to the bathroom</li>
-                    <li>Report issues with any bathroom</li>
-                    <li>Track your bathroom statistics</li>
-                </ul>
-            </div>
-            <div class="bathroom-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/bathroom.png" alt="Bathroom"
-                    class="thumbnail">
-            </div>
-        </div>
-    </a>
-
-    <!-- screen queue -->
-    <a href="{{site.baseurl}}/student-toolkit/queue">
-        <div class="screen-queue card">
-            <div class="screen-queue-details">
-                <h3>Screen Queue</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>Add yourself to a queue to present to the teacher</li>
-                    <li>Track who is not waiting to go to present</li>
-                    <li>Track who is waiting to go to present</li>
-                    <li>Track who has already presented</li>
-                </ul>
-            </div>
-            <div class="screen-queue-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/group-chat.png" alt="ScreenQueue"
-                    class="thumbnail">
-            </div>
-        </div>
-    </a>
-
-    <!-- assignment submissions -->
-    <a href="{{site.baseurl}}/student/submissions">
-        <div class="assignment-submissions card">
-            <div class="assignment-submissions-details">
-                <h3>Assignment Submissions</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>Submit an assignment directly to the teacher</li>
-                    <li>Write special comments on your assignment submission</li>
-                </ul>
-            </div>
-            <div class="assignment-submissions-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/submissions.png" alt="Submissions"
-                    class="thumbnail">
-            </div>
-        </div>
-    </a>
-
-    <!-- seed tracker -->
-    <a href="{{site.baseurl}}/student/seedtracker">
-        <div class="seed-tracker card">
-            <div class="seed-tracker-details">
-                <h3>Seed Tracker</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>Request seed</li>
-                </ul>
-            </div>
-            <div class="seed-tracker-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/seedtracker.png" alt="Seed Tracker"
-                    class="thumbnail">
-            </div>
-        </div>
-    </a>
-
-    <!-- sagai -->
-    <a href="{{site.baseurl}}/student/SAGAI">
-        <div class="sagai card">
-            <div class="sagai-details">
-                <h3>SAGAI</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>Use AI to grade your work</li>
-                    <li>Use AI to generate hacks based on a topic or other set of instructions</li>
-                    <li>Ask an AI to answer questions you have</li>
-                    <li>Manage assignments</li>
-                </ul>
-            </div>
-            <div class="sagai-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/sagai.png" alt="SAGAI" class="thumbnail">
-            </div>
-        </div>
-    </a>
-
-    <!-- grade viewer -->
-    <a href="{{site.baseurl}}/student/view-grades">
-        <div class="view-grades card">
-            <div class="view-grades-details">
-                <h3>View Grades</h3>
-                <p>This tool lets you:</p>
-                <ul>
-                    <li>View your grades per assignment</li>
-                </ul>
-            </div>
-            <div class="view-grades-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/view-grades.png" alt="view-grades"
-                    class="thumbnail">
-            </div>
-        </div>
-    </a>
+        </a>
+    {% endfor %}
 </div>

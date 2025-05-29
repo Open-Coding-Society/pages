@@ -47,7 +47,7 @@ def get_github_repository_issues(token=None):
     # Construct the GraphQL query, using multiple lines for readability
     query = """
     query {
-    organization(login: "nighthawkcoders") {
+    organization(login: "open-coding-society") {
         projectsV2(first: 2) {
         nodes {
             items(first: 100) {
@@ -163,7 +163,7 @@ def create_issues():
 
 # Not used in this script, but can be used to get the token
 def getToken():
-    # confirm that this endpoing is storing key that works for all nighthawkcoders repos 
+    # confirm that this endpoing is storing key that works for all open-coding-society repos 
     api_endpoint = 'https://7vybv54v24.execute-api.us-east-2.amazonaws.com/GithubSecret'
 
     # Define headers if needed

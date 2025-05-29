@@ -98,7 +98,7 @@ def get_github_repository_issues_and_prs(token, owner, repo):
 
 def create_issues_and_prs():
     token = os.environ.get('GITHUB_TOKEN')  # via GitHub secrets
-    owner = "nighthawkcoders"  # replace with your repository owner
+    owner = "open-coding-society"  # replace with your repository owner
     repo = "flask_2025"  # replace with your repository name
 
     data = get_github_repository_issues_and_prs(token, owner, repo)

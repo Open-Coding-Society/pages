@@ -115,7 +115,7 @@ title: Investments Home
         // Fetch and populate crypto data dynamically
         async function fetchCryptos() {
             try {
-                const response = await fetch('http://localhost:8085/api/crypto/live');
+                const response = await fetch('http://localhost:8585/api/crypto/live');
                 if (!response.ok) throw new Error('Failed to fetch crypto data');
                 const cryptos = await response.json();
                 drawCryptoChart(cryptos);

@@ -7,13 +7,13 @@ courses: {'csse': {'week': 0}, 'csp': {'week': 0}, 'csa': {'week': 0}}
 comments: True
 ---
 
-## [Issue](https://github.com/nighthawkcoders/portfolio_2025/issues/14) 
+## [Issue](https://github.com/open-coding-society/pages/issues/14) 
 
 ## Project-base Learning Requirements
 Each sprint there will be hacks and project-based learning requirements.  It is up to the individual to develop their own plan for how they will represent work.  Here are some links and tips.
 
 - All work, tangible artifacts, will be captured in personal GitHub Pages
-- Tools and Software Development requirements are foundational requirements for all the CompSci courses.  Thus, they are identical, but listed independently under [CSSE Projects](https://github.com/orgs/nighthawkcoders/projects/15), [CSP Projects](https://github.com/orgs/nighthawkcoders/projects/17), [CSA Projects](https://github.com/orgs/nighthawkcoders/projects/16).
+- Tools and Software Development requirements are foundational requirements for all the CompSci courses.  Thus, they are identical, but listed independently under [CSSE Projects](https://github.com/orgs/open-coding-society/projects/15), [CSP Projects](https://github.com/orgs/open-coding-society/projects/17), [CSA Projects](https://github.com/orgs/open-coding-society/projects/16).
 - To obtain clarity on instructions you should start by picking a post in Sprint 1, then ask questions.  
 - In Agile Development methodology, which we will learn throughout the course, an iteration (plans, designs, review references, coding) and questions should all be considered as part of your work.
 - Since iteraction and questions are part of your work, you should consider capturing and outlining questions and interations in the blog you create.
@@ -35,7 +35,7 @@ The Teacher likes behaviors that are easily viewed and interpreted as productive
 - Ears that can listen.  100% of time you should be available for discussion.  Covered or plugged in ears restricts hearing.
 - Hands that can code. The primary coding device is assumed to be your laptop!  Sprint 1 will be focused on laptop importance.
 
-[Read Learning Habits Table](https://github.com/nighthawkcoders/portfolio_2025/issues/14) to understand how behaviors will impact grading.
+[Read Learning Habits Table](https://github.com/open-coding-society/pages/issues/14) to understand how behaviors will impact grading.
 
 
 

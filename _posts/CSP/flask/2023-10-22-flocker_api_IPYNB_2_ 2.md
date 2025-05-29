@@ -8,7 +8,7 @@ type: ccc
 courses: {'csp': {'week': 10}}
 ---
 
-## Clone flocker_frontend `https://github.com/nighthawkcoders/flocker_frontend.git`
+## Clone flocker_frontend `https://github.com/open-coding-society/flocker_frontend.git`
 
 To set up the workspace for your frontend project, follow these steps:
 
@@ -45,7 +45,7 @@ To set up the workspace for your frontend project, follow these steps:
 6. **Access the Web Server**:
    - Click the loopback address (e.g., `http://127.0.0.1:4887`) displayed in the terminal to load the web server in your browser.
 
-## Clone Backend flocker_backend `https://github.com/nighthawkcoders/flocker_backend.git`
+## Clone Backend flocker_backend `https://github.com/open-coding-society/flocker_backend.git`
 
 1. **Ensure .env Setup**:
    - Create a `.env` file in the root directory of your project with the following content:
@@ -172,7 +172,7 @@ Postman is a powerful tool for testing APIs. It allows developers to send HTTP r
 
 3. **Set the Request Method and URL**:
    - Select the HTTP method (e.g., GET, POST, PUT, DELETE) from the dropdown menu.
-   - Enter the URL of the API endpoint you want to test (e.g., `http://127.0.0.1:8087/api/jokes`).
+   - Enter the URL of the API endpoint you want to test (e.g., `http://127.0.0.1:8587/api/jokes`).
 
 4. **Add Request Body (for POST/PUT requests)**:
    - If you are sending data to the server (e.g., for a POST or PUT request), add the request body in the "Body" tab.
@@ -232,13 +232,13 @@ Endpoint: `http://127.0.0.1:8887/api/group`
 
 
 
-## Running Deployed Frontend / Backend `https://nighthawkcoders.github.io/flocker_frontend/`
+## Running Deployed Frontend / Backend `https://open-coding-society.github.io/flocker_frontend/`
 
 The frontend is deployed using GitHub Pages, and the backend is deployed using AWS. Pull requests to your integration leads will enable your project to be updated. Teams will fork both repositories and will make pull requests to update their work.
 
 Some samples of frontend to backend interactions already exist in the project.
 
-### Signup and Login `https://nighthawkcoders.github.io/flocker_frontend/login`
+### Signup and Login `https://open-coding-society.github.io/flocker_frontend/login`
 
 Add your own account and credentials using the signup and login features.
 
@@ -251,19 +251,19 @@ There are three test users in the system:
 
 ### Login and Signup
 
-After logging in, you will see the username at the top of the page `https://nighthawkcoders.github.io/flocker_frontend/profile`. Hover over the name for other options such as `Post` and `History`. These options help you add and review post history by the user.
+After logging in, you will see the username at the top of the page `https://open-coding-society.github.io/flocker_frontend/profile`. Hover over the name for other options such as `Post` and `History`. These options help you add and review post history by the user.
 
 ### Using the Code from Website Frontend
 
 1. **Access the Frontend**:
-   - Navigate to the deployed frontend at `https://nighthawkcoders.github.io/flocker_frontend/`.
+   - Navigate to the deployed frontend at `https://open-coding-society.github.io/flocker_frontend/`.
 
 2. **Signup and Login**:
    - Use the signup feature to create a new account or login with existing credentials.
    - Test users (`toby`, `hop`, `niko`) can be used for testing purposes.
 
 3. **Navigate to Profile**:
-   - After logging in, go to the profile page at `https://nighthawkcoders.github.io/flocker_frontend/profile`.
+   - After logging in, go to the profile page at `https://open-coding-society.github.io/flocker_frontend/profile`.
    - Your username will be displayed at the top of the page.
 
 4. **Explore Options**:
@@ -282,7 +282,7 @@ After logging in, you will see the username at the top of the page `https://nigh
 
 ## Frontend Code
 
-The code for the frontend is located in the [flocker_frontend repository](https://github.com/nighthawkcoders/flocker_frontend/tree/main/navigation/authentication). The key files for review are `post.md` and `history.md`. These files fetch the API and format the code on the page.
+The code for the frontend is located in the [flocker_frontend repository](https://github.com/open-coding-society/flocker_frontend/tree/main/navigation/authentication). The key files for review are `post.md` and `history.md`. These files fetch the API and format the code on the page.
 
 ### Key Points
 
@@ -388,7 +388,7 @@ div class="container">
 
 ## Backend API
 
-The code for API endpoints is located in the [flocker_backend repository](https://github.com/nighthawkcoders/flocker_backend/tree/main/api). Key files include `post.py`, `section.py`, and `group.py`. The API is registered in the root `main.py` file.
+The code for API endpoints is located in the [flocker_backend repository](https://github.com/open-coding-society/flocker_backend/tree/main/api). Key files include `post.py`, `section.py`, and `group.py`. The API is registered in the root `main.py` file.
 
 ### Key Points
 
@@ -475,7 +475,7 @@ class PostAPI:
 
 ## Backend Model
 
-The code for model (database) definitions is located in the [flocker_backend repository](https://github.com/nighthawkcoders/flocker_backend/tree/main/model). Key files include `post.py`, `section.py`, and `group.py`. The model is included in the root `main.py` file.
+The code for model (database) definitions is located in the [flocker_backend repository](https://github.com/open-coding-society/flocker_backend/tree/main/model). Key files include `post.py`, `section.py`, and `group.py`. The model is included in the root `main.py` file.
 
 ### Key Points
 

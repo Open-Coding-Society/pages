@@ -18,7 +18,7 @@ menu: nav/csp_units/csp_unit3_p3_fundamentals.html
 
   <ul>
     <li>
-      Please review the grading rubric found <a href="https://github.com/Ryan378-code/portfolio_2025/issues/4" style="color: #87CEFA;">here</a> before submitting.
+      Please review the grading rubric found <a href="https://github.com/Ryan378-code/pages/issues/4" style="color: #87CEFA;">here</a> before submitting.
     </li>
   </ul>
 </div>
@@ -27,7 +27,7 @@ menu: nav/csp_units/csp_unit3_p3_fundamentals.html
 <div style="border: 2px solid #D8BFD8; padding: 15px; border-radius: 10px;">
   <span style="color: #87CEFA;">Homework Submission:</span>
   <p>
-    Please submit your homework <a href="https://github.com/Ryan378-code/portfolio_2025/issues/2" style="color: #87CEFA;">here</a>.
+    Please submit your homework <a href="https://github.com/Ryan378-code/pages/issues/2" style="color: #87CEFA;">here</a>.
   </p>
 </div>
 

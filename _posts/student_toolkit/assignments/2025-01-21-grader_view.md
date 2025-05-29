@@ -1,13 +1,119 @@
 ---
-layout: base
+layout: toolkit
+active_tab: graderview
 title: Grader View
 type: issues
 permalink: /student/assign-grades
 comments: false
 ---
+<style>
+    #user-details-container {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color:rgb(42, 41, 41);
+    }
+    
+    .user-card {
+        padding: 10px;
+        background-color:rgb(42, 41, 41);
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .user-card h3 {
+        margin: 0 0 10px;
+    }
+    
+    .user-card p {
+        margin: 5px 0;
+    }
+    
+    .container {
+        margin: 20px;
+    }
+    
+    .toggle-container {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .toggle-btn {
+        padding: 10px 20px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        background-color:rgb(42, 41, 41);
+        margin-right: 10px;
+        border-radius: 5px;
+    }
+    
+    .toggle-active {
+        background-color: #007bff;
+        color: #fff;
+    }
+    
+    #submissionsTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    #submissionsTable th, #submissionsTable td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    #submissionsTable th {
+        background-color:rgb(49, 41, 41);
+    }
 
-<h2>Assignments Grading</h2>
-<div class="container">
+    .btn {
+        padding: 5px 10px;
+        cursor: pointer;
+        border: 1px solid #007bff;
+        background-color: #007bff;
+        color: white;
+        border-radius: 3px;
+    }
+    
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color:rgb(42, 41, 41);
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close-btn {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        color: red;
+    }
+</style>
+
 <table id="assignmentTable">
     <thead>
     <tr>
@@ -23,10 +129,9 @@ comments: false
     <!-- Populated dynamically -->
     </tbody>
 </table>
-</div>
 
 <!-- Submissions Modal -->
-<div id="submissionsModal" class="modal">
+<div id="submissionsModal" class="modal" style="z-index: 100;">
 <div class="modal-content">
     <span class="close-btn">&times;</span>
     <h2 id="assignmentNameHeader">Submissions</h2>
@@ -169,14 +274,8 @@ comments: false
         console.log(studentIds);
 
         fetch(`${javaURI}/api/synergy/grades/requests/bulk`, {
+            ...fetchOptions,
             method: 'POST',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Origin': 'client'
-            },
             body: JSON.stringify({
                 'studentIds': studentIds,
                 'assignmentId': assignmentId,

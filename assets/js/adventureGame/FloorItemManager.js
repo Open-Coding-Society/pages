@@ -9,7 +9,7 @@ class FloorItemManager {
         }
         this.items = [];
         this.maxItems = 1;
-        this.spawnInterval = 30000; // 30 seconds
+        this.spawnInterval = 30000;
         this.spawnTimer = null;
         FloorItemManager.instance = this;
         this.initialize();

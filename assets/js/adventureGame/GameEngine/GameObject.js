@@ -15,16 +15,12 @@
  * @method handleReaction - Handles player reaction / state updates to the collision.
  */
 class GameObject {
-    /**
-     * Constructor for the GameObject class.
-     * Throws an error if an attempt is made to instantiate this class directly,
-     * as it is intended to be used as a base class.
-     */
+    
     constructor(gameEnv = null) {
         if (new.target === GameObject) {
             throw new TypeError("Cannot construct GameObject instances directly");
         }
-        this.gameEnv = gameEnv; // GameEnv instance
+        this.gameEnv = gameEnv; 
         this.collisionWidth = 0;
         this.collisionHeight = 0;
         this.collisionData = {};

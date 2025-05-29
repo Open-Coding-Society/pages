@@ -93,12 +93,13 @@
 </head>
 
 <body>
-    <header class="site-header text-white">
-        <div class="wrapper flex items-center justify-between px-4 py-3">
-            <!-- Left: Site Title -->
-            <a class="site-title" rel="author" href="{{ " {{site.baseurl}}/" | relative_url }}"
-                data-value="{{ site.title | escape }}">
-                {{ site.title | escape }}
+    <header class="site-header">
+        <div class="wrapper">
+            {%- assign default_paths = site.pages | map: "path" -%}
+            {%- assign page_paths = site.header_pages | default: default_paths -%}
+            {%- assign titles_size = site.pages | map: 'title' | join: '' | size -%}
+            <a class="site-title" rel="author" href="{{ "/" | relative_url }}" data-value="{{ site.title | escape }}">
+                <img src="{{ site.baseurl }}/images/logo.png" alt="Logo" style="height: 40px; vertical-align: middle; margin-right: 10px;">
             </a>
 
             <!-- Right: Navigation -->

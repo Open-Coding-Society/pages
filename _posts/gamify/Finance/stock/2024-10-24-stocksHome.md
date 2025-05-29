@@ -255,7 +255,6 @@ title: Stocks Home
             </tr>
         </table>
     </div>
-    
     <!-- Add the Crypto Holdings section -->
     <div class="crypto-holdings">
         <h3>Your Crypto Holdings</h3>
@@ -266,14 +265,12 @@ title: Stocks Home
             </tr>
         </table>
     </div>
-    
     <!-- Move this to a modal only -->
     <div class="crypto-history">
         <h3>Recent Transactions</h3>
         <button class="view-full-history-btn" onclick="openHistoryModal()">View Full History</button>
     </div>
 </div>
-
 <!-- Modal for Full History -->
 <div id="historyModal" class="modal">
     <div class="modal-content">
@@ -290,10 +287,9 @@ title: Stocks Home
     </div>
 </div>
 </div>
-
 </div>
-
 <script type="module">
+// changes
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 // Fetch user credentials and update the welcome message
 async function updateWelcomeMessage() {
@@ -318,24 +314,19 @@ try {
         console.error("HTTP status code: " + response.status);
         return null;
     }
-
     const data = await response.json();
     if (!data) return null;
-
     console.log("User Data:", data);
-
     // Store user email for later use
     if (data.email) {
         localStorage.setItem("userEmail", data.email);
     }
-
     return data;
 } catch (err) {
     console.error("Fetch error: ", err);
     return null;
 }
 }
-
 async function getUserStocks() {
 try {
     const credentials = await getCredentialsJava(); // Get user data
@@ -524,33 +515,26 @@ try {
         console.warn("User email not found in localStorage.");
         return;
     }
-
     console.log(`Fetching transaction history for email: ${email}`);
-
     const response = await fetch(javaURI + `/api/crypto/history?email=${encodeURIComponent(email)}`);
     if (!response.ok) {
         throw new Error(`Error fetching transaction history: ${response.statusText}`);
     }
-
     const transactionData = await response.json();
     console.log("Transaction History Response:", transactionData);
-
     let cryptoHistoryString = transactionData.cryptoHistory;
     if (!cryptoHistoryString || cryptoHistoryString.trim() === "") {
         console.warn("No transaction history found.");
         return;
     }
-
     const transactionHistory = cryptoHistoryString.split("\n").filter(entry => entry.trim() !== "");
     console.log("Parsed Transaction History:", transactionHistory);
-
     const table = document.getElementById("cryptoHistoryTable");
     const fullTable = document.getElementById("fullCryptoHistoryTable");
     if (!table || !fullTable) {
         console.error("Table elements not found.");
         return;
     }
-
     // Clear existing table rows (except header)
     table.innerHTML = `
         <tr>
@@ -560,12 +544,10 @@ try {
             <th>Timestamp</th>
         </tr>`;
     fullTable.innerHTML = table.innerHTML; // Clone structure for modal
-
     // 🟢 **Balance Tracking Fix**
     let runningBalance = 100000; // ✅ Start at $100,000
     let labels = [];
     let balances = [];
-
     transactionHistory.forEach(transaction => {
         const rowData = parseTransaction(transaction);
         if (rowData) {
@@ -776,7 +758,7 @@ async function fetchAndUpdateLiveBalanceChart() {
         }
 
         const data = await response.json();
-        const balance = parseFloat(data.balance);
+        const balance = parseFloat(data.banks.balance);
 
         // Add new data point
         const currentTime = getFormattedTime();

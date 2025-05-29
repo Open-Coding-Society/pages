@@ -23,7 +23,7 @@ Jekyll converts Markdown (.md) files into HTML. Behind the scenes of GitHub Page
 Static content refers to web pages that are delivered to the user's browser exactly as stored, without any server-side processing or dynamic content generation. This means the content remains the same for every user and does not change unless the source files are manually updated. Static websites are typically faster, more secure, and easier to deploy compared to dynamic websites, which require server-side processing to generate content on-the-fly.
 
 ### Adding Dynamics to GitHub Pages
-Through the use of JavaScript and the fetch of data through APIs (backed by servers), developers are able to customize GitHub Pages to support data change. As we explore the portfolio_2025, we will see JavaScript games, login systems, and data that appear very dynamic.
+Through the use of JavaScript and the fetch of data through APIs (backed by servers), developers are able to customize GitHub Pages to support data change. As we explore the pages, we will see JavaScript games, login systems, and data that appear very dynamic.
 
 ### Nighthawk Pages
 While this introduction covers the basics of creating static content with GitHub Pages, our classroom GitHub Pages will delve deeper into more advanced topics. We will explore how to integrate dynamic content, use advanced JavaScript techniques, and leverage APIs to create more interactive and engaging web pages.

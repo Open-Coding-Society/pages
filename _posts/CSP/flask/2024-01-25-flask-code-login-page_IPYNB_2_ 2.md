@@ -295,19 +295,19 @@ If we look closely, we see that login is imported from config.js. Let's take a l
 ```python
 export var pythonURI;
 if (location.hostname === "localhost") {
-        pythonURI = "http://localhost:8087";
+        pythonURI = "http://localhost:8587";
 } else if (location.hostname === "127.0.0.1") {
-        pythonURI = "http://127.0.0.1:8087";
+        pythonURI = "http://127.0.0.1:8587";
 } else {
-        pythonURI =  "https://flask2.nighthawkcodingsociety.com";
+        pythonURI =  "https://flask.opencodingsociety.com";
 }
 export var javaURI;
 if (location.hostname === "localhost") {
-        javaURI = "http://localhost:8085";
+        javaURI = "http://localhost:8585";
 } else if (location.hostname === "127.0.0.1") {
-        javaURI = "http://127.0.0.1:8085"; //rey
+        javaURI = "http://127.0.0.1:8585";
 } else {
-        javaURI = "https://spring.nighthawkcodingsociety.com";
+        javaURI = "https://spring.opencodingsociety.com";
 }
 
 export const fetchOptions = {

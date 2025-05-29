@@ -15,7 +15,7 @@ comments: True
 - When you comment on a blog post, utterances will create a GitHub issue in the designated repository to store the comments
 - You need to authenticate with your Github account as this prevents spam
 - If you scroll down to the bottom of a page, you can see if utterances are there or not
-- If you cloned one of nighthawkcoders repositories, utterances.html will be within your blog's _includes folder
+- If you cloned one of open-coding-society repositories, utterances.html will be within your blog's _includes folder
 
 ## How to install
 - Visit this page [Utterances](https://github.com/apps/utterances) and press the button that says "install"

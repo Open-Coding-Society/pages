@@ -8,7 +8,7 @@ type: ccc
 courses: {'csp': {'week': 9}}
 ---
 
-## Run Frontend (portfolio_2025 or flocker_frontend)
+## Run Frontend (pages or flocker_frontend)
 
 To set up the workspace for your frontend project, follow these steps:
 
@@ -115,7 +115,7 @@ To set up the workspace for your frontend project, follow these steps:
 2. **Run Login in Browser**:
    - Open your web browser and navigate to the following URL to access the login page:
      ```plaintext
-     http://127.0.0.1:4100/portfolio_2025/login
+     http://127.0.0.1:4100/pages/login
      ```
    - This URL points to the login page of your frontend application.
 
@@ -220,7 +220,7 @@ Postman is a powerful tool for testing APIs. It allows developers to send HTTP r
 
 3. **Set the Request Method and URL**:
    - Select the HTTP method (e.g., GET, POST, PUT, DELETE) from the dropdown menu.
-   - Enter the URL of the API endpoint you want to test (e.g., `http://127.0.0.1:8087/api/jokes`).
+   - Enter the URL of the API endpoint you want to test (e.g., `http://127.0.0.1:8587/api/jokes`).
 
 4. **Add Request Headers (if needed)**:
    - If your API requires specific headers (e.g., Content-Type, Authorization), add them in the "Headers" tab.
