@@ -43,8 +43,6 @@ image: /images/platformer/backgrounds/home.png
 
   <audio id = "laserCharge" src ="{{site.baseurl}}/assets/audio/charging-laser.mp3" preload="auto"></audio>
   
-   <!--Audio for Shark -->
-   <audio id = "SharkAudio" src ="{{site.baseurl}}/assets/audio/Shark.mp3" preload="auto"></audio>
   
   <!-- Wrap both the controls and gameplay in a container div -->
   <div id="canvasContainer">

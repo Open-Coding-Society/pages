@@ -1,4 +1,4 @@
-import Character from './Character.js';
+import Character from "./Character.js";
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
@@ -18,10 +18,6 @@ class Player extends Character {
         this.keypress = data?.keypress || {up: 87, left: 65, down: 83, right: 68};
         this.pressedKeys = {}; // active keys array
         this.bindMovementKeyListners();
-        this.gravity = data.GRAVITY || false;
-        this.acceleration = 0.001;
-        this.time = 0;
-        this.moved = false;
     }
 
     /**
@@ -31,11 +27,17 @@ class Player extends Character {
      * The .bind(this) method ensures that 'this' refers to the object object.
      */
     bindMovementKeyListners() {
-        addEventListener('keydown', this.handleKeyDown.bind(this));
-        addEventListener('keyup', this.handleKeyUp.bind(this));
+        // Only add event listeners if we're in a game environment
+        if (this.gameEnv) {
+            addEventListener('keydown', this.handleKeyDown.bind(this));
+            addEventListener('keyup', this.handleKeyUp.bind(this));
+        }
     }
 
     handleKeyDown({ keyCode }) {
+        // Only handle key events if we're in a game environment
+        if (!this.gameEnv) return;
+        
         // capture the pressed key in the active keys array
         this.pressedKeys[keyCode] = true;
         // set the velocity and direction based on the newly pressed key
@@ -50,6 +52,9 @@ class Player extends Character {
      * @param {Object} event - The keyup event object.
      */
     handleKeyUp({ keyCode }) {
+        // Only handle key events if we're in a game environment
+        if (!this.gameEnv) return;
+        
         // remove the lifted key from the active keys array
         if (keyCode in this.pressedKeys) {
             delete this.pressedKeys[keyCode];
@@ -86,36 +91,18 @@ class Player extends Character {
         } else if (this.pressedKeys[this.keypress.up]) {
             this.velocity.y -= this.yVelocity;
             this.direction = 'up';
-            this.moved = true;
         } else if (this.pressedKeys[this.keypress.left]) {
             this.velocity.x -= this.xVelocity;
             this.direction = 'left';
-            this.moved = true;
         } else if (this.pressedKeys[this.keypress.down]) {
             this.velocity.y += this.yVelocity;
             this.direction = 'down';
-            this.moved = true;
         } else if (this.pressedKeys[this.keypress.right]) {
             this.velocity.x += this.xVelocity;
             this.direction = 'right';
-            this.moved = true;
-        } else{
-            this.moved = false;
         }
     }
-    update() {
-        super.update();
-        if(!this.moved){
-            if (this.gravity) {
-                    this.time += 1;
-                    this.velocity.y += 0.5 + this.acceleration * this.time;
-                }
-            }
-        else{
-            this.time = 0;
-        }
-        }
-        
+
     /**
      * Overrides the reaction to the collision to handle
      *  - clearing the pressed keys array

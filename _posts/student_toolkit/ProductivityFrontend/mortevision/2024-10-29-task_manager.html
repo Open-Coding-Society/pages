@@ -1,0 +1,366 @@
+---
+permalink: /project/mort-translator/personal-planner
+search_exclude: true
+layout: base
+---
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Planning System</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', sans-serif; /* Handwritten-like font for a casual feel */
+            background-color: #fdf6e3; /* Light yellowish background for a notepad effect */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+    
+        h1 {
+            font-size: 28px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    
+        li {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #d9a600;
+            background-color: #fff9d4;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            position: relative;
+            transform: rotate(-1deg); /* Slight tilt to give a "post-it" look */
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+    
+        li:hover {
+            background-color: #fff3b0;
+        }
+    
+        /* Style for the main add button */
+        #add-btn {
+            font-size: 24px;
+            background-color: #ffd966;
+            color: #333;
+            border: none;
+            border-radius: 50%;
+            padding: 15px;
+            margin: 20px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+        }
+    
+        #add-btn:hover {
+            background-color: #ffe699;
+        }
+    
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .modal-content {
+            background-color: #fffdf2;
+            padding: 25px;
+            border-radius: 8px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+    
+        .modal-content h2 {
+            color: #d9a600;
+            font-size: 20px;
+        }
+    
+        .modal-content input,
+        .modal-content select {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    
+        .modal-content button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #ffd966;
+            color: #333;
+        }
+    
+        .modal-content button:hover {
+            background-color: #ffe699;
+        }
+    </style>    
+</head>
+<body>
+
+    <div id="app">
+        <h1>My Plans</h1>
+        <ul id="plan-list">
+            <!-- Task content goes here -->
+        </ul>
+    </div>
+
+    <button id="add-btn">+</button>
+
+    <!-- Modal for adding a new task -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2>Add New Plan</h2>
+            <select id="task-select">
+                <option value="" disabled selected>Select a task</option>
+            </select>
+            <input type="date" id="due-date" placeholder="Due Date" required />
+            <input type="text" id="status" placeholder="Status" required />
+            <input type="text" id="description" placeholder="Description" required />
+            <button id="save-plan-btn">Save Plan</button>
+        </div>
+    </div>
+
+    <!-- Modal for editing a task -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Task</h2>
+            <input type="date" id="edit-due-date" required />
+            <input type="text" id="edit-status" placeholder="Status" required />
+            <input type="text" id="edit-description" placeholder="Description" required />
+            <button id="save-edit-btn">Save Changes</button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import {javaURI} from '{{site.baseurl}}/assets/js/api/config.js';
+        let plans = [];
+        let draggedIndex = null;
+        username = "John";
+
+        // Function to fetch tasks from backend
+        async function fetchTasks() {
+            try {
+                const response = await fetch(`${javaURI}/api/assignments/getAssignments`);
+                const tasks = await response.json();
+                populateTaskDropdown(tasks);
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        }
+
+        async function fetchUserTasks(username) {
+            try {
+                const response = await fetch(`${javaURI}/api/tasks/getTasks/${username}`);
+                if (response.ok) {
+                    plans = await response.json(); // Update plans array with fetched tasks
+                    console.log(plans);
+                    renderPlans(); // Render tasks in the UI
+                } else {
+                    console.error('No tasks found for user:', username);
+                }
+            } catch (error) {
+                console.error('Error fetching user tasks:', error);
+            }
+        }
+
+        async function saveEdit(index) {
+            const plan = plans[index];
+            const updatedTask = {
+                dueDate: document.getElementById('edit-due-date').value,
+                status: document.getElementById('edit-status').value,
+                description: document.getElementById('edit-description').value
+            };
+
+            try {
+                const response = await fetch(`${javaURI}/api/tasks/update/${plan.taskId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedTask)
+                });
+
+                if (response.ok) {
+                    const updatedPlan = await response.json();
+                    plans[index] = updatedPlan; // Update plan in the list
+                    renderPlans();
+                    document.getElementById('edit-modal').style.display = 'none'; // Close the modal
+                } else {
+                    console.error('Error updating task:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Open modal to edit task details
+        function openEditModal(index) {
+            const plan = plans[index];
+            document.getElementById('edit-due-date').value = plan.dueDate;
+            document.getElementById('edit-status').value = plan.status;
+            document.getElementById('edit-description').value = plan.description;
+            document.getElementById('edit-modal').style.display = 'flex';
+
+            // Save the edited details
+            document.getElementById('save-edit-btn').onclick = function() {
+                saveEdit(index);
+            };
+        }
+
+        // Populate dropdown with tasks
+        function populateTaskDropdown(tasks) {
+            const taskSelect = document.getElementById('task-select');
+            tasks.forEach(task => {
+                const option = document.createElement('option');
+                option.value = JSON.stringify(task); // Store entire task object
+                option.textContent = task.name;
+                taskSelect.appendChild(option);
+            });
+        }
+
+        // Render plans list with draggable tasks
+        function renderPlans() {
+            const planList = document.getElementById('plan-list');
+            planList.innerHTML = '';
+
+            plans.forEach((plan, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${plan.taskName} - Points: ${plan.points} - Do-by: ${plan.dueDate}`;
+                li.draggable = true;
+                li.addEventListener('click', () => openEditModal(index));
+                
+                // Drag and drop events
+                li.addEventListener('dragstart', () => draggedIndex = index);
+                li.addEventListener('dragover', (e) => e.preventDefault()); // Necessary for drop event to work
+                li.addEventListener('drop', () => handleDrop(index));
+
+                planList.appendChild(li);
+            });
+        }
+
+        // Handle drop event to reorder tasks
+        function handleDrop(dropIndex) {
+            const draggedPlan = plans[draggedIndex];
+            plans.splice(draggedIndex, 1); // Remove dragged item
+            plans.splice(dropIndex, 0, draggedPlan); // Insert at new position
+            renderPlans();
+        }
+
+        // Open modal to add new task
+        document.getElementById('add-btn').addEventListener('click', function() {
+            document.getElementById('modal').style.display = 'flex';
+        });
+
+        // Save selected task to plans
+        document.getElementById('save-plan-btn').addEventListener('click', async function() {
+            const selectedTaskData = document.getElementById('task-select').value;
+            const dueDate = document.getElementById('due-date').value;
+            const status = document.getElementById('status').value;
+            const description = document.getElementById('description').value;
+
+            if (selectedTaskData && dueDate && status && description) {
+                const selectedTask = JSON.parse(selectedTaskData); // Parse selected task data
+
+                // Create task object to send
+                const task = {
+                    assignment: {
+                        assignmentId: selectedTask.assignmentId, // Assuming assignmentId is present in the fetched task
+                    },
+                    dueDate: dueDate,
+                    status: status,
+                    description: description,
+                    taskName: selectedTask.name, // Include task name if necessary
+                    time: Date.now(),
+                    username: username,
+                    points: selectedTask.points
+                };
+
+                console.log(selectedTask.assignmentId)
+
+                // Send POST request to create the task
+                try {
+                    const response = await fetch(`${javaURI}/api/tasks/create`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(task)
+                    });
+
+                    if (response.ok) {
+                        plans.push(task); // Add the created task to the plans
+                        renderPlans();
+                        // Reset modal fields
+                        document.getElementById('task-select').value = '';
+                        document.getElementById('due-date').value = '';
+                        document.getElementById('status').value = '';
+                        document.getElementById('description').value = '';
+                        document.getElementById('modal').style.display = 'none';
+                    } else {
+                        console.error('Error creating task:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        });
+
+        // Function to open edit modal with selected task's data
+        function openEditModal(index) {
+            const plan = plans[index];
+            document.getElementById('edit-due-date').value = plan.due_date;
+            document.getElementById('edit-modal').style.display = 'flex';
+
+            // Save the changes made to the due date
+            document.getElementById('save-edit-btn').onclick = function() {
+                const newDueDate = document.getElementById('edit-due-date').value;
+                if (newDueDate) {
+                    plans[index].due_date = newDueDate;
+                    renderPlans();
+                    document.getElementById('edit-modal').style.display = 'none';
+                }
+            };
+        }
+
+        // Close modals on clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        };
+
+        // Initial render and fetch tasks
+        renderPlans();
+        fetchTasks();
+        fetchUserTasks(username);
+    </script>
+
+</body>

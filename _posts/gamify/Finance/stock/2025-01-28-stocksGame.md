@@ -1,5 +1,5 @@
 ---
-layout: fortunefinders
+layout: finance
 permalink: /stocks/game
 title: Stocks Game
 ---
@@ -9,12 +9,12 @@ title: Stocks Game
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-      font-family: Arial, sans-serif;
-      background-color: #0f0f0f;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
+            font-family: Arial, sans-serif;
+            background-color: #0f0f0f;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -246,9 +246,9 @@ title: Stocks Game
 
 }
 async function getUserBalance() {
-try {
-const credentials = await getCredentialsJava(); // Fetch user data
-const userId = credentials?.id; // Extract user ID
+    try {
+        const credentials = await getCredentialsJava(); // Fetch user data
+        const userId = credentials?.id; // Extract user ID
 
         if (!userId) {
             console.error("User ID not found in credentials.");
@@ -270,11 +270,11 @@ const userId = credentials?.id; // Extract user ID
     } catch (error) {
         console.error("Error fetching user balance:", error);
     }
-
 }
 
 // Run on page load
 window.onload = getUserBalance;
+
 
     // Make functions globally available
     window.addStock = addStock;

@@ -255,6 +255,7 @@ search_exclude: true
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script type="module">
     import { login, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
     // Function to handle Java login
     window.javaLogin = function () {
         const options = {

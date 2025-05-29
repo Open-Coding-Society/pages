@@ -14,9 +14,6 @@ class Enemy extends Character {
         // Update begins by drawing the object
         this.draw();
 
-        if (this.spriteData && typeof this.spriteData.update === 'function') {
-            this.spriteData.update.call(this);
-        }
         // Check for collision with the player
         if (!this.playerDestroyed && this.collisionChecks()) {
             this.handleCollisionEvent();
@@ -74,6 +71,7 @@ class Enemy extends Character {
     handleCollisionEvent() {
         console.log("Player collided with the Enemy. Player is dead.");
         this.playerDestroyed = true; // Mark the player as "dead"
+        alert("KABOOM!!");
         this.gameEnv.gameControl.currentLevel.restart = true; 
     }
 

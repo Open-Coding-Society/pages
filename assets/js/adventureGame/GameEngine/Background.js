@@ -14,6 +14,7 @@ export class Background extends GameObject {
         if (!data.src) {
             throw new Error('Background requires a src property in data');
         }
+
         this.data = data;
         // Set the properties of the background
         this.image = new Image();

@@ -34,7 +34,6 @@ class GameLevelWater {
         SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
-        GRAVITY: true,
         INIT_POSITION: { x: 0, y: height - (height/OCTOPUS_SCALE_FACTOR) }, 
         pixels: {height: 250, width: 167},
         orientation: {rows: 3, columns: 2 },
@@ -86,118 +85,60 @@ class GameLevelWater {
         }
       };
 
-     // Shark Data
-      const sprite_src_shark = path + "/images/gamify/shark.png"; // be sure to include the path
-      const sprite_data_shark = {
+     
+    const sprite_src_shark = path + "/images/gamify/shark.png"; // be sure to include the path
+    const sprite_data_shark = {
         id: 'Shark',
         greeting: "Enemy Shark",
         src: sprite_src_shark,
-        SCALE_FACTOR: 5,
+        SCALE_FACTOR: 5,  // Adjust this based on your scaling needs
         ANIMATION_RATE: 100,
         pixels: {height: 225, width: 225},
         INIT_POSITION: { x: 100, y: 100},
         orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },  
-        hitbox: { widthPercentage: 0.25, heightPercentage: 0.55
-         },
-          //walking area creates the box where the Shark can walk in 
-          walkingArea: {
-            xMin: width / 5, //left boundary
-            xMax: (width * 3 / 5), //right boundary 
-            yMin: height / 4, //top boundary 
-            yMax: (height * 3 / 5) //bottom boundary
-          },
-        speed: 10,
+        down: {row: 0, start: 0, columns: 1 },  // This is the stationary npc, down is default 
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        
+        //walking area creates the box where the creeper can walk in 
+        walkingArea: {
+          xMin: width / 5, //left boundary
+          xMax: (width * 3 / 5), //right boundary 
+          yMin: height / 4, //top boundary 
+          yMax: (height * 3 / 5) //bottom boundary
+        },
+        
+        // speed and direction, the speed is currently set to five and x:1 means its moving right and y:1 means its moving down. these values can be turned negative to mean the opposite
+        speed : 5,
         direction: { x: 1, y: 1 },
-        sound: new Audio(path + "/assets/audio/shark.mp3"),
-        // sound: new Audio(path + "/assets/audio/shark.mp3"),
+
+        // moves the object by adding speed multiplied by direction to INIT_POSITION: if moving right, x increases and if moving down, y increases
         updatePosition: function () {
-          this.INIT_POSITION.x += this.direction.x * this.speed;
-          this.INIT_POSITION.y += this.direction.y * this.speed;
+          this.INIT_POSITION.x += this.direction.x * this.speed; // Update x position based on direction and speed
+          this.INIT_POSITION.y += this.direction.y * this.speed; // Update y position based on direction and speed
+
+          //boundary checks, this makes it so the creeper bounces off walls when it's collision/hit box collides with the boundaries of the set walking area
           if (this.INIT_POSITION.x <= this.walkingArea.xMin) {
             this.INIT_POSITION.x = this.walkingArea.xMin;
-            this.direction.x = 1;
+            this.direction.x = 1; 
           }
           if (this.INIT_POSITION.x >= this.walkingArea.xMax) {
             this.INIT_POSITION.x = this.walkingArea.xMax;
-            this.direction.x = -1;
+            this.direction.x = -1; 
           }
           if (this.INIT_POSITION.y <= this.walkingArea.yMin) {
             this.INIT_POSITION.y = this.walkingArea.yMin;
-            this.direction.y = 1;
+            this.direction.y = 1; 
           }
           if (this.INIT_POSITION.y >= this.walkingArea.yMax) {
             this.INIT_POSITION.y = this.walkingArea.yMax;
-            this.direction.y = -1;
-          }
-          const spriteElement = document.getElementById(this.id);
-          if (spriteElement) {
-            spriteElement.style.transform = this.direction.x === -1 ? "scaleX(-1)" : "scaleX(1)";
-            spriteElement.style.left = this.INIT_POSITION.x + 'px';
-            spriteElement.style.top = this.INIT_POSITION.y + 'px';
+            this.direction.y = -1; 
           }
         },
-        // Splash Animation
-        // This function creates a splash animation when the shark moves
-        isAnimating: false,
-        playAnimation: function () {
-          if (this.isAnimating) return;
-          this.isAnimating = true;
-        
-          const spriteElement = document.getElementById(this.id);
-          if (!spriteElement) return;
-        
-          this.sound.play();
-        
-          const particleCount = 20;
-        
-          for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'splash-particle';
-        
-            // Random position and direction
-            particle.style.position = 'absolute';
-            particle.style.left = `${spriteElement.offsetLeft + spriteElement.offsetWidth / 3}px`;
-            particle.style.top = `${spriteElement.offsetTop + spriteElement.offsetHeight / 3}px`;
-            particle.style.width = '6px';
-            particle.style.height = '6px';
-            particle.style.borderRadius = '50%';
-            particle.style.backgroundColor = 'aqua';
-            particle.style.pointerEvents = 'none';
-            particle.style.zIndex = 1000;
-            particle.style.opacity = 1;
-            particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
-        
-            // Animate outward
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = 60 + Math.random() * 40;
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
-        
-            document.body.appendChild(particle);
-            requestAnimationFrame(() => {
-              particle.style.transform = `translate(${x}px, ${y}px)`;
-              particle.style.opacity = 0;
-            });
-        
-            // Cleanup
-            setTimeout(() => {
-              particle.remove();
-            }, 1000);
-          }
-        
-          setTimeout(() => {
-            this.isAnimating = false;
-          }, 1000);
-        }
       };
-      // Set intervals to update position and play animation  
+
       setInterval(() => {
-        sprite_data_shark.updatePosition();
-      }, 100);
-      setInterval(() => {
-        sprite_data_shark.playAnimation();
-      }, 1000);
+        sprite_data_shark.updatePosition(); 
+      }, 100); // update position every 100 milliseconds 
 
     // List of classes and supporting definitions to create the game level
     this.classes = [

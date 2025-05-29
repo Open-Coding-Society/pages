@@ -62,7 +62,6 @@ class Character extends GameObject {
         this.hitbox = data?.hitbox || {};
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
         document.getElementById("gameContainer").appendChild(this.canvas);
-        this.canvas.style = "image-rendering: pixelated;";
 
         // Set initial object properties 
         this.x = 0;
@@ -250,15 +249,7 @@ class Character extends GameObject {
      * This method changes the object's position based on its velocity and ensures that the object
      * stays within the boundaries of the canvas.
      */
-    move(x, y) {
-
-        if(x != undefined){
-            this.position.x = x;
-        }
-        if(x != undefined){
-            this.position.y = y;
-        }
-        
+    move() {
         // Update or change position according to velocity events
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;

@@ -13,7 +13,6 @@ permalink: /gamify/end
     // Adnventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/adventureGame/Game.js";
     import GameLevelEnd from "{{site.baseurl}}/assets/js/adventureGame/GameLevelEnd.js";
-    import GameLevelDesert from "{{site.baseurl}}/assets/js/adventureGame/GameLevelDesert.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     const gameLevelClasses = [GameLevelEnd];
@@ -39,9 +38,6 @@ permalink: /gamify/end
         <h2 style="color: purple; margin-bottom: 15px; text-align: center;">Welcome to the END!!!!</h2>
         <div style="margin-bottom: 15px;">
             <h3 style="color: purple;">Controls:</h3>
-            <p>• WASD - Move</p>
-            <p>• WASD - Move (Steve)</p>
-            <p>• IJKL - Move (Alex)</p>
             <p>• WASD - Move (Steve)</p>
             <p>• IJKL - Move (Alex)</p>
             <p>• E/U - Interact with NPCs</p>

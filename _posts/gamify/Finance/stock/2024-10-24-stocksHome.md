@@ -1,5 +1,5 @@
 ---
-layout: fortunefinders
+layout: finance
 permalink: /stocks/home
 title: Stocks Home
 ---
@@ -9,21 +9,11 @@ title: Stocks Home
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     body {
-
-      font-family: Arial, sans-serif;
-      background-color: #0f0f0f;
-      color: #fff;
-      margin: 0;
-      padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
     }
-
-            font-family: Arial, sans-serif;
-            background-color: #0f0f0f;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-        }
-
     .navbar {
         display: flex;
         justify-content: space-between;

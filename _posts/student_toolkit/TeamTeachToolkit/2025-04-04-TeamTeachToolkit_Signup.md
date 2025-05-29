@@ -3,7 +3,7 @@ toc: false
 layout: aesthetihawk
 active_tab: teamteach
 title: Team Teach Signup
-permalink: /student/teamteachsignup
+permalink: /student/TeamTeachToolkit/signup
 description: Sign up for team teach topics
 ---
 

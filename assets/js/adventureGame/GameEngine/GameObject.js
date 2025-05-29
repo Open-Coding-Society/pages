@@ -84,7 +84,6 @@ class GameObject {
             }
         }
 
-        // Reset collision events if no collisions detected
         if (!collisionDetected) {
             this.state.collisionEvents = [];
         }
@@ -164,32 +163,15 @@ class GameObject {
     }
 
     /**
-     * Handles the reaction to the collision, updated to use dialogue (from end team hack)
+     * Handles the reaction to the collision, this could be overridden by subclasses
      * @param {*} other 
      */
     handleCollisionReaction(other) {
-    // First check if reaction is a function that can be called
-        if (other && other.reaction && typeof other.reaction === "function") {
+        if (other.reaction && typeof other.reaction === "function") {
             other.reaction();
             return;
         }
-        
-        // If the object has a dialogueSystem, use it instead of console.log
-        if (other && other.id) {
-            // Try to find the object instance to use its dialogueSystem
-            const targetObject = this.gameEnv.gameObjects.find(obj => 
-                obj.spriteData && obj.spriteData.id === other.id
-            );
-            
-            if (targetObject && targetObject.dialogueSystem) {
-                targetObject.showReactionDialogue();
-            } else if (targetObject && targetObject.showItemMessage) {
-                targetObject.showItemMessage();
-            } else if (other.greeting) {
-                // Fallback to greeting if available
-                console.log(other.greeting);
-            }
-        }
+        console.log(other.greet);
     }
 
     /**

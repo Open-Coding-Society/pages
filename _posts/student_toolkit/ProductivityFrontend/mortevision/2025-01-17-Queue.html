@@ -1,0 +1,48 @@
+---
+title: Presentation Queue
+permalink: /student-toolkit/queue
+menu: nav/toolkits/productivity-frontend/menu.html
+layout: base
+---
+
+{% include MorteVision/queuehead.html %}
+
+<div id="assignmentModal" class="modal">
+    <div class="modal-content">
+      <h2>Select an Assignment</h2>
+      <label for="modalAssignmentDropdown">Choose an Assignment:</label>
+      <select id="modalAssignmentDropdown"></select>
+      <button class="large filledHighlight primary", id="confirmAssignment">Confirm</button>
+    </div>
+</div>
+
+<h1>Queue Management</h1>
+
+<div class="queue-container">
+    <div class="column">
+        <h2>Working</h2>
+        <ul id="notGoneList"></ul>
+    </div>
+    <div class="column">
+        <h2>Waiting</h2>
+        <ul id="waitingList"></ul>
+    </div>
+    <div class="column">
+        <h2>Completed</h2>
+        <ul id="doneList"></ul>
+    </div>
+</div>
+
+<br>
+<br>
+
+<div class="controls">
+    <button id="addQueue" class="large primary">Add to Waiting</button>
+    <button id="removeQueue" class="large primary">Remove from Waiting</button>
+    <button id="beginTimer" class="large primary">Begin Timer</button><br>
+    <button id="customToggleBtn" class="large primary">Add/Remove Group in Waiting</button>
+</div>
+
+<div class="timer">
+    <span id="timerDisplay">00:00</span>
+</div>

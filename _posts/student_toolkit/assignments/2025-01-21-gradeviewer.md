@@ -2,7 +2,8 @@
 layout: aesthetihawk
 active_tab: grades
 title: Viewing Grades
-permalink: /student/grades
+permalink: /student/view-grades
+comments: false
 ---
 
 <div class="min-h-screen bg-neutral-900 text-white">

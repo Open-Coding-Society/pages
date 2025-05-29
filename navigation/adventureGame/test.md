@@ -7,7 +7,7 @@ permalink: /gamify/test
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adventure Game High Scores</title>
+    <title>Person High Scores</title>
     <style>
         body {
             font-family: Arial, sans-serif;

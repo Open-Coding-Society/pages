@@ -1,0 +1,89 @@
+#mvHeader
+{
+    background-color: #344a64;
+    width:100%;
+    height:80px;
+    position:absolute;
+    left:0;
+    top:61px;
+    padding-left: 20px;
+    display: flex;
+    align-items: center;
+    font-size: x-large;
+    justify-content: space-between;
+}
+
+.page-content
+{
+    margin-top: 66px;
+}
+
+#mvHeaderLogoAnchor
+{
+    display: flex;
+    height:100%;
+    align-items: flex-start;
+}
+
+#mvHeaderLogo
+{
+    height:80%;
+    position:relative;
+    top:10%;
+    transition: all .5s;
+}
+
+#mvHeaderLogo:hover
+{
+    filter: drop-shadow(0 0 1rem rgb(255, 255, 255));
+}
+
+#mvMorteVisionLogoText
+{
+    margin-left: 5px;
+    color:white;
+    font-family: "Londrina Sketch", sans-serif;
+    text-decoration: none;
+}
+
+#mvMorteVisionLogoText:hover
+{
+    animation: squiggly-anim infinite .5s;
+}
+
+#mvHeaderLogoWrap
+{
+    height:100%;
+    position: relative;
+    align-items: center;
+    display: flex;
+}
+
+#mvHeaderGitHub
+{
+    color:white;
+    font-family: "Inter", sans-serif;
+    text-decoration: none;
+}
+
+@keyframes squiggly-anim {
+	0% {
+		filter: url("#squiggly-0");
+	}
+
+	25% {
+		filter: url("#squiggly-1");
+	}
+
+	50% {
+		filter: url("#squiggly-2");
+	}
+
+	75% {
+		filter: url("#squiggly-3");
+	}
+
+	100% {
+		filter: url("#squiggly-4");
+	}
+}

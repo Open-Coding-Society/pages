@@ -1,4 +1,4 @@
-// Updated GameLevel.js
+// GameLevel.js
 import GameEnv from "./GameEnv.js"
 
 class GameLevel {
@@ -14,42 +14,60 @@ class GameLevel {
 
   create(GameLevelClass) {
     this.continue = true
+    this.restart = false
     this.gameEnv.create()
-    this.gameLevel = new GameLevelClass(this.gameEnv)
-    this.gameObjectClasses = this.gameLevel.classes
-
-    // Set current level instance in Game
-    if (typeof Game !== 'undefined' && Game.setCurrentLevelInstance) {
-        Game.setCurrentLevelInstance(this.gameLevel);
+    
+    // Check if GameLevelClass is a valid constructor
+    if (typeof GameLevelClass !== 'function') {
+      console.error('GameLevelClass is not a constructor', GameLevelClass);
+      throw new Error('GameLevelClass is not a constructor');
     }
+    
+    try {
+      this.gameLevel = new GameLevelClass(this.gameEnv)
+      
+      // Check if classes property exists
+      if (!this.gameLevel.classes || !Array.isArray(this.gameLevel.classes)) {
+        console.error('GameLevel classes array is invalid', this.gameLevel);
+        throw new Error('GameLevel classes array is invalid');
+      }
+      
+      this.gameObjectClasses = this.gameLevel.classes
 
-    for (let gameObjectClass of this.gameObjectClasses) {
+      for (let gameObjectClass of this.gameObjectClasses) {
         if (!gameObjectClass.data) gameObjectClass.data = {}
+        
+        // Check if class property is a constructor
+        if (typeof gameObjectClass.class !== 'function') {
+          console.error('GameObject class is not a constructor', gameObjectClass);
+          continue; // Skip this object but don't crash the level
+        }
+        
         let gameObject = new gameObjectClass.class(gameObjectClass.data, this.gameEnv)
         this.gameEnv.gameObjects.push(gameObject)
-    }
+      }
 
     if (typeof this.gameLevel.initialize === "function") {
-        this.gameLevel.initialize()
+      this.gameLevel.initialize()
+
     }
 
-    window.addEventListener("resize", this.resize.bind(this))
+      window.addEventListener("resize", this.resize.bind(this))
+      
+    } catch (error) {
+      console.error('Error creating game level:', error);
+      this.continue = false;
+    }
   }
 
   destroy() {
-    if (typeof this.gameLevel.destroy === "function") {
+    if (typeof this.gameLevel?.destroy === "function") {
       this.gameLevel.destroy()
     }
 
-    // Properly clean up all game objects
     for (let index = this.gameEnv.gameObjects.length - 1; index >= 0; index--) {
-      // Make sure each object's destroy method is called to clean up event listeners
       this.gameEnv.gameObjects[index].destroy()
     }
-
-    // Clear out the game objects array
-    this.gameEnv.gameObjects = [];
-    
     window.removeEventListener("resize", this.resize.bind(this))
   }
 
@@ -60,7 +78,7 @@ class GameLevel {
       gameObject.update()
     }
 
-    if (typeof this.gameLevel.update === "function") {
+    if (typeof this.gameLevel?.update === "function") {
       this.gameLevel.update()
     }
   }

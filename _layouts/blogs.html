@@ -2,7 +2,7 @@
 layout: page 
 ---
 
-<!-- This inserts content from the page using this layout -->
+<!-- This inserts conmtent from the page using this layout -->
 {{ content | markdownify }}
 
 <!-- Get all posts -->
@@ -46,3 +46,5 @@ layout: page
     {%- endfor -%}
   </ul>
 {%- endif -%}
+
+<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/blogs.css">

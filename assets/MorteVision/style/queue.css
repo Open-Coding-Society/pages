@@ -1,0 +1,94 @@
+/* Queue layout styling */
+.queue-container {
+    margin: auto;
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    max-width: 100%;
+    gap: 20px;
+}
+
+/* Column styling with neumorphic effect */
+.column {
+    width: 30%;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: inset 5px 5px 15px #0f0f0f, inset -5px -5px 15px #2d2d2d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.column h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+/* Card styling for each name */
+.card {
+    width: 150px;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #282828;
+    border-radius: 10px;
+    box-shadow: 3px 3px 5px #0f0f0f, -3px -3px 5px #353535;
+    text-align: center;
+}
+
+/* Timer display */
+.timer {
+    padding-left: 423px;
+    margin-top: 20px;
+    font-size: 1.5em;
+    color: #76ff03;
+}
+
+/* Dropdown and initializer button */
+.dropdown-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+select {
+    background-color: #333;
+    color: #e0e0e0;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.disabled-hover:hover {
+    background-color: #222 !important;
+    /* Same as the non-hover color */
+    transform: none;
+    /* No scaling */
+    box-shadow: 3px 3px 10px #0f0f0f, -3px -3px 10px #353535;
+    /* Same shadow */
+}
+
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black with opacity */
+}
+
+.modal-content {
+    background-color: black;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    text-align: center;
+}

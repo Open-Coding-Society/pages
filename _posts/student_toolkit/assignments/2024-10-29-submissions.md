@@ -7,17 +7,19 @@ permalink: /student/submissions
 
 <div class="container mx-auto px-4 py-8 max-w-3xl">
     <div class="bg-transparent rounded-lg shadow-lg p-6 mb-6">
-        <h1 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-2">Assignment Submissions</h1>
+        <h1 class="text-3xl font-bold text-white-700 mb-6 border-b pb-2">Assignment Submissions</h1>
         <div class="mb-4 flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-700">Enable group submissions</span>
-            <label class="inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="myToggle" class="sr-only peer">
-                <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-600"></div>
-            </label>
+        <span class="text-sm font-medium text-white">Enable group submissions</span>
+        <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="myToggle" class="sr-only peer">
+            <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 rounded-full peer peer-checked:bg-gray-600">
+            <div class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+            </div>
+        </label>
         </div>
         <div class="space-y-4">
             <div class="flex justify-between items-center">
-                <label for="assignment-select" class="text-sm font-medium text-gray-700">Assignment</label>
+                <label for="assignment-select" class="text-sm font-medium text-white-700">Assignment</label>
                 <select id="assignment-select" class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                     <option value="" disabled selected>Select an Assignment</option>
                 </select>
@@ -30,12 +32,12 @@ permalink: /student/submissions
             </div>
             <div id="Group Submit" class="hidden space-y-4 mt-6 p-4 rounded-md border border-gray-400">
                 <div class="flex justify-between items-center">
-                    <label for="searchBar" class="text-sm font-medium text-gray-700">Search Group Members</label>
+                    <label for="searchBar" class="text-sm font-medium text-white-700">Search Group Members</label>
                     <input type="text" id="searchBar" placeholder="Search for a name..." onkeyup="filterNames()"
                         class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                 </div>
                 <div class="flex items-center">
-                    <label for="rowsPerPage" class="text-sm font-medium text-gray-700 mr-2">Rows per page:</label>
+                    <label for="rowsPerPage" class="text-sm font-medium text-white-700 mr-2">Rows per page:</label>
                     <select id="rowsPerPage" onchange="changeRowsPerPage()"
                         class="px-2 py-1 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                         <option value="5">5</option>
@@ -59,19 +61,19 @@ permalink: /student/submissions
                         <tbody id="namesTableBody" class="divide-y divide-gray-300"></tbody>
                     </table>
                 </div>
-                <div id="Review-Group" class="p-3 rounded-md font-medium text-gray-700 border border-gray-400">
+                <div id="Review-Group" class="p-3 rounded-md font-medium text-white-700 border border-gray-400">
                     Group Members:
                 </div>
             </div>
 
             <div class="flex justify-between items-center mt-4">
-                <label for="submissionContent" class="text-sm font-medium text-gray-700">Submission Content</label>
+                <label for="submissionContent" class="text-sm font-medium text-white-700">Submission Content</label>
                 <textarea id="submissionContent" rows="5" required
                     class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"></textarea>
             </div>
 
             <div class="flex justify-between items-center mt-4">
-                <label for="comments" class="text-sm font-medium text-gray-700">Comments</label>
+                <label for="comments" class="text-sm font-medium text-white-700">Comments</label>
                 <textarea id="comments" rows="5"
                     class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"></textarea>
             </div>
@@ -86,8 +88,8 @@ permalink: /student/submissions
             <div id="outputBox" class="mt-4 p-3 rounded-md"></div>
 
             <div class="mt-8">
-                <h1 class="text-2xl font-bold text-gray-700 mb-2">Previous Submissions for:</h1>
-                <div id="Assignment-name" class="text-lg font-medium text-gray-700 mb-4">Assignment-Content</div>
+                <h1 class="text-2xl font-bold text-white-700 mb-2">Previous Submissions for:</h1>
+                <div id="Assignment-name" class="text-lg font-medium text-white-700 mb-4">Assignment-Content</div>
 
                 <div class="overflow-x-auto">
                     <table id="submissions-table" class="min-w-full bg-gray-100 rounded-lg overflow-hidden">
@@ -424,7 +426,7 @@ permalink: /student/submissions
             actionCell.className = "py-2 px-4";
             
             const addButton = document.createElement("button");
-            addButton.className = "px-3 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
+            addButton.className = "px-3 py-1 bg-indigo-500 text-gray rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
             addButton.textContent = "Add";
             addButton.onclick = function() { addName(`${name.name},${name.id}`); };
             
