@@ -5,14 +5,15 @@ title: Viewing Grades
 permalink: /student/grades
 ---
 
-<div class="container mx-auto px-4 py-6">
-    <h2 class="text-2xl font-bold text-white mb-4">Your Grades</h2>
+<div class="min-h-screen bg-neutral-900 text-white">
+  <div class="max-w-5xl mx-auto py-10 px-4">
+    <h2 class="text-2xl font-bold mb-6 text-center">YOUR GRADES</h2>
     <div class="overflow-x-auto">
-        <table id="gradesTable" class="min-w-full table-auto border border-blue-900 bg-transparent">
-            <thead class="bg-transparent text-white font-bold">
+        <table id="gradesTable" class="min-w-full border border-white text-sm text-left">
+            <thead class="text-white">
                 <tr>
-                    <th class="px-6 py-3 uppercase tracking-wider border-b border-blue-900">Assignment</th>
-                    <th class="px-6 py-3 uppercase tracking-wider border-b border-blue-900">Grade</th>
+                    <th class="px-4 py-2 border border-white" style="background-color: #404040;">Assignment</th>
+                    <th class="px-4 py-2 border border-white" style="background-color: #404040;">Grade</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,6 +21,7 @@ permalink: /student/grades
             </tbody>
         </table>
     </div>
+  </div>
 </div>
 
 <script type="module">
@@ -35,11 +37,11 @@ permalink: /student/grades
             let row = tableBody.insertRow();
 
             let cell1 = row.insertCell(0);
-            cell1.className = "px-6 py-4 text-white font-semibold";
+            cell1.className = "border border-white px-4 py-2";
             cell1.textContent = stugrade[1];
 
             let cell2 = row.insertCell(1);
-            cell2.className = "px-6 py-4 text-white font-semibold";
+            cell2.className = "border border-white px-4 py-2";
             cell2.textContent = stugrade[0];
         });
 
@@ -58,14 +60,14 @@ permalink: /student/grades
 
         const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
         let averageRow = tableBody.insertRow();
-        averageRow.classList.add("border", "border-green-500");
+        averageRow.classList.add("border", "border-white");
 
         let cell1 = averageRow.insertCell(0);
-        cell1.className = "px-6 py-4 text-white font-semibold";
+        cell1.className = "border border-white px-4 py-2 font-bold";
         cell1.textContent = "Average";
 
         let cell2 = averageRow.insertCell(1);
-        cell2.className = "px-6 py-4 text-white font-semibold";
+        cell2.className = "border border-white px-4 py-2 font-bold";
         cell2.textContent = average;
     }
 
