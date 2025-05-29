@@ -9,15 +9,14 @@ permalink: /student/submissions
     <div class="bg-transparent rounded-lg shadow-lg p-6 mb-6">
         <h1 class="text-3xl font-bold text-white-700 mb-6 border-b pb-2">Assignment Submissions</h1>
         <div class="mb-4 flex items-center justify-between">
-        <div class="mb-4 flex items-center justify-between">
-     <span class="text-sm font-medium text-white">Enable group submissions</span>
-    <label class="inline-flex items-center cursor-pointer">
-        <input type="checkbox" id="myToggle" class="sr-only peer">
-        <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 rounded-full peer peer-checked:bg-gray-600">
-        <div class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transition-transform duration-300 transform peer-checked:translate-x-5"></div>
+        <span class="text-sm font-medium text-white">Enable group submissions</span>
+        <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="myToggle" class="sr-only peer">
+            <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 rounded-full peer peer-checked:bg-gray-600">
+            <div class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+            </div>
+        </label>
         </div>
-    </label>
-    </div>
         <div class="space-y-4">
             <div class="flex justify-between items-center">
                 <label for="assignment-select" class="text-sm font-medium text-white-700">Assignment</label>
