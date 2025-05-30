@@ -72,6 +72,21 @@
                         </a>
                     </li>
 
+                    <!-- calendar button-->
+                    <li>
+                        <a id="Calendar" href="{{site.baseurl}}/student/calendar" onclick="setActiveTab(this)"
+                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
+                            <span class="inline-flex justify-center items-center ml-4">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
+                                </svg>
+                            </span>
+                            <span class="ml-2 text-sm tracking-wide truncate">Calendar</span>
+                        </a>
+                    </li>
+
                     <!-- hallpass button -->
                     <li>
                         <a id="Hallpass" href="{{site.baseurl}}/hallpass" onclick="setActiveTab(this)"
@@ -108,21 +123,6 @@
                         <div class="flex flex-row items-center h-8">
                             <div class="text-sm font-light tracking-wide text-neutral-500">Toolkit</div>
                         </div>
-                    </li>
-
-                    <!-- calendar link (first under toolkit) -->
-                    <li>
-                        <a id="Calendar" href="{{site.baseurl}}/student/calendar" onclick="setActiveTab(this)"
-                            class="nav-item relative flex flex-row items-center h-11 focus:outline-none text-neutral-600 hover:text-neutral-50 border-l-4 border-transparent hover:border-indigo-500 pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
-                                </svg>
-                            </span>
-                            <span class="ml-2 text-sm tracking-wide truncate">Calendar</span>
-                        </a>
                     </li>
 
                     <!-- groups -->
