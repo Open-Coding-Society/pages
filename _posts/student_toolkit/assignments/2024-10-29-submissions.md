@@ -11,9 +11,9 @@ permalink: /student/submissions
         <div class="mb-4 flex items-center justify-between">
         <span class="text-sm font-medium text-white">Enable group submissions</span>
         <label class="inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="myToggle" class="sr-only peer">
-            <div class="relative w-11 h-6 bg-gray-300 rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 peer-checked:bg-gray-600 transition-colors">
-                <div class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transform transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+            <input type="checkbox" id="myToggle" class="sr-only" onchange="toggleSwitch(this)">
+            <div id="customToggleTrack" class="relative w-11 h-6 bg-gray-300 rounded-full transition-colors duration-300">
+                <div id="customToggleCircle" class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transition-all duration-300"></div>
             </div>
         </label>
         </div>
@@ -445,4 +445,19 @@ permalink: /student/submissions
         await fetchSubmissions();
         await fetchAssignments();
     });
+</script>
+<script type="text/javascript">
+    function toggleSwitch(checkbox) {
+        const track = document.getElementById('customToggleTrack');
+        const circle = document.getElementById('customToggleCircle');
+        if (checkbox.checked) {
+            track.classList.remove('bg-gray-300');
+            track.classList.add('bg-gray-600');
+            circle.style.left = '24px';
+        } else {
+            track.classList.remove('bg-gray-600');
+            track.classList.add('bg-gray-300');
+            circle.style.left = '2px';
+        }
+    }
 </script>
