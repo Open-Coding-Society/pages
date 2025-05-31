@@ -1,28 +1,18 @@
 import { baseurl, pythonURI, fetchOptions } from './config.js';
 
-console.log("login.js loaded");
-
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Base URL:", baseurl); // Debugging line
     getCredentials(baseurl) // Call the function to get credentials
         .then(data => {
-            console.log("Credentials data:", data); // Debugging line
             const loginArea = document.getElementById('loginArea');
             if (data) { // Update the login area based on the data
                 loginArea.innerHTML = `
                     <div class="dropdown">
                         <button class="dropbtn">${data.name}</button>
                         <div class="dropdown-content hidden">
-                            ${
-                                data.roles && Array.isArray(data.roles) && data.roles.length > 0
-                                    ? `<div class="roles-list" style="padding: 8px 16px; color: #888; font-size: 0.95em;">
-                                        Roles: ${data.roles.map(role => role.name).join(", ")}
-                                       </div>
-                                       <hr style="margin: 4px 0;">`
-                                    : ''
-                            }
-                            <a href="${baseurl}/logout">Logout</a>
+                            <a href="${baseurl}/profile">Profile</a>
                             <a href="${baseurl}/gamify/fortuneFinders">Gamify</a>
+                            <a href="${baseurl}/logout">Logout</a>
+                            
                         </div>
                     </div>
                 `;
