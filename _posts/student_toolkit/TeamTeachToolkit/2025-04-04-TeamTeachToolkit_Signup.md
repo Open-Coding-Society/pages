@@ -125,7 +125,11 @@ async function fetchAssignTopics(topic) {
       <td class="border border-white px-4 py-2">${topic.dueDate}</td>
       <td class="border border-white px-4 py-2">${studentsText}</td>
       <td class="border border-white px-4 py-2">
-        <button class="border border-white px-3 py-1 rounded text-sm transition ${alreadySignedUp ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'}" data-topic-id="${topic.id}" ${alreadySignedUp ? 'disabled' : ''}>
+        <button
+          class="px-3 py-1 rounded text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-400
+                ${alreadySignedUp ? 'bg-indigo-300 text-white opacity-50 cursor-not-allowed' : 'bg-indigo-500 text-white hover:bg-indigo-600'}"
+          ${alreadySignedUp ? 'disabled' : ''}
+          data-topic-id="${topic.id}">
           ${alreadySignedUp ? 'Signed Up' : 'Sign Up'}
         </button>
       </td>`;
