@@ -12,8 +12,8 @@ permalink: /student/submissions
         <span class="text-sm font-medium text-white">Enable group submissions</span>
         <label class="inline-flex items-center cursor-pointer">
             <input type="checkbox" id="myToggle" class="sr-only peer">
-            <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 rounded-full peer peer-checked:bg-gray-600">
-            <div class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+            <div class="relative w-11 h-6 bg-gray-300 rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 peer-checked:bg-gray-600 transition-colors">
+                <div class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transform transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
             </div>
         </label>
         </div>
