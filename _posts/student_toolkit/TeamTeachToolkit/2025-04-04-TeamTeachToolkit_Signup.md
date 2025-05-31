@@ -7,40 +7,40 @@ permalink: /student/TeamTeachToolkit/signup
 description: Sign up for team teach topics
 ---
 
-<div class="min-h-screen bg-neutral-900 text-white">
+<div class="min-h-screen bg-neutral-900 text-gray-100">
   <div class="max-w-5xl mx-auto py-10 px-4">
 
     <div id="tooltip" 
-         style="position: fixed; background: #222; color: #eee; padding: 8px 12px; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.2s; max-width: 300px; z-index: 1000; font-size: 0.875rem;">
+         style="position: fixed; background: #23272f; color: #f3f4f6; padding: 8px 12px; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.2s; max-width: 300px; z-index: 1000; font-size: 0.875rem; border: 1px solid #27272a;">
     </div>
 
-    <p id="loggedInStudent" class="mb-6 text-center text-sm">Fetching student info...</p>
+    <p id="loggedInStudent" class="mb-6 text-center text-sm text-gray-300">Fetching student info...</p>
 
-    <div class="border border-white rounded-lg p-6">
-      <h2 class="text-2xl font-bold mb-6 text-center">TEAM TEACH SIGNUP</h2>
+    <div class="border border-neutral-700 rounded-lg p-6 bg-neutral-800 shadow-md">
+      <h2 class="text-2xl font-bold mb-6 text-center text-gray-100">TEAM TEACH SIGNUP</h2>
 
       <div class="flex flex-col gap-4 mb-6">
         <input type="text" id="name" placeholder="Enter Team Teach Topic"
-          class="w-full px-4 py-2 text-white rounded placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white" style="background-color: #404040;">
+          class="w-full px-4 py-2 text-gray-100 rounded-lg border border-gray-600 bg-neutral-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <input type="text" id="description" placeholder="Enter Topic Description"
-          class="w-full px-4 py-2 text-white rounded placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white" style="background-color: #404040;">
+          class="w-full px-4 py-2 text-gray-100 rounded-lg border border-gray-600 bg-neutral-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <input type="date" id="dueDate"
-          class="w-full px-4 py-2 text-white rounded placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white" style="background-color: #404040;">
+          class="w-full px-4 py-2 text-gray-100 rounded-lg border border-gray-600 bg-neutral-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <button id="addTopicBtn"
-          class="w-full border border-white px-4 py-2 rounded hover:bg-white hover:text-black transition">Add Topic</button>
+          class="w-full border border-indigo-500 px-4 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none transition">Add Topic</button>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full border border-white text-sm text-left">
-          <thead class="text-white">
+        <table class="min-w-full border border-neutral-700 text-sm text-left bg-neutral-800 rounded-lg">
+          <thead class="text-gray-100 bg-neutral-700">
             <tr>
-              <th class="px-4 py-2 border border-white" style="background-color: #404040;">Topic</th>
-              <th class="px-4 py-2 border border-white" style="background-color: #404040;">Date</th>
-              <th class="px-4 py-2 border border-white" style="background-color: #404040;">Signed Up</th>
-              <th class="px-4 py-2 border border-white" style="background-color: #404040;">Actions</th>
+              <th class="px-4 py-2 border border-neutral-700">Topic</th>
+              <th class="px-4 py-2 border border-neutral-700">Date</th>
+              <th class="px-4 py-2 border border-neutral-700">Signed Up</th>
+              <th class="px-4 py-2 border border-neutral-700">Actions</th>
             </tr>
           </thead>
-          <tbody id="topicsList" class="text-white" style="background-color: #404040;"></tbody>
+          <tbody id="topicsList" class="text-gray-100 bg-neutral-800"></tbody>
         </table>
       </div>
     </div>
