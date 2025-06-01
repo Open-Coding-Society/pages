@@ -13,7 +13,7 @@ permalink: /student/submissions
         <label class="inline-flex items-center cursor-pointer">
             <input type="checkbox" id="myToggle" class="sr-only" onchange="toggleSwitch(this)">
             <div id="customToggleTrack" class="relative w-11 h-6 bg-neutral-600 rounded-full transition-colors duration-300">
-                <div id="customToggleCircle" class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-500 transition-all duration-300"></div>
+                <div id="customToggleCircle" class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full border border-gray-500 transition-all duration-300"></div>
             </div>
         </label>
         </div>
@@ -88,16 +88,16 @@ permalink: /student/submissions
             <div id="outputBox" class="mt-4 p-3 rounded-md"></div>
 
             <div class="mt-8">
-                <h1 class="text-2xl font-bold text-gray-100 mb-2">Previous Submissions for:</h1>
-                <div id="Assignment-name" class="text-lg font-medium text-gray-300 mb-4">Assignment-Content</div>
+                <h1 class="text-2xl font-bold text-white-100 mb-2">Previous Submissions for:</h1>
+                <div id="Assignment-name" class="text-lg font-medium text-white-300 mb-4">Assignment-Content</div>
 
                 <div class="overflow-x-auto">
                     <table id="submissions-table" class="min-w-full bg-neutral-700 rounded-lg overflow-hidden">
                         <thead class="bg-neutral-800">
                             <tr>
-                                <th class="py-2 px-4 text-left text-gray-100">Submission Content</th>
-                                <th class="py-2 px-4 text-left text-gray-100">Grade</th>
-                                <th class="py-2 px-4 text-left text-gray-100">Feedback</th>
+                                <th class="py-2 px-4 text-left text-white-100">Submission Content</th>
+                                <th class="py-2 px-4 text-left text-white-100">Grade</th>
+                                <th class="py-2 px-4 text-left text-white-100">Feedback</th>
                             </tr>
                         </thead>
                         <tbody id="submissions-tbody" class="divide-y divide-neutral-600">
@@ -334,23 +334,23 @@ permalink: /student/submissions
                 console.log("SKIBBBB");
                 const contentCell = document.createElement('td');
                 contentCell.textContent = submission.content || 'N/A';
-                contentCell.className = 'py-2 px-4 text-gray-700';
+                contentCell.className = 'py-2 px-4 text-white-700';
                 row.appendChild(contentCell);
 
                 const gradeCell = document.createElement('td');
                 gradeCell.textContent = submission.grade || 'Ungraded';
                 gradeCell.className = 'py-2 px-4 font-medium';
                 if (submission.grade) {
-                    gradeCell.classList.add('text-green-600');
+                    gradeCell.classList.add('text-blue-600');
                 } else {
-                    gradeCell.classList.add('text-gray-500');
+                    gradeCell.classList.add('text-white-500');
                 }
                 row.appendChild(gradeCell);
                 console.log(submission.grade);
 
                 const feedbackCell = document.createElement('td');
                 feedbackCell.textContent = submission.feedback || 'No feedback yet';
-                feedbackCell.className = 'py-2 px-4 italic text-gray-600';
+                feedbackCell.className = 'py-2 px-4 italic text-white-600';
                 row.appendChild(feedbackCell);
 
                 tableBody.appendChild(row);
@@ -418,7 +418,7 @@ permalink: /student/submissions
             let info = [name.name, name.id];
 
             const nameCell = document.createElement("td");
-            nameCell.className = "py-2 px-4 text-gray-700";
+            nameCell.className = "py-2 px-4 text-white-700";
             nameCell.textContent = name.name;
             row.appendChild(nameCell);
 
@@ -426,7 +426,7 @@ permalink: /student/submissions
             actionCell.className = "py-2 px-4";
             
             const addButton = document.createElement("button");
-            addButton.className = "px-3 py-1 bg-indigo-500 text-gray rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
+            addButton.className = "px-3 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
             addButton.textContent = "Add";
             addButton.onclick = function() { addName(`${name.name},${name.id}`); };
             
