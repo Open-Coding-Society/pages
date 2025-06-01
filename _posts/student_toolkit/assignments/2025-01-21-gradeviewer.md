@@ -6,21 +6,24 @@ permalink: /student/view-grades
 comments: false
 ---
 
-<div class="min-h-screen bg-neutral-900 text-white">
-  <div class="max-w-5xl mx-auto py-10 px-4">
-    <h2 class="text-2xl font-bold mb-6 text-center">YOUR GRADES</h2>
-    <div class="overflow-x-auto">
-        <table id="gradesTable" class="min-w-full border border-white text-sm text-left">
-            <thead class="text-white">
-                <tr>
-                    <th class="px-4 py-2 border border-white" style="background-color: #404040;">Assignment</th>
-                    <th class="px-4 py-2 border border-white" style="background-color: #404040;">Grade</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Grade rows will be dynamically added here -->
-            </tbody>
+<div class="min-h-screen bg-neutral-900 py-10">
+  <div class="max-w-5xl mx-auto px-4">
+    <!-- Grades Card -->
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold text-white text-center mb-6">Your Grades</h2>
+      <div class="overflow-x-auto">
+        <table id="gradesTable" class="min-w-full divide-y divide-neutral-700 text-white text-sm">
+          <thead class="text-white">
+            <tr>
+              <th class="px-4 py-2 text-left font-bold text-base">Assignment</th>
+              <th class="px-4 py-2 text-left font-bold text-base">Grade</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-neutral-700">
+            <!-- Grade rows will be dynamically added here -->
+          </tbody>
         </table>
+      </div>
     </div>
   </div>
 </div>
