@@ -328,7 +328,6 @@ permalink: /student/submissions
 
         submissions.forEach(submission => {
             const row = document.createElement('tr');
-            row.className = "hover:bg-indigo-50";
             console.log(submission.assignment?.id + " " + assignIndex + "$$$$$");
             if (submission.assignment?.id == assignIndex) {
                 console.log("SKIBBBB");
@@ -414,7 +413,6 @@ permalink: /student/submissions
         tableBody.innerHTML = "";
         names.forEach(name => {
             const row = document.createElement("tr");
-            row.className = "hover:bg-indigo-50";
             let info = [name.name, name.id];
 
             const nameCell = document.createElement("td");
