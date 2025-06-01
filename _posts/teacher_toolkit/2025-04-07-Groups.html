@@ -7,120 +7,218 @@ permalink: /student/groups
 comments: false
 ---
 
+<div class="min-h-screen bg-neutral-900 py-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <!-- Page Title -->
+    <h2 class="text-2xl font-semibold text-white mb-6">Group Management</h2>
 
-<div class="max-w-6xl mx-auto p-4">
-<h2 class="text-2xl font-semibold mb-4">Group Management</h2>
+    <!-- Card Container -->
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
+      <!-- Search bar -->
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search by Group ID or Member Name/Email"
+        class="w-full mb-4 px-3 py-2 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
 
-<!-- Search bar -->
-<input type="text" id="searchInput" placeholder="Search by Group ID or Member Name/Email"
-        class="w-full p-2 border border-gray-300 rounded mb-4">
+      <!-- Table Container -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-neutral-700 text-white">
+          <thead class="bg-neutral-700">
+            <tr>
+              <th class="p-3 text-left text-sm font-medium">Group ID</th>
+              <th class="p-3 text-left text-sm font-medium">Name</th>
+              <th class="p-3 text-left text-sm font-medium">Period</th>
+              <th class="p-3 text-left text-sm font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="groupTableBody" class="divide-y divide-neutral-700">
+            <!-- Rows injected via JS will appear here -->
+          </tbody>
+        </table>
+      </div>
 
-<!-- Table -->
-<div class="overflow-x-auto bg-black shadow rounded">
-    <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-800 text-white">
-        <tr>
-        <th class="p-3 text-left">Group ID</th>
-        <th class="p-3 text-left">Name</th>
-        <th class="p-3 text-left">Period</th>
-        <th class="p-3 text-left">Actions</th>
-        </tr>
-    </thead>
-    <tbody id="groupTableBody" class="divide-y divide-gray-200">
-        <!-- Populated via JS -->
-    </tbody>
-    </table>
-</div>
-
-<!-- Create Group Button -->
-<div class="flex justify-center mt-6">
-    <button id="openCreateModal" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-    Create Group
-    </button>
-</div>
+      <!-- “Create Group” Button -->
+      <div class="flex justify-center mt-6">
+        <button
+          id="openCreateModal"
+          class="bg-indigo-500 hover:bg-indigo-600 text-white font-medium px-5 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        >
+          Create Group
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Create Group Modal -->
-<div id="createGroupModal" class="fixed inset-0 hidden bg-black bg-opacity-75 flex items-center justify-center z-50">
-  <div class="bg-neutral-900 rounded-lg shadow-lg w-full max-w-3xl overflow-y-auto max-h-[90vh] text-white">
-    <div class="flex justify-between items-center p-4 border-b border-gray-700">
+<div
+  id="createGroupModal"
+  class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-neutral-800 rounded-lg shadow-lg w-full max-w-3xl overflow-y-auto max-h-[90vh] text-white">
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center p-4 border-b border-neutral-700">
       <h3 class="text-xl font-semibold">Create New Group</h3>
-      <button class="text-gray-400 hover:text-gray-200" onclick="toggleModal('createGroupModal')">&times;</button>
+      <button
+        class="text-gray-400 hover:text-gray-200"
+        onclick="toggleModal('createGroupModal')"
+      >
+        &times;
+      </button>
     </div>
-    <div class="p-4 space-y-4">
+
+    <!-- Modal Body -->
+    <div class="p-6 space-y-4">
+      <!-- Group Name -->
       <div>
-        <label for="groupNameInput" class="block text-sm font-medium">Group Name</label>
-        <input type="text" id="groupNameInput" placeholder="Enter group name"
-               class="w-full p-2 mt-1 bg-gray-800 border border-gray-700 rounded text-white">
+        <label for="groupNameInput" class="block text-sm font-medium text-gray-200">Group Name</label>
+        <input
+          type="text"
+          id="groupNameInput"
+          placeholder="Enter group name"
+          class="w-full mt-1 px-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
       </div>
+
+      <!-- Group Period -->
       <div>
-        <label for="groupPeriodInput" class="block text-sm font-medium">Group Period</label>
-        <input type="text" id="groupPeriodInput" placeholder="Enter group period"
-               class="w-full p-2 mt-1 bg-gray-800 border border-gray-700 rounded text-white">
+        <label for="groupPeriodInput" class="block text-sm font-medium text-gray-200">Group Period</label>
+        <input
+          type="text"
+          id="groupPeriodInput"
+          placeholder="Enter group period"
+          class="w-full mt-1 px-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
       </div>
-      <div class="border rounded p-4 max-h-[400px] overflow-y-auto bg-gray-800">
-        <input type="text" id="userSearch" placeholder="Search users..."
-               class="w-full p-2 mb-3 bg-gray-700 border border-gray-600 rounded text-white">
+
+      <!-- User List Scroll Area -->
+      <div class="border border-neutral-600 rounded-lg bg-neutral-700 p-4 max-h-[400px] overflow-y-auto">
+        <input
+          type="text"
+          id="userSearch"
+          placeholder="Search users..."
+          class="w-full mb-3 px-3 py-2 bg-neutral-600 border border-neutral-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
         <div id="createUserList" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <!-- Users checkboxes loaded here -->
+          <!-- JS will inject checkboxes here -->
         </div>
       </div>
     </div>
-    <div class="p-4 border-t border-gray-700 flex justify-end gap-2">
-      <button onclick="toggleModal('createGroupModal')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Cancel</button>
-      <button id="createGroupBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Create Group</button>
+
+    <!-- Modal Footer -->
+    <div class="p-4 border-t border-neutral-700 flex justify-end gap-2">
+      <button
+        onclick="toggleModal('createGroupModal')"
+        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-gray-500"
+      >
+        Cancel
+      </button>
+      <button
+        id="createGroupBtn"
+        class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+      >
+        Create Group
+      </button>
     </div>
   </div>
 </div>
 
-<!-- Edit Group Modal (dark-themed) -->
-<div id="editGroupModal" class="fixed inset-0 hidden bg-black bg-opacity-75 flex items-center justify-center z-50">
-  <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl overflow-y-auto max-h-[90vh] text-white">
-    <div class="flex justify-between items-center p-4 border-b border-gray-700">
+<!-- Edit Group Modal -->
+<div
+  id="editGroupModal"
+  class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+  <div class="bg-neutral-800 rounded-lg shadow-lg w-full max-w-3xl overflow-y-auto max-h-[90vh] text-white">
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center p-4 border-b border-neutral-700">
       <h3 class="text-xl font-semibold">Edit Group</h3>
-      <button class="text-gray-400 hover:text-gray-200" onclick="toggleModal('editGroupModal')">&times;</button>
+      <button
+        class="text-gray-400 hover:text-gray-200"
+        onclick="toggleModal('editGroupModal')"
+      >
+        &times;
+      </button>
     </div>
-    <div class="p-4 space-y-4">
+
+    <!-- Modal Body -->
+    <div class="p-6 space-y-4">
       <input type="hidden" id="editGroupId" />
+
+      <!-- Edit Name -->
       <div>
-        <label for="editGroupNameInput" class="block text-sm font-medium">Group Name</label>
-        <input type="text" id="editGroupNameInput" placeholder="Enter group name"
-               class="w-full p-2 mt-1 bg-gray-800 border border-gray-700 rounded text-white">
+        <label for="editGroupNameInput" class="block text-sm font-medium text-gray-200">Group Name</label>
+        <input
+          type="text"
+          id="editGroupNameInput"
+          placeholder="Enter group name"
+          class="w-full mt-1 px-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
       </div>
+
+      <!-- Edit Period -->
       <div>
-        <label for="editGroupPeriodInput" class="block text-sm font-medium">Group Period</label>
-        <input type="text" id="editGroupPeriodInput" placeholder="Enter group period"
-               class="w-full p-2 mt-1 bg-gray-800 border border-gray-700 rounded text-white">
+        <label for="editGroupPeriodInput" class="block text-sm font-medium text-gray-200">Group Period</label>
+        <input
+          type="text"
+          id="editGroupPeriodInput"
+          placeholder="Enter group period"
+          class="w-full mt-1 px-3 py-2 bg-neutral-700 border border-neutral-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
       </div>
-      <div class="border rounded p-4 max-h-[400px] overflow-y-auto bg-gray-800">
-        <input type="text" id="userSearchEdit" placeholder="Search users..."
-               class="w-full p-2 mb-3 bg-gray-700 border border-gray-600 rounded text-white">
+
+      <!-- Edit User List Scroll Area -->
+      <div class="border border-neutral-600 rounded-lg bg-neutral-700 p-4 max-h-[400px] overflow-y-auto">
+        <input
+          type="text"
+          id="userSearchEdit"
+          placeholder="Search users..."
+          class="w-full mb-3 px-3 py-2 bg-neutral-600 border border-neutral-500 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
         <div id="editUserList" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <!-- Users with checkboxes will be loaded here -->
+          <!-- JS will inject checkboxes here -->
         </div>
       </div>
     </div>
-    <div class="p-4 border-t border-gray-700 flex justify-end gap-2">
-      <button onclick="toggleModal('editGroupModal')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Cancel</button>
-      <button id="saveEditGroupBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save Changes</button>
+
+    <!-- Modal Footer -->
+    <div class="p-4 border-t border-neutral-700 flex justify-end gap-2">
+      <button
+        onclick="toggleModal('editGroupModal')"
+        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-gray-500"
+      >
+        Cancel
+      </button>
+      <button
+        id="saveEditGroupBtn"
+        class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+      >
+        Save Changes
+      </button>
     </div>
   </div>
 </div>
+
 
 <script type="module">
 
   // Modal toggle utility
-function toggleModal(id) {
-  const modal = document.getElementById(id);
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    fetchUsers(); // fetch users each time modal opens
-  } else {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  } 
-}
+    function toggleModal(id) {
+    const modal = document.getElementById(id);
+    if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        if (id === "createGroupModal" || id === "editGroupModal") {
+        fetchUsers(); // fetch users only when opening a modal
+        }
+    } else {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+    }
+    window.toggleModal = toggleModal;
+
 
 function fetchUsers() {
   fetch(personURL, fetchOptions)
@@ -177,10 +275,10 @@ function getTable() {
           <td>${name}</td>
           <td>${period}</td>
           <td class="space-x-2">
-            <button class="bg-blue-500 text-white px-2 py-1 rounded toggle-members" data-target="members-${groupId}">
+            <button class="bg-blue-500 text-black px-2 py-1 rounded toggle-members" data-target="members-${groupId}">
               View Members
             </button>
-            <button class="bg-yellow-400 text-black px-2 py-1 rounded edit-group" data-groupid="${groupId}" data-name="${name}" data-period="${period}">
+            <button class="bg-blue-500 text-black px-2 py-1 rounded edit-group" data-groupid="${groupId}" data-name="${name}" data-period="${period}">
               Edit
             </button>
           </td>
