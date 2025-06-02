@@ -1,7 +1,7 @@
 ---
 layout: tailwind
 title: Your Analytics
-permalink: /analytics
+permalink: /student/analytics
 search_exclude: true
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Grade Analytics 
-permalink: /student/analytics
+permalink: /student/analytics2
 search_exclude: true
 show_reading_time: false 
 ---
