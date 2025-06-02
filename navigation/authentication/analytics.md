@@ -71,11 +71,109 @@ search_exclude: true
             <div class="chart-section" id="userGradeSection">
                 <h2 class="text-xl font-semibold mb-2">🎓 Your Grade</h2>
                 <p id="userGrade">Loading your grade...</p>
-                <button id="predictGradeBtn" class="mt-2 px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700 transition">Predict Grade</button>
+                <div class="flex gap-3 mt-2">
+                    <button id="predictGradeBtn" class="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-700 transition">Predict Grade</button>
+                    <button id="smartPredictBtn" class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition">Smart Predict Grade</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script type="module">
+    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+    const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
+    const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
+    const commitsUrl = `${pythonURI}/api/analytics/github/user/commits`;
+    const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
+    const issuesUrl = `${pythonURI}/api/analytics/github/user/issues`;
+
+    async function fetchData() {
+        try {
+            const profileLinksRequest = fetch(profileLinksUrl, fetchOptions);
+            const userProfileRequest = fetch(userProfileUrl, fetchOptions);
+            const commitsRequest = fetch(commitsUrl, fetchOptions);
+            const prsRequest = fetch(prsUrl, fetchOptions);
+            const issuesRequest = fetch(issuesUrl, fetchOptions);
+
+            const [profileLinksResponse, userProfileResponse, commitsResponse, prsResponse, issuesResponse] = await Promise.all([
+                profileLinksRequest,
+                userProfileRequest,
+                commitsRequest,
+                prsRequest,
+                issuesRequest
+            ]);
+
+            if (!profileLinksResponse.ok || !userProfileResponse.ok || !commitsResponse.ok || !prsResponse.ok || !issuesResponse.ok) {
+                throw new Error('Failed to fetch one or more resources');
+            }
+
+            const profileLinks = await profileLinksResponse.json();
+            const userProfile = await userProfileResponse.json();
+            const commitsData = await commitsResponse.json();
+            const prsData = await prsResponse.json();
+            const issuesData = await issuesResponse.json();
+
+            const commitsArray = commitsData.details_of_commits || [];
+            const commitsCount = commitsData.total_commit_contributions || 0;
+
+            function calculateGradeFromCommits(commitCount) {
+                if (commitCount > 20) return "90 % (A)";
+                if (commitCount >= 10) return "85 % (B)";
+                if (commitCount >= 5) return "75 % (C)";
+                return "55 % (F)";
+            }
+
+            document.getElementById('predictGradeBtn').addEventListener('click', () => {
+                const commitGrade = calculateGradeFromCommits(commitsData.total_commit_contributions || 0);
+                document.getElementById('userGrade').textContent = `Predicted Grade (by Commits): ${commitGrade}`;
+            });
+
+            document.getElementById('smartPredictBtn').addEventListener('click', () => {
+                const commits = commitsData.total_commit_contributions || 0;
+                const additions = commitsData.total_lines_added || 0;
+                const deletions = commitsData.total_lines_deleted || 0;
+                const prs = prsData.total_pull_requests || 0;
+                const issues = issuesData.total_issues || 0;
+                const repos = userProfile.public_repos || 0;
+                const gists = userProfile.public_gists || 0;
+                const followers = userProfile.followers || 0;
+                const following = userProfile.following || 0;
+
+                let score = 0;
+                score += commits * 2;
+                score += additions * 0.15;
+                score += deletions * 0.1;
+                score += prs * 3;
+                score += issues * 1.5;
+                score += repos * 1.2;
+                score += gists * 0.5;
+                score += followers * 0.3;
+                score += following * 0.1;
+
+                let grade = '';
+                if (score > 70) {
+                    grade = '90% (A)';
+                } else if (score > 50) {
+                    grade = '80% (B)';
+                } else if (score > 30) {
+                    grade = '70% (C)';
+                } else {
+                    grade = '55% (F)';
+                }
+
+                document.getElementById('userGrade').textContent = `Smart Predicted Grade: ${grade}`;
+            });
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('userGrade').textContent = 'Error predicting grade.';
+        }
+    }
+
+    fetchData();
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
