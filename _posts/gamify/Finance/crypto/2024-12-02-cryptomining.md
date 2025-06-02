@@ -1,6 +1,7 @@
 ---
-layout: fortunefinders
+layout: finance
 title: Crypto Mining Simulator
+type: issueshen i
 permalink: /crypto/mining
 ---
 
@@ -22,6 +23,12 @@ permalink: /crypto/mining
         <div class="tutorial-help-button fixed top-6 right-6 z-50" title="Interactive Tutorial">
             <button onclick="startTutorial()" class="bg-gray-800 hover:bg-gray-700 text-green-500 w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 border border-green-500/30">
                 <span class="text-lg font-bold">?</span>
+            </button>
+        </div>
+        <!-- Volume Control Button -->
+        <div class="volume-control fixed top-6 right-20 z-50" title="Toggle Sound">
+            <button onclick="audioManager.toggleMute()" class="bg-gray-800 hover:bg-gray-700 text-blue-500 w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/30">
+                <span class="text-lg font-bold" id="volume-icon">🔊</span>
             </button>
         </div>
         <div class="container mx-auto pt-24">
