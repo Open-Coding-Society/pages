@@ -1,7 +1,7 @@
 /* Reset base styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #0f0f0f;
+    background-color: rgba(32, 32, 46, 0.95); /* Made slightly transparent */
     color: #fff;
     margin: 0;
     padding: 0;
@@ -11,7 +11,8 @@ body {
 .main-content {
     padding: 1rem;
     position: relative;
-    z-index: 0; /* Lower z-index to stay below navbar */
+    z-index: 1; /* Ensure content is above particles */
+    padding-top: 1rem;
 }
 /* Title styles */
 .page-title {
@@ -32,8 +33,9 @@ body {
 .gpu-shop-modal,
 .active-gpus-modal,
 .tutorial-welcome,
-.notification {
-    z-index: 1000; /* Consistent z-index for modals */
+.notification,
+.navbar {
+    z-index: 1000; /* Keep these above everything */
 }
 .notification { /* This entire style, ".notification", is what makes the notification pops out from the top right! */
     position: fixed;
@@ -810,4 +812,107 @@ body.modal-open {
 
 .volume-control button.muted:hover {
     opacity: 0.8;
+}
+
+/* Top Control Bar */
+.top-control-bar {
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(75, 85, 99, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+/* Crypto-themed floating animations */
+#crypto-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0; /* Place behind content */
+    background: transparent;
+}
+
+#crypto-particles canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.crypto-particle {
+    position: absolute;
+    background: transparent;
+    pointer-events: none;
+    opacity: 0.6;
+    animation: float-up 15s linear infinite;
+}
+
+.crypto-particle::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.crypto-particle.bitcoin::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f7931a'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+}
+
+.crypto-particle.ethereum::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23627eea'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+}
+
+.crypto-particle.hash::before {
+    content: '#';
+    color: #00ff00;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.crypto-particle.binary::before {
+    content: '01';
+    color: #00ffff;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 0.8em;
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Add some random movement to particles */
+.crypto-particle:nth-child(odd) {
+    animation: float-up 15s linear infinite, sway 3s ease-in-out infinite;
+}
+
+.crypto-particle:nth-child(even) {
+    animation: float-up 15s linear infinite, sway 3s ease-in-out infinite reverse;
+}
+
+@keyframes sway {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(20px);
+    }
 }

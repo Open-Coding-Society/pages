@@ -1,7 +1,6 @@
 ---
-layout: finance
+layout: fortunefinders
 title: Crypto Mining Simulator
-type: issueshen i
 permalink: /crypto/mining
 ---
 
@@ -19,19 +18,7 @@ permalink: /crypto/mining
     <link rel="stylesheet" href="{{site.baseurl}}/assets/css/crypto.css"/>
     <div id="notification" class="notification"></div>
     <div class="main-content">
-        <!-- Tutorial Help Button -->
-        <div class="tutorial-help-button fixed top-6 right-6 z-50" title="Interactive Tutorial">
-            <button onclick="startTutorial()" class="bg-gray-800 hover:bg-gray-700 text-green-500 w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 border border-green-500/30">
-                <span class="text-lg font-bold">?</span>
-            </button>
-        </div>
-        <!-- Volume Control Button -->
-        <div class="volume-control fixed top-6 right-20 z-50" title="Toggle Sound">
-            <button onclick="audioManager.toggleMute()" class="bg-gray-800 hover:bg-gray-700 text-blue-500 w-8 h-8 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/30">
-                <span class="text-lg font-bold" id="volume-icon">🔊</span>
-            </button>
-        </div>
-        <div class="container mx-auto pt-24">
+        <div class="container mx-auto pt-20">
             <!-- Core Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Wallet -->
@@ -153,6 +140,18 @@ permalink: /crypto/mining
                     <a href="{{site.baseurl}}/crypto/energy-store" class="mining-button energy-store">
                         <span>Energy Store</span>
                     </a>
+                    <!-- Volume Control Button -->
+                    <div class="volume-control" title="Toggle Sound">
+                        <button onclick="audioManager.toggleMute()" class="mining-button bg-gray-800 hover:bg-gray-700 text-blue-500 w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/30">
+                            <span class="text-lg font-bold" id="volume-icon">🔊</span>
+                        </button>
+                    </div>
+                    <!-- Tutorial Help Button -->
+                    <div class="tutorial-help-button" title="Interactive Tutorial">
+                        <button onclick="startTutorial()" class="mining-button bg-gray-800 hover:bg-gray-700 text-green-500 w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 border border-green-500/30">
+                            <span class="text-lg font-bold">?</span>
+                        </button>
+                    </div>
                 </div>
                 <!-- Mining Countdown Timer -->
                 <div id="mining-countdown" class="mt-4 hidden">
