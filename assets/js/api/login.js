@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                             <a href="${baseurl}/logout">Logout</a>
                             <a href="${baseurl}/gamify/fortuneFinders">Gamify</a>
-                            <a href="${baseurl}/analytics">Analytics</a>
+
                         </div>
                     </div>
                 `;
