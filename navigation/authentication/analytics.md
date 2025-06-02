@@ -413,22 +413,25 @@ search_exclude: true
             }
 
             const data = await response.json();
-            const commitData = data.commits?.details_of_commits || [];
-            const commitCount = data.commits?.total_commit_contributions || 0;
 
-            // Create and style summary card using CSS class
+            const commitData = data.commits?.details_of_commits || data.details_of_commits || [];
+            const commitCount = data.commits?.total_commit_contributions || data.total_commit_contributions || 0;
+            const totalAdditions = data.commits?.total_lines_added || data.total_lines_added || 0;
+            const totalDeletions = data.commits?.total_lines_deleted || data.total_lines_deleted || 0;
+
             const summaryCard = document.createElement("div");
             summaryCard.className = "summary-card bg-slate-800 text-white p-5 rounded-lg shadow max-w-xs text-center";
 
             summaryCard.innerHTML = `
-                <img src="https://github.com/identicons/${uid}.png" alt="Avatar">
+                <img src="https://github.com/identicons/${uid}.png" alt="Avatar" class="mx-auto rounded-full w-20 h-20 mb-3">
                 <p><strong>UID:</strong> ${uid}</p>
                 <p><strong>Total Commits:</strong> ${commitCount}</p>
+                <p><strong>Total Additions:</strong> +${totalAdditions}</p>
+                <p><strong>Total Deletions:</strong> -${totalDeletions}</p>
             `;
 
             summaryContainer.appendChild(summaryCard);
 
-            // Render commit cards in separate container
             renderCommitCards(commitData, uid, commitContainer);
         } catch (e) {
             errorEl.textContent = "Unexpected error.";
