@@ -131,6 +131,9 @@ search_exclude: true
 
             const commitsArray = commitsData.details_of_commits || [];
             const commitsCount = commitsData.total_commit_contributions || 0;
+            const totalAdditions = commitsData.total_lines_added || 0;
+            const totalDeletions = commitsData.total_lines_deleted || 0;
+            document.getElementById('line-change').textContent = `➕ Total Additions: ${totalAdditions}, ➖ Deletions: ${totalDeletions}`;
 
             function calculateGradeFromCommits(commitCount) {
                 if (commitCount > 20) return "90 % (A) ";
@@ -202,23 +205,11 @@ search_exclude: true
             return;
         }
 
-        let allCommits = [];
-        for (const item of commitsArray) {
-            const repo = item.repository?.nameWithOwner || "Unknown Repo";
-            const nodes = item.contributions?.nodes || [];
+        // Sort commits by date (most recent first)
+        commitsArray.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            for (const node of nodes) {
-                allCommits.push({
-                    repo,
-                    message: `🧾 ${node.commitCount} commit${node.commitCount > 1 ? 's' : ''}`,
-                    date: node.occurredAt || node.committedDate || node.pushedDate || "Unknown date"
-                });
-            }
-        }
-
-        allCommits.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        allCommits.slice(0, 10).forEach((commit, index) => {
+        // Limit to 10 most recent commits
+        commitsArray.slice(0, 10).forEach((commit, index) => {
             const card = document.createElement("div");
             card.className = "card animate__animated animate__fadeInUp";
             card.style.backgroundColor = "#34495e";
@@ -229,16 +220,26 @@ search_exclude: true
             card.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
             card.style.animationDelay = `${index * 0.1}s`;
 
+            // Repo name (with link to commit URL)
             const repoLink = document.createElement("a");
-            repoLink.href = `https://github.com/${commit.repo}`;
+            repoLink.href = commit.url;
             repoLink.target = "_blank";
-            repoLink.textContent = commit.repo;
+            repoLink.textContent = commit.repository;
             repoLink.style.color = "#1abc9c";
             repoLink.style.textDecoration = "none";
+            repoLink.style.fontWeight = "bold";
 
+            // Commit message
             const message = document.createElement("p");
             message.textContent = `📝 ${commit.message}`;
 
+            // Additions and deletions
+            const linesChanged = document.createElement("p");
+            linesChanged.textContent = `➕ +${commit.additions} / ➖ -${commit.deletions}`;
+            linesChanged.style.fontSize = "0.9em";
+            linesChanged.style.color = "#ccc";
+
+            // Commit date
             const dateOnly = new Date(commit.date).toLocaleDateString(undefined, {
                 year: 'numeric',
                 month: 'short',
@@ -250,13 +251,17 @@ search_exclude: true
             dateElement.style.fontSize = "0.9em";
             dateElement.style.color = "#bbb";
 
+            // Append elements to card
             card.appendChild(repoLink);
             card.appendChild(message);
+            card.appendChild(linesChanged);
             card.appendChild(dateElement);
 
+            // Append card to container
             container.appendChild(card);
         });
     }
+
 
     function jsonToHtml(json) {
         const jsonString = JSON.stringify(json, null, 2);
