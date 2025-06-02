@@ -1,4 +1,5 @@
 import { login, pythonURI, javaURI, fetchOptions } from '../api/config.js';
+import audioManager from './audio.js';
 
 console.log("front.js is loaded.");
 
@@ -29,37 +30,13 @@ async function fetchUser() {
       userEmail = userInfo.email;
       console.log("Successfully fetched user email:", userEmail);
       localStorage.setItem("userEmail", userEmail);
-      
-      // Initialize user data
-      try {
-        const initData = await initializeUserIfNeeded();
-        console.log('Initialization result:', initData);
-        
-        // Update UI with initial data if available
-        if (initData && initData.bank) {
-          updateBalance(initData.bank.balance);
-        } else {
-          // Set default balance if bank data is not available
-          updateBalance("0.00");
-        }
-      } catch (initError) {
-        console.warn("Error during initialization:", initError);
-        // Set default balance on initialization error
-        updateBalance("0.00");
-      }
-      
-      // Try to fetch mining state
-      await initializeMiningState();
-      
+      fetchUserBalance(); // Fetch balance after getting the email
     } else if (response.status === 401 || response.status === 201) {
       console.log("Guest user detected");
       document.getElementById('user-balance').innerText = "0.00";
     }
   } catch (error) {
     console.error("Error fetching user:", error);
-    // Set default balance on error
-    document.getElementById('user-balance').innerText = "0.00";
-    showNotification('Error loading user data. Please refresh the page.', true);
   }
 }
 
@@ -356,11 +333,13 @@ window.toggleMining = async function () {
         if (result.isMining) {
             startPeriodicUpdates();
             startCountdown();
-            showNotification('Mining started successfully');
+            audioManager.play('miningStart');
+            audioManager.toggleBGM(); // Start BGM when mining starts
         } else {
             stopPeriodicUpdates();
             stopCountdown();
-            showNotification('Mining stopped');
+            audioManager.play('miningStop');
+            audioManager.stopAll(); // Stop BGM when mining stops
         }
         
         // Update all balances after mining state change
@@ -651,38 +630,6 @@ async function updateMiningStats() {
     }
 }
 
-// GPU Temperature Animation
-let currentGpuTemp = 0;
-let gpuTempAnimationFrame = null;
-
-function animateGpuTemp(targetTemp) {
-    cancelAnimationFrame(gpuTempAnimationFrame);
-    function step() {
-        // Smoothly approach the target temperature
-        const diff = targetTemp - currentGpuTemp;
-        if (Math.abs(diff) < 0.1) {
-            currentGpuTemp = targetTemp;
-        } else {
-            currentGpuTemp += diff * 0.01; // Slower animation 
-        }
-        // Update the display
-        const tempElement = document.getElementById('gpu-temp');
-        tempElement.textContent = `${currentGpuTemp.toFixed(1)}°C`;
-        // Update color
-        if (currentGpuTemp >= 80) {
-            tempElement.className = 'stat-value text-red-500';
-        } else if (currentGpuTemp >= 70) {
-            tempElement.className = 'stat-value text-yellow-500';
-        } else {
-            tempElement.className = 'stat-value text-green-500';
-        }
-        if (currentGpuTemp !== targetTemp) {
-            gpuTempAnimationFrame = requestAnimationFrame(step);
-        }
-    }
-    gpuTempAnimationFrame = requestAnimationFrame(step);
-}
-
 // UI Updates
 function updateDisplay(stats) {
     // Log incoming data
@@ -723,9 +670,7 @@ function updateDisplay(stats) {
     const basePower = parseFloat(stats.powerConsumption) || 0;
     // Calculate new values with fluctuations
     const newTemp = Math.max(30, Math.min(90, baseTemp + tempVariation)); // Keep between 30-90°C
-    const newPower = Math.max(0, basePower + powerVariation);
-    // Animate GPU temperature
-    animateGpuTemp(stats.isMining ? newTemp : 0);
+    const newPower = Math.max(0, basePower + powerVariation); // Keep above 0W
     // Update display elements
     document.getElementById('hashrate').textContent = `${(parseFloat(stats.hashrate) || 0).toFixed(2)} MH/s`;
     document.getElementById('shares').textContent = stats.shares || 0;
@@ -740,6 +685,15 @@ function updateDisplay(stats) {
             `${activeGPUs} Active of ${totalGPUs} GPUs (Click to view)`;
     } else {
         document.getElementById('current-gpu').textContent = 'No GPUs';
+    }
+    // Add color indicators for temperature
+    const tempElement = document.getElementById('gpu-temp');
+    if (newTemp >= 80) {
+        tempElement.className = 'stat-value text-red-500'; // Hot
+    } else if (newTemp >= 70) {
+        tempElement.className = 'stat-value text-yellow-500'; // Warm
+    } else {
+        tempElement.className = 'stat-value text-green-500'; // Good
     }
     // Store stats globally for modal access
     window.stats = stats;
@@ -1319,54 +1273,3 @@ window.addEventListener('offline', () => {
     showNotification('You are offline', true);
     stopPeriodicUpdates();
 });
-
-async function initializeUserIfNeeded() {
-    try {
-        // First try to get mining state
-        const stateResponse = await fetch(`${javaURI}/api/mining/state`, fetchOptions);
-        if (stateResponse.ok) {
-            console.log('Mining state exists, no initialization needed');
-            return;
-        }
-
-        // If mining state fails, try to initialize
-        console.log('Attempting to initialize user...');
-        const response = await fetch(`${javaURI}/api/mining/init/user?email=${userEmail}`, {
-            method: 'GET', // Changed from POST to GET
-            ...fetchOptions
-        });
-        
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.log('Initialization endpoint not found, using fallback data');
-                // Use fallback data
-                const fallbackData = {
-                    bank: { balance: 1000.0 },
-                    miningUser: {
-                        email: userEmail,
-                        energyPlan: { name: 'Basic Plan', EEM: 0.12 }
-                    }
-                };
-                console.log('Using fallback data:', fallbackData);
-                return fallbackData;
-            }
-            throw new Error(`Failed to initialize user: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('User initialized:', data);
-        return data;
-        
-    } catch (error) {
-        console.error('Error initializing user:', error);
-        showNotification('Error initializing user data. Using fallback data.', true);
-        // Return fallback data
-        return {
-            bank: { balance: 1000.0 },
-            miningUser: {
-                email: userEmail,
-                energyPlan: { name: 'Basic Plan', EEM: 0.12 }
-            }
-        };
-    }
-}
