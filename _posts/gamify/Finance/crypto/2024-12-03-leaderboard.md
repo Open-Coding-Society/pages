@@ -4,6 +4,7 @@ permalink: /leaderboard/overall-leaderboard
 title: Leaderboard
 ---
 
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +13,6 @@ title: Leaderboard
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* General Styles */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #121212;
