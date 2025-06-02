@@ -7,103 +7,98 @@ permalink: /student/submissions
 
 <div class="container mx-auto px-4 py-8 max-w-3xl">
     <div class="bg-transparent rounded-lg shadow-lg p-6 mb-6">
-        <h1 class="text-3xl font-bold text-indigo-700 mb-6 border-b pb-2">Assignment Submissions</h1>
-        
-        <div class="mb-4">
+        <h1 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-2">Assignment Submissions</h1>
+        <div class="mb-4 flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700">Enable group submissions</span>
             <label class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="myToggle" class="sr-only peer">
-                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                <span class="ml-3 text-sm font-medium text-gray-700">Enable group submissions</span>
+                <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gray-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-600"></div>
             </label>
         </div>
-
         <div class="space-y-4">
-            <div>
-                <select id="assignment-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="flex justify-between items-center">
+                <label for="assignment-select" class="text-sm font-medium text-gray-700">Assignment</label>
+                <select id="assignment-select" class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
                     <option value="" disabled selected>Select an Assignment</option>
                 </select>
             </div>
-            
-            <div id="Assignment-Content" class="p-4 bg-opacity-75 bg-blue-50 rounded-md mb-4 border-l-4 border-indigo-500 text-gray-700">
+            <div id="Assignment-Content" class="p-4 bg-gray-100 rounded-md mb-4 border-l-4 border-gray-500 text-gray-800">
                 Assignment-Content
             </div>
-            
-            <div id="timer-container" class="p-3 rounded-md border">
-                <p id="time-left" class="font-bold">Select assignment to view time left here</p>
+            <div id="timer-container" class="p-3 rounded-md border border-gray-400">
+                <p id="time-left" class="font-bold text-gray-700">Select assignment to view time left here</p>
+            </div>
+            <div id="Group Submit" class="hidden space-y-4 mt-6 p-4 rounded-md border border-gray-400">
+                <div class="flex justify-between items-center">
+                    <label for="searchBar" class="text-sm font-medium text-gray-700">Search Group Members</label>
+                    <input type="text" id="searchBar" placeholder="Search for a name..." onkeyup="filterNames()"
+                        class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                </div>
+                <div class="flex items-center">
+                    <label for="rowsPerPage" class="text-sm font-medium text-gray-700 mr-2">Rows per page:</label>
+                    <select id="rowsPerPage" onchange="changeRowsPerPage()"
+                        class="px-2 py-1 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="1000">1000</option>
+                        <option value="2000">2000</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-gray-100 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="py-2 px-4 text-left text-gray-700">Name</th>
+                                <th class="py-2 px-4 text-left text-gray-700">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="namesTableBody" class="divide-y divide-gray-300"></tbody>
+                    </table>
+                </div>
+                <div id="Review-Group" class="p-3 rounded-md font-medium text-gray-700 border border-gray-400">
+                    Group Members:
+                </div>
             </div>
 
-            <div id="Group Submit" class="hidden space-y-4 mt-6 p-4 rounded-md border border-green-300">
-            <div>
-                <input type="text" id="searchBar" placeholder="Search for a name..." onkeyup="filterNames()" 
-                    class="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="flex justify-between items-center mt-4">
+                <label for="submissionContent" class="text-sm font-medium text-gray-700">Submission Content</label>
+                <textarea id="submissionContent" rows="5" required
+                    class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"></textarea>
             </div>
-            
-            <div class="flex items-center">
-                <label for="rowsPerPage" class="text-sm font-medium text-gray-700 mr-2">Rows per page: </label>
-                <select id="rowsPerPage" onchange="changeRowsPerPage()" 
-                        class="px-2 py-1 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="1000">1000</option>
-                    <option value="2000">2000</option>
-                </select>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white bg-opacity-50 rounded-lg overflow-hidden">
-                    <thead class="bg-green-100 bg-opacity-75">
-                        <tr>
-                            <th class="py-2 px-4 text-left text-green-700">Name</th>
-                            <th class="py-2 px-4 text-left text-green-700">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="namesTableBody" class="divide-y divide-gray-200"></tbody>
-                </table>
-            </div>
-            
-            <div id="Review-Group" class="p-3 rounded-md font-medium text-green-700 border border-green-300">
-                Group Members: 
-            </div>
-        </div>
-            
-            <div class="mt-4">
-                <label for="submissionContent" class="block text-sm font-medium text-gray-700 mb-1">Submission Content:</label>
-                <textarea id="submissionContent" rows="5" required 
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-            </div>
-            
-            <div class="mt-4">
-                <label for="comments" class="block text-sm font-medium text-gray-700 mb-1">Comments:</label>
-                <textarea id="comments" rows="5" 
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+
+            <div class="flex justify-between items-center mt-4">
+                <label for="comments" class="text-sm font-medium text-gray-700">Comments</label>
+                <textarea id="comments" rows="5"
+                    class="w-2/3 px-3 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"></textarea>
             </div>
 
             <div class="mt-6">
-                <button id="submit-assignment" class="w-full md:w-auto px-6 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                <button id="submit-assignment"
+                    class="w-full md:w-auto px-6 py-3 bg-gray-700 text-white font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600 transition">
                     Submit Assignment
                 </button>
             </div>
-            
+
             <div id="outputBox" class="mt-4 p-3 rounded-md"></div>
 
             <div class="mt-8">
-                <h1 class="text-2xl font-bold text-indigo-700 mb-2">Previous Submissions for: </h1>
+                <h1 class="text-2xl font-bold text-gray-700 mb-2">Previous Submissions for:</h1>
                 <div id="Assignment-name" class="text-lg font-medium text-gray-700 mb-4">Assignment-Content</div>
-                
+
                 <div class="overflow-x-auto">
-                    <table id="submissions-table" class="min-w-full bg-white bg-opacity-50 rounded-lg overflow-hidden">
-                        <thead class="bg-indigo-100 bg-opacity-75">
+                    <table id="submissions-table" class="min-w-full bg-gray-100 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-200">
                             <tr>
                                 <th class="py-2 px-4 text-left text-gray-700">Submission Content</th>
                                 <th class="py-2 px-4 text-left text-gray-700">Grade</th>
                                 <th class="py-2 px-4 text-left text-gray-700">Feedback</th>
                             </tr>
                         </thead>
-                        <tbody id="submissions-tbody" class="divide-y divide-gray-200">
+                        <tbody id="submissions-tbody" class="divide-y divide-gray-300">
                             <!-- Submissions will be populated here -->
                         </tbody>
                     </table>
@@ -112,7 +107,6 @@ permalink: /student/submissions
         </div>
     </div>
 </div>
-
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     let selectedTask = "";

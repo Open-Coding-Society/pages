@@ -158,7 +158,7 @@ active_tab: profile
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
     // external functions
-    import { fetchUserData } from '{{site.baseurl}}/assets/js/Aesthetihawk/profile/fetchUserData.js';
+    import { getUserData } from '{{site.baseurl}}/assets/js/Aesthetihawk/profile/getUserData.js';
     import { setUserData } from '{{site.baseurl}}/assets/js/Aesthetihawk/profile/setUserData.js';
 
 
@@ -207,8 +207,8 @@ active_tab: profile
         }
     };
 
-    
-    window.fetchUserData = fetchUserData; // get the data
+
+    window.getUserData = getUserData; // get the data
     window.setUserData = setUserData; // setting the user data to display
     document.addEventListener("DOMContentLoaded", async () => {
         try {

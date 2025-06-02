@@ -362,7 +362,9 @@ async function handleReturningUser(currentAway) {
     
     try {
         // Send usage time to database
-        await recordBathroomUsage(currentAway, timeRange);
+        const users = loadUsers();
+        const studentId = users[currentAway];
+        await recordBathroomUsage(studentId, timeRange);
         
         // Update UI immediately
         document.getElementById('current-away').innerHTML = 'Nobody';
@@ -385,7 +387,7 @@ async function recordBathroomUsage(studentEmail, timeRange) {
     if (!studentEmail || studentEmail === 'Nobody' || studentEmail === 'None') return;
     
     const tinkleBody = {
-        studentEmail: studentEmail,
+        sid: studentEmail,
         timeIn: timeRange
     };
     
@@ -667,8 +669,10 @@ function autoRemoveQueue() {
         const timeIn = getTime();
         const time = formatTimeRange(timeOut, timeIn);
         
+        const users = loadUsers();
+        const studentId = users[currentAway];  
         // Submit time data
-        recordBathroomUsage(currentAway, time);
+        recordBathroomUsage(studentId, time);
         
         // Clear user
         removeUser(currentAway);

@@ -385,6 +385,7 @@ class GameLevelAirport {
     cryptoModal.style.zIndex = "1000";
     document.body.appendChild(cryptoModal);
 
+
     const iframeWrapper = document.createElement("div");
     iframeWrapper.id = "cryptoFrameWrapper";
     iframeWrapper.style.position = "relative";
@@ -400,9 +401,9 @@ class GameLevelAirport {
     const cryptoFrame = document.createElement("iframe");
     cryptoFrame.id = "cryptoFrame";
     cryptoFrame.style.width = "100%";
-    cryptoFrame.style.height = "110%";
+    cryptoFrame.style.height = "160%"; // Increased height to accommodate more cropping
     cryptoFrame.style.position = "absolute";
-    cryptoFrame.style.top = "-10%";
+    cryptoFrame.style.top = "-40%"; // Move further up to completely hide gray banner and yellow section
     cryptoFrame.style.left = "0";
     cryptoFrame.style.border = "none";
     iframeWrapper.appendChild(cryptoFrame);
