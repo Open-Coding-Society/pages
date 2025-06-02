@@ -1,0 +1,249 @@
+---
+layout: base
+---
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<nav class="custom-navbar">
+    <div class="custom-navbar-content">
+  <div class="nav-links">
+
+    <div class="dropdown">
+      <button class="dropdown-toggle">Bank</button>
+      <div class="dropdown-menu">
+        <a 
+          href="{{ site.baseurl }}/gamify/bankanalytics" 
+          class="dropdown-item" 
+          data-npc="Bank-NPC"
+        >
+          Analytics
+        </a>
+        <a 
+          href="{{ site.baseurl }}/leaderboard/overall-leaderboard" 
+          class="dropdown-item" 
+          data-npc="Bank-NPC"
+        >
+          Leaderboard
+        </a>
+        <a 
+          href="{{ site.baseurl }}/gamify/loan" 
+          class="dropdown-item" 
+          data-npc="Bank-NPC"
+        >
+          Loans
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+    <div class="nav-balance">
+      <i class="bi bi-coin"></i>
+      <span id="navbarBalance">$---.--</span>
+    </div>
+  </div>
+
+</nav>
+
+{{ content }}
+
+<script type="module">
+  import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+  async function loadGameBalance() {
+    try {
+      const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error("Response is not JSON");
+      }
+      const userData = await response.json();
+      const balanceElement = document.getElementById('gameBalance');
+      if (balanceElement) {
+        balanceElement.textContent = `$${Number(userData.banks.balance).toFixed(2)}`;
+      }
+    } catch (error) {
+      console.error("Error loading game balance:", error);
+      const balanceElement = document.getElementById('gameBalance');
+      if (balanceElement) {
+        balanceElement.textContent = "$0.00";
+      }
+    }
+  }
+  async function getNpcProgress(personId) {
+      try {
+          const response = await fetch(`${javaURI}/bank/${personId}/npcProgress`, this.fetchOptions);
+          if (!response.ok) {
+              throw new Error("Failed to fetch questions");
+          }
+          const npcProgressDictionary = await response.json();
+          console.log(npcProgressDictionary);
+          return npcProgressDictionary
+      } catch (error) {
+          console.error("Error fetching Npc Progress:", error);
+          return null;
+      }
+  }
+
+  async function applyNpcLocks(game) {
+   
+    try {
+      const npcProgress = await getNpcProgress(game.id);
+      document.querySelectorAll('.dropdown-item[data-npc]').forEach(el => {
+        const key = el.getAttribute('data-npc');
+        if (npcProgress[key] === false) {
+          el.classList.add('locked');
+        } else {
+          el.classList.remove('locked');
+        }
+      });
+    } catch (err) {
+      console.error("Error applying NPC locks:", err);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    applyNpcLocks(window.game);
+  });
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadGameBalance();
+  setInterval(loadGameBalance, 30000);
+});
+</script>
+
+
+<style>
+  .dropdown-item.locked {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #cccccc !important;
+  }
+  .dropdown-item.locked::before {
+    content: "\f023";
+    font-family: "bootstrap-icons";
+    margin-right: 6px;
+    color: #cccccc;
+  }
+
+  .custom-navbar {
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    margin-bottom: 20px;
+  }
+
+  .custom-navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+  }
+
+  .nav-link:hover {
+    color: #ff9800;
+    }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-toggle {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+  }
+
+  .dropdown-toggle:hover {
+    color: #ff9800;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; 
+    left: 0;
+    background-color: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 10px 0;
+    min-width: 150px;
+    z-index: 9999;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    display: block;
+  }
+
+  .dropdown-item {
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+
+  .dropdown-item:hover {
+    background-color: #ff9800;
+    color: #1c1c1c;
+  }
+
+
+  .ff-game-bar {
+    margin: 20px 0;
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .ff-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 20px;
+  }
+
+  .ff-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ff-title {
+    color: #ffffff;
+  }
+
+  .nav-balance {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    font-size: 16px;
+    gap: 6px;
+  }
+
+  .nav-balance i {
+    font-size: 20px;
+    color: #ff9800;
+  }
+</style>

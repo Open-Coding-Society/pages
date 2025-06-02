@@ -108,7 +108,8 @@ comments: false
 </div>
 
 <script type="module">
-// Modal toggle utility
+
+  // Modal toggle utility
 function toggleModal(id) {
   const modal = document.getElementById(id);
   if (modal.classList.contains("hidden")) {
@@ -119,6 +120,28 @@ function toggleModal(id) {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   } 
+}
+
+function fetchUsers() {
+  fetch(personURL, fetchOptions)
+    .then((response) => response.json())
+    .then((users) => {
+      const userList = document.getElementById("createUserList");
+      userList.innerHTML = "";
+
+      users.forEach((user) => {
+        const div = document.createElement("div");
+        div.className = "form-check";
+        div.innerHTML = `
+          <label class="inline-flex items-center">
+            <input type="checkbox" class="user-checkbox mr-2" value="${user.id}">
+            ${user.name} (${user.email})
+          </label>
+        `;
+        userList.appendChild(div);
+      });
+    })
+    .catch((err) => console.error("Error loading users:", err));
 }
 
 // Environment setup
@@ -218,28 +241,6 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
     if (details) details.style.display = match ? "" : "none";
   });
 });
-
-function fetchUsers() {
-  fetch(personURL, fetchOptions)
-    .then((response) => response.json())
-    .then((users) => {
-      const userList = document.getElementById("createUserList");
-      userList.innerHTML = "";
-
-      users.forEach((user) => {
-        const div = document.createElement("div");
-        div.className = "form-check";
-        div.innerHTML = `
-          <label class="inline-flex items-center">
-            <input type="checkbox" class="user-checkbox mr-2" value="${user.id}">
-            ${user.name} (${user.email})
-          </label>
-        `;
-        userList.appendChild(div);
-      });
-    })
-    .catch((err) => console.error("Error loading users:", err));
-}
 
 document.getElementById("createGroupBtn").addEventListener("click", () => {
   const selectedUserIds = Array.from(
@@ -451,5 +452,25 @@ document.getElementById("saveEditGroupBtn").addEventListener("click", () => {
       console.error("Error updating group:", error);
       alert("Error occurred. See console.");
     });
+});
+
+// Filter users in Create Group Modal
+document.getElementById("userSearch").addEventListener("input", function () {
+  const search = this.value.toLowerCase();
+  document.querySelectorAll("#createUserList label").forEach((label) => {
+    label.style.display = label.textContent.toLowerCase().includes(search)
+      ? "block"
+      : "none";
+  });
+});
+
+// Filter users in Edit Group Modal
+document.getElementById("userSearchEdit").addEventListener("input", function () {
+  const search = this.value.toLowerCase();
+  document.querySelectorAll("#editUserList label").forEach((label) => {
+    label.style.display = label.textContent.toLowerCase().includes(search)
+      ? "block"
+      : "none";
+  });
 });
 </script>

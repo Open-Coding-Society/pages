@@ -1,0 +1,53 @@
+Title: "Java ML"
+Description: "Tablesaw, Weka, Smile, and Practice"
+Topics:
+  - title: "Tablesaw"
+    image: "/javaml/tablesaw.jpeg"
+    link: "/javaml/intro/tablesaw"
+    alt: "tablesaw"
+    subtitle: "Data Structures in Action"
+    keyPoints:
+      - "Filtering, summarizing, and visualizing datasets"
+      - "Looping structures for data iteration"
+      - "Creating and using custom classes to model data"
+      - "Managing collections with arrays and ArrayLists"
+    description: |
+      Learn Java fundamentals through data manipulation. Tablesaw makes it easy to apply loops, classes, and arrays in real-world datasets—bridging AP CSA topics with practical data science.
+  - title: "Weka"
+    image: "/javaml/weka.jpeg"
+    link: "/javaml/intro/weka"
+    alt: "weka"
+    subtitle: "Primitive Types for ML Data"
+    keyPoints:
+      - "Selecting appropriate primitive types for ML datasets"
+      - "Managing data precision and memory using numeric types"
+      - "Understanding casting and type conversion in feature engineering"
+      - "Utilizing boolean logic for conditional operations in ML workflows"
+    description: |
+      Master Java’s primitive types with Weka. Explore how data types impact memory, accuracy, and logic in machine learning workflows, while working with Weka’s built-in tools and formats.
+
+  - title: "Smile"
+    image: "/javaml/smile.jpg"
+    link: "/javaml/intro/smile"
+    alt: "smile"
+    subtitle: "OOP Meets Machine Learning"
+    keyPoints:
+      - "Distinguishing between instance methods and static utilities"
+      - "Handling nulls and preventing NullPointerExceptions in pipelines"
+      - "Structuring ML applications with object-oriented design"
+      - "Using constructors to configure algorithms and datasets"
+    description: |
+      Apply object-oriented programming in machine learning with Smile. Build and use model objects and manage state with constructors
+
+  - title: "Practice"
+    image: "/javaml/wine.jpeg"
+    link: "/javaml/intro/practice"
+    alt: "wine"
+    subtitle: "Wine Quality Analysis"
+    keyPoints:
+      - "Load and explore wine quality datasets"
+      - "Create visualizations to understand data patterns"
+      - "Build and compare machine learning models"
+      - "Make predictions on wine quality"
+    description: |
+      Apply what you've learned in Tablesaw, Weka, and Smile to analyze wine quality data and build machine learning models! 

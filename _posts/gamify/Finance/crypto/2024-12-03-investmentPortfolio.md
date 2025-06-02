@@ -162,15 +162,17 @@ permalink: /crypto/portfolio
 
 
 <div class="container">
-    <div class="balance-container">
+    <!-- <div class="balance-container">
         <div class="balance-title">Current Balance</div>
         <div class="balance-amount" id="user-balance">Loading...</div>
-    </div>
-
+    </div> -->
     <div class="crypto-list" id="crypto-list-container"></div>
-</div>
+    <button class="btn btn-buy" onclick="viewHoldings()">View Current Holdings</button>
+    <button class="btn btn-sell" onclick="viewHistory()">View Purchase History</button>
 
 <!-- Modal -->
+</div>
+    
 <div class="modal" id="crypto-modal">
     <div class="modal-content">
         <span class="modal-close" onclick="closeModal()">&times;</span>

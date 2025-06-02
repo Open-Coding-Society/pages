@@ -2,7 +2,7 @@
 import { javaURI, fetchOptions } from '../../api/config.js';
 
 // fetches all profile data and returns it as an array
-export async function fetchUserData() {
+export async function getUserData() {
     // api url for fetching data
     const javaURL = javaURI + "/api/person/get";
 
@@ -11,6 +11,7 @@ export async function fetchUserData() {
     let email = null;
     let sid = null;
     let kasmServerNeeded = null;
+    let pfp = null;
 
     // get the java data (email & kasm)
     try {
@@ -24,6 +25,7 @@ export async function fetchUserData() {
             email = javaData.email;
             sid = javaData.sid;
             kasmServerNeeded = javaData.kasmServerNeeded;
+            pfp = javaData.pfp;
         } else {
             console.error('error fetching data:', javaResponse.status);
         }
@@ -32,5 +34,5 @@ export async function fetchUserData() {
     }
 
     // return all data in an array
-    return [name, uid, email, sid, kasmServerNeeded];
+    return [name, uid, email, sid, kasmServerNeeded, pfp];
 }

@@ -1,5 +1,5 @@
 ---
-layout: fortunefinders
+layout: fortunefindersCasino
 title: Blackjack
 permalink: /gamify/blackjack
 ---
@@ -76,7 +76,7 @@ permalink: /gamify/blackjack
                     <div class="card-body">
                         <h3 class="card-title">Place Your Bet</h3>
                         <div class="input-group mb-3">
-                            <input type="number" id="betAmount" class="form-control text-center" min="1000" value="1000" step="1000">
+                            <input type="number" id="betAmount" class="form-control text-center" min="1" value="1000" step="1000">
                             <span class="input-group-text bet-display" id="betValue">$1,000</span>
                         </div>
                     </div>
@@ -167,13 +167,15 @@ permalink: /gamify/blackjack
     document.addEventListener("DOMContentLoaded", function() {
         fetchUserData();
         
+        // Update bet display when user types
         document.getElementById("betAmount").addEventListener("input", function() {
             let betValue = this.value;
-            if (betValue < 1000) {
-                this.value = 1000;
-                betValue = 1000;
+            // Allow user to type any value, just update the display
+            if (betValue && !isNaN(betValue)) {
+                document.getElementById("betValue").innerText = `$${Number(betValue).toLocaleString()}`;
+            } else {
+                document.getElementById("betValue").innerText = "$0";
             }
-            document.getElementById("betValue").innerText = `$${Number(betValue).toLocaleString()}`;
         });
     });
 
@@ -181,6 +183,13 @@ permalink: /gamify/blackjack
         try {
             await fetchUserData();
             const bet = parseInt(document.getElementById("betAmount").value);
+            
+            // Check minimum bet requirement
+            if (bet < 1000) {
+                document.getElementById("gameStatus").innerText = "Sorry, the minimum betting limit is $1,000";
+                document.getElementById("gameStatus").className = "fs-5 text-danger";
+                return;
+            }
             
             if (bet > currentBalance) {
                 document.getElementById("gameStatus").innerText = "You don't have enough money for this bet!";

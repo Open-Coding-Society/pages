@@ -1,5 +1,5 @@
 ---
-layout: fortunefinders
+layout: fortunefindersBank
 permalink: /leaderboard/overall-leaderboard
 title: Leaderboard
 ---
@@ -420,8 +420,8 @@ title: Leaderboard
             return total;
         }
 
-        // Redirect to bank analytics page with enhanced loading
-        function redirectToAnalytics(userId) {
+        // Redirect to bank analytics page with personId
+        function redirectToAnalytics(personId) {
             // Show loading indicator
             const $row = $(event.target).closest('tr');
             $row.css('opacity', '0.7');
@@ -430,9 +430,9 @@ title: Leaderboard
             const originalContent = $row.find('.name').html();
             $row.find('.name').html('Loading analytics...');
 
-            // Redirect with a slight delay for visual feedback
+            // Redirect with personId parameter
             setTimeout(() => {
-                window.location.href = `/pages/gamify/bankanalytics?userId=${userId}`;
+                window.location.href = `{{site.baseurl}}/gamify/bankanalytics?personId=${personId}`;
             }, 500);
         }
 
@@ -471,7 +471,7 @@ title: Leaderboard
                     return;
                 }
 
-                // Fetch analytics for all users to show risk levels
+                // Fetch analytics for all users to show risk levels and get personId
                 for (const entry of result.data) {
                     const displayName = entry.username && entry.username !== "undefined" 
                         ? entry.username 
@@ -479,18 +479,23 @@ title: Leaderboard
 
                     // Try to get cached analytics or fetch it
                     let riskInfo = 'Loading...';
+                    let personId = null;
                     try {
                         const analytics = await fetchUserAnalytics(entry.userId);
                         if (analytics) {
                             riskInfo = `<span style="color: ${getRiskColor(analytics.riskCategory)};">${analytics.riskCategoryString}</span>`;
+                            personId = analytics.personId; // Get the personId from analytics
                         }
                     } catch (e) {
                         riskInfo = 'N/A';
                     }
 
+                    // Use personId if available, otherwise fallback to userId
+                    const idForRedirect = personId || entry.userId;
+
                     const row = `
                         <tr class="user-row" 
-                            onclick="redirectToAnalytics(${entry.userId})" 
+                            onclick="redirectToAnalytics(${idForRedirect})" 
                             onmouseenter="showUserPreview(${entry.userId}, event)" 
                             onmouseleave="$('#user-preview').hide()" 
                             title="Click to view ${displayName}'s detailed analytics">

@@ -112,14 +112,16 @@ def convert_notebooks():
         }
 
         for future in concurrent.futures.as_completed(futures):
+            notebook_file = futures[future]
             try:
                 future.result()
             except Exception as e:
                 print(
-                    f"Error occurred during notebook processing: {traceback.format_exc()}"
+                    f"Error occurred during notebook processing: {notebook_file}\n{traceback.format_exc()}"
                 )
             finally:
-                # update the progress bar in the main thread
+                rel_path = os.path.relpath(notebook_file, notebook_directory)
+                convertBar.set_suffix(rel_path)
                 convertBar.continue_progress()
 
     convertBar.end_progress()

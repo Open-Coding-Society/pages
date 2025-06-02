@@ -146,7 +146,7 @@ class GameControl {
      * @param {*} event - The keydown event object
      */
     handleNextLevelKey(event) {
-        if (event.key.toLowerCase() === 't' || event.key.toLowerCase() === 'Escape') {
+        if (event.key.toLowerCase() === 't' || event.key.toLowerCase() === 'escape') {
             if (this.currentLevelIndex < this.levelClasses.length - 1) {
                 console.log("Hotkey 't' pressed: Transitioning to next level.");
                 this.currentLevel.continue = false;

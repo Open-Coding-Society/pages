@@ -275,10 +275,10 @@ class GameLevelEnd {
         
     const sprite_src_endship = path + "/images/gamify/endship.png";
     const sprite_greet_endship = "Find the elytra";
-    
+
     // Store a reference to the dialogueSystem for use in sprite data
     const dialogueSystem = this.dialogueSystem;
-    
+
     const sprite_data_endship = {
         id: 'Endship',
         greeting: sprite_greet_endship,
@@ -295,13 +295,32 @@ class GameLevelEnd {
           "The end ship looms before you...",
           "The end ship seems to beckon you to loot the treasure within...",
           "funny purple spaceship heheheheheh",
+          "Press 'M' to enter the ship's adventure...",
           // Add more later?
         ],
         reaction: function() {
-          //sient reaction for interaction to work
+          //silent reaction for interaction to work
         },
         interact: function() {
           dialogueSystem.showRandomDialogue(); // Using Dialogue system instead of alert
+          // Add event listener for 'm' key press during interaction
+          const handleKeyPress = (event) => {
+            if (event.key.toLowerCase() === 'e') {
+              // Remove the event listener to prevent multiple bindings
+              document.removeEventListener('keydown', handleKeyPress);
+              
+              // Redirect to the specified URL
+              window.location.href = '/assets/js/adventureGame/adPlatEngine/endplatformer.html';
+            }
+          };
+          
+          // Add the event listener
+          document.addEventListener('keydown', handleKeyPress);
+          
+          // Optional: Remove the event listener after a timeout to prevent it from staying active indefinitely
+          setTimeout(() => {
+            document.removeEventListener('keydown', handleKeyPress);
+          }, 10000); // Remove after 10 seconds
         }
     };
 

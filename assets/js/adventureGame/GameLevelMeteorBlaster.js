@@ -3,7 +3,6 @@ import Player from "./GameEngine/Player.js"
 import Meteor from "./Meteor.js"
 import Character from "./GameEngine/Character.js";
 import Quiz from "./Quiz.js"
-import { checkGameImages } from "./debug-helper.js"
 
 class GameLevelMeteorBlaster {
   constructor(gameEnv) {
