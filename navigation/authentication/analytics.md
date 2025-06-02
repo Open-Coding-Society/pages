@@ -1,5 +1,6 @@
 ---
-layout: tailwind
+layout: aesthetihawk
+active_tab: analytics
 title: Your Analytics
 permalink: /student/analytics
 search_exclude: true
