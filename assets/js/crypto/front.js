@@ -583,6 +583,10 @@ window.buyGpu = async function (gpuId, quantity) {
         const response = await fetch(`${javaURI}/api/mining/gpu/buy/${gpuId}`, options);
         const result = await response.json();
         if (response.ok) {
+            // Play the buying GPU sound effect
+            if (window.audioManager) {
+                window.audioManager.play('buyingGPU');
+            }
             showNotification(result.message);
             await updateMiningStats();
             await loadGPUs();
