@@ -54,6 +54,30 @@ show_reading_time: false
         width: 100%;
         box-sizing: border-box;
     }
+    
+    select {
+        color: white;
+        border-radius: 12px;
+        border: 1px solid rgba(72, 72, 81, 0.63);
+        filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.3));
+        padding: 15px;
+        transition: all 0.3s ease;
+        background-color: #121212;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    select option[disabled], select:invalid {
+        color: #757575;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+
+
 </style>
 <br>
 <div class="login-container">
@@ -86,6 +110,18 @@ show_reading_time: false
             </div>
             <div class="form-group">
                 <input type="text" id="signupSid" placeholder="Student ID" required>
+            </div>
+            <div class="form-group">
+                <select id="signupSchool" required>
+                    <option value="" disabled selected>Select Your High School</option>
+                    <option value="school1">Abraxas</option>
+                    <option value="school2">Del Norte</option>
+                    <option value="school3">Mt Carmel</option>
+                    <option value="school4">Poway</option>
+                    <option value="school5">Poway to Palomar</option>
+                    <option value="school6">Rancho Bernardo</option>
+                    <option value="school7">Westview</option>
+                </select>
             </div>
             <div class="form-group">
                 <input type="text" id="signupEmail" placeholder="Email" required>
@@ -254,6 +290,8 @@ show_reading_time: false
             body: {
                 name: document.getElementById("name").value,
                 uid: document.getElementById("signupUid").value,
+                sid: document.getElementById("signupSid").value,
+                school: document.getElementById("signupSchool").value,
                 email: document.getElementById("signupEmail").value,
                 password: document.getElementById("signupPassword").value,
                 kasm_server_needed: document.getElementById("kasmNeeded").checked,
