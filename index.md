@@ -539,6 +539,7 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
   const submitBtn = document.getElementById("feedback-submit");
   const successMsg = document.getElementById("feedback-success");
   const errorMsg = document.getElementById("feedback-error");
+  console.log(window.user);
 
   btn.onclick = () => {
     modal.style.display = "block";
@@ -555,19 +556,22 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
     const body = document.getElementById("feedback-body").value.trim();
     const type = document.getElementById("feedback-type").value;
 
-
     if (!title || !body) {
       alert("Please fill in both fields.");
       return;
     }
 
+    const githubUsername = window.user?.uid || "Anonymous"; // fallback if not logged in
+    
+    console.log("Payload:", { title, body, type, uid: githubUsername });
+    
     try {
       const res = await fetch(`${pythonURI}/api/feedback/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ title, body, type })
+        body: JSON.stringify({ title, body, type, uid: githubUsername })
       });
 
       if (res.ok) {
