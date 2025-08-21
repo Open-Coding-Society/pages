@@ -3,7 +3,7 @@ description: "Class of 2025"
 owner_name: John Mortensen
 github_username: AdityaS-2010
 github_repo: "Calculator-lesson" 
-baseurl: "" 
+baseurl: "/Calculator-lesson" 
 future: true
 remote_theme: jekyll/minima
 minima:
