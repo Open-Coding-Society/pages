@@ -2,7 +2,7 @@
 layout: post
 title: Calculator Lessons Index
 description: "Organized links to all calculator lesson notebooks and challenges."
-permalink: /calculator/lesson
+permalink: /CSP/Calculator-lessons/calculatorlessons
 ---
 
 # Calculator Lessons Index
