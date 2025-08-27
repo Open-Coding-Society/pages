@@ -86,7 +86,7 @@ lxdData:
       Categories: ["JavaScript", "API"]
       Game: "/solitaire" ## Change to API example with /api-basics/game
       Lessons: "/api-basics/lessons"
-      Image: "/images/solitaire.png" ## Change Image
+      Image: "/images/basic-api/api-image.jpg"
       Alt: "API Image"
 ---
 {%- include tailwind/lxd.html -%}
