@@ -26,10 +26,16 @@ These TODOs practice variables, functions, buttons, CSS styling, and DOM updates
     gap: .25rem;
   }
 
-  /* ====== HISTORY AREA ====== */
+  /*
+  ┌─────────────────────────────────────────┐
+  │ 📝 TODO-H1: STYLE THE HISTORY AREA      │
+  │ Change the font-size or color to make   │
+  │ history readable.                       │
+  │ Example: font-size: 12px; color: #9aa0a6│
+  └─────────────────────────────────────────┘
+  */
   #history {
-    /* TODO-H1 (STYLE): change the font-size or color to make history readable.
-       Example you could try: font-size: 12px; color: #9aa0a6; */
+    /* your styles here */
   }
   #history ul { margin: 0; padding: 0 0 0 1rem; }
   #history li { list-style: none; }
@@ -52,7 +58,15 @@ These TODOs practice variables, functions, buttons, CSS styling, and DOM updates
       <!-- result + history -->
       <div class="calculator-output">
         <div class="history-controls">
-         <!-- TODO-H2 (BUTTON): CREATE the Clear History button here.-->
+         <!--
+         ┌─────────────────────────────────────────┐
+         │ 📝 TODO-H2: CREATE CLEAR HISTORY BUTTON │
+         │ Add a button element with               │
+         │ id="clear-history" and class="history-  │
+         │ btn". Text should be "Clear"            │
+         └─────────────────────────────────────────┘
+         -->
+         <!-- your button here -->
         </div>
         <div id="history"><!-- history list renders here --></div>
         <div id="output">0</div>
@@ -88,7 +102,13 @@ let tokens = [];          // expression tokens: ["12", "/", "3", "+", "2", "*", 
 let currentNum = "";      // digits being typed (string, allows ".")
 let justEvaluated = false;
 
-// TODO-H3 (VARIABLE): Declare a variable named `history` to store the history entries (it should be an array).
+/*
+┌─────────────────────────────────────────┐
+│ 📝 TODO-H3: DECLARE HISTORY VARIABLE    │
+│ Create a variable named `history` to    │
+│ store the history entries (array)       │
+└─────────────────────────────────────────┘
+*/
 // code here
 
 // ========== DOM ==========
@@ -111,31 +131,40 @@ function updateScreen(){
 
 // ===== HISTORY FUNCTIONS =====
 
-// TODO-H4 (FUNCTION): Implement renderHistory()
-// - Build a <ul> with each history string as an <li>
-// - Put it into historyEl.innerHTML
 function renderHistory(){
-  // your code here
+  historyEl.innerHTML = `<ul>${history.map(item => `<li>${item}</li>`).join("")}</ul>`;
 }
 
-// TODO-H5 (FUNCTION): Implement addToHistory(exprString, resultShown)
-// - Call renderHistory() so the UI updates
 function addToHistory(exprString, resultShown){
   history.unshift(`${exprString} = ${resultShown}`);
-  history = history.slice(0, 10);
-  // your code here
+  /*
+  ┌─────────────────────────────────────────┐
+  │ 📝 TODO-H4: UPDATE HISTORY VARIABLE     │
+  │ Update the history array to keep only   │
+  │ the last 10 entries by using            │
+  │ slice(0, 10) to assign the first 10     │
+  │ items back to the history variable.     │
+  │ Then call renderHistory() to update     │
+  │ the display.                            │
+  └─────────────────────────────────────────┘
+  */
+  // your code here to update history variable
+
 }
 
-function resetAll(){
-  tokens = [];
-  currentNum = "";
-  justEvaluated = false;
-
-  // TODO-H6 (INTEGRATION): Also clear the history when A/C is pressed.
-  // (One line to reset, one line to render.)
-  // code here
-  updateScreen();
-}
+/*
+┌─────────────────────────────────────────┐
+│ 📝 TODO-H5: CREATE RESETALL FUNCTION    │
+│ Create a function called resetAll() that│
+│ resets the calculator to its starting   │
+│ state. Look at the STATE section above  │
+│ to see what variables need to be reset  │
+│ to their initial values (don't forget   |
+|  the history variable). Also call       |
+|  updateScreen() and renderHistory()     │
+└─────────────────────────────────────────┘
+*/
+// your function here
 
 // ===== precedence-aware evaluation (provided) =====
 function evalTokens(seq){
@@ -175,11 +204,11 @@ operations.forEach(btn => btn.addEventListener("click", () => onOperator(btn.tex
 equals.forEach(btn => btn.addEventListener("click", onEquals));
 clearBtns.forEach(btn => btn.addEventListener("click", resetAll));
 
-// TODO-H7 (BUTTON/EVENT): Wire up the "Clear History" button
-// - When clicked, set the history array to empty and call renderHistory()
+
 if (clearHistoryBtn) {
   clearHistoryBtn.addEventListener("click", () => {
-    // your code here
+    history = [];
+    renderHistory();
   });
 }
 
@@ -239,9 +268,14 @@ function onEquals(){
   // Show "expr = result"
   output.textContent = `${exprString} = ${shown}`;
 
-  // ===== HISTORY INTEGRATION =====
-  // TODO-H8 (CALL): Call addToHistory here so each time "=" is pressed,
-  // the expression and result are saved and the list updates.
+  /*
+  ┌─────────────────────────────────────────┐
+  │ 📝 TODO-H6: SAVE TO HISTORY            │
+  │ Call addToHistory() with exprString     │
+  │ and shown result so calculation gets    │
+  │ saved to history list                   │
+  └─────────────────────────────────────────┘
+  */
   // code here
 
   // Continue from result
