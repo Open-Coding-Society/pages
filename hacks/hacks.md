@@ -82,7 +82,7 @@ lxdData:
     - Title: "API Basics"
       Genre: "Coding"
       Level: "4"
-      Description: "Add Desc Here"
+      Description: "Learn the basics of APIs, Async, Error Handling, and best practices."
       Categories: ["JavaScript", "API"]
       Game: "/solitaire" ## Change to API example with /api-basics/game
       Lessons: "/api-basics/lessons"
