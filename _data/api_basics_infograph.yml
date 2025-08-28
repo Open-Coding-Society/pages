@@ -1,0 +1,39 @@
+# course illustrations
+Title: "Solitaire Foundations"
+Description: "Learn how to play and understand the logic behind Solitaire. These sections introduce the essential skills players develop while interacting with the game, connecting coding concepts to gameplay."
+Topics:
+  - title: "API Intro"
+    image: "/basic-api/api-intro.jpg"
+    link: "/api-basics/lesson/intro"
+    alt: "API Intro"
+    keyPoints:
+      - "Overview"
+    subtitle: "Add subtitle here"
+    description: "Add Description Here"
+
+  - title: "Error Handling"
+    image: "/basic-api/api-err.png"
+    link: "/api-basics/lesson/error-handling"
+    alt: "API Error Handling"
+    keyPoints:
+      - "Add Key Points"
+    subtitle: "Add Subtitle"
+    description: "Add Description Here"
+
+  - title: "Asynchronous Calls"
+    image: "/basic-api/async-function.jpg"
+    link: "/api-basics/lesson/asyn-functions"
+    alt: "Async Functions"
+    keyPoints:
+      - "Add Key Points"
+    subtitle: "Add Subtitle"
+    description: "Add Description Here"
+
+  - title: "Data Handling"
+    image: "/basic-api/js-fetch.png"
+    link: "/api-basics/lesson/handling-data"
+    alt: "API Data Handling"
+    keyPoints:
+      - "Add Key Points"
+    subtitle: "Add Subtitle"
+    description: "Add Description Here"
