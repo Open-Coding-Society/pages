@@ -95,7 +95,7 @@ lxdData:
       Categories: ["Console", "OOP", "Game Coding", "Elements", "Innovation"]
       Game: "/rock-paper-scissor"
       Lessons: "/rock_paper_scissors/lessons"
-      Image: "/images/rock-paper-scissors.jpg"
+      Image: "/images/rps/rock-paper-scissors.jpg"
       Alt: "Rock paper Scissors Image"
     
 ---
