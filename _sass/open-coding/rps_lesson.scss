@@ -1,0 +1,43 @@
+@import "materials/main.scss";
+
+.rps-lesson {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e3a8a, #3730a3);
+  color: #ffffff !important; // ensures text is white everywhere
+  margin: 0;
+  padding: 20px;
+  line-height: 1.6;
+  min-height: 100vh;
+
+  * {
+    color: #ffffff !important; // force all nested elements to white
+  }
+
+  .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #832d2d;
+      padding: 40px;
+      border: 3px solid #ffd700;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+      * {
+        color: #ffffff !important;
+      }
+  }
+
+  h1, h2, h3, h4, p, li, strong, .subtitle, button, .console-example, .code-block, .section-highlight, .phase-section, .success-indicators, .activities-section, .play-instructions, #oopExplanation {
+      color: #ffffff !important;
+  }
+
+  button {
+    background: linear-gradient(45deg, #ffd700, #c06c84);
+    color: #ffffff !important;
+  }
+
+  #stopBtn {
+    color: #ffffff !important;
+  }
+}
+
