@@ -1,0 +1,331 @@
+:root{
+          --bg: #0d1117;            /* softer charcoal */
+          --panel: #161b22;         /* lifted card background */
+          --muted: #c9d1d9;         /* lighter gray for better readability */
+          --text: #f0f6fc;          /* brighter off-white text */
+          --brand: #7c3aed;         /* vibrant purple for links */
+          --brand-2: #06b6d4;       /* cyan blue accent */
+          --pink: #f472b6;          /* bright pink */
+          --purple: #a855f7;        /* medium purple */
+          --blue: #3b82f6;          /* bright blue */
+          --brown: #92400e;         /* warm brown */
+          --light-yellow: #fef08a;  /* light yellow */
+          --warn: #fbbf24;          /* golden yellow */
+          --danger: #ef4444;        /* modern red */
+          --ok: #10b981;            /* fresh green */
+          --ring: rgba(124,58,237,.4);
+          --code-bg: #0d1117;       /* darker code background */
+          --code-border: #30363d;   /* lighter border */
+          --code-text: #e6edf3;     /* light code text */
+          --shadow: 0 10px 30px rgba(0,0,0,.4);
+          --radius: 18px;
+          --radius-sm: 12px;
+          --maxw: 900px;
+        }
+
+        /* Force dark theme always - no light mode */
+        html,body{
+          background: radial-gradient(1200px 800px at 20% -10%, rgba(244,114,182,.15), transparent 60%),
+                      radial-gradient(1000px 700px at 120% 20%, rgba(168,85,247,.12), transparent 60%),
+                      radial-gradient(800px 600px at 80% 80%, rgba(59,130,246,.08), transparent 60%),
+                      var(--bg);
+          color: var(--text);
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+          line-height: 1.65;
+          -webkit-font-smoothing: antialiased;
+          text-rendering: optimizeLegibility;
+          min-height: 100vh;
+          margin: 0;
+          padding: 0;
+        }
+
+        main, .page, .container{
+          width: min(100% - 3rem, var(--maxw));
+          margin-inline: auto;
+          padding: 2rem 1rem;
+        }
+
+        /* Headings with better contrast */
+        .page h1, .page h2, .page h3, .page h4{
+          letter-spacing: .2px;
+          color: var(--text);
+        }
+        .page h1{ font-size: clamp(2rem, 2vw + 1.5rem, 2.6rem); margin-top: 1.6rem; }
+        .page h2{ font-size: clamp(1.35rem, 1.2vw + 1.1rem, 1.8rem); margin-top: 2.2rem; }
+        .page h3{ font-size: clamp(1.1rem, .8vw + 1rem, 1.35rem); margin-top: 1.6rem; }
+
+        /* Title ribbon with colorful gradient */
+        .page h1 + p em{
+          display: inline-block;
+          background: linear-gradient(90deg, rgba(244,114,182,.25), rgba(168,85,247,.25), rgba(59,130,246,.25));
+          border: 1px solid rgba(244,114,182,.4);
+          color: var(--text);
+          padding: .55rem .8rem;
+          border-radius: var(--radius-sm);
+          box-shadow: var(--shadow);
+        }
+
+        /* Horizontal divider with rainbow gradient */
+        .page hr, .page > section + section::before, .page > * + hr{
+          content: "";
+          display: block;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, var(--pink), var(--purple), var(--blue), var(--brand-2), transparent);
+          border: none;
+          margin: 2rem 0 1.5rem;
+        }
+
+        /* Lists with colorful markers */
+        .page ul, .page ol{ padding-left: 1.2rem; color: var(--text); }
+        .page li{ margin: .35rem 0; color: var(--text); }
+        .page ul li::marker{ color: var(--pink); }
+        .page ol li::marker{ color: var(--purple); font-weight: 700; }
+
+        /* Alternate list item colors for fun */
+        .page ul li:nth-child(odd)::marker{ color: var(--pink); }
+        .page ul li:nth-child(even)::marker{ color: var(--blue); }
+        .page ol li:nth-child(3n+1)::marker{ color: var(--purple); }
+        .page ol li:nth-child(3n+2)::marker{ color: var(--brand-2); }
+        .page ol li:nth-child(3n+3)::marker{ color: var(--pink); }
+
+        /* Tip cards / callouts with vibrant colors */
+        .callout{
+          background: linear-gradient(135deg, rgba(244,114,182,.15), rgba(168,85,247,.08));
+          border: 1px solid rgba(244,114,182,.35);
+          border-radius: var(--radius);
+          padding: 1rem 1.1rem;
+          box-shadow: var(--shadow);
+          color: var(--text);
+          margin: 1rem 0;
+        }
+        .callout--warn{ 
+          border-color: rgba(251,191,36,.5); 
+          background: linear-gradient(135deg, rgba(254,240,138,.18), rgba(251,191,36,.08));
+          color: var(--text);
+        }
+        .callout--ok{ 
+          border-color: rgba(16,185,129,.5); 
+          background: linear-gradient(135deg, rgba(16,185,129,.18), rgba(6,182,212,.08));
+          color: var(--text);
+        }
+        .callout--info{
+          border-color: rgba(59,130,246,.5);
+          background: linear-gradient(135deg, rgba(59,130,246,.18), rgba(168,85,247,.08));
+          color: var(--text);
+        }
+        .callout--purple{
+          border-color: rgba(168,85,247,.5);
+          background: linear-gradient(135deg, rgba(168,85,247,.18), rgba(244,114,182,.08));
+          color: var(--text);
+        }
+
+        /* Code blocks with better contrast */
+        pre, code{
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        }
+
+        pre{
+          background: linear-gradient(180deg, rgba(88,166,255,.12), rgba(57,208,216,.08)), var(--code-bg);
+          color: var(--code-text);
+          border: 1px solid var(--code-border);
+          border-radius: var(--radius);
+          padding: 1rem 1.1rem;
+          overflow: auto;
+          box-shadow: var(--shadow);
+          margin: 1rem 0;
+        }
+
+        code{
+          background: rgba(88,166,255,.2);
+          border: 1px solid rgba(88,166,255,.35);
+          color: var(--text);
+          padding: .15rem .4rem;
+          border-radius: .5rem;
+        }
+
+        /* "Console" styled block */
+        pre.console{
+          background: #0a0b0f;
+          border-color: #30363d;
+          color: #f0f6fc;
+        }
+        pre.console code{ background: transparent; border: none; padding: 0; color: inherit; }
+
+        /* Inline badges with vibrant colors */
+        .badge{
+          display: inline-flex; align-items: center; gap: .4rem;
+          padding: .25rem .6rem; border-radius: 999px; font-size: .85rem; font-weight: 600;
+          background: rgba(16,185,129,.25); color: #6ee7b7; border: 1px solid rgba(16,185,129,.4);
+        }
+        .badge--warn{ background: rgba(254,240,138,.25); color: var(--light-yellow); border-color: rgba(251,191,36,.4); }
+        .badge--danger{ background: rgba(255,107,107,.2); color: #fca5a5; border-color: rgba(255,107,107,.4); }
+        .badge--pink{ background: rgba(244,114,182,.25); color: var(--pink); border-color: rgba(244,114,182,.4); }
+        .badge--purple{ background: rgba(168,85,247,.25); color: var(--purple); border-color: rgba(168,85,247,.4); }
+        .badge--blue{ background: rgba(59,130,246,.25); color: var(--blue); border-color: rgba(59,130,246,.4); }
+        .badge--brown{ background: rgba(146,64,14,.35); color: #fdba74; border-color: rgba(146,64,14,.5); }
+
+        /* Step grid with colorful gradients */
+        .steps{
+          display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;
+        }
+        .step{
+          background: var(--panel);
+          border: 1px solid rgba(244,114,182,.3);
+          border-radius: var(--radius);
+          padding: 1rem;
+          box-shadow: var(--shadow);
+          color: var(--text);
+        }
+        .step:nth-child(odd){
+          border-color: rgba(244,114,182,.3);
+          background: linear-gradient(135deg, rgba(244,114,182,.08), var(--panel));
+        }
+        .step:nth-child(even){
+          border-color: rgba(168,85,247,.3);
+          background: linear-gradient(135deg, rgba(168,85,247,.08), var(--panel));
+        }
+        .step:nth-child(3n){
+          border-color: rgba(59,130,246,.3);
+          background: linear-gradient(135deg, rgba(59,130,246,.08), var(--panel));
+        }
+        .step__num{
+          width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+          background: linear-gradient(135deg, rgba(244,114,182,.3), rgba(168,85,247,.3)); 
+          color: var(--text);
+          border: 1px solid rgba(244,114,182,.5);
+          font-weight: 700; margin-bottom: .5rem;
+        }
+        .step:nth-child(even) .step__num{
+          background: linear-gradient(135deg, rgba(168,85,247,.3), rgba(59,130,246,.3));
+          border-color: rgba(168,85,247,.5);
+        }
+        .step:nth-child(3n) .step__num{
+          background: linear-gradient(135deg, rgba(59,130,246,.3), rgba(6,182,212,.3));
+          border-color: rgba(59,130,246,.5);
+        }
+
+        /* Link + focus styles with purple theme */
+        a{ color: var(--brand); text-decoration: none; }
+        a:hover{ text-decoration: underline; color: var(--pink); }
+
+        :focus-visible{
+          outline: 3px solid var(--ring);
+          outline-offset: 2px;
+          border-radius: .5rem;
+        }
+
+        /* Buttons with rainbow gradients */
+        .btn{
+          display: inline-flex; align-items: center; gap: .6rem;
+          background: linear-gradient(135deg, rgba(244,114,182,.3), rgba(168,85,247,.25), rgba(59,130,246,.2));
+          border: 1px solid rgba(244,114,182,.5);
+          color: var(--text);
+          padding: .6rem .9rem; border-radius: 999px; font-weight: 600; text-decoration: none;
+          box-shadow: var(--shadow);
+          transition: transform .08s ease, filter .2s ease;
+        }
+        .btn:hover{ 
+          transform: translateY(-2px); 
+          filter: brightness(1.3); 
+          text-decoration: none; 
+          color: var(--text);
+          box-shadow: 0 15px 40px rgba(244,114,182,.3);
+        }
+        .btn--purple{
+          background: linear-gradient(135deg, rgba(168,85,247,.3), rgba(124,58,237,.25));
+          border-color: rgba(168,85,247,.5);
+        }
+        .btn--blue{
+          background: linear-gradient(135deg, rgba(59,130,246,.3), rgba(6,182,212,.25));
+          border-color: rgba(59,130,246,.5);
+        }
+        .btn--yellow{
+          background: linear-gradient(135deg, rgba(254,240,138,.3), rgba(251,191,36,.25));
+          border-color: rgba(251,191,36,.5);
+          color: #1f2937;
+        }
+
+        /* Admonitions using blockquote with colorful borders */
+        .page blockquote{
+          margin: 1rem 0; padding: 1rem 1.2rem;
+          background: linear-gradient(135deg, rgba(168,85,247,.12), rgba(244,114,182,.06));
+          border-left: 4px solid var(--purple);
+          border-radius: 0 var(--radius) var(--radius) 0;
+        }
+        .page blockquote p{ margin: 0; color: var(--text); }
+
+        /* Tables with colorful headers */
+        .page table{
+          border-collapse: separate; border-spacing: 0; width: 100%;
+          background: var(--panel); border: 1px solid rgba(244,114,182,.3); border-radius: var(--radius);
+          overflow: hidden; box-shadow: var(--shadow);
+          color: var(--text);
+        }
+        .page th, .page td{ padding: .75rem .9rem; text-align: left; color: var(--text); }
+        .page thead th{ 
+          background: linear-gradient(135deg, rgba(244,114,182,.15), rgba(168,85,247,.12), rgba(59,130,246,.08));
+          color: var(--light-yellow);
+          font-weight: 700;
+        }
+        .page tbody tr + tr td{ border-top: 1px solid rgba(168,85,247,.15); }
+        .page tbody tr:hover{ background: rgba(244,114,182,.05); }
+
+        /* "Success Indicators" checklist */
+        .checklist{ list-style: none; padding-left: 0; }
+        .checklist li{ position: relative; padding-left: 1.8rem; margin: .5rem 0; color: var(--text); }
+        .checklist li::before{
+          content: "✔"; position: absolute; left: 0; top: 0; line-height: 1.4; width: 1.2rem; height: 1.2rem;
+          display: inline-grid; place-items: center; border-radius: 6px;
+          background: rgba(63,185,80,.25); color: var(--ok); border: 1px solid rgba(63,185,80,.4);
+        }
+
+        /* Permalink banner */
+        .permalink-tag{
+          display: inline-flex; align-items: center; gap: .5rem; font-size: .9rem; color: var(--muted);
+        }
+        .permalink-tag svg{ opacity: .8; }
+
+        /* Small helpers with proper colors */
+        .muted{ color: var(--muted); }
+        .lead{ font-size: 1.05rem; color: var(--muted); }
+        .center{ text-align: center; }
+
+        /* Ensure all text elements have proper color */
+        p, div, span, li, td, th { color: var(--text); }
+
+        /* Responsive spacing for prose inside Markdown */
+        .page > *{ margin-block: 1rem; }
+        .page > h1, .page > h2, .page > h3{ margin-block: 1.2rem .6rem; }
+
+        /* Enhanced dark aesthetic touches with more color */
+        body::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: 
+            radial-gradient(circle at 25% 25%, rgba(244,114,182,.04) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(168,85,247,.03) 0%, transparent 50%),
+            radial-gradient(circle at 50% 10%, rgba(59,130,246,.02) 0%, transparent 50%),
+            radial-gradient(circle at 10% 80%, rgba(6,182,212,.02) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: -1;
+        }
+
+        /* Remove any print styles that force light mode */
+        @media print{
+          body{ background: var(--bg); color: var(--text); }
+          a{ color: var(--brand); }
+        }
+
+        /* Demo section styling */
+        .demo-section {
+          background: linear-gradient(135deg, rgba(244,114,182,.08), rgba(168,85,247,.05));
+          border: 1px solid rgba(244,114,182,.3);
+          border-radius: var(--radius);
+          padding: 1.5rem;
+          margin: 2rem 0;
+          box-shadow: var(--shadow);
+        }
