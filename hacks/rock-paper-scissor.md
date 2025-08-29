@@ -42,15 +42,15 @@ permalink: /rock-paper-scissor/
     </div>
     <div id="images" style="display:flex; justify-content:center; gap:20px; margin-bottom:14px;">
       <button id="rock-btn" style="background:none; border:none; padding:0; cursor:pointer;">
-        <img id="rock-img" src="{{site.baseurl}}/images/gamify/rock.jpg"
+        <img id="rock-img" src="{{site.baseurl}}/images/rps/rock.jpg"
              style="width:100px; border:2px solid white; border-radius:10px;">
       </button>
       <button id="paper-btn" style="background:none; border:none; padding:0; cursor:pointer;">
-        <img id="paper-img" src="{{site.baseurl}}/images/gamify/paper.jpeg"
+        <img id="paper-img" src="{{site.baseurl}}/images/rps/paper.jpeg"
              style="width:100px; border:2px solid white; border-radius:10px;">
       </button>
       <button id="scissors-btn" style="background:none; border:none; padding:0; cursor:pointer;">
-        <img id="scissors-img" src="{{site.baseurl}}/images/gamify/scissors.jpeg"
+        <img id="scissors-img" src="{{site.baseurl}}/images/rps/scissors.jpeg"
              style="width:100px; border:2px solid white; border-radius:10px;">
       </button>
     </div>
