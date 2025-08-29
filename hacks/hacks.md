@@ -70,6 +70,15 @@ lxdData:
       Lessons: "/rpg/latest/lesson"
       Image: "/images/toolkit-nav-buttons/rpg.png"
       Alt: "Underwater RPG Adventure"
+    - Title: "Tic Tac Toe"
+      Genre: "Coding"
+      Level: "Intermediate"
+      Description: "Learn how to use Jupyter notebooks to develop Python projects. "
+      Categories: ["Python", "Jupyter", "Game Coding"]
+      Game: "/pages-thinkers-yash/games/tictactoe/howtorun"
+      Lessons: "/pages-thinkers-yash/games/tictactoe/lesson"
+      Image: "/pages-thinkers-yash/images/tictactoe/tictactoe.png"
+      Alt: "Tic Tac Toe"
     - Title: "Solitaire"
       Genre: "Coding"
       Level: "2"
@@ -79,6 +88,15 @@ lxdData:
       Lessons: "/solitaire/lesson"
       Image: "/images/solitaire.png"
       Alt: "Solitaire Image"
+    - Title: "Rock Paper Scissors"
+      Genre: "Coding"
+      Level: "Intermediate"
+      Description: "Learn more about console, elements and OOP as you play with Rock Paper Scissors."
+      Categories: ["Console", "OOP", "Game Coding", "Elements", "Innovation"]
+      Game: "/pages-thinkers-yash/rock-paper-scissor"
+      Lessons: "/pages-thinkers-yash/rock_paper_scissors/lessons"
+      Image: "/pages-thinkers-yash/images/rock-paper-scissors.jpg"
+      Alt: "Rock paper Scissors Image"
     
 ---
 
