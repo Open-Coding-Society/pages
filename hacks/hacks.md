@@ -75,9 +75,9 @@ lxdData:
       Level: "Intermediate"
       Description: "Learn how to use Jupyter notebooks to develop Python projects. "
       Categories: ["Python", "Jupyter", "Game Coding"]
-      Game: "/pages-thinkers-yash/games/tictactoe/howtorun"
-      Lessons: "/pages-thinkers-yash/games/tictactoe/lesson"
-      Image: "/pages-thinkers-yash/images/tictactoe/tictactoe.png"
+      Game: "/games/tictactoe/howtorun"
+      Lessons: "/games/tictactoe/lesson"
+      Image: "/images/tictactoe/tictactoe.png"
       Alt: "Tic Tac Toe"
     - Title: "Solitaire"
       Genre: "Coding"
@@ -93,9 +93,9 @@ lxdData:
       Level: "Intermediate"
       Description: "Learn more about console, elements and OOP as you play with Rock Paper Scissors."
       Categories: ["Console", "OOP", "Game Coding", "Elements", "Innovation"]
-      Game: "/pages-thinkers-yash/rock-paper-scissor"
-      Lessons: "/pages-thinkers-yash/rock_paper_scissors/lessons"
-      Image: "/pages-thinkers-yash/images/rock-paper-scissors.jpg"
+      Game: "/rock-paper-scissor"
+      Lessons: "/rock_paper_scissors/lessons"
+      Image: "/images/rock-paper-scissors.jpg"
       Alt: "Rock paper Scissors Image"
     
 ---
