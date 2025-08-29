@@ -4,7 +4,7 @@ Description: "Learn how to play and understand the logic behind Solitaire. These
 Topics:
   - title: "API Intro"
     image: "/basic-api/api-intro.jpg"
-    link: "/api-basics/lesson/intro"
+    link: "/api-basics/lesson/intro-extended"
     alt: "API Intro"
     keyPoints:
       - "Overview"
@@ -26,7 +26,7 @@ Topics:
 
   - title: "Asynchronous Calls"
     image: "/basic-api/async-function.jpg"
-    link: "/api-basics/lesson/asyn-functions"
+    link: "/api-basics/lesson/async"
     alt: "Async Functions"
     keyPoints:
       - "Async"
