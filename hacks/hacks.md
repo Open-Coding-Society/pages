@@ -106,5 +106,14 @@ lxdData:
       Lessons: "/cookie-clicker-game-docs"
       Image: "/images/cookie.jpg"
       Alt: "Cookie"
+    - Title: "Connect 4"
+      Genre: "Coding"
+      Level: "2"
+      Description: "Mastering game development fundamentals by bulding and understaning Connect 4's core mechanics."
+      Categories: ["Javascript", "Game Coding", "2D Arrays", "Innovation"]
+      Game: "/connect4"
+      Lessons: "/connect4lesson"
+      Image: "/images/connect4/connect4.jpeg"
+      Alt: "Connect Four Image"
 ---
 {%- include tailwind/lxd.html -%}
