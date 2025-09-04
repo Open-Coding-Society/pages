@@ -3,7 +3,7 @@ layout: aesthetihawk
 active_tab: groups
 title: Groups Management
 type: issues
-permalink: /student/groups
+permalink: /student/groups/debug
 comments: false
 ---
 
@@ -203,15 +203,15 @@ comments: false
 
 <script type="module">
 
-// Modal toggle utility
+  // Modal toggle utility
 function toggleModal(id) {
     const modal = document.getElementById(id);
     if (modal.classList.contains("hidden")) {
         modal.classList.remove("hidden");
         modal.classList.add("flex");
-        if (id === "createGroupModal" || id === "editGroupModal") {
-        // fetchUsers(); // fetch users only when opening a modal
-        }
+        // if (id === "createGroupModal" || id === "editGroupModal") {
+        //     fetchUsers(); // fetch users only when opening a modal
+        // }
     } else {
         modal.classList.add("hidden");
         modal.classList.remove("flex");
@@ -220,13 +220,24 @@ function toggleModal(id) {
 window.toggleModal = toggleModal;
 
 
-function fetchUsers() {
-  fetch(personURL, fetchOptions)
-    .then((response) => response.json())
-    .then((users) => {
+
+let currentPersonPageUrl = `${javaURI}/api/people/page/0?pageSize=10`; // default: first page, 10 users
+let pagingLinks = { previous: null, next: null };
+
+function fetchUsers(url = currentPersonPageUrl) {
+  fetch(url, fetchOptions)
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to fetch users");
+      return response.json();
+    })
+    .then((data) => {
+      const users = data.data || [];
+      pagingLinks = data.paging || { previous: null, next: null };
+      currentPersonPageUrl = url;
+
+      // render users
       const userList = document.getElementById("createUserList");
       userList.innerHTML = "";
-
       users.forEach((user) => {
         const div = document.createElement("div");
         div.className = "form-check";
@@ -238,9 +249,40 @@ function fetchUsers() {
         `;
         userList.appendChild(div);
       });
+
+      renderPaginationControls();
     })
     .catch((err) => console.error("Error loading users:", err));
 }
+
+function renderPaginationControls() {
+  // remove old pagination if present
+  let container = document.getElementById("paginationControls");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "paginationControls";
+    container.className = "flex justify-between mt-4";
+    document.getElementById("createUserList").after(container);
+  }
+  container.innerHTML = `
+    <button id="prevPageBtn" class="px-3 py-1 rounded bg-gray-600 text-white ${!pagingLinks.previous ? "opacity-50 cursor-not-allowed" : ""}">
+      Previous
+    </button>
+    <button id="nextPageBtn" class="px-3 py-1 rounded bg-gray-600 text-white ${!pagingLinks.next ? "opacity-50 cursor-not-allowed" : ""}">
+      Next
+    </button>
+  `;
+
+  document.getElementById("prevPageBtn").addEventListener("click", () => {
+    if (pagingLinks.previous) fetchUsers(javaURI + pagingLinks.previous);
+  });
+  document.getElementById("nextPageBtn").addEventListener("click", () => {
+    if (pagingLinks.next) fetchUsers(javaURI + pagingLinks.next);
+  });
+}
+
+
+
 
 // Environment setup
 import {javaURI, fetchOptions} from '{{site.baseurl}}/assets/js/api/config.js';
@@ -570,8 +612,8 @@ document.getElementById("userSearchEdit").addEventListener("input", function () 
   });
 });
 
-
 document.addEventListener("DOMContentLoaded", (event) => {
   fetchUsers();
 });
+
 </script>

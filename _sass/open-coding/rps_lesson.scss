@@ -1,42 +1,210 @@
-@import "materials/main.scss";
+.rps-lesson .lesson-wrapper {
+  background: #121212; /* slightly lighter than page background */
+  border-radius: 12px;
+  padding: 40px 32px;
+  margin: 40px auto;
+  max-width: 1000px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  border: 1px solid #000000;
+}
 
 .rps-lesson {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1e3a8a, #3730a3);
-  color: #ffffff !important; // ensures text is white everywhere
-  margin: 0;
-  padding: 20px;
-  line-height: 1.6;
+  background: #121212;
   min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+}
 
-  * {
-    color: #ffffff !important; // force all nested elements to white
-  }
+.rps-lesson .subtitle {
+  text-align: center;
+  color: #e5e7eb;
+  font-style: italic;
+  font-size: 1.15em;
+  margin-bottom: 24px;
+}
 
-  .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: #832d2d;
-      padding: 40px;
-      border: 3px solid #ffd700;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+.rps-lesson .play-instructions {
+  background: #121212;
+  color: #fff;
+  border: 2px solid #ffa600;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin: 20px auto 32px auto;
+  padding: 20px;
+  max-width: 700px;
+}
 
-      * {
-        color: #ffffff !important;
-      }
-  }
+.rps-lesson .game-buttons {
+  text-align: center;
+  margin: 32px 0 24px 0;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+}
 
-  h1, h2, h3, h4, p, li, strong, .subtitle, button, .console-example, .code-block, .section-highlight, .phase-section, .success-indicators, .activities-section, .play-instructions, #oopExplanation {
-      color: #ffffff !important;
-  }
+.rps-lesson button {
+  background: #232336;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  padding: 10px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.rps-lesson button:hover {
+  background: #ffa600;
+  color: #232336;
+  transform: translateY(-2px);
+}
+.rps-lesson button:active {
+  background: #c06c84;
+  color: #fff;
+  transform: translateY(-1px);
+}
 
-  button {
-    background: linear-gradient(45deg, #ffd700, #c06c84);
-    color: #ffffff !important;
-  }
+.rps-lesson h1 {
+  color: #fff;
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.rps-lesson h2 {
+  color: #fff;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-top: 36px;
+  margin-bottom: 18px;
+  border-left: 5px solid #c06c84;
+  padding-left: 18px;
+}
+.rps-lesson h3 {
+  color: #fff;
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-top: 28px;
+  margin-bottom: 12px;
+}
+.rps-lesson h4 {
+  color: #fff;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+.rps-lesson p, .rps-lesson li, .rps-lesson strong {
+  color: #e5e7eb;
+  font-size: 0.98em;
+}
+.rps-lesson ul, .rps-lesson ol {
+  margin: 15px 0;
+  padding-left: 30px;
+}
+.rps-lesson li {
+  margin: 8px 0;
+}
 
-  #stopBtn {
-    color: #ffffff !important;
-  }
+/* Section highlight for all major content blocks */
+.rps-lesson .section-highlight {
+  background: #121212;
+  border-radius: 16px;
+  border: 2px solid #c06c84;
+  box-shadow: 0 0 0 2px #c06c84;
+  padding: 32px 28px 24px 28px;
+  margin-bottom: 32px;
+}
+
+.rps-lesson .console-example, .rps-lesson .code-block {
+  background: #000 !important;
+  color: #f6f5f4 !important;
+  padding: 18px;
+  font-family: 'Courier New', monospace;
+  margin: 18px 0;
+  border: 2px solid #8e6fc4;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 1em;
+}
+
+.rps-lesson .checkpoint-section {
+  margin: 32px 0 24px 0;
+  padding: 24px;
+  background: #111112;
+  border-radius: 12px;
+  border: 2px solid #ffd700;
+  box-shadow: 0 2px 12px #0004;
+}
+.rps-lesson .checkpoint-label {
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+  display: block;
+}
+.rps-lesson .checkpoint-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 6px;
+  border: 2px solid #444;
+  margin-bottom: 10px;
+  background: #121212;
+  color: #fff;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.rps-lesson .checkpoint-input.correct {
+  border: 2px solid #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  background: #1e2e1e;
+}
+.rps-lesson .checkpoint-input.incorrect {
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  background: #2e1e1e;
+}
+.rps-lesson .checkpoint-feedback {
+  font-weight: bold;
+  margin-bottom: 8px;
+  min-height: 24px;
+}
+.rps-lesson .checkpoint-feedback.correct {
+  color: #22c55e;
+}
+.rps-lesson .checkpoint-feedback.incorrect {
+  color: #ef4444;
+}
+.rps-lesson .show-answer-btn {
+  background: #111112;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+.rps-lesson .show-answer-btn:hover {
+  background: #8e6fc4;
+}
+.rps-lesson .flowchart-box {
+  border: 2px solid #fff !important;
+  background: #121212;
+  border-radius: 8px;
+  max-width: 500px;
+  text-align: left;
+  padding: 1rem 1.5rem;
+}
+.rps-lesson .flowchart-arrow {
+  color: #fff !important;
+  font-size: 2.5rem;
 }

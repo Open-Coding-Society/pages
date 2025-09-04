@@ -6,11 +6,6 @@ layout: opencs
     /* Teaching Layout - Styles ONLY markdown content, not Python cells */
     
     /* Container wrapper for teaching content */
-    .teaching-wrapper {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 20px 0;
-    }
 
     .teaching-container {
         max-width: 1200px;
@@ -127,12 +122,34 @@ layout: opencs
 
     /* Special markdown cell styling for inline code */
     .markdown-section code,
-    .section code {
-        background: #f7fafc !important;
-        color: #333 !important;
-        padding: 2px 4px;
-        border-radius: 3px;
-        font-family: 'Courier New', monospace;
+    .section code,
+    .info-box code,
+    .think-box code,
+    .challenge-box code,
+    .checkpoint-box code,
+    .warning-box code,
+    .key-points code {
+        background: #f0f4f8 !important;
+        color: #2d3748 !important;
+        padding: 2px 6px !important;
+        border-radius: 3px !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 0.9em !important;
+        border: 1px solid #e2e8f0 !important;
+        display: inline !important;
+    }
+    
+    /* Override for code inside pre blocks (code blocks, not inline) */
+    .section pre code,
+    .markdown-section pre code,
+    .code-block code,
+    .code-preview code,
+    .code-snippet code {
+        background: transparent !important;
+        color: #e2e8f0 !important;
+        border: none !important;
+        padding: 0 !important;
+        display: block !important;
     }
 
     /* Info boxes - only in markdown */
@@ -202,10 +219,27 @@ layout: opencs
     .warning-box h4 {
         color: #c53030 !important;
         margin-bottom: 10px;
+        font-weight: 600 !important;
     }
 
-    .warning-box p {
+    .warning-box p,
+    .warning-box li,
+    .warning-box ul {
         color: #742a2a !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Special fix for code inside warning boxes */
+    .warning-box code {
+        background: rgba(255, 255, 255, 0.5) !important;
+        color: #7f1d1d !important;
+        padding: 2px 6px !important;
+        border-radius: 3px !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 0.9em !important;
+        border: 1px solid rgba(229, 62, 62, 0.3) !important;
+        display: inline !important;
+        font-weight: 600 !important;
     }
 
     /* Process flow visualization */
@@ -533,389 +567,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-</script>
-
-<script>
-  // Local Storage functionality for Popcorn Hack
-  document.addEventListener('DOMContentLoaded', function() {
-    // Animate sections on load with staggered timing
-    const sections = document.querySelectorAll('.animate-in');
-    sections.forEach((section, index) => {
-      setTimeout(() => {
-        section.classList.add('show');
-      }, index * 120);
-    });
-    
-    // Load saved response if exists
-    const savedResponse = localStorage.getItem('popcornHack_' + window.location.pathname);
-    if (savedResponse) {
-      document.getElementById('hackResponse').value = savedResponse;
-    }
-    // Save response on change
-document.getElementById('hackResponse').addEventListener('input', function() {
-  localStorage.setItem('popcornHack_' + window.location.pathname, this.value);
-});
-    
-    // Load saved poll response if exists
-    const savedPoll = localStorage.getItem('quickPoll_' + window.location.pathname);
-    if (savedPoll) {
-      document.getElementById('pollResponse').value = savedPoll;
-    }
-    
-    // Add hover and interaction effects to buttons
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(btn => {
-      btn.addEventListener('mouseover', function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)';
-      });
-      
-      btn.addEventListener('mouseout', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)';
-      });
-      
-      btn.addEventListener('mousedown', function() {
-        this.style.transform = 'translateY(1px)';
-      });
-      
-      btn.addEventListener('mouseup', function() {
-        this.style.transform = 'translateY(-2px)';
-      });
-    });
-  });
-
-  function clearResponse() {
-  const editor = document.getElementById('hackResponse');
-  const output = document.getElementById('output');
-  const storageKey = 'popcornHack_' + window.location.pathname;
-
-  editor.value = '';
-  output.textContent = '';
-  localStorage.removeItem(storageKey);
-}
-
-// Feedback poll JS from your provided code
-
-
-let selectedFeedback = null;
-
-function selectFeedback(type) {
-  const formContainer = document.getElementById('feedbackForm');
-  const thumbsUp = document.getElementById('thumbsUp');
-  const thumbsDown = document.getElementById('thumbsDown');
-
-  // Clear previous selection
-  thumbsUp.classList.remove('selected');
-  thumbsDown.classList.remove('selected');
-
-  // Highlight selected button
-  if (type === 'up') {
-    thumbsUp.classList.add('selected');
-  } else {
-    thumbsDown.classList.add('selected');
-  }
-
-  // Define values
-  const entryId = "entry.2118665550";
-  const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfLtJ379pka0HiBUrKfhg3iMoqNe_CTq8GyKh4Teb4aXq3VEA/viewform?usp=pp_url";
-  const feedbackValue = window.location.href;
-  const formUrl = `${baseUrl}&${entryId}=${encodeURIComponent(feedbackValue)}`;
-
-  // Show Google Form
-  formContainer.innerHTML = `
-    <iframe
-      src="${formUrl}"
-      style="width: 100%; height: 600px; border: none; border-radius: 10px;"
-      allowfullscreen
-    ></iframe>
-  `;
-  formContainer.style.display = 'block';
-}
-
-
-async function submitFeedback() {
-  const feedbackText = document.getElementById('feedbackText').value.trim();
-
-  if (!feedbackText) {
-    alert('Please provide some feedback before submitting.');
-    return;
-  }
-
-  // Hide form and show success message (same as before)
-  document.getElementById('feedbackForm').style.display = 'none';
-  const statusDiv = document.getElementById('feedbackStatus');
-  const statusText = document.getElementById('statusText');
-
-  if (selectedFeedback === 'up') {
-    statusText.textContent = 'Thank you for your positive feedback! 🎉';
-    statusDiv.style.background = 'rgba(76, 175, 80, 0.15)';
-    statusDiv.style.borderLeftColor = '#4CAF50';
-  } else {
-    statusText.textContent = 'Thank you for helping us improve! 🚀';
-    statusDiv.style.background = 'rgba(255, 152, 0, 0.15)';
-    statusDiv.style.borderLeftColor = '#ff9800';
-  }
-
-  statusDiv.style.display = 'block';
-
-  // Send feedback to the backend
-  await sendFeedbackToServer(selectedFeedback, feedbackText);
-
-  // Reset after 3 seconds
-  setTimeout(() => {
-    resetFeedback();
-  }, 3000);
-}
-
-
-function resetFeedback() {
-    selectedFeedback = null;
-    
-    // Reset button states
-    document.getElementById('thumbsUp').classList.remove('selected');
-    document.getElementById('thumbsDown').classList.remove('selected');
-    
-    // Hide form and status
-    document.getElementById('feedbackForm').style.display = 'none';
-    document.getElementById('feedbackStatus').style.display = 'none';
-    
-    // Clear textarea
-    document.getElementById('feedbackText').value = '';
-}
-
-  
-  function showStatusMessage(id) {
-    const statusElement = document.getElementById(id);
-    statusElement.style.display = 'block';
-    statusElement.classList.add('fade-in');
-    setTimeout(() => {
-      statusElement.classList.add('fade-out');
-      setTimeout(() => {
-        statusElement.style.display = 'none';
-        statusElement.classList.remove('fade-in', 'fade-out');
-      }, 500);
-    }, 1500);
-  }
-
-  let pyodideReadyPromise = loadPyodide();
-
-  async function runPythonCode(code) {
-  const pyodide = await pyodideReadyPromise;
-
-  // Redirect Python's print output
-  let output = '';
-  pyodide.setStdout({
-    batched: (data) => {
-      output += data + '\n';
-    },
-  });
-  pyodide.setStderr({
-    batched: (data) => {
-      output += 'Error: ' + data + '\n';
-    },
-  });
-
-  try {
-    const result = await pyodide.runPythonAsync(code);
-    if (typeof result !== 'undefined') {
-      output += result.toString(); // append returned value if any
-    }
-  } catch (err) {
-    output += `\nException: ${err}`;
-  }
-
-  return output;
-}
-
-
-
-async function runCode() {
-  const code = document.getElementById('hackResponse').value;
-
-  if (code.startsWith('#python') || code.startsWith('print') || code.includes('def ') || code.includes('import ')) {
-    // Run as Python
-    const output = await runPythonCode(code);
-    document.getElementById('output').innerText = output;
-  } else {
-    // Run as JS (or other language you support)
-    try {
-      const result = eval(code);
-      document.getElementById('output').innerText = result;
-    } catch (err) {
-      document.getElementById('output').innerText = 'JS Error: ' + err.message;
-    }
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.runCode = async function () {
-    const language = document.getElementById("languageSelect").value;
-    const code = document.getElementById("hackResponse").value;
-    const outputElement = document.getElementById("output");
-
-    outputElement.textContent = "Running...";
-
-    if (language === "python") {
-      if (!window.pyodide) {
-        outputElement.textContent = "Loading Python runtime...";
-        window.pyodide = await loadPyodide();
-      }
-
-      try {
-        await window.pyodide.loadPackagesFromImports(code);
-
-        // Redirect stdout in Python using StringIO
-        await window.pyodide.runPythonAsync(`
-import sys
-from io import StringIO
-_stdout = sys.stdout
-sys.stdout = StringIO()
-`);
-        await window.pyodide.runPythonAsync(code);
-        const output = await window.pyodide.runPythonAsync(`sys.stdout.getvalue()`);
-        await window.pyodide.runPythonAsync(`sys.stdout = _stdout`);
-
-        outputElement.textContent = output || "[No output]";
-      } catch (err) {
-        outputElement.textContent = "Python Error: " + err;
-      }
-    } else if (language === "javascript") {
-      try {
-        const result = eval(code);
-        outputElement.textContent = result !== undefined ? result : "[No output]";
-      } catch (err) {
-        outputElement.textContent = "JS Error: " + err;
-      }
-    }
-  };
-});
-
-let dataVisible = false;
-
-function selectFeedback(type) {
-  const formContainer = document.getElementById('feedbackForm');
-  const thumbsUp = document.getElementById('thumbsUp');
-  const thumbsDown = document.getElementById('thumbsDown');
-
-  // Clear previous selection
-  thumbsUp.classList.remove('selected');
-  thumbsDown.classList.remove('selected');
-
-  // Highlight selected button
-  if (type === 'up') {
-    thumbsUp.classList.add('selected');
-  } else {
-    thumbsDown.classList.add('selected');
-  }
-
-  // Define values
-  const entryId = "entry.2118665550";
-  const baseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfLtJ379pka0HiBUrKfhg3iMoqNe_CTq8GyKh4Teb4aXq3VEA/viewform?usp=pp_url";
-  const feedbackValue = type === 'up' ? 'Great! 👍' : 'Needs Improvement 👎';
-  const formUrl = `${baseUrl}&${entryId}=${encodeURIComponent(feedbackValue)}`;
-
-  // Show Google Form
-  formContainer.innerHTML = `
-    <iframe
-      src="${formUrl}"
-      style="width: 100%; height: 600px; border: none; border-radius: 10px;"
-      allowfullscreen
-    ></iframe>
-  `;
-  formContainer.style.display = 'block';
-}
-
-function toggleDataView() {
-  const container = document.getElementById('dataContainer');
-  const toggleBtn = document.getElementById('dataToggle');
-  const toggleText = document.getElementById('toggleText');
-  const toggleArrow = document.querySelector('.toggle-arrow');
-  
-  dataVisible = !dataVisible;
-  
-  if (dataVisible) {
-    container.style.display = 'block';
-    // Force reflow to ensure display change is processed
-    container.offsetHeight;
-    container.classList.add('show');
-    toggleText.textContent = 'Hide Response Data';
-    toggleArrow.classList.add('rotated');
-    
-    // Update last updated time
-    const lastUpdatedElement = document.getElementById('lastUpdated');
-    if (lastUpdatedElement) {
-      lastUpdatedElement.textContent = `Updated ${new Date().toLocaleTimeString()}`;
-    }
-  } else {
-    container.classList.remove('show');
-    toggleText.textContent = 'View Response Data';
-    toggleArrow.classList.remove('rotated');
-    
-    // Hide after animation completes
-    setTimeout(() => {
-      if (!dataVisible) {
-        container.style.display = 'none';
-      }
-    }, 500);
-  }
-}
-
-function hideLoadingOverlay() {
-  const overlay = document.getElementById('loadingOverlay');
-  if (overlay) {
-    setTimeout(() => {
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-      }, 300);
-    }, 1000);
-  }
-}
-
-function refreshData() {
-  const iframe = document.getElementById('dataIframe');
-  const overlay = document.getElementById('loadingOverlay');
-  
-  if (overlay) {
-    // Show loading overlay
-    overlay.style.display = 'flex';
-    overlay.style.opacity = '1';
-  }
-  
-  if (iframe) {
-    // Refresh iframe by reloading its source
-    iframe.src = iframe.src;
-  }
-  
-  // Update timestamp after a delay to simulate loading
-  setTimeout(() => {
-    const lastUpdatedElement = document.getElementById('lastUpdated');
-    if (lastUpdatedElement) {
-      lastUpdatedElement.textContent = `Updated ${new Date().toLocaleTimeString()}`;
-    }
-  }, 1500);
-}
-
-// Auto-refresh data every 5 minutes when visible
-setInterval(() => {
-  if (dataVisible) {
-    const lastUpdatedElement = document.getElementById('lastUpdated');
-    if (lastUpdatedElement) {
-      lastUpdatedElement.textContent = `Updated ${new Date().toLocaleTimeString()}`;
-    }
-  }
-}, 300000); // 300000ms = 5 minutes
-
-// Optional: Reset feedback function (if you want to add a reset button)
-function resetFeedback() {
-  const thumbsUp = document.getElementById('thumbsUp');
-  const thumbsDown = document.getElementById('thumbsDown');
-  const formContainer = document.getElementById('feedbackForm');
-  
-  thumbsUp.classList.remove('selected');
-  thumbsDown.classList.remove('selected');
-  formContainer.style.display = 'none';
-  formContainer.innerHTML = '';
-}
 </script>

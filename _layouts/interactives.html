@@ -1,6 +1,7 @@
 ---
 layout: opencs
 ---
+<meta name="gemini-api-key" content="AIzaSyDM-_Gj6GQTXHcym9cP_syUeopcF25x47o"> 
 
 <div class="lesson-container">
   <!-- Sidebar with Lesson Links -->
@@ -15,6 +16,11 @@ layout: opencs
     <h3>💡 Future References</h3>
     <ul>
       <li><a href="{{site.baseurl}}/solitaire/lesson/future-references">Future Reference Tags</a></li>
+    </ul>
+
+    <h3>🎯 End of Lesson</h3>
+    <ul>
+      <li><a href="{{site.baseurl}}/solitaire/lesson/quiz">End of Lesson Quiz</a></li>
     </ul>
     <hr>
 
@@ -423,3 +429,373 @@ document.addEventListener("DOMContentLoaded", () => {
   right: 20px;
 }
 </style>
+<script type="module">
+// ---------- Helpers to pull lesson metadata ----------
+function readLessonConfig() {
+  try {
+    const el = document.getElementById("lesson-config");
+    if (!el) return null;
+    return JSON.parse(el.textContent || "{}");
+  } catch { return null; }
+}
+
+function extractKeyPointsFromDOM() {
+  const root = document.querySelector(".post-content");
+  if (!root) return [];
+
+  // Find a heading that likely precedes key points
+  const headings = Array.from(root.querySelectorAll("h2,h3"));
+  let list = null;
+  const want = /key\s*points|takeaways|what\s*you\s*learned|summary/i;
+
+  const targetHeading = headings.find(h => want.test(h.textContent));
+  if (targetHeading) {
+    // Next sibling UL/OL after the heading
+    let n = targetHeading.nextElementSibling;
+    while (n && !/UL|OL/.test(n.tagName)) n = n.nextElementSibling;
+    if (n && /UL|OL/.test(n.tagName)) list = n;
+  }
+
+  // Fallback: first UL/OL in the post
+  if (!list) list = root.querySelector("ul,ol");
+  if (!list) return [];
+
+  return Array.from(list.querySelectorAll("li"))
+    .map(li => li.innerText.trim())
+    .filter(Boolean)
+    .slice(0, 12);
+}
+
+function getRubricDefault() {
+  return [
+    "definitions_or_vocabulary",
+    "examples_or_code_snippets",
+    "accuracy_of_explanations",
+    "ties_to_lesson_objectives"
+  ];
+}
+
+// ---------- Public API used by your scorer ----------
+function gatherLessonSignals() {
+  const cfg = readLessonConfig();
+  const keyPoints = (cfg?.key_points && Array.isArray(cfg.key_points) && cfg.key_points.length)
+    ? cfg.key_points
+    : extractKeyPointsFromDOM();
+
+  const rubricCriteria = (cfg?.rubric_criteria && Array.isArray(cfg.rubric_criteria) && cfg.rubric_criteria.length)
+    ? cfg.rubric_criteria
+    : getRubricDefault();
+
+  const lessonEl = document.querySelector(".post-content");
+  const lessonText = lessonEl ? lessonEl.innerText : "";
+  const title = (document.querySelector(".lesson-content h1")?.innerText || "").trim();
+
+  return { keyPoints, rubricCriteria, lessonText, title };
+}
+
+// ---------- Prompt factory (reusable for all lessons) ----------
+export function buildScoringPrompt({ lessonText, responseText, keyPoints, rubricCriteria, title }) {
+  const kp = keyPoints?.length ? keyPoints.map((s, i) => `${i+1}. ${s}`).join("\n") : "N/A";
+
+  const rubricJoined = JSON.stringify(rubricCriteria || getRubricDefault());
+
+  return `
+You are grading a student's short reflection after a lesson titled: "${title}".
+
+Use ONLY:
+1) The lesson's key points (below), and
+2) The student's response.
+
+Return STRICT JSON with:
+- "score": integer 0–100 (basic = 0–39, emerging = 40–59, proficient = 60–84, advanced = 85–100)
+- "reasoning": 1–3 sentences, concise and specific
+- "tips": 2–4 concrete improvement tips as an array of short strings
+- "rubricCriteria": subset of ${rubricJoined} that the student actually demonstrated
+
+Be strict on correctness and specificity. Reward answers that reference the key points or give relevant examples.
+Penalize vague statements or unrelated content.
+
+KEY_POINTS:
+${kp}
+
+LESSON_CONTEXT (optional backup; do not quote verbatim if key points suffice):
+"""${(lessonText || "").slice(0, 28000)}"""
+
+STUDENT_RESPONSE:
+"""${(responseText || "").slice(0, 4000)}"""
+  `.trim();
+}
+
+// If you’re calling scoreWithGemini() elsewhere, just swap in:
+// const { keyPoints, rubricCriteria, lessonText, title } = gatherLessonSignals();
+// const prompt = buildScoringPrompt({ lessonText, responseText, keyPoints, rubricCriteria, title });
+
+</script>
+
+<script type="module">
+/**
+ * Minimal client-only Gemini scorer for lessons (reusable across pages).
+ * No backend required. Saves to localStorage now; easy to POST later.
+ */
+
+/* ---------------------------- API KEY HELPERS ---------------------------- */
+// You can swap this to the meta tag if you prefer build-time injection
+function getApiKey() {
+  const input = document.getElementById("gemini-key");
+  if (input && input.value.trim()) return input.value.trim();
+  const meta = document.querySelector('meta[name="gemini-api-key"]');
+  return meta?.content?.trim() || "";
+}
+
+/* ------------------------------ PAGE HELPERS ----------------------------- */
+function getLessonAndResponse() {
+  const lessonEl = document.querySelector(".post-content");
+  const reflectionEl = document.getElementById("reflection-box");
+  return {
+    lessonText: lessonEl ? lessonEl.innerText : "",
+    responseText: reflectionEl ? reflectionEl.value.trim() : ""
+  };
+}
+
+// Attach a small UI: a button + a results box
+(function attachScoringUI() {
+  const quiz = document.querySelector(".lesson-quiz");
+  if (!quiz) return;
+
+  const btn = document.createElement("button");
+  btn.id = "score-reflection";
+  btn.className = "btn";
+  btn.textContent = "🤖 Get AI Score";
+
+  const out = document.createElement("div");
+  out.id = "ai-score-output";
+  out.style.marginTop = ".5rem";
+
+  quiz.appendChild(btn);
+  quiz.appendChild(out);
+})();
+
+/* ---------------------- LESSON SIGNALS & PROMPT BUILDER ------------------ */
+// Optional per-lesson config exposed via:
+// script id="lesson-config" type="application/json">{ ... }
+function readLessonConfig() {
+  try {
+    const el = document.getElementById("lesson-config");
+    if (!el) return null;
+    return JSON.parse(el.textContent || "{}");
+  } catch {
+    return null;
+  }
+}
+
+function extractKeyPointsFromDOM() {
+  const root = document.querySelector(".post-content");
+  if (!root) return [];
+
+  // Prefer lists under headings like “Key Points”, “Takeaways”, etc.
+  const headings = Array.from(root.querySelectorAll("h2,h3"));
+  const want = /key\s*points|takeaways|what\s*you\s*learned|summary/i;
+
+  let list = null;
+  const targetHeading = headings.find(h => want.test(h.textContent));
+  if (targetHeading) {
+    let n = targetHeading.nextElementSibling;
+    while (n && !/UL|OL/.test(n.tagName)) n = n.nextElementSibling;
+    if (n && /UL|OL/.test(n.tagName)) list = n;
+  }
+
+  // Fallback: first UL/OL on the page
+  if (!list) list = root.querySelector("ul,ol");
+  if (!list) return [];
+
+  return Array.from(list.querySelectorAll("li"))
+    .map(li => li.innerText.trim())
+    .filter(Boolean)
+    .slice(0, 12);
+}
+
+function getRubricDefault() {
+  return [
+    "definitions_or_vocabulary",
+    "examples_or_code_snippets",
+    "accuracy_of_explanations",
+    "ties_to_lesson_objectives"
+  ];
+}
+
+function gatherLessonSignals() {
+  const cfg = readLessonConfig();
+
+  const keyPoints = (cfg?.key_points && Array.isArray(cfg.key_points) && cfg.key_points.length)
+    ? cfg.key_points
+    : extractKeyPointsFromDOM();
+
+  const rubricCriteria = (cfg?.rubric_criteria && Array.isArray(cfg.rubric_criteria) && cfg.rubric_criteria.length)
+    ? cfg.rubric_criteria
+    : getRubricDefault();
+
+  const lessonEl = document.querySelector(".post-content");
+  const lessonText = lessonEl ? lessonEl.innerText : "";
+  const title = (document.querySelector(".lesson-content h1")?.innerText || "").trim() || (cfg?.title || document.title);
+
+  return { keyPoints, rubricCriteria, lessonText, title };
+}
+
+function buildScoringPrompt({ lessonText, responseText, keyPoints, rubricCriteria, title }) {
+  const kp = keyPoints?.length ? keyPoints.map((s, i) => `${i+1}. ${s}`).join("\n") : "N/A";
+  const rubricJoined = JSON.stringify(rubricCriteria || getRubricDefault());
+
+  return `
+You are grading a student's short reflection after a lesson titled: "${title}".
+
+Use ONLY:
+1) The lesson's key points (below), and
+2) The student's response.
+
+Return STRICT JSON with:
+- "score": integer 0–100 (basic = 0–39, emerging = 40–59, proficient = 60–84, advanced = 85–100)
+- "reasoning": 1–3 sentences, concise and specific
+- "tips": 2–4 concrete improvement tips as an array of short strings
+- "rubricCriteria": subset of ${rubricJoined} that the student actually demonstrated
+
+Be strict on correctness and specificity. Reward answers that reference the key points or give relevant examples.
+Penalize vague statements or unrelated content.
+
+KEY_POINTS:
+${kp}
+
+LESSON_CONTEXT (optional backup; do not quote verbatim if key points suffice):
+"""${(lessonText || "").slice(0, 28000)}"""
+
+STUDENT_RESPONSE:
+"""${(responseText || "").slice(0, 4000)}"""
+`.trim();
+}
+
+
+/* ----------------------------- GEMINI CLIENT ----------------------------- */
+async function backoffFetch(url, options, retries = 2, baseDelayMs = 1200) {
+  for (let i = 0; i <= retries; i++) {
+    const res = await fetch(url, options);
+    if (res.status !== 429) return res;
+    if (i === retries) return res;
+    await new Promise(r => setTimeout(r, baseDelayMs * (i + 1)));
+  }
+}
+
+async function scoreWithGemini(apiKey, promptText, model = "gemini-1.5-flash") {
+  if (!apiKey) throw new Error("Missing Gemini API key.");
+  const endpoint =
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=` +
+    encodeURIComponent(apiKey);
+
+  const body = {
+    contents: [{ role: "user", parts: [{ text: promptText }]}],
+    generationConfig: {
+      temperature: 0.2,
+      maxOutputTokens: 400,
+      responseMimeType: "application/json"
+    }
+  };
+
+  const res = await backoffFetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!res?.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`Gemini error (${res?.status || "?"}): ${txt || res?.statusText || "Unknown error"}`);
+  }
+
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+  // Be robust to accidental trailing commentary:
+  const jsonStart = text.indexOf("{");
+  const jsonEnd = text.lastIndexOf("}");
+  const clean = jsonStart !== -1 ? text.slice(jsonStart, jsonEnd + 1) : "{}";
+  return JSON.parse(clean);
+}
+
+/* --------------------------- STORAGE & RENDERING ------------------------- */
+function persistScore(lessonKey, payload) {
+  const key = `score-${lessonKey}`;
+  const record = {
+    ...payload,
+    ts: Date.now(),
+    rubricVersion: 1
+  };
+  localStorage.setItem(key, JSON.stringify(record));
+  return record;
+}
+
+function renderScore(targetEl, payload) {
+  targetEl.innerHTML = `
+    <div style="background:#1f2020;border:1px solid #333;border-radius:8px;padding:12px;">
+      <strong>AI Score:</strong> ${payload.score}/100
+      <div style="opacity:.85;margin-top:.25rem">${payload.reasoning || ""}</div>
+      ${
+        Array.isArray(payload.tips) && payload.tips.length
+          ? `<div style="margin-top:.5rem"><em>Tips:</em><ul>${payload.tips
+              .map(t => `<li>${t}</li>`)
+              .join("")}</ul></div>`
+          : ""
+      }
+    </div>
+  `;
+}
+
+/* --------------------------------- MAIN ---------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const scoreBtn = document.getElementById("score-reflection");
+  const out = document.getElementById("ai-score-output");
+  if (!scoreBtn || !out) return;
+
+  // Optional: display any previous score for this lesson
+  const current = window.location.pathname.split("/").pop();
+  const existing = localStorage.getItem(`score-${current}`);
+  if (existing) {
+    try { renderScore(out, JSON.parse(existing)); } catch {}
+  }
+
+  scoreBtn.addEventListener("click", async () => {
+    out.textContent = "Scoring with Gemini…";
+    try {
+      const apiKey = getApiKey();
+      const { lessonText, responseText } = getLessonAndResponse();
+      if (!responseText) throw new Error("Please write your reflection first.");
+
+      const signals = gatherLessonSignals();
+      const promptText = buildScoringPrompt({
+        lessonText,
+        responseText,
+        keyPoints: signals.keyPoints,
+        rubricCriteria: signals.rubricCriteria,
+        title: signals.title
+      });
+      
+      console.log("Generated Gemini prompt:\n", promptText);
+
+      const result = await scoreWithGemini(apiKey, promptText, /* model */ "gemini-1.5-flash");
+
+      // Normalize fields just in case
+      const payload = {
+        score: Math.max(0, Math.min(100, parseInt(result.score ?? 0, 10))),
+        reasoning: String(result.reasoning ?? ""),
+        tips: Array.isArray(result.tips) ? result.tips.slice(0, 4).map(String) : [],
+        rubricCriteria: Array.isArray(result.rubricCriteria) ? result.rubricCriteria : []
+      };
+
+      const saved = persistScore(current, payload);
+      renderScore(out, saved);
+
+      // (Future) You’ll POST `saved` to your backend to store in a blob/table.
+      // e.g., await fetch('/api/lesson-scores', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(saved) })
+
+    } catch (err) {
+      out.textContent = "❌ " + (err?.message || err);
+    }
+  });
+});
+</script>

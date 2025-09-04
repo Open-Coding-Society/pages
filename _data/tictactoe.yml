@@ -9,7 +9,7 @@ Topics:
     description: "This lesson will introduce students to the important parts of a jupyter notebook: the frontmatter, markdown, and code cells."
   - title: "Python Coding Lesson"
     image: "/tictactoe/python.png"
-    link: "/games/tictactoe/pythoncode"
+    link: "/games/tictactoe/pythoncodev2"
     alt: "Python"
     subtitle: "Tic-Tac-Toe with Python"
     description: "This lesson will teach students how to run the Python command line game and create a new one for your own needs."
