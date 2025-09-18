@@ -58,7 +58,7 @@ lxdData:
       Description: "Hands-on choding challenge to add function to a Calculator."
       Categories: ["JavaScript", "Styling", "Buttons", "Math"]
       Game: "/calculator"
-      Lessons: "https://adityas-2010.github.io/Calculator-lesson/CSP/Calculator-lessons/calculatorlessons"
+      Lessons: "/calculatorlessons"
       Image: "/images/calculator.png"
       Alt: "Calculator functions"
     - Title: "RPG Game"
