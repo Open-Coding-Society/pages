@@ -18,6 +18,7 @@
         <p class="p4-mini-message" data-mini-message>Mark lessons as complete to unlock the next level.</p>
         <button type="button" class="p4-mini-toggle" data-mini-toggle disabled>Checking...</button>
         <p class="p4-mini-next" data-mini-next></p>
+        <p class="p4-mini-back" data-mini-back></p>
     </div>
 </div>
 
@@ -107,13 +108,15 @@
     box-shadow: none;
 }
 
-.p4-mini-next {
+.p4-mini-next,
+.p4-mini-back {
     margin: 0;
     font-size: 0.9rem;
     color: rgba(190, 199, 255, 0.8);
 }
 
-.p4-mini-next a {
+.p4-mini-next a,
+.p4-mini-back a {
     color: rgba(125, 170, 255, 0.95);
     text-decoration: underline;
 }
@@ -150,6 +153,7 @@
     const messageEl = widget.querySelector('[data-mini-message]');
     const toggleBtn = widget.querySelector('[data-mini-toggle]');
     const nextEl = widget.querySelector('[data-mini-next]');
+    const prevEl = widget.querySelector('[data-mini-back]');
 
     function connect() {
         const progress = window.P4Progress;
@@ -182,7 +186,9 @@
             const lessons = progress.getLessons();
             const lesson = lessons.find(item => item.slug === slug);
             const index = lessons.indexOf(lesson);
+
             if (index !== -1) {
+                // Next lesson
                 const nextLesson = lessons[index + 1];
                 if (nextLesson) {
                     const locked = !progress.isUnlocked(nextLesson.slug);
@@ -192,6 +198,15 @@
                     nextEl.innerHTML = prefix + link + (status ? ' ' + status : '');
                 } else {
                     nextEl.textContent = 'You reached the final level in this unit!';
+                }
+
+                // Previous lesson
+                const prevLesson = lessons[index - 1];
+                if (prevLesson) {
+                    const link = '<a href="' + prevLesson.url + '">⬅ Back to ' + prevLesson.title + '</a>';
+                    prevEl.innerHTML = link;
+                } else {
+                    prevEl.textContent = '';
                 }
             }
         }
