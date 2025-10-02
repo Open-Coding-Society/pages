@@ -2,7 +2,7 @@
 layout: post
 title: Rendering Resources
 search_exclude: true
-menu: nav/bitshift-nav/doc.html
+menu: nav/bitshift-nav/render.html
 ---
 
 ## Research

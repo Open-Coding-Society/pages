@@ -1,0 +1,265 @@
+<script>
+(function() {
+    if (window.P4Progress) {
+        window.P4Progress.notify && window.P4Progress.notify();
+        return;
+    }
+
+    const dataEl = document.getElementById('p4-lessons-data');
+    if (!dataEl) {
+        console.warn('P4Progress: lesson data not found.');
+        return;
+    }
+
+    let lessonData;
+    try {
+        lessonData = JSON.parse(dataEl.textContent.trim()).filter(Boolean);
+    } catch (err) {
+        console.warn('P4Progress: unable to parse lesson data.', err);
+        lessonData = [];
+    }
+
+    const moduleLabels = {
+        '3-1': '3.1 Variables',
+        '3-2': '3.2 Data Abstraction',
+        '3-3': '3.3 Mathematical Expressions',
+        '3-4': '3.4 Strings',
+        '3-5': '3.5 Booleans',
+        '3-6': '3.6 Conditionals',
+        '3-7': '3.7 Nested Conditionals',
+        '3-8': '3.8 Iteration',
+        '3-9': '3.9 Developing Algorithms',
+        '3-10A': '3.10 Lists - Python',
+        '3-10B': '3.10 Lists - Mixed/JS'
+    };
+
+    const moduleOrder = ['3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8', '3-9', '3-10A', '3-10B'];
+
+    function getSlug(permalink) {
+        if (!permalink) return '';
+        const parts = permalink.split('/').filter(Boolean);
+        const last = parts[parts.length - 1] || '';
+        return last.replace(/\/$/, '');
+    }
+
+    function getModuleKey(slug) {
+        if (!slug) return '';
+        const parts = slug.split('-');
+        if (parts.length >= 2) {
+            return parts[0] + '-' + parts[1].replace(/[^0-9A-Za-z]/g, '').toUpperCase().replace(/^(A|B)$/i, function(m){return m.toUpperCase();});
+        }
+        return slug;
+    }
+
+    function normalizeModule(key) {
+        if (!key) return '';
+        if (key.startsWith('3-10a')) return '3-10A';
+        if (key.startsWith('3-10b')) return '3-10B';
+        return key;
+    }
+
+    const grouped = new Map();
+
+    lessonData.forEach((entry) => {
+        const slug = getSlug(entry.permalink);
+        if (!slug) {
+            return;
+        }
+        let moduleKey = normalizeModule(getModuleKey(slug)).replace(/[^0-9A-Za-z-]/g, '').toUpperCase();
+        if (!moduleKey.includes('-')) {
+            const segs = slug.split('-');
+            moduleKey = segs.length >= 2 ? (segs[0] + '-' + segs[1]).toUpperCase() : slug.toUpperCase();
+        }
+        if (!grouped.has(moduleKey)) {
+            grouped.set(moduleKey, []);
+        }
+        const lesson = {
+            title: entry.title || slug,
+            permalink: entry.permalink,
+            url: entry.url,
+            slug,
+            moduleKey
+        };
+        grouped.get(moduleKey).push(lesson);
+    });
+
+    function lessonSort(a, b) {
+        const moduleIndexA = moduleOrder.indexOf(a.moduleKey);
+        const moduleIndexB = moduleOrder.indexOf(b.moduleKey);
+        const aIndex = moduleIndexA === -1 ? Number.MAX_SAFE_INTEGER : moduleIndexA;
+        const bIndex = moduleIndexB === -1 ? Number.MAX_SAFE_INTEGER : moduleIndexB;
+        if (aIndex !== bIndex) {
+            return aIndex - bIndex;
+        }
+        const aParts = a.slug.split('-');
+        const bParts = b.slug.split('-');
+        const len = Math.max(aParts.length, bParts.length);
+        for (let i = 0; i < len; i++) {
+            const aVal = aParts[i];
+            const bVal = bParts[i];
+            if (aVal === bVal) continue;
+            const aNum = Number(aVal);
+            const bNum = Number(bVal);
+            const aNumValid = !Number.isNaN(aNum);
+            const bNumValid = !Number.isNaN(bNum);
+            if (aNumValid && bNumValid) {
+                return aNum - bNum;
+            }
+            return String(aVal || '').localeCompare(String(bVal || ''), undefined, { numeric: true, sensitivity: 'base' });
+        }
+        return 0;
+    }
+
+    const orderedModules = [];
+    const seen = new Set();
+
+    moduleOrder.forEach((key) => {
+        if (grouped.has(key)) {
+            const lessonsInModule = grouped.get(key).sort(lessonSort);
+            orderedModules.push({
+                key,
+                label: moduleLabels[key] || key,
+                lessons: lessonsInModule
+            });
+            seen.add(key);
+        }
+    });
+
+    grouped.forEach((lessonsInModule, key) => {
+        if (seen.has(key)) return;
+        orderedModules.push({
+            key,
+            label: moduleLabels[key] || key,
+            lessons: lessonsInModule.sort(lessonSort)
+        });
+    });
+
+    const orderedLessons = [];
+    orderedModules.forEach((module) => {
+        module.lessons.forEach((lesson) => {
+            orderedLessons.push(lesson);
+        });
+    });
+
+    const indexBySlug = new Map();
+    orderedLessons.forEach((lesson, index) => {
+        indexBySlug.set(lesson.slug, index);
+    });
+
+    const storageKey = 'p4-fundamentals-progress-v1';
+    let stored;
+    try {
+        stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    } catch (err) {
+        stored = [];
+    }
+    const completed = new Set(Array.isArray(stored) ? stored : []);
+
+    const listeners = new Set();
+
+    function persist() {
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(Array.from(completed)));
+        } catch (err) {
+            console.warn('P4Progress: unable to persist progress.', err);
+        }
+    }
+
+    function getState() {
+        const total = orderedLessons.length;
+        const completedCount = Array.from(completed).filter(slug => indexBySlug.has(slug)).length;
+        const percent = total ? Math.round((completedCount / total) * 100) : 0;
+        const unlocked = new Set();
+        orderedLessons.forEach((lesson, index) => {
+            if (index === 0) {
+                unlocked.add(lesson.slug);
+                return;
+            }
+            const prevSlug = orderedLessons[index - 1].slug;
+            if (completed.has(prevSlug)) {
+                unlocked.add(lesson.slug);
+            }
+        });
+        return {
+            total,
+            completed: new Set(completed),
+            percent,
+            orderedLessons: orderedLessons.slice(),
+            orderedModules: orderedModules.map(module => ({
+                key: module.key,
+                label: module.label,
+                lessons: module.lessons.map(lesson => ({ ...lesson }))
+            })),
+            unlocked
+        };
+    }
+
+    function notify() {
+        const state = getState();
+        listeners.forEach((fn) => {
+            try {
+                fn(state);
+            } catch (err) {
+                console.error('P4Progress listener error:', err);
+            }
+        });
+        document.dispatchEvent(new CustomEvent('p4-progress-update', { detail: state }));
+    }
+
+    function ensureUnlocked(slug) {
+        if (!indexBySlug.has(slug)) return true;
+        const index = indexBySlug.get(slug);
+        if (index === 0) return true;
+        const prevSlug = orderedLessons[index - 1].slug;
+        return completed.has(prevSlug);
+    }
+
+    function setCompleted(slug, isCompleted) {
+        if (!indexBySlug.has(slug)) return;
+        if (!ensureUnlocked(slug) && isCompleted) {
+            return;
+        }
+        if (isCompleted) {
+            completed.add(slug);
+        } else {
+            completed.delete(slug);
+            // Remove later lessons that rely on this one
+            orderedLessons.forEach((lesson, index) => {
+                if (index > indexBySlug.get(slug) && completed.has(lesson.slug)) {
+                    completed.delete(lesson.slug);
+                }
+            });
+        }
+        persist();
+        notify();
+    }
+
+    function toggleCompleted(slug) {
+        const already = completed.has(slug);
+        setCompleted(slug, !already);
+    }
+
+    function subscribe(fn) {
+        if (typeof fn !== 'function') return () => {};
+        listeners.add(fn);
+        fn(getState());
+        return () => listeners.delete(fn);
+    }
+
+    window.P4Progress = {
+        subscribe,
+        setCompleted,
+        toggleCompleted,
+        isCompleted: (slug) => completed.has(slug),
+        isUnlocked: ensureUnlocked,
+        getState,
+        getModules: () => getState().orderedModules,
+        getLessons: () => orderedLessons.slice(),
+        getLesson: (slug) => orderedLessons.find(lesson => lesson.slug === slug) || null,
+        reset: () => { completed.clear(); persist(); notify(); },
+        notify
+    };
+
+    notify();
+})();
+</script>

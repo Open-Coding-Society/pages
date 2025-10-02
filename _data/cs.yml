@@ -42,7 +42,7 @@ introduction_tools: &introduction_tools |
 
 Onboarding: 
   title: Onboarding and LxD
-  description: During this Sprint, students will establish the foundational tools, collaborative practices, and development mindset essential for their Computer Science journey. You'll gain hands-on experience with Linux systems, VSCode development environment, and GitHub workflows while building your first portfolio site. Through iterative development with Markdown, HTML, CSS, and JavaScript, you'll learn to build Jekyll sites, embrace mistakes as learning opportunities, leverage AI tools effectively, and practice pair programming - all while documenting your growth journey. The focus is on building sustainable habits and understanding a breadth of concepts rather than rushing to in depth coding.
+  description: During this Sprint, students will establish the foundational tools, collaborative practices, and development mindset essential for their Computer Science journey. You'll gain hands-on experience with Linux systems, VSCode development environment, and GitHub workflows while building your first portfolio site. Through iterative development with Markdown, HTML, CSS, and JavaScript, you'll learn to build Jekyll sites, embrace mistakes as learning opportunities, leverage AI tools effectively, and practice pair programming - all while documenting your growth journey. The focus is on building sustainable habits and understanding a breadth of concepts rather than rushing into in-depth coding.
   illustration: *introduction_tools
   mermaid_figure: |
     flowchart TD

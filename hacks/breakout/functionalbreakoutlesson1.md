@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: base_chatadpt
 title: Functional Breakout Blocks Lesson 1
 author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
 permalink: functionalbreakoutlesson1
@@ -7,6 +7,14 @@ permalink: functionalbreakoutlesson1
 
 #### [Return to Main Functional Lesson Page]({{ site.baseurl }}/functionalbreakoutlesson)
 ## **Lesson 1: Paddle and Base Blocks**
+
+### Lesson Objectives
+- Draw and control a paddle using keyboard input
+- Implement basic collision detection for paddle and ball
+- Create and render bricks on the canvas
+- Use functions to manage game state and rendering
+- Develop interactive demos for paddle and ball movement
+- Build a mini Breakout game using only functional code
 
 **Goal:** Learn how to move the paddle (player) left and right and create basic bricks.
 

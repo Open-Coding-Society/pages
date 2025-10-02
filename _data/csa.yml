@@ -148,13 +148,13 @@ Sprint1:
   end: 2
 Sprint2:
   title: Java / Spring Web Development
-  description: Students will master the Fundamentals of Java Programming using the Spring Framework. In this Sprint, students will become familiar with Java types, booleans, iteration, recursion, using and writing objects. Student teaching labs will introduce AP required aspects of Java, while learning the Spring Framework.  This will teach key Java concepts while using a JWT login system, a Rest Controller, Plain Old Java Objects (POJOs), Object Relational Model (ORM), and Java Persistent API (JPA).
+  description: Students will master the Fundamentals of Java Programming using the Spring Framework. In this Sprint, students will become familiar with Java types, booleans, iteration, recursion, using, and writing objects. Student teaching labs will introduce AP-required aspects of Java while learning the Spring Framework. This will teach key Java concepts while using a JWT login system, a Rest Controller, Plain Old Java Objects (POJOs), Object Relational Model (ORM), and Java Persistence API (JPA).
   illustration: *college_board_fundamentals
   start: 3
   end: 7
 Sprint3:
-  title: Create a Team Project for N@tM
-  description: In this Sprint, students will continue to become familiar with Java development as they immerse into  Web Development using the Spring Framework. Coding will focus on Restful APIs, receiving requests, working with data using SQLite, and responding to requests.  Student will pick a Full Stack Web Development project, and work in teams to build it out, including all layers, and how to use ThymeLeaf to create an Admin UI.  The goal is to have the project working and deployed on AWS by the end of this Sprint.  
+  title: Team Project for N@tM
+  description: In this Sprint, students will continue to become familiar with Java development as they immerse themselves in  Web Development using the Spring Framework. Coding will focus on RESTful APIs, receiving requests, working with data using SQLite, and responding to requests.  Students will pick a Full Stack Web Development project, and work in teams to build it out, including all layers, and how to use ThymeLeaf to create an Admin UI.  The goal is to have the project working and deployed on AWS by the end of this Sprint.
   illustration: *web_dev_layers
   start: 8
   end: 12

@@ -47,6 +47,7 @@ future: true
 # sass:
 #   quiet_deps: true
 #   silence_deprecations: [import]
+incremental: true
 
 remote_theme: jekyll/minima@d4d779a
 plugins:

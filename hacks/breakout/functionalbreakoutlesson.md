@@ -1,6 +1,6 @@
 ---
-layout: post
-author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
+layout: base_chatadpt 
+title: "Breakout Blocks Lesson"
 permalink: functionalbreakoutlesson
 ---
 
@@ -102,6 +102,13 @@ flowchart TD
     style F fill:#f9fbe7,stroke:#827717,stroke-width:2px,color:#000000
     style G fill:#ffebee,stroke:#d32f2f,stroke-width:3px,color:#000000
 ```
+## Lesson Objectives:
+  - Understand the basics of functional programming in JavaScript
+  - Learn how to break down the Breakout game into pure functions
+  - Implement paddle and ball movement using functional patterns
+  - Explore state management without classes or objects
+  - Practice refactoring imperative code into functional style
+  - Analyze the benefits and tradeoffs of functional vs. OOP approaches
 
 <!-- ADD ICONS to the cards IN FUTURE! -->
 

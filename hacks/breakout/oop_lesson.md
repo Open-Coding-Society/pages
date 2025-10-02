@@ -1,5 +1,5 @@
 ---
-layout: post 
+layout: base_chatadpt 
 title: OOP Breakout Lesson
 author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
 permalink: oopbreakoutlesson
@@ -475,7 +475,7 @@ document.querySelectorAll('#oop-breakout-quizzes .quiz-card').forEach(card=>{
       if(!r1||r1.parentNode.textContent.trim()!==answers[3].single[0]) correct=false;
       if(!r2||r2.parentNode.textContent.trim()!==answers[3].single[1]) correct=false;
     }
-    fb.textContent=correct?"✅ Correct!":"❌ Try again.";
+    fb.textContent=correct?"✅ Correct!":"❌ Try again.";    
     fb.className="feedback "+(correct?"ok":"bad");
   };
   card.querySelector('.clear').onclick=()=>{

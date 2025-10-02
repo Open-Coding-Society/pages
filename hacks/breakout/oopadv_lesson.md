@@ -1,5 +1,5 @@
 ---
-layout: post 
+layout: base_chatadpt 
 title: OOP Advanced Lesson
 author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
 permalink: oopadvlesson
@@ -8,6 +8,15 @@ permalink: oopadvlesson
 
 #### [Return to main OOP lesson page]({{ site.baseurl }}/oopbreakoutlesson)
 ## Lesson 1 — Advanced Inheritance: Building Complex Class Hierarchies
+
+## Lesson Objectives:
+- Master advanced OOP concepts: multi-level inheritance, polymorphism
+- Build complex class hierarchies (e.g., StrongBrick, MovingBrick)
+- Implement method overriding and dynamic behavior
+- Use composition and arrays for state management
+- Integrate power-up creation and management patterns
+- Tackle advanced challenges: ExplosiveBrick, BrickFactory, PowerUpManager
+- Design extensible systems for future game features
 
 ### Big picture
 

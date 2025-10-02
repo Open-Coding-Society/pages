@@ -1,0 +1,371 @@
+<div id="controls">
+    <div id="level-info">Level 1 of 3</div>
+    <button id="prev-level">← Prev Level</button>
+    <button id="next-level">Next Level →</button>
+    <button id="rotate-cw">Rotate CW</button>
+    <button id="rotate-ccw">Rotate CCW</button>
+    <button id="start-pushers">Start Pushers (O)</button>
+    <button id="stop-pushers">Stop Pushers (Esc)</button>
+</div>
+
+<div id="grid-container"></div>
+
+<script type="module" src="/assets/js/block-unlock/tile.js"></script>
+<script type="module" src="/assets/js/block-unlock/grid-system.js"></script>
+<script type="module" src="/assets/js/block-unlock/level-system.js"></script>
+
+<script type="module">
+import { Grid } from "/assets/js/block-unlock/grid-system.js";
+import { Tile } from "/assets/js/block-unlock/tile.js";
+import { LevelLoader } from "/assets/js/block-unlock/level-system.js";
+
+let container = document.getElementById("grid-container");
+const BASE_CELL_SIZE = 60;
+
+// Track mouse position for tile placement
+let lastMouseX = 0;
+let lastMouseY = 0;
+let lastClickedCell = null;
+
+document.addEventListener('mousemove', (e) => {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+});
+
+// Create grid - will be resized by level loader
+const g = new Grid(10, 10, 0);
+g.startGame = true;
+g.SetToGrid();
+
+// Create level loader
+let cells = [];
+const levelLoader = new LevelLoader(g, container, cells);
+
+// Set up level completion callback
+g.onLevelComplete = () => {
+    console.log("🎉 Level completed!");
+    setTimeout(async () => {
+        const hasNext = await levelLoader.nextLevel();
+        if (!hasNext) {
+            alert("🎉 Congratulations! You completed all levels!");
+        } else {
+            updateLevelDisplay();
+            recreateDisplay();
+        }
+    }, 1000);
+};
+
+// Helper: direction -> degrees
+function directionToAngle(dir){
+    switch(dir){
+        case 'east': return 90;
+        case 'south': return 180;
+        case 'west': return 270;
+        default: return 0;
+    }
+}
+
+function recreateDisplay() {
+    // Get fresh reference to container
+    container = document.getElementById("grid-container");
+    
+    // Clear container
+    container.innerHTML = '';
+    cells.length = 0;
+
+    // Update container styling
+    container.style.setProperty("--grid-cols", g.Xsize);
+    container.style.setProperty("--grid-rows", g.Ysize);
+    container.style.setProperty("--cell-size", `${BASE_CELL_SIZE}px`);
+    container.style.gridTemplateColumns = `repeat(${g.Xsize}, 1fr)`;
+    container.style.gridTemplateRows = `repeat(${g.Ysize}, 1fr)`;
+
+    // Recreate cells
+    for(let y=0; y<g.Ysize; y++){
+        for(let x=0; x<g.Xsize; x++){
+            const cell = document.createElement("div");
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+            cell.classList.add("grid-cell");
+
+            const bg = document.createElement("div");
+            bg.classList.add("cell-bg");
+            
+            // Add border styling if this cell has borders
+            const border = g.getBorder(x, y);
+            if (border) {
+                bg.classList.add("placeable");
+                if (border.directions.includes('n')) bg.classList.add("border-n");
+                if (border.directions.includes('s')) bg.classList.add("border-s");
+                if (border.directions.includes('e')) bg.classList.add("border-e");
+                if (border.directions.includes('w')) bg.classList.add("border-w");
+            }
+            
+            cell.appendChild(bg);
+
+            const spriteDiv = document.createElement("div");
+            spriteDiv.classList.add("cell-tile");
+
+            const key = `${x},${y}`;
+            const tile = g.tileMap[key];
+
+            if(tile && tile.sprite){
+                spriteDiv.style.backgroundImage = `url('${tile.sprite}')`;
+                spriteDiv.style.setProperty('--rotation', `${directionToAngle(tile.direction)}deg`);
+            } else {
+                spriteDiv.style.backgroundImage = `url('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')`;
+                spriteDiv.style.setProperty('--rotation', `0deg`);
+            }
+
+            cell.appendChild(spriteDiv);
+            container.appendChild(cell);
+            cells.push({cell, spriteDiv, bg});
+        }
+    }
+
+    // Add event listeners directly - no separate function
+    container.addEventListener("click", handleCellClick);
+    
+    // Update selection visual after recreation
+    updateSelectionVisual();
+}
+
+function handleCellClick(e) {
+    const cell = e.target.closest('.grid-cell');
+    if(!cell) return;
+    
+    const x = parseInt(cell.dataset.x);
+    const y = parseInt(cell.dataset.y);
+    
+    console.log(`Clicked cell (${x}, ${y}), placeable: ${g.isPlaceable(x, y)}`);
+    
+    // Store clicked cell for tile placement
+    lastClickedCell = {x, y};
+    
+    // Try to select tile (works for existing tiles in placeable areas)
+    g.selectTile([x,y]);
+    updateSelectionVisual();
+}
+
+function updateLevelDisplay() {
+    const info = levelLoader.getCurrentLevelInfo();
+    const levelInfoDiv = document.getElementById("level-info");
+    if (levelInfoDiv) {
+        levelInfoDiv.textContent = `${info.name} (${info.index}/${info.total})`;
+    }
+}
+
+// Load initial level
+levelLoader.loadCurrentLevel().then(() => {
+    updateLevelDisplay();
+    recreateDisplay();
+});
+
+// Update function
+g.subscribe((x,y,value)=>{
+    const index = y*g.Xsize + x;
+    if (!cells[index]) return;
+    
+    const {spriteDiv} = cells[index];
+    const key = `${x},${y}`;
+    const tile = g.tileMap[key];
+
+    if(tile && tile.sprite){
+        spriteDiv.style.backgroundImage = `url('${tile.sprite}')`;
+        spriteDiv.style.setProperty('--rotation', `${directionToAngle(tile.direction)}deg`);
+    } else {
+        spriteDiv.style.backgroundImage = `url('data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')`;
+        spriteDiv.style.setProperty('--rotation', `0deg`);
+    }
+    updateSelectionVisual();
+});
+
+// Selection visual
+function updateSelectionVisual(){
+    if (!cells.length) return;
+    
+    // Clear all selections
+    cells.forEach(c=> {
+        if (c && c.bg) c.bg.classList.remove('selected');
+    });
+    
+    // Add selection to selected tile
+    if(g.selectedTile){
+        const [sx,sy] = g.selectedTile.CordLocation;
+        const index = sy*g.Xsize + sx;
+        if(cells[index] && cells[index].bg){
+            cells[index].bg.classList.add('selected');
+            console.log(`Selected tile at (${sx}, ${sy})`);
+        }
+    }
+}
+
+// Key handling
+window.addEventListener("keydown", e=>{
+    if(e.key==='o'||e.key==='O'){ g.startPushers(); e.preventDefault(); return; }
+    if(e.key==='Escape'){ g.stopAllPushers(); e.preventDefault(); return; }
+
+    // Number key tile placement (1-5)
+    const num = parseInt(e.key);
+    if(num >= 1 && num <= 5) {
+        let targetX, targetY;
+        
+        // Use last clicked cell if available and placeable
+        if (lastClickedCell && g.isPlaceable(lastClickedCell.x, lastClickedCell.y)) {
+            targetX = lastClickedCell.x;
+            targetY = lastClickedCell.y;
+        } 
+        // Fallback to selected tile position
+        else if (g.selectedTile) {
+            [targetX, targetY] = g.selectedTile.CordLocation;
+        }
+        // Last resort: try mouse position
+        else {
+            const hoveredCell = document.elementFromPoint(lastMouseX || 0, lastMouseY || 0);
+            if (hoveredCell) {
+                const cell = hoveredCell.closest('.grid-cell');
+                if (cell) {
+                    targetX = parseInt(cell.dataset.x);
+                    targetY = parseInt(cell.dataset.y);
+                }
+            }
+        }
+        
+        if (targetX !== undefined && targetY !== undefined) {
+            console.log(`Trying to place tile ${num} at (${targetX}, ${targetY})`);
+            g.placeTile(targetX, targetY, num);
+            e.preventDefault();
+            return;
+        }
+    }
+
+    if(!g.selectedTile) return;
+    const map={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"};
+    if(map[e.key]){ 
+        console.log(`Moving selected tile ${map[e.key]}`);
+        g.moveSelected(map[e.key]); 
+        e.preventDefault(); 
+        updateSelectionVisual(); 
+        return; 
+    }
+
+    if(e.key==='r'||e.key==='R'){ g.rotateSelected(true); e.preventDefault(); updateSelectionVisual(); return; }
+    if(e.key==='q'||e.key==='Q'){ g.rotateSelected(false); e.preventDefault(); updateSelectionVisual(); return; }
+});
+
+// Button handlers
+document.getElementById("prev-level")?.addEventListener("click", async ()=>{ 
+    console.log("Previous level clicked");
+    await levelLoader.prevLevel(); 
+    updateLevelDisplay(); 
+    recreateDisplay(); 
+});
+
+document.getElementById("next-level")?.addEventListener("click", async ()=>{ 
+    console.log("Next level clicked");
+    await levelLoader.nextLevel(); 
+    updateLevelDisplay(); 
+    recreateDisplay(); 
+});
+
+document.getElementById("rotate-cw")?.addEventListener("click", ()=>{ 
+    g.rotateSelected(true); 
+    updateSelectionVisual(); 
+});
+
+document.getElementById("rotate-ccw")?.addEventListener("click", ()=>{ 
+    g.rotateSelected(false); 
+    updateSelectionVisual(); 
+});
+
+document.getElementById("start-pushers")?.addEventListener("click", ()=>{ 
+    g.startPushers(); 
+});
+
+document.getElementById("stop-pushers")?.addEventListener("click", ()=>{ 
+    g.stopAllPushers(); 
+});
+
+</script>
+
+<style>
+#controls{ text-align:center; margin-bottom:10px; }
+#controls button{ margin:0 5px; padding:6px 10px; cursor:pointer; }
+
+#level-info {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+#grid-container{
+    display:grid;
+    gap:1px;
+    width:90vw;
+    max-width:900px;
+    margin:0 auto;
+    background:#222;
+    border:2px solid #555;
+}
+
+.grid-cell{
+    position:relative;
+    width: var(--cell-size);
+    height: var(--cell-size);
+}
+
+.cell-bg{
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    background:#333;
+    border:1px solid #888;
+    transition:box-shadow 0.12s, border 0.12s;
+}
+
+.cell-bg.selected{
+    border:3px solid #ff0 !important;
+    box-shadow:0 0 10px rgba(255,255,0,0.5) !important;
+}
+
+/* Placeable area styling */
+.cell-bg.placeable{
+    background:#2a4a2a; /* Slightly green tint for placeable areas */
+}
+
+/* Border directions - thicker and more visible */
+.cell-bg.border-n{
+    border-top: 4px solid #00ff88;
+}
+
+.cell-bg.border-s{
+    border-bottom: 4px solid #00ff88;
+}
+
+.cell-bg.border-e{
+    border-right: 4px solid #00ff88;
+}
+
+.cell-bg.border-w{
+    border-left: 4px solid #00ff88;
+}
+
+.cell-tile{
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    transition:transform 0.18s;
+    transform: rotate(var(--rotation,0deg));
+}
+
+.grid-cell:hover .cell-tile{
+    transform: scale(1.05) rotate(var(--rotation,0deg));
+    cursor:pointer;
+}
+
+/* Hover effect for placeable areas */
+.grid-cell:hover .cell-bg.placeable{
+    background:#3a5a3a;
+}

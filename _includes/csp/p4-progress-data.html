@@ -1,0 +1,13 @@
+<script type="application/json" id="p4-lessons-data">
+[
+{% assign p4_posts = site.posts | where: "menu", "nav/csp_units/csp_unit3_p4_fundamentals.html" | sort: "permalink" %}
+{% assign first_item = true %}
+{% for post in p4_posts %}
+{% unless post.permalink contains '/fundamentals' %}
+{% unless first_item %},{% endunless %}
+  {"title": {{ post.title | jsonify }}, "permalink": "{{ post.permalink }}", "url": "{{ post.url | relative_url }}"}
+{% assign first_item = false %}
+{% endunless %}
+{% endfor %}
+]
+</script>

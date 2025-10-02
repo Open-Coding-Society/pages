@@ -1,0 +1,13 @@
+<script type="application/json" id="programming-lessons-data">
+[
+{% assign programming_posts = site.posts | where: "menu", "nav/csp_units/csp_programming_lessons.html" | sort: "permalink" %}
+{% assign first_item = true %}
+{% for post in programming_posts %}
+{% unless post.permalink contains '/fundamentals' %}
+{% unless first_item %},{% endunless %}
+  {"title": {{ post.title | jsonify }}, "permalink": "{{ post.permalink }}", "url": "{{ post.url | relative_url }}"}
+{% assign first_item = false %}
+{% endunless %}
+{% endfor %}
+]
+</script>

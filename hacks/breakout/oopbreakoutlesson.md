@@ -1,5 +1,5 @@
 ---
-layout: post 
+layout: base_chatadpt 
 author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
 permalink: oopbreakoutlesson
 ---
@@ -109,6 +109,14 @@ flowchart LR
     style Activity fill:#fff8e1,stroke:#000,color:#000
     style Quizzes fill:#fce4ec,stroke:#000,color:#000
 ```
+
+## Lesson Objectives:
+  - Introduce object-oriented programming concepts in JavaScript
+  - Explain the structure of the Breakout game using classes
+  - Compare inheritance, composition, and encapsulation
+  - Map game entities (Ball, Paddle, Brick, PowerUp) to class hierarchies
+  - Discuss the role of the Game class as a coordinator
+  - Prepare students for deeper OOP topics in subsequent lessons
 
 <div class="cards-container">
 	<div class="card card-image-cover">

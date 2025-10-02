@@ -11,6 +11,8 @@ menu: nav/bitshift-nav/tutorial.html
 
 This is a beginner-friendly guide that walks you through the full process of building a basic 3D rendering engine using JavaScript and a 2D HTML canvas. No frameworks or WebGL required. You will learn the fundamental math behind how 3D objects are transformed and projected onto a 2D screen.
 
+The full script can be found [here]({{ site.baseurl }}navigation/bitshift/documentation/tutorial/intro-code).
+
 ---
 
 ## Step 1: Setting Up the Canvas
@@ -212,5 +214,3 @@ To solidify your understanding, try completing the following:
 You’ve now built a foundational 3D engine from scratch using JavaScript. You learned how to move points relative to a camera, apply 3D rotations, and project 3D coordinates onto a 2D screen.
 
 Up next we'll learn how to render our points onto the screen [here]({{site.baseurl}}/navigation/documentation/tutorial/render)!
-
-The full code for this section can be found here: 

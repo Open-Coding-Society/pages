@@ -1,5 +1,5 @@
 ---
-layout: post 
+layout: base_chatadpt 
 title: OOP Breakout Lesson
 author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
 permalink: oopbreakoutlesson2
@@ -7,13 +7,20 @@ permalink: oopbreakoutlesson2
 
 #### [Return to main OOP lesson page]({{ site.baseurl }}/oopbreakoutlesson)
 
----
+
+## Lesson Objectives:
+- Deep dive into the Paddle class: attributes vs. methods
+- Implement movement, input handling, and rendering for Paddle
+- Explore how inheritance enables code reuse
+- Add advanced paddle features (e.g., power-ups, resizing)
+- Practice overriding methods and customizing behavior
+- Analyze the impact of OOP design on game extensibility
 
 ## Lesson 2 — The `Paddle` class: attributes vs. methods
 
 ### What are attributes?
 
-Attributes (also called **properties/fields**) are the data on an object—things the object *has*. In the `Paddle` constructor, these are the attributes:
+Attributes (also called **properties/fields**) are the data on an object—things the object *has*. In the `Paddle` constructor, the following are the attributes:
 
 ```js
 constructor(x, y, canvasWidth, canvasHeight) {
@@ -98,7 +105,7 @@ These methods set position (e.g., via mouse move), center and resize the paddle,
 
 ## ACTIVITY: showcase what you learned, draw out what you learned in the Whiteboard below. 
 
- - Draw your “class” as a box → properties inside (like health, lives), methods outside (like move(), hitBrick()).
+ - Draw your “class” as a box → properties inside (like health and lives), methods outside (like move(), hitBrick()).
 
  - Draw inheritance → a Paddle class, then draw a “PowerPaddle” subclass that has an extra feature (like shooting lasers).
 

@@ -48,6 +48,14 @@ flowchart TD
     style G fill:#ffebee,stroke:#d32f2f,stroke-width:3px,color:#000000
 ```
 
+## Lesson Objectives:
+  - Explore the structure and progression of Breakout game levels
+  - Analyze point systems and scoring logic
+  - Implement level transitions and checkpoints
+  - Integrate interactive demos for level mechanics
+  - Practice designing fair and engaging game progression
+  - Visualize lesson flow with diagrams and code samples
+
 <br>
 
 ### [👉 Click this for full source code](https://github.com/code259/curators/tree/main/hacks/breakout)

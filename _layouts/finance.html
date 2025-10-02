@@ -119,25 +119,12 @@ async function loadUserBalance() {
     const balanceElement = document.getElementById('navbarBalance');
 
     const usernameElement = document.getElementById('navbarUsername');
-    const balanceElement = document.getElementById('navbarBalance');
     
     if (usernameElement) {
       usernameElement.textContent = userData.uid || "Guest";
     }
     if (balanceElement) {
       balanceElement.textContent = `$${Number(userData.banks.balance).toFixed(2)}`;
-    }
-  } catch (error) {
-    console.error("Error loading user info:", error);
-    const usernameElement = document.getElementById('navbarUsername');
-    const balanceElement = document.getElementById('navbarBalance');
-    
-    if (usernameElement) {
-      usernameElement.textContent = "Error";
-    }
-
-    if (balanceElement) {
-      balanceElement.textContent = "$0.00";
     }
   }
 }

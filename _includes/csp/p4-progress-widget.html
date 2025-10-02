@@ -1,0 +1,239 @@
+{% assign __slug_parts = page.permalink | split: '/' %}
+{% assign __lesson_slug = '' %}
+{% for __part in __slug_parts reversed %}
+  {% if __part and __part != '' %}
+    {% assign __lesson_slug = __part %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+<div class="p4-mini-progress" data-p4-mini data-lesson-slug="{{ __lesson_slug }}">
+    <div class="p4-mini-meter">
+        <div class="p4-mini-track">
+            <div class="p4-mini-fill" data-mini-fill></div>
+        </div>
+        <div class="p4-mini-value" data-mini-value>0%</div>
+    </div>
+    <div class="p4-mini-body">
+        <p class="p4-mini-message" data-mini-message>Mark lessons as complete to unlock the next level.</p>
+        <button type="button" class="p4-mini-toggle" data-mini-toggle disabled>Checking...</button>
+        <p class="p4-mini-next" data-mini-next></p>
+        <p class="p4-mini-back" data-mini-back></p>
+    </div>
+</div>
+
+<style>
+.p4-mini-progress {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: center;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(24, 20, 77, 0.9), rgba(10, 5, 36, 0.92));
+    border: 1px solid rgba(80, 66, 190, 0.45);
+    color: #f2f5ff;
+    box-shadow: 0 18px 32px rgba(8, 5, 25, 0.45);
+}
+
+.p4-mini-meter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.p4-mini-track {
+    position: relative;
+    width: 54px;
+    height: 180px;
+    padding: 4px;
+    border-radius: 28px;
+    background: linear-gradient(160deg, rgba(76, 63, 222, 0.35), rgba(21, 13, 68, 0.85));
+    border: 1px solid rgba(110, 123, 255, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.p4-mini-fill {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    height: 0;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(125, 95, 255, 0.2) 0%, rgba(91, 122, 255, 0.6) 45%, rgba(41, 122, 255, 0.92) 100%);
+    transition: height 320ms ease;
+}
+
+.p4-mini-value {
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.04em;
+}
+
+.p4-mini-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.p4-mini-message {
+    margin: 0;
+    font-size: 0.98rem;
+    color: rgba(225, 229, 255, 0.85);
+}
+
+.p4-mini-toggle {
+    align-self: start;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(109, 95, 255, 0.45);
+    background: linear-gradient(135deg, rgba(93, 76, 255, 0.9), rgba(55, 122, 255, 0.9));
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.p4-mini-toggle:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(55, 122, 255, 0.35);
+}
+
+.p4-mini-toggle[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.p4-mini-next,
+.p4-mini-back {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(190, 199, 255, 0.8);
+}
+
+.p4-mini-next a,
+.p4-mini-back a {
+    color: rgba(125, 170, 255, 0.95);
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .p4-mini-progress {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+    .p4-mini-body {
+        align-items: center;
+    }
+    .p4-mini-toggle {
+        align-self: center;
+    }
+}
+</style>
+
+<script>
+(function() {
+    const widget = document.querySelector('[data-p4-mini]');
+    if (!widget) {
+        return;
+    }
+    const slug = widget.dataset.lessonSlug;
+    if (!slug) {
+        console.warn('P4Progress widget: no lesson slug found.');
+        return;
+    }
+
+    const fillEl = widget.querySelector('[data-mini-fill]');
+    const valueEl = widget.querySelector('[data-mini-value]');
+    const messageEl = widget.querySelector('[data-mini-message]');
+    const toggleBtn = widget.querySelector('[data-mini-toggle]');
+    const nextEl = widget.querySelector('[data-mini-next]');
+    const prevEl = widget.querySelector('[data-mini-back]');
+
+    function connect() {
+        const progress = window.P4Progress;
+        if (!progress) {
+            return;
+        }
+
+        function update(state) {
+            if (!state) return;
+            if (fillEl) {
+                fillEl.style.height = state.percent + '%';
+            }
+            if (valueEl) {
+                valueEl.textContent = state.percent + '%';
+            }
+
+            const isUnlocked = progress.isUnlocked(slug);
+            const isCompleted = progress.isCompleted(slug);
+
+            if (!isUnlocked) {
+                toggleBtn.disabled = true;
+                toggleBtn.textContent = 'Locked';
+                messageEl.textContent = 'Complete the previous lesson to unlock this level.';
+            } else {
+                toggleBtn.disabled = false;
+                toggleBtn.textContent = isCompleted ? 'Completed - click to reset' : 'Mark this lesson complete';
+                messageEl.textContent = isCompleted ? 'Great job! The next level is ready for you.' : 'Work through this lesson, then mark it complete to unlock the next one.';
+            }
+
+            const lessons = progress.getLessons();
+            const lesson = lessons.find(item => item.slug === slug);
+            const index = lessons.indexOf(lesson);
+
+            if (index !== -1) {
+                // Next lesson
+                const nextLesson = lessons[index + 1];
+                if (nextLesson) {
+                    const locked = !progress.isUnlocked(nextLesson.slug);
+                    const prefix = locked ? 'Next level locked: ' : 'Next level unlocked: ';
+                    const status = locked ? 'Complete this lesson to continue.' : '';
+                    const link = '<a href="' + nextLesson.url + '">' + nextLesson.title + '</a>';
+                    nextEl.innerHTML = prefix + link + (status ? ' ' + status : '');
+                } else {
+                    nextEl.textContent = 'You reached the final level in this unit!';
+                }
+
+                // Previous lesson
+                const prevLesson = lessons[index - 1];
+                if (prevLesson) {
+                    const link = '<a href="' + prevLesson.url + '">⬅ Back to ' + prevLesson.title + '</a>';
+                    prevEl.innerHTML = link;
+                } else {
+                    prevEl.textContent = '';
+                }
+            }
+        }
+
+        const unsubscribe = progress.subscribe(update);
+
+        toggleBtn.addEventListener('click', () => {
+            if (!progress.isUnlocked(slug)) {
+                return;
+            }
+            progress.toggleCompleted(slug);
+        });
+
+        widget.addEventListener('p4-progress-widget:disconnect', () => {
+            unsubscribe();
+        });
+    }
+
+    if (window.P4Progress) {
+        connect();
+    } else {
+        document.addEventListener('p4-progress-update', function handleReady() {
+            if (window.P4Progress) {
+                connect();
+                document.removeEventListener('p4-progress-update', handleReady);
+            }
+        });
+    }
+})();
+</script>

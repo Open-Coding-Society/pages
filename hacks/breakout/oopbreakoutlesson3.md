@@ -1,5 +1,5 @@
 ---
-layout: post 
+layout: base_chatadpt 
 title: OOP Breakout Lesson
 author: Nikhil, Rohan, Pranav, Aditya, Shriya, Samhita
 permalink: oopbreakoutlesson3
@@ -7,7 +7,14 @@ permalink: oopbreakoutlesson3
 
 #### [Return to main OOP lesson page]({{ site.baseurl }}/oopbreakoutlesson)
 
----
+
+## Lesson Objectives:
+- Understand constructors and object instantiation in OOP
+- Implement the Ball class with velocity, position, and collision logic
+- Use inheritance to extend GameObject functionality
+- Add advanced ball features (e.g., speed changes, effects)
+- Integrate ball movement and collision into the game loop
+- Visualize object creation and lifecycle in Breakout
 
 ### What is a constructor?
 
