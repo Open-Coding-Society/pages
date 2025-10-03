@@ -116,6 +116,53 @@ The very first time you clone run project you will need to run this Ruby command
 bundle install
 ```
 
+### Jupyter Kernels
+
+To run many of the IPYNB files you will need to install Jupyter kernels for the languages you want to use. Here are the most common and recommended kernels:
+
+#### Recommended Kernels
+
+- **Python3** (ipykernel): For Python code cells and most data science workflows.
+- **Java** (IJava or jbang-ijava): For Java code cells and Java notebooks.
+
+#### Sample Installation Commands
+
+**macOS (Homebrew):**
+
+```bash
+# For Java kernel (IJava)
+brew install coursier
+cs install --channel=https://github.com/SpencerPark/IJava/releases/latest/download/channel.json ijava
+# Or for jbang-ijava
+brew install jbang
+jbang app install ijava
+```
+
+**Ubuntu/Linux (apt):**
+
+```bash
+# For Java kernel (IJava)
+sudo apt install coursier
+cs install --channel=https://github.com/SpencerPark/IJava/releases/latest/download/channel.json ijava
+
+# Or for jbang-ijava
+sudo apt install jbang
+# or sudo snap install jbang --classic
+jbang app install ijava
+```
+
+#### List your installed kernels
+
+```shell
+(venv) username@machine path % jupyter kernelspec list
+Available kernels:
+  python3        /Users/username/Library/Jupyter/kernels/python3
+  java           /Users/username/Library/Jupyter/kernels/java
+  jbang-ijava    /Users/username/Library/Jupyter/kernels/jbang-ijava
+```
+
+Recommended Kernels
+
 ### Start the Server  
 
 This requires running terminal commands `make`, `make stop`, `make clean`, or `make convert` to manage the running server.  Logging of details will appear in the terminal.   A `Makefile` has been created in the project to support commands and start processes.

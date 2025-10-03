@@ -1,0 +1,129 @@
+main .wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    margin: 0;
+    max-width: none;
+}
+
+.graph-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto;
+    min-height: 700px;
+    height: auto;
+}
+
+svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /*z-index: 1;*/
+}
+
+.arrow {
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 3;
+    fill: none;
+    marker-end: url(#arrowhead);
+}
+
+.node {
+    position: absolute;
+    background: #e06665;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+
+.node:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    z-index: 3;
+}
+
+.node-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3a79;
+    margin-bottom: 5px;
+}
+
+.node-title {
+    font-size: 14px;
+    color: #d8d8d8;
+    text-align: center;
+    padding: 0 10px;
+    font-weight: 600;
+}
+
+.tooltip {
+    position: absolute;
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.tooltip.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.tooltip-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 8px;
+}
+
+.tooltip-list {
+    list-style: none;
+}
+
+.tooltip-list li {
+    padding: 6px 0;
+    color: #333;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.tooltip-list li:last-child {
+    border-bottom: none;
+}
+
+.tooltip-list li a {
+    color: #333;
+    text-decoration: none;
+    display: inline;
+    transition: color 0.2s ease;
+}
+
+.tooltip-list li a:hover {
+    color: #667eea;
+}
+
+.tooltip-list li a:before {
+    content: "→ ";
+    color: #667eea;
+    font-weight: bold;
+}
