@@ -1,4 +1,4 @@
-// CHANGES: New level system for storing and loading game levels with smooth transitions
+// CHANGES v1.5: Enhanced reset with comprehensive debugging, improved tile loading verification
 
 export class LevelSystem {
     constructor() {
@@ -155,46 +155,109 @@ export class LevelLoader {
 
     async loadLevel(levelData) {
         if (!levelData) {
-            console.error("No level data provided");
+            console.error("❌ No level data provided");
             return false;
         }
 
-        console.log(`Loading: ${levelData.name}`);
+        console.log("╔════════════════════════════════════╗");
+        console.log(`║   LOADING: ${levelData.name.padEnd(22)} ║`);
+        console.log("╚════════════════════════════════════╝");
 
-        // Clear current level
+        // Store the startGame flag before clearing
+        const wasGameStarted = this.grid.startGame;
+        console.log("💾 Saving startGame flag:", wasGameStarted);
+        
+        // Clear current level (this stops pushers and clears tiles)
         this.grid.clearLevel();
+        
+        // Restore startGame flag after clearing
+        this.grid.startGame = wasGameStarted;
+        console.log("♻️ Restored startGame flag:", this.grid.startGame);
 
         // Resize grid if needed
         const [newWidth, newHeight] = levelData.gridSize;
         if (newWidth !== this.grid.Xsize || newHeight !== this.grid.Ysize) {
+            console.log(`📐 Resizing grid: ${this.grid.Xsize}x${this.grid.Ysize} → ${newWidth}x${newHeight}`);
             this.resizeGrid(newWidth, newHeight);
         }
 
         // Add borders
+        console.log(`🟩 Adding ${levelData.borders.length} border cells...`);
         levelData.borders.forEach(border => {
             this.grid.addBorder(border.x, border.y, border.directions);
         });
+        console.log(`✅ Added ${this.grid.borders.length} borders`);
 
         // Add tiles - import Tile class dynamically
         const { Tile } = await import('./tile.js');
-        levelData.tiles.forEach(tileData => {
+        console.log(`🎮 Adding ${levelData.tiles.length} tiles...`);
+        
+        levelData.tiles.forEach((tileData, index) => {
             const tile = new Tile(
                 [tileData.x, tileData.y], 
                 tileData.state, 
                 tileData.direction || 'north'
             );
             this.grid.addTile(tile);
+            
+            const tileTypeName = ['Empty','Block','Pusher','Heavy','Rotater','SliderH','SliderV','Key','Door','Immovable'][tileData.state] || 'Unknown';
+            console.log(`  ${index+1}. ${tileTypeName} (state ${tileData.state}) at (${tileData.x}, ${tileData.y}) facing ${tile.direction}`);
         });
+        
+        console.log(`✅ Added ${Object.keys(this.grid.tileMap).length} tiles to grid`);
+
+        // Verify tiles were added
+        console.log("🔍 Verifying tiles in tileMap:");
+        for(const key in this.grid.tileMap) {
+            const tile = this.grid.tileMap[key];
+            console.log(`  - ${key}: State ${tile.State}, Direction ${tile.direction}`);
+        }
 
         // Refresh visual display
+        console.log("🎨 Refreshing visual display...");
         this.refreshDisplay();
 
+        console.log("╔════════════════════════════════════╗");
+        console.log(`║   LOADED: ${levelData.name.padEnd(24)} ║`);
+        console.log("╚════════════════════════════════════╝");
         return true;
     }
 
     async loadCurrentLevel() {
         const levelData = this.levelSystem.getCurrentLevel();
         return this.loadLevel(levelData);
+    }
+
+    async resetCurrentLevel() {
+        console.log("╔════════════════════════════════════╗");
+        console.log("║   RESET LEVEL - START             ║");
+        console.log("╚════════════════════════════════════╝");
+        console.log("📍 Current level index:", this.levelSystem.getCurrentLevelIndex());
+        console.log("📍 Current level name:", this.levelSystem.getCurrentLevel()?.name);
+        
+        // Stop any moving pushers before reset
+        console.log("🛑 Stopping all pushers...");
+        this.grid.stopAllPushers();
+        
+        // Get current level data
+        const levelData = this.levelSystem.getCurrentLevel();
+        console.log("📋 Level data retrieved:", levelData ? "✅" : "❌");
+        
+        if (!levelData) {
+            console.error("❌ Failed to get current level data!");
+            return false;
+        }
+        
+        // Reload the current level
+        console.log("🔄 Reloading level...");
+        const result = await this.loadLevel(levelData);
+        
+        console.log("📊 Reset result:", result ? "✅ Success" : "❌ Failed");
+        console.log("╔════════════════════════════════════╗");
+        console.log("║   RESET LEVEL - COMPLETE          ║");
+        console.log("╚════════════════════════════════════╝");
+        
+        return result;
     }
 
     async nextLevel() {

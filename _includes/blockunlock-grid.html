@@ -2,6 +2,7 @@
     <div id="level-info">Level 1 of 3</div>
     <button id="prev-level">← Prev Level</button>
     <button id="next-level">Next Level →</button>
+    <button id="reset-level">🔄 Reset Level</button>
     <button id="rotate-cw">Rotate CW</button>
     <button id="rotate-ccw">Rotate CCW</button>
     <button id="start-pushers">Start Pushers (O)</button>
@@ -43,16 +44,28 @@ const levelLoader = new LevelLoader(g, container, cells);
 
 // Set up level completion callback
 g.onLevelComplete = () => {
-    console.log("🎉 Level completed!");
+    console.log("=== 🎉 LEVEL COMPLETION TRIGGERED 🎉 ===");
+    
+    // Stop all pushers immediately
+    g.stopAllPushers();
+    console.log("All pushers stopped");
+    
+    // Wait for visual feedback, then load next level
     setTimeout(async () => {
+        console.log("Loading next level...");
         const hasNext = await levelLoader.nextLevel();
+        
         if (!hasNext) {
+            console.log("No more levels - game complete!");
             alert("🎉 Congratulations! You completed all levels!");
         } else {
+            console.log("Next level loaded, updating display...");
             updateLevelDisplay();
             recreateDisplay();
+            console.log("Display updated successfully");
         }
-    }, 1000);
+        console.log("=== LEVEL TRANSITION COMPLETE ===");
+    }, 800);
 };
 
 // Helper: direction -> degrees
@@ -202,7 +215,13 @@ function updateSelectionVisual(){
 
 // Key handling
 window.addEventListener("keydown", e=>{
-    if(e.key==='o'||e.key==='O'){ g.startPushers(); e.preventDefault(); return; }
+    if(e.key==='o'||e.key==='O'){ 
+        console.log("'O' key pressed - starting pushers");
+        console.log("Grid startGame flag:", g.startGame);
+        g.startPushers(); 
+        e.preventDefault(); 
+        return; 
+    }
     if(e.key==='Escape'){ g.stopAllPushers(); e.preventDefault(); return; }
 
     // Number key tile placement (1-5)
@@ -279,6 +298,8 @@ document.getElementById("rotate-ccw")?.addEventListener("click", ()=>{
 });
 
 document.getElementById("start-pushers")?.addEventListener("click", ()=>{ 
+    console.log("Start Pushers button clicked!");
+    console.log("Grid startGame flag:", g.startGame);
     g.startPushers(); 
 });
 
@@ -369,3 +390,4 @@ document.getElementById("stop-pushers")?.addEventListener("click", ()=>{
 .grid-cell:hover .cell-bg.placeable{
     background:#3a5a3a;
 }
+</style></content>

@@ -1,4 +1,4 @@
-// CHANGES: Fixed tile placement bug, restricted tile selection and movement to placeable areas only, added level completion detection
+// CHANGES v1.5: Fixed level completion to detect ADJACENT tiles (touching), not same position. Enhanced reset debugging.
 import { Tile } from "/assets/js/block-unlock/tile.js";
 
 export class Grid {
@@ -15,6 +15,7 @@ export class Grid {
         this.startGame=false;
         this.borders = []; // Array of border objects {x, y, directions: ['n','s','e','w']}
         this.onLevelComplete = null; // Callback for level completion
+        this.isCheckingCompletion = false; // Prevent multiple completion triggers
     }
 
     SetToGrid(){ Grid.currentGridData=this; }
@@ -26,8 +27,9 @@ export class Grid {
         this.grid[y][x]=value; 
         this.notify(x,y); 
         
-        // Check for level completion after each grid change
-        this.checkLevelCompletion();
+        // Check for level completion after EVERY grid change
+        // Use setTimeout to let the grid update complete first
+        setTimeout(() => this.checkLevelCompletion(), 50);
     }
     get(x,y){ if(x<0||x>=this.Xsize||y<0||y>=this.Ysize) return null; return this.grid[y][x]; }
 
@@ -73,14 +75,18 @@ export class Grid {
         // Remove existing tile if any
         const key = `${x},${y}`;
         if (this.tileMap[key]) {
+            console.log("Removing existing tile at position");
             delete this.tileMap[key];
         }
 
-        // Place new tile
-        const newTile = new Tile([x, y], tileState);
+        // Place new tile with proper direction initialization
+        const newTile = new Tile([x, y], tileState, 'north');
+        console.log(`Created new tile - isPusher: ${newTile.isPusher()}, direction: ${newTile.direction}`);
+        
         this.tileMap[key] = newTile;
         this.set(x, y, tileState);
         console.log(`Successfully placed tile ${tileState} at (${x}, ${y})`);
+        console.log(`Tile in map - isPusher: ${this.tileMap[key].isPusher()}`);
         return true;
     }
 
@@ -166,7 +172,28 @@ export class Grid {
         this.selectedTile=tilesToMove.find(t=>t===this.selectedTile);
     }
 
-    startPushers(){ for(const k in this.tileMap){ const t=this.tileMap[k]; if(t && t.isPusher()) t.startPushing(this); } }
+    startPushers(){ 
+        console.log("=== START PUSHERS CALLED ===");
+        console.log("startGame flag:", this.startGame);
+        console.log("Total tiles in map:", Object.keys(this.tileMap).length);
+        
+        let pusherCount = 0;
+        let startedCount = 0;
+        
+        for(const k in this.tileMap){ 
+            const t=this.tileMap[k]; 
+            if(t && t.isPusher()) {
+                pusherCount++;
+                console.log(`Found pusher at ${k}, direction: ${t.direction}, isMoving: ${t.isMoving}`);
+                const started = t.startPushing(this);
+                if(started) startedCount++;
+                console.log(`Pusher start result:`, started);
+            }
+        }
+        
+        console.log(`Total pushers found: ${pusherCount}, Successfully started: ${startedCount}`);
+        console.log("=== END START PUSHERS ===");
+    }
     stopAllPushers(){ for(const k in this.tileMap){ const t=this.tileMap[k]; if(t && t.isPusher()) t.stopPushing(); } }
 
     rotateSelected(clockwise=true){
@@ -179,38 +206,108 @@ export class Grid {
 
     // Clear all tiles and borders (for loading new levels)
     clearLevel() {
+        console.log("╔════════════════════════════════════╗");
+        console.log("║   CLEARING LEVEL - START          ║");
+        console.log("╚════════════════════════════════════╝");
+        console.log("📊 Before Clear:");
+        console.log("  - Total tiles:", Object.keys(this.tileMap).length);
+        console.log("  - Tile positions:", Object.keys(this.tileMap));
+        console.log("  - Total borders:", this.borders.length);
+        console.log("  - startGame flag:", this.startGame);
+        
+        // Stop all pushers first
+        console.log("🛑 Stopping all pushers...");
+        this.stopAllPushers();
+        
+        // Clear everything
+        console.log("🗑️ Clearing tileMap...");
         this.tileMap = {};
+        
+        console.log("🗑️ Clearing borders...");
         this.borders = [];
+        
+        console.log("🗑️ Clearing selection...");
         this.selectedTile = null;
-        this.startGame = false;
+        
+        console.log("🗑️ Resetting completion flag...");
+        this.isCheckingCompletion = false;
+        
+        console.log("✅ Keeping startGame as:", this.startGame);
         
         // Reset grid to empty
+        console.log("🧹 Resetting all grid cells to 0...");
         for(let y = 0; y < this.Ysize; y++) {
             for(let x = 0; x < this.Xsize; x++) {
                 this.grid[y][x] = 0;
+            }
+        }
+        
+        // Notify all cells to update visuals
+        console.log("📢 Notifying all cells for visual update...");
+        for(let y = 0; y < this.Ysize; y++) {
+            for(let x = 0; x < this.Xsize; x++) {
                 this.notify(x, y);
             }
         }
+        
+        console.log("📊 After Clear:");
+        console.log("  - Total tiles:", Object.keys(this.tileMap).length);
+        console.log("  - Total borders:", this.borders.length);
+        console.log("  - startGame flag:", this.startGame);
+        console.log("╔════════════════════════════════════╗");
+        console.log("║   CLEARING LEVEL - COMPLETE       ║");
+        console.log("╚════════════════════════════════════╝");
     }
 
     // Check if key reached door (level completion)
     checkLevelCompletion() {
-        // Find key and door positions
-        let keyPos = null;
-        let doorPos = null;
+        // Prevent multiple simultaneous completion checks
+        if (this.isCheckingCompletion) return;
+        
+        // Find key and door tiles
+        let keyTile = null;
+        let doorTile = null;
         
         for(const key in this.tileMap) {
             const tile = this.tileMap[key];
-            if(tile.State === 7) keyPos = tile.CordLocation; // Key
-            if(tile.State === 8) doorPos = tile.CordLocation; // Door
+            if(tile.State === 7) keyTile = tile; // Key
+            if(tile.State === 8) doorTile = tile; // Door
         }
         
-        // Check if key and door are at same position
-        if(keyPos && doorPos && keyPos[0] === doorPos[0] && keyPos[1] === doorPos[1]) {
-            console.log("Level completed! Key reached door!");
+        if (!keyTile || !doorTile) {
+            return; // No key or door exists
+        }
+        
+        const [keyX, keyY] = keyTile.CordLocation;
+        const [doorX, doorY] = doorTile.CordLocation;
+        
+        // Calculate distance between key and door
+        const deltaX = Math.abs(keyX - doorX);
+        const deltaY = Math.abs(keyY - doorY);
+        
+        console.log(`🔍 Completion Check: Key at (${keyX},${keyY}), Door at (${doorX},${doorY}), Distance: Δx=${deltaX}, Δy=${deltaY}`);
+        
+        // Check if key and door are ADJACENT (touching)
+        // They touch if they're 1 tile apart horizontally OR vertically (not diagonally)
+        const isTouching = (deltaX === 1 && deltaY === 0) || (deltaX === 0 && deltaY === 1);
+        
+        if (isTouching) {
+            console.log(`✅ KEY IS TOUCHING DOOR! Δx=${deltaX}, Δy=${deltaY}`);
+            console.log(`🎉 LEVEL COMPLETE! Key (${keyX},${keyY}) touched Door (${doorX},${doorY})`);
+            
+            // Prevent multiple triggers
+            this.isCheckingCompletion = true;
+            
             if(this.onLevelComplete) {
-                setTimeout(() => this.onLevelComplete(), 500); // Small delay for visual feedback
+                this.onLevelComplete();
             }
+            
+            // Reset flag after a delay
+            setTimeout(() => {
+                this.isCheckingCompletion = false;
+            }, 2000);
+        } else {
+            console.log(`❌ Not touching: Δx=${deltaX}, Δy=${deltaY} (need 1,0 or 0,1)`);
         }
     }
 }
