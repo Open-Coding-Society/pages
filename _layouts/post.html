@@ -87,6 +87,13 @@ layout: opencs
         {% include csp/p4-progress-widget.html %}
       {% endunless %}
     {% endif %}
+    {% if page.menu == 'nav/csp_units/csp_programming_lessons.html' %}
+      {% include csp/programming-lessons-progress-data.html %}
+      {% include csp/programming-lessons-progress-controller.html %}
+      {% unless page.permalink contains '/fundamentals' %}
+        {% include csp/programming-lessons-progress-widget.html %}
+      {% endunless %}
+    {% endif %}
     {% if page.categories.size > 0 %}
       Categories:
       {% for category in  page.categories  %}
