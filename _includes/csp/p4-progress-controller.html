@@ -160,6 +160,8 @@
     function persist() {
         try {
             localStorage.setItem(storageKey, JSON.stringify(Array.from(completed)));
+            // Trigger cross-page sync
+            localStorage.setItem('p4-progress-sync', Date.now().toString());
         } catch (err) {
             console.warn('P4Progress: unable to persist progress.', err);
         }
@@ -246,6 +248,109 @@
         return () => listeners.delete(fn);
     }
 
+    // Enhanced progress analytics and insights
+    function getProgressInsights() {
+        const state = getState();
+        const completedCount = state.completed.size;
+        const total = state.total;
+        const percent = state.percent;
+        
+        const insights = {
+            totalLessons: total,
+            completedLessons: completedCount,
+            remainingLessons: total - completedCount,
+            progressPercent: percent,
+            isComplete: percent >= 100,
+            isNearComplete: percent >= 90,
+            streak: 0,
+            lastCompleted: null,
+            averageTimePerLesson: 0,
+            estimatedTimeRemaining: 0
+        };
+
+        // Calculate streak (consecutive completed lessons from the end)
+        let streak = 0;
+        for (let i = orderedLessons.length - 1; i >= 0; i--) {
+            if (completed.has(orderedLessons[i].slug)) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        insights.streak = streak;
+
+        // Find last completed lesson
+        const completedLessons = orderedLessons.filter(lesson => completed.has(lesson.slug));
+        if (completedLessons.length > 0) {
+            insights.lastCompleted = completedLessons[completedLessons.length - 1];
+        }
+
+        return insights;
+    }
+
+    // Enhanced reset with confirmation
+    function resetProgress(confirmReset = false) {
+        if (!confirmReset) {
+            if (window.confirm('Are you sure you want to reset all progress? This action cannot be undone.')) {
+                resetProgress(true);
+            }
+            return;
+        }
+        
+        completed.clear();
+        persist();
+        notify();
+        
+        // Show success message
+        if (window.console && console.log) {
+            console.log('Progress reset successfully!');
+        }
+    }
+
+    // Export progress data
+    function exportProgress() {
+        const state = getState();
+        const insights = getProgressInsights();
+        
+        return {
+            timestamp: new Date().toISOString(),
+            version: '1.0',
+            progress: {
+                completed: Array.from(state.completed),
+                total: state.total,
+                percent: state.percent
+            },
+            insights: insights,
+            lessons: orderedLessons.map(lesson => ({
+                slug: lesson.slug,
+                title: lesson.title,
+                url: lesson.url,
+                completed: state.completed.has(lesson.slug),
+                unlocked: state.unlocked.has(lesson.slug)
+            }))
+        };
+    }
+
+    // Import progress data
+    function importProgress(data) {
+        try {
+            if (data && data.progress && Array.isArray(data.progress.completed)) {
+                completed.clear();
+                data.progress.completed.forEach(slug => {
+                    if (typeof slug === 'string') {
+                        completed.add(slug);
+                    }
+                });
+                persist();
+                notify();
+                return true;
+            }
+        } catch (err) {
+            console.warn('P4Progress: unable to import progress data.', err);
+        }
+        return false;
+    }
+
     window.P4Progress = {
         subscribe,
         setCompleted,
@@ -256,8 +361,11 @@
         getModules: () => getState().orderedModules,
         getLessons: () => orderedLessons.slice(),
         getLesson: (slug) => orderedLessons.find(lesson => lesson.slug === slug) || null,
-        reset: () => { completed.clear(); persist(); notify(); },
-        notify
+        reset: resetProgress,
+        notify,
+        getInsights: getProgressInsights,
+        export: exportProgress,
+        import: importProgress
     };
 
     notify();

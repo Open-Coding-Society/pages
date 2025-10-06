@@ -7,131 +7,421 @@
   {% endif %}
 {% endfor %}
 
-<div class="p4-mini-progress" data-p4-mini data-lesson-slug="{{ __lesson_slug }}">
-    <div class="p4-mini-meter">
-        <div class="p4-mini-track">
-            <div class="p4-mini-fill" data-mini-fill></div>
-        </div>
-        <div class="p4-mini-value" data-mini-value>0%</div>
+<div class="p4-mini" data-p4-mini data-lesson-slug="{{ __lesson_slug | escape }}">
+    <div class="p4-mini__top">
+        <span class="p4-mini__stage" data-mini-stage>Start</span>
+        <span class="p4-mini__percent" data-mini-value>0%</span>
     </div>
-    <div class="p4-mini-body">
-        <p class="p4-mini-message" data-mini-message>Mark lessons as complete to unlock the next level.</p>
-        <button type="button" class="p4-mini-toggle" data-mini-toggle disabled>Checking...</button>
-        <p class="p4-mini-next" data-mini-next></p>
-        <p class="p4-mini-back" data-mini-back></p>
+    <div class="p4-mini__bar" data-mini-bar role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="p4-mini__bar-fill" data-mini-fill></div>
     </div>
+    <div class="p4-mini__counts">
+        <span class="p4-mini__count" data-mini-count>0 / 0 lessons</span>
+        <span class="p4-mini__summary" data-mini-summary>Let’s light up your first checkpoint.</span>
+    </div>
+    <div class="p4-mini__actions">
+        <button type="button" class="p4-mini__toggle" data-mini-toggle disabled>Checking…</button>
+    </div>
+    <p class="p4-mini__message" data-mini-message>Mark this lesson complete when you finish the walkthrough.</p>
+    <p class="p4-mini__next" data-mini-next>Next level appears once you unlock it.</p>
 </div>
 
 <style>
-.p4-mini-progress {
+:root {
+    --p4-mini-space-xs: 8px;
+    --p4-mini-space-sm: 16px;
+    --p4-mini-space-md: 24px;
+    --p4-mini-space-lg: 32px;
+    --p4-mini-radius-xs: 8px;
+    --p4-mini-radius-sm: 12px;
+    --p4-mini-radius-md: 16px;
+    --p4-mini-radius-lg: 24px;
+    --p4-mini-radius-full: 9999px;
+    
+    /* Modern Color Palette - matching page theme */
+    --p4-mini-clr-primary: #6366f1;
+    --p4-mini-clr-primary-light: #818cf8;
+    --p4-mini-clr-primary-dark: #4f46e5;
+    --p4-mini-clr-secondary: #06b6d4;
+    --p4-mini-clr-accent: #f59e0b;
+    --p4-mini-clr-success: #10b981;
+    --p4-mini-clr-warning: #f59e0b;
+    --p4-mini-clr-error: #ef4444;
+    
+    /* Surface Colors - matching page theme */
+    --p4-mini-clr-surface: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98));
+    --p4-mini-clr-surface-elevated: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.98));
+    --p4-mini-clr-surface-glass: rgba(255, 255, 255, 0.05);
+    --p4-mini-clr-surface-glass-strong: rgba(255, 255, 255, 0.1);
+    
+    /* Text Colors - matching page theme */
+    --p4-mini-clr-text-primary: #f8fafc;
+    --p4-mini-clr-text-secondary: #cbd5e1;
+    --p4-mini-clr-text-muted: #94a3b8;
+    --p4-mini-clr-text-disabled: #64748b;
+    
+    /* Border Colors - matching page theme */
+    --p4-mini-clr-border: rgba(148, 163, 184, 0.2);
+    --p4-mini-clr-border-strong: rgba(148, 163, 184, 0.4);
+    --p4-mini-clr-border-focus: var(--p4-mini-clr-primary);
+    
+    /* Shadows - matching page theme */
+    --p4-mini-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --p4-mini-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --p4-mini-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --p4-mini-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --p4-mini-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --p4-mini-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+    --p4-mini-shadow-glow-strong: 0 0 40px rgba(99, 102, 241, 0.5);
+    
+    /* Transitions - matching page theme */
+    --p4-mini-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --p4-mini-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --p4-mini-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --p4-mini-transition-bounce: 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Gradients - matching page theme */
+    --p4-mini-gradient-primary: linear-gradient(135deg, var(--p4-mini-clr-primary), var(--p4-mini-clr-primary-light));
+    --p4-mini-gradient-success: linear-gradient(135deg, var(--p4-mini-clr-success), #34d399);
+    --p4-mini-gradient-warning: linear-gradient(135deg, var(--p4-mini-clr-warning), #fbbf24);
+    --p4-mini-gradient-surface: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.9));
+    --p4-mini-gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+.p4-mini {
     display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 18px;
-    align-items: center;
-    padding: 18px 20px;
-    margin-bottom: 24px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(24, 20, 77, 0.9), rgba(10, 5, 36, 0.92));
-    border: 1px solid rgba(80, 66, 190, 0.45);
-    color: #f2f5ff;
-    box-shadow: 0 18px 32px rgba(8, 5, 25, 0.45);
-}
-
-.p4-mini-meter {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-}
-
-.p4-mini-track {
+    gap: var(--p4-mini-space-md);
+    padding: var(--p4-mini-space-lg);
+    border-radius: var(--p4-mini-radius-lg);
+    background: var(--p4-mini-clr-surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--p4-mini-clr-border);
+    box-shadow: var(--p4-mini-shadow-2xl), var(--p4-mini-shadow-glow);
+    color: var(--p4-mini-clr-text-primary);
     position: relative;
-    width: 54px;
-    height: 180px;
-    padding: 4px;
-    border-radius: 28px;
-    background: linear-gradient(160deg, rgba(76, 63, 222, 0.35), rgba(21, 13, 68, 0.85));
-    border: 1px solid rgba(110, 123, 255, 0.35);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
 }
 
-.p4-mini-fill {
+.p4-mini::before {
+    content: "";
     position: absolute;
-    left: 4px;
-    right: 4px;
-    bottom: 4px;
-    height: 0;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(125, 95, 255, 0.2) 0%, rgba(91, 122, 255, 0.6) 45%, rgba(41, 122, 255, 0.92) 100%);
-    transition: height 320ms ease;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--p4-mini-gradient-primary);
+    opacity: 0.6;
 }
 
-.p4-mini-value {
-    font-weight: 700;
-    font-size: 1.3rem;
-    letter-spacing: 0.04em;
+.p4-mini::after {
+    content: "";
+    position: absolute;
+    inset: -200px -300px auto -200px;
+    height: clamp(200px, 30vw, 300px);
+    background: radial-gradient(ellipse at 30% 20%, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, transparent 70%);
+    pointer-events: none;
+    animation: float 20s ease-in-out infinite;
 }
 
-.p4-mini-body {
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(2deg); }
+}
+
+.p4-mini > * {
+    position: relative;
+    z-index: 1;
+}
+
+.p4-mini__top {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--p4-mini-space-sm);
 }
 
-.p4-mini-message {
-    margin: 0;
-    font-size: 0.98rem;
-    color: rgba(225, 229, 255, 0.85);
-}
-
-.p4-mini-toggle {
-    align-self: start;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(109, 95, 255, 0.45);
-    background: linear-gradient(135deg, rgba(93, 76, 255, 0.9), rgba(55, 122, 255, 0.9));
-    color: #fff;
+.p4-mini__stage {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--p4-mini-space-xs);
+    padding: var(--p4-mini-space-xs) var(--p4-mini-space-md);
+    border-radius: var(--p4-mini-radius-full);
+    background: var(--p4-mini-gradient-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--p4-mini-clr-border);
+    font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--p4-mini-clr-text-secondary);
+    box-shadow: var(--p4-mini-shadow-sm);
+    transition: var(--p4-mini-transition-normal);
+}
+
+.p4-mini__stage:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--p4-mini-shadow-md);
+    border-color: var(--p4-mini-clr-primary);
+}
+
+.p4-mini__percent {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: var(--p4-mini-gradient-primary);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.p4-mini__bar {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    border-radius: var(--p4-mini-radius-full);
+    background: var(--p4-mini-clr-surface-glass);
+    border: 1px solid var(--p4-mini-clr-border);
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.p4-mini__bar-fill {
+    width: 0;
+    height: 100%;
+    border-radius: var(--p4-mini-radius-full);
+    background: var(--p4-mini-gradient-primary);
+    transition: width var(--p4-mini-transition-slow);
+    position: relative;
+    overflow: hidden;
+}
+
+.p4-mini__bar-fill::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.p4-mini__counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--p4-mini-space-sm);
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.875rem;
+    color: var(--p4-mini-clr-text-secondary);
+}
+
+.p4-mini__summary {
+    font-size: 0.875rem;
+    color: var(--p4-mini-clr-text-muted);
+    font-weight: 500;
+}
+
+.p4-mini__actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.p4-mini__toggle {
+    padding: var(--p4-mini-space-sm) var(--p4-mini-space-md);
+    border-radius: var(--p4-mini-radius-full);
+    border: 1px solid var(--p4-mini-clr-border);
+    background: var(--p4-mini-gradient-primary);
+    color: var(--p4-mini-clr-text-primary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
     cursor: pointer;
-    transition: transform 160ms ease, box-shadow 160ms ease;
+    transition: var(--p4-mini-transition-normal);
+    box-shadow: var(--p4-mini-shadow-sm);
 }
 
-.p4-mini-toggle:hover:not([disabled]) {
+.p4-mini__toggle:hover:not([disabled]) {
     transform: translateY(-2px);
-    box-shadow: 0 12px 20px rgba(55, 122, 255, 0.35);
+    box-shadow: var(--p4-mini-shadow-glow);
+    border-color: var(--p4-mini-clr-primary);
 }
 
-.p4-mini-toggle[disabled] {
+.p4-mini__toggle:active:not([disabled]) {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.p4-mini__toggle[disabled] {
     cursor: not-allowed;
     opacity: 0.6;
     box-shadow: none;
+    background: var(--p4-mini-clr-surface-glass);
+    border-color: var(--p4-mini-clr-border);
+    color: var(--p4-mini-clr-text-disabled);
 }
 
-.p4-mini-next,
-.p4-mini-back {
+.p4-mini__message,
+.p4-mini__next {
     margin: 0;
-    font-size: 0.9rem;
-    color: rgba(190, 199, 255, 0.8);
+    font-size: 0.875rem;
+    color: var(--p4-mini-clr-text-secondary);
+    line-height: 1.6;
+    font-weight: 500;
 }
 
-.p4-mini-next a,
-.p4-mini-back a {
-    color: rgba(125, 170, 255, 0.95);
-    text-decoration: underline;
+.p4-mini__next a {
+    color: var(--p4-mini-clr-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--p4-mini-transition-normal);
+    border-bottom: 1px solid transparent;
 }
 
+.p4-mini__next a:hover {
+    color: var(--p4-mini-clr-primary-light);
+    border-bottom-color: var(--p4-mini-clr-primary);
+}
+
+.p4-mini__next a.is-locked {
+    pointer-events: none;
+    color: var(--p4-mini-clr-text-disabled);
+    border-bottom: none;
+}
+
+/* Enhanced states for better visual feedback */
+.p4-mini.has-progress .p4-mini__stage {
+    background: var(--p4-mini-gradient-primary);
+    color: var(--p4-mini-clr-text-primary);
+    box-shadow: var(--p4-mini-shadow-glow);
+}
+
+.p4-mini.is-complete {
+    border-color: var(--p4-mini-clr-success);
+    box-shadow: var(--p4-mini-shadow-2xl), 0 0 30px rgba(16, 185, 129, 0.3);
+}
+
+.p4-mini.is-complete::before {
+    background: var(--p4-mini-gradient-success);
+}
+
+.p4-mini.is-near-complete {
+    border-color: var(--p4-mini-clr-accent);
+    box-shadow: var(--p4-mini-shadow-2xl), 0 0 25px rgba(245, 158, 11, 0.2);
+}
+
+.p4-mini.is-near-complete::before {
+    background: var(--p4-mini-gradient-warning);
+}
+
+.p4-mini__stage.is-active {
+    background: var(--p4-mini-gradient-primary);
+    color: var(--p4-mini-clr-text-primary);
+    box-shadow: var(--p4-mini-shadow-glow);
+}
+
+.p4-mini__stage.is-complete {
+    background: var(--p4-mini-gradient-success);
+    color: var(--p4-mini-clr-text-primary);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.p4-mini__toggle.is-locked {
+    background: var(--p4-mini-clr-surface-glass);
+    border-color: var(--p4-mini-clr-border);
+    color: var(--p4-mini-clr-text-disabled);
+    cursor: not-allowed;
+}
+
+.p4-mini__toggle.is-completed {
+    background: var(--p4-mini-gradient-success);
+    border-color: var(--p4-mini-clr-success);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.p4-mini__toggle.is-completed:hover:not([disabled]) {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+}
+
+.next-lesson-link {
+    color: var(--p4-mini-clr-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--p4-mini-transition-normal);
+    border-bottom: 1px solid transparent;
+}
+
+.next-lesson-link:hover {
+    color: var(--p4-mini-clr-primary-light);
+    border-bottom-color: var(--p4-mini-clr-primary);
+}
+
+.next-lesson-link.is-locked {
+    pointer-events: none;
+    color: var(--p4-mini-clr-text-disabled);
+    border-bottom: none;
+}
+
+/* Progress bar enhancements */
+.p4-mini__bar-fill {
+    position: relative;
+    overflow: hidden;
+}
+
+.p4-mini__bar-fill::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    animation: progress-shine 3s infinite;
+}
+
+@keyframes progress-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Responsive design improvements */
 @media (max-width: 640px) {
-    .p4-mini-progress {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        text-align: center;
+    .p4-mini {
+        padding: var(--p4-mini-space-md) var(--p4-mini-space-sm);
     }
-    .p4-mini-body {
-        align-items: center;
+    .p4-mini__counts {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--p4-mini-space-xs);
     }
-    .p4-mini-toggle {
-        align-self: center;
+    .p4-mini__toggle {
+        width: 100%;
+        justify-content: center;
+    }
+    .p4-mini__percent {
+        font-size: 1.75rem;
+    }
+    .p4-mini__stage {
+        font-size: 0.8rem;
+        padding: var(--p4-mini-space-xs) var(--p4-mini-space-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .p4-mini {
+        padding: var(--p4-mini-space-sm);
+    }
+    .p4-mini__percent {
+        font-size: 1.5rem;
+    }
+    .p4-mini__message,
+    .p4-mini__next {
+        font-size: 0.8rem;
     }
 }
 </style>
@@ -142,18 +432,50 @@
     if (!widget) {
         return;
     }
+
     const slug = widget.dataset.lessonSlug;
     if (!slug) {
         console.warn('P4Progress widget: no lesson slug found.');
         return;
     }
 
+    const barEl = widget.querySelector('[data-mini-bar]');
     const fillEl = widget.querySelector('[data-mini-fill]');
-    const valueEl = widget.querySelector('[data-mini-value]');
+    const percentEl = widget.querySelector('[data-mini-value]');
+    const stageEl = widget.querySelector('[data-mini-stage]');
     const messageEl = widget.querySelector('[data-mini-message]');
     const toggleBtn = widget.querySelector('[data-mini-toggle]');
     const nextEl = widget.querySelector('[data-mini-next]');
-    const prevEl = widget.querySelector('[data-mini-back]');
+    const countEl = widget.querySelector('[data-mini-count]');
+    const summaryEl = widget.querySelector('[data-mini-summary]');
+
+    if (!toggleBtn) {
+        return;
+    }
+
+    const stageLabels = {
+        start: 'Start',
+        learn: 'Learn',
+        practice: 'Practice',
+        quiz: 'Quiz',
+        victory: 'Victory'
+    };
+
+    const stepMessages = {
+        start: 'Kick off the journey with this lesson.',
+        learn: 'You are building confidence—keep at it!',
+        practice: 'Time to flex those skills with practice.',
+        quiz: 'Lock it in with review or a quiz.',
+        victory: 'Victory! You crushed Big Idea 3.'
+    };
+
+    const steps = [
+        { id: 'start', threshold: 0 },
+        { id: 'learn', threshold: 10 },
+        { id: 'practice', threshold: 40 },
+        { id: 'quiz', threshold: 70 },
+        { id: 'victory', threshold: 99 }
+    ];
 
     function connect() {
         const progress = window.P4Progress;
@@ -162,62 +484,144 @@
         }
 
         function update(state) {
-            if (!state) return;
-            if (fillEl) {
-                fillEl.style.height = state.percent + '%';
+            if (!state) {
+                return;
             }
-            if (valueEl) {
-                valueEl.textContent = state.percent + '%';
+
+            const percent = state.percent;
+            
+            // Update progress bar with smooth animation
+            if (fillEl) {
+                fillEl.style.width = percent + '%';
+            }
+            if (barEl) {
+                barEl.setAttribute('aria-valuenow', percent);
+            }
+            if (percentEl) {
+                percentEl.textContent = percent + '%';
+            }
+
+            // Determine current step based on progress
+            let activeStep = steps[0];
+            steps.forEach((step) => {
+                if (percent >= step.threshold) {
+                    activeStep = step;
+                }
+            });
+
+            // Update stage indicator with better visual feedback
+            if (stageEl) {
+                stageEl.textContent = stageLabels[activeStep.id] || activeStep.id;
+                stageEl.classList.toggle('is-active', percent > 0);
+                stageEl.classList.toggle('is-complete', percent >= 100);
+            }
+            
+            // Update message with more engaging content
+            if (messageEl) {
+                messageEl.textContent = stepMessages[activeStep.id] || stepMessages.start;
+            }
+
+            // Update lesson counts with better formatting
+            if (countEl) {
+                countEl.textContent = state.completed.size + ' / ' + state.total + ' lessons';
+            }
+
+            // Update summary with more motivational messaging
+            if (summaryEl) {
+                const remaining = Math.max(state.total - state.completed.size, 0);
+                if (remaining === 0) {
+                    summaryEl.textContent = '🎉 All lessons complete—victory achieved!';
+                } else if (remaining === 1) {
+                    summaryEl.textContent = 'Almost there! 1 lesson remains before victory.';
+                } else if (remaining <= 5) {
+                    summaryEl.textContent = `You're in the final stretch! ${remaining} lessons remain before victory.`;
+                } else {
+                    summaryEl.textContent = `${remaining} lessons remain before victory.`;
+                }
             }
 
             const isUnlocked = progress.isUnlocked(slug);
             const isCompleted = progress.isCompleted(slug);
 
+            // Enhanced button states with better UX
             if (!isUnlocked) {
                 toggleBtn.disabled = true;
-                toggleBtn.textContent = 'Locked';
-                messageEl.textContent = 'Complete the previous lesson to unlock this level.';
+                toggleBtn.textContent = '🔒 Locked';
+                toggleBtn.title = 'Complete the previous lesson to unlock this level.';
+                toggleBtn.classList.add('is-locked');
             } else {
                 toggleBtn.disabled = false;
-                toggleBtn.textContent = isCompleted ? 'Completed - click to reset' : 'Mark this lesson complete';
-                messageEl.textContent = isCompleted ? 'Great job! The next level is ready for you.' : 'Work through this lesson, then mark it complete to unlock the next one.';
+                toggleBtn.textContent = isCompleted ? '✅ Completed — reset?' : '🎯 Mark lesson complete';
+                toggleBtn.title = isCompleted ? 'Reset completion if you want to revisit the lesson.' : 'Click after you finish to unlock the next level.';
+                toggleBtn.classList.remove('is-locked');
+                toggleBtn.classList.toggle('is-completed', isCompleted);
             }
 
-            const lessons = progress.getLessons();
-            const lesson = lessons.find(item => item.slug === slug);
-            const index = lessons.indexOf(lesson);
-
-            if (index !== -1) {
-                // Next lesson
-                const nextLesson = lessons[index + 1];
+            // Enhanced next lesson display
+            if (nextEl) {
+                nextEl.textContent = '';
+                const lessons = progress.getLessons();
+                const lesson = lessons.find(item => item.slug === slug);
+                const index = lessons.indexOf(lesson);
+                const nextLesson = index !== -1 ? lessons[index + 1] : null;
+                
                 if (nextLesson) {
                     const locked = !progress.isUnlocked(nextLesson.slug);
-                    const prefix = locked ? 'Next level locked: ' : 'Next level unlocked: ';
-                    const status = locked ? 'Complete this lesson to continue.' : '';
-                    const link = '<a href="' + nextLesson.url + '">' + nextLesson.title + '</a>';
-                    nextEl.innerHTML = prefix + link + (status ? ' ' + status : '');
+                    const prefix = locked ? '🔒 Next level locked: ' : '➡️ Up next: ';
+                    nextEl.append(prefix);
+                    
+                    const link = document.createElement('a');
+                    link.href = nextLesson.url;
+                    link.textContent = nextLesson.title;
+                    link.classList.add('next-lesson-link');
+                    
+                    if (locked) {
+                        link.classList.add('is-locked');
+                        link.setAttribute('aria-disabled', 'true');
+                        link.tabIndex = -1;
+                        link.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        });
+                        nextEl.appendChild(link);
+                        nextEl.append(' — finish this lesson first.');
+                    } else {
+                        nextEl.appendChild(link);
+                    }
                 } else {
-                    nextEl.textContent = 'You reached the final level in this unit!';
-                }
-
-                // Previous lesson
-                const prevLesson = lessons[index - 1];
-                if (prevLesson) {
-                    const link = '<a href="' + prevLesson.url + '">⬅ Back to ' + prevLesson.title + '</a>';
-                    prevEl.innerHTML = link;
-                } else {
-                    prevEl.textContent = '';
+                    nextEl.textContent = '🏆 Victory path complete — nothing left to unlock!';
                 }
             }
+
+            // Add visual feedback for progress milestones
+            widget.classList.toggle('has-progress', percent > 0);
+            widget.classList.toggle('is-complete', percent >= 100);
+            widget.classList.toggle('is-near-complete', percent >= 90);
         }
 
         const unsubscribe = progress.subscribe(update);
 
+        // Enhanced button interaction with better feedback
         toggleBtn.addEventListener('click', () => {
-            if (!progress.isUnlocked(slug)) {
+            if (toggleBtn.disabled) {
                 return;
             }
+            
+            // Add visual feedback
+            toggleBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                toggleBtn.style.transform = '';
+            }, 150);
+            
             progress.toggleCompleted(slug);
+        });
+
+        // Add keyboard support
+        toggleBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleBtn.click();
+            }
         });
 
         widget.addEventListener('p4-progress-widget:disconnect', () => {
@@ -225,13 +629,65 @@
         });
     }
 
+    // Enhanced initialization with better error handling and cross-page sync
+    function initializeWidget() {
+        if (window.P4Progress) {
+            connect();
+            // Notify other pages of progress updates for better sync
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'p4-fundamentals-progress-v1') {
+                    window.P4Progress.notify();
+                }
+            });
+        } else {
+            document.addEventListener('p4-progress-update', function handleReady() {
+                if (window.P4Progress) {
+                    connect();
+                    // Set up cross-page synchronization
+                    window.addEventListener('storage', (e) => {
+                        if (e.key === 'p4-fundamentals-progress-v1') {
+                            window.P4Progress.notify();
+                        }
+                    });
+                    document.removeEventListener('p4-progress-update', handleReady);
+                }
+            });
+        }
+    }
+
+    // Add cross-page progress synchronization
+    function setupCrossPageSync() {
+        // Listen for progress changes from other tabs/windows
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'p4-fundamentals-progress-v1' && window.P4Progress) {
+                // Force a progress update when data changes in another tab
+                setTimeout(() => {
+                    window.P4Progress.notify();
+                }, 100);
+            }
+        });
+
+        // Notify other tabs when progress changes
+        const originalNotify = window.P4Progress?.notify;
+        if (originalNotify) {
+            window.P4Progress.notify = function() {
+                originalNotify.call(this);
+                // Trigger a storage event to notify other tabs
+                localStorage.setItem('p4-progress-sync', Date.now().toString());
+            };
+        }
+    }
+
+    // Initialize the widget
+    initializeWidget();
+    
+    // Set up cross-page sync when P4Progress is available
     if (window.P4Progress) {
-        connect();
+        setupCrossPageSync();
     } else {
-        document.addEventListener('p4-progress-update', function handleReady() {
+        document.addEventListener('p4-progress-update', () => {
             if (window.P4Progress) {
-                connect();
-                document.removeEventListener('p4-progress-update', handleReady);
+                setupCrossPageSync();
             }
         });
     }
