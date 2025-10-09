@@ -24,3 +24,7 @@ vendor/*
 package-lock.json
 private/
 .jekyll-metadata
+IJava
+IJava/
+.gradle/
+build/
