@@ -1,8 +1,10 @@
 ---
 layout: post 
-title: CSA Lesson HomePage
+title: CSA Lessons Homepage
 search_exclude: true
 permalink: /navigation/csa-lessons/
+courses: {'csa':  {'week': 6}}
+type: lesson
 ---
 
 
