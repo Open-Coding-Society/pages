@@ -1,0 +1,617 @@
+<!-- Grading Feedback Tool with Threaded Comments - BACKEND VERSION -->
+<style>
+.grading-feedback-container {
+  background: #1a1a1a;
+  border: 2px solid #0f0;
+  border-radius: 10px;
+  padding: 2rem;
+  margin: 2rem 0;
+  max-width: 900px;
+}
+
+.grading-feedback-container h3 {
+  color: #0f0;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #0f0;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #0f0;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submit-feedback-btn {
+  background: #0f0;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.submit-feedback-btn:hover {
+  background: #0c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
+}
+
+.submit-feedback-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.feedback-message {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  text-align: center;
+  display: none;
+}
+
+.feedback-message.success {
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid #0f0;
+  color: #0f0;
+}
+
+.feedback-message.error {
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid #f00;
+  color: #f00;
+}
+
+.feedback-history {
+  margin-top: 2rem;
+  border-top: 1px solid #444;
+  padding-top: 2rem;
+}
+
+.feedback-history h4 {
+  color: #0f0;
+  margin-bottom: 1.5rem;
+}
+
+.feedback-thread {
+  background: #222;
+  border-left: 3px solid #0f0;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+}
+
+.thread-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.thread-info {
+  flex: 1;
+}
+
+.feedback-name {
+  color: #0f0;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.feedback-timestamp {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.feedback-grade {
+  background: #333;
+  color: #0f0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.feedback-submission {
+  color: #ccc;
+  margin: 1rem 0;
+  line-height: 1.6;
+  padding: 1rem;
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.thread-replies {
+  margin-top: 1.5rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid #444;
+}
+
+.reply-item {
+  background: #1a1a1a;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  border-left: 2px solid #666;
+}
+
+.reply-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.reply-author {
+  color: #0f0;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.reply-timestamp {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.reply-content {
+  color: #aaa;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.reply-form {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+.reply-form textarea {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 0.75rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.reply-form textarea:focus {
+  outline: none;
+  border-color: #0f0;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.reply-btn,
+.cancel-reply-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.reply-btn {
+  background: #0f0;
+  color: #000;
+  font-weight: bold;
+}
+
+.reply-btn:hover {
+  background: #0c0;
+}
+
+.cancel-reply-btn {
+  background: #333;
+  color: #fff;
+}
+
+.cancel-reply-btn:hover {
+  background: #444;
+}
+
+.add-reply-btn {
+  background: #333;
+  color: #0f0;
+  border: 1px solid #0f0;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+
+.add-reply-btn:hover {
+  background: #0f0;
+  color: #000;
+}
+
+.login-warning {
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid #ffa500;
+  color: #ffa500;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.login-warning a {
+  color: #0f0;
+  font-weight: bold;
+  text-decoration: underline;
+}
+</style>
+
+<div class="grading-feedback-container">
+  <h3>📝 Submit Your Grade Feedback</h3>
+  
+  <div id="loginWarning" class="login-warning" style="display: none;">
+    ⚠️ You must be <a href="{{ site.baseurl }}/login">logged in</a> to submit feedback or reply to posts.
+  </div>
+
+  <form class="feedback-form" id="gradingFeedbackForm">
+    <div class="form-group">
+      <label for="gradeReceived">Grade Received *</label>
+      <select id="gradeReceived" name="gradeReceived" required>
+        <option value="">Select grade...</option>
+        <option value="A+ (97-100%)">A+ (97-100%)</option>
+        <option value="A (93-96%)">A (93-96%)</option>
+        <option value="A- (90-92%)">A- (90-92%)</option>
+        <option value="B+ (87-89%)">B+ (87-89%)</option>
+        <option value="B (83-86%)">B (83-86%)</option>
+        <option value="B- (80-82%)">B- (80-82%)</option>
+        <option value="C+ (77-79%)">C+ (77-79%)</option>
+        <option value="C (73-76%)">C (73-76%)</option>
+        <option value="C- (70-72%)">C- (70-72%)</option>
+        <option value="D (60-69%)">D (60-69%)</option>
+        <option value="F (Below 60%)">F (Below 60%)</option>
+        <option value="Not Yet Graded">Not Yet Graded</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="additionalComments">Submission / Comments *</label>
+      <textarea id="additionalComments" name="additionalComments" placeholder="Share your thoughts, challenges, or reflections on this assignment..." required></textarea>
+    </div>
+
+    <button type="submit" class="submit-feedback-btn" id="submitBtn">Submit Feedback</button>
+  </form>
+
+  <div id="feedbackMessage" class="feedback-message"></div>
+
+  <div class="feedback-history" id="feedbackHistory" style="display: none;">
+    <h4>💬 Submission Threads</h4>
+    <div id="feedbackThreadsList"></div>
+  </div>
+</div>
+
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+(async function() {
+  const currentPageUrl = window.location.pathname;
+  const currentPageTitle = document.title;
+  let isLoggedIn = false;
+  
+  // Check if user is logged in
+  async function checkAuth() {
+    try {
+      const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      isLoggedIn = response.ok;
+      return response.ok;
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      isLoggedIn = false;
+      return false;
+    }
+  }
+  
+  // Load posts from backend
+  async function loadPosts() {
+    try {
+      const response = await fetch(`${javaURI}/api/post/page?url=${encodeURIComponent(currentPageUrl)}`);
+      if (!response.ok) {
+        throw new Error('Failed to load posts');
+      }
+      const posts = await response.json();
+      displayPosts(posts);
+    } catch (error) {
+      console.error('Error loading posts:', error);
+      showMessage('Error loading posts', 'error');
+    }
+  }
+  
+  // Create a new post
+  async function createPost(postData) {
+    try {
+      const response = await fetch(`${javaURI}/api/post`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify(postData)
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create post');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
+    }
+  }
+  
+  // Create a reply
+  async function createReply(parentId, content) {
+    try {
+      const response = await fetch(`${javaURI}/api/post/reply`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({
+          parentId: parentId,
+          content: content
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create reply');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating reply:', error);
+      throw error;
+    }
+  }
+  
+  // Display posts
+  function displayPosts(posts) {
+    const historyDiv = document.getElementById('feedbackHistory');
+    const listDiv = document.getElementById('feedbackThreadsList');
+    
+    if (!posts || posts.length === 0) {
+      historyDiv.style.display = 'none';
+      return;
+    }
+    
+    historyDiv.style.display = 'block';
+    listDiv.innerHTML = '';
+    
+    // Show newest first (already sorted by backend)
+    posts.forEach((thread) => {
+      const threadDiv = document.createElement('div');
+      threadDiv.className = 'feedback-thread';
+      
+      let repliesHtml = '';
+      if (thread.replies && thread.replies.length > 0) {
+        repliesHtml = `
+          <div class="thread-replies">
+            <div class="reply-count">💬 ${thread.replyCount} ${thread.replyCount === 1 ? 'reply' : 'replies'}</div>
+            ${thread.replies.map(reply => `
+              <div class="reply-item">
+                <div class="reply-header">
+                  <span class="reply-author">${escapeHtml(reply.studentName)}</span>
+                  <span class="reply-timestamp">${formatDate(reply.timestamp)}</span>
+                </div>
+                <div class="reply-content">${escapeHtml(reply.content)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      const gradeHtml = thread.gradeReceived ? 
+        `<div class="feedback-grade">${escapeHtml(thread.gradeReceived)}</div>` : '';
+      
+      threadDiv.innerHTML = `
+        <div class="thread-header">
+          <div class="thread-info">
+            <div class="feedback-name">${escapeHtml(thread.studentName)}</div>
+            <div class="feedback-timestamp">${formatDate(thread.timestamp)}</div>
+          </div>
+          ${gradeHtml}
+        </div>
+        <div class="feedback-submission">${escapeHtml(thread.content)}</div>
+        ${repliesHtml}
+        ${isLoggedIn ? `
+          <button class="add-reply-btn" onclick="window.showReplyForm(${thread.id})">💬 Add Reply / Feedback</button>
+          <div class="reply-form" data-thread-id="${thread.id}" style="display: none;">
+            <textarea class="reply-content-input" placeholder="Write your feedback or reply..."></textarea>
+            <div class="reply-actions">
+              <button class="reply-btn" onclick="window.submitReply(${thread.id})">Post Reply</button>
+              <button class="cancel-reply-btn" onclick="window.hideReplyForm(${thread.id})">Cancel</button>
+            </div>
+          </div>
+        ` : ''}
+      `;
+      
+      listDiv.appendChild(threadDiv);
+    });
+  }
+  
+  // Show/hide reply form
+  window.showReplyForm = function(threadId) {
+    if (!isLoggedIn) {
+      showMessage('Please log in to reply', 'error');
+      return;
+    }
+    
+    // Hide all other reply forms
+    document.querySelectorAll('.reply-form').forEach(form => {
+      if (form.dataset.threadId != threadId) {
+        form.style.display = 'none';
+      }
+    });
+    
+    const form = document.querySelector(`.reply-form[data-thread-id="${threadId}"]`);
+    if (form) {
+      form.style.display = 'block';
+      form.querySelector('textarea').focus();
+    }
+  };
+  
+  window.hideReplyForm = function(threadId) {
+    const form = document.querySelector(`.reply-form[data-thread-id="${threadId}"]`);
+    if (form) {
+      form.style.display = 'none';
+      form.querySelector('textarea').value = '';
+    }
+  };
+  
+  window.submitReply = async function(threadId) {
+    const form = document.querySelector(`.reply-form[data-thread-id="${threadId}"]`);
+    const contentInput = form.querySelector('.reply-content-input');
+    const content = contentInput.value.trim();
+    
+    if (!content) {
+      showMessage('Please enter your reply', 'error');
+      return;
+    }
+    
+    try {
+      await createReply(threadId, content);
+      showMessage('✅ Reply added successfully!', 'success');
+      window.hideReplyForm(threadId);
+      await loadPosts(); // Reload to show new reply
+    } catch (error) {
+      showMessage('Error adding reply: ' + error.message, 'error');
+    }
+  };
+  
+  // Helper functions
+  function showMessage(message, type) {
+    const msgDiv = document.getElementById('feedbackMessage');
+    msgDiv.textContent = message;
+    msgDiv.className = 'feedback-message ' + type;
+    msgDiv.style.display = 'block';
+    
+    setTimeout(() => {
+      msgDiv.style.display = 'none';
+    }, 5000);
+  }
+  
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  function formatDate(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  }
+  
+  // Form submission
+  const form = document.getElementById('gradingFeedbackForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const loginWarning = document.getElementById('loginWarning');
+  
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!isLoggedIn) {
+      loginWarning.style.display = 'block';
+      showMessage('Please log in to submit feedback', 'error');
+      return;
+    }
+    
+    const formData = {
+      gradeReceived: document.getElementById('gradeReceived').value,
+      content: document.getElementById('additionalComments').value.trim(),
+      pageUrl: currentPageUrl,
+      pageTitle: currentPageTitle
+    };
+    
+    if (!formData.gradeReceived || !formData.content) {
+      showMessage('Please fill in all fields', 'error');
+      return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    
+    try {
+      await createPost(formData);
+      showMessage('✅ Feedback submitted successfully!', 'success');
+      form.reset();
+      await loadPosts(); // Reload to show new post
+    } catch (error) {
+      showMessage('Error submitting feedback: ' + error.message, 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Feedback';
+    }
+  });
+  
+  // Initialize
+  const authOk = await checkAuth();
+  if (!authOk) {
+    loginWarning.style.display = 'block';
+    submitBtn.disabled = true;
+  }
+  
+  await loadPosts();
+  
+  // Auto-reload every 30 seconds to show new posts/replies
+  setInterval(loadPosts, 30000);
+})();
+</script>
+
