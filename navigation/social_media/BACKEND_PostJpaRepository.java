@@ -66,3 +66,4 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
     List<Post> findRecentMainPosts(@Param("limit") int limit);
 }
 
+
