@@ -9,6 +9,7 @@ import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
+import GameLevelOverworld from './GameLevelOverworld.js';
 
 class GameLevelDesert {
   constructor(gameEnv) {
@@ -247,6 +248,139 @@ class GameLevelDesert {
                                       
                                       // Start the End level with the same control
                                       console.log("Transitioning to End level...");
+                                      gameControl.transitionToLevel();
+                                      
+                                      // Fade out overlay
+                                      setTimeout(() => {
+                                          fadeOverlay.style.opacity = '0';
+                                          setTimeout(() => {
+                                              document.body.removeChild(fadeOverlay);
+                                          }, 1000);
+                                      }, 500);
+                                  }, 1000);
+                              });
+                          }
+                      }
+                  },
+                  {
+                      text: "Not Ready",
+                      action: () => {
+                          this.dialogueSystem.closeDialogue();
+                      }
+                  }
+              ]);
+          }
+      }
+
+      const sprite_src_chickenj = path + "/images/gamify/chickenj.png";
+      const sprite_greet_chickenj = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
+      const sprite_data_chickenj = {
+          id: 'Chicken Jockey',
+          greeting: sprite_greet_chickenj,
+          src: sprite_src_chickenj,
+          SCALE_FACTOR: 9,
+          ANIMATION_RATE: 100,
+          pixels: {width: 150, height: 255},
+          INIT_POSITION: { x: (width * 4 / 6), y: (height * 1 / 10)},
+          orientation: {rows: 1, columns: 1 },
+          down: {row: 0, start: 0, columns: 1 },
+          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+          // Add dialogues array for random messages
+          dialogues: [
+              "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
+              "GRRRRRRRR!!",
+              "I'm placing blocks and stuff cuz im in freaking minceraftttt",
+              "BAWAKKKKK!",
+              "You want to fight the chicken?",
+              "CHICKEN JOCKEEEYYYY"
+          ],
+          reaction: function() {
+              // Don't show any reaction dialogue - this prevents the first alert
+              // The interact function will handle all dialogue instead
+          },
+          interact: function() {
+              // Clear any existing dialogue first to prevent duplicates
+              if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                  this.dialogueSystem.closeDialogue();
+              }
+              
+              // Create a new dialogue system if needed
+              if (!this.dialogueSystem) {
+                  this.dialogueSystem = new DialogueSystem();
+              }
+              
+              // Show portal dialogue with buttons
+              this.dialogueSystem.showDialogue(
+                  "Do you follow the Chicken Jockey?",
+                  "Chicken Jockey",
+                  this.spriteData.src
+              );
+              
+              // Add buttons directly to the dialogue
+              this.dialogueSystem.addButtons([
+                  {
+                      text: "Sure!",
+                      primary: true,
+                      action: () => {
+                          this.dialogueSystem.closeDialogue();
+                          
+                          // Clean up the current game state
+                          if (gameEnv && gameEnv.gameControl) {
+                              // Store reference to the current game control
+                              const gameControl = gameEnv.gameControl;
+                              
+                              // Create fade overlay for transition
+                              const fadeOverlay = document.createElement('div');
+                              Object.assign(fadeOverlay.style, {
+                                  position: 'fixed',
+                                  top: '0',
+                                  left: '0',
+                                  width: '100%',
+                                  height: '100%',
+                                  backgroundColor: '#000',
+                                  opacity: '0',
+                                  transition: 'opacity 1s ease-in-out',
+                                  zIndex: '9999'
+                              });
+                              document.body.appendChild(fadeOverlay);
+                              
+                              console.log("You walk after the Chicken Jockey...");
+                              
+                              // Fade in
+                              requestAnimationFrame(() => {
+                                  fadeOverlay.style.opacity = '1';
+                                  
+                                  // After fade in, transition to End level
+                                  setTimeout(() => {
+                                      // Clean up current level properly
+                                      if (gameControl.currentLevel) {
+                                          // Properly destroy the current level
+                                          console.log("Destroying current level...");
+                                          gameControl.currentLevel.destroy();
+                                          
+                                          // Force cleanup of any remaining canvases
+                                          const gameContainer = document.getElementById('gameContainer');
+                                          const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                          oldCanvases.forEach(canvas => {
+                                              console.log("Removing old canvas:", canvas.id);
+                                              canvas.parentNode.removeChild(canvas);
+                                          });
+                                      }
+                                      
+                                      console.log("You walk after the Chicken Jockey...");
+                                      
+                                      // IMPORTANT: Store the original level classes for return journey
+                                      gameControl._originalLevelClasses = gameControl.levelClasses;
+                                      
+                                      
+                                      gameControl.levelClasses = [GameLevelOverworld];
+                                      gameControl.currentLevelIndex = 0;
+                                      
+                                      // Make sure game is not paused
+                                      gameControl.isPaused = false;
+                                      
+                                      // Start the End level with the same control
+                                      console.log("You walk after the Chicken Jockey...");
                                       gameControl.transitionToLevel();
                                       
                                       // Fade out overlay
@@ -724,7 +858,8 @@ class GameLevelDesert {
       { class: Npc, data: sprite_data_stocks },
       { class: Npc, data: sprite_data_crypto },
       { class: Npc, data: sprite_data_minesweeper },
-      { class: Npc, data: sprite_data_endportal }  // Added End Portal NPC
+      { class: Npc, data: sprite_data_chickenj },
+      { class: Npc, data: sprite_data_endportal } 
     ];
   }
 

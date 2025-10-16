@@ -43,10 +43,20 @@ jobs:
           source venv/bin/activate  # Activate the virtual environment
           pip install -r requirements.txt  # Install Python packages
 
-      - name: Execute conversion script
+      - name: Execute notebook conversion script
         run: |
           source venv/bin/activate  # Activate virtual environment
-          python scripts/convert_notebooks.py  # Run your Python script
+          python scripts/convert_notebooks.py  # Run notebook conversion
+          
+      - name: Execute DOCX conversion script
+        run: |
+          source venv/bin/activate  # Activate virtual environment
+          if [ -d "_docx" ] && [ "$(ls -A _docx 2>/dev/null)" ]; then
+            echo "🔄 Converting DOCX files..."
+            python scripts/convert_docx.py  # Run DOCX conversion
+          else
+            echo "📂 No DOCX files found, skipping conversion"
+          fi
       - name: Build with Jekyll
         run: |
           bundle exec jekyll build  # Build your Jekyll site

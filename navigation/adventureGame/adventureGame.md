@@ -15,9 +15,10 @@ permalink: /gamify/adventureGame
     import GameLevelWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWater.js";
     import GameLevelDesert from "{{site.baseurl}}/assets/js/adventureGame/GameLevelDesert.js";
     import GameLevelEnd from "{{site.baseurl}}/assets/js/adventureGame/GameLevelEnd.js";
+    import GameLevelOverworld from "{{site.baseurl}}/assets/js/adventureGame/GameLevelOverworld.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    const gameLevelClasses = [GameLevelDesert, GameLevelEnd];
+    const gameLevelClasses = [GameLevelDesert, GameLevelEnd, GameLevelOverworld];
 
     const instructionsStyle = `
         position: fixed;

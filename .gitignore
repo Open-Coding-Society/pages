@@ -24,3 +24,17 @@ vendor/*
 package-lock.json
 private/
 .jekyll-metadata
+
+# DOCX conversion intermediate files
+images/docx/*.png
+images/docx/*.jpg
+images/docx/*.jpeg
+images/docx/*.gif
+images/docx/*.bmp
+images/docx/*.tiff
+docx-index.md
+# Converted DOCX posts (auto-generated)
+_posts/**/*_DOCX_.md
+# Temporary DOCX files
+_docx/~$*
+*.tmp

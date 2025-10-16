@@ -240,6 +240,7 @@ permalink: /peppa-maze/
       <select id="lessonSelect">
         <option value="variables">Variables & Assignments</option>
         <option value="algorithms">Developing Algorithms</option>
+        <option value="algorithmic efficiency">Algorithmic Efficiency</option>
       </select><br>
       <button class="mode-btn" onclick="startGame(1)">Single Player</button>
       <button class="mode-btn" onclick="startGame(2)">Two Players</button>
@@ -247,6 +248,7 @@ permalink: /peppa-maze/
   </div>
 
   <div id="turnIndicator">Peppa's Turn!</div>
+  <div id="questionProgress" style="margin:10px auto; max-width:300px;">Questions used: 0 / 0 <button id="resetProgress" style="margin-left:10px;">Reset</button></div>
 
   <div id="gameContainer"></div>
 
@@ -370,9 +372,29 @@ permalink: /peppa-maze/
         { question: "Debugging means finding and fixing issues in an algorithm without starting over.", answers: ["True", "False"], correct: 0, explanation: "True! Debug by testing, identifying problems, and making targeted fixes." }
       ];
 
-      const allQuestions = (lessonType === "algorithms" ? algorithmFacts : variableFacts).slice();
-      let availableQuestions = shuffleArray(allQuestions);
-      let usedQuestions = new Set();
+      const efficiencyFacts = [
+        { question: "Algorithmic efficiency measures how fast an algorithm runs and how much memory it uses.", answers: ["True", "False"], correct: 0, explanation: "True! Efficiency is about speed (time) and space (memory) — the two main resources algorithms use." },
+        { question: "A more efficient algorithm finishes slower and uses more memory.", answers: ["True", "False"], correct: 1, explanation: "False! A more efficient algorithm finishes faster and uses less memory." },
+        { question: "Time complexity describes how the number of steps grows as the input size increases.", answers: ["True", "False"], correct: 0, explanation: "True! Time complexity measures how runtime changes when the problem gets bigger." },
+        { question: "Big-O notation gives the exact number of steps an algorithm takes.", answers: ["True", "False"], correct: 1, explanation: "False! Big-O shows how fast work grows, not the exact count — it’s about the trend." },
+        { question: "O(1) means the algorithm’s work stays constant no matter how big the input is.", answers: ["True", "False"], correct: 0, explanation: "True! Constant time means no extra work even if input grows — like checking if a number is even." },
+        { question: "O(n) means the number of steps doubles every time the input doubles.", answers: ["True", "False"], correct: 1, explanation: "False! That’s O(n²). In O(n), steps grow in direct proportion — double input, double work." },
+        { question: "O(n²) algorithms grow much faster than O(n) ones as input size increases.", answers: ["True", "False"], correct: 0, explanation: "True! Quadratic growth means doubling input can make work four times larger." },
+        { question: "O(2ⁿ) is one of the most efficient algorithm types.", answers: ["True", "False"], correct: 1, explanation: "False! O(2ⁿ) grows explosively — doubling input doubles the work, making it very inefficient." },
+        { question: "In Python, a while loop that runs ‘n’ times has O(n) time complexity.", answers: ["True", "False"], correct: 0, explanation: "True! Each iteration adds one step per item, so it’s linear (O(n))." },
+        { question: "Nested loops, like a loop inside another loop, usually create quadratic time complexity.", answers: ["True", "False"], correct: 0, explanation: "True! One loop runs for each run of the other, multiplying work: O(n * n) = O(n²)." },
+        { question: "Processing power and time are unlimited, so algorithmic efficiency doesn’t really matter.", answers: ["True", "False"], correct: 1, explanation: "False! Computers have limits — efficient code saves time, energy, and memory." },
+        { question: "Memory usage is often related to an algorithm’s time complexity.", answers: ["True", "False"], correct: 0, explanation: "True! Algorithms that handle lots of data often use more time and memory together." },
+        { question: "O(1) and O(n²) algorithms usually perform about the same on large inputs.", answers: ["True", "False"], correct: 1, explanation: "False! Constant time (O(1)) stays fast; quadratic time (O(n²)) quickly slows down for big inputs." },
+        { question: "Big-O notation helps programmers compare which algorithms will run faster as data grows.", answers: ["True", "False"], correct: 0, explanation: "True! Big-O is used to compare performance and scalability between algorithms." },
+        { question: "Efficient algorithms save time, use less memory, and handle large problems better.", answers: ["True", "False"], correct: 0, explanation: "True! That’s the goal — make code that runs quickly and scales well." }
+];
+
+
+  // Choose question set: algorithms, algorithmic efficiency, or variables
+        const allQuestions = (lessonType === "algorithms" ? algorithmFacts : (lessonType === "algorithmic efficiency" ? efficiencyFacts : variableFacts)).slice();
+        let availableQuestions = shuffleArray(allQuestions);
+        let usedQuestions = new Set();
 
       function shuffleArray(array) {
         const shuffled = [...array];
@@ -537,6 +559,7 @@ permalink: /peppa-maze/
           usedQuestions.clear();
         }
         const q = availableQuestions.shift();
+        if (q) usedQuestions.add(q);
         if (!q) return;
 
         waitingForAnswer = true;

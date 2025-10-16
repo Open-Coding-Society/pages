@@ -45,9 +45,9 @@ class Npc extends Character {
 
     update() {
         this.draw();
-        // Check if player is still in collision
+        // Check if player is still in collision - add null checks
         const players = this.gameEnv.gameObjects.filter(
-            obj => obj.state.collisionEvents.includes(this.spriteData.id)
+            obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
         );
         
         // Reset interaction state if player moved away
@@ -109,8 +109,9 @@ class Npc extends Character {
             return;
         }
         
+        // Add null checks here too
         const players = this.gameEnv.gameObjects.filter(
-            obj => obj.state.collisionEvents.includes(this.spriteData.id)
+            obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
         );
         const hasInteract = this.interact !== undefined;
 

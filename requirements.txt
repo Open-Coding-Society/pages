@@ -8,3 +8,7 @@ pandas
 seaborn
 scikit-learn
 progress
+mammoth
+pillow
+python-docx
+markdownify

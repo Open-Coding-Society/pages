@@ -57,7 +57,10 @@ class GameLevel {
     this.gameEnv.clear()
 
     for (let gameObject of this.gameEnv.gameObjects) {
-      gameObject.update()
+      // Check if gameObject has an update method before calling it
+      if (gameObject && typeof gameObject.update === 'function') {
+        gameObject.update()
+      }
     }
 
     if (typeof this.gameLevel.update === "function") {
@@ -68,7 +71,10 @@ class GameLevel {
   resize() {
     this.gameEnv.resize()
     for (let gameObject of this.gameEnv.gameObjects) {
-      gameObject.resize()
+      // Check if gameObject has a resize method before calling it
+      if (gameObject && typeof gameObject.resize === 'function') {
+        gameObject.resize()
+      }
     }
   }
 }

@@ -102,16 +102,8 @@ use-yat:
 	@cp _themes/yat/page.html _layouts/page.html
 	@cp _themes/yat/post.html _layouts/post.html
 
-use-hydejack:
-	@cp _themes/hydejack/_config.yml _config.yml
-	@cp _themes/hydejack/Gemfile Gemfile
-	@cp _themes/hydejack/opencs.html _layouts/opencs.html
-	@cp _themes/hydejack/page.html _layouts/page.html
-	@cp _themes/hydejack/post.html _layouts/post.html
-
 serve-hydejack: use-hydejack clean
 	@make serve-current
-
 
 build-tactile: use-tactile build-current
 
@@ -169,17 +161,41 @@ build-current: clean
 serve: serve-current
 build: build-current
 
-# Notebook conversion
-convert: $(MARKDOWN_FILES)
+# Notebook and DOCX conversion
+convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
 	@python3 -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+
+# DOCX conversion
+convert-docx:
+	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
+		python3 scripts/convert_docx.py; \
+	else \
+		echo "📂 No DOCX files found in _docx directory"; \
+	fi
+
+# Clean only DOCX-converted files (safe)
+clean-docx:
+	@echo "🧹 Cleaning DOCX-converted files..."
+	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
+	@echo "🧹 Cleaning extracted DOCX images..."
+	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
+	@echo "🧹 Cleaning DOCX index page..."
+	@rm -f docx-index.md 2>/dev/null || true
+	@echo "✅ DOCX cleanup complete"
 
 clean: stop
 	@echo "Cleaning converted IPYNB files..."
 	@find _posts -type f -name '*_IPYNB_2_.md' -exec rm {} +
 	@echo "Cleaning Github Issue files..."
 	@find _posts -type f -name '*_GithubIssue_.md' -exec rm {} +
+	@echo "Cleaning converted DOCX files..."
+	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
+	@echo "Cleaning extracted DOCX images..."
+	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
+	@echo "Cleaning DOCX index page..."
+	@rm -f docx-index.md 2>/dev/null || true
 	@echo "Removing empty directories in _posts..."
 	@while [ $$(find _posts -type d -empty | wc -l) -gt 0 ]; do \
 		find _posts -type d -empty -exec rmdir {} +; \
@@ -203,23 +219,44 @@ refresh:
 	@make clean
 	@make
 
+docx-only: convert-docx
+	@echo "📋 DOCX conversion complete - ready for preview"
+
+preview-docx: clean-docx convert-docx
+	@echo "🔍 Converting DOCX and starting preview server..."
+	@make serve-current
+
 help:
 	@echo "Available Makefile commands:"
+	@echo ""
+	@echo "📝 Theme Serve Commands:"
 	@echo "  make serve-minima   - Switch to Minima and serve"
 	@echo "  make serve-text     - Switch to TeXt and serve"
 	@echo "  make serve-cayman   - Switch to Cayman and serve"
 	@echo "  make serve-so-simple   - Switch to So Simple and serve"
 	@echo "  make serve-yat      - Switch to Yat and serve"
 	@echo "  make serve-hydejack - Switch to HydeJack and serve"
-	@echo "  make serve          - Serve with current config"
+	@echo ""
+	@echo "🏗️ Theme Build Commands:"
 	@echo "  make build-minima   - Switch to Minima and build"
 	@echo "  make build-text     - Switch to TeXt and build"
 	@echo "  make build-cayman   - Switch to Cayman and build"
 	@echo "  make build-so-simple   - Switch to So Simple and build"
 	@echo "  make build-yat      - Switch to Yat and build"
+	@echo ""
+	@echo "🚀 Server Commands:"
+	@echo "  make serve          - Serve with current config"
 	@echo "  make build          - Build with current config"
-	@echo "  make clean          - Remove generated files"
 	@echo "  make stop           - Stop server and logging"
 	@echo "  make reload         - Stop and restart server"
 	@echo "  make refresh        - Stop, clean, and restart server"
-	@echo "  make convert        - Convert notebooks to Markdown"
+	@echo ""
+	@echo "🔄 Conversion Commands:"
+	@echo "  make convert        - Convert notebooks and DOCX files"
+	@echo "  make convert-docx   - Convert DOCX files only"
+	@echo "  make docx-only      - Convert DOCX and prepare for preview"
+	@echo "  make preview-docx   - Clean, convert DOCX, and serve"
+	@echo ""
+	@echo "🗑️ Cleanup Commands:"
+	@echo "  make clean          - Remove all generated files"
+	@echo "  make clean-docx     - Remove DOCX-generated files only"
