@@ -401,7 +401,7 @@ show_reading_time: false
 </div>
 
 <script type="module">
-import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
 let allPosts = [];
 let filteredPosts = [];
@@ -410,7 +410,7 @@ let isLoggedIn = false;
 // Check authentication
 async function checkAuth() {
   try {
-    const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+    const response = await fetch(`${pythonURI}/api/person/get`, fetchOptions);
     isLoggedIn = response.ok;
     return response.ok;
   } catch (error) {
@@ -423,7 +423,8 @@ async function checkAuth() {
 // Load all posts
 async function loadAllPosts() {
   try {
-    const response = await fetch(`${javaURI}/api/post/all`, fetchOptions);
+    // No authentication needed to view posts
+    const response = await fetch(`${pythonURI}/api/post/all`, fetchOptions);
     if (!response.ok) {
       throw new Error('Failed to load posts');
     }
@@ -573,7 +574,7 @@ window.submitReply = async function(postId) {
   }
   
   try {
-    const response = await fetch(`${javaURI}/api/post/reply`, {
+    const response = await fetch(`${pythonURI}/api/post/reply`, {
       ...fetchOptions,
       method: 'POST',
       body: JSON.stringify({
@@ -651,10 +652,9 @@ function formatDate(timestamp) {
   
   if (!authOk) {
     document.getElementById('loginPrompt').style.display = 'block';
-    document.getElementById('loadingMessage').style.display = 'none';
-    return;
   }
   
+  // Load posts regardless of authentication (viewing is public)
   await loadAllPosts();
   
   // Auto-refresh every 30 seconds
@@ -662,5 +662,5 @@ function formatDate(timestamp) {
 })();
 </script>
 
-
-
+<!-- Gemini AI Chat Widget -->
+{% include social_media/gemini-chat-widget.html %}
