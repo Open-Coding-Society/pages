@@ -379,9 +379,9 @@ show_reading_time: false
     }
     // Function to handle Java login
     window.javaLogin = function () {
-    const loginURL = `${javaURI}/authenticate`;
-    const databaseURL = `${javaURI}/api/person/get`;
-    const signupURL = `${javaURI}/api/person/create`;
+    const loginURL = `${javaURI}/api/authenticate`;
+    const databaseURL = `${javaURI}/api/id`;
+    const signupURL = `${javaURI}/api/user`;
     const userCredentials = JSON.stringify({
         uid: document.getElementById("uid").value,
         password: document.getElementById("password").value,
@@ -551,7 +551,7 @@ show_reading_time: false
         });
 
         // Spring Backend Request
-        const springPromise = fetch(`${javaURI}/api/person/create`, {
+        const springPromise = fetch(`${javaURI}/api/user`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
