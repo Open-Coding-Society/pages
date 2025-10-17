@@ -450,7 +450,7 @@ show_reading_time: false
 </div>
 
 <script type="module">
-import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
 let allPosts = [];
 let isLoggedIn = false;
@@ -474,7 +474,7 @@ window.switchTab = function(tab) {
 // Check authentication
 async function checkAuth() {
   try {
-    const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+    const response = await fetch(`${pythonURI}/api/person/get`, fetchOptions);
     isLoggedIn = response.ok;
     return response.ok;
   } catch (error) {
@@ -487,7 +487,7 @@ async function checkAuth() {
 // Create post
 async function createPost(postData) {
   try {
-    const response = await fetch(`${javaURI}/api/post`, {
+    const response = await fetch(`${pythonURI}/api/post`, {
       ...fetchOptions,
       method: 'POST',
       body: JSON.stringify(postData)
@@ -510,7 +510,8 @@ async function loadAllPosts() {
   document.getElementById('loadingMessage').style.display = 'block';
   
   try {
-    const response = await fetch(`${javaURI}/api/post/all`, fetchOptions);
+    // No authentication needed to view posts
+    const response = await fetch(`${pythonURI}/api/post/all`, fetchOptions);
     if (!response.ok) {
       throw new Error('Failed to load posts');
     }
@@ -617,7 +618,7 @@ window.submitReply = async function(postId) {
   }
   
   try {
-    const response = await fetch(`${javaURI}/api/post/reply`, {
+    const response = await fetch(`${pythonURI}/api/post/reply`, {
       ...fetchOptions,
       method: 'POST',
       body: JSON.stringify({
@@ -733,3 +734,5 @@ form.addEventListener('submit', async function(e) {
 })();
 </script>
 
+<!-- Gemini AI Chat Widget -->
+{% include social_media/gemini-chat-widget.html %}
