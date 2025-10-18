@@ -9,8 +9,8 @@ let socketURI
 let javaURI
 let pagesURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-    javaURI = "http://localhost:8585";
-    socketURI = "ws://localhost:8585/websocket";
+    javaURI = "http://localhost:8587";
+    socketURI = "ws://localhost:8587/websocket";
     pagesURI = "http://127.0.0.1:4500";
 } else {
     javaURI = "https://spring.opencodingsociety.com";

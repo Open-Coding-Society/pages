@@ -170,7 +170,7 @@ function displayCryptoBalances(data) {
 }
 // Function to load available cryptocurrencies
 function loadAvailableCryptocurrencies() {
-    console.log('Fetching cryptocurrencies from: http://localhost:8585/api/mining/cryptocurrencies');
+    console.log('Fetching cryptocurrencies from: http://localhost:8587/api/mining/cryptocurrencies');
     // Sample cryptocurrency data to display when backend is unavailable
     const sampleCryptos = [
         {

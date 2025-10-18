@@ -1,0 +1,597 @@
+<!-- Gemini AI Chat Widget - Floating Bottom Right -->
+<style>
+/* Chat Widget Container */
+.ai-chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Chat Button (When Closed) */
+.ai-chat-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.ai-chat-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.ai-chat-button svg {
+  width: 28px;
+  height: 28px;
+  fill: white;
+}
+
+/* Notification Badge */
+.ai-chat-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  display: none;
+}
+
+/* Chat Window */
+.ai-chat-window {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 380px;
+  height: 550px;
+  background: #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.ai-chat-window.open {
+  display: flex;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chat Header */
+.ai-chat-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-chat-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.ai-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.ai-chat-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ai-chat-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Chat Messages */
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ai-chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 3px;
+}
+
+/* Message Bubble */
+.ai-message {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-message.user {
+  flex-direction: row-reverse;
+}
+
+.ai-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.ai-message.bot .ai-message-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.ai-message.user .ai-message-avatar {
+  background: #0f0;
+  color: #000;
+}
+
+.ai-message-content {
+  max-width: 75%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.ai-message.bot .ai-message-content {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-bottom-left-radius: 4px;
+}
+
+.ai-message.user .ai-message-content {
+  background: #667eea;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-message-time {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Typing Indicator */
+.ai-typing {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.ai-typing.active {
+  display: flex;
+}
+
+.ai-typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.ai-typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #667eea;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.ai-typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ai-typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Chat Input */
+.ai-chat-input {
+  padding: 16px;
+  background: #222;
+  border-top: 1px solid #333;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ai-chat-input input {
+  flex: 1;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 24px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ai-chat-input input:focus {
+  border-color: #667eea;
+}
+
+.ai-chat-input input::placeholder {
+  color: #666;
+}
+
+.ai-send-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #667eea;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ai-send-button:hover:not(:disabled) {
+  background: #764ba2;
+  transform: scale(1.05);
+}
+
+.ai-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-send-button svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* Welcome Message */
+.ai-welcome {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+}
+
+.ai-welcome-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.ai-welcome h3 {
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.ai-welcome p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Suggestions */
+.ai-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ai-suggestion {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #667eea;
+  padding: 8px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-suggestion:hover {
+  background: #333;
+  border-color: #667eea;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .ai-chat-window {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 100px);
+    bottom: 80px;
+    right: 20px;
+  }
+}
+</style>
+
+<!-- Chat Widget HTML -->
+<div class="ai-chat-widget" id="aiChatWidget">
+  <!-- Chat Button -->
+  <button class="ai-chat-button" id="aiChatButton" onclick="toggleAIChat()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3 .97 4.29L2 22l5.71-.97C9 21.64 10.46 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.34 0-2.61-.35-3.71-.96l-.27-.14-2.78.47.47-2.78-.14-.27C5.35 14.61 5 13.34 5 12c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7z"/>
+      <circle cx="9" cy="12" r="1"/>
+      <circle cx="12" cy="12" r="1"/>
+      <circle cx="15" cy="12" r="1"/>
+    </svg>
+    <span class="ai-chat-badge" id="aiChatBadge">1</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div class="ai-chat-window" id="aiChatWindow">
+    <!-- Header -->
+    <div class="ai-chat-header">
+      <div class="ai-chat-title">
+        <span class="ai-status-dot"></span>
+        <span>AI Assistant</span>
+      </div>
+      <button class="ai-chat-close" onclick="toggleAIChat()">✕</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="ai-chat-messages" id="aiChatMessages">
+      <div class="ai-welcome">
+        <div class="ai-welcome-icon">🤖</div>
+        <h3>Hi! I'm your AI Assistant</h3>
+        <p>Ask me anything about the social media platform, your posts, or get help with your assignments!</p>
+        <div class="ai-suggestions">
+          <button class="ai-suggestion" onclick="sendSuggestion('How do I create a post?')">
+            How do I create a post?
+          </button>
+          <button class="ai-suggestion" onclick="sendSuggestion('Help me with citations')">
+            Help me with citations
+          </button>
+          <button class="ai-suggestion" onclick="sendSuggestion('Explain this lesson')">
+            Explain this lesson
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="ai-typing" id="aiTyping">
+      <div class="ai-message-avatar">🤖</div>
+      <div class="ai-typing-dots">
+        <div class="ai-typing-dot"></div>
+        <div class="ai-typing-dot"></div>
+        <div class="ai-typing-dot"></div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="ai-chat-input">
+      <input 
+        type="text" 
+        id="aiChatInput" 
+        placeholder="Type your message..." 
+        onkeypress="handleAIKeyPress(event)"
+      />
+      <button class="ai-send-button" id="aiSendButton" onclick="sendAIMessage()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+let chatMessages = [];
+let isChatOpen = false;
+
+// Toggle chat window
+window.toggleAIChat = function() {
+  const chatWindow = document.getElementById('aiChatWindow');
+  const chatButton = document.getElementById('aiChatButton');
+  
+  isChatOpen = !isChatOpen;
+  
+  if (isChatOpen) {
+    chatWindow.classList.add('open');
+    chatButton.style.display = 'none';
+    document.getElementById('aiChatInput').focus();
+    // Hide badge when opened
+    document.getElementById('aiChatBadge').style.display = 'none';
+  } else {
+    chatWindow.classList.remove('open');
+    chatButton.style.display = 'flex';
+  }
+};
+
+// Send message
+window.sendAIMessage = async function() {
+  const input = document.getElementById('aiChatInput');
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  // Clear input
+  input.value = '';
+  
+  // Add user message
+  addMessage('user', message);
+  
+  // Show typing indicator
+  document.getElementById('aiTyping').classList.add('active');
+  
+  // Disable send button
+  const sendButton = document.getElementById('aiSendButton');
+  sendButton.disabled = true;
+  
+  try {
+    // Call Gemini API
+    const response = await fetch(`${javaURI}/api/gemini`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        text: message,
+        prompt: 'You are a helpful AI assistant for a student social media platform. Answer questions about the platform, help with academic work, and provide study guidance. Keep responses concise and friendly.'
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to get AI response');
+    }
+    
+    const data = await response.json();
+    
+    // Hide typing indicator
+    document.getElementById('aiTyping').classList.remove('active');
+    
+    // Add AI response
+    if (data.success && data.text) {
+      addMessage('bot', data.text);
+    } else {
+      addMessage('bot', 'Sorry, I encountered an error. Please try again!');
+    }
+    
+  } catch (error) {
+    console.error('AI Chat error:', error);
+    document.getElementById('aiTyping').classList.remove('active');
+    addMessage('bot', 'Oops! Something went wrong. Please make sure you\'re logged in and try again.');
+  } finally {
+    // Re-enable send button
+    sendButton.disabled = false;
+  }
+};
+
+// Handle Enter key
+window.handleAIKeyPress = function(event) {
+  if (event.key === 'Enter') {
+    sendAIMessage();
+  }
+};
+
+// Send suggestion
+window.sendSuggestion = function(text) {
+  document.getElementById('aiChatInput').value = text;
+  sendAIMessage();
+};
+
+// Add message to chat
+function addMessage(type, content) {
+  const messagesContainer = document.getElementById('aiChatMessages');
+  
+  // Remove welcome message if exists
+  const welcome = messagesContainer.querySelector('.ai-welcome');
+  if (welcome) {
+    welcome.remove();
+  }
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `ai-message ${type}`;
+  
+  const avatar = document.createElement('div');
+  avatar.className = 'ai-message-avatar';
+  avatar.textContent = type === 'bot' ? '🤖' : '👤';
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'ai-message-content';
+  contentDiv.textContent = content;
+  
+  messageDiv.appendChild(avatar);
+  messageDiv.appendChild(contentDiv);
+  
+  messagesContainer.appendChild(messageDiv);
+  
+  // Scroll to bottom
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  
+  // Store message
+  chatMessages.push({ type, content, timestamp: new Date() });
+}
+
+// Show welcome notification after page loads
+setTimeout(() => {
+  const badge = document.getElementById('aiChatBadge');
+  if (!isChatOpen && chatMessages.length === 0) {
+    badge.style.display = 'flex';
+  }
+}, 3000);
+</script>
+
