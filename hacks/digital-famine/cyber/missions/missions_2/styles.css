@@ -1,0 +1,321 @@
+:root {
+  color-scheme: dark;
+  --bg-outer: #030614;
+  --bg-inner: radial-gradient(140% 160% at 20% -20%, rgba(120, 214, 255, 0.25), transparent 65%),
+    radial-gradient(120% 140% at 80% 0%, rgba(156, 39, 176, 0.2), transparent 70%),
+    linear-gradient(185deg, #050b1c, #030616 55%, #060a1f 100%);
+  --card-bg: rgba(9, 15, 36, 0.92);
+  --panel-bg: rgba(13, 20, 46, 0.9);
+  --accent: #67d4ff;
+  --accent-strong: #00ffc6;
+  --danger: #ff5f5f;
+  --success: #66ffa1;
+  --text: #e9f1ff;
+  --text-muted: #9bb7ff;
+  --border: rgba(103, 212, 255, 0.35);
+  --shadow: 0 30px 60px rgba(2, 10, 35, 0.55);
+  font-size: 16px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg-outer);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3.5rem 1.8rem 5rem;
+}
+
+.hero {
+  background: var(--card-bg);
+  padding: 3rem;
+  border-radius: 1.8rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 320px;
+  background: radial-gradient(circle at top right, rgba(103, 212, 255, 0.25), transparent 65%);
+  pointer-events: none;
+}
+
+.mission-label {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(103, 212, 255, 0.14);
+  border: 1px solid var(--border);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  margin: 0 0 1.2rem;
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+}
+
+.lead {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 46ch;
+}
+
+.objective-card {
+  margin-top: 2.5rem;
+  background: var(--card-bg);
+  border-radius: 1.5rem;
+  padding: 2.2rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.objective-card h2 {
+  margin-top: 0;
+}
+
+.objective-card ul {
+  margin: 1.2rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.simulator {
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 1.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.panel {
+  background: var(--panel-bg);
+  border-radius: 1.4rem;
+  padding: 2.2rem;
+  border: 1px solid rgba(103, 212, 255, 0.25);
+  box-shadow: var(--shadow);
+}
+
+.form {
+  display: grid;
+  gap: 1.2rem;
+  margin-top: 1.4rem;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+  color: var(--text-muted);
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(103, 212, 255, 0.25);
+  background: rgba(5, 10, 28, 0.8);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(103, 212, 255, 0.18);
+}
+
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+
+.switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 95, 95, 0.4);
+  transition: 0.3s;
+  border-radius: 9999px;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background-color: rgba(102, 255, 161, 0.35);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
+.switch-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.cta {
+  background: linear-gradient(135deg, var(--accent), rgba(120, 255, 208, 0.9));
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #04121e;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 30px rgba(103, 212, 255, 0.25);
+}
+
+.log-panel h3 {
+  margin-top: 0;
+}
+
+.console {
+  background: rgba(4, 9, 24, 0.84);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  border: 1px solid rgba(103, 212, 255, 0.18);
+  min-height: 180px;
+  overflow-y: auto;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: #a7ffeb;
+  font-size: 0.95rem;
+  box-shadow: inset 0 0 12px rgba(3, 8, 22, 0.6);
+}
+
+.console strong {
+  color: var(--accent);
+}
+
+.indicators {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.indicator {
+  padding: 0.75rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(4, 9, 24, 0.8);
+  border: 1px solid rgba(103, 212, 255, 0.16);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.indicator--breach {
+  border-color: rgba(255, 95, 95, 0.4);
+  background: rgba(255, 95, 95, 0.18);
+  color: #ffe6e6;
+}
+
+.indicator--safe {
+  border-color: rgba(102, 255, 161, 0.4);
+  background: rgba(102, 255, 161, 0.18);
+  color: #e6ffef;
+}
+
+.debrief {
+  margin-top: 3.5rem;
+  background: var(--card-bg);
+  border-radius: 1.6rem;
+  padding: 2.6rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.debrief-grid article {
+  background: rgba(4, 9, 24, 0.65);
+  border-radius: 1.1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(103, 212, 255, 0.16);
+}
+
+.success-code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 1.4rem;
+  color: var(--accent);
+  margin: 0.6rem 0 0.2rem;
+}
+
+.caption {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .hero,
+  .objective-card,
+  .panel,
+  .debrief {
+    padding: 1.8rem;
+  }
+
+  .lead {
+    font-size: 0.95rem;
+  }
+}
