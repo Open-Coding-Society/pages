@@ -253,5 +253,4 @@ remote_theme: jekyll/minima
                     });
             }
         </script>
-
 </body>

@@ -183,7 +183,7 @@ title: My Title</code></pre>
   };
   const gradeButtons = document.querySelectorAll('.grade-button');
   gradeButtons.forEach(button => {
-    button.addEventListener('click', async () => {
+    button.addEventListener('click', () => {
       const frqBox = button.closest('.frq-box');
       const frqId = frqBox.dataset.frqId;
       const questionText = FRQ_QUESTIONS[frqId];
@@ -202,27 +202,31 @@ title: My Title</code></pre>
           <div class="loading-spinner"></div>
           <span>Grading...</span>
         </div>`;
-      try {
-        const response = await fetch(`${javaURI}/api/grade`, {
-          method: 'POST',
-          mode: 'cors',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            question: questionText,
-            answer: studentResponse
-          })
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const result = await response.json();
+      // Fetch with basic promise syntax
+      fetch(`${javaURI}/api/grade`, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: questionText,
+          answer: studentResponse
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("HTTP error! status: " + response.status);
+        }
+        return response.json();
+      })
+      .then(result => {
         console.log("Full result from backend:", result);
-        let feedbackText;
-        try {
-          feedbackText = result.candidates?.[0]?.content?.parts?.[0]?.text
-            || result.feedback
-            || "Could not generate feedback. Please try again.";
-        } catch (e) {
-          console.error("Error parsing feedback:", e);
+        let feedbackText = "";
+        if (result.candidates && result.candidates[0] && result.candidates[0].content && result.candidates[0].content.parts) {
+          feedbackText = result.candidates[0].content.parts[0].text;
+        } else if (result.feedback) {
+          feedbackText = result.feedback;
+        } else {
           feedbackText = "Could not generate feedback. Please try again.";
         }
         const formattedFeedback = feedbackText
@@ -239,12 +243,14 @@ title: My Title</code></pre>
             nextPart.scrollIntoView({ behavior: 'smooth' });
           }
         }
-      } catch (error) {
+      })
+      .catch(error => {
         console.error("Error generating feedback:", error);
         feedbackBox.innerHTML = `<span style="color:red;">An error occurred while grading. Please try again.</span>`;
-      } finally {
+      })
+      .finally(() => {
         button.disabled = false;
-      }
+      });
     });
   });
   // Auto-save FRQ responses into localStorage
@@ -269,25 +275,22 @@ title: My Title</code></pre>
       </div>`;
     document.body.appendChild(modal);
   }
-  // Exponential backoff for API retries
-  async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const response = await fetch(url, options);
-        if (response.status === 429 && i < retries - 1) {
-          await new Promise(res => setTimeout(res, delay));
-          delay *= 2;
-          continue;
+  // Optional: Simpler backoff helper using then()
+  function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+    return fetch(url, options)
+      .then(response => {
+        if (response.status === 429 && retries > 1) {
+          return new Promise(resolve => setTimeout(resolve, delay))
+            .then(() => fetchWithBackoff(url, options, retries - 1, delay * 2));
         }
         return response;
-      } catch (error) {
-        if (i < retries - 1) {
-          await new Promise(res => setTimeout(res, delay));
-          delay *= 2;
-          continue;
+      })
+      .catch(error => {
+        if (retries > 1) {
+          return new Promise(resolve => setTimeout(resolve, delay))
+            .then(() => fetchWithBackoff(url, options, retries - 1, delay * 2));
         }
         throw error;
-      }
-    }
+      });
   }
 </script>
