@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mission 2 · Patch the Wormhole</title> 
+    <link rel ="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <p class="mission-label">Mission 2</p>
+        <h1>Patch the Wormhole</h1>
+        <p class="lead">
+          Alien hackers are siphoning agent intel through an unguarded login endpoint.
+          Reproduce the breach, study the exploit, then lock the tunnel with parameterized queries.
+        </p>
+      </header>
+
+      <section class="objective-card">
+        <h2>Mission Objectives</h2>
+        <ul>
+          <li>Trigger the wormhole with the classic payload <code>' OR '1'='1</code>.</li>
+          <li>Analyse the request log to spot where the query breaks.</li>
+          <li>Enable secure mode and confirm the intrusion is blocked.</li>
+        </ul>
+      </section>
+
+      <section class="simulator">
+        <div class="panel breach-panel">
+          <h3>Wormhole Simulator</h3>
+          <p>Try breaching the endpoint with arbitrary credentials. Toggle secure mode to deploy prepared statements.</p>
+
+          <form id="breach-form" class="form">
+            <div class="form-field">
+              <label for="codename">Codename</label>
+              <input id="codename" name="codename" placeholder="GhostWolf" required />
+            </div>
+            <div class="form-field">
+              <label for="passcode">Passcode</label>
+              <input id="passcode" name="passcode" placeholder="hunter2" required />
+            </div>
+
+            <div class="switcher">
+              <label class="switch">
+                <input type="checkbox" id="secure-toggle" />
+                <span class="slider"></span>
+              </label>
+              <span class="switch-label">Secure Mode (Parameterized Query)</span>
+            </div>
+
+            <button type="submit" class="cta">Execute Query</button>
+          </form>
+        </div>
+
+        <div class="panel log-panel">
+          <h3>SQL Console Output</h3>
+          <pre id="console-log" class="console">$ Awaiting input…</pre>
+
+          <h4>Indicators</h4>
+          <ul class="indicators">
+            <li id="indicator-breach" class="indicator indicator--neutral">Breach Status: Unknown</li>
+            <li id="indicator-telemetry" class="indicator indicator--neutral">Telemetry: No anomalies</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="debrief">
+        <h2>Debrief &amp; Reflection</h2>
+        <div class="debrief-grid">
+          <article>
+            <h3>Forensics Log</h3>
+            <p>
+              When secure mode is disabled, the payload alters the WHERE clause
+              and authenticates every record. With secure mode active, the payload is treated
+              as literal input and the wormhole collapses.
+            </p>
+          </article>
+          <article>
+            <h3>Next Steps</h3>
+            <ul>
+              <li>Record the sanitized query in your mission log.</li>
+              <li>Document input validation rules for future agents.</li>
+              <li>Submit telemetry proving the breach no longer leaks data.</li>
+            </ul>
+          </article>
+          <article>
+            <h3>Success Code</h3>
+            <p class="success-code">BRAVO-4M8Q</p>
+            <p class="caption">Deliver this fragment to HQ once the wormhole is secure.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
