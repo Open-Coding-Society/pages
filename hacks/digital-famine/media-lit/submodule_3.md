@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Submodule 3"
-description: "Submodule 3 of Analytics/Admin Mini-Quest"
+title: "Truth Scanner
+description: "Third line of defense agaisnt foreign invaders"
 permalink: /digital-famine/media-lit/submodule_3/
 parent: "Analytics/Admin"
 team: "Curators"
@@ -12,7 +12,7 @@ author: "Curators Team"
 date: 2025-10-21
 ---
 
-# Submodule 3
+# Truth Scanner
 
 ## Content Coming Soon
 This submodule will be developed by the Curators team.

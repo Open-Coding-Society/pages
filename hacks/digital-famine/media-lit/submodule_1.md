@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Awareness"
-description: "First line of defense agaisnt foreign defense "
+description: "First line of defense agaisnt foreign invaders"
 permalink: /digital-famine/media-lit/submodule_1/
 parent: "Analytics/Admin"
 team: "Curators"
@@ -12,7 +12,7 @@ author: "Curators Team"
 date: 2025-10-21
 ---
 
-# Submodule 1
+# Awareness
 
 ## Content Coming Soon
 This submodule will be developed by the Curators team.

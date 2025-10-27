@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Submodule 2"
-description: "Submodule 2 of Analytics/Admin Mini-Quest"
+title: "Bias Checker"
+description: "First line of defense agaisnt foreign invaders
 permalink: /digital-famine/media-lit/submodule_2/
 parent: "Analytics/Admin"
 team: "Curators"
@@ -12,7 +12,7 @@ author: "Curators Team"
 date: 2025-10-21
 ---
 
-# Submodule 2
+# Bias Checker
 
 ## Content Coming Soon
 This submodule will be developed by the Curators team.
