@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Submodule 1"
-description: "Submodule 1 of Analytics/Admin Mini-Quest"
+title: "Awareness"
+description: "First line of defense agaisnt foreign defense "
 permalink: /digital-famine/media-lit/submodule_1/
 parent: "Analytics/Admin"
 team: "Curators"
