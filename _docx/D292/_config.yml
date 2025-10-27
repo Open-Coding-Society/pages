@@ -1,0 +1,29 @@
+# Jekyll-style configuration for D292 WGU files
+
+# Directory defaults for all D292 files
+defaults:
+  categories: ["WGU" ]
+  tags: ["wgu", "d292"]
+  author: "John Mortensen"
+
+# File-specific overrides
+files:
+  Plagiarism-WGU-SGM2-Task1-Ideation-Higher-Level-Education:
+    title: "D292 Task 1: Ideation for an E-Learning Solution"
+    description: "Plagiarism lesson. Students will brainstorm and outline their ideas for an e-learning solution, focusing on innovative approaches to instructional design."
+    permalink: "/wgu/d292/task1-ideation/"
+
+  Plagiarism-WGU-SGM2-Task2-Storyboard-Higher-Level-Education:
+    title: "D292 Task 2: Storyboard for an E-Learning Solution"
+    description: "Plagiarism lesson. Students will create a storyboard for their e-learning solution, outlining the key components and flow of the instructional materials."
+    permalink: "/wgu/d292/task2-storyboard/"
+
+  Plagiarism-WGU-SGM2-Task3-Mockup-Higher-Level-Education:
+    title: "D292 Task 3: Prototype Mockup for an E-Learning Solution"
+    description: "Plagiarism lesson. Students will create a prototype mockup for an e-learning solution, demonstrating their understanding of instructional design principles and user experience."
+    permalink: "/wgu/d292/task3-mockup/"
+
+  Plagiarism-WGU-SGM2-Task4-Test-Plan-Higher-Level-Education:
+    title: "D292 Task 4: Test Plan for an E-Learning Solution"
+    description: "Plagiarism lesson. Students will develop a comprehensive test plan to evaluate the effectiveness and usability of their e-learning solution, ensuring it meets learning objectives and user needs."
+    permalink: "/wgu/d292/task4-test-plan/"

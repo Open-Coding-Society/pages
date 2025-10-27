@@ -52,10 +52,10 @@ jobs:
         run: |
           source venv/bin/activate  # Activate virtual environment
           if [ -d "_docx" ] && [ "$(ls -A _docx 2>/dev/null)" ]; then
-            echo "🔄 Converting DOCX files..."
+            echo "Converting DOCX files..."
             python scripts/convert_docx.py  # Run DOCX conversion
           else
-            echo "📂 No DOCX files found, skipping conversion"
+            echo "No DOCX files found, skipping conversion"
           fi
       - name: Build with Jekyll
         run: |

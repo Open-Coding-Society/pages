@@ -1,6 +1,13 @@
+// -------------------- API CONFIG LOADER --------------------
+import { javaURI, fetchOptions } from '/assets/js/api/config.js';
+async function getApiConfig() {
+  return { javaURI, fetchOptions };
+}
+
 // -------------------- FLASHCARDS (MUST BE FIRST) --------------------
 // Define ALL flashcard functions immediately in global scope
 window.flashcardsData = null;
+window.lessonProgress = null;
 
 window.flipCard = function(cardId) {
   const card = document.getElementById(cardId);
@@ -11,38 +18,32 @@ window.flipCard = function(cardId) {
 
 window.navigateCards = function(direction) {
   if (!window.flashcardsData) return;
-  
+
   let newIndex = window.flashcardsData.currentIndex;
-  
-  if (direction === 'next' && window.flashcardsData.currentIndex < window.flashcardsData.totalCards) {
-    newIndex = window.flashcardsData.currentIndex + 1;
-  } else if (direction === 'prev' && window.flashcardsData.currentIndex > 1) {
-    newIndex = window.flashcardsData.currentIndex - 1;
-  }
-  
+  if (direction === 'next' && newIndex < window.flashcardsData.totalCards) newIndex++;
+  else if (direction === 'prev' && newIndex > 1) newIndex--;
+
   if (newIndex !== window.flashcardsData.currentIndex) {
     window.flashcardsData.currentIndex = newIndex;
+    window.lessonProgress.currentFlashcardIndex = newIndex;
     showCard(newIndex);
     updateNavButtons();
-    saveFlashcardsData();
-    syncLessonProgress(); // 🔄 backend sync
+    syncLessonProgress();
   }
 };
 
 window.markCard = function(status) {
   if (!window.flashcardsData) return;
-  
   const currentCard = document.querySelector('[id^="card-"]:not(.hidden)');
   if (!currentCard) return;
-  
   const cardIndex = parseInt(currentCard.dataset.index);
   const statusEl = document.getElementById(`status-${cardIndex}`);
-  
-  // Remove card from both arrays
-  window.flashcardsData.knownCards = window.flashcardsData.knownCards.filter(idx => idx !== cardIndex);
-  window.flashcardsData.reviewCards = window.flashcardsData.reviewCards.filter(idx => idx !== cardIndex);
-  
-  // Add to appropriate array
+
+  // Remove from both sets
+  window.flashcardsData.knownCards = window.flashcardsData.knownCards.filter(i => i !== cardIndex);
+  window.flashcardsData.reviewCards = window.flashcardsData.reviewCards.filter(i => i !== cardIndex);
+
+  // Add to appropriate set
   if (status === 'know') {
     window.flashcardsData.knownCards.push(cardIndex);
     if (statusEl) statusEl.innerHTML = '<span style="color: #00E676;">✓ You know this card</span>';
@@ -50,28 +51,22 @@ window.markCard = function(status) {
     window.flashcardsData.reviewCards.push(cardIndex);
     if (statusEl) statusEl.innerHTML = '<span style="color: #FFAB00;">↻ Marked for review</span>';
   }
-  
-  // Update progress and save
+
   updateProgressBar();
   populateReviewSidebar();
-  saveFlashcardsData();
-  syncLessonProgress(); // 🔄 backend sync
-  
-  // Award badge for using flashcards
-  if (typeof unlockBadge === 'function') unlockBadge('flashcards');
-  
-  if (cardIndex < window.flashcardsData.totalCards) {
-    setTimeout(() => window.navigateCards('next'), 500);
-  }
+  syncLessonProgress();
+
+  unlockBadge('flashcards');
+  if (cardIndex < window.flashcardsData.totalCards) setTimeout(() => window.navigateCards('next'), 500);
 };
 
 window.jumpToCard = function(index) {
   if (!window.flashcardsData) return;
   window.flashcardsData.currentIndex = index;
+  window.lessonProgress.currentFlashcardIndex = index;
   showCard(index);
   updateNavButtons();
-  saveFlashcardsData();
-  syncLessonProgress(); // 🔄 backend sync
+  syncLessonProgress();
 };
 
 // Helper functions for flashcards
@@ -81,7 +76,6 @@ function showCard(index) {
     const inner = card.querySelector('.flashcard-inner');
     if (inner) inner.classList.remove('flipped');
   });
-  
   const card = document.getElementById(`card-${index}`);
   if (card) card.classList.remove('hidden');
   updateNavButtons();
@@ -96,81 +90,94 @@ function updateNavButtons() {
 }
 
 function updateProgressBar() {
-  if (!window.flashcardsData) return;
   const progressBar = document.getElementById('flashcard-progress');
-  if (!progressBar) return;
-  const totalCards = window.flashcardsData.totalCards;
+  if (!window.flashcardsData || !progressBar) return;
+  const total = window.flashcardsData.totalCards;
   const uniqueKnown = new Set(window.flashcardsData.knownCards);
-  const knownPercentage = (uniqueKnown.size / totalCards) * 100;
-  progressBar.style.width = `${knownPercentage}%`;
+  const percent = (uniqueKnown.size / total) * 100;
+  progressBar.style.width = `${percent}%`;
 }
 
 function populateReviewSidebar() {
-  if (!window.flashcardsData) return;
   const reviewList = document.getElementById('review-list');
-  if (!reviewList) return;
-  reviewList.innerHTML = "";
+  if (!window.flashcardsData || !reviewList) return;
+  reviewList.innerHTML = '';
   window.flashcardsData.reviewCards.forEach(cardIdx => {
     const cardEl = document.getElementById(`card-${cardIdx}`);
     if (!cardEl) return;
-    const frontText = cardEl.querySelector(".flashcard-front h3");
-    const text = frontText ? frontText.textContent : `Card ${cardIdx}`;
+    const text = cardEl.querySelector('.flashcard-front h3')?.textContent || `Card ${cardIdx}`;
     const li = document.createElement('li');
     li.innerHTML = `<button onclick="jumpToCard(${cardIdx})">${text}</button>`;
     reviewList.appendChild(li);
   });
 }
 
-function saveFlashcardsData() {
-  if (!window.flashcardsData) return;
-  const lessonKey = window.location.pathname.split("/").pop() || "lesson";
-  const flashcardsKey = `flashcards-${lessonKey}`;
-  localStorage.setItem(flashcardsKey, JSON.stringify(window.flashcardsData));
-}
+// -------------------- LESSON PROGRESS LOADER --------------------
+async function loadLessonProgress() {
+  const loggedIn = await isUserLoggedIn();
+  if (!loggedIn) {
+    console.log("User not logged in — skipping lesson progress tracking.");
+    showLoginMessage("lesson");
+    return;
+  }
 
-// Initialize flashcards
-document.addEventListener('DOMContentLoaded', function() {
-  if (!document.querySelector('.flashcards-section')) return;
+  const { javaURI, fetchOptions } = await getApiConfig();
   const lessonKey = window.location.pathname.split("/").pop() || "lesson";
-  const flashcardsKey = `flashcards-${lessonKey}`;
+  const URL = `${javaURI}/api/lesson-progress/${lessonKey}`;
+
+  const res = await fetch(URL, { ...fetchOptions, credentials: 'include' });
+  if (!res.ok) return console.warn("No lesson progress found");
+  const progress = await res.json();
+
+  window.lessonProgress = progress;
+  window.lessonProgress.lessonKey = lessonKey;
+
   const totalCards = document.querySelectorAll('[id^="card-"]').length;
-  const saved = localStorage.getItem(flashcardsKey);
-  window.flashcardsData = saved ? JSON.parse(saved) : {
+  window.flashcardsData = {
     knownCards: [],
     reviewCards: [],
-    currentIndex: 1,
-    totalCards: totalCards,
-    lastVisited: new Date().toISOString()
+    currentIndex: progress.currentFlashcardIndex || 1,
+    totalCards: totalCards
   };
+
+  // Time display
+  totalTime = progress.totalTimeMs || 0;
+  const timeEl = document.getElementById("total-time");
+  if (timeEl) timeEl.textContent = formatTime(totalTime);
+
+  // Reflection
+  const box = document.getElementById("reflection-box");
+  if (box && progress.reflectionText) box.value = progress.reflectionText;
+
+  renderBadges(progress.badges || []);
   updateProgressBar();
   showCard(window.flashcardsData.currentIndex);
   populateReviewSidebar();
   updateNavButtons();
-  syncLessonProgress(); // 🔄 create progress record immediately
-});
+}
+
+
+
+document.addEventListener("DOMContentLoaded", loadLessonProgress);
 
 // -------------------- TIME TRACKER --------------------
-(function () {
+let totalTime = 0, startTime = 0, isActive = true;
+function formatTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return `${m}:${(s % 60).toString().padStart(2, "0")}`;
+}
+
+(function() {
   const display = document.getElementById("total-time");
   const statusEl = document.getElementById("timer-status");
   if (!display || !statusEl) return;
-  const lessonKey = window.location.pathname.split("/").pop() || "lesson";
-  let startTime = Date.now();
-  let totalTime = parseInt(localStorage.getItem(`lesson-time-${lessonKey}`)) || 0;
-  let isActive = true;
-
-  function formatTime(ms) {
-    const s = Math.floor(ms / 1000);
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  }
 
   function update() {
-    if (!isActive) return;
-    const current = totalTime + (Date.now() - startTime);
-    display.textContent = formatTime(current);
-    if (current >= 60000) unlockBadge(lessonKey); // 1 min badge
+    if (!isActive || !window.lessonProgress) return;
+    const elapsed = totalTime + (Date.now() - startTime);
+    display.textContent = formatTime(elapsed);
+    if (elapsed >= 60000) unlockBadge(window.lessonProgress.lessonKey);
   }
 
   function pause() {
@@ -179,8 +186,10 @@ document.addEventListener('DOMContentLoaded', function() {
     isActive = false;
     statusEl.textContent = "Paused";
     statusEl.className = "timer-status paused";
-    localStorage.setItem(`lesson-time-${lessonKey}`, totalTime);
-    syncLessonProgress(); // 🔄 backend sync
+    if (window.lessonProgress) {
+      window.lessonProgress.totalTimeMs = totalTime;
+      syncLessonProgress();
+    }
   }
 
   function resume() {
@@ -191,100 +200,65 @@ document.addEventListener('DOMContentLoaded', function() {
     statusEl.className = "timer-status active";
   }
 
+  startTime = Date.now();
   setInterval(update, 1000);
   document.addEventListener("visibilitychange", () => (document.hidden ? pause() : resume()));
-  window.addEventListener("beforeunload", () => {
-    if (isActive) totalTime += Date.now() - startTime;
-    localStorage.setItem(`lesson-time-${lessonKey}`, totalTime);
-    syncLessonProgress(); // 🔄 backend sync on unload
+  window.addEventListener("beforeunload", pause);
+})();
+
+// -------------------- REFLECTION / QUIZ --------------------
+(function() {
+  const saveBtn = document.getElementById("save-reflection");
+  const box = document.getElementById("reflection-box");
+  const status = document.getElementById("reflection-status");
+  if (!saveBtn || !box || !status) return;
+
+  saveBtn.addEventListener("click", async () => {
+    if (!window.lessonProgress) return;
+    window.lessonProgress.reflectionText = box.value;
+    status.textContent = "Saved!";
+    setTimeout(() => (status.textContent = ""), 1500);
+    unlockBadge('reflection');
+    await syncLessonProgress();
   });
 })();
 
-// -------------------- PROGRESS TRACKER --------------------
-(function () {
-  const bar = document.getElementById("lesson-progress");
-  const text = document.getElementById("progress-text");
-  const resetBtn = document.getElementById("reset-progress");
-  if (!bar || !text) return;
-
-  let TOTAL_LESSONS = 6;
-  const configEl = document.getElementById('progress-config');
-  if (configEl) {
-    try {
-      const config = JSON.parse(configEl.textContent);
-      TOTAL_LESSONS = config.totalLessons || 6;
-    } catch (e) {}
-  }
-
-  const PROGRESS_INCREMENT = 100 / TOTAL_LESSONS;
-  const key = "lesson-progress";
-  const lessonKey = window.location.pathname.split("/").pop() || "lesson";
-
-  let progress = JSON.parse(localStorage.getItem(key)) || {};
-  progress[lessonKey] = true;
-  localStorage.setItem(key, JSON.stringify(progress));
-
-  const done = Object.keys(progress).length;
-  const percent = Math.min(Math.round(done * PROGRESS_INCREMENT), 100);
-  bar.style.width = percent + "%";
-  text.textContent = percent + "% complete";
-
-  if (resetBtn) {
-    resetBtn.onclick = () => {
-      if (confirm("Reset all progress and time data?")) {
-        localStorage.removeItem(key);
-        localStorage.removeItem("lesson-badges");
-        for (let i = 1; i <= TOTAL_LESSONS; i++) {
-          localStorage.removeItem(`lesson-time-lesson-${i}`);
-        }
-        location.reload();
-      }
-    };
-  }
-})();
-
-// -------------------- DYNAMIC BADGES --------------------
+// -------------------- BADGES --------------------
 function getBadgeConfig() {
-  const configEl = document.getElementById('badge-config');
-  if (!configEl) return { availableBadges: [], lessonKey: '' };
+  const el = document.getElementById("badge-config");
+  if (!el) return { availableBadges: [], lessonKey: '' };
   try {
-    const config = JSON.parse(configEl.textContent);
-    return {
-      availableBadges: config.lessonBadges || [],
-      lessonKey: config.lessonKey || ''
-    };
-  } catch (e) {
+    return JSON.parse(el.textContent);
+  } catch {
     return { availableBadges: [], lessonKey: '' };
   }
 }
 
 function unlockBadge(badgeName) {
+  if (!window.lessonProgress) return;
   const config = getBadgeConfig();
-  if (config.availableBadges.length > 0 && !config.availableBadges.includes(badgeName)) return;
-  
-  let badges = JSON.parse(localStorage.getItem("lesson-badges")) || [];
+  if (config.availableBadges.length && !config.availableBadges.includes(badgeName)) return;
+  const badges = window.lessonProgress.badges || [];
   if (!badges.includes(badgeName)) {
     badges.push(badgeName);
-    localStorage.setItem("lesson-badges", JSON.stringify(badges));
+    window.lessonProgress.badges = badges;
     renderBadges(badges);
     showCongratsPopup(badgeName);
-    syncLessonProgress(); // 🔄 backend sync
+    syncLessonProgress();
   }
 }
 
 function renderBadges(badges) {
-  const badgeContainer = document.getElementById("badges");
-  if (!badgeContainer) return;
-  const config = getBadgeConfig();
-  badgeContainer.innerHTML = "";
-  badges.forEach((badgeName) => {
-    if (config.availableBadges.length > 0 && !config.availableBadges.includes(badgeName)) return;
+  const container = document.getElementById("badges");
+  if (!container) return;
+  container.innerHTML = "";
+  badges.forEach(b => {
     const span = document.createElement("span");
     span.className = "badge";
-    span.innerHTML = `🏅 ${badgeName}`;
-    badgeContainer.appendChild(span);
+    span.innerHTML = `🏅 ${b}`;
+    container.appendChild(span);
   });
-  if (badgeContainer.innerHTML === "") badgeContainer.innerHTML = "No badges yet...";
+  if (!badges.length) container.innerHTML = "No badges yet...";
 }
 
 function showCongratsPopup(badgeName) {
@@ -299,67 +273,27 @@ function showCongratsPopup(badgeName) {
   }, 3000);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  let saved = JSON.parse(localStorage.getItem("lesson-badges")) || [];
-  renderBadges(saved);
-});
-
-// -------------------- SANDBOX --------------------
-(function () {
-  const runBtn = document.getElementById("run-sandbox");
-  const codeBox = document.getElementById("sandbox-code");
-  const output = document.getElementById("sandbox-output");
-  if (!runBtn || !codeBox || !output) return;
-  runBtn.addEventListener("click", () => {
-    try {
-      const result = eval(codeBox.value);
-      output.textContent = String(result ?? "✅ Code ran successfully.");
-    } catch (e) {
-      output.textContent = "❌ Error: " + e.message;
-    }
-  });
-})();
-
-// -------------------- QUIZ / REFLECTION --------------------
-(function () {
-  const saveBtn = document.getElementById("save-reflection");
-  const box = document.getElementById("reflection-box");
-  const status = document.getElementById("reflection-status");
-  if (!saveBtn || !box || !status) return;
-
-  const lessonKey = window.location.pathname.split("/").pop() || "lesson";
-  const refKey = "reflection-" + lessonKey;
-  box.value = localStorage.getItem(refKey) || "";
-
-  saveBtn.addEventListener("click", () => {
-    localStorage.setItem(refKey, box.value);
-    status.textContent = "Saved!";
-    setTimeout(() => (status.textContent = ""), 1500);
-    unlockBadge('reflection');
-    syncLessonProgress(); // 🔄 backend sync
-  });
-})();
-
 // -------------------- BLACKBOARD --------------------
-(function () {
-  const canvasEl = document.getElementById('blackboard-canvas');
+(function() {
+  const canvasEl = document.getElementById("blackboard-canvas");
   if (!canvasEl) return;
-  if (typeof fabric !== 'undefined') {
-    const canvas = new fabric.Canvas('blackboard-canvas');
+  if (typeof fabric !== "undefined") {
+    const canvas = new fabric.Canvas("blackboard-canvas");
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush.color = "white";
     canvas.freeDrawingBrush.width = 5;
     document.addEventListener("keydown", e => {
-      if(e.key === "r") canvas.freeDrawingBrush.color = "red";
-      if(e.key === "b") canvas.freeDrawingBrush.color = "blue";
-      if(e.key === "g") canvas.freeDrawingBrush.color = "green";
-      if(e.key === "w") canvas.freeDrawingBrush.color = "white";
-      if(e.key === "c") canvas.clear();
+      if (e.key === "r") canvas.freeDrawingBrush.color = "red";
+      if (e.key === "b") canvas.freeDrawingBrush.color = "blue";
+      if (e.key === "g") canvas.freeDrawingBrush.color = "green";
+      if (e.key === "w") canvas.freeDrawingBrush.color = "white";
+      if (e.key === "c") canvas.clear();
     });
   }
 })();
 
-(function(){
+// -------------------- DEMO TOGGLE --------------------
+(function() {
   const toggle = document.getElementById("demo-toggle");
   const canvas = document.getElementById("demo-canvas-wrapper");
   const code = document.getElementById("demo-code");
@@ -376,44 +310,88 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 })();
 
-// -------------------- BACKEND SYNC --------------------
-// Dynamic import helper for environments where this file is loaded as a normal script
-// (import statements at top-level require <script type="module">). We load the
-// config module only when needed using import(), and cache the promise.
-import { javaURI, fetchOptions } from '/assets/js/api/config.js';
+// -------------------- LOGIN / SYNC HELPERS --------------------
+// -------------------- LOGIN / SYNC HELPERS --------------------
 
-async function getApiConfig() {
-  return { javaURI, fetchOptions };
+// Match OpenCS convention: check via /api/person/get instead of cookies
+async function isUserLoggedIn() {
+  const { javaURI, fetchOptions } = await getApiConfig();
+  try {
+    const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+    if (!response.ok) {
+      throw new Error(`Spring server response: ${response.status}`);
+    }
+    return true;
+  } catch (err) {
+    console.warn("User not authenticated:", err);
+    return false;
+  }
+}
+
+function showLoginMessage(feature) {
+  const message = document.createElement("div");
+  message.className = "login-popup";
+  message.style.position = "fixed";
+  message.style.top = "20px";
+  message.style.left = "50%";
+  message.style.transform = "translateX(-50%)";
+  message.style.background = "#f44336";
+  message.style.color = "white";
+  message.style.padding = "1rem";
+  message.style.borderRadius = "8px";
+  message.style.zIndex = "9999";
+  message.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+  message.innerHTML = `
+    🔒 Please log in to save your ${feature} progress
+    <a href="/login" style="color:white; margin-left:1rem; text-decoration:underline;">Go to Login</a>
+  `;
+  document.body.appendChild(message);
+  setTimeout(() => message.remove(), 4000);
 }
 
 
-const userId = localStorage.getItem("userId") || "guest";
-const lessonKey = window.location.pathname.split("/").pop() || "lesson";
-
 async function syncLessonProgress() {
+  const loggedIn = await isUserLoggedIn();
+  if (!loggedIn || !window.lessonProgress) {
+    console.log("Skipping sync — user not logged in.");
+    return;
+  }
+
   try {
     const { javaURI, fetchOptions } = await getApiConfig();
-    if (!javaURI) throw new Error('javaURI not configured');
+    const lessonKey = window.lessonProgress.lessonKey;
+    const URL = `${javaURI}/api/lesson-progress/${lessonKey}`;
 
-    const URL = `${javaURI}/api/lesson-progress/${userId}/${lessonKey}`;
-    const getRes = await fetch(URL, fetchOptions);
-    let progress = await getRes.json();
+    // Fetch existing record (backend ensures it exists)
+    const getRes = await fetch(URL, { ...fetchOptions, credentials: 'include' });
+    if (!getRes.ok) throw new Error(`GET failed ${getRes.status}`);
+    const progress = await getRes.json();
 
-    // Merge frontend state into backend object
-    progress.totalTimeMs = parseInt(localStorage.getItem(`lesson-time-${lessonKey}`)) || 0;
+    // Merge fields
+    progress.totalTimeMs = window.lessonProgress.totalTimeMs || 0;
     progress.lastVisited = new Date().toISOString();
-    progress.badges = JSON.parse(localStorage.getItem("lesson-badges")) || [];
-    progress.reflectionText = localStorage.getItem(`reflection-${lessonKey}`) || "";
+    progress.badges = window.lessonProgress.badges || [];
+    progress.reflectionText = window.lessonProgress.reflectionText || "";
     progress.currentFlashcardIndex = window.flashcardsData?.currentIndex || 1;
 
-    // ✅ PUT updated progress
-    await fetch(`${javaURI}/api/lesson-progress/${progress.id}`, {
+    // Completion logic
+    const hasReflection = progress.reflectionText.trim().length > 0;
+    const hasTime = progress.totalTimeMs > 30000;
+    const hasFlash = (window.flashcardsData?.knownCards?.length || 0) > 0;
+    progress.completed = hasReflection && hasTime && hasFlash;
+
+    // Update backend
+    const putRes = await fetch(`${javaURI}/api/lesson-progress/${progress.id}`, {
       ...fetchOptions,
-      method: "PUT",
+      method: 'PUT',
+      headers: { ...fetchOptions.headers, 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(progress)
     });
 
+    if (!putRes.ok) throw new Error(`PUT failed ${putRes.status}`);
+    console.log("✅ Lesson progress synced");
   } catch (err) {
-    console.warn('Lesson progress sync failed:', err);
+    console.warn("Lesson progress sync failed:", err);
   }
 }

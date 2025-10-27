@@ -16,7 +16,13 @@ default: serve-current
 		if (/^[[:blank:]]*$$/) { regenerate=0 } \
 		else { \
 			print; \
-			if ($$0 ~ /_notebooks\/.*\.ipynb/) { system("make convert &") } \
+			if ($$0 ~ /_notebooks\/.*\.ipynb/ || $$0 ~ /_docx\/.*\.docx/) { \
+				system("make convert &") \
+			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
+				match($$0, /_docx\/.*\/_config\.yml/); \
+				configFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-docx-config CONFIG_FILE=\"" configFile "\" &") \
+			} \
 		} \
 	}') 2>/dev/null &
 	@for ((COUNTER = 0; ; COUNTER++)); do \
@@ -33,29 +39,6 @@ default: serve-current
 		sleep 1; \
 	done
 	@sed '$$d' $(LOG_FILE)
-
-# Theme switching: copy config and Gemfile for the theme
-# use-minima:
-# 	@cp _themes/minima/_config.yml _config.yml
-#	@cp _themes/minima/Gemfile Gemfile
-#	@cp _themes/minima/opencs.html _layouts/opencs.html
-#	@cp _themes/minima/page.html _layouts/page.html
-#	@cp _themes/minima/post.html _layouts/post.html
-
-# use-text:
-#	@cp _themes/text/_config.yml _config.yml
-#	@cp _themes/text/Gemfile Gemfile
-#	@cp _themes/text/opencs.html _layouts/opencs.html
-#	@cp _themes/text/page.html _layouts/page.html
-#	@cp _themes/text/post.html _layouts/post.html
-#	@cp _themes/text/navigation.yml _data/navigation.yml
-
-# use-cayman:
-#	@cp _themes/cayman/_config.yml _config.yml
-#	@cp _themes/cayman/Gemfile Gemfile
-#	@cp _themes/cayman/opencs.html _layouts/opencs.html
-#	@cp _themes/cayman/page.html _layouts/page.html
-#	@cp _themes/cayman/post.html _layouts/post.html
 
 use-minima:
 	@echo "Switching to Minima theme..."
@@ -172,18 +155,46 @@ convert-docx:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
 		python3 scripts/convert_docx.py; \
 	else \
-		echo "📂 No DOCX files found in _docx directory"; \
+		echo "No DOCX files found in _docx directory"; \
+	fi
+
+# DOCX conversion for specific config change
+convert-docx-config:
+	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
+		if [ -n "$(CONFIG_FILE)" ]; then \
+			echo "🔧 Config file changed: $(CONFIG_FILE)"; \
+			python3 scripts/convert_docx.py --config-changed "$(CONFIG_FILE)"; \
+		else \
+			python3 scripts/convert_docx.py; \
+		fi; \
+	else \
+		echo "No DOCX files found in _docx directory"; \
 	fi
 
 # Clean only DOCX-converted files (safe)
 clean-docx:
-	@echo "🧹 Cleaning DOCX-converted files..."
+	@echo "Cleaning DOCX-converted files..."
 	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
-	@echo "🧹 Cleaning extracted DOCX images..."
+	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
-	@echo "🧹 Cleaning DOCX index page..."
+	@echo "Cleaning DOCX index page..."
 	@rm -f docx-index.md 2>/dev/null || true
-	@echo "✅ DOCX cleanup complete"
+	@echo "DOCX cleanup complete"
+
+# Color mapping
+update-colors:
+	@echo "Updating local color map..."
+	@python3 scripts/update_color_map.py
+	@echo "Color map updated successfully"
+	@echo "Generated files:"
+	@echo "   - _sass/root-color-map.scss"
+	@echo "   - local-color-usage-report.md"
+	@echo "   - colors.json"
+
+# Update colors and preview
+update-colors-preview: update-colors
+	@echo "Starting server to preview color changes..."
+	@make serve-current
 
 clean: stop
 	@echo "Cleaning converted IPYNB files..."
@@ -220,16 +231,16 @@ refresh:
 	@make
 
 docx-only: convert-docx
-	@echo "📋 DOCX conversion complete - ready for preview"
+	@echo "DOCX conversion complete - ready for preview"
 
 preview-docx: clean-docx convert-docx
-	@echo "🔍 Converting DOCX and starting preview server..."
+	@echo "Converting DOCX and starting preview server..."
 	@make serve-current
 
 help:
 	@echo "Available Makefile commands:"
 	@echo ""
-	@echo "📝 Theme Serve Commands:"
+	@echo "Theme Serve Commands:"
 	@echo "  make serve-minima   - Switch to Minima and serve"
 	@echo "  make serve-text     - Switch to TeXt and serve"
 	@echo "  make serve-cayman   - Switch to Cayman and serve"
@@ -237,41 +248,45 @@ help:
 	@echo "  make serve-yat      - Switch to Yat and serve"
 	@echo "  make serve-hydejack - Switch to HydeJack and serve"
 	@echo ""
-	@echo "🏗️ Theme Build Commands:"
+	@echo "Theme Build Commands:"
 	@echo "  make build-minima   - Switch to Minima and build"
 	@echo "  make build-text     - Switch to TeXt and build"
 	@echo "  make build-cayman   - Switch to Cayman and build"
 	@echo "  make build-so-simple   - Switch to So Simple and build"
 	@echo "  make build-yat      - Switch to Yat and build"
 	@echo ""
-	@echo "🚀 Server Commands:"
+	@echo "Color Mapping Commands:"
+	@echo "  make update-colors         - Update local color map"
+	@echo "  make update-colors-preview - Update colors and start server"
+	@echo ""
+	@echo "Server Commands:"
 	@echo "  make serve          - Serve with current config"
 	@echo "  make build          - Build with current config"
 	@echo "  make stop           - Stop server and logging"
 	@echo "  make reload         - Stop and restart server"
 	@echo "  make refresh        - Stop, clean, and restart server"
 	@echo ""
-	@echo "🔄 Conversion Commands:"
+	@echo "Conversion Commands:"
 	@echo "  make convert        - Convert notebooks and DOCX files"
 	@echo "  make convert-docx   - Convert DOCX files only"
 	@echo "  make docx-only      - Convert DOCX and prepare for preview"
 	@echo "  make preview-docx   - Clean, convert DOCX, and serve"
 	@echo ""
-	@echo "🗑️ Cleanup Commands:"
+	@echo "Cleanup Commands:"
 	@echo "  make clean          - Remove all generated files"
 	@echo "  make clean-docx     - Remove DOCX-generated files only"
 	@echo ""
-	@echo "🔍 Diagnostic Commands:"
+	@echo "Diagnostic Commands:"
 	@echo "  make convert-check  - Check notebooks for conversion warnings"
 	@echo "  make convert-fix    - Fix identified notebook conversion issues"
 
 # Notebook diagnostic and fix targets
 convert-check:
-	@echo "🔍 Running conversion diagnostics..."
-	@echo "📋 Checking for notebook conversion warnings or errors..."
+	@echo "Running conversion diagnostics..."
+	@echo "Checking for notebook conversion warnings or errors..."
 	@python3 scripts/check_conversion_warnings.py
 
 convert-fix:
-	@echo "🔧 Running conversion fixes..."
-	@echo "🛠️  Fixing notebooks with known warnings or errors..."
+	@echo "Running conversion fixes..."
+	@echo "️Fixing notebooks with known warnings or errors..."
 	@python3 scripts/check_conversion_warnings.py --fix

@@ -1,0 +1,6 @@
+# Jekyll-style global configuration for DOCX conversions
+defaults:
+  layout: post
+  categories: ["DOCX"]
+  tags: ["docx"]
+  author: "Generated from DOCX"

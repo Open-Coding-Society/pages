@@ -215,7 +215,7 @@ title: My Title</code></pre>
                     The student's response is: "${studentResponse}"
                     Format your final output with a clear heading for the grade and the feedback. Also, in the final output don't include hashtags to make your text bigger, it messes with the system on my end.
                 `;
-                const apiKey = "AIzaSyB3Ky_RSgPsdXBt5I32ZVWRZ09Ont5_xmQ";
+                const apiKey = "AIzaSyA3-LeTIUkZcYpb_DNZhrzgb5NJtE8bewc";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const payload = {
                     contents: [{

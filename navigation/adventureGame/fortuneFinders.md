@@ -11,7 +11,6 @@ permalink: /gamify/fortuneFinders
 
 <script type="module">
     // Adnventure Game assets locations
-    // import Game from "{{site.baseurl}}/assets/js/adventureGame/Game.js";
     import FinTech from "{{site.baseurl}}/assets/js/adventureGame/FinTech.js";
     import GameLevelAirport from "{{site.baseurl}}/assets/js/adventureGame/GameLevelAirport.js";
     import GameLevelWallstreet from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWallstreet.js";

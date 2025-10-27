@@ -6,12 +6,12 @@ import GameLevelStarWars from './GameLevelStarWars.js';
 import Shark from './Shark.js';
 
 class GameLevelWater {
-  /**
-   * Properties and methods to define a game level
-   * @param {*} gameEnv - The active game environment
-   */
   constructor(gameEnv) {
-    // Dependencies to support game level creation
+    console.log("Initializing GameLevelWater...");
+    
+    // Store the game environment reference
+    this.gameEnv = gameEnv;
+
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
@@ -87,8 +87,8 @@ class GameLevelWater {
       };
 
      // Shark Data
-      const sprite_src_shark = path + "/images/gamify/shark.png"; // be sure to include the path
-      const sprite_data_shark = {
+    const sprite_src_shark = path + "/images/gamify/shark.png"; // be sure to include the path
+    const sprite_data_shark = {
         id: 'Shark',
         greeting: "Enemy Shark",
         src: sprite_src_shark,
@@ -199,27 +199,28 @@ class GameLevelWater {
         sprite_data_shark.playAnimation();
       }, 1000);
 
-      // Nezuko NPC sprite data
-const sprite_src_nezuko = path + "/images/gamify/nezuko.png"; // be sure to include the path
-const sprite_greet_nezuko = "I've never seen you before. Are you lost? Well, even if you are.. I don't think I'm going to help you get out of here.";
-const platformerLink = "https://pages.opencodingsociety.com/navigation/game.html"; // Replace this with your actual platformer game link
+    // Nezuko NPC sprite data
+    const sprite_src_nezuko = path + "/images/gamify/nezuko.png"; // be sure to include the path
+    const sprite_greet_nezuko = "I've never seen you before. Are you lost? Well, even if you are.. I don't think I'm going to help you get out of here.";
+    const platformerLink = "https://pages.opencodingsociety.com/navigation/game.html"; // Replace this with your actual platformer game link
 
-const sprite_data_nezuko = {
-  id: 'Nezuko',
-  greeting: sprite_greet_nezuko,
-  src: sprite_src_nezuko,
-  SCALE_FACTOR: 5,
-  ANIMATION_RATE: 50,
-  pixels: {height: 316, width: 189},
-  INIT_POSITION: { x: (width / 1.3), y: (height / 1.3)},
-  orientation: {rows: 4, columns: 3 },
-  down: {row: 0, start: 0, columns: 3 },
-  hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+    const sprite_data_nezuko = {
+      id: 'Nezuko',
+      greeting: sprite_greet_nezuko,
+      src: sprite_src_nezuko,
+      SCALE_FACTOR: 5,
+      ANIMATION_RATE: 50,
+      pixels: {height: 316, width: 189},
+      INIT_POSITION: { x: (width / 1.3), y: (height / 1.3)},
+      orientation: {rows: 4, columns: 3 },
+      down: {row: 0, start: 0, columns: 3 },
+      hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
 
-  onCollision: function(player) {
-    window.location.href = platformerLink;
-  }
-};
+      onCollision: function(player) {
+        window.location.href = platformerLink;
+      }
+    };
+
 const sprite_src_puffer = path + "/images/gamify/puffer.png";
     const sprite_data_puffer = {
       id: 'Pufferfish',
@@ -247,22 +248,13 @@ const sprite_src_puffer = path + "/images/gamify/puffer.png";
       hitbox: { widthPercentage: 0.25, heightPercentage: 0.55 }
     };
 
-    // Setup environment
-    const background = new GameEnvBackground(image_data_water);
-    const player = new Player(sprite_data_octopus);
-    const javaPortal = new Npc(sprite_data_nomad);
-    const shark = new Shark(sprite_data_shark);
-    const puffer = new Pufferfish(sprite_data_puffer);
-    const goldfish = new Goldfish(sprite_data_gold);
-    const nezuko = new Npc(sprite_data_nezuko);
-
-    gameEnv.setBackground(background);
-    gameEnv.addPlayer(player);
-    gameEnv.addNpc(javaPortal);
-    gameEnv.addEnemy(shark);
-    gameEnv.addEnemy(puffer);
-    gameEnv.addEnemy(goldfish);
-    gameEnv.addNpc(nezuko);
+    this.classes = [      
+      { class: GameEnvBackground, data: image_data_water },
+      { class: Player, data: sprite_data_octopus },
+      { class: Npc, data: sprite_data_nomad },
+      { class: Shark, data: sprite_data_shark },
+      { class: Npc, data: sprite_data_nezuko },
+    ];
   }
 }
 

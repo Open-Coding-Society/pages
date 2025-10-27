@@ -1,0 +1,32 @@
+// USER COLOR DEFINITIONS
+// Edit colors here - this file controls the entire color scheme
+// After editing, run: make update-colors (or python3 scripts/apply_user_colors.py)
+
+// =============================================================================
+// PRIMARY COLORS
+// =============================================================================
+
+$background: #121212;
+$black1: rgba(0, 0, 0, 1);
+$blue1: #007aff;
+$blueShadow1: #2196f3;
+$gradient1: linear-gradient(120deg, #1e1e1e 45%, #2a2a2a);
+$gray1: rgba(142, 142, 147, 1);
+$gray2: rgba(99, 99, 102, 1);
+$gray3: rgba(72, 72, 74, 1);
+$gray4: rgba(58, 58, 60, 1);
+$gray5: rgba(44, 44, 46, 1);
+$gray6: rgba(28, 28, 30, 1);
+$green1: #34c759;
+$lightBlue1: rgba(75, 186, 255, 1);
+$white1: rgba(255, 255, 255, 1);
+$white2: rgba(white, 0.87);
+$white3: rgba(225, 225, 230, 1);
+
+// =============================================================================
+// ADDITIONAL COLORS (Auto-discovered from your SCSS)
+// =============================================================================
+
+// TEST: Add a custom color
+$my-custom-cat: #02375a;
+$my-custom-dog: #cafff3;

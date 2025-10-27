@@ -26,10 +26,11 @@ title: Little Guys
 <canvas id="game"></canvas>
 
 <script>
-    import { cameraController } from './assets/js/gamify/cameraController.js';
-    import { Entity } from './assets/js/gamify/entity.js';
-    import { Transform } from './assets/js/gamify/tools.js';
-    import { distance, toRadians, pointAt } from './essentials.js';
+    import { Camera } from '{{ base.url }}/assets/js/gamify/cameraController.js';
+    '/home/spenc/jTri1/pages/assets/js/gamify/cameraController.js'
+    import { Entity } from '{{ base.url }}/assets/js/gamify/entity.js';
+    import { Transform } from '{{ base.url }}/assets/js/gamify/tools.js';
+    import { distance, toRadians, pointAt } from '{{ base.url }}/essentials.js';
 
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
@@ -43,11 +44,11 @@ title: Little Guys
     resize();
 
 
-
     const Mouse = {
         x: 0,
         y: 0,
-        down: false
+        down: false,
+        moving: false
     };
 
     const camera = new Camera();
@@ -84,10 +85,13 @@ title: Little Guys
         
         updateEntities();
 
-        if (Mouse.down) {
+        if (Mouse.down && Mouse.moving) {
             const dif = distance(Mouse.x, Mouse.y, lastMouse.x, lastMouse.y);
             const dir = pointAt(Mouse.x, Mouse.y, lastMouse.x, lastMouse.y);
-            
+
+            drag.move(dif, dir);
+            camera.follow(drag);
+
         } else {
             lastMouse = Mouse;
         }
@@ -102,6 +106,11 @@ title: Little Guys
     window.addEventListener('mousemove', e => {
         Mouse.x = e.clientX;
         Mouse.y = e.clientY;
+        if (Mouse = lastMouse) {
+            Mouse.moving = false;
+        } else {
+            Mouse.moving = true;
+        }
     });
 
     window.addEventListener('mousedown', () => Mouse.down = true);

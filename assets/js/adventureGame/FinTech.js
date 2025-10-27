@@ -1,9 +1,8 @@
-import Game from './Game.js';
+import Game from './GameEngine/Game.js';
 import GameControl from './GameEngine/GameControl.js';
 import Quiz from './Quiz.js';
 import Inventory from "./Inventory.js";
 import { defaultItems } from "./items.js";
-import GameLevelEnd from './GameLevelEnd.js';
 
 class StatsManager {
     constructor(game) {

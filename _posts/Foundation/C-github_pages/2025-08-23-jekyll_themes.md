@@ -131,134 +131,123 @@ remote_theme: jekyll/minima
             <div class="feedback-box"></div>
         </div>
     </div>
-    <script>
-        const FRQ_QUESTIONS = {
-            '1': "Explain why Jekyll uses layouts and includes. How do these features make web development easier?",
-            '2': "Describe the role of `_config.yml` in Jekyll. Why is it important for themes?",
-            '3': "Compare the strengths of Minima and TeXt. Which would you choose and why?",
-            '4': "A student’s theme won’t switch even after editing `_config.yml`. What steps would you take to troubleshoot?",
-            '5': "Summarize in your own words why themes are valuable for developers using Jekyll."
-        };
-        const gradeButtons = document.querySelectorAll('.grade-button');
-        gradeButtons.forEach(button => {
-            button.addEventListener('click', async () => {
-                const frqBox = button.closest('.frq-box');
-                const frqId = frqBox.dataset.frqId;
-                const questionText = FRQ_QUESTIONS[frqId];
-                const studentResponseTextArea = frqBox.querySelector('textarea');
-                const feedbackBox = frqBox.querySelector('.feedback-box');
-                const studentResponse = studentResponseTextArea.value.trim();
-                if (!studentResponse) {
-                    showModal("Please enter your response before submitting.");
-                    return;
-                }
-                // Show loading state
-                button.disabled = true;
-                feedbackBox.style.display = 'block';
-                feedbackBox.innerHTML = '<div class="flex items-center space-x-2"><div class="loading-spinner"></div><span>Grading...</span></div>';
-                try {
-                    const systemPrompt = `
-                        You are an expert tutor grading a student's answer to a free-response question about Jekyll themes.
-                        Your task is to:
-                        1. Determine a grade for the student's response based on the following 1-5 scale:
-                           - 5: The answer addresses all parts of the question and is detailed and comprehensive.
-                           - 4: The answer is correct and addresses most parts of the question.
-                           - 3: The answer is correct but may be incomplete or lack detail.
-                           - 2: The answer has significant inaccuracies or is incomplete.
-                           - 1: The answer is incorrect or does not address the question.
-                           Write the grade like this: "Grade: (1-5)/5"
-                        2. Provide detailed, constructive feedback explaining the grade.
-                        3. Offer very short suggestions on what the user could improve on, enough to give them a hint but not enough for them to figure out what to answer.
-                        The question is: "${questionText}"
-                        The student's response is: "${studentResponse}"
-                        Format your final output with a clear heading for the grade and the feedback. Also, in the final output don't include hashtags to make your text bigger, it messes with the system on my end.
-                    `;
-                    const apiKey = "AIzaSyB3Ky_RSgPsdXBt5I32ZVWRZ09Ont5_xmQ";
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                    const payload = {
-                        contents: [{
-                            parts: [
-                                { text: systemPrompt }
-                            ]
-                        }]
-                    };
-                    const response = await fetchWithBackoff(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+        <script type="module">
+                import { javaURI, fetchOptions } from '../../assets/js/api/config.js';
+                const FRQ_QUESTIONS = {
+                    '1': "Explain why Jekyll uses layouts and includes. How do these features make web development easier?",
+                    '2': "Describe the role of `_config.yml` in Jekyll. Why is it important for themes?",
+                    '3': "Compare the strengths of Minima and TeXt. Which would you choose and why?",
+                    '4': "A student’s theme won’t switch even after editing `_config.yml`. What steps would you take to troubleshoot?",
+                    '5': "Summarize in your own words why themes are valuable for developers using Jekyll."
+                };
+                const gradeButtons = document.querySelectorAll('.grade-button');
+                gradeButtons.forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const frqBox = button.closest('.frq-box');
+                        const frqId = frqBox.dataset.frqId;
+                        const questionText = FRQ_QUESTIONS[frqId];
+                        const studentResponseTextArea = frqBox.querySelector('textarea');
+                        const feedbackBox = frqBox.querySelector('.feedback-box');
+                        const studentResponse = studentResponseTextArea.value.trim();
+                        if (!studentResponse) {
+                            showModal("Please enter your response before submitting.");
+                            return;
+                        }
+                        // Show loading state
+                        button.disabled = true;
+                        feedbackBox.style.display = 'block';
+                        feedbackBox.innerHTML = `
+                            <div class="flex items-center space-x-2">
+                                <div class="loading-spinner"></div>
+                                <span>Grading...</span>
+                            </div>`;
+                        try {
+                            const response = await fetch(`${javaURI}/api/grade`, {
+                                method: 'POST',
+                                mode: 'cors',
+                                credentials: 'include',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    question: questionText,
+                                    answer: studentResponse
+                                })
+                            });
+                            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                            const result = await response.json();
+                            console.log("Full result from backend:", result);
+                            let feedbackText;
+                            try {
+                                feedbackText = result.candidates?.[0]?.content?.parts?.[0]?.text
+                                    || result.feedback
+                                    || "Could not generate feedback. Please try again.";
+                            } catch (e) {
+                                console.error("Error parsing feedback:", e);
+                                feedbackText = "Could not generate feedback. Please try again.";
+                            }
+                            const formattedFeedback = feedbackText
+                                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                                .replace(/\n/g, "<br>");
+                            feedbackBox.innerHTML = formattedFeedback
+                            // Unlock next part if grade is 4 or 5
+                            const gradeMatch = feedbackText.match(/Grade:\s*(\d)\/5/);
+                            if (gradeMatch && parseInt(gradeMatch[1], 10) >= 4) {
+                                const currentPart = parseInt(frqBox.closest('.lesson-part').dataset.part, 10);
+                                const nextPart = document.querySelector(`.lesson-part[data-part="${currentPart + 1}"]`);
+                                if (nextPart) {
+                                    nextPart.style.display = 'block';
+                                    nextPart.scrollIntoView({ behavior: 'smooth' });
+                                }
+                            }
+                        } catch (error) {
+                            console.error("Error generating feedback:", error);
+                            feedbackBox.innerHTML = `<span style="color:red;">An error occurred while grading. Please try again.</span>`;
+                        } finally {
+                            button.disabled = false;
+                        }
                     });
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const result = await response.json();
-                    const feedbackText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate feedback. Please try again.";
-                    const formattedFeedback = feedbackText
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\n/g, '<br>');
-                    feedbackBox.innerHTML = formattedFeedback;
-                    // Unlock next part if grade is 4 or 5
-                    const gradeMatch = feedbackText.match(/Grade:\s*(\d)\/5/);
-                    if (gradeMatch && parseInt(gradeMatch[1], 10) >= 4) {
-                        const currentPart = parseInt(frqBox.closest('.lesson-part').dataset.part, 10);
-                        const nextPart = document.querySelector(`.lesson-part[data-part="${currentPart + 1}"]`);
-                        if (nextPart) {
-                            nextPart.style.display = 'block';
-                            nextPart.scrollIntoView({ behavior: 'smooth' });
+                });
+                // Auto-save FRQ responses into localStorage
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.querySelectorAll(".frq-box textarea").forEach((textarea, index) => {
+                        const key = "jekyll_frq_answer_" + index;
+                        const saved = localStorage.getItem(key);
+                        if (saved) textarea.value = saved;
+                        textarea.addEventListener("input", () => {
+                            localStorage.setItem(key, textarea.value);
+                        });
+                    });
+                });
+                // Simple modal for alerts
+                function showModal(message) {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <p>${message}</p>
+                            <button class="modal-button" onclick="this.closest('.modal').remove()">OK</button>
+                        </div>`;
+                    document.body.appendChild(modal);
+                }
+                // Exponential backoff for API retries
+                async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            const response = await fetch(url, options);
+                            if (response.status === 429 && i < retries - 1) {
+                                await new Promise(res => setTimeout(res, delay));
+                                delay *= 2;
+                                continue;
+                            }
+                            return response;
+                        } catch (error) {
+                            if (i < retries - 1) {
+                                await new Promise(res => setTimeout(res, delay));
+                                delay *= 2;
+                                continue;
+                            }
+                            throw error;
                         }
                     }
-                } catch (error) {
-                    console.error("Error generating feedback:", error);
-                    feedbackBox.innerHTML = `<span style="color:red;">An error occurred while grading. Please try again.</span>`;
-                } finally {
-                    button.disabled = false;
                 }
-            });
-        });
-        // Auto-save FRQ responses into localStorage
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll(".frq-box textarea").forEach((textarea, index) => {
-                const key = "jekyll_frq_answer_" + index;
-                const saved = localStorage.getItem(key);
-                if (saved) {
-                    textarea.value = saved;
-                }
-                textarea.addEventListener("input", () => {
-                    localStorage.setItem(key, textarea.value);
-                });
-            });
-        });
-        // Simple modal for alerts
-        function showModal(message) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <p>${message}</p>
-                    <button class="modal-button" onclick="this.closest('.modal').remove()">OK</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        // Exponential backoff for API retries
-        async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.status === 429 && i < retries - 1) {
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 2;
-                        continue;
-                    }
-                    return response;
-                } catch (error) {
-                    if (i < retries - 1) {
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 2;
-                        continue;
-                    }
-                    throw error;
-                }
-            }
-        }
-    </script>
+        </script>
 </body>

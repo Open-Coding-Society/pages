@@ -1,4 +1,4 @@
-import GameControl from './GameEngine/GameControl.js';
+import GameControl from './GameControl.js';
 class Game {
     constructor(environment) {
         this.environment = environment;

@@ -1,0 +1,388 @@
+{
+  "generated_by": "scripts/update_color_map.py",
+  "total_colors": 61,
+  "colors": {
+    "bg-0": {
+      "value": "#000",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "bg-1": {
+      "value": "#1F2020",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "bg-2": {
+      "value": "#1F1F1F",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "bg-3": {
+      "value": "#2A2D2D",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "panel": {
+      "value": "#2B2B2B",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "surface": {
+      "value": "#333",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "text": {
+      "value": "#F0F0F0",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "text-muted": {
+      "value": "#aaa",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "accent": {
+      "value": "#4CAFEF",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "accent-700": {
+      "value": "#007ACC",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "accent-700-hover": {
+      "value": "#005FA3",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "green": {
+      "value": "#4ADE80",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "green-bg": {
+      "value": "#2D5A3D",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "warn": {
+      "value": "#FBBF24",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "warn-bg": {
+      "value": "#5A3D2D",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "popup-bg": {
+      "value": "#222",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "teal": {
+      "value": "#38B2AC",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "orange": {
+      "value": "#ED8936",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "blue": {
+      "value": "#3182CE",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "red": {
+      "value": "#E53E3E",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "success-green": {
+      "value": "#28A745",
+      "source_files": [
+        "_sass/minima/lessonbase.scss"
+      ]
+    },
+    "toggle-btn-bg": {
+      "value": "green",
+      "source_files": [
+        "_sass/open-coding/chatbot.scss"
+      ]
+    },
+    "toggle-btn-hover-bg": {
+      "value": "darkgreen",
+      "source_files": [
+        "_sass/open-coding/chatbot.scss"
+      ]
+    },
+    "msger-send-btn-bg": {
+      "value": "blue",
+      "source_files": [
+        "_sass/open-coding/chatbot.scss"
+      ]
+    },
+    "msger-send-btn-hover-bg": {
+      "value": "darkblue",
+      "source_files": [
+        "_sass/open-coding/chatbot.scss"
+      ]
+    },
+    "left-msg-bg": {
+      "value": "white",
+      "source_files": [
+        "_sass/open-coding/chatbot.scss"
+      ]
+    },
+    "right-msg-bg": {
+      "value": "lightBlue1",
+      "source_files": [
+        "_sass/open-coding/chatbot.scss"
+      ]
+    },
+    "login-container-bg": {
+      "value": "#1e1e1e",
+      "source_files": [
+        "_sass/open-coding/elements/forms/containers.scss"
+      ]
+    },
+    "validation-success-color": {
+      "value": "#10b981",
+      "source_files": [
+        "_sass/open-coding/elements/forms/passwordvalidation.scss"
+      ]
+    },
+    "validation-error-color": {
+      "value": "#ef4444",
+      "source_files": [
+        "_sass/open-coding/elements/forms/passwordvalidation.scss"
+      ]
+    },
+    "validation-focus-color": {
+      "value": "#6366f1",
+      "source_files": [
+        "_sass/open-coding/elements/forms/passwordvalidation.scss"
+      ]
+    },
+    "status-indicator-pending-bg": {
+      "value": "rgba(255, 193, 7, 0.2)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-pending-border": {
+      "value": "rgba(255, 193, 7, 0.3)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-pending-color": {
+      "value": "#ffc107",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-success-bg": {
+      "value": "rgba(40, 167, 69, 0.2)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-success-border": {
+      "value": "rgba(40, 167, 69, 0.3)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-success-color": {
+      "value": "#28a745",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-error-bg": {
+      "value": "rgba(220, 53, 69, 0.2)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-error-border": {
+      "value": "rgba(220, 53, 69, 0.3)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-error-color": {
+      "value": "#dc3545",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-base-bg": {
+      "value": "rgba(255, 255, 255, 0.05)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "status-indicator-base-border": {
+      "value": "rgba(255, 255, 255, 0.1)",
+      "source_files": [
+        "_sass/open-coding/elements/status-indicators/common.scss"
+      ]
+    },
+    "black1": {
+      "value": "rgba(0, 0, 0, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gray1": {
+      "value": "rgba(142, 142, 147, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gray2": {
+      "value": "rgba(99, 99, 102, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gray3": {
+      "value": "rgba(72, 72, 74, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gray4": {
+      "value": "rgba(58, 58, 60, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gray5": {
+      "value": "rgba(44, 44, 46, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gray6": {
+      "value": "rgba(28, 28, 30, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "white1": {
+      "value": "rgba(255, 255, 255, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "white2": {
+      "value": "rgba(white, 0.87)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "white3": {
+      "value": "rgba(225, 225, 230, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "gradient1": {
+      "value": "linear-gradient(120deg, #1e1e1e 45%, #2a2a2a)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "blue1": {
+      "value": "#007aff",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "green1": {
+      "value": "#34c759",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "lightBlue1": {
+      "value": "rgba(75, 186, 255, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "blueShadow1": {
+      "value": "#2196f3",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "background": {
+      "value": "#121212",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "dt-leaderboard": {
+      "value": "#e85252",
+      "source_files": [
+        "_sass/open-coding/platformer-game.scss"
+      ]
+    },
+    "my-custom-cat": {
+      "value": "#02375a",
+      "source_files": [
+        "_sass/user-colors.scss"
+      ]
+    },
+    "my-custom-dog": {
+      "value": "#cafff3",
+      "source_files": [
+        "_sass/user-colors.scss"
+      ]
+    }
+  }
+}

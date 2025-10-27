@@ -1,0 +1,24 @@
+# Jekyll-style configuration for Quest curriculum files
+
+# Directory defaults for all Quest files
+defaults:
+  categories: ["Quests"]
+  tags: ["quest", "curriculum"]
+  author: "Open Coding Society"
+
+# File-specific overrides
+files:
+  QuestOfCode-AIUsage-Thinkers:
+    title: "Quest of Code: AI Usage for Thinkers"
+    description: "Educational curriculum focusing on responsible AI usage and critical thinking skills"
+    permalink: "/quests/questofcode-ai-usage/"
+
+  QuestOfCode-WGU-Digital-Citizenship:
+    title: "Quest of Code: WGU Digital Citizenship"
+    description: "Comprehensive digital citizenship curriculum designed for WGU requirements"
+    permalink: "/quests/questofcode-digital-citizenship/"
+
+  QuestOfSpook-Game-Development:
+    title: "Quest of Spook: Game Development"
+    description: "Halloween-themed game development curriculum using JavaScript and OCS framework"
+    permalink: "/quests/questofspook-game-dev/"

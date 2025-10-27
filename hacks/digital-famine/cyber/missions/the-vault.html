@@ -1,0 +1,171 @@
+---
+layout: page
+title: Final Sequence — The Vault
+permalink: /missions/the-vault/
+---
+
+<section class="mission-hero">
+  <p class="mission-stage">Final Protocol</p>
+  <h1>Unlock the Sacred Vault</h1>
+  <p>All three code fragments converge here. Align them, enter the PIN, and claim the Sacred Page that ends the invasion.</p>
+</section>
+
+<section class="mission-gallery">
+  <figure>
+    <img src="{{ '/images/gamify/universe.jpg' | relative_url }}" alt="Vault chamber suspended in space" loading="lazy">
+    <figcaption>The vault hovers in orbit, awaiting the combined codes.</figcaption>
+  </figure>
+  <figure>
+    <img src="{{ '/images/gamify/octocat.png' | relative_url }}" alt="Guardian sentinel protecting the Sacred Page" loading="lazy">
+    <figcaption>A guardian sentinel verifies every digit before release.</figcaption>
+  </figure>
+</section>
+
+<section class="mission-pulse">
+  <h2>Quick Objectives</h2>
+  <ul>
+    <li>Assemble the three decrypted fragments into a four-digit PIN.</li>
+    <li>Authenticate the code against vault telemetry.</li>
+    <li>Retrieve the Sacred Page and broadcast the defense algorithms.</li>
+  </ul>
+</section>
+
+<section class="mission-mermaid">
+  <div class="mermaid">
+graph TD
+    A[Code Fragment Alpha] --> D[Assemble PIN]
+    B[Code Fragment Bravo] --> D
+    C[Code Fragment Charlie] --> D
+    D --> E{Vault Authentication}
+    E -->|Fail| D
+    E -->|Success| F[Vault Doors Open]
+    F --> G[Secure Sacred Page]
+    G --> H[Earth Defense Restored]
+  </div>
+</section>
+
+<section class="mission-note">
+  <p>Tip: Keep your mission logs close. The vault only opens when the fragments are aligned in the exact order earned.</p>
+</section>
+
+<style>
+.mission-hero {
+  background: radial-gradient(115% 115% at 50% 0%, rgba(44, 26, 70, 0.95), rgba(14, 8, 29, 0.95));
+  color: #fcecff;
+  padding: 3rem 2rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  margin-bottom: 2.5rem;
+}
+
+.mission-stage {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: #e8b6ff;
+  margin-bottom: 0.75rem;
+}
+
+.mission-hero h1 {
+  font-size: clamp(2rem, 6vw, 3rem);
+  margin-bottom: 1rem;
+}
+
+.mission-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.mission-gallery figure {
+  background: rgba(22, 12, 39, 0.85);
+  border: 1px solid rgba(232, 182, 255, 0.3);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+}
+
+.mission-gallery img {
+  width: 100%;
+  display: block;
+}
+
+.mission-gallery figcaption {
+  padding: 1rem;
+  color: #f6dcff;
+  font-size: 0.95rem;
+  background: rgba(16, 7, 30, 0.9);
+}
+
+.mission-pulse {
+  background: rgba(20, 10, 35, 0.9);
+  border: 1px solid rgba(232, 182, 255, 0.35);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.mission-pulse h2 {
+  color: #e8b6ff;
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+}
+
+.mission-pulse ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #f2d9ff;
+}
+
+.mission-mermaid {
+  background: rgba(24, 12, 43, 0.92);
+  border: 1px solid rgba(232, 182, 255, 0.35);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+}
+
+.mission-mermaid .mermaid {
+  font-size: 1.1rem;
+}
+
+.mission-note {
+  background: rgba(26, 14, 44, 0.9);
+  border-left: 4px solid #e8b6ff;
+  padding: 1.5rem 2rem;
+  color: #f7e6ff;
+  border-radius: 1rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 680px) {
+  .mission-hero {
+    padding: 2.4rem 1.6rem;
+  }
+
+  .mission-mermaid .mermaid {
+    font-size: 1rem;
+  }
+}
+</style>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    securityLevel: 'loose',
+    themeVariables: {
+      primaryColor: '#9C27B0',
+      primaryTextColor: '#ffffff',
+      primaryBorderColor: '#e8b6ff',
+      lineColor: '#e8b6ff',
+      secondaryColor: '#1a1a2e',
+      tertiaryColor: '#0a0e27'
+    }
+  });
+</script>

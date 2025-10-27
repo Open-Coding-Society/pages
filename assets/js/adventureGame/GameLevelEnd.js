@@ -4,7 +4,7 @@ import Player from './GameEngine/Player.js';
 import Npc from './GameEngine/Npc.js';  // Direct import for portal creation
 import Collectible from './GameEngine/Collectible.js';
 import Quiz from './Quiz.js';
-import Game from './Game.js';
+import Game from './GameEngine/Game.js';
 import Enemy from './GameEngine/Enemy.js';
 import DialogueSystem from './DialogueSystem.js';
 
@@ -52,7 +52,7 @@ class GameLevelEnd {
         zIndex: 5  // Higher z-index to appear above parallax
     };
     
-    const sprite_src_chillguy = path + "/images/gamify/Steve.png";
+    const sprite_src_chillguy = path + "/images/gamify/end_steve.png";
     const CHILLGUY_SCALE_FACTOR = 7;
     const sprite_data_chillguy = {
         id: 'Steve',
