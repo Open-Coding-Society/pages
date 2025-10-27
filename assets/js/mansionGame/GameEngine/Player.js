@@ -15,7 +15,14 @@ class Player extends Character {
      */
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
-        this.keypress = data?.keypress || {up: 87, left: 65, down: 83, right: 68};
+        // Normalize key mappings: allow number or array of keyCodes per direction.
+        const rawKeypress = data?.keypress || {up: 87, left: 65, down: 83, right: 68};
+        this.keypress = {
+            up: Array.isArray(rawKeypress.up) ? rawKeypress.up : [rawKeypress.up],
+            left: Array.isArray(rawKeypress.left) ? rawKeypress.left : [rawKeypress.left],
+            down: Array.isArray(rawKeypress.down) ? rawKeypress.down : [rawKeypress.down],
+            right: Array.isArray(rawKeypress.right) ? rawKeypress.right : [rawKeypress.right]
+        };
         this.pressedKeys = {}; // active keys array
         this.bindMovementKeyListners();
         this.gravity = data.GRAVITY || false;
@@ -65,37 +72,45 @@ class Player extends Character {
         this.velocity.x = 0;
         this.velocity.y = 0;
 
+        // Helper to see if any of the keyCodes for a direction are active.
+        const isActive = (keyArray) => {
+            for (let code of keyArray) {
+                if (this.pressedKeys[code]) return true;
+            }
+            return false;
+        };
+
         // Multi-key movements (diagonals: upLeft, upRight, downLeft, downRight)
-        if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.left]) {
+        if (isActive(this.keypress.up) && isActive(this.keypress.left)) {
             this.velocity.y -= this.yVelocity;
             this.velocity.x -= this.xVelocity;
             this.direction = 'upLeft';
-        } else if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.right]) {
+        } else if (isActive(this.keypress.up) && isActive(this.keypress.right)) {
             this.velocity.y -= this.yVelocity;
             this.velocity.x += this.xVelocity;
             this.direction = 'upRight';
-        } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.left]) {
+        } else if (isActive(this.keypress.down) && isActive(this.keypress.left)) {
             this.velocity.y += this.yVelocity;
             this.velocity.x -= this.xVelocity;
             this.direction = 'downLeft';
-        } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.right]) {
+        } else if (isActive(this.keypress.down) && isActive(this.keypress.right)) {
             this.velocity.y += this.yVelocity;
             this.velocity.x += this.xVelocity;
             this.direction = 'downRight';
         // Single key movements (left, right, up, down) 
-        } else if (this.pressedKeys[this.keypress.up]) {
+        } else if (isActive(this.keypress.up)) {
             this.velocity.y -= this.yVelocity;
             this.direction = 'up';
             this.moved = true;
-        } else if (this.pressedKeys[this.keypress.left]) {
+        } else if (isActive(this.keypress.left)) {
             this.velocity.x -= this.xVelocity;
             this.direction = 'left';
             this.moved = true;
-        } else if (this.pressedKeys[this.keypress.down]) {
+        } else if (isActive(this.keypress.down)) {
             this.velocity.y += this.yVelocity;
             this.direction = 'down';
             this.moved = true;
-        } else if (this.pressedKeys[this.keypress.right]) {
+        } else if (isActive(this.keypress.right)) {
             this.velocity.x += this.xVelocity;
             this.direction = 'right';
             this.moved = true;

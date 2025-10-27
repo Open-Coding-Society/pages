@@ -39,7 +39,8 @@ class MansionLevel4 {
 		upLeft: {row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
 		upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
 		hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-		keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
+	// Allow both WASD and Arrow keys: W/UpArrow, A/LeftArrow, S/DownArrow, D/RightArrow
+	keypress: { up: [87, 38], left: [65, 37], down: [83, 40], right: [68, 39] } // W,A,S,D and Arrows
 	};
 
 	// List of objects defnitions for this level
