@@ -1,4 +1,5 @@
 import Character from './Character.js';
+import TouchControls from './TouchControls.js';
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
@@ -29,6 +30,22 @@ class Player extends Character {
         this.acceleration = 0.001;
         this.time = 0;
         this.moved = false;
+
+        // Initialize touch controls for mobile devices
+        // Use the first keyCode from each array for touch controls
+        const touchOptions = {
+            mapping: {
+                up: this.keypress.up[0],
+                left: this.keypress.left[0],
+                down: this.keypress.down[0],
+                right: this.keypress.right[0],
+                interact: 69  // E key for interact
+            },
+            interactLabel: 'E',
+            position: 'left',
+            id: `touch-controls-${data?.id || 'player'}`
+        };
+        this.touchControls = new TouchControls(gameEnv, touchOptions);
     }
 
     /**
@@ -142,6 +159,16 @@ class Player extends Character {
         this.pressedKeys = {};
         this.updateVelocityAndDirection();
         super.handleCollisionReaction(other);
+    }
+
+    /**
+     * Clean up player resources including touch controls
+     */
+    destroy() {
+        if (this.touchControls) {
+            this.touchControls.destroy();
+        }
+        super.destroy();
     }
 
 

@@ -12,7 +12,7 @@ class MansionLevel4 {
 	const image_background = path + "/images/mansionGame/image_lvl4.png"; // be sure to include the path
 	const image_data_background = {
 		name: 'background',
-		greeting: "This is the library, you will fight hordes of enemies, survive as long as possible.",
+		greeting: "This is the casino, you will try to gamble your way out of the level, survive as long as possible.",
 		src: image_background,
 		pixels: {height: 1280, width: 720}
 	};
@@ -22,7 +22,7 @@ class MansionLevel4 {
 	const CHILLGUY_SCALE_FACTOR = 5;
 	const sprite_data_chillguy = {
 		id: 'Chill Guy',
-		greeting: "Hi I am Chill Guy, ready to explore the library!",
+		greeting: "Hi I am Chill Guy, ready to explore the casino!",
 		src: sprite_src_chillguy,
 		SCALE_FACTOR: CHILLGUY_SCALE_FACTOR,
 		STEP_FACTOR: 1000,
