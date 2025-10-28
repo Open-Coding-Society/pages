@@ -14,8 +14,14 @@ date: 2025-10-21
 
 # Bias Checker
 
-## Media Bias Sorting Game
-Test your knowledge of media bias by sorting news outlets into their typical editorial positions. This interactive game helps you understand the different biases present in major news sources.
+### Why is checking for bias Important?
+The alien misinformation swarm doesn’t invade with lasers or ships — it attacks minds.
+Every distorted headline, every emotional post, every half-true story is a signal designed to scramble human judgment. Once people can’t tell what’s real, they stop trusting reliable information. Biased language can make ordinary events sound urgent or frightening, pushing people to react before they think. When that happens, truth fades and manipulation spreads.
+--- 
+**By identifying bias, you decode the signal. You learn to notice when words are chosen to provoke rather than inform.**
+
+## Media Bias Training 
+Before you recieve your mission to protect Media Literacy Planet, you'll need to undergo training. Test your knowledge of media bias by sorting news outlets into their typical editorial positions. This training will help you understand the different biases present in major news sources to defeat the invaders. 
 
 <style>
 .game-container {
@@ -179,7 +185,7 @@ Test your knowledge of media bias by sorting news outlets into their typical edi
     <div class="game-header">
         <div class="player-info">
             <div class="info-pill" id="player-name">Player: Guest</div>
-            <div class="info-pill" id="lives">Lives: 😺😺😺</div>
+            <div class="info-pill" id="lives">Lives: 👽👽👽</div>
             <div class="info-pill" id="score">Score: 0</div>
         </div>
     </div>
@@ -277,7 +283,7 @@ Test your knowledge of media bias by sorting news outlets into their typical edi
 
     function updateDisplays() {
         scoreDisplay.textContent = `Score: ${score}`;
-        livesDisplay.textContent = `Lives: ${"😺".repeat(Math.max(0, lives))}`;
+        livesDisplay.textContent = `Lives: ${"👽".repeat(Math.max(0, lives))}`;
         playerDisplay.textContent = `Player: ${currentPlayer}`;
     }
 
@@ -441,4 +447,124 @@ Test your knowledge of media bias by sorting news outlets into their typical edi
     fetchLeaderboard();
     setInterval(fetchLeaderboard, 30000); // Refresh every 30 seconds
 </script>
+
+### Transmission from Media Literacy Command:
+Planet Media Literacy's communication grid has been hacked by alien misinformation drones. They’re spreading biased headlines to confuse humans and weaken your defenses.
+**Your mission**: analyze incoming headlines and separate reliable transmissions from corrupted ones before misinformation spreads across the galaxy.
+---
+**Mission Briefing**
+- Read each incoming headline on your dashboard.
+- Decide if the transmission sounds balanced and factual or biased and manipulative.
+- Drag or beam each headline into the correct containment zone on the right:
+
+    - 🟦 Balanced / Accurate — verified signals from trusted sources.
+
+    - 🔴 Biased / Misleading — corrupted broadcasts from alien bots.
+
+Complete your analysis to secure the communication line and see your mission score.
+
+<div style="background-color:background: linear-gradient(135deg, #2a455fff, #9384d5ff);color:white;padding:0;margin:0;font-family:system-ui,sans-serif;min-height:100vh;">
+
+<style>
+  :root{--bg:#0f1720;--card:#0b1220;--accent:#4dc3ff;--muted:#9aa6b2}
+  html,body{height:100%;margin:0}
+  .wrap{max-width:980px;margin:32px auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  h1{font-size:1.25rem;margin:0}
+  .controls{display:flex;gap:8px}
+  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#05232d;font-weight:600;cursor:pointer}
+
+  .game{display:grid;grid-template-columns:1fr 320px;gap:18px}
+  .board{background:var(--card);padding:18px;border-radius:12px;min-height:360px}
+  .items{display:flex;flex-wrap:wrap;gap:10px}
+
+  .draggable{background:#071426;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);cursor:grab;user-select:none}
+  .draggable[aria-pressed="true"]{outline:3px solid rgba(77,195,255,0.15)}
+
+  .side{background:transparent}
+  .zone{background:#071826;border:2px dashed rgba(255,255,255,0.03);min-height:80px;padding:12px;border-radius:10px;margin-bottom:12px}
+  .zone.good{border-color:rgba(77,195,255,0.25)}
+  .zone.bad{border-color:rgba(255,110,110,0.15)}
+  .zone.empty{opacity:.6}
+
+  .status{color:var(--muted);font-size:.95rem;margin-top:10px}
+  .footer{margin-top:14px;color:var(--muted);font-size:.9rem}
+
+  @media (max-width:880px){.game{grid-template-columns:1fr;margin:0}.side{order:2}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Media Bias Game — Base</h1>
+    <div class="controls">
+      <button id="shuffle">Shuffle</button>
+      <button id="reset">Reset</button>
+    </div>
+  </header>
+
+  <main class="game">
+    <section class="board" aria-label="game board">
+      <p class="status">Drag headlines into the zone you think they belong to.</p>
+      <div class="items" id="items" aria-live="polite"></div>
+    </section>
+    <aside class="side">
+      <div class="zone good" id="leftZone" data-zone="good" tabindex="0" aria-label="Accurate / Balanced reporting">
+        <strong>Balanced / Accurate</strong>
+        <div class="zone-contents"></div>
+      </div>
+      <div class="zone bad" id="rightZone" data-zone="bad" tabindex="0" aria-label="Biased / Misleading reporting">
+        <strong>Biased / Misleading</strong>
+        <div class="zone-contents"></div>
+      </div>
+      <div class="footer">
+        <div>Score: <span id="score">0</span> / <span id="total">0</span></div>
+        <div style="margin-top:6px">Hints: <small>Use keyboard: TAB to focus, SPACE to select, arrow keys to move.</small></div>
+      </div>
+    </aside>
+  </main>
+</div>
+<script>
+  const HEADLINES = [
+    {id:1, text:'Study finds coffee linked to lower heart disease risk', correct:'good'},
+    {id:2, text:'Celebrity says x — experts warn of rising trend', correct:'bad'},
+    {id:3, text:'Government releases budget with small tax relief for families', correct:'good'},
+    {id:4, text:'Opinion: this frightening trend will destroy your neighborhood', correct:'bad'},
+    {id:5, text:'Local school wins national science award', correct:'good'},
+    {id:6, text:'Shocking footage suggests new conspiracy about vaccines', correct:'bad'}
+  ];
+  const itemsEl = document.getElementById('items');
+  const leftZone = document.getElementById('leftZone');
+  const rightZone = document.getElementById('rightZone');
+  const scoreEl = document.getElementById('score');
+  const totalEl = document.getElementById('total');
+  const shuffleBtn = document.getElementById('shuffle');
+  const resetBtn = document.getElementById('reset');
+  let state = { order: [], placed: {} };
+  function makeDraggable(item){
+    const btn = document.createElement('button');
+    btn.className = 'draggable';
+    btn.type = 'button';
+    btn.draggable = true;
+    btn.id = 'item-'+item.id;
+    btn.textContent = item.text;
+    btn.setAttribute('data-id', item.id);
+    btn.setAttribute('aria-pressed','false');
+    btn.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', item.id);
+      btn.style.opacity = '0.6';
+    });
+    btn.addEventListener('dragend', () => btn.style.opacity = '');
+    btn.addEventListener('keydown', e => {
+      if(e.code === 'Space'){
+        e.preventDefault();
+        const pressed = btn.getAttribute('aria-pressed') === 'true';
+        btn.setAttribute('aria-pressed', String(!pressed));
+      }
+      if(['ArrowLeft','ArrowRight'].includes(e.code)){
+        e.preventDefault();
+        const zone = e.code === 'ArrowLeft' ? leftZone : rightZone;
+        placeIntoZone(item.id, zone.dataset.zone);
+      }
+    });
+
 
