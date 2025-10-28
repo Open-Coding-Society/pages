@@ -19,7 +19,7 @@ Test your knowledge of media bias by sorting news outlets into their typical edi
 
 <style>
 .game-container {
-    background: linear-gradient(135deg, #2a455fff, #6a92b3ff);
+    background: linear-gradient(135deg, #2a455fff, #9384d5ff);
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
