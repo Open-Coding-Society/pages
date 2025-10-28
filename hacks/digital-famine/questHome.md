@@ -16,7 +16,7 @@ lxdData:
       Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
       Categories: ["cyber", "HTML", "CSS","Javascript"]
       Video: "/digital-famine/cyber-video"
-      Lessons: "/digital-famine/cyber/"
+      Lessons: "/digital-famine/cybersecurity-game/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "CS Portfolio Quest cyber"
     - Title: "C2: media"
