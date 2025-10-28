@@ -15,12 +15,15 @@
 #   in _config.yml. It will appear in your document head meta (for Google search
 #   results) and in your feed.xml site description.
 
-title: Open Coding 
-description: "Class of 2028"
-owner_name: CSPGAME-Encryptors 
-github_username: CSPGAME-Encryptors 
-github_repo: "CyberSecurityGame" 
-baseurl: "" 
+title: CyberSecurityGame
+description: "CyberSecurityGame — interactive lessons and missions"
+owner_name: CSPGAME-Encryptors
+github_username: CSPGAME-Encryptors
+github_repo: "CyberSecurityGame"
+# If you are serving from https://<org>.github.io/<repo>/, set baseurl to "/<repo>"
+# If serving from an organization or user site like https://<org>.github.io/ (repo named <org>.github.io), leave baseurl blank.
+baseurl: "/CyberSecurityGame"
+url: "https://CSPGAME-Encryptors.github.io"
 future: true
 
 

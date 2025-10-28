@@ -1,0 +1,13 @@
+{%- if site.minima.social_links -%}
+<nav class="site-social-links" aria-label="Social links">
+  <ul class="social-links-list">
+    {%- for item in site.minima.social_links -%}
+      <li class="social-link-item">
+        <a href="{{ item.user_url | default: item.url }}" title="{{ item.title | default: item.platform }}" target="_blank" rel="noopener noreferrer">
+          {{ item.platform }}
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</nav>
+{%- endif -%}
