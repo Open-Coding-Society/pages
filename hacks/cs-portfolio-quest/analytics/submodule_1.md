@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Submodule 1"
 description: "Submodule 1 of Analytics/Admin Mini-Quest"
 permalink: /cs-portfolio-quest/analytics/submodule_1/
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will be developed by the Curators team.
+

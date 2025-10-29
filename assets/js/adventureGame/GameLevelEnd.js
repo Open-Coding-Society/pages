@@ -52,12 +52,12 @@ class GameLevelEnd {
         zIndex: 5  // Higher z-index to appear above parallax
     };
     
-    const sprite_src_chillguy = path + "/images/gamify/end_steve.png";
+    const sprite_src_steve = path + "/images/gamify/end_steve.png";
     const CHILLGUY_SCALE_FACTOR = 7;
-    const sprite_data_chillguy = {
+    const sprite_data_steve = {
         id: 'Steve',
         greeting: "Hi, I am Steve.",
-        src: sprite_src_chillguy,
+        src: sprite_src_steve,
         SCALE_FACTOR: CHILLGUY_SCALE_FACTOR,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 25,
@@ -74,7 +74,13 @@ class GameLevelEnd {
         upLeft: {row: 5, start: 0, columns: 4, rotate: Math.PI/8 },
         upRight: {row: 7, start: 0, columns: 4, rotate: -Math.PI/8 },
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-        keypress: { up: 87, left: 65, down: 83, right: 68 } // Using W, A, S, D for Steve
+        /* These are default controls but shown for this 2-player setup
+        // keypress: { up: 87, left: 65, down: 83, right: 68 }, // Using W, A, S, D for Steve
+        touchOptions: {
+          interactLabel: "E",
+          position: "left"
+        }
+        */
     };
     
     const sprite_src_alex = path + "/images/gamify/Alex.png";
@@ -99,7 +105,11 @@ class GameLevelEnd {
         upLeft: {row: 5, start: 0, columns: 4, rotate: Math.PI/8 },
         upRight: {row: 7, start: 0, columns: 4, rotate: -Math.PI/8 },
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-        keypress: { up: 73, left: 74, down: 75, right: 76 } // Using I, J, K, L for Alex to differentiate from Steve 
+        keypress: { up: 73, left: 74, down: 75, right: 76, interact: 85 }, // Using I, J, K, L for Alex to differentiate from Steve
+        touchOptions: {
+          interactLabel: "U",
+          position: "right"
+        }
     };
 
     // Store a reference to the current instance to use in closures
@@ -473,7 +483,7 @@ class GameLevelEnd {
     this.classes = [
       { class: BackgroundParallax, data: image_data_parallax },  // Add parallax background first
       { class: GamEnvBackground, data: image_data_end },         // Then regular background
-      { class: Player, data: sprite_data_chillguy },
+      { class: Player, data: sprite_data_steve },
       { class: Npc, data: sprite_data_endship },
       { class: Collectible, data: sprite_data_eye },
       { class: Player, data: sprite_data_alex },

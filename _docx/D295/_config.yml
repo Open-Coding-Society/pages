@@ -1,8 +1,8 @@
-# Jekyll-style configuration for D292 WGU files
+# Jekyll-style configuration for D295 WGU files
 
-# Directory defaults for all D292 files
+# Directory defaults for all D295 files
 defaults:
-  categories: ["WGU" ]
+  categories: ["WGU"]
   tags: ["wgu", "d295"]
   author: "John Mortensen"
 
@@ -12,3 +12,18 @@ files:
     title: "D295 Task 1: Digital Citizenship Ideation"
     description: "WGU D295 assessment focusing on digital citizenship education ideation phase"
     permalink: "/wgu/d295/task1-ideation/"
+  
+  QuestOfCode-WGU-Demonstrating-Essential-Concepts:
+    title: "D295 Task 2: Quest-Based Learning"
+    description: "WGU D295 assessment demonstrating essential concepts through quest-based e-learning design"
+    permalink: "/wgu/d295/task2-demonstration/"
+
+  QuestOfCode-WGU-Collobarative-E-Learning:
+    title: "D295 Task 3: Collaborative E-Learning"
+    description: "WGU D295 assessment on designing collaborative e-learning experiences"
+    permalink: "/wgu/d295/task3-collaboration/"
+
+  QuestOfCode-WGU-Assessment-E-Learning:
+    title: "D295 Task 4: Assessment in E-Learning"
+    description: "WGU D295 assessment focusing on creating effective assessments for e-learning"
+    permalink: "/wgu/d295/task4-assessment/"

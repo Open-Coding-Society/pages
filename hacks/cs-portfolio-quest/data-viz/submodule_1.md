@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Submodule 1"
 description: "Submodule 1 of Data Visualization Mini-Quest"
 permalink: /cs-portfolio-quest/data-viz/submodule_1/
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will be developed by the Applicators team.
+

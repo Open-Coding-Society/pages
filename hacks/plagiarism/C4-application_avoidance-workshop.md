@@ -1,10 +1,11 @@
 ---
 layout: post
+microblog: True
+breadcrumb: True
 title: Plagiarism Avoidance Workshop 
 description: A tool to assist students in building an APA reference in citations using AI. 
 author: John Mortensen
 permalink: /plagiarism/4
-breadcrumb: True
 ---
 
 ## Evaluate Sample Paragraphs
@@ -145,10 +146,8 @@ Recent studies in cognitive psychology have revealed new insights into how memor
 </div>
 
 <script type="module">
-    // API Endpoint
-    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-    const ENDPOINT = `${pythonURI}/api/gemini`;
+    // Import the new modular API
+    import { queryGemini } from '{{ site.baseurl }}/assets/js/api/gemini.js';
 
     // Analysis prompts for different modes
     const ANALYSIS_PROMPTS = {
@@ -169,14 +168,15 @@ Recent studies in cognitive psychology have revealed new insights into how memor
         // Test Mode - Fill editor with sample text
         document.getElementById("test-mode-c4").onclick = function() {
             if (confirm("This will fill the editor with sample text for testing. Continue?")) {
-                const sampleText = `Artificial intelligence is transforming education by providing personalized learning experiences. Many educators are exploring how AI can enhance traditional teaching methods. According to recent research, AI-powered adaptive learning systems can significantly improve student outcomes.
+                const sampleText = `
+Artificial intelligence is transforming education by providing personalized learning experiences. Many educators are exploring how AI can enhance traditional teaching methods. According to recent research, AI-powered adaptive learning systems can significantly improve student outcomes.
 
 Machine learning algorithms analyze student performance data to identify areas where individual learners need additional support. This technology enables teachers to provide more targeted interventions and customized learning paths.
 
 However, the integration of AI in education also raises important questions about data privacy, algorithmic bias, and the changing role of human instructors. As educational institutions continue to adopt these technologies, it becomes crucial to establish proper guidelines for citation and attribution when using AI-generated content in academic work.
 
-The future of education will likely involve a collaborative approach between human educators and AI systems, working together to create more effective and inclusive learning environments for all students.`;
-                
+The future of education will likely involve a collaborative approach between human educators and AI systems, working together to create more effective and inclusive learning environments for all students.
+`;
                 quill.setText(sampleText);
                 document.getElementById("submitBtn").disabled = false;
                 showStatusMessage("🧪 Test mode: Editor filled with sample text for plagiarism analysis!", "info");
@@ -245,7 +245,7 @@ The future of education will likely involve a collaborative approach between hum
             const text = quill.getText().trim();
             const content = quill.getContents();
             const mode = document.getElementById("analysisMode").value;
-            
+
             if (text.length === 0) {
                 showStatusMessage("⚠️ Cannot submit empty text", "warning");
                 return;
@@ -267,12 +267,12 @@ The future of education will likely involve a collaborative approach between hum
 
                 // Move from draft storage to instructor assessment storage
                 localStorage.setItem('plagiarism-c4-assessment', JSON.stringify(assessmentData));
-                
+
                 // Remove the draft since it's now submitted
                 localStorage.removeItem('plagiarism-writing-draft');
-                
+
                 showStatusMessage("🎓 Writing sample submitted for instructor assessment! Draft cleared.", "success");
-                
+
                 // Disable submit button after successful submission
                 document.getElementById("submitBtn").disabled = true;
             } catch (error) {
@@ -341,58 +341,30 @@ The future of education will likely involve a collaborative approach between hum
 
             const prompt = ANALYSIS_PROMPTS[mode] || ANALYSIS_PROMPTS.plagiarism;
 
-            fetch(ENDPOINT, {
-                ...fetchOptions,
-                method: "POST",
-                body: JSON.stringify({
-                    prompt: prompt,
-                    text: text
-                })
-            })
-            .then(resp => {
-                if (!resp.ok) return resp.text().then(text => { throw new Error(text); });
-                return resp.json();
+            // Use the new modular API with functional programming style
+            queryGemini({
+                prompt: prompt,
+                text: text
+                // parseJSON: false (default) - C4 expects raw text/markdown for analysis
             })
             .then(result => {
-                if (result.error || result.message) {
-                    // Handle error responses - use status messages instead of output div
-                    let errorMsg = result.error || result.message || "Unknown error";
+                // result is already parsed and validated by the API
+                // The API ensures result.success and result.text exist
+                const markdown = result.text;
 
-                    // Add error code if present
-                    if (result.error_code) {
-                        errorMsg += ` (Error ${result.error_code})`;
-                    }
+                // Convert the Markdown content into fully styled HTML
+                const htmlContent = marked.parse(markdown);
 
-                    // Special handling for authentication errors
-                    if (result.message && result.message.includes("Authentication")) {
-                        errorMsg += " (Login required)";
-                    }
+                // Insert the formatted HTML into the output div
+                outputDiv.innerHTML = htmlContent;
 
-                    // Clear the analyzing message and show status error
-                    outputDiv.textContent = "";
-                    showStatusMessage("⚠️ " + errorMsg, "error");
-                } else if (result.success && result.text) {
-                    // Handle successful response - the analysis is in result.text
-                    const markdown = result.text;
-
-                    // Convert the Markdown content into fully styled HTML
-                    const htmlContent = marked.parse(markdown);
-
-                    // Insert the formatted HTML into the output div
-                    outputDiv.innerHTML = htmlContent;
-
-                    // Show success status
-                    showStatusMessage("✅ Analysis completed successfully!", "success");
-                } else {
-                    // Clear the analyzing message and show warning
-                    outputDiv.textContent = "";
-                    showStatusMessage("⚠️ Analysis complete: No clear analysis provided by the backend", "warning");
-                }
+                // Show success status
+                showStatusMessage("✅ Analysis completed successfully!", "success");
             })
-            .catch(e => {
+            .catch(error => {
                 // Clear the analyzing message and show error status
                 outputDiv.textContent = "";
-                showStatusMessage("⚠️ Login is required or connection failed: " + e.message, "error");
+                showStatusMessage("⚠️ " + error.message, "error");
             });
         };
 

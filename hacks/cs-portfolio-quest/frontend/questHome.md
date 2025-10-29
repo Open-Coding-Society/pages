@@ -55,14 +55,15 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_5/"
       Image: "/images/cs-portfolio-quest/frontend.svg"
       Alt: "Frontend Submodule 5"
-    - Title: "Submodule 6"
+    - Title: "Frontend Quest"
       Genre: "Project Creation"
       Level: 6
-      Description: "Team-defined frontend development module"
+      Description: "JS interpreter used to code a project"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
       Video: "/cs-portfolio-quest/frontend/submodule_6-video"
       Lessons: "/cs-portfolio-quest/frontend/submodule_6/"
       Image: "/images/cs-portfolio-quest/frontend.svg"
       Alt: "Frontend Submodule 6"
 ---
-{%- include tailwind/cs-portfolio-quest_info.html -%}
+
+{%- include tailwind/cs-portfolio-mini_quest_info.html -%}

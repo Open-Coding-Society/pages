@@ -1,5 +1,6 @@
 ---
 layout: post
+microblog: True
 title: APA Reference Instruction
 description: A tool to assist students in building an APA reference. 
 author: John Mortensen
@@ -141,7 +142,7 @@ Research this quote and use it to build an APA reference.
 </div>
 
 <script type="module">
-import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { queryGemini } from '{{ site.baseurl }}/assets/js/api/gemini.js';
 
 // Status message helper function for AI quote research
 function showAIStatus(message, type) {
@@ -176,13 +177,6 @@ function showAIStatus(message, type) {
 }
 
 window.generativeQuoteToFillValuesForAPA = function() {
-    /* 1. Provide a generative AI prompt that expects a quote
-     * 2. Call generative API with payload
-           - quote: user input
-           - wrap with prompt to return search for primary reference of provided quote and return key:value JSON structure with author, date, title, source, url
-     * 3. Fill response key values into doc elements apa-author, apa-date, apa-title, apa-source, apa-url.
-     */
-
     const text = document.getElementById('user-provided-quote').value.trim();
 
     if (!text) {
@@ -190,51 +184,18 @@ window.generativeQuoteToFillValuesForAPA = function() {
         return;
     }
 
-    const ENDPOINT = `${pythonURI}/api/gemini`;
-    const PROMPT = `Please locate a primary source for the provided text and format response as JSON structure with these exact keys: author, date, title, source, url, formal_quote, intext_citation. Include the formal_quote field with the exact/corrected version of the quote from the original source. Include the intext_citation field with a proper APA in-text citation format (e.g., "(Smith, 2023)" or "Smith (2023)"). The quote is: `;
+    const CITATION_PROMPT = `Please locate a primary source for the provided text and format response as JSON structure with these exact keys: author, date, title, source, url, formal_quote, intext_citation. Include the formal_quote field with the exact/corrected version of the quote from the original source. Include the intext_citation field with a proper APA in-text citation format (e.g., "(Smith, 2023)" or "Smith (2023)"). The quote is: `;
 
     showAIStatus("🔍 Researching quote and finding primary source...", "loading");
 
-    fetch(ENDPOINT, {
-        ...fetchOptions,
-        method: "POST",
-        body: JSON.stringify({
-            prompt: PROMPT,
-            text: text
-        })
+    // Functional programming style with promise chaining
+    queryGemini({
+        prompt: CITATION_PROMPT,
+        text: text,
+        parseJSON: true  // Request JSON parsing for citation data
     })
-    .then(resp => {
-        if (!resp.ok) return resp.text().then(text => { throw new Error(text); });
-        return resp.json();
-    })
-    .then(data => {
-        // Parse the AI response - it should be JSON with citation fields
-        let citationData;
-        try {
-            // If the response is already an object with the fields we need
-            if (data.author || data.date || data.title) {
-                citationData = data;
-            } else if (data.response) {
-                // If the response is wrapped in a 'response' field
-                let responseText = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
-                // Strip markdown code blocks if present
-                responseText = responseText.replace(/```json\s*|\s*```/g, '').trim();
-                citationData = JSON.parse(responseText);
-            } else if (data.text) {
-                // If the response is in a 'text' field
-                let responseText = data.text;
-                // Strip markdown code blocks if present
-                responseText = responseText.replace(/```json\s*|\s*```/g, '').trim();
-                citationData = JSON.parse(responseText);
-            } else {
-                // Try to parse the entire response as JSON
-                citationData = JSON.parse(JSON.stringify(data));
-            }
-        } catch (parseError) {
-            console.error("Failed to parse AI response:", parseError);
-            throw new Error("AI response was not in expected JSON format");
-        }
-
+    .then(citationData => {
+        // citationData is already parsed JSON from the API
         // Display formal quote if provided
         if (citationData.formal_quote) {
             const formalQuoteElement = document.getElementById('formal-quote-text');
@@ -276,10 +237,11 @@ window.generativeQuoteToFillValuesForAPA = function() {
         generateAPA();
 
         showAIStatus("✅ Citation fields filled! Review and adjust as needed.", "success");
+
+        return citationData;
     })
     .catch(error => {
-        console.error("Error in AI quote research:", error);
-        showAIStatus("⚠️ Login is required or connection failed: " + error.message, "error");
+        showAIStatus("⚠️ " + error.message, "error");
 
         // Fallback: Fill with example data for the Steve Jobs quote if that's what was entered
         if (text.toLowerCase().includes("innovation distinguishes") || text.toLowerCase().includes("steve jobs")) {
@@ -288,13 +250,13 @@ window.generativeQuoteToFillValuesForAPA = function() {
             document.getElementById('apa-title').value = "Stanford University Commencement Address";
             document.getElementById('apa-source').value = "Stanford News";
             document.getElementById('apa-url').value = "https://news.stanford.edu/news/2005/june15/jobs-061505.html";
-            
+
             // Show formal quote and citation for fallback
             const formalQuoteElement = document.getElementById('formal-quote-text');
             const formalDisplayElement = document.getElementById('formal-quote-display');
             const inTextElement = document.getElementById('intext-citation-text');
             const inTextDisplayElement = document.getElementById('intext-citation-display');
-            
+
             if (formalQuoteElement && formalDisplayElement) {
                 formalQuoteElement.textContent = "Innovation distinguishes between a leader and a follower.";
                 formalDisplayElement.style.display = 'block';
@@ -303,7 +265,7 @@ window.generativeQuoteToFillValuesForAPA = function() {
                 inTextElement.textContent = "(Jobs, 2005)";
                 inTextDisplayElement.style.display = 'block';
             }
-            
+
             generateAPA();
             showAIStatus("📚 Using known source for Steve Jobs quote (AI unavailable)", "success");
         }
@@ -342,11 +304,11 @@ function generateInTextCitation() {
     // Extract just the year from the date
     const yearMatch = date.match(/(\d{4})/);
     const year = yearMatch ? yearMatch[1] : date;
-    
+
     // Extract last name from author (assuming format "LastName, F.")
     const lastNameMatch = author.match(/^([^,]+)/);
     const lastName = lastNameMatch ? lastNameMatch[1].trim() : author;
-    
+
     inTextCitation = `(${lastName}, ${year})`;
   } else {
     // Default example

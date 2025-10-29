@@ -1,10 +1,13 @@
 import GameObject from './GameObject.js';
+import { Transform } from './Transform.js';
+
+const base = new Transform()
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
 const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
 const ANIMATION_RATE = 1; // 1/nth of the frame rate
-const INIT_POSITION = { x: 0, y: 0 };
+const INIT_POSITION = base.position;
 const PIXELS = {height: 16, width: 16};
 
 /**
@@ -54,6 +57,9 @@ class Character extends GameObject {
             isFinishing: false,
         }; // Object control data
 
+        this.transform = new Transform(); // Basic position transform to hold position (x and y)
+        this.velocity = new Transform(); // Velocity holds two dimensions (x velocity and y velocity)
+
         // Create canvas element
         this.canvas = document.createElement("canvas");
         this.canvas.id = data.id || "default";
@@ -65,8 +71,6 @@ class Character extends GameObject {
         this.canvas.style = "image-rendering: pixelated;";
 
         // Set initial object properties 
-        this.x = 0;
-        this.y = 0;
         this.frame = 0;
         
         // Initialize the object's properties 
@@ -74,7 +78,7 @@ class Character extends GameObject {
         this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
         this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
         this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
-        this.position = data.INIT_POSITION || INIT_POSITION;
+        this.transform.position = data.INIT_POSITION || INIT_POSITION;
         
         // Always set spriteData, even if there's no sprite sheet
         this.spriteData = data;
@@ -83,6 +87,51 @@ class Character extends GameObject {
         if (data && data.src) {
             // Load the sprite sheet
             this.spriteSheet = new Image();
+
+            // mark when the sprite image has finished loading
+            this.spriteReady = false;
+            this.spriteSheet.onload = () => {
+                this.spriteReady = true;
+                // If pixels weren't provided or look invalid, populate from image natural size
+                try {
+                    if (!this.spriteData.pixels || this.spriteData.pixels.width === undefined || this.spriteData.pixels.height === undefined) {
+                        this.spriteData.pixels = { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
+                    }
+                    if (!this.spriteData.orientation) {
+                        this.spriteData.orientation = { rows: 1, columns: 1 };
+                    }
+                    // Recalculate size in case dimensions changed
+                    this.resize();
+                    // Diagnostic logging to help ensure frames are calculated correctly
+                    try {
+                        const pixels = this.spriteData.pixels;
+                        const orientation = this.spriteData.orientation;
+                        const frameW = Math.max(1, Math.round(pixels.width / orientation.columns));
+                        const frameH = Math.max(1, Math.round(pixels.height / orientation.rows));
+                        console.log("[Character] Sprite loaded:", this.spriteSheet.src,
+                                    "natural:", this.spriteSheet.naturalWidth + 'x' + this.spriteSheet.naturalHeight,
+                                    "pixels:", pixels.width + 'x' + pixels.height,
+                                    "orientation:", orientation.columns + 'x' + orientation.rows,
+                                    "frame:", frameW + 'x' + frameH);
+
+                        const dirs = ['up','right','down','left','upRight','upLeft','downRight','downLeft'];
+                        dirs.forEach(d => {
+                            const dd = this.spriteData[d];
+                            if (!dd) return;
+                            const row = dd.row || 0;
+                            const cols = dd.columns || orientation.columns || 1;
+                            console.log(`[Character] direction ${d}: row=${row}, columns=${cols}`);
+                        });
+                    } catch (logErr) {
+                        console.warn('Character sprite diagnostics failed', logErr);
+                    }
+                } catch (err) {
+                    console.warn('Error during sprite onload processing', err);
+                }
+            };
+            this.spriteSheet.onerror = (e) => {
+                console.warn('Failed to load sprite sheet:', data.src, e);
+            };
             this.spriteSheet.src = data.src;
 
             // Initialize animation properties
@@ -92,7 +141,6 @@ class Character extends GameObject {
         }
 
         // Initialize the object's position and velocity
-        this.velocity = { x: 0, y: 0 };
 
         // Set the initial size and velocity of the object
         this.resize();
@@ -144,18 +192,27 @@ class Character extends GameObject {
      * Draws the current frame of the sprite sheet.
      */
     drawSprite() {
+        // If sprite hasn't loaded yet, draw a placeholder
+        if (!this.spriteReady) {
+            this.drawDefaultSquare();
+            return;
+        }
+
         // Calculate the frame dimensions
-        const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
-        const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
+        const pixels = this.spriteData.pixels || { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
+        const orientation = this.spriteData.orientation || { rows: 1, columns: 1 };
+        const frameWidth = Math.max(1, Math.round(pixels.width / orientation.columns));
+        const frameHeight = Math.max(1, Math.round(pixels.height / orientation.rows));
 
         // Calculate the frame position on the sprite sheet
-        const directionData = this.spriteData[this.direction];
-        const frameX = (directionData.start + this.frameIndex) * frameWidth;
-        const frameY = directionData.row * frameHeight;
+        const directionData = this.spriteData[this.direction] || {};
+        const frameX = ((directionData.start || 0) + (this.frameIndex || 0)) * frameWidth;
+        const frameY = (directionData.row || 0) * frameHeight;
 
         // Set the canvas dimensions based on the frame size
-        this.canvas.width = frameWidth;
-        this.canvas.height = frameHeight;
+    // Set the canvas dimensions based on the frame size (integers)
+    this.canvas.width = frameWidth;
+    this.canvas.height = frameHeight;
 
         // Apply transformations (rotation, mirroring, spinning)
         this.applyTransformations(directionData);
@@ -177,8 +234,9 @@ class Character extends GameObject {
     updateAnimationFrame() {
         this.frameCounter++;
         if (this.frameCounter % this.animationRate === 0) {
-            const directionData = this.spriteData[this.direction];
-            this.frameIndex = (this.frameIndex + 1) % directionData.columns;
+            const directionData = this.spriteData[this.direction] || {};
+            const frames = directionData.columns || this.spriteData.orientation.columns || 1;
+            this.frameIndex = (this.frameIndex + 1) % frames;
         }
     }
 
@@ -253,26 +311,27 @@ class Character extends GameObject {
     move(x, y) {
 
         if(x != undefined){
-            this.position.x = x;
+            this.transform.position.x = x;
         }
-        if(x != undefined){
-            this.position.y = y;
+        if(y != undefined){
+            this.transform.position.y = y;
         }
         
         // Update or change position according to velocity events
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        this.transform.position.x += this.transform.velocity.x;
+        this.transform.position.y += this.transform.velocity.y;
 
         // Ensure the object stays within the canvas boundaries
         // Bottom of the canvas
+
         if (this.position.y + this.height > this.gameEnv.innerHeight) {
             this.position.y = this.gameEnv.innerHeight - this.height;
             this.velocity.y = 0;
         }
         // Top of the canvas
-        if (this.position.y < 0) {
-            this.position.y = 0;
-            this.velocity.y = 0;
+        if (this.transform.position.y < 0) {
+            this.transform.position.y = 0;
+            this.transform.velocity.y = 0;
         }
         // Right of the canvas
         if (this.position.x + this.width > this.gameEnv.innerWidth) {
@@ -289,7 +348,7 @@ class Character extends GameObject {
 
     /**
      * Resizes the object based on the game environment.
-     * 
+     * 6
      * This method adjusts the object's size and velocity based on the scale of the game environment.
      * It also adjusts the object's position proportionally based on the previous and current scale.
      */

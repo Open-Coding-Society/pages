@@ -131,7 +131,7 @@ class ColorMapUpdater:
             # Return the last definition (SCSS uses last-wins for variable redefinition)
             value = matches[-1].strip()
             
-            # Remove !default flag if present (used for default values that can be overridden)
+            # Remove !default flag if present (used for the default values that can be overridden)
             value = re.sub(r'\s*!default\s*$', '', value)
             return value
         

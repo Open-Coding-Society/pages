@@ -1,0 +1,146 @@
+
+<div id="mini-quest" class="container mx-auto px-4 py-8">
+  <div class="text-center mb-8">
+    <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">{{ page.lxdData.Title }}</h1>
+    <p class="text-gray-300">{{ page.lxdData.Description }}</p>
+  </div>
+
+  <!-- Per-module progress (keeps your classes) -->
+  <div class="bg-gray-800 rounded-lg p-4 mb-6">
+    <div class="module-progress">
+      <div class="progress-bar module-progress-bar" id="module-progress-bar"></div>
+    </div>
+    <p class="text-gray-300 text-sm mt-2" id="module-progress-text">0/6 lessons completed</p>
+  </div>
+
+  <!-- Lessons grid: reuse your card styling -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% assign lessons = page.lxdData.Lessons | default: page.lxdData.Topics %}
+    {% assign sorted = lessons | sort: "Level" %}
+    {% for lesson in sorted %}
+      {% assign n = lesson.Level %}
+      <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden group card-hover-effects lesson" data-lesson="{{ n }}">
+        <div class="module-status p-4">
+          <span class="lesson-badge status-badge status-locked">Locked</span>
+        </div>
+
+        <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900">
+          <a href="{{ lesson.Video }}" class="block w-full h-full group video-link">
+            <img src="{{ site.baseurl }}{{ lesson.Image }}" alt="{{ lesson.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110">
+            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div class="iridescent bg-white bg-opacity-90 rounded-full p-3">
+                <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path d="M8 5v10l8-5z"/></svg>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-white mb-1">Lesson {{ n }} — {{ lesson.Title }}</h3>
+          <p class="text-sm text-gray-400 mb-2">Level: {{ lesson.Level }}</p>
+          {% if lesson.Description %}
+            <p class="text-gray-300 text-sm mb-4">{{ lesson.Description }}</p>
+          {% endif %}
+
+          <div class="flex gap-2">
+            <a href="{{ site.baseurl }}{{ lesson.Lessons }}" class="lesson-link iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition">Open Lesson</a>
+            <a href="{{ lesson.Video }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition video-link">Watch Video</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if page.nextModuleUrl %}
+    <div class="text-center mt-10">
+      <a id="next-module-cta"
+         href="{{ site.baseurl }}{{ page.nextModuleUrl }}"
+         class="iridescent text-white inline-block px-4 py-2 rounded-lg font-semibold"
+         style="display:none;">
+        Continue to Next Module →
+      </a>
+    </div>
+  {% endif %}
+
+  <div class="text-center mt-6">
+    <a href="{{ site.baseurl }}/cs-portfolio-quest/" class="text-blue-300 underline">← Back to Modules</a>
+  </div>
+</div>
+
+<!-- Mini-quest Locking/Progress -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const container = document.getElementById("mini-quest");
+  if (!container) return;
+
+  // Derive the mini-quest slug from URL: /cs-portfolio-quest/<slug>/...
+  function getMiniQuestSlug() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const i = parts.indexOf("cs-portfolio-quest");
+    return (i >= 0 && parts[i+1]) ? parts[i+1] : null; // e.g. "frontend"
+  }
+  const miniQuest = getMiniQuestSlug();
+  if (!miniQuest) return;
+
+  const LESSON_COUNT = 6;
+  const NS = "cs-portfolio-quest";
+
+  const k = (m,n) => `${NS}:${m}:lesson:${n}`;
+  const isDone = (m,n) => localStorage.getItem(k(m,n)) === "done";
+  const markDone = (m,n) => localStorage.setItem(k(m,n), "done");
+  const prevAllDone = (m,n) => { for (let i=1;i<n;i++) if (!isDone(m,i)) return false; return true; };
+  const countDone = (m) => { let c=0; for (let i=1;i<=LESSON_COUNT;i++) if (isDone(m,i)) c++; return c; };
+  const moduleDone = (m) => countDone(m) === LESSON_COUNT;
+
+  // public helper for lesson pages (kept for consistency)
+  window.CPQ = window.CPQ || {};
+  window.CPQ.markLessonComplete = function (n, opts = { redirectToNext: true }) {
+    markDone(miniQuest, n);
+    if (opts.redirectToNext && n < LESSON_COUNT) {
+      const nextEl = document.querySelector(`.lesson[data-lesson="${n+1}"] .lesson-link`);
+      if (nextEl) window.location.href = nextEl.getAttribute("href");
+    }
+    updateLocks();
+  };
+
+  function updateLocks() {
+    document.querySelectorAll(".lesson[data-lesson]").forEach((card) => {
+      const n = Number(card.dataset.lesson);
+      const link = card.querySelector(".lesson-link");
+      const badge = card.querySelector(".lesson-badge");
+
+      const done = isDone(miniQuest, n);
+      const unlocked = n === 1 ? true : prevAllDone(miniQuest, n);
+
+      if (badge) {
+        if (done) { badge.textContent="Completed"; badge.className="lesson-badge status-badge status-completed"; }
+        else if (unlocked) { badge.textContent="Available"; badge.className="lesson-badge status-badge status-current"; }
+        else { badge.textContent="Locked"; badge.className="lesson-badge status-badge status-locked"; }
+      }
+
+      if (link) {
+        if (unlocked) { link.style.opacity=""; link.style.pointerEvents=""; link.setAttribute("aria-disabled","false"); }
+        else { link.style.opacity="0.5"; link.style.pointerEvents="none"; link.setAttribute("aria-disabled","true"); }
+      }
+    });
+
+    const doneCnt = countDone(miniQuest);
+    const pct = Math.round((doneCnt/LESSON_COUNT)*100);
+    const bar = document.getElementById("module-progress-bar");
+    const txt = document.getElementById("module-progress-text");
+    if (bar) bar.style.width = pct + "%", bar.className = "progress-bar module-progress-bar" + (doneCnt===LESSON_COUNT?" completed":doneCnt?" partial":"");
+    if (txt) txt.textContent = `${doneCnt}/${LESSON_COUNT} lessons completed`;
+
+    const nextBtn = document.getElementById("next-module-cta");
+    if (nextBtn) nextBtn.style.display = moduleDone(miniQuest) ? "" : "none";
+  }
+
+  // Initial render
+  updateLocks();
+
+  // Handle Back/Forward cache restores so the UI refreshes when you click back
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) updateLocks();
+  });
+});
+</script>

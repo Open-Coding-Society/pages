@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "CSS Styling Fundamentals"
 description: "Submodule 3 of Frontend Development Mini-Quest"
 permalink: /cs-portfolio-quest/frontend/submodule_3/
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will cover css styling fundamentals.
+

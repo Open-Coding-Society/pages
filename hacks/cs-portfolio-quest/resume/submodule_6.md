@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Submodule 6"
 description: "Submodule 6 of Resume Building Mini-Quest"
 permalink: /cs-portfolio-quest/resume/submodule_6/
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will be developed by the Grinders team.
+

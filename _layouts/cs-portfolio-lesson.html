@@ -1,0 +1,195 @@
+---
+layout: opencs
+---
+
+<style>
+  /* === Post Header === */
+  .post-header h3 { font-size: 1.8rem; font-weight: 600; margin-top: .5rem; margin-bottom: .5rem; line-height: 1.3; }
+  .page-description { font-size: 1rem; color: #555; margin-bottom: 1rem; }
+
+  /* === Meta Info === */
+  .post-meta { font-size: .9rem; color: #666; margin-bottom: .5rem; }
+  .post-meta time { font-weight: 500; }
+
+  /* === Category & Breadcrumb Links === */
+  .category-tags-link { display:inline-block; padding:.2rem .6rem; margin:.1rem; font-size:.85rem; background:#f5f5f5; border-radius:999px; color:#333; text-decoration:none; transition:background .2s ease; }
+  .category-tags-link:hover { background:#e0e0e0; }
+  .post-header { margin-bottom: 1rem; }
+  .post-header a.category-tags-link { margin-right:.3rem; }
+
+  /* === Main Content Styling === */
+  .post-content { line-height: 1.7; font-size: 1rem; }
+  .post-content h2, .post-content h3 { margin-top:1.5rem; margin-bottom:.75rem; border-bottom:1px solid #eee; padding-bottom:.3rem; }
+
+  /* === Comments Section Separator === */
+  .post-content + div, .post-content + section { margin-top:2rem; padding-top:1rem; border-top:1px solid #ddd; }
+</style>
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    {%- if page.menu -%}
+      {% include {{page.menu}} html=content %}
+    {%- endif -%}
+
+    {% if page.menu == 'nav/csp_units/csp_unit3_p4_fundamentals.html' %}
+      {% include csp/p4-progress-data.html %}
+      {% include csp/p4-progress-controller.html %}
+      {% unless page.permalink contains '/fundamentals' %}
+        {% include csp/p4-progress-widget.html %}
+      {% endunless %}
+    {% endif %}
+
+    {% if page.categories.size > 0 %}
+      Categories:
+      {% for category in page.categories %}
+        <a class="category-tags-link" href="{{site.baseurl}}/search/#{{category|slugize}}">{{category}}</a>{% unless forloop.last %}&nbsp;{% endunless %}
+      {% endfor %}
+    {% endif %}
+
+    {% if page.breadcrumb %}
+      {% assign parts = page.permalink | split: '/' %}
+      {% assign num_parts = parts.size | minus: 1 %}
+      {% assign parent_parts = '' %}
+      {% for i in (0..num_parts) %}
+        {% unless forloop.last %}
+          {% if parent_parts == '' %}
+            {% assign parent_parts = parts[i] %}
+          {% else %}
+            {% assign parent_parts = parent_parts | append: '/' | append: parts[i] %}
+          {% endif %}
+        {% endunless %}
+      {% endfor %}
+      Breadcrumb:
+      <a class="category-tags-link" href="{{ site.baseurl }}/{{ parent_parts }}">/{{ parent_parts }}</a>
+      {% assign data = site.data[page.data] %}
+      {% for topic in data.Topics %}
+        {% if page.permalink == topic.link %}
+          &raquo; <span class="font-bold">{{ topic.title }}</span>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    <p class="post-meta post-meta-title">
+      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {{ page.date | date: date_format }}
+      </time>
+      {%- if page.modified_date -%}
+        ~
+        {%- assign mdate = page.modified_date | date_to_xmlschema -%}
+        <time class="dt-modified" datetime="{{ mdate }}" itemprop="dateModified">
+          {{ mdate | date: date_format }}
+        </time>
+      {%- endif -%}
+      {%- if page.author -%}
+        • {% for author in page.author %}
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ author }}</span></span>{% if forloop.last == false %}, {% endif %}
+        {% endfor %}
+      {%- endif -%}
+      {%- if page.show_reading_time != false -%}
+        • {% include reading_time.html -%}
+      {%- endif -%}
+    </p>
+
+    <h3>{{ page.title | escape }}</h3>
+    {%- if page.description -%}
+      {%- if site.html_escape.description -%}
+        <p class="page-description">{{ page.description | escape }}</p>
+      {%- else -%}
+        <p class="page-description">{{ page.description }}</p>
+      {%- endif -%}
+    {%- endif -%}
+  </header>
+
+  <!-- ===== LESSON CONTENT (keeps your post aesthetics) ===== -->
+  <div class="post-content e-content" itemprop="articleBody">
+    {%- if page.toc -%}
+      {% include toc.html html=content %}
+    {%- endif -%}
+    {%- if page.submenu -%}
+      {% include submenu.html %}
+    {%- endif -%}
+
+    <!-- The specific hooks your JS depends on -->
+    <div id="lesson-container" class="container mx-auto px-4 py-8" data-lesson="{{ page.submodule }}">
+      <div class="prose prose-invert max-w-3xl mx-auto">
+        {{ content }}
+      </div>
+
+      <div class="max-w-3xl mx-auto mt-8 flex items-center justify-between gap-4">
+        <button id="mark-complete-btn"
+                class="iridescent text-white px-4 py-2 rounded-lg font-semibold opacity-50 pointer-events-none"
+                aria-disabled="true">
+          Mark Lesson {{ page.submodule }} Complete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {%- if page.comments -%}
+    {% include utterances.html %}
+  {%- endif -%}
+  {%- if site.disqus.shortname -%}
+    {% include disqus_comments.html %}
+  {%- endif -%}
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>
+
+<!-- ===== Mini-quest locking/progress (unchanged) ===== -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const wrap = document.getElementById("lesson-container");
+  if (!wrap) return;
+
+  function getMiniQuestSlug() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const i = parts.indexOf("cs-portfolio-quest");
+    return (i >= 0 && parts[i+1]) ? parts[i+1] : null;
+  }
+  const miniQuest = getMiniQuestSlug();
+  if (!miniQuest) return;
+
+  const lessonNumber = Number(wrap.dataset.lesson); // 1..6
+  const NS = "cs-portfolio-quest";
+
+  const k = (m,n) => `${NS}:${m}:lesson:${n}`;
+  const isDone = (m,n) => localStorage.getItem(k(m,n)) === "done";
+  const markDone = (m,n) => localStorage.setItem(k(m,n), "done");
+
+  const btn = document.getElementById("mark-complete-btn");
+
+  function setEnabled(enabled) {
+    if (!btn) return;
+    if (enabled) {
+      btn.classList.remove("opacity-50","pointer-events-none");
+      btn.setAttribute("aria-disabled","false");
+    } else {
+      btn.classList.add("opacity-50","pointer-events-none");
+      btn.setAttribute("aria-disabled","true");
+    }
+  }
+
+  if (isDone(miniQuest, lessonNumber)) {
+    btn.textContent = "Completed ✓";
+    setEnabled(true);
+  }
+
+  btn.addEventListener("click", function () {
+    markDone(miniQuest, lessonNumber);
+    btn.textContent = "Completed ✓";
+    setEnabled(true);
+    alert("Nice! This lesson is marked complete.");
+  });
+
+  const activateOnScroll = () => {
+    const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 80);
+    if (scrolledToBottom || isDone(miniQuest, lessonNumber)) {
+      setEnabled(true);
+      window.removeEventListener("scroll", activateOnScroll);
+    }
+  };
+  window.addEventListener("scroll", activateOnScroll, { passive: true });
+  activateOnScroll();
+});
+</script>

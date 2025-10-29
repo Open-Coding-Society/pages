@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Purpose of Frontend"
 description: "Submodule 1 of Frontend Development Mini-Quest"
 permalink: /cs-portfolio-quest/frontend/submodule_1/

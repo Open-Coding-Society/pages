@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Submodule 5"
 description: "Submodule 5 of Backend Development Mini-Quest"
 permalink: /cs-portfolio-quest/backend/submodule_5/
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will be developed by the Encrypters team.
+

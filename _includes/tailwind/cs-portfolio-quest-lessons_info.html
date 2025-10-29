@@ -1,0 +1,165 @@
+<!-- cs-portfolio-quest-lessons.html -->
+<!-- This is your individual lesson page layout -->
+
+<div id="lesson-container" class="container mx-auto px-4 py-8" data-lesson="{{ page.lessonNumber }}">
+  
+  <!-- Back navigation -->
+  <div class="mb-6">
+    <a href="{{ site.baseurl }}{{ page.moduleUrl }}" class="text-blue-300 hover:text-blue-200 transition">
+      ← Back to Module
+    </a>
+  </div>
+
+  <!-- Mini-quest progress bar at the top of lesson -->
+  <div class="bg-gray-800 rounded-lg p-4 mb-8 max-w-3xl mx-auto">
+    <h3 class="text-white font-semibold mb-2 text-center">Module Progress</h3>
+    <div class="module-progress">
+      <div class="progress-bar module-progress-bar" id="lesson-progress-bar"></div>
+    </div>
+    <p class="text-gray-300 text-sm mt-2 text-center" id="lesson-progress-text">0/6 lessons completed</p>
+  </div>
+
+  <!-- Lesson content -->
+  <div class="prose prose-invert max-w-3xl mx-auto">
+    <h1 class="text-3xl font-bold text-white mb-4">Lesson {{ page.lessonNumber }}: {{ page.title }}</h1>
+    {{ content }}
+  </div>
+
+  <!-- Navigation buttons -->
+  <div class="max-w-3xl mx-auto mt-12 flex items-center justify-between gap-4">
+    {% if page.prevLessonUrl %}
+    <a href="{{ site.baseurl }}{{ page.prevLessonUrl }}" class="iridescent text-white px-6 py-3 rounded-lg font-semibold transition">
+      ← Previous Lesson
+    </a>
+    {% else %}
+    <div></div>
+    {% endif %}
+
+    {% if page.nextLessonUrl %}
+    <a href="{{ site.baseurl }}{{ page.nextLessonUrl }}" id="next-lesson-btn" class="iridescent text-white px-6 py-3 rounded-lg font-semibold transition opacity-50 pointer-events-none" aria-disabled="true">
+      Next Lesson →
+    </a>
+    {% else %}
+    {% endif %}
+  </div>
+
+  <!-- Completion notification toast -->
+  <div id="completion-toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-32 transition-transform duration-300 z-50">
+    <span class="font-semibold">✓ Lesson {{ page.lessonNumber }} completed!</span>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const wrap = document.getElementById("lesson-container");
+  if (!wrap) return;
+
+  // === CONFIG ===
+  const LESSON_COUNT = 6;
+  const NS = "cs-portfolio-quest";
+
+  // Get mini-quest slug from URL (e.g., "frontend", "backend")
+  function getMiniQuestSlug() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const i = parts.indexOf("cs-portfolio-quest");
+    return (i >= 0 && parts[i+1]) ? parts[i+1] : null;
+  }
+  const miniQuest = getMiniQuestSlug();
+  if (!miniQuest) return;
+
+  const lessonNumber = Number(wrap.dataset.lesson);
+  if (!lessonNumber || lessonNumber < 1 || lessonNumber > LESSON_COUNT) return;
+
+  // === STORAGE HELPERS ===
+  const k = (m,n) => `${NS}:${m}:lesson:${n}`;
+  const isDone = (m,n) => localStorage.getItem(k(m,n)) === "done";
+  const markDone = (m,n) => localStorage.setItem(k(m,n), "done");
+  const countDone = (m) => {
+    let c = 0;
+    for (let i = 1; i <= LESSON_COUNT; i++) {
+      if (isDone(m, i)) c++;
+    }
+    return c;
+  };
+
+  // === UI ELEMENTS ===
+  const toast = document.getElementById("completion-toast");
+  const progressBar = document.getElementById("lesson-progress-bar");
+  const progressText = document.getElementById("lesson-progress-text");
+  const nextBtn = document.getElementById("next-lesson-btn");
+  const backBtn = document.getElementById("back-to-module-btn");
+
+  let hasCompleted = isDone(miniQuest, lessonNumber);
+  let hasShownToast = false;
+
+  // === UPDATE PROGRESS BAR ===
+  function updateProgressBar() {
+    const doneCnt = countDone(miniQuest);
+    const pct = Math.round((doneCnt / LESSON_COUNT) * 100);
+    
+    if (progressBar) {
+      progressBar.style.width = pct + "%";
+      progressBar.className = "progress-bar module-progress-bar" + 
+        (doneCnt === LESSON_COUNT ? " completed" : doneCnt ? " partial" : "");
+    }
+    
+    if (progressText) {
+      progressText.textContent = `${doneCnt}/${LESSON_COUNT} lessons completed`;
+    }
+  }
+
+  // === SHOW COMPLETION TOAST ===
+  function showCompletionToast() {
+    if (!toast || hasShownToast) return;
+    hasShownToast = true;
+    
+    toast.style.transform = "translateY(0)";
+    setTimeout(() => {
+      toast.style.transform = "translateY(150%)";
+    }, 3000);
+  }
+
+  // === ENABLE NEXT BUTTON ===
+  function enableNextButton() {
+    const btn = nextBtn || backBtn;
+    if (!btn) return;
+    
+    btn.classList.remove("opacity-50", "pointer-events-none");
+    btn.setAttribute("aria-disabled", "false");
+  }
+
+  // === AUTO-COMPLETE ON SCROLL ===
+  function checkScrollCompletion() {
+    if (hasCompleted) return;
+
+    const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 100);
+    
+    if (scrolledToBottom) {
+      // Mark complete
+      markDone(miniQuest, lessonNumber);
+      hasCompleted = true;
+      
+      // Update UI
+      updateProgressBar();
+      showCompletionToast();
+      enableNextButton();
+      
+      // Remove listeners
+      window.removeEventListener("scroll", checkScrollCompletion);
+      window.removeEventListener("resize", checkScrollCompletion);
+    }
+  }
+
+  // === INITIAL SETUP ===
+  updateProgressBar();
+  
+  if (hasCompleted) {
+    enableNextButton();
+  }
+
+  // Start monitoring scroll
+  checkScrollCompletion(); // Check immediately
+  window.addEventListener("scroll", checkScrollCompletion, { passive: true });
+  window.addEventListener("resize", checkScrollCompletion, { passive: true });
+});
+</script>

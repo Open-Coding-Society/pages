@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Component Integration"
 description: "Submodule 6 of Frontend Development Mini-Quest"
 permalink: /cs-portfolio-quest/frontend/submodule_6/
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will cover component integration.
+

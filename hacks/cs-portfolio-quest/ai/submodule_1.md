@@ -1,7 +1,7 @@
 ---
-layout: post
-title: "Submodule 1"
-description: "Submodule 1 of AI Usage Mini-Quest"
+layout: cs-portfolio-lesson
+title: "Resume & Interview Prep"
+description: "Learn to rewrite resume bullets with metrics using STAR format and prepare for the three most common interview questions by recording and analyzing your responses."
 permalink: /cs-portfolio-quest/ai/submodule_1/
 parent: "AI Usage"
 team: "Thinkers"
@@ -16,3 +16,4 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will be developed by the Thinkers team.
+
