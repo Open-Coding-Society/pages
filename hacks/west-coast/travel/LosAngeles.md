@@ -1,22 +1,19 @@
 ---
 layout: post
 title: "Los Angeles"
-description: "Submodule 1 of Analytics/Admin Mini-Quest"
-permalink: /west-coast/analytics/submodule_1/
+description: "Roadtrip through LA and learn UI while you're there!"
+permalink: /west-coast/analytics/losangeles/
 parent: "Analytics/Admin"
 team: "Cool Collaborators"
 submodule: 1
-categories: [CSP, Submodule, Analytics/Admin]
-tags: [analytics, submodule, curators]
 author: "Cool Collaborators"
 date: 2025-10-21
 ---
 
-# Los AngEles 
+# Los Angeles 
 
 ## Content Coming Soon
 This submodule will be developed by the Cool Collaborators team. 
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -446,7 +443,6 @@ This submodule will be developed by the Cool Collaborators team.
 </html>
 
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"> 
@@ -454,6 +450,84 @@ This submodule will be developed by the Cool Collaborators team.
 <title>Reveal Code Modal</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 <style>
+  :root {
+  --bg1: #0f2027;
+  --bg2: #203a43;
+  --ink: #e5e5e5;
+  --muted: #a1a1a1;
+  --accent: #8a5cff;
+  --accent2: #3fc1c9;
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+}
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.app {
+  width: min(1280px, 96vw);
+  height: min(900px, 94vh);
+  background: #1c1c27;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  position: relative;
+}
+
+header {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #1f1f2a 0%, #252537 100%);
+  border-bottom: 1px solid #333;
+}
+
+header h1 {
+  color: #fff;
+}
+
+.crumb {
+  color: var(--muted);
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border: 0;
+  border-radius: 16px;
+  padding: 18px 22px;
+  font-weight: 700;
+  box-shadow: 0 12px 24px rgba(108, 99, 255, 0.25);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 32px rgba(108, 99, 255, 0.4);
+}
+
+.desc {
+  color: #c0c0d0;
+}
+
+.back .btn {
+  background: #2e2e3a;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+.back .btn:hover {
+  background: #444456;
+}
+
   body {
     font-family: 'Poppins', sans-serif;
     display: flex;
@@ -527,6 +601,7 @@ This submodule will be developed by the Cool Collaborators team.
     text-align: center;
   }
 </style>
+
 </head>
 <body>
 

@@ -38,10 +38,10 @@ lxdData:
       Image: "/images/west-coast/data-viz.svg"
       Alt: "CS Portfolio Quest Data Visualization"
     - Title: "C4: Travel"
-      Genre: "Application"
+      Genre: "User Interface"
       Level: 4
-      Description: "Learn to write about your CS projects for inclusion on your resume, both in technical and non-technical terms"
-      Categories: ["CV", "Resume", "Blogging"]
+      Description: "Learn how to design and develop dynamic UI elements inspired by global destinations to enhance your creative journey."
+      Categories: ["UI", "Styling", "Structure"]
       Video: "/west-coast/resume-video"
       Lessons: "/west-coast/travel/"
       Image: "/images/west-coast/resume.svg"

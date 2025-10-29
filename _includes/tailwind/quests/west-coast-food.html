@@ -811,6 +811,26 @@ window.markCityCompleted = markCityCompleted;
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   console.log('=== FOOD MODULE NAVIGATION SETUP ===');
-  initializeCityLocking();
+  
+  // Force reload progress from localStorage
+  loadGameProgress();
+  
+  // Small delay to ensure DOM is fully ready
+  setTimeout(() => {
+    initializeCityLocking();
+    
+    // Debug logging
+    console.log('Current game progress:', gameProgress);
+    console.log('Unlocked cities:', gameProgress.unlockedCities);
+    console.log('Completed cities:', gameProgress.completedCities);
+  }, 100);
 });
+
+// Add a function to manually refresh progress (for debugging)
+window.refreshCityProgress = function() {
+  console.log('🔄 Manually refreshing city progress...');
+  loadGameProgress();
+  initializeCityLocking();
+  console.log('Updated progress:', gameProgress);
+};
 </script>

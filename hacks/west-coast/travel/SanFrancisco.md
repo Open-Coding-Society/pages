@@ -1,24 +1,21 @@
 ---
 layout: post
 title: "San Francisco"
-description: "Submodule 2 of Analytics/Admin Mini-Quest"
-permalink: /west-coast/analytics/submodule_2/
+description: "Roadtrip through SF and learn UI while you're there!"
+permalink: /west-coast/analytics/sanfrancisco/
 parent: "Analytics/Admin"
-team: "Curators"
+team: "Cool Collaborators"
 submodule: 2
-categories: [CSP, Submodule, Analytics/Admin]
-tags: [analytics, submodule, curators]
-author: "Curators Team"
+author: "Cool Collaborators"
 date: 2025-10-21
 ---
 
 # San Francisco
 
 ## Content Coming Soon
-This submodule will be developed by the Curators team.
+This submodule will be developed by the Collaborators team.
 
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"> 
@@ -33,25 +30,26 @@ This submodule will be developed by the Curators team.
     align-items: center;
     height: 100vh;
     margin: 0;
-    background: #f4f4f9;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* dark ocean gradient */
+    color: #f5f5f5;
   }
 
   .reveal-button {
-    background: linear-gradient(90deg, #4facfe, #00f2fe); /* Blue gradient */
+    background: linear-gradient(90deg, #4facfe, #00f2fe); /* blue gradient */
     border: none;
-    color: white;
+    color: black;
     padding: 25px 40px;
     font-size: 22px;
     font-weight: 500;
     border-radius: 12px;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 6px 10px rgba(0,0,0,0.25);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.5);
   }
 
   .reveal-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.6);
   }
 
   /* Modal overlay */
@@ -62,14 +60,14 @@ This submodule will be developed by the Curators team.
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.75);
     justify-content: center;
     align-items: center;
   }
 
   /* Modal content box */
   .modal-content {
-    background: #1e1e1e;
+    background: #1e1e1e; /* dark gray code box */
     color: #d4d4d4;
     padding: 25px;
     border-radius: 12px;
@@ -79,6 +77,7 @@ This submodule will be developed by the Curators team.
     font-size: 18px;
     white-space: pre-wrap;
     position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
   }
 
   /* Close button */
@@ -120,7 +119,7 @@ This submodule will be developed by the Curators team.
     document.getElementById('codeModal').style.display = 'none';
   }
 
-  // Close modal if user clicks outside the content box. 
+  // Close modal if user clicks outside the content box
   window.onclick = function(event) {
     const modal = document.getElementById('codeModal');
     if (event.target === modal) {
@@ -131,3 +130,4 @@ This submodule will be developed by the Curators team.
 
 </body>
 </html>
+

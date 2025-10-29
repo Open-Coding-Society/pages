@@ -1,50 +1,40 @@
 ---
 layout: post 
+title: UI Roadtrip
 tailwind: True
-title: Analytics and Mastery Certificate Quest
 description: >
-  Analytics and Mastery Certificate - Demonstrate comprehensive understanding and earn your CS Portfolio certificate
+  Code on the Road: A UI Adventure Across the The West Coast
 author: CSA 2025-26
 permalink: /west-coast/travel/
 lxdData:
-  Title: "Analytics and Mastery Modules"
-  Description: "Complete your CS Portfolio journey and earn your mastery certificate!"
+  Title: "Code on the Road: A UI Adventure Across the The West Coast"
+  Description: "From San Diego to Seattle, we’re coding our way up the coast! You'll receive a destination, see how we built via code, try coding it yourself, then share it on the microblog."
   Topics:
     - Title: "San Diego"
-      Genre: "Integration"
+      Genre: "User Interface"
       Level: 1
-      Description: "Team-defined analytics and mastery module"
-      Categories: ["Certificate", "Integration", "Achievement"]
-      Video: "/west-coast/analytics/submodule_1-video"
-      Lessons: "/west-coast/analytics/submodule_1/"
-      Image: "/images/west-coast/analytics.svg"
-      Alt: "Analytics Submodule 1"
+      Description: "Learn UI, Fun Destinations, Travel Quest"
+      Lessons: "/west-coast/analytics/sandiego/"
+      Image: "/images/west-coast/sandiego.png"
     - Title: "Los Angeles"
-      Genre: "Integration"
+      Genre: "User Interface"
       Level: 2
-      Description: "Team-defined analytics and mastery module"
-      Categories: ["Certificate", "Integration", "Achievement"]
-      Video: "/west-coast/analytics/submodule_2-video"
-      Lessons: "/west-coast/analytics/submodule_2/"
-      Image: "/images/west-coast/analytics.svg"
-      Alt: "Analytics Submodule 2"
+      Description: "Learn UI, Fun Destinations, Travel Quest"
+      Lessons: "/west-coast/analytics/losangeles/"
+      Image: "/images/west-coast/la.png"
     - Title: "San Francisco"
-      Genre: "Integration"
+      Genre: "User Interface"
       Level: 3
-      Description: "Team-defined analytics and mastery module"
-      Categories: ["Certificate", "Integration", "Achievement"]
-      Video: "/west-coast/analytics/submodule_3-video"
-      Lessons: "/west-coast/analytics/submodule_3/"
-      Image: "/images/west-coast/analytics.svg"
-      Alt: "Analytics Submodule 3"
+      Description: "Learn UI, Fun Destinations, Travel Quest"
+      Lessons: "/west-coast/analytics/sanfrancisco/"
+      Image: "/images/west-coast/sanfranciso.png"
     - Title: "Seattle"
-      Genre: "Integration"
+      Genre: "User Interface"
       Level: 4
-      Description: "Team-defined analytics and mastery module"
-      Categories: ["Certificate", "Integration", "Achievement"]
-      Video: "/west-coast/analytics/submodule_4-video"
+      Description: "Learn UI, Fun Destinations, Travel Quest"
       Lessons: "/west-coast/analytics/submodule_4/"
-      Image: "/images/west-coast/analytics.svg"
-      Alt: "Analytics Submodule 4"
+      Image: "/images/west-coast/seattle.png"
 ---
 {%- include tailwind/quests/west-coast.html -%}
+
+
