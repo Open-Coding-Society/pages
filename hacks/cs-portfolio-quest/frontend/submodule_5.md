@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "JavaScript Guide"
 description: Guide on and how to code in JavaScript
 permalink: /cs-portfolio-quest/frontend/submodule_5/
@@ -41,4 +41,3 @@ date: 2025-10-21
 ## Content Coming Soon
 This submodule will cover responsive design.
 
-{%- include tailwind/cs-portfolio-quest-lessons_info.html -%}

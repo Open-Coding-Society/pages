@@ -6,15 +6,16 @@ description: >
   Finish off the game of DIGITAL FAMINE and bring back knowledge and skills to your home
 author: CodeMaxxers
 permalink: /digital-famine/end/
+breadcrumb: true
 lxdData:
   Title: "End Modules"
-  Description: "Bring home the knowledge you gained from previous planets back home!"
+  Description: "Fix your ship and return the knoladge found throught your advendure!"
   Topics:
-    - Title: "Submodule 1"
+    - Title: "Sus Transmission"
       Genre: "Project Creation"
       Level: 1
-      Description: "Team-defined end development module"
-      Categories: ["end", "Flask", "Spring", "Databases"]
+      Description: "Look through incomming transmissing and find the non-malicious transmission"
+      Categories: ["end", "Flask", "Spring", "Databases", "Microblogging"]
       Video: "/digital-famine/end/submodule_1-video"
       Lessons: "/digital-famine/end/submodule_1/"
       Image: "/images/digital-famine/end.svg"
@@ -22,7 +23,7 @@ lxdData:
     - Title: "Submodule 2"
       Genre: "Project Creation"
       Level: 2
-      Description: "Team-defined end development module"
+      Description: "This submodule will test you on your media literacy! You will need to apply all your knowledge learned in the media literacy planet to identify fake information in a multiple choice style quiz. You will be able to gather all parts needed to fix the information sector of the ship at the end of the quiz."
       Categories: ["end", "Flask", "Spring", "Databases"]
       Video: "/digital-famine/end/submodule_2-video"
       Lessons: "/digital-famine/end/submodule_2/"
@@ -55,14 +56,5 @@ lxdData:
       Lessons: "/digital-famine/end/submodule_5/"
       Image: "/images/digital-famine/end.svg"
       Alt: "end Submodule 5"
-    - Title: "Submodule 6"
-      Genre: "Project Creation"
-      Level: 6
-      Description: "Team-defined end development module"
-      Categories: ["end", "Flask", "Spring", "Databases"]
-      Video: "/digital-famine/end/submodule_6-video"
-      Lessons: "/digital-famine/end/submodule_6/"
-      Image: "/images/digital-famine/end.svg"
-      Alt: "end Submodule 6"
 ---
 {%- include tailwind/quests/digital-famine.html -%}

@@ -2,6 +2,7 @@
 layout: opencs
 title: Platformer
 permalink: /digital-famine/
+breadcrumb: true
 ---
  
 <div id="gameContainer">

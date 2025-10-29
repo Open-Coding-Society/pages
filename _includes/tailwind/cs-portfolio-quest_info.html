@@ -86,34 +86,50 @@
 <!-- Quest Hub Locking/Progress -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const path = window.location.pathname.replace(/\/+$/, "");
-  if (path !== "/cs-portfolio-quest") return;
-
-  const MODULE_IDS = ["c1","c2","c3","c4","c5","c6"];  // order matters
-  const LESSON_COUNT = 6;
   const NS = "cs-portfolio-quest";
+  const LESSON_COUNT = 6;
 
-  const key = (m,n) => `${NS}:${m}:lesson:${n}`;
-  const lessonDone = (m,n) => localStorage.getItem(key(m,n)) === "done";
-  const moduleCountDone = (m) => { let c=0; for (let i=1;i<=LESSON_COUNT;i++) if (lessonDone(m,i)) c++; return c; };
-  const moduleCompleted = (m) => moduleCountDone(m) === LESSON_COUNT;
+  // Helpers that operate on SLUGS (e.g., "frontend", "ai-usage")
+  const key = (slug,n) => `${NS}:${slug}:lesson:${n}`;
+  const lessonDone = (slug,n) => localStorage.getItem(key(slug,n)) === "done";
+  const moduleCountDone = (slug) => { let c=0; for (let i=1;i<=LESSON_COUNT;i++) if (lessonDone(slug,i)) c++; return c; };
+  const moduleCompleted = (slug) => moduleCountDone(slug) === LESSON_COUNT;
 
+  // Find all module cards in page order and extract their mini-quest slug
+  const cards = Array.from(document.querySelectorAll('[data-module]'));
+  function getSlugFromCard(card) {
+    // prefer an explicit data attribute if you decide to add one later:
+    // const explicit = card.dataset.slug; if (explicit) return explicit;
+    const link = card.querySelector(".lesson-link"); // points to the mini-quest landing page
+    if (!link) return null;
+    try {
+      const url = new URL(link.getAttribute("href"), window.location.origin);
+      // expected path: /cs-portfolio-quest/<slug>/...
+      const parts = url.pathname.split("/").filter(Boolean);
+      const i = parts.indexOf("cs-portfolio-quest");
+      return (i >= 0 && parts[i+1]) ? parts[i+1] : null;
+    } catch { return null; }
+  }
+
+  const modules = cards.map(card => ({
+    card,
+    slug: getSlugFromCard(card)
+  })).filter(m => !!m.slug);
+
+  // Iterate in visual order; unlock module N when module N-1 is completed.
   let completedModules = 0;
 
-  MODULE_IDS.forEach((m, idx) => {
-    const card = document.querySelector(`[data-module="${m}"]`);
-    if (!card) return;
-
+  modules.forEach((m, idx) => {
+    const { card, slug } = m;
     const badge = card.querySelector(".module-badge");
-    const bar = card.querySelector(".module-progress-bar");
-    const link = card.querySelector(".lesson-link");
+    const bar   = card.querySelector(".module-progress-bar");
+    const link  = card.querySelector(".lesson-link");
 
-    const prev = MODULE_IDS[idx-1];
-    const available = idx === 0 ? true : moduleCompleted(prev);
-    const doneCnt = moduleCountDone(m);
+    const doneCnt   = moduleCountDone(slug);
     const completed = doneCnt === LESSON_COUNT;
+    const available = idx === 0 ? true : moduleCompleted(modules[idx-1].slug);
 
-    // progress bar inside card (based on lessons)
+    // progress bar inside card
     if (bar) {
       const pct = Math.round((doneCnt/LESSON_COUNT)*100);
       bar.style.width = pct + "%";
@@ -134,14 +150,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // overall progress
+  // overall progress bar/text at top of page
   const overall = document.getElementById("overall-progress");
   const progressText = document.getElementById("progress-text");
-  if (overall) overall.style.width = ((completedModules / MODULE_IDS.length)*100) + "%";
+  if (overall) overall.style.width = ((completedModules / modules.length)*100) + "%";
   if (progressText) {
-    progressText.textContent = completedModules === MODULE_IDS.length
+    progressText.textContent = completedModules === modules.length
       ? "🎉 Congratulations! All modules completed!"
-      : `${completedModules}/${MODULE_IDS.length} modules completed`;
+      : `${completedModules}/${modules.length} modules completed`;
   }
 });
 </script>

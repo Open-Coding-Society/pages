@@ -6,6 +6,7 @@ description: >
   Learn about media literacy and help defent Media Literacy plant from Foreign invaders. Build your shield level by completing the modules. 
 author: CSP 2025-26
 permalink: /digital-famine/media/
+breadcrumb: true
 lxdData:
   Title: "Mastery of Media Literacy Modules"
   Description: "Complete your Media Literacy journey and unlock your vault and defend your planet!"

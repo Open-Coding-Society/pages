@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Purpose of Frontend"
 description: "Submodule 1 of Frontend Development Mini-Quest"
 permalink: /cs-portfolio-quest/frontend/submodule_1/
@@ -16,5 +16,3 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will cover the purpose of frontend development.
-
-{%- include tailwind/cs-portfolio-quest-lessons_info.html -%}

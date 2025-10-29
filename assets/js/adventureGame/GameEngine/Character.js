@@ -87,6 +87,51 @@ class Character extends GameObject {
         if (data && data.src) {
             // Load the sprite sheet
             this.spriteSheet = new Image();
+
+            // mark when the sprite image has finished loading
+            this.spriteReady = false;
+            this.spriteSheet.onload = () => {
+                this.spriteReady = true;
+                // If pixels weren't provided or look invalid, populate from image natural size
+                try {
+                    if (!this.spriteData.pixels || this.spriteData.pixels.width === undefined || this.spriteData.pixels.height === undefined) {
+                        this.spriteData.pixels = { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
+                    }
+                    if (!this.spriteData.orientation) {
+                        this.spriteData.orientation = { rows: 1, columns: 1 };
+                    }
+                    // Recalculate size in case dimensions changed
+                    this.resize();
+                    // Diagnostic logging to help ensure frames are calculated correctly
+                    try {
+                        const pixels = this.spriteData.pixels;
+                        const orientation = this.spriteData.orientation;
+                        const frameW = Math.max(1, Math.round(pixels.width / orientation.columns));
+                        const frameH = Math.max(1, Math.round(pixels.height / orientation.rows));
+                        console.log("[Character] Sprite loaded:", this.spriteSheet.src,
+                                    "natural:", this.spriteSheet.naturalWidth + 'x' + this.spriteSheet.naturalHeight,
+                                    "pixels:", pixels.width + 'x' + pixels.height,
+                                    "orientation:", orientation.columns + 'x' + orientation.rows,
+                                    "frame:", frameW + 'x' + frameH);
+
+                        const dirs = ['up','right','down','left','upRight','upLeft','downRight','downLeft'];
+                        dirs.forEach(d => {
+                            const dd = this.spriteData[d];
+                            if (!dd) return;
+                            const row = dd.row || 0;
+                            const cols = dd.columns || orientation.columns || 1;
+                            console.log(`[Character] direction ${d}: row=${row}, columns=${cols}`);
+                        });
+                    } catch (logErr) {
+                        console.warn('Character sprite diagnostics failed', logErr);
+                    }
+                } catch (err) {
+                    console.warn('Error during sprite onload processing', err);
+                }
+            };
+            this.spriteSheet.onerror = (e) => {
+                console.warn('Failed to load sprite sheet:', data.src, e);
+            };
             this.spriteSheet.src = data.src;
 
             // Initialize animation properties
@@ -147,18 +192,27 @@ class Character extends GameObject {
      * Draws the current frame of the sprite sheet.
      */
     drawSprite() {
+        // If sprite hasn't loaded yet, draw a placeholder
+        if (!this.spriteReady) {
+            this.drawDefaultSquare();
+            return;
+        }
+
         // Calculate the frame dimensions
-        const frameWidth = this.spriteData.pixels.width / this.spriteData.orientation.columns;
-        const frameHeight = this.spriteData.pixels.height / this.spriteData.orientation.rows;
+        const pixels = this.spriteData.pixels || { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
+        const orientation = this.spriteData.orientation || { rows: 1, columns: 1 };
+        const frameWidth = Math.max(1, Math.round(pixels.width / orientation.columns));
+        const frameHeight = Math.max(1, Math.round(pixels.height / orientation.rows));
 
         // Calculate the frame position on the sprite sheet
-        const directionData = this.spriteData[this.direction];
-        const frameX = (directionData.start + this.frameIndex) * frameWidth;
-        const frameY = directionData.row * frameHeight;
+        const directionData = this.spriteData[this.direction] || {};
+        const frameX = ((directionData.start || 0) + (this.frameIndex || 0)) * frameWidth;
+        const frameY = (directionData.row || 0) * frameHeight;
 
         // Set the canvas dimensions based on the frame size
-        this.canvas.width = frameWidth;
-        this.canvas.height = frameHeight;
+    // Set the canvas dimensions based on the frame size (integers)
+    this.canvas.width = frameWidth;
+    this.canvas.height = frameHeight;
 
         // Apply transformations (rotation, mirroring, spinning)
         this.applyTransformations(directionData);
@@ -180,8 +234,9 @@ class Character extends GameObject {
     updateAnimationFrame() {
         this.frameCounter++;
         if (this.frameCounter % this.animationRate === 0) {
-            const directionData = this.spriteData[this.direction];
-            this.frameIndex = (this.frameIndex + 1) % directionData.columns;
+            const directionData = this.spriteData[this.direction] || {};
+            const frames = directionData.columns || this.spriteData.orientation.columns || 1;
+            this.frameIndex = (this.frameIndex + 1) % frames;
         }
     }
 

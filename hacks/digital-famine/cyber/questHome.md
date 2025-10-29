@@ -1,11 +1,12 @@
 ---
 layout: post 
 tailwind: True
-title: Frontend Development Quest
+title: Submodule 4- Cybersecurity planet
 description: >
   Learn how to develop blogs and projects that convey information effectively and are visually appealing
 author: CSA 2025-26
 permalink: /digital-famine/cyber/
+breadcrumb: true
 lxdData:
   Title: "Frontend Development Modules"
   Description: "Master frontend development skills through hands-on projects and earn certificates!"

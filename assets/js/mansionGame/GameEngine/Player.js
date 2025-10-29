@@ -1,4 +1,5 @@
 import Character from './Character.js';
+import TouchControls from './TouchControls.js';
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
@@ -8,6 +9,8 @@ const INIT_POSITION = { x: 0, y: 0 };
 
 
 class Player extends Character {
+    // Static counter for unique player IDs (uninitialized)
+    static playerCount;
     /**
      * The constructor method is called when a new Player object is created.
      * 
@@ -15,13 +18,21 @@ class Player extends Character {
      */
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
+        // Increment static player counter and assign unique id
+        Player.playerCount = (Player.playerCount || 0) + 1;
+        this.id = data?.id ? data.id.toLowerCase() : `player${Player.playerCount}`;
         this.keypress = data?.keypress || {up: 87, left: 65, down: 83, right: 68};
+        this.touchOptions = data?.touchOptions || {interactLabel: "E", position: "left"};
+        this.touchOptions.id = `touch-controls-${this.id}`;
+        this.touchOptions.mapping = this.keypress;
         this.pressedKeys = {}; // active keys array
         this.bindMovementKeyListners();
         this.gravity = data.GRAVITY || false;
         this.acceleration = 0.001;
         this.time = 0;
         this.moved = false;
+        // Initialize touch controls for mobile devices
+        this.touchControls = new TouchControls(gameEnv, this.touchOptions);
     }
 
     /**
@@ -64,32 +75,28 @@ class Player extends Character {
     updateVelocityAndDirection() {
         this.velocity.x = 0;
         this.velocity.y = 0;
-
-        // Make horizontal movement slightly slower than vertical for nicer feel
-        const lateralFactor = 0.7; // reduce horizontal speed to 70%
-        const xVel = this.xVelocity * lateralFactor;
-        const yVel = this.yVelocity;
+        const xVel = this.xVelocity * 0.7;
 
         // Multi-key movements (diagonals: upLeft, upRight, downLeft, downRight)
         if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y -= yVel;
+            this.velocity.y -= this.yVelocity;
             this.velocity.x -= xVel;
             this.direction = 'upLeft';
         } else if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y -= yVel;
+            this.velocity.y -= lthis.yVelocity;
             this.velocity.x += xVel;
             this.direction = 'upRight';
         } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y += yVel;
+            this.velocity.y += this.yVelocity;
             this.velocity.x -= xVel;
             this.direction = 'downLeft';
         } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y += yVel;
+            this.velocity.y += this.yVelocity;
             this.velocity.x += xVel;
             this.direction = 'downRight';
         // Single key movements (left, right, up, down) 
         } else if (this.pressedKeys[this.keypress.up]) {
-            this.velocity.y -= yVel;
+            this.velocity.y -= this.yVelocity;
             this.direction = 'up';
             this.moved = true;
         } else if (this.pressedKeys[this.keypress.left]) {
@@ -97,7 +104,7 @@ class Player extends Character {
             this.direction = 'left';
             this.moved = true;
         } else if (this.pressedKeys[this.keypress.down]) {
-            this.velocity.y += yVel;
+            this.velocity.y += this.yVelocity;
             this.direction = 'down';
             this.moved = true;
         } else if (this.pressedKeys[this.keypress.right]) {
@@ -132,6 +139,68 @@ class Player extends Character {
         this.pressedKeys = {};
         this.updateVelocityAndDirection();
         super.handleCollisionReaction(other);
+    }
+
+    /**
+     * Toggle touch controls visibility (useful for debugging or user preference)
+     */
+    toggleTouchControls() {
+        if (this.touchControls) {
+            this.touchControls.toggle();
+        }
+    }
+
+    /**
+     * Show touch controls explicitly
+     */
+    showTouchControls() {
+        if (this.touchControls) {
+            this.touchControls.show();
+        }
+    }
+
+    /**
+     * Hide touch controls explicitly  
+     */
+    hideTouchControls() {
+        if (this.touchControls) {
+            this.touchControls.hide();
+        }
+    }
+
+    /**
+     * Show the interact button when near an NPC
+     */
+    showInteractButton() {
+        if (this.touchControls) {
+            this.touchControls.showInteractButton();
+        }
+    }
+
+    /**
+     * Hide the interact button when not near an NPC
+     */
+    hideInteractButton() {
+        if (this.touchControls) {
+            this.touchControls.hideInteractButton();
+        }
+    }
+
+    /**
+     * Check if interact button is currently visible
+     */
+    isInteractButtonVisible() {
+        return this.touchControls ? this.touchControls.isInteractButtonVisible() : false;
+    }
+
+    /**
+     * Clean up resources when player is destroyed
+     */
+    destroy() {
+        if (this.touchControls) {
+            this.touchControls.destroy();
+        }
+        super.destroy?.();
     }
 
 

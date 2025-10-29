@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Markdown to HTML and Full-Stack"
 description: "Submodule 2 of Frontend Development Mini-Quest"
 permalink: /cs-portfolio-quest/frontend/submodule_2/

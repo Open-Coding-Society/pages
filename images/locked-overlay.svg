@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Semi-transparent dark overlay -->
+  <rect width="400" height="400" fill="rgba(0, 0, 0, 0.7)"/>
+  
+  <!-- Lock icon -->
+  <g transform="translate(200, 200)">
+    <!-- Lock shackle -->
+    <path d="M -30 -20 
+             L -30 -40 
+             Q -30 -60, -15 -70
+             Q 0 -80, 15 -70
+             Q 30 -60, 30 -40
+             L 30 -20" 
+          fill="none" 
+          stroke="white" 
+          stroke-width="8" 
+          stroke-linecap="round"/>
+    
+    <!-- Lock body -->
+    <rect x="-40" y="-20" width="80" height="60" rx="5" fill="white"/>
+    
+    <!-- Keyhole -->
+    <circle cx="0" cy="5" r="8" fill="rgba(0, 0, 0, 0.7)"/>
+    <rect x="-3" y="5" width="6" height="15" fill="rgba(0, 0, 0, 0.7)"/>
+  </g>
+  
+  <!-- Optional text -->
+  <text x="200" y="280" 
+        font-family="Arial, sans-serif" 
+        font-size="24" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle">LOCKED</text>
+</svg>
