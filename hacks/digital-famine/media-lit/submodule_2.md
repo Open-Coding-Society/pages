@@ -24,6 +24,13 @@ Every distorted headline, every emotional post, every half-true story is a signa
 Before you recieve your mission to protect Media Literacy Planet, you'll need to undergo training. Test your knowledge of media bias by sorting news outlets into their typical editorial positions. This training will help you understand the different biases present in major news sources to defeat the invaders. 
 
 <style>
+body {
+  min-height: 100vh;
+  /* use the image placed under hacks/digital-famine/media-lit/media/assets/ */
+  background: url('/hacks/digital-famine/media-lit/media/assets/spacebackground.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-color: #061226; /* fallback */
+}
 .game-container {
     background: linear-gradient(135deg, #353e74ff, #9384d5ff);
     border-radius: 15px;
@@ -317,11 +324,13 @@ Before you recieve your mission to protect Media Literacy Planet, you'll need to
     }
 
     function initGame() {
-        imagesArea.innerHTML = '';
-        placedImages.clear();
-        score = 0;
-        lives = 3;
-        updateDisplays();
+    imagesArea.innerHTML = '';
+    // clear any previously placed images inside the bins for the image game
+    document.querySelectorAll('.bin-content').forEach(el => el.innerHTML = '');
+    placedImages.clear();
+    score = 0;
+    lives = 3;
+    updateDisplays();
 
         const getRandomSubset = (arr, count) => {
             return [...arr]
@@ -454,8 +463,8 @@ Before you recieve your mission to protect Media Literacy Planet, you'll need to
 ### Transmission from Media Literacy Command:
 Planet Media Literacy's communication grid has been hacked by alien misinformation drones. They’re spreading biased headlines to confuse humans and weaken your defenses.
 **Your mission**: analyze incoming headlines and separate reliable transmissions from corrupted ones before misinformation spreads across the galaxy.
----
-**Mission Briefing**
+
+### Mission Briefing
 - Read each incoming headline on your dashboard.
 - Decide if the transmission sounds balanced and factual or biased and manipulative.
 - Drag or beam each headline into the correct containment zone on the right:
@@ -580,7 +589,7 @@ Complete your analysis to secure the communication line and see your mission sco
   <div class="game-card" role="application" aria-labelledby="bias-game-title">
     <div class="game-header">
       <div>
-        <h2 id="bias-game-title" class="game-title">Bias Checker — Training Card</h2>
+        <h2 id="bias-game-title" class="game-title">Bias Checker — Mission</h2>
         <div class="status">Sort incoming headlines into the correct bin. You have 3 lives — wrong answers cost a life.</div>
         <!-- player pill moved here to separate from action buttons -->
         <div style="margin-top:10px;">
@@ -591,6 +600,7 @@ Complete your analysis to secure the communication line and see your mission sco
         <!-- action buttons grouped on the right to reduce clustering -->
         <button id="shuffle" title="Shuffle headlines">Shuffle</button>
         <button id="reset" class="ghost" title="Reset game">Reset</button>
+        <button id="submit-headlines" class="btn-primary" title="Submit answers">Submit</button>
       </div>
     </div>
 
@@ -636,7 +646,7 @@ Complete your analysis to secure the communication line and see your mission sco
       {id:3, text:'Government releases budget with small tax relief for families', correct:'good'},
       {id:4, text:'Opinion: this frightening trend will destroy your neighborhood', correct:'bad'},
       {id:5, text:'Local school wins national science award', correct:'good'},
-      {id:6, text:'Shocking footage suggests new conspiracy about vaccines', correct:'bad'}
+      {id:6, text:'Shocking footage suggests new conspiracy about vaccines', correct:'bad'},
     ];
 
     // DOM
@@ -658,6 +668,28 @@ Complete your analysis to secure the communication line and see your mission sco
       score: 0,
       lives: 3
     };
+
+    // feedback modal/message
+    function showCongrats() {
+      const msg = document.createElement('div');
+      msg.style.position = 'fixed';
+      msg.style.top = '0';
+      msg.style.left = '0';
+      msg.style.width = '100vw';
+      msg.style.height = '100vh';
+      msg.style.background = 'rgba(0,0,0,0.55)';
+      msg.style.display = 'flex';
+      msg.style.alignItems = 'center';
+      msg.style.justifyContent = 'center';
+      msg.style.zIndex = '9999';
+      msg.innerHTML = `<div style="background: #6a75c8ff;padding:36px 32px 28px 32px;border-radius:18px;box-shadow:0 8px 32px #353e7444;text-align:center;max-width:420px;">
+        <h2 style='color:#2b6cb0;margin-bottom:12px;'>Congratulations!</h2>
+        <div style='font-size:1.1rem;color:#033e61;margin-bottom:18px;'>You defended Media Literacy Planet.<br><b>The shield level is now 2.</b></div>
+        <div style='font-size:1.05rem;color: #a3cbf5ff;margin-bottom:18px;'>Continue to the <b>Truth Scanner</b>!</div>
+        <button style='margin-top:8px;padding:8px 18px;border-radius:8px;background:#4299e1;color:white;font-weight:700;border:none;cursor:pointer;' onclick='this.closest("div").parentNode.remove()'>Close</button>
+      </div>`;
+      document.body.appendChild(msg);
+    }
 
     function renderItems() {
       itemsEl.innerHTML = '';
@@ -701,6 +733,8 @@ Complete your analysis to secure the communication line and see your mission sco
     function resetGame() {
       state.score = 0;
       state.lives = 3;
+      // clear any headlines already placed in the bins
+      document.querySelectorAll('.bin-contents').forEach(el => el.innerHTML = '');
       shuffleOrder();
       renderItems();
     }
@@ -712,33 +746,19 @@ Complete your analysis to secure the communication line and see your mission sco
 
     function placeIntoZone(id, zone) {
       id = Number(id);
+      // allow placement without immediate penalty; evaluate on Submit
       if (state.placed[id]) return;
       const item = HEADLINES.find(h => h.id === id);
       if (!item) return;
-      const correct = item.correct;
       const binEl = (zone === 'good') ? leftZone : rightZone;
       const contents = binEl.querySelector('.bin-contents');
       const node = document.querySelector(`.headline[data-id="${id}"]`);
       if (!node) return;
-      // correct?
-      if (correct === zone) {
-        contents.appendChild(node);
-        node.style.opacity = '0.6';
-        node.style.cursor = 'default';
-        state.score += 1;
-        state.placed[id] = true;
-      } else {
-        // incorrect
-        state.lives -= 1;
-        node.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:280});
-        if (state.lives <= 0) {
-          // end game: post score (if backend available) and reset
-          alert(`Game over! Final score: ${state.score}`);
-          // postScore(currentPlayer, state.score) // optional
-          resetGame();
-          return;
-        }
-      }
+      // place into selected bin and mark placed zone
+      contents.appendChild(node);
+      node.style.opacity = '0.6';
+      node.style.cursor = 'default';
+      state.placed[id] = zone; // store placed zone string for later evaluation
       renderItems();
     }
 
@@ -764,9 +784,44 @@ Complete your analysis to secure the communication line and see your mission sco
       });
     }
 
-    // shuffle/reset controls
+    // shuffle/reset/submit controls
     shuffleBtn.addEventListener('click', () => { shuffleOrder(); renderItems(); });
     resetBtn.addEventListener('click', resetGame);
+    document.getElementById('submit-headlines').addEventListener('click', () => {
+      const placedCount = Object.keys(state.placed).length;
+      const allPlaced = placedCount === HEADLINES.length;
+      if (!allPlaced) {
+        alert('Please sort all headlines before submitting!');
+        return;
+      }
+
+      // Evaluate placements
+      let correctCount = 0;
+      let incorrectCount = 0;
+      HEADLINES.forEach(h => {
+        const placedZone = state.placed[h.id];
+        if (placedZone === h.correct) correctCount += 1;
+        else incorrectCount += 1;
+      });
+
+      // update score and deduct lives only now
+      state.score = correctCount;
+      state.lives -= incorrectCount;
+      updateDisplays();
+
+      if (state.lives <= 0) {
+        alert(`Game Over! Final score: ${state.score}`);
+        resetGame();
+        return;
+      }
+
+      if (incorrectCount === 0) {
+        // perfect
+        showCongrats();
+      } else {
+        alert(`You have ${correctCount} correct and ${incorrectCount} incorrect. Lives remaining: ${state.lives}. You can adjust and resubmit.`);
+      }
+    });
 
     // minimal leaderboard fetch (keeps existing backend calls if present)
     async function fetchLeaderboard() {
