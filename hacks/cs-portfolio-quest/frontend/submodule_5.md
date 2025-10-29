@@ -16,7 +16,7 @@ date: 2025-10-21
 
 ### Purpose
 
-[Content here]
+Considering you're on this section, you likely have learned that HTML is what structures website. CSS is what styles and add a design to websites. JavaScript add to this list: It makes the website interactive.
 
 ### Syntax
 
@@ -24,7 +24,15 @@ date: 2025-10-21
 
 ### Variables
 
-[Content here]
+Variables are essentially how data is stored in usable containers in code.
+
+There are 4 ways this can be done, but only two are recommended.
+
+The first of these methods is **let**. It allows the variable to be changed after it is defined:
+`let x = 5`
+
+The second of these methods is **const**. After the variable is defined, it cannot be changed:
+`const x = 5`
 
 ### Operators
 
