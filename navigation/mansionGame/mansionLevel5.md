@@ -1,6 +1,6 @@
 ---
 layout: opencs
-title: Adventure Game
+title: Mansion Level 5
 permalink: /gamify/mansion5
 ---
 

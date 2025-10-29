@@ -1,26 +1,64 @@
 ---
 layout: post
-title: Microblog API - JavaScript Promise Demonstration
-description: Instructor-Led Demonstration of API Consumption with Promise Patterns for Digital Citizenship Quest Projects
-permalink: /flask-microblog-api-demonstration
 toc: True
+title: Microblog Reference 
+description: Instructor-Led Demonstration of API Consumption with Promise Patterns for Digital Citizenship Quest Projects
+permalink: /microblog/reference
 author: John Mortensen
 ---
 
-## WGU D295: Demonstrating Essential Concepts for K–12 E-Learning
 
-### Lesson Overview: JavaScript API Consumption for Quest-Based Learning
+## Microblog System Architecture: Layered AI Approach
 
-This lesson demonstrates essential concepts for consuming APIs in JavaScript using promise patterns, specifically designed for **Digital Citizenship Quest Projects** where students create interactive experiences for the "Night at the Museum" showcase.
+This article is the main technical reference for the microblog system, which uses a layered approach to enable interactive, AI-powered microblogging on any lesson or article page.
 
-### Primary Strategy: Instructor Introduction and Demonstration
+### Architectural Overview
 
-- Live coding demonstrations of API integration
-- Error handling pattern modeling
-- Promise chain construction walkthrough
-- Debugging technique demonstrations
+**1. Layout Layer (`_layouts/opencs.html`):**
+- Handles the inclusion of all required dependencies (Tailwind CSS, jQuery, and microblog scripts).
+- Injects the microblog overlay panel and floating button into the page.
+- Reads frontmatter (e.g., `microblog: True`) to determine whether to activate the microblog UI.
+- Ensures the microblog panel is available and styled consistently across all enabled pages.
+
+**2. JavaScript Layer (`assets/js/api/microblog.js`):**
+- Handles all UI interactivity: opening/closing the panel, posting, replying, and updating the display.
+- Manages API calls to the backend (fetching, posting, reacting, etc.).
+- Implements error handling, loading states, and user feedback.
+- Uses modern JavaScript patterns (Promises, async/await) for robust, maintainable code.
+
+**3. Backend/API Layer:**
+- Provides RESTful endpoints for microblog operations (GET, POST, reply, react).
+- Can be extended or replaced as needed for different deployments.
+
+### How It Works
+
+1. Add `layout: opencs` and `microblog: True` to your page’s frontmatter.
+2. The layout automatically injects the microblog overlay and loads all dependencies.
+3. The JavaScript file (`microblog.js`) detects the UI, wires up event handlers, and manages all API interactions.
+4. Users can post, reply, and react in real time, with all updates reflected instantly in the panel.
 
 ---
+
+## Enabling and Extending Microblogging
+
+To extend or customize, edit `_layouts/opencs.html` for layout changes, or `assets/js/api/microblog.js` for UI/API logic.
+
+---
+
+## API Endpoints
+
+The JavaScript layer communicates with the following endpoints:
+
+- `GET /microblog` - Retrieve all microblog posts
+- `POST /microblog` - Create a new microblog post
+- `POST /microblog/reply` - Reply to a microblog post
+- `POST /microblog/reaction` - Add reaction to a post
+
+---
+
+## Example: JavaScript API Consumption and UI Logic
+
+The following demonstrations show how the microblog.js file interacts with the API and manages UI updates. These patterns are used throughout the system for robust, user-friendly microblogging.
 
 ## Part 1: Instructor Introduction and Demonstration
 

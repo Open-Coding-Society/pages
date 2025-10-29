@@ -65,38 +65,43 @@ class Player extends Character {
         this.velocity.x = 0;
         this.velocity.y = 0;
 
+        // Make horizontal movement slightly slower than vertical for nicer feel
+        const lateralFactor = 0.7; // reduce horizontal speed to 70%
+        const xVel = this.xVelocity * lateralFactor;
+        const yVel = this.yVelocity;
+
         // Multi-key movements (diagonals: upLeft, upRight, downLeft, downRight)
         if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y -= this.yVelocity;
-            this.velocity.x -= this.xVelocity;
+            this.velocity.y -= yVel;
+            this.velocity.x -= xVel;
             this.direction = 'upLeft';
         } else if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y -= this.yVelocity;
-            this.velocity.x += this.xVelocity;
+            this.velocity.y -= yVel;
+            this.velocity.x += xVel;
             this.direction = 'upRight';
         } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y += this.yVelocity;
-            this.velocity.x -= this.xVelocity;
+            this.velocity.y += yVel;
+            this.velocity.x -= xVel;
             this.direction = 'downLeft';
         } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y += this.yVelocity;
-            this.velocity.x += this.xVelocity;
+            this.velocity.y += yVel;
+            this.velocity.x += xVel;
             this.direction = 'downRight';
         // Single key movements (left, right, up, down) 
         } else if (this.pressedKeys[this.keypress.up]) {
-            this.velocity.y -= this.yVelocity;
+            this.velocity.y -= yVel;
             this.direction = 'up';
             this.moved = true;
         } else if (this.pressedKeys[this.keypress.left]) {
-            this.velocity.x -= this.xVelocity;
+            this.velocity.x -= xVel;
             this.direction = 'left';
             this.moved = true;
         } else if (this.pressedKeys[this.keypress.down]) {
-            this.velocity.y += this.yVelocity;
+            this.velocity.y += yVel;
             this.direction = 'down';
             this.moved = true;
         } else if (this.pressedKeys[this.keypress.right]) {
-            this.velocity.x += this.xVelocity;
+            this.velocity.x += xVel;
             this.direction = 'right';
             this.moved = true;
         } else{

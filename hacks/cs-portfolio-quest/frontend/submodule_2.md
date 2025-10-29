@@ -16,3 +16,5 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will cover converting Markdown to HTML.
+
+{%- include tailwind/cs-portfolio-quest-lessons_info.html -%}

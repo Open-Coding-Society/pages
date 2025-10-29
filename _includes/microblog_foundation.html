@@ -1,0 +1,254 @@
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- MicroBlog Container -->
+<div id="microblog-playground">
+  <em>Loading microblog posts...</em>
+</div>
+
+<!-- Create/Edit Modal Overlay using Tailwind -->
+<div id="microblog-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-blue-500 rounded-lg shadow-lg w-full max-w-lg mx-2 p-6 relative">
+    <button id="modal-close" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+    <h2 id="modal-title" class="text-xl font-bold mb-4">Create Microblog Post</h2>
+    <form id="microblog-form" class="space-y-4">
+      <input type="hidden" id="post-id" name="id">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Topic</label>
+        <input id="topic-id" name="topicId" type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2" readonly>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Content <span class="text-red-500">*</span></label>
+        <textarea id="content" name="content" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+      </div>
+      <div class="flex justify-end space-x-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!--JavaScript Logic for MicroBlog -->
+<script type="module">
+// Imports for APIs used on this page
+import { fetchPosts, createPost, updatePost } from '/assets/js/api/microblog.js';
+
+// Default Key for New MicroBlog Posts
+const pagePermalink = '{{page.permalink}}';
+
+// Create/Edit Modal Functions
+function openModal({ mode, post = {} }) {
+  document.getElementById('microblog-modal').classList.remove('hidden');
+  document.getElementById('modal-title').textContent = mode === 'edit' ? 'Edit Microblog Post' : 'Create Microblog Post';
+  document.getElementById('post-id').value = post.id || '';
+  document.getElementById('topic-id').value = post.topicPath || pagePermalink;
+  document.getElementById('content').value = post.content || '';
+}
+function closeModal() {
+  document.getElementById('microblog-modal').classList.add('hidden');
+}
+document.getElementById('modal-close').onclick = closeModal;
+document.getElementById('microblog-modal').onclick = function(e) {
+  if (e.target === this) closeModal();
+};
+
+// Save Button Listner for Update and Create
+document.getElementById('microblog-form').onsubmit = async function(e) {
+  e.preventDefault();
+  const id = document.getElementById('post-id').value;
+  const topicPath = document.getElementById('topic-id').value;
+  const content = document.getElementById('content').value;
+  try {
+    // API calls to Update and Create Posts
+    if (id) {
+      await updatePost({ id, content, topicPath });
+    } else {
+      await createPost({ content, topicPath });
+    }
+    closeModal();
+    renderMicroblogTable();
+  } catch (err) {
+    alert('Error saving post: ' + err.message);
+  }
+};
+
+// MicroBlog Table Manager
+async function renderMicroblogTable() {
+    const container = document.getElementById('microblog-playground');
+    try {
+        // Determine filter mode and pass page if needed
+        let pageArg = undefined;
+        if (window.__microblogFilterMode === undefined || window.__microblogFilterMode === 'page') {
+          // Use current page as filter; fallback to location.pathname or a default string
+          pageArg = window.location ? window.location.pathname : 'default';
+        }
+        // API call to Read former Posts
+        const data = await fetchPosts(pageArg);
+        // SVG icons for Create (+) and Edit (pencil)
+        const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
+        const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 ml-1 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
+        // Single page icon (default)
+        const pageIcon = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white mx-1 cursor-pointer" id="page-icon"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="4" width="12" height="16" rx="2" fill="white" stroke="white" stroke-width="1.5"/><rect x="8" y="6" width="8" height="12" rx="1" fill="purple" stroke="white" stroke-width="1.5"/></svg></span>`;
+        // Many pages icon (secondary option)
+        const manyPagesIcon = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white mx-1 cursor-pointer" id="many-pages-icon"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><g><rect x="7" y="15" width="10" height="6" rx="2" fill="#60a5fa" stroke="white" stroke-width="1.2"/><rect x="5" y="11" width="12" height="6" rx="2" fill="#2563eb" stroke="white" stroke-width="1.2"/><rect x="3" y="7" width="12" height="6" rx="2" fill="#1e40af" stroke="white" stroke-width="1.2"/></g></svg></span>`;
+        // Create and Page Icons
+        const controlsInfo = `
+          <span id="filter-icons" class="flex items-center" style="color:white;">
+            <button id="create-btn" class="bg-green-600 text-white px-2 py-1 rounded-full hover:bg-green-700 flex items-center justify-center w-8 h-8">${createIcon}</button>
+            ${pageIcon}
+            ${manyPagesIcon}
+          </span>
+        `;
+
+        // Table: Keys and Special Formatting
+        const analytics = [
+          { key: 'userName' },
+          { key: 'timestamp', format: ts => {
+              if (!ts) return '';
+              const d = new Date(ts);
+              if (isNaN(d)) return ts;
+              return d.toLocaleString();
+            }
+          },
+          { key: 'characterCount', format: v => `Count: ${v}` }
+        ];
+        const message = [
+          { key: 'topicPath', format: v => `Topic: ${v}` },
+          { key: 'content' }
+        ];
+
+        // Table: columns
+        let head = `
+            <thead>
+                <tr>
+                    <th style="width:30%">Analytics</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+        `;
+
+        // Table: rows; generated from microblog data
+        let genBody = '';
+        (data.microblogs || []).forEach(post => {
+            const analyticsCell = analytics.map(f => {
+              let value = post[f.key] ?? '';
+              if (f.format) value = f.format(value);
+              return `<div>${value}</div>`;
+            }).join('');
+            // Edit button inline with Topic
+            const messageCell = message.map(f => {
+              let value = post[f.key] ?? '';
+              if (f.key === 'topicPath') {
+                value = (f.format ? f.format(value) : value) +
+                  ` <button class='edit-btn ml-2' data-id='${post.id}' title='Edit'>${editIcon}</button>`;
+              } else if (f.format) {
+                value = f.format(value);
+              }
+              return `<div>${value}</div>`;
+            }).join('');
+            genBody += `<tr><td class="text-left">${analyticsCell}</td><td class="text-left">${messageCell}</td></tr>`;
+        });
+
+        // Table: body
+        let body = `
+        <tbody>
+            ${genBody}
+        </tbody>
+        `;
+
+
+        // Table: set container with scrollable wrapper
+        container.innerHTML = `
+        <div class="max-h-[45vh] sm:max-h-[60vh] lg:max-h-[70vh] overflow-y-auto" style="max-height:70vh;">
+          <table id="microblog-table" border="1" style="border-collapse:collapse; margin-top:1em; width:100%;">
+              ${head}
+              ${body}
+          </table>
+        </div>
+        `;
+
+        // Wait for DOM update, then initialize DataTables
+        setTimeout(() => {
+        // JQuery micro-table Bottom and Top control updates
+        if (window.jQuery && $('#microblog-table').length) {
+            $('#microblog-table').DataTable({
+                initComplete: function() {
+                    // Top controls (Show entries)
+                    const lengthDiv = document.querySelector('.dataTables_length');
+                    if (lengthDiv) {
+                      lengthDiv.style.display = 'flex';
+                      lengthDiv.style.alignItems = 'center';
+                      lengthDiv.insertAdjacentHTML('afterbegin', controlsInfo);
+                      lengthDiv.querySelectorAll('*').forEach(el => {
+                        el.style.marginTop = '0';
+                        el.style.marginBottom = '0';
+                      });
+                      const createBtn = document.getElementById('create-btn');
+                      if (createBtn) createBtn.onclick = () => openModal({ mode: 'create' });
+                    }
+                    // Bottom controls (prefix to info)
+                    const infoDiv = document.querySelector('.dataTables_info');
+                    if (infoDiv) {
+                      infoDiv.style.display = 'flex';
+                      infoDiv.style.alignItems = 'center';
+                      infoDiv.innerHTML = controlsInfo + infoDiv.innerHTML;
+                      // Only bind if not already bound (avoid duplicate IDs)
+                      const btns = infoDiv.querySelectorAll('#create-btn');
+                      btns.forEach(btn => btn.onclick = () => openModal({ mode: 'create' }));
+                    }
+                    // Filter mode logic (default: page, people = all)
+                    window.__microblogFilterMode = 'page';
+                    function setFilterMode(mode) {
+                      window.__microblogFilterMode = mode;
+                      // Update icon backgrounds for visual feedback
+                      const pageIconEl = document.getElementById('page-icon');
+                      const manyPagesIconEl = document.getElementById('many-pages-icon');
+                      if (pageIconEl && manyPagesIconEl) {
+                        if (mode === 'page') {
+                          pageIconEl.style.background = '#9333ea'; // purple
+                          manyPagesIconEl.style.background = '#2563eb'; // blue
+                          pageIconEl.style.opacity = '1';
+                          manyPagesIconEl.style.opacity = '0.5';
+                        } else {
+                          manyPagesIconEl.style.background = '#2563eb';
+                          pageIconEl.style.background = '#9333ea';
+                          manyPagesIconEl.style.opacity = '1';
+                          pageIconEl.style.opacity = '0.5';
+                        }
+                      }
+                      // Re-render table with new filter
+                      renderMicroblogTable();
+                    }
+                    setTimeout(() => {
+                      // Bind ALL filter icons (top and bottom)
+                      document.querySelectorAll('#page-icon').forEach(el => {
+                        el.onclick = () => setFilterMode('page');
+                      });
+                      document.querySelectorAll('#many-pages-icon').forEach(el => {
+                        el.onclick = () => setFilterMode('people');
+                      });
+                      // Only set default filter if not already set
+                      if (!window.__microblogFilterModeInitialized) {
+                        window.__microblogFilterModeInitialized = true;
+                        setFilterMode('page');
+                      }
+                    }, 0);
+                }
+            });
+            // Bind edit buttons using event delegation so it works on all pages
+            $('#microblog-table').off('click', '.edit-btn').on('click', '.edit-btn', function() {
+              const id = $(this).data('id');
+              const post = (data.microblogs || []).find(p => p.id == id);
+              openModal({ mode: 'edit', post });
+            });
+        }
+        }, 0);
+    } catch (error) {
+        container.innerHTML = `<div style="color:red;">Failed to load microblog posts: ${error.message}</div>`;
+    }
+}
+renderMicroblogTable();
+</script>

@@ -65,4 +65,5 @@ lxdData:
       Image: "/images/cs-portfolio-quest/frontend.svg"
       Alt: "Frontend Submodule 6"
 ---
-{%- include tailwind/cs-portfolio-quest_info.html -%}
+
+{%- include tailwind/cs-portfolio-mini_quest_info.html -%}

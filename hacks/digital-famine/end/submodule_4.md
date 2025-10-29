@@ -1,18 +1,18 @@
 ---
 layout: post
 title: "Submodule 4"
-description: "Submodule 4 of Backend Development Mini-Quest"
+description: "Task 4 of the End Quest"
 permalink: /digital-famine/end/submodule_4/
-parent: "Backend Development"
-team: "Encrypters"
+parent: "End Quest"
+team: "CodeMaxxers"
 submodule: 4
-categories: [CSP, Submodule, Backend]
-tags: [backend, submodule, encrypters]
-author: "Encrypters Team"
-date: 2025-10-21
+categories: [CSP, Submodule, End]
+tags: [end, submodule, codemaxxers]
+author: "CodeMaxxers Team"
+date: 2025-10-24
 ---
 
 # Submodule 4
 
 ## Content Coming Soon
-This submodule will be developed by the Encrypters team.
+This submodule will be developed by the CodeMaxxers team.

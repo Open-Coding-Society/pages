@@ -1,0 +1,76 @@
+
+<div id="lesson-container" class="container mx-auto px-4 py-8" data-lesson="{{ page.submodule }}">
+  <div class="prose prose-invert max-w-3xl mx-auto">
+    <!-- Your markdown content will render here via Jekyll -->
+    {{ content }}
+  </div>
+
+  <div class="max-w-3xl mx-auto mt-8 flex items-center justify-between gap-4">
+    <!-- Mark Complete button (initially disabled until scrolled to bottom; remove disabled attr if not desired) -->
+    <button id="mark-complete-btn"
+            class="iridescent text-white px-4 py-2 rounded-lg font-semibold opacity-50 pointer-events-none"
+            aria-disabled="true">
+      Mark Lesson {{ page.lessonNumber }} Complete
+    </button>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const wrap = document.getElementById("lesson-container");
+  if (!wrap) return;
+
+  // mini-quest slug from URL (e.g., "frontend")
+  function getMiniQuestSlug() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    const i = parts.indexOf("cs-portfolio-quest");
+    return (i >= 0 && parts[i+1]) ? parts[i+1] : null;
+  }
+  const miniQuest = getMiniQuestSlug();
+  if (!miniQuest) return;
+
+  // lesson number from data-lesson (your front matter 'submodule')
+  const lessonNumber = Number(wrap.dataset.lesson); // 1..6
+  const NS = "cs-portfolio-quest";
+
+  const k = (m,n) => `${NS}:${m}:lesson:${n}`;
+  const isDone = (m,n) => localStorage.getItem(k(m,n)) === "done";
+  const markDone = (m,n) => localStorage.setItem(k(m,n), "done");
+
+  const btn = document.getElementById("mark-complete-btn");
+
+  function setEnabled(enabled) {
+    if (!btn) return;
+    if (enabled) {
+      btn.classList.remove("opacity-50","pointer-events-none");
+      btn.setAttribute("aria-disabled","false");
+    } else {
+      btn.classList.add("opacity-50","pointer-events-none");
+      btn.setAttribute("aria-disabled","true");
+    }
+  }
+
+  if (isDone(miniQuest, lessonNumber)) {
+    btn.textContent = "Completed ✓";
+    setEnabled(true);
+  }
+
+  btn.addEventListener("click", function () {
+    markDone(miniQuest, lessonNumber);
+    btn.textContent = "Completed ✓";
+    setEnabled(true);
+    alert("Nice! This lesson is marked complete.");
+  });
+
+  // Optional: enable the button once user scrolls near the bottom
+  const activateOnScroll = () => {
+    const scrolledToBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 80);
+    if (scrolledToBottom || isDone(miniQuest, lessonNumber)) {
+      setEnabled(true);
+      window.removeEventListener("scroll", activateOnScroll);
+    }
+  };
+  window.addEventListener("scroll", activateOnScroll, { passive: true });
+  activateOnScroll();
+});
+</script>

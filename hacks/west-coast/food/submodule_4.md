@@ -1,18 +1,19 @@
 ---
-layout: post
-title: "JavaScript Event Handling"
-description: "Submodule 4 of Frontend Development Mini-Quest"
-permalink: /west-coast/food/seattle/
-parent: "Frontend Development"
-team: "Creators"
-submodule: 4
-categories: [CSP, Submodule, Frontend]
-tags: [javascript, events, handling]
-author: "Creators Team"
-date: 2025-10-21
+layout: opencs
+microblog: True 
+title: "Seattle"
+description: "City Two of Food - Seattle"
+permalink: /west-coast/food/SEA/
+parent: "Seattle"
+team: "Syntax Terrors"
+submodule: 1
+categories: [CSP]
+tags: [food, seattle]
+author: "Syntax Terrors"
+date: 2025-10-24
 ---
 
-# JavaScript Event Handling
+# Seattle 
 
 ## Content Coming Soon
-This submodule will cover javascript event handling.
+This submodule will cover Seattle. 

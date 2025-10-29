@@ -22,6 +22,46 @@ class Game {
         return new Game(environment);
     }
 
+    returnHome() {
+        if (this.gameControl && !this.gameControl.currentLevelIndex == 0) {
+            try {
+                this.gameControl.currentLevel.destroy();
+                this.gameControl.cleanupInteractionHandlers();
+            } catch (error) {
+                console.error("Error during cleanup when returning home:", error);
+            }
+            this.gameControl.currentLevelIndex = 0;
+            this.gameControl.transitionToLevel();
+        } else {
+            console.warn("Failed to load home level");
+        }
+    }
+
+    loadNextLevel() {
+        // Trigger the same behavior as pressing Escape key
+        if (this.gameControl && this.gameControl.currentLevel) {
+            this.gameControl.currentLevel.continue = false;
+            console.log("Loading next level...");
+        } else {
+            console.warn("GameControl or currentLevel not available");
+        }
+    }
+
+    loadPreviousLevel() {
+        if (this.gameControl && this.gameControl.currentLevelIndex > 0) {
+            try {
+                this.gameControl.currentLevel.destroy();
+                this.gameControl.cleanupInteractionHandlers();
+            } catch (error) {
+                console.error("Error during cleanup when returning home:", error);
+            }
+            this.gameControl.currentLevelIndex--;
+            this.gameControl.transitionToLevel();
+        } else {
+            console.warn("No previous level to load");
+        }
+    }
+
     initUser() {
         const pythonURL = this.pythonURI + '/api/id';
         fetch(pythonURL, this.fetchOptions)

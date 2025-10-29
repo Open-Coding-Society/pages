@@ -1,5 +1,6 @@
 ---
-layout: post
+layout: opencs
+microblog: True 
 tailwind: True
 title: Travel Quest — Food Route
 description: >

@@ -5,22 +5,35 @@
     @include status-indicator-state($status-indicator-pending-bg, $status-indicator-pending-border);
     animation: statusIndicatorPendingPulse 2s ease-in-out infinite;
   }
-  
+
   &.success {
     @include status-indicator-state($status-indicator-success-bg, $status-indicator-success-border);
     animation: statusIndicatorSuccessPulse 0.5s ease-in-out;
   }
-  
+
   &.error {
     @include status-indicator-state($status-indicator-error-bg, $status-indicator-error-border);
     animation: statusIndicatorErrorShake 0.5s ease-in-out;
   }
-  
+
   &.loading {
     @include status-indicator-state($status-indicator-pending-bg, $status-indicator-pending-border);
-    
+
     .status-icon {
       animation: statusIndicatorSpin 1s linear infinite;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+
+    .status-icon {
+      opacity: 0.5;
+    }
+
+    .status-text {
+      color: #888;
+      font-style: italic;
     }
   }
 }

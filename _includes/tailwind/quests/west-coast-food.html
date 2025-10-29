@@ -23,7 +23,7 @@
   font-weight: 600;
 }
 
-/* City cards - clean sections */
+/* City cards - clean sections with extended height */
 .city-card {
   background: linear-gradient(135deg, 
     rgba(55, 65, 81, 0.95) 0%, 
@@ -32,10 +32,12 @@
   border: 2px solid rgba(139, 92, 246, 0.3);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  padding: 24px;
-  margin: 16px 0;
+  padding: 24px 24px 80px 24px;  /* Added extra bottom padding for button space */
+  margin: 32px 0;
   overflow: visible;
   transition: all 0.3s ease;
+  position: relative;
+  min-height: 220px;  /* Minimum height to ensure space */
 }
 
 /* LOCKED CITIES */
@@ -103,49 +105,160 @@
   color: #10b981;
 }
 
-/* Travel route connector */
-.travel-route {
+/* City icon styling - supports both images and emojis */
+.city-icon {
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+.city-icon img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.city-icon img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+}
+
+.city-icon.emoji {
+  font-size: 48px;
+  line-height: 1;
+}
+
+/* IMAGE MODAL/LIGHTBOX STYLES */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin: 32px 0;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.image-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.image-modal-content {
   position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.7);
+  transition: transform 0.3s ease;
 }
 
-.route-line {
-  width: 4px;
-  height: 60px;
-  background: linear-gradient(to bottom, 
-    rgba(139, 92, 246, 0.8) 0%,
-    rgba(59, 130, 246, 0.8) 50%,
-    rgba(139, 92, 246, 0.8) 100%);
-  border-radius: 2px;
-  position: relative;
-  animation: pulse 2s infinite;
+.image-modal.show .image-modal-content {
+  transform: scale(1);
 }
 
-.route-line.locked {
-  background: linear-gradient(to bottom, 
-    rgba(107, 114, 128, 0.4) 0%,
-    rgba(107, 114, 128, 0.4) 50%,
-    rgba(107, 114, 128, 0.4) 100%);
-  animation: none;
+.image-modal img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  max-width: 80vw;
+  max-height: 80vh;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-/* ENHANCED: Clickable route button - now as link */
-.route-link {
+.image-modal-close {
   position: absolute;
-  top: 50%;
+  top: -10px;
+  right: -10px;
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.image-modal-close:hover {
+  background: rgba(185, 28, 28, 1);
+  transform: scale(1.1);
+}
+
+.image-modal-title {
+  position: absolute;
+  bottom: -50px;
   left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
+  transform: translateX(-50%);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+  .city-card {
+    padding: 16px 16px 70px 16px;  /* Adjusted bottom padding for mobile */
+    margin: 20px 0;
+    min-height: 200px;  /* Slightly smaller minimum height on mobile */
+  }
+  
+  .city-icon img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .city-icon.emoji {
+    font-size: 36px;
+  }
+  
+  .image-modal-content {
+    padding: 10px;
+  }
+  
+  .image-modal img {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+  
+  .image-modal-title {
+    font-size: 14px;
+    bottom: -40px;
+  }
+}
+
+/* ENHANCED: Route button back inside city card */
+.city-route-button {
+  position: absolute;
+  bottom: 20px;  /* Back inside the card */
+  right: 20px;
+  font-size: 32px;
   background: rgba(31, 41, 55, 0.95);
-  padding: 12px;
+  padding: 16px;
   border-radius: 50%;
   border: 2px solid rgba(139, 92, 246, 0.5);
   cursor: pointer;
@@ -154,23 +267,19 @@
   text-decoration: none;
   display: inline-block;
   color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-.route-link:hover {
+.city-route-button:hover {
   background: rgba(139, 92, 246, 0.2);
   border-color: rgba(139, 92, 246, 0.8);
-  transform: translate(-50%, -50%) scale(1.1);
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
   color: white;
   text-decoration: none;
 }
 
-.route-link.active {
-  background: rgba(139, 92, 246, 0.3);
-  border-color: rgba(139, 92, 246, 1);
-}
-
-.route-link.locked {
+.city-route-button.locked {
   background: rgba(107, 114, 128, 0.3);
   border-color: rgba(107, 114, 128, 0.5);
   cursor: not-allowed;
@@ -178,29 +287,51 @@
   pointer-events: none;
 }
 
-.route-link.locked:hover {
-  transform: translate(-50%, -50%);
-  box-shadow: none;
+.city-route-button.locked:hover {
+  transform: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* Special styling for San Diego start button */
-.route-link.start-journey {
+.city-route-button.start-journey {
   background: linear-gradient(135deg, #10b981, #059669);
   border-color: rgba(16, 185, 129, 0.8);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
   animation: startPulse 2s infinite;
 }
 
-.route-link.start-journey:hover {
+.city-route-button.start-journey:hover {
   background: linear-gradient(135deg, #047857, #065f46);
-  transform: translate(-50%, -50%) scale(1.15);
-  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.6);
+  transform: scale(1.15);
+  box-shadow: 0 8px 40px rgba(16, 185, 129, 0.6);
   color: white;
 }
 
 @keyframes startPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
+  0%, 100% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 36px rgba(16, 185, 129, 0.8); }
+}
+
+/* XP and Theme indicators */
+.city-xp {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.city-theme {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #a78bfa;
+  font-style: italic;
 }
 
 /* Data tag styling to match theme */
@@ -286,27 +417,6 @@
   from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
   to { transform: translateX(-50%) translateY(0); opacity: 1; }
 }
-
-@media (max-width: 768px) {
-  .city-card {
-    padding: 16px;
-    margin: 12px 0;
-  }
-  
-  .route-line {
-    height: 40px;
-  }
-  
-  .route-link {
-    font-size: 18px;
-    padding: 8px;
-  }
-  
-  .city-card.locked::after {
-    font-size: 12px;
-    padding: 10px 16px;
-  }
-}
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
@@ -353,27 +463,50 @@
         </div>
       </div>
 
-      <!-- Travel Route with Cities and Links -->
+      <!-- Travel Route with Cities and Buttons -->
       <div class="max-w-5xl mx-auto">
         {% if page.lxdData.Cities %}
           {% for city in page.lxdData.Cities %}
             
-            <!-- City Card -->
+            <!-- City Card with integrated button -->
             <div class="city-card rounded-2xl shadow-lg relative" id="city-{{ forloop.index0 }}" data-city-index="{{ forloop.index0 }}">
+              
               <!-- Progress indicator -->
               <div class="city-progress" id="progress-{{ forloop.index0 }}">
                 🎯 Ready to explore
               </div>
               
-              <!-- City Title -->
+              <!-- XP Reward indicator -->
+              {% if city.XP_Reward %}
+              <div class="city-xp">
+                ⭐ {{ city.XP_Reward }} XP
+              </div>
+              {% endif %}
+              
+              <!-- City Title with Icon/Image support -->
               <div class="w-full mb-4">
-                <h3 class="text-3xl xl:text-4xl font-bold text-white cute-heading">
-                  🏙️ {{ city.Name }}
+                <h3 class="text-3xl xl:text-4xl font-bold text-white cute-heading flex items-center">
+                  <!-- Icon/Image Display Logic -->
+                  {% if city.Image %}
+                    <span class="city-icon">
+                      <img src="{{ site.baseurl }}{{ city.Image }}" 
+                           alt="{{ city.Name }} icon" 
+                           loading="lazy"
+                           onclick="openImageModal('{{ site.baseurl }}{{ city.Image }}', '{{ city.Name }}')"
+                           title="Click to view full image">
+                    </span>
+                  {% elsif city.Icon %}
+                    <span class="city-icon emoji">{{ city.Icon }}</span>
+                  {% endif %}
+                  {{ city.Name }}
                 </h3>
+                {% if city.Theme %}
+                <div class="city-theme cute-text">{{ city.Theme }}</div>
+                {% endif %}
               </div>
 
               <!-- City Description -->
-              <div class="w-full">
+              <div class="w-full mb-6">
                 {% if city.Description %}
                 <p class="text-gray-300 text-lg leading-relaxed cute-text mb-4">{{ city.Description }}</p>
                 {% endif %}
@@ -388,29 +521,25 @@
                 </div>
                 {% endif %}
               </div>
-            </div>
 
-            <!-- Travel Route & Link for ALL cities (including San Diego) -->
-            <div class="travel-route">
-              <div class="route-line" id="route-{{ forloop.index0 }}">
-                <!-- Route link for each city -->
-                {% if forloop.index0 == 0 %}
-                  {% assign city_permalink = "/west-coast/food/sandiego" %}
-                {% elsif forloop.index0 == 1 %}
-                  {% assign city_permalink = "/west-coast/food/LA" %}
-                {% elsif forloop.index0 == 2 %}
-                  {% assign city_permalink = "/west-coast/food/sanfrancisco" %}
-                {% else %}
-                  {% assign city_permalink = "/west-coast/food/seattle" %}
-                {% endif %}
-                <a href="{{ site.baseurl }}{{ city_permalink }}" 
-                   class="route-link {% if forloop.first %}start-journey{% endif %}" 
-                   id="route-link-{{ forloop.index0 }}" 
-                   data-route="{{ forloop.index0 }}" 
-                   title="{% if forloop.first %}☀️ Start Your San Diego Journey!{% elsif forloop.index0 == 1 %}🌴 Explore Los Angeles{% elsif forloop.index0 == 2 %}🌁 Discover San Francisco{% else %}🌲 Reach Seattle{% endif %}">
-                  {% if forloop.first %}☀️{% elsif forloop.index0 == 1 %}🌴{% elsif forloop.index0 == 2 %}🌁{% else %}🌲{% endif %}
-                </a>
-              </div>
+              <!-- Route Button inside card -->
+              {% if forloop.index0 == 0 %}
+                {% assign city_permalink = "/west-coast/food/SD" %}
+              {% elsif forloop.index0 == 1 %}
+                {% assign city_permalink = "/west-coast/food/LA" %}
+              {% elsif forloop.index0 == 2 %}
+                {% assign city_permalink = "/west-coast/food/SF" %}
+              {% else %}
+                {% assign city_permalink = "/west-coast/food/SEA" %}
+              {% endif %}
+              <a href="{{ site.baseurl }}{{ city_permalink }}" 
+                 class="city-route-button {% if forloop.first %}start-journey{% endif %}" 
+                 id="route-link-{{ forloop.index0 }}" 
+                 data-route="{{ forloop.index0 }}" 
+                 title="{% if forloop.first %}☀️ Start Your San Diego Journey!{% elsif forloop.index0 == 1 %}🌴 Explore Los Angeles{% elsif forloop.index0 == 2 %}🌁 Discover San Francisco{% else %}🌲 Reach Seattle{% endif %}">
+                {% if forloop.first %}☀️{% elsif forloop.index0 == 1 %}🌴{% elsif forloop.index0 == 2 %}🌁{% else %}🌲{% endif %}
+              </a>
+              
             </div>
 
           {% endfor %}
@@ -426,7 +555,7 @@
         <div class="inline-block bg-rgba(31, 41, 55, 0.8) rounded-2xl px-8 py-4 border border-blue-500/30">
           <h3 class="text-lg font-bold text-white cute-heading mb-2">🗺️ How to Navigate</h3>
           <p class="text-gray-300 cute-text text-sm">
-            Click on the emoji buttons below each city to enter that city's submodule.<br>
+            Click on city images to view them full-screen, or click the emoji buttons in the bottom-right corner to enter that city's submodule.<br>
             Complete activities in order: San Diego → Los Angeles → San Francisco → Seattle
           </p>
         </div>
@@ -443,7 +572,45 @@
   </div>
 </div>
 
+<!-- IMAGE MODAL -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+  <div class="image-modal-content" onclick="event.stopPropagation()">
+    <button class="image-modal-close" onclick="closeImageModal()">×</button>
+    <img id="modalImage" src="" alt="City Image">
+    <div id="modalTitle" class="image-modal-title"></div>
+  </div>
+</div>
+
 <script type="text/javascript">
+// IMAGE MODAL FUNCTIONS
+function openImageModal(imageSrc, cityName) {
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const modalTitle = document.getElementById('modalTitle');
+  
+  modalImage.src = imageSrc;
+  modalTitle.textContent = cityName;
+  modal.classList.add('show');
+  
+  // Prevent body scrolling when modal is open
+  document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+  const modal = document.getElementById('imageModal');
+  modal.classList.remove('show');
+  
+  // Restore body scrolling
+  document.body.style.overflow = 'auto';
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeImageModal();
+  }
+});
+
 // CITY UNLOCKING SYSTEM (simplified for navigation)
 let gameProgress = {
   unlockedCities: [0], // San Diego starts unlocked
@@ -482,10 +649,9 @@ function saveGameProgress() {
 function initializeCityLocking() {
   loadGameProgress();
   
-  // Get all city cards and route links
+  // Get all city cards and route buttons
   const cityCards = document.querySelectorAll('.city-card');
-  const routeLinks = document.querySelectorAll('.route-link');
-  const routeLines = document.querySelectorAll('.route-line');
+  const routeButtons = document.querySelectorAll('.city-route-button');
   
   // Lock all cities except unlocked ones
   cityCards.forEach((card, index) => {
@@ -496,12 +662,12 @@ function initializeCityLocking() {
     }
   });
   
-  // Lock route links for locked cities
-  routeLinks.forEach((link, index) => {
+  // Lock route buttons for locked cities
+  routeButtons.forEach((button, index) => {
     if (!gameProgress.unlockedCities.includes(index)) {
-      lockRoute(index);
+      lockCityButton(index);
     } else {
-      unlockRoute(index);
+      unlockCityButton(index);
     }
   });
   
@@ -529,37 +695,31 @@ function unlockCity(cityIndex) {
   }
 }
 
-function lockRoute(routeIndex) {
-  const routeLink = document.getElementById(`route-link-${routeIndex}`);
-  const routeLine = document.getElementById(`route-${routeIndex}`);
+function lockCityButton(routeIndex) {
+  const routeButton = document.getElementById(`route-link-${routeIndex}`);
   
-  if (routeLink) {
-    routeLink.classList.add('locked');
-    routeLink.title = 'Complete previous city to unlock';
+  if (routeButton) {
+    routeButton.classList.add('locked');
+    routeButton.title = 'Complete previous city to unlock';
     // Remove start-journey class if locked
-    routeLink.classList.remove('start-journey');
+    routeButton.classList.remove('start-journey');
     
     // Add click prevention
-    routeLink.addEventListener('click', function(e) {
+    routeButton.addEventListener('click', function(e) {
       e.preventDefault();
       alert('🔒 Complete the previous city first to unlock this route!');
     });
   }
-  
-  if (routeLine) {
-    routeLine.classList.add('locked');
-  }
 }
 
-function unlockRoute(routeIndex) {
-  const routeLink = document.getElementById(`route-link-${routeIndex}`);
-  const routeLine = document.getElementById(`route-${routeIndex}`);
+function unlockCityButton(routeIndex) {
+  const routeButton = document.getElementById(`route-link-${routeIndex}`);
   
-  if (routeLink) {
-    routeLink.classList.remove('locked');
+  if (routeButton) {
+    routeButton.classList.remove('locked');
     
     // Remove any click prevention
-    routeLink.style.pointerEvents = 'auto';
+    routeButton.style.pointerEvents = 'auto';
     
     // Set appropriate title based on city
     const cityData = [
@@ -570,15 +730,11 @@ function unlockRoute(routeIndex) {
     ];
     
     const cityInfo = cityData[routeIndex] || { title: 'Click to explore this city' };
-    routeLink.title = cityInfo.title;
+    routeButton.title = cityInfo.title;
     
     if (routeIndex === 0) {
-      routeLink.classList.add('start-journey');
+      routeButton.classList.add('start-journey');
     }
-  }
-  
-  if (routeLine) {
-    routeLine.classList.remove('locked');
   }
 }
 
@@ -641,7 +797,7 @@ function markCityCompleted(cityIndex) {
     if (nextCityIndex < 4 && !gameProgress.unlockedCities.includes(nextCityIndex)) {
       gameProgress.unlockedCities.push(nextCityIndex);
       unlockCity(nextCityIndex);
-      unlockRoute(nextCityIndex);
+      unlockCityButton(nextCityIndex);
     }
     
     saveGameProgress();

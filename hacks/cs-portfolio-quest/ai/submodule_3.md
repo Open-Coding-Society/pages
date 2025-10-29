@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Submodule 3"
-description: "Submodule 3 of AI Usage Mini-Quest"
+title: "Real Project Example"
+description: "A walkthrough of simplifying a Flask/Spring backend into Flask-only using AI assistance, broken into phases: understanding the system, planning migration, implementing changes, and debugging."
 permalink: /cs-portfolio-quest/ai/submodule_3/
 parent: "AI Usage"
 team: "Thinkers"
@@ -16,3 +16,5 @@ date: 2025-10-21
 
 ## Content Coming Soon
 This submodule will be developed by the Thinkers team.
+
+{%- include tailwind/cs-portfolio-quest-lessons_info.html -%}

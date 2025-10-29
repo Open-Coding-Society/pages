@@ -1,18 +1,19 @@
 ---
-layout: post
-title: "CSS Styling Fundamentals"
-description: "Submodule 3 of Frontend Development Mini-Quest"
-permalink: /west-coast/food/sanfrancisco/
-parent: "Frontend Development"
-team: "Creators"
-submodule: 3
-categories: [CSP, Submodule, Frontend]
-tags: [css, styling, fundamentals]
-author: "Creators Team"
-date: 2025-10-21
+layout: opencs
+microblog: True 
+title: "San Francisco"
+description: "City Three of Food - San Francisco"
+permalink: /west-coast/food/SF/
+parent: "San Francisco"
+team: "Syntax Terrors"
+submodule: 1
+categories: [CSP]
+tags: [food, sanfrancisco]
+author: "Syntax Terrors"
+date: 2025-10-24
 ---
 
-# CSS Styling Fundamentals
+# San Francisco 
 
 ## Content Coming Soon
-This submodule will cover css styling fundamentals.
+This submodule will cover San Francisco. 

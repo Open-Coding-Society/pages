@@ -65,4 +65,4 @@ lxdData:
       Image: "/images/cs-portfolio-quest/backend.svg"
       Alt: "Backend Submodule 6"
 ---
-{%- include tailwind/cs-portfolio-quest_info.html -%}
+{%- include tailwind/cs-portfolio-mini_quest_info.html -%}

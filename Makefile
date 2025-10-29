@@ -1,3 +1,4 @@
+HOST ?= localhost
 PORT ?= 4500
 LOG_FILE = /tmp/jekyll$(PORT).log
 
@@ -109,7 +110,7 @@ serve-yat: use-yat clean
 # General serve target (uses whatever is in _config.yml/Gemfile)
 serve-current: stop convert
 	@echo "Starting server with current config/Gemfile..."
-	@@nohup bundle install && bundle exec jekyll serve -H 127.0.0.1 -P $(PORT) > $(LOG_FILE) 2>&1 & \
+	@@nohup bundle install && bundle exec jekyll serve -H $(HOST) -P $(PORT) > $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
 		echo "Server PID: $$PID"
 	@@until [ -f $(LOG_FILE) ]; do sleep 1; done
