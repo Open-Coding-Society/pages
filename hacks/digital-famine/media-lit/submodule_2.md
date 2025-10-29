@@ -25,7 +25,7 @@ Before you recieve your mission to protect Media Literacy Planet, you'll need to
 
 <style>
 .game-container {
-    background: linear-gradient(135deg, #2a455fff, #9384d5ff);
+    background: linear-gradient(135deg, #353e74ff, #9384d5ff);
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -151,10 +151,13 @@ Before you recieve your mission to protect Media Literacy Planet, you'll need to
 }
 
 .leaderboard {
-    background: rgba(255,255,255,0.4);
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 20px;
+  /* darker, more visible card for leaderboard */
+  background: linear-gradient(180deg, rgba(95, 73, 174, 0.18), rgba(60, 97, 156, 0.4));
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  color: #eaf6ff; /* light text on darker background */
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .leaderboard-header {
@@ -171,13 +174,13 @@ Before you recieve your mission to protect Media Literacy Planet, you'll need to
 
 .leaderboard-table th,
 .leaderboard-table td {
-    padding: 10px;
-    text-align: left;
-    color: #2c5282;
+  padding: 10px;
+  text-align: left;
+  color: inherit; /* use leaderboard color (light) */
 }
 
 .leaderboard-table tr:nth-child(even) {
-    background: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.02);
 }
 </style>
 
@@ -463,108 +466,335 @@ Planet Media Literacy's communication grid has been hacked by alien misinformati
 
 Complete your analysis to secure the communication line and see your mission score.
 
-<div style="background-color:background: linear-gradient(135deg, #2a455fff, #9384d5ff);color:white;padding:0;margin:0;font-family:system-ui,sans-serif;min-height:100vh;">
+<div class="game-card-wrapper">
+  <style>
+    /* Card + palette (light blue) */
+    .game-card {
+      max-width: 980px;
+      margin: 28px auto;
+      /* lighter blue card to match the other game */
+      background: linear-gradient(135deg, #353e74ff, #9384d5ff);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(27,78,120,0.08);
+      color: #04263a;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    .game-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+    .game-title { font-size:1.15rem; margin:0; font-weight:700; color:#033e61; }
+    .controls { display:flex; gap:8px; }
+    .pill { background: rgba(3,62,97,0.06); padding:6px 10px; border-radius:999px; font-weight:700; color:#033e61; }
+    .grid { display:grid; grid-template-columns: 1fr 320px; gap:18px; align-items:start; }
+    .board {
+      background: rgba(190, 192, 246, 0.75);
+      border-radius:12px;
+      padding:16px;
+      min-height:320px;
+      box-shadow: 0 4px 12px rgba(2,22,36,0.04) inset;
+    }
+    .items { display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; }
+    .headline {
+      background: white;
+      padding:10px 12px;
+      border-radius:10px;
+      box-shadow: 0 2px 6px rgba(2,22,36,0.06);
+      cursor:grab;
+      width: calc(50% - 12px);
+      min-width: 180px;
+      user-select:none;
+      transition: transform .12s ease, opacity .12s ease;
+      font-size:14px;
+      color:#04263a;
+    }
+    .headline.dragging { opacity:0.6; transform:scale(.98); cursor:grabbing; }
+    .side {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .bin {
+      background: rgba(176, 186, 241, 0.86);
+      border: 2px dashed rgba(3,62,97,0.12);
+      padding:12px;
+      border-radius:10px;
+      min-height:110px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:center;
+      text-align:center;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      color:#04334b;
+    }
+    .bin.highlight { transform: translateY(-4px); border-color: rgba(3,62,97,0.45); box-shadow: 0 8px 20px rgba(3,62,97,0.06); }
+    .bin-label { font-weight:800; color:#033e61; margin-bottom:6px; }
+    .bin .bin-contents { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%; }
+    .status { color: #678dc2ff; font-size:18px; margin-top:8px; }
+    .controls button {
+      background: #0b74b5;
+      color: white;
+      border: none;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .controls button.ghost { background: transparent; color:#033e61; border:1px solid rgba(3,62,97,0.08); }
+    .leaderboard {
+      /* darker leaderboard so header/title is readable */
+      background: linear-gradient(135deg, rgba(148, 146, 215, 0.55), rgba(109, 124, 207, 0.47));
+      padding:12px;
+      border-radius:10px;
+      color: #eaf6ff;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    /* refresh button inside leaderboard: more polished appearance */
+    #refresh-lb.ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #5c7cb0ff;
+      color: #eaf6ff;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(3,62,97,0.08);
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+    #refresh-lb.ghost::before {
+      content: "⟳";
+      font-size: 14px;
+      opacity: 0.95;
+      transform: translateY(0);
+    }
+    #refresh-lb.ghost:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(3,62,97,0.14);
+      background: linear-gradient(90deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    }
+    @media (max-width:900px) { .grid{grid-template-columns:1fr} }
+  </style>
 
-<style>
-  :root{--bg:#0f1720;--card:#0b1220;--accent:#4dc3ff;--muted:#9aa6b2}
-  html,body{height:100%;margin:0}
-  .wrap{max-width:980px;margin:32px auto;padding:20px}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-  h1{font-size:1.25rem;margin:0}
-  .controls{display:flex;gap:8px}
-  button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#05232d;font-weight:600;cursor:pointer}
-
-  .game{display:grid;grid-template-columns:1fr 320px;gap:18px}
-  .board{background:var(--card);padding:18px;border-radius:12px;min-height:360px}
-  .items{display:flex;flex-wrap:wrap;gap:10px}
-
-  .draggable{background:#071426;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);cursor:grab;user-select:none}
-  .draggable[aria-pressed="true"]{outline:3px solid rgba(77,195,255,0.15)}
-
-  .side{background:transparent}
-  .zone{background:#071826;border:2px dashed rgba(255,255,255,0.03);min-height:80px;padding:12px;border-radius:10px;margin-bottom:12px}
-  .zone.good{border-color:rgba(77,195,255,0.25)}
-  .zone.bad{border-color:rgba(255,110,110,0.15)}
-  .zone.empty{opacity:.6}
-
-  .status{color:var(--muted);font-size:.95rem;margin-top:10px}
-  .footer{margin-top:14px;color:var(--muted);font-size:.9rem}
-
-  @media (max-width:880px){.game{grid-template-columns:1fr;margin:0}.side{order:2}}
-</style>
-
-<div class="wrap">
-  <header>
-    <h1>Media Bias Game — Base</h1>
-    <div class="controls">
-      <button id="shuffle">Shuffle</button>
-      <button id="reset">Reset</button>
+  <div class="game-card" role="application" aria-labelledby="bias-game-title">
+    <div class="game-header">
+      <div>
+        <h2 id="bias-game-title" class="game-title">Bias Checker — Training Card</h2>
+        <div class="status">Sort incoming headlines into the correct bin. You have 3 lives — wrong answers cost a life.</div>
+        <!-- player pill moved here to separate from action buttons -->
+        <div style="margin-top:10px;">
+          <div class="pill" id="player-name">Player: Guest</div>
+        </div>
+      </div>
+      <div class="controls" style="align-items:center;">
+        <!-- action buttons grouped on the right to reduce clustering -->
+        <button id="shuffle" title="Shuffle headlines">Shuffle</button>
+        <button id="reset" class="ghost" title="Reset game">Reset</button>
+      </div>
     </div>
-  </header>
 
-  <main class="game">
-    <section class="board" aria-label="game board">
-      <p class="status">Drag headlines into the zone you think they belong to.</p>
-      <div class="items" id="items" aria-live="polite"></div>
-    </section>
-    <aside class="side">
-      <div class="zone good" id="leftZone" data-zone="good" tabindex="0" aria-label="Accurate / Balanced reporting">
-        <strong>Balanced / Accurate</strong>
-        <div class="zone-contents"></div>
-      </div>
-      <div class="zone bad" id="rightZone" data-zone="bad" tabindex="0" aria-label="Biased / Misleading reporting">
-        <strong>Biased / Misleading</strong>
-        <div class="zone-contents"></div>
-      </div>
-      <div class="footer">
-        <div>Score: <span id="score">0</span> / <span id="total">0</span></div>
-        <div style="margin-top:6px">Hints: <small>Use keyboard: TAB to focus, SPACE to select, arrow keys to move.</small></div>
-      </div>
-    </aside>
-  </main>
+    <div class="grid">
+      <section class="board" aria-label="Headlines board">
+        <div class="small">Incoming transmissions</div>
+        <div class="items" id="items" aria-live="polite"></div>
+        <div class="status" style="margin-top:12px;">
+          Score: <strong id="score">0</strong> &nbsp;|&nbsp; Lives: <span id="lives">👽👽👽</span> &nbsp;|&nbsp; Total: <span id="total">0</span>
+        </div>
+      </section>
+
+      <aside class="side" aria-label="Bins">
+        <div class="bin" id="leftZone" data-zone="good" tabindex="0" aria-label="Balanced / Accurate">
+          <div class="bin-label">Balanced / Accurate</div>
+          <div class="bin-contents" aria-live="polite"></div>
+        </div>
+
+        <div class="bin" id="rightZone" data-zone="bad" tabindex="0" aria-label="Biased / Misleading">
+          <div class="bin-label">Biased / Misleading</div>
+          <div class="bin-contents" aria-live="polite"></div>
+        </div>
+
+        <div class="leaderboard">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>Top Players</strong>
+            <button id="refresh-lb" class="ghost">Refresh</button>
+          </div>
+          <table style="width:100%; margin-top:10px; font-size:13px;">
+            <thead><tr><th>#</th><th>Player</th><th style="text-align:right">Score</th></tr></thead>
+            <tbody id="leaderboard-body"><tr><td colspan="3" style="text-align:center;color:rgba(3,62,97,0.5)">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // HEADLINES data (you can expand)
+    const HEADLINES = [
+      {id:1, text:'Study finds coffee linked to lower heart disease risk', correct:'good'},
+      {id:2, text:'Celebrity says x — experts warn of rising trend', correct:'bad'},
+      {id:3, text:'Government releases budget with small tax relief for families', correct:'good'},
+      {id:4, text:'Opinion: this frightening trend will destroy your neighborhood', correct:'bad'},
+      {id:5, text:'Local school wins national science award', correct:'good'},
+      {id:6, text:'Shocking footage suggests new conspiracy about vaccines', correct:'bad'}
+    ];
+
+    // DOM
+    const itemsEl = document.getElementById('items');
+    const leftZone = document.getElementById('leftZone');
+    const rightZone = document.getElementById('rightZone');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const totalEl = document.getElementById('total');
+    const shuffleBtn = document.getElementById('shuffle');
+    const resetBtn = document.getElementById('reset');
+    const playerNameEl = document.getElementById('player-name');
+    const leaderboardBody = document.getElementById('leaderboard-body');
+
+    // state
+    let state = {
+      order: [],
+      placed: {},   // id -> true when placed
+      score: 0,
+      lives: 3
+    };
+
+    function renderItems() {
+      itemsEl.innerHTML = '';
+      state.order.forEach(h => {
+        if (state.placed[h.id]) return; // skip placed
+        const el = document.createElement('div');
+        el.className = 'headline';
+        el.draggable = true;
+        el.textContent = h.text;
+        el.dataset.id = h.id;
+        el.dataset.correct = h.correct;
+        // drag handlers
+        el.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', h.id);
+          el.classList.add('dragging');
+        });
+        el.addEventListener('dragend', () => el.classList.remove('dragging'));
+        // keyboard accessibility: Space to mark and arrows to place
+        el.tabIndex = 0;
+        el.addEventListener('keydown', (e) => {
+          if (e.code === 'Space') {
+            e.preventDefault();
+            el.classList.toggle('dragging');
+          } else if (e.code === 'ArrowLeft') {
+            placeIntoZone(h.id, 'good');
+          } else if (e.code === 'ArrowRight') {
+            placeIntoZone(h.id, 'bad');
+          }
+        });
+        itemsEl.appendChild(el);
+      });
+      totalEl.textContent = state.order.length;
+      updateDisplays();
+    }
+
+    function shuffleOrder() {
+      state.order = [...HEADLINES].sort(()=>0.5-Math.random());
+      state.placed = {};
+    }
+
+    function resetGame() {
+      state.score = 0;
+      state.lives = 3;
+      shuffleOrder();
+      renderItems();
+    }
+
+    function updateDisplays() {
+      scoreEl.textContent = state.score;
+      livesEl.textContent = '👽'.repeat(Math.max(0, state.lives));
+    }
+
+    function placeIntoZone(id, zone) {
+      id = Number(id);
+      if (state.placed[id]) return;
+      const item = HEADLINES.find(h => h.id === id);
+      if (!item) return;
+      const correct = item.correct;
+      const binEl = (zone === 'good') ? leftZone : rightZone;
+      const contents = binEl.querySelector('.bin-contents');
+      const node = document.querySelector(`.headline[data-id="${id}"]`);
+      if (!node) return;
+      // correct?
+      if (correct === zone) {
+        contents.appendChild(node);
+        node.style.opacity = '0.6';
+        node.style.cursor = 'default';
+        state.score += 1;
+        state.placed[id] = true;
+      } else {
+        // incorrect
+        state.lives -= 1;
+        node.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:280});
+        if (state.lives <= 0) {
+          // end game: post score (if backend available) and reset
+          alert(`Game over! Final score: ${state.score}`);
+          // postScore(currentPlayer, state.score) // optional
+          resetGame();
+          return;
+        }
+      }
+      renderItems();
+    }
+
+    // drop targets
+    function setupBins() {
+      [leftZone, rightZone].forEach(zoneEl => {
+        zoneEl.addEventListener('dragover', (e) => { e.preventDefault(); zoneEl.classList.add('highlight'); });
+        zoneEl.addEventListener('dragleave', () => { zoneEl.classList.remove('highlight'); });
+        zoneEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zoneEl.classList.remove('highlight');
+          const id = e.dataTransfer.getData('text/plain');
+          const zoneKey = zoneEl.dataset.zone;
+          placeIntoZone(id, zoneKey);
+        });
+        // keyboard: Enter places first focused headline into the bin
+        zoneEl.addEventListener('keydown', (e) => {
+          if (e.code === 'Enter') {
+            const first = document.querySelector('.headline');
+            if (first) placeIntoZone(first.dataset.id, zoneEl.dataset.zone);
+          }
+        });
+      });
+    }
+
+    // shuffle/reset controls
+    shuffleBtn.addEventListener('click', () => { shuffleOrder(); renderItems(); });
+    resetBtn.addEventListener('click', resetGame);
+
+    // minimal leaderboard fetch (keeps existing backend calls if present)
+    async function fetchLeaderboard() {
+      if (typeof javaURI === 'undefined') {
+        leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:rgba(3,62,97,0.5)">No backend</td></tr>';
+        return;
+      }
+      try {
+        const res = await fetch(javaURI + '/api/media/');
+        if (!res.ok) throw new Error('LB fetch failed');
+        const data = await res.json();
+        leaderboardBody.innerHTML = '';
+        data.forEach((r, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${r.rank||i+1}</td><td>${r.username||r.user||'Unknown'}</td><td style="text-align:right">${r.score||r.points||0}</td>`;
+          leaderboardBody.appendChild(tr);
+        });
+      } catch (err) {
+        leaderboardBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:rgba(3,62,97,0.5)">Unable to load</td></tr>';
+      }
+    }
+
+    // init
+    setupBins();
+    shuffleOrder();
+    renderItems();
+    updateDisplays();
+    if (typeof fetchLeaderboard === 'function') { fetchLeaderboard().catch(()=>{}); }
+    document.getElementById('refresh-lb').addEventListener('click', fetchLeaderboard);
+  </script>
 </div>
-<script>
-  const HEADLINES = [
-    {id:1, text:'Study finds coffee linked to lower heart disease risk', correct:'good'},
-    {id:2, text:'Celebrity says x — experts warn of rising trend', correct:'bad'},
-    {id:3, text:'Government releases budget with small tax relief for families', correct:'good'},
-    {id:4, text:'Opinion: this frightening trend will destroy your neighborhood', correct:'bad'},
-    {id:5, text:'Local school wins national science award', correct:'good'},
-    {id:6, text:'Shocking footage suggests new conspiracy about vaccines', correct:'bad'}
-  ];
-  const itemsEl = document.getElementById('items');
-  const leftZone = document.getElementById('leftZone');
-  const rightZone = document.getElementById('rightZone');
-  const scoreEl = document.getElementById('score');
-  const totalEl = document.getElementById('total');
-  const shuffleBtn = document.getElementById('shuffle');
-  const resetBtn = document.getElementById('reset');
-  let state = { order: [], placed: {} };
-  function makeDraggable(item){
-    const btn = document.createElement('button');
-    btn.className = 'draggable';
-    btn.type = 'button';
-    btn.draggable = true;
-    btn.id = 'item-'+item.id;
-    btn.textContent = item.text;
-    btn.setAttribute('data-id', item.id);
-    btn.setAttribute('aria-pressed','false');
-    btn.addEventListener('dragstart', e => {
-      e.dataTransfer.setData('text/plain', item.id);
-      btn.style.opacity = '0.6';
-    });
-    btn.addEventListener('dragend', () => btn.style.opacity = '');
-    btn.addEventListener('keydown', e => {
-      if(e.code === 'Space'){
-        e.preventDefault();
-        const pressed = btn.getAttribute('aria-pressed') === 'true';
-        btn.setAttribute('aria-pressed', String(!pressed));
-      }
-      if(['ArrowLeft','ArrowRight'].includes(e.code)){
-        e.preventDefault();
-        const zone = e.code === 'ArrowLeft' ? leftZone : rightZone;
-        placeIntoZone(item.id, zone.dataset.zone);
-      }
-    });
-
-
