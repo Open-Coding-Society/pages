@@ -40,7 +40,7 @@ The second of these methods is **const**. After the variable is defined, it cann
 
 Mathematical operators are often used in JavaScript and other programming languages. Below is a list of a handful of operators:
 
-Addition operator:
+**Addition operator:**
 
 ```
 let x = 5;
@@ -52,7 +52,7 @@ let z = x + y
 console.log(z);
 ```
 
-Subtraction operator:
+**Subtraction operator:**
 
 ```
 let x = 5;
@@ -64,7 +64,7 @@ let z = x - y;
 console.log(z);
 ```
 
-Multiplication operator:
+**Multiplication operator:**
 
 ```
 let x = 5;
@@ -77,14 +77,41 @@ console.log(z);
 
 ```
 
-Division operator:
+**Division operator:**
 
 ```
 let x = 10;
 let y = 2;
 
+let z = x / y;
+
 // z will output 20
 console.log(z);
+```
+
+**Modulus operator:**
+
+```
+let x = 10;
+let y = 2;
+
+let z = x % y;
+
+// z will output 0
+console.log(z);
+```
+
+**Exponential operator:**
+
+```
+let x = 2;
+let y = 4;
+
+let z = 2**4;
+
+// z will output 16
+console.log(z);
+
 ```
 
 ### If Conditions
