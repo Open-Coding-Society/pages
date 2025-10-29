@@ -83,7 +83,7 @@ class Player extends Character {
             this.velocity.x -= xVel;
             this.direction = 'upLeft';
         } else if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y -= lthis.yVelocity;
+            this.velocity.y -= this.yVelocity;
             this.velocity.x += xVel;
             this.direction = 'upRight';
         } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.left]) {

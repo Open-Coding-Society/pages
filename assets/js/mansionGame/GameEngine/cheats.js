@@ -78,7 +78,7 @@ export function addLevelNavigationButtons(gameInstance) {
     homeButton.onclick = function() {
         console.log("Home button clicked");
         console.log("Returning to home...");
-        gameInstance.returnHome();
+        window.location.href = "/gamify/mansionGame";
     };
 
     // Create Info button (right of Home)
