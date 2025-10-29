@@ -219,8 +219,9 @@ body {
     <div class="images-area" id="images"></div>
 
     <div class="controls">
-        <button class="btn btn-ghost" id="reset-btn">Reset</button>
-        <button class="btn btn-primary" id="submit-btn">Submit Score</button>
+    <button class="btn btn-ghost" id="reset-btn">Reset</button>
+    <button class="btn btn-ghost" id="autofill-images" title="Autofill images">Autofill</button>
+    <button class="btn btn-primary" id="submit-btn">Submit Score</button>
     </div>
 
     <div class="leaderboard">
@@ -355,6 +356,30 @@ body {
         });
     }
 
+      // Autofill helper for image game: place all images into their correct bins
+      function autofillImageGame(showAlert = false) {
+        // clear existing bin contents
+        document.querySelectorAll('.bin-content').forEach(el => el.innerHTML = '');
+        // find all image elements (either in pool or already placed)
+        const imgs = Array.from(document.querySelectorAll('img.image'));
+        let correctCount = 0;
+        imgs.forEach(img => {
+          const target = img.dataset.bin;
+          const id = img.dataset.id;
+          const bin = Array.from(document.querySelectorAll('.bin')).find(b => b.dataset.bin === target);
+          if (bin) {
+            bin.querySelector('.bin-content').appendChild(img);
+            img.style.opacity = '0.6';
+            img.style.cursor = 'default';
+            placedImages.add(id);
+            correctCount++;
+          }
+        });
+        score = correctCount;
+        updateDisplays();
+        if (showAlert) alert(`Autofill placed ${correctCount} images into their correct bins.`);
+      }
+
     bins.forEach(bin => {
         bin.addEventListener('dragover', e => {
             e.preventDefault();
@@ -447,12 +472,36 @@ body {
     }
 
     document.getElementById('reset-btn').addEventListener('click', initGame);
+  document.getElementById('autofill-images').addEventListener('click', () => autofillImageGame(true));
     document.getElementById('submit-btn').addEventListener('click', () => {
         postScore(currentPlayer, score);
         alert(`Score submitted! Final score: ${score}`);
         initGame();
     });
     document.getElementById('refresh-lb').addEventListener('click', fetchLeaderboard);
+    document.getElementById('autofill-headlines').addEventListener('click', () => {
+      // place every headline into its correct bin and mark placed
+      document.querySelectorAll('.bin-contents').forEach(el => el.innerHTML = '');
+      state.placed = {};
+      HEADLINES.forEach(h => {
+        const node = document.querySelector(`.headline[data-id="${h.id}"]`);
+        const zone = h.correct;
+        const binEl = (zone === 'good') ? leftZone : rightZone;
+        const contents = binEl.querySelector('.bin-contents');
+        if (node) {
+          contents.appendChild(node);
+          node.style.opacity = '0.6';
+          node.style.cursor = 'default';
+        }
+        state.placed[h.id] = zone;
+      });
+      // perfect placement
+      state.score = HEADLINES.length;
+      state.lives = 3;
+      updateDisplays();
+      // show congrats automatically
+      showCongrats();
+    });
 
     // Initialize
     fetchUser();
@@ -601,6 +650,7 @@ Complete your analysis to secure the communication line and see your mission sco
         <!-- action buttons grouped on the right to reduce clustering -->
         <button id="shuffle" title="Shuffle headlines">Shuffle</button>
         <button id="reset" class="ghost" title="Reset game">Reset</button>
+        <button id="autofill-headlines" class="ghost" title="Autofill headlines">Autofill</button>
         <button id="submit-headlines" class="btn-primary" title="Submit answers">Submit</button>
       </div>
     </div>
