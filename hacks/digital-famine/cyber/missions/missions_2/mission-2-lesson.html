@@ -1,104 +1,208 @@
 ---
 layout: page
-title: Mission 1 — Build the Base Database
+title: Mission 2 — Fix the Wormhole
 permalink: /digital-famine/cyber/mission-2-lesson/
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mission 2 · Patch the Wormhole</title> 
-    <link rel ="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <header class="hero">
-        <p class="mission-label">Mission 2</p>
-        <h1>Patch the Wormhole</h1>
-        <p class="lead">
-          Alien hackers are siphoning agent intel through an unguarded login endpoint.
-          Reproduce the breach, study the exploit, then lock the tunnel with parameterized queries.
-        </p>
-      </header>
+<link rel="stylesheet" href="styles.css" />
 
-      <section class="objective-card">
-        <h2>Mission Objectives</h2>
-        <ul>
-          <li>Trigger the wormhole with the classic payload <code>' OR '1'='1</code>.</li>
-          <li>Analyse the request log to spot where the query breaks.</li>
-          <li>Enable secure mode and confirm the intrusion is blocked.</li>
-        </ul>
-      </section>
+<section class="mission-hero">
+  <div class="hero-sprites">
+    <span class="sprite sprite--drone"></span>
+    <span class="sprite sprite--ufo"></span>
+  </div>
+  <div class="hero-copy">
+    <p class="mission-label">Mission 2</p>
+    <h1>Patch the Wormhole</h1>
+    <p class="lead">
+      The alien syndicate is funneling Earth’s agent database through a SQL injection wormhole. Reproduce their payload,
+      diagnose the flaw, then deploy parameterized defenses before the data stream is lost.
+    </p>
+    <div class="mission-stats">
+      <div class="stat-card">
+        <p class="stat-label">Attempts</p>
+        <p class="stat-value" id="stat-attempts">0</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Breach Alerts</p>
+        <p class="stat-value danger" id="stat-breaches">0</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Secure Runs</p>
+        <p class="stat-value success" id="stat-secure">0</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <section class="simulator">
-        <div class="panel breach-panel">
-          <h3>Wormhole Simulator</h3>
-          <p>Try breaching the endpoint with arbitrary credentials. Toggle secure mode to deploy prepared statements.</p>
+<section class="mission-brief">
+  <article class="brief-card">
+    <h2>Scenario Intel</h2>
+    <p>
+      An obsolete login endpoint concatenates user input straight into SQL. The payload
+      <code>' OR '1'='1</code> turns every WHERE clause into a universal pass.
+    </p>
+    <p>The longer the vulnerability stays open, the faster the wormhole destabilizes the agent archive.</p>
+  </article>
+  <article class="brief-card">
+    <h2>Learning Targets</h2>
+    <ul>
+      <li>Explain why string concatenation enables SQL injection.</li>
+      <li>Demonstrate how parameterized queries neutralize rogue input.</li>
+      <li>Document secure coding practices for future mission teams.</li>
+    </ul>
+  </article>
+  <article class="brief-card">
+    <h2>Tools Online</h2>
+    <ul>
+      <li>SQL query console with live comparison.</li>
+      <li>Threat meter visualizing breach severity.</li>
+      <li>Mission log for validated takeaways.</li>
+    </ul>
+  </article>
+</section>
 
-          <form id="breach-form" class="form">
-            <div class="form-field">
-              <label for="codename">Codename</label>
-              <input id="codename" name="codename" placeholder="GhostWolf" required />
-            </div>
-            <div class="form-field">
-              <label for="passcode">Passcode</label>
-              <input id="passcode" name="passcode" placeholder="hunter2" required />
-            </div>
+<section class="wormhole-lab">
+  <div class="wormhole-visual" id="wormhole">
+    <div class="wormhole-core"></div>
+    <div class="wormhole-ring wormhole-ring--outer"></div>
+    <div class="wormhole-ring wormhole-ring--inner"></div>
+    <div class="wormhole-energy"></div>
+  </div>
 
-            <div class="switcher">
-              <label class="switch">
-                <input type="checkbox" id="secure-toggle" />
-                <span class="slider"></span>
-              </label>
-              <span class="switch-label">Secure Mode (Parameterized Query)</span>
-            </div>
+  <div class="meter-panel">
+    <div class="meter-header">
+      <h2>Infiltration Meter</h2>
+      <span id="meter-status" class="meter-status">Status: Stable</span>
+    </div>
+    <div class="meter-track">
+      <div id="meter-bar" class="meter-bar"></div>
+    </div>
+    <p class="meter-caption">
+      Insecure queries crank the threat meter into the red. Drop the payload with secure mode enabled to collapse the wormhole.
+    </p>
+  </div>
+</section>
 
-            <button type="submit" class="cta">Execute Query</button>
-          </form>
+<section class="training-grid">
+  <article class="training-card">
+    <h3>Phase 1 · Recon</h3>
+    <p>Run the alien payload through the legacy endpoint and inspect the query string it produces.</p>
+    <ul>
+      <li>Identify the portion of the WHERE clause that the payload overwrites.</li>
+      <li>Record the vulnerable query for your report.</li>
+    </ul>
+  </article>
+  <article class="training-card">
+    <h3>Phase 2 · Harden</h3>
+    <p>Activate parameterized queries to bind user input separately from the SQL template.</p>
+    <ul>
+      <li>Re-run the same payload under secure mode.</li>
+      <li>Observe how the query structure stays intact.</li>
+    </ul>
+  </article>
+  <article class="training-card">
+    <h3>Phase 3 · Verify</h3>
+    <p>Authenticate with legitimate credentials to ensure defense mechanisms don’t block valid agents.</p>
+    <ul>
+      <li>Create test accounts in the simulation below.</li>
+      <li>Confirm expected rows are returned while the payload fails.</li>
+    </ul>
+  </article>
+</section>
+
+<section class="lab-section">
+  <div class="lab-console">
+    <h2>Vulnerability Lab</h2>
+    <p>Experiment with the login form. The command log shows the exact SQL executed and the resulting rows.</p>
+
+    <form id="lab-form" class="lab-form">
+      <div class="form-row">
+        <label for="input-codename">Codename</label>
+        <input id="input-codename" name="codename" placeholder="GhostWolf" required />
+      </div>
+      <div class="form-row">
+        <label for="input-passcode">Passcode</label>
+        <input id="input-passcode" name="passcode" placeholder="hunter2" required />
+      </div>
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="toggle-secure" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="toggle-copy">
+          <strong>Secure Mode</strong>
+          <p>Use parameterized queries &amp; input validation</p>
         </div>
+      </div>
+      <button type="submit" class="cta">Execute Query</button>
+    </form>
 
-        <div class="panel log-panel">
-          <h3>SQL Console Output</h3>
-          <pre id="console-log" class="console">$ Awaiting input…</pre>
+    <div class="lab-stats">
+      <div class="badge" id="badge-status">No breaches detected.</div>
+      <div class="badge code">Code Fragment: <span id="badge-code">—</span></div>
+    </div>
+  </div>
 
-          <h4>Indicators</h4>
-          <ul class="indicators">
-            <li id="indicator-breach" class="indicator indicator--neutral">Breach Status: Unknown</li>
-            <li id="indicator-telemetry" class="indicator indicator--neutral">Telemetry: No anomalies</li>
-          </ul>
-        </div>
-      </section>
+  <div class="lab-log">
+    <h3>Command Log</h3>
+    <pre id="log-output">$ Awaiting orders…</pre>
 
-      <section class="debrief">
-        <h2>Debrief &amp; Reflection</h2>
-        <div class="debrief-grid">
-          <article>
-            <h3>Forensics Log</h3>
-            <p>
-              When secure mode is disabled, the payload alters the WHERE clause
-              and authenticates every record. With secure mode active, the payload is treated
-              as literal input and the wormhole collapses.
-            </p>
-          </article>
-          <article>
-            <h3>Next Steps</h3>
-            <ul>
-              <li>Record the sanitized query in your mission log.</li>
-              <li>Document input validation rules for future agents.</li>
-              <li>Submit telemetry proving the breach no longer leaks data.</li>
-            </ul>
-          </article>
-          <article>
-            <h3>Success Code</h3>
-            <p class="success-code">BRAVO-4M8Q</p>
-            <p class="caption">Deliver this fragment to HQ once the wormhole is secure.</p>
-          </article>
-        </div>
-      </section>
-    </main>
+    <div class="indicator-grid">
+      <div class="indicator" id="indicator-breach">Breach Status: Unknown</div>
+      <div class="indicator" id="indicator-telemetry">Telemetry: No anomalies</div>
+    </div>
+  </div>
+</section>
 
-    <script src="script.js"></script>
-  </body>
-</html>
+<section class="mission-checklist">
+  <h2>Secure Coding Checklist</h2>
+  <ol>
+    <li>Mirror the attack: run the payload and capture the vulnerable SQL statement.</li>
+    <li>Refactor to parameterized queries and rerun the payload.</li>
+    <li>Validate legitimate users still succeed.</li>
+    <li>Document the fix and submit the BRAVO fragment to HQ.</li>
+  </ol>
+</section>
+
+<section class="debrief">
+  <h2>Debrief &amp; Reflection</h2>
+  <div class="debrief-grid">
+    <article>
+      <h3>Forensics Log</h3>
+      <p>String concatenation let the payload rewrite the WHERE clause and leak every agent record.</p>
+      <p>Prepared statements preserved the structure, treating the payload as literal text instead of executable SQL.</p>
+    </article>
+    <article>
+      <h3>Action Items</h3>
+      <ul>
+        <li>Refactor every database helper to use parameter binding APIs.</li>
+        <li>Add automated tests that fire the injection payload at new endpoints.</li>
+        <li>Share coding standards that outlaw dynamic SQL built from user strings.</li>
+      </ul>
+    </article>
+    <article>
+      <h3>Success Code</h3>
+      <p class="success-code" id="success-code">Pending</p>
+      <p class="caption">Your BRAVO fragment unlocks the final vault once the wormhole is stable.</p>
+    </article>
+  </div>
+
+  <div class="reflection">
+    <h3>Mission Reflection</h3>
+    <details>
+      <summary>What did the injection exploit?</summary>
+      <p>Unescaped input turned the conditional logic into a tautology (<code>1=1</code>), so every row satisfied the query.</p>
+    </details>
+    <details>
+      <summary>How did parameter binding solve it?</summary>
+      <p>The SQL engine received a precompiled statement with placeholders, and the payload was bound as data, not syntax.</p>
+    </details>
+    <details>
+      <summary>How will you prevent future breaches?</summary>
+      <p>Create a shared database module that enforces parameterized queries, sanitizes input, and audits suspicious requests.</p>
+    </details>
+  </div>
+</section>
+
+<script src="script.js" defer></script>
