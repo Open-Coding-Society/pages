@@ -1,4 +1,5 @@
 import Character from './Character.js';
+import { magnitude } from './Essentials.js';
 import TouchControls from './TouchControls.js';
 
 // Define non-mutable constants as defaults
@@ -76,41 +77,26 @@ class Player extends Character {
         this.velocity.x = 0;
         this.velocity.y = 0;
 
-        // Multi-key movements (diagonals: upLeft, upRight, downLeft, downRight)
-        if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y -= this.yVelocity;
-            this.velocity.x -= this.xVelocity;
-            this.direction = 'upLeft';
-        } else if (this.pressedKeys[this.keypress.up] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y -= this.yVelocity;
-            this.velocity.x += this.xVelocity;
-            this.direction = 'upRight';
-        } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.left]) {
-            this.velocity.y += this.yVelocity;
-            this.velocity.x -= this.xVelocity;
-            this.direction = 'downLeft';
-        } else if (this.pressedKeys[this.keypress.down] && this.pressedKeys[this.keypress.right]) {
-            this.velocity.y += this.yVelocity;
-            this.velocity.x += this.xVelocity;
-            this.direction = 'downRight';
-        // Single key movements (left, right, up, down) 
-        } else if (this.pressedKeys[this.keypress.up]) {
+        if (this.pressedKeys[this.keypress.up]) {
             this.velocity.y -= this.yVelocity;
             this.direction = 'up';
-            this.moved = true;
-        } else if (this.pressedKeys[this.keypress.left]) {
-            this.velocity.x -= this.xVelocity;
-            this.direction = 'left';
-            this.moved = true;
-        } else if (this.pressedKeys[this.keypress.down]) {
+        }
+        if (this.pressedKeys[this.keypress.down]) {
             this.velocity.y += this.yVelocity;
             this.direction = 'down';
-            this.moved = true;
-        } else if (this.pressedKeys[this.keypress.right]) {
+        }
+        if (this.pressedKeys[this.keypress.left]) {
+            this.velocity.x -= this.xVelocity;
+            this.direction = 'left';
+        }
+        if (this.pressedKeys[this.keypress.right]) {
             this.velocity.x += this.xVelocity;
             this.direction = 'right';
+        }
+        
+        if (magnitude(this.velocity.x, this.velocity.y) >= 0.1) {
             this.moved = true;
-        } else{
+        } else {
             this.moved = false;
         }
     }

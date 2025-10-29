@@ -1,10 +1,13 @@
 import GameObject from './GameObject.js';
+import { Transform } from './Transform.js';
+
+const base = new Transform()
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
 const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
 const ANIMATION_RATE = 1; // 1/nth of the frame rate
-const INIT_POSITION = { x: 0, y: 0 };
+const INIT_POSITION = base.position;
 const PIXELS = {height: 16, width: 16};
 
 /**
@@ -54,6 +57,9 @@ class Character extends GameObject {
             isFinishing: false,
         }; // Object control data
 
+        this.transform = new Transform(); // Basic position transform to hold position (x and y)
+        this.velocity = new Transform(); // Velocity holds two dimensions (x velocity and y velocity)
+
         // Create canvas element
         this.canvas = document.createElement("canvas");
         this.canvas.id = data.id || "default";
@@ -65,8 +71,6 @@ class Character extends GameObject {
         this.canvas.style = "image-rendering: pixelated;";
 
         // Set initial object properties 
-        this.x = 0;
-        this.y = 0;
         this.frame = 0;
         
         // Initialize the object's properties 
@@ -74,7 +78,7 @@ class Character extends GameObject {
         this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
         this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
         this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
-        this.position = data.INIT_POSITION || INIT_POSITION;
+        this.transform.position = data.INIT_POSITION || INIT_POSITION;
         
         // Always set spriteData, even if there's no sprite sheet
         this.spriteData = data;
@@ -92,7 +96,6 @@ class Character extends GameObject {
         }
 
         // Initialize the object's position and velocity
-        this.velocity = { x: 0, y: 0 };
 
         // Set the initial size and velocity of the object
         this.resize();
@@ -253,26 +256,27 @@ class Character extends GameObject {
     move(x, y) {
 
         if(x != undefined){
-            this.position.x = x;
+            this.transform.position.x = x;
         }
-        if(x != undefined){
-            this.position.y = y;
+        if(y != undefined){
+            this.transform.position.y = y;
         }
         
         // Update or change position according to velocity events
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        this.transform.position.x += this.transform.velocity.x;
+        this.transform.position.y += this.transform.velocity.y;
 
         // Ensure the object stays within the canvas boundaries
         // Bottom of the canvas
+
         if (this.position.y + this.height > this.gameEnv.innerHeight) {
             this.position.y = this.gameEnv.innerHeight - this.height;
             this.velocity.y = 0;
         }
         // Top of the canvas
-        if (this.position.y < 0) {
-            this.position.y = 0;
-            this.velocity.y = 0;
+        if (this.transform.position.y < 0) {
+            this.transform.position.y = 0;
+            this.transform.velocity.y = 0;
         }
         // Right of the canvas
         if (this.position.x + this.width > this.gameEnv.innerWidth) {
@@ -289,7 +293,7 @@ class Character extends GameObject {
 
     /**
      * Resizes the object based on the game environment.
-     * 
+     * 6
      * This method adjusts the object's size and velocity based on the scale of the game environment.
      * It also adjusts the object's position proportionally based on the previous and current scale.
      */
