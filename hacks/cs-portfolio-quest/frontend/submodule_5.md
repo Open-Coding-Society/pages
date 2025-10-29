@@ -12,6 +12,16 @@ author: "Creators Team"
 date: 2025-10-21
 ---
 
+<style>
+    .exercise-section {
+        background-color: gray;
+        color: white;
+        opacity: 0.6;
+        border-color: red;
+        border-style: solid;
+    }
+</style>
+
 # JavaScript Section
 
 ## Purpose
@@ -119,6 +129,11 @@ let z = 2**4;
 console.log(z);
 
 ```
+
+<div class="exercise-section">
+    <h4>Exercise One</h4>
+    <p></p>
+</div>
 
 ## If Conditions
 
