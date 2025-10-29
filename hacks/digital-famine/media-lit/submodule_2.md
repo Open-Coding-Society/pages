@@ -18,6 +18,7 @@ date: 2025-10-21
 The alien misinformation swarm doesn’t invade with lasers or ships — it attacks minds.
 Every distorted headline, every emotional post, every half-true story is a signal designed to scramble human judgment. Once people can’t tell what’s real, they stop trusting reliable information. Biased language can make ordinary events sound urgent or frightening, pushing people to react before they think. When that happens, truth fades and manipulation spreads.
 --- 
+
 **By identifying bias, you decode the signal. You learn to notice when words are chosen to provoke rather than inform.**
 
 ## Media Bias Training 
