@@ -14,15 +14,15 @@ date: 2025-10-21
 
 # JavaScript Section
 
-### Purpose
+## Purpose
 
-Considering you're on this section, you likely have learned that HTML is what structures website. CSS is what styles and add a design to websites. JavaScript add to this list: It makes the website interactive.
+Considering you're on this section, you likely have learned that HTML is what structures website and CSS is what styles and adds design to websites. JavaScript add to this list: **It makes the website interactive.**
 
-### Syntax
+## Syntax
 
 [Content here]
 
-### Variables
+## Variables
 
 Variables are essentially how data is stored in usable containers in code.
 
@@ -30,15 +30,21 @@ There are 4 ways this can be done, but only two are recommended.
 
 The first of these methods is **let**. It allows the variable to be changed after it is defined:
 
-`let x = 5;`
+```
+let x = 5;
+x = 6; // Successfully changes value
+```
 
 The second of these methods is **const**. After the variable is defined, it cannot be changed:
 
-`const x = 5;`
+```
+const x = 5;
+x = 6; // WILL NOT WORK
+```
 
-### Operators
+## Operators
 
-Mathematical operators are often used in JavaScript and other programming languages. Below is a list of a handful of operators:
+Mathematical operators are often used in JavaScript and other programming languages. Below is a handful of operators:
 
 **Addition operator:**
 
@@ -114,14 +120,12 @@ console.log(z);
 
 ```
 
-### If Conditions
+## If Conditions
+
+If conditions
 
 [Content here]
 
-### Objects
+## Objects
 
 [Content here]
-
-## Content Coming Soon
-This submodule will cover responsive design.
-
