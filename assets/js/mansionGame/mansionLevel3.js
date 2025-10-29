@@ -1,5 +1,5 @@
 import GameEnvBackground from './GameEngine/GameEnvBackground.js'
-import AnimatedPlayer from './GameEngine/AnimatedPlayer.js'
+import Player from './GameEngine/Player.js'
 
 
 class MansionLevel3 {
@@ -18,31 +18,41 @@ class MansionLevel3 {
         mode: 'contain',
     };
 
-    // 🧍 Player (optional)
-    // const sprite_src_explorer = path + "/images/gamify/explorer.png";
-    // const EXPLORER_SCALE = 5;
-    // const sprite_data_explorer = {
-    //   id: 'Explorer',
-    //   greeting: "I’m ready to uncover the mansion’s secrets!",
-    //   src: sprite_src_explorer,
-    //   SCALE_FACTOR: EXPLORER_SCALE,
-    //   STEP_FACTOR: 1000,
-    //   ANIMATION_RATE: 50,
-    //   INIT_POSITION: { x: 0, y: height - (height / EXPLORER_SCALE) },
-    //   pixels: { height: 384, width: 512 },
-    //   orientation: { rows: 3, columns: 4 },
-    //   down: { row: 0, start: 0, columns: 3 },
-    //   left: { row: 2, start: 0, columns: 3 },
-    //   right: { row: 1, start: 0, columns: 3 },
-    //   up: { row: 3, start: 0, columns: 3 },
-    //   hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-    //   keypress: { up: 87, left: 65, down: 83, right: 68 }, // W, A, S, D
-    // };
+    // 🧍 Player data (using same movement system as Level 5)
+    const sprite_player = path + "/images/gamify/spookMcWalk.png"; // be sure to include the path
+  const player_scale_factor = 7; // Bigger player
+  const sprite_data_player = {
+    id: 'Player',
+    greeting: "I'm ready to explore the library and find the hidden key!",
+    src: sprite_player,
+    SCALE_FACTOR: player_scale_factor,
+    STEP_FACTOR: 800,
+    ANIMATION_RATE: 10,
+    INIT_POSITION: { x: 0, y: 0 }, 
+    pixels: {height: 2400, width: 3600},
+    orientation: {rows: 2, columns: 3},
+    down: {row: 1, start: 0, columns: 3},
+    downRight: {row: 1, start: 0, columns: 3, rotate: Math.PI/16},
+    downLeft: {row: 0, start: 0, columns: 3, rotate: -Math.PI/16},
+    left: {row: 0, start: 0, columns: 3},
+    right: {row: 1, start: 0, columns: 3},
+    up: {row: 1, start: 0, columns: 3},
+    upLeft: {row: 0, start: 0, columns: 3, rotate: Math.PI/16},
+    upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
+    hitbox: {widthPercentage: 0.45, heightPercentage: 0.2},
+    // Support both WASD and Arrow keys
+    keypress: {
+      up: [87, 38],    // W, ArrowUp
+      left: [65, 37],  // A, ArrowLeft
+      down: [83, 40],  // S, ArrowDown
+      right: [68, 39]  // D, ArrowRight
+    }
+  };
 
     //  List of game object definitions for this level
     this.classes = [
       { class: GameEnvBackground, data: image_data_background },
-      // { class: Player, data: sprite_data_explorer },
+      { class: Player, data: sprite_data_player },
     ];
   }
 }
