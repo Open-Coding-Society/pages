@@ -647,6 +647,7 @@ Complete your analysis to secure the communication line and see your mission sco
       {id:4, text:'Opinion: this frightening trend will destroy your neighborhood', correct:'bad'},
       {id:5, text:'Local school wins national science award', correct:'good'},
       {id:6, text:'Shocking footage suggests new conspiracy about vaccines', correct:'bad'},
+      {id:7, text:'Leader of planet, growing old, allows invaders to come into planetary space', correct:'bad'},
     ];
 
     // DOM
