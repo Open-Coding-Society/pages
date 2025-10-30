@@ -31,7 +31,7 @@ By the end of this module, you will be able to:
 - Basic web development concepts
 
 
-## 1. CSS Basics
+## CSS Basics
 
 
 CSS (Cascading Style Sheets) is a powerful language used to style webpages. It describes how HTML elements are displayed on the screen and can easily change properties of elements like colors, layouts, spacing, and more.
@@ -69,49 +69,7 @@ selector {
     another-property: value;
 }
 ```
-
-
-## 3. CSS Box Model
-The CSS box model is fundamental to understanding layout in CSS. Every element in CSS has:
-- Content: The actual content of the element
-- Padding: Clear space around the content
-- Border: A border around the padding
-- Margin: Clear space outside the border
-
-
-## Code Example
-A common HTML element used in almost every page is <p>. To style this, we can do something like:
-
-
-p {
-    font-family: Papyrus;
-    font-size: 15px;
-    color: blue;
-}
-
-
-Here is a 'cheat sheet' to some common things you can style with CSS (You may need to look up more details about a specific property in order to use it as this cheat sheet is simply an overview of properties you can use, not how to use them):
-<a href="https://docs.google.com/spreadsheets/d/1cPH5LYVC5lIy5zE4CmK2D_cMIoQfSDDn7RwHzgbpPc0/edit?gid=0#gid=0">Cheat Sheet</a>
-
-
-## Grouping and Nesting
-If we want to add the same styling to multiple elements, we can use grouping. Similar to the example with p above, simply add multiple elements before the {} to do this. Example:
-
-
-h1, h2 {
-    color: red;
-}
-
-
-We can also target elements in a heirarchy like this:
-
-
-ul li {
-    list-style-type: square;
-}
-
-
-## 2. CSS Selectors
+## CSS Selectors
 
 
 CSS selectors are patterns used to select and style HTML elements. Here are the main types:
@@ -160,22 +118,61 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
    div > p { margin: 10px; }
    ```
 
+## CSS Box Model
+The CSS box model is fundamental to understanding layout in CSS. Every element in CSS has:
+- Content: The actual content of the element
+- Padding: Clear space around the content
+- Border: A border around the padding
+- Margin: Clear space outside the border
+
+
+## Code Example
+A common HTML element used in almost every page is <p>. To style this, we can do something like:
+
+```css
+p {
+    font-family: Papyrus;
+    font-size: 15px;
+    color: blue;
+}
+```
+
+Here is a 'cheat sheet' to some common things you can style with CSS (You may need to look up more details about a specific property in order to use it as this cheat sheet is simply an overview of properties you can use, not how to use them):
+<a href="https://docs.google.com/spreadsheets/d/1cPH5LYVC5lIy5zE4CmK2D_cMIoQfSDDn7RwHzgbpPc0/edit?gid=0#gid=0">Cheat Sheet</a>
+
+
+## Grouping and Nesting
+If we want to add the same styling to multiple elements, we can use grouping. Similar to the example with p above, simply add multiple elements before the {} to do this. Example:
+
+```css
+h1, h2 {
+    color: red;
+}
+```
+
+We can also target elements in a heirarchy like this:
+
+```css
+ul li {
+    list-style-type: square;
+}
+```
 
 ## Comments
 A very basic part of CSS, but it is always good practice to comment on code that may be unclear. To create a single line comment, use /**/ in the same line, and you can also spread that out through multiple lines to create a multi-line comment. Examples:
 
-
+```css
 .button {
     /* This is a single line comment */
     background-color: yellow;
 }
-
 
 #header {
     /* This is a
         multi-line comment */
     font-family: Papyrus;
 }
+```
 
 
 ## Other Resource(s)
@@ -190,9 +187,16 @@ You can find a lot more in-depth information here: <a href="https://www.geeksfor
 5. Consider mobile-first design
 
 
-## 4. Layout with Flexbox
-Flexbox is a powerful layout model that makes it easy to create flexible, responsive layouts.
+## Layout with Flexbox
+Flexbox is a powerful layout model that makes it easy to create flexible, responsive layouts. Example:
 
+```css
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+```
 
 ## Common Pitfalls to Avoid
 - Overusing !important
@@ -202,7 +206,6 @@ Flexbox is a powerful layout model that makes it easy to create flexible, respon
 
 ## Interactive CSS Playground
 Try out your CSS below:
-
 
 <div class="css-playground">
     <div class="editor-container">
