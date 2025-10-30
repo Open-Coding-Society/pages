@@ -173,18 +173,6 @@ button.reset-btn:hover {
 }
 </style>
 
-<!-- Progress Tracker -->
-<div id="progress-tracker">
-  <div id="tracker-toggle">❯</div>
-  <h3 style="margin-bottom: 10px; color:#a6c9ff;">Progress Tracker</h3>
-  <div id="tracker-items">
-    <div class="tracker-item" id="tracker1"><span></span><p>Checkpoint 1</p></div>
-    <div class="tracker-item" id="tracker2"><span></span><p>Checkpoint 2</p></div>
-    <div class="tracker-item" id="tracker3"><span></span><p>Checkpoint 3</p></div>
-  </div>
-  <button class="reset-btn" style="margin-top:15px;" onclick="resetProgress()">Reset Progress</button>
-</div>
-
 # CSS Styling Fundamentals
 
 
@@ -545,13 +533,6 @@ function resetProgress() {
     }
     document.querySelectorAll('.feedback').forEach(f => f.textContent = '');
 }
-
-// Toggle tracker
-document.getElementById('tracker-toggle').addEventListener('click', () => {
-    const tracker = document.getElementById('progress-tracker');
-    tracker.classList.toggle('open');
-    document.getElementById('tracker-toggle').textContent = tracker.classList.contains('open') ? '❮' : '❯';
-});
 
 // Validation functions
 function validateCheckpoint1() {
