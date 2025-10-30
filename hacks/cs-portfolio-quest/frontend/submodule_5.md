@@ -6,6 +6,9 @@ permalink: /cs-portfolio-quest/frontend/submodule_5/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 5
+microblog: True
+breadcrumb: True
+
 categories: [CSP, Submodule, Frontend]
 tags: [javascript]
 author: "Creators Team"
@@ -131,7 +134,7 @@ console.log(z);
 ```
 
 <div class="exercise-section">
-    <h4>Exercise One</h4>
+    <h4>Exercise #1</h4>
     <p></p>
 </div>
 
