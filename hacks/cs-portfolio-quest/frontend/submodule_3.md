@@ -101,6 +101,41 @@ button:hover {
     color: #e8f0ff;
     border: 1px solid #355c9b;
 }
+
+/* ===== Button Improvements ===== */
+button {
+    margin-top: 10px;
+    margin-right: 10px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Apply CSS button (primary) */
+button.apply-btn {
+    background-color: #1a73e8;
+    color: #fff;
+}
+
+button.apply-btn:hover {
+    background-color: #2c85f7;
+    transform: translateY(-2px);
+}
+
+/* Reset CSS button (secondary/danger) */
+button.reset-btn {
+    background-color: #d9534f;
+    color: #fff;
+}
+
+button.reset-btn:hover {
+    background-color: #e46863;
+    transform: translateY(-2px);
+}
 </style>
 
 
@@ -355,4 +390,24 @@ function resetCSS() {
     document.getElementById('css-input').value = '';
     document.getElementById('dynamic-style')?.remove();
 }
+
+// ===== Enable Tab Key in Textarea =====
+document.addEventListener('DOMContentLoaded', () => {
+    const textarea = document.getElementById('css-input');
+
+    textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+
+            // Insert four spaces (you could also use "\t" if preferred)
+            const value = textarea.value;
+            textarea.value = value.substring(0, start) + '    ' + value.substring(end);
+
+            // Move cursor forward after inserted spaces
+            textarea.selectionStart = textarea.selectionEnd = start + 4;
+        }
+    });
+});
 </script>
