@@ -125,6 +125,20 @@ The CSS box model is fundamental to understanding layout in CSS. Every element i
 - Border: A border around the padding
 - Margin: Clear space outside the border
 
+```text
++-----------------------+
+|       Margin          |
+|  +-----------------+  |
+|  |     Border      |  |
+|  | +-------------+ |  |
+|  | |  Padding    | |  |
+|  | | +---------+ | |  |
+|  | | | Content | | |  |
+|  | | +---------+ | |  |
+|  | +-------------+ |  |
+|  +-----------------+  |
++-----------------------+
+```
 
 ## Code Example
 A common HTML element used in almost every page is <p>. To style this, we can do something like:
@@ -218,6 +232,7 @@ Example:
     color: white;
 }"></textarea>
         <button onclick="applyCSS()">Apply CSS</button>
+        <button onclick="resetCSS()">Reset CSS</button>
     </div>
     <div class="preview-container">
         <h3>Preview</h3>
@@ -244,5 +259,10 @@ function applyCSS() {
     style.id = 'dynamic-style';
     style.textContent = css;
     document.head.appendChild(style);
+}
+
+function resetCSS() {
+    document.getElementById('css-input').value = '';
+    document.getElementById('dynamic-style')?.remove();
 }
 </script>
