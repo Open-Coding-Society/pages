@@ -138,6 +138,15 @@ date: 2025-10-21
     </div>
   </div>
 
+<a href="{{site.baseurl}}/cs-portfolio-quest/frontend/submodule_5" 
+   style="display:inline-block; background-color:#1e3a8a; color:white; text-decoration:none; 
+          padding:10px 20px; border-radius:8px; border:none; cursor:pointer; 
+          text-align:center; transition:background-color 0.2s;"
+   onmouseover="this.style.backgroundColor='#1d4ed8'" 
+   onmouseout="this.style.backgroundColor='#1e3a8a'">
+  Previous
+</a>
+
 <script>
 (function(){
   // Helper: write to console pane
