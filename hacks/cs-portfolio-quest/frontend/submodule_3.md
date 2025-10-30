@@ -250,20 +250,34 @@ The CSS box model is fundamental to understanding layout in CSS. Every element i
 - Border: A border around the padding
 - Margin: Clear space outside the border
 
-```text
-+-----------------------+
-|       Margin          |
-|  +-----------------+  |
-|  |     Border      |  |
-|  | +-------------+ |  |
-|  | |  Padding    | |  |
-|  | | +---------+ | |  |
-|  | | | Content | | |  |
-|  | | +---------+ | |  |
-|  | +-------------+ |  |
-|  +-----------------+  |
-+-----------------------+
-```
+<div style="background: linear-gradient(135deg, #0b1a33, #102a4c, #0c2340); padding: 30px; border-radius: 15px; color: #eaf0ff; font-family: 'Segoe UI', sans-serif; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-top: 30px;">
+  <h3 style="color:#a6c9ff; margin-bottom: 20px;">The CSS Box Model</h3>
+  <div style="display: inline-block; position: relative; text-align: center;">
+    <!-- Margin -->
+    <div style="background-color: rgba(173, 216, 230, 0.15); padding: 20px; border-radius: 10px;">
+      <div style="color:#a6c9ff; font-size:14px; margin-bottom:5px;">Margin</div>
+
+      <!-- Border -->
+      <div style="background-color: rgba(100, 149, 237, 0.25); padding: 15px; border-radius: 8px;">
+        <div style="color:#a6c9ff; font-size:14px; margin-bottom:5px;">Border</div>
+
+        <!-- Padding -->
+        <div style="background-color: rgba(135, 206, 250, 0.35); padding: 12px; border-radius: 6px;">
+          <div style="color:#a6c9ff; font-size:14px; margin-bottom:5px;">Padding</div>
+
+          <!-- Content -->
+          <div style="background-color: #1a3b6d; color:#ffffff; padding: 20px; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.4);">
+            <strong>Content</strong><br>
+            <span style="font-size: 13px; opacity: 0.8;">(text, images, etc.)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size: 14px; color: #a6c9ff; margin-top: 15px;">
+    Each layer adds space or structure around the content box.
+  </p>
+</div>
 
 ## Code Example
 A common HTML element used in almost every page is <p>. To style this, we can do something like:
@@ -276,9 +290,42 @@ p {
 }
 ```
 
-Here is a 'cheat sheet' to some common things you can style with CSS (You may need to look up more details about a specific property in order to use it as this cheat sheet is simply an overview of properties you can use, not how to use them):
-<a href="https://docs.google.com/spreadsheets/d/1cPH5LYVC5lIy5zE4CmK2D_cMIoQfSDDn7RwHzgbpPc0/edit?gid=0#gid=0">Cheat Sheet</a>
+<div style="background: linear-gradient(135deg, #0b1a33, #102a4c, #0c2340); padding: 25px; border-radius: 15px; color: #eaf0ff; font-family: 'Segoe UI', sans-serif; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+  <h3 style="text-align:center; color:#a6c9ff; margin-bottom:15px;">🎨 CSS Property Cheat Sheet</h3>
+  <table style="width:100%; border-collapse:collapse; text-align:left; font-size:15px;">
+    <thead style="background:#12294a;">
+      <tr>
+        <th style="padding:10px; color:#a6c9ff;">Category</th>
+        <th style="padding:10px; color:#a6c9ff;">Property</th>
+        <th style="padding:10px; color:#a6c9ff;">Example</th>
+        <th style="padding:10px; color:#a6c9ff;">Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:8px;">Text & Font</td><td>`color`</td><td>`color: blue;`</td><td>Sets text color</td></tr>
+      <tr><td></td><td>`font-size`</td><td>`font-size: 18px;`</td><td>Controls text size</td></tr>
+      <tr><td></td><td>`font-family`</td><td>`font-family: Arial, sans-serif;`</td><td>Changes typeface</td></tr>
+      <tr><td></td><td>`text-align`</td><td>`text-align: center;`</td><td>Aligns text</td></tr>
+      <tr><td></td><td>`font-weight`</td><td>`font-weight: bold;`</td><td>Makes text bold</td></tr>
 
+      <tr><td style="padding:8px;">Box & Layout</td><td>`margin`</td><td>`margin: 20px;`</td><td>Space outside an element</td></tr>
+      <tr><td></td><td>`padding`</td><td>`padding: 10px;`</td><td>Space inside an element</td></tr>
+      <tr><td></td><td>`border`</td><td>`border: 1px solid black;`</td><td>Adds border</td></tr>
+      <tr><td></td><td>`box-shadow`</td><td>`box-shadow: 0 4px 8px gray;`</td><td>Adds shadow</td></tr>
+
+      <tr><td style="padding:8px;">Backgrounds & Borders</td><td>`background-color`</td><td>`background-color: lightblue;`</td><td>Sets background color</td></tr>
+      <tr><td></td><td>`border-radius`</td><td>`border-radius: 10px;`</td><td>Rounds corners</td></tr>
+
+      <tr><td style="padding:8px;">Position & Display</td><td>`display`</td><td>`display: flex;`</td><td>Defines display type</td></tr>
+      <tr><td></td><td>`position`</td><td>`position: absolute;`</td><td>Positions element</td></tr>
+      <tr><td></td><td>`top`, `left`</td><td>`top: 10px;`</td><td>Offsets element position</td></tr>
+
+      <tr><td style="padding:8px;">Animations & Effects</td><td>`transition`</td><td>`transition: all 0.3s ease;`</td><td>Animates property changes</td></tr>
+      <tr><td></td><td>`transform`</td><td>`transform: rotate(10deg);`</td><td>Rotates or scales element</td></tr>
+      <tr><td></td><td>`opacity`</td><td>`opacity: 0.8;`</td><td>Controls transparency</td></tr>
+    </tbody>
+  </table>
+</div>
 
 ## Grouping and Nesting
 If we want to add the same styling to multiple elements, we can use grouping. Similar to the example with p above, simply add multiple elements before the {} to do this. Example:
