@@ -31,10 +31,6 @@ date: 2025-10-21
 
 Considering you're on this section, you likely have learned that HTML is what structures website and CSS is what styles and adds design to websites. JavaScript add to this list: **It makes the website interactive.**
 
-## Syntax
-
-[Content here]
-
 ## Variables
 
 Variables are essentially how data is stored in usable containers in code.
@@ -137,13 +133,3 @@ console.log(z);
     <h4>Exercise #1</h4>
     <p></p>
 </div>
-
-## If Conditions
-
-If conditions
-
-[Content here]
-
-## Objects
-
-[Content here]
