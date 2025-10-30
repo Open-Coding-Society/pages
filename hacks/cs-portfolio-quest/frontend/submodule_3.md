@@ -136,8 +136,54 @@ button.reset-btn:hover {
     background-color: #e46863;
     transform: translateY(-2px);
 }
+
+/* ===== Checkpoints ===== */
+.checkpoint {
+    background: linear-gradient(135deg, #0b1a33, #102a4c, #0c2340);
+    border-radius: 15px;
+    padding: 25px;
+    color: #eaf0ff;
+    margin: 25px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.checkpoint h3 {
+    color: #a6c9ff;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.checkpoint textarea {
+    width: 100%;
+    background-color: #0e1f3d;
+    color: #e8f0ff;
+    border: 1px solid #355c9b;
+    border-radius: 8px;
+    font-family: "Consolas", monospace;
+    padding: 10px;
+    min-height: 100px;
+}
+.feedback {
+    margin-top: 10px;
+    font-weight: 500;
+}
+.feedback.correct {
+    color: #28a745;
+}
+.feedback.incorrect {
+    color: #dc3545;
+}
 </style>
 
+<!-- Progress Tracker -->
+<div id="progress-tracker">
+  <div id="tracker-toggle">❯</div>
+  <h3 style="margin-bottom: 10px; color:#a6c9ff;">Progress Tracker</h3>
+  <div id="tracker-items">
+    <div class="tracker-item" id="tracker1"><span></span><p>Checkpoint 1</p></div>
+    <div class="tracker-item" id="tracker2"><span></span><p>Checkpoint 2</p></div>
+    <div class="tracker-item" id="tracker3"><span></span><p>Checkpoint 3</p></div>
+  </div>
+  <button class="reset-btn" style="margin-top:15px;" onclick="resetProgress()">Reset Progress</button>
+</div>
 
 # CSS Styling Fundamentals
 
@@ -194,6 +240,15 @@ selector {
     another-property: value;
 }
 ```
+
+<div id="checkpoint1" class="checkpoint">
+  <h3>Checkpoint 1: Change Paragraph Text Color</h3>
+  <p>Write CSS that makes all &lt;p&gt; text blue.</p>
+  <textarea id="checkpoint1-input" placeholder="Your Code Here"></textarea><br>
+  <button class="apply-btn" onclick="validateCheckpoint1()">Check Answer</button>
+  <p id="checkpoint1-feedback" class="feedback"></p>
+</div>
+
 ## CSS Selectors
 
 
@@ -243,6 +298,19 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
    div > p { margin: 10px; }
    ```
 
+<div id="checkpoint2" class="checkpoint">
+  <h3>Checkpoint 2: Multiple Choice</h3>
+  <p>Which CSS selector targets all elements on the page?</p>
+  <div>
+    <input type="radio" name="q2" value="a"> a) .all { }<br>
+    <input type="radio" name="q2" value="b"> b) #all { }<br>
+    <input type="radio" name="q2" value="c"> c) * { }<br>
+    <input type="radio" name="q2" value="d"> d) body, html { }<br>
+  </div>
+  <button class="apply-btn" onclick="validateCheckpoint2()">Submit</button>
+  <p id="checkpoint2-feedback" class="feedback"></p>
+</div>
+
 ## CSS Box Model
 The CSS box model is fundamental to understanding layout in CSS. Every element in CSS has:
 - Content: The actual content of the element
@@ -279,17 +347,6 @@ The CSS box model is fundamental to understanding layout in CSS. Every element i
   </p>
 </div>
 
-## Code Example
-A common HTML element used in almost every page is <p>. To style this, we can do something like:
-
-```css
-p {
-    font-family: Papyrus;
-    font-size: 15px;
-    color: blue;
-}
-```
-
 <div style="background: linear-gradient(135deg, #0b1a33, #102a4c, #0c2340); padding: 25px; border-radius: 15px; color: #eaf0ff; font-family: 'Segoe UI', sans-serif; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
   <h3 style="text-align:center; color:#a6c9ff; margin-bottom:15px;">🎨 CSS Property Cheat Sheet</h3>
   <table style="width:100%; border-collapse:collapse; text-align:left; font-size:15px;">
@@ -325,6 +382,14 @@ p {
       <tr><td></td><td>`opacity`</td><td>`opacity: 0.8;`</td><td>Controls transparency</td></tr>
     </tbody>
   </table>
+</div>
+
+<div id="checkpoint3" class="checkpoint">
+  <h3>Checkpoint 3: Create a Shadowed Box</h3>
+  <p>Write CSS for a class called <code>.card</code> that gives a gray shadow and 20px padding.</p>
+  <textarea id="checkpoint3-input" placeholder="Your Code Here (Tip: Use the Cheat Sheet)"></textarea><br>
+  <button class="apply-btn" onclick="validateCheckpoint3()">Check Answer</button>
+  <p id="checkpoint3-feedback" class="feedback"></p>
 </div>
 
 ## Grouping and Nesting
@@ -457,4 +522,84 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/* ====== Checkpoint Logic ====== */
+function updateTracker(id, status) {
+    const item = document.getElementById(`tracker${id}`);
+    item.classList.remove('completed', 'failed');
+    if (status === 'completed') item.classList.add('completed');
+    if (status === 'failed') item.classList.add('failed');
+    localStorage.setItem(`checkpoint${id}`, status);
+}
+function restoreProgress() {
+    for (let i = 1; i <= 3; i++) {
+        const status = localStorage.getItem(`checkpoint${i}`);
+        if (status) updateTracker(i, status);
+    }
+}
+function resetProgress() {
+    for (let i = 1; i <= 3; i++) {
+        localStorage.removeItem(`checkpoint${i}`);
+        const item = document.getElementById(`tracker${i}`);
+        item.classList.remove('completed', 'failed');
+    }
+    document.querySelectorAll('.feedback').forEach(f => f.textContent = '');
+}
+
+// Toggle tracker
+document.getElementById('tracker-toggle').addEventListener('click', () => {
+    const tracker = document.getElementById('progress-tracker');
+    tracker.classList.toggle('open');
+    document.getElementById('tracker-toggle').textContent = tracker.classList.contains('open') ? '❮' : '❯';
+});
+
+// Validation functions
+function validateCheckpoint1() {
+    const input = document.getElementById('checkpoint1-input').value.trim().toLowerCase();
+    const feedback = document.getElementById('checkpoint1-feedback');
+    if (input.includes('p') && input.includes('color:') && input.includes('blue')) {
+        feedback.textContent = '✅ Correct! Paragraph text set to blue.';
+        feedback.className = 'feedback correct';
+        updateTracker(1, 'completed');
+    } else {
+        feedback.textContent = '❌ Try again — remember to target <p> and use color: blue;';
+        feedback.className = 'feedback incorrect';
+        updateTracker(1, 'failed');
+    }
+}
+
+function validateCheckpoint2() {
+    const selected = document.querySelector('input[name="q2"]:checked');
+    const feedback = document.getElementById('checkpoint2-feedback');
+    if (!selected) {
+        feedback.textContent = '⚠️ Please select an answer.';
+        feedback.className = 'feedback incorrect';
+        return;
+    }
+    if (selected.value === 'c') {
+        feedback.textContent = '✅ Correct! The universal selector * targets all elements.';
+        feedback.className = 'feedback correct';
+        updateTracker(2, 'completed');
+    } else {
+        feedback.textContent = '❌ Incorrect. The correct answer is * { }.';
+        feedback.className = 'feedback incorrect';
+        updateTracker(2, 'failed');
+    }
+}
+
+function validateCheckpoint3() {
+    const input = document.getElementById('checkpoint3-input').value.trim().toLowerCase();
+    const feedback = document.getElementById('checkpoint3-feedback');
+    if (input.includes('.card') && input.includes('box-shadow') && input.includes('gray') && input.includes('padding: 20px')) {
+        feedback.textContent = '✅ Great! You added a box shadow and padding.';
+        feedback.className = 'feedback correct';
+        updateTracker(3, 'completed');
+    } else {
+        feedback.textContent = '❌ Check syntax — make sure your class is .card and includes box-shadow and padding.';
+        feedback.className = 'feedback incorrect';
+        updateTracker(3, 'failed');
+    }
+}
+
+restoreProgress();
 </script>
