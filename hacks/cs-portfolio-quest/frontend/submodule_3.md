@@ -14,6 +14,96 @@ author: "Creators Team"
 date: 2025-10-21
 ---
 
+<style>
+/* ============ CSS Playground Styling ============ */
+.css-playground {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #0b1a33, #102a4c, #0c2340);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    margin-top: 30px;
+}
+
+.editor-container, .preview-container {
+    flex: 1 1 45%;
+    background: #13284d;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    min-width: 320px;
+}
+
+.editor-container h3, 
+.preview-container h3 {
+    text-align: center;
+    color: #a6c9ff;
+    margin-bottom: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#css-input {
+    width: 100%;
+    min-height: 300px; /* ensures more vertical space */
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 15px;
+    background-color: #0e1f3d;
+    color: #e8f0ff;
+    border: 1px solid #355c9b;
+    border-radius: 10px;
+    padding: 15px;
+    resize: vertical;
+    line-height: 1.4;
+    white-space: pre; /* keeps one-line CSS intact */
+    overflow-x: auto; /* allows horizontal scroll instead of wrapping */
+}
+
+button {
+    margin-top: 10px;
+    margin-right: 10px;
+    background-color: #1a4c8b;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+button:hover {
+    background-color: #2560b3;
+    transform: translateY(-2px);
+}
+
+.preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: auto;
+}
+
+#css-preview {
+    width: 100%;
+    background: #0e1f3d;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    min-height: 250px;
+    color: #e8f0ff;
+    border: 1px solid #355c9b;
+}
+</style>
+
+
 # CSS Styling Fundamentals
 
 
