@@ -200,6 +200,29 @@ Flexbox is a powerful layout model that makes it easy to create flexible, respon
 - Mixing units unnecessarily
 - Not considering browser compatibility
 
+## Interactive CSS Playground
+Try out your CSS below:
+
+
+<div class="css-playground">
+    <div class="editor-container">
+        <h3>CSS Editor</h3>
+        <textarea id="css-input" rows="10" placeholder="Enter your CSS here...
+Example:
+.test-div {
+    background-color: blue;
+    padding: 20px;
+    color: white;
+}"></textarea>
+        <button onclick="applyCSS()">Apply CSS</button>
+    </div>
+    <div class="preview-container">
+        <h3>Preview</h3>
+        <div id="css-preview">
+            <div class="test-div">Test Content</div>
+        </div>
+    </div>
+</div>
 
 ## Practice Challenges
 1. Create a centered card with padding and shadow
@@ -207,3 +230,16 @@ Flexbox is a powerful layout model that makes it easy to create flexible, respon
 3. Create a responsive grid layout
 4. Style a form with custom inputs
 
+<script>
+function applyCSS() {
+    const styleElement = document.getElementById('dynamic-style');
+    if (styleElement) {
+        styleElement.remove();
+    }
+    const css = document.getElementById('css-input').value;
+    const style = document.createElement('style');
+    style.id = 'dynamic-style';
+    style.textContent = css;
+    document.head.appendChild(style);
+}
+</script>
