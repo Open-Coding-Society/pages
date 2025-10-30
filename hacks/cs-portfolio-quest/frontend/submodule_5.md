@@ -17,8 +17,7 @@ date: 2025-10-21
 
 <style>
     .exercise-section {
-        background-color: gray;
-        color: white;
+        background-color: blue;
         opacity: 0.6;
         border-color: red;
         border-style: solid;
@@ -130,6 +129,7 @@ console.log(z);
 ```
 
 <div class="exercise-section">
-    <h4>Exercise #1</h4>
-    <p></p>
+    <h4>Exercises</h4>
+    <p width="100%">Define two variables and define new variables by using operators on those two variables</p>
+    <textarea rows="10" cols="70" placeholder="code goes here"></textarea>
 </div>
