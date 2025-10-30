@@ -1,4 +1,5 @@
 import GameObject from './GameObject.js';
+import { Transform } from './Transform.js';
 
 /** Background class for primary background
  * 

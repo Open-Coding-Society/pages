@@ -1,6 +1,7 @@
 // Npc.js with DialogueSystem integration
 import Character from "./Character.js";
 import DialogueSystem from "../DialogueSystem.js";
+import { Transform } from './Transform.js';
 
 class Npc extends Character {
     constructor(data = null, gameEnv = null) {
@@ -13,6 +14,8 @@ class Npc extends Character {
         this.handleKeyUpBound = this.handleKeyUp.bind(this);
         this.bindInteractKeyListeners();
         
+        this.transform = new Transform();
+
         // IMPORTANT: Create a unique ID for each NPC to avoid conflicts
         this.uniqueId = data?.id + "_" + Math.random().toString(36).substr(2, 9);
         
