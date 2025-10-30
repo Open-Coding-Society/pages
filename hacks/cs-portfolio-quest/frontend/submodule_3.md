@@ -177,33 +177,35 @@ button.reset-btn:hover {
 
 
 ## Learning Objectives
-By the end of this module, you will be able to:
-- Understand basic CSS syntax and how to apply styles
-- Use different types of CSS selectors effectively
-- Implement basic layouts and styling techniques
-- Debug common CSS issues
+<p>By the end of this module, you will be able to:</p>
+<ul>
+  <li> - Understand basic CSS syntax and how to apply styles</li>
+  <li> - Use different types of CSS selectors effectively</li>
+  <li> - Implement basic layouts and styling techniques</li>
+  <li> - Debug common CSS issues</li>
+</ul>
 
 
 ## Prerequisites
-- Basic understanding of HTML structure
-- Familiarity with text editors
-- Basic web development concepts
-
+<ul>
+    <li> - Basic understanding of HTML structure</li>
+    <li> - Familiarity with text editors</li>
+    <li> - Basic web development concepts</li>
+</ul>
 
 ## CSS Basics
-
-
 CSS (Cascading Style Sheets) is a powerful language used to style webpages. It describes how HTML elements are displayed on the screen and can easily change properties of elements like colors, layouts, spacing, and more.
 
 
 ### CSS Implementation Methods
 CSS can be implemented in three ways:
-1. **Inline CSS**: Directly in HTML elements using the style attribute
-2. **Internal CSS**: Using the `<style>` tag in HTML document
-3. **External CSS**: Linking an external .css file
+<ol>
+    <li><strong>1. Inline CSS</strong>: Directly in HTML elements using the style attribute</li>
+    <li><strong>2. Internal CSS</strong>: Using the <code>&lt;style&gt;</code> tag in HTML document</li>
+    <li><strong>3. External CSS</strong>: Linking an external .css file</li>
+</ol>
 
-
-Example of each:
+Examples:
 ```html
 <!-- Inline CSS -->
 <p style="color: blue;">This is inline styling</p>
@@ -237,54 +239,56 @@ selector {
   <p id="checkpoint1-feedback" class="feedback"></p>
 </div>
 
-## CSS Selectors
 
+## CSS Selectors
 
 CSS selectors are patterns used to select and style HTML elements. Here are the main types:
 
-
 ### Basic Selectors
-1. **Universal Selector (*)**
-   ```css
-   * { margin: 0; }
-   ```
 
+1. **Universal Selector (*)**
+
+    ```css
+    * { margin: 0; }
+    ```
 
 2. **Element Selector**
-   ```css
-   p { color: blue; }
-   ```
 
+    ```css
+    p { color: blue; }
+    ```
 
 3. **Class Selector (.)**
-   ```css
-   .button { background: yellow; }
-   ```
 
+    ```css
+    .button { background: yellow; }
+    ```
 
 4. **ID Selector (#)**
-   ```css
-   #header { font-size: 24px; }
-   ```
 
+    ```css
+    #header { font-size: 24px; }
+    ```
 
 ### Advanced Selectors
-1. **Attribute Selectors**
-   ```css
-   input[type="text"] { border: 1px solid gray; }
-   ```
 
+1. **Attribute Selectors**
+
+    ```css
+    input[type="text"] { border: 1px solid gray; }
+    ```
 
 2. **Pseudo-classes**
-   ```css
-   a:hover { color: red; }
-   ```
 
+    ```css
+    a:hover { color: red; }
+    ```
 
 3. **Combinators**
-   ```css
-   div > p { margin: 10px; }
-   ```
+
+    ```css
+    div > p { margin: 10px; }
+    ```
 
 <div id="checkpoint2" class="checkpoint">
   <h3>Checkpoint 2: Multiple Choice</h3>
@@ -300,11 +304,13 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
 </div>
 
 ## CSS Box Model
-The CSS box model is fundamental to understanding layout in CSS. Every element in CSS has:
-- Content: The actual content of the element
-- Padding: Clear space around the content
-- Border: A border around the padding
-- Margin: Clear space outside the border
+<p>The CSS box model is fundamental to understanding layout in CSS. Every element in CSS has:</p>
+<ul>
+  <li> - <strong>Content</strong>: The actual content of the element</li>
+  <li> - <strong>Padding</strong>: Clear space around the content</li>
+  <li> - <strong>Border</strong>: A border around the padding</li>
+  <li> - <strong>Margin</strong>: Clear space outside the border</li>
+</ul>
 
 <div style="background: linear-gradient(135deg, #0b1a33, #102a4c, #0c2340); padding: 30px; border-radius: 15px; color: #eaf0ff; font-family: 'Segoe UI', sans-serif; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-top: 30px;">
   <h3 style="color:#a6c9ff; margin-bottom: 20px;">The CSS Box Model</h3>
@@ -419,11 +425,14 @@ You can find a lot more in-depth information here: <a href="https://www.geeksfor
 
 
 ## Best Practices
-1. Use meaningful class names
-2. Keep selectors simple
-3. Use comments for complex styles
-4. Organize properties consistently
-5. Consider mobile-first design
+<ol>
+  <li>1. Use meaningful class names</li>
+  <li>2. Keep selectors simple</li>
+  <li>3. Use comments for complex styles</li>
+  <li>4. Organize properties consistently</li>
+  <li>5. Consider mobile-first design</li>
+</ol>
+
 
 
 ## Layout with Flexbox
@@ -438,10 +447,13 @@ Flexbox is a powerful layout model that makes it easy to create flexible, respon
 ```
 
 ## Common Pitfalls to Avoid
-- Overusing !important
-- Deep nesting of selectors
-- Mixing units unnecessarily
-- Not considering browser compatibility
+<ul>
+  <li> - Overusing <code>!important</code></li>
+  <li> - Deep nesting of selectors</li>
+  <li> - Mixing units unnecessarily</li>
+  <li> - Not considering browser compatibility</li>
+</ul>
+
 
 ## Interactive CSS Playground
 Try out your CSS below:
@@ -468,10 +480,13 @@ Example:
 </div>
 
 ## Practice Challenges
-1. Create a centered card with padding and shadow
-2. Build a simple navigation bar using flexbox
-3. Create a responsive grid layout
-4. Style a form with custom inputs
+<ol>
+  <li>1. Create a centered card with padding and shadow</li>
+  <li>2. Build a simple navigation bar using flexbox</li>
+  <li>3. Create a responsive grid layout</li>
+  <li>4. Style a form with custom inputs</li>
+</ol>
+
 
 <script>
 function applyCSS() {
