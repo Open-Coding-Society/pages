@@ -11,6 +11,9 @@ tags: [microblogging, submodule, unzippers]
 author: "Jaynee Chauhan, Michelle Ji"
 date: 2025-10-28
 breadcrumb: true
+footer:
+  previous: /digital-famine/microblog/hintsAI
+  home: /digital-famine/
 ---
 
 # Database & Security Quiz
