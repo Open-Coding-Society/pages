@@ -3,6 +3,10 @@ layout: post
 title: Microblog API
 permalink: /digital-famine/microblog/api/
 breadcrumb: True
+footer:
+  previous: /digital-famine/microblog/
+  home: /digital-famine/
+  next: /digital-famine/microblog/microb/
 ---
 
 # Microblog API - Beginner's Guide

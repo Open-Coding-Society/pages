@@ -11,6 +11,10 @@ tags: [microblogging, submodule, unzippers]
 author: "Krishna Visvanath, Sloane Sommers"
 date: 2025-10-21
 breadcrumb: true
+footer:
+  previous: /digital-famine/microblog/mcq/
+  home: /digital-famine/
+  next: /digital-famine/microblog/vault/
 ---
 
 # Submodule 1
