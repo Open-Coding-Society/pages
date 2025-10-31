@@ -24,7 +24,7 @@ lxdData:
       Level: 2
       Description: "Click here for some AI hints"
       Categories: ["Quest 1", "Quest 2", "Quest 3"]
-      Lessons: "/digital-famine/microblog/hints/"
+      Lessons: "/digital-famine/microblog/hintsAI/"
       Image: "/images/digital-famine/ai.svg"
       Alt: "AI Submodule 2"
     - Title: "Cybersecurity Hints"
@@ -32,7 +32,7 @@ lxdData:
       Level: 3
       Description: "Click here for some Cybersecurity hints!"
       Categories: ["Quest 1", "Quest 2", "Quest 3"]
-      Lessons: "/digital-famine/ai/submodule_3/"
+      Lessons: "/digital-famine/microblog/hintsCyber/"
       Image: "/images/digital-famine/ai.svg"
       Alt: "CS Submodule 3"
 ---
