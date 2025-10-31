@@ -2,6 +2,7 @@
 layout: post 
 tailwind: True
 title: Hints for Quests
+author: Jaynee Chauhan, Michelle Ji
 description: >
   Do you need some help? Don't worry we won't tell ;)
 author: CSP 2025-26
