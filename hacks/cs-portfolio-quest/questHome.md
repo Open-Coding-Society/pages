@@ -15,9 +15,9 @@ lxdData:
       Level: 1
       Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
       Categories: ["Frontend", "HTML", "CSS","Javascript"]
-      Video: "/cs-portfolio-quest/frontend-video"
+      Video: "/cs-portfolio-quest/frontend/"
       Lessons: "/cs-portfolio-quest/frontend/"
-      Image: "/images/cs-portfolio-quest/frontend.svg"
+      Image: "/images/cs-portfolio-quest/frontend/mainpage.png"
       Alt: "CS Portfolio Quest Frontend"
     - Title: "C2: Backend Development"
       Genre: "Project Creation"

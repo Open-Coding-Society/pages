@@ -19,8 +19,22 @@ date: 2025-10-21
     .exercise-section {
         background-color: blue;
         opacity: 0.6;
-        border-color: red;
+        border-color: black;
+        border-width: 5px;
         border-style: solid;
+        border-radius: 5px;
+    }
+
+    .code-input {
+        margin-left: 5px;
+        margin-top: auto;
+        margin-bottom: auto;    
+        margin-right: auto;
+    }
+
+    .example-answer {
+        color: black;
+        background-color: #8C00FF;
     }
 </style>
 
@@ -29,6 +43,10 @@ date: 2025-10-21
 ## Purpose
 
 Considering you're on this section, you likely have learned that HTML is what structures website and CSS is what styles and adds design to websites. JavaScript add to this list: **It makes the website interactive.**
+
+<br>
+
+This guide will go over some of the most fundamental concepts relating to JavaScript.
 
 ## Variables
 
@@ -130,24 +148,89 @@ console.log(z);
 
 <div class="exercise-section">
     <h4>Exercises</h4>
-    <p width="100%">Define two variables and define new variables by using operators on those two variables</p>
-    <textarea rows="10" cols="70" placeholder="code goes here"></textarea>
+    <p width="100%">Define two variables and define new variables by using operators on those two variables.</p>
+    <textarea class="code-input" rows="10" cols="70" placeholder="CODE HERE"></textarea>
+
+    <button onclick="showAnswer()">Show Example Answer</button>
+    <p class="example-answer" id="example-answer"></p>
 </div>
 
-<a href="{{site.baseurl}}/cs-portfolio-quest/frontend/submodule_4" 
-   style="display:inline-block; background-color:#1e3a8a; color:white; text-decoration:none; 
-          padding:10px 20px; border-radius:8px; border:none; cursor:pointer; 
-          text-align:center; transition:background-color 0.2s;"
-   onmouseover="this.style.backgroundColor='#1d4ed8'" 
-   onmouseout="this.style.backgroundColor='#1e3a8a'">
-  Previous
-</a>
-<a href="{{site.baseurl}}/cs-portfolio-quest/frontend/submodule_6" 
-   style="display:inline-block; background-color:#1e3a8a; color:white; text-decoration:none; 
-          padding:10px 20px; border-radius:8px; border:none; cursor:pointer; 
-          text-align:center; transition:background-color 0.2s;"
-   onmouseover="this.style.backgroundColor='#1d4ed8'" 
-   onmouseout="this.style.backgroundColor='#1e3a8a'">
-  Next
-</a>
 
+
+## Function
+Functions are reusable blocks of code that code to be more efficiently and concisely managed. In JavaScript, they are formatted like the following:
+
+```
+function name(p1, p2) {
+    // Code here
+}
+```
+
+These are each of the individual components of a function:
+
+<ol>
+    <li>Each function must be initialized with the keyword 'function'</li>
+    <br>
+    <li>Next comes the name of the function followed by a pair of parentheses ()</li>
+    <br>
+    <li>Inside the parentheses are optional parameters that can be used in the function</li>
+    <br>
+    <li>After the function name and possible parameters have been established, curly brackets { } are used to hold the code</li>
+    <br>
+    <li>At this point, you write the code you want to reuse!</li>
+    <br>
+</ol>
+
+## DOM Basics
+JavaScript can be used to edit dynamically edit HTML content as well!
+
+Here is an example of how that can be done:
+
+```
+<p id="change-content"></p>
+
+<script>
+    const element = document.getElementById("change-content");
+    element.innerHTML = "Hello, World!"
+</script>
+```
+
+Essentially, in order to change the content of an HTML tag, you must first apply an identifier to the certain tag. This allows us to identify and access that tag in JavaScript via the ID.
+
+<br>
+
+Once an ID is in place, in JavaScript, a variable is defined that retrieves the element via its id with the code `document.getElementById("id-here");`
+
+<br>
+
+Now, at this point, the variable can be used to access the HTML by using `.innerHTML = " ";` allowing for the text of the HTML tag to be directly modified.
+
+## Console and console.log()
+A very useful part of JavaScript is the tools it provides to help developers debug their code.
+
+<br>
+
+The most prominent of these 'tools' is console.log(), while allow developers to output and record how their code works and reacts in a special place on a web page called the console.
+
+<br>
+
+The console can be accessed by the shortcut Control+Shift+J for Windows and Linux or Command+Option+J for Mac.
+
+<br>
+
+Using console.log() outputs stuff straight here to the console. You can only use console.log() in the console itself! Try it out by typing the following code in the console: `console.log("Hello, World!");`.
+
+<br>
+
+It should output Hello World.
+
+<br>
+
+console.log() is used in many applications beyond this, and is helpful for debugging certain parts of your code. So, when trying to identify why certain parts of the codes are acting in an unintended manner, consider using console.log() to help out.
+    
+<script>
+    function showAnswer() {
+        const exampleAnswer = document.getElementById("example-answer");
+        exampleAnswer.innerHTML = "x=5<br>y=2<br>z=x*2<br>console.log(z)";
+    }
+</script>

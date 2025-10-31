@@ -1,0 +1,560 @@
+---
+layout: post
+title: "AI Usage Quest — Module 3: AI APIs"
+description: "Learn to integrate AI capabilities through APIs and build interactive applications"
+permalink: /digital-famine/ai/submodule_3/
+categories: [CSP, Submodule, AIUsage]
+tags: [ai, api, flask, microblog, integration]
+author: "Debuggers Team"
+microblog: true
+date: 2025-10-30
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: AI APIs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #2563eb, #0f172a);
+            min-height: 100vh;
+        }
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .section-hidden { display: none; }
+        .code-example {
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .code-example pre {
+            margin: 0;
+            color: #e2e8f0;
+        }
+        .code-example code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="border-b border-green-500/30 bg-slate-900/50 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <h1 class="text-4xl font-bold text-center mb-2">AI Usage Quest</h1>
+            <p class="text-center text-green-300 text-lg">Module 3: AI APIs</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-slate-800/50 backdrop-blur border border-green-500/30 rounded-lg p-6 mb-8">
+            <div class="flex items-center justify-between overflow-x-auto pb-2 gap-2">
+                <button onclick="goToSection(0)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-green-600" data-section="0">
+                    <span class="text-2xl mb-1">🔌</span>
+                    <span class="text-xs text-center">Introduction</span>
+                </button>
+                <div class="w-8 h-0.5 bg-green-500/30"></div>
+                <button onclick="goToSection(1)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="1">
+                    <span class="text-2xl mb-1">📚</span>
+                    <span class="text-xs text-center">API Basics</span>
+                </button>
+                <div class="w-8 h-0.5 bg-green-500/30"></div>
+                <button onclick="goToSection(2)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="2">
+                    <span class="text-2xl mb-1">🏗️</span>
+                    <span class="text-xs text-center">Architecture</span>
+                </button>
+                <div class="w-8 h-0.5 bg-green-500/30"></div>
+                <button onclick="goToSection(3)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="3">
+                    <span class="text-2xl mb-1">💻</span>
+                    <span class="text-xs text-center">UI Layer</span>
+                </button>
+                <div class="w-8 h-0.5 bg-green-500/30"></div>
+                <button onclick="goToSection(4)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="4">
+                    <span class="text-2xl mb-1">🎮</span>
+                    <span class="text-xs text-center">Demo</span>
+                </button>
+                <div class="w-8 h-0.5 bg-green-500/30"></div>
+                <button onclick="goToSection(5)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="5">
+                    <span class="text-2xl mb-1">🏆</span>
+                    <span class="text-xs text-center">Quiz</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="section-0" class="mission-section">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/50 rounded-lg p-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl pulse">🔌</span>
+                        <h2 class="text-3xl font-bold text-green-400">Welcome to AI APIs</h2>
+                    </div>
+                    <div class="space-y-4 text-lg">
+                        <p>An AI API (Application Programming Interface) is a set of rules that allows developers to integrate artificial intelligence capabilities into their applications without building AI models from scratch.</p>
+                        <p class="text-green-300">APIs act as bridges, enabling software to communicate with and use AI services by sending requests and receiving responses.</p>
+                        
+                        <div class="bg-slate-900/50 border border-green-500/20 rounded-lg p-6 mt-6">
+                            <h3 class="text-xl font-semibold text-green-300 mb-3">What Can AI APIs Do?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-green-400 font-semibold mb-2">🗣️ Natural Language Processing</p>
+                                    <p class="text-sm">Understand and generate human language for chatbots, translations, and content creation.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-green-400 font-semibold mb-2">👁️ Image Recognition</p>
+                                    <p class="text-sm">Identify objects, faces, and scenes in photos and videos.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-green-400 font-semibold mb-2">📊 Data Analysis</p>
+                                    <p class="text-sm">Process and analyze large datasets to find patterns and insights.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-green-400 font-semibold mb-2">🤖 Automation</p>
+                                    <p class="text-sm">Automate repetitive tasks and make intelligent decisions.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mt-4">
+                            <p class="font-semibold">💡 Real World Example:</p>
+                            <p>When you use Google, Uber, ApplePay, or any service that needs AI analysis, you're using AI APIs. They combine our world digitally!</p>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 mt-6 text-center">
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-green-500/30">
+                                <p class="text-green-400 font-semibold">Time</p>
+                                <p class="text-2xl">45-60 min</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-green-500/30">
+                                <p class="text-green-400 font-semibold">Difficulty</p>
+                                <p class="text-2xl">⭐⭐⭐☆☆</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-green-500/30">
+                                <p class="text-green-400 font-semibold">Badge</p>
+                                <p class="text-2xl text-yellow-400">API Builder</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(1)" class="w-full bg-green-600 hover:bg-green-700 py-4 rounded-lg font-semibold text-lg">Begin Learning</button>
+            </div>
+        </div>
+
+        <div id="section-1" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">📚 API Fundamentals</h2>
+                    <div class="space-y-6 text-lg">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-green-300 mb-3">Building a Customer Service Chatbot</h3>
+                            <p class="mb-4">A typical example of using an AI API is building a customer service chatbot that uses natural language processing to understand queries and generate responses.</p>
+                        </div>
+                        
+                        <div class="bg-slate-900/50 border border-green-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-green-300 mb-4">How It Works</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-2xl">1</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">User Sends Message</p>
+                                        <p class="text-sm text-gray-300">Customer asks a question through your website or app.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-2xl">2</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">API Request</p>
+                                        <p class="text-sm text-gray-300">Your application sends the message to an AI API (like OpenAI or Claude).</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-2xl">3</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">AI Processes</p>
+                                        <p class="text-sm text-gray-300">The AI understands the question and generates an appropriate response.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-2xl">4</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">Response Returned</p>
+                                        <p class="text-sm text-gray-300">Your application receives the AI's response and displays it to the customer.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-purple-300 mb-4">Key Benefits</h4>
+                            <ul class="space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-purple-400">•</span>
+                                    <span><strong>No AI Expertise Required:</strong> Use pre-trained models without understanding machine learning</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-purple-400">•</span>
+                                    <span><strong>Faster Development:</strong> Integrate powerful AI features in hours instead of months</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-purple-400">•</span>
+                                    <span><strong>Cost Effective:</strong> Pay only for what you use, no infrastructure needed</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-purple-400">•</span>
+                                    <span><strong>Continuous Updates:</strong> API providers improve models without you changing code</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(2)" class="w-full bg-green-600 hover:bg-green-700 py-4 rounded-lg font-semibold text-lg">Continue to Architecture</button>
+            </div>
+        </div>
+
+        <div id="section-2" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">🏗️ Microblog Architecture: Three Layers</h2>
+                    <div class="space-y-6 text-lg">
+                        <p>Understanding how a complete application works helps you build better AI integrations. Let's explore the microblog system as an example.</p>
+                        
+                        <div class="bg-slate-900/50 border border-blue-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-blue-300 mb-4">Layer 1: Layout Layer</h4>
+                            <p class="mb-3">Handles the visual structure and dependencies.</p>
+                            <ul class="space-y-2 text-sm ml-4">
+                                <li>• Includes required CSS and JavaScript libraries (Tailwind, jQuery)</li>
+                                <li>• Injects the microblog overlay panel and floating button</li>
+                                <li>• Reads frontmatter (<code class="bg-slate-800 px-2 py-1 rounded">microblog: true</code>) to activate features</li>
+                                <li>• Ensures consistent styling across all enabled pages</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-purple-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-purple-300 mb-4">Layer 2: JavaScript Layer (UI)</h4>
+                            <p class="mb-3">Makes the interface interactive and dynamic.</p>
+                            <ul class="space-y-2 text-sm ml-4">
+                                <li>• Handles all user interactions (opening/closing panel, posting, replying)</li>
+                                <li>• Manages API calls to the backend (fetching, posting, reacting)</li>
+                                <li>• Implements error handling and loading states</li>
+                                <li>• Uses modern patterns (Promises, async/await) for maintainability</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-green-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-green-300 mb-4">Layer 3: Backend/API Layer</h4>
+                            <p class="mb-3">Processes requests and manages data.</p>
+                            <ul class="space-y-2 text-sm ml-4">
+                                <li>• Provides RESTful endpoints for microblog operations (GET, POST, UPDATE, DELETE)</li>
+                                <li>• Handles data validation and security</li>
+                                <li>• Connects to databases to store and retrieve posts</li>
+                                <li>• Can be extended or replaced for different deployments</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mt-4">
+                            <p class="font-semibold">🔑 Key Flow:</p>
+                            <p>User Action → Event Handler → Function → API Call → Re-render → Updated UI</p>
+                            <p class="text-sm mt-2">The UI stays in sync with data by re-rendering after every change, rather than manually updating individual pieces.</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(3)" class="w-full bg-green-600 hover:bg-green-700 py-4 rounded-lg font-semibold text-lg">Continue to UI Layer</button>
+            </div>
+        </div>
+
+        <div id="section-3" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">💻 JavaScript UI Functionality</h2>
+                    <div class="space-y-6 text-lg">
+                        <p>UI functionality refers to the JavaScript code that makes your web page interactive. Let's explore the three main components:</p>
+                        
+                        <div class="bg-slate-900/50 border border-green-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-green-300 mb-4">1. Modal System (Pop-up Window)</h4>
+                            <p class="mb-3">A modal is a pop-up window that appears over the main page for creating and editing posts.</p>
+                            
+                            <div class="code-example">
+                                <pre><code>function openModal({ mode, post = {} }) {
+  document.getElementById('microblog-modal').classList.remove('hidden');
+  document.getElementById('modal-title').textContent = 
+    mode === 'edit' ? 'Edit Microblog Post' : 'Create Microblog Post';
+  document.getElementById('post-id').value = post.id || '';
+  document.getElementById('content').value = post.content || '';
+}</code></pre>
+                            </div>
+                            
+                            <p class="text-sm mt-3"><strong>What this does:</strong></p>
+                            <ul class="text-sm space-y-1 ml-4 mt-2">
+                                <li>• Makes the modal visible by removing the 'hidden' CSS class</li>
+                                <li>• Changes the title based on create/edit mode</li>
+                                <li>• Pre-fills form with existing data (edit) or leaves empty (create)</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-blue-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-blue-300 mb-4">2. Form Submission (Saving Data)</h4>
+                            <p class="mb-3">When a user fills out the form and clicks "Save":</p>
+                            
+                            <div class="code-example">
+                                <pre><code>document.getElementById('microblog-form').onsubmit = async function(e) {
+  e.preventDefault();
+  
+  const id = document.getElementById('post-id').value;
+  const content = document.getElementById('content').value;
+  
+  try {
+    if (id) {
+      await updatePost({ id, content });
+    } else {
+      await createPost({ content });
+    }
+    closeModal();
+    renderMicroblogTable();
+  } catch (err) {
+    alert('Error saving post: ' + err.message);
+  }
+};</code></pre>
+                            </div>
+                            
+                            <p class="text-sm mt-3"><strong>Step-by-step:</strong></p>
+                            <ul class="text-sm space-y-1 ml-4 mt-2">
+                                <li>1. <code class="bg-slate-800 px-1 rounded">e.preventDefault()</code> stops page refresh</li>
+                                <li>2. Collect data from form fields</li>
+                                <li>3. Check for ID - if exists, update; if not, create</li>
+                                <li>4. Call appropriate API function</li>
+                                <li>5. Close modal and refresh table display</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-purple-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-purple-300 mb-4">3. Table Rendering (Displaying Data)</h4>
+                            <p class="mb-3">This function fetches post data and displays it in a table:</p>
+                            
+                            <div class="code-example">
+                                <pre><code>async function renderMicroblogTable() {
+  const container = document.getElementById('microblog-playground');
+  
+  try {
+    // Fetch data from API
+    const data = await fetchPosts();
+    
+    // Build table HTML
+    let tableHTML = '&lt;table id="microblog-table"&gt;...';
+    data.microblogs.forEach(post => {
+      tableHTML += `&lt;tr&gt;
+        &lt;td&gt;${post.userName}&lt;/td&gt;
+        &lt;td&gt;${post.content}&lt;/td&gt;
+      &lt;/tr&gt;`;
+    });
+    tableHTML += '&lt;/table&gt;';
+    
+    // Display table
+    container.innerHTML = tableHTML;
+    
+    // Add interactive features
+    $('#microblog-table').DataTable();
+  } catch (error) {
+    container.innerHTML = `&lt;div style="color:red;"&gt;Error: ${error.message}&lt;/div&gt;`;
+  }
+}</code></pre>
+                            </div>
+                            
+                            <p class="text-sm mt-3"><strong>Why this matters:</strong> The table rebuilds from scratch every time data changes, ensuring the UI always matches current data.</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(4)" class="w-full bg-green-600 hover:bg-green-700 py-4 rounded-lg font-semibold text-lg">Try the Demo</button>
+            </div>
+        </div>
+
+        <div id="section-4" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">🎮 Interactive Microblog Demo</h2>
+                    <div class="space-y-4 text-lg">
+                        <p>Click the button below to open an interactive demonstration of a microblog panel. This shows how all the layers work together!</p>
+                        
+                        <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-blue-300 mb-3">What You Can Do:</h4>
+                            <ul class="space-y-2">
+                                <li>• Open and close the sliding panel</li>
+                                <li>• See the responsive design in action</li>
+                                <li>• Interact with form elements</li>
+                                <li>• Experience the user flow</li>
+                            </ul>
+                        </div>
+
+                        <button id="demo-toggle-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-lg font-semibold text-lg">
+                            💬 Open Microblog Demo
+                        </button>
+                    </div>
+                </div>
+                <button onclick="goToSection(5)" class="w-full bg-green-600 hover:bg-green-700 py-4 rounded-lg font-semibold text-lg">Take the Quiz</button>
+            </div>
+        </div>
+
+        <div id="section-5" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">🏆 Knowledge Check</h2>
+                    
+                    <div class="question-block mb-6" id="question1">
+                        <h3 class="text-xl mb-4">Question 1: Which of the following actions demonstrates using an AI API?</h3>
+                        <div class="space-y-2">
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'A', false)">A) Copy and paste text to move your essay</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'B', false)">B) Build a snake game by coding yourself</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'C', false)">C) Using a phone to take pictures for your friends</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'D', true)">D) Using the customer service chatbot on a house renting website</button>
+                        </div>
+                        <div id="feedback1" class="feedback mt-3 p-3 rounded-lg"></div>
+                    </div>
+
+                    <div class="question-block mb-6" id="question2">
+                        <h3 class="text-xl mb-4">Question 2: In the microblog architecture, which layer handles user interactions like opening/closing the panel and posting messages?</h3>
+                        <div class="space-y-2">
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'A', false)">A) Layout Layer</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'B', true)">B) JavaScript/UI Layer</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'C', false)">C) Backend/API Layer</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'D', false)">D) Database Layer</button>
+                        </div>
+                        <div id="feedback2" class="feedback mt-3 p-3 rounded-lg"></div>
+                    </div>
+
+                    <div class="question-block mb-6" id="question3">
+                        <h3 class="text-xl mb-4">Question 3: What is the purpose of calling <code>e.preventDefault()</code> in a form submission handler?</h3>
+                        <div class="space-y-2">
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'A', false)">A) To validate the form data</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'B', false)">B) To send data to the API</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'C', true)">C) To stop the page from refreshing (default behavior)</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'D', false)">D) To close the modal window</button>
+                        </div>
+                        <div id="feedback3" class="feedback mt-3 p-3 rounded-lg"></div>
+                    </div>
+
+                    <div id="score-container" class="section-hidden text-center">
+                        <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-8">
+                            <h3 class="text-3xl font-bold text-yellow-400 mb-4">🎉 Quiz Complete!</h3>
+                            <p id="final-score" class="text-2xl mb-4"></p>
+                            <div class="bg-slate-900/70 p-6 rounded mb-4">
+                                <p class="text-lg font-semibold text-green-400">Badge Earned: API Builder 🏆</p>
+                                <p class="text-sm text-gray-300 mt-2">You've mastered the fundamentals of AI APIs!</p>
+                            </div>
+                            <div id="code-reveal" class="section-hidden mb-4">
+                                <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-6">
+                                    <p class="text-xl font-bold text-green-400 mb-2">🔑 Your Code Number: 1</p>
+                                    <p class="text-sm text-gray-300">Remember this number! You'll need it along with the other module codes to unlock the final challenge.</p>
+                                </div>
+                            </div>
+                            <div id="retry-message" class="section-hidden mb-4">
+                                <div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-6">
+                                    <p class="text-xl font-bold text-red-400 mb-2">⚠️ Try Again!</p>
+                                    <p class="text-sm text-gray-300">You need to get all questions correct to receive your code for the final challenge.</p>
+                                </div>
+                            </div>
+                            <button onclick="resetQuiz()" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-semibold">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let questionsAnswered = 0;
+        const totalQuestions = 3;
+
+        function goToSection(n) {
+            document.querySelectorAll('.mission-section').forEach(s => s.classList.add('section-hidden'));
+            document.getElementById('section-' + n).classList.remove('section-hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-green-600');
+                b.classList.add('bg-slate-700/50');
+            });
+            document.querySelector('.nav-btn[data-section="' + n + '"]').classList.add('bg-green-600');
+            window.scrollTo(0, 0);
+        }
+
+        function checkAnswer(questionNum, selectedOption, isCorrect) {
+            const feedbackDiv = document.getElementById('feedback' + questionNum);
+            const buttons = document.querySelectorAll('#question' + questionNum + ' .option-btn');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            event.target.classList.add(isCorrect ? 'bg-green-600' : 'bg-red-600');
+
+            if (isCorrect) {
+                feedbackDiv.textContent = '✅ Correct! Great job!';
+                feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg bg-green-900/30 border border-green-500/50 text-green-300';
+                score++;
+            } else {
+                const correctAnswers = { 1: 'D', 2: 'B', 3: 'C' };
+                buttons.forEach(btn => {
+                    if (btn.textContent.startsWith(correctAnswers[questionNum] + ')')) {
+                        btn.classList.add('bg-green-600');
+                    }
+                });
+                feedbackDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300';
+            }
+
+            questionsAnswered++;
+
+            if (questionsAnswered === totalQuestions) {
+                setTimeout(() => {
+                    document.querySelectorAll('.question-block').forEach(block => block.style.display = 'none');
+                    document.getElementById('score-container').classList.remove('section-hidden');
+                    document.getElementById('final-score').textContent = `You scored ${score} out of ${totalQuestions}!`;
+
+                    if (score === totalQuestions) {
+                        document.getElementById('code-reveal').classList.remove('section-hidden');
+                    } else {
+                        document.getElementById('retry-message').classList.remove('section-hidden');
+                    }
+                }, 1500);
+            }
+        }
+
+        function resetQuiz() {
+            score = 0;
+            questionsAnswered = 0;
+
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.style.display = 'block';
+            });
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('bg-green-600', 'bg-red-600');
+            });
+
+            document.querySelectorAll('.feedback').forEach(feedback => {
+                feedback.textContent = '';
+                feedback.className = 'feedback mt-3 p-3 rounded-lg';
+            });
+
+            document.getElementById('score-container').classList.add('section-hidden');
+            document.getElementById('code-reveal').classList.add('section-hidden');
+            document.getElementById('retry-message').classList.add('section-hidden');
+        }
+
+        // Demo button functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const demoBtn = document.getElementById('demo-toggle-btn');
+            if (demoBtn) {
+                demoBtn.addEventListener('click', () => {
+                    alert('Demo feature: This would open the microblog panel. The actual implementation is available on pages with microblog: true enabled.');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

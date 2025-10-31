@@ -1,7 +1,7 @@
 ---
 layout: cs-portfolio-lesson
-title: "Prompt Engineering"
-description: "Master the art of specific prompts by including context, the problem, what you've tried, and desired outcomes. Practice iterative refinement to get better AI responses."
+title: "Coding with AI"
+description: "Practice writing SPEC prompts for code generation, debugging, and security best practices to get the most accurate AI-generated code."
 permalink: /cs-portfolio-quest/ai/submodule_2/
 parent: "AI Usage"
 team: "Thinkers"
@@ -11,451 +11,1216 @@ tags: [ai, submodule, thinkers]
 author: "Thinkers Team"
 date: 2025-10-21
 ---
-
-## Module 2: Prompt Engineering
-
-### Real Talk on Prompts
-
-Most students waste time with vague prompts. Winners get specific. The difference between a useless AI response and one that actually solves your problem comes down to how you ask.
-
 <style>
-  .prompt-container {
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 8px;
-  }
-  
-  .comparison-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin: 20px 0;
-  }
-  
-  .bad-prompt {
-    background: #ffe0e0;
-    border-left: 4px solid #ff4444;
-    padding: 20px;
-    border-radius: 8px;
-    color: #000;
-  }
-  
-  .bad-prompt h4 {
-    color: #c41e3a;
-  }
-  
-  .good-prompt {
-    background: #e0f7fa;
-    border-left: 4px solid #00bcd4;
-    padding: 20px;
-    border-radius: 8px;
-    color: #000;
-  }
-  
-  .good-prompt h4 {
-    color: #00838f;
-  }
-  
-  .component-box {
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px 0;
-  }
-  
-  .iteration-step {
-    background: #e9ecef;
-    border-left: 4px solid #6c757d;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 4px;
-  }
-  
-  .practice-textarea {
-    width: 100%;
-    min-height: 120px;
-    padding: 12px;
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    resize: vertical;
-    margin: 10px 0;
-  }
-  
-  .status-box {
-    padding: 12px;
-    border-radius: 8px;
-    margin: 15px 0;
-    display: none;
-  }
-  
-  @media (max-width: 768px) {
-    .comparison-box {
-      grid-template-columns: 1fr;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-  }
+    .comic-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+        position: relative;
+    }
+    .comic-header {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeIn 1s ease-in;
+    }
+    .comic-header h1 {
+        font-size: 48px;
+        color: #FFD700;
+        text-shadow: 3px 3px 0px #FF6B6B, 6px 6px 0px #4ECDC4;
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .comic-header p {
+        font-size: 18px;
+        color: #333;
+        font-style: italic;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .comic-page {
+        display: none;
+        animation: slideIn 0.5s ease-out;
+        min-height: 600px;
+    }
+    .comic-page.active {
+        display: block;
+    }
+    .comic-panel {
+        background: #fff;
+        border: 5px solid #000;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px 0;
+        box-shadow: 8px 8px 0px rgba(0,0,0,0.3);
+        position: relative;
+    }
+    .comic-panel::before {
+        content: '';
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        width: 30px;
+        height: 30px;
+        background: #FFD700;
+        border-radius: 50%;
+        border: 3px solid #000;
+    }
+    .speech-bubble {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 15px 0;
+        position: relative;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+    }
+    .speech-bubble.bad {
+        background: #ffe0e0;
+        border-color: #ff4444;
+    }
+    .speech-bubble.good {
+        background: #e0f7fa;
+        border-color: #00bcd4;
+    }
+    .speech-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        left: 30px;
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 0px solid transparent;
+        border-top: 20px solid #000;
+    }
+    .speech-bubble.bad::after {
+        border-top-color: #ff4444;
+    }
+    .speech-bubble.good::after {
+        border-top-color: #00bcd4;
+    }
+    .speech-bubble h3 {
+        color: #000;
+        margin-bottom: 10px;
+        font-size: 24px;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .speech-bubble p {
+        color: #000;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+    .spec-builder {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 4px solid #000;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        color: #fff;
+    }
+    .spec-builder h3 {
+        color: #FFD700;
+        font-size: 28px;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .spec-section {
+        background: rgba(255,255,255,0.1);
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    .spec-section h4 {
+        color: #FFD700;
+        font-size: 20px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .spec-section h4:hover {
+        color: #FFF;
+    }
+    .spec-content {
+        margin-top: 10px;
+    }
+    .spec-builder label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    .spec-builder input[type="text"],
+    .spec-builder textarea,
+    .spec-builder select {
+        width: 100%;
+        padding: 12px;
+        border: 3px solid #000;
+        border-radius: 10px;
+        font-family: 'Comic Sans MS', cursive;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    .spec-builder textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+    .completeness-meter {
+        background: #e0e0e0;
+        border: 3px solid #000;
+        border-radius: 20px;
+        height: 30px;
+        margin: 15px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .completeness-fill {
+        background: linear-gradient(90deg, #ff4444 0%, #ffa500 50%, #28a745 100%);
+        height: 100%;
+        width: 0%;
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 10px;
+        color: #fff;
+        font-weight: bold;
+    }
+    .code-example {
+        background: #f5f5f5;
+        border: 3px solid #000;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+        font-family: monospace;
+        overflow-x: auto;
+    }
+    .code-example.bad {
+        border-color: #ff4444;
+        background: #ffe0e0;
+    }
+    .code-example.good {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+    .debug-template {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+    }
+    .debug-template h4 {
+        color: #667eea;
+        font-size: 20px;
+        margin-bottom: 15px;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .debug-step {
+        margin: 15px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-left: 5px solid #667eea;
+        border-radius: 5px;
+    }
+    .debug-step strong {
+        color: #000;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+    .security-checklist {
+        background: #fff;
+        border: 4px solid #dc3545;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+    }
+    .security-checklist h4 {
+        color: #dc3545;
+        font-size: 24px;
+        margin-bottom: 20px;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .security-item {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .security-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    .security-item.found {
+        background: #d4edda;
+        border-color: #28a745;
+    }
+    .security-item.missed {
+        background: #f8d7da;
+        border-color: #dc3545;
+    }
+    .security-item h5 {
+        color: #000;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .bug-hunter {
+        background: #fff;
+        border: 3px solid #000;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .code-line {
+        padding: 8px 12px;
+        margin: 2px 0;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+        font-family: monospace;
+        transition: all 0.2s ease;
+        border-radius: 3px;
+    }
+    .code-line:hover {
+        background: #f0f0f0;
+    }
+    .code-line.vulnerable {
+        border-left-color: #ffc107;
+    }
+    .code-line.clicked-correct {
+        background: #d4edda;
+        border-left-color: #28a745;
+    }
+    .code-line.clicked-wrong {
+        background: #f8d7da;
+        border-left-color: #dc3545;
+    }
+    .score-display {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        border: 3px solid #000;
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: #000;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+    }
+    .submit-area {
+        background: #fff3cd;
+        border: 4px dashed #ffc107;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+    }
+    .submit-area h3 {
+        color: #856404;
+        margin-bottom: 15px;
+        font-size: 24px;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .submit-area textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 15px;
+        border: 3px solid #000;
+        border-radius: 10px;
+        font-family: 'Comic Sans MS', cursive;
+        font-size: 14px;
+        margin: 10px 0;
+        resize: vertical;
+    }
+    .action-button {
+        background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+        color: #fff;
+        border: 3px solid #000;
+        border-radius: 25px;
+        padding: 12px 25px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        font-family: 'Comic Sans MS', cursive;
+        margin: 5px;
+    }
+    .action-button:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+    }
+    .action-button:active {
+        transform: translate(1px, 1px);
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    }
+    .status-box {
+        background: #d4edda;
+        border: 3px solid #28a745;
+        border-radius: 15px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #155724;
+        font-weight: bold;
+        display: none;
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+    }
+    .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        padding: 20px;
+    }
+    .nav-button {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        color: #fff;
+        border: 4px solid #000;
+        border-radius: 50px;
+        padding: 15px 40px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        font-family: 'Comic Sans MS', cursive;
+        text-transform: uppercase;
+    }
+    .nav-button:hover:not(:disabled) {
+        transform: translate(-2px, -2px);
+        box-shadow: 7px 7px 0px rgba(0,0,0,0.3);
+    }
+    .nav-button:active:not(:disabled) {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    }
+    .nav-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .page-indicator {
+        background: #FFD700;
+        color: #000;
+        border: 3px solid #000;
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+        font-family: 'Comic Sans MS', cursive;
+    }
+    .example-toggle {
+        background: #ffc107;
+        color: #000;
+        border: 2px solid #000;
+        border-radius: 15px;
+        padding: 8px 15px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 10px 0;
+        display: inline-block;
+    }
+    .example-toggle:hover {
+        background: #ffca28;
+    }
+    .example-content {
+        display: none;
+        background: rgba(255,255,255,0.2);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+    @media (max-width: 768px) {
+        .comparison-grid {
+            grid-template-columns: 1fr;
+        }
+        .comic-header h1 {
+            font-size: 32px;
+        }
+        .nav-button {
+            padding: 12px 25px;
+            font-size: 16px;
+        }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes slideIn {
+        from { 
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    .pow-effect {
+        display: inline-block;
+        animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    /* Dark theme overrides */
+    .post-content .comic-container h1,
+    .post-content .comic-container h2,
+    .post-content .comic-container h3,
+    .post-content .comic-container h4,
+    .post-content .comic-container h5,
+    .post-content .comic-container p,
+    .post-content .comic-container li,
+    .post-content .comic-container a,
+    .post-content .comic-container .speech-bubble h3,
+    .post-content .comic-container .speech-bubble p,
+    .post-content .comic-container .code-example,
+    .post-content .comic-container .comic-panel,
+    .post-content .comic-container .debug-template {
+        color: #000 !important;
+    }
+    .post-content .comic-container .comic-panel,
+    .post-content .comic-container .code-example,
+    .post-content .comic-container .submit-area,
+    .post-content .comic-container .debug-template,
+    .post-content .comic-container .bug-hunter,
+    .post-content .comic-container .security-checklist {
+        background-color: #fff !important;
+        border-color: #000 !important;
+        color: #000 !important;
+    }
+    .post-content .comic-container .comic-header h1 {
+        color: #FFD700 !important;
+        text-shadow: 3px 3px 0px #FF6B6B, 6px 6px 0px #4ECDC4 !important;
+    }
+    .post-content .comic-container code,
+    .post-content .comic-container pre,
+    .post-content .comic-container kbd,
+    .post-content .comic-container samp {
+        background-color: #f5f5f5 !important;
+        color: #111 !important;
+        padding: 2px 6px !important;
+        border-radius: 6px !important;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+        font-family: monospace !important;
+        font-size: 0.95em !important;
+    }
+    .post-content .comic-container pre {
+        padding: 12px !important;
+        overflow: auto !important;
+    }
+    .post-content #lesson-container .prose .comic-container select,
+    .post-content #lesson-container .prose .comic-container input,
+    .post-content #lesson-container .prose .comic-container textarea,
+    .post-content #lesson-container .prose .comic-container option,
+    .post-content #lesson-container .prose .comic-container .spec-builder select,
+    .post-content #lesson-container .prose .comic-container .spec-builder input,
+    .post-content #lesson-container .prose .comic-container .spec-builder textarea {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border-color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+    }
+    .post-content #lesson-container .prose .comic-container input::placeholder,
+    .post-content #lesson-container .prose .comic-container textarea::placeholder {
+        color: #6c6c6c !important;
+        opacity: 1 !important;
+    }
+    .post-content #lesson-container .prose .comic-container label {
+        color: #fff !important;
+    }
+    .post-content #lesson-container .prose .comic-container option {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
 </style>
 
-<div class="prompt-container">
-
-## The Difference Between Bad and Good Prompts
-
-<div class="comparison-box">
-  <div class="bad-prompt">
-    <h4>❌ Bad Prompt:</h4>
-    <p><em>"Help me with my code"</em></p>
-    <p><strong>Why it fails:</strong> No context, no specifics, no code shown. AI has to guess everything.</p>
-  </div>
-  
-  <div class="good-prompt">
-    <h4>✅ Good Prompt:</h4>
-    <p><em>"I'm getting a 404 error in my Flask app when trying to POST to /api/login. The route exists and works in Postman but fails from my React frontend. Here's the fetch call: [code]. Here's my Flask route: [code]. What's the likely issue?"</em></p>
-    <p><strong>Why it works:</strong> Specific error, tools mentioned, code provided, clear problem statement.</p>
-  </div>
-</div>
-
----
-
-## The 4 Components Every Prompt Needs
-
-<div class="component-box">
-  <h4>1. 📋 Context</h4>
-  <p><strong>What you're working on and with what tools</strong></p>
-  <ul>
-    <li>"I'm building a Flask backend with React frontend"</li>
-    <li>"Using Python 3.11 with SQLite database"</li>
-    <li>"Working on authentication for a student portfolio site"</li>
-  </ul>
-</div>
-
-<div class="component-box">
-  <h4>2. 🔍 Problem</h4>
-  <p><strong>Specific issue you're facing</strong></p>
-  <ul>
-    <li>Not: "It doesn't work"</li>
-    <li>Yes: "Getting 'CORS policy' error when frontend tries to fetch from backend"</li>
-    <li>Include error messages, unexpected behavior, or what's different from expected</li>
-  </ul>
-</div>
-
-<div class="component-box">
-  <h4>3. 🔧 What You've Tried</h4>
-  <p><strong>Failed attempts (shows you're not being lazy)</strong></p>
-  <ul>
-    <li>"I tried adding CORS headers but still getting blocked"</li>
-    <li>"Checked the Flask route - it returns 200 in Postman"</li>
-    <li>"Frontend console shows the request never completes"</li>
-  </ul>
-</div>
-
-<div class="component-box">
-  <h4>4. 🎯 Desired Outcome</h4>
-  <p><strong>What success looks like</strong></p>
-  <ul>
-    <li>"Need the POST request to successfully reach Flask and return user data"</li>
-    <li>"Want to understand why CORS is blocking and how to fix it properly"</li>
-    <li>"Should work like it does in Postman but from the browser"</li>
-  </ul>
-</div>
-
----
-
-## Iterative Refinement In Practice
-
-**Most students give up after one bad AI response. Winners iterate.**
-
-<div class="iteration-step">
-  <strong>Round 1 - Generic Prompt:</strong><br>
-  <em>You: "Explain how JWT authentication works in Flask"</em><br>
-  <span style="color: #6c757d;">AI: [Generic explanation about JWTs and basic Flask setup]</span>
-</div>
-
-<div class="iteration-step">
-  <strong>Round 2 - Add Context:</strong><br>
-  <em>You: "I need to implement JWT auth that persists across page refreshes in a Github Pages + Flask app. Show me the Flask backend token generation and the Github Pages frontend token storage/usage."</em><br>
-  <span style="color: #0c5460;">AI: [Much more useful - specific code for your stack]</span>
-</div>
-
-<div class="iteration-step">
-  <strong>Round 3 - Refine Based on Response:</strong><br>
-  <em>You: "This token expires in 15 min. How do I implement refresh tokens to keep users logged in longer?"</em><br>
-  <span style="color: #155724;">AI: [Exactly what you needed - refresh token implementation]</span>
-</div>
-
----
-
-### Practice Exercise (15 min)
-
-**Take a problem you're currently stuck on. Write 3 progressively better prompts, each adding more specificity based on what's missing.**
-
-<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0; border-radius: 4px;">
-  <strong>📝 Your Turn:</strong> Use the text areas below to practice iterative prompt refinement. Start vague, then improve with each version.
-</div>
-
-<label for="prompt-v1"><strong>Version 1 - Initial Prompt (Probably Too Vague):</strong></label>
-<textarea id="prompt-v1" class="practice-textarea" placeholder="Start with your first attempt at describing your problem..."></textarea>
-
-<label for="prompt-v2"><strong>Version 2 - Add Context & Specifics:</strong></label>
-<textarea id="prompt-v2" class="practice-textarea" placeholder="Improve your prompt by adding: What tools are you using? What exactly is the error? What have you tried?"></textarea>
-
-<label for="prompt-v3"><strong>Version 3 - The Killer Prompt:</strong></label>
-<textarea id="prompt-v3" class="practice-textarea" placeholder="Final version: Include context, specific problem, what you tried, desired outcome, and any relevant code snippets"></textarea>
-
-<div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-  <button class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition" onclick="savePromptExercise()">
-    💾 Save Progress
-  </button>
-  <button class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition" onclick="loadPromptExercise()">
-    📂 Load Saved Work
-  </button>
-  <button class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition" onclick="analyzePrompts()">
-    🔍 Analyze My Prompts
-  </button>
-  <button class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition" onclick="testModePrompts()">
-    🧪 Test Mode
-  </button>
-</div>
-
-<div id="prompt-status" class="status-box"></div>
-<div id="analysis-result" class="status-box"></div>
-
----
-
-### Real-World Example: Debugging a Flask API
-
-**Scenario:** Your Flask API works in Postman but fails from your React frontend.
-
-<details style="background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #dee2e6;">
-  <summary style="cursor: pointer; font-weight: bold; color: #007bff;">Click to see the progression from bad → good prompt</summary>
-  
-  <div style="margin-top: 15px;">
-    <div style="background: #f8d7da; padding: 15px; margin: 10px 0; border-radius: 6px;">
-      <strong>❌ Attempt 1 (Useless):</strong><br>
-      "My API doesn't work"
+<div class="comic-container">
+    <div class="comic-header">
+        <h1 class="pow-effect">CODING WITH AI!</h1>
+        <p style="color: #f3f3f3 !important; font-style: italic;">Generate better code with SPEC, debug efficiently, and stay secure</p>
     </div>
-    
-    <div style="background: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 6px;">
-      <strong>⚠️ Attempt 2 (Better but still vague):</strong><br>
-      "I'm getting an error when I call my Flask API from React"
+
+    <!-- PAGE 1: The SPEC Framework -->
+    <div class="comic-page active" id="page-1">
+      <img src="{{site.baseurl}}/images/docx/Quests_QuestOfCode-AIUsage-Thinkers_image4.png" height="625">
+        <div class="comic-panel">
+            <h2 style="color: #000; font-size: 32px; margin-bottom: 20px;">Comic Strip 1: The SPEC Framework</h2>
+            <p style="color: #000; font-size: 18px; line-height: 1.8;">
+                Vague prompts get you vague code. Use <strong>SPEC</strong> to generate exactly what you need:
+            </p>
+            <ul style="color: #000; margin: 20px 0; padding-left: 20px;">
+                <li><strong>S</strong>pecific: What exactly should it do?</li>
+                <li><strong>P</strong>latform: What language/version/libraries?</li>
+                <li><strong>E</strong>xamples: Show input/output samples</li>
+                <li><strong>C</strong>onstraints: What are the rules and limits?</li>
+            </ul>
+        </div>
+
+        <div class="comparison-grid">
+            <div class="speech-bubble bad">
+                <h3>Bad Prompt</h3>
+                <p><em>"Write a login function"</em></p>
+                <p style="margin-top: 15px;"><strong>Result:</strong> Generic code that doesn't fit your needs</p>
+            </div>
+            <div class="speech-bubble good">
+                <h3>Good SPEC Prompt</h3>
+                <p><strong>S:</strong> Validate user registration with username, email, password</p>
+                <p><strong>P:</strong> Python 3.11, only 're' library for regex</p>
+                <p><strong>E:</strong> Input: {'username': 'ab', 'email': 'invalid'} → Output: (False, ['Username too short', 'Invalid email'])</p>
+                <p><strong>C:</strong> Username 3-20 chars, valid email, password 8+ chars with uppercase+lowercase+number</p>
+            </div>
+        </div>
+
+        <div class="spec-builder">
+            <h3>SPEC Builder Interactive</h3>
+            <p style="margin-bottom: 20px;">Build your prompt section by section and watch the completeness score!</p>
+            
+            <div class="completeness-meter">
+                <div class="completeness-fill" id="completeness-fill">0%</div>
+            </div>
+
+            <div class="spec-section">
+                <h4 onclick="toggleSection('specific')">
+                    <span>S - Specific (What exactly?)</span>
+                    <span>▼</span>
+                </h4>
+                <div class="spec-content" id="specific-content">
+                    <button class="example-toggle" onclick="toggleExamples('specific-examples')">Show Examples</button>
+                    <div class="example-content" id="specific-examples">
+                        <p style="color: #fff;">"Validate users" (bad) vs "Validate user registration data including username, email, and password" (good)</p>
+                    </div>
+                    <textarea id="spec-specific" placeholder="Describe exactly what your code should do..." oninput="updateCompleteness()"></textarea>
+                </div>
+            </div>
+
+            <div class="spec-section">
+                <h4 onclick="toggleSection('platform')">
+                    <span>P - Platform (Language/Version/Libraries)</span>
+                    <span>▼</span>
+                </h4>
+                <div class="spec-content" id="platform-content">
+                    <button class="example-toggle" onclick="toggleExamples('platform-examples')">Show Examples</button>
+                    <div class="example-content" id="platform-examples">
+                        <p style="color: #fff;">"Python" (bad) vs "Python 3.11, no external libraries except 're' for regex" (good)</p>
+                    </div>
+                    <textarea id="spec-platform" placeholder="Specify language, version, and allowed libraries..." oninput="updateCompleteness()"></textarea>
+                </div>
+            </div>
+
+            <div class="spec-section">
+                <h4 onclick="toggleSection('examples')">
+                    <span>E - Examples (Input/Output)</span>
+                    <span>▼</span>
+                </h4>
+                <div class="spec-content" id="examples-content">
+                    <button class="example-toggle" onclick="toggleExamples('examples-examples')">Show Examples</button>
+                    <div class="example-content" id="examples-examples">
+                        <p style="color: #fff;">Show concrete test cases: Input: {'username': 'ab'} → Output: (False, ['Username too short (min 3)'])</p>
+                    </div>
+                    <textarea id="spec-examples" placeholder="Provide input/output examples..." oninput="updateCompleteness()"></textarea>
+                </div>
+            </div>
+
+            <div class="spec-section">
+                <h4 onclick="toggleSection('constraints')">
+                    <span>C - Constraints (Rules/Limits)</span>
+                    <span>▼</span>
+                </h4>
+                <div class="spec-content" id="constraints-content">
+                    <button class="example-toggle" onclick="toggleExamples('constraints-examples')">Show Examples</button>
+                    <div class="example-content" id="constraints-examples">
+                        <p style="color: #fff;">Define all validation rules: Username 3-20 chars alphanumeric, Email standard format, Password 8+ with upper+lower+number</p>
+                    </div>
+                    <textarea id="spec-constraints" placeholder="List all constraints and validation rules..." oninput="updateCompleteness()"></textarea>
+                </div>
+            </div>
+
+            <button class="action-button" onclick="generatePrompt()">Generate Complete Prompt</button>
+            <div id="generated-prompt" style="display:none; background: #fff; color: #000; padding: 20px; border-radius: 10px; margin-top: 15px; border: 3px dashed #FFD700;">
+                <h4 style="color: #667eea;">Your Complete SPEC Prompt:</h4>
+                <pre id="prompt-output" style="white-space: pre-wrap; font-family: monospace; color: #000; background: transparent; border: none;"></pre>
+                <button class="action-button" onclick="copyPrompt()">Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <h3>Submit Your SPEC Prompt</h3>
+            <p style="color: #000; margin-bottom: 15px;">Use the SPEC framework to write a prompt for code you actually need. Fill out all 4 sections.</p>
+            <textarea id="submit-prompt-1" placeholder="Write your complete SPEC prompt here..."></textarea>
+            <button class="action-button" onclick="saveSubmission(1)">Save Submission</button>
+            <button class="action-button" onclick="loadExample(1)">Load Example</button>
+            <div id="status-1" class="status-box"></div>
+        </div>
     </div>
-    
-    <div style="background: #d1ecf1; padding: 15px; margin: 10px 0; border-radius: 6px;">
-      <strong>✅ Attempt 3 (Getting there):</strong><br>
-      "My Flask /api/login route returns 404 when called from React fetch() but works in Postman. Using Flask-CORS."
+
+    <!-- PAGE 2: Debug Like You Mean It -->
+    <div class="comic-page" id="page-2">
+      <img src="{{site.baseurl}}/images/docx/Quests_QuestOfCode-AIUsage-Thinkers_image6.png" height="625">
+        <div class="comic-panel">
+            <h2 style="color: #000; font-size: 32px; margin-bottom: 20px;">Comic Strip 2: Debug Like You Mean It</h2>
+            <p style="color: #000; font-size: 18px; margin-bottom: 20px;">
+                AI can help debug, but only if you give it what it needs. Use the <strong>4-Step Template</strong>:
+            </p>
+        </div>
+
+        <div class="debug-template">
+            <h4>4-Step Debugging Template</h4>
+            <div class="debug-step">
+                <strong>1. Problem (One specific sentence)</strong>
+                <p style="color: #666;">"It's broken" (bad) vs "Function returns None instead of calculated average" (good)</p>
+            </div>
+            <div class="debug-step">
+                <strong>2. Expected vs Actual</strong>
+                <p style="color: #666;">Expected: Returns float average of list<br>Actual: Returns None</p>
+            </div>
+            <div class="debug-step">
+                <strong>3. Minimal Code (Only relevant parts)</strong>
+                <p style="color: #666;">Just the function + test case, not 500 lines of unrelated code</p>
+            </div>
+            <div class="debug-step">
+                <strong>4. What You Tried</strong>
+                <p style="color: #666;">Checked if list is empty<br>Added print statements<br>Tested with simple data</p>
+            </div>
+        </div>
+
+        <div class="comic-panel">
+            <h3 style="color: #000; font-size: 24px; margin-bottom: 15px;">Debug Template Builder</h3>
+            <p style="color: #000; margin-bottom: 15px;">Fill out the 4-step template for your debugging challenge:</p>
+            
+            <label style="color: #000; font-weight: bold; display: block; margin-top: 20px;">1. Problem Statement:</label>
+            <input type="text" id="debug-problem" placeholder="One specific sentence about what's wrong..." style="width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #667eea; border-radius: 8px;">
+            
+            <label style="color: #000; font-weight: bold; display: block; margin-top: 15px;">2. Expected vs Actual:</label>
+            <textarea id="debug-expected" placeholder="Expected: [what should happen]&#10;Actual: [what's happening]" style="width: 100%; min-height: 80px; padding: 10px; margin: 10px 0; border: 2px solid #667eea; border-radius: 8px;"></textarea>
+            
+            <label style="color: #000; font-weight: bold; display: block; margin-top: 15px;">3. Minimal Code:</label>
+            <textarea id="debug-code" placeholder="Paste only the relevant function/code..." style="width: 100%; min-height: 100px; padding: 10px; margin: 10px 0; border: 2px solid #667eea; border-radius: 8px; font-family: monospace;"></textarea>
+            
+            <label style="color: #000; font-weight: bold; display: block; margin-top: 15px;">4. What You Tried:</label>
+            <textarea id="debug-tried" placeholder="List everything you've tried..." style="width: 100%; min-height: 80px; padding: 10px; margin: 10px 0; border: 2px solid #667eea; border-radius: 8px;"></textarea>
+            
+            <button class="action-button" onclick="analyzeDebugPrompt()">Analyze My Debug Prompt</button>
+            <div id="debug-feedback" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: none;">
+                <h4 style="color: #000;">Feedback:</h4>
+                <div id="debug-feedback-content" style="color: #000;"></div>
+            </div>
+        </div>
+
+        <div class="submit-area">
+            <h3>Submit Your Debug Prompt</h3>
+            <p style="color: #000; margin-bottom: 15px;">Use the 4-step template to debug actual code you're stuck on. Fill out all 4 sections.</p>
+            <textarea id="submit-prompt-2" placeholder="Write your complete debug prompt here..."></textarea>
+            <button class="action-button" onclick="saveSubmission(2)">Save Submission</button>
+            <button class="action-button" onclick="loadExample(2)">Load Example</button>
+            <div id="status-2" class="status-box"></div>
+        </div>
     </div>
-    
-    <div style="background: #d4edda; padding: 15px; margin: 10px 0; border-radius: 6px;">
-      <strong>🎯 Attempt 4 (Perfect):</strong><br>
-      "I'm building a Flask backend (localhost:5001) with React frontend (localhost:3000). The POST request to /api/login works in Postman but returns 404 from React. I've installed Flask-CORS and added CORS(app) to my Flask app. Here's my Flask route: <code>[route code]</code>. Here's my React fetch: <code>[fetch code]</code>. Browser console shows: 'Failed to fetch'. What's causing the CORS/routing issue?"
+
+    <!-- PAGE 3: Security - The 5 Non-Negotiables -->
+    <div class="comic-page" id="page-3">
+        <div class="comic-panel">
+            <h2 style="color: #000; font-size: 32px; margin-bottom: 20px;">Comic Strip 3: Security - The 5 Non-Negotiables</h2>
+            <p style="color: #000; font-size: 18px; margin-bottom: 20px;">
+                AI generates code fast. But it also generates vulnerabilities. <strong>Run these 5 checks EVERY TIME:</strong>
+            </p>
+        </div>
+
+        <div class="security-checklist">
+            <h4>The 5 Security Checks</h4>
+            
+            <div class="security-item" onclick="showSecurityDetails(1)">
+                <h5>1. SQL Injection - Use Parameterized Queries</h5>
+                <div class="comparison-grid" style="margin-top: 10px;">
+                    <div class="code-example bad">
+                        <strong>Vulnerable:</strong><br>
+                        <code>f"SELECT * FROM users WHERE name = '{username}'"</code>
+                    </div>
+                    <div class="code-example good">
+                        <strong>Safe:</strong><br>
+                        <code>cursor.execute("SELECT * FROM users WHERE name = ?", (username,))</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-item" onclick="showSecurityDetails(2)">
+                <h5>2. Hardcoded Secrets - Use Environment Variables</h5>
+                <div class="comparison-grid" style="margin-top: 10px;">
+                    <div class="code-example bad">
+                        <strong>Vulnerable:</strong><br>
+                        <code>API_KEY = "sk_live_1234abcd"</code>
+                    </div>
+                    <div class="code-example good">
+                        <strong>Safe:</strong><br>
+                        <code>API_KEY = os.getenv("API_KEY")</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-item" onclick="showSecurityDetails(3)">
+                <h5>3. Input Validation - Never Trust User Input</h5>
+                <div class="comparison-grid" style="margin-top: 10px;">
+                    <div class="code-example bad">
+                        <strong>Vulnerable:</strong><br>
+                        <code>email = request.form['email']<br># immediately use it</code>
+                    </div>
+                    <div class="code-example good">
+                        <strong>Safe:</strong><br>
+                        <code>email = request.form['email']<br>if validate_email(email):<br>&nbsp;&nbsp;# then use it</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-item" onclick="showSecurityDetails(4)">
+                <h5>4. XSS Protection - Escape Output, Sanitize HTML</h5>
+                <div class="comparison-grid" style="margin-top: 10px;">
+                    <div class="code-example bad">
+                        <strong>Vulnerable:</strong><br>
+                        <code>f"&lt;div&gt;{user_comment}&lt;/div&gt;"</code>
+                    </div>
+                    <div class="code-example good">
+                        <strong>Safe:</strong><br>
+                        <code>f"&lt;div&gt;{escape(user_comment)}&lt;/div&gt;"</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-item" onclick="showSecurityDetails(5)">
+                <h5>5. Auth/Authorization - Verify Who Can Access What</h5>
+                <div class="comparison-grid" style="margin-top: 10px;">
+                    <div class="code-example bad">
+                        <strong>Vulnerable:</strong><br>
+                        <code>@app.route('/admin')<br>def admin():<br>&nbsp;&nbsp;# no checks</code>
+                    </div>
+                    <div class="code-example good">
+                        <strong>Safe:</strong><br>
+                        <code>@app.route('/admin')<br>@login_required<br>@admin_required<br>def admin():</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bug-hunter">
+            <h3 style="color: #000; font-size: 24px; margin-bottom: 15px;">Security Bug Hunter Game</h3>
+            <p style="color: #000; margin-bottom: 15px;">Click on lines you think are vulnerable. Find all 5 security issues!</p>
+            
+            <div class="score-display" id="bug-score">Found: 0/5 vulnerabilities</div>
+            
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; border: 2px solid #000;">
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 1)">1: from flask import Flask, request</div>
+                <div class="code-line" data-vulnerable="true" data-vuln-type="hardcoded-secret" onclick="checkVulnerability(this, 2)">2: API_KEY = "sk_live_abc123xyz"  # API key for payments</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 3)">3: app = Flask(__name__)</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 4)">4: </div>
+                <div class="code-line" data-vulnerable="true" data-vuln-type="no-auth" onclick="checkVulnerability(this, 5)">5: @app.route('/admin/delete_user')</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 6)">6: def delete_user():</div>
+                <div class="code-line" data-vulnerable="true" data-vuln-type="no-validation" onclick="checkVulnerability(this, 7)">7: &nbsp;&nbsp;&nbsp;&nbsp;user_id = request.args.get('id')</div>
+                <div class="code-line" data-vulnerable="true" data-vuln-type="sql-injection" onclick="checkVulnerability(this, 8)">8: &nbsp;&nbsp;&nbsp;&nbsp;db.execute(f"DELETE FROM users WHERE id = {user_id}")</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 9)">9: &nbsp;&nbsp;&nbsp;&nbsp;return "User deleted"</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 10)">10: </div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 11)">11: @app.route('/comment')</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 12)">12: def post_comment():</div>
+                <div class="code-line" data-vulnerable="false" onclick="checkVulnerability(this, 13)">13: &nbsp;&nbsp;&nbsp;&nbsp;comment = request.form['comment']</div>
+                <div class="code-line" data-vulnerable="true" data-vuln-type="xss" onclick="checkVulnerability(this, 14)">14: &nbsp;&nbsp;&nbsp;&nbsp;return f"&lt;div&gt;{comment}&lt;/div&gt;"</div>
+            </div>
+            
+            <button class="action-button" onclick="resetBugHunter()" style="margin-top: 15px;">Reset Game</button>
+        </div>
+
+        <div class="submit-area">
+            <h3>Submit Your Security Analysis</h3>
+            <p style="color: #000; margin-bottom: 15px;">Paste code (yours or AI-generated). Run through the 5-point security checklist. List any vulnerabilities you found and how to fix them.</p>
+            <textarea id="submit-prompt-3" placeholder="Paste your code and security analysis here..."></textarea>
+            <button class="action-button" onclick="saveSubmission(3)">Save Submission</button>
+            <button class="action-button" onclick="loadExample(3)">Load Example</button>
+            <div id="status-3" class="status-box"></div>
+        </div>
     </div>
-  </div>
-</details>
 
----
-
-### Key Takeaways
-
-<div style="background: #007bff; color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-  <h4 style="margin-top: 0;">🎯 Remember:</h4>
-  <ul style="margin: 10px 0;">
-    <li><strong>Be specific:</strong> Error messages, tools, what you tried</li>
-    <li><strong>Iterate:</strong> First response bad? Refine your prompt</li>
-    <li><strong>Include code:</strong> Show what you've actually written</li>
-    <li><strong>State the goal:</strong> What does success look like?</li>
-    <li><strong>Don't give up:</strong> Winners ask 3+ times with better prompts each time</li>
-  </ul>
-</div>
-
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changePage(-1)">◄ PREV</button>
+        <div class="page-indicator">
+            <span id="currentPage">1</span> / <span id="totalPages">3</span>
+        </div>
+        <button class="nav-button" id="nextBtn" onclick="changePage(1)">NEXT ►</button>
+    </div>
 </div>
 
 <script>
-// Status message helper
-function showStatus(message, type, elementId = 'prompt-status') {
-    const statusDiv = document.getElementById(elementId);
-    statusDiv.textContent = message;
-    statusDiv.style.display = "block";
+    let currentPage = 1;
+    const totalPages = 3;
+    let bugHunterFound = 0;
+    let bugHunterClicked = new Set();
 
-    switch(type) {
-        case "success":
-            statusDiv.style.backgroundColor = "#d4edda";
-            statusDiv.style.color = "#155724";
-            statusDiv.style.border = "1px solid #c3e6cb";
-            break;
-        case "error":
-            statusDiv.style.backgroundColor = "#f8d7da";
-            statusDiv.style.color = "#721c24";
-            statusDiv.style.border = "1px solid #f5c6cb";
-            break;
-        case "info":
-            statusDiv.style.backgroundColor = "#d1ecf1";
-            statusDiv.style.color = "#0c5460";
-            statusDiv.style.border = "1px solid #bee5eb";
-            break;
-        case "warning":
+    // Navigation
+    function showPage(pageNum) {
+        document.querySelectorAll('.comic-page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.getElementById(`page-${pageNum}`).classList.add('active');
+        document.getElementById('currentPage').textContent = pageNum;
+        document.getElementById('prevBtn').disabled = pageNum === 1;
+        document.getElementById('nextBtn').disabled = pageNum === totalPages;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changePage(direction) {
+        currentPage += direction;
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        showPage(currentPage);
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') changePage(-1);
+        if (e.key === 'ArrowRight') changePage(1);
+    });
+
+    // SPEC Builder Functions
+    function toggleSection(sectionId) {
+        const content = document.getElementById(sectionId + '-content');
+        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleExamples(exampleId) {
+        const examples = document.getElementById(exampleId);
+        examples.style.display = examples.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function updateCompleteness() {
+        const specific = document.getElementById('spec-specific').value.trim();
+        const platform = document.getElementById('spec-platform').value.trim();
+        const examples = document.getElementById('spec-examples').value.trim();
+        const constraints = document.getElementById('spec-constraints').value.trim();
+        
+        let score = 0;
+        if (specific.length > 20) score += 25;
+        if (platform.length > 10) score += 25;
+        if (examples.length > 20) score += 25;
+        if (constraints.length > 20) score += 25;
+        
+        document.getElementById('completeness-fill').style.width = score + '%';
+        document.getElementById('completeness-fill').textContent = score + '%';
+    }
+
+    function generatePrompt() {
+        const specific = document.getElementById('spec-specific').value.trim();
+        const platform = document.getElementById('spec-platform').value.trim();
+        const examples = document.getElementById('spec-examples').value.trim();
+        const constraints = document.getElementById('spec-constraints').value.trim();
+        
+        if (!specific || !platform || !examples || !constraints) {
+            alert('Please fill out all 4 sections of the SPEC framework!');
+            return;
+        }
+        
+        const prompt = `SPECIFIC: ${specific}\n\nPLATFORM: ${platform}\n\nEXAMPLES:\n${examples}\n\nCONSTRAINTS:\n${constraints}`;
+        
+        document.getElementById('prompt-output').textContent = prompt;
+        document.getElementById('generated-prompt').style.display = 'block';
+    }
+
+    function copyPrompt() {
+        const text = document.getElementById('prompt-output').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Prompt copied to clipboard!');
+        });
+    }
+
+    // Debug Template Functions
+    function analyzeDebugPrompt() {
+        const problem = document.getElementById('debug-problem').value.trim();
+        const expected = document.getElementById('debug-expected').value.trim();
+        const code = document.getElementById('debug-code').value.trim();
+        const tried = document.getElementById('debug-tried').value.trim();
+        
+        let feedback = [];
+        let score = 0;
+        
+        if (problem.length > 20) {
+            feedback.push('Good problem statement');
+            score += 25;
+        } else {
+            feedback.push('Problem statement needs more detail');
+        }
+        
+        if (expected.includes('Expected') && expected.includes('Actual')) {
+            feedback.push('Clear expected vs actual comparison');
+            score += 25;
+        } else {
+            feedback.push('Need clear "Expected" and "Actual" sections');
+        }
+        
+        if (code.length > 30 && code.length < 500) {
+            feedback.push('Good code length - focused and minimal');
+            score += 25;
+        } else if (code.length === 0) {
+            feedback.push('Missing code sample');
+        } else if (code.length > 500) {
+            feedback.push('Code might be too long - try to minimize');
+            score += 15;
+        }
+        
+        if (tried.length > 30) {
+            feedback.push('Showed what you tried');
+            score += 25;
+        } else {
+            feedback.push('List what debugging steps you\'ve already taken');
+        }
+        
+        document.getElementById('debug-feedback-content').innerHTML = 
+            `<strong>Score: ${score}%</strong><br><br>` + feedback.join('<br>');
+        document.getElementById('debug-feedback').style.display = 'block';
+    }
+
+    // Security Functions
+    function showSecurityDetails(num) {
+        // Visual feedback when clicked
+        const items = document.querySelectorAll('.security-item');
+        items[num-1].style.transform = 'scale(1.02)';
+        setTimeout(() => {
+            items[num-1].style.transform = 'scale(1)';
+        }, 200);
+    }
+
+    function checkVulnerability(element, lineNum) {
+        if (bugHunterClicked.has(lineNum)) return; // Already clicked
+        
+        bugHunterClicked.add(lineNum);
+        const isVulnerable = element.dataset.vulnerable === 'true';
+        
+        if (isVulnerable) {
+            element.classList.add('clicked-correct');
+            bugHunterFound++;
+            const vulnType = element.dataset.vulnType;
+            let message = '';
+            switch(vulnType) {
+                case 'hardcoded-secret':
+                    message = 'Hardcoded API key!';
+                    break;
+                case 'no-auth':
+                    message = 'No authentication check!';
+                    break;
+                case 'no-validation':
+                    message = 'No input validation!';
+                    break;
+                case 'sql-injection':
+                    message = 'SQL injection vulnerability!';
+                    break;
+                case 'xss':
+                    message = 'XSS vulnerability - unescaped output!';
+                    break;
+            }
+            element.title = `✓ ${message}`;
+        } else {
+            element.classList.add('clicked-wrong');
+            element.title = '✗ This line is safe';
+        }
+        
+        document.getElementById('bug-score').textContent = `Found: ${bugHunterFound}/5 vulnerabilities`;
+        
+        if (bugHunterFound === 5) {
+            setTimeout(() => {
+                alert('Congratulations! You found all 5 security vulnerabilities!');
+            }, 300);
+        }
+    }
+
+    function resetBugHunter() {
+        bugHunterFound = 0;
+        bugHunterClicked.clear();
+        document.querySelectorAll('.code-line').forEach(line => {
+            line.classList.remove('clicked-correct', 'clicked-wrong');
+            line.title = '';
+        });
+        document.getElementById('bug-score').textContent = 'Found: 0/5 vulnerabilities';
+    }
+
+    // Local Storage Functions
+    function saveSubmission(pageNum) {
+        const textarea = document.getElementById('submit-prompt-' + pageNum);
+        const statusDiv = document.getElementById('status-' + pageNum);
+        const content = textarea.value.trim();
+        
+        if (!content) {
+            statusDiv.textContent = "Please write something before saving!";
             statusDiv.style.backgroundColor = "#fff3cd";
             statusDiv.style.color = "#856404";
-            statusDiv.style.border = "1px solid #ffeaa7";
-            break;
+            statusDiv.style.borderColor = "#ffc107";
+            statusDiv.style.display = "block";
+            setTimeout(() => statusDiv.style.display = "none", 3000);
+            return;
+        }
+        
+        const data = {
+            page: pageNum,
+            content: content,
+            timestamp: new Date().toISOString()
+        };
+        
+        try {
+            localStorage.setItem('ai-submodule-2-page-' + pageNum, JSON.stringify(data));
+            statusDiv.textContent = "Submission saved successfully!";
+            statusDiv.style.backgroundColor = "#d4edda";
+            statusDiv.style.color = "#155724";
+            statusDiv.style.borderColor = "#28a745";
+            statusDiv.style.display = "block";
+            setTimeout(() => statusDiv.style.display = "none", 3000);
+        } catch (error) {
+            statusDiv.textContent = "Failed to save: " + error.message;
+            statusDiv.style.backgroundColor = "#f8d7da";
+            statusDiv.style.color = "#721c24";
+            statusDiv.style.borderColor = "#dc3545";
+            statusDiv.style.display = "block";
+        }
     }
 
-    setTimeout(() => {
-        statusDiv.style.display = "none";
-    }, 5000);
-}
+    function loadExample(pageNum) {
+        const examples = {
+            1: `SPECIFIC: Create a user registration validator that checks username, email, and password fields and returns all validation errors at once.
 
-// Save prompt exercise
-function savePromptExercise() {
-    const v1 = document.getElementById('prompt-v1').value.trim();
-    const v2 = document.getElementById('prompt-v2').value.trim();
-    const v3 = document.getElementById('prompt-v3').value.trim();
+PLATFORM: Python 3.11, only use the 're' library for regex validation. No external dependencies.
 
-    if (!v1 && !v2 && !v3) {
-        showStatus("⚠️ Please write at least one prompt before saving", "warning");
-        return;
-    }
+EXAMPLES:
+Input: {'username': 'ab', 'email': 'notanemail', 'password': 'weak'}
+Output: (False, ['Username must be 3-20 characters', 'Invalid email format', 'Password must be 8+ characters with uppercase, lowercase, and number'])
 
-    const data = {
-        version1: v1,
-        version2: v2,
-        version3: v3,
-        timestamp: new Date().toISOString(),
-        module: 'prompt-engineering'
-    };
+Input: {'username': 'validuser', 'email': 'user@example.com', 'password': 'SecurePass123'}
+Output: (True, [])
 
-    try {
-        localStorage.setItem('ai-prompt-exercise', JSON.stringify(data));
-        showStatus("✅ Progress saved successfully!", "success");
-    } catch (error) {
-        showStatus("❌ Failed to save: " + error.message, "error");
-    }
-}
-
-// Load prompt exercise
-function loadPromptExercise() {
-    try {
-        const saved = localStorage.getItem('ai-prompt-exercise');
-        if (saved) {
-            const data = JSON.parse(saved);
-            document.getElementById('prompt-v1').value = data.version1 || '';
-            document.getElementById('prompt-v2').value = data.version2 || '';
-            document.getElementById('prompt-v3').value = data.version3 || '';
+CONSTRAINTS:
+- Username: 3-20 characters, alphanumeric only (no special characters)
+- Email: Must match standard email regex pattern
+- Password: Minimum 8 characters, must contain at least one uppercase letter, one lowercase letter, and one number
+- Return ALL errors in a list, not just the first one found
+- Return tuple of (is_valid: bool, errors: list)`,
             
-            const saveDate = new Date(data.timestamp).toLocaleString();
-            showStatus(`✅ Work loaded! (Saved: ${saveDate})`, "success");
-        } else {
-            showStatus("⚠️ No saved work found", "warning");
+            2: `PROBLEM: Function returns None instead of the calculated average when given a list of numbers.
+
+EXPECTED VS ACTUAL:
+Expected: calculate_average([10, 20, 30]) should return 20.0
+Actual: calculate_average([10, 20, 30]) returns None
+
+MINIMAL CODE:
+def calculate_average(numbers):
+    if len(numbers) == 0:
+        return 0
+    total = sum(numbers)
+    average = total / len(numbers)
+    # Missing return statement here
+
+# Test case
+result = calculate_average([10, 20, 30])
+print(result)  # Prints: None
+
+WHAT I TRIED:
+Verified the list is not empty
+Added print statements - total and average variables calculate correctly
+Tested with simple data [1, 2, 3] - still returns None
+Checked for indentation issues
+Haven't figured out why it's not returning the value`,
+            
+            3: `CODE ANALYSIS:
+
+from flask import Flask, request
+import sqlite3
+
+app = Flask(__name__)
+
+@app.route('/user/profile')
+def get_profile():
+    user_id = request.args.get('id')
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+    user = cursor.fetchone()
+    return f"<h1>Welcome {user[1]}</h1>"
+
+SECURITY CHECKLIST:
+
+1. SQL Injection: VULNERABLE - Using f-string in SQL query on line 10
+   FIX: cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+
+2. Hardcoded Secrets: Not applicable in this snippet
+
+3. Input Validation: VULNERABLE - No validation of user_id parameter
+   FIX: Validate user_id is a positive integer before query
+
+4. XSS Protection: VULNERABLE - Unescaped user data in HTML on line 12
+   FIX: from markupsafe import escape; return f"<h1>Welcome {escape(user[1])}</h1>"
+
+5. Auth/Authorization: VULNERABLE - No login check, any user can view any profile
+   FIX: Add @login_required decorator and verify current_user.id == user_id
+
+VULNERABILITIES FOUND: 4 out of 5 categories have issues`
+        };
+        
+        const textarea = document.getElementById('submit-prompt-' + pageNum);
+        if (!textarea) return;
+        
+        textarea.value = examples[pageNum] || '';
+        
+        const statusDiv = document.getElementById('status-' + pageNum);
+        if (statusDiv) {
+            statusDiv.textContent = 'Loaded example. Edit as needed then Save.';
+            statusDiv.style.backgroundColor = '#fff3cd';
+            statusDiv.style.color = '#856404';
+            statusDiv.style.borderColor = '#ffc107';
+            statusDiv.style.display = 'block';
+            setTimeout(() => statusDiv.style.display = 'none', 3500);
         }
-    } catch (error) {
-        showStatus("❌ Failed to load: " + error.message, "error");
-    }
-}
-
-// Analyze prompts for quality
-function analyzePrompts() {
-    const v1 = document.getElementById('prompt-v1').value.trim();
-    const v2 = document.getElementById('prompt-v2').value.trim();
-    const v3 = document.getElementById('prompt-v3').value.trim();
-
-    if (!v1 && !v2 && !v3) {
-        showStatus("⚠️ Please write some prompts first", "warning", "analysis-result");
-        return;
     }
 
-    const components = ['context', 'problem', 'tried', 'outcome', 'error', 'code'];
-    
-    function scorePrompt(text) {
-        let score = 0;
-        const lower = text.toLowerCase();
-        
-        if (lower.includes('flask') || lower.includes('react') || lower.includes('python')) score++;
-        if (lower.includes('error') || lower.includes('issue') || lower.includes('problem')) score++;
-        if (lower.includes('tried') || lower.includes('attempted') || lower.includes('already')) score++;
-        if (lower.includes('want') || lower.includes('need') || lower.includes('should')) score++;
-        if (text.length > 100) score++;
-        if (text.includes('```') || text.includes('[code]')) score++;
-        
-        return score;
-    }
-
-    const scores = [scorePrompt(v1), scorePrompt(v2), scorePrompt(v3)];
-    const improvements = [];
-    
-    for (let i = 1; i < scores.length; i++) {
-        if (scores[i] > scores[i-1]) {
-            improvements.push(`✅ Version ${i+1} improved!`);
-        } else if (scores[i] === scores[i-1] && v1 && v2) {
-            improvements.push(`⚠️ Version ${i+1} needs more detail`);
+    function loadSubmissions() {
+        for (let i = 1; i <= 3; i++) {
+            try {
+                const saved = localStorage.getItem('ai-submodule-2-page-' + i);
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    const textarea = document.getElementById('submit-prompt-' + i);
+                    if (textarea) {
+                        textarea.value = data.content;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading page ' + i, error);
+            }
         }
     }
 
-    const finalScore = scores[2] || scores[1] || scores[0];
-    let feedback = `<strong>Analysis Results:</strong><br>`;
-    feedback += `Final Prompt Score: ${finalScore}/6<br>`;
-    feedback += improvements.join('<br>');
-    
-    if (finalScore >= 5) {
-        feedback += `<br><br>🎯 <strong>Excellent!</strong> Your final prompt has most key components.`;
-    } else if (finalScore >= 3) {
-        feedback += `<br><br>👍 <strong>Good progress!</strong> Consider adding: code snippets, specific error messages, or tools being used.`;
-    } else {
-        feedback += `<br><br>📚 <strong>Keep refining!</strong> Add context, specific problems, and what you've tried.`;
-    }
-
-    const analysisDiv = document.getElementById('analysis-result');
-    analysisDiv.innerHTML = feedback;
-    analysisDiv.style.display = "block";
-    analysisDiv.style.backgroundColor = "#e7f3ff";
-    analysisDiv.style.color = "#004085";
-    analysisDiv.style.border = "2px solid #007bff";
-}
-
-// Test mode - fill with examples
-function testModePrompts() {
-    if (confirm("Fill all fields with example prompts for testing?")) {
-        document.getElementById('prompt-v1').value = "My code doesn't work";
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        showPage(1);
+        loadSubmissions();
         
-        document.getElementById('prompt-v2').value = "I'm getting an error in my Flask app when I try to connect to my database. The error says something about connection refused.";
-        
-        document.getElementById('prompt-v3').value = `I'm building a Flask backend (Python 3.11) with SQLite database for a student portfolio site. When I try to query the database from my /api/users route, I get "sqlite3.OperationalError: unable to open database file". 
+        // Open all SPEC sections by default
+        ['specific', 'platform', 'examples', 'constraints'].forEach(section => {
+            document.getElementById(section + '-content').style.display = 'block';
+        });
+    });
 
-I've tried:
-- Checking that the database file exists (it does: database.db in root folder)
-- Verifying file permissions (it's readable)
-- Testing the query directly in Python shell (works fine there)
-
-Here's my database connection code:
-\`\`\`python
-conn = sqlite3.connect('database.db')
-cursor = conn.cursor()
-\`\`\`
-
-Here's my Flask route:
-\`\`\`python
-@app.route('/api/users')
-def get_users():
-    conn = sqlite3.connect('database.db')
-    users = conn.execute('SELECT * FROM users').fetchall()
-    return jsonify(users)
-\`\`\`
-
-Expected: Should return list of users from database
-Actual: Gets connection error when Flask route runs
-
-What am I missing about database connections in Flask routes?`;
-
-        showStatus("🧪 Test mode activated! Example prompts loaded.", "info");
-    }
-}
-
-// Auto-load on page load
-document.addEventListener('DOMContentLoaded', function() {
-    loadPromptExercise();
-});
-
-localStorage.setItem('ai-submodule-2-completed', 'true');
-
+    // Save completion status
+    localStorage.setItem('ai-submodule-2-completed', 'true');
 </script>
-

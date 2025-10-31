@@ -80,7 +80,6 @@ select {
 
 # SASS
 
-<<<<<<< HEAD
 ## Introduction
 
 Modern frontend development offers two powerful styling approaches: **Tailwind CSS** provides utility classes for rapid UI construction, while **Sass** (SCSS syntax) extends CSS with variables, mixins, and partials that compile into standard CSS. This lesson demonstrates how both tools integrate into a Jekyll project. You'll explore a small interactive Tailwind playground and complete a free-response question about choosing between utilities and abstractions.
@@ -96,58 +95,79 @@ Modern frontend development offers two powerful styling approaches: **Tailwind C
 ### A) Tailwind Quick Demo via CDN
 
 For experimentation, load Tailwind via CDN (not recommended for production):
-{% raw %}<script src="https://cdn.tailwindcss.com"></script>{% endraw %}
+
+```html
+<script src="https://cdn.tailwindcss.com"></script>
+```
 
 ### B) Production Tailwind Build
 
 Install Tailwind and PostCSS:
+
+```bash
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init
+```
 
 **tailwind.config.js**
+```javascript
 module.exports = {
   content: ['./_site/**/*.html', './**/*.md', './**/*.html'],
   theme: { extend: {} },
   plugins: [],
 }
+```
 
 **postcss.config.js**
+```javascript
 module.exports = {
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
   }
 }
+```
 
 **assets/css/tailwind.css**
+```css
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+```
 
 **package.json scripts**
+```json
 {
   "scripts": {
     "build:css": "tailwindcss -i ./assets/css/tailwind.css -o ./_site/assets/css/tw.css --minify"
   }
 }
+```
 
 Link in your layout:
-{% raw %}<link rel="stylesheet" href="{{ '/assets/css/tw.css' | relative_url }}">{% endraw %}
+```html
+<link rel="stylesheet" href="{{ '/assets/css/tw.css' | relative_url }}">
+```
 
 ### C) Sass Structure in Jekyll
 
 Create `_sass/` folder for partials. Jekyll compiles any `.scss` file in `assets/css/` that has YAML front matter.
 
 **_sass/_variables.scss**
+```scss
 $primary: #2563eb;
 $spacing: 1rem;
+```
 
 **_sass/_mixins.scss**
+```scss
 @mixin card-shadow {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+```
 
 **assets/css/main.scss**
+```scss
 ---
 ---
 @use '../_sass/variables' as *;
@@ -162,9 +182,12 @@ body {
   padding: $spacing;
   @include card-shadow;
 }
+```
 
 Link in your layout:
-{% raw %}<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">{% endraw %}
+```html
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+```
 
 ## Tiny Interactive Demo (Tailwind Playground)
 
@@ -256,6 +279,71 @@ Yes. Use Tailwind for component utilities and Sass for global styles, theme vari
 - **Sass** organizes styles with variables, mixins, and partials; Jekyll compiles `.scss` files with front matter into `.css`.
 - **Jekyll outputs**: `tw.css` (Tailwind) and `main.css` (Sass) link independently in your layout for complementary styling.
 - **Best practice**: Use Tailwind for component-level styling and Sass for theme management and reusable abstractions.
+
+## Interactive Demo JavaScript
+
+**Tailwind Playground Script**
+```javascript
+(function() {
+  const selPadding = document.getElementById('sel-padding');
+  const selRadius = document.getElementById('sel-radius');
+  const selTone = document.getElementById('sel-tone');
+  const btnApply = document.getElementById('btn-apply');
+  const demoCard = document.getElementById('demo-card');
+
+  btnApply.addEventListener('click', () => {
+    const padding = selPadding.value;
+    const radius = selRadius.value;
+    const tone = selTone.value;
+    demoCard.className = `${padding} ${radius} ${tone}`;
+    demoCard.style.border = '1px solid #4b5563';
+  });
+})();
+```
+
+**Form Submission Handler**
+```javascript
+import { javaURI } from '/assets/js/api/config.js';
+
+document.addEventListener("DOMContentLoaded", () => {
+  const submitBtn = document.getElementById("submitBtn");
+  const nameInput = document.getElementById("name");
+  const responseInput = document.getElementById("response");
+  const messageDiv = document.getElementById("message");
+
+  submitBtn.addEventListener("click", async () => {
+    const name = nameInput.value.trim();
+    const response = responseInput.value.trim();
+
+    if (!name || !response) {
+      messageDiv.textContent = "Please fill in both fields.";
+      messageDiv.style.color = "red";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${javaURI}/api/responses`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, response })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        messageDiv.textContent = `✅ Response saved! (ID: ${data.id})`;
+        messageDiv.style.color = "green";
+        responseInput.value = "";
+      } else {
+        messageDiv.textContent = "⚠️ Error submitting response.";
+        messageDiv.style.color = "red";
+      }
+    } catch (err) {
+      messageDiv.textContent = "❌ Could not connect to server.";
+      messageDiv.style.color = "red";
+    }
+  });
+});
+```
 
 <script>
 (function() {

@@ -55,7 +55,7 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_5/"
       Image: "/images/cs-portfolio-quest/frontend/javascript.png"
       Alt: "Frontend Submodule 5"
-    - Title: "Frontend Quest"
+    - Title: "Submodule 6"
       Genre: "Project Creation"
       Level: 6
       Description: "Learn about Component Integration in this lesson!"

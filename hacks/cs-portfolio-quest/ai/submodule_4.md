@@ -1,469 +1,302 @@
 ---
-layout: cs-portfolio-lesson
-title: "Coding with AI - The Realistic Version"
-description: "Use the SPEC framework for code generation, follow a debugging template, and always run security checks. The key principle: understand and verify before using any AI-generated code."
-permalink: /cs-portfolio-quest/ai/submodule_4/
-parent: "AI Usage"
-team: "Thinkers"
-submodule: 4
-categories: [CSP, Submodule, AIUsage]
-tags: [ai, submodule, thinkers]
-author: "Thinkers Team"
-date: 2025-10-21
----
-
----
 layout: post
-title: "Coding with AI - The Realistic Version"
-description: "Use the SPEC framework for code generation, follow a debugging template, and always run security checks."
+title: "AI Usage Certification"
+description: "Complete your AI Usage Quest and earn your official certification from Open Coding Society. Add it to your LinkedIn profile to showcase your skills."
 permalink: /cs-portfolio-quest/ai/submodule_4/
 parent: "AI Usage"
 team: "Thinkers"
-submodule: 4
+submodule: 5
 categories: [CSP, Submodule, AIUsage]
-tags: [ai, submodule, thinkers]
+tags: [ai, submodule, thinkers, certificate]
 author: "Thinkers Team"
 date: 2025-10-21
 ---
 
-<style>
-.code-editor {
-    width: 100%;
-    min-height: 200px;
-    font-family: 'Courier New', monospace;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: #2d2d2d;
-    color: #f8f8f2;
-    font-size: 14px;
-}
+# AI Usage Quest Certification
 
-.spec-section {
-    margin: 20px 0;
-    padding: 20px;
-    background: #f8f9fa;
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+Congratulations on completing the AI Usage Quest! Earn your official certification from **Open Coding Society**.
 
-.spec-section h3 {
-    color: #007bff;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 20px;
-}
-
-.spec-section p {
-    color: #495057;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-.spec-section input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    font-size: 14px;
-    background: white;
-    color: #212529;
-}
-
-.security-result {
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 8px;
-    display: none;
-}
-
-.security-result.pass {
-    background: #d4edda;
-    border: 2px solid #28a745;
-    color: #155724;
-}
-
-.security-result.fail {
-    background: #f8d7da;
-    border: 2px solid #dc3545;
-    color: #721c24;
-}
-
-.security-result.loading {
-    background: #d1ecf1;
-    border: 2px solid #17a2b8;
-    color: #0c5460;
-}
-
-.vulnerability-list {
-    margin-top: 10px;
-    padding-left: 20px;
-}
-
-.vulnerability-list li {
-    margin: 8px 0;
-    line-height: 1.6;
-}
-
-.button-primary {
-    padding: 12px 24px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s;
-    margin-top: 10px;
-}
-
-.button-primary:hover {
-    background: #0056b3;
-}
-
-.button-primary:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
-}
-
-.score-display {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 15px 0;
-}
-
-.security-checks-list {
-    background: #fff3cd;
-    border: 2px solid #ffc107;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.security-checks-list h2 {
-    color: #856404;
-    margin-top: 0;
-}
-
-.security-checks-list ol {
-    color: #856404;
-}
-
-.security-checks-list ol li {
-    margin: 8px 0;
-    line-height: 1.6;
-}
-
-.example-section {
-    background: #e7f3ff;
-    border: 2px solid #007bff;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.example-section h2 {
-    color: #007bff;
-    margin-top: 0;
-}
-
-.trust-verify {
-    background: #d4edda;
-    border: 2px solid #28a745;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-}
-
-.trust-verify h2 {
-    color: #155724;
-    margin-top: 0;
-}
-
-.trust-verify ol {
-    color: #155724;
-}
-
-.trust-verify ol li {
-    margin: 8px 0;
-    line-height: 1.6;
-}
-</style>
-
-# Coding with AI - The Realistic Version
-
-Learn to write better AI prompts using the **SPEC Framework** and automatically check your code for security vulnerabilities.
+<img src="{{site.baseurl}}/images/docx/Quests_QuestOfCode-AIUsage-Thinkers_image5.png" height="625">
 
 ---
 
-## The SPEC Framework
+## Complete All Submodules
 
-Before asking AI to generate code, structure your prompt using these 4 components:
-
-<div class="spec-section">
-  <h3>📝 S - Specific</h3>
-  <p><strong>What exact functionality do you need?</strong></p>
-  <textarea id="spec-specific" class="code-editor" rows="2" 
-    placeholder="Example: Create a function to validate user registration data">
-  </textarea>
-</div>
-
-<div class="spec-section">
-  <h3>💻 P - Platform</h3>
-  <p><strong>Language, version, frameworks</strong></p>
-  <input type="text" id="spec-platform" 
-    placeholder="Example: Python 3.9, no external libraries">
-</div>
-
-<div class="spec-section">
-  <h3>📊 E - Examples</h3>
-  <p><strong>Sample input/output</strong></p>
-  <textarea id="spec-examples" class="code-editor" rows="3"
-    placeholder="Input: {'username': 'ab', 'email': 'invalid'}
-Output: (False, ['Username too short', 'Invalid email'])">
-  </textarea>
-</div>
-
-<div class="spec-section">
-  <h3>⚙️ C - Constraints</h3>
-  <p><strong>Security, performance, style requirements</strong></p>
-  <textarea id="spec-constraints" class="code-editor" rows="2"
-    placeholder="- Username: 3-20 chars, alphanumeric only
-- Password: 8+ chars with uppercase, lowercase, number
-- Return all errors, not just first one">
-  </textarea>
-</div>
-
----
-
-## Your Code Submission
-
-<div class="spec-section">
-  <h3>📄 Paste Your Code Here</h3>
-  <p>Submit your code for automatic security analysis</p>
-  <textarea id="code-submission" class="code-editor" rows="15"
-    placeholder="def validate_user(data):
-    errors = []
+<div id="checklist-container">
+    <h3>Prerequisites Checklist:</h3>
     
-    if len(data['username']) < 3:
-        errors.append('Username too short')
+    <div id="check-submodule-1">
+        <span id="icon-1">⏳</span>
+        <strong>Submodule 1: Resume & Interview Prep</strong>
+        <p>Transform resume bullets and practice behavioral questions</p>
+    </div>
     
-    if '@' not in data['email']:
-        errors.append('Invalid email')
+    <div id="check-submodule-2">
+        <span id="icon-2">⏳</span>
+        <strong>Submodule 2: Prompt Engineering</strong>
+        <p>Master the 4-component prompt framework</p>
+    </div>
     
-    return (len(errors) == 0, errors)">
-  </textarea>
-  
-  <div style="margin-top: 15px;">
-    <button id="check-button" class="button-primary" onclick="checkCodeSecurity()">
-      🔍 Run Security Check
-    </button>
-  </div>
+    <div id="check-submodule-3">
+        <span id="icon-3">⏳</span>
+        <strong>Submodule 3: Real Project Example</strong>
+        <p>Follow the Flask/Spring migration walkthrough</p>
+    </div>
+    
+    <div id="progress-container">
+        <div id="overall-progress">0% Complete</div>
+    </div>
 </div>
 
-<div id="result" class="security-result"></div>
+<div id="status-message"></div>
 
 ---
 
-<div class="security-checks-list">
-  <h2>The 5 Essential Security Checks</h2>
-  <p>Your code will be automatically checked for:</p>
-  <ol>
-    <li><strong>🛡️ SQL Injection Prevention</strong> - Are you using parameterized queries?</li>
-    <li><strong>🔐 Secrets Management</strong> - No hardcoded passwords or API keys</li>
-    <li><strong>✅ Input Validation</strong> - All user input must be validated</li>
-    <li><strong>🚫 XSS Protection</strong> - Sanitize output to prevent cross-site scripting</li>
-    <li><strong>🔒 Authentication</strong> - Proper auth/authorization checks</li>
-  </ol>
-</div>
+## Your Certificate Preview
 
----
-
-<div class="trust-verify">
-  <h2>Trust But Verify Rule</h2>
-  <p>For every AI-generated code:</p>
-  <ol>
-    <li><strong>Understand it</strong> - If you can't explain it, don't use it</li>
-    <li><strong>Test it</strong> - Try edge cases and error conditions</li>
-    <li><strong>Secure it</strong> - Run through the checklist above</li>
-    <li><strong>Simplify it</strong> - Remove unnecessary complexity</li>
-  </ol>
-</div>
-
----
-
-<div class="example-section">
-  <h2>Example: Good vs Bad Code</h2>
-  
-  <h3>❌ Bad (Insecure)</h3>
-  <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
-password = "mySecret123"  # Hardcoded!
-query = "SELECT * FROM users WHERE name = '" + user_input + "'"  # SQL injection!
-html = "&lt;div&gt;" + user_comment + "&lt;/div&gt;"  # XSS vulnerability!
-  </pre>
-
-  <h3>✅ Good (Secure)</h3>
-  <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
-password = os.getenv("DB_PASSWORD")  # From environment
-query = "SELECT * FROM users WHERE name = ?"  # Parameterized
-html = "&lt;div&gt;" + escape(user_comment) + "&lt;/div&gt;"  # Sanitized
-  </pre>
-</div>
-
-<script type="module">
-import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-const ENDPOINT = `${pythonURI}/api/gemini`;
-
-window.checkCodeSecurity = async function() {
-    const code = document.getElementById('code-submission').value.trim();
-    const resultDiv = document.getElementById('result');
-    const button = document.getElementById('check-button');
+<div id="cert-preview">
+    <h2>AI Usage Quest Certificate</h2>
+    <p>This certifies that</p>
     
-    if (!code) {
-        alert('Please paste your code first!');
+    <input type="text" id="student-name" placeholder="Enter your full name" maxlength="50" />
+    
+    <p>has successfully completed the AI Usage Quest, demonstrating proficiency in:</p>
+    
+    <div>
+        <p>✓ AI-powered resume optimization</p>
+        <p>✓ Advanced prompt engineering techniques</p>
+        <p>✓ Real-world project implementation with AI</p>
+        <p>✓ Secure coding practices with AI assistance</p>
+    </div>
+    
+    <p><strong>Issued by Open Coding Society</strong><br><span id="cert-date">October 2025</span></p>
+</div>
+
+---
+
+## Claim Your Certificate
+
+<button id="download-btn" onclick="downloadCertificate()" disabled>Download Certificate (PDF)</button>
+<button id="linkedin-btn" onclick="addToLinkedIn()" disabled>Add to LinkedIn Profile</button>
+<button id="verify-btn" onclick="checkCompletion()">Check Status</button>
+
+---
+
+## How to Add This Certificate to LinkedIn
+
+**When you click "Add to LinkedIn Profile":**
+
+1. **Organization:** Select "Open Coding Society"
+2. **Certificate Name:** "AI Usage Quest - Prompt Engineering & Development"
+3. **Credential ID:** Auto-filled with your unique ID
+4. **Issue Date:** Current month/year
+5. **Skills:** AI Prompting, ChatGPT, Code Review, Resume Writing
+
+**Pro Tip:** Add this to your "Licenses & Certifications" section!
+
+<img src="{{site.baseurl}}/images/docx/Quests_QuestOfCode-AIUsage-Thinkers_image2.png" height="625">
+
+---
+
+## Why This Certificate Matters
+
+**Career Boost** - Show employers you can effectively use AI tools  
+**Verified Skills** - Official recognition from Open Coding Society  
+**Stand Out** - Differentiate yourself from other candidates  
+
+---
+
+## FAQ
+
+**Is this certificate recognized by employers?**  
+Yes! Open Coding Society is recognized on LinkedIn. Many employers look for AI proficiency.
+
+**How long to appear on LinkedIn?**  
+Immediately! It's added to your profile within seconds.
+
+**Can I retake any submodule?**  
+Yes! Revisit and improve submissions anytime before claiming.
+
+**Will I get a physical certificate?**  
+You'll receive a PDF you can print. LinkedIn credential is digital and verifiable.
+
+---
+
+<script>
+const SUBMODULES = ['submodule-1', 'submodule-2', 'submodule-3', 'submodule-4'];
+
+function checkCompletion() {
+    const completion = {};
+    SUBMODULES.forEach(m => {
+        completion[m] = localStorage.getItem(`ai-${m}-completed`) === 'true';
+    });
+    
+    SUBMODULES.forEach((module, idx) => {
+        const item = document.getElementById(`check-${module}`);
+        const icon = document.getElementById(`icon-${idx + 1}`);
+        if (completion[module]) {
+            item.style.background = '#d4edda';
+            icon.textContent = '✅';
+        } else {
+            item.style.background = '#f8f9fa';
+            icon.textContent = '⏳';
+        }
+    });
+    
+    const completed = SUBMODULES.filter(m => completion[m]).length;
+    const percentage = (completed / SUBMODULES.length) * 100;
+    const bar = document.getElementById('overall-progress');
+    bar.textContent = `${Math.round(percentage)}% Complete`;
+    bar.style.width = `${percentage}%`;
+    
+    const allDone = SUBMODULES.every(m => completion[m]);
+    document.getElementById('download-btn').disabled = !allDone;
+    document.getElementById('linkedin-btn').disabled = !allDone;
+    
+    const msg = document.getElementById('status-message');
+    if (allDone) {
+        msg.style.background = '#d4edda';
+        msg.style.color = '#155724';
+        msg.textContent = 'All submodules complete! Your certificate is ready!';
+    } else {
+        const remaining = SUBMODULES.filter(m => !completion[m]).length;
+        msg.style.background = '#fff3cd';
+        msg.style.color = '#856404';
+        msg.textContent = `${remaining} submodule${remaining > 1 ? 's' : ''} remaining to unlock certificate.`;
+    }
+    msg.style.display = 'block';
+    msg.style.padding = '15px';
+    msg.style.margin = '20px 0';
+    msg.style.borderRadius = '8px';
+}
+
+function downloadCertificate() {
+    const name = document.getElementById('student-name').value.trim();
+    if (!name) {
+        alert('Please enter your name first!');
         return;
     }
     
-    // Build SPEC context
-    const specContext = `
-SPEC Framework Context:
-- Specific: ${document.getElementById('spec-specific').value}
-- Platform: ${document.getElementById('spec-platform').value}
-- Examples: ${document.getElementById('spec-examples').value}
-- Constraints: ${document.getElementById('spec-constraints').value}
-    `.trim();
+    const certId = 'AICERT-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    localStorage.setItem('ai-quest-certificate', JSON.stringify({
+        name: name,
+        id: certId,
+        date: new Date().toISOString(),
+        modules: SUBMODULES
+    }));
     
-    // Show loading state
-    resultDiv.className = 'security-result loading';
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<p>🔍 Analyzing code security...</p>';
-    button.disabled = true;
-    
-    // Build prompt for security analysis
-    const prompt = `Analyze this code for security vulnerabilities. Check these 5 critical areas:
-1. SQL Injection (parameterized queries used?)
-2. Hardcoded secrets (passwords, API keys in code?)
-3. Input validation (user input validated?)
-4. XSS protection (output sanitized?)
-5. Authentication (proper auth checks?)
-
-Code to analyze:
-\`\`\`
-${code}
-\`\`\`
-
-${specContext}
-
-Respond in JSON format with:
-{
-  "score": <number 0-100>,
-  "passed": <boolean>,
-  "vulnerabilities": [<array of specific issues found>],
-  "feedback": "<overall security assessment>",
-  "recommendations": [<array of how to fix issues>]
-}`;
-
-    try {
-        const response = await fetch(ENDPOINT, {
-            ...fetchOptions,
-            method: 'POST',
-            body: JSON.stringify({
-                prompt: prompt,
-                text: code
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-        
-        const result = await response.json();
-        
-        if (result.error || !result.text) {
-            throw new Error(result.error || 'No response from AI');
-        }
-        
-        // Parse the AI response
-        let analysis;
-        try {
-            // Try to extract JSON from the response
-            const jsonMatch = result.text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                analysis = JSON.parse(jsonMatch[0]);
-            } else {
-                // Fallback: create analysis from text
-                analysis = {
-                    score: 70,
-                    passed: false,
-                    vulnerabilities: ['AI response not in expected format'],
-                    feedback: result.text,
-                    recommendations: ['Review the detailed feedback above']
-                };
-            }
-        } catch (e) {
-            console.error('JSON parse error:', e);
-            analysis = {
-                score: 0,
-                passed: false,
-                vulnerabilities: ['Could not parse AI response'],
-                feedback: result.text,
-                recommendations: []
-            };
-        }
-        
-        displayResults(analysis);
-        
-    } catch (error) {
-        resultDiv.className = 'security-result fail';
-        resultDiv.innerHTML = `
-            <h3>❌ Error</h3>
-            <p>Failed to analyze code: ${error.message}</p>
-            <p>Make sure the backend is running and try again.</p>
-        `;
-    } finally {
-        button.disabled = false;
-    }
-}
-
-function displayResults(analysis) {
-    const resultDiv = document.getElementById('result');
-    const passed = analysis.score >= 80;
-    
-    resultDiv.className = passed ? 'security-result pass' : 'security-result fail';
-    resultDiv.style.display = 'block';
-    
-    let html = `
-        <div class="score-display">
-            ${passed ? '✅' : '❌'} Security Score: ${analysis.score}/100
-        </div>
-        <p><strong>${passed ? 'PASSED' : 'FAILED'}</strong></p>
-        <p>${analysis.feedback}</p>
+    // Generate simple PDF preview
+    const certHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>AI Quest Certificate</title>
+            <style>
+                body { font-family: Georgia, serif; text-align: center; padding: 50px; }
+                .cert { background: white; padding: 60px; max-width: 800px; margin: 0 auto; border: 3px solid #667eea; }
+                h1 { font-size: 48px; color: #667eea; }
+                .name { font-size: 36px; font-weight: bold; color: #764ba2; margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="cert">
+                <h1>Certificate of Completion</h1>
+                <h2>AI Usage Quest</h2>
+                <p>This certifies that</p>
+                <div class="name">${name}</div>
+                <p>has successfully completed the AI Usage Quest</p>
+                <p><strong>Issued by Open Coding Society</strong><br>${new Date().toLocaleDateString()}</p>
+                <p style="font-size: 12px; color: #666; margin-top: 40px;">Certificate ID: ${certId}</p>
+            </div>
+            <script>window.onload = () => setTimeout(() => window.print(), 500);<\/script>
+        </body>
+        </html>
     `;
     
-    if (analysis.vulnerabilities && analysis.vulnerabilities.length > 0) {
-        html += `
-            <h4>🔍 Issues Found:</h4>
-            <ul class="vulnerability-list">
-                ${analysis.vulnerabilities.map(v => `<li>${v}</li>`).join('')}
-            </ul>
-        `;
-    }
+    const win = window.open('', '_blank');
+    win.document.write(certHTML);
+    win.document.close();
     
-    if (analysis.recommendations && analysis.recommendations.length > 0) {
-        html += `
-            <h4>💡 Recommendations:</h4>
-            <ul class="vulnerability-list">
-                ${analysis.recommendations.map(r => `<li>${r}</li>`).join('')}
-            </ul>
-        `;
-    }
-    
-    resultDiv.innerHTML = html;
+    const msg = document.getElementById('status-message');
+    msg.style.background = '#d4edda';
+    msg.style.color = '#155724';
+    msg.textContent = `Certificate ready! ID: ${certId}`;
+    msg.style.display = 'block';
 }
-localStorage.setItem('ai-submodule-2-completed', 'true');
 
+function addToLinkedIn() {
+    const name = document.getElementById('student-name').value.trim();
+    if (!name) {
+        alert('Please enter your name and download certificate first!');
+        return;
+    }
+    
+    let certId;
+    const saved = localStorage.getItem('ai-quest-certificate');
+    if (saved) {
+        certId = JSON.parse(saved).id;
+    } else {
+        certId = 'AICERT-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+    
+    const url = new URL('https://www.linkedin.com/profile/add');
+    url.searchParams.append('startTask', 'CERTIFICATION_NAME');
+    url.searchParams.append('name', 'AI Usage Quest - Prompt Engineering & Development');
+    url.searchParams.append('organizationName', 'Open Coding Society');
+    url.searchParams.append('issueYear', new Date().getFullYear());
+    url.searchParams.append('issueMonth', new Date().getMonth() + 1);
+    url.searchParams.append('certId', certId);
+    url.searchParams.append('certUrl', window.location.origin + '/ai-quest-verify/' + certId);
+    
+    window.open(url.toString(), '_blank');
+    
+    const msg = document.getElementById('status-message');
+    msg.style.background = '#d4edda';
+    msg.style.color = '#155724';
+    msg.textContent = 'Opening LinkedIn... Follow prompts to add certification!';
+    msg.style.display = 'block';
+}
+
+
+function generatePrintableCertificate(certData) {
+    const certHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>AI Quest Certificate</title>
+            <style>
+                body { font-family: Georgia, serif; text-align: center; padding: 50px; }
+                .cert { background: white; padding: 60px; max-width: 800px; margin: 0 auto; border: 3px solid #667eea; }
+                h1 { font-size: 48px; color: #667eea; }
+                .name { font-size: 36px; font-weight: bold; color: #764ba2; margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="cert">
+                <h1>Certificate of Completion</h1>
+                <h2>AI Usage Quest</h2>
+                <p>This certifies that</p>
+                <div class="name">${certData.name}</div>
+                <p>has successfully completed the AI Usage Quest</p>
+                <p><strong>Issued by Open Coding Society</strong><br>${new Date(certData.issueDate).toLocaleDateString()}</p>
+                <p style="font-size: 12px; color: #666; margin-top: 40px;">Certificate ID: ${certData.id}</p>
+            </div>
+            <script>window.onload = () => setTimeout(() => window.print(), 500);<\/script>
+        </body>
+        </html>
+    `;
+    
+    const win = window.open('', '_blank');
+    win.document.write(certHTML);
+    win.document.close();
+}
+
+document.getElementById('cert-date').textContent = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric'
+});
+
+document.addEventListener('DOMContentLoaded', checkCompletion);
 </script>
 
+{%- include tailwind/cs-portfolio-quest-lessons_info.html -%}

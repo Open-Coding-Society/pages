@@ -1,0 +1,614 @@
+---
+layout: post
+title: "Mini-Game"
+description: "AI Mini-Game that tests knowledge from all three levels"
+permalink: /digital-famine/ai/submodule_4/
+breadcrumb: true
+microblog: true
+parent: "AI Usage"
+team: "Debuggers"
+submodule: 4
+categories: [CSP, Submodule, AIUsage]
+tags: [ai, debuggers, mini-game]
+author: "Debuggers Team"
+date: 2025-10-21
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Quiz Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .game-container {
+            background: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 32px;
+            max-width: 800px;
+            width: 100%;
+            border: 4px solid #374151;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .title {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .roadblock-counter {
+            color: #fbbf24;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .progress-bar {
+            background: #374151;
+            height: 12px;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .progress-fill {
+            background: #fbbf24;
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .emoji-container {
+            background: #374151;
+            border: 4px solid #fbbf24;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 96px;
+        }
+        
+        .question {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            background: #374151;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            border: 2px solid #4b5563;
+            background: #374151;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option-btn:hover:not(:disabled) {
+            background: #4b5563;
+            border-color: #6b7280;
+        }
+        
+        .option-btn.selected {
+            background: #ca8a04;
+            border-color: #fbbf24;
+        }
+        
+        .option-btn.correct {
+            background: #16a34a;
+            border-color: #4ade80;
+        }
+        
+        .option-btn.incorrect {
+            background: #dc2626;
+            border-color: #f87171;
+        }
+        
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+        
+        .feedback {
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid;
+            margin-bottom: 24px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .feedback.correct {
+            background: #14532d;
+            border-color: #4ade80;
+        }
+        
+        .feedback.incorrect {
+            background: #7f1d1d;
+            border-color: #f87171;
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.next {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .action-btn.next:hover {
+            background: #15803d;
+        }
+        
+        .action-btn.retry {
+            background: #ca8a04;
+            color: white;
+        }
+        
+        .action-btn.retry:hover {
+            background: #a16207;
+        }
+        
+        .roadblock-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: pulse 1s infinite;
+        }
+        
+        .roadblock-text {
+            background: #dc2626;
+            border: 4px solid #fbbf24;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .victory-screen {
+            text-align: center;
+        }
+        
+        .victory-emoji {
+            font-size: 96px;
+            margin-bottom: 24px;
+            animation: bounce 1s infinite;
+        }
+        
+        .victory-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4ade80;
+            margin-bottom: 16px;
+        }
+        
+        .victory-text {
+            font-size: 20px;
+            color: #d1d5db;
+            margin-bottom: 24px;
+        }
+        
+        .treasure-box {
+            background: #fef3c7;
+            border: 4px solid #fbbf24;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .treasure-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #92400e;
+        }
+        
+        .play-again-btn {
+            background: #16a34a;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .play-again-btn:hover {
+            background: #15803d;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .code-entry-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .code-entry-box {
+            background: #1e293b;
+            border: 4px solid #fbbf24;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .code-entry-title {
+            color: #fbbf24;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .code-entry-text {
+            color: #d1d5db;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 24px;
+            text-align: center;
+            border: 3px solid #374151;
+            border-radius: 8px;
+            background: #0f172a;
+            color: white;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #fbbf24;
+        }
+
+        .code-submit-btn {
+            background: #fbbf24;
+            color: #1e293b;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .code-submit-btn:hover {
+            background: #f59e0b;
+        }
+
+        .code-error {
+            color: #ef4444;
+            font-size: 16px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="code-entry-overlay" class="code-entry-overlay">
+        <div class="code-entry-box">
+            <div class="code-entry-title">🔐 Enter Vault Code</div>
+            <div class="code-entry-text">
+                You must collect the code numbers from all three modules to unlock the final challenge.<br><br>
+                Enter the 3-digit code in order (Module 1, Module 2, Module 3):
+            </div>
+            <input type="text" id="code-input" class="code-input" maxlength="3" placeholder="•••" autocomplete="off">
+            <button onclick="verifyCode()" class="code-submit-btn">Unlock Vault</button>
+            <div id="code-error" class="code-error hidden"></div>
+        </div>
+    </div>
+
+    <div id="roadblock-overlay" class="roadblock-overlay hidden">
+        <div class="roadblock-text" id="roadblock-text"></div>
+    </div>
+
+    <div class="game-container">
+        <div id="game-screen">
+            <div class="header">
+                <div class="title">
+                    <span>🔒</span>
+                    <span>Vault Challenge</span>
+                </div>
+                <div class="roadblock-counter" id="counter">Roadblock 1 / 3</div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            
+            <div class="emoji-container" id="emoji">🚪</div>
+            
+            <div class="question" id="question"></div>
+            
+            <div class="options" id="options"></div>
+            
+            <div id="feedback" class="hidden"></div>
+            
+            <div id="action-button"></div>
+        </div>
+        
+        <div id="victory-screen" class="victory-screen hidden">
+            <div class="victory-emoji">🔓</div>
+            <h1 class="victory-title">🎉 VAULT UNLOCKED! 🎉</h1>
+            <p class="victory-text">Congratulations! You've successfully navigated through all roadblocks and opened the vault!</p>
+            <div class="treasure-box">
+                <p class="treasure-text">💎 TREASURE ACQUIRED 💎</p>
+            </div>
+            <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Code verification function
+        function verifyCode() {
+            const input = document.getElementById('code-input').value;
+            const errorDiv = document.getElementById('code-error');
+            const correctCode = '261'; // Module 1=2, Module 2=6, Module 3=1
+
+            if (input === correctCode) {
+                // Hide the code entry overlay
+                document.getElementById('code-entry-overlay').classList.add('hidden');
+                // Show success message briefly
+                errorDiv.textContent = '✅ Code accepted! Loading vault challenge...';
+                errorDiv.style.color = '#10b981';
+                errorDiv.classList.remove('hidden');
+            } else {
+                // Show error
+                errorDiv.textContent = '❌ Incorrect code. Complete all modules to get the correct code.';
+                errorDiv.style.color = '#ef4444';
+                errorDiv.classList.remove('hidden');
+                document.getElementById('code-input').value = '';
+            }
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('code-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    verifyCode();
+                }
+            });
+        });
+
+        const roadblocks = [
+            {
+                id: 1,
+                emoji: '🚪',
+                question: "Which is a real-life example of Narrow AI?",
+                options: [
+                    { id: 'a', text: "A general-purpose robot that can do any human task" },
+                    { id: 'b', text: "Netflix recommendation system" },
+                    { id: 'c', text: "A sentient AI with consciousness" },
+                    { id: 'd', text: "A machine that can learn anything instantly" }
+                ],
+                correctAnswer: 'b',
+                roadblockText: "🚧 ROADBLOCK 1: AI Fundamentals Challenge 🚧"
+            },
+            {
+                id: 2,
+                emoji: '🔐',
+                question: "Which is a type of prompt engineering?",
+                options: [
+                    { id: 'a', text: "Database Indexing" },
+                    { id: 'b', text: "Few-Shot Prompt" },
+                    { id: 'c', text: "Binary Compilation" },
+                    { id: 'd', text: "Network Routing" }
+                ],
+                correctAnswer: 'b',
+                roadblockText: "🚧 ROADBLOCK 2: Prompt Engineering Challenge 🚧"
+            },
+            {
+                id: 3,
+                emoji: '🏛️',
+                question: "What is NOT a real life example of an AI API?",
+                options: [
+                    { id: 'a', text: "OpenAI GPT API" },
+                    { id: 'b', text: "Google Vision API" },
+                    { id: 'c', text: "MindReader Telepathy API" },
+                    { id: 'd', text: "AWS Rekognition API" }
+                ],
+                correctAnswer: 'c',
+                roadblockText: "🚧 ROADBLOCK 3: AI API Knowledge Challenge 🚧"
+            }
+        ];
+
+        let currentRoadblock = 0;
+        let selectedAnswer = null;
+        let showFeedback = false;
+
+        function showRoadblockOverlay() {
+            const overlay = document.getElementById('roadblock-overlay');
+            const text = document.getElementById('roadblock-text');
+            text.textContent = roadblocks[currentRoadblock].roadblockText;
+            overlay.classList.remove('hidden');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 2500);
+        }
+
+        function updateUI() {
+            const current = roadblocks[currentRoadblock];
+            
+            document.getElementById('counter').textContent = `Roadblock ${currentRoadblock + 1} / ${roadblocks.length}`;
+            document.getElementById('progress').style.width = `${(currentRoadblock / roadblocks.length) * 100}%`;
+            document.getElementById('emoji').textContent = current.emoji;
+            document.getElementById('question').textContent = current.question;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            current.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span style="font-weight: bold; margin-right: 12px;">${option.id.toUpperCase()}.</span>${option.text}`;
+                btn.onclick = () => selectAnswer(option.id, btn);
+                btn.id = `option-${option.id}`;
+                optionsContainer.appendChild(btn);
+            });
+            
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('action-button').innerHTML = '';
+        }
+
+        function selectAnswer(answerId, btn) {
+            if (showFeedback) return;
+            
+            selectedAnswer = answerId;
+            showFeedback = true;
+            
+            const current = roadblocks[currentRoadblock];
+            const isCorrect = selectedAnswer === current.correctAnswer;
+            
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            
+            btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = isCorrect 
+                ? '<span style="font-size: 24px;">✅</span><span>Correct! You may proceed.</span>'
+                : '<span style="font-size: 24px;">❌</span><span>Incorrect! Try another answer.</span>';
+            feedback.classList.remove('hidden');
+            
+            const actionBtn = document.createElement('button');
+            actionBtn.className = `action-btn ${isCorrect ? 'next' : 'retry'}`;
+            
+            if (isCorrect) {
+                actionBtn.textContent = currentRoadblock < roadblocks.length - 1 
+                    ? 'Proceed to Next Roadblock →' 
+                    : 'Open Vault! 🔓';
+                actionBtn.onclick = nextRoadblock;
+            } else {
+                actionBtn.textContent = 'Try Again';
+                actionBtn.onclick = retry;
+            }
+            
+            document.getElementById('action-button').appendChild(actionBtn);
+        }
+
+        function retry() {
+            selectedAnswer = null;
+            showFeedback = false;
+            
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('correct', 'incorrect', 'selected');
+            });
+            
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('action-button').innerHTML = '';
+        }
+
+        function nextRoadblock() {
+            if (currentRoadblock < roadblocks.length - 1) {
+                currentRoadblock++;
+                selectedAnswer = null;
+                showFeedback = false;
+                updateUI();
+                showRoadblockOverlay();
+            } else {
+                showVictory();
+            }
+        }
+
+        function showVictory() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('victory-screen').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            currentRoadblock = 0;
+            selectedAnswer = null;
+            showFeedback = false;
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('victory-screen').classList.add('hidden');
+            updateUI();
+            showRoadblockOverlay();
+        }
+
+        // Initialize game
+        updateUI();
+        showRoadblockOverlay();
+    </script>
+</body>
+</html>

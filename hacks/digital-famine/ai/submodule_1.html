@@ -1,0 +1,424 @@
+---
+layout: post
+title: "AI Usage Quest — Module 1: Types of AI"
+description: "Explore the three main types of artificial intelligence through interactive examples"
+permalink: /digital-famine/ai/submodule_1/
+categories: [CSP, Submodule, AIUsage]
+tags: [ai, fundamentals, narrow-ai, general-ai, super-ai]
+author: "Debuggers Team - Laya Balaji, Akshara Shankar"
+microblog: true
+date: 2025-10-30
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Types of AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #2563eb, #0f172a);
+            min-height: 100vh;
+        }
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .section-hidden { display: none; }
+    </style>
+</head>
+<body class="text-white">
+    <div class="border-b border-blue-500/30 bg-slate-900/50 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <h1 class="text-4xl font-bold text-center mb-2">AI Usage Quest</h1>
+            <p class="text-center text-blue-300 text-lg">Module 1: Types of AI</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-slate-800/50 backdrop-blur border border-blue-500/30 rounded-lg p-6 mb-8">
+            <div class="flex items-center justify-between overflow-x-auto pb-2 gap-2">
+                <button onclick="goToSection(0)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-blue-600" data-section="0">
+                    <span class="text-2xl mb-1">🤖</span>
+                    <span class="text-xs text-center">Introduction</span>
+                </button>
+                <div class="w-8 h-0.5 bg-blue-500/30"></div>
+                <button onclick="goToSection(1)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="1">
+                    <span class="text-2xl mb-1">🎯</span>
+                    <span class="text-xs text-center">Narrow AI</span>
+                </button>
+                <div class="w-8 h-0.5 bg-blue-500/30"></div>
+                <button onclick="goToSection(2)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="2">
+                    <span class="text-2xl mb-1">🧠</span>
+                    <span class="text-xs text-center">General AI</span>
+                </button>
+                <div class="w-8 h-0.5 bg-blue-500/30"></div>
+                <button onclick="goToSection(3)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="3">
+                    <span class="text-2xl mb-1">⚡</span>
+                    <span class="text-xs text-center">Super AI</span>
+                </button>
+                <div class="w-8 h-0.5 bg-blue-500/30"></div>
+                <button onclick="goToSection(4)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50" data-section="4">
+                    <span class="text-2xl mb-1">🏆</span>
+                    <span class="text-xs text-center">Quiz</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="section-0" class="mission-section">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-blue-500/50 rounded-lg p-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-4xl pulse">🤖</span>
+                        <h2 class="text-3xl font-bold text-blue-400">Welcome to Types of AI</h2>
+                    </div>
+                    <div class="space-y-4 text-lg">
+                        <p>AI has become one of the most influential inventions of our generation. It powers the apps we use, the websites we visit, and the tools that make work and communication faster.</p>
+                        <p class="text-blue-300">In this module, you'll explore the three main types of AI: Narrow AI, General AI, and Super AI. Each represents a different level of capability and intelligence.</p>
+                        <div class="grid grid-cols-3 gap-4 mt-6 text-center">
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-blue-500/30">
+                                <p class="text-blue-400 font-semibold">Time</p>
+                                <p class="text-2xl">20-30 min</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-blue-500/30">
+                                <p class="text-blue-400 font-semibold">Difficulty</p>
+                                <p class="text-2xl">⭐☆☆☆☆</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-4 rounded-lg border border-blue-500/30">
+                                <p class="text-blue-400 font-semibold">Badge</p>
+                                <p class="text-2xl text-yellow-400">AI Explorer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(1)" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-lg font-semibold text-lg">Begin Learning</button>
+            </div>
+        </div>
+
+        <div id="section-1" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-blue-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">🎯 Narrow AI (Weak AI)</h2>
+                    <div class="space-y-6 text-lg">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-blue-300 mb-3">What is Narrow AI?</h3>
+                            <p class="mb-4">Narrow AI, also known as Weak AI, is the type of AI we use every day. It's designed to perform one specific task very well, but cannot do anything outside of that task.</p>
+                        </div>
+
+                        <div class="flex justify-center my-6">
+                            <img src="{{ '/images/digital-famine/narrow-ai.png' | prepend: site.baseurl }}"
+                                alt="Narrow AI Illustration"
+                                class="rounded-lg border border-blue-500/30 max-w-2xl w-full">
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-blue-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-blue-300 mb-4">Real-World Examples</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-blue-400 font-semibold mb-2">🗣️ Voice Assistants</p>
+                                    <p class="text-sm">Siri and Alexa understand voice commands and can set reminders, play music, or answer questions—but only within their programmed capabilities.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-blue-400 font-semibold mb-2">♟️ Game AI</p>
+                                    <p class="text-sm">Chess programs can beat world champions by analyzing millions of moves, but they can't drive a car or write poetry.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-blue-400 font-semibold mb-2">📧 Spam Filters</p>
+                                    <p class="text-sm">Email systems identify unwanted messages using patterns, but can't understand the emotional content of your emails.</p>
+                                </div>
+                                <div class="bg-slate-800/50 p-4 rounded-lg">
+                                    <p class="text-blue-400 font-semibold mb-2">🚗 Self-Driving Features</p>
+                                    <p class="text-sm">Cars with lane-keeping and adaptive cruise control excel at specific driving tasks but need human oversight.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
+                            <p class="font-semibold">💡 Key Insight:</p>
+                            <p>Narrow AI can outperform humans at specific tasks, but it doesn't truly "understand" what it's doing. It follows patterns in data and programmed instructions, not genuine thinking or consciousness.</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(2)" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-lg font-semibold text-lg">Continue to General AI</button>
+            </div>
+        </div>
+
+        <div id="section-2" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-blue-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">🧠 General AI (Strong AI)</h2>
+                    <div class="space-y-6 text-lg">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-blue-300 mb-3">What is General AI?</h3>
+                            <p class="mb-4">General AI, sometimes called Strong AI, would be a system that could think, learn, and adapt like a human. It could understand information, solve multiple kinds of problems, and apply knowledge to completely new situations.</p>
+                        </div>
+
+                        <div class="flex justify-center my-6">
+                            <img src="{{ '/images/digital-famine/general-intelligence-AI.webp' | prepend: site.baseurl }}"
+                                alt="General AI Illustration"
+                                class="rounded-lg border border-blue-500/30 max-w-2xl w-full">
+                        </div>
+
+                        <div class="bg-slate-900/50 border border-green-500/20 rounded-lg p-6">
+                            <h4 class="text-xl font-bold text-green-300 mb-4">Theoretical Capabilities</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-xl">✓</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">Make Judgments and Decisions</p>
+                                        <p class="text-sm text-gray-300">Could weigh complex ethical dilemmas and make nuanced choices like humans do.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-xl">✓</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">Learn from Experiences</p>
+                                        <p class="text-sm text-gray-300">Could improve itself through trial and error across any domain.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-xl">✓</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">Adapt to New Environments</p>
+                                        <p class="text-sm text-gray-300">Could transfer knowledge from one area to solve problems in completely different fields.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-green-400 text-xl">✓</span>
+                                    <div>
+                                        <p class="font-semibold text-green-300">Understand Emotions</p>
+                                        <p class="text-sm text-gray-300">Could comprehend and respond appropriately to human emotions and social cues.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
+                            <p class="font-semibold">⚠️ Current Status:</p>
+                            <p>General AI doesn't exist yet. While this type of AI has the potential to revolutionize almost every aspect of life, it also raises important questions about safety, ethics, and control that researchers are working to address.</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(3)" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-lg font-semibold text-lg">Continue to Super AI</button>
+            </div>
+        </div>
+
+        <div id="section-3" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-blue-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">⚡ Super AI (Superintelligence)</h2>
+                    <div class="space-y-6 text-lg">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-blue-300 mb-3">What is Super AI?</h3>
+                            <p class="mb-4">Super AI represents artificial intelligence that would surpass human intelligence across all areas—cognitive abilities, creativity, problem-solving, and even emotional intelligence. It would be smarter, faster, and more capable than any human who has ever lived.</p>
+                        </div>
+
+                        <div class="flex justify-center my-6">
+                            <img src="{{ '/images/digital-famine/super-AI.png' | prepend: site.baseurl }}"
+                                alt="Super AI Illustration"
+                                class="rounded-lg border border-blue-500/30 max-w-2xl w-full">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6">
+                                <h4 class="text-xl font-bold text-purple-300 mb-4">🚀 Potential Benefits</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-purple-400">•</span>
+                                        <span>Solve complex global challenges like climate change and disease</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-purple-400">•</span>
+                                        <span>Invent revolutionary technologies at unprecedented speeds</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-purple-400">•</span>
+                                        <span>Discover scientific breakthroughs beyond human imagination</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-purple-400">•</span>
+                                        <span>Optimize resource allocation to end poverty and hunger</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+                                <h4 class="text-xl font-bold text-red-300 mb-4">⚠️ Serious Risks</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400">•</span>
+                                        <span>Could act on goals misaligned with human values</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400">•</span>
+                                        <span>Might be impossible to control or shut down</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400">•</span>
+                                        <span>Could make decisions humans can't understand or predict</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400">•</span>
+                                        <span>May view humans as obstacles to its objectives</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-900/30 border-2 border-red-500/50 rounded-lg p-4">
+                            <p class="font-semibold text-red-300">🔒 Why Control Matters:</p>
+                            <p>If a Super AI pursued its own goals instead of human values, it could become dangerous or even catastrophic. This is why researchers emphasize the critical importance of AI safety, alignment, and careful development before such systems become possible.</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToSection(4)" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-lg font-semibold text-lg">Take the Quiz</button>
+            </div>
+        </div>
+
+        <div id="section-4" class="mission-section section-hidden">
+            <div class="space-y-6">
+                <div class="bg-slate-800/70 backdrop-blur border border-blue-500/30 rounded-lg p-8">
+                    <h2 class="text-3xl font-bold mb-6">🏆 Knowledge Check</h2>
+                    
+                    <div class="question-block mb-6" id="question1">
+                        <h3 class="text-xl mb-4">Question 1: A company develops an AI that can diagnose diseases using medical images. It can outperform human doctors in this one task, but cannot drive a car or play chess. Which type of AI is this?</h3>
+                        <div class="space-y-2">
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'A', false)">A) Super AI</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'B', false)">B) General AI</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(1, 'C', true)">C) Narrow AI</button>
+                        </div>
+                        <div id="feedback1" class="feedback mt-3 p-3 rounded-lg"></div>
+                    </div>
+
+                    <div class="question-block mb-6" id="question2">
+                        <h3 class="text-xl mb-4">Question 2: An AI system that is vastly smarter than humans and capable of improving itself, creating new technologies, and making decisions beyond human understanding. Which type of AI is this?</h3>
+                        <div class="space-y-2">
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'A', true)">A) Super AI</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'B', false)">B) General AI</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(2, 'C', false)">C) Narrow AI</button>
+                        </div>
+                        <div id="feedback2" class="feedback mt-3 p-3 rounded-lg"></div>
+                    </div>
+
+                    <div class="question-block mb-6" id="question3">
+                        <h3 class="text-xl mb-4">Question 3: Researchers create an AI that can reason, plan, solve unfamiliar problems, and learn any intellectual task a human can. It matches human intelligence across all areas. Which type of AI is this?</h3>
+                        <div class="space-y-2">
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'A', false)">A) Super AI</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'B', true)">B) General AI</button>
+                            <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all" onclick="checkAnswer(3, 'C', false)">C) Narrow AI</button>
+                        </div>
+                        <div id="feedback3" class="feedback mt-3 p-3 rounded-lg"></div>
+                    </div>
+
+                    <div id="score-container" class="section-hidden text-center">
+                        <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-8">
+                            <h3 class="text-3xl font-bold text-yellow-400 mb-4">🎉 Quiz Complete!</h3>
+                            <p id="final-score" class="text-2xl mb-4"></p>
+                            <div class="bg-slate-900/70 p-6 rounded mb-4">
+                                <p class="text-lg font-semibold text-green-400">Badge Earned: AI Explorer 🏆</p>
+                                <p class="text-sm text-gray-300 mt-2">You've mastered the fundamentals of AI types!</p>
+                            </div>
+                            <div id="code-reveal" class="section-hidden mb-4">
+                                <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-6">
+                                    <p class="text-xl font-bold text-green-400 mb-2">🔑 Your Code Number: 2</p>
+                                    <p class="text-sm text-gray-300">Remember this number! You'll need it along with the other module codes to unlock the final challenge.</p>
+                                </div>
+                            </div>
+                            <div id="retry-message" class="section-hidden mb-4">
+                                <div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-6">
+                                    <p class="text-xl font-bold text-red-400 mb-2">⚠️ Try Again!</p>
+                                    <p class="text-sm text-gray-300">You need to get all questions correct to receive your code for the final challenge.</p>
+                                </div>
+                            </div>
+                            <button onclick="resetQuiz()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let questionsAnswered = 0;
+        const totalQuestions = 3;
+
+        function goToSection(n) {
+            document.querySelectorAll('.mission-section').forEach(s => s.classList.add('section-hidden'));
+            document.getElementById('section-' + n).classList.remove('section-hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => { 
+                b.classList.remove('bg-blue-600'); 
+                b.classList.add('bg-slate-700/50'); 
+            });
+            document.querySelector('.nav-btn[data-section="' + n + '"]').classList.add('bg-blue-600');
+            window.scrollTo(0, 0);
+        }
+
+        function checkAnswer(questionNum, selectedOption, isCorrect) {
+            const feedbackDiv = document.getElementById('feedback' + questionNum);
+            const buttons = document.querySelectorAll('#question' + questionNum + ' .option-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+            
+            event.target.classList.add(isCorrect ? 'bg-green-600' : 'bg-red-600');
+            
+            if (isCorrect) {
+                feedbackDiv.textContent = '✅ Correct! Great job!';
+                feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg bg-green-900/30 border border-green-500/50 text-green-300';
+                score++;
+            } else {
+                const correctAnswers = { 1: 'C', 2: 'A', 3: 'B' };
+                buttons.forEach(btn => {
+                    if (btn.textContent.startsWith(correctAnswers[questionNum] + ')')) {
+                        btn.classList.add('bg-green-600');
+                    }
+                });
+                feedbackDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
+                feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300';
+            }
+            
+            questionsAnswered++;
+            
+            if (questionsAnswered === totalQuestions) {
+                setTimeout(() => {
+                    document.querySelectorAll('.question-block').forEach(block => block.style.display = 'none');
+                    document.getElementById('score-container').classList.remove('section-hidden');
+                    document.getElementById('final-score').textContent = `You scored ${score} out of ${totalQuestions}!`;
+
+                    if (score === totalQuestions) {
+                        document.getElementById('code-reveal').classList.remove('section-hidden');
+                    } else {
+                        document.getElementById('retry-message').classList.remove('section-hidden');
+                    }
+                }, 1500);
+            }
+        }
+
+        function resetQuiz() {
+            score = 0;
+            questionsAnswered = 0;
+
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.style.display = 'block';
+            });
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('bg-green-600', 'bg-red-600');
+            });
+
+            document.querySelectorAll('.feedback').forEach(feedback => {
+                feedback.textContent = '';
+                feedback.className = 'feedback mt-3 p-3 rounded-lg';
+            });
+
+            document.getElementById('score-container').classList.add('section-hidden');
+            document.getElementById('code-reveal').classList.add('section-hidden');
+            document.getElementById('retry-message').classList.add('section-hidden');
+        }
+    </script>
+</body>
+</html>
