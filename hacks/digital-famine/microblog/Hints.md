@@ -7,6 +7,9 @@ description: >
 author: CSP 2025-26
 permalink: /digital-famine/microblog/hints
 breadcrumb: true
+footer:
+  home: /digital-famine/
+  next: /digital-famine/microblog/hintsML
 lxdData:
   Title: "Quest Hints"
   Description: "Click On these modules for some hints!"
