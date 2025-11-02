@@ -1,6 +1,7 @@
 import GameEnvBackground from './GameEngine/GameEnvBackground.js'
 import Player from './GameEngine/Player.js'
 import Npc from './GameEngine/Npc.js'
+import DialogueSystem from './GameEngine/DialogueSystem.js'
 
 // Mansion Level 2 Game with WASD character movement.
 class MansionLevel2 {
