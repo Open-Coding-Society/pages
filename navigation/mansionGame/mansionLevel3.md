@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: Adventure Game
-permalink: /gamify/mansion3
+title: Dungeon Escape - Level 3
+permalink: /gamify/mansion3-restructured
 microblog: true
 ---
 
@@ -11,19 +11,22 @@ microblog: true
 </div>
 
 <script type="module">
+    // Adventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
-    import GameLevel3 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3.js";
+    import MansionLevel3_Restructured from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3_Restructured.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
+    // Web Server Environment data
     const environment = {
-        path: "{{site.baseurl}}",
-        pythonURI,
-        javaURI,
-        fetchOptions,
+        path:"{{site.baseurl}}",
+        pythonURI: pythonURI,
+        javaURI: javaURI,
+        fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [GameLevel3]
-    };
-
+        gameLevelClasses: [MansionLevel3_Restructured]
+    }
+    
+    // Launch Adventure Game
     Game.main(environment);
 </script>

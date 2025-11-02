@@ -1,0 +1,1145 @@
+diff --git a/assets/js/mansionGame/mansionLevel3.js b/assets/js/mansionGame/mansionLevel3.js
+index 2c93cb2ae..8c2bb3b3b 100644
+--- a/assets/js/mansionGame/mansionLevel3.js
++++ b/assets/js/mansionGame/mansionLevel3.js
+@@ -1,57 +1,473 @@
+-import GameEnvBackground from './GameEngine/GameEnvBackground.js';
+-import Player from './GameEngine/Player.js';
+-
+-class MansionLevel3 {
+-  constructor(gameEnv) {
+-    let width = gameEnv.innerWidth;
+-    let height = gameEnv.innerHeight;
+-    let path = gameEnv.path;
+-
+-    // 🏰 Background data
+-    const image_background = path + "/images/mansionGame/library_lvl3.png";
+-    const image_data_background = {
+-        name: 'background',
+-        greeting: "Welcome to the Library — find the hidden key to unlock the mansion’s secret chamber.",
+-        src: image_background,
+-        pixels: {height: 580, width: 1038},
+-        mode: 'contain',
+-    };
+-
+-    // 🧍 Player data (WASD only)
+-    const sprite_player = path + "/images/gamify/spookMcWalk.png";
+-    const player_scale_factor = 7; // Bigger player
+-    const sprite_data_player = {
+-      id: 'Player',
+-      greeting: "I'm ready to explore the library and find the hidden key!",
+-      src: sprite_player,
+-      SCALE_FACTOR: player_scale_factor,
+-      STEP_FACTOR: 800,
+-      ANIMATION_RATE: 10,
+-      INIT_POSITION: { x: (width / 2 - width / (5 * player_scale_factor)), y: height - (height / player_scale_factor) },
+-      pixels: {height: 2400, width: 3600},
+-      orientation: {rows: 2, columns: 3},
+-      down: {row: 1, start: 0, columns: 3},
+-      downRight: {row: 1, start: 0, columns: 3, rotate: Math.PI/16},
+-      downLeft: {row: 0, start: 0, columns: 3, rotate: -Math.PI/16},
+-      left: {row: 0, start: 0, columns: 3},
+-      right: {row: 1, start: 0, columns: 3},
+-      up: {row: 1, start: 0, columns: 3},
+-      upLeft: {row: 0, start: 0, columns: 3, rotate: Math.PI/16},
+-      upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
+-      hitbox: {widthPercentage: 0.45, heightPercentage: 0.2},
+-      keypress: {
+-        up: 87,    // W
+-        left: 65,  // A
+-        down: 83,  // S
+-        right: 68  // D
+-      }
+-    };
+-
+-    this.classes = [
+-      { class: GameEnvBackground, data: image_data_background },
+-      { class: Player, data: sprite_data_player },
+-    ];
+-  }
+-}
+-
+-export default MansionLevel3;
+\ No newline at end of file
++(function() {
++    function initGame() {
++        // ============= Create Game Container =============
++        var gameContainer = document.createElement('div');
++        gameContainer.style.cssText = 'width: 800px; height: 600px; position: relative; border: 4px solid #8b0000; box-shadow: 0 0 30px rgba(139, 0, 0, 0.5); margin: 20px auto; font-family: "Courier New", monospace;';
++
++        var canvas = document.createElement('canvas');
++        canvas.width = 800;
++        canvas.height = 600;
++        canvas.style.cssText = 'width: 100%; height: 100%; display: block; background: #2d1b4e;';
++        gameContainer.appendChild(canvas);
++        var ctx = canvas.getContext('2d');
++
++        // Create UI
++        var uiDiv = document.createElement('div');
++        uiDiv.style.cssText = 'position: absolute; top: 10px; left: 10px; font-size: 20px; text-shadow: 2px 2px 4px #000; z-index: 10; background: rgba(0, 0, 0, 0.7); padding: 15px; border: 3px solid #8b0000; border-radius: 5px;';
++
++        var heartsCanvas = document.createElement('canvas');
++        heartsCanvas.width = 120;
++        heartsCanvas.height = 40;
++        heartsCanvas.style.cssText = 'display: block; margin-bottom: 10px; image-rendering: pixelated;';
++        uiDiv.appendChild(heartsCanvas);
++        var heartsCtx = heartsCanvas.getContext('2d');
++
++        var scoreDiv = document.createElement('div');
++        scoreDiv.style.cssText = "font-size: 14px; color: #00ff00; margin: 5px 0; text-shadow: 2px 2px #003300;";
++        scoreDiv.textContent = 'Score: 0';
++        uiDiv.appendChild(scoreDiv);
++
++        var distanceDiv = document.createElement('div');
++        distanceDiv.style.cssText = "font-size: 14px; color: #00ff00; margin: 5px 0; text-shadow: 2px 2px #003300;";
++        distanceDiv.textContent = 'Distance: 0m';
++        uiDiv.appendChild(distanceDiv);
++
++        gameContainer.appendChild(uiDiv);
++
++        // Instructions
++        var instructionsDiv = document.createElement('div');
++        instructionsDiv.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); text-align: center; font-size: 14px; text-shadow: 2px 2px 4px #000; color: #fff;';
++        instructionsDiv.textContent = 'Use ← → Arrow Keys to Move | Find the Golden Skeleton Key at 20,000m!';
++        gameContainer.appendChild(instructionsDiv);
++
++        // Game Over Screen
++        var gameOverDiv = document.createElement('div');
++        gameOverDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); padding: 40px; border: 4px solid #ff0000; border-radius: 15px; text-align: center; display: none; z-index: 100; color: #fff;';
++        var gameOverTitle = document.createElement('h1');
++        gameOverTitle.textContent = 'GAME OVER';
++        gameOverTitle.style.marginBottom = '20px';
++        gameOverDiv.appendChild(gameOverTitle);
++        var gameOverText = document.createElement('p');
++        gameOverText.textContent = 'You were caught by the skeletons!';
++        gameOverDiv.appendChild(gameOverText);
++        var restartBtn1 = document.createElement('button');
++        restartBtn1.textContent = 'Try Again';
++        restartBtn1.style.cssText = 'margin-top: 20px; padding: 15px 40px; background: #8b0000; border: none; color: #fff; font-size: 18px; cursor: pointer; border-radius: 5px;';
++        restartBtn1.onmouseover = function() { this.style.background = '#b00000'; };
++        restartBtn1.onmouseout = function() { this.style.background = '#8b0000'; };
++        gameOverDiv.appendChild(restartBtn1);
++        gameContainer.appendChild(gameOverDiv);
++
++        // Victory Screen
++        var victoryDiv = document.createElement('div');
++        victoryDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); padding: 40px; border: 4px solid #ffd700; border-radius: 15px; text-align: center; display: none; z-index: 100; color: #fff;';
++        var victoryTitle = document.createElement('h1');
++        victoryTitle.textContent = '🎉 VICTORY! 🎉';
++        victoryTitle.style.cssText = 'color: #ffd700; margin-bottom: 20px;';
++        victoryDiv.appendChild(victoryTitle);
++        var victoryText = document.createElement('p');
++        victoryText.textContent = 'You found the key and escaped!';
++        victoryDiv.appendChild(victoryText);
++        var finalScoreP = document.createElement('p');
++        victoryDiv.appendChild(finalScoreP);
++        var restartBtn2 = document.createElement('button');
++        restartBtn2.textContent = 'Play Again';
++        restartBtn2.style.cssText = 'margin-top: 20px; padding: 15px 40px; background: #8b0000; border: none; color: #fff; font-size: 18px; cursor: pointer; border-radius: 5px;';
++        restartBtn2.onmouseover = function() { this.style.background = '#b00000'; };
++        restartBtn2.onmouseout = function() { this.style.background = '#8b0000'; };
++        victoryDiv.appendChild(restartBtn2);
++        gameContainer.appendChild(victoryDiv);
++
++        document.body.appendChild(gameContainer);
++
++        // ============= Game Variables =============
++        var gameState = {
++            lives: 3,
++            score: 0,
++            distance: 0,
++            speed: 4,
++            paused: false,
++            hasKey: false,
++            gameOver: false,
++            deathAnimation: false,
++            deathTimer: 0
++        };
++
++        var player = {
++            x: 380,
++            y: 520,
++            width: 40,
++            height: 60,
++            speed: 8,
++            rotation: 0,
++            opacity: 1,
++            isDying: false,
++            sidePadding: 100
++        };
++
++        var keys = {};
++        var obstacles = [];
++        var spawnTimer = 0;
++        var spawnInterval = 100;
++        var keySpawned = false;
++        var maxSkeletonsPerWave = 1;
++        var lanes = [100, 200, 300, 400, 500, 600, 700];
++
++        // ============= Input Handling =============
++        document.addEventListener('keydown', function(e) {
++            keys[e.key] = true;
++        });
++
++        document.addEventListener('keyup', function(e) {
++            keys[e.key] = false;
++        });
++
++        // ============= Background Functions =============
++        function drawBackground() {
++            ctx.fillStyle = '#2d1b4e';
++            ctx.fillRect(0, 0, canvas.width, canvas.height);
++
++            var stairHeight = 30;
++            var offset = (gameState.distance * 3) % stairHeight;
++            
++            for (var i = -1; i < canvas.height / stairHeight + 1; i++) {
++                var y = i * stairHeight - offset;
++                
++                ctx.fillStyle = '#4a2f6e';
++                ctx.fillRect(0, y, canvas.width, stairHeight - 5);
++                
++                ctx.fillStyle = '#3d2558';
++                ctx.fillRect(0, y + stairHeight - 5, canvas.width, 5);
++            }
++
++            var gradient = ctx.createRadialGradient(
++                canvas.width / 2, canvas.height / 2, 100,
++                canvas.width / 2, canvas.height / 2, 500
++            );
++            gradient.addColorStop(0, 'rgba(0,0,0,0)');
++            gradient.addColorStop(1, 'rgba(0,0,0,0.5)');
++            ctx.fillStyle = gradient;
++            ctx.fillRect(0, 0, canvas.width, canvas.height);
++        }
++
++        // ============= Player Functions =============
++        function updatePlayer() {
++            if (!player.isDying) {
++                if (keys['ArrowLeft'] || keys['a']) {
++                    player.x -= player.speed;
++                }
++                if (keys['ArrowRight'] || keys['d']) {
++                    player.x += player.speed;
++                }
++
++                if (player.x < player.sidePadding) player.x = player.sidePadding;
++                if (player.x + player.width > canvas.width - player.sidePadding) {
++                    player.x = canvas.width - player.sidePadding - player.width;
++                }
++            }
++        }
++
++        function drawPlayer() {
++            ctx.save();
++            
++            if (player.isDying) {
++                ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
++                ctx.rotate(player.rotation);
++                ctx.globalAlpha = player.opacity;
++                ctx.translate(-(player.x + player.width / 2), -(player.y + player.height / 2));
++            }
++            
++            ctx.fillStyle = '#00ff00';
++            ctx.fillRect(player.x, player.y, player.width, player.height);
++            
++            ctx.fillStyle = '#ffcc99';
++            ctx.fillRect(player.x + 10, player.y, 20, 20);
++            
++            ctx.fillStyle = '#0066cc';
++            ctx.fillRect(player.x + 12, player.y + 20, 16, 25);
++            
++            ctx.fillStyle = '#003366';
++            ctx.fillRect(player.x + 12, player.y + 45, 6, 15);
++            ctx.fillRect(player.x + 22, player.y + 45, 6, 15);
++            
++            ctx.restore();
++        }
++
++        function startPlayerDeath() {
++            player.isDying = true;
++        }
++
++        function updateDeathAnimation() {
++            if (gameState.deathAnimation) {
++                gameState.deathTimer++;
++                player.rotation += 0.15;
++                player.y += 3;
++                player.opacity -= 0.02;
++                
++                if (player.opacity <= 0 || gameState.deathTimer > 100) {
++                    gameState.gameOver = true;
++                    gameOverDiv.style.display = 'block';
++                }
++            }
++        }
++
++        function resetPlayer() {
++            player.x = 380;
++            player.y = 520;
++            player.rotation = 0;
++            player.opacity = 1;
++            player.isDying = false;
++        }
++
++        // ============= Obstacle Functions =============
++        function createObstacle(x, y, isKey, isFake) {
++            return {
++                x: x,
++                y: y,
++                width: 50,
++                height: 50,
++                isKey: isKey || false,
++                isFake: isFake || false,
++                fakeTimer: 0,
++                revealed: false
++            };
++        }
++
++        function updateObstacle(obs) {
++            obs.y += gameState.speed;
++
++            if (obs.isFake && !obs.revealed) {
++                obs.fakeTimer++;
++                if (obs.fakeTimer > 80) {
++                    obs.revealed = true;
++                }
++            }
++        }
++
++        function drawObstacle(obs) {
++            if (obs.isKey && !obs.revealed) {
++                ctx.fillStyle = '#ffd700';
++                ctx.shadowColor = '#ffd700';
++                ctx.shadowBlur = 15;
++            } else if (obs.isFake && !obs.revealed) {
++                ctx.fillStyle = '#ffd700';
++                ctx.shadowColor = '#ffd700';
++                ctx.shadowBlur = 15;
++            } else {
++                ctx.fillStyle = '#ffffff';
++                ctx.shadowBlur = 0;
++            }
++
++            ctx.fillRect(obs.x + 15, obs.y, 20, 20);
++            ctx.fillRect(obs.x + 20, obs.y + 20, 10, 20);
++            ctx.fillRect(obs.x + 10, obs.y + 25, 10, 3);
++            ctx.fillRect(obs.x + 30, obs.y + 25, 10, 3);
++            ctx.fillRect(obs.x + 17, obs.y + 40, 6, 10);
++            ctx.fillRect(obs.x + 27, obs.y + 40, 6, 10);
++
++            ctx.shadowBlur = 0;
++        }
++
++        function spawnObstacle() {
++            if (!keySpawned && gameState.distance > 20000) {
++                if (Math.random() < 0.015) {
++                    var randomLane = lanes[Math.floor(Math.random() * lanes.length)];
++                    var isFake = Math.random() < 0.3;
++                    obstacles.push(createObstacle(randomLane, -60, !isFake, isFake));
++                    if (!isFake) keySpawned = true;
++                    return;
++                }
++            }
++
++            var numToSpawn = Math.min(maxSkeletonsPerWave, Math.floor(Math.random() * maxSkeletonsPerWave) + 1);
++            var usedLanes = [];
++            
++            for (var i = 0; i < numToSpawn; i++) {
++                var randomLane;
++                var attempts = 0;
++                
++                do {
++                    randomLane = lanes[Math.floor(Math.random() * lanes.length)];
++                    attempts++;
++                } while (usedLanes.indexOf(randomLane) !== -1 && attempts < 10);
++                
++                if (usedLanes.indexOf(randomLane) === -1) {
++                    usedLanes.push(randomLane);
++                    obstacles.push(createObstacle(randomLane, -60 - (i * 100)));
++                }
++            }
++        }
++
++        function checkCollision(obs) {
++            return player.x < obs.x + obs.width &&
++                   player.x + player.width > obs.x &&
++                   player.y < obs.y + obs.height &&
++                   player.y + player.height > obs.y;
++        }
++
++        // ============= UI Functions =============
++        function drawPixelHeart(x, y, filled) {
++            var heartPixels = [
++                [0,1,1,0,1,1,0],
++                [1,1,1,1,1,1,1],
++                [1,1,1,1,1,1,1],
++                [0,1,1,1,1,1,0],
++                [0,0,1,1,1,0,0],
++                [0,0,0,1,0,0,0]
++            ];
++            
++            var pixelSize = 4;
++            heartsCtx.fillStyle = filled ? '#ff0000' : '#550000';
++            
++            for (var row = 0; row < heartPixels.length; row++) {
++                for (var col = 0; col < heartPixels[row].length; col++) {
++                    if (heartPixels[row][col] === 1) {
++                        heartsCtx.fillRect(x + col * pixelSize, y + row * pixelSize, pixelSize, pixelSize);
++                    }
++                }
++            }
++            
++            if (filled) {
++                heartsCtx.strokeStyle = '#aa0000';
++                heartsCtx.lineWidth = 1;
++                for (var row = 0; row < heartPixels.length; row++) {
++                    for (var col = 0; col < heartPixels[row].length; col++) {
++                        if (heartPixels[row][col] === 1) {
++                            heartsCtx.strokeRect(x + col * pixelSize, y + row * pixelSize, pixelSize, pixelSize);
++                        }
++                    }
++                }
++            }
++        }
++
++        function updateHearts() {
++            heartsCtx.clearRect(0, 0, heartsCanvas.width, heartsCanvas.height);
++            for (var i = 0; i < 3; i++) {
++                drawPixelHeart(5 + i * 35, 5, i < gameState.lives);
++            }
++        }
++
++        function updateUI() {
++            scoreDiv.textContent = 'Score: ' + gameState.score;
++            distanceDiv.textContent = 'Distance: ' + Math.floor(gameState.distance) + 'm';
++        }
++
++        // ============= Game Control Functions =============
++        function handleHit() {
++            gameState.lives--;
++            updateHearts();
++            
++            if (gameState.lives <= 0) {
++                startPlayerDeath();
++                gameState.deathAnimation = true;
++            } else {
++                startPlayerDeath();
++                setTimeout(function() {
++                    player.isDying = false;
++                    player.rotation = 0;
++                    player.opacity = 1;
++                }, 500);
++            }
++        }
++
++        function restartGame() {
++            gameState.lives = 3;
++            gameState.score = 0;
++            gameState.distance = 0;
++            gameState.speed = 4;
++            gameState.paused = false;
++            gameState.hasKey = false;
++            gameState.gameOver = false;
++            gameState.deathAnimation = false;
++            gameState.deathTimer = 0;
++
++            resetPlayer();
++            obstacles = [];
++            keySpawned = false;
++            spawnTimer = 0;
++            spawnInterval = 100;
++            maxSkeletonsPerWave = 1;
++
++            updateHearts();
++            updateUI();
++            gameOverDiv.style.display = 'none';
++            victoryDiv.style.display = 'none';
++
++            gameLoop();
++        }
++
++        restartBtn1.onclick = restartGame;
++        restartBtn2.onclick = restartGame;
++
++        // ============= Main Game Loop =============
++        function gameLoop() {
++            if (gameState.gameOver) return;
++            
++            if (!gameState.paused) {
++                ctx.clearRect(0, 0, canvas.width, canvas.height);
++                
++                drawBackground();
++                updatePlayer();
++                
++                maxSkeletonsPerWave = Math.min(5, Math.floor(gameState.distance / 2000) + 1);
++                
++                spawnTimer++;
++                if (spawnTimer > spawnInterval) {
++                    spawnObstacle();
++                    spawnTimer = 0;
++                    
++                    if (spawnInterval > 30) {
++                        spawnInterval -= 0.8;
++                    }
++                    if (gameState.speed < 10) {
++                        gameState.speed += 0.03;
++                    }
++                }
++                
++                updateDeathAnimation();
++                
++                for (var i = obstacles.length - 1; i >= 0; i--) {
++                    var obs = obstacles[i];
++                    updateObstacle(obs);
++                    drawObstacle(obs);
++                    
++                    if (checkCollision(obs) && !player.isDying) {
++                        if (obs.isKey && !obs.isFake) {
++                            gameState.hasKey = true;
++                            gameState.score += 500;
++                            gameState.gameOver = true;
++                            finalScoreP.textContent = 'Final Score: ' + gameState.score;
++                            victoryDiv.style.display = 'block';
++                        } else {
++                            handleHit();
++                            obstacles.splice(i, 1);
++                        }
++                    }
++                    
++                    if (obs.y > canvas.height) {
++                        obstacles.splice(i, 1);
++                        gameState.score += 10;
++                    }
++                }
++                
++                drawPlayer();
++                
++                gameState.distance += gameState.speed;
++                updateUI();
++            }
++            
++            requestAnimationFrame(gameLoop);
++        }
++
++        // ============= Start Game =============
++        updateHearts();
++        gameLoop();
++    }
++
++    // Initialize when DOM is ready
++    if (document.readyState === 'loading') {
++        document.addEventListener('DOMContentLoaded', initGame);
++    } else {
++        initGame();
++    }
++})();
+diff --git a/navigation/mansionGame/mansionLevel3.md b/navigation/mansionGame/mansionLevel3.md
+index 1427f6a2c..774674d5c 100644
+--- a/navigation/mansionGame/mansionLevel3.md
++++ b/navigation/mansionGame/mansionLevel3.md
+@@ -3,26 +3,582 @@ layout: opencs
+ title: Adventure Game
+ permalink: /gamify/mansion3
+ ---
++<script>
++// ============= Wait for DOM to be ready =============
++(function() {
++    function initGame() {
++        // ============= Create Styles =============
++        var style = document.createElement('style');
++        style.textContent = `
++            body {
++                margin: 0;
++                padding: 0;
++                background: #1a0f2e;
++                display: flex;
++                justify-content: center;
++                align-items: center;
++                min-height: 100vh;
++                font-family: "Courier New", monospace;
++            }
++            
++            .mobile-controls {
++                position: absolute;
++                bottom: 20px;
++                width: 100%;
++                display: flex;
++                justify-content: space-between;
++                padding: 0 20px;
++                box-sizing: border-box;
++                z-index: 20;
++                pointer-events: none;
++            }
++            
++            .arrow-btn {
++                pointer-events: auto;
++                width: 70px;
++                height: 70px;
++                background: rgba(139, 0, 0, 0.8);
++                border: 3px solid #ff0000;
++                border-radius: 10px;
++                color: #fff;
++                font-size: 32px;
++                display: flex;
++                align-items: center;
++                justify-content: center;
++                cursor: pointer;
++                user-select: none;
++                touch-action: manipulation;
++                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
++                transition: all 0.1s;
++            }
++            
++            .arrow-btn:active {
++                background: rgba(180, 0, 0, 0.9);
++                transform: scale(0.95);
++                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
++            }
++            
++            @media (max-width: 850px) {
++                .mobile-controls {
++                    bottom: 10px;
++                }
++            }
++        `;
++        document.head.appendChild(style);
+ 
+-<div id="gameContainer">
+-    <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
+-    <canvas id='gameCanvas'></canvas>
+-</div>
+-
+-<script type="module">
+-    import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
+-    import GameLevel3 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3.js";
+-    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+-
+-    const environment = {
+-        path: "{{site.baseurl}}",
+-        pythonURI,
+-        javaURI,
+-        fetchOptions,
+-        gameContainer: document.getElementById("gameContainer"),
+-        gameCanvas: document.getElementById("gameCanvas"),
+-        gameLevelClasses: [GameLevel3]
+-    };
+-
+-    Game.main(environment);
+-</script>
++        // ============= Create Game Container =============
++        var gameContainer = document.createElement('div');
++        gameContainer.style.cssText = 'width: 800px; height: 600px; position: relative; border: 4px solid #8b0000; box-shadow: 0 0 30px rgba(139, 0, 0, 0.5); margin: 20px auto; font-family: "Courier New", monospace; max-width: 100%;';
++
++        var canvas = document.createElement('canvas');
++        canvas.width = 800;
++        canvas.height = 600;
++        canvas.style.cssText = 'width: 100%; height: 100%; display: block; background: #2d1b4e;';
++        gameContainer.appendChild(canvas);
++        var ctx = canvas.getContext('2d');
++
++        // Create UI
++        var uiDiv = document.createElement('div');
++        uiDiv.style.cssText = 'position: absolute; top: 10px; left: 10px; font-size: 20px; text-shadow: 2px 2px 4px #000; z-index: 10; background: rgba(0, 0, 0, 0.7); padding: 15px; border: 3px solid #8b0000; border-radius: 5px;';
++
++        var heartsCanvas = document.createElement('canvas');
++        heartsCanvas.width = 120;
++        heartsCanvas.height = 40;
++        heartsCanvas.style.cssText = 'display: block; margin-bottom: 10px; image-rendering: pixelated;';
++        uiDiv.appendChild(heartsCanvas);
++        var heartsCtx = heartsCanvas.getContext('2d');
++
++        var scoreDiv = document.createElement('div');
++        scoreDiv.style.cssText = "font-size: 14px; color: #00ff00; margin: 5px 0; text-shadow: 2px 2px #003300;";
++        scoreDiv.textContent = 'Score: 0';
++        uiDiv.appendChild(scoreDiv);
++
++        var distanceDiv = document.createElement('div');
++        distanceDiv.style.cssText = "font-size: 14px; color: #00ff00; margin: 5px 0; text-shadow: 2px 2px #003300;";
++        distanceDiv.textContent = 'Distance: 0m';
++        uiDiv.appendChild(distanceDiv);
++
++        gameContainer.appendChild(uiDiv);
++
++        // Instructions
++        var instructionsDiv = document.createElement('div');
++        instructionsDiv.style.cssText = 'position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); text-align: center; font-size: 14px; text-shadow: 2px 2px 4px #000; color: #fff;';
++        instructionsDiv.textContent = 'Use ← → Arrow Keys to Move | Find the Golden Skeleton Key at 20,000m!';
++        gameContainer.appendChild(instructionsDiv);
++
++        // Mobile Controls
++        var mobileControls = document.createElement('div');
++        mobileControls.className = 'mobile-controls';
++        
++        var leftBtn = document.createElement('div');
++        leftBtn.className = 'arrow-btn';
++        leftBtn.innerHTML = '◄';
++        leftBtn.id = 'leftBtn';
++        
++        var rightBtn = document.createElement('div');
++        rightBtn.className = 'arrow-btn';
++        rightBtn.innerHTML = '►';
++        rightBtn.id = 'rightBtn';
++        
++        mobileControls.appendChild(leftBtn);
++        mobileControls.appendChild(rightBtn);
++        gameContainer.appendChild(mobileControls);
++
++        // Game Over Screen
++        var gameOverDiv = document.createElement('div');
++        gameOverDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); padding: 40px; border: 4px solid #ff0000; border-radius: 15px; text-align: center; display: none; z-index: 100; color: #fff;';
++        var gameOverTitle = document.createElement('h1');
++        gameOverTitle.textContent = 'GAME OVER';
++        gameOverTitle.style.marginBottom = '20px';
++        gameOverDiv.appendChild(gameOverTitle);
++        var gameOverText = document.createElement('p');
++        gameOverText.textContent = 'You were caught by the skeletons!';
++        gameOverDiv.appendChild(gameOverText);
++        var restartBtn1 = document.createElement('button');
++        restartBtn1.textContent = 'Try Again';
++        restartBtn1.style.cssText = 'margin-top: 20px; padding: 15px 40px; background: #8b0000; border: none; color: #fff; font-size: 18px; cursor: pointer; border-radius: 5px;';
++        restartBtn1.onmouseover = function() { this.style.background = '#b00000'; };
++        restartBtn1.onmouseout = function() { this.style.background = '#8b0000'; };
++        gameOverDiv.appendChild(restartBtn1);
++        gameContainer.appendChild(gameOverDiv);
++
++        // Victory Screen
++        var victoryDiv = document.createElement('div');
++        victoryDiv.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); padding: 40px; border: 4px solid #ffd700; border-radius: 15px; text-align: center; display: none; z-index: 100; color: #fff;';
++        var victoryTitle = document.createElement('h1');
++        victoryTitle.textContent = '🎉 VICTORY! 🎉';
++        victoryTitle.style.cssText = 'color: #ffd700; margin-bottom: 20px;';
++        victoryDiv.appendChild(victoryTitle);
++        var victoryText = document.createElement('p');
++        victoryText.textContent = 'You found the key and escaped!';
++        victoryDiv.appendChild(victoryText);
++        var finalScoreP = document.createElement('p');
++        victoryDiv.appendChild(finalScoreP);
++        var restartBtn2 = document.createElement('button');
++        restartBtn2.textContent = 'Play Again';
++        restartBtn2.style.cssText = 'margin-top: 20px; padding: 15px 40px; background: #8b0000; border: none; color: #fff; font-size: 18px; cursor: pointer; border-radius: 5px;';
++        restartBtn2.onmouseover = function() { this.style.background = '#b00000'; };
++        restartBtn2.onmouseout = function() { this.style.background = '#8b0000'; };
++        victoryDiv.appendChild(restartBtn2);
++        gameContainer.appendChild(victoryDiv);
++
++        document.body.appendChild(gameContainer);
++
++        // ============= Game Variables =============
++        var gameState = {
++            lives: 3,
++            score: 0,
++            distance: 0,
++            speed: 4,
++            paused: false,
++            hasKey: false,
++            gameOver: false,
++            deathAnimation: false,
++            deathTimer: 0
++        };
++
++        var player = {
++            x: 380,
++            y: 520,
++            width: 40,
++            height: 60,
++            speed: 8,
++            rotation: 0,
++            opacity: 1,
++            isDying: false,
++            sidePadding: 100
++        };
++
++        var keys = {};
++        var obstacles = [];
++        var spawnTimer = 0;
++        var spawnInterval = 100;
++        var keySpawned = false;
++        var maxSkeletonsPerWave = 1;
++        var lanes = [100, 200, 300, 400, 500, 600, 700];
++
++        // ============= Input Handling =============
++        document.addEventListener('keydown', function(e) {
++            keys[e.key] = true;
++        });
++
++        document.addEventListener('keyup', function(e) {
++            keys[e.key] = false;
++        });
++
++        // Mobile touch controls
++        function handleTouchStart(direction) {
++            return function(e) {
++                e.preventDefault();
++                keys[direction] = true;
++            };
++        }
++
++        function handleTouchEnd(direction) {
++            return function(e) {
++                e.preventDefault();
++                keys[direction] = false;
++            };
++        }
++
++        leftBtn.addEventListener('touchstart', handleTouchStart('ArrowLeft'));
++        leftBtn.addEventListener('touchend', handleTouchEnd('ArrowLeft'));
++        leftBtn.addEventListener('mousedown', handleTouchStart('ArrowLeft'));
++        leftBtn.addEventListener('mouseup', handleTouchEnd('ArrowLeft'));
++        leftBtn.addEventListener('mouseleave', handleTouchEnd('ArrowLeft'));
++
++        rightBtn.addEventListener('touchstart', handleTouchStart('ArrowRight'));
++        rightBtn.addEventListener('touchend', handleTouchEnd('ArrowRight'));
++        rightBtn.addEventListener('mousedown', handleTouchStart('ArrowRight'));
++        rightBtn.addEventListener('mouseup', handleTouchEnd('ArrowRight'));
++        rightBtn.addEventListener('mouseleave', handleTouchEnd('ArrowRight'));
++
++        // ============= Background Functions =============
++        function drawBackground() {
++            ctx.fillStyle = '#2d1b4e';
++            ctx.fillRect(0, 0, canvas.width, canvas.height);
++
++            var stairHeight = 30;
++            var offset = (gameState.distance * 3) % stairHeight;
++            
++            for (var i = -1; i < canvas.height / stairHeight + 1; i++) {
++                var y = i * stairHeight - offset;
++                
++                ctx.fillStyle = '#4a2f6e';
++                ctx.fillRect(0, y, canvas.width, stairHeight - 5);
++                
++                ctx.fillStyle = '#3d2558';
++                ctx.fillRect(0, y + stairHeight - 5, canvas.width, 5);
++            }
++
++            var gradient = ctx.createRadialGradient(
++                canvas.width / 2, canvas.height / 2, 100,
++                canvas.width / 2, canvas.height / 2, 500
++            );
++            gradient.addColorStop(0, 'rgba(0,0,0,0)');
++            gradient.addColorStop(1, 'rgba(0,0,0,0.5)');
++            ctx.fillStyle = gradient;
++            ctx.fillRect(0, 0, canvas.width, canvas.height);
++        }
++
++        // ============= Player Functions =============
++        function updatePlayer() {
++            if (!player.isDying) {
++                if (keys['ArrowLeft'] || keys['a']) {
++                    player.x -= player.speed;
++                }
++                if (keys['ArrowRight'] || keys['d']) {
++                    player.x += player.speed;
++                }
++
++                if (player.x < player.sidePadding) player.x = player.sidePadding;
++                if (player.x + player.width > canvas.width - player.sidePadding) {
++                    player.x = canvas.width - player.sidePadding - player.width;
++                }
++            }
++        }
++
++        function drawPlayer() {
++            ctx.save();
++            
++            if (player.isDying) {
++                ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
++                ctx.rotate(player.rotation);
++                ctx.globalAlpha = player.opacity;
++                ctx.translate(-(player.x + player.width / 2), -(player.y + player.height / 2));
++            }
++            
++            ctx.fillStyle = '#00ff00';
++            ctx.fillRect(player.x, player.y, player.width, player.height);
++            
++            ctx.fillStyle = '#ffcc99';
++            ctx.fillRect(player.x + 10, player.y, 20, 20);
++            
++            ctx.fillStyle = '#0066cc';
++            ctx.fillRect(player.x + 12, player.y + 20, 16, 25);
++            
++            ctx.fillStyle = '#003366';
++            ctx.fillRect(player.x + 12, player.y + 45, 6, 15);
++            ctx.fillRect(player.x + 22, player.y + 45, 6, 15);
++            
++            ctx.restore();
++        }
++
++        function startPlayerDeath() {
++            player.isDying = true;
++        }
++
++        function updateDeathAnimation() {
++            if (gameState.deathAnimation) {
++                gameState.deathTimer++;
++                player.rotation += 0.15;
++                player.y += 3;
++                player.opacity -= 0.02;
++                
++                if (player.opacity <= 0 || gameState.deathTimer > 100) {
++                    gameState.gameOver = true;
++                    gameOverDiv.style.display = 'block';
++                }
++            }
++        }
++
++        function resetPlayer() {
++            player.x = 380;
++            player.y = 520;
++            player.rotation = 0;
++            player.opacity = 1;
++            player.isDying = false;
++        }
++
++        // ============= Obstacle Functions =============
++        function createObstacle(x, y, isKey, isFake) {
++            return {
++                x: x,
++                y: y,
++                width: 50,
++                height: 50,
++                isKey: isKey || false,
++                isFake: isFake || false,
++                fakeTimer: 0,
++                revealed: false
++            };
++        }
++
++        function updateObstacle(obs) {
++            obs.y += gameState.speed;
++
++            if (obs.isFake && !obs.revealed) {
++                obs.fakeTimer++;
++                if (obs.fakeTimer > 80) {
++                    obs.revealed = true;
++                }
++            }
++        }
++
++        function drawObstacle(obs) {
++            if (obs.isKey && !obs.revealed) {
++                ctx.fillStyle = '#ffd700';
++                ctx.shadowColor = '#ffd700';
++                ctx.shadowBlur = 15;
++            } else if (obs.isFake && !obs.revealed) {
++                ctx.fillStyle = '#ffd700';
++                ctx.shadowColor = '#ffd700';
++                ctx.shadowBlur = 15;
++            } else {
++                ctx.fillStyle = '#ffffff';
++                ctx.shadowBlur = 0;
++            }
++
++            ctx.fillRect(obs.x + 15, obs.y, 20, 20);
++            ctx.fillRect(obs.x + 20, obs.y + 20, 10, 20);
++            ctx.fillRect(obs.x + 10, obs.y + 25, 10, 3);
++            ctx.fillRect(obs.x + 30, obs.y + 25, 10, 3);
++            ctx.fillRect(obs.x + 17, obs.y + 40, 6, 10);
++            ctx.fillRect(obs.x + 27, obs.y + 40, 6, 10);
++
++            ctx.shadowBlur = 0;
++        }
++
++        function spawnObstacle() {
++            if (!keySpawned && gameState.distance > 20000) {
++                if (Math.random() < 0.015) {
++                    var randomLane = lanes[Math.floor(Math.random() * lanes.length)];
++                    var isFake = Math.random() < 0.3;
++                    obstacles.push(createObstacle(randomLane, -60, !isFake, isFake));
++                    if (!isFake) keySpawned = true;
++                    return;
++                }
++            }
++
++            var numToSpawn = Math.min(maxSkeletonsPerWave, Math.floor(Math.random() * maxSkeletonsPerWave) + 1);
++            var usedLanes = [];
++            
++            for (var i = 0; i < numToSpawn; i++) {
++                var randomLane;
++                var attempts = 0;
++                
++                do {
++                    randomLane = lanes[Math.floor(Math.random() * lanes.length)];
++                    attempts++;
++                } while (usedLanes.indexOf(randomLane) !== -1 && attempts < 10);
++                
++                if (usedLanes.indexOf(randomLane) === -1) {
++                    usedLanes.push(randomLane);
++                    obstacles.push(createObstacle(randomLane, -60 - (i * 100)));
++                }
++            }
++        }
++
++        function checkCollision(obs) {
++            return player.x < obs.x + obs.width &&
++                   player.x + player.width > obs.x &&
++                   player.y < obs.y + obs.height &&
++                   player.y + player.height > obs.y;
++        }
++
++        // ============= UI Functions =============
++        function drawPixelHeart(x, y, filled) {
++            var heartPixels = [
++                [0,1,1,0,1,1,0],
++                [1,1,1,1,1,1,1],
++                [1,1,1,1,1,1,1],
++                [0,1,1,1,1,1,0],
++                [0,0,1,1,1,0,0],
++                [0,0,0,1,0,0,0]
++            ];
++            
++            var pixelSize = 4;
++            heartsCtx.fillStyle = filled ? '#ff0000' : '#550000';
++            
++            for (var row = 0; row < heartPixels.length; row++) {
++                for (var col = 0; col < heartPixels[row].length; col++) {
++                    if (heartPixels[row][col] === 1) {
++                        heartsCtx.fillRect(x + col * pixelSize, y + row * pixelSize, pixelSize, pixelSize);
++                    }
++                }
++            }
++            
++            if (filled) {
++                heartsCtx.strokeStyle = '#aa0000';
++                heartsCtx.lineWidth = 1;
++                for (var row = 0; row < heartPixels.length; row++) {
++                    for (var col = 0; col < heartPixels[row].length; col++) {
++                        if (heartPixels[row][col] === 1) {
++                            heartsCtx.strokeRect(x + col * pixelSize, y + row * pixelSize, pixelSize, pixelSize);
++                        }
++                    }
++                }
++            }
++        }
++
++        function updateHearts() {
++            heartsCtx.clearRect(0, 0, heartsCanvas.width, heartsCanvas.height);
++            for (var i = 0; i < 3; i++) {
++                drawPixelHeart(5 + i * 35, 5, i < gameState.lives);
++            }
++        }
++
++        function updateUI() {
++            scoreDiv.textContent = 'Score: ' + gameState.score;
++            distanceDiv.textContent = 'Distance: ' + Math.floor(gameState.distance) + 'm';
++        }
++
++        // ============= Game Control Functions =============
++        function handleHit() {
++            gameState.lives--;
++            updateHearts();
++            
++            if (gameState.lives <= 0) {
++                startPlayerDeath();
++                gameState.deathAnimation = true;
++            } else {
++                startPlayerDeath();
++                setTimeout(function() {
++                    player.isDying = false;
++                    player.rotation = 0;
++                    player.opacity = 1;
++                }, 500);
++            }
++        }
++
++        function restartGame() {
++            gameState.lives = 3;
++            gameState.score = 0;
++            gameState.distance = 0;
++            gameState.speed = 4;
++            gameState.paused = false;
++            gameState.hasKey = false;
++            gameState.gameOver = false;
++            gameState.deathAnimation = false;
++            gameState.deathTimer = 0;
++
++            resetPlayer();
++            obstacles = [];
++            keySpawned = false;
++            spawnTimer = 0;
++            spawnInterval = 100;
++            maxSkeletonsPerWave = 1;
++
++            updateHearts();
++            updateUI();
++            gameOverDiv.style.display = 'none';
++            victoryDiv.style.display = 'none';
++
++            gameLoop();
++        }
++
++        restartBtn1.onclick = restartGame;
++        restartBtn2.onclick = restartGame;
++
++        // ============= Main Game Loop =============
++        function gameLoop() {
++            if (gameState.gameOver) return;
++            
++            if (!gameState.paused) {
++                ctx.clearRect(0, 0, canvas.width, canvas.height);
++                
++                drawBackground();
++                updatePlayer();
++                
++                maxSkeletonsPerWave = Math.min(5, Math.floor(gameState.distance / 2000) + 1);
++                
++                spawnTimer++;
++                if (spawnTimer > spawnInterval) {
++                    spawnObstacle();
++                    spawnTimer = 0;
++                    
++                    if (spawnInterval > 30) {
++                        spawnInterval -= 0.8;
++                    }
++                    if (gameState.speed < 10) {
++                        gameState.speed += 0.03;
++                    }
++                }
++                
++                updateDeathAnimation();
++                
++                for (var i = obstacles.length - 1; i >= 0; i--) {
++                    var obs = obstacles[i];
++                    updateObstacle(obs);
++                    drawObstacle(obs);
++                    
++                    if (checkCollision(obs) && !player.isDying) {
++                        if (obs.isKey && !obs.isFake) {
++                            gameState.hasKey = true;
++                            gameState.score += 500;
++                            gameState.gameOver = true;
++                            finalScoreP.textContent = 'Final Score: ' + gameState.score;
++                            victoryDiv.style.display = 'block';
++                        } else {
++                            handleHit();
++                            obstacles.splice(i, 1);
++                        }
++                    }
++                    
++                    if (obs.y > canvas.height) {
++                        obstacles.splice(i, 1);
++                        gameState.score += 10;
++                    }
++                }
++                
++                drawPlayer();
++                
++                gameState.distance += gameState.speed;
++                updateUI();
++            }
++            
++            requestAnimationFrame(gameLoop);
++        }
++
++        // ============= Start Game =============
++        updateHearts();
++        gameLoop();
++    }
++
++    // Initialize when DOM is ready
++    if (document.readyState === 'loading') {
++        document.addEventListener('DOMContentLoaded', initGame);
++    } else {
++        initGame();
++    }
++})();
