@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Submodule 4"
-description: "Task 4 of the End Quest"
+title: "Cyber Defense Protocol"
+description: "Phase 1/2 Cyber Defense & Final Sequence (Vault) - End Quest"
 permalink: /digital-famine/end/submodule_4/
 parent: "End Quest"
 team: "CodeMaxxers"
@@ -14,7 +14,7 @@ microblog: true
 date: 2025-10-24
 ---
 
-# Submodule 4
+# Cyber Defense Protocol
 
 <!DOCTYPE html>
 <html lang="en">

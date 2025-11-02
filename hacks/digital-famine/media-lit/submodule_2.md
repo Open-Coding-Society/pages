@@ -3,6 +3,10 @@ layout: post
 title: "Bias Detector"
 description: "Second line of defense from foregin invaders"
 permalink: /digital-famine/media-lit/submodule_2/
+footer:
+  previous: /digital-famine/media-lit/submodule_1
+  home: /digital-famine/media-lit
+  next: /digital-famine/media-lit/submodule_3
 parent: "Analytics/Admin"
 team: "Scratchers"
 submodule: 2

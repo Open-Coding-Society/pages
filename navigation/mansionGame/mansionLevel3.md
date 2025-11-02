@@ -2,6 +2,7 @@
 layout: opencs
 title: Adventure Game
 permalink: /gamify/mansion3
+microblog: true
 ---
 
 <div id="gameContainer">

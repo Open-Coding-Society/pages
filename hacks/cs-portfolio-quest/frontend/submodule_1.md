@@ -133,31 +133,30 @@ microblog: true
 
 <h2>Learning Objectives</h2>
 
-<p>By the end of this foundational module, you will be able to:</p>
 <ul>
-  <li>Define Frontend Development and its role in a web application.</li>
-  <li>Identify the three core technologies (HTML, CSS, JS) and their respective functions.</li>
-  <li>Differentiate between the Client-Side (Frontend) and the Server-Side (Backend).</li>
-  <li>Explain the concept of synergy between the core technologies.</li>
+  <li>- Define Frontend Development and its role in a web application.</li>
+  <li>- Identify the three core technologies (HTML, CSS, JS) and their respective functions.</li>
+  <li>- Differentiate between the Client-Side (Frontend) and the Server-Side (Backend).</li>
+  <li>- Explain the concept of synergy between the core technologies.</li>
 </ul>
 
 <h2>Prerequisites</h2>
 
 <ul>
-    <li>Basic curiosity about how websites work.</li>
-    <li>Familiarity with web browsers.</li>
-    <li>No prior coding experience required!</li>
+    <li>- Basic curiosity about how websites work.</li>
+    <li>- Familiarity with web browsers.</li>
+    <li>- No prior coding experience required!</li>
 </ul>
 
 <h2>Frontend Basics: The User's World</h2>
 
-<p>Frontend development is the practice of converting data into a graphical interface for users to view and interact with. It is everything a user sees and touches on a website, like buttons, images, text, and layouts. We call it **client-side development** because the code executes directly in the user's web browser (the client).</p>
+<p>Frontend development is the practice of converting data into a graphical interface for users to view and interact with. It is everything a user sees and touches on a website, like buttons, images, text, and layouts. We call it client-side development because the code executes directly in the user's web browser (the client).</p>
 <p></p>
 <p>The three essential technologies that make up every modern web page are:</p>
 
 <h3>1. HTML: Structure</h3>
 
-<p>HTML (HyperText Markup Language) provides the **structure** and **content**. It defines elements like headings (&lt;h1&gt;), paragraphs (&lt;p&gt;), lists, and inputs. A website with only HTML is functional but plain.</p>
+<p>HTML (HyperText Markup Language) provides the structure and content. It defines elements like headings (&lt;h1&gt;), paragraphs (&lt;p&gt;), lists, and inputs. A website with only HTML is functional but plain.</p>
 <p></p>
 
 <div class="example-block">
@@ -189,7 +188,7 @@ p {
 
 <h3>3. JavaScript: Behavior (The Brain and Muscles)</h3>
 
-<p>JavaScript (JS) is the **interactivity** and **behavior** layer. It handles dynamic features, responds to user actions (like button clicks), validates form data, and allows the page to communicate with the server without reloading.</p>
+<p>JavaScript (JS) is the interactivity and behavior layer. It handles dynamic features, responds to user actions (like button clicks), validates form data, and allows the page to communicate with the server without reloading.</p>
 <p></p>
 
 <div class="example-block">
@@ -312,9 +311,9 @@ Initial State Button
 
 <p>To prepare for upcoming modules, consider these questions:</p>
 <ol>
-  <li>If a website looks visually broken but all the text and links are present and functional, which core technology is likely malfunctioning?</li>
-  <li>Where would you define the order of two separate &lt;p&gt; elements on a page: HTML, CSS, or JavaScript?</li>
-  <li>What is the fundamental difference between client-side and server-side code execution?</li>
+  <li>- If a website looks visually broken but all the text and links are present and functional, which core technology is likely malfunctioning?</li>
+  <li>- Where would you define the order of two separate &lt;p&gt; elements on a page: HTML, CSS, or JavaScript?</li>
+  <li>- What is the fundamental difference between client-side and server-side code execution?</li>
 </ol>
 <p></p>
 

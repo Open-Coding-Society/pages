@@ -2,6 +2,7 @@
 layout: opencs
 title: Adventure Game
 permalink: /gamify/mansion2
+microblog: true
 ---
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>

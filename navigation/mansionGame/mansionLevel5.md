@@ -2,6 +2,7 @@
 layout: opencs
 title: Mansion Level 5
 permalink: /gamify/mansion5
+microblog: true
 ---
 
 <div id="gameContainer">

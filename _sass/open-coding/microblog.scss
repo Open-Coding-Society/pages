@@ -1,3 +1,4 @@
+
 /* Microblog form group and label */
 .microblog-form-group {
   width: 100%;
@@ -12,12 +13,6 @@
 }
 .microblog-form-label .required {
   color: #ef4444;
-}
-/* Microblog Modal (Create/Reply) */
-#microblog-panel,
-#microblog-modal-panel {
-  background: #2563eb !important;
-  color: #fff !important;
 }
 
 
@@ -44,8 +39,8 @@
 }
 /* Modal Panel: matches microblog panel pattern */
 .microblog-modal-panel {
-  background: #2563eb;
-  color: #fff;
+  background: var(--green-bg);
+  color: var(--white);
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px rgba(0,0,0,0.1);
   width: 100%;
@@ -179,6 +174,8 @@
 
 /* Side Panel */
 .microblog-panel {
+  background: var(--green-bg);
+  color: var(--white);
   position: fixed;
   top: 5rem;
   right: 0;
