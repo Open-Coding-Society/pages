@@ -10,7 +10,7 @@ permalink: /gamify/mansion2
 <script type="module">
     // Adnventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
-    import MansionLevel4 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
+    import MansionLevel2 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Web Server Environment data
     const environment = {
@@ -20,7 +20,7 @@ permalink: /gamify/mansion2
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [MansionLevel4]
+        gameLevelClasses: [MansionLevel2]
     }
     // Launch Adventure Game
     Game.main(environment);
