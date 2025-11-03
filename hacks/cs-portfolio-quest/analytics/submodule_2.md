@@ -360,64 +360,6 @@ date: 2025-10-21
     </div>
   </div>
 
-  <div class="skills-card">
-    <h2 class="section-title">Skills Mastery</h2>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Data Analysis</span>
-        <span class="skill-percentage">92%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 92%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Python</span>
-        <span class="skill-percentage">88%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 88%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">AI Ethics</span>
-        <span class="skill-percentage">85%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 85%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Machine Learning</span>
-        <span class="skill-percentage">78%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 78%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Statistics</span>
-        <span class="skill-percentage">90%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 90%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">SQL</span>
-        <span class="skill-percentage">82%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 82%"></div>
-      </div>
-    </div>
-  </div>
-
   
 <!-- Instructional Card -->
 <div style="
