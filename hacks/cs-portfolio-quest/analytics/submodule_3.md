@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: cs-portfolio-lesson
 title: "Submodule 3"
 description: "Submodule 3 of Analytics/Admin Mini-Quest"
 permalink: /cs-portfolio-quest/analytics/submodule_3/
@@ -9,14 +9,11 @@ submodule: 3
 categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team"
-date: 2025-10-21
 ---
 
-{%- include tailwind/cs-portfolio-quest-lessons_info.html -%}
 
 # Submodule 3: User Management System and User Analytics
 
-[Return to Analytics and Mastery Certificate Quest]({{ site.baseurl }}/cs-portfolio-quest/analytics/)
 <style>
   .analytics-container {
     background-color: #121212;
@@ -401,16 +398,16 @@ date: 2025-10-21
         <div class="metric-icon" style="background: rgba(234, 140, 51, 0.2);">📊</div>
       </div>
       <div class="metric-value">84.5%</div>
-      <div class="metric-subtitle">6 students enrolled</div>
+      <div class="metric-subtitle" id="students-enrolled">6 students enrolled</div>
     </div>
 
     <div class="metric-card">
       <div class="metric-header">
-        <span class="metric-title">Modules Completed</span>
+        <span class="metric-title">Average Modules Completed</span>
         <div class="metric-icon" style="background: rgba(16, 185, 129, 0.2);">✅</div>
       </div>
-      <div class="metric-value">48</div>
-      <div class="metric-subtitle">Out of 96 total</div>
+      <div class="metric-value" id="modules-completed">0</div>
+      <div class="metric-subtitle">Out of 25 total</div>
     </div>
 
     <div class="metric-card">
@@ -427,7 +424,7 @@ date: 2025-10-21
         <span class="metric-title">Progress Rate</span>
         <div class="metric-icon" style="background: rgba(139, 92, 246, 0.2);">📈</div>
       </div>
-      <div class="metric-value">50%</div>
+      <div class="metric-value" id="progress-percentage">0%</div>
       <div class="metric-subtitle">Average completion</div>
     </div>
   </div>
@@ -468,6 +465,10 @@ date: 2025-10-21
             Module 4
             <span class="sort-indicator">▼</span>
           </th>
+          <th class="center" onclick="sortTable('module5')" id="th-module5">
+            Module 5
+            <span class="sort-indicator">▼</span>
+          </th>
           <th class="center">Overall</th>
         </tr>
       </thead>
@@ -503,55 +504,110 @@ date: 2025-10-21
   </div>
 </div>
 
-<!-- Flask data pull -->
-
-<!-- <script type="module">
-  import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
-  import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-  async function fetchPeople() {
-    for (let id = 1; id <= 2; id++) {
-      try {
-        const res = await fetch(`${pythonURI}/api/user`, {
-          ...fetchOptions,
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          },
-        });
-
-        console.log(`Request for ID ${id} → Status: ${res.status}`);
-
-        if (res.status === 404) {
-          console.log(`ID ${id} not found. Terminating loop.`);
-          break; // stop loop if 404
-        }
-
-        if (res.ok) {
-          const data = await res.json();
-          console.log(`Data for ID ${id}:`, data);
-        } else {
-          console.warn(`Request failed for ID ${id} with status ${res.status}`);
-        }
-
-      } catch (err) {
-        console.error(`Error fetching ID ${id}:`, err);
-        break; // optional: stop on network or fetch error
-      }
-    }
-  }
-
-  fetchPeople();
-</script> -->
-
 <script type="module">
   import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
+  async function getCredentials() {
+        try {
+            const res = await fetch(`${pythonURI}/api/id`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const role = data.role;
+                console.log(role);
+                return role;
+            } else {
+                console.log(`Request failed for with status ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+  }
+
+  // after page load, check credentials and redirect non-Admin users to the main quest page
+  // Tested with admin (toby) and default user (hop), and hop is redirected while toby is not
+  window.addEventListener('load', async () => {
+    try {
+      const role = await getCredentials();
+      if (role !== 'Admin') {
+        window.location.href = '{{ site.baseurl }}/cs-portfolio-quest';
+      }
+    } catch (err) {
+      console.error('Error checking credentials:', err);
+    }
+  });
+
+  async function downloadReport() {
+      let csv = 'Student Name,Overall Average,Module 1 Progress,Module 1 Average,Module 2 Progress,Module 2 Average,Module 3 Progress,Module 3 Average,Module 4 Progress,Module 4 Average,Module 5 Progress,Module 5 Average\n';
+
+      const data = await fetchPeople();
+      const { students, completions } = data;
+      
+      students.forEach(s => {
+        const overall = calculateOverallAverage(s.modules);
+        csv += [
+          s.name,
+          overall,
+          s.modules['Module 1'].progress + '%',
+          calculateModuleAverage(s.modules['Module 1']),
+          s.modules['Module 2'].progress + '%',
+          calculateModuleAverage(s.modules['Module 2']),
+          s.modules['Module 3'].progress + '%',
+          calculateModuleAverage(s.modules['Module 3']),
+          s.modules['Module 4'].progress + '%',
+          calculateModuleAverage(s.modules['Module 4']),
+          s.modules['Module 5'].progress + '%',
+          calculateModuleAverage(s.modules['Module 5'])
+        ].join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'studentvue_analytics_report.csv';
+      a.click();
+  }
+  // expose to global scope so inline `onclick` handlers (in the HTML) can call it
+  window.downloadReport = downloadReport;
+
+  async function getLessonData() {
+      try {
+          const res = await fetch(`${javaURI}/api/stats`, {
+              ...fetchOptions,
+              method: "GET",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+          });
+
+          if (!res.ok) {
+              console.log(`Request failed with status ${res.status}`);
+              return;
+          }
+
+          const data = await res.json();
+          return data;
+      } catch (err) {
+          console.log(`Error: ${err}`);
+      }
+  }
+
   async function fetchPeople() {
     const students = [];
-    
-    for (let id = 1; id <= 100; id++) {
+    const completions = [];
+
+    const lessonData = await getLessonData();
+    console.log(lessonData);
+
+    for (let id = 1; id <= 75; id++) {
       try {
         const res = await fetch(`${javaURI}/api/person/${id}`, {
           ...fetchOptions,
@@ -561,29 +617,77 @@ date: 2025-10-21
           },
         });
 
-        console.log(`Request for ID ${id} → Status: ${res.status}`);
-
+        // silently skip 404s and continue
         if (res.status === 404) {
-          console.log(`ID ${id} not found. Terminating loop.`);
-          break;
+          continue;
         }
 
         if (res.ok) {
           const data = await res.json();
-          console.log(`Fetched person:`, data);
+          console.log(data);
+          const filtered = lessonData.filter(item => item.username === data.uid);
+          console.log(`Data for ${data.uid}:`, filtered);
+
+          // Define modules and total submodules
+          const lesson_modules = {
+              'AI Usage': 4,
+              'Backend Development': 6,
+              'Data Visualization': 3,
+              'Frontend Development': 6,
+              'Resume Building': 6
+          };
+
+          // Initialize result object
+          const moduleStats = {};
+          Object.keys(lesson_modules).forEach(m => {
+              moduleStats[m] = { time: 0, percentComplete: 0 };
+          });
+
+          // Sum time and count finished submodules per module
+          const finishedCounts = {};
+          Object.keys(lesson_modules).forEach(m => finishedCounts[m] = 0);
+
+          filtered.forEach(item => {
+              const mod = item.module;
+              if (lesson_modules[mod] !== undefined) {
+                  // Sum time
+                  moduleStats[mod].time += item.time || 0;
+
+                  // Count finished submodules
+                  if (item.finished) finishedCounts[mod] += 1;
+              }
+          });
+
+          // Compute percent completion per module
+          Object.keys(lesson_modules).forEach(m => {
+              const totalSubmodules = lesson_modules[m];
+              const finished = finishedCounts[m];
+              moduleStats[m].percentComplete = (finished / totalSubmodules) * 100;
+          });
+
+          const frontendCompletion = moduleStats["Frontend Development"].percentComplete
+          const backendCompletion = moduleStats["Backend Development"].percentComplete
+          const datavizCompletion = moduleStats["Data Visualization"].percentComplete
+          const resumeCompletion = moduleStats["Resume Building"].percentComplete
+          const aiCompletion = moduleStats["AI Usage"].percentComplete
+          const averageCompletion = (frontendCompletion + backendCompletion + datavizCompletion + resumeCompletion + aiCompletion) / 5
+          completions.push(averageCompletion)
+
+          console.log(moduleStats);
 
           // Create random lesson and module data
-          const randomLessons = () =>
-            Array.from({ length: 5 }, () => Math.floor(Math.random() * 21) * 5); // random 0–100 in steps of 5
+          const randomLessons = (numLessons) =>
+            Array.from({ length: numLessons }, () => Math.floor(Math.random() * 21) * 5); // random 0–100 in steps of 5
 
-          const randomProgress = () =>
-            Math.floor(Math.random() * 5) * 25; // random 0, 25, 50, 75, 100
+          // const randomProgress = () =>
+          //   Math.floor(Math.random() * 5) * 25; // random 0, 25, 50, 75, 100
 
           const modules = {
-            "Module 1": { progress: randomProgress(), lessons: randomLessons() },
-            "Module 2": { progress: randomProgress(), lessons: randomLessons() },
-            "Module 3": { progress: randomProgress(), lessons: randomLessons() },
-            "Module 4": { progress: randomProgress(), lessons: randomLessons() },
+            "Module 1": { progress: frontendCompletion, lessons: randomLessons(6) },  // 6 lessons
+            "Module 2": { progress: backendCompletion, lessons: randomLessons(6) },  // 6 lessons
+            "Module 3": { progress: datavizCompletion, lessons: randomLessons(3) },  // 3 lessons
+            "Module 4": { progress: resumeCompletion, lessons: randomLessons(6) },  // 6 lessons
+            "Module 5": { progress: aiCompletion, lessons: randomLessons(4) },  // 4 lessons
           };
 
           students.push({
@@ -593,43 +697,69 @@ date: 2025-10-21
           });
 
         } else {
-          console.warn(`Request failed for ID ${id} with status ${res.status}`);
+          // silently ignore non-OK responses
+          continue;
         }
 
       } catch (err) {
-        console.error(`Error fetching ID ${id}:`, err);
-        break;
+        // suppress all errors silently
+        console.log(err);
       }
     }
-
-    console.log("✅ Final students array:", students);
-    return students;
+    return {
+      students,
+      completions
+    };
   }
 
-  fetchPeople();
+  // helper functions moved to module scope so other top-level functions (e.g. downloadReport)
+  // can call them without needing to run `main()` first.
+  function calculateModuleAverage(moduleData) {
+    const completed = moduleData.lessons.filter(s => s > 0);
+    if (completed.length === 0) return 0;
+    return Math.round(completed.reduce((a, b) => a + b, 0) / completed.length);
+  }
+
+  function calculateOverallAverage(modules) {
+    let total = 0, count = 0;
+    Object.values(modules).forEach(m => {
+      m.lessons.forEach(s => {
+        if (s > 0) { total += s; count++; }
+      });
+    });
+    return count > 0 ? Math.round(total / count) : 0;
+  }
 
   async function main() {
-    const students = await fetchPeople();
+    console.log("In main function");
+    const data = await fetchPeople();
+    const { students, completions } = data;
+    const percentageAverage = completions.length > 0 ? completions.reduce((sum, value) => sum + value, 0) / completions.length : 0;
+    const modulesCompletedAverage = 25 * percentageAverage/100;
+    // truncate display values to 2 decimals
+    const displayPercentage = Number(percentageAverage).toFixed(2);
+    const displayModulesCompleted = Number(modulesCompletedAverage).toFixed(2);
     console.log("Students array:", students);
+    console.log("Completions array:", completions);
+
+    // Updating Cards
+    const progressPercentageEl = document.getElementById("progress-percentage");
+    if (progressPercentageEl) {
+      progressPercentageEl.innerText = `${displayPercentage}%`;
+    }
+      const modulesCompletedEl = document.getElementById("modules-completed");
+    if (modulesCompletedEl) {
+      modulesCompletedEl.innerText = `${displayModulesCompleted}`;
+    }
+      const studentsEnrolledEl = document.getElementById("students-enrolled");
+      if (studentsEnrolledEl) {
+          studentsEnrolledEl.innerText = `${students.length} students enrolled`;
+      }
+
 
     let currentSort = { key: 'name', direction: 'asc' };
     let expandedRow = null;
-
-    function calculateModuleAverage(moduleData) {
-      const completed = moduleData.lessons.filter(s => s > 0);
-      if (completed.length === 0) return 0;
-      return Math.round(completed.reduce((a, b) => a + b, 0) / completed.length);
-    }
-
-    function calculateOverallAverage(modules) {
-      let total = 0, count = 0;
-      Object.values(modules).forEach(m => {
-        m.lessons.forEach(s => {
-          if (s > 0) { total += s; count++; }
-        });
-      });
-      return count > 0 ? Math.round(total / count) : 0;
-    }
+    
 
     function getGradeClass(score) {
       if (score >= 90) return 'grade-a';
@@ -680,9 +810,9 @@ date: 2025-10-21
                 ${avg > 0 ? avg + '%' : '--'}
               </div>
               <div class="progress-bar-container">
-                <div class="progress-bar" style="width: ${data.progress}%"></div>
+                <div class="progress-bar" style="width: ${data.progress.toFixed(2)}%"></div>
               </div>
-              <div class="progress-info">${data.progress}% Complete</div>
+              <div class="progress-info">${data.progress.toFixed(2)}% Complete</div>
             </td>
           `;
         });
@@ -703,7 +833,7 @@ date: 2025-10-21
         if (isExpanded) detailRow.classList.add('active');
         detailRow.id = `detail-${student.id}`;
         detailRow.innerHTML = `
-          <td colspan="6">
+          <td colspan="7">
             <div class="detail-content">
               <div class="detail-header">Grade Details - ${student.name}</div>
               <div class="modules-grid">
@@ -754,33 +884,6 @@ date: 2025-10-21
       document.getElementById('th-' + key).classList.add('active');
       
       renderTable();
-    }
-
-    function downloadReport() {
-      let csv = 'Student Name,Overall Average,Module 1 Progress,Module 1 Average,Module 2 Progress,Module 2 Average,Module 3 Progress,Module 3 Average,Module 4 Progress,Module 4 Average\n';
-      
-      students.forEach(s => {
-        const overall = calculateOverallAverage(s.modules);
-        csv += [
-          s.name,
-          overall,
-          s.modules['Module 1'].progress + '%',
-          calculateModuleAverage(s.modules['Module 1']),
-          s.modules['Module 2'].progress + '%',
-          calculateModuleAverage(s.modules['Module 2']),
-          s.modules['Module 3'].progress + '%',
-          calculateModuleAverage(s.modules['Module 3']),
-          s.modules['Module 4'].progress + '%',
-          calculateModuleAverage(s.modules['Module 4'])
-        ].join(',') + '\n';
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'studentvue_analytics_report.csv';
-      a.click();
     }
 
     renderTable();

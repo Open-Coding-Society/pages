@@ -1,0 +1,658 @@
+---
+layout: cs-portfolio-lesson
+---
+
+{{content}}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: rgb(0, 0, 0);
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Chat Toggle Button */
+    .chat-toggle-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 55px;
+        height: 55px;
+        background: linear-gradient(135deg, #ea8c33, #d67324);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(234, 140, 51, 0.4);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chat-toggle-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 30px rgba(234, 140, 51, 0.5);
+    }
+
+    .chat-toggle-btn:active {
+        transform: scale(0.95);
+    }
+
+    .chat-toggle-btn.active {
+        background: linear-gradient(135deg, #c56520, #b4581c);
+    }
+
+    /* Chat Modal */
+    .chat-modal {
+        position: fixed;
+        bottom: 75px;
+        right: 33px;
+        width: 400px;
+        height: 550px;
+        background: rgb(0, 0, 0);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(234, 140, 51, 0.2);
+    }
+
+    .chat-modal.open {
+        display: flex;
+        animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Chat Header */
+    .chat-header {
+        background: linear-gradient(135deg, #ea8c33, #d67324);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+
+    .close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+    .close-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Chat Body */
+    .chat-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Messages Area */
+    .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        background: linear-gradient(to bottom, #000000, #15181f);
+    }
+
+    .messages-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    .message-bubble, .ai-bubble {
+        max-width: 85%;
+        padding: 12px 16px;
+        margin: 8px 0;
+        border-radius: 18px;
+        word-wrap: break-word;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .message-bubble {
+        background: linear-gradient(135deg, #ea8c33, #d67324);
+        color: white;
+        margin-left: auto;
+        margin-right: 0;
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 2px 8px rgba(234, 140, 51, 0.3);
+    }
+
+    .ai-bubble {
+        background: white;
+        color: #374151;
+        margin-left: 0;
+        margin-right: auto;
+        border-bottom-left-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f3f4f6;
+    }
+
+    .timestamp {
+        font-size: 10px;
+        opacity: 0.7;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .typing-indicator {
+        background: white;
+        color: #ea8c33;
+        padding: 12px 16px;
+        border-radius: 18px;
+        border-bottom-left-radius: 6px;
+        font-style: italic;
+        font-size: 13px;
+        max-width: 85%;
+        margin: 8px 0;
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f3f4f6;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+    }
+
+    /* Input Area */
+    .input-container {
+        padding: 20px;
+        background: rgb(0, 0, 0);
+        border-top: 1px solid #15181f;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .message-input {
+        flex: 1;
+        padding: 10px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        outline: none;
+        font-size: 14px;
+        background: #000000;
+        color: white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+    }
+
+    .message-input:focus {
+        border-color: #ea8c33;
+        background: rgb(0, 0, 0);
+        box-shadow: 0 0 0 3px rgba(234, 140, 51, 0.1);
+    }
+
+    .message-input::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Instructions */
+    .instructions {
+        background: linear-gradient(135deg, #1b1c20, #000000);
+        border: 1px solid #ea8c33;
+        border-radius: 12px;
+        padding: 16px;
+        margin: 8px 0;
+        font-size: 13px;
+        color: #d67324;
+        box-shadow: 0 2px 8px rgba(234, 140, 51, 0.1);
+    }
+
+    .instructions h4 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: #ea8c33;
+        font-weight: 600;
+    }
+
+    .instructions ul {
+        margin: 0;
+        padding-left: 16px;
+    }
+
+    .instructions li {
+        margin: 4px 0;
+    }
+</style>
+
+<button class="chat-toggle-btn" id="chatToggle">💬</button>
+
+<div class="chat-modal" id="chatModal">
+    <div class="chat-header">
+        <h3>Analytics Guide Bot</h3>
+        <button class="close-btn" id="closeChat">×</button>
+    </div>
+    
+    <div class="chat-body">
+        <div class="messages-container" id="messagesContainer">
+            <div class="instructions">
+                <h4>Welcome to the Analytics Guide! 📊</h4>
+                <ul>
+                    <li>Learn how to read your analytics dashboard</li>
+                    <li>Understand your study metrics & progress</li>
+                    <li>Get tips on improving your performance</li>
+                    <li>Ask questions about any chart or statistic</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="messageInput" 
+                class="message-input" 
+                placeholder="Ask about your analytics dashboard..."
+                maxlength="500"
+            >
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Import configurations
+    import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+    const API_KEY = 'AIzaSyAwUorzifmPEIX6M74Kd_as-C-7Ih6UyLs';
+
+    // Modal functionality
+    const chatToggle = document.getElementById('chatToggle');
+    const chatModal = document.getElementById('chatModal');
+    const closeChat = document.getElementById('closeChat');
+    const messageInput = document.getElementById('messageInput');
+    const messagesContainer = document.getElementById('messagesContainer');
+
+    let isOpen = false;
+    let hasInitialMessage = false;
+    let userAnalyticsData = null;
+
+    // Fetch user credentials
+    async function getCredentials() {
+        try {
+            const res = await fetch(`${pythonURI}/api/id`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const username = data.uid;
+                console.log(username);
+                return username;
+            } else {
+                console.log(`Request failed with status ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    // Fetch lesson data
+    async function getLessonData() {
+        const username = await getCredentials();
+        try {
+            const res = await fetch(`${javaURI}/api/stats`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (!res.ok) {
+                console.log(`Request failed with status ${res.status}`);
+                return;
+            }
+
+            const data = await res.json();
+            console.log("All data", data);
+
+            const filtered = data.filter(item => item.username === username);
+            console.log(`Data for ${username}:`, filtered);
+
+            const totalTime = filtered.reduce((sum, item) => sum + (item.time || 0), 0);
+            console.log(`Total time spent:`, totalTime);
+            const modulesComplete = filtered.length;
+            console.log(`Modules Completed:`, modulesComplete);
+            const modulesIncomplete = 25 - filtered.length;
+            console.log(`Modules Incomplete:`, modulesIncomplete);
+
+            // Define modules and total submodules
+            const modules = {
+                'AI Usage': 4,
+                'Backend Development': 6,
+                'Data Visualization': 3,
+                'Frontend Development': 6,
+                'Resume Building': 6
+            };
+
+            // Initialize result object
+            const moduleStats = {};
+            Object.keys(modules).forEach(m => {
+                moduleStats[m] = { time: 0, percentComplete: 0 };
+            });
+
+            // Sum time and count finished submodules per module
+            const finishedCounts = {};
+            Object.keys(modules).forEach(m => finishedCounts[m] = 0);
+
+            filtered.forEach(item => {
+                const mod = item.module;
+                if (modules[mod] !== undefined) {
+                    // Sum time
+                    moduleStats[mod].time += item.time || 0;
+
+                    // Count finished submodules
+                    if (item.finished) finishedCounts[mod] += 1;
+                }
+            });
+
+            // Compute percent completion per module
+            Object.keys(modules).forEach(m => {
+                const totalSubmodules = modules[m];
+                const finished = finishedCounts[m];
+                moduleStats[m].percentComplete = (finished / totalSubmodules) * 100;
+            });
+
+            console.log(`Module stats for ${username}:`, moduleStats);
+
+            return {
+                username,
+                totalTime,
+                modulesComplete,
+                modulesIncomplete,
+                moduleStats,
+                filteredData: filtered
+            };
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    // Format analytics data for chatbot context
+    function formatAnalyticsForPrompt(analyticsData) {
+        if (!analyticsData) return "No analytics data available yet.";
+        
+        const { username, totalTime, modulesComplete, modulesIncomplete, moduleStats } = analyticsData;
+        
+        let formattedData = `Current User: ${username}\n\n`;
+        formattedData += `Overall Statistics:\n`;
+        formattedData += `- Total Study Time: ${totalTime.toFixed(1)} minutes (${(totalTime / 60).toFixed(1)} hours)\n`;
+        formattedData += `- Modules Completed: ${modulesComplete} out of 25\n`;
+        formattedData += `- Modules In Progress: ${modulesIncomplete}\n\n`;
+        
+        formattedData += `Module-Specific Breakdown:\n`;
+        Object.entries(moduleStats).forEach(([moduleName, stats]) => {
+            formattedData += `\n${moduleName}:\n`;
+            formattedData += `  - Time Spent: ${stats.time.toFixed(1)} minutes\n`;
+            formattedData += `  - Completion: ${stats.percentComplete.toFixed(1)}%\n`;
+        });
+        
+        return formattedData;
+    }
+
+    // Gemini API integration with analytics data
+    async function sendToGeminiAPI(userMessage) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+
+        const analyticsContext = formatAnalyticsForPrompt(userAnalyticsData);
+
+        const systemPrompt = `You are the Analytics Guide Bot, a friendly and knowledgeable assistant helping students understand their learning analytics dashboard. Your role is to:
+
+1. Explain what different metrics mean (study time, modules completed, completion rates)
+2. Help users understand charts and graphs (study time by module, completion rates)
+3. Provide tips on how to improve their learning performance
+4. Answer questions about the analytics dashboard interface
+5. Explain how to interpret trends and patterns in their data
+6. Give personalized insights based on their actual data
+
+USER'S CURRENT ANALYTICS DATA:
+${analyticsContext}
+
+Available Modules:
+- Frontend Development (6 submodules)
+- Backend Development (6 submodules)
+- Data Visualization (3 submodules)
+- Resume Building (6 submodules)
+- AI Usage (4 submodules)
+
+Keep responses:
+- Clear and educational
+- Conversational but informative
+- Focused on the analytics dashboard
+- Encouraging and supportive
+- Concise (2-4 sentences usually)
+- PERSONALIZED to their actual data when relevant
+- Do not use markdown/bolded text in responses
+
+Your name is Analytics Guide Bot. Be helpful and make analytics easy to understand!`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: `${systemPrompt}\n\nUser question: ${userMessage}` }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                console.error('Unexpected response structure:', data);
+                return "I received an unexpected response. Please try asking your question again.";
+            }
+        } catch (error) {
+            console.error('Error communicating with Gemini API:', error);
+            return "I'm having trouble connecting right now. Please try again in a moment.";
+        }
+    }
+
+    // Modal toggle functionality
+    function toggleChat() {
+        isOpen = !isOpen;
+        if (isOpen) {
+            chatModal.classList.add('open');
+            chatToggle.classList.add('active');
+            chatToggle.innerHTML = '×';
+            messageInput.focus();
+            if (!hasInitialMessage) {
+                displayInitialMessage();
+            }
+        } else {
+            chatModal.classList.remove('open');
+            chatToggle.classList.remove('active');
+            chatToggle.innerHTML = '💬';
+        }
+    }
+
+    chatToggle.addEventListener('click', toggleChat);
+    closeChat.addEventListener('click', toggleChat);
+
+    // Initial message with personalized data
+    function displayInitialMessage() {
+        if (!userAnalyticsData) {
+            addMessageToChat("Hey! I'm your Analytics Guide Bot. Loading your analytics data...", true);
+            return;
+        }
+
+        const { totalTime, modulesComplete, modulesIncomplete } = userAnalyticsData;
+        
+        const messages = [
+            `Hey! I can see you've completed ${modulesComplete} modules and spent ${(totalTime / 60).toFixed(1)} hours learning. What would you like to know about your progress?`,
+            `Welcome! You have ${modulesIncomplete} modules in progress. I'm here to help you understand your analytics. What questions do you have?`,
+            `Hi there! I can see your learning journey so far. You've completed ${modulesComplete} modules. Want to know more about your performance?`,
+            `Hello! Based on your ${(totalTime / 60).toFixed(1)} hours of study time, I can help you understand your learning patterns. What would you like to explore?`
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        setTimeout(() => {
+            addMessageToChat(randomMessage, true);
+            hasInitialMessage = true;
+        }, 500);
+    }
+
+    // Chat utility functions
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function addMessageToChat(message, isAI = false) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(isAI ? 'ai-bubble' : 'message-bubble');
+        
+        const messageText = document.createElement('div');
+        messageText.textContent = message;
+        
+        const timestamp = document.createElement('span');
+        timestamp.classList.add('timestamp');
+        timestamp.textContent = getCurrentTime();
+        
+        messageElement.appendChild(messageText);
+        messageElement.appendChild(timestamp);
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('typing-indicator');
+        typingIndicator.id = 'typingIndicator';
+        typingIndicator.textContent = 'Analytics Guide is typing...';
+        messagesContainer.appendChild(typingIndicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return typingIndicator;
+    }
+
+    function hideTypingIndicator(indicator) {
+        if (indicator && indicator.parentNode) {
+            indicator.parentNode.removeChild(indicator);
+        }
+    }
+
+    // Message sending
+    messageInput.addEventListener('keypress', async function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            const userMessage = event.target.value.trim();
+            
+            if (!userMessage) return;
+            
+            // Add user message
+            addMessageToChat(userMessage);
+            event.target.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = showTypingIndicator();
+            
+            try {
+                // Get AI response
+                const aiResponse = await sendToGeminiAPI(userMessage);
+                
+                // Hide typing indicator and add AI response
+                hideTypingIndicator(typingIndicator);
+                
+                setTimeout(() => {
+                    addMessageToChat(aiResponse, true);
+                }, 500);
+                
+            } catch (error) {
+                hideTypingIndicator(typingIndicator);
+                addMessageToChat("Sorry, I encountered an error. Please try again.", true);
+            }
+        }
+    });
+
+    // Initialize: Load analytics data when page loads
+    async function initializeChatbot() {
+        console.log("Initializing chatbot with analytics data...");
+        userAnalyticsData = await getLessonData();
+        console.log("Analytics data loaded:", userAnalyticsData);
+    }
+
+    // Call initialization
+    initializeChatbot();
+</script>

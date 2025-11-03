@@ -61,6 +61,34 @@ export function initPlanetNavigation(gameInstance) {
   prevBtn.onmouseout = () => prevBtn.style.transform = 'scale(1)';
   prevBtn.onclick = () => navigateToPreviousPlanet(gameInstance);
   
+
+// Help/Story Button (reopen splash screen)
+const helpBtn = document.createElement('button');
+helpBtn.id = 'help-btn';
+helpBtn.innerHTML = '📖 Story';
+helpBtn.className = 'medium filledHighlight primary';
+helpBtn.style.cssText = `
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 10px 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+`;
+helpBtn.onmouseover = () => helpBtn.style.transform = 'scale(1.05)';
+helpBtn.onmouseout = () => helpBtn.style.transform = 'scale(1)';
+helpBtn.onclick = () => {
+  if (window.reopenSplashScreen) {
+    window.reopenSplashScreen();
+  } else {
+    console.warn('Splash screen function not available');
+  }
+};
+
   // Cheat Menu Button
   const cheatBtn = document.createElement('button');
   cheatBtn.id = 'cheat-btn';
@@ -138,6 +166,7 @@ export function initPlanetNavigation(gameInstance) {
   buttonWrapper.appendChild(prevBtn);
   buttonWrapper.appendChild(cheatBtn);
   buttonWrapper.appendChild(resetBtn);
+  buttonWrapper.appendChild(helpBtn);
   buttonWrapper.appendChild(nextBtn);
   
   // Add wrapper to footer
@@ -154,7 +183,7 @@ export function initPlanetNavigation(gameInstance) {
 function getPlanetURL(planetKey) {
   const planetURLs = {
     'microblog': '/digital-famine/microblog/',
-    'medialit': '/digital-famine/medialit/',
+    'medialit': '/digital-famine/media-lit/',
     'ai': '/digital-famine/ai/',
     'cyber': '/digital-famine/cybersecurity-game/',
     'end': '/digital-famine/end/'
@@ -278,10 +307,10 @@ function showCheatMenu(gameInstance) {
   
   // Planet buttons
   const planets = [
-    { key: 'microblog', name: 'Microblogging Planet', icon: '✍️' },
-    { key: 'medialit', name: 'Media Literacy Planet', icon: '🎓' },
-    { key: 'ai', name: 'AI Planet', icon: '🧠' },
-    { key: 'cyber', name: 'Cybersecurity Planet', icon: '🛡️' }
+    { key: 'microblog', name: 'Microblogging Planet' },
+    { key: 'medialit', name: 'Media Literacy Planet' },
+    { key: 'ai', name: 'AI Planet' },
+    { key: 'cyber', name: 'Cybersecurity Planet'}
   ];
   
   planets.forEach(planet => {
@@ -320,7 +349,7 @@ function showCheatMenu(gameInstance) {
   
   // Complete All button
   const completeAllBtn = document.createElement('button');
-  completeAllBtn.innerHTML = '🌟 COMPLETE ALL PLANETS';
+  completeAllBtn.innerHTML = 'COMPLETE ALL PLANETS';
   completeAllBtn.style.cssText = `
     width: 100%;
     background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);

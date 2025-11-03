@@ -580,28 +580,13 @@ footer:
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏟️ Stop 2: San Francisco</h1>
+            <h1>🏟️ Stop 3: San Francisco</h1>
             <p>Learn How to Make Complete API Calls</p>
         </div>
 
         <div class="section">
-            <h2>Meet the San Francisco Stadiums</h2>
-            <div class="stadium-cards">
-                <div class="stadium-card">
-                    <h3>🏀 Chase Center</h3>
-                    <div class="info"><strong>Team:</strong> Golden State Warriors</div>
-                    <div class="info"><strong>Capacity:</strong> 18,064 fans</div>
-                    <div class="info"><strong>Opened:</strong> 2019</div>
-                    <div class="info"><strong>Championships:</strong> 7 NBA Titles</div>
-                </div>
-                <div class="stadium-card">
-                    <h3>🏈 Levi's Stadium</h3>
-                    <div class="info"><strong>Team:</strong> San Francisco 49ers</div>
-                    <div class="info"><strong>Capacity:</strong> 68,500 fans</div>
-                    <div class="info"><strong>Opened:</strong> 2014</div>
-                    <div class="info"><strong>Championships:</strong> 5 Super Bowls</div>
-                </div>
-            </div>
+            <h2>Meet Your San Francisco Sports Teams</h2>
+            <div class="stadium-cards" id="stadium-cards"></div>
         </div>
 
         <div class="section">
@@ -633,8 +618,6 @@ footer:
                         <label>Step 1: Select which stadium data you want:</label>
                         <select id="stadiumSelect" onchange="updateURL()">
                             <option value="">-- Choose a stadium --</option>
-                            <option value="chase_center">🏀 Chase Center (Warriors)</option>
-                            <option value="levis_stadium">🏈 Levi's Stadium (49ers)</option>
                         </select>
                     </div>
                     <div class="constructed-url" id="constructedURL">
@@ -705,12 +688,8 @@ footer:
 
             <div class="quiz-question" id="q3">
                 <div class="question-number">Question 3 of 3</div>
-                <div class="question-text">Which stadium has a larger capacity?</div>
-                <div class="quiz-options">
-                    <div class="quiz-option" onclick="selectOption(3, 0, false)">A) Chase Center (18,064 fans)</div>
-                    <div class="quiz-option" onclick="selectOption(3, 1, true)">B) Levi's Stadium (68,500 fans)</div>
-                    <div class="quiz-option" onclick="selectOption(3, 2, false)">C) They have the same capacity</div>
-                </div>
+                <div class="question-text" id="q3-text">Which stadium has a larger capacity?</div>
+                <div class="quiz-options" id="q3-options"></div>
                 <div class="quiz-feedback" id="feedback3"></div>
                 <button class="next-btn" id="next3" onclick="showResults()">See Results →</button>
             </div>
@@ -725,32 +704,158 @@ footer:
     </div>
 
     <script>
-        const stadiumData = {
-            chase_center: {
-                name: "Chase Center",
-                team: "Golden State Warriors",
-                sport: "Basketball (NBA)",
-                capacity: 18064,
-                opened: 2019,
-                location: "San Francisco, CA",
-                championships: 7,
-                cost: "$1.4 Billion"
-            },
-            levis_stadium: {
+        // COMPLETE SF TEAMS DATABASE
+        const COMPLETE_SF_TEAMS = {
+            "Football - 49ers": {
+                id: "levis_stadium",
                 name: "Levi's Stadium",
                 team: "San Francisco 49ers",
-                sport: "Football (NFL)",
+                sport: "Football - 49ers",
                 capacity: 68500,
                 opened: 2014,
                 location: "Santa Clara, CA",
                 championships: 5,
-                cost: "$1.3 Billion"
+                cost: "$1.3 Billion",
+                icon: "🏈"
+            },
+            "Basketball - Warriors": {
+                id: "chase_center",
+                name: "Chase Center",
+                team: "Golden State Warriors",
+                sport: "Basketball - Warriors",
+                capacity: 18064,
+                opened: 2019,
+                location: "San Francisco, CA",
+                championships: 7,
+                cost: "$1.4 Billion",
+                icon: "🏀"
+            },
+            "Baseball - Giants": {
+                id: "oracle_park",
+                name: "Oracle Park",
+                team: "San Francisco Giants",
+                sport: "Baseball - Giants",
+                capacity: 41915,
+                opened: 2000,
+                location: "San Francisco, CA",
+                championships: 8,
+                cost: "$357 Million",
+                icon: "⚾"
+            },
+            "Ice Hockey - Sharks": {
+                id: "sap_center",
+                name: "SAP Center",
+                team: "San Jose Sharks",
+                sport: "Ice Hockey - Sharks",
+                capacity: 17562,
+                opened: 1993,
+                location: "San Jose, CA",
+                championships: 0,
+                cost: "$162 Million",
+                icon: "🏒"
+            },
+            "Baseball - A's": {
+                id: "oakland_coliseum",
+                name: "Oakland Coliseum",
+                team: "Oakland Athletics",
+                sport: "Baseball - A's",
+                capacity: 46847,
+                opened: 1966,
+                location: "Oakland, CA",
+                championships: 9,
+                cost: "$25.5 Million",
+                icon: "⚾"
             }
         };
 
+        let stadiumData = {};
+        let userSports = [];
         let currentKey = null;
         let selectedStadium = null;
         let score = 0;
+
+        function loadUserItinerary() {
+            try {
+                const itinerary = JSON.parse(localStorage.getItem('westCoastItinerary'));
+                if (itinerary && itinerary.cities && itinerary.cities['San Francisco'] && 
+                    itinerary.cities['San Francisco'].sports) {
+                    userSports = itinerary.cities['San Francisco'].sports;
+                    
+                    // Map user sports to stadium data
+                    userSports.forEach(sport => {
+                        const teamData = COMPLETE_SF_TEAMS[sport.name];
+                        if (teamData) {
+                            stadiumData[teamData.id] = teamData;
+                        }
+                    });
+                    
+                    if (Object.keys(stadiumData).length === 2) {
+                        displayUserStadiums();
+                        populateStadiumSelect();
+                        generateQuiz();
+                    } else {
+                        displayDefaultStadiums();
+                    }
+                } else {
+                    displayDefaultStadiums();
+                }
+            } catch (error) {
+                console.error('Error loading itinerary:', error);
+                displayDefaultStadiums();
+            }
+        }
+
+        function displayUserStadiums() {
+            const container = document.getElementById('stadium-cards');
+            let html = '';
+
+            Object.values(stadiumData).forEach(stadium => {
+                html += `
+                    <div class="stadium-card">
+                        <h3>${stadium.icon} ${stadium.name}</h3>
+                        <div class="info"><strong>Team:</strong> ${stadium.team}</div>
+                        <div class="info"><strong>Capacity:</strong> ${stadium.capacity.toLocaleString()} fans</div>
+                        <div class="info"><strong>Opened:</strong> ${stadium.opened}</div>
+                        <div class="info"><strong>Championships:</strong> ${stadium.championships}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function populateStadiumSelect() {
+            const select = document.getElementById('stadiumSelect');
+            select.innerHTML = '<option value="">-- Choose a stadium --</option>';
+            
+            Object.values(stadiumData).forEach(stadium => {
+                select.innerHTML += `<option value="${stadium.id}">${stadium.icon} ${stadium.name} (${stadium.team})</option>`;
+            });
+        }
+
+        function generateQuiz() {
+            const teams = Object.values(stadiumData);
+            if (teams.length === 2) {
+                const q3Options = document.getElementById('q3-options');
+                const larger = teams[0].capacity > teams[1].capacity ? 0 : 1;
+                
+                q3Options.innerHTML = `
+                    <div class="quiz-option" onclick="selectOption(3, 0, ${larger === 0})">A) ${teams[0].name} (${teams[0].capacity.toLocaleString()} fans)</div>
+                    <div class="quiz-option" onclick="selectOption(3, 1, ${larger === 1})">B) ${teams[1].name} (${teams[1].capacity.toLocaleString()} fans)</div>
+                    <div class="quiz-option" onclick="selectOption(3, 2, false)">C) They have the same capacity</div>
+                `;
+            }
+        }
+
+        function displayDefaultStadiums() {
+            stadiumData = {
+                chase_center: COMPLETE_SF_TEAMS["Basketball - Warriors"],
+                levis_stadium: COMPLETE_SF_TEAMS["Football - 49ers"]
+            };
+            displayUserStadiums();
+            populateStadiumSelect();
+            generateQuiz();
+        }
 
         function generateKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -874,3 +979,138 @@ footer:
                     feedback.className = 'quiz-feedback correct show';
                     feedback.textContent = '✅ Correct! Great job!';
                     score++;
+                } else {
+                    selected.classList.add('incorrect');
+                    feedback.className = 'quiz-feedback incorrect show';
+                    feedback.textContent = '❌ Not quite. Review the material and try again!';
+                }
+                document.getElementById(`next${questionNum}`).classList.add('show');
+            }, 300);
+        }
+
+        function nextQuestion(num) {
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            document.getElementById(`q${num}`).classList.add('active');
+        }
+
+        function showResults() {
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            const complete = document.getElementById('quizComplete');
+            complete.classList.add('show');
+            
+            document.getElementById('finalScore').textContent = `${score}/3`;
+            
+            const message = document.getElementById('scoreMessage');
+            if (score === 3) {
+                message.textContent = 'Perfect! You understand APIs!';
+            } else if (score === 2) {
+                message.textContent = 'Great job! You\'re almost there!';
+            } else {
+                message.textContent = 'Keep learning! Review the material and try again!';
+            }
+        }
+
+        function restartQuiz() {
+            score = 0;
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            document.getElementById('q1').classList.add('active');
+            document.getElementById('quizComplete').classList.remove('show');
+            
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.querySelectorAll('.quiz-feedback').forEach(f => {
+                f.classList.remove('show');
+            });
+            
+            document.querySelectorAll('.next-btn').forEach(btn => {
+                btn.classList.remove('show');
+            });
+            
+            // Reset drag and drop
+            const draggables = document.getElementById('draggables');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            dropZones.forEach(zone => {
+                const item = zone.querySelector('.drag-item');
+                if (item) {
+                    draggables.appendChild(item);
+                }
+                zone.classList.remove('filled');
+            });
+        }
+
+        // Drag and Drop functionality
+        let draggedElement = null;
+
+        function setupDragDrop() {
+            const draggables = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            draggables.forEach(item => {
+                item.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.style.opacity = '0.5';
+                });
+
+                item.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', function() {
+                    this.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    
+                    if (draggedElement && this.children.length === 0) {
+                        this.appendChild(draggedElement);
+                        this.classList.add('filled');
+                    }
+                });
+            });
+        }
+
+        function checkDragDrop() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correct = true;
+
+            dropZones.forEach(zone => {
+                const expectedStep = zone.dataset.position;
+                const droppedItem = zone.querySelector('.drag-item');
+                
+                if (!droppedItem || droppedItem.dataset.step !== expectedStep) {
+                    correct = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback2');
+            const nextBtn = document.getElementById('next2');
+
+            if (correct) {
+                feedback.className = 'quiz-feedback correct show';
+                feedback.textContent = '✅ Perfect! You correctly ordered the API call steps!';
+                score++;
+            } else {
+                feedback.className = 'quiz-feedback incorrect show';
+                feedback.textContent = '❌ Not quite right. Remember: Get API key → Build request URL → Receive data response';
+            }
+
+            nextBtn.classList.add('show');
+        }
+
+        // Load user's itinerary on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserItinerary();
+            setupDragDrop();
+        });

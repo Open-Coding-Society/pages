@@ -254,11 +254,46 @@ summary {
 details[open] > summary {
     list-style-type: '▼ ';
 }
+
+/* Itinerary Info Box */
+.itinerary-info {
+  background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.06));
+  border: 2px solid rgba(78,204,163,0.2);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+
+.itinerary-info h3 {
+  color: #4ecca3;
+  margin: 0 0 0.5rem 0;
+}
+
+.selected-foods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.food-item {
+  padding: 0.5rem;
+  background: rgba(78,204,163,0.1);
+  border-left: 3px solid #4ecca3;
+  border-radius: 0.35rem;
+}
 </style>
 
 <!-- Dark mode toggle -->
 <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-bottom:0.75rem;">
   <button id="themeToggleBtn" class="sq-btn" title="Toggle dark / light">🌙 Dark</button>
+</div>
+
+<!-- Itinerary Info Display -->
+<div id="itineraryInfo" class="itinerary-info" style="display:none;">
+  <h3>🍽️ Your Selected San Diego Foods</h3>
+  <div class="selected-foods" id="selectedFoodsList"></div>
+  <p class="small" style="margin-top: 0.75rem; opacity: 0.8;">These are the foods from your West Coast trip itinerary. Complete the tasks below to learn about them!</p>
 </div>
 
 <!-- Progress Tracker -->
@@ -268,8 +303,9 @@ details[open] > summary {
     <div id="task-fishtaco" class="task-item">Task 1: Fish Taco Class - <span class="status">Incomplete</span></div>
     <div id="task-burritocart" class="task-item">Task 2: Burrito Cart - <span class="status">Incomplete</span></div>
     <div id="task-bajabowl" class="task-item">Task 3: Build Baja Bowl - <span class="status">Incomplete</span></div>
-    <div id="task-seed" class="task-item">Task 4: Seed Pantry - <span class="status">Incomplete</span></div>
-    <div id="task-view" class="task-item">Task 5: View Pantry - <span class="status">Incomplete</span></div>
+    <div id="task-post" class="task-item">Task 4: Programmatic POST and Unit Test - <span class="status">Incomplete</span></div>
+    <div id="task-seed" class="task-item">Task 5: Seed Pantry - <span class="status">Incomplete</span></div>
+    <div id="task-view" class="task-item">Task 6: View Pantry - <span class="status">Incomplete</span></div>
   </div>
   <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: 0.5rem;">
     <strong>Completion: <span id="completion-percentage">0%</span></strong>
@@ -323,9 +359,45 @@ details[open] > summary {
     fishtaco: false,
     burritocart: false,
     bajabowl: false,
+    post: false,
     seed: false,
     view: false
   };
+
+  // Load and display itinerary foods
+  function loadItineraryFoods() {
+    try {
+      const itineraryData = localStorage.getItem('westCoastItinerary');
+      if (itineraryData) {
+        const itinerary = JSON.parse(itineraryData);
+        if (itinerary.cities && itinerary.cities['San Diego']) {
+          const sdFoods = itinerary.cities['San Diego'].foods;
+          if (sdFoods && sdFoods.length > 0) {
+            displayItineraryFoods(sdFoods);
+            window.userSelectedFoods = sdFoods;
+            return sdFoods;
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error loading itinerary:', e);
+    }
+    return null;
+  }
+
+  function displayItineraryFoods(foods) {
+    const infoBox = document.getElementById('itineraryInfo');
+    const foodsList = document.getElementById('selectedFoodsList');
+    
+    if (foods && foods.length > 0) {
+      foodsList.innerHTML = foods.map(food => 
+        `<div class="food-item">🍽️ ${food}</div>`
+      ).join('');
+      infoBox.style.display = 'block';
+    } else {
+      infoBox.style.display = 'none';
+    }
+  }
 
   // Load progress from localStorage
   function loadTaskProgress() {
@@ -361,7 +433,7 @@ details[open] > summary {
 
   // Update progress display
   function updateProgressDisplay() {
-    const tasks = ['fishtaco', 'burritocart', 'bajabowl', 'seed', 'view'];
+    const tasks = ['fishtaco', 'burritocart', 'bajabowl', 'post', 'seed', 'view'];
     let completedCount = 0;
 
     tasks.forEach(task => {
@@ -479,7 +551,19 @@ details[open] > summary {
     }
     async getDishes(query={}) {
       const city = (query.city||'sd').toLowerCase();
-      return this.db.dishes.filter(d => (d.city||'sd').toLowerCase()===city);
+      let dishes = this.db.dishes.filter(d => (d.city||'sd').toLowerCase()===city);
+      
+      // Filter by user's selected foods if available
+      if (window.userSelectedFoods && window.userSelectedFoods.length > 0) {
+        dishes = dishes.filter(d => {
+          return window.userSelectedFoods.some(selectedFood => 
+            d.name.toLowerCase().includes(selectedFood.toLowerCase()) ||
+            selectedFood.toLowerCase().includes(d.name.toLowerCase())
+          );
+        });
+      }
+      
+      return dishes;
     }
     reset() { this.db.reset(); }
   }
@@ -506,6 +590,8 @@ details[open] > summary {
     window.logTo('terminal-init','[MockAPI] DB loaded from localStorage.');
   }
 
+  // Load itinerary foods on page load
+  loadItineraryFoods();
   loadTaskProgress();
 })();
 </script>
@@ -522,26 +608,28 @@ details[open] > summary {
     - GET /api/dishes?city=sd  
   <br>
   - Data is stored in **localStorage**, so progress **persists** across refreshes.  
-  - When creating the **Baja Bowl**, a toast appears showing “+50 XP 🎉”.
+  - When creating the **Baja Bowl**, a toast appears showing "+50 XP 🎉".
+  - **NEW:** The page now reads your itinerary from localStorage and displays only your selected San Diego foods!
 
 <br>
 
 <!-- Task 1 -->
 <details open>
-  <summary>Task 1: Fish Taco Class</summary>
+  <summary>Task 1: Your Selected Food Class</summary>
   <div class="sq-card">
-    <div class="sq-label">Describe & implement the <strong>FishTaco</strong> class (id, fishType, toppings[], sauce, price, spiceLevel) and method <code>calculateTotalPrice()</code> (<em>8% tax</em>). Throw error if fishType missing.</div>
+    <div class="sq-label">Create a class for your first selected food! Implement the <strong>SelectedDish</strong> class with properties (id, name, ingredients[], category, price, calories) and method <code>calculateTotalPrice()</code> (<em>8% tax</em>). Throw error if name is missing.</div>
     <textarea id="code-fishtaco" class="code-editor">
-// class FishTaco { ... } - edit or run the example
-class FishTaco {
-  constructor(id, fishType, toppings = [], sauce, price = 0, spiceLevel = "Mild") {
-    if (!fishType) throw new Error("Fish type required");
+// Create a class for your selected San Diego food!
+// Check the Itinerary Info box above to see your selected foods
+class SelectedDish {
+  constructor(id, name, ingredients = [], category, price = 0, calories = 0) {
+    if (!name) throw new Error("Dish name required");
     this.id = id;
-    this.fishType = fishType;
-    this.toppings = Array.isArray(toppings) ? toppings : [];
-    this.sauce = sauce || null;
+    this.name = name;
+    this.ingredients = Array.isArray(ingredients) ? ingredients : [];
+    this.category = category || "San Diego";
     this.price = Number(price) || 0;
-    this.spiceLevel = spiceLevel;
+    this.calories = Number(calories) || 0;
   }
 
   calculateTotalPrice() {
@@ -550,10 +638,15 @@ class FishTaco {
   }
 }
 
-// sample usage:
-const taco = new FishTaco("t1", "Mahi-Mahi", ["cabbage","lime","pico"], "chipotle", 5.99, "Medium");
-console.log("Created:", taco);
-console.log("Total price:", taco.calculateTotalPrice().toFixed(2));
+// Example with your selected food - customize this with your actual selection!
+const selectedFood = window.userSelectedFoods && window.userSelectedFoods[0] 
+  ? window.userSelectedFoods[0] 
+  : "Fish Tacos (Baja-style)";
+
+const dish = new SelectedDish("d1", selectedFood, ["fresh ingredients","local produce"], "San Diego Favorite", 12.99, 450);
+console.log("Created your selected dish:", dish);
+console.log("Total price with tax:", dish.calculateTotalPrice().toFixed(2));
+console.log("Calories:", dish.calories);
 
 // Mark task as complete when run successfully
 completeTask('fishtaco');
@@ -563,39 +656,82 @@ completeTask('fishtaco');
       <button class="sq-btn" onclick="copyEditor('code-fishtaco')">Copy</button>
     </div>
     <pre id="terminal-fishtaco" class="sq-terminal"></pre>
+    <div class="sq-card" style="background: rgba(59,130,246,0.05); margin-top:0.5rem;">
+  <strong>Checkpoint 🧩 — What you just did:</strong>
+  <ul>
+    <li>Created a <code>FishTaco</code> class (simulates a database "record").</li>
+    <li>Added fields: <em>id, fishType, toppings, sauce, price, spiceLevel</em>.</li>
+    <li>Implemented <code>calculateTotalPrice()</code> → simulates derived data.</li>
+    <li>Learned that <strong>CREATE = instantiating and saving new records</strong>.</li>
+  </ul>
+  <small>Tip: think of each taco object as a row in your dishes table!</small>
+</div>
+
+<div class="sq-card quiz-block" style="background: rgba(99,102,241,0.06); margin-top:0.5rem;">
+  <strong>🧩 Quick Quiz:</strong>
+
+  <div class="quiz-question" data-answer="b">
+    <p>1️⃣ Why should the constructor throw an error when <code>fishType</code> is missing?</p>
+    <label><input type="radio" name="q1-fish" value="a"> It improves performance</label><br>
+    <label><input type="radio" name="q1-fish" value="b"> It enforces data integrity</label><br>
+    <label><input type="radio" name="q1-fish" value="c"> It adds extra toppings automatically</label>
+  </div>
+
+  <div class="quiz-question" data-answer="a">
+    <p>2️⃣ What field does <code>calculateTotalPrice()</code> derive from?</p>
+    <label><input type="radio" name="q1-price" value="a"> price</label><br>
+    <label><input type="radio" name="q1-price" value="b"> spiceLevel</label><br>
+    <label><input type="radio" name="q1-price" value="c"> id</label>
+  </div>
+
+  <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answers</button>
+  <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+</div>
+
+
   </div>
 </details>
 
 <!-- Task 2 -->
 <details>
-  <summary>Task 2: BurritoCart</summary>
+  <summary>Task 2: Food Collection Cart</summary>
   <div class="sq-card">
-    <div class="sq-label">Implement <strong>BurritoCart</strong> with methods <code>addBurrito()</code>, <code>removeBurrito()</code>, <code>getTotalPrice()</code>, <code>getBurritosByFilling()</code>.</div>
+    <div class="sq-label">Implement <strong>FoodCart</strong> to manage your selected San Diego foods with methods <code>addDish()</code>, <code>removeDish()</code>, <code>getTotalPrice()</code>, <code>getDishesByCategory()</code>.</div>
     <textarea id="code-burritocart" class="code-editor">
-// BurritoCart implementation
-class BurritoCart {
+// FoodCart implementation for your selected San Diego foods
+class FoodCart {
   constructor() {
-    this.burritos = [];
+    this.dishes = [];
   }
-  addBurrito(burrito) {
-    if (!burrito || typeof burrito !== 'object') throw new Error('Invalid burrito');
-    this.burritos.push(burrito);
+  addDish(dish) {
+    if (!dish || typeof dish !== 'object') throw new Error('Invalid dish');
+    this.dishes.push(dish);
   }
-  removeBurrito(index) {
-    if (index < 0 || index >= this.burritos.length) return;
-    this.burritos.splice(index,1);
+  removeDish(index) {
+    if (index < 0 || index >= this.dishes.length) return;
+    this.dishes.splice(index,1);
   }
-  getTotalPrice() { return this.burritos.reduce((s,b)=>s+(Number(b.price)||0),0); }
-  getBurritosByFilling(filling) { return this.burritos.filter(b => b.filling === filling); }
+  getTotalPrice() { return this.dishes.reduce((s,d)=>s+(Number(d.price)||0),0); }
+  getDishesByCategory(category) { return this.dishes.filter(d => d.category === category); }
 }
 
-// example
-const cart = new BurritoCart();
-cart.addBurrito({ name: "California Burrito", filling: "Carne Asada", price: 8.5 });
-cart.addBurrito({ name: "Veggie Burrito", filling: "Beans", price: 7.0 });
-console.log("Cart:", cart.burritos);
-console.log("Total:", cart.getTotalPrice());
-console.log("Carne Asada burritos:", cart.getBurritosByFilling("Carne Asada"));
+// Example using your selected foods from the itinerary
+const cart = new FoodCart();
+
+// Get your selected foods
+const food1 = window.userSelectedFoods && window.userSelectedFoods[0] 
+  ? window.userSelectedFoods[0] 
+  : "Fish Tacos (Baja-style)";
+const food2 = window.userSelectedFoods && window.userSelectedFoods[1] 
+  ? window.userSelectedFoods[1] 
+  : "California Burrito";
+
+cart.addDish({ name: food1, category: "San Diego Favorite", price: 12.99 });
+cart.addDish({ name: food2, category: "San Diego Favorite", price: 10.50 });
+
+console.log("Your food cart:", cart.dishes);
+console.log("Total price:", cart.getTotalPrice());
+console.log("San Diego Favorites:", cart.getDishesByCategory("San Diego Favorite"));
 
 // Mark task as complete when run successfully
 completeTask('burritocart');
@@ -605,20 +741,52 @@ completeTask('burritocart');
       <button class="sq-btn" onclick="copyEditor('code-burritocart')">Copy</button>
     </div>
     <pre id="terminal-burritocart" class="sq-terminal"></pre>
+    <div class="sq-card" style="background: rgba(59,130,246,0.05); margin-top:0.5rem;">
+  <strong>Checkpoint 🧩 — Key Learnings:</strong>
+  <ul>
+    <li>Created a container (cart) to hold multiple “records” (burritos).</li>
+    <li>Methods to <strong>add/remove/retrieve</strong> items simulate CRUD operations.</li>
+    <li>Running code here simulates <strong>client-side creation</strong> of multiple records before sending to DB.</li>
+  </ul>
+ 
+</div>
+<div class="sq-card quiz-block" style="background: rgba(99,102,241,0.06); margin-top:0.5rem;">
+  <strong>🧩 Quick Quiz:</strong>
+
+  <div class="quiz-question" data-answer="c">
+    <p>1️⃣ Which CRUD operation would an <code>updateBurrito()</code> method represent?</p>
+    <label><input type="radio" name="q2-crud" value="a"> Create</label><br>
+    <label><input type="radio" name="q2-crud" value="b"> Read</label><br>
+    <label><input type="radio" name="q2-crud" value="c"> Update</label><br>
+    <label><input type="radio" name="q2-crud" value="d"> Delete</label>
+  </div>
+
+  <div class="quiz-question" data-answer="b">
+    <p>2️⃣ Why is filtering burritos by filling useful before sending them to a backend?</p>
+    <label><input type="radio" name="q2-burrito" value="a"> It reduces calories</label><br>
+    <label><input type="radio" name="q2-burrito" value="b"> It minimizes unnecessary data transfer</label><br>
+    <label><input type="radio" name="q2-burrito" value="c"> It automatically creates new records</label>
+  </div>
+
+  <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answers</button>
+  <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+</div>
+
+
   </div>
 </details>
 
 <!-- Task 3 -->
 <details>
-  <summary>Task 3: Build the Baja Bowl</summary>
+  <summary>Task 3: Create Your Selected Dish</summary>
   <div class="sq-card">
-    <div class="sq-label">Use the form to build a <strong>Baja Bowl</strong>. Required fields: <em>name, category, ingredients (name, qty, unit), calories</em>. Photo may be a URL or uploaded file (stored as data URL).</div>
+    <div class="sq-label">Use the form to create one of your selected San Diego foods! Required fields: <em>name (choose from your selections above), category, ingredients (name, qty, unit), calories</em>. Photo may be a URL or uploaded file (stored as data URL).</div>
     <div style="display:grid; grid-template-columns: 1fr; gap:0.5rem;">
-      <label class="sq-label">Dish name</label>
-      <input id="dish-name" class="sq-field" placeholder="Baja Bowl" value="Baja Bowl" />
+      <label class="sq-label">Dish name (use one of your selected foods above!)</label>
+      <input id="dish-name" class="sq-field" placeholder="Your selected food..." value="" />
 
       <label class="sq-label">Category</label>
-      <input id="dish-category" class="sq-field" placeholder="Healthy" value="Healthy" />
+      <input id="dish-category" class="sq-field" placeholder="San Diego Favorite" value="San Diego Favorite" />
 
       <label class="sq-label">Calories</label>
       <input id="dish-calories" type="number" class="sq-field" placeholder="600" value="600" />
@@ -628,9 +796,9 @@ completeTask('burritocart');
 
       <label class="sq-label">Add Ingredients (name, qty, unit)</label>
       <div style="display:flex; gap:0.5rem;">
-        <input id="ing-name" class="sq-field" placeholder="avocado" />
+        <input id="ing-name" class="sq-field" placeholder="fresh fish" />
         <input id="ing-qty" class="sq-field" placeholder="1" />
-        <input id="ing-unit" class="sq-field" placeholder="cup" />
+        <input id="ing-unit" class="sq-field" placeholder="serving" />
         <button class="sq-btn" onclick="addIngredient()">Add</button>
       </div>
 
@@ -639,10 +807,42 @@ completeTask('burritocart');
       <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
         <button class="sq-btn sq-run" onclick="runCreateForm()">Create Dish (POST)</button>
         <button class="sq-btn" onclick="clearForm()">Clear</button>
+        <button class="sq-btn" onclick="autofillSelectedFood()">Auto-fill Selected Food</button>
       </div>
 
       <div style="margin-top:0.5rem">
         <div id="terminal-create" class="sq-terminal"></div>
+        <div class="sq-card" style="background: rgba(59,130,246,0.05); margin-top:0.5rem;">
+          <strong>Checkpoint 🧩 — What just happened:</strong>
+          <ul>
+            <li>Collected user input from form → simulates a POST request.</li>
+            <li>Validated required fields: <strong>name, category, calories, ingredients</strong>.</li>
+            <li>Called <code>MockAPIInstance.postDish()</code> → “created” a new dish in the mock DB.</li>
+            <li>Displayed feedback in the terminal and XP toast → confirms creation success.</li>
+          </ul>
+          <small>Quiz: What would happen if you submitted without ingredients? Which part of the code prevents it?</small>
+        </div>
+
+        <div class="sq-card quiz-block" style="background: rgba(99,102,241,0.06); margin-top:0.5rem;">
+          <strong>🧩 Quick Quiz:</strong>
+
+          <div class="quiz-question" data-answer="b">
+            <p>1️⃣ What HTTP method is simulated when you click the "Create Dish" button?</p>
+            <label><input type="radio" name="q3-post" value="a"> GET</label><br>
+            <label><input type="radio" name="q3-post" value="b"> POST</label><br>
+            <label><input type="radio" name="q3-post" value="c"> PATCH</label>
+          </div>
+
+          <div class="quiz-question" data-answer="c">
+            <p>2️⃣ Why does the form have client-side validation before sending the data?</p>
+            <label><input type="radio" name="q3-baja" value="a"> To make the form look better</label><br>
+            <label><input type="radio" name="q3-baja" value="b"> To add extra ingredients automatically</label><br>
+            <label><input type="radio" name="q3-baja" value="c"> To prevent sending incomplete or invalid data to the server</label>
+          </div>
+
+          <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answers</button>
+          <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -651,6 +851,23 @@ completeTask('burritocart');
 <script>
 (function(){
   window._localIngredientBuffer = [];
+  
+  window.autofillSelectedFood = function() {
+    const food1 = window.userSelectedFoods && window.userSelectedFoods[0] 
+      ? window.userSelectedFoods[0] 
+      : "Baja Bowl";
+    document.getElementById('dish-name').value = food1;
+    document.getElementById('dish-category').value = "San Diego Favorite";
+    document.getElementById('dish-calories').value = "450";
+    
+    // Clear and add sample ingredients
+    window._localIngredientBuffer = [
+      { name: "fresh ingredients", qty: "1", unit: "serving" },
+      { name: "local produce", qty: "1", unit: "cup" }
+    ];
+    renderIngredientList();
+  };
+  
   window.addIngredient = function() {
     const name = document.getElementById('ing-name').value.trim();
     const qty = document.getElementById('ing-qty').value.trim();
@@ -735,9 +952,19 @@ completeTask('burritocart');
     city: "sd"
   };
 
+  // 1. Log the action from the client's perspective
+  console.log('[Client] Sending POST /api/dishes', payload);
+
+  // 2. Call the mock API to create the dish
   const res = await MockAPIInstance.postDish(payload);
-  console.log("Status:", res.status);
-  console.log("Body:", res.body);
+
+  // 3. Check the response and log the result from the server's perspective
+  if (res.status === 201) {
+    console.log('[Server] 201 Created', res.body);
+    completeTask('post'); // This now runs only on success
+  } else {
+    console.log('[Server] Error', res);
+  }
 })();
     </textarea>
     <div style="margin-top:0.5rem" class="editor-actions">
@@ -745,6 +972,37 @@ completeTask('burritocart');
       <button class="sq-btn" onclick="copyEditor('code-post')">Copy</button>
     </div>
     <pre id="terminal-post" class="sq-terminal"></pre>
+    <div class="sq-card" style="background: rgba(59,130,246,0.05); margin-top:0.5rem;">
+      <strong>Checkpoint 🧩 — Key Takeaways:</strong>
+      <ul>
+        <li>You manually sent a POST request to the mock backend.</li>
+        <li>Checked the response status <code>201 Created</code> → confirms creation.</li>
+        <li>Unit test simulates automated verification of CREATE operation.</li>
+        <li>Understand: creation = server-side addition of new resource.</li>
+      </ul>
+    </div>
+
+    <div class="sq-card quiz-block" style="background: rgba(99,102,241,0.06); margin-top:0.5rem;">
+      <strong>🧩 Quick Quiz:</strong>
+
+      <div class="quiz-question" data-answer="b">
+        <p>1️⃣ What does the HTTP status code <code>201 Created</code> signify?</p>
+        <label><input type="radio" name="q4-post" value="a"> The server found the resource</label><br>
+        <label><input type="radio" name="q4-post" value="b"> The server successfully created a new resource</label><br>
+        <label><input type="radio" name="q4-post" value="c"> The server reported an error</label>
+      </div>
+
+      <div class="quiz-question" data-answer="b">
+        <p>2️⃣ What is a major benefit of programmatic POST calls?</p>
+        <label><input type="radio" name="q4-benefit" value="a"> They are always more secure than forms</label><br>
+        <label><input type="radio" name="q4-benefit" value="b"> They allow for automation and scripting</label><br>
+        <label><input type="radio" name="q4-benefit" value="c"> They use less client-side memory</label>
+      </div>
+
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answers</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+
     <div style="margin-top:0.75rem;">
       <button class="sq-btn sq-run" onclick="runUnitTest()">Run Unit Test: POST returns 201 & created resource</button>
       <div id="terminal-test" class="sq-terminal" style="margin-top:0.5rem"></div>
@@ -782,6 +1040,36 @@ window.runUnitTest = async function() {
       <button class="sq-btn" onclick="clearTerm('terminal-seed')">Clear</button>
     </div>
     <pre id="terminal-seed" class="sq-terminal" style="margin-top:0.5rem"></pre>
+    <div class="sq-card" style="background: rgba(59,130,246,0.05); margin-top:0.5rem;">
+      <strong>Checkpoint 🧩 — Bulk Creation:</strong>
+      <ul>
+        <li>Inserted multiple dishes at once using <code>postBulk()</code>.</li>
+        <li>Shows how batch creation works in databases/APIs.</li>
+        <li>Completion of this task triggers module progress update.</li>
+      </ul>
+      <small>Think: why might bulk creation fail if one record is invalid?</small>
+    </div>
+
+    <div class="sq-card quiz-block" style="background: rgba(99,102,241,0.06); margin-top:0.5rem;">
+      <strong>🧩 Quick Quiz:</strong>
+
+      <div class="quiz-question" data-answer="c">
+        <p>1️⃣ What is the primary benefit of a "bulk" create operation?</p>
+        <label><input type="radio" name="q5-seed" value="a"> It uses more server memory</label><br>
+        <label><input type="radio" name="q5-seed" value="b"> It guarantees every dish is created correctly</label><br>
+        <label><input type="radio" name="q5-seed" value="c"> It reduces the number of network requests</label>
+      </div>
+
+      <div class="quiz-question" data-answer="c">
+        <p>2️⃣ A good API wraps a bulk operation in a single ____ to ensure all-or-nothing success.</p>
+        <label><input type="radio" name="q5-bulk" value="a"> Promise</label><br>
+        <label><input type="radio" name="q5-bulk" value="b"> Function</label><br>
+        <label><input type="radio" name="q5-bulk" value="c"> Transaction</label>
+      </div>
+
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answers</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
   </div>
 </details>
 
@@ -808,12 +1096,42 @@ window.seedPantry = async function() {
 <details>
   <summary>Task 6: View Pantry</summary>
   <div class="sq-card">
-    <div class="sq-label">View the San Diego pantry (GET /api/dishes?city=sd)</div>
+    <div class="sq-label">View the San Diego pantry (GET /api/dishes?city=sd) - <strong>Now filtered to show only your selected foods from the itinerary!</strong></div>
     <div style="display:flex; gap:0.5rem;">
       <button class="sq-btn sq-run" onclick="viewPantry()">View Pantry</button>
       <button class="sq-btn" onclick="clearTerm('terminal-pantry')">Clear</button>
     </div>
     <pre id="terminal-pantry" class="sq-terminal" style="margin-top:0.5rem"></pre>
+    <div class="sq-card" style="background: rgba(59,130,246,0.05); margin-top:0.5rem;">
+      <strong>Checkpoint 🧩 — Viewing Data:</strong>
+      <ul>
+        <li>GET request retrieves all dishes for San Diego.</li>
+        <li>Observe the dishes you created — creation verified!</li>
+      </ul>
+      <small>Mini Quiz: Which task showed CREATE, and which one shows READ?</small>
+    </div>
+
+    <div class="sq-card quiz-block" style="background: rgba(99,102,241,0.06); margin-top:0.5rem;">
+      <strong>🧩 Quick Quiz:</strong>
+
+      <div class="quiz-question" data-answer="b">
+        <p>1️⃣ Viewing the pantry is an example of which CRUD operation?</p>
+        <label><input type="radio" name="q6-crud" value="a"> Create</label><br>
+        <label><input type="radio" name="q6-crud" value="b"> Read</label><br>
+        <label><input type="radio" name="q6-crud" value="c"> Update</label>
+      </div>
+
+      <div class="quiz-question" data-answer="b">
+        <p>2️⃣ What HTTP method is typically used to fetch or read data from an API?</p>
+        <label><input type="radio" name="q6-view" value="a"> POST</label><br>
+        <label><input type="radio" name="q6-view" value="b"> GET</label><br>
+        <label><input type="radio" name="q6-view" value="c"> DELETE</label>
+      </div>
+
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answers</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+
   </div>
 </details>
 
@@ -825,7 +1143,7 @@ window.viewPantry = async function() {
     logTo('terminal-pantry','[Server] 200 OK — No dishes found for city=sd. Try seeding.');
     return;
   }
-  logTo('terminal-pantry','[Server] 200 OK — Dishes for city=sd:');
+  logTo('terminal-pantry','[Server] 200 OK — Dishes for city=sd (filtered by your itinerary):');
   dishes.forEach(d => logTo('terminal-pantry', JSON.stringify(d, null, 2)));
   completeTask('view'); // Mark task as complete
 };
@@ -903,4 +1221,51 @@ function clearTerm(id) { const el = document.getElementById(id); if (el) el.text
     }
   }
 })();
-</script>f
+
+function submitQuiz(btn) {
+  const block = btn.closest('.quiz-block');
+  const questions = block.querySelectorAll('.quiz-question');
+  let correct = 0;
+  const total = questions.length;
+
+  questions.forEach(q => {
+    const expected = q.dataset.answer.trim().toLowerCase();
+    let userAnswer = '';
+
+    const radios = q.querySelectorAll('input[type="radio"]');
+    const text = q.querySelector('input[type="text"]');
+
+    // Find the user's choice
+    if (radios.length) {
+      const selected = [...radios].find(r => r.checked);
+      if (selected) userAnswer = selected.value.trim().toLowerCase();
+    } else if (text) {
+      userAnswer = text.value.trim().toLowerCase();
+    }
+
+    // Remove old highlights
+    q.style.borderLeft = '';
+    q.style.paddingLeft = '';
+
+    // Compare answers
+    if (userAnswer === expected) {
+      correct++;
+      q.style.borderLeft = '4px solid #10b981'; // green
+      q.style.paddingLeft = '0.5rem';
+    } else {
+      q.style.borderLeft = '4px solid #ef4444'; // red
+      q.style.paddingLeft = '0.5rem';
+    }
+  });
+
+  // Show overall feedback
+  const feedback = block.querySelector('.quiz-feedback');
+  if (correct === total) {
+    feedback.innerHTML = `✅ Perfect! ${correct}/${total} correct.`;
+    feedback.style.color = '#10b981';
+  } else {
+    feedback.innerHTML = `❌ ${correct}/${total} correct — check the red ones and try again.`;
+    feedback.style.color = '#ef4444';
+  }
+}
+</script>

@@ -1,8 +1,8 @@
 ---
 layout: opencs
-microblog: True 
+microblog: True  
 title: "Seattle"
-description: "City Two of Food - Seattle"
+description: "City Four of Food - Seattle"
 permalink: /west-coast/food/SEA/
 parent: "Seattle"
 team: "Syntax Terrors"
@@ -22,7 +22,7 @@ footer:
 **Focus:** D in CRUD — **DELETE & ANALYZE**  
 **Location:** Seattle, WA ☕🐚🌧️  
 
-Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in a Sourdough Bread Bowl*) and run analytics to uncover insights about all cities’ menus.
+Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in a Sourdough Bread Bowl*) and run analytics to uncover insights about all cities' menus.
 
 ---
 
@@ -109,66 +109,96 @@ Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in
   text-align: center;
 }
 
-.sq-card h3, .sq-card p, .sq-card label, .sq-card input, .sq-card select, .sq-card pre {
-  color: #fdf2f8 !important;
+/* Itinerary Foods Display */
+.itinerary-foods {
+  background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
+  border: 2px solid rgba(16,185,129,0.3);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 8px 30px rgba(16,185,129,0.2);
 }
-.sq-card, .sq-card h3, .sq-card p, .sq-card label, .sq-card input, .sq-card select, .sq-card pre, .sq-card ul, .sq-card li {
-  color: #fdf2f8 !important;
+
+.itinerary-foods h3 {
+  color: #10b981;
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
-progress-tracker, .progress-tracker h3, .progress-tracker .status, .progress-tracker strong, .progress-tracker span, .progress-tracker div 
-.sq-terminal, .sq-terminal * {
-  color: #fdf2f8 !important;
+
+.food-item {
+  background: rgba(30, 41, 59, 0.8);
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  transition: transform 0.2s ease;
+}
+
+.food-item:hover {
+  transform: translateX(4px);
+}
+
+.food-item h4 {
+  color: #10b981;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.food-item p {
+  color: #d1d5db;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.no-itinerary-msg {
+  text-align: center;
+  color: #d1d5db;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.sq-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+  color: #fdf2f8;
+}
+
+.sq-field {
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148,163,184,0.12);
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  color: #fdf2f8;
+  outline: none;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.01);
+  font-size: 0.95rem;
+}
+
+.sq-terminal {
+  background: #071827;
+  color: #fdf2f8;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+  min-height: 3rem;
+  white-space: pre-wrap;
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,0.02);
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.02);
+  margin-top: 0.5rem;
 }
 </style>
 
-<div class="progress-tracker">
-  <h3 style="color:#2dd4bf;">🎯 Seattle Progress Tracker</h3>
-  <div id="progress-display">
-    <div id="task-archive">🗃️ Task 1: Archive Dish – <span class="status">Incomplete</span></div>
-    <div id="task-harddelete">🗑️ Task 2: Hard Delete Cascade – <span class="status">Incomplete</span></div>
-    <div id="task-analytics">📊 Task 3: Analytics Dashboard – <span class="status">Incomplete</span></div>
-    <div id="task-seed">🌱 Task 4: Seed Seattle Dishes – <span class="status">Incomplete</span></div>
-    <div id="task-view">👀 Task 5: View Archived/Active Lists – <span class="status">Incomplete</span></div>
-  </div>
+<!-- Itinerary Foods Display -->
+<div class="itinerary-foods">
+  <h3>🍽️ Your Seattle Food Selections</h3>
+  <div id="itinerary-foods-display"></div>
 </div>
-
----
-
-### 🧠 What Does DELETE Mean?
-
-In databases, **DELETE** = cleaning up existing records — sometimes gently, sometimes permanently.  
-There are **two main approaches**:
-
-### 🗃️ Soft Delete (Archiving)
-- Adds a `deleted_at` timestamp instead of erasing the record.  
-- The data stays in the database but is hidden from normal queries (`WHERE deleted_at IS NULL`).  
-- Allows easy “undo” or “restore” later.  
-**Example:** When the Seattle restaurant closes, the *Clam Chowder in a Sourdough Bread Bowl* is archived — it disappears from the active menu but remains in the system for reporting.
-
-### 🗑️ Hard Delete (Cascade)
-- Permanently removes a record and all related rows (via **cascading delete**).  
-- Cleans out join tables like `dish_ingredients` to prevent orphaned data.  
-**Example:** If you fully remove the clam chowder, its linked ingredients (“clams,” “bread bowl,” “cream”) are also deleted — the dish is gone forever.
-
-### 📊 Analytics Dashboard (GROUP BY)
-- After cleaning up data, we can **analyze what remains**.  
-- Use SQL `GROUP BY` and aggregate functions (`COUNT`, `AVG`, `SUM`) to reveal insights:  
-  - Top ingredients used across all cities  
-  - Average calories per city  
-  - Number of dishes per category  
-  - Active vs archived chowders  
-
-**Analogy:**  
-Your database is like a restaurant kitchen.  
-Soft delete = putting an item in cold storage (it’s still there).  
-Hard delete = tossing it out completely.  
-Analytics = reviewing the kitchen log to see what’s sold, archived, or missing — keeping your menu sustainable and efficient.
-
----
-<style>
-/**** Remove the old white background and conflicting color rules ****/
-.sq-card{background:unset;}
-</style>
 
 <!-- Progress Tracker -->
 <div class="progress-tracker">
@@ -193,13 +223,45 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
   🎉 CRUD Complete!<br><small style="opacity:.9;font-size:14px;">Congratulations, Cleanup Crew!</small>
 </div>
 
-<!-- 🧼 Seattle Cleanup Lesson — DELETE & ANALYTICS (Interactive Edition, Fully Working) -->
+---
+
+### 🧠 What Does DELETE Mean?
+
+In databases, **DELETE** = cleaning up existing records — sometimes gently, sometimes permanently.  
+There are **two main approaches**:
+
+### 🗃️ Soft Delete (Archiving)
+- Adds a `deleted_at` timestamp instead of erasing the record.  
+- The data stays in the database but is hidden from normal queries (`WHERE deleted_at IS NULL`).  
+- Allows easy "undo" or "restore" later.  
+**Example:** When the Seattle restaurant closes, the *Clam Chowder in a Sourdough Bread Bowl* is archived — it disappears from the active menu but remains in the system for reporting.
+
+### 🗑️ Hard Delete (Cascade)
+- Permanently removes a record and all related rows (via **cascading delete**).  
+- Cleans out join tables like `dish_ingredients` to prevent orphaned data.  
+**Example:** If you fully remove the clam chowder, its linked ingredients ("clams," "bread bowl," "cream") are also deleted — the dish is gone forever.
+
+### 📊 Analytics Dashboard (GROUP BY)
+- After cleaning up data, we can **analyze what remains**.  
+- Use SQL `GROUP BY` and aggregate functions (`COUNT`, `AVG`, `SUM`) to reveal insights:  
+  - Top ingredients used across all cities  
+  - Average calories per city  
+  - Number of dishes per category  
+  - Active vs archived chowders  
+
+**Analogy:**  
+Your database is like a restaurant kitchen.  
+Soft delete = putting an item in cold storage (it's still there).  
+Hard delete = tossing it out completely.  
+Analytics = reviewing the kitchen log to see what's sold, archived, or missing — keeping your menu sustainable and efficient.
+
+---
 
 <!-- 🗃️ Soft Delete -->
 <div class="sq-card">
   <h3>🗃️ Soft Delete — Archive a Dish</h3>
   <p>
-    When you <strong>soft delete</strong> a dish, you don’t remove it — you set <code>deleted_at</code>.
+    When you <strong>soft delete</strong> a dish, you don't remove it — you set <code>deleted_at</code>.
     This keeps data for later analysis or restoration.
   </p>
   <p><em>Example:</em> The <strong>Clam Chowder in a Sourdough Bread Bowl</strong> restaurant closes for renovation — we archive, not erase.</p>
@@ -225,7 +287,7 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
   <h3>🗑️ Hard Delete — Permanent Removal</h3>
   <p>
     <strong>Hard delete</strong> removes the dish and any linked data (e.g., ingredients).  
-    Once gone, it’s gone forever — like throwing away a spoiled clam chowder.
+    Once gone, it's gone forever — like throwing away a spoiled clam chowder.
   </p>
 
   <label class="sq-label">🧩 Quick Check: What else must be deleted with the dish?</label>
@@ -246,7 +308,7 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
     After cleanup, you can analyze your data.  
     The backend groups dishes by city, category, or ingredient to uncover insights.
   </p>
-  <ul style="margin-left:1.2rem; color:#23213a; font-weight:600;">
+  <ul style="margin-left:1.2rem; color:#fdf2f8; font-weight:600;">
     <li>Top ingredients across all cities</li>
     <li>Average calories per city</li>
     <li>Number of dishes per category</li>
@@ -270,7 +332,7 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
 <!-- 🌱 Seed Dishes -->
 <div class="sq-card">
   <h3>🌱 Seed Seattle Dishes</h3>
-  <p>Load sample data into your mock database — includes Clam Chowder, Salmon Bagel, and Vegan Soup.</p>
+  <p>Load sample data into your mock database — includes dishes from your itinerary!</p>
   <button class="sq-btn sq-run" onclick="seedSeattle()">Seed Seattle Dishes</button>
   <pre id="terminal-seedsea" class="sq-terminal"></pre>
 </div>
@@ -305,17 +367,77 @@ if(typeof window.showToast!=="function"){
 }
 function flash(el,color){if(!el)return;el.style.transition='background 0.3s';el.style.background=color;setTimeout(()=>el.style.background='',600);}
 
-/* ========== mock data setup ========== */
+/* ========== mock data setup with itinerary integration ========== */
 window.SeattleDB = window.SeattleDB || { dishes: [] };
+
+// Load and display itinerary foods
+function loadItineraryFoods() {
+  const itineraryData = localStorage.getItem('westCoastItinerary');
+  const displayElement = document.getElementById('itinerary-foods-display');
+  
+  if (!itineraryData) {
+    displayElement.innerHTML = '<div class="no-itinerary-msg">No itinerary found. Please complete the trip planner quiz first!</div>';
+    return [];
+  }
+
+  try {
+    const itinerary = JSON.parse(itineraryData);
+    const seattleFoods = itinerary.cities['Seattle']?.foods || [];
+    
+    if (seattleFoods.length === 0) {
+      displayElement.innerHTML = '<div class="no-itinerary-msg">No foods selected for Seattle in your itinerary.</div>';
+      return [];
+    }
+
+    let html = '';
+    seattleFoods.forEach((food, index) => {
+      html += `
+        <div class="food-item">
+          <h4>🍽️ ${food}</h4>
+          <p>Selected food #${index + 1} from your personalized itinerary</p>
+        </div>
+      `;
+    });
+    
+    displayElement.innerHTML = html;
+    return seattleFoods;
+  } catch (e) {
+    console.error('Error loading itinerary:', e);
+    displayElement.innerHTML = '<div class="no-itinerary-msg">Error loading itinerary data.</div>';
+    return [];
+  }
+}
 
 function seedSeattle(){
   clearTerm('terminal-seedsea');
-  SeattleDB.dishes = [
-    {id:'1', name:'Clam Chowder', city:'Seattle', calories:450, deleted_at:null},
-    {id:'2', name:'Salmon Bagel', city:'Seattle', calories:380, deleted_at:null},
-    {id:'3', name:'Vegan Soup', city:'Seattle', calories:320, deleted_at:null}
-  ];
-  logTo('terminal-seedsea','🌱 Seeded 3 Seattle dishes.');
+  
+  // Get foods from itinerary
+  const itineraryData = localStorage.getItem('westCoastItinerary');
+  let seattleFoods = ['Fresh Salmon', 'Pike Place Market Chowder', 'Dungeness Crab']; // defaults
+  
+  if (itineraryData) {
+    try {
+      const itinerary = JSON.parse(itineraryData);
+      const selectedFoods = itinerary.cities['Seattle']?.foods || [];
+      if (selectedFoods.length > 0) {
+        seattleFoods = selectedFoods;
+      }
+    } catch (e) {
+      console.error('Error reading itinerary:', e);
+    }
+  }
+  
+  // Create dishes from itinerary foods
+  SeattleDB.dishes = seattleFoods.map((food, idx) => ({
+    id: String(idx + 1),
+    name: food,
+    city: 'Seattle',
+    calories: 350 + (idx * 50),
+    deleted_at: null
+  }));
+  
+  logTo('terminal-seedsea', `🌱 Seeded ${SeattleDB.dishes.length} Seattle dishes from your itinerary:`);
+  SeattleDB.dishes.forEach(d => logTo('terminal-seedsea', ` - ${d.name} (ID: ${d.id})`));
   showToast('Seattle dishes seeded — +10 XP');
   completeTask?.('seed');
 }
@@ -326,12 +448,27 @@ function clearTerm(id){const e=document.getElementById(id);if(e)e.textContent=''
 /* 🗃️ Archive Dish (soft delete) */
 function runArchive(){
   clearTerm('terminal-archive');
-  const id=document.getElementById('archive-id').value.trim();
+  const id = document.getElementById('archive-id').value.trim();
   if(!id){logTo('terminal-archive','⚠️ Please enter a dish ID.');return;}
-  const dish=SeattleDB.dishes.find(d=>d.id===id);
-  if(!dish){logTo('terminal-archive','❌ Dish not found.');return;}
+  // Normalize both input and stored id to compare as plain numbers/strings
+  const normalize = x => String(x).replace(/^dish_/, '');
+  const dish = SeattleDB.dishes.find(d => normalize(d.id) === normalize(id));
+  if(!dish){
+    // Try again: if input is 'dish_1' and not found, try matching input as is
+    const fallback = SeattleDB.dishes.find(d => d.id === id);
+    if(fallback){
+      if(fallback.deleted_at){logTo('terminal-archive','⚠️ Already archived.');return;}
+      fallback.deleted_at = new Date().toISOString();
+      logTo('terminal-archive',`✅ Archived: ${fallback.name}`);
+      showToast('Dish archived — +5 XP');
+      flash(document.getElementById('terminal-archive'),'rgba(16,185,129,0.15)');
+      completeTask?.('archive');
+      return;
+    }
+    logTo('terminal-archive','❌ Dish not found.');return;
+  }
   if(dish.deleted_at){logTo('terminal-archive','⚠️ Already archived.');return;}
-  dish.deleted_at=new Date().toISOString();
+  dish.deleted_at = new Date().toISOString();
   logTo('terminal-archive',`✅ Archived: ${dish.name}`);
   showToast('Dish archived — +5 XP');
   flash(document.getElementById('terminal-archive'),'rgba(16,185,129,0.15)');
@@ -360,7 +497,11 @@ function runAnalytics(){
   const archived=SeattleDB.dishes.filter(d=>d.deleted_at);
   const avgCalories = (arr)=> arr.length? (arr.reduce((a,b)=>a+b.calories,0)/arr.length).toFixed(1):0;
   const avg=avgCalories(active);
-  logTo('terminal-analytics',`Active dishes: ${active.length}\nArchived dishes: ${archived.length}\nAverage calories (active): ${avg}`);
+  logTo('terminal-analytics',`📊 Analytics Dashboard\n${'='.repeat(40)}`);
+  logTo('terminal-analytics',`Active dishes: ${active.length}`);
+  logTo('terminal-analytics',`Archived dishes: ${archived.length}`);
+  logTo('terminal-analytics',`Average calories (active): ${avg}`);
+  logTo('terminal-analytics',`\nYour itinerary foods: ${active.map(d=>d.name).join(', ')}`);
   showToast('Analytics run complete — +15 XP');
   flash(document.getElementById('terminal-analytics'),'rgba(16,185,129,0.15)');
   completeTask?.('analytics');
@@ -372,7 +513,7 @@ function viewSeattle(){
   if(!SeattleDB.dishes.length){logTo('terminal-viewsea','⚠️ No data found. Seed dishes first.');return;}
   const active=SeattleDB.dishes.filter(d=>!d.deleted_at);
   const archived=SeattleDB.dishes.filter(d=>d.deleted_at);
-  logTo('terminal-viewsea',`Active Dishes (${active.length}):`,...active.map(d=>` - ${d.name} (${d.calories} cal)`),`\nArchived Dishes (${archived.length}):`,...archived.map(d=>` - ${d.name} (${d.calories} cal)`));
+  logTo('terminal-viewsea',`Active Dishes (${active.length}):`,...active.map(d=>` - ${d.name} (${d.calories} cal, ID: ${d.id})`),`\nArchived Dishes (${archived.length}):`,...archived.map(d=>` - ${d.name} (${d.calories} cal, ID: ${d.id})`));
   showToast('Viewing dishes list');
   completeTask?.('view');
 }
@@ -397,56 +538,3 @@ function checkAnalyticsQuiz(){
   else{logTo(termId,'❌ Not quite. The correct answer is GROUP BY.');flash(term,'rgba(239,68,68,0.15)');}
 }
 </script>
-
-<<<<<<< HEAD
-=======
-<script>
-(function(){
-  window.taskProgress={archive:false,harddelete:false,analytics:false,seed:false,view:false};
-
-  function loadTaskProgress(){
-    const saved=localStorage.getItem('sea_task_progress');
-    if(saved)try{Object.assign(window.taskProgress,JSON.parse(saved));}catch{}
-    updateProgressDisplay();
-  }
-  function saveTaskProgress(){localStorage.setItem('sea_task_progress',JSON.stringify(window.taskProgress));}
-  window.completeTask=function(t){
-    if(!window.taskProgress[t]){
-      window.taskProgress[t]=true;saveTaskProgress();updateProgressDisplay();checkModuleCompletion();
-    }
-  };
-  function updateProgressDisplay(){
-    const tasks=['archive','harddelete','analytics','seed','view'];let done=0;
-    tasks.forEach(x=>{
-      const el=document.getElementById(`task-${x}`);if(!el)return;
-      const s=el.querySelector('.status');
-      if(window.taskProgress[x]){s.textContent='Complete ✅';s.className='status task-complete';done++;}
-      else{s.textContent='Incomplete';s.className='status';}
-    });
-    const pct=Math.round((done/tasks.length)*100);
-    document.getElementById('completion-percentage').textContent=`${pct}%`;
-    document.getElementById('progress-bar').style.width=`${pct}%`;
-  }
-  function checkModuleCompletion(){
-    if(Object.values(window.taskProgress).every(Boolean)){
-      document.getElementById('unlockNotification').style.display='block';
-      setTimeout(()=>document.getElementById('unlockNotification').style.display='none',4000);
-      unlockNextCity();
-    }
-  }
-  function unlockNextCity(){
-    try{
-      const saved=localStorage.getItem('city_progress');
-      let gp={unlockedCities:[0,1,2,3],completedCities:[],totalCitiesCompleted:0};
-      if(saved)gp=JSON.parse(saved);
-      if(!gp.completedCities.includes(3)){gp.completedCities.push(3);gp.totalCitiesCompleted++;}
-      localStorage.setItem('city_progress',JSON.stringify(gp));
-    }catch(e){console.error(e);}
-  }
-  window.showToast=(txt,ms=2000)=>{const b=document.getElementById('sqToast');b.textContent=txt;b.style.display='block';setTimeout(()=>b.style.display='none',ms);};
-  window.logTo=(id,...p)=>{const e=document.getElementById(id);if(!e)return;const t=p.map(a=>typeof a==='object'?JSON.stringify(a,null,2):String(a)).join(' ');e.textContent+=(e.textContent?'\n':'')+t;e.scrollTop=e.scrollHeight;};
-  window.clearTerm=id=>{const e=document.getElementById(id);if(e)e.textContent='';};
-  loadTaskProgress();
-})();
-</script>
->>>>>>> 86e2929be71f26422d30cf5f5aadd6712613c820

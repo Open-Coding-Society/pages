@@ -5,7 +5,7 @@ import Npc from './GameEngine/Npc.js';
 // import GameControl from './GameEngine/GameControl.js';
 import GameLevel1 from './mansionLevel1.js';
 // import GameLevel2 from './mansionLevel2.js';
-// import GameLevel3 from './mansionLevel3.js';
+import GameLevel3 from './mansionLevel3.js';
 // import GameLevel4 from './mansionLevel4.js';
 import GameLevel5 from './mansionLevel5.js';
 import GameLevel6 from './mansionLevel6.js';

@@ -5,7 +5,7 @@ title: Media Literacy Quest
 description: >
   Learn about media literacy and help defend Media Literacy Planet from foreign invaders. Build your shield level by completing the modules. 
 author: CSP 2025-26
-permalink: /digital-famine/medialit/
+permalink: /digital-famine/media-lit/
 breadcrumb: true
 lxdData:
   Title: "Mastery of Media Literacy Modules"
@@ -48,7 +48,6 @@ lxdData:
       Level: 4
       Description: "Enter the vault code with numbers gathered through the mission to get your Media Literacy certificate"
       Categories: ["Certificate", "Integration", "Achievement"]
-      Video: "/digital-famine/media-lit/submodule_5-video"
       Lessons: "/digital-famine/media-lit/submodule_5/"
       Image: "/images/digital-famine/congratulations.png"
       Alt: "Analytics Submodule 5"

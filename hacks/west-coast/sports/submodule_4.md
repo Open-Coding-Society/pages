@@ -277,36 +277,8 @@ footer:
         <div class="learning-section">
             <h2><span class="step-number">1</span>The Coach Selects a Stadium</h2>
             <p>First, you (the coach) need to decide which stadium you want information about. Click on any stadium card below:</p>
-            <div class="stadium-grid">
-                <div class="stadium-card" onclick="selectStadium('football')">
-                    <h3>Lumen Field</h3>
-                    <p><strong>Team:</strong> Seattle Seahawks</p>
-                    <p><strong>Sport:</strong> Football (NFL)</p>
-                </div>
-
-                <div class="stadium-card" onclick="selectStadium('baseball')">
-                    <h3>T-Mobile Park</h3>
-                    <p><strong>Team:</strong> Seattle Mariners</p>
-                    <p><strong>Sport:</strong> Baseball (MLB)</p>
-                </div>
-
-                <div class="stadium-card" onclick="selectStadium('hockey')">
-                    <h3>Climate Pledge Arena</h3>
-                    <p><strong>Team:</strong> Seattle Kraken</p>
-                    <p><strong>Sport:</strong> Ice Hockey (NHL)</p>
-                </div>
-
-                <div class="stadium-card" onclick="selectStadium('college')">
-                    <h3>Husky Stadium</h3>
-                    <p><strong>Team:</strong> Washington Huskies</p>
-                    <p><strong>Sport:</strong> College Football</p>
-                </div>
-
-                <div class="stadium-card" onclick="selectStadium('cricket')">
-                    <h3>Marymoor Park</h3>
-                    <p><strong>Team:</strong> Seattle Orcas</p>
-                    <p><strong>Sport:</strong> Cricket (MLC)</p>
-                </div>
+            <div class="stadium-grid" id="stadiumGrid">
+                <!-- Stadium cards will be dynamically inserted here -->
             </div>
         </div>
 
@@ -404,37 +376,107 @@ footer:
                 stadium: "Lumen Field", 
                 capacity: 68740,
                 location: "47.5952° N, 122.3316° W",
-                tickets: "$85-$250"
+                tickets: "$85-$250",
+                sportKey: "Football - Seahawks"
             },
             baseball: { 
                 team: "Mariners", 
                 stadium: "T-Mobile Park", 
                 capacity: 47929,
                 location: "47.5914° N, 122.3325° W",
-                tickets: "$15-$180"
+                tickets: "$15-$180",
+                sportKey: "Baseball - Mariners"
             },
             hockey: { 
                 team: "Kraken", 
                 stadium: "Climate Pledge Arena", 
                 capacity: 17151,
                 location: "47.6221° N, 122.3540° W",
-                tickets: "$50-$300"
+                tickets: "$50-$300",
+                sportKey: "Ice Hockey - Kraken"
             },
             college: { 
                 team: "Huskies", 
                 stadium: "Husky Stadium", 
                 capacity: 70138,
                 location: "47.6501° N, 122.3016° W",
-                tickets: "$35-$150"
+                tickets: "$35-$150",
+                sportKey: "College Football - Huskies"
             },
             cricket: { 
                 team: "Orcas", 
                 stadium: "Marymoor Park", 
                 capacity: 5000,
                 location: "47.6634° N, 122.1146° W",
-                tickets: "$10-$40"
+                tickets: "$10-$40",
+                sportKey: "Cricket - Orcas"
             }
         };
+
+        // Load user's selected sports from itinerary
+        function loadUserSports() {
+            try {
+                const itinerary = JSON.parse(localStorage.getItem('westCoastItinerary'));
+                if (itinerary && itinerary.cities && itinerary.cities.Seattle) {
+                    const seattleSports = itinerary.cities.Seattle.sports;
+                    return seattleSports.map(sport => sport.name);
+                }
+            } catch (e) {
+                console.error('Error loading itinerary:', e);
+            }
+            return null;
+        }
+
+        // Map sport names to playbook keys
+        function mapSportToKey(sportName) {
+            const sportMap = {
+                'Football - Seahawks': 'football',
+                'Baseball - Mariners': 'baseball',
+                'Ice Hockey - Kraken': 'hockey',
+                'College Football - Huskies': 'college',
+                'Cricket - Orcas': 'cricket'
+            };
+            return sportMap[sportName];
+        }
+
+        // Initialize stadium grid with user's selected sports
+        function initializeStadiums() {
+            const stadiumGrid = document.getElementById('stadiumGrid');
+            const userSports = loadUserSports();
+            
+            if (userSports && userSports.length > 0) {
+                // Show only user's selected sports
+                userSports.forEach(sportName => {
+                    const sportKey = mapSportToKey(sportName);
+                    if (sportKey && playbook[sportKey]) {
+                        const sport = playbook[sportKey];
+                        const card = document.createElement('div');
+                        card.className = 'stadium-card';
+                        card.onclick = () => selectStadium(sportKey);
+                        card.innerHTML = `
+                            <h3>${sport.stadium}</h3>
+                            <p><strong>Team:</strong> ${sport.team}</p>
+                            <p><strong>Sport:</strong> ${sportName}</p>
+                        `;
+                        stadiumGrid.appendChild(card);
+                    }
+                });
+            } else {
+                // Fallback: show all stadiums if no itinerary found
+                Object.keys(playbook).forEach(key => {
+                    const sport = playbook[key];
+                    const card = document.createElement('div');
+                    card.className = 'stadium-card';
+                    card.onclick = () => selectStadium(key);
+                    card.innerHTML = `
+                        <h3>${sport.stadium}</h3>
+                        <p><strong>Team:</strong> ${sport.team}</p>
+                        <p><strong>Sport:</strong> ${sport.sportKey}</p>
+                    `;
+                    stadiumGrid.appendChild(card);
+                });
+            }
+        }
 
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
@@ -494,12 +536,32 @@ footer:
             
             setTimeout(() => {
                 let response = '';
+                const userSports = loadUserSports();
+                
                 if (endpoint === 'schedules') {
-                    response = JSON.stringify({
+                    const scheduleData = {
                         "Seahawks": ["vs 49ers - Nov 3", "@ Rams - Nov 10"],
                         "Mariners": ["Season starts March 2026"],
-                        "Kraken": ["vs Canucks - Nov 5", "@ Flames - Nov 7"]
-                    }, null, 2);
+                        "Kraken": ["vs Canucks - Nov 5", "@ Flames - Nov 7"],
+                        "Huskies": ["vs Oregon - Nov 8", "@ Stanford - Nov 15"],
+                        "Orcas": ["vs Mumbai Indians - Nov 4", "vs Delhi Capitals - Nov 6"]
+                    };
+                    
+                    if (userSports && userSports.length > 0) {
+                        const filteredSchedules = {};
+                        userSports.forEach(sportName => {
+                            const sportKey = mapSportToKey(sportName);
+                            if (sportKey && playbook[sportKey]) {
+                                const team = playbook[sportKey].team;
+                                if (scheduleData[team]) {
+                                    filteredSchedules[team] = scheduleData[team];
+                                }
+                            }
+                        });
+                        response = JSON.stringify(filteredSchedules, null, 2);
+                    } else {
+                        response = JSON.stringify(scheduleData, null, 2);
+                    }
                 } else if (endpoint === 'weather') {
                     response = JSON.stringify({
                         "location": "Seattle, WA",
@@ -508,17 +570,36 @@ footer:
                         "precipitation": "20%"
                     }, null, 2);
                 } else if (endpoint === 'tickets') {
-                    response = JSON.stringify({
+                    const ticketData = {
                         "Seahawks": "$85-$250",
                         "Mariners": "$15-$180",
                         "Kraken": "$50-$300",
                         "Huskies": "$35-$150",
                         "Orcas": "$10-$40"
-                    }, null, 2);
+                    };
+                    
+                    if (userSports && userSports.length > 0) {
+                        const filteredTickets = {};
+                        userSports.forEach(sportName => {
+                            const sportKey = mapSportToKey(sportName);
+                            if (sportKey && playbook[sportKey]) {
+                                const team = playbook[sportKey].team;
+                                if (ticketData[team]) {
+                                    filteredTickets[team] = ticketData[team];
+                                }
+                            }
+                        });
+                        response = JSON.stringify(filteredTickets, null, 2);
+                    } else {
+                        response = JSON.stringify(ticketData, null, 2);
+                    }
                 }
                 output.textContent = 'Team\'s response:\n\n' + response;
             }, 800);
         }
+
+        // Initialize stadiums on page load
+        initializeStadiums();
     </script>
 </body>
 </html>

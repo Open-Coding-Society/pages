@@ -2,6 +2,7 @@
 layout: opencs
 title: Mansion Game
 permalink: /gamify/mansionGame
+microblog: true
 ---
 
 <div id="gameContainer">

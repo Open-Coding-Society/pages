@@ -22,7 +22,7 @@ class Player extends Character {
         Player.playerCount = (Player.playerCount || 0) + 1;
         this.id = data?.id ? data.id.toLowerCase() : `player${Player.playerCount}`;
         this.keypress = data?.keypress || {up: 87, left: 65, down: 83, right: 68};
-        this.touchOptions = data?.touchOptions || {interactLabel: "E", position: "left"};
+        this.touchOptions = data?.touchOptions || {interactLabel: "e", position: "left"};
         this.touchOptions.id = `touch-controls-${this.id}`;
         this.touchOptions.mapping = this.keypress;
         this.pressedKeys = {}; // active keys array
