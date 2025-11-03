@@ -1,26 +1,43 @@
 ---
-layout: post
-title: "Hints"
-description: "Submodule 2 of Hints Mini-Quest"
-permalink: /digital-famine/microblog/hints/
-parent: "AI Usage"
-team: "Thinkers"
-submodule: 2
-categories: [CSP, Submodule, Microblogging]
-tags: [microblogging, submodule, unzippers]
-author: "Jaynee Chauhan, Michelle Ji"
-date: 2025-10-28
+layout: post 
+tailwind: True
+title: Hints for Quests
+author: Jaynee Chauhan, Michelle Ji
+description: >
+  Do you need some help? Don't worry we won't tell ;)
+author: CSP 2025-26
+permalink: /digital-famine/microblog/hints
 breadcrumb: true
+footer:
+  home: /digital-famine/
+  next: /digital-famine/microblog/hintsML
+lxdData:
+  Title: "Quest Hints"
+  Description: "Click On these modules for some hints!"
+  Topics:
+    - Title: "Media Literacy hints"
+      Genre: "Assessment"
+      Level: 1
+      Description: "Click here for some Media Literacy hints"
+      Categories: ["Quest 1", "Quest 2"]
+      Lessons: "/digital-famine/microblog/hintsML/"
+      Image: "/images/digital-famine/ai.svg"
+      Alt: "ML Submodule 1"
+    - Title: "AI hints"
+      Genre: "Assessment"
+      Level: 2
+      Description: "Click here for some AI hints"
+      Categories: ["Quest 1", "Quest 2", "Quest 3"]
+      Lessons: "/digital-famine/microblog/hintsAI/"
+      Image: "/images/digital-famine/ai.svg"
+      Alt: "AI Submodule 2"
+    - Title: "Cybersecurity Hints"
+      Genre: "Assessment"
+      Level: 3
+      Description: "Click here for some Cybersecurity hints!"
+      Categories: ["Quest 1", "Quest 2", "Quest 3"]
+      Lessons: "/digital-famine/microblog/hintsCyber/"
+      Image: "/images/digital-famine/ai.svg"
+      Alt: "CS Submodule 3"
 ---
-
-# Hints
-
-## Choose your path!
-
-<button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;" onclick="window.location.href=''">Cybersecurity</button>
-
-<button style="background-color: #008CBA; color: white; padding: 10px 20px; border: none; cursor: pointer;" onclick="window.location.href=''">AI</button>
-
-<button style="background-color: #f44336; color: white; padding: 10px 20px; border: none; cursor: pointer;" onclick="window.location.href='https://pages.opencodingsociety.com/digital-famine/microblog/hintsML/'">Media Literacy</button>
-
-<button style="background-color: #555555; color: white; padding: 10px 20px; border: none; cursor: pointer;" onclick="window.location.href=''">Microblog</button>
+{%- include tailwind/cs-portfolio-quest_info.html -%}
