@@ -424,23 +424,20 @@ Welcome! This interactive page lets learners *actually* update dishes, ingredien
   <button id="themeToggleBtn" class="sq-btn" title="Toggle dark / light">🌙 Dark</button>
 </div>
 
-<!-- Fill-in-the-blanks for Sourdough -->
-<div class="sq-card">
-  <div class="sq-label">Fill in the blanks about updating Sourdough. Type the missing words below.</div>
-  <form id="sourdough-fill-blank" onsubmit="return checkSourdoughAnswers()" style="display:grid; gap:0.75rem;">
-    <label class="sq-label">1. What field is required to identify which dish to update?</label>
-    <input class="sq-field" type="text" id="blank-id" placeholder="Field name...">
+<!-- intro -->
+# Understanding UPDATE in CRUD
 
-    <label class="sq-label">2. What field stores the number of calories?</label>
-    <input class="sq-field" type="text" id="blank-calories" placeholder="Field name...">
+The UPDATE operation in CRUD allows you to modify existing records in a database. Here are the key points:
 
-    <label class="sq-label">3. What field stores the dish's category?</label>
-    <input class="sq-field" type="text" id="blank-category" placeholder="Field name...">
-
-    <button class="sq-btn sq-run" type="submit">Check Answers</button>
-    <div id="sourdough-feedback" class="small" style="margin-top:0.5rem"></div>
-  </form>
-</div>
+- **Purpose**: Modifies existing data without creating new records
+- **Required Information**: 
+  - Unique identifier (ID) to locate the record
+  - New values for fields you want to update
+- **HTTP Method**: Uses PUT or PATCH requests in REST APIs
+- **Common Use Cases**: 
+  - Updating user profiles
+  - Modifying product details
+  - Changing status or settings
 
 ---
 
