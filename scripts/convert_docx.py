@@ -34,8 +34,9 @@ except ImportError:
 try:
     import mammoth
     from PIL import Image
-except ImportError:
-    print("❌ Required packages not found.")
+    import docx  # explicitly try to import python-docx
+except ImportError as e:
+    print(f"❌ Import error: {e}")
     print("Please install dependencies:")
     print("   pip install mammoth pillow python-docx")
     print("   or run: pip install -r requirements.txt")

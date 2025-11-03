@@ -22,7 +22,7 @@ permalink: /gamify/mansionGame
     import GameLevel6 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel6.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    const gameLevelClasses = [GameLevelMain, GameLevel1, GameLevel2 GameLevel4, GameLevel5, GameLevel6 ];
+    const gameLevelClasses = [GameLevelMain, GameLevel1, GameLevel2, GameLevel4, GameLevel5, GameLevel6];
 
     // Web Server Environment data
     const environment = {
