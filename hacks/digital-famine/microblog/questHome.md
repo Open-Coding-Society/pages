@@ -7,9 +7,10 @@ breadcrumb: true
 author: Lucas M
 ---
 
-To begin your mission, you'll have to repair Old Earth's communications network *Rampart-B*. The old *Rampart-A* network was a partnership between global agencies and the NSA to monitor all internet activity worldwide (monitoring at a rate of 3 terabits/sec!), but as an apocalyptic event occurred, the network was repurposed as a fallback communications network for humanity.
+YOUR MISSION: Repair Old Earth's comm system *Rampart-B*. After the apocalyptic event, the old *Rampart-A* is rendered defunct, as humans took to the stars.
 
-The system is now defunct, as humans took to the stars. We'll have the reestablish this network to maintain contact with our operatives.
+Let's reestablish this network to contact our operatives!
+
 
 <!--Vis Network Style-->
 <style type="text/css">

@@ -11,6 +11,10 @@ tags: [microblogging, submodule, unzippers]
 author: "Shay Mortensen"
 date: 2025-10-21
 breadcrumb: true
+footer:
+  previous: /navigation/search/microblogapi/
+  home: /digital-famine/
+  next: /digital-famine/microblog/decentralization/
 ---
 
 # Submodule 4
