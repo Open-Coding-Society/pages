@@ -253,6 +253,7 @@ a:hover {
 </table>
 </div>
 
+
 <!-- ============================= -->
 <!-- LA Food Tasks in Boxes -->
 <!-- ============================= -->
@@ -288,6 +289,66 @@ a:hover {
     <em>Hint: Combine <code>WHERE calories &lt; 400</code> with <code>ORDER BY calories ASC</code>.</em>
   </div>
 </div>
+<!-- ============================= -->
+<!-- 2️⃣ LA Coding Practice Box -->
+<!-- ============================= -->
+<div class="coding-practice-container">
+  <h3>💻 Try Your SQL Query!</h3>
+  <p>Type your SQL code for selecting foods from the LA menu and check your answer.</p>
+  
+  <textarea id="la-code-input" placeholder="Type your SQL here..." rows="6" style="
+    width: 90%;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    border: 1px solid #444;
+    margin-bottom: 12px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  "></textarea>
+  
+  <button id="la-code-check-btn" style="
+    display: block;
+    margin: 0 auto 16px auto;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  ">Check Code ✅</button>
+  
+  <div id="la-code-result" style="
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ffcc80;
+  "></div>
+</div>
+
+<script>
+  // Example: Expected answer (you can change for different tasks)
+  const expectedLAQuery = "SELECT name, price FROM dishes WHERE city='LA';";
+
+  document.getElementById('la-code-check-btn').addEventListener('click', () => {
+    const userInput = document.getElementById('la-code-input').value.trim();
+    const resultEl = document.getElementById('la-code-result');
+
+    if(userInput.toUpperCase() === expectedLAQuery.toUpperCase()){
+      resultEl.style.color = "#4caf50";
+      resultEl.textContent = "✅ Correct! Great job!";
+    } else {
+      resultEl.style.color = "#f44336";
+      resultEl.textContent = "❌ Not quite. Check your SELECT, FROM, and WHERE clauses!";
+    }
+  });
+</script>
 
 <!-- ============================= -->
 <!-- SQL Concept Dropdowns -->
