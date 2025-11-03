@@ -10,42 +10,6 @@ categories: [CSP, Submodule, Backend]
 tags: [backend, submodule, encrypters]
 author: "Encrypters Team"
 date: 2025-10-21
-question: |
-  Question 1: Trace the Flow
-  When a user clicks "Submit" in your Free Response form, the 7 steps that happen are:
-
-  The browser detects the click event on the "Submit" button.
-
-  The form data is collected from the input fields.
-
-  The frontend sends the data to the server via an HTTP request (usually POST).
-
-  The server receives the request and routes it to the appropriate backend handler.
-
-  The backend processes the data, performing validation or any business logic.
-
-  The backend stores the data in the database.
-
-  The server sends a response back to the frontend, which may display a success message or update the UI.
-
-  Question 2: HTTP Methods
-
-  Viewing all responses → GET
-
-  Submitting a new response → POST
-
-  Editing your response → PUT or PATCH
-
-  Deleting your response → DELETE
-
-  Question 3: Error Handling
-  Three types of errors your code might handle:
-
-  Validation Errors – If form data is missing or invalid, the server returns an error response (e.g., status 400) and the frontend displays a message.
-
-  Network Errors – If the request fails to reach the server, the frontend catches the error and alerts the user.
-
-  Server Errors – If something goes wrong on the backend (e.g., database failure), the server returns a 500 error, which the frontend can display as a generic error message.
 ---
 
 # Module 1: Full Stack Part Two - Backend
