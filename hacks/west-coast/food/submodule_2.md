@@ -252,7 +252,109 @@ a:hover {
   </tr>
 </table>
 </div>
+<!-- ============================= -->
+<!-- 2️⃣ LA Coding Practice Boxes -->
+<!-- ============================= -->
+<div class="coding-practice-container">
+  <h3>💻 LA SQL Practice</h3>
+  <p>Type your SQL code for each food task and check your answer!</p>
 
+  <div id="la-coding-tasks">
+    <!-- Tasks will be generated here dynamically -->
+  </div>
+</div>
+
+<script>
+  // Define all LA tasks
+  const laTasks = [
+    {
+      id: "koreanbbq",
+      title: "Korean BBQ 🍖",
+      hint: "Filter by category or dish name containing 'Korean BBQ'.",
+      expected: "SELECT name, price FROM dishes WHERE name LIKE '%Korean BBQ%';"
+    },
+    {
+      id: "streettacos",
+      title: "Street Tacos 🌮",
+      hint: "Retrieve top 5 street taco dishes sorted by rating.",
+      expected: "SELECT name, price FROM dishes WHERE name LIKE '%Street Tacos%' ORDER BY rating DESC LIMIT 5;"
+    },
+    {
+      id: "innout",
+      title: "In-N-Out 🍔",
+      hint: "Paginate 3 items per page. Retrieve page 2.",
+      expected: "SELECT name, price FROM dishes WHERE name LIKE '%In-N-Out%' LIMIT 3 OFFSET 3;"
+    },
+    {
+      id: "avocado",
+      title: "Avocado Toast 🥑",
+      hint: "Find dishes containing 'avocado'.",
+      expected: "SELECT name, price FROM dishes WHERE name LIKE '%avocado%';"
+    },
+    {
+      id: "ramen",
+      title: "Ramen & Fusion 🍜",
+      hint: "Find dishes with 'noodles' in ingredients and explain indexing.",
+      expected: "SELECT name, price FROM dishes WHERE ingredients ILIKE '%noodles%';"
+    },
+    {
+      id: "erewhon",
+      title: "Erewhon 🥤",
+      hint: "Retrieve smoothies under 400 calories and sort by calories ascending.",
+      expected: "SELECT name, calories FROM dishes WHERE name LIKE '%Erewhon%' AND calories < 400 ORDER BY calories ASC;"
+    }
+  ];
+
+  const container = document.getElementById('la-coding-tasks');
+
+  laTasks.forEach(task => {
+    const taskDiv = document.createElement('div');
+    taskDiv.style.cssText = "background-color: #1f1f1f; padding: 16px; margin: 16px 0; border-radius: 10px;";
+
+    taskDiv.innerHTML = `
+      <h4 style="color:#ffab40; margin-bottom: 6px;">${task.title}</h4>
+      <p style="color:#ccc; font-size:0.95rem;">Hint: ${task.hint}</p>
+      <textarea id="${task.id}-input" placeholder="Type your SQL here..." rows="4" style="
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        border: 1px solid #444;
+        margin-bottom: 8px;
+      "></textarea>
+      <button id="${task.id}-check-btn" style="
+        display: block;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 8px;
+      ">Check Code ✅</button>
+      <div id="${task.id}-result" style="color:#ffcc80; font-weight:600; text-align:center;"></div>
+    `;
+    container.appendChild(taskDiv);
+
+    // Add click listener for this task
+    document.getElementById(`${task.id}-check-btn`).addEventListener('click', () => {
+      const userInput = document.getElementById(`${task.id}-input`).value.trim();
+      const resultEl = document.getElementById(`${task.id}-result`);
+
+      if(userInput.toUpperCase() === task.expected.toUpperCase()){
+        resultEl.style.color = "#4caf50";
+        resultEl.textContent = "✅ Correct! Great job!";
+      } else {
+        resultEl.style.color = "#f44336";
+        resultEl.textContent = "❌ Not quite. Check your SELECT, FROM, and WHERE clauses!";
+      }
+    });
+  });
+</script>
 
 <!-- ============================= -->
 <!-- LA Food Tasks in Boxes -->
@@ -289,66 +391,6 @@ a:hover {
     <em>Hint: Combine <code>WHERE calories &lt; 400</code> with <code>ORDER BY calories ASC</code>.</em>
   </div>
 </div>
-<!-- ============================= -->
-<!-- 2️⃣ LA Coding Practice Box -->
-<!-- ============================= -->
-<div class="coding-practice-container">
-  <h3>💻 Try Your SQL Query!</h3>
-  <p>Type your SQL code for selecting foods from the LA menu and check your answer.</p>
-  
-  <textarea id="la-code-input" placeholder="Type your SQL here..." rows="6" style="
-    width: 90%;
-    padding: 12px;
-    border-radius: 8px;
-    background-color: #1f1f1f;
-    color: #e0e0e0;
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-    border: 1px solid #444;
-    margin-bottom: 12px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  "></textarea>
-  
-  <button id="la-code-check-btn" style="
-    display: block;
-    margin: 0 auto 16px auto;
-    background-color: #4caf50;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-  ">Check Code ✅</button>
-  
-  <div id="la-code-result" style="
-    text-align: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #ffcc80;
-  "></div>
-</div>
-
-<script>
-  // Example: Expected answer (you can change for different tasks)
-  const expectedLAQuery = "SELECT name, price FROM dishes WHERE city='LA';";
-
-  document.getElementById('la-code-check-btn').addEventListener('click', () => {
-    const userInput = document.getElementById('la-code-input').value.trim();
-    const resultEl = document.getElementById('la-code-result');
-
-    if(userInput.toUpperCase() === expectedLAQuery.toUpperCase()){
-      resultEl.style.color = "#4caf50";
-      resultEl.textContent = "✅ Correct! Great job!";
-    } else {
-      resultEl.style.color = "#f44336";
-      resultEl.textContent = "❌ Not quite. Check your SELECT, FROM, and WHERE clauses!";
-    }
-  });
-</script>
 
 <!-- ============================= -->
 <!-- SQL Concept Dropdowns -->
