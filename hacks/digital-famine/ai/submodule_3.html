@@ -145,8 +145,8 @@ date: 2025-10-30
                 <button onclick="goToSection(6)"
                     class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50"
                     data-section="6">
-                    <span class="text-2xl mb-1">🏆</span>
-                    <span class="text-xs text-center">Quiz</span>
+                    <span class="text-2xl mb-1">🔑</span>
+                    <span class="text-xs text-center">Get Code</span>
                 </button>
                 <div class="w-8 h-0.5 bg-green-500/30"></div>
             </div>
@@ -752,216 +752,62 @@ return await response.<input type="text" id="input3" class="inline-input" placeh
 
         <div id="section-6" class="mission-section section-hidden">
             <div class="space-y-6">
-                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
-                <h2 class="text-3xl font-bold mb-6">🏆 Knowledge Check — Module 3 (AI APIs)</h2>
-                <p class="text-lg mb-4">Answer all three questions correctly to complete this module’s quiz.</p>
-
-                <!-- Q1: Architecture layers -->
-                <div class="question-block mb-6" id="q1">
-                    <h3 class="text-xl mb-4">
-                    1) In the microblog architecture, which layer is responsible for
-                    making HTTP requests (GET/POST/PUT) and parsing JSON responses?
-                    </h3>
-                    <div class="space-y-2">
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(1, 'A', false)">A) UI Framework (opencs.html)</button>
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(1, 'B', false)">B) UI Functionality (microblog_foundation.html)</button>
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(1, 'C', true)">C) API Management (microblog.js)</button>
-                    </div>
-                    <div id="f1" class="feedback mt-3 p-3 rounded-lg"></div>
-                </div>
-
-                <!-- Q2: HTTP methods -->
-                <div class="question-block mb-6" id="q2">
-                    <h3 class="text-xl mb-4">
-                    2) You want to create a new microblog post. Which HTTP method should you use, and where is the data sent?
-                    </h3>
-                    <div class="space-y-2">
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(2, 'A', false)">A) GET with JSON in the URL</button>
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(2, 'B', true)">B) POST with JSON in the request body</button>
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(2, 'C', false)">C) PUT with JSON in response.json()</button>
-                    </div>
-                    <div id="f2" class="feedback mt-3 p-3 rounded-lg"></div>
-                </div>
-
-                <!-- Q3: UI flow -->
-                <div class="question-block mb-6" id="q3">
-                    <h3 class="text-xl mb-4">
-                    3) Which order best describes the end-to-end UI flow for saving a post?
-                    </h3>
-                    <div class="space-y-2">
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(3, 'A', false)">
-                        A) API Call → User Action → UI Re-render → Event Handler → Function
-                    </button>
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(3, 'B', true)">
-                        B) User Action → Event Handler → Function → API Call → UI Re-render
-                    </button>
-                    <button class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg"
-                        onclick="quizAnswer(3, 'C', false)">
-                        C) Function → API Call → User Action → UI Re-render → Event Handler
-                    </button>
-                    </div>
-                    <div id="f3" class="feedback mt-3 p-3 rounded-lg"></div>
-                </div>
-
-                <!-- Results -->
-                <div id="quiz-result" class="section-hidden text-center">
-                <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-8">
-                    <h3 class="text-3xl font-bold text-yellow-400 mb-4">🎉 Quiz Complete!</h3>
-                    <p id="quiz-score" class="text-2xl mb-4"></p>
-
-                    <div id="quiz-pass" class="section-hidden">
-                    <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-6 mb-4">
-                        <p class="text-xl font-bold text-green-400">✅ Perfect score! Reloading to reveal your code…</p>
-                    </div>
-                    </div>
-
-                    <div id="quiz-fail" class="section-hidden">
-                    <div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-6 mb-4">
-                        <p class="text-xl font-bold text-red-400">❌ Not quite. You need all answers correct.</p>
-                        <p class="text-sm text-gray-300">Click “Retry Quiz” to try again.</p>
-                    </div>
-                    </div>
-
-                    <button onclick="quizRetry()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold">
-                    Retry Quiz
-                    </button>
-                </div>
-                </div>
-
-                <!-- Code wrapper: appears IN THE QUIZ TAB after a perfect score + refresh -->
-                <div id="quiz-code-wrapper" class="section-hidden text-center">
-                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8">
-                    <h2 class="text-4xl font-bold mb-4">🎉 All Challenges Complete!</h2>
-                    <p class="text-xl mb-6">Great job—your module code is unlocked.</p>
+                <div class="bg-slate-800/70 backdrop-blur border border-green-500/30 rounded-lg p-8 text-center">
+                    <h2 class="text-4xl font-bold mb-6">🎉 Module 3 Complete!</h2>
+                    <p class="text-xl mb-6 text-gray-300">Congratulations! You've mastered AI APIs.</p>
 
                     <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-8">
-                    <p class="text-2xl font-bold text-yellow-400 mb-4">🔑 Your Module Code: 1</p>
-                    <p class="text-gray-300">Remember this number for the final vault challenge.</p>
+                        <p class="text-2xl font-bold text-yellow-400 mb-4">🔑 Your Module Code: 1</p>
+                        <p class="text-gray-300">Remember this number! You'll need it along with the other module codes to unlock the final vault challenge.</p>
                     </div>
                 </div>
             </div>
+        </div>
 
 
     <script>
-        let score = 0;
-        let questionsAnswered = 0;
-        const totalQuestions = 3;
-
         function goToSection(n) {
-        document.querySelectorAll('.mission-section').forEach(s => s.classList.add('section-hidden'));
-        document.getElementById('section-' + n).classList.remove('section-hidden');
-        document.querySelectorAll('.nav-btn').forEach(b => {
-            b.classList.remove('bg-green-600');
-            b.classList.add('bg-slate-700/50');
-        });
-        const active = document.querySelector('.nav-btn[data-section="' + n + '"]');
-        if (active) active.classList.add('bg-green-600');
-        window.scrollTo(0, 0);
+            document.querySelectorAll('.mission-section').forEach(s => s.classList.add('section-hidden'));
+            document.getElementById('section-' + n).classList.remove('section-hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-green-600');
+                b.classList.add('bg-slate-700/50');
+            });
+            const active = document.querySelector('.nav-btn[data-section="' + n + '"]');
+            if (active) active.classList.add('bg-green-600');
+            window.scrollTo(0, 0);
         }
 
-        // --- Challenge checks (keep same behavior) ---
+        // Challenge checks
         function checkChallenge1() {
-        const input1 = document.getElementById('input1').value;
-        const input2 = document.getElementById('input2').value.trim().toLowerCase();
-        const input3 = document.getElementById('input3').value.trim().toLowerCase();
-        const feedback = document.getElementById('feedback1');
-        feedback.classList.remove('hidden');
+            const input1 = document.getElementById('input1').value;
+            const input2 = document.getElementById('input2').value.trim().toLowerCase();
+            const input3 = document.getElementById('input3').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback1');
+            feedback.classList.remove('hidden');
 
-        if (input1 === 'POST' && input2 === 'postdata' && input3 === 'json') {
-            feedback.innerHTML =
-            '<div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 text-green-400 font-bold">✅ Correct! You understand API requests!</div>';
-        } else {
-            feedback.innerHTML =
-            '<div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-red-400 font-bold">❌ Try again! Method: POST, Variable: postData, Method: json</div>';
-        }
+            if (input1 === 'POST' && input2 === 'postdata' && input3 === 'json') {
+                feedback.innerHTML =
+                '<div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 text-green-400 font-bold">✅ Correct! You understand API requests!</div>';
+            } else {
+                feedback.innerHTML =
+                '<div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-red-400 font-bold">❌ Try again! Method: POST, Variable: postData, Method: json</div>';
+            }
         }
 
         function checkChallenge2() {
-        const input4 = document.getElementById('input4').value.trim().toLowerCase();
-        const input5 = document.getElementById('input5').value.trim().toLowerCase();
-        const feedback = document.getElementById('feedback2');
-        feedback.classList.remove('hidden');
+            const input4 = document.getElementById('input4').value.trim().toLowerCase();
+            const input5 = document.getElementById('input5').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback2');
+            feedback.classList.remove('hidden');
 
-        if (input4 === 'submit' && input5 === 'preventdefault') {
-            feedback.innerHTML =
-            '<div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 text-green-400 font-bold">✅ Perfect! You understand form handling!</div>';
-        } else {
-            feedback.innerHTML =
-            '<div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-red-400 font-bold">❌ Try again! Event property: submit, Method: preventDefault</div>';
-        }
-        }
-
-        // --- Quiz logic identical to Module 1 ---
-        function quizAnswer(num, choice, correct) {
-        const block = document.getElementById('q' + num);
-        const feedback = document.getElementById('f' + num);
-        const buttons = block.querySelectorAll('.option-btn');
-        buttons.forEach(b => (b.disabled = true));
-
-        event.target.classList.add(correct ? 'bg-green-600' : 'bg-red-600');
-
-        if (correct) {
-            feedback.textContent = '✅ Correct! Great job!';
-            feedback.className =
-            'feedback mt-3 p-3 rounded-lg bg-green-900/30 border border-green-500/50 text-green-300';
-            score++;
-        } else {
-            const quizKey = { 1: 'C', 2: 'B', 3: 'B' };
-            buttons.forEach(btn => {
-            if (btn.textContent.trim().startsWith(quizKey[num] + ')')) {
-                btn.classList.add('bg-green-600');
-            }
-            });
-            feedback.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
-            feedback.className =
-            'feedback mt-3 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300';
-        }
-
-        questionsAnswered++;
-        if (questionsAnswered === totalQuestions) {
-            setTimeout(() => {
-            document.querySelectorAll('#section-6 .question-block').forEach(q => (q.style.display = 'none'));
-            document.getElementById('quiz-result').classList.remove('section-hidden');
-            document.getElementById('quiz-score').textContent = `You scored ${score} out of ${totalQuestions}!`;
-
-            if (score === totalQuestions) {
-                document.getElementById('quiz-pass').classList.remove('section-hidden');
-                document.getElementById('quiz-code-wrapper').classList.remove('section-hidden');
+            if (input4 === 'submit' && input5 === 'preventdefault') {
+                feedback.innerHTML =
+                '<div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-4 text-green-400 font-bold">✅ Perfect! You understand form handling!</div>';
             } else {
-                document.getElementById('quiz-fail').classList.remove('section-hidden');
+                feedback.innerHTML =
+                '<div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-red-400 font-bold">❌ Try again! Event property: submit, Method: preventDefault</div>';
             }
-            }, 1000);
-        }
-        }
-
-        function quizRetry() {
-        score = 0;
-        questionsAnswered = 0;
-
-        [1, 2, 3].forEach(n => {
-            const block = document.getElementById('q' + n);
-            const feedback = document.getElementById('f' + n);
-            block.style.display = 'block';
-            feedback.textContent = '';
-            feedback.className = 'feedback mt-3 p-3 rounded-lg';
-            block.querySelectorAll('.option-btn').forEach(btn => {
-            btn.disabled = false;
-            btn.classList.remove('bg-green-600', 'bg-red-600');
-            });
-        });
-
-        document.getElementById('quiz-result').classList.add('section-hidden');
-        document.getElementById('quiz-pass').classList.add('section-hidden');
-        document.getElementById('quiz-fail').classList.add('section-hidden');
-        document.getElementById('quiz-code-wrapper').classList.add('section-hidden');
         }
     </script>
 
