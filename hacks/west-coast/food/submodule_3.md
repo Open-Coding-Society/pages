@@ -325,7 +325,8 @@ details[open] > summary {
     <div id="task-dimsum" class="task-item">Task 1: Dim Sum Menu - <span class="status">Incomplete</span></div>
     <div id="task-chowmein" class="task-item">Task 2: Chowmein Order - <span class="status">Incomplete</span></div>
     <div id="task-sourdough" class="task-item">Task 3: Update Sourdough - <span class="status">Incomplete</span></div>
-    <div id="task-view" class="task-item">Task 4: PUT Endpoint - <span class="status">Incomplete</span></div>
+    <div id="task-seed" class="task-item">Task 4: Seed Pantry - <span class="status">Incomplete</span></div>
+    <div id="task-view" class="task-item">Task 5: View Pantry - <span class="status">Incomplete</span></div>
   </div>
   <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: 0.5rem;">
     <strong>Completion: <span id="completion-percentage">0%</span></strong>
@@ -333,6 +334,12 @@ details[open] > summary {
       <div id="progress-bar" style="background: linear-gradient(90deg, var(--success), #059669); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
     </div>
   </div>
+</div>
+
+<!-- Unlock Notification -->
+<div id="unlockNotification" class="unlock-notification">
+  🎉 Seattle Unlocked!<br>
+  <small style="font-size: 13px; opacity: 0.95;">You can now continue to the next city!</small>
 </div>
 
 **Quest Chapter:** *The Food Route*  
@@ -450,7 +457,7 @@ function checkSourdoughAnswers() {
 
   // Update progress display
   function updateProgressDisplay() {
-    const tasks = ['dimsum', 'chowmein', 'sourdough', 'seed', 'view'];
+    const tasks = ['dimsum', 'chowmein', 'sourdough', 'seed', 'view']; // 5 tasks total
     let completedCount = 0;
 
     tasks.forEach(task => {
@@ -483,18 +490,19 @@ function checkSourdoughAnswers() {
     const isComplete = allTasks.every(task => task === true);
     
     if (isComplete) {
+      // Show the unlock notification
       const notification = document.getElementById('unlockNotification');
       if (notification) {
         notification.style.display = 'block';
         setTimeout(() => notification.style.display = 'none', 4000);
       }
-      unlockNextCity();
+      unlockSeattle();
       console.log('🎉 San Francisco module completed! Seattle should now be unlocked.');
     }
   }
 
-  // Fallback unlock methods
-  function unlockNextCity() {
+  // Unlock Seattle (city index 3)
+  function unlockSeattle() {
     try {
       const saved = localStorage.getItem('city_progress');
       let gameProgress = saved ? JSON.parse(saved) : { unlockedCities:[0,1,2], completedCities:[], totalCitiesCompleted:0 };
@@ -506,9 +514,9 @@ function checkSourdoughAnswers() {
         gameProgress.unlockedCities.push(3);
       }
       localStorage.setItem('city_progress', JSON.stringify(gameProgress));
-      console.log('✅ Progress updated:', gameProgress);
+      console.log('✅ SF Progress updated:', gameProgress);
     } catch (e) {
-      console.error('Unlock failed:', e);
+      console.error('SF Unlock failed:', e);
     }
   }
 
@@ -1100,7 +1108,7 @@ window.runUnitTest = async function() {
     logTo('terminal-test', '❌ Setup Failed: Could not create test dish');
     return;
   }
-// Now update it
+  // Now update it
   const id = createRes.body.id;
   const updateRes = await window.MockAPIInstance.putDish(id, {
     name: "Updated Test Dish",
@@ -1112,7 +1120,7 @@ window.runUnitTest = async function() {
   if (updateRes.status === 200 && updateRes.body && updateRes.body.name === "Updated Test Dish") {
     logTo('terminal-test', '✅ Unit Test Passed: PUT returned 200 and resource updated');
     logTo('terminal-test', JSON.stringify(updateRes.body, null, 2));
-    completeTask('sourdough'); // Mark task as complete
+    completeTask('view'); // Mark the unit test task as complete
   } else {
     logTo('terminal-test', '❌ Unit Test Failed', JSON.stringify(updateRes, null, 2));
   }
@@ -1248,4 +1256,106 @@ function clearTerm(id) { const el = document.getElementById(id); if (el) el.text
     }
   }
 })();
+</script>
+
+<!-- Quick Complete Button for Testing - Bottom Right Corner -->
+<button id="quickCompleteBtn" onclick="autoCompleteAllTasks()" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(139,92,246,0.9);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transition: all 0.2s ease;
+" onmouseover="this.style.background='rgba(139,92,246,1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(139,92,246,0.9)'; this.style.transform='translateY(0)'">
+  Complete All Tasks
+</button>
+
+<script>
+function autoCompleteAllTasks() {
+  // Hide the button after clicking
+  document.getElementById('quickCompleteBtn').style.display = 'none';
+  
+  // Fill in all the form blanks automatically
+  
+  // Sourdough fill-in-the-blanks
+  document.getElementById('blank-id').value = 'id';
+  document.getElementById('blank-calories').value = 'calories';  
+  document.getElementById('blank-category').value = 'category';
+  checkSourdoughAnswers();
+  
+  // DimSum fill-in-the-blanks
+  document.getElementById('blank-updatePrice').value = 'updatePrice';
+  document.getElementById('blank-options').value = 'options';
+  document.getElementById('blank-class').value = 'class';
+  document.getElementById('blank-addOption').value = 'addOption';
+  document.getElementById('blank-removeOption').value = 'removeOption';
+  checkDimSumAnswers();
+  
+  // Chowmein fill-in-the-blanks
+  document.getElementById('blank-noodleType').value = 'noodleType';
+  document.getElementById('blank-updateProtein').value = 'updateProtein';
+  document.getElementById('blank-extras').value = 'extras';
+  checkChowmeinAnswers();
+  
+  // PUT endpoint fill-in-the-blanks
+  document.getElementById('blank-method').value = 'PUT';
+  document.getElementById('blank-status').value = '200';
+  document.getElementById('blank-name').value = 'name';
+  checkPutAnswers();
+  
+  // Run the interactive tasks
+  setTimeout(() => {
+    seedPantry();
+  }, 500);
+  
+  setTimeout(() => {
+    viewPantry();
+  }, 1000);
+  
+  setTimeout(() => {
+    runUnitTest();
+  }, 1500);
+  
+  // Mark all tasks as complete
+  setTimeout(() => {
+    completeTask('dimsum');
+    completeTask('chowmein'); 
+    completeTask('sourdough');
+    completeTask('seed');
+    completeTask('view');
+    
+    showToast('🎉 All tasks completed! Seattle unlocked!', 4000);
+  }, 2000);
+}
+
+// Add the missing checkPutAnswers function
+function checkPutAnswers() {
+  const answers = {
+    blank_method: "PUT",
+    blank_status: "200", 
+    blank_name: "name"
+  };
+  let correct = 0;
+  let total = Object.keys(answers).length;
+  for (const key in answers) {
+    const val = document.getElementById(key.replace('_', '-')).value.trim();
+    if (val.toLowerCase() === answers[key].toLowerCase()) correct++;
+  }
+  const feedback = document.getElementById('put-feedback');
+  if (correct === total) {
+    feedback.textContent = '✅ All correct! You understand PUT endpoints.';
+    completeTask('view');
+  } else {
+    feedback.textContent = `You got ${correct} out of ${total} correct. Try again!`;
+  }
+  return false;
+}
 </script>

@@ -1269,3 +1269,68 @@ function submitQuiz(btn) {
   }
 }
 </script>
+
+<!-- Quick Complete Button for Testing - Bottom Right Corner -->
+<button id="quickCompleteBtn" onclick="autoCompleteAllTasks()" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(139,92,246,0.9);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transition: all 0.2s ease;
+" onmouseover="this.style.background='rgba(139,92,246,1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(139,92,246,0.9)'; this.style.transform='translateY(0)'">
+  Complete All Tasks
+</button>
+
+<script>
+function autoCompleteAllTasks() {
+  // Hide the button after clicking
+  document.getElementById('quickCompleteBtn').style.display = 'none';
+  
+  // Auto-fill the dish creation form
+  document.getElementById('dish-name').value = 'Baja Bowl';
+  document.getElementById('dish-category').value = 'San Diego Favorite';
+  document.getElementById('dish-calories').value = '450';
+  
+  // Clear and add sample ingredients
+  window._localIngredientBuffer = [
+    { name: "rice", qty: "1", unit: "cup" },
+    { name: "beans", qty: "0.5", unit: "cup" },
+    { name: "avocado", qty: "1", unit: "piece" }
+  ];
+  renderIngredientList();
+  
+  // Run the interactive tasks in sequence
+  setTimeout(() => {
+    runCreateForm();
+  }, 500);
+  
+  setTimeout(() => {
+    seedPantry();
+  }, 1000);
+  
+  setTimeout(() => {
+    viewPantry();
+  }, 1500);
+  
+  // Mark all tasks as complete
+  setTimeout(() => {
+    completeTask('fishtaco');
+    completeTask('burritocart'); 
+    completeTask('bajabowl');
+    completeTask('post');
+    completeTask('seed');
+    completeTask('view');
+    
+    showToast('🎉 All tasks completed! Los Angeles unlocked!', 4000);
+  }, 2000);
+}
+</script>

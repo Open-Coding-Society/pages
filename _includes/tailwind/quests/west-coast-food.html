@@ -1248,24 +1248,11 @@ function updateShowcaseWalls() {
   for (let i = 0; i < 4; i++) {
     const showcaseWall = document.getElementById(`showcase-${i}`);
     const uploadForm = document.getElementById(`upload-form-${i}`);
-    const cityCard = document.getElementById(`city-${i}`);
     
     if (gameProgress.completedCities.includes(i)) {
       // Unlock showcase wall
       showcaseWall.classList.remove('locked');
       uploadForm.style.display = 'block';
-      
-      // Add upload button to city card
-      if (cityCard && !cityCard.querySelector('.city-upload-btn')) {
-        const uploadBtn = document.createElement('div');
-        uploadBtn.className = 'city-upload-btn show';
-        uploadBtn.textContent = '📸 Share';
-        uploadBtn.title = 'Add to Showcase Wall';
-        uploadBtn.onclick = function() {
-          toggleCityShowcase(i);
-        };
-        cityCard.appendChild(uploadBtn);
-      }
     }
   }
   
