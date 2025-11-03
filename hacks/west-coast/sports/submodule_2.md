@@ -23,457 +23,470 @@ footer:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LA Sports API - Step 2: Backend Setup</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            padding: 20px;
-            min-height: 100vh;
-            color: #333;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 20px;
+        min-height: 100vh;
+        /* FIX 1: REMOVED: color: #333; */
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+    /* FIX 2: ADDED a general color rule for content inside the container */
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        color: #333; /* Default dark text color for all main content */
+    }
 
-        .header {
-            background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
-            color: white;
-            padding: 60px 40px;
-            text-align: center;
-            border-radius: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 15px 50px rgba(253, 185, 39, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
+    .header {
+        background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
+        color: #000 !important;
+        padding: 60px 40px;
+        text-align: center;
+        border-radius: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 50px rgba(253, 185, 39, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
 
-        .header::before {
-            content: '🌴';
-            position: absolute;
-            font-size: 180px;
-            opacity: 0.1;
-            top: -30px;
-            left: 80px;
-            animation: sway 3s ease-in-out infinite;
-        }
+    .header::before {
+        content: '🌴';
+        position: absolute;
+        font-size: 180px;
+        opacity: 0.1;
+        top: -30px;
+        left: 80px;
+        animation: sway 3s ease-in-out infinite;
+    }
 
-        .header::after {
-            content: '🌴';
-            position: absolute;
-            font-size: 180px;
-            opacity: 0.1;
-            bottom: -30px;
-            right: 80px;
-            animation: sway 3s ease-in-out infinite reverse;
-        }
+    .header::after {
+        content: '🌴';
+        position: absolute;
+        font-size: 180px;
+        opacity: 0.1;
+        bottom: -30px;
+        right: 80px;
+        animation: sway 3s ease-in-out infinite reverse;
+    }
 
-        @keyframes sway {
-            0%, 100% { transform: rotate(-2deg); }
-            50% { transform: rotate(2deg); }
-        }
+    @keyframes sway {
+        0%, 100% { transform: rotate(-2deg); }
+        50% { transform: rotate(2deg); }
+    }
 
+    .header h1 {
+        font-size: 3.5em;
+        margin-bottom: 15px;
+        text-shadow: 3px 3px 6px rgba(255,255,255,0.3);
+        color: #000000ff !important;
+    }
+
+    .header p {
+        font-size: 1.4em;
+        opacity: 0.95;
+        color: #000000ff !important;
+    }
+
+    .step-badge {
+        display: inline-block;
+        background: rgba(0,0,0,0.1);
+        padding: 12px 30px;
+        border-radius: 30px;
+        margin-top: 20px;
+        font-size: 1.2em;
+        font-weight: bold;
+        border: 2px solid rgba(0,0,0,0.2);
+        color: #000 !important;
+    }
+
+    .concept-section {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 50px;
+        border-radius: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        border-left: 10px solid #FDB927;
+    }
+
+    .concept-section h2 {
+        color: #552583 !important;
+        margin-bottom: 25px;
+        font-size: 2.5em;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* Text color for concept section paragraph is already good: #2c3e50 */
+    .concept-section p {
+        color: #2c3e50 !important;
+        line-height: 2;
+        font-size: 1.15em;
+        margin-bottom: 20px;
+    }
+
+    .concept-section ul {
+        color: #2c3e50;
+        line-height: 2;
+        margin-left: 30px;
+        font-size: 1.1em;
+    }
+
+    .concept-section li {
+        margin-bottom: 15px;
+    }
+
+    .concept-section strong {
+        color: #552583;
+    }
+
+    .concept-section h3 {
+        color: #552583 !important;
+        font-size: 1.8em;
+        margin: 30px 0 15px 0;
+    }
+
+    .la-teams-showcase {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 50px;
+        border-radius: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        /* REMOVED: color: #000 !important; */
+    }
+
+    .la-teams-showcase h2 {
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 2.5em;
+        color: #000 !important;
+    }
+
+    /* REMOVED: .la-teams-showcase > p { color: #000 !important; } */
+
+    .teams-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .team-card {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        border: 2px solid #dee2e6;
+        transition: all 0.3s;
+    }
+
+    .team-card:hover {
+        background: #f8f9fa;
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .team-icon {
+        font-size: 4em;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .team-name {
+        font-size: 1.8em;
+        text-align: center;
+        margin-bottom: 15px;
+        font-weight: bold;
+        color: #000 !important;
+    }
+
+    .stadium-name {
+        text-align: center;
+        font-size: 1.1em;
+        color: #333 !important;
+        margin-bottom: 20px;
+    }
+
+    .team-url {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85em;
+        word-break: break-all;
+        margin-top: 15px;
+        color: #000 !important;
+        border: 2px solid #dee2e6;
+    }
+
+    .copy-button {
+        background: #FDB927;
+        color: #552583;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        transition: all 0.3s;
+    }
+
+    .copy-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
+    }
+
+    .code-box {
+        background: #f8f9fa;
+        color: #000 !important;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: 'Courier New', monospace;
+        margin: 10px 0;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        user-select: all;
+        cursor: text;
+        border: 2px solid #FDB927;
+    }
+
+    .practice-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 50px;
+        border-radius: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 50px rgba(118, 75, 162, 0.4);
+        /* REMOVED: color: #000 !important; */
+    }
+
+    .practice-section h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        color: #000 !important;
+    }
+
+    .build-area {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        border: 2px solid #dee2e6;
+    }
+
+    /* REMOVED: .build-area > p { color: #000 !important; } */
+
+    .build-step {
+        margin-bottom: 25px;
+    }
+
+    .step-label {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #000 !important;
+    }
+
+    .step-input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 2px solid #dee2e6;
+        font-size: 1em;
+        font-family: 'Courier New', monospace;
+        transition: border-color 0.3s;
+        background: #fff;
+        color: #000 !important;
+    }
+
+    .step-input:focus {
+        outline: none;
+        border-color: #FDB927;
+    }
+
+    .step-input::placeholder {
+        color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .url-output {
+        background: #f8f9fa;
+        color: #000 !important;
+        padding: 20px;
+        border-radius: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1em;
+        margin: 20px 0;
+        word-break: break-all;
+        min-height: 60px;
+        user-select: all;
+        cursor: text;
+        border: 2px solid #dee2e6;
+    }
+
+    .check-button {
+        background: #FDB927;
+        color: #552583;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+    }
+
+    .check-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
+    }
+
+    .feedback {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: bold;
+        display: none;
+    }
+
+    .feedback.correct {
+        background: #d5f4e6;
+        color: #27ae60;
+        display: block;
+    }
+
+    .feedback.incorrect {
+        background: #fadbd8;
+        color: #e74c3c;
+        display: block;
+    }
+
+    .hint {
+        background: rgba(253, 185, 39, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        font-style: italic;
+        border-left: 4px solid #FDB927;
+        /* REMOVED: color: #000 !important; */
+    }
+
+    .challenge-section {
+        background: white;
+        padding: 50px;
+        border-radius: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .challenge-section h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        color: #552583 !important;
+    }
+
+    .challenge-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        border: 2px solid #dee2e6;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .challenge-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .challenge-card h3 {
+        margin-bottom: 15px;
+        font-size: 1.5em;
+        color: #552583 !important;
+    }
+
+    /* REMOVED: .challenge-card p { color: #2c3e50 !important; } */
+
+    .challenge-input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 2px solid #dee2e6;
+        font-size: 1em;
+        font-family: 'Courier New', monospace;
+        margin: 15px 0;
+        transition: border-color 0.3s;
+        color: #000 !important;
+    }
+
+    .challenge-input:focus {
+        outline: none;
+        border-color: #FDB927;
+    }
+
+    .challenge-button {
+        background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
+        color: #000 !important;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .challenge-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(253, 185, 39, 0.3);
+    }
+
+    .key-takeaways {
+        background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
+        color: #000 !important;
+        padding: 50px;
+        border-radius: 25px;
+        box-shadow: 0 15px 50px rgba(253, 185, 39, 0.4);
+    }
+
+    .key-takeaways h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        color: #000 !important;
+    }
+
+    .key-takeaways ul {
+        line-height: 2.2;
+        font-size: 1.15em;
+        color: #000 !important;
+    }
+
+    .key-takeaways li {
+        margin-bottom: 18px;
+        color: #000 !important;
+    }
+
+    @media (max-width: 768px) {
         .header h1 {
-            font-size: 3.5em;
-            margin-bottom: 15px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.4em;
-            opacity: 0.95;
-        }
-
-        .step-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.25);
-            padding: 12px 30px;
-            border-radius: 30px;
-            margin-top: 20px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border: 2px solid rgba(255,255,255,0.4);
-        }
-
-        .concept-section {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 50px;
-            border-radius: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            border-left: 10px solid #FDB927;
-        }
-
-        .concept-section h2 {
-            color: #552583;
-            margin-bottom: 25px;
-            font-size: 2.5em;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .concept-section p {
-            color: #2c3e50;
-            line-height: 2;
-            font-size: 1.15em;
-            margin-bottom: 20px;
-        }
-
-        .concept-section ul {
-            color: #2c3e50;
-            line-height: 2;
-            margin-left: 30px;
-            font-size: 1.1em;
-        }
-
-        .concept-section li {
-            margin-bottom: 15px;
-        }
-
-        .concept-section strong {
-            color: #552583;
-        }
-
-        .concept-section h3 {
-            color: #552583;
-            font-size: 1.8em;
-            margin: 30px 0 15px 0;
-        }
-
-        .la-teams-showcase {
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-            padding: 50px;
-            border-radius: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-            color: white;
-        }
-
-        .la-teams-showcase h2 {
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 2.5em;
+            font-size: 2em;
         }
 
         .teams-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: 1fr;
         }
-
-        .team-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
-        }
-
-        .team-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
-        }
-
-        .team-icon {
-            font-size: 4em;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .team-name {
-            font-size: 1.8em;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .stadium-name {
-            text-align: center;
-            font-size: 1.1em;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        .team-url {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85em;
-            word-break: break-all;
-            margin-top: 15px;
-            color: #4af626;
-        }
-
-        .copy-button {
-            background: #FDB927;
-            color: #552583;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .copy-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
-        }
-
-        .code-box {
-            background: #1e1e1e;
-            color: #4af626;
-            padding: 15px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            margin: 10px 0;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-            user-select: all;
-            cursor: text;
-            border: 2px solid #FDB927;
-        }
-
-        .practice-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 50px;
-            border-radius: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 15px 50px rgba(118, 75, 162, 0.4);
-            color: white;
-        }
-
-        .practice-section h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .build-area {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .build-area > p {
-            font-size: 1.2em;
-            margin-bottom: 25px;
-        }
-
-        .build-step {
-            margin-bottom: 25px;
-        }
-
-        .step-label {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .step-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            font-size: 1em;
-            font-family: 'Courier New', monospace;
-            transition: border-color 0.3s;
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-        }
-
-        .step-input:focus {
-            outline: none;
-            border-color: #FDB927;
-        }
-
-        .step-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .url-output {
-            background: #1e1e1e;
-            color: #4af626;
-            padding: 20px;
-            border-radius: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1em;
-            margin: 20px 0;
-            word-break: break-all;
-            min-height: 60px;
-            user-select: all;
-            cursor: text;
-        }
-
-        .check-button {
-            background: #FDB927;
-            color: #552583;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        .check-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
-        }
-
-        .feedback {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: bold;
-            display: none;
-        }
-
-        .feedback.correct {
-            background: #d5f4e6;
-            color: #27ae60;
-            display: block;
-        }
-
-        .feedback.incorrect {
-            background: #fadbd8;
-            color: #e74c3c;
-            display: block;
-        }
-
-        .hint {
-            background: rgba(253, 185, 39, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-style: italic;
-            border-left: 4px solid #FDB927;
-        }
-
-        .challenge-section {
-            background: white;
-            padding: 50px;
-            border-radius: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        }
-
-        .challenge-section h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            color: #552583;
-        }
-
-        .challenge-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 2px solid #dee2e6;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .challenge-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .challenge-card h3 {
-            margin-bottom: 15px;
-            font-size: 1.5em;
-            color: #552583;
-        }
-
-        .challenge-card p {
-            color: #2c3e50;
-        }
-
-        .challenge-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid #dee2e6;
-            font-size: 1em;
-            font-family: 'Courier New', monospace;
-            margin: 15px 0;
-            transition: border-color 0.3s;
-        }
-
-        .challenge-input:focus {
-            outline: none;
-            border-color: #FDB927;
-        }
-
-        .challenge-button {
-            background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .challenge-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.3);
-        }
-
-        .key-takeaways {
-            background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
-            color: white;
-            padding: 50px;
-            border-radius: 25px;
-            box-shadow: 0 15px 50px rgba(253, 185, 39, 0.4);
-        }
-
-        .key-takeaways h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .key-takeaways ul {
-            line-height: 2.2;
-            font-size: 1.15em;
-        }
-
-        .key-takeaways li {
-            margin-bottom: 18px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .teams-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="container">
@@ -509,7 +522,6 @@ footer:
 
         <div class="la-teams-showcase">
             <h2>🏟️ Your LA Sports Teams & Their API URLs</h2>
-            <p style="text-align: center; margin-bottom: 30px; font-size: 1.1em;">Here are the API URLs for your selected LA teams. Click "Copy URL" to copy the URL and test it in your browser!</p>
             <div class="teams-grid" id="teams-grid"></div>
         </div>
 
@@ -523,7 +535,6 @@ footer:
             
             <div class="challenge-card">
                 <h3>Challenge 1: Build a URL for the LA Rams</h3>
-                <p>Create the complete API URL to search for the LA Rams team.</p>
                 <input type="text" class="challenge-input" id="challenge1" placeholder="Type your URL here...">
                 <button class="challenge-button" onclick="checkChallenge(1)">Check Answer</button>
                 <div class="feedback" id="feedback1"></div>
@@ -532,7 +543,6 @@ footer:
 
             <div class="challenge-card">
                 <h3>Challenge 2: Get ALL NBA Teams</h3>
-                <p>Build a URL to get all teams in the NBA league (not just one team).</p>
                 <input type="text" class="challenge-input" id="challenge2" placeholder="Type your URL here...">
                 <button class="challenge-button" onclick="checkChallenge(2)">Check Answer</button>
                 <div class="feedback" id="feedback2"></div>
@@ -541,7 +551,6 @@ footer:
 
             <div class="challenge-card">
                 <h3>Challenge 3: Search for USC Trojans Players</h3>
-                <p>Build a URL to search for players on the USC Trojans team.</p>
                 <input type="text" class="challenge-input" id="challenge3" placeholder="Type your URL here...">
                 <button class="challenge-button" onclick="checkChallenge(3)">Check Answer</button>
                 <div class="feedback" id="feedback3"></div>
