@@ -292,8 +292,11 @@ class BlackjackGameManager {
                 // Check for win condition
                 if (this.money >= this.goalMoney) {
                     setTimeout(() => {
-                        alert("🎉 CONGRATULATIONS! You've reached $25,000 and escaped the casino! Level Complete!");
                         this.exitGame();
+                        // Trigger level win callback if provided
+                        if (this.onWin && typeof this.onWin === 'function') {
+                            this.onWin();
+                        }
                     }, 2000);
                 }
                 
