@@ -2430,6 +2430,8 @@ const DESTINATIONS = [
   }
 ];
 
+
+
 // 🌍 Generate Destination
 function generateDestination() {
   const query = document.getElementById("user-search-input").value.trim().toLowerCase();
