@@ -6,7 +6,26 @@
   <div class="microblog-panel-header">
     <button id="microblog-close-btn" class="microblog-close-btn" aria-label="Close Microblog">&times;</button>
     <h2 class="microblog-panel-title">Microblog</h2>
+    <button id="guest-signup-toggle" class="guest-signup-toggle-btn">Guest Signup</button>
   </div>
+
+  <!-- Guest Signup Form (initially hidden) -->
+  <div id="guest-signup-form" class="guest-signup-container" style="display: none;">
+    <h3 class="guest-signup-title">Quick Guest Signup</h3>
+    <form id="guest-form" onsubmit="handleGuestSignup(event);">
+      <div class="guest-form-group">
+        <input type="text" id="guest-username" placeholder="Username" required>
+      </div>
+      <div class="guest-form-group">
+        <input type="password" id="guest-password" placeholder="Password" required>
+      </div>
+      <p>
+        <button type="submit" class="guest-submit-btn">Sign Up & Login</button>
+      </p>
+      <p id="guest-status-message" class="guest-status"></p>
+    </form>
+  </div>
+
   <div class="microblog-panel-content">
     <!-- MicroBlog Container -->
     <div id="microblog-playground">
@@ -15,7 +34,10 @@
   </div>
 </aside>
 
-<script>
+<script type="module">
+// Import required functions from config
+import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
 // Microblog panel open/close logic
 const microblogPanel = document.getElementById('microblog-panel');
 const microblogFab = document.getElementById('microblog-toggle-btn');
@@ -31,6 +53,96 @@ function closeMicroblogPanel() {
 }
 microblogFab.onclick = openMicroblogPanel;
 microblogCloseBtn.onclick = closeMicroblogPanel;
+
+// Guest signup toggle logic
+const guestSignupToggle = document.getElementById('guest-signup-toggle');
+const guestSignupForm = document.getElementById('guest-signup-form');
+
+guestSignupToggle.onclick = function() {
+  if (guestSignupForm.style.display === 'none') {
+    guestSignupForm.style.display = 'block';
+  } else {
+    guestSignupForm.style.display = 'none';
+  }
+};
+
+// Guest signup handler with auto-login
+window.handleGuestSignup = async function(event) {
+  event.preventDefault();
+
+  const username = document.getElementById('guest-username').value;
+  const password = document.getElementById('guest-password').value;
+  const statusMessage = document.getElementById('guest-status-message');
+  const submitButton = document.querySelector('.guest-submit-btn');
+
+  // Disable button and show loading state
+  submitButton.disabled = true;
+  submitButton.textContent = 'Creating Account...';
+  statusMessage.textContent = '';
+  statusMessage.style.color = '#666';
+
+  const signupData = {
+    uid: username,
+    password: password
+  };
+
+  try {
+    // Step 1: Create guest account using Flask backend
+    statusMessage.textContent = 'Creating guest account...';
+    const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(signupData)
+    });
+
+    if (!signupResponse.ok) {
+      const errorText = await signupResponse.text();
+      throw new Error(`Signup failed: ${errorText}`);
+    }
+
+    await signupResponse.json();
+    statusMessage.textContent = 'Account created! Logging in...';
+
+    // Step 2: Auto-login with the same credentials
+    const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(signupData)
+    });
+
+    if (!loginResponse.ok) {
+      throw new Error('Auto-login failed');
+    }
+
+    await loginResponse.json();
+
+    // Success - stay on current page
+    statusMessage.textContent = 'Success! You are now logged in.';
+    statusMessage.style.color = 'green';
+
+    // Hide the form after successful signup/login
+    setTimeout(() => {
+      guestSignupForm.style.display = 'none';
+      // Reset form
+      document.getElementById('guest-username').value = '';
+      document.getElementById('guest-password').value = '';
+      submitButton.disabled = false;
+      submitButton.textContent = 'Sign Up & Login';
+    }, 2000);
+
+  } catch (error) {
+    console.error('Guest signup error:', error);
+    statusMessage.textContent = `Error: ${error.message}`;
+    statusMessage.style.color = 'red';
+    submitButton.disabled = false;
+    submitButton.textContent = 'Sign Up & Login';
+  }
+};
 </script>
 
 <!-- Create/Edit Modal Overlay using Tailwind -->
