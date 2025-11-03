@@ -2640,30 +2640,30 @@ button:active {
 </div>
 
 <!-- HOLLYWOOD QUIZ -->
-<section class="quiz-section quiz-section-item" data-destination="Griffith Observatory" style="display: none;">
+<section class="quiz-section quiz-section-item" data-destination="Hollywood Sign" style="display: none;">
   <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
   <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
-  <form id="button-quiz-1">
-    <label for="q1-1">
+  <form id="button-quiz-2">
+    <label for="q2-1">
       1️⃣ Complete this code structure to add a button inside the body: <br>
       <code>&lt;body&gt;<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&lt;________&gt;Click Me!&lt;/________&gt;<br>
       &lt;/body&gt;</code>
     </label><br>
-    <input type="text" id="q1-1" placeholder="Type your answer here"><br><br>
+    <input type="text" id="q2-1" placeholder="Type your answer here"><br><br>
 
-    <label for="q1-2">
+    <label for="q2-2">
       2️⃣ Add the missing part to make your button show an alert when clicked: <br>
       <code>&lt;button ________="alert('Hello!')"&gt;Click Me!&lt;/button&gt;</code>
     </label><br>
-    <input type="text" id="q1-2" placeholder="Type your answer here"><br><br>
+    <input type="text" id="q2-2" placeholder="Type your answer here"><br><br>
 
-    <button type="button" onclick="checkAnswers1()">Check Answers</button>
+    <button type="button" onclick="checkAnswers2()">Check Answers</button>
   </form>
 
-  <div id="quiz-result-1" class="quiz-result"></div>
-  <div id="button-demo-1" class="button-demo"></div>
+  <div id="quiz-result-2" class="quiz-result"></div>
+  <div id="button-demo-2" class="button-demo"></div>
 </section>
 
 
@@ -2857,30 +2857,30 @@ button:active {
 </div>
 
 <!-- UNIVERSAL QUIZ -->
-<section class="quiz-section quiz-section-item" data-destination="Griffith Observatory" style="display: none;">
+<section class="quiz-section quiz-section-item" data-destination="Universal Studios" style="display: none;">
   <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
   <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
-  <form id="button-quiz-1">
-    <label for="q1-1">
+  <form id="button-quiz-3">
+    <label for="q3-1">
       1️⃣ Complete this code structure to add a button inside the body: <br>
       <code>&lt;body&gt;<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&lt;________&gt;Click Me!&lt;/________&gt;<br>
       &lt;/body&gt;</code>
     </label><br>
-    <input type="text" id="q1-1" placeholder="Type your answer here"><br><br>
+    <input type="text" id="q3-1" placeholder="Type your answer here"><br><br>
 
-    <label for="q1-2">
+    <label for="q3-2">
       2️⃣ Add the missing part to make your button show an alert when clicked: <br>
       <code>&lt;button ________="alert('Hello!')"&gt;Click Me!&lt;/button&gt;</code>
     </label><br>
-    <input type="text" id="q1-2" placeholder="Type your answer here"><br><br>
+    <input type="text" id="q3-2" placeholder="Type your answer here"><br><br>
 
-    <button type="button" onclick="checkAnswers1()">Check Answers</button>
+    <button type="button" onclick="checkAnswers3()">Check Answers</button>
   </form>
 
-  <div id="quiz-result-1" class="quiz-result"></div>
-  <div id="button-demo-1" class="button-demo"></div>
+  <div id="quiz-result-3" class="quiz-result"></div>
+  <div id="button-demo-3" class="button-demo"></div>
 </section>
 
 <!-- SECTION 4: WALK OF FAME -->
@@ -3059,31 +3059,7 @@ button:active {
 </div>
 
 <!-- WALK OF FAME QUIZ -->
-<section class="quiz-section quiz-section-item" data-destination="Griffith Observatory" style="display: none;">
-  <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
-  <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
-  <form id="button-quiz-1">
-    <label for="q1-1">
-      1️⃣ Complete this code structure to add a button inside the body: <br>
-      <code>&lt;body&gt;<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&lt;________&gt;Click Me!&lt;/________&gt;<br>
-      &lt;/body&gt;</code>
-    </label><br>
-    <input type="text" id="q1-1" placeholder="Type your answer here"><br><br>
-
-    <label for="q1-2">
-      2️⃣ Add the missing part to make your button show an alert when clicked: <br>
-      <code>&lt;button ________="alert('Hello!')"&gt;Click Me!&lt;/button&gt;</code>
-    </label><br>
-    <input type="text" id="q1-2" placeholder="Type your answer here"><br><br>
-
-    <button type="button" onclick="checkAnswers1()">Check Answers</button>
-  </form>
-
-  <div id="quiz-result-1" class="quiz-result"></div>
-  <div id="button-demo-1" class="button-demo"></div>
-</section>
 
 <script>
 // Load itinerary from localStorage and show only selected destinations
