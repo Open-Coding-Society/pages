@@ -6,6 +6,7 @@ permalink: /cs-portfolio-quest/data-viz/submodule_2/
 parent: "Data Visualization"
 team: "Applicators"
 submodule: 2
+microblog: true
 categories: [CSP, Submodule, DataVisualization]
 tags: [spring-boot, search, jpql, pagination]
 author: "Applicators Team"
