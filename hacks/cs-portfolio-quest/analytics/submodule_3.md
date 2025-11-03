@@ -9,6 +9,7 @@ submodule: 3
 categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team"
+microblog: true
 ---
 
 
