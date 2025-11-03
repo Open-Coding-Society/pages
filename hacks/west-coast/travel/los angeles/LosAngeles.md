@@ -1833,12 +1833,12 @@ button:active {
   border: 2px solid #ddd;
   border-radius: 5px;
   margin-bottom: 10px;
-  background: #000 !important;       /* black background */
-  color: #fff !important;            /* white text */
+  background: #000 !important;
+  color: #fff !important;
 }
 
 .quiz-section input[type="text"]::placeholder {
-  color: #aaa;            /* placeholder gray for contrast */
+  color: #aaa;
 }
 
 .quiz-section button {
@@ -2240,6 +2240,46 @@ button:active {
   height: 110px;
 }
 
+/* Personalization Banner */
+.personalization-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 800px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.personalization-banner h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.personalization-banner p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #e4e4e7;
+}
+
+.personalization-banner .destinations-list {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.destination-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
 /* ===== Accessibility: Reduced Motion ===== */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -2268,8 +2308,15 @@ button:active {
   <p>Starting our LA roadtrip adventure…</p>
 </div>
 
+<!-- Personalization Banner -->
+<div id="personalizationBanner" class="personalization-banner" style="display: none;">
+  <h3>🎯 Your Personalized LA Experience</h3>
+  <p>Based on your itinerary preferences, here are your selected destinations:</p>
+  <div class="destinations-list" id="destinationsList"></div>
+</div>
+
 <!-- SECTION 1: GRIFFITH OBSERVATORY -->
-<section class="griffith-scene" id="griffith">
+<section class="griffith-scene scene-section" id="griffith" data-destination="Griffith Observatory" style="display: none;">
   <div class="twinkle" style="top:12%;left:12%"></div>
   <div class="twinkle t2" style="left:48%"></div>
   <div class="twinkle t3" style="left:72%"></div>
@@ -2326,7 +2373,7 @@ button:active {
 </section>
 
 <!-- GRIFFITH LESSON -->
-<div class="lesson-content">
+<div class="lesson-content lesson-section" data-destination="Griffith Observatory" style="display: none;">
   <div class="container">
     <h1>Los Angeles</h1>
     <h2>Griffith Observatory Button Lesson</h2>
@@ -2439,7 +2486,7 @@ button:active {
 </div>
 
 <!-- GRIFFITH QUIZ -->
-<section class="quiz-section">
+<section class="quiz-section quiz-section-item" data-destination="Griffith Observatory" style="display: none;">
   <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
   <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
@@ -2464,7 +2511,7 @@ button:active {
 </section>
 
 <!-- SECTION 2: HOLLYWOOD SIGN -->
-<section class="hollywood-scene" id="hollywood">
+<section class="hollywood-scene scene-section" id="hollywood" data-destination="Hollywood Sign" style="display: none;">
   <div class="hill-shape" style="--x:-10%"></div>
   <div class="hill-shape" style="--x:20%"></div>
   <div class="hill-shape" style="--x:55%"></div>
@@ -2483,7 +2530,7 @@ button:active {
 </section>
 
 <!-- HOLLYWOOD LESSON -->
-<div class="lesson-content">
+<div class="lesson-content lesson-section" data-destination="Hollywood Sign" style="display: none;">
   <div class="container">
     <h1>Los Angeles</h1>
     <h2>Hollywood Sign Button Lesson</h2>
@@ -2590,7 +2637,7 @@ button:active {
 </div>
 
 <!-- HOLLYWOOD QUIZ -->
-<section class="quiz-section">
+<section class="quiz-section quiz-section-item" data-destination="Hollywood Sign" style="display: none;">
   <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
   <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
@@ -2615,7 +2662,7 @@ button:active {
 </section>
 
 <!-- SECTION 3: UNIVERSAL STUDIOS -->
-<section class="universal-scene" id="universal">
+<section class="universal-scene scene-section" id="universal" data-destination="Universal Studios" style="display: none;">
   <div class="sun"></div>
   <div class="cloud cloud1"></div>
   <div class="cloud cloud2"></div>
@@ -2707,7 +2754,7 @@ button:active {
 </section>
 
 <!-- UNIVERSAL LESSON -->
-<div class="lesson-content">
+<div class="lesson-content lesson-section" data-destination="Universal Studios" style="display: none;">
   <div class="container">
     <h1>Los Angeles</h1>
     <h2>Universal Studios Button Lesson</h2>
@@ -2804,7 +2851,7 @@ button:active {
 </div>
 
 <!-- UNIVERSAL QUIZ -->
-<section class="quiz-section">
+<section class="quiz-section quiz-section-item" data-destination="Universal Studios" style="display: none;">
   <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
   <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
@@ -2829,7 +2876,7 @@ button:active {
 </section>
 
 <!-- SECTION 4: WALK OF FAME -->
-<section class="walkoffame-scene" id="walkoffame">
+<section class="walkoffame-scene scene-section" id="walkoffame" data-destination="Hollywood Walk of Fame" style="display: none;">
   <div class="chinese-theatre">
     <div class="theatre-roof"></div>
     <div class="theatre-body">
@@ -2864,7 +2911,7 @@ button:active {
 </section>
 
 <!-- WALK OF FAME LESSON -->
-<div class="lesson-content">
+<div class="lesson-content lesson-section" data-destination="Hollywood Walk of Fame" style="display: none;">
   <div class="container">
     <h1>Los Angeles</h1>
     <h2>Hollywood Walk of Fame Button Lesson</h2>
@@ -3004,7 +3051,7 @@ button:active {
 </div>
 
 <!-- WALK OF FAME QUIZ -->
-<section class="quiz-section">
+<section class="quiz-section quiz-section-item" data-destination="Hollywood Walk of Fame" style="display: none;">
   <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
   <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
@@ -3029,6 +3076,83 @@ button:active {
 </section>
 
 <script>
+// Load itinerary from localStorage and show only selected destinations
+(function() {
+  try {
+    const itineraryData = localStorage.getItem('westCoastItinerary');
+    
+    if (itineraryData) {
+      const itinerary = JSON.parse(itineraryData);
+      
+      // Check if Los Angeles data exists
+      if (itinerary.cities && itinerary.cities['Los Angeles']) {
+        const laDestinations = itinerary.cities['Los Angeles'].destinations;
+        
+        // Show personalization banner
+        const banner = document.getElementById('personalizationBanner');
+        const destinationsList = document.getElementById('destinationsList');
+        
+        if (laDestinations && laDestinations.length > 0) {
+          banner.style.display = 'block';
+          
+          // Display selected destinations in banner
+          destinationsList.innerHTML = laDestinations.map(dest => 
+            `<div class="destination-badge">${dest}</div>`
+          ).join('');
+          
+          // Show only the sections for selected destinations
+          const allScenes = document.querySelectorAll('.scene-section');
+          const allLessons = document.querySelectorAll('.lesson-section');
+          const allQuizzes = document.querySelectorAll('.quiz-section-item');
+          
+          // Hide all sections first
+          allScenes.forEach(scene => scene.style.display = 'none');
+          allLessons.forEach(lesson => lesson.style.display = 'none');
+          allQuizzes.forEach(quiz => quiz.style.display = 'none');
+          
+          // Show only selected destinations
+          laDestinations.forEach(destination => {
+            // Show scene
+            const scene = document.querySelector(`.scene-section[data-destination="${destination}"]`);
+            if (scene) scene.style.display = 'block';
+            
+            // Show lesson
+            const lesson = document.querySelector(`.lesson-section[data-destination="${destination}"]`);
+            if (lesson) lesson.style.display = 'block';
+            
+            // Show quiz
+            const quiz = document.querySelector(`.quiz-section-item[data-destination="${destination}"]`);
+            if (quiz) quiz.style.display = 'block';
+          });
+        } else {
+          // No destinations selected, show all
+          showAllDestinations();
+        }
+      } else {
+        // No LA data, show all
+        showAllDestinations();
+      }
+    } else {
+      // No itinerary data, show all
+      showAllDestinations();
+    }
+  } catch (error) {
+    console.error('Error loading itinerary:', error);
+    // On error, show all
+    showAllDestinations();
+  }
+})();
+
+function showAllDestinations() {
+  const allScenes = document.querySelectorAll('.scene-section');
+  const allLessons = document.querySelectorAll('.lesson-section');
+  const allQuizzes = document.querySelectorAll('.quiz-section-item');
+  
+  allScenes.forEach(scene => scene.style.display = 'block');
+  allLessons.forEach(lesson => lesson.style.display = 'block');
+  allQuizzes.forEach(quiz => quiz.style.display = 'block');
+}
+
 // Hide intro after 4 seconds
 setTimeout(() => {
   const intro = document.getElementById('intro');
@@ -3292,7 +3416,7 @@ function generateDestination() {
       climate: "Mild temperate",
       activities: "Temple visits, tea ceremonies, exploring Arashiyama bamboo forest"
     });
-    showAIStatus("🌸 No exact match found, but here’s a great suggestion: Kyoto!", "success");
+    showAIStatus("🌸 No exact match found, but here's a great suggestion: Kyoto!", "success");
   }
 }
 
