@@ -22,12 +22,25 @@ function getProgressState() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const state = JSON.parse(saved);
-      return { ...defaultState, ...state };
+      // Ensure completed is always an array
+      if (!Array.isArray(state.completed)) {
+        state.completed = [];
+      }
+      // Ensure current module is valid
+      if (typeof state.current !== 'number' || state.current < 1) {
+        state.current = 1;
+      }
+      const mergedState = { ...defaultState, ...state };
+      // Force save valid state
+      saveProgressState(mergedState);
+      return mergedState;
     }
   } catch (error) {
     console.warn('Error loading end module progress:', error);
   }
   
+  // Initialize fresh state
+  saveProgressState(defaultState);
   return defaultState;
 }
 
@@ -52,6 +65,11 @@ function saveProgressState(state) {
 export function completeModule(moduleNumber, isAutoComplete = false) {
   const state = getProgressState();
   
+  // Force completed to be an array if somehow it became invalid
+  if (!Array.isArray(state.completed)) {
+    state.completed = [];
+  }
+
   // Check if already completed
   const wasAlreadyCompleted = state.completed.includes(moduleNumber);
   
@@ -61,10 +79,15 @@ export function completeModule(moduleNumber, isAutoComplete = false) {
     console.log(`✅ Module ${moduleNumber} marked as complete!`);
   }
   
-  // Update current module to next available
-  state.current = Math.max(...state.completed) + 1;
-  if (state.current > 5) state.current = 5;
-  
+  // Update current module to next available (fixed logic)
+  const nextModule = moduleNumber + 1;
+  if (nextModule <= 5) {
+    state.current = nextModule;
+  } else {
+    state.current = 5;
+  }
+
+  // Explicitly save progression
   saveProgressState(state);
   
   // Always update all displays
@@ -90,9 +113,7 @@ export function completeModule(moduleNumber, isAutoComplete = false) {
  */
 function handleNormalCompletion(moduleNumber) {
   console.log(`🎮 Module ${moduleNumber} completed through normal gameplay!`);
-  
-  // Show success message
-  showSuccessMessage(`🎉 Congratulations! Module ${moduleNumber} completed! ${moduleNumber < 5 ? `Module ${moduleNumber + 1} is now unlocked!` : 'All modules complete!'}`);
+  // Normal completion: refresh UI and enable navigation. (Success popup removed.)
   
   // Get current state and refresh UI
   const state = getProgressState();
@@ -151,10 +172,24 @@ export function isModuleUnlocked(moduleNumber) {
   // First module is always unlocked
   if (moduleNumber === 1) return true;
   
+  // Force completed to be an array if somehow it became invalid
+  if (!Array.isArray(state.completed)) {
+    state.completed = [];
+    saveProgressState(state);
+  }
+  
   // A module is unlocked if the previous module is completed
-  const isUnlocked = state.completed.includes(moduleNumber - 1);
-  console.log(`Module ${moduleNumber} unlocked status:`, isUnlocked, 'Previous completed:', state.completed.includes(moduleNumber - 1));
-  return isUnlocked;
+  const previousModuleCompleted = state.completed.includes(moduleNumber - 1);
+  
+  // Debug logging
+  console.log(`Module ${moduleNumber} unlock check:`, {
+    previousModule: moduleNumber - 1,
+    isUnlocked: previousModuleCompleted,
+    completedModules: state.completed,
+    currentModule: state.current
+  });
+  
+  return previousModuleCompleted;
 }
 
 /**
@@ -898,9 +933,7 @@ function autoCompleteCurrentModule() {
   
   if (confirm(`🎮 Auto-complete Module ${moduleNum}? This will mark it as finished and unlock the next module.`)) {
     const state = completeModule(moduleNum, true);
-    
-    showSuccessMessage(`✅ Module ${moduleNum} completed! ${moduleNum < 5 ? `Module ${moduleNum + 1} is now unlocked!` : 'All modules complete!'}`);
-    
+    // Completion popup removed for a smoother UX; UI is refreshed below.
     refreshModuleUI(state, moduleNum);
     
     if (moduleNum < 5) {
