@@ -10,6 +10,7 @@ categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team"
 date: 2025-10-21
+microblog: true
 ---
 
 # Submodule 2: Certfication

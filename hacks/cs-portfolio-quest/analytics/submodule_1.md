@@ -10,6 +10,7 @@ categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team: Nikhil, Rohan, Pranav, Shriya, Samhita, Adi"
 date: 2025-10-22
+microblog: true
 ---
 
 # Submodule 1: Overall Analytics & Grades
@@ -781,9 +782,9 @@ Keep it conversational, positive, and concise (3-4 sentences total). Be specific
 
           // Define modules and total submodules
           const spiderModules = {
-              'AI Usage': 4,
-              'Backend Development': 6,
-              'Data Visualization': 3,
+              'AI Usage': 3,
+              'Backend Development': 4,
+              'Data Visualization': 2,
               'Frontend Development': 6,
               'Resume Building': 6
           };
