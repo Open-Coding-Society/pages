@@ -1221,3 +1221,5 @@ Why not: Engineering calculations need 100% accuracy and domain expertise. AI ca
     // Save completion status
     localStorage.setItem('ai-submodule-3-completed', 'true');
 </script>
+
+

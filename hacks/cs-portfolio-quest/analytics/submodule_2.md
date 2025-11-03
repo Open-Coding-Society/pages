@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: certchatbot
 title: "Submodule 2: Certificates and Badges"
 description: "Submodule 2 of Analytics/Admin Mini-Quest"
 permalink: /cs-portfolio-quest/analytics/submodule_2/
@@ -12,7 +12,7 @@ author: "Curators Team"
 date: 2025-10-21
 ---
 
-# Submodule 2
+# Submodule 2: Certfication
 
 <style>
   * {
@@ -286,6 +286,10 @@ date: 2025-10-21
       font-size: 1.25rem;
     }
   }
+  #lessonCompleteButton {
+    display: none !important;
+  }
+
 </style>
 
 <div class="container">
@@ -299,7 +303,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Frontend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -310,7 +313,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Backend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -321,7 +323,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Data Visualization', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -332,7 +333,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Resume Building', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -343,7 +343,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('AI Usage', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
   </div>
@@ -420,7 +419,49 @@ date: 2025-10-21
   </div>
 
   
+<!-- Instructional Card -->
+<div style="
+  width: 100%;
+  background-color: #121212;
+  border: 1px solid #d1d9e0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 40px;
+  box-shadow: 0 2px 8px rgba(117, 47, 47, 0.08);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  line-height: 1.6;
+">
+
+  <h2 style="text-align: center; color: #004182;">How to Fill Out Your Certification</h2>
+
+  <!-- Screenshot image -->
+  <center><img src="{{site.baseurl}}/images/cs-portfolio-quest/analytics/LinkdenReqs.png" height="625"></center>
+
+
+  <p style="text-align: center; max-width: 800px; margin: 0 auto 20px auto;">
+    Use the example above as a reference when adding your certification on LinkedIn. Below is a guide explaining what to fill out in each section.
+  </p>
+
+  <ul style="list-style-type: none; padding-left: 0; max-width: 800px; margin: 0 auto;">
+    <li><strong>Name:</strong> Enter the official title of your certificate (e.g., “Python Data Analysis Certificate” or “AWS Certified Developer”).</li>
+    <li><strong>Issuing Organization:</strong> Type the name of the organization that granted the certificate (e.g., “Coursera,” “Google,” “Microsoft”).</li>
+    <li><strong>Issue Date:</strong> Select the month and year when you received your certification.</li>
+    <li><strong>Expiration Date:</strong> Leave this blank if the certification never expires, or fill in the date when it becomes invalid.</li>
+    <li><strong>Credential ID:</strong> If your certificate includes a unique ID number, enter it here. Otherwise, you can leave it empty.</li>
+    <li><strong>Credential URL:</strong> Paste the link where your certificate can be verified or viewed online (for example, the public certificate link from your organization).</li>
+  </ul>
+
+  <h3 style="color: #004182; margin-top: 30px; text-align: center;">Optional Sections</h3>
+  <ul style="list-style-type: none; padding-left: 0; max-width: 800px; margin: 0 auto;">
+    <li><strong>Skills:</strong> Add relevant skills that this certification demonstrates, such as “Cybersecurity,” “Cloud Computing,” or “Data Analysis.”</li>
+    <li><strong>Media:</strong> Upload a copy of your certificate (PDF or image) or link to a project or document that showcases your achievement.</li>
+  </ul>
+
+  <p style="text-align: center; color: #333; margin-top: 20px;">
+    Once everything is complete, click <strong>Save</strong> to publish your certification to your LinkedIn profile.
+  </p>
 </div>
+
 
 <canvas id="certCanvas"></canvas>
 
