@@ -10,7 +10,7 @@ lxdData:
   Title: "Frontend Development Modules"
   Description: "Master frontend development skills through hands-on projects and earn certificates!"
   Topics:
-    - Title: "Submodule 1"
+    - Title: "Frontend Purpose"
       Genre: "Project Creation"
       Level: 1
       Description: "Learn about the Purpose of Frontend in this Lesson!"
@@ -19,7 +19,7 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_1/"
       Image: "/images/cs-portfolio-quest/frontend/frontend.png"
       Alt: "Frontend Submodule 1"
-    - Title: "Submodule 2"
+    - Title: "Markdown and Html + Full-Stack"
       Genre: "Project Creation"
       Level: 2
       Description: "Learn about Markdown to HTML & Full Stack in this Lesson!"
@@ -28,8 +28,8 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_2/"
       Image: "/images/cs-portfolio-quest/frontend/fullstack.png"
       Alt: "Frontend Submodule 2"
-    - Title: "Submodule 3"
-      Genre: "Project Creation"
+    - Title: "CSS Styling"
+      Genre: "Markdown and Html + Full-Stack"
       Level: 3
       Description: "Learn about CSS Styling in this lesson!"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
@@ -37,7 +37,7 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_3/"
       Image: "/images/cs-portfolio-quest/frontend/css.png"
       Alt: "Frontend Submodule 3"
-    - Title: "Submodule 4"
+    - Title: "Tailwind and SASS"
       Genre: "Project Creation"
       Level: 4
       Description: "Learn about Tailwind and Sass in this lesson!"
@@ -46,7 +46,7 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_4/"
       Image: "/images/cs-portfolio-quest/frontend/tailwind.png"
       Alt: "Frontend Submodule 4"
-    - Title: "Submodule 5"
+    - Title: "Javascript"
       Genre: "Project Creation"
       Level: 5
       Description: "Learn About Javascript in this Lesson!"
@@ -55,7 +55,7 @@ lxdData:
       Lessons: "/cs-portfolio-quest/frontend/submodule_5/"
       Image: "/images/cs-portfolio-quest/frontend/javascript.png"
       Alt: "Frontend Submodule 5"
-    - Title: "Submodule 6"
+    - Title: "Component Integration"
       Genre: "Project Creation"
       Level: 6
       Description: "Learn about Component Integration in this lesson!"

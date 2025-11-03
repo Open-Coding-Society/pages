@@ -11,6 +11,10 @@ tags: [backend, submodule, zombies]
 author: "Zombies Team"
 date: 2025-10-21
 microblog: True
+footer:
+  previous: /west-coast/backend/submodule_1/
+  home: /west-coast/sports/
+  next: /west-coast/backend/submodule_3/
 ---
 
 <html lang="en">
@@ -582,120 +586,19 @@ fetch('sports-api.com/teams/lakers')<br>
         </div>
 
         <div class="la-teams-showcase">
-            <h2>🏆 Los Angeles Sports Teams Data</h2>
-            <div class="teams-grid">
-                <div class="team-card">
-                    <div class="team-icon">🏀</div>
-                    <div class="team-name">Lakers</div>
-                    <div class="team-stats">
-                        <div class="stat-box">
-                            <div class="stat-label">Stadium</div>
-                            <div class="stat-value" style="font-size: 1em;">Crypto.com</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Capacity</div>
-                            <div class="stat-value">19,068</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Founded</div>
-                            <div class="stat-value">1947</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Championships</div>
-                            <div class="stat-value">17</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="team-card">
-                    <div class="team-icon">⚾</div>
-                    <div class="team-name">Dodgers</div>
-                    <div class="team-stats">
-                        <div class="stat-box">
-                            <div class="stat-label">Stadium</div>
-                            <div class="stat-value" style="font-size: 0.9em;">Dodger Stadium</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Capacity</div>
-                            <div class="stat-value">56,000</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Founded</div>
-                            <div class="stat-value">1883</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Championships</div>
-                            <div class="stat-value">7</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="team-card">
-                    <div class="team-icon">🏈</div>
-                    <div class="team-name">Rams</div>
-                    <div class="team-stats">
-                        <div class="stat-box">
-                            <div class="stat-label">Stadium</div>
-                            <div class="stat-value" style="font-size: 0.9em;">SoFi Stadium</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Capacity</div>
-                            <div class="stat-value">70,240</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Founded</div>
-                            <div class="stat-value">1936</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Championships</div>
-                            <div class="stat-value">2</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h2>🏆 Your Los Angeles Sports Teams Data</h2>
+            <div class="teams-grid" id="teams-grid"></div>
         </div>
 
         <div class="data-structure-demo">
-            <h2>📊 How LA Sports Data is Organized</h2>
-            <p>This is how your API's data source might be structured as a JSON file. Each team has organized properties that the API can easily access:</p>
-            <div class="json-display">
-{<br>
-&nbsp;&nbsp;<span class="json-key">"la_teams"</span>: [<br>
-&nbsp;&nbsp;&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id"</span>: <span class="json-number">1</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"name"</span>: <span class="json-string">"Los Angeles Lakers"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"sport"</span>: <span class="json-string">"Basketball"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"stadium"</span>: <span class="json-string">"Crypto.com Arena"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"capacity"</span>: <span class="json-number">19068</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"founded"</span>: <span class="json-number">1947</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"championships"</span>: <span class="json-number">17</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id"</span>: <span class="json-number">2</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"name"</span>: <span class="json-string">"Los Angeles Dodgers"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"sport"</span>: <span class="json-string">"Baseball"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"stadium"</span>: <span class="json-string">"Dodger Stadium"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"capacity"</span>: <span class="json-number">56000</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"founded"</span>: <span class="json-number">1883</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"championships"</span>: <span class="json-number">7</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;&nbsp;&nbsp;{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id"</span>: <span class="json-number">3</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"name"</span>: <span class="json-string">"Los Angeles Rams"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"sport"</span>: <span class="json-string">"Football"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"stadium"</span>: <span class="json-string">"SoFi Stadium"</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"capacity"</span>: <span class="json-number">70240</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"founded"</span>: <span class="json-number">1936</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"championships"</span>: <span class="json-number">2</span><br>
-&nbsp;&nbsp;&nbsp;&nbsp;}<br>
-&nbsp;&nbsp;]<br>
-}
-            </div>
+            <h2>📊 How Your LA Sports Data is Organized</h2>
+            <p>This is how your API's data source is structured as a JSON file. Each team has organized properties that the API can easily access:</p>
+            <div class="json-display" id="json-display"></div>
         </div>
 
         <div class="interactive-coding">
-            <h2>💻 Interactive: Access the Data Source</h2>
-            <p>Write code to retrieve data from the LA sports teams data source. Try accessing different teams and their stats!</p>
+            <h2>💻 Interactive: Access Your Data Source</h2>
+            <p>Write code to retrieve data from YOUR LA sports teams data source. Try accessing different teams and their stats!</p>
             
             <div class="coding-workspace">
                 <div class="code-editor">
@@ -703,16 +606,16 @@ fetch('sports-api.com/teams/lakers')<br>
                     <div class="editor-header">JavaScript</div>
                     <textarea id="codeInput" placeholder="// Write your code here to access the data...
 // Example:
-// const lakers = laTeams[0];
-// console.log(lakers.name);
-// console.log(lakers.championships);"></textarea>
+// const team1 = laTeams[0];
+// console.log(team1.name);
+// console.log(team1.championships);"></textarea>
                     <button class="run-button" id="runButton">▶ Run Code</button>
                     
                     <div class="hint-box">
                         <h4>💡 Try these challenges:</h4>
-                        • Access and display the Lakers' championship count<br>
+                        • Access and display your first team's championship count<br>
                         • Find which stadium has the largest capacity<br>
-                        • Calculate the total championships of all LA teams<br>
+                        • Calculate the total championships of your LA teams<br>
                         • Display all team names in a list
                     </div>
                 </div>
@@ -742,35 +645,180 @@ Try: console.log(laTeams);</div>
     </div>
 
     <script>
-        const laTeams = [
-            {
+        // COMPLETE LA TEAMS DATABASE
+        const COMPLETE_LA_TEAMS = {
+            "Basketball - Clippers": {
                 id: 1,
-                name: "Los Angeles Lakers",
-                sport: "Basketball",
-                stadium: "Crypto.com Arena",
-                capacity: 19068,
-                founded: 1947,
-                championships: 17
+                name: "Los Angeles Clippers",
+                sport: "Basketball - Clippers",
+                stadium: "Intuit Dome",
+                capacity: 18000,
+                founded: 1970,
+                championships: 0,
+                icon: "🏀"
             },
-            {
+            "Football - Chargers": {
                 id: 2,
+                name: "Los Angeles Chargers",
+                sport: "Football - Chargers",
+                stadium: "SoFi Stadium",
+                capacity: 70240,
+                founded: 1960,
+                championships: 0,
+                icon: "🏈"
+            },
+            "Football - USC": {
+                id: 3,
+                name: "USC Trojans",
+                sport: "Football - USC",
+                stadium: "LA Memorial Coliseum",
+                capacity: 77500,
+                founded: 1888,
+                championships: 11,
+                icon: "🏈"
+            },
+            "Baseball - Dodgers": {
+                id: 4,
                 name: "Los Angeles Dodgers",
-                sport: "Baseball",
+                sport: "Baseball - Dodgers",
                 stadium: "Dodger Stadium",
                 capacity: 56000,
                 founded: 1883,
-                championships: 7
+                championships: 7,
+                icon: "⚾"
             },
-            {
-                id: 3,
-                name: "Los Angeles Rams",
-                sport: "Football",
-                stadium: "SoFi Stadium",
-                capacity: 70240,
-                founded: 1936,
-                championships: 2
+            "Soccer - LA Galaxy": {
+                id: 5,
+                name: "LA Galaxy",
+                sport: "Soccer - LA Galaxy",
+                stadium: "Dignity Health Sports Park",
+                capacity: 27000,
+                founded: 1995,
+                championships: 5,
+                icon: "⚽"
             }
-        ];
+        };
+
+        let laTeams = [];
+        let userSports = [];
+
+        function loadUserItinerary() {
+            try {
+                const itinerary = JSON.parse(localStorage.getItem('westCoastItinerary'));
+                if (itinerary && itinerary.cities && itinerary.cities['Los Angeles'] && 
+                    itinerary.cities['Los Angeles'].sports) {
+                    userSports = itinerary.cities['Los Angeles'].sports;
+                    
+                    // Map user sports to team data
+                    laTeams = userSports.map(sport => COMPLETE_LA_TEAMS[sport.name]).filter(t => t);
+                    
+                    if (laTeams.length === 2) {
+                        displayUserTeams();
+                        displayUserJSON();
+                    } else {
+                        displayDefaultTeams();
+                    }
+                } else {
+                    displayDefaultTeams();
+                }
+            } catch (error) {
+                console.error('Error loading itinerary:', error);
+                displayDefaultTeams();
+            }
+        }
+
+        function displayUserTeams() {
+            const grid = document.getElementById('teams-grid');
+            let html = '';
+
+            laTeams.forEach(team => {
+                html += `
+                    <div class="team-card">
+                        <div class="team-icon">${team.icon}</div>
+                        <div class="team-name">${team.name}</div>
+                        <div class="team-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">Stadium</div>
+                                <div class="stat-value" style="font-size: ${team.stadium.length > 15 ? '0.9em' : '1em'};">${team.stadium.replace('Dignity Health Sports Park', 'DHSP')}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Capacity</div>
+                                <div class="stat-value">${team.capacity.toLocaleString()}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Founded</div>
+                                <div class="stat-value">${team.founded}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Championships</div>
+                                <div class="stat-value">${team.championships}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function displayUserJSON() {
+            const display = document.getElementById('json-display');
+            let json = '{\n  <span class="json-key">"la_teams"</span>: [\n';
+
+            laTeams.forEach((team, idx) => {
+                json += '    {\n';
+                json += `      <span class="json-key">"id"</span>: <span class="json-number">${team.id}</span>,\n`;
+                json += `      <span class="json-key">"name"</span>: <span class="json-string">"${team.name}"</span>,\n`;
+                json += `      <span class="json-key">"sport"</span>: <span class="json-string">"${team.sport}"</span>,\n`;
+                json += `      <span class="json-key">"stadium"</span>: <span class="json-string">"${team.stadium}"</span>,\n`;
+                json += `      <span class="json-key">"capacity"</span>: <span class="json-number">${team.capacity}</span>,\n`;
+                json += `      <span class="json-key">"founded"</span>: <span class="json-number">${team.founded}</span>,\n`;
+                json += `      <span class="json-key">"championships"</span>: <span class="json-number">${team.championships}</span>\n`;
+                json += '    }' + (idx < laTeams.length - 1 ? ',' : '') + '\n';
+            });
+
+            json += '  ]\n}';
+            display.innerHTML = json;
+        }
+
+        function displayDefaultTeams() {
+            // Default to Lakers, Dodgers, Rams
+            laTeams = [
+                {
+                    id: 1,
+                    name: "Los Angeles Lakers",
+                    sport: "Basketball",
+                    stadium: "Crypto.com Arena",
+                    capacity: 19068,
+                    founded: 1947,
+                    championships: 17,
+                    icon: "🏀"
+                },
+                {
+                    id: 2,
+                    name: "Los Angeles Dodgers",
+                    sport: "Baseball",
+                    stadium: "Dodger Stadium",
+                    capacity: 56000,
+                    founded: 1883,
+                    championships: 7,
+                    icon: "⚾"
+                },
+                {
+                    id: 3,
+                    name: "Los Angeles Rams",
+                    sport: "Football",
+                    stadium: "SoFi Stadium",
+                    capacity: 70240,
+                    founded: 1936,
+                    championships: 2,
+                    icon: "🏈"
+                }
+            ];
+
+            displayUserTeams();
+            displayUserJSON();
+        }
 
         function runCode() {
             const code = document.getElementById('codeInput').value;
@@ -808,3 +856,8 @@ Try: console.log(laTeams);</div>
                 }, 3000);
             }
         }
+
+        document.getElementById('runButton').addEventListener('click', runCode);
+
+        // Load user's itinerary on page load
+        document.addEventListener('DOMContentLoaded', loadUserItinerary);

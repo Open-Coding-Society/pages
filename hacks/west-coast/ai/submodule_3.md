@@ -11,6 +11,10 @@ categories: [CSP, Submodule, AIUsage]
 tags: [ai, submodule, PromptEnginering]
 author: "TheSprinters"
 date: 2025-10-21
+footer:
+  previous: /west-coast/ai/submodule_2
+  home: /west-coast/ai
+  next: /west-coast/ai/submodule_4
 ---
 
 <style>

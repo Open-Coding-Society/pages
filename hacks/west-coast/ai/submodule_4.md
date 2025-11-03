@@ -11,6 +11,9 @@ categories: [CSP, Submodule, AIUsage]
 tags: [ai, submodule, Generation]
 author: "TheSprinters"
 date: 2025-10-21
+footer:
+  previous: /west-coast/ai/submodule_3/
+  home: /west-coast/ai/
 ---
 <!DOCTYPE html>
 <html lang="en">

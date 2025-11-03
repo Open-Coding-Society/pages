@@ -1,23 +1,21 @@
 class BlackjackGameManager {
     constructor(gameEnv) {
-        this.gameEnv = gameEnv; // Store reference to game environment
+        this.gameEnv = gameEnv;
         this.money = 1000;
         this.currentBet = 0;
-        this.goalMoney = 25000; // Changed from 100000 to 25000
+        this.goalMoney = 25000;
         this.gameActive = false;
         this.overlay = null;
+        this.roundInProgress = false;
     }
 
     startGame() {
         if (this.gameActive) return;
         this.gameActive = true;
         this.createOverlay();
-        this.currentBet = this.money; // Bet all money
-        this.initializeBlackjack();
     }
 
     createOverlay() {
-        // Create dark overlay with initial opacity 0 for fade-in
         this.overlay = document.createElement('div');
         this.overlay.id = 'blackjack-overlay';
         this.overlay.style.cssText = `
@@ -37,13 +35,11 @@ class BlackjackGameManager {
             transition: opacity 0.8s ease-in-out;
         `;
         
-        // Fade out the game canvas
         if (this.gameEnv && this.gameEnv.canvas) {
             this.gameEnv.canvas.style.transition = 'opacity 0.8s ease-in-out';
             this.gameEnv.canvas.style.opacity = '0';
         }
 
-        // Create game container
         const gameContainer = document.createElement('div');
         gameContainer.id = 'embedded-blackjack';
         gameContainer.style.cssText = `
@@ -55,23 +51,17 @@ class BlackjackGameManager {
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
         `;
 
-        // Add money display
         const moneyDisplay = document.createElement('div');
         moneyDisplay.id = 'money-display';
         moneyDisplay.style.cssText = `
             font-size: 24px;
             font-weight: bold;
-            color: white;
+            color: #2ecc71;
             text-align: center;
             margin-bottom: 20px;
         `;
-        moneyDisplay.innerHTML = `
-            Current Money: $${this.money}<br>
-            Current Bet: $${this.currentBet}<br>
-            Goal: $${this.goalMoney}
-        `;
+        moneyDisplay.innerHTML = `Current Money: $${this.money} | Goal: $${this.goalMoney}`;
 
-        // Add instructions
         const instructions = document.createElement('div');
         instructions.style.cssText = `
             background: #f39c12;
@@ -84,51 +74,46 @@ class BlackjackGameManager {
         `;
         instructions.innerHTML = `
             🎰 CASINO CHALLENGE 🎰<br>
-            Choose your bet amount and play strategically!<br>
-            Win your way from $1,000 to $25,000 to escape!
-        `;
-
-        // Add betting amount selector
-        const bettingSelector = document.createElement('div');
-        bettingSelector.style.cssText = `
-            background: #34495e;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: white;
-            text-align: center;
-        `;
-        bettingSelector.innerHTML = `
-            <label for="bet-amount" style="font-weight: bold; margin-right: 10px; color: white;">Bet Amount:</label>
-            <select id="bet-amount" style="padding: 8px; font-size: 16px; border-radius: 5px; border: 2px solid #2ecc71; color: white; background: #2c3e50;">
-                <option value="100" style="color: white;">$100 (Safe)</option>
-                <option value="500" style="color: white;">$500 (Medium)</option>
-                <option value="1000" selected style="color: white;">$1,000 (Risky)</option>
-                <option value="2500" style="color: white;">$2,500 (Very Risky)</option>
-                <option value="5000" style="color: white;">$5,000 (All-In)</option>
-                <option value="all" style="color: white;">All Money (YOLO)</option>
-            </select>
+            Choose your bet amount and try to reach $25,000!
         `;
 
         gameContainer.appendChild(moneyDisplay);
         gameContainer.appendChild(instructions);
-        gameContainer.appendChild(bettingSelector);
         this.overlay.appendChild(gameContainer);
         document.body.appendChild(this.overlay);
         
-        // Trigger fade-in after a brief moment
         setTimeout(() => {
             this.overlay.style.opacity = '1';
         }, 50);
 
-        // Load blackjack game into container
         this.loadBlackjackHTML(gameContainer);
     }
 
+    updateMoneyDisplay() {
+        const moneyDisplay = document.getElementById('money-display');
+        const moneyColor = this.money >= 0 ? '#2ecc71' : '#e74c3c';
+        const moneyText = this.money >= 0 ? `$${this.money}` : `-$${Math.abs(this.money)} (DEBT)`;
+        moneyDisplay.innerHTML = `<span style="color: ${moneyColor}">Current Money: ${moneyText}</span> | <span style="color: white;">Goal: $${this.goalMoney}</span>`;
+    }
+
     loadBlackjackHTML(container) {
-        // Import the blackjack HTML structure
         const blackjackHTML = `
-            <div id="game-container" style="background: transparent;">
+            <div id="betting-area" style="background: #34495e; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                <h3 style="color: white; margin-bottom: 15px;">Select Your Bet:</h3>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button class="bet-btn" data-bet="100" style="padding: 15px 25px; font-size: 18px; font-weight: bold; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer;">$100</button>
+                    <button class="bet-btn" data-bet="500" style="padding: 15px 25px; font-size: 18px; font-weight: bold; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer;">$500</button>
+                    <button class="bet-btn" data-bet="1000" style="padding: 15px 25px; font-size: 18px; font-weight: bold; background: #f39c12; color: white; border: none; border-radius: 8px; cursor: pointer;">$1,000</button>
+                    <button class="bet-btn" data-bet="2500" style="padding: 15px 25px; font-size: 18px; font-weight: bold; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer;">$2,500</button>
+                    <button class="bet-btn" data-bet="5000" style="padding: 15px 25px; font-size: 18px; font-weight: bold; background: #c0392b; color: white; border: none; border-radius: 8px; cursor: pointer;">$5,000</button>
+                    <button class="bet-btn" data-bet="all" style="padding: 15px 25px; font-size: 18px; font-weight: bold; background: #8e44ad; color: white; border: none; border-radius: 8px; cursor: pointer;">ALL IN</button>
+                </div>
+                <p id="bet-message" style="color: white; margin-top: 15px; font-size: 16px;">Choose a bet amount to start playing!</p>
+            </div>
+            <div id="game-container" style="background: transparent; display: none;">
+                <div style="background: #2c3e50; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p id="current-bet-display" style="color: white; font-size: 20px; font-weight: bold; text-align: center; margin: 0;">Current Bet: $0</p>
+                </div>
                 <div id="dealer-area" class="player-area">
                     <h2 style="color: white;">Dealer's Hand: <span id="dealer-score">0</span></h2>
                     <div class="hand-container">
@@ -144,12 +129,12 @@ class BlackjackGameManager {
                     </div>
                 </div>
                 <div id="game-controls">
-                    <button id="new-game-btn">New Game</button>
                     <button id="hit-btn">Hit</button>
                     <button id="stand-btn">Stand</button>
+                    <button id="new-bet-btn" style="background: #3498db;">New Bet</button>
                     <button id="exit-casino-btn" style="background: #e74c3c; color: white;">Exit Casino</button>
                 </div>
-                <p id="message" style="color: white; font-weight: bold;"></p>
+                <p id="message" style="color: white; font-weight: bold; text-align: center; font-size: 18px;"></p>
             </div>
         `;
 
@@ -158,23 +143,63 @@ class BlackjackGameManager {
     }
 
     initializeBlackjack() {
-        // Wait for DOM elements to be ready
         setTimeout(() => {
+            const bettingArea = document.getElementById("betting-area");
+            const gameContainer = document.getElementById("game-container");
             const dealerCardsEl = document.getElementById("dealer-cards");
             const playerCardsEl = document.getElementById("player-cards");
-            const dealerScoreEl = document.getElementById("dealer-score");
-            const playerScoreEl = document.getElementById("player-score");
             const messageEl = document.getElementById("message");
+            const betMessage = document.getElementById("bet-message");
+            const currentBetDisplay = document.getElementById("current-bet-display");
 
-            const newGameBtn = document.getElementById("new-game-btn");
             const hitBtn = document.getElementById("hit-btn");
             const standBtn = document.getElementById("stand-btn");
+            const newBetBtn = document.getElementById("new-bet-btn");
             const exitBtn = document.getElementById("exit-casino-btn");
 
             let deck = [];
             let playerHand = [];
             let dealerHand = [];
             let gameOver = false;
+
+            // Bet button handlers
+            const betButtons = document.querySelectorAll('.bet-btn');
+            betButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const betValue = btn.dataset.bet;
+                    let betAmount;
+                    
+                    if (betValue === 'all') {
+                        betAmount = this.money;
+                    } else {
+                        betAmount = parseInt(betValue);
+                    }
+                    
+                    // Check if player has enough money
+                    if (betAmount > this.money) {
+                        betMessage.textContent = `Not enough money! You only have $${this.money}`;
+                        betMessage.style.color = '#e74c3c';
+                        return;
+                    }
+                    
+                    if (this.money <= 0) {
+                        betMessage.textContent = "You're out of money! Try exiting and re-entering the casino.";
+                        betMessage.style.color = '#e74c3c';
+                        return;
+                    }
+                    
+                    // Place bet and start game
+                    this.currentBet = betAmount;
+                    this.money -= betAmount;
+                    this.updateMoneyDisplay();
+                    
+                    currentBetDisplay.textContent = `Current Bet: $${this.currentBet}`;
+                    bettingArea.style.display = 'none';
+                    gameContainer.style.display = 'block';
+                    
+                    startRound();
+                });
+            });
 
             const createDeck = () => {
                 const suits = ["♠", "♥", "♦", "♣"];
@@ -217,7 +242,6 @@ class BlackjackGameManager {
                     const cardEl = document.createElement("div");
                     cardEl.classList.add("card");
                     cardEl.textContent = `${card.value}${card.suit}`;
-                    // Change black cards (spades and clubs) to white for visibility
                     cardEl.style.color = (card.suit==="♥"||card.suit==="♦")?"red":"white";
                     container.appendChild(cardEl);
                 }
@@ -231,7 +255,6 @@ class BlackjackGameManager {
                 const cardEl1 = document.createElement("div");
                 cardEl1.classList.add("card");
                 cardEl1.textContent = `${firstCard.value}${firstCard.suit}`;
-                // Change black cards (spades and clubs) to white for visibility
                 cardEl1.style.color = (firstCard.suit==="♥"||firstCard.suit==="♦")?"red":"white";
                 dealerCardsEl.appendChild(cardEl1);
 
@@ -243,85 +266,65 @@ class BlackjackGameManager {
                 document.getElementById("dealer-points").textContent = getCardValue(firstCard);
             };
 
+            const endRound = (result) => {
+                gameOver = true;
+                this.roundInProgress = false;
+                
+                if (result === 'win') {
+                    // Win: Get back bet + winnings
+                    this.money += (this.currentBet * 2);
+                    messageEl.textContent = `🎉 You Win! Won $${this.currentBet}`;
+                    messageEl.style.color = '#2ecc71';
+                } else if (result === 'push') {
+                    // Push: Get bet back
+                    this.money += this.currentBet;
+                    messageEl.textContent = `🤝 Push! Your $${this.currentBet} is returned`;
+                    messageEl.style.color = '#f39c12';
+                } else {
+                    // Loss: Money already deducted
+                    messageEl.textContent = `😢 You Lost $${this.currentBet}`;
+                    messageEl.style.color = '#e74c3c';
+                }
+                
+                this.updateMoneyDisplay();
+                
+                // Check for win condition
+                if (this.money >= this.goalMoney) {
+                    setTimeout(() => {
+                        alert("🎉 CONGRATULATIONS! You've reached $25,000 and escaped the casino! Level Complete!");
+                        this.exitGame();
+                    }, 2000);
+                }
+                
+                // Check for loss condition
+                if (this.money <= 0) {
+                    setTimeout(() => {
+                        messageEl.textContent += " | You're out of money! Exit and try again.";
+                    }, 1000);
+                }
+            };
+
             const checkGameOver = () => {
                 const playerValue = calculateHand(playerHand);
                 const dealerValue = calculateHand(dealerHand);
 
                 if (playerValue > 21) {
-                    messageEl.textContent = "You busted! Lost $" + this.currentBet;
-                    console.log('Player busted. Money before:', this.money);
-                    // Subtract the bet from current money (goes into debt if needed)
-                    this.money -= this.currentBet;
-                    console.log('Money after losing bet:', this.money);
-                    gameOver = true;
-                    this.handleGameEnd(false);
+                    endRound('loss');
                 } else if (dealerValue > 21) {
-                    console.log('Dealer busted! Money before:', this.money);
-                    // Win the bet amount
-                    this.money += this.currentBet;
-                    messageEl.textContent = "Dealer busted! Won $" + this.currentBet;
-                    console.log('Money after winning bet:', this.money);
-                    gameOver = true;
-                    this.handleGameEnd(true);
+                    endRound('win');
                 } else if (gameOver) {
                     if (playerValue > dealerValue) {
-                        console.log('Player won! Money before:', this.money, 'currentBet:', this.currentBet);
-                        const oldMoney = this.money;
-                        // Win the bet amount
-                        this.money += this.currentBet;
-                        console.log('Money after winning bet:', this.money, 'Went from', oldMoney, 'to', this.money);
-                        messageEl.textContent = "You win! Won $" + this.currentBet;
-                        this.handleGameEnd(true);
+                        endRound('win');
                     } else if (dealerValue > playerValue) {
-                        messageEl.textContent = "Dealer wins! Lost $" + this.currentBet;
-                        console.log('Dealer won. Money before:', this.money);
-                        // Subtract the bet from current money (goes into debt if needed)
-                        this.money -= this.currentBet;
-                        console.log('Money after losing bet:', this.money);
-                        this.handleGameEnd(false);
+                        endRound('loss');
                     } else {
-                        // Push - money stays the same (bet is returned)
-                        console.log('Push! Money before:', this.money, 'currentBet:', this.currentBet);
-                        // Money should already be correct, but let's ensure it
-                        // Since we bet all money, on push we just keep what we had
-                        messageEl.textContent = "Push! It's a tie. Your $" + this.money + " is returned.";
-                        console.log('Push! Money after:', this.money);
-                        this.handleGameEnd(false);
+                        endRound('push');
                     }
                 }
             };
 
-            const newGame = () => {
-                // Get selected bet amount
-                const betSelector = document.getElementById('bet-amount');
-                const betValue = betSelector.value;
-                
-                let betAmount;
-                if (betValue === 'all') {
-                    // Bet all money (or $1000 if in debt/at zero)
-                    betAmount = this.money > 0 ? this.money : 1000;
-                } else {
-                    betAmount = parseInt(betValue);
-                    // If they don't have enough money, bet on credit
-                    if (this.money < betAmount && this.money >= 0) {
-                        // Can't bet more than you have unless in debt
-                        betAmount = Math.max(this.money, 100); // Minimum $100 bet
-                    }
-                }
-                
-                this.currentBet = betAmount;
-                console.log('Starting new game. Current money:', this.money, 'Betting:', this.currentBet);
-                
-                // Color code money display: green if positive, red if negative
-                const moneyColor = this.money >= 0 ? '#2ecc71' : '#e74c3c';
-                const moneyDisplay = this.money >= 0 ? `$${this.money}` : `-$${Math.abs(this.money)} (DEBT)`;
-                
-                document.getElementById('money-display').innerHTML = `
-                    <span style="color: ${moneyColor}">Current Money: ${moneyDisplay}</span><br>
-                    <span style="color: white;">Current Bet: $${this.currentBet}</span><br>
-                    <span style="color: white;">Goal: $${this.goalMoney}</span>
-                `;
-
+            const startRound = () => {
+                this.roundInProgress = true;
                 deck = createDeck();
                 playerHand = [deck.pop(), deck.pop()];
                 dealerHand = [deck.pop(), deck.pop()];
@@ -329,7 +332,8 @@ class BlackjackGameManager {
 
                 renderHand(playerHand, playerCardsEl, document.getElementById("player-points"));
                 renderDealerInitial();
-                messageEl.textContent = "Game started. Your move!";
+                messageEl.textContent = "Game started. Hit or Stand?";
+                messageEl.style.color = 'white';
             };
 
             const hit = () => {
@@ -341,7 +345,7 @@ class BlackjackGameManager {
                 if (playerValue > 21) {
                     checkGameOver();
                 } else if (playerValue === 21) {
-                    messageEl.textContent = "Blackjack! You have 21. Stand or risk busting!";
+                    messageEl.textContent = "21! You might want to stand...";
                 } else {
                     messageEl.textContent = `You have ${playerValue}. Hit or Stand?`;
                 }
@@ -351,7 +355,6 @@ class BlackjackGameManager {
                 if (gameOver) return;
 
                 dealerCardsEl.children[1].textContent = `${dealerHand[1].value}${dealerHand[1].suit}`;
-                // Change black cards (spades and clubs) to white for visibility
                 dealerCardsEl.children[1].style.color = (dealerHand[1].suit==="♥"||dealerHand[1].suit==="♦") ? "red" : "white";
                 document.getElementById("dealer-points").textContent = calculateHand(dealerHand);
 
@@ -361,7 +364,6 @@ class BlackjackGameManager {
                     const cardEl = document.createElement("div");
                     cardEl.classList.add("card");
                     cardEl.textContent = `${card.value}${card.suit}`;
-                    // Change black cards (spades and clubs) to white for visibility
                     cardEl.style.color = (card.suit==="♥"||card.suit==="♦")?"red":"white";
                     dealerCardsEl.appendChild(cardEl);
                     document.getElementById("dealer-points").textContent = calculateHand(dealerHand);
@@ -371,63 +373,47 @@ class BlackjackGameManager {
                 checkGameOver();
             };
 
-            newGameBtn.addEventListener("click", newGame);
+            const newBet = () => {
+                gameContainer.style.display = 'none';
+                bettingArea.style.display = 'block';
+                betMessage.textContent = "Choose a bet amount to start playing!";
+                betMessage.style.color = 'white';
+                this.currentBet = 0;
+                currentBetDisplay.textContent = "Current Bet: $0";
+            };
+
             hitBtn.addEventListener("click", hit);
             standBtn.addEventListener("click", stand);
+            newBetBtn.addEventListener("click", newBet);
             exitBtn.addEventListener("click", () => this.exitGame());
-
-            // Start first game automatically
-            newGame();
         }, 100);
-    }
-
-    handleGameEnd(won) {
-        // Color code money display: green if positive, red if negative
-        const moneyColor = this.money >= 0 ? '#2ecc71' : '#e74c3c';
-        const moneyDisplay = this.money >= 0 ? `$${this.money}` : `-$${Math.abs(this.money)} (DEBT)`;
-        
-        // Update the display with current money (currentBet is outdated after the round)
-        document.getElementById('money-display').innerHTML = `
-            <span style="color: ${moneyColor}">Current Money: ${moneyDisplay}</span><br>
-            <span style="color: white;">Current Bet: $0 (Round Over)</span><br>
-            <span style="color: white;">Goal: $${this.goalMoney}</span>
-        `;
-
-        // Only trigger victory if we actually have the goal money (and not in debt)
-        if (this.money >= this.goalMoney) {
-            setTimeout(() => {
-                alert("🎉 CONGRATULATIONS! You've won $25,000 and escaped the casino! Level Complete!");
-                this.exitGame();
-                // Trigger level completion
-            }, 2000);
-        }
     }
 
     exitGame() {
         if (this.overlay) {
-            // Fade out overlay
             this.overlay.style.opacity = '0';
             
-            // Fade in the game canvas
             if (this.gameEnv && this.gameEnv.canvas) {
                 this.gameEnv.canvas.style.opacity = '1';
             }
             
-            // Remove overlay after transition completes
             setTimeout(() => {
                 if (this.overlay && this.overlay.parentNode) {
                     document.body.removeChild(this.overlay);
                 }
                 this.overlay = null;
-            }, 800); // Match the transition duration
+            }, 800);
         }
         this.gameActive = false;
+        
+        // Reset money to $1000 when exiting
+        this.money = 1000;
+        this.currentBet = 0;
     }
 
     resetLevel() {
         this.money = 1000;
         this.exitGame();
-        // Instead of location.reload(), reset the game state
         window.location.reload();
     }
 }

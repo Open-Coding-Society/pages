@@ -10,6 +10,10 @@ categories: [CSP, Submodule, AIUsage]
 tags: [ai, submodule, thinkers]
 author: "TheSprinters"
 date: 2025-10-21
+footer:
+  previous: /west-coast/ai/submodule_1/
+  home: /west-coast/ai/
+  next: /west-coast/ai/submodule_3/
 ---
 
 # Submodule 2: How LLM Memory Works: Interactive Visual Guide

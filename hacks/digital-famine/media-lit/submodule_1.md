@@ -3,6 +3,9 @@ layout: post
 title: "Awareness"
 description: "First line of defense from foreign invaders"
 permalink: /digital-famine/media-lit/submodule_1/
+footer:
+  home: /hacks/navigation
+  next: /digital-famine/media-lit/submodule_2
 parent: "Analytics/Admin"
 team: "Scratchers"
 submodule: 1
@@ -50,12 +53,12 @@ date: 2025-10-21
 
 <style>
 body {
-min-height: 100vh;
-background: url('https://img.freepik.com/free-vector/space-ship-window-with-space-planets-stars-cartoon-vector-illustration_1284-16119.jpg') no-repeat center center fixed;
-background-size: cover;
-font-family: system-ui, -apple-system, sans-serif;
-color: #ffffff;
-overflow-x: hidden;
+  min-height: 100vh;
+  background: url('{{ site.baseurl }}/hacks/digital-famine/media-lit/media/assets/spacebackground.jpg') no-repeat center center fixed;
+  background-size: cover;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #ffffff;
+  overflow-x: hidden;
 }
 
 
@@ -477,7 +480,7 @@ text-align: center;
   <!-- use Jekyll baseurl so the link works regardless of domain -->
   <a class="btn btn-primary" id="next-mission"
      href="{{ site.baseurl }}/digital-famine/media-lit/submodule_2/"
-     aria-label="Go to Media Bias (Submodule 2)" style="display:none">Next Mission</a>
+     aria-label="Go to Bias Detector (Submodule 2)" style="display:none">Next Mission</a>
 </div>
 
 
@@ -511,14 +514,14 @@ text-align: center;
 
   <!-- Alien popup (image background removed via CSS). Replace src if you want a different image. -->
   <div class="alien-popup" id="alien-popup" role="dialog" aria-modal="true" aria-hidden="true">
-    <img id="alien-img" src="https://png.pngtree.com/png-vector/20240530/ourmid/pngtree-scary-alien-in-a-flying-saucer-cartoon-character-png-image_12552691.png" alt="alien">
+    <img id="alien-img" src="{{ site.baseurl }}/images/digital-famine/alien.png" alt="alien">
     <div id="alien-msg">Wrong! The alien appears.</div>
     <button class="btn btn-primary" id="alien-close">Continue</button>
   </div>
 
   <div class="notification" id="notification">
-    Congratulations. Shield Level 1 has been achieved. Proceed to the next mission:
-    <a id="media-bias-link" href="{{ site.baseurl }}/digital-famine/media-lit/submodule_2/" aria-label="Go to Media Bias (Submodule 2)">Media Bias</a>
+    Congratulations. Shield Level 1 has been achieved. The number to access the vault is 2. Proceed to the next mission:
+    <a id="media-bias-link" href="{{ site.baseurl }}/digital-famine/media-lit/submodule_2/" aria-label="Go to Bias Detector (Submodule 2)">Bias Detector</a>
   </div>
 </div>
 

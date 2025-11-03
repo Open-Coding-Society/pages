@@ -1,0 +1,205 @@
+<!-- Prerequisites links -->
+{% if page.lxdData.Prequisites %}
+<div class="mb-8">
+  <ul class="flex flex-wrap gap-4 justify-center">{% for prereq in page.lxdData.Prequisites %}<li><a href="{{ site.baseurl}}{{ prereq.link }}" class="iridescent flex-1 text-white text-white text-center py-2 rounded-lg font-semibold transition">{{ prereq.title }}</a></li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<!-- Progress Overview -->
+<div class="mb-8 text-center">
+  <div class="bg-red-800 rounded-lg p-6 max-w-2xl mx-auto">
+    <h3 class="text-white font-semibold mb-3">Learning Progress</h3>
+    <div class="module-progress">
+      <div class="progress-bar" id="overall-progress"></div>
+    </div>
+    <p class="text-gray-300 text-sm" id="progress-text">Complete modules C1-C4 to earn your certificate</p>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
+  <!-- Pearly glow effect around container -->
+  <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
+  <div class="relative z-10"> <!-- Wrapper div to ensure content stays above the glow -->
+
+    <!-- Title and Description -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">{{ page.lxdData.Title }}</h2>
+      <p class="text-xl text-gray-300 max-w-4xl mx-auto">{{ page.lxdData.Description }}</p>
+    </div>
+
+    <!-- Topics Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12">
+      {% for topic in page.lxdData.Topics %}
+        {% assign module_image = "" %}
+        {% if topic.Level == 1 %}
+          {% assign module_image = "images/WC_AI_Submodule1.png" %}
+        {% elsif topic.Level == 2 %}
+          {% assign module_image = "images/WC_AI_Submodule2.png" %}
+        {% elsif topic.Level == 3 %}
+          {% assign module_image = "images/WC_AI_Submodule3.webp" %}
+        {% elsif topic.Level == 4 %}
+          {% assign module_image = "images/WC_AI_Submodule4RM.png" %}
+        {% endif %}
+        
+        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2 card-hover-effects" data-module="c{{ topic.Level }}">
+          
+          <!-- Module Status Badge -->
+          <div class="module-status">
+            <span class="status-badge status-locked module-badge">Locked</span>
+          </div>
+          
+          <!-- Image with Play Overlay -->
+          <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
+            <a href="{{ topic.Video }}" class="block w-full h-full group video-link">
+              <img src="{{ site.baseurl }}/{{ module_image }}" alt="{{ topic.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110">
+              <!-- Play Button Overlay -->
+              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div class="iridescent bg-white bg-opacity-90 rounded-full p-3">
+                  <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 5v10l8-5z"/>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </div>
+          
+          <!-- Module Progress Bar -->
+          <div class="px-6">
+            <div class="module-progress">
+              <div class="progress-bar module-progress-bar"></div>
+            </div>
+          </div>
+          
+          <div class="p-6 pt-2">
+            <h3 class="text-xl font-bold text-white mb-1">{{ topic.Title }}</h3>
+            <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
+            <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
+            <div class="mb-4">
+              <span class="text-sm font-semibold text-gray-200">Categories:</span>
+              <div class="flex flex-wrap gap-1 mt-1">
+                {% for cat in topic.Categories %}
+                  <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <a href="{{ site.baseurl }}{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition lesson-link">Start Module</a>
+              <a href="{{ topic.Video }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition video-link">Watch Video</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Only run progress tracking on the main plagiarism navigation page
+    // Should run on /plagiarism or /plagiarism/ 
+    const currentPath = window.location.pathname;
+    if (currentPath !== '/plagiarism' && currentPath !== '/plagiarism/') {
+        return;
+    }
+    
+    // Check completion status for each module
+    function updateModuleStatus() {
+        const modules = ['c1', 'c2', 'c3', 'c4'];
+        let completedCount = 0;
+        
+        // First check if we have any module cards on this page
+        const hasModuleCards = document.querySelector('[data-module]') !== null;
+        if (!hasModuleCards) {
+            return;
+        }
+        
+        modules.forEach((module, index) => {
+            const card = document.querySelector(`[data-module="${module}"]`);
+            const badge = card?.querySelector('.module-badge');
+            const progressBar = card?.querySelector('.module-progress-bar');
+            const lessonLink = card?.querySelector('.lesson-link');
+            
+            if (!card || !badge || !progressBar) {
+                return;
+            }
+            
+            let isCompleted = false;
+            let isAvailable = false;
+            
+            // Check localStorage for completion
+            switch(module) {
+                case 'c1':
+                    // C1 is always available (case studies) and auto-mark as viewed
+                    isAvailable = true;
+                    // Auto-mark C1 as viewed if we're on any plagiarism page
+                    if (window.location.pathname.includes('/plagiarism')) {
+                        localStorage.setItem('plagiarism-c1-viewed', 'true');
+                    }
+                    isCompleted = localStorage.getItem('plagiarism-c1-viewed') === 'true';
+                    break;
+                case 'c2':
+                    isAvailable = true; // Available after C1
+                    isCompleted = localStorage.getItem('plagiarism-c2-assessment') !== null;
+                    break;
+                case 'c3':
+                    isAvailable = localStorage.getItem('plagiarism-c2-assessment') !== null;
+                    isCompleted = localStorage.getItem('plagiarism-c3-assessment') !== null;
+                    break;
+                case 'c4':
+                    isAvailable = localStorage.getItem('plagiarism-c3-assessment') !== null;
+                    isCompleted = localStorage.getItem('plagiarism-c4-assessment') !== null;
+                    break;
+            }
+            
+            // Update badge and progress
+            if (isCompleted) {
+                badge.textContent = 'Completed';
+                badge.className = 'status-badge status-completed';
+                progressBar.className = 'progress-bar module-progress-bar completed';
+                lessonLink.textContent = 'Review';
+                completedCount++;
+            } else if (isAvailable) {
+                badge.textContent = 'Available';
+                badge.className = 'status-badge status-current';
+                progressBar.className = 'progress-bar module-progress-bar partial';
+                lessonLink.textContent = 'Start Module';
+            } else {
+                badge.textContent = 'Locked';
+                badge.className = 'status-badge status-locked';
+                progressBar.className = 'progress-bar module-progress-bar';
+                lessonLink.textContent = 'Locked';
+                lessonLink.style.opacity = '0.5';
+                lessonLink.style.pointerEvents = 'none';
+            }
+        });
+        
+        // Update overall progress
+        const overallProgress = (completedCount / modules.length) * 100;
+        const progressBar = document.getElementById('overall-progress');
+        const progressText = document.getElementById('progress-text');
+        
+        if (progressBar) {
+            progressBar.style.width = overallProgress + '%';
+        }
+        if (progressText) {
+            if (completedCount === modules.length) {
+                progressText.textContent = '🎉 Congratulations! All modules completed!';
+            } else {
+                progressText.textContent = `${completedCount}/${modules.length} modules completed`;
+            }
+        }
+    }
+    
+    // Mark C1 as viewed when navigation page loads
+    if (window.location.pathname.includes('/plagiarism') && 
+        !window.location.pathname.includes('/plagiarism/')) {
+        localStorage.setItem('plagiarism-c1-viewed', 'true');
+    }
+    
+    // Update status on page load
+    updateModuleStatus();
+    
+    // Remove setInterval - it was causing the reset to 0/6 issue
+    // Progress will update when user navigates between pages or manually refreshes
+});
+</script>

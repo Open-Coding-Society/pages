@@ -1,8 +1,8 @@
 ---
 layout: opencs
-microblog: True 
+microblog: True  
 title: "Seattle"
-description: "City Two of Food - Seattle"
+description: "City Four of Food - Seattle"
 permalink: /west-coast/food/SEA/
 parent: "Seattle"
 team: "Syntax Terrors"
@@ -22,7 +22,7 @@ footer:
 **Focus:** D in CRUD — **DELETE & ANALYZE**  
 **Location:** Seattle, WA ☕🐚🌧️  
 
-Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in a Sourdough Bread Bowl*) and run analytics to uncover insights about all cities’ menus.
+Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in a Sourdough Bread Bowl*) and run analytics to uncover insights about all cities' menus.
 
 ---
 
@@ -109,66 +109,96 @@ Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in
   text-align: center;
 }
 
-.sq-card h3, .sq-card p, .sq-card label, .sq-card input, .sq-card select, .sq-card pre {
-  color: #fdf2f8 !important;
+/* Itinerary Foods Display */
+.itinerary-foods {
+  background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));
+  border: 2px solid rgba(16,185,129,0.3);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 8px 30px rgba(16,185,129,0.2);
 }
-.sq-card, .sq-card h3, .sq-card p, .sq-card label, .sq-card input, .sq-card select, .sq-card pre, .sq-card ul, .sq-card li {
-  color: #fdf2f8 !important;
+
+.itinerary-foods h3 {
+  color: #10b981;
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
-progress-tracker, .progress-tracker h3, .progress-tracker .status, .progress-tracker strong, .progress-tracker span, .progress-tracker div 
-.sq-terminal, .sq-terminal * {
-  color: #fdf2f8 !important;
+
+.food-item {
+  background: rgba(30, 41, 59, 0.8);
+  border-left: 4px solid #10b981;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  transition: transform 0.2s ease;
+}
+
+.food-item:hover {
+  transform: translateX(4px);
+}
+
+.food-item h4 {
+  color: #10b981;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.food-item p {
+  color: #d1d5db;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.no-itinerary-msg {
+  text-align: center;
+  color: #d1d5db;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.sq-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+  color: #fdf2f8;
+}
+
+.sq-field {
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148,163,184,0.12);
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  color: #fdf2f8;
+  outline: none;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.01);
+  font-size: 0.95rem;
+}
+
+.sq-terminal {
+  background: #071827;
+  color: #fdf2f8;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+  min-height: 3rem;
+  white-space: pre-wrap;
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,0.02);
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.02);
+  margin-top: 0.5rem;
 }
 </style>
 
-<div class="progress-tracker">
-  <h3 style="color:#2dd4bf;">🎯 Seattle Progress Tracker</h3>
-  <div id="progress-display">
-    <div id="task-archive">🗃️ Task 1: Archive Dish – <span class="status">Incomplete</span></div>
-    <div id="task-harddelete">🗑️ Task 2: Hard Delete Cascade – <span class="status">Incomplete</span></div>
-    <div id="task-analytics">📊 Task 3: Analytics Dashboard – <span class="status">Incomplete</span></div>
-    <div id="task-seed">🌱 Task 4: Seed Seattle Dishes – <span class="status">Incomplete</span></div>
-    <div id="task-view">👀 Task 5: View Archived/Active Lists – <span class="status">Incomplete</span></div>
-  </div>
+<!-- Itinerary Foods Display -->
+<div class="itinerary-foods">
+  <h3>🍽️ Your Seattle Food Selections</h3>
+  <div id="itinerary-foods-display"></div>
 </div>
-
----
-
-### 🧠 What Does DELETE Mean?
-
-In databases, **DELETE** = cleaning up existing records — sometimes gently, sometimes permanently.  
-There are **two main approaches**:
-
-### 🗃️ Soft Delete (Archiving)
-- Adds a `deleted_at` timestamp instead of erasing the record.  
-- The data stays in the database but is hidden from normal queries (`WHERE deleted_at IS NULL`).  
-- Allows easy “undo” or “restore” later.  
-**Example:** When the Seattle restaurant closes, the *Clam Chowder in a Sourdough Bread Bowl* is archived — it disappears from the active menu but remains in the system for reporting.
-
-### 🗑️ Hard Delete (Cascade)
-- Permanently removes a record and all related rows (via **cascading delete**).  
-- Cleans out join tables like `dish_ingredients` to prevent orphaned data.  
-**Example:** If you fully remove the clam chowder, its linked ingredients (“clams,” “bread bowl,” “cream”) are also deleted — the dish is gone forever.
-
-### 📊 Analytics Dashboard (GROUP BY)
-- After cleaning up data, we can **analyze what remains**.  
-- Use SQL `GROUP BY` and aggregate functions (`COUNT`, `AVG`, `SUM`) to reveal insights:  
-  - Top ingredients used across all cities  
-  - Average calories per city  
-  - Number of dishes per category  
-  - Active vs archived chowders  
-
-**Analogy:**  
-Your database is like a restaurant kitchen.  
-Soft delete = putting an item in cold storage (it’s still there).  
-Hard delete = tossing it out completely.  
-Analytics = reviewing the kitchen log to see what’s sold, archived, or missing — keeping your menu sustainable and efficient.
-
----
-<style>
-/**** Remove the old white background and conflicting color rules ****/
-.sq-card{background:unset;}
-</style>
 
 <!-- Progress Tracker -->
 <div class="progress-tracker">
@@ -193,13 +223,121 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
   🎉 CRUD Complete!<br><small style="opacity:.9;font-size:14px;">Congratulations, Cleanup Crew!</small>
 </div>
 
-<!-- 🧼 Seattle Cleanup Lesson — DELETE & ANALYTICS (Interactive Edition, Fully Working) -->
+<!-- Quick Complete Button for Testing - Bottom Right Corner -->
+<button id="quickCompleteBtn" onclick="autoCompleteAllTasks()" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(139,92,246,0.9);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transition: all 0.2s ease;
+" onmouseover="this.style.background='rgba(139,92,246,1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(139,92,246,0.9)'; this.style.transform='translateY(0)'">
+  Complete All Tasks
+</button>
+
+<script>
+function autoCompleteAllTasks() {
+  // Hide the button after clicking
+  document.getElementById('quickCompleteBtn').style.display = 'none';
+  
+  // Auto-complete the quizzes with correct answers
+  document.getElementById('archive-quiz').value = 'a';
+  checkArchiveQuiz();
+  
+  document.getElementById('hard-quiz').value = 'dish_ingredients';
+  checkHardQuiz();
+  
+  document.getElementById('analytics-quiz').value = 'b';
+  checkAnalyticsQuiz();
+  
+  // Run the interactive tasks in sequence
+  setTimeout(() => {
+    seedSeattle();
+  }, 500);
+  
+  setTimeout(() => {
+    viewSeattle();
+  }, 1000);
+  
+  setTimeout(() => {
+    // Set up some dish IDs for archive/delete operations
+    if (SeattleDB.dishes.length > 0) {
+      document.getElementById('archive-id').value = SeattleDB.dishes[0].id;
+      runArchive();
+    }
+  }, 1500);
+  
+  setTimeout(() => {
+    if (SeattleDB.dishes.length > 1) {
+      document.getElementById('hard-id').value = SeattleDB.dishes[1].id;
+      runHard();
+    }
+  }, 2000);
+  
+  setTimeout(() => {
+    runAnalytics();
+  }, 2500);
+  
+  // Mark all tasks as complete
+  setTimeout(() => {
+    completeTask('archive');
+    completeTask('harddelete');
+    completeTask('analytics');
+    completeTask('seed');
+    completeTask('view');
+    
+    showToast('🎉 All tasks completed! CRUD journey finished!', 4000);
+  }, 3000);
+}
+</script>
+
+---
+
+### 🧠 What Does DELETE Mean?
+
+In databases, **DELETE** = cleaning up existing records — sometimes gently, sometimes permanently.  
+There are **two main approaches**:
+
+### 🗃️ Soft Delete (Archiving)
+- Adds a `deleted_at` timestamp instead of erasing the record.  
+- The data stays in the database but is hidden from normal queries (`WHERE deleted_at IS NULL`).  
+- Allows easy "undo" or "restore" later.  
+**Example:** When the Seattle restaurant closes, the *Clam Chowder in a Sourdough Bread Bowl* is archived — it disappears from the active menu but remains in the system for reporting.
+
+### 🗑️ Hard Delete (Cascade)
+- Permanently removes a record and all related rows (via **cascading delete**).  
+- Cleans out join tables like `dish_ingredients` to prevent orphaned data.  
+**Example:** If you fully remove the clam chowder, its linked ingredients ("clams," "bread bowl," "cream") are also deleted — the dish is gone forever.
+
+### 📊 Analytics Dashboard (GROUP BY)
+- After cleaning up data, we can **analyze what remains**.  
+- Use SQL `GROUP BY` and aggregate functions (`COUNT`, `AVG`, `SUM`) to reveal insights:  
+  - Top ingredients used across all cities  
+  - Average calories per city  
+  - Number of dishes per category  
+  - Active vs archived chowders  
+
+**Analogy:**  
+Your database is like a restaurant kitchen.  
+Soft delete = putting an item in cold storage (it's still there).  
+Hard delete = tossing it out completely.  
+Analytics = reviewing the kitchen log to see what's sold, archived, or missing — keeping your menu sustainable and efficient.
+
+---
 
 <!-- 🗃️ Soft Delete -->
 <div class="sq-card">
   <h3>🗃️ Soft Delete — Archive a Dish</h3>
   <p>
-    When you <strong>soft delete</strong> a dish, you don’t remove it — you set <code>deleted_at</code>.
+    When you <strong>soft delete</strong> a dish, you don't remove it — you set <code>deleted_at</code>.
     This keeps data for later analysis or restoration.
   </p>
   <p><em>Example:</em> The <strong>Clam Chowder in a Sourdough Bread Bowl</strong> restaurant closes for renovation — we archive, not erase.</p>
@@ -225,7 +363,7 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
   <h3>🗑️ Hard Delete — Permanent Removal</h3>
   <p>
     <strong>Hard delete</strong> removes the dish and any linked data (e.g., ingredients).  
-    Once gone, it’s gone forever — like throwing away a spoiled clam chowder.
+    Once gone, it's gone forever — like throwing away a spoiled clam chowder.
   </p>
 
   <label class="sq-label">🧩 Quick Check: What else must be deleted with the dish?</label>
@@ -246,7 +384,7 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
     After cleanup, you can analyze your data.  
     The backend groups dishes by city, category, or ingredient to uncover insights.
   </p>
-  <ul style="margin-left:1.2rem; color:#23213a; font-weight:600;">
+  <ul style="margin-left:1.2rem; color:#fdf2f8; font-weight:600;">
     <li>Top ingredients across all cities</li>
     <li>Average calories per city</li>
     <li>Number of dishes per category</li>
@@ -270,7 +408,7 @@ Analytics = reviewing the kitchen log to see what’s sold, archived, or missing
 <!-- 🌱 Seed Dishes -->
 <div class="sq-card">
   <h3>🌱 Seed Seattle Dishes</h3>
-  <p>Load sample data into your mock database — includes Clam Chowder, Salmon Bagel, and Vegan Soup.</p>
+  <p>Load sample data into your mock database — includes dishes from your itinerary!</p>
   <button class="sq-btn sq-run" onclick="seedSeattle()">Seed Seattle Dishes</button>
   <pre id="terminal-seedsea" class="sq-terminal"></pre>
 </div>
@@ -305,19 +443,79 @@ if(typeof window.showToast!=="function"){
 }
 function flash(el,color){if(!el)return;el.style.transition='background 0.3s';el.style.background=color;setTimeout(()=>el.style.background='',600);}
 
-/* ========== mock data setup ========== */
+/* ========== mock data setup with itinerary integration ========== */
 window.SeattleDB = window.SeattleDB || { dishes: [] };
+
+// Load and display itinerary foods
+function loadItineraryFoods() {
+  const itineraryData = localStorage.getItem('westCoastItinerary');
+  const displayElement = document.getElementById('itinerary-foods-display');
+  
+  if (!itineraryData) {
+    displayElement.innerHTML = '<div class="no-itinerary-msg">No itinerary found. Please complete the trip planner quiz first!</div>';
+    return [];
+  }
+
+  try {
+    const itinerary = JSON.parse(itineraryData);
+    const seattleFoods = itinerary.cities['Seattle']?.foods || [];
+    
+    if (seattleFoods.length === 0) {
+      displayElement.innerHTML = '<div class="no-itinerary-msg">No foods selected for Seattle in your itinerary.</div>';
+      return [];
+    }
+
+    let html = '';
+    seattleFoods.forEach((food, index) => {
+      html += `
+        <div class="food-item">
+          <h4>🍽️ ${food}</h4>
+          <p>Selected food #${index + 1} from your personalized itinerary</p>
+        </div>
+      `;
+    });
+    
+    displayElement.innerHTML = html;
+    return seattleFoods;
+  } catch (e) {
+    console.error('Error loading itinerary:', e);
+    displayElement.innerHTML = '<div class="no-itinerary-msg">Error loading itinerary data.</div>';
+    return [];
+  }
+}
 
 function seedSeattle(){
   clearTerm('terminal-seedsea');
-  SeattleDB.dishes = [
-    {id:'1', name:'Clam Chowder', city:'Seattle', calories:450, deleted_at:null},
-    {id:'2', name:'Salmon Bagel', city:'Seattle', calories:380, deleted_at:null},
-    {id:'3', name:'Vegan Soup', city:'Seattle', calories:320, deleted_at:null}
-  ];
-  logTo('terminal-seedsea','🌱 Seeded 3 Seattle dishes.');
+  
+  // Get foods from itinerary
+  const itineraryData = localStorage.getItem('westCoastItinerary');
+  let seattleFoods = ['Fresh Salmon', 'Pike Place Market Chowder', 'Dungeness Crab']; // defaults
+  
+  if (itineraryData) {
+    try {
+      const itinerary = JSON.parse(itineraryData);
+      const selectedFoods = itinerary.cities['Seattle']?.foods || [];
+      if (selectedFoods.length > 0) {
+        seattleFoods = selectedFoods;
+      }
+    } catch (e) {
+      console.error('Error reading itinerary:', e);
+    }
+  }
+  
+  // Create dishes from itinerary foods
+  SeattleDB.dishes = seattleFoods.map((food, idx) => ({
+    id: String(idx + 1),
+    name: food,
+    city: 'Seattle',
+    calories: 350 + (idx * 50),
+    deleted_at: null
+  }));
+  
+  logTo('terminal-seedsea', `🌱 Seeded ${SeattleDB.dishes.length} Seattle dishes from your itinerary:`);
+  SeattleDB.dishes.forEach(d => logTo('terminal-seedsea', ` - ${d.name} (ID: ${d.id})`));
   showToast('Seattle dishes seeded — +10 XP');
-  completeTask?.('seed');
+  completeTask('seed'); // Mark task as complete
 }
 
 /* helper: clear any terminal */
@@ -375,7 +573,11 @@ function runAnalytics(){
   const archived=SeattleDB.dishes.filter(d=>d.deleted_at);
   const avgCalories = (arr)=> arr.length? (arr.reduce((a,b)=>a+b.calories,0)/arr.length).toFixed(1):0;
   const avg=avgCalories(active);
-  logTo('terminal-analytics',`Active dishes: ${active.length}\nArchived dishes: ${archived.length}\nAverage calories (active): ${avg}`);
+  logTo('terminal-analytics',`📊 Analytics Dashboard\n${'='.repeat(40)}`);
+  logTo('terminal-analytics',`Active dishes: ${active.length}`);
+  logTo('terminal-analytics',`Archived dishes: ${archived.length}`);
+  logTo('terminal-analytics',`Average calories (active): ${avg}`);
+  logTo('terminal-analytics',`\nYour itinerary foods: ${active.map(d=>d.name).join(', ')}`);
   showToast('Analytics run complete — +15 XP');
   flash(document.getElementById('terminal-analytics'),'rgba(16,185,129,0.15)');
   completeTask?.('analytics');
@@ -387,28 +589,155 @@ function viewSeattle(){
   if(!SeattleDB.dishes.length){logTo('terminal-viewsea','⚠️ No data found. Seed dishes first.');return;}
   const active=SeattleDB.dishes.filter(d=>!d.deleted_at);
   const archived=SeattleDB.dishes.filter(d=>d.deleted_at);
-  logTo('terminal-viewsea',`Active Dishes (${active.length}):`,...active.map(d=>` - ${d.name} (${d.calories} cal)`),`\nArchived Dishes (${archived.length}):`,...archived.map(d=>` - ${d.name} (${d.calories} cal)`));
+  logTo('terminal-viewsea',`Active Dishes (${active.length}):`,...active.map(d=>` - ${d.name} (${d.calories} cal, ID: ${d.id})`),`\nArchived Dishes (${archived.length}):`,...archived.map(d=>` - ${d.name} (${d.calories} cal, ID: ${d.id})`));
   showToast('Viewing dishes list');
-  completeTask?.('view');
+  completeTask('view'); // Mark task as complete
 }
 
 /* ========== quizzes ========== */
 function checkArchiveQuiz(){
   const val=document.getElementById('archive-quiz').value,termId='terminal-archive',term=document.getElementById(termId);
   if(!val){logTo(termId,'⚠️ Please choose an answer first.');flash(term,'rgba(251,191,36,0.15)');return;}
-  if(val==='a'){logTo(termId,'✅ Correct! Archiving keeps records for analytics and restoration.');showToast('+3 XP — You understood soft delete!');flash(term,'rgba(16,185,129,0.15)');}
+  if(val==='a'){
+    logTo(termId,'✅ Correct! Archiving keeps records for analytics and restoration.');
+    showToast('+3 XP — You understood soft delete!');
+    flash(term,'rgba(16,185,129,0.15)');
+    completeTask('archive'); // Mark archive concept as complete
+  }
   else{logTo(termId,'❌ Not quite. Soft delete preserves data for later reports.');flash(term,'rgba(239,68,68,0.15)');}
 }
 function checkHardQuiz(){
   const val=document.getElementById('hard-quiz').value.trim().toLowerCase(),termId='terminal-hard',term=document.getElementById(termId);
   if(!val){logTo(termId,'⚠️ Please enter your answer.');flash(term,'rgba(251,191,36,0.15)');return;}
-  if(val.includes('dish_ingredient')){logTo(termId,'✅ Correct! The join table dish_ingredients must be deleted with the dish.');showToast('+3 XP — Cascade delete learned!');flash(term,'rgba(16,185,129,0.15)');}
+  if(val.includes('dish_ingredient')){
+    logTo(termId,'✅ Correct! The join table dish_ingredients must be deleted with the dish.');
+    showToast('+3 XP — Cascade delete learned!');
+    flash(term,'rgba(16,185,129,0.15)');
+    completeTask('harddelete'); // Mark hard delete concept as complete
+  }
   else{logTo(termId,'❌ Hint: It starts with "dish_" and links dishes to ingredients.');flash(term,'rgba(239,68,68,0.15)');}
 }
 function checkAnalyticsQuiz(){
   const val=document.getElementById('analytics-quiz').value,termId='terminal-analytics',term=document.getElementById(termId);
   if(!val){logTo(termId,'⚠️ Please choose an answer.');flash(term,'rgba(251,191,36,0.15)');return;}
-  if(val==='b'){logTo(termId,'✅ Correct! GROUP BY groups rows for aggregate calculations.');showToast('+3 XP — Analytics concept clear!');flash(term,'rgba(16,185,129,0.15)');}
+  if(val==='b'){
+    logTo(termId,'✅ Correct! GROUP BY groups rows for aggregate calculations.');
+    showToast('+3 XP — Analytics concept clear!');
+    flash(term,'rgba(16,185,129,0.15)');
+    completeTask('analytics'); // Mark analytics concept as complete
+  }
   else{logTo(termId,'❌ Not quite. The correct answer is GROUP BY.');flash(term,'rgba(239,68,68,0.15)');}
 }
-</script>
+
+// Task completion tracking for Seattle
+window.taskProgress = {
+  archive: false,
+  harddelete: false,
+  analytics: false,
+  seed: false,
+  view: false
+};
+
+// Load progress from localStorage
+function loadTaskProgress() {
+  const saved = localStorage.getItem('sea_task_progress');
+  if (saved) {
+    try {
+      window.taskProgress = { ...window.taskProgress, ...JSON.parse(saved) };
+    } catch (e) {
+      console.error('Error loading task progress:', e);
+    }
+  }
+  updateProgressDisplay();
+}
+
+// Save progress to localStorage
+function saveTaskProgress() {
+  try {
+    localStorage.setItem('sea_task_progress', JSON.stringify(window.taskProgress));
+  } catch (e) {
+    console.error('Error saving task progress:', e);
+  }
+}
+
+// Mark task as complete
+window.completeTask = function(taskName) {
+  if (!window.taskProgress[taskName]) {
+    window.taskProgress[taskName] = true;
+    saveTaskProgress();
+    updateProgressDisplay();
+    checkModuleCompletion();
+  }
+};
+
+// Update progress display
+function updateProgressDisplay() {
+  const tasks = ['archive', 'harddelete', 'analytics', 'seed', 'view'];
+  let completedCount = 0;
+
+  tasks.forEach(task => {
+    const element = document.getElementById(`task-${task}`);
+    if (element) {
+      const statusSpan = element.querySelector('.status');
+      if (window.taskProgress[task]) {
+        statusSpan.textContent = 'Complete ✅';
+        statusSpan.className = 'status task-complete';
+        completedCount++;
+      } else {
+        statusSpan.textContent = 'Incomplete';
+        statusSpan.className = 'status';
+      }
+    }
+  });
+
+  // Update progress bar
+  const percentage = Math.round((completedCount / tasks.length) * 100);
+  const percentageElement = document.getElementById('completion-percentage');
+  const progressBar = document.getElementById('progress-bar');
+  
+  if (percentageElement) percentageElement.textContent = `${percentage}%`;
+  if (progressBar) progressBar.style.width = `${percentage}%`;
+}
+
+// Check if module is complete and mark Seattle as completed
+function checkModuleCompletion() {
+  const allTasks = Object.values(window.taskProgress);
+  const isComplete = allTasks.every(task => task === true);
+  
+  if (isComplete) {
+    // Show the completion notification
+    const notification = document.getElementById('unlockNotification');
+    if (notification) {
+      notification.innerHTML = `
+        🎉 CRUD Journey Complete!<br>
+        <small style="opacity:.9;font-size:14px;">Now share your adventure on the Seattle Showcase Wall!</small>
+      `;
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 6000);
+    }
+    markSeattleComplete();
+    console.log('🎉 Seattle module completed! CRUD journey finished.');
+  }
+}
+
+// Mark Seattle as complete in the main navigation
+function markSeattleComplete() {
+  try {
+    const saved = localStorage.getItem('city_progress');
+    let gameProgress = saved ? JSON.parse(saved) : { unlockedCities:[0,1,2,3], completedCities:[], totalCitiesCompleted:0 };
+    if (!gameProgress.completedCities.includes(3)) {
+      gameProgress.completedCities.push(3);
+      gameProgress.totalCitiesCompleted++;
+    }
+    localStorage.setItem('city_progress', JSON.stringify(gameProgress));
+    console.log('✅ Seattle Progress updated:', gameProgress);
+  } catch (e) {
+    console.error('Seattle completion failed:', e);
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadItineraryFoods();
+  loadTaskProgress();
+});

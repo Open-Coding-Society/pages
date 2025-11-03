@@ -67,7 +67,7 @@ class MansionLevel6 {
             SCALE_FACTOR: 4,
             ANIMATION_RATE: 30,
             pixels: {width: 3600, height: 1200},
-            INIT_POSITION: { x: (width * 3 / 4), y: (height * 1 / 2)},
+            INIT_POSITION: {x: (width * 9 / 16), y: (height * 1 / 4)},
             orientation: {rows: 1, columns: 3 },
             down: {row: 0, start: 0, columns: 3 },
             hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
@@ -83,7 +83,8 @@ class MansionLevel6 {
                 "Go ahead. I aint stoppin' you, the Reaper'll finish you clean.",
                 "You are a fool to challenge the Reaper.",
                 "You will end up like me once you face the Reaper.",
-                "Are you the next opponent for my master? That's unfortunate for you."
+                "Are you the next opponent for my master? That's unfortunate for you.",
+                "Why I won't attack you? Well, my master will finish you off soon enough."
             ],
             reaction: function() {
                 // Don't do anything on touch
@@ -134,7 +135,7 @@ class MansionLevel6 {
                 // Don't show any reaction dialogue - this prevents the first alert
                 // The interact function will handle all dialogue instead
             },
-            // Ask the player wether they want to enter the doors-- if they do, move to the battle room
+            // Ask the player whether they want to enter the doors-- if they do, move to the battle room
             interact: function() {
                 // Clear any existing dialogue first to prevent duplicates
                 if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
@@ -170,6 +171,8 @@ class MansionLevel6 {
                                 const fadeOverlay = document.createElement('div');
                                 const fadeInMs = 2000; // longer fade in
                                 const fadeOutMs = 1200; // fade out duration
+                                // Reset the battle room fade flag
+                                window.__battleRoomFadeComplete = false;
                                 Object.assign(fadeOverlay.style, {
                                     position: 'fixed',
                                     top: '0',
@@ -209,6 +212,7 @@ class MansionLevel6 {
                                     }
                                 } catch (e) { console.warn('Failed to stop level music:', e); }
 
+                                // Start the music for the battle room
                                 console.log("Starting battle music...");
                                 const audio = new Audio(path + "/assets/sounds/mansionGame/SkeletonLord.mp3");
                                 audio.loop = true;
@@ -221,11 +225,17 @@ class MansionLevel6 {
                                 requestAnimationFrame(() => {
                                     fadeOverlay.style.opacity = '1';
 
+                                    // Mark that the battle-room fade-complete flag is not yet set.
+                                    // This flag will be set to true once the overlay is fully removed
+                                    // so enemies in the battle room can wait for the screen to finish
+                                    // fading before they begin moving/attacking.
+                                    try { window.__battleRoomFadeComplete = false; } catch(e) {}
+
                                     // Create a centered transition text that will type itself
                                     const transitionText = document.createElement('div');
                                     const fullText = 'YOUR FATE HAS BEEN SEALED';
                                     transitionText.textContent = '';
-                                    const typingSpeed = 80; // ms per char
+                                    const typingSpeed = 20; // ms per char -- CHANGE TO 80 WHEN FINISHED THE SLOW SPEED IS FOR DEVELOPMENT
                                     Object.assign(transitionText.style, {
                                         position: 'fixed',
                                         top: '50%',
@@ -268,7 +278,7 @@ class MansionLevel6 {
 
                                     // Compute when to perform the level transition: wait until both fadeIn and typing complete
                                     const typingDuration = fullText.length * typingSpeed;
-                                    const waitMs = Math.max(fadeInMs, typingDuration) + 800; // small hold after
+                                    const waitMs = Math.max(fadeInMs, typingDuration) + 200; // small hold after -- CHANGE TO 800 WHEN FINISHED THE SLOW SPEED IS FOR DEVELOPMENT
 
                                     setTimeout(() => {
                                         // Clean up current level properly
@@ -321,6 +331,9 @@ class MansionLevel6 {
                                                     setTimeout(() => {
                                                         try { document.body.removeChild(fadeOverlay); } catch (e) {}
                                                         try { document.body.removeChild(transitionText); } catch (e) {}
+                                                        // Now the battle room visuals have finished fading in for the player.
+                                                        // Signal to in-level enemies that it's OK to start moving.
+                                                        try { window.__battleRoomFadeComplete = true; } catch (e) {}
                                                     }, fadeOutMs + 150);
                                                 }
                                             }, untypeSpeed);
@@ -344,15 +357,44 @@ class MansionLevel6 {
                     }
                 ]);
             }
-        }
-        
+        };
+
+        const sprite_src_chair = path + "/images/mansionGame/invisDoorCollisionSprite.png";
+        const sprite_data_chair = {
+            id: 'Chair',
+            greeting: "Don't sit on me!",
+            src: sprite_src_chair,
+            SCALE_FACTOR: 6,
+            ANIMATION_RATE: 100,
+            pixels: {width: 2029, height: 2025},
+            INIT_POSITION: {x: (width * 8 / 80), y: (height * 1 / 4)},
+            orientation: {rows: 1, columns: 1},
+            down: {row: 0, start: 0, columns: 1},
+            hitbox: {widthPercentage: 0.1, heightPercentage: 0.2}
+        };
+
+        const sprite_src_chair2 = path + "/images/mansionGame/invisDoorCollisionSprite.png";
+        const sprite_data_chair2 = {
+            id: 'Chair 2',
+            greeting: "Don't sit on me!",
+            src: sprite_src_chair2,
+            SCALE_FACTOR: 6,
+            ANIMATION_RATE: 100,
+            pixels: {width: 2029, height: 2025},
+            INIT_POSITION: {x: (width * 71 / 80), y: (height * 9 / 40)},
+            orientation: {rows: 1, columns: 1},
+            down: {row: 0, start: 0, columns: 1},
+            hitbox: {widthPercentage: 0.1, heightPercentage: 0.2}
+        };
 
         // This is every sprite we want the game engine to render, and with whatever data
         this.classes = [
             {class: GameEnvBackground, data: image_data_chamber},
             {class: Player, data: sprite_data_mc},
             {class: Npc, data: sprite_data_zombie},
-            {class: Npc, data: sprite_data_bossdoor}
+            {class: Npc, data: sprite_data_bossdoor},
+            {class: Npc, data: sprite_data_chair},
+            {class: Npc, data: sprite_data_chair2}
         ];
 
     };

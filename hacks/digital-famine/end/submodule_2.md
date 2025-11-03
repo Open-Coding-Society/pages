@@ -817,8 +817,11 @@ breadcrumb: true
       ? '🛡️ <strong>PASS</strong>: Media Literacy Module complete. Shield Integrity restored. Alien cyberattack collapses under verified data.'
       : '🔧 <strong>RETRY</strong>: Strengthen verification and bias checks. Review feedback and attempt again.';
 
-    // tiny confetti if pass (no external libs)
-    if (passed) miniConfetti();
+    // If passed, mark the module as complete
+    if (passed) {
+      miniConfetti();
+      window.markCurrentModuleComplete(); // Mark module complete to unlock next module
+    }
   }
 
   $('#save').addEventListener('click', save);

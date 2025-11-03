@@ -76,6 +76,23 @@ date: 2025-10-21
   .cert-purple:hover {
     box-shadow: 0 8px 20px rgba(142, 68, 173, 0.4);
   }
+  .cert-teal {
+    background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+    box-shadow: 0 4px 12px rgba(22, 160, 133, 0.32);
+  }
+  .cert-teal:hover {
+    box-shadow: 0 10px 26px rgba(22, 160, 133, 0.4);
+    transform: translateY(-4px);
+  }
+  .cert-yellow {
+    background: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%);
+    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.28);
+    color: #111;
+  }
+  .cert-yellow:hover {
+    box-shadow: 0 10px 26px rgba(241, 196, 15, 0.36);
+    transform: translateY(-4px);
+  }
   .cert-badge {
     background: rgba(0, 0, 0, 0.2);
     color: #fff;
@@ -266,33 +283,57 @@ date: 2025-10-21
 <div class="container">
   <h2 class="section-title">Earned Certificates</h2>
   <div class="certificates-grid">
-    <div class="cert-card cert-red">
-      <span class="cert-badge">Verified</span>
-      <h3 class="cert-title">Advanced Python Programming</h3>
-      <div class="cert-org">Open Coding Society</div>
-      <div class="cert-date">September 2024</div>
-      <div class="cert-actions">
-        <button class="btn btn-download" onclick="downloadCert('Advanced Python Programming', 'Data Science Academy', 'September 2024')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
-      </div>
-    </div>
     <div class="cert-card cert-orange">
       <span class="cert-badge">Verified</span>
-      <h3 class="cert-title">Data Analysis with Python</h3>
+      <h3 class="cert-title">Frontend Development</h3>
       <div class="cert-org">Open Coding Society</div>
-      <div class="cert-date">June 2024</div>
+      <div class="cert-date">November 2025</div>
       <div class="cert-actions">
-        <button class="btn btn-download" onclick="downloadCert('Data Analysis with Python', 'Data Science Institute', 'June 2024')">⬇ Download</button>
+        <button class="btn btn-download" onclick="downloadCert('Frontend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
         <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
+
+    <div class="cert-card cert-red">
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">Backend Development</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('Backend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+        <button class="btn btn-share">🔗 Share</button>
+      </div>
+    </div>
+
     <div class="cert-card cert-purple">
       <span class="cert-badge">Verified</span>
-      <h3 class="cert-title">Machine Learning Fundamentals</h3>
+      <h3 class="cert-title">Data Visualization</h3>
       <div class="cert-org">Open Coding Society</div>
-      <div class="cert-date">July 2024</div>
+      <div class="cert-date">November 2025</div>
       <div class="cert-actions">
-        <button class="btn btn-download" onclick="downloadCert('Machine Learning Fundamentals', 'AI Learning Hub', 'July 2024')">⬇ Download</button>
+        <button class="btn btn-download" onclick="downloadCert('Data Visualization', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+        <button class="btn btn-share">🔗 Share</button>
+      </div>
+    </div>
+
+    <div class="cert-card cert-teal">
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">Resume Building</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('Resume Building', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+        <button class="btn btn-share">🔗 Share</button>
+      </div>
+    </div>
+
+    <div class="cert-card cert-yellow">
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">AI Usage</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('AI Usage', 'Open Coding Society', 'November 2025')">⬇ Download</button>
         <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
@@ -356,123 +397,160 @@ date: 2025-10-21
     </div>
   </div>
 
-  <div class="badges-card">
-    <h2 class="section-title">Achievement Badges</h2>
-    <div class="badges-grid">
-      <div class="badge badge-red">Python Master</div>
-      <div class="badge badge-orange">Data Wizard</div>
-      <div class="badge badge-purple">Quick Learner</div>
-      <div class="badge badge-red">Streak Champion</div>
-      <div class="badge badge-teal">Problem Solver</div>
-      <div class="badge badge-yellow">AI Enthusiast</div>
-    </div>
-    <div class="badges-footer">5 badges earned • 4 more to unlock</div>
-  </div>
+  
 </div>
 
 <canvas id="certCanvas"></canvas>
 
-<script>
-function downloadCert(course, org, date) {
-  const canvas = document.getElementById('certCanvas');
-  const ctx = canvas.getContext('2d');
-  
-  canvas.width = 1400;
-  canvas.height = 1000;
-  
-// Background - elegant cream
-  ctx.fillStyle = '#f8f6f0';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // Outer border - navy
-  ctx.strokeStyle = '#2c3e50';
-  ctx.lineWidth = 25;
-  ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-  
-  // Inner border - gold accent
-  ctx.strokeStyle = '#c9b037';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
-  
-  // Decorative corners
-  ctx.fillStyle = '#c9b037';
-  ctx.beginPath();
-  ctx.arc(80, 80, 15, 0, Math.PI * 2);
-  ctx.arc(canvas.width - 80, 80, 15, 0, Math.PI * 2);
-  ctx.arc(80, canvas.height - 80, 15, 0, Math.PI * 2);
-  ctx.arc(canvas.width - 80, canvas.height - 80, 15, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Title
+<script type="module">
+// Provide a safe global stub immediately so inline onclick handlers won't fail
+window.downloadCert = async function () {
+  // temporary stub while module initializes
+  alert('Preparing certificate... If this message persists, the certificate system failed to initialize.');
+};
+
+(async () => {
+  try {
+    const cfg = await import('{{ site.baseurl }}/assets/js/api/config.js');
+    const { pythonURI, fetchOptions } = cfg;
+
+    async function getCredentials() {
+      try {
+        const res = await fetch(`${pythonURI}/api/id`, {
+          ...fetchOptions,
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          return data.name || 'Student Name';
+        } else {
+          console.log(`Request failed with status ${res.status}`);
+        }
+      } catch (err) {
+        console.log(`Error fetching credentials: ${err}`);
+      }
+      return 'Student Name';
+    }
+
+    async function downloadCert(course, org, date) {
+      const name = await getCredentials();
+
+      const canvas = document.getElementById('certCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = 1400;
+      canvas.height = 1000;
+
+      // Background - elegant cream
+      ctx.fillStyle = '#f8f6f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Outer border - navy
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 25;
+      ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+      // Inner border - gold accent
+      ctx.strokeStyle = '#c9b037';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
+
+      // Decorative corners
+      ctx.fillStyle = '#c9b037';
+      ctx.beginPath();
+      ctx.arc(80, 80, 15, 0, Math.PI * 2);
+      ctx.arc(canvas.width - 80, 80, 15, 0, Math.PI * 2);
+      ctx.arc(80, canvas.height - 80, 15, 0, Math.PI * 2);
+      ctx.arc(canvas.width - 80, canvas.height - 80, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Title
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 60px Georgia';
+      ctx.textAlign = 'center';
+      ctx.fillText('CERTIFICATE', canvas.width / 2, 200);
+
+      ctx.font = 'bold 48px Georgia';
+      ctx.fillText('OF COMPLETION', canvas.width / 2, 260);
+
+      // Decorative line under title
+      ctx.strokeStyle = '#c9b037';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(400, 290);
+      ctx.lineTo(1000, 290);
+      ctx.stroke();
+
+      // "This is to certify that"
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = '28px Arial';
+      ctx.fillText('This is to certify that', canvas.width / 2, 380);
+
+      // Student name (from API)
+      ctx.fillStyle = '#ea8c33';
+      ctx.font = 'italic bold 52px Georgia';
+      ctx.fillText(name, canvas.width / 2, 470);
+
+      // Underline
+      ctx.strokeStyle = '#ea8c33';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(400, 490);
+      ctx.lineTo(1000, 490);
+      ctx.stroke();
+
+      // "has successfully completed"
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = '28px Arial';
+      ctx.fillText('has successfully completed the course', canvas.width / 2, 560);
+
+      // Course name
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 44px Arial';
+      ctx.fillText(course, canvas.width / 2, 650);
+
+      // Organization
+      ctx.fillStyle = '#555';
+      ctx.font = '26px Arial';
+      ctx.fillText('Issued by ' + org, canvas.width / 2, 710);
+
+  // Date — use current date to ensure certificate is issued today
+  const issuanceDate = new Date();
+  const formattedDate = issuanceDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  // match the Advanced Python Programming accent (red) for the date
   ctx.fillStyle = '#2c3e50';
-  ctx.font = 'bold 60px Georgia';
-  ctx.textAlign = 'center';
-  ctx.fillText('CERTIFICATE', canvas.width / 2, 200);
-  
-  ctx.font = 'bold 48px Georgia';
-  ctx.fillText('OF COMPLETION', canvas.width / 2, 260);
-  
-  // Decorative line under title
-  ctx.strokeStyle = '#c9b037';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(400, 290);
-  ctx.lineTo(1000, 290);
-  ctx.stroke();
-  // "This is to certify that"
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '28px Arial';
-  ctx.fillText('This is to certify that', canvas.width / 2, 380);
-  
-  // Student name
-  ctx.fillStyle = '#ea8c33';
-  ctx.font = 'italic bold 52px Georgia';
-  ctx.fillText('Student Name', canvas.width / 2, 470);
-  
-  // Underline
-  ctx.strokeStyle = '#ea8c33';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(400, 490);
-  ctx.lineTo(1000, 490);
-  ctx.stroke();
-  
-  // "has successfully completed"
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '28px Arial';
-  ctx.fillText('has successfully completed the course', canvas.width / 2, 560);
-  
-  // Course name
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 44px Arial';
-  ctx.fillText(course, canvas.width / 2, 650);
-  
-  // Organization
-  ctx.fillStyle = '#b0b0b0';
-  ctx.font = '26px Arial';
-  ctx.fillText('Issued by ' + org, canvas.width / 2, 710);
-  
-  // Date
-  ctx.fillStyle = '#ea8c33';
   ctx.font = 'bold 24px Arial';
-  ctx.fillText('Date: ' + date, canvas.width / 2, 800);
-  
-  // Signature line
-  ctx.strokeStyle = '#ea8c33';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(500, 880);
-  ctx.lineTo(900, 880);
-  ctx.stroke();
-  
-  ctx.fillStyle = '#b0b0b0';
-  ctx.font = '20px Arial';
-  ctx.fillText('Authorized Signature', canvas.width / 2, 920);
-  
-  // Download
-  const link = document.createElement('a');
-  link.download = course.replace(/\s+/g, '_') + '_Certificate.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-}
+  ctx.fillText('Date: ' + formattedDate, canvas.width / 2, 800);
+
+      // Signature line
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(500, 880);
+      ctx.lineTo(900, 880);
+      ctx.stroke();
+
+      // signature name: larger and lifted above the line to match 'OF COMPLETION'
+      ctx.fillStyle = '#555';
+      ctx.font = 'bold 48px Georgia';
+      // place slightly above the signature line
+      ctx.fillText('John Mortenson', canvas.width / 2, 860);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.download = `${course.replace(/\s+/g, '_')}_Certificate.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // replace the stub with the real implementation
+    window.downloadCert = downloadCert;
+  } catch (err) {
+    console.error('Failed to initialize certificate downloader:', err);
+    // keep the user-friendly stub already assigned above
+  }
+})();
+
 </script>

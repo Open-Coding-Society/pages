@@ -18,7 +18,7 @@
         <div class="Box box-shadow-medium rounded-1 col-12">
             <div class="col-8 d-table-cell p-3">
 
-                <h3><a href="#{{ category }}">{{ category }}</a></h3>
+                <h3 id="{{ category }}"><a href="#{{ category }}">{{ category }}</a></h3>
                 {% for post in site.categories[category] %}
                 {% if post.hide != true %}
                 {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
@@ -37,3 +37,20 @@
 </ul>
 
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function scrollToHash(retries) {
+        if (window.location.hash) {
+            var id = window.location.hash.substring(1);
+            var el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView();
+            } else if (retries > 0) {
+                setTimeout(function() { scrollToHash(retries - 1); }, 200);
+            }
+        }
+    }
+    scrollToHash(10); // Try for up to 2 seconds (10 x 200ms)
+});
+</script>

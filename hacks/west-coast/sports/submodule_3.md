@@ -10,710 +10,1107 @@ categories: [CSP, Submodule, Backend]
 tags: [backend, submodule, zombies]
 author: "Zombies Team"
 date: 2025-10-21
+microblog: True
+footer:
+  previous: /west-coast/backend/submodule_2/
+  home: /west-coast/sports/
+  next: /west-coast/backend/submodule_4/
 ---
-
-# Submodule 3
-
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        padding: 20px;
-        min-height: 100vh;
-    }
-
-    .container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .header {
-        background: linear-gradient(135deg, #0a1929 0%, #1e3a5f 100%);
-        color: white;
-        padding: 40px;
-        text-align: center;
-        border-radius: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .header h1 {
-        font-size: 2.5em;
-        margin-bottom: 10px;
-    }
-
-    .header p {
-        font-size: 1.2em;
-        opacity: 0.9;
-    }
-
-    .concept-box {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        border-left: 6px solid #FDB927;
-    }
-
-    .concept-box h2 {
-        color: #2c3e50 !important;
-        margin-bottom: 20px;
-        font-size: 1.8em;
-    }
-
-    .concept-box .concept-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .concept-item {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 4px solid #3498db;
-    }
-
-    .concept-item h3 {
-        color: #2c3e50 !important;
-        margin-bottom: 10px;
-        font-size: 1.2em;
-    }
-
-    .concept-item p {
-        color: #555 !important;
-        line-height: 1.6;
-    }
-
-    .api-demo-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    .api-panel {
-        background: white;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .panel-header {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        color: white;
-        padding: 25px;
-        text-align: center;
-    }
-
-    .panel-header h2 {
-        font-size: 1.8em;
-        margin-bottom: 10px;
-    }
-
-    .panel-body {
-        padding: 30px;
-    }
-
-    .code-block {
-        background: #2c3e50;
-        color: #00ff00;
-        padding: 20px;
-        border-radius: 10px;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9em;
-        white-space: pre-wrap;
-        margin-bottom: 20px;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .code-comment {
-        color: #95a5a6;
-    }
-
-    .code-keyword {
-        color: #e74c3c;
-    }
-
-    .code-string {
-        color: #f39c12;
-    }
-
-    .code-function {
-        color: #3498db;
-    }
-
-    .api-call-btn {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        color: white;
-        border: none;
-        padding: 15px 30px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1.1em;
-        font-weight: bold;
-        width: 100%;
-        margin-bottom: 20px;
-        transition: all 0.3s;
-        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-    }
-
-    .api-call-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
-    }
-
-    .response-area {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        border: 2px solid #ddd;
-        min-height: 150px;
-        display: none;
-    }
-
-    .response-area.active {
-        display: block;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>San Francisco - Making API Calls</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
         }
-    }
 
-    .response-header {
-        color: #27ae60 !important;
-        font-weight: bold;
-        margin-bottom: 10px;
-        font-size: 1.1em;
-    }
-
-    .json-display {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        font-family: 'Courier New', monospace;
-        font-size: 0.9em;
-        color: #2c3e50;
-        white-space: pre-wrap;
-    }
-
-    .stadium-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    .stadium-card {
-        background: white;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s;
-    }
-
-    .stadium-card:hover {
-        transform: translateY(-10px);
-    }
-
-    .warriors-header {
-        background: linear-gradient(135deg, #1D428A 0%, #FDB927 100%);
-        padding: 30px;
-        text-align: center;
-        color: white;
-    }
-
-    .niners-header {
-        background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-        padding: 30px;
-        text-align: center;
-        color: white;
-    }
-
-    .stadium-card h2 {
-        font-size: 2em;
-        margin-bottom: 10px;
-    }
-
-    .stadium-body {
-        padding: 30px;
-    }
-
-    .warriors-card .stadium-body {
-        background: linear-gradient(to bottom, rgba(29, 66, 138, 0.05) 0%, white 100%);
-    }
-
-    .niners-card .stadium-body {
-        background: linear-gradient(to bottom, rgba(170, 0, 0, 0.05) 0%, white 100%);
-    }
-
-    .stat-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 15px;
-        border-bottom: 1px solid #ecf0f1;
-        background: white;
-        margin-bottom: 5px;
-        border-radius: 8px;
-    }
-
-    .stat-row:last-child {
-        border-bottom: none;
-    }
-
-    .warriors-card .stat-label {
-        font-weight: bold;
-        color: #1D428A;
-    }
-
-    .warriors-card .stat-value {
-        color: #FDB927;
-        font-weight: bold;
-        font-size: 1.1em;
-    }
-
-    .niners-card .stat-label {
-        font-weight: bold;
-        color: #AA0000;
-    }
-
-    .niners-card .stat-value {
-        color: #B3995D;
-        font-weight: bold;
-        font-size: 1.1em;
-    }
-
-    .data-interpretation {
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .data-interpretation h2 {
-        color: #2c3e50 !important;
-        margin-bottom: 25px;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .insight-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .insight-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .insight-card h3 {
-        margin-bottom: 15px;
-        font-size: 1.3em;
-    }
-
-    .insight-card p {
-        line-height: 1.6;
-        opacity: 0.95;
-    }
-
-    .lessons-learned {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .lessons-learned h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        font-size: 2em;
-    }
-
-    .lessons-learned ul {
-        line-height: 2;
-        font-size: 1.1em;
-        list-style: none;
-    }
-
-    .lessons-learned li {
-        margin-bottom: 15px;
-        padding-left: 30px;
-        position: relative;
-    }
-
-    .lessons-learned li:before {
-        content: "✓";
-        position: absolute;
-        left: 0;
-        font-weight: bold;
-        font-size: 1.2em;
-    }
-
-    .chart-container {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .chart-container h2 {
-        color: #2c3e50 !important;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    @media (max-width: 1024px) {
-        .api-demo-section {
-            grid-template-columns: 1fr;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
         }
-    }
-</style>
 
-<div class="container">
-    <div class="header">
-        <h1> Step 3: Create / Call the API</h1>
-        <p>San Francisco Bay Area - Chase Center & Levi's Stadium</p>
-    </div>
-
-    <div class="concept-box">
-        <h2> Key Concepts</h2>
-        <div class="concept-grid">
-            <div class="concept-item">
-                <h3> Making the API</h3>
-                <p>Write code to handle requests, pull data, and return it (usually in JSON format)</p>
-            </div>
-            <div class="concept-item">
-                <h3> Calling the API</h3>
-                <p>Use another program or code to request data from the API</p>
-            </div>
-            <div class="concept-item">
-                <h3> Data Collection</h3>
-                <p>Gathering real-world sports stadium data from Chase Center (Basketball) and Levi's Stadium (Football)</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="api-demo-section">
-        <div class="api-panel">
-            <div class="panel-header">
-                <h2>1️ Creating the API</h2>
-                <p>Backend Code - Handling Requests</p>
-            </div>
-            <div class="panel-body">
-                <div class="code-block"><span class="code-comment">// API Backend Code (Python/Flask)</span>
-
-<span class="code-keyword">from</span> flask <span class="code-keyword">import</span> Flask, jsonify
-
-app = Flask(__name__)
-
-<span class="code-comment"># Stadium database</span>
-stadiums = {
-    <span class="code-string">"chase_center"</span>: {
-        <span class="code-string">"name"</span>: <span class="code-string">"Chase Center"</span>,
-        <span class="code-string">"team"</span>: <span class="code-string">"Golden State Warriors"</span>,
-        <span class="code-string">"sport"</span>: <span class="code-string">"Basketball"</span>,
-        <span class="code-string">"capacity"</span>: 18064,
-        <span class="code-string">"opened"</span>: 2019,
-        <span class="code-string">"location"</span>: <span class="code-string">"San Francisco"</span>,
-        <span class="code-string">"championships"</span>: 7
-    },
-    <span class="code-string">"levis_stadium"</span>: {
-        <span class="code-string">"name"</span>: <span class="code-string">"Levi's Stadium"</span>,
-        <span class="code-string">"team"</span>: <span class="code-string">"San Francisco 49ers"</span>,
-        <span class="code-string">"sport"</span>: <span class="code-string">"Football"</span>,
-        <span class="code-string">"capacity"</span>: 68500,
-        <span class="code-string">"opened"</span>: 2014,
-        <span class="code-string">"location"</span>: <span class="code-string">"Santa Clara"</span>,
-        <span class="code-string">"championships"</span>: 5
-    }
-}
-
-<span class="code-comment"># API Endpoint</span>
-@app.route(<span class="code-string">'/api/stadium/&lt;stadium_id&gt;'</span>)
-<span class="code-keyword">def</span> <span class="code-function">get_stadium</span>(stadium_id):
-    <span class="code-keyword">if</span> stadium_id <span class="code-keyword">in</span> stadiums:
-        <span class="code-keyword">return</span> jsonify(stadiums[stadium_id])
-    <span class="code-keyword">else</span>:
-        <span class="code-keyword">return</span> jsonify({<span class="code-string">"error"</span>: <span class="code-string">"Not found"</span>}), 404</div>
-            </div>
-        </div>
-
-        <div class="api-panel">
-            <div class="panel-header">
-                <h2> Calling the API</h2>
-                <p>Frontend Code - Requesting Data</p>
-            </div>
-            <div class="panel-body">
-                <div class="code-block"><span class="code-comment">// JavaScript - Calling the API</span>
-
-<span class="code-keyword">async function</span> <span class="code-function">fetchStadiumData</span>(stadiumId) {
-    <span class="code-keyword">try</span> {
-        <span class="code-comment">// Make API request</span>
-        <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> fetch(
-            <span class="code-string">`/api/stadium/${stadiumId}`</span>
-        );
-        
-        <span class="code-comment">// Parse JSON response</span>
-        <span class="code-keyword">const</span> data = <span class="code-keyword">await</span> response.json();
-        
-        <span class="code-comment">// Display the data</span>
-        console.log(data);
-        <span class="code-keyword">return</span> data;
-        
-    } <span class="code-keyword">catch</span> (error) {
-        console.error(<span class="code-string">"Error:"</span>, error);
-    }
-}
-
-<span class="code-comment">// Example usage:</span>
-<span class="code-function">fetchStadiumData</span>(<span class="code-string">'chase_center'</span>);
-<span class="code-function">fetchStadiumData</span>(<span class="code-string">'levis_stadium'</span>);</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="api-panel" style="margin-bottom: 30px;">
-        <div class="panel-header">
-            <h2> Try It Live - Call the API!</h2>
-            <p>Click the buttons to simulate API calls</p>
-        </div>
-        <div class="panel-body">
-            <button class="api-call-btn" onclick="callAPI('chase_center')">
-                 GET /api/stadium/chase_center
-            </button>
-            <div id="chase-response" class="response-area"></div>
-
-            <button class="api-call-btn" onclick="callAPI('levis_stadium')">
-                 GET /api/stadium/levis_stadium
-            </button>
-            <div id="levis-response" class="response-area"></div>
-        </div>
-    </div>
-
-    <div class="stadium-cards">
-        <div class="stadium-card warriors-card">
-            <div class="warriors-header">
-                <h2> Chase Center</h2>
-                <p>Home of the Golden State Warriors</p>
-            </div>
-            <div class="stadium-body">
-                <div class="stat-row">
-                    <span class="stat-label">Capacity</span>
-                    <span class="stat-value">18,064</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Opened</span>
-                    <span class="stat-value">2019</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Location</span>
-                    <span class="stat-value">San Francisco, CA</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Sport</span>
-                    <span class="stat-value">Basketball (NBA)</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Championships</span>
-                    <span class="stat-value">7 Titles</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Cost</span>
-                    <span class="stat-value">$1.4 Billion</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="stadium-card niners-card">
-            <div class="niners-header">
-                <h2> Levi's Stadium</h2>
-                <p>Home of the San Francisco 49ers</p>
-            </div>
-            <div class="stadium-body">
-                <div class="stat-row">
-                    <span class="stat-label">Capacity</span>
-                    <span class="stat-value">68,500</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Opened</span>
-                    <span class="stat-value">2014</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Location</span>
-                    <span class="stat-value">Santa Clara, CA</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Sport</span>
-                    <span class="stat-value">Football (NFL)</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Championships</span>
-                    <span class="stat-value">5 Super Bowls</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Cost</span>
-                    <span class="stat-value">$1.3 Billion</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <h2> Stadium Comparison Chart</h2>
-        <canvas id="comparisonChart"></canvas>
-    </div>
-
-    <div class="data-interpretation">
-        <h2> Data Interpretation & Conclusions</h2>
-        <div class="insight-grid">
-            <div class="insight-card">
-                <h3> Capacity Difference</h3>
-                <p>Levi's Stadium holds 68,500 fans compared to Chase Center's 18,064. Football stadiums are typically 3-4x larger than basketball arenas due to field size and outdoor vs indoor design.</p>
-            </div>
-            <div class="insight-card">
-                <h3> Similar Investment</h3>
-                <p>Both venues cost over $1 billion to build, showing that modern sports facilities require massive investment regardless of sport or size.</p>
-            </div>
-            <div class="insight-card">
-                <h3> Championship Legacy</h3>
-                <p>The Warriors (7) and 49ers (5) are both historic franchises. The data shows these new stadiums continue a winning tradition.</p>
-            </div>
-            <div class="insight-card">
-                <h3> Recent Construction</h3>
-                <p>Both stadiums opened in the 2010s, featuring cutting-edge technology, sustainability features, and modern fan experiences.</p>
-            </div>
-            <div class="insight-card">
-                <h3> Bay Area Location</h3>
-                <p>Chase Center is in San Francisco proper while Levi's is in Santa Clara, showing how teams balance urban vs suburban locations.</p>
-            </div>
-            <div class="insight-card">
-                <h3> API Use Case</h3>
-                <p>This demonstrates how APIs can collect, organize, and present sports data in a structured format that's easy to analyze and compare.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="lessons-learned">
-        <h2>💡 Lessons Learned</h2>
-        <ul>
-            <li>How APIs work and can be used in the real world to collect data</li>
-            <li>How to create APIs that handle requests and return structured JSON data</li>
-            <li>How to call APIs using JavaScript fetch requests</li>
-            <li>How to interpret collected data by comparing statistics and finding patterns</li>
-            <li>How to make conclusions from collected data through analysis and visualization</li>
-            <li>Understanding the difference between creating (backend) and calling (frontend) APIs</li>
-        </ul>
-    </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script>
-    const stadiumData = {
-        chase_center: {
-            name: "Chase Center",
-            team: "Golden State Warriors",
-            sport: "Basketball",
-            capacity: 18064,
-            opened: 2019,
-            location: "San Francisco, CA",
-            championships: 7,
-            cost: "$1.4 Billion"
-        },
-        levis_stadium: {
-            name: "Levi's Stadium",
-            team: "San Francisco 49ers",
-            sport: "Football",
-            capacity: 68500,
-            opened: 2014,
-            location: "Santa Clara, CA",
-            championships: 5,
-            cost: "$1.3 Billion"
+        .header {
+            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(170, 0, 0, 0.2);
         }
-    };
 
-    function callAPI(stadiumId) {
-        const responseDiv = document.getElementById(`${stadiumId === 'chase_center' ? 'chase' : 'levis'}-response`);
-        
-        setTimeout(() => {
-            const data = stadiumData[stadiumId];
-            const response = {
-                status: 200,
-                message: "Success",
-                data: data
-            };
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
 
-            responseDiv.innerHTML = `
-                <div class="response-header">✓ API Response (200 OK)</div>
-                <div class="json-display">${JSON.stringify(response, null, 2)}</div>
-            `;
-            responseDiv.classList.add('active');
-            
-            responseDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 500);
-    }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
 
-    const ctx = document.getElementById('comparisonChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Capacity', 'Year Opened', 'Championships'],
-            datasets: [
-                {
-                    label: 'Chase Center',
-                    data: [18064, 2019, 7],
-                    backgroundColor: 'rgba(29, 66, 138, 0.8)',
-                    borderColor: 'rgba(29, 66, 138, 1)',
-                    borderWidth: 2
-                },
-                {
-                    label: "Levi's Stadium",
-                    data: [68500, 2014, 5],
-                    backgroundColor: 'rgba(170, 0, 0, 0.8)',
-                    borderColor: 'rgba(170, 0, 0, 1)',
-                    borderWidth: 2
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #AA0000;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #B3995D;
+            padding-bottom: 10px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #AA0000;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+
+        .explanation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #B3995D;
+            margin: 20px 0;
+        }
+
+        .explanation h3 {
+            color: #AA0000;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .explanation p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .stadium-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stadium-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #dee2e6;
+            transition: all 0.3s;
+        }
+
+        .stadium-card:hover {
+            border-color: #B3995D;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .stadium-card h3 {
+            color: #AA0000;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .stadium-card .info {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .interactive-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #B3995D;
+        }
+
+        .interactive-box h3 {
+            color: #AA0000;
+            margin-bottom: 15px;
+        }
+
+        .key-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #dee2e6;
+            margin: 15px 0;
+            color: #333;
+            font-size: 1em;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(170, 0, 0, 0.3);
+        }
+
+        .url-builder {
+            margin: 20px 0;
+        }
+
+        .url-part {
+            margin-bottom: 15px;
+        }
+
+        .url-part label {
+            display: block;
+            font-weight: bold;
+            color: #AA0000;
+            margin-bottom: 5px;
+        }
+
+        .url-part select, .url-part input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .url-part select:focus, .url-part input:focus {
+            outline: none;
+            border-color: #B3995D;
+        }
+
+        .constructed-url {
+            background: #2c3e50;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            word-break: break-all;
+            margin-top: 15px;
+            min-height: 60px;
+        }
+
+        .call-btn {
+            background: #B3995D;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .call-btn:hover:not(:disabled) {
+            background: #9d864f;
+            transform: scale(1.02);
+        }
+
+        .call-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .response-area {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .response-area.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-    });
-</script>
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #AA0000;
+            font-weight: bold;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #AA0000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .json-display {
+            background: #2c3e50;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .parsed-data {
+            background: white;
+            border: 3px solid #B3995D;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .data-label {
+            font-weight: bold;
+            color: #AA0000;
+        }
+
+        .data-value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            color: #155724;
+            margin: 15px 0;
+        }
+
+        .key-takeaway {
+            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.8;
+            box-shadow: 0 10px 30px rgba(170, 0, 0, 0.2);
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Quiz Styles */
+        .quiz-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 3px solid #B3995D;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-section h2 {
+            color: #AA0000;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .quiz-question {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .quiz-question.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .question-number {
+            background: #B3995D;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .quiz-option {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+            font-size: 1.05em;
+        }
+
+        .quiz-option:hover {
+            border-color: #B3995D;
+            background: #fff9e6;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            border-color: #AA0000;
+            background: #ffe6e6;
+            font-weight: bold;
+        }
+
+        .quiz-option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .quiz-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .quiz-feedback.correct {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1em;
+            display: none;
+        }
+
+        .next-btn.show {
+            display: inline-block;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quiz-complete {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .quiz-complete.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .quiz-score {
+            font-size: 3em;
+            color: #AA0000;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            background: #B3995D;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        .restart-btn:hover {
+            background: #9d864f;
+            transform: scale(1.05);
+        }
+
+        .drag-item {
+            background: white;
+            border: 2px solid #AA0000;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: move;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .drag-item:hover {
+            background: #ffe6e6;
+        }
+
+        .drop-zone {
+            background: white;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        .drop-zone.filled {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .drop-zone.drag-over {
+            background: #fff9e6;
+            border-color: #B3995D;
+        }
+
+        @media (max-width: 768px) {
+            .stadium-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏟️ Stop 3: San Francisco</h1>
+            <p>Learn How to Make Complete API Calls</p>
+        </div>
+
+        <div class="section">
+            <h2>Meet Your San Francisco Sports Teams</h2>
+            <div class="stadium-cards" id="stadium-cards"></div>
+        </div>
+
+        <div class="section">
+            <h2><span class="step-number">1</span> Get Your API Key</h2>
+            <div class="explanation">
+                <h3>What is an API Key?</h3>
+                <p>An API key is like a special password that proves you have permission to access data. Think of it like a stadium pass - without it, you can't get in! Real sports apps need API keys to get live scores and stats.</p>
+            </div>
+
+            <div class="interactive-box">
+                <h3>🔑 Generate Your Access Key:</h3>
+                <div class="key-display" id="keyDisplay">Click the button below to generate your API key...</div>
+                <button class="generate-btn" onclick="generateKey()">🔓 Generate API Key</button>
+                <div id="keySuccess"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="step-number">2</span> Build Your API Request</h2>
+            <div class="explanation">
+                <h3>What is an API Request?</h3>
+                <p>An API request is like asking a specific question. You need to tell the computer: WHERE to look (URL), WHAT you want (which stadium), and WHO you are (your API key). Let's build one!</p>
+            </div>
+
+            <div class="interactive-box">
+                <h3>🔨 Build Your Request URL:</h3>
+                <div class="url-builder">
+                    <div class="url-part">
+                        <label>Step 1: Select which stadium data you want:</label>
+                        <select id="stadiumSelect" onchange="updateURL()">
+                            <option value="">-- Choose a stadium --</option>
+                        </select>
+                    </div>
+                    <div class="constructed-url" id="constructedURL">
+                        Select a stadium above to see your API request URL...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="step-number">3</span> Send the Request & Get Data</h2>
+            <div class="explanation">
+                <h3>Making the API Call</h3>
+                <p>When you click "Send Request," your computer asks the server: "Give me information about this stadium." The server looks it up and sends back the data in JSON format - a way computers organize information.</p>
+            </div>
+
+            <button class="call-btn" id="sendBtn" onclick="sendRequest()" disabled>
+                🚀 Send API Request
+            </button>
+
+            <div id="responseArea" class="response-area"></div>
+        </div>
+
+        <div class="key-takeaway">
+            <p>🎯 <span class="highlight">What You Learned:</span> Making an API call has 3 steps: Get permission (API key), Build your request (URL), Send it and receive data (JSON response). Every app that shows live sports data does exactly this!</p>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="quiz-section">
+            <h2>🎯 Test Your Knowledge</h2>
+            
+            <div class="quiz-question active" id="q1">
+                <div class="question-number">Question 1 of 3</div>
+                <div class="question-text">What is an API key used for?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectOption(1, 0, false)">A) To make your computer faster</div>
+                    <div class="quiz-option" onclick="selectOption(1, 1, true)">B) To prove you have permission to access the data</div>
+                    <div class="quiz-option" onclick="selectOption(1, 2, false)">C) To encrypt your password</div>
+                    <div class="quiz-option" onclick="selectOption(1, 3, false)">D) To store data on your computer</div>
+                </div>
+                <div class="quiz-feedback" id="feedback1"></div>
+                <button class="next-btn" id="next1" onclick="nextQuestion(2)">Next Question →</button>
+            </div>
+
+            <div class="quiz-question" id="q2">
+                <div class="question-number">Question 2 of 3</div>
+                <div class="question-text">Drag the steps of making an API call into the correct order:</div>
+                <div style="margin: 20px 0;">
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: #AA0000;">Available Steps (drag these):</strong>
+                        <div id="draggables">
+                            <div class="drag-item" draggable="true" data-step="3">Receive the data response</div>
+                            <div class="drag-item" draggable="true" data-step="1">Get an API key</div>
+                            <div class="drag-item" draggable="true" data-step="2">Build the request URL</div>
+                        </div>
+                    </div>
+                    <div>
+                        <strong style="color: #AA0000;">Correct Order (drop here):</strong>
+                        <div class="drop-zone" data-position="1">1st: Drop here</div>
+                        <div class="drop-zone" data-position="2">2nd: Drop here</div>
+                        <div class="drop-zone" data-position="3">3rd: Drop here</div>
+                    </div>
+                </div>
+                <button class="generate-btn" onclick="checkDragDrop()" style="margin-top: 20px;">Check Answer</button>
+                <div class="quiz-feedback" id="feedback2"></div>
+                <button class="next-btn" id="next2" onclick="nextQuestion(3)">Next Question →</button>
+            </div>
+
+            <div class="quiz-question" id="q3">
+                <div class="question-number">Question 3 of 3</div>
+                <div class="question-text" id="q3-text">Which stadium has a larger capacity?</div>
+                <div class="quiz-options" id="q3-options"></div>
+                <div class="quiz-feedback" id="feedback3"></div>
+                <button class="next-btn" id="next3" onclick="showResults()">See Results →</button>
+            </div>
+
+            <div class="quiz-complete" id="quizComplete">
+                <h3 style="color: #AA0000; font-size: 2em; margin-bottom: 20px;">🎉 Quiz Complete!</h3>
+                <div class="quiz-score" id="finalScore">3/3</div>
+                <p style="color: #666; font-size: 1.2em; margin-bottom: 20px;" id="scoreMessage">Perfect! You understand APIs!</p>
+                <button class="restart-btn" onclick="restartQuiz()">🔄 Retake Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // COMPLETE SF TEAMS DATABASE
+        const COMPLETE_SF_TEAMS = {
+            "Football - 49ers": {
+                id: "levis_stadium",
+                name: "Levi's Stadium",
+                team: "San Francisco 49ers",
+                sport: "Football - 49ers",
+                capacity: 68500,
+                opened: 2014,
+                location: "Santa Clara, CA",
+                championships: 5,
+                cost: "$1.3 Billion",
+                icon: "🏈"
+            },
+            "Basketball - Warriors": {
+                id: "chase_center",
+                name: "Chase Center",
+                team: "Golden State Warriors",
+                sport: "Basketball - Warriors",
+                capacity: 18064,
+                opened: 2019,
+                location: "San Francisco, CA",
+                championships: 7,
+                cost: "$1.4 Billion",
+                icon: "🏀"
+            },
+            "Baseball - Giants": {
+                id: "oracle_park",
+                name: "Oracle Park",
+                team: "San Francisco Giants",
+                sport: "Baseball - Giants",
+                capacity: 41915,
+                opened: 2000,
+                location: "San Francisco, CA",
+                championships: 8,
+                cost: "$357 Million",
+                icon: "⚾"
+            },
+            "Ice Hockey - Sharks": {
+                id: "sap_center",
+                name: "SAP Center",
+                team: "San Jose Sharks",
+                sport: "Ice Hockey - Sharks",
+                capacity: 17562,
+                opened: 1993,
+                location: "San Jose, CA",
+                championships: 0,
+                cost: "$162 Million",
+                icon: "🏒"
+            },
+            "Baseball - A's": {
+                id: "oakland_coliseum",
+                name: "Oakland Coliseum",
+                team: "Oakland Athletics",
+                sport: "Baseball - A's",
+                capacity: 46847,
+                opened: 1966,
+                location: "Oakland, CA",
+                championships: 9,
+                cost: "$25.5 Million",
+                icon: "⚾"
+            }
+        };
+
+        let stadiumData = {};
+        let userSports = [];
+        let currentKey = null;
+        let selectedStadium = null;
+        let score = 0;
+
+        function loadUserItinerary() {
+            try {
+                const itinerary = JSON.parse(localStorage.getItem('westCoastItinerary'));
+                if (itinerary && itinerary.cities && itinerary.cities['San Francisco'] && 
+                    itinerary.cities['San Francisco'].sports) {
+                    userSports = itinerary.cities['San Francisco'].sports;
+                    
+                    // Map user sports to stadium data
+                    userSports.forEach(sport => {
+                        const teamData = COMPLETE_SF_TEAMS[sport.name];
+                        if (teamData) {
+                            stadiumData[teamData.id] = teamData;
+                        }
+                    });
+                    
+                    if (Object.keys(stadiumData).length === 2) {
+                        displayUserStadiums();
+                        populateStadiumSelect();
+                        generateQuiz();
+                    } else {
+                        displayDefaultStadiums();
+                    }
+                } else {
+                    displayDefaultStadiums();
+                }
+            } catch (error) {
+                console.error('Error loading itinerary:', error);
+                displayDefaultStadiums();
+            }
+        }
+
+        function displayUserStadiums() {
+            const container = document.getElementById('stadium-cards');
+            let html = '';
+
+            Object.values(stadiumData).forEach(stadium => {
+                html += `
+                    <div class="stadium-card">
+                        <h3>${stadium.icon} ${stadium.name}</h3>
+                        <div class="info"><strong>Team:</strong> ${stadium.team}</div>
+                        <div class="info"><strong>Capacity:</strong> ${stadium.capacity.toLocaleString()} fans</div>
+                        <div class="info"><strong>Opened:</strong> ${stadium.opened}</div>
+                        <div class="info"><strong>Championships:</strong> ${stadium.championships}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function populateStadiumSelect() {
+            const select = document.getElementById('stadiumSelect');
+            select.innerHTML = '<option value="">-- Choose a stadium --</option>';
+            
+            Object.values(stadiumData).forEach(stadium => {
+                select.innerHTML += `<option value="${stadium.id}">${stadium.icon} ${stadium.name} (${stadium.team})</option>`;
+            });
+        }
+
+        function generateQuiz() {
+            const teams = Object.values(stadiumData);
+            if (teams.length === 2) {
+                const q3Options = document.getElementById('q3-options');
+                const larger = teams[0].capacity > teams[1].capacity ? 0 : 1;
+                
+                q3Options.innerHTML = `
+                    <div class="quiz-option" onclick="selectOption(3, 0, ${larger === 0})">A) ${teams[0].name} (${teams[0].capacity.toLocaleString()} fans)</div>
+                    <div class="quiz-option" onclick="selectOption(3, 1, ${larger === 1})">B) ${teams[1].name} (${teams[1].capacity.toLocaleString()} fans)</div>
+                    <div class="quiz-option" onclick="selectOption(3, 2, false)">C) They have the same capacity</div>
+                `;
+            }
+        }
+
+        function displayDefaultStadiums() {
+            stadiumData = {
+                chase_center: COMPLETE_SF_TEAMS["Basketball - Warriors"],
+                levis_stadium: COMPLETE_SF_TEAMS["Football - 49ers"]
+            };
+            displayUserStadiums();
+            populateStadiumSelect();
+            generateQuiz();
+        }
+
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let key = 'sf_';
+            for (let i = 0; i < 20; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            currentKey = key;
+            document.getElementById('keyDisplay').textContent = key;
+            document.getElementById('keySuccess').innerHTML = `
+                <div class="success-message" style="margin-top: 15px;">
+                    ✅ <strong>Success!</strong> Your API key has been generated. You can now make requests!
+                </div>
+            `;
+            
+            updateURL();
+        }
+
+        function updateURL() {
+            const stadium = document.getElementById('stadiumSelect').value;
+            selectedStadium = stadium;
+            
+            if (!stadium) {
+                document.getElementById('constructedURL').textContent = 'Select a stadium above to see your API request URL...';
+                document.getElementById('sendBtn').disabled = true;
+                return;
+            }
+            
+            let url = `https://api.sfsports.com/v1/stadium/${stadium}?format=json`;
+            
+            if (currentKey) {
+                url += `&api_key=${currentKey}`;
+                document.getElementById('sendBtn').disabled = false;
+            } else {
+                document.getElementById('sendBtn').disabled = true;
+            }
+            
+            document.getElementById('constructedURL').textContent = url;
+        }
+
+        function sendRequest() {
+            const responseArea = document.getElementById('responseArea');
+            responseArea.classList.add('active');
+            
+            responseArea.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Sending request to server...</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const data = stadiumData[selectedStadium];
+                const response = {
+                    status: 200,
+                    message: "Success",
+                    timestamp: new Date().toISOString(),
+                    data: data
+                };
+                
+                responseArea.innerHTML = `
+                    <div class="success-message">
+                        ✅ <strong>Request Successful!</strong> The server found the data and sent it back.
+                    </div>
+                    <h3 style="color: #AA0000; margin: 20px 0 10px 0;">📥 Raw JSON Response:</h3>
+                    <div class="json-display">${JSON.stringify(response, null, 2)}</div>
+                    <h3 style="color: #AA0000; margin: 20px 0 10px 0;">📊 Parsed Data (Easy to Read):</h3>
+                    <div class="parsed-data">
+                        <div class="data-row">
+                            <span class="data-label">Stadium Name:</span>
+                            <span class="data-value">${data.name}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Team:</span>
+                            <span class="data-value">${data.team}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Sport:</span>
+                            <span class="data-value">${data.sport}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Capacity:</span>
+                            <span class="data-value">${data.capacity.toLocaleString()} fans</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Opened:</span>
+                            <span class="data-value">${data.opened}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Championships:</span>
+                            <span class="data-value">${data.championships}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Cost to Build:</span>
+                            <span class="data-value">${data.cost}</span>
+                        </div>
+                    </div>
+                    <div class="explanation" style="margin-top: 20px;">
+                        <h3>💡 What Just Happened?</h3>
+                        <p>The server received your request, looked up ${data.name} in its database, and sent back all the information as JSON. Your browser then converted (parsed) that JSON into a readable format!</p>
+                    </div>
+                `;
+                
+                responseArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 1500);
+        }
+
+        // Quiz Functions
+        function selectOption(questionNum, optionIndex, isCorrect) {
+            const options = document.querySelectorAll(`#q${questionNum} .quiz-option`);
+            options.forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
+            
+            const selected = options[optionIndex];
+            selected.classList.add('selected');
+            
+            setTimeout(() => {
+                const feedback = document.getElementById(`feedback${questionNum}`);
+                if (isCorrect) {
+                    selected.classList.add('correct');
+                    feedback.className = 'quiz-feedback correct show';
+                    feedback.textContent = '✅ Correct! Great job!';
+                    score++;
+                } else {
+                    selected.classList.add('incorrect');
+                    feedback.className = 'quiz-feedback incorrect show';
+                    feedback.textContent = '❌ Not quite. Review the material and try again!';
+                }
+                document.getElementById(`next${questionNum}`).classList.add('show');
+            }, 300);
+        }
+
+        function nextQuestion(num) {
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            document.getElementById(`q${num}`).classList.add('active');
+        }
+
+        function showResults() {
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            const complete = document.getElementById('quizComplete');
+            complete.classList.add('show');
+            
+            document.getElementById('finalScore').textContent = `${score}/3`;
+            
+            const message = document.getElementById('scoreMessage');
+            if (score === 3) {
+                message.textContent = 'Perfect! You understand APIs!';
+            } else if (score === 2) {
+                message.textContent = 'Great job! You\'re almost there!';
+            } else {
+                message.textContent = 'Keep learning! Review the material and try again!';
+            }
+        }
+
+        function restartQuiz() {
+            score = 0;
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            document.getElementById('q1').classList.add('active');
+            document.getElementById('quizComplete').classList.remove('show');
+            
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.querySelectorAll('.quiz-feedback').forEach(f => {
+                f.classList.remove('show');
+            });
+            
+            document.querySelectorAll('.next-btn').forEach(btn => {
+                btn.classList.remove('show');
+            });
+            
+            // Reset drag and drop
+            const draggables = document.getElementById('draggables');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            dropZones.forEach(zone => {
+                const item = zone.querySelector('.drag-item');
+                if (item) {
+                    draggables.appendChild(item);
+                }
+                zone.classList.remove('filled');
+            });
+        }
+
+        // Drag and Drop functionality
+        let draggedElement = null;
+
+        function setupDragDrop() {
+            const draggables = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            draggables.forEach(item => {
+                item.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.style.opacity = '0.5';
+                });
+
+                item.addEventListener('dragend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', function() {
+                    this.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    
+                    if (draggedElement && this.children.length === 0) {
+                        this.appendChild(draggedElement);
+                        this.classList.add('filled');
+                    }
+                });
+            });
+        }
+
+        function checkDragDrop() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correct = true;
+
+            dropZones.forEach(zone => {
+                const expectedStep = zone.dataset.position;
+                const droppedItem = zone.querySelector('.drag-item');
+                
+                if (!droppedItem || droppedItem.dataset.step !== expectedStep) {
+                    correct = false;
+                }
+            });
+
+            const feedback = document.getElementById('feedback2');
+            const nextBtn = document.getElementById('next2');
+
+            if (correct) {
+                feedback.className = 'quiz-feedback correct show';
+                feedback.textContent = '✅ Perfect! You correctly ordered the API call steps!';
+                score++;
+            } else {
+                feedback.className = 'quiz-feedback incorrect show';
+                feedback.textContent = '❌ Not quite right. Remember: Get API key → Build request URL → Receive data response';
+            }
+
+            nextBtn.classList.add('show');
+        }
+
+        // Load user's itinerary on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserItinerary();
+            setupDragDrop();
+        });

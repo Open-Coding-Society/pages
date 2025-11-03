@@ -17,7 +17,7 @@ lxdData:
       Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
       Video: "/cs-portfolio-quest/ai/submodule_1-video"
       Lessons: "/cs-portfolio-quest/ai/submodule_1/"
-      Image: "/images/cs-portfolio-quest/ai.svg"
+      Image: "/images/cs-portfolio-quest/ai/submodule1.png"
       Alt: "AI Submodule 1"
     - Title: "Coding with AI"
       Genre: "Assessment"
@@ -26,7 +26,7 @@ lxdData:
       Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
       Video: "/cs-portfolio-quest/ai/submodule_2-video"
       Lessons: "/cs-portfolio-quest/ai/submodule_2/"
-      Image: "/images/cs-portfolio-quest/ai.svg"
+      Image: "/images/cs-portfolio-quest/ai/submodule2.png"
       Alt: "AI Submodule 2"
     - Title: "Resume & Interview Prep"
       Genre: "Assessment"
@@ -35,7 +35,7 @@ lxdData:
       Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
       Video: "/cs-portfolio-quest/ai/submodule_3-video"
       Lessons: "/cs-portfolio-quest/ai/submodule_3/"
-      Image: "/images/cs-portfolio-quest/ai.svg"
+      Image: "/images/cs-portfolio-quest/ai/submodule3.png"
       Alt: "AI Submodule 3"
     - Title: "AI Usage Certification"
       Genre: "Assessment"
@@ -44,7 +44,7 @@ lxdData:
       Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
       Video: "/cs-portfolio-quest/ai/submodule_4-video"
       Lessons: "/cs-portfolio-quest/ai/submodule_4/"
-      Image: "/images/cs-portfolio-quest/ai.svg"
+      Image: "/images/cs-portfolio-quest/ai/submodule4.png"
       Alt: "AI Submodule 4"
 ---
 {%- include tailwind/cs-portfolio-mini_quest_info.html -%}

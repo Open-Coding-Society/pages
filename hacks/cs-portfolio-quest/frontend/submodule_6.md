@@ -12,11 +12,9 @@ author: "Creators Team"
 date: 2025-10-21
 ---
 
-<!-- Keep the improved vertical layout, restore the original dark color scheme -->
+
 <style>
   :root{
-    --bg1:#071029;
-    --bg2:#071b2b;
     --panel:#0b1220;
     --glass:rgba(255,255,255,0.04);
     --border:rgba(255,255,255,0.08);

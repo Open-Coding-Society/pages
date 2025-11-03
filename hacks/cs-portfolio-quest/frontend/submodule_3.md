@@ -14,6 +14,7 @@ author: "Creators Team"
 date: 2025-10-21
 ---
 
+
 <style>
 /* ============ CSS Playground Styling ============ */
 .css-playground {
@@ -31,6 +32,7 @@ date: 2025-10-21
     margin-top: 30px;
 }
 
+
 .editor-container, .preview-container {
     flex: 1 1 45%;
     background: #13284d;
@@ -40,7 +42,8 @@ date: 2025-10-21
     min-width: 320px;
 }
 
-.editor-container h3, 
+
+.editor-container h3,
 .preview-container h3 {
     text-align: center;
     color: #a6c9ff;
@@ -48,6 +51,7 @@ date: 2025-10-21
     font-weight: 600;
     letter-spacing: 0.5px;
 }
+
 
 #css-input {
     width: 100%;
@@ -65,6 +69,7 @@ date: 2025-10-21
     overflow-x: auto; /* allows horizontal scroll instead of wrapping */
 }
 
+
 button {
     margin-top: 10px;
     margin-right: 10px;
@@ -78,10 +83,12 @@ button {
     font-weight: 500;
 }
 
+
 button:hover {
     background-color: #2560b3;
     transform: translateY(-2px);
 }
+
 
 .preview-container {
     display: flex;
@@ -90,6 +97,7 @@ button:hover {
     justify-content: flex-start;
     overflow: auto;
 }
+
 
 #css-preview {
     width: 100%;
@@ -101,6 +109,7 @@ button:hover {
     color: #e8f0ff;
     border: 1px solid #355c9b;
 }
+
 
 /* ===== Button Improvements ===== */
 button {
@@ -115,16 +124,19 @@ button {
     font-family: "Segoe UI", sans-serif;
 }
 
+
 /* Apply CSS button (primary) */
 button.apply-btn {
     background-color: #1a73e8;
     color: #fff;
 }
 
+
 button.apply-btn:hover {
     background-color: #2c85f7;
     transform: translateY(-2px);
 }
+
 
 /* Reset CSS button (secondary/danger) */
 button.reset-btn {
@@ -132,10 +144,12 @@ button.reset-btn {
     color: #fff;
 }
 
+
 button.reset-btn:hover {
     background-color: #e46863;
     transform: translateY(-2px);
 }
+
 
 /* ===== Checkpoints ===== */
 .checkpoint {
@@ -173,6 +187,7 @@ button.reset-btn:hover {
 }
 </style>
 
+
 # CSS Styling Fundamentals
 
 
@@ -185,13 +200,6 @@ button.reset-btn:hover {
   <li> - Debug common CSS issues</li>
 </ul>
 
-
-## Prerequisites
-<ul>
-    <li> - Basic understanding of HTML structure</li>
-    <li> - Familiarity with text editors</li>
-    <li> - Basic web development concepts</li>
-</ul>
 
 ## CSS Basics
 CSS (Cascading Style Sheets) is a powerful language used to style webpages. It describes how HTML elements are displayed on the screen and can easily change properties of elements like colors, layouts, spacing, and more.
@@ -210,12 +218,10 @@ Examples:
 <!-- Inline CSS -->
 <p style="color: blue;">This is inline styling</p>
 
-
 <!-- Internal CSS (in head section) -->
 <style>
     p { color: blue; }
 </style>
-
 
 <!-- External CSS -->
 <link rel="stylesheet" href="styles.css">
@@ -233,7 +239,7 @@ selector {
 
 <div id="checkpoint1" class="checkpoint">
   <h3>Checkpoint 1: Change Paragraph Text Color</h3>
-  <p>Write CSS that makes all &lt;p&gt; text blue.</p>
+  <p>Write CSS that makes all &lt;p&gt; text red.</p>
   <textarea id="checkpoint1-input" placeholder="Your Code Here"></textarea><br>
   <button class="apply-btn" onclick="validateCheckpoint1()">Check Answer</button>
   <p id="checkpoint1-feedback" class="feedback"></p>
@@ -241,8 +247,8 @@ selector {
 
 
 ## CSS Selectors
-
 CSS selectors are patterns used to select and style HTML elements. Here are the main types:
+
 
 ### Basic Selectors
 
@@ -269,6 +275,7 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
     ```css
     #header { font-size: 24px; }
     ```
+
 
 ### Advanced Selectors
 
@@ -303,6 +310,7 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
   <p id="checkpoint2-feedback" class="feedback"></p>
 </div>
 
+
 ## CSS Box Model
 <p>The CSS box model is fundamental to understanding layout in CSS. Every element in CSS has:</p>
 <ul>
@@ -319,13 +327,16 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
     <div style="background-color: rgba(173, 216, 230, 0.15); padding: 20px; border-radius: 10px;">
       <div style="color:#a6c9ff; font-size:14px; margin-bottom:5px;">Margin</div>
 
+
       <!-- Border -->
       <div style="background-color: rgba(100, 149, 237, 0.25); padding: 15px; border-radius: 8px;">
         <div style="color:#a6c9ff; font-size:14px; margin-bottom:5px;">Border</div>
 
+
         <!-- Padding -->
         <div style="background-color: rgba(135, 206, 250, 0.35); padding: 12px; border-radius: 6px;">
           <div style="color:#a6c9ff; font-size:14px; margin-bottom:5px;">Padding</div>
+
 
           <!-- Content -->
           <div style="background-color: #1a3b6d; color:#ffffff; padding: 20px; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.4);">
@@ -359,17 +370,21 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
       <tr><td></td><td>`text-align`</td><td>`text-align: center;`</td><td>Aligns text</td></tr>
       <tr><td></td><td>`font-weight`</td><td>`font-weight: bold;`</td><td>Makes text bold</td></tr>
 
+
       <tr><td style="padding:8px;">Box & Layout</td><td>`margin`</td><td>`margin: 20px;`</td><td>Space outside an element</td></tr>
       <tr><td></td><td>`padding`</td><td>`padding: 10px;`</td><td>Space inside an element</td></tr>
       <tr><td></td><td>`border`</td><td>`border: 1px solid black;`</td><td>Adds border</td></tr>
       <tr><td></td><td>`box-shadow`</td><td>`box-shadow: 0 4px 8px gray;`</td><td>Adds shadow</td></tr>
 
+
       <tr><td style="padding:8px;">Backgrounds & Borders</td><td>`background-color`</td><td>`background-color: lightblue;`</td><td>Sets background color</td></tr>
       <tr><td></td><td>`border-radius`</td><td>`border-radius: 10px;`</td><td>Rounds corners</td></tr>
+
 
       <tr><td style="padding:8px;">Position & Display</td><td>`display`</td><td>`display: flex;`</td><td>Defines display type</td></tr>
       <tr><td></td><td>`position`</td><td>`position: absolute;`</td><td>Positions element</td></tr>
       <tr><td></td><td>`top`, `left`</td><td>`top: 10px;`</td><td>Offsets element position</td></tr>
+
 
       <tr><td style="padding:8px;">Animations & Effects</td><td>`transition`</td><td>`transition: all 0.3s ease;`</td><td>Animates property changes</td></tr>
       <tr><td></td><td>`transform`</td><td>`transform: rotate(10deg);`</td><td>Rotates or scales element</td></tr>
@@ -380,13 +395,14 @@ CSS selectors are patterns used to select and style HTML elements. Here are the 
 
 <div id="checkpoint3" class="checkpoint">
   <h3>Checkpoint 3: Create a Shadowed Box</h3>
-  <p>Write CSS for a class called <code>.card</code> that gives a gray shadow and 20px padding.</p>
+  <p>Write CSS for a class called <code>.card</code> that creates a green shadow and 50px padding.</p>
   <textarea id="checkpoint3-input" placeholder="Your Code Here (Tip: Use the Cheat Sheet)"></textarea><br>
   <button class="apply-btn" onclick="validateCheckpoint3()">Check Answer</button>
   <p id="checkpoint3-feedback" class="feedback"></p>
 </div>
 
-## Grouping and Nesting
+
+## Grouping
 If we want to add the same styling to multiple elements, we can use grouping. Similar to the example with p above, simply add multiple elements before the {} to do this. Example:
 
 ```css
@@ -395,13 +411,6 @@ h1, h2 {
 }
 ```
 
-We can also target elements in a heirarchy like this:
-
-```css
-ul li {
-    list-style-type: square;
-}
-```
 
 ## Comments
 A very basic part of CSS, but it is always good practice to comment on code that may be unclear. To create a single line comment, use /**/ in the same line, and you can also spread that out through multiple lines to create a multi-line comment. Examples:
@@ -434,7 +443,6 @@ You can find a lot more in-depth information here: <a href="https://www.geeksfor
 </ol>
 
 
-
 ## Layout with Flexbox
 Flexbox is a powerful layout model that makes it easy to create flexible, responsive layouts. Example:
 
@@ -446,17 +454,19 @@ Flexbox is a powerful layout model that makes it easy to create flexible, respon
 }
 ```
 
-## Common Pitfalls to Avoid
-<ul>
-  <li> - Overusing <code>!important</code></li>
-  <li> - Deep nesting of selectors</li>
-  <li> - Mixing units unnecessarily</li>
-  <li> - Not considering browser compatibility</li>
-</ul>
+
+## Practice Challenges
+<ol>
+  <li>1. Create a centered card with padding and shadow</li>
+  <li>2. Build a simple navigation bar using flexbox</li>
+  <li>3. Create a responsive grid layout</li>
+  <li>4. Style a form with custom inputs</li>
+</ol>
 
 
 ## Interactive CSS Playground
 Try out your CSS below:
+
 
 <div class="css-playground">
     <div class="editor-container">
@@ -478,14 +488,6 @@ Example:
         </div>
     </div>
 </div>
-
-## Practice Challenges
-<ol>
-  <li>1. Create a centered card with padding and shadow</li>
-  <li>2. Build a simple navigation bar using flexbox</li>
-  <li>3. Create a responsive grid layout</li>
-  <li>4. Style a form with custom inputs</li>
-</ol>
 
 <script>
 function applyCSS() {
@@ -552,12 +554,12 @@ function resetProgress() {
 function validateCheckpoint1() {
     const input = document.getElementById('checkpoint1-input').value.trim().toLowerCase();
     const feedback = document.getElementById('checkpoint1-feedback');
-    if (input.includes('p') && input.includes('color:') && input.includes('blue')) {
-        feedback.textContent = '✅ Correct! Paragraph text set to blue.';
+    if (input.includes('p') && input.includes('color:') && input.includes('red')) {
+        feedback.textContent = '✅ Correct! Paragraph text set to red.';
         feedback.className = 'feedback correct';
         updateTracker(1, 'completed');
     } else {
-        feedback.textContent = '❌ Try again — remember to target <p> and use color: blue;';
+        feedback.textContent = '❌ Try again — remember to target <p> and use color: red;';
         feedback.className = 'feedback incorrect';
         updateTracker(1, 'failed');
     }
@@ -585,7 +587,7 @@ function validateCheckpoint2() {
 function validateCheckpoint3() {
     const input = document.getElementById('checkpoint3-input').value.trim().toLowerCase();
     const feedback = document.getElementById('checkpoint3-feedback');
-    if (input.includes('.card') && input.includes('box-shadow') && input.includes('gray') && input.includes('padding: 20px')) {
+    if (input.includes('.card') && input.includes('box-shadow') && input.includes('green') && input.includes('padding: 50px')) {
         feedback.textContent = '✅ Great! You added a box shadow and padding.';
         feedback.className = 'feedback correct';
         updateTracker(3, 'completed');
@@ -598,3 +600,6 @@ function validateCheckpoint3() {
 
 restoreProgress();
 </script>
+
+
+

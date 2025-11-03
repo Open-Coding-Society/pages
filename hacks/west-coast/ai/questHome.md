@@ -50,7 +50,7 @@ lxdData:
       Alt: "AI Key 4"
       RequiresLevel: 3
 ---
-{%- include tailwind/quests/west-coast.html -%}
+{%- include tailwind/quests/west-coast-AI.html -%}
 
 
 <!-- Lock/Unlock Logic -->

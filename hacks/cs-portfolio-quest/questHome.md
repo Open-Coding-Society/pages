@@ -26,7 +26,7 @@ lxdData:
       Categories: ["Backend", "Flask", "Spring", "Databases"]
       Lessons: "/cs-portfolio-quest/backend/"
       LessonCount: 6
-      Image: "/images/cs-portfolio-quest/backend.svg"
+      Image: "/images/cs-portfolio-quest/backend/backendmain.png"
       Alt: "CS Portfolio Quest Backend"
     - Title: "C3: Data Visualization"
       Genre: "Practice"
@@ -35,7 +35,7 @@ lxdData:
       Categories: ["Visualization", "ML", "Collation"]
       Lessons: "/cs-portfolio-quest/data-viz/"
       LessonCount: 2
-      Image: "/images/cs-portfolio-quest/data-viz.svg"
+      Image: "/images/cs-portfolio-quest/datavisualization/data_visualization_main.png"
       Alt: "CS Portfolio Quest Data Visualization"
     - Title: "C4: Resume Building"
       Genre: "Application"
@@ -44,7 +44,7 @@ lxdData:
       Categories: ["CV", "Resume", "Blogging"]
       Lessons: "/cs-portfolio-quest/resume/"
       LessonCount: 6
-      Image: "/images/cs-portfolio-quest/resume.svg"
+      Image: "/images/cs-portfolio-quest/resume/resumemain.png"
       Alt: "CS Portfolio Quest Resume"
     - Title: "C5: AI Usage"
       Genre: "Assessment"
@@ -53,7 +53,7 @@ lxdData:
       Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
       Lessons: "/cs-portfolio-quest/ai/"
       LessonCount: 4
-      Image: "/images/cs-portfolio-quest/ai.svg"
+      Image: "/images/cs-portfolio-quest/ai/aimain.png"
       Alt: "CS Portfolio Quest AI"
     - Title: "C6: Analytics and Mastery Certificate"
       Genre: "Integration"
@@ -61,7 +61,7 @@ lxdData:
       Description: "Analytics and Mastery Certificate"
       Categories: ["Certificate", "Integration", "Achievement"]
       Lessons: "/cs-portfolio-quest/analytics/"
-      Image: "/images/cs-portfolio-quest/analytics.svg"
+      Image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
       Alt: "CS Portfolio Quest Mastery Certificate"
 ---
 {%- include tailwind/cs-portfolio-quest_info.html -%}

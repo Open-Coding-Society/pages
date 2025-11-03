@@ -99,35 +99,100 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
 .code-section {
   text-align: center;
 }
+
+/* Itinerary Foods Display */
+.itinerary-foods {
+  background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+  border: 3px solid #ff1493;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 1.5rem auto;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(255, 20, 147, 0.3);
+}
+
+.itinerary-foods h3 {
+  color: white;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.food-item {
+  background: rgba(255, 255, 255, 0.95);
+  border-left: 4px solid #ff1493;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  transition: transform 0.2s ease;
+}
+
+.food-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(255, 20, 147, 0.2);
+}
+
+.food-item h4 {
+  color: #ff1493;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.food-item p {
+  color: #555;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.no-itinerary-msg {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+/* Filter the table to show only itinerary foods */
+.table-container tr.hidden-row {
+  display: none;
+}
 </style>
 
+<!-- Itinerary Foods Display -->
+<div class="itinerary-foods">
+  <h3>🍽️ Your Los Angeles Food Selections</h3>
+  <div id="itinerary-foods-display"></div>
+</div>
+
 <div class="table-container">
-<table>
+<table id="food-table">
   <tr>
     <th>Food</th>
     <th>Description</th>
   </tr>
-  <tr>
+  <tr data-food="Korean BBQ">
     <td>🍖 Korean BBQ</td>
     <td>Sizzling short ribs, spicy pork belly, and endless banchan cooked right at your table.</td>
   </tr>
-  <tr>
+  <tr data-food="Street Tacos (al pastor)">
     <td>🌮 Street Tacos (al pastor)</td>
     <td>Authentic flavors from taco trucks with marinated pork, cilantro, onion, and pineapple.</td>
   </tr>
-  <tr>
+  <tr data-food="In-N-Out Burger">
     <td>🍔 In-N-Out Burger</td>
-    <td>California’s iconic fast-food favorite known for fresh ingredients and “Animal Style” fries.</td>
+    <td>California's iconic fast-food favorite known for fresh ingredients and "Animal Style" fries.</td>
   </tr>
-  <tr>
+  <tr data-food="Avocado Toast">
     <td>🥑 Avocado Toast</td>
     <td>The brunch classic topped with poached eggs, microgreens, and local sourdough.</td>
   </tr>
-  <tr>
+  <tr data-food="Ramen & Fusion Dishes">
     <td>🍜 Ramen & Fusion Dishes</td>
     <td>Creative blends of global flavors found in Little Tokyo and beyond.</td>
   </tr>
-  <tr>
+  <tr data-food="Erewhon">
     <td>🥤 Erewhon</td>
     <td>The trendy health market known for luxury smoothies and influencer culture.</td>
   </tr>
@@ -369,6 +434,12 @@ a:hover {
   color: #29b6f6;
   text-decoration: underline;
 }
+
+/* Task completion styling */
+.task-complete { 
+  color: #10b981 !important; 
+  font-weight: 700; 
+}
 </style>
 
 
@@ -471,12 +542,13 @@ a:hover {
 <!-- ============================= -->
 <script>
 // -----------------------------
-// Quiz XP (5 questions, 40 XP)
+// Quiz XP (5 questions, 8 XP each = 40 XP max)
 // -----------------------------
 let score = 0;
 let totalQuestions = 5;
 let answered = 0;
 let laXP = parseInt(localStorage.getItem("laXP")) || 0;
+let quizCompleted = false;
 
 function updateProgressBar() {
   const progressFill = document.getElementById("progress-fill");
@@ -491,26 +563,102 @@ function checkAnswer(button, correct) {
   if (parent.classList.contains('answered')) return;
   parent.classList.add('answered');
 
-  if (correct) button.classList.add('correct');
-  else button.classList.add('incorrect');
+  if (correct) {
+    button.classList.add('correct');
+    score++;
+  } else {
+    button.classList.add('incorrect');
+  }
 
   const options = parent.querySelectorAll('.quiz-option');
-  options.forEach(opt=>opt.disabled=true);
+  options.forEach(opt => opt.disabled = true);
 
   answered++;
-  if (answered===totalQuestions) {
-    let earned = scoreXP();
-    laXP += earned;
-    localStorage.setItem("laXP", laXP);
-    updateProgressBar();
-    document.getElementById("quiz-result").textContent = `Quiz complete! You earned ${earned} XP`;
-  } else if (correct) {
-    score++;
+  
+  if (answered === totalQuestions) {
+    finishQuiz();
   }
 }
 
-function scoreXP() {
-  return score===totalQuestions? 40: Math.floor((score/totalQuestions)*40);
+function finishQuiz() {
+  const earnedXP = score * 8; // 8 XP per correct answer
+  const resultElement = document.getElementById("quiz-result");
+  
+  if (score === totalQuestions) {
+    // Perfect score - full 40 XP
+    if (!quizCompleted) {
+      laXP += 40;
+      localStorage.setItem("laXP", laXP);
+      updateProgressBar();
+      quizCompleted = true;
+      
+      // Mark Korean BBQ task as complete when quiz is perfected
+      if (typeof completeLATask === 'function') {
+        completeLATask('koreanbbq');
+      }
+      
+      // Check if we've reached 90 XP and unlock next city
+      checkXPCompletion();
+    }
+    resultElement.innerHTML = `
+      <div style="color: #4caf50; font-size: 1.3rem;">
+        🎉 Perfect Score! You earned 40 XP!
+      </div>
+    `;
+  } else {
+    // Partial score - show what they earned and retry option
+    resultElement.innerHTML = `
+      <div style="color: #ff9800; font-size: 1.1rem;">
+        📊 Score: ${score}/${totalQuestions} (${earnedXP} XP earned)<br>
+        <span style="font-size: 0.9rem;">Get all 5 correct for the full 40 XP!</span><br>
+        <button onclick="retakeQuiz()" style="
+          background: linear-gradient(135deg, #4caf50, #45a049);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          margin-top: 10px;
+          transition: transform 0.2s ease;
+        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          🔄 Retake Quiz
+        </button>
+      </div>
+    `;
+  }
+}
+
+function retakeQuiz() {
+  // Reset quiz state
+  score = 0;
+  answered = 0;
+  
+  // Reset all question containers
+  const questions = document.querySelectorAll('.quiz-question');
+  questions.forEach(question => {
+    question.classList.remove('answered');
+    const options = question.querySelectorAll('.quiz-option');
+    options.forEach(option => {
+      option.disabled = false;
+      option.classList.remove('correct', 'incorrect');
+    });
+  });
+  
+  // Clear result
+  document.getElementById("quiz-result").innerHTML = '';
+  
+  // Show encouragement message
+  const resultElement = document.getElementById("quiz-result");
+  resultElement.innerHTML = `
+    <div style="color: #2196f3; font-size: 1rem;">
+      🔄 Quiz reset! Try again for the full 40 XP!
+    </div>
+  `;
+  
+  setTimeout(() => {
+    resultElement.innerHTML = '';
+  }, 2000);
 }
 
 // -----------------------------
@@ -529,12 +677,244 @@ function checkBlanks() {
       window.fillXPAdded = true;
       localStorage.setItem("laXP", laXP);
       updateProgressBar();
+      
+      // Mark fill-in-the-blanks task as complete
+      completeLATask('streettacos');
+      
+      // Check if we've reached 90 XP and unlock next city
+      checkXPCompletion();
     }
   } else {
     result.textContent = "❌ Try again! Hint: Use SELECT, FROM, WHERE with LIKE and calories filter.";
   }
 }
 
+// Add this to the <script> section at the bottom of submodule_2.md
+
+// Task completion tracking for LA
+window.laTaskProgress = {
+  koreanbbq: false,
+  streettacos: false,
+  innout: false,
+  avocado: false,
+  ramen: false,
+  erewhon: false
+};
+
+// Load progress from localStorage
+function loadLATaskProgress() {
+  const saved = localStorage.getItem('la_task_progress');
+  if (saved) {
+    try {
+      window.laTaskProgress = { ...window.laTaskProgress, ...JSON.parse(saved) };
+    } catch (e) {
+      console.error('Error loading LA task progress:', e);
+    }
+  }
+  updateLAProgressDisplay();
+}
+
+// Save progress to localStorage
+function saveLATaskProgress() {
+  try {
+    localStorage.setItem('la_task_progress', JSON.stringify(window.laTaskProgress));
+  } catch (e) {
+    console.error('Error saving LA task progress:', e);
+  }
+}
+
+// Mark LA task as complete
+window.completeLATask = function(taskName) {
+  if (!window.laTaskProgress[taskName]) {
+    window.laTaskProgress[taskName] = true;
+    saveLATaskProgress();
+    updateLAProgressDisplay();
+    checkLAModuleCompletion();
+  }
+};
+
+// Update progress display
+function updateLAProgressDisplay() {
+  const tasks = ['koreanbbq', 'streettacos', 'innout', 'avocado', 'ramen', 'erewhon'];
+  let completedCount = 0;
+
+  tasks.forEach(task => {
+    const element = document.getElementById(`task-${task}`);
+    if (element) {
+      const statusSpan = element.querySelector('.status');
+      if (window.laTaskProgress[task]) {
+        statusSpan.textContent = 'Complete ✅';
+        statusSpan.className = 'status task-complete';
+        completedCount++;
+      } else {
+        statusSpan.textContent = 'Incomplete';
+        statusSpan.className = 'status';
+      }
+    }
+  });
+
+  // Update progress bar if it exists
+  const percentage = Math.round((completedCount / tasks.length) * 100);
+  const percentageElement = document.getElementById('la-completion-percentage');
+  const progressBar = document.getElementById('la-progress-bar');
+  
+  if (percentageElement) percentageElement.textContent = `${percentage}%`;
+  if (progressBar) progressBar.style.width = `${percentage}%`;
+}
+
+// Check if LA module is complete and unlock next city
+function checkLAModuleCompletion() {
+  const allTasks = Object.values(window.laTaskProgress);
+  const isComplete = allTasks.every(task => task === true);
+  
+  if (isComplete) {
+    const notification = document.getElementById('laUnlockNotification');
+    if (notification) {
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 4000);
+    }
+    unlockSanFrancisco();
+    console.log('🎉 Los Angeles module completed! San Francisco should now be unlocked.');
+  }
+}
+
+// Add this new function to check XP completion:
+function checkXPCompletion() {
+  if (laXP >= 90) {
+    // Show unlock notification
+    const notification = document.getElementById('laUnlockNotification');
+    if (notification) {
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 4000);
+    }
+    
+    // Unlock San Francisco (city index 2)
+    unlockSanFrancisco();
+    console.log('🎉 Los Angeles XP completed (90/90)! San Francisco should now be unlocked.');
+  }
+}
+
+// Unlock San Francisco (city index 2)
+function unlockSanFrancisco() {
+  try {
+    const saved = localStorage.getItem('city_progress'); 
+    let gameProgress = saved ? JSON.parse(saved) : { unlockedCities:[0,1], completedCities:[], totalCitiesCompleted:0 };
+    if (!gameProgress.completedCities.includes(1)) {
+      gameProgress.completedCities.push(1);
+      gameProgress.totalCitiesCompleted++;
+    }
+    if (!gameProgress.unlockedCities.includes(2)) {
+      gameProgress.unlockedCities.push(2);
+    }
+    localStorage.setItem('city_progress', JSON.stringify(gameProgress));
+    console.log('✅ LA Progress updated:', gameProgress);
+  } catch (e) {
+    console.error('LA Unlock failed:', e);
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadLATaskProgress();
+});
+
 // Initialize
 updateProgressBar();
+</script>
+
+<!-- Unlock Notification -->
+<div id="laUnlockNotification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, rgba(255,105,180,0.98), rgba(255,69,180,0.98)); color: white; padding: 20px 36px; border-radius: 14px; font-weight: 700; font-size: 16px; z-index: 10000; box-shadow: 0 30px 80px rgba(255,20,147,0.6); display: none; text-align: center;">
+  🎉 San Francisco Unlocked!<br>
+  <small style="font-size: 13px; opacity: 0.95;">You can now continue to the next city!</small>
+</div>
+
+<!-- Progress Tracker -->
+<div class="progress-container" style="background: linear-gradient(135deg, rgba(255,179,71,0.08), rgba(255,105,180,0.06)); border: 1px solid rgba(255,179,71,0.14); padding: 1rem; border-radius: 0.75rem; margin: 1rem 0; color: #333; box-shadow: 0 8px 30px rgba(255,20,147,0.15);">
+  <h3 style="color: #ff6f61; margin: 0 0 0.6rem 0;">🎯 Los Angeles Progress Tracker</h3>
+  <div id="la-progress-display">
+    <div id="task-koreanbbq" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 1: Korean BBQ Quiz - <span class="status">Incomplete</span></div>
+    <div id="task-streettacos" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 2: Street Tacos Filter - <span class="status">Incomplete</span></div>
+    <div id="task-innout" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 3: In-N-Out Pagination - <span class="status">Incomplete</span></div>
+    <div id="task-avocado" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 4: Avocado Search - <span class="status">Incomplete</span></div>
+    <div id="task-ramen" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 5: Ramen Indexing - <span class="status">Incomplete</span></div>
+    <div id="task-erewhon" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 6: Erewhon Calories - <span class="status">Incomplete</span></div>
+  </div>
+  <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 0.5rem;">
+    <strong>Completion: <span id="la-completion-percentage">0%</span></strong>
+    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 6px; margin-top: 0.5rem;">
+      <div id="la-progress-bar" style="background: linear-gradient(90deg, #ff6f61, #ff1493); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Complete Button for Testing - Bottom Right Corner -->
+<button id="quickCompleteBtn" onclick="autoCompleteAllTasks()" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(139,92,246,0.9);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transition: all 0.2s ease;
+" onmouseover="this.style.background='rgba(139,92,246,1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(139,92,246,0.9)'; this.style.transform='translateY(0)'">
+  Complete All Tasks
+</button>
+
+<script>
+function autoCompleteAllTasks() {
+  // Hide the button after clicking
+  document.getElementById('quickCompleteBtn').style.display = 'none';
+  
+  // Auto-complete the quiz with perfect answers
+  const questions = document.querySelectorAll('.quiz-question');
+  questions.forEach((question, index) => {
+    // Get the correct answer buttons based on the quiz structure
+    if (index === 0) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // SELECT
+    if (index === 1) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // WHERE
+    if (index === 2) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // LIMIT 10 OFFSET 0
+    if (index === 3) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // LIKE
+    if (index === 4) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // CREATE INDEX
+  });
+  
+  // Auto-fill the fill-in-the-blanks
+  setTimeout(() => {
+    document.getElementById('blank1').value = 'SELECT NAME, PRICE';
+    document.getElementById('blank2').value = 'FROM DISHES';
+    document.getElementById('blank3').value = "WHERE NAME LIKE '%HALIBUT%' AND CALORIES>300";
+    checkBlanks();
+  }, 1000);
+  
+  // Mark all tasks as complete
+  setTimeout(() => {
+    completeLATask('koreanbbq');
+    completeLATask('streettacos');
+    completeLATask('innout');
+    completeLATask('avocado');
+    completeLATask('ramen');
+    completeLATask('erewhon');
+    
+    showToast('🎉 All tasks completed! San Francisco unlocked!', 4000);
+  }, 2000);
+}
+
+// Add showToast function if it doesn't exist
+if (typeof showToast === 'undefined') {
+  window.showToast = function(message, duration = 3000) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669);
+      color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; z-index: 10000;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
+  };
+}
 </script>

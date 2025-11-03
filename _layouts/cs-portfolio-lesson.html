@@ -235,7 +235,10 @@ layout: opencs
 </article>
 
 <!-- ===== Mini-quest locking/progress (AUTO-COMPLETE ON SCROLL) ===== -->
-<script>
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
 document.addEventListener("DOMContentLoaded", function () {
   const wrap = document.getElementById("lesson-container");
   if (!wrap) return;
@@ -285,6 +288,62 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.setAttribute("aria-disabled", "false");
   }
 
+  async function getCredentials() {
+        try {
+            const res = await fetch(`${pythonURI}/api/id`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const username = data.uid;
+                console.log(username);
+                return username;
+            } else {
+                console.log(`Request failed for with status ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+  }
+
+  async function markLessonComplete(timeOnLesson) {
+        const username = await getCredentials();
+        const module = "{{ page.parent | escape }}";
+        const submodule = "{{ page.submodule | escape }}";
+        try {
+            const res = await fetch(`${javaURI}/api/stats`, {
+                ...fetchOptions,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "username": username,
+                    "module": module,
+                    "submodule": submodule,
+                    "finished": true,
+                    "time": timeOnLesson/60
+                }),
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.error(`Server responded with status ${res.status}: ${text}`);
+            }
+        } catch (err) {
+        console.error(`Error sending lesson complete status to backend`, err);
+        }
+  }
+
+  // log time spent on lessons
+  let startTime = Date.now();
+  let timeSpentSec = 0;
+
   const activateOnScroll = () => {
     // If already completed, don't trigger again
     if (hasCompleted) return;
@@ -301,6 +360,11 @@ document.addEventListener("DOMContentLoaded", function () {
       
       // Enable next button if it exists
       enableNextButton();
+
+      // Lesson complete
+      let timeSpentSec = Math.round((Date.now() - startTime) / 1000);
+      console.log(`User spent ${timeSpentSec} seconds to finish the lesson.`);
+      markLessonComplete(timeSpentSec); // for lesson complete API - curators
       
       // Remove listener - no longer needed
       window.removeEventListener("scroll", activateOnScroll);

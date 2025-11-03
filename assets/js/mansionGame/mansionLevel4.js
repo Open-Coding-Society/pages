@@ -16,6 +16,10 @@ class MansionLevel4 {
 
         // Initialize blackjack manager
         this.blackjackManager = new BlackjackGameManager(gameEnv);
+        
+        // Track if player is in trigger zone
+        this.inTriggerZone = false;
+        this.promptVisible = false;
 
         // Background data
         const image_background = path + "/images/mansionGame/image_lvl4.png";
@@ -52,6 +56,7 @@ class MansionLevel4 {
 
         // Store reference to blackjack manager for use in trigger zone
         const blackjackManager = this.blackjackManager;
+        const levelContext = this;
 
         // Define trigger zone in the illuminated center area
         const triggerZoneData = {
@@ -60,10 +65,15 @@ class MansionLevel4 {
             width: width * 0.30,
             height: height * 0.40,
             color: 'rgba(255, 215, 0, 0.2)',
-            visible: false, // Make invisible so it doesn't show the ugly yellow box
+            visible: false,
             message: '🎰 Welcome to the Casino! Step into the light to start gambling!',
             onEnter: () => {
-                blackjackManager.startGame();
+                levelContext.inTriggerZone = true;
+                levelContext.showPrompt();
+            },
+            onExit: () => {
+                levelContext.inTriggerZone = false;
+                levelContext.hidePrompt();
             }
         };
 
@@ -89,17 +99,90 @@ class MansionLevel4 {
         // Adding Music
         this.backgroundMusic = new Audio(path + '/audio/mansionGame/SpookieDookie.mp3');
         this.backgroundMusic.loop = true;
-        this.backgroundMusic.volume = 0.3; // Set volume to a reasonable level
+        this.backgroundMusic.volume = 0.3;
         this.backgroundMusic.play();
+        
+        // Setup E key listener
+        this.setupKeyListener();
     }
 
-    // Update method called every frame by the game engine
+    setupKeyListener() {
+        this.keyHandler = (e) => {
+            // Check if E key is pressed (key code 69)
+            if (e.keyCode === 69 && this.inTriggerZone && !this.blackjackManager.gameActive) {
+                this.blackjackManager.startGame();
+                this.hidePrompt();
+            }
+        };
+        
+        document.addEventListener('keydown', this.keyHandler);
+    }
+
+    showPrompt() {
+        if (this.promptVisible || this.blackjackManager.gameActive) return;
+        
+        this.promptVisible = true;
+        
+        // Create prompt overlay
+        this.promptElement = document.createElement('div');
+        this.promptElement.id = 'casino-prompt';
+        this.promptElement.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #f39c12;
+            border-radius: 15px;
+            padding: 30px 50px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(243, 156, 18, 0.8);
+            animation: pulse 2s infinite;
+        `;
+        
+        this.promptElement.innerHTML = `
+            <style>
+                @keyframes pulse {
+                    0%, 100% { box-shadow: 0 0 30px rgba(243, 156, 18, 0.8); }
+                    50% { box-shadow: 0 0 50px rgba(243, 156, 18, 1); }
+                }
+            </style>
+            <div style="font-size: 48px; margin-bottom: 15px;">🎰</div>
+            <h2 style="color: #f39c12; font-size: 32px; margin: 0 0 15px 0; font-weight: bold;">BLACKJACK TABLE</h2>
+            <p style="color: white; font-size: 20px; margin: 10px 0;">Win $25,000 to escape!</p>
+            <div style="margin-top: 25px; padding: 15px; background: #f39c12; border-radius: 10px;">
+                <p style="color: white; font-size: 24px; margin: 0; font-weight: bold;">Press [E] to Enter</p>
+            </div>
+        `;
+        
+        document.body.appendChild(this.promptElement);
+    }
+
+    hidePrompt() {
+        if (!this.promptVisible) return;
+        
+        this.promptVisible = false;
+        
+        if (this.promptElement && this.promptElement.parentNode) {
+            document.body.removeChild(this.promptElement);
+            this.promptElement = null;
+        }
+    }
+
     update() {
         // Collision detection removed - it was causing player to be stuck
         // The player now moves freely, only blocked by canvas boundaries
     }
-
-    // Removed collision checking method - was causing issues with player movement
+    
+    // Clean up when level is destroyed
+    destroy() {
+        document.removeEventListener('keydown', this.keyHandler);
+        this.hidePrompt();
+        if (this.backgroundMusic) {
+            this.backgroundMusic.pause();
+        }
+    }
 }
 
 export default MansionLevel4;
