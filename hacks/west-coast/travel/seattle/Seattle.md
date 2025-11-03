@@ -217,6 +217,7 @@ body.loading {
   box-shadow: 0 20px 60px rgba(0,0,0,.5);
   margin-bottom: 40px;
   color: #000;
+  display: none;
 }
 
 /* Space Needle Styles */
@@ -1202,6 +1203,7 @@ body.loading {
   padding: 60px 80px;
   background: linear-gradient(135deg, #002244, #003366);
   color: #fff;
+  display: none;
 }
 
 .quiz-section h1 {
@@ -1405,6 +1407,47 @@ body.loading {
   margin-top: 10px;
 }
 
+/* Personalization Banner Styles */
+.personalization-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 1200px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+}
+
+.personalization-banner h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.personalization-banner p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #e4e4e7;
+}
+
+.personalization-banner .destinations-list {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.destination-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
 @media (max-width: 768px) {
   .content {
     padding: 40px 30px;
@@ -1434,6 +1477,13 @@ body.loading {
 </style>
 </head>
 <body class="loading">
+
+<!-- Personalization Banner -->
+<div id="personalizationBanner" class="personalization-banner">
+  <h3>🎯 Your Personalized Seattle Experience</h3>
+  <p>Based on your itinerary preferences, here are your selected destinations:</p>
+  <div class="destinations-list" id="destinationsList"></div>
+</div>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-text">Loading Seattle Landmarks...</div>
@@ -1468,7 +1518,7 @@ body.loading {
 <div class="main-container">
 
 <!-- Space Needle Section -->
-<div class="landmark-section">
+<div class="landmark-section" data-destination="Space Needle">
   <div class="needle-scene">
     <div class="label">🗼 Space Needle</div>
     <div class="seattle-sky">
@@ -1682,7 +1732,7 @@ body.loading {
 </div>
 
 <!-- Pike Place Market Section -->
-<div class="landmark-section">
+<div class="landmark-section" data-destination="Pike Place Market">
   <div class="pike-scene">
     <div class="label">🐟 Pike Place Market</div>
     <div class="clock">
@@ -1850,7 +1900,7 @@ body.loading {
 </div>
 
 <!-- Mount Rainier Section -->
-<div class="landmark-section">
+<div class="landmark-section" data-destination="Mount Rainier National Park">
   <div class="rainier-scene">
     <div class="label">⛰️ Mount Rainier</div>
     
@@ -1997,7 +2047,7 @@ body.loading {
     </ul>
   </div>
   
-  <div class="quiz-section">
+    <div class="quiz-section">
     <h1>🎯 Progress Bar Quiz</h1>
     <p class="subtitle">Test your knowledge of progress bar design principles!</p>
     
@@ -2048,7 +2098,7 @@ body.loading {
 </div>
 
 <!-- Lumen Field Section -->
-<div class="landmark-section">
+<div class="landmark-section" data-destination="Lumen Field">
   <div class="lumen-scene">
     <div class="label">🏈 Lumen Field</div>
     
@@ -2236,6 +2286,79 @@ body.loading {
 </div>
 
 <script>
+// Load itinerary from localStorage and show only selected destinations
+(function() {
+  try {
+    const itineraryData = localStorage.getItem('westCoastItinerary');
+    
+    if (itineraryData) {
+      const itinerary = JSON.parse(itineraryData);
+      
+      // Check if Seattle data exists
+      if (itinerary.cities && itinerary.cities['Seattle']) {
+        const seattleDestinations = itinerary.cities['Seattle'].destinations;
+        
+        // Show personalization banner
+        const banner = document.getElementById('personalizationBanner');
+        const destinationsList = document.getElementById('destinationsList');
+        
+        if (seattleDestinations && seattleDestinations.length > 0) {
+          banner.style.display = 'block';
+          
+          // Display selected destinations in banner
+          destinationsList.innerHTML = seattleDestinations.map(dest => 
+            `<div class="destination-badge">${dest}</div>`
+          ).join('');
+          
+          // Show only the sections for selected destinations
+          const allSections = document.querySelectorAll('.landmark-section');
+          
+          // Hide all sections first
+          allSections.forEach(section => section.style.display = 'none');
+          
+          // Show only selected destinations
+          seattleDestinations.forEach(destination => {
+            const section = document.querySelector(`.landmark-section[data-destination="${destination}"]`);
+            if (section) {
+              section.style.display = 'block';
+              
+              // Also show the lesson and quiz content within this section
+              const lesson = section.querySelector('.content');
+              const quiz = section.querySelector('.quiz-section');
+              if (lesson) lesson.style.display = 'block';
+              if (quiz) quiz.style.display = 'block';
+            }
+          });
+        } else {
+          // No destinations selected, show all
+          showAllDestinations();
+        }
+      } else {
+        // No Seattle data, show all
+        showAllDestinations();
+      }
+    } else {
+      // No itinerary data, show all
+      showAllDestinations();
+    }
+  } catch (error) {
+    console.error('Error loading itinerary:', error);
+    // On error, show all
+    showAllDestinations();
+  }
+})();
+
+function showAllDestinations() {
+  const allSections = document.querySelectorAll('.landmark-section');
+  allSections.forEach(section => {
+    section.style.display = 'block';
+    const lesson = section.querySelector('.content');
+    const quiz = section.querySelector('.quiz-section');
+    if (lesson) lesson.style.display = 'block';
+    if (quiz) quiz.style.display = 'block';
+  });
+}
+
 // Loading screen
 window.addEventListener('load', function() {
   setTimeout(() => {
@@ -2310,18 +2433,26 @@ function checkAnswer(landmark, questionNum) {
 }
 
 landmarks.forEach(landmark => {
-  document.getElementById(`${landmark}-answer1`).addEventListener('input', () => checkAnswer(landmark, 1));
-  document.getElementById(`${landmark}-answer2`).addEventListener('input', () => checkAnswer(landmark, 2));
+  // Only add event listeners if the elements exist (for selected destinations)
+  const answer1 = document.getElementById(`${landmark}-answer1`);
+  const answer2 = document.getElementById(`${landmark}-answer2`);
   
-  document.getElementById(`${landmark}-answer1`).addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkAnswer(landmark, 1);
-  });
-  document.getElementById(`${landmark}-answer2`).addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkAnswer(landmark, 2);
-  });
+  if (answer1) {
+    answer1.addEventListener('input', () => checkAnswer(landmark, 1));
+    answer1.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkAnswer(landmark, 1);
+    });
+  }
+  
+  if (answer2) {
+    answer2.addEventListener('input', () => checkAnswer(landmark, 2));
+    answer2.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkAnswer(landmark, 2);
+    });
+  }
 });
 </script>
-Share your experiences in the mircoblog!
+
 <!-- 🌍 Destination Finder Tool -->
 <div style="padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #dee2e6;">
   <h3 style="margin-top: 0; color: #495057;">AI-Powered Destination Finder</h3>
@@ -2459,7 +2590,7 @@ function generateDestination() {
       climate: "Mild temperate",
       activities: "Temple visits, tea ceremonies, exploring Arashiyama bamboo forest"
     });
-    showAIStatus("🌸 No exact match found, but here’s a great suggestion: Kyoto!", "success");
+    showAIStatus("🌸 No exact match found, but here's a great suggestion: Kyoto!", "success");
   }
 }
 
