@@ -234,10 +234,19 @@ layout: opencs
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
 
+<button onclick="markLessonComplete()" id="lessonCompleteButton" style="position:fixed;bottom:80px;right:1rem;padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);cursor:pointer;z-index:60;">
+  Mark as done
+</button>
+
+
 <!-- ===== Mini-quest locking/progress (AUTO-COMPLETE ON SCROLL) ===== -->
 <script type="module">
-import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+  // log time spent on lessons
+  let startTime = Date.now();
+  let timeSpentSec = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
   const wrap = document.getElementById("lesson-container");
@@ -315,6 +324,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const username = await getCredentials();
         const module = "{{ page.parent | escape }}";
         const submodule = "{{ page.submodule | escape }}";
+        let timeSpentSec = Math.round((Date.now() - startTime) / 1000);
+        console.log(`User spent ${timeSpentSec} seconds to finish the lesson.`);
         try {
             const res = await fetch(`${javaURI}/api/stats`, {
                 ...fetchOptions,
@@ -327,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "module": module,
                     "submodule": submodule,
                     "finished": true,
-                    "time": timeOnLesson/60
+                    "time": timeSpentSec/60
                 }),
             });
 
@@ -339,10 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error(`Error sending lesson complete status to backend`, err);
         }
   }
-
-  // log time spent on lessons
-  let startTime = Date.now();
-  let timeSpentSec = 0;
+  window.markLessonComplete = markLessonComplete;
 
   const activateOnScroll = () => {
     // If already completed, don't trigger again
