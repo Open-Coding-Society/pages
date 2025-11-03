@@ -535,7 +535,7 @@ class MansionLevel5 {
             <div>
             'W','A','S','D' to move around <br>
             'C' to shoot <br>
-            Kill 15 zombies to progress <br>
+            Kill 20 zombies to progress <br>
             Press 'E' to enter the door at the end
             </div>
         `
@@ -550,7 +550,7 @@ class MansionLevel5 {
                 <div style="font-size: 14px;">${this.zombiesKilled} zombie kills</div>
             `;
 
-            if (this.zombiesKilled >= 15 && this.spawnZombies) 
+            if (this.zombiesKilled >= 20 && this.spawnZombies) 
             {
                 console.log("Level completed")
                 this.spawnZombies = false;
