@@ -30,7 +30,6 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
 - Use **SELECT** to read data.
 - Filter with **WHERE**.
 - Sort and limit results.
-- Display menu results dynamically.
 
 ---
 
@@ -189,42 +188,67 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
 <!-- ============================= -->
 
 <style>
-/* Dropdown explanations */
-.topic-dropdown {
-  width: 90%;
-  max-width: 700px;
-  margin: 20px auto;
+/* General dark background */
+body {
+  background-color: #121212;
+  color: #e0e0e0;
   font-family: "Poppins", sans-serif;
 }
 
+/* Table styling */
+.table-container {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+.table-container th {
+  background-color: #333333;
+  color: #ffffff;
+  padding: 12px;
+  font-size: 1.2rem;
+}
+
+.table-container td {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  padding: 12px;
+  font-size: 1.1rem;
+}
+
+.table-container tr:nth-child(even) td {
+  background-color: #2a2a2a;
+}
+
+.table-container {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Dropdown explanations */
 .topic-dropdown summary {
-  background-color: #ffb347;
-  color: white;
+  background-color: #444444;
+  color: #ffffff;
   padding: 12px 16px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
   font-size: 1.1rem;
-  margin-bottom: 8px;
-}
-
-.topic-dropdown details[open] summary {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
 }
 
 .topic-dropdown div {
-  background-color: #fff3e0;
+  background-color: #1f1f1f;
   padding: 12px;
   border-radius: 0 0 10px 10px;
   font-size: 1rem;
+  color: #f0f0f0;
 }
 
-/* Quiz styling */
+/* Quiz container */
 .quiz-container {
-  background: #fffaf0;
+  background: #1f1f1f;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   padding: 25px;
   width: 90%;
   max-width: 700px;
@@ -233,40 +257,37 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
 
 .quiz-container h2 {
   text-align: center;
-  color: #ff6f61;
-  margin-bottom: 20px;
-}
-
-.quiz-question {
+  color: #ffab40;
   margin-bottom: 20px;
 }
 
 .quiz-option {
   display: block;
-  background-color: #e0f7fa;
-  color: #333;
+  background-color: #2c2c2c;
+  color: #e0e0e0;
   border: none;
   border-radius: 8px;
   padding: 10px 16px;
   margin: 8px 0;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
   width: 100%;
   text-align: left;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .quiz-option:hover {
-  background-color: #b2ebf2;
+  background-color: #3a3a3a;
   transform: scale(1.02);
 }
 
 .quiz-option.correct {
-  background-color: #c8e6c9;
+  background-color: #388e3c;
+  color: #ffffff;
 }
-
 .quiz-option.incorrect {
-  background-color: #ffcdd2;
+  background-color: #d32f2f;
+  color: #ffffff;
 }
 
 #quiz-result, #fill-result {
@@ -274,7 +295,41 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
   text-align: center;
   font-weight: 600;
   font-size: 1.2rem;
-  color: #2e7d32;
+  color: #ffcc80;
+}
+
+/* Fill-in-the-blanks container */
+.fill-container {
+  width: 90%;
+  max-width: 700px;
+  margin: 30px auto;
+  background: #1f1f1f;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.fill-container input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background: #2c2c2c;
+  color: #e0e0e0;
+  width: 200px;
+  margin: 0 6px;
+}
+
+.fill-container button {
+  background-color: #6200ea;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.fill-container button:hover {
+  background-color: #3700b3;
 }
 
 /* XP Progress Bar */
@@ -285,14 +340,14 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
 }
 
 .progress-bar {
-  background-color: #eee;
+  background-color: #2c2c2c;
   border-radius: 12px;
   overflow: hidden;
   height: 16px;
 }
 
 .progress-fill {
-  background-color: #4caf50;
+  background: linear-gradient(90deg,#4caf50,#81c784);
   height: 100%;
   width: 0%;
   transition: width 1s ease-in-out;
@@ -302,42 +357,20 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
   margin-top: 8px;
   font-weight: bold;
   text-align: right;
-  font-family: "Poppins", sans-serif;
+  color: #ffcc80;
 }
 
-/* Fill-in-the-blanks styling */
-.fill-container {
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-  background: #f0f4f8;
-  border-radius: 12px;
-  padding: 20px;
-  font-family: "Poppins", sans-serif;
+/* Table links (optional) */
+a {
+  color: #81d4fa;
 }
 
-.fill-container input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 200px;
-  margin: 0 6px;
-}
-
-.fill-container button {
-  background-color: #4b9cd3;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.fill-container button:hover {
-  background-color: #357ab7;
+a:hover {
+  color: #29b6f6;
+  text-decoration: underline;
 }
 </style>
+
 
 <!-- ============================= -->
 <!-- 1️⃣ Dropdown Explanations -->
