@@ -195,6 +195,15 @@ layout: opencs
           {% assign nextLesson = currentLesson | plus: 1 %}
           {% assign basePath = page.url | split: '/submodule_' | first %}
           
+          <!-- Dynamically find total submodules from quest home page -->
+          {% assign questHomePath = basePath | append: '/' %}
+          {% assign totalSubmodules = 6 %}
+          {% for p in site.pages %}
+            {% if p.url == questHomePath and p.lxdData.Topics %}
+              {% assign totalSubmodules = p.lxdData.Topics.size %}
+            {% endif %}
+          {% endfor %}
+          
           {% if currentLesson > 1 %}
           <a href="{{ basePath }}/submodule_{{ prevLesson }}/" class="nav-button nav-button-prev">
             <span class="nav-arrow">←</span>
@@ -204,7 +213,7 @@ layout: opencs
           <div style="width: 200px;"></div>
           {% endif %}
 
-          {% if currentLesson < 6 %}
+          {% if currentLesson < totalSubmodules %}
           <a href="{{ basePath }}/submodule_{{ nextLesson }}/" id="next-lesson-btn" class="nav-button nav-button-next nav-button-disabled" aria-disabled="true">
             <span class="nav-text">Next Lesson</span>
             <span class="nav-arrow">→</span>
