@@ -80,149 +80,138 @@ class MansionLevel5 {
         hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
         zIndex: 10,
         isKilling: false, // Flag to prevent multiple kills
-		frameCount: 0,
         
         // The update method with all functionality inline
         update: function() {
-            // Skip update if already in killing process
-            if (this.isKilling) {
-                return;
-            }
-			
-			this.frameCount++;
+            // // Skip update if already in killing process
+            // if (this.isKilling) {
+            //     return;
+            // }
             
-            // player
-            let nearest = player;
+            // // player
+            // let nearest = player;
 
 
-            // Move towards nearest player
-            const speed = 0.8; // Adjust speed as needed
-			const dy = 0;
-			const dx = 0;
-		    const angle = 0;
-
-			if (this.frameCount % 10 == 0)
-			{
-				dx = nearest.position.x - this.position.x;
-				dy = nearest.position.y - this.position.y;
-				angle = Math.atan2(dy, dx);
-			}
+            // // Move towards nearest player
+            // const speed = 0.8; // Adjust speed as needed
+            // const dx = nearest.position.x - this.position.x;
+            // const dy = nearest.position.y - this.position.y;
+            // const angle = Math.atan2(dy, dx);
             
-            // Update position
-            this.position.x += Math.cos(angle) * speed;
-            this.position.y += Math.sin(angle) * speed;
+            // // Update position
+            // this.position.x += Math.cos(angle) * speed;
+            // this.position.y += Math.sin(angle) * speed;
             
-            // Check for collision with player
-			if (this.frameCount % 10 == 0)
-            {
-                // Calculate distance for hitbox collision
-                const playerX = nearest.position.x + nearest.width / 2;
-                const playerY = nearest.position.y + nearest.height / 2;
-                const enemyX = this.position.x + this.width / 2;
-                const enemyY = this.position.y + this.height / 2;
+            // // Check for collision with player
+            // {
+            //     // Calculate distance for hitbox collision
+            //     const playerX = nearest.position.x + nearest.width / 2;
+            //     const playerY = nearest.position.y + nearest.height / 2;
+            //     const enemyX = this.position.x + this.width / 2;
+            //     const enemyY = this.position.y + this.height / 2;
                 
-                const dx = playerX - enemyX;
-                const dy = playerY - enemyY;
-                const distance = Math.sqrt(dx*dx + dy*dy);
+            //     const dx = playerX - enemyX;
+            //     const dy = playerY - enemyY;
+            //     const distance = Math.sqrt(dx*dx + dy*dy);
                 
-                // Hitbox collision - adjust values as needed
-                const collisionThreshold = (nearest.width * nearest.hitbox.widthPercentage + 
-                                        this.width * this.hitbox.widthPercentage) / 2;
+            //     // Hitbox collision - adjust values as needed
+            //     const collisionThreshold = (nearest.width * nearest.hitbox.widthPercentage + 
+            //                             this.width * this.hitbox.widthPercentage) / 2;
                 
-                if (distance < collisionThreshold) {
-                    // Set killing flag to prevent repeated kills
-                    this.isKilling = true;
+            //     if (distance < collisionThreshold) {
+            //         // Set killing flag to prevent repeated kills
+            //         this.isKilling = true;
                     
-                    // === PLAYER DEATH: ALL FUNCTIONALITY INLINE ===
+            //         // === PLAYER DEATH: ALL FUNCTIONALITY INLINE ===
                     
-                    // 1. Play death animation - particle effect
-                    const playerX = nearest.position.x;
-                    const playerY = nearest.position.y;
+            //         // 1. Play death animation - particle effect
+            //         const playerX = nearest.position.x;
+            //         const playerY = nearest.position.y;
                     
-                    // Create explosion effect
-                    for (let i = 0; i < 20; i++) {
-                        const particle = document.createElement('div');
-                        particle.style.position = 'absolute';
-                        particle.style.width = '5px';
-                        particle.style.height = '5px';
-                        particle.style.backgroundColor = 'red';
-                        particle.style.left = `${playerX + nearest.width/2}px`;
-                        particle.style.top = `${playerY + nearest.height/2}px`;
-                        particle.style.zIndex = '9999';
-                        document.body.appendChild(particle);
+            //         // Create explosion effect
+            //         for (let i = 0; i < 20; i++) {
+            //             const particle = document.createElement('div');
+            //             particle.style.position = 'absolute';
+            //             particle.style.width = '5px';
+            //             particle.style.height = '5px';
+            //             particle.style.backgroundColor = 'red';
+            //             particle.style.left = `${playerX + nearest.width/2}px`;
+            //             particle.style.top = `${playerY + nearest.height/2}px`;
+            //             particle.style.zIndex = '9999';
+            //             document.body.appendChild(particle);
                         
-                        // Animate particles outward
-                        const angle = Math.random() * Math.PI * 2;
-                        const speed = Math.random() * 5 + 2;
-                        const distance = Math.random() * 100 + 50;
+            //             // Animate particles outward
+            //             const angle = Math.random() * Math.PI * 2;
+            //             const speed = Math.random() * 5 + 2;
+            //             const distance = Math.random() * 100 + 50;
                         
-                        const destX = Math.cos(angle) * distance;
-                        const destY = Math.sin(angle) * distance;
+            //             const destX = Math.cos(angle) * distance;
+            //             const destY = Math.sin(angle) * distance;
                         
-                        particle.animate(
-                            [
-                                { transform: 'translate(0, 0)', opacity: 1 },
-                                { transform: `translate(${destX}px, ${destY}px)`, opacity: 0 }
-                            ],
-                            {
-                                duration: 1000,
-                                easing: 'ease-out',
-                                fill: 'forwards'
-                            }
-                        );
+            //             particle.animate(
+            //                 [
+            //                     { transform: 'translate(0, 0)', opacity: 1 },
+            //                     { transform: `translate(${destX}px, ${destY}px)`, opacity: 0 }
+            //                 ],
+            //                 {
+            //                     duration: 1000,
+            //                     easing: 'ease-out',
+            //                     fill: 'forwards'
+            //                 }
+            //             );
                         
-                        // Remove particle after animation
-                        setTimeout(() => {
-                            if (particle.parentNode) {
-                                particle.parentNode.removeChild(particle);
-                            }
-                        }, 1000);
-                    }
+            //             // Remove particle after animation
+            //             setTimeout(() => {
+            //                 if (particle.parentNode) {
+            //                     particle.parentNode.removeChild(particle);
+            //                 }
+            //             }, 1000);
+            //         }
                     
-                    // 2. Show death message dialog
-                    const deathMessage = document.createElement('div');
-                    deathMessage.style.position = 'fixed';
-                    deathMessage.style.top = '50%';
-                    deathMessage.style.left = '50%';
-                    deathMessage.style.transform = 'translate(-50%, -50%)';
-                    deathMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-                    deathMessage.style.color = '#FF0000';
-                    deathMessage.style.padding = '30px';
-                    deathMessage.style.borderRadius = '10px';
-                    deathMessage.style.fontFamily = "'Press Start 2P', sans-serif";
-                    deathMessage.style.fontSize = '24px';
-                    deathMessage.style.textAlign = 'center';
-                    deathMessage.style.zIndex = '10000';
-                    deathMessage.style.border = '3px solid #FF0000';
-                    deathMessage.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
-                    deathMessage.style.width = '400px';
-                    deathMessage.innerHTML = `
-                        <div style="margin-bottom: 20px;">☠️ YOU DIED ☠️</div>
-                        <div style="font-size: 16px; margin-bottom: 20px;">The zombies got you!</div>
-                        <div style="font-size: 14px;">Respawning in 2 seconds...</div>
-                    `;
+            //         // 2. Show death message dialog
+            //         const deathMessage = document.createElement('div');
+            //         deathMessage.style.position = 'fixed';
+            //         deathMessage.style.top = '50%';
+            //         deathMessage.style.left = '50%';
+            //         deathMessage.style.transform = 'translate(-50%, -50%)';
+            //         deathMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            //         deathMessage.style.color = '#FF0000';
+            //         deathMessage.style.padding = '30px';
+            //         deathMessage.style.borderRadius = '10px';
+            //         deathMessage.style.fontFamily = "'Press Start 2P', sans-serif";
+            //         deathMessage.style.fontSize = '24px';
+            //         deathMessage.style.textAlign = 'center';
+            //         deathMessage.style.zIndex = '10000';
+            //         deathMessage.style.border = '3px solid #FF0000';
+            //         deathMessage.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+            //         deathMessage.style.width = '400px';
+            //         deathMessage.innerHTML = `
+            //             <div style="margin-bottom: 20px;">☠️ YOU DIED ☠️</div>
+            //             <div style="font-size: 16px; margin-bottom: 20px;">The zombies got you!</div>
+            //             <div style="font-size: 14px;">Respawning in 2 seconds...</div>
+            //         `;
                     
-                    document.body.appendChild(deathMessage);
+            //         document.body.appendChild(deathMessage);
                     
-                    // Remove message after delay
-                    setTimeout(() => {
-                        if (deathMessage.parentNode) {
-                            deathMessage.parentNode.removeChild(deathMessage);
-                        }
-                    }, 2000);
+            //         // Remove message after delay
+            //         setTimeout(() => {
+            //             if (deathMessage.parentNode) {
+            //                 deathMessage.parentNode.removeChild(deathMessage);
+            //             }
+            //         }, 2000);
                     
-                    // 3. Reset the level after a short delay using page reload for reliability
-                    setTimeout(() => {
-                        // Clean up any lingering resources before reload
-                        if (self && self.timerInterval) {
-                            clearInterval(self.timerInterval);
-                        }
+            //         // 3. Reset the level after a short delay using page reload for reliability
+            //         setTimeout(() => {
+            //             // Clean up any lingering resources before reload
+            //             if (self && self.timerInterval) {
+            //                 clearInterval(self.timerInterval);
+            //             }
                         
-                        // Force a complete page reload - most reliable way to reset
-                        location.reload();
-                    }, 2000); // 2 second delay before reset
-                }
-            }
+            //             // Force a complete page reload - most reliable way to reset
+            //             location.reload();
+            //         }, 2000); // 2 second delay before reset
+            //     }
+            // }
         }
     };
 
@@ -344,7 +333,7 @@ class MansionLevel5 {
             const laser = new Character(laserData, this.gameEnv)
     
             // generate lasers in circle
-            laser.velocity = { x: Math.cos((i * Math.PI * 2)/laserNum)*15, y: Math.sin((i * Math.PI * 2)/laserNum)*15 }
+            laser.velocity = { x: Math.cos((i * Math.PI * 2)/laserNum)*5, y: Math.sin((i * Math.PI * 2)/laserNum)*5 }
 
             const outerInstance = this;
     
@@ -368,7 +357,7 @@ class MansionLevel5 {
                     this.collisionWidth = 0;
                     this.collisionHeight = 0;
                     this.destroy()
-                }, 2000);
+                }, 5000);
     
                 this.draw()
             }
@@ -439,7 +428,7 @@ class MansionLevel5 {
 
     // Method to spawn a batch of zombies
     spawnZombieBatch() {
-        const numZombies = 4; // spawn zombies per batch
+        const numZombies = 1; // spawn zombies per batch
         
         for (let i = 0; i < numZombies; i++) {
             const side = Math.floor(Math.random() * 4);
@@ -492,6 +481,131 @@ class MansionLevel5 {
         }
     }
 
+    updateZombies() 
+    {
+        for (let i = 0; i < this.zombieList.length; i++)
+        {
+            let currentZombie = this.zombieList[i];
+
+            // Skip update if already in killing process
+            if (currentZombie.isKilling) {
+                return;
+            }
+            
+            
+            // player
+            let nearest = this.playerRef;
+    
+    
+            // Move towards nearest player
+            const speed = 0.8; // Adjust speed as needed
+            const dx = nearest.position.x - currentZombie.position.x;
+            const dy = nearest.position.y - currentZombie.position.y;
+            const angle = Math.atan2(dy, dx);
+            
+            // Update position
+            currentZombie.position.x += Math.cos(angle) * speed;
+            currentZombie.position.y += Math.sin(angle) * speed;
+            
+            // Check for collision with player
+            {
+                if (this.isColliding(nearest, currentZombie)) {
+                    // Set killing flag to prevent repeated kills
+                    currentZombie.isKilling = true;
+                    
+                    // === PLAYER DEATH: ALL FUNCTIONALITY INLINE ===
+                    
+                    // 1. Play death animation - particle effect
+                    const playerX = nearest.position.x;
+                    const playerY = nearest.position.y;
+                    
+                    // Create explosion effect
+                    for (let i = 0; i < 20; i++) {
+                        const particle = document.createElement('div');
+                        particle.style.position = 'absolute';
+                        particle.style.width = '5px';
+                        particle.style.height = '5px';
+                        particle.style.backgroundColor = 'red';
+                        particle.style.left = `${playerX + nearest.width/2}px`;
+                        particle.style.top = `${playerY + nearest.height/2}px`;
+                        particle.style.zIndex = '9999';
+                        document.body.appendChild(particle);
+                        
+                        // Animate particles outward
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 5 + 2;
+                        const distance = Math.random() * 100 + 50;
+                        
+                        const destX = Math.cos(angle) * distance;
+                        const destY = Math.sin(angle) * distance;
+                        
+                        particle.animate(
+                            [
+                                { transform: 'translate(0, 0)', opacity: 1 },
+                                { transform: `translate(${destX}px, ${destY}px)`, opacity: 0 }
+                            ],
+                            {
+                                duration: 1000,
+                                easing: 'ease-out',
+                                fill: 'forwards'
+                            }
+                        );
+                        
+                        // Remove particle after animation
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 1000);
+                    }
+                    
+                    // 2. Show death message dialog
+                    const deathMessage = document.createElement('div');
+                    deathMessage.style.position = 'fixed';
+                    deathMessage.style.top = '50%';
+                    deathMessage.style.left = '50%';
+                    deathMessage.style.transform = 'translate(-50%, -50%)';
+                    deathMessage.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                    deathMessage.style.color = '#FF0000';
+                    deathMessage.style.padding = '30px';
+                    deathMessage.style.borderRadius = '10px';
+                    deathMessage.style.fontFamily = "'Press Start 2P', sans-serif";
+                    deathMessage.style.fontSize = '24px';
+                    deathMessage.style.textAlign = 'center';
+                    deathMessage.style.zIndex = '10000';
+                    deathMessage.style.border = '3px solid #FF0000';
+                    deathMessage.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+                    deathMessage.style.width = '400px';
+                    deathMessage.innerHTML = `
+                        <div style="margin-bottom: 20px;">☠️ YOU DIED ☠️</div>
+                        <div style="font-size: 16px; margin-bottom: 20px;">The zombies got you!</div>
+                        <div style="font-size: 14px;">Respawning in 2 seconds...</div>
+                    `;
+                    
+                    document.body.appendChild(deathMessage);
+                    
+                    // Remove message after delay
+                    setTimeout(() => {
+                        if (deathMessage.parentNode) {
+                            deathMessage.parentNode.removeChild(deathMessage);
+                        }
+                    }, 2000);
+                    
+                    // 3. Reset the level after a short delay using page reload for reliability
+                    setTimeout(() => {
+                        // Clean up any lingering resources before reload
+                        if (self && self.timerInterval) {
+                            clearInterval(self.timerInterval);
+                        }
+                        
+                        // Force a complete page reload - most reliable way to reset
+                        location.reload();
+                    }, 2000); // 2 second delay before reset
+                }
+            }
+        }
+    }
+
     start()
     {
         // create kills text
@@ -517,7 +631,7 @@ class MansionLevel5 {
 
         const tutorial = document.createElement('div');
         tutorial.style.position = 'fixed';
-        tutorial.style.top = '90%';
+        tutorial.style.top = '80%';
         tutorial.style.right = '10%';
         tutorial.style.transform = 'translate(-50%, -50%)';
         tutorial.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
@@ -535,7 +649,7 @@ class MansionLevel5 {
             <div>
             'W','A','S','D' to move around <br>
             'C' to shoot <br>
-            Kill 20 zombies to progress <br>
+            Kill 10 zombies to progress <br>
             Press 'E' to enter the door at the end
             </div>
         `
@@ -543,21 +657,23 @@ class MansionLevel5 {
         document.body.appendChild(tutorial);
         document.body.appendChild(kills);
 
-        // update and collisions every 10 milliseconds
+        // update and collisions every 15 milliseconds
         setInterval(() => {
+            this.updateZombies();
             this.checkCollisions();
+
             kills.innerHTML = `
                 <div style="font-size: 14px;">${this.zombiesKilled} zombie kills</div>
             `;
 
-            if (this.zombiesKilled >= 20 && this.spawnZombies) 
+            if (this.zombiesKilled >= 10 && this.spawnZombies) 
             {
                 console.log("Level completed")
                 this.spawnZombies = false;
                 const finishDoor = new Npc(this.finishDoorData, this.gameEnv);
                 this.gameEnv.gameObjects.push(finishDoor);
             }
-        }, 1);
+        }, 15);
     }
 }
 
