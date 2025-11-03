@@ -1,8 +1,17 @@
 import Enemy from '../GameEngine/Enemy.js';
-import Boomerang from '../CustomGameClasses/Boomerang.js';
-import Projectile from '../CustomGameClasses/Projectile.js';
-import Arm from '../CustomGameClasses/Arm.js';
-import showEndScreen from '../EndScreen.js';
+import Boomerang from './Boomerang.js';
+import Projectile from './Projectile.js';
+import Arm from './Arm.js';
+import showEndScreen from './EndScreen.js';
+import Player from '../GameEngine/Player.js';
+import { updateBossHealthBar } from './HealthBars.js';
+
+/*
+    Boss class to define the Reaper
+    - Uses various attacks at an attack interval to damage the player
+    - Has heath (see HealthBars.js for health bars)
+    - Slowly moves towards the player
+*/
 
 class Boss extends Enemy {
     constructor(data = null, gameEnv = null) {
@@ -21,6 +30,7 @@ class Boss extends Enemy {
         this.lastAttackTime = Date.now();
         this.attackInterval = data?.attackInterval || 2000;
         this.angerModifier = 1;
+        this.attackProbShift = 0.05;
 
         // Debug/cheat key code - uncomment to enable
         // Add a debug/cheat key ('p') that instantly defeats this boss
@@ -30,6 +40,9 @@ class Boss extends Enemy {
                 if (event.key === 'p' || event.key === 'P') {
                     console.log("[Boss] Kill key pressed: forcing boss death.");
                     this.healthPoints = 0;
+                     window.__mansionLevelEnded = true;
+                    // Show victory screen immediately
+                    try { showEndScreen(this.gameEnv); } catch (e) { console.warn('Error showing victory screen:', e); }
                     // Remove the boss graphic and objects from the game
                     try { this.destroy(); } catch (e) { console.warn('Error destroying boss:', e); }
                     // End the current level so game control can transition
@@ -49,6 +62,7 @@ class Boss extends Enemy {
         this.projectileTypes = data?.projectileTypes || ['FIREBALL', 'ARROW'];
 
         // Initialize arms
+        
         this.leftArm = new Arm({
             xOffset: -60,
             yOffset: 20,
@@ -64,6 +78,7 @@ class Boss extends Enemy {
             emptySrc: "../../images/mansionGame/ReaperRightHandEmpty.png",
             hasWeapon: true
         }, gameEnv);
+        
 
         //this.arms = [this.leftArm, this.rightArm];
 
@@ -83,7 +98,7 @@ class Boss extends Enemy {
             const full = this.fullHealth || 1;
             const percent = Math.max(0, Math.min(100, (this.healthPoints / full) * 100));
             this._bossHealthFill.style.width = `${percent}%`;
-            this._bossHealthFill.style.backgroundColor = percent < 33 ? '#8B0000' : percent < 66 ? '#FF4500' : '#FF0000';
+            this._bossHealthFill.style.backgroundColor = percent < 33 ? '#A020F0' : percent < 66 ? '#800000' : '#FF0000';
 
             // If boss is dead, remove the health bar from the DOM (cleanup)
             if (this.healthPoints <= 0) {
@@ -157,7 +172,7 @@ class Boss extends Enemy {
 
     // Locate the nearest player
     findNearestPlayer() {
-        const players = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Player');
+        const players = this.gameEnv.gameObjects.filter(obj => obj instanceof Player);
         if (players.length === 0) return null;
 
         let nearest = players[0];
@@ -179,14 +194,19 @@ class Boss extends Enemy {
     // Randomize attack chances
     performAttack(target) {
         const rand = Math.random();
-
-        if (this.stage >= 3 && rand < 0.3) {
+        const attackProbModifier = this.attackProbShift * (this.stage - 1);
+        
+        if (this.stage >= 2 && rand < 0.3 + attackProbModifier) {
             this.scytheAttack(target);
-        } else if (rand < 0.6) {
+        } else if (rand < 0.6 + attackProbModifier) {
             this.fireballAttack(target);
         } else {
             this.arrowAttack(target);
         }
+        
+
+        // shoots only scythes for debugging
+        // this.scytheAttack(target);
     }
 
     // Move towards a certian location

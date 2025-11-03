@@ -1,7 +1,7 @@
 ---
 layout: cs-portfolio-lesson
-title: "Submodule 3"
-description: "Submodule 3 of Resume Building Mini-Quest"
+title: "Experiences and Achievments"
+description: "Learn about why you need experiences/achievments on your resume and add your own"
 permalink: /cs-portfolio-quest/resume/submodule_3/
 parent: "Resume Building"
 team: "Grinders"
@@ -48,7 +48,8 @@ date: 2025-10-21
       </div>
       <p id="miniQuizResult" class="text-sm mt-2"></p>
     </div>
-    <div>
+    <!-- moved to the right -->
+    <div class="flex justify-end">
       <button id="toStep2" class="px-3 py-2 border rounded">See examples →</button>
     </div>
   </section>
@@ -103,7 +104,8 @@ date: 2025-10-21
         </div>
       </div>
     </div>
-    <div>
+    <!-- moved to the right -->
+    <div class="flex justify-end">
       <button id="toStep3" class="px-3 py-2 border rounded">Practice: drag & drop →</button>
     </div>
   </section>
@@ -131,9 +133,15 @@ date: 2025-10-21
       <div class="font-medium mb-1">Items:</div>
       <div id="itemsPool" class="border rounded p-3 flex flex-wrap gap-2"></div>
     </div>
-    <div class="flex gap-2">
-      <button id="checkAnswersBtn" class="px-3 py-2 border rounded hidden">Check my answers</button>
-      <button id="toStep4" class="px-3 py-2 border rounded hidden">Start writing →</button>
+    <!-- left: check/continue; right: skip/next -->
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex gap-2">
+        <button id="checkAnswersBtn" class="px-3 py-2 border rounded hidden">Check my answers</button>
+        <button id="toStep4" class="px-3 py-2 border rounded hidden">Start writing →</button>
+      </div>
+      <div class="flex justify-end">
+        <button id="skipToStep4" class="px-3 py-2 border rounded">Skip to writing →</button>
+      </div>
     </div>
   </section>
 
@@ -153,32 +161,58 @@ date: 2025-10-21
     <div class="text-sm text-gray-600">
       Tip: Use the <b>Action → Metric → Result</b> format. Example: “Optimized SQL queries, reducing latency by 50% and increasing weekly retention by 12%.”
     </div>
-    <div>
+    <div class="flex justify-end">
       <button id="toStep5" class="px-3 py-2 border rounded">Preview →</button>
     </div>
   </section>
 
-  <!-- STEP 5: Resume Preview -->
-  <section data-step="4" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">Preview</h2>
-    <div id="resumePreview" class="border rounded p-4 space-y-3 text-sm leading-6"></div>
-    <div class="grid md:grid-cols-2 gap-2">
+<!-- STEP 5: Resume Preview -->
+<section data-step="4" class="space-y-3 hidden">
+  <h2 class="text-xl font-semibold">Preview</h2>
+  <div id="resumePreview" class="border rounded p-4 space-y-3 text-sm leading-6"></div>
+
+  <!-- Actions row: Prev on left, other buttons on right -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+    <button id="prevBtn" class="px-3 py-2 border rounded">Previous</button>
+    <div class="flex flex-wrap gap-2">
       <button id="saveDraft" class="px-3 py-2 border rounded">Save Draft</button>
       <button id="submitFinal" class="px-3 py-2 border rounded">Submit Final</button>
+      <button
+        id="nextModuleBtnNav"
+        data-href="/cs-portfolio-quest/resume/submodule_4/"
+        class="px-3 py-2 border rounded bg-red-600 text-white disabled:opacity-60"
+        disabled
+      >Next Module →</button>
     </div>
-    <p id="saveMessage" class="text-sm mt-1"></p>
-  </section>
-
-  <!-- Bottom Navigation -->
-  <div class="flex justify-between mt-4">
-    <button id="prevBtn" class="px-3 py-2 border rounded" disabled>Previous</button>
-    <button
-      id="nextModuleBtnNav"
-      data-href="/cs-portfolio-quest/resume/submodule_4/"
-      class="px-3 py-2 border rounded hidden bg-red-600 text-white disabled:opacity-60"
-      disabled
-    >Next Module →</button>
   </div>
+
+  <p id="saveMessage" class="text-sm mt-1"></p>
+</section>
+
+<!-- Bottom Navigation -->
+<div class="flex justify-between mt-4">
+  <button id="prevBtn" class="px-3 py-2 border rounded" disabled>Previous</button>
+  <button
+    id="nextModuleBtnNav"
+    data-href="/cs-portfolio-quest/resume/submodule_4/"
+    class="px-3 py-2 border rounded hidden bg-red-600 text-white disabled:opacity-60"
+    disabled
+  >Next Module →</button>
+</div>
+
+  <!-- Floating Selected Sprite -->
+<video id="floating-sprite" width="150" height="160" loop muted playsinline style="
+  position: fixed;
+  bottom: 20px;
+  right: -200px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: none;
+  z-index: 1000;
+">
+  <source id="floating-source" src="" type="video/mp4">
+</video>
+
 </div>
 
 <script>
@@ -215,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const badZone  = $('#badZone');
   const checkAnswersBtn = $('#checkAnswersBtn');
   const toStep4 = $('#toStep4');
+  const skipToStep4 = $('#skipToStep4'); // NEW
   const scoreSpan = $('#score');
   const totalSpan = $('#total');
 
@@ -367,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   toStep4?.addEventListener('click', ()=>showStep(3));
+  skipToStep4?.addEventListener('click', ()=>showStep(3)); // NEW: skippable
 
   // --------- STEP 4: Form (summary + experiences) ----------
   addExperienceBtn?.addEventListener('click', ()=>addExperience());
@@ -598,4 +634,30 @@ document.addEventListener('DOMContentLoaded', () => {
   restore();
   showStep(0);
 });
+
+// ✅ Floating MP4 sprite logic
+const floatingSprite = document.getElementById("floating-sprite");
+const floatingSource = document.getElementById("floating-source");
+
+// On page load, check if a character was selected in Submodule 1
+const savedCharacter = localStorage.getItem("selectedCharacter");
+if (savedCharacter) {
+  showFloatingSprite(savedCharacter);
+}
+
+function showFloatingSprite(charId) {
+  const spriteMap = {
+    "char1": "{{site.baseurl}}/hacks/cs-portfolio-quest/resume/sprites/elephant_3.mp4",
+    "char2": "{{site.baseurl}}/hacks/cs-portfolio-quest/resume/sprites/hamster_3.mp4",
+    "char3": "{{site.baseurl}}/hacks/cs-portfolio-quest/resume/sprites/monkey_3.mp4"
+  };
+
+  const src = spriteMap[charId];
+  if (src) {
+    floatingSource.src = src;
+    floatingSprite.load();
+    floatingSprite.style.display = "block";
+    floatingSprite.play();
+  }
+}
 </script>

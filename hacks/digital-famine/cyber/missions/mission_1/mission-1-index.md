@@ -2,7 +2,7 @@
 layout: post
 title: "Mission 1 — Build the Base Database"
 description: "Learn database fundamentals through hands-on SQLite construction"
-permalink: /digital-famine/cyber/submodule_1
+permalink: /digital-famine/cybersecurity-game/submodule_1
 categories: [CSP, Submodule, Database]
 tags: [sql, database, fundamentals, sqlite]
 author: "Cybersecurity Team"
@@ -585,6 +585,6 @@ You'll need all three fragments to unlock the Sacred Vault in the final mission!
 
 ---
 
-**Next Mission:** [Mission 2 - Patch the Wormhole →](/digital-famine/cyber/submodule_2/)
+**Next Mission:** [Mission 2 - Patch the Wormhole →](/digital-famine/cybersecurity-game/submodule_2/)
 
 ---

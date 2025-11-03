@@ -166,10 +166,10 @@ class MansionLevel1_Pantry {
       setTimeout(() => {
         try {
           const dsFinal = new DialogueSystem({ id: 'collected_all' + Math.random().toString(36).slice(2, 8) });
-          dsFinal.showDialogue('You have collected all the items and completed the level!', 'Pantry');
+          dsFinal.showDialogue('You have collected all the items and completed the level! Click "Collect Key" to exit.', 'Pantry');
           dsFinal.addButtons([
             {
-              text: 'Close',
+              text: 'COLLECT KEY',
               primary: true,
               action: () => {
               dsFinal.closeDialogue();
@@ -191,6 +191,12 @@ class MansionLevel1_Pantry {
               keyImg.style.animation = 'keyGlow 2s ease-in-out infinite alternate';
 
               // Create a keyframe animation for the glow pulse
+
+              const levelMusic = new Audio(path + "/assets/sounds/mansionGame/victory_sound.mp3");
+              levelMusic.loop = false;
+              levelMusic.volume = 0.1;
+              levelMusic.play().catch(err => console.warn('Level music failed to play:', err));
+
               const styleSheet = document.createElement('style');
               styleSheet.textContent = `
               @keyframes keyGlow {

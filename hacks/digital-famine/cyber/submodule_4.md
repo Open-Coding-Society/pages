@@ -2,7 +2,7 @@
 layout: post
 title: "JavaScript Event Handling"
 description: "Final Vault"
-permalink: /digital-famine/cyber/submodule_4/
+permalink: /digital-famine/cybersecurity-game/submodule_4/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 4

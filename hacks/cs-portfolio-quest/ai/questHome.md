@@ -37,15 +37,6 @@ lxdData:
       Lessons: "/cs-portfolio-quest/ai/submodule_3/"
       Image: "/images/cs-portfolio-quest/ai/submodule3.png"
       Alt: "AI Submodule 3"
-    - Title: "AI Usage Certification"
-      Genre: "Assessment"
-      Level: 4
-      Description: "Complete your AI Usage Quest and earn your official certification from Open Coding Society. Add it to your LinkedIn profile to showcase your skills."
-      Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
-      Video: "/cs-portfolio-quest/ai/submodule_4-video"
-      Lessons: "/cs-portfolio-quest/ai/submodule_4/"
-      Image: "/images/cs-portfolio-quest/ai/submodule4.png"
-      Alt: "AI Submodule 4"
 ---
 {%- include tailwind/cs-portfolio-mini_quest_info.html -%}
 
@@ -70,7 +61,7 @@ lxdData:
     btn.disabled = true;
     fb.innerHTML = 'Grading...';
     try {
-      const res = await fetch(`${javaURI}/api/grade`, {
+      const res = await fetch(`${javaURI}/api/gemini-frq/grade`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',

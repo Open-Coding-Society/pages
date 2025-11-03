@@ -4,6 +4,7 @@ title: Microblogging Communications Network Establishment
 description: Navigate through interconnected challenges in a satellite communication network
 permalink: /digital-famine/microblog/
 breadcrumb: true
+author: Lucas M
 ---
 
 To begin your mission, you'll have to repair Old Earth's communications network *Rampart-B*. The old *Rampart-A* network was a partnership between global agencies and the NSA to monitor all internet activity worldwide (monitoring at a rate of 3 terabits/sec!), but as an apocalyptic event occurred, the network was repurposed as a fallback communications network for humanity.
@@ -88,18 +89,30 @@ The system is now defunct, as humans took to the stars. We'll have the reestabli
          longTitle: 'Ground Station Delta',
          description: 'Ground station for southern hemisphere coverage.',
          tags: ['ground','coverage']},
-        {id: 5, label: 'Decentralization', url: '{{ base.siteurl }}/digital-famine/microblog/decentralization', title: 'Open Node 5',
+        {id: 5, label: 'Decentralization', url: '{{ base.siteurl }}/digital-famine/microblog/decentralization/', title: 'Open Node 5',
          image: defaultImgUrl,
          longTitle: 'Backup Array Epsilon',
          description: 'Cold backup array; bring spare modules to reactivate.',
-         tags: ['backup','spare-parts']}
+         tags: ['backup','spare-parts']},
+        {id: 6, label: 'Threat Modeling', url: '{{ base.siteurl }}/digital-famine/microblog/threat-modeling/', title: 'Open Node 6',
+         image: defaultImgUrl,
+         longTitle: 'Backup Array Zeta',
+         description: 'Cold backup array; bring spare modules to reactivate.',
+         tags: ['backup','spare-parts']},
+        {id: 7, label: 'Vault', url: '{{ base.siteurl }}/digital-famine/microblog/vault/', title: 'Open Node 7',
+         image: defaultImgUrl,
+         longTitle: 'Main Admin Control Panel',
+         description: 'Admin control panel; gain access to next module and reestablish link.',
+         tags: ['admin']}
     ]);
 
     // create an array with edges
     var edges = new vis.DataSet([
         {from: 1, to: 2},
         {from: 2, to: 3},
-        {from: 3, to: 5}
+        {from: 3, to: 5},
+        {from: 3, to: 6},
+        {from: 5, to: 7}
     ]);
 
     // provide the data in the vis format
