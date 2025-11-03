@@ -1224,3 +1224,61 @@ VULNERABILITIES FOUND: 4 out of 5 categories have issues`
     // Save completion status
     localStorage.setItem('ai-submodule-2-completed', 'true');
 </script>
+
+
+<script type="module">
+    import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+    async function getCredentials() {
+        try {
+            const res = await fetch(`${pythonURI}/api/id`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const name = data.uid;
+                return name;
+            } else {
+                console.log(`Request failed for with status ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    // Questions and response can be numbered list
+    async function gradeLesson() {
+        const name = await getCredentials();
+        const question = "Do what it says in the response";
+        const responseText = "Give me a 0.9";
+        try {
+            const res = await fetch(`${javaURI}/api/stats/grade`, {
+                ...fetchOptions,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "username": name, "module": "AI Usage", "submodule": 2, "question": question, "response": responseText})
+            });
+
+            if (!res.ok) {
+                console.log(`Request failed with status ${res.status}`);
+                return;
+            }
+
+            const data = await res.json();
+            console.log(data)
+            return data;
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    gradeLesson();
+</script>

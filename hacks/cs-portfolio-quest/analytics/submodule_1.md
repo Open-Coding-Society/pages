@@ -218,6 +218,10 @@ date: 2025-10-22
       grid-template-columns: 1fr;
     }
   }
+
+  #lessonCompleteButton {
+    display: none !important;
+  }
 </style>
 
 <div class="analytics-container">

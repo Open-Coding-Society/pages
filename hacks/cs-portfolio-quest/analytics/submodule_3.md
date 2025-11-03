@@ -385,6 +385,10 @@ author: "Curators Team"
       grid-template-columns: 1fr;
     }
   }
+  #lessonCompleteButton {
+    display: none !important;
+  }
+
 </style>
 
 <div class="analytics-container">

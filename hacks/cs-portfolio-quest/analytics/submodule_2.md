@@ -290,7 +290,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Frontend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -301,7 +300,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Backend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -312,7 +310,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Data Visualization', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -323,7 +320,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Resume Building', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
 
@@ -334,7 +330,6 @@ date: 2025-10-21
       <div class="cert-date">November 2025</div>
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('AI Usage', 'Open Coding Society', 'November 2025')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
       </div>
     </div>
   </div>
