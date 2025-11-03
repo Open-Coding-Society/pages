@@ -1,6 +1,6 @@
 ---
 layout: opencs
-microblog: True 
+microblog: True  
 title: "Seattle"
 description: "City Four of Food - Seattle"
 permalink: /west-coast/food/SEA/
@@ -448,12 +448,27 @@ function clearTerm(id){const e=document.getElementById(id);if(e)e.textContent=''
 /* 🗃️ Archive Dish (soft delete) */
 function runArchive(){
   clearTerm('terminal-archive');
-  const id=document.getElementById('archive-id').value.trim();
+  const id = document.getElementById('archive-id').value.trim();
   if(!id){logTo('terminal-archive','⚠️ Please enter a dish ID.');return;}
-  const dish=SeattleDB.dishes.find(d=>d.id===id);
-  if(!dish){logTo('terminal-archive','❌ Dish not found.');return;}
+  // Normalize both input and stored id to compare as plain numbers/strings
+  const normalize = x => String(x).replace(/^dish_/, '');
+  const dish = SeattleDB.dishes.find(d => normalize(d.id) === normalize(id));
+  if(!dish){
+    // Try again: if input is 'dish_1' and not found, try matching input as is
+    const fallback = SeattleDB.dishes.find(d => d.id === id);
+    if(fallback){
+      if(fallback.deleted_at){logTo('terminal-archive','⚠️ Already archived.');return;}
+      fallback.deleted_at = new Date().toISOString();
+      logTo('terminal-archive',`✅ Archived: ${fallback.name}`);
+      showToast('Dish archived — +5 XP');
+      flash(document.getElementById('terminal-archive'),'rgba(16,185,129,0.15)');
+      completeTask?.('archive');
+      return;
+    }
+    logTo('terminal-archive','❌ Dish not found.');return;
+  }
   if(dish.deleted_at){logTo('terminal-archive','⚠️ Already archived.');return;}
-  dish.deleted_at=new Date().toISOString();
+  dish.deleted_at = new Date().toISOString();
   logTo('terminal-archive',`✅ Archived: ${dish.name}`);
   showToast('Dish archived — +5 XP');
   flash(document.getElementById('terminal-archive'),'rgba(16,185,129,0.15)');
@@ -522,52 +537,4 @@ function checkAnalyticsQuiz(){
   if(val==='b'){logTo(termId,'✅ Correct! GROUP BY groups rows for aggregate calculations.');showToast('+3 XP — Analytics concept clear!');flash(term,'rgba(16,185,129,0.15)');}
   else{logTo(termId,'❌ Not quite. The correct answer is GROUP BY.');flash(term,'rgba(239,68,68,0.15)');}
 }
-
-/* ========== Task Progress Tracking ========== */
-(function(){
-  window.taskProgress={archive:false,harddelete:false,analytics:false,seed:false,view:false};
-
-  function loadTaskProgress(){
-    const saved=localStorage.getItem('sea_task_progress');
-    if(saved)try{Object.assign(window.taskProgress,JSON.parse(saved));}catch{}
-    updateProgressDisplay();
-  }
-  function saveTaskProgress(){localStorage.setItem('sea_task_progress',JSON.stringify(window.taskProgress));}
-  window.completeTask=function(t){
-    if(!window.taskProgress[t]){
-      window.taskProgress[t]=true;saveTaskProgress();updateProgressDisplay();checkModuleCompletion();
-    }
-  };
-  function updateProgressDisplay(){
-    const tasks=['archive','harddelete','analytics','seed','view'];let done=0;
-    tasks.forEach(x=>{
-      const el=document.getElementById(`task-${x}`);if(!el)return;
-      const s=el.querySelector('.status');
-      if(window.taskProgress[x]){s.textContent='Complete ✅';s.className='status task-complete';done++;}
-      else{s.textContent='Incomplete';s.className='status';}
-    });
-    const pct=Math.round((done/tasks.length)*100);
-    document.getElementById('completion-percentage').textContent=`${pct}%`;
-    document.getElementById('progress-bar').style.width=`${pct}%`;
-  }
-  function checkModuleCompletion(){
-    if(Object.values(window.taskProgress).every(Boolean)){
-      document.getElementById('unlockNotification').style.display='block';
-      setTimeout(()=>document.getElementById('unlockNotification').style.display='none',4000);
-      unlockNextCity();
-    }
-  }
-  function unlockNextCity(){
-    try{
-      const saved=localStorage.getItem('city_progress');
-      let gp={unlockedCities:[0,1,2,3],completedCities:[],totalCitiesCompleted:0};
-      if(saved)gp=JSON.parse(saved);
-      if(!gp.completedCities.includes(3)){gp.completedCities.push(3);gp.totalCitiesCompleted++;}
-      localStorage.setItem('city_progress',JSON.stringify(gp));
-    }catch(e){console.error(e);}
-  }
-  
-  loadTaskProgress();
-  loadItineraryFoods();
-})();
 </script>

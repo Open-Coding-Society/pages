@@ -7,7 +7,7 @@ class TouchControls {
      * @param {object} gameEnv - Game environment
      * @param {object} options - { keyMap, interactLabel, position, id }
      *   keyMap: {up, left, down, right, interact} (keyCodes)
-     *   interactLabel: string (e.g. 'E' or 'U')
+     *   interactLabel: string (e.g. 'e' or 'u')
      *   position: 'left' | 'right' (default: 'left')
      *   id: string (for unique DOM id)
      */

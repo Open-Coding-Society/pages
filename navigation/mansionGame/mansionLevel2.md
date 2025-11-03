@@ -9,9 +9,11 @@ microblog: true
     <canvas id='gameCanvas'></canvas>
 </div>
 <script type="module">
-    // Adnventure Game assets locations
+    // Adventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
-    import MansionLevel4 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
+    import { initCheats } from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/cheats.js";
+    import GameLevel2 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
+    import GameLevel3 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Web Server Environment data
     const environment = {
@@ -21,8 +23,11 @@ microblog: true
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [MansionLevel4]
+        gameLevelClasses: [GameLevel2, GameLevel3]
     }
     // Launch Adventure Game
-    Game.main(environment);
+    const game = Game.main(environment);
+    
+    // Initialize cheats/navigation buttons
+    initCheats(game);
 </script>
