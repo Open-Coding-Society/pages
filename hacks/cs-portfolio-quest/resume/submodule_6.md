@@ -11,20 +11,6 @@ tags: [resume, submodule, grinders]
 author: "Grinders Team"
 date: 2025-10-29
 ---
-<<<<<<< HEAD
-
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-<div class="max-w-3xl mx-auto p-4">
-  <h1 class="text-2xl font-bold mb-2">Interview Prep with ELIO</h1>
-  <p class="text-gray-600 mb-4">Master the interview flow, then practice with ELIO. Saved locally on your device.</p>
-
-  <!-- Progress -->
-  <div class="border rounded p-3 mb-4">
-    <div class="flex justify-between text-sm">
-      <span>Progress</span><span id="progressLabel">Step 1 / 10</span>
-=======
-## delete 1, 6, 7, 9, 5
 <html lang="en">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -601,7 +587,6 @@ date: 2025-10-29
                 Next
             </button>
         </div>
->>>>>>> 5d452b56c (changes to mod 3, changing styling)
     </div>
     <div class="w-full bg-gray-200 rounded h-2 mt-2">
       <div id="progressBar" class="bg-blue-600 h-2 rounded" style="width:10%"></div>

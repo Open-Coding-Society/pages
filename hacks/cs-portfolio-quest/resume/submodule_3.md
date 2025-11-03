@@ -79,14 +79,9 @@ date: 2025-10-21
       </div>
       <p id="miniQuizResult" class="text-sm mt-2"></p>
     </div>
-<<<<<<< HEAD
     <!-- moved to the right -->
     <div class="flex justify-end">
       <button id="toStep2" class="px-3 py-2 border rounded">See examples →</button>
-=======
-    <div>
-      <button id="toStep2" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700">See examples →</button>
->>>>>>> 5d452b56c (changes to mod 3, changing styling)
     </div>
   </section>
 
@@ -140,14 +135,9 @@ date: 2025-10-21
         </div>
       </div>
     </div>
-<<<<<<< HEAD
     <!-- moved to the right -->
     <div class="flex justify-end">
       <button id="toStep3" class="px-3 py-2 border rounded">Practice: drag & drop →</button>
-=======
-    <div>
-      <button id="toStep3" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700">Practice: drag & drop →</button>
->>>>>>> 5d452b56c (changes to mod 3, changing styling)
     </div>
   </section>
 
@@ -174,7 +164,6 @@ date: 2025-10-21
       <div class="font-medium mb-1 text-white">Items:</div>
       <div id="itemsPool" class="border border-dark rounded p-3 flex flex-wrap gap-2 bg-dark-card"></div>
     </div>
-<<<<<<< HEAD
     <!-- left: check/continue; right: skip/next -->
     <div class="flex items-center justify-between gap-2">
       <div class="flex gap-2">
@@ -184,11 +173,6 @@ date: 2025-10-21
       <div class="flex justify-end">
         <button id="skipToStep4" class="px-3 py-2 border rounded">Skip to writing →</button>
       </div>
-=======
-    <div class="flex gap-2">
-      <button id="checkAnswersBtn" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700 hidden">Check my answers</button>
-      <button id="toStep4" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700 hidden">Start writing →</button>
->>>>>>> 5d452b56c (changes to mod 3, changing styling)
     </div>
   </section>
 
@@ -208,7 +192,6 @@ date: 2025-10-21
     <div class="text-sm text-gray-custom">
       Tip: Use the <b class="text-white">Action → Metric → Result</b> format. Example: "Optimized SQL queries, reducing latency by 50% and increasing weekly retention by 12%."
     </div>
-<<<<<<< HEAD
     <div class="flex justify-end">
       <button id="toStep5" class="px-3 py-2 border rounded">Preview →</button>
     </div>
@@ -232,33 +215,6 @@ date: 2025-10-21
         disabled
       >Next Module →</button>
     </div>
-=======
-    <div>
-      <button id="toStep5" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700">Preview →</button>
-    </div>
-  </section>
-
-  <!-- STEP 5: Resume Preview -->
-  <section data-step="4" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold text-white">Preview</h2>
-    <div id="resumePreview" class="border border-dark rounded p-4 space-y-3 text-sm leading-6 bg-dark-card"></div>
-    <div class="grid md:grid-cols-2 gap-2">
-      <button id="saveDraft" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700">Save Draft</button>
-      <button id="submitFinal" class="px-3 py-2 border border-dark rounded bg-blue-600 text-white hover:bg-blue-700">Submit Final</button>
-    </div>
-    <p id="saveMessage" class="text-sm mt-1"></p>
-  </section>
-
-  <!-- Bottom Navigation -->
-  <div class="flex justify-between mt-4">
-    <button id="prevBtn" class="px-3 py-2 border border-dark rounded bg-dark-card text-white hover:bg-gray-700 disabled:opacity-40" disabled>Previous</button>
-    <button
-      id="nextModuleBtnNav"
-      data-href="/cs-portfolio-quest/resume/submodule_4/"
-      class="px-3 py-2 border border-dark rounded hidden bg-red-600 text-white disabled:opacity-60 hover:opacity-90"
-      disabled
-    >Next Module →</button>
->>>>>>> 5d452b56c (changes to mod 3, changing styling)
   </div>
 
   <p id="saveMessage" class="text-sm mt-1"></p>
@@ -687,7 +643,6 @@ document.addEventListener('DOMContentLoaded', () => {
   restore();
   showStep(0);
 });
-<<<<<<< HEAD
 
 // ✅ Floating MP4 sprite logic
 const floatingSprite = document.getElementById("floating-sprite");
@@ -715,9 +670,3 @@ function showFloatingSprite(charId) {
   }
 }
 </script>
-=======
-</script>
-
-</body>
-</html>
->>>>>>> 5d452b56c (changes to mod 3, changing styling)
