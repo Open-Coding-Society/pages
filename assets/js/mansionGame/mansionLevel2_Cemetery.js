@@ -24,6 +24,7 @@ class MansionLevel2_Cemetery {
       playerInput: [],        // Player's clicks so far
       lives: 3,              // Remaining lives
       round: 1,              // Current round number
+      maxRounds: 7,          // Maximum rounds to win the game
       isPlaying: false,      // Is game currently active?
       isPlayerTurn: false,   // Can player click gravestones now?
       gravestones: [],       // Array of gravestone NPCs
@@ -364,10 +365,23 @@ class MansionLevel2_Cemetery {
 
   /**
    * Handles when player successfully completes the sequence
-   * Advances to the next round
+   * Advances to the next round or wins the game
    */
   handleCompletedSequence() {
     this.memoryGame.isPlayerTurn = false;
+
+    // Check if player has completed all rounds
+    if (this.memoryGame.round >= this.memoryGame.maxRounds) {
+      // Player wins!
+      if (this.statusDisplay) {
+        this.statusDisplay.innerHTML = '🎉 YOU WIN! You beat the game!';
+      }
+      
+      setTimeout(() => {
+        this.endGameWithVictory();
+      }, 3000);
+      return;
+    }
 
     if (this.statusDisplay) {
       this.statusDisplay.innerHTML = '✅ Correct! Next round...';
@@ -402,6 +416,28 @@ class MansionLevel2_Cemetery {
       this.refreshUserInterface();
       this.beginNewRound();
     }, 3000);
+  }
+
+  /**
+   * Player has won the game by completing all rounds!
+   * Shows victory message and offers to restart
+   */
+  endGameWithVictory() {
+    if (this.statusDisplay) {
+      this.statusDisplay.innerHTML = '🏆 VICTORY! You completed all 7 rounds! Restarting...';
+    }
+
+    setTimeout(() => {
+      // Reset all game state to allow replay
+      this.memoryGame.lives = 3;
+      this.memoryGame.round = 1;
+      this.memoryGame.sequence = [];
+      this.memoryGame.playerInput = [];
+      
+      // Update UI and start fresh
+      this.refreshUserInterface();
+      this.beginNewRound();
+    }, 5000);
   }
 
   /**
