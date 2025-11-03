@@ -633,7 +633,7 @@ footer:
             <h2>What is an API?</h2>
             <div class="simple-explanation">
                 <h3>Simple Definition:</h3>
-                <p>An <strong>API (Application Programming Interface)</strong> is like a waiter at a restaurant. You tell the waiter what you want (make a request), the waiter goes to the kitchen (database), and brings back your food (data).</p>
+                <p>An <strong>API (Application Programming Interface)</strong> is like a football game. The coach will tell the quarterback what you want (make a request), the coach goes to the playbook (database), and brings back your play (data).</p>
             </div>
 
             <div class="simple-explanation">
