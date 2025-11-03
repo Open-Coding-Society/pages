@@ -12,61 +12,60 @@ author: "Encrypters Team"
 date: 2025-10-21
 ---
 
-# Submodule 2 Databases - Data Persistence & Management
+# Module 2: Databases & APIs 
 
-## Welcome to the World of Data Storage! 
 
-Imagine your backend without a database - every time the server restarts, all data disappears! Databases are the long-term memory of your application.
+In this module, you'll learn how **databases store data** and how **APIs transfer data**. APIs and Databases work together for a functional backend.
 
 ---
 
-## 1. Database Fundamentals
+## Understanding Databases
 
 ### What is a Database?
 
-A database is an organized collection of data that can be easily:
+A database is an organized collection of data that can be:
 - **Stored**: Save information permanently
 - **Retrieved**: Get information quickly
 - **Updated**: Change information
 - **Deleted**: Remove information
 
-### Real-World Analogy: Library vs. Pile of Books
-
-**Without Database** (Pile of Books):
-```
-All books thrown in a room
-Want to find "Harry Potter"? → Search through every book
-Want all books by J.K. Rowling? → Search through every book again
-Want to add a book? → Throw it in the pile
-Organization? → None!
-```
-
-**With Database** (Organized Library):
-```
-Books organized by:
-- Author (quick lookup)
-- Category (find similar books)
-- ISBN (unique identifier)
-Want "Harry Potter"? → Look up catalog, find shelf A3
-Want all J.K. Rowling books? → Check author index
-Add a book? → Assign location, update catalog
-```
+Databases are like organized libraries that make finding and managing data efficient.
 
 ---
 
-## 2. Relational vs. Non-Relational Databases
+## SQL vs NoSQL Databases
 
-### Relational Databases (SQL)
+### Quick Comparison
 
-Think of spreadsheets with multiple sheets that reference each other.
+| Feature | SQL (Relational) | NoSQL (Non-Relational) |
+|---------|------------------|------------------------|
+| **Structure** | Tables with fixed columns | Flexible documents/objects |
+| **Relationships** | Foreign keys, JOIN operations | Nested documents |
+| **Schema** | Must be defined upfront | Can change anytime |
+| **Best for** | Complex queries, transactions | Fast reads, flexible data |
+| **Examples** | PostgreSQL, MySQL, SQLite | MongoDB, Firebase |
 
-**Examples**: PostgreSQL, MySQL, SQLite
+### When to Use Each
 
-**Structure**: Tables with rows and columns
+**Choose SQL when:**
+- Data has clear relationships (users have posts, orders have items)
+- Data integrity is critical (banking, healthcare)
+- Need complex queries (find all users who posted in January AND have >100 followers)
 
-**Example - Social Media App**:
+**Choose NoSQL when:**
+- Data structure varies (not all records have same fields)
+- Need rapid development (structure can change easily)
+- Scaling horizontally (millions of users across many servers)
 
-**Users Table**:
+---
+
+## SQL Fundamentals
+
+### Tables, Columns, and Rows
+
+The following example is a representation of how a Database can be used in a social media app:
+
+**Users Table:**
 ```
 +----+----------+-------------------+------------+
 | id | username | email             | created_at |
@@ -76,467 +75,580 @@ Think of spreadsheets with multiple sheets that reference each other.
 +----+----------+-------------------+------------+
 ```
 
-**Posts Table**:
+**Posts Table:**
 ```
 +----+---------+------------------+-------+------------+
-| id | user_id | content          | likes | created_at |
+| id | user_id | message          | likes | created_at |
 +----+---------+------------------+-------+------------+
 | 1  | 1       | Hello world!     | 10    | 2024-01-16 |
-| 2  | 1       | Learning SQL!    | 5     | 2024-01-17 |
-| 3  | 2       | Backend is fun   | 15    | 2024-01-21 |
+| 2  | 2       | Backend is fun   | 15    | 2024-01-21 |
 +----+---------+------------------+-------+------------+
 ```
 
-Notice: `user_id` in Posts connects to `id` in Users!
-
-**When to Use SQL**:
-- Data has clear relationships (users have posts, orders have items)
-- Need complex queries (find all users who posted in January AND have >100 followers)
-- Data integrity is critical (banking, healthcare)
-- Structured data that fits in tables
-
----
-
-### Non-Relational Databases (NoSQL)
-
-**Structure**: Collections of documents (like JSON objects)
-
-**Example - Same Social Media App**:
-
-**Users Collection**:
-```json
-{
-  "_id": "abc123",
-  "username": "alice",
-  "email": "alice@email.com",
-  "posts": [
-    {
-      "content": "Hello world!",
-      "likes": 10,
-      "created_at": "2024-01-16"
-    },
-    {
-      "content": "Learning SQL!",
-      "likes": 5,
-      "created_at": "2024-01-17"
-    }
-  ],
-  "created_at": "2024-01-15"
-}
-```
-
-Everything for one user is stored together!
-
-**When to Use NoSQL**:
-- Flexible data structure (not all users have same fields)
-- Need to scale horizontally (millions of users)
-- Rapid development (structure can change easily)
-- Hierarchical data (comments within posts within users)
-
----
-
-### Comparison Table
-
-| Feature | SQL (Relational) | NoSQL (Non-Relational) |
-|---------|------------------|------------------------|
-| **Structure** | Tables with fixed columns | Flexible documents/objects |
-| **Relationships** | Foreign keys, JOIN operations | Nested documents or references |
-| **Schema** | Must be defined upfront | Can change anytime |
-| **Scaling** | Vertical (bigger server) | Horizontal (more servers) |
-| **Best for** | Complex queries, transactions | Fast reads, flexible data |
-| **Learning curve** | Moderate (need to learn SQL) | Easier (like working with JSON) |
-
----
-
-## 3. More on SQL (We'll focus on SQL for this course)
-
-### Tables, Columns, and Rows
-
-**Key Terms**:
-- **Table**: A collection of related data (like "users" or "posts")
-- **Column**: A specific attribute (like "email" or "username")
-- **Row**: A single record (one user, one post)
-- **Schema**: The structure/blueprint of a table (what columns exist and their types)
+When working with SQL databases, knowing the following terms will be crucial:
+- **Table**: Collection of related data (users, posts)
+- **Column**: Specific attribute (email, username)
+- **Row**: Single record (one user, one post)
+- **Primary Key**: Unique identifier (id column)
+- **Foreign Key**: Links tables together (user_id in posts → id in users)
 
 ---
 
 ### Data Types
 
-Just like variables in programming, database columns have types:
-
-#### Common Data Types:
-
-**Text Types**:
+**Common SQL Data Types:**
 ```sql
-VARCHAR(50)    → Variable-length text up to 50 characters
-                 Example: usernames, emails
-                 
-TEXT           → Long text (no limit)
-                 Example: blog post content, descriptions
-                 
-CHAR(2)        → Fixed-length text
-                 Example: US state codes (CA, NY, TX)
-```
-
-**Number Types**:
-```sql
-INT            → Whole numbers (-2,147,483,648 to 2,147,483,647)
-                 Example: age, post count
-                 
-BIGINT         → Really big whole numbers
-                 Example: view counts, like counts
-                 
-DECIMAL(10,2)  → Decimal numbers (10 total digits, 2 after decimal)
-                 Example: prices (199.99), ratings (4.75)
-                 
-FLOAT          → Approximate decimal numbers
-                 Example: scientific calculations
-```
-
-**Date/Time Types**:
-```sql
+VARCHAR(50)    → Variable-length text (usernames, emails)
+TEXT           → Long text (blog content)
+INT            → Whole numbers (age, count)
+DECIMAL(10,2)  → Decimal numbers (prices: 199.99)
 DATE           → Date only (2024-01-15)
-                 Example: birthday, account creation date
-                 
-TIME           → Time only (14:30:00)
-                 Example: appointment time
-                 
-TIMESTAMP      → Date and time together (2024-01-15 14:30:00)
-                 Example: when post was created, last login
+TIMESTAMP      → Date and time (2024-01-15 14:30:00)
+BOOLEAN        → True or False (is_active, email_verified)
 ```
 
-**Boolean Type**:
-```sql
-BOOLEAN        → True or False
-                 Example: is_active, email_verified, is_admin
-```
-
-**Creating a Table with Types**:
-```sql
-CREATE TABLE users (
-    id INT,
-    username VARCHAR(30),
-    email VARCHAR(100),
-    age INT,
-    bio TEXT,
-    is_active BOOLEAN,
-    account_balance DECIMAL(10,2),
-    created_at TIMESTAMP
-);
-```
-
----
-
-### Primary Keys: Unique Identifiers
-
-Every row needs a unique identifier (like a person's ID card).
-
-**Without Primary Key** :
-```
-users table:
-+----------+-----------------+
-| username | email           |
-+----------+-----------------+
-| alice    | alice@email.com |
-| alice    | alice@email.com |  ← Duplicate! Which Alice?
-+----------+-----------------+
-```
-
-**With Primary Key**:
-```
-users table:
-+----+----------+-----------------+
-| id | username | email           |
-+----+----------+-----------------+
-| 1  | alice    | alice@email.com |
-| 2  | alice    | other@email.com |  ← Different person!
-+----+----------+-----------------+
-```
-
-**Creating with Primary Key**:
-```sql
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,  -- Automatically increases
-    username VARCHAR(30),
-    email VARCHAR(100)
-);
-```
----
-
-### Foreign Keys: Connecting Tables
-
-Foreign keys create relationships between tables.
-
-**Example: Blog System**
-
-**Users Table**:
+**Creating a Table:**
 ```sql
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(30),
-    email VARCHAR(100)
+    username VARCHAR(30) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-**Posts Table**:
+---
+
+### Relationships Between Tables
+
+**One-to-Many Example:**
 ```sql
 CREATE TABLE posts (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,                        -- Foreign Key!
+    user_id INT,
     title VARCHAR(200),
     content TEXT,
-    created_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
 
-**What This Means**:
+**What this means:**
+- One user can have many posts
+- Each post belongs to one user
 - `user_id` in posts MUST match an `id` in users
-- Can't create a post with `user_id = 999` if user 999 doesn't exist
 - Protects data integrity!
 
-**Visual Representation**:
+---
+
+## Understanding APIs
+
+### What is an API?
+
+**API** = Application Programming Interface
+
+A set of rules that lets programs talk to each other.
+
+### Restaurant Analogy
 ```
-users table:                    posts table:
-+----|----------+               +----+---------+-------------+
-| id | username |               | id | user_id | title       |
-|----|----------|               |----|---------|-------------|
-| 1  | alice    |   ←───────────| 1  | 1       | First post  |
-| 2  | bob      |   ←───────────| 2  | 2       | Hello!      |
-+----|----------+           ↑   | 3  | 1       | Second one  |
-                            |   +----+---------+-------------+
-                            |
-                    user_id connects to id
+You (Frontend)  →  Waiter (API)  →  Chef (Backend)  →  Kitchen (Database)
+
+1. You order a cheeseburger
+2. Waiter takes order to chef
+3. Chef gets ingredients from kitchen
+4. Waiter brings burger back to you
+```
+
+**Key Point**: The API is the what allows connection between the  frontend and backend.
+
+---
+
+## RESTful API Design
+
+### What is REST?
+
+REST = **RE**presentational **S**tate **T**ransfer
+
+Rules for creating predictable, scalable APIs:
+- URLs represent resources (things like "users" or "posts")
+- HTTP methods represent actions (GET, POST, PUT, DELETE)
+- Each request is independent (stateless)
+- Responses use standard formats (JSON)
+
+### HTTP Methods
+
+| Method | Purpose | Database Operation | Example |
+|--------|---------|-------------------|---------|
+| **GET** | Retrieve data | SELECT | Get all posts |
+| **POST** | Create data | INSERT | Create new post |
+| **PUT** | Replace data | UPDATE | Replace entire post |
+| **PATCH** | Update partially | UPDATE | Change just title |
+| **DELETE** | Remove data | DELETE | Delete post |
+
+**Good URL Design Examples**:
+```
+GET    /api/users          → Get all users
+GET    /api/users/42       → Get user 42
+POST   /api/users          → Create new user
+PUT    /api/users/42       → Update user 42
+DELETE /api/users/42       → Delete user 42
+GET    /api/users/42/posts → Get posts by user 42
+```
+
+
+**Tip**: Use nouns (things), not verbs (actions)
+
+---
+
+## HTTP Request/Response Cycle
+
+### Anatomy of a Request
+```
+POST /api/posts HTTP/1.1
+Host: api.myapp.com
+Content-Type: application/json
+Authorization: Bearer abc123token
+
+{
+  "title": "My First Post",
+  "content": "Hello world!"
+}
+```
+
+**Parts:**
+- **Method**: POST (creating data)
+- **URL**: /api/posts (the resource)
+- **Headers**: Metadata (content type, authentication)
+- **Body**: The actual data being sent
+
+### Anatomy of a Response
+```
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{
+  "id": 42,
+  "title": "My First Post",
+  "content": "Hello world!",
+  "created_at": "2024-10-28T10:30:00Z"
+}
+```
+
+**Parts:**
+- **Status Code**: 201 (success - created)
+- **Headers**: Metadata about response
+- **Body**: The data being returned
+
+---
+
+## A brief overview of Status Codes
+
+
+| Code | Meaning | When to Use |
+|------|---------|-------------|
+| **200 OK** | Success | GET, PUT, PATCH worked |
+| **201 Created** | Resource created | POST worked |
+| **204 No Content** | Success, no data | DELETE worked |
+| **400 Bad Request** | Invalid data | Missing required field |
+| **401 Unauthorized** | Not logged in | No auth token |
+| **403 Forbidden** | Not allowed | User trying to access admin page |
+| **404 Not Found** | Doesn't exist | User 999 doesn't exist |
+| **500 Internal Server Error** | Server crashed | Bug in code |
+| **503 Service Unavailable** | Server down | Maintenance mode |
+These status codes may be returned by the terminal/debug or postman, or in whichever medium that is being used to send a request.
+
+---
+
+## CRUD Operations Through APIs
+
+CRUD = **C**reate, **R**ead, **U**pdate, **D**elete
+
+Now we can learn how APIs and Databases work together. In applications, you will create **API endpoints** to perform CRUD operations. 
+
+### CREATE - Adding Data
+
+**API Endpoint:**
+```python
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    # Get data from request
+    data = request.json
+    
+    # Create new user (ORM converts to SQL INSERT)
+    new_user = User(
+        username=data['username'],
+        email=data['email']
+    )
+    
+    # Save to database
+    db.session.add(new_user)
+    db.session.commit()
+    
+    return jsonify(new_user.to_dict()), 201
 ```
 
 ---
 
-## 4. CRUD Operations in SQL
+### READ - Retrieving Data via API
 
-CRUD = **C**reate, **R**ead, **U**pdate, **D**elete (the four basic operations)
-
-### CREATE (INSERT)
-
-**Adding Data to Tables**
-
-**Single Row**:
-```sql
-INSERT INTO users (username, email, created_at)
-VALUES ('alice', 'alice@email.com', NOW());
+**Get All Users:**
+```python
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    # Query all users (ORM converts to SQL SELECT)
+    users = User.query.all()
+    
+    return jsonify([user.to_dict() for user in users])
+```
+**Get Specific User:**
+```python
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    # Find user by ID (ORM adds WHERE clause)
+    user = User.query.get_or_404(user_id)
+    
+    return jsonify(user.to_dict())
 ```
 
-**Multiple Rows**:
-```sql
-INSERT INTO users (username, email, created_at)
-VALUES 
-    ('alice', 'alice@email.com', NOW()),
-    ('bob', 'bob@email.com', NOW()),
-    ('charlie', 'charlie@email.com', NOW());
-```
-
-**Real-World Scenario**: User signs up on your website
-```sql
--- They fill out registration form
-INSERT INTO users (username, email, password_hash, is_active)
-VALUES ('new_user', 'newuser@email.com', '$2b$12$...', true);
-```
-
----
-
-### READ (SELECT)
-
-**Retrieving Data**
-
-**Get Everything**:
-```sql
-SELECT * FROM users;
--- * means "all columns"
-```
-
-Result:
-```
-+----+----------+-------------------+------------+
-| id | username | email             | created_at |
-+----+----------+-------------------+------------+
-| 1  | alice    | alice@email.com   | 2024-01-15 |
-| 2  | bob      | bob@email.com     | 2024-01-20 |
-+----+----------+-------------------+------------+
-```
-
-**Get Specific Columns**:
-```sql
-SELECT username, email FROM users;
-```
-
-Result:
-```
-+----------+-------------------+
-| username | email             |
-+----------+-------------------+
-| alice    | alice@email.com   |
-| bob      | bob@email.com     |
-+----------+-------------------+
-```
-
-**WHERE Clause (Filtering)**:
-```sql
--- Find specific user
-SELECT * FROM users WHERE username = 'alice';
-
--- Find users created after a date
-SELECT * FROM users WHERE created_at > '2024-01-18';
-
--- Multiple conditions (AND)
-SELECT * FROM users 
-WHERE is_active = true AND created_at > '2024-01-01';
-
--- Multiple conditions (OR)
-SELECT * FROM users 
-WHERE username = 'alice' OR username = 'bob';
-```
-
-**Comparison Operators**:
-```sql
-=     → equals
-!=    → not equals
->     → greater than
-<     → less than
->=    → greater than or equal
-<=    → less than or equal
-LIKE  → pattern matching
-
--- Examples:
-SELECT * FROM posts WHERE likes > 10;
-SELECT * FROM users WHERE email LIKE '%@gmail.com';  -- % = wildcard
-SELECT * FROM products WHERE price BETWEEN 10 AND 50;
-```
-
-**ORDER BY (Sorting)**:
-```sql
--- Oldest first
-SELECT * FROM users ORDER BY created_at ASC;
-
--- Newest first
-SELECT * FROM users ORDER BY created_at DESC;
-
--- Most liked posts
-SELECT * FROM posts ORDER BY likes DESC;
-```
-
-**LIMIT (Get Only Some Results)**:
-```sql
--- Get 10 most recent posts
-SELECT * FROM posts 
-ORDER BY created_at DESC 
-LIMIT 10;
-
--- Get posts 11-20 (pagination)
-SELECT * FROM posts 
-ORDER BY created_at DESC 
-LIMIT 10 OFFSET 10;
+**Filtering with Query Parameters:**
+```python
+@app.route('/api/posts', methods=['GET'])
+def get_posts():
+    # Get query parameters
+    category = request.args.get('category')
+    limit = request.args.get('limit', 20, type=int)
+    
+    # Build filtered query
+    query = Post.query
+    
+    if category:
+        query = query.filter_by(category=category)
+    
+    # Sort and limit results
+    posts = query.order_by(Post.created_at.desc()).limit(limit).all()
+    
+    return jsonify([post.to_dict() for post in posts])
 ```
 
 ---
 
-### UPDATE (Modify Existing Data)
+### UPDATE - Modifying Data via API
 
-**Change Data in Database**
-
-**Update Single Column**:
-```sql
-UPDATE users 
-SET email = 'newemail@example.com'
-WHERE id = 1;
+**Update User:**
+```python
+@app.route('/api/users/<int:user_id>', methods=['PATCH'])
+def update_user(user_id):
+    # Find user
+    user = User.query.get_or_404(user_id)
+    
+    # Get updated data
+    data = request.json
+    
+    # Update only provided fields
+    if 'username' in data:
+        user.username = data['username']
+    if 'email' in data:
+        user.email = data['email']
+    
+    # Save changes (ORM converts to SQL UPDATE)
+    db.session.commit()
+    
+    return jsonify(user.to_dict())
 ```
 
-**Update Multiple Columns**:
-```sql
-UPDATE users 
-SET 
-    username = 'alice_updated',
-    email = 'alice_new@email.com',
-    updated_at = NOW()
-WHERE id = 1;
-```
 
-**DANGER - Updating Without WHERE**:
-```sql
--- This updates EVERY user!
-UPDATE users SET username = 'alice';  -- Don't do this!
-```
+**Make sure to specify the user so that you don't update all users.**
+```python
+# BAD - Updates ALL users!
+User.query.update({'username': 'alice'})
+db.session.commit()
 
-**Real-World Scenarios**:
-```sql
--- User changes their profile
-UPDATE users 
-SET bio = 'Backend developer learning SQL'
-WHERE id = 5;
-
--- Increment like count on a post
-UPDATE posts 
-SET likes = likes + 1
-WHERE id = 42;
-
--- Mark user as verified
-UPDATE users 
-SET email_verified = true, verified_at = NOW()
-WHERE email = 'user@example.com';
+# GOOD - Only updates specific user
+user = User.query.get(user_id)
+user.username = 'alice'
+db.session.commit()
 ```
 
 ---
 
-### DELETE (Remove Data)
+### DELETE - Removing Data via API
 
-**Remove Rows from Table**
-
-**Delete Specific Row**:
-```sql
-DELETE FROM users WHERE id = 5;
+**Delete User:**
+```python
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    # Find user
+    user = User.query.get_or_404(user_id)
+    
+    # Delete from database (ORM converts to SQL DELETE)
+    db.session.delete(user)
+    db.session.commit()
+    
+    # Return empty response with 204 status
+    return '', 204
 ```
 
-**Delete Multiple Rows**:
-```sql
--- Delete all inactive users
-DELETE FROM users WHERE is_active = false;
+**Be cautious not to delete all data:**
+```python
+# BAD - Deletes ALL users!
+User.query.delete()
+db.session.commit()
 
--- Delete old posts
-DELETE FROM posts WHERE created_at < '2023-01-01';
+# GOOD - Only deletes specific user
+user = User.query.get(user_id)
+db.session.delete(user)
+db.session.commit()
 ```
 
-**EXTREME DANGER - Delete Without WHERE**:
-```sql
--- This deletes EVERYTHING!
-DELETE FROM users;  -- ALL USERS GONE!
+---
+
+### Summary: CRUD in APIs vs Raw SQL
+
+| Operation | API Code (What You Write) | SQL Generated (Behind the Scenes) |
+|-----------|--------------------------|-----------------------------------|
+| **CREATE** | `db.session.add(user)` | `INSERT INTO users ...` |
+| **READ** | `User.query.all()` | `SELECT * FROM users` |
+| **READ ONE** | `User.query.get(42)` | `SELECT * FROM users WHERE id = 42` |
+| **UPDATE** | `user.email = 'new@email.com'` | `UPDATE users SET email = '...' WHERE id = 42` |
+| **DELETE** | `db.session.delete(user)` | `DELETE FROM users WHERE id = 42` |
+---
+
+## A review of Databases and APIs working together
+
+### Scenario: User Creates a New Post
+
+**Step 1: Frontend sends request**
+```javascript
+fetch('https://api.myapp.com/posts', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer abc123'
+  },
+  body: JSON.stringify({
+    title: 'My Post',
+    content: 'Hello world!'
+  })
+})
 ```
+
+**Step 2: Backend receives request (Flask)**
+```python
+@app.route('/api/posts', methods=['POST'])
+def create_post():
+    # 1. Get data from request
+    data = request.json
+    
+    # 2. Validate data
+    if not data.get('title'):
+        return jsonify({'error': 'Title required'}), 400
+    
+    # 3. Create database record
+    post = Post(
+        title=data['title'],
+        content=data['content'],
+        user_id=get_current_user_id()
+    )
+    
+    # 4. Save to database
+    db.session.add(post)
+    db.session.commit()
+    
+    # 5. Return response
+    return jsonify({
+        'id': post.id,
+        'title': post.title,
+        'created_at': post.created_at
+    }), 201
+```
+
+**Step 3: Database stores data**
+```sql
+-- ORM generates this SQL automatically
+INSERT INTO posts (title, content, user_id, created_at)
+VALUES ('My Post', 'Hello world!', 5, '2024-10-28 10:30:00');
+```
+
+**Step 4: Response sent back**
+```json
+{
+  "id": 42,
+  "title": "My Post",
+  "created_at": "2024-10-28T10:30:00Z"
+}
+```
+
+**Step 5: Frontend displays success**
+```javascript
+.then(response => response.json())
+.then(data => {
+  console.log('Post created with ID:', data.id);
+  alert('Post created successfully!');
+})
+```
+---
+
+
+## Testing APIs with Postman
+
+### What is Postman?
+
+Postman is a tool for testing APIs without writing frontend code. 
+
+### Using Postman
+
+1. **Create a new request**
+2. **Set HTTP method** (GET, POST, etc.)
+3. **Enter URL** (http://localhost:5000/api/posts)
+4. **Add headers** if needed (Content-Type, Authorization)
+5. **Add body** for POST/PUT requests
+6. **Click send and view the response**
+
+### Testing Example Scenarios
+
+**Test 1: Create Post (Success)**
+```
+POST http://localhost:5000/api/posts
+Headers: Content-Type: application/json
+Body: {"title": "Test", "content": "Hello"}
+Expected: 201 Created
+```
+
+### Using Environment Variables
+
+Instead of typing `http://localhost:5000` every time:
+
+1. Create environment: "Local Dev"
+2. Add variable: `base_url = http://localhost:5000`
+3. Use in requests: `{{base_url}}/api/posts`
+
+---
+
+## JSON Format
+
+### What is JSON?
+
+**JSON** = **J**ava**S**cript **O**bject **N**otation
+
+The standard format for API data exchange.
+
+**Example:**
+```json
+{
+  "id": 42,
+  "username": "alice",
+  "email": "alice@example.com",
+  "posts": [
+    {
+      "id": 1,
+      "title": "First Post",
+      "likes": 10
+    },
+    {
+      "id": 2,
+      "title": "Second Post",
+      "likes": 5
+    }
+  ],
+  "is_active": true,
+  "created_at": "2024-10-28T10:30:00Z"
+}
+```
+
+**Features of JSON:**
+- Human-readable and machine-parseable
+- Supports strings, numbers, booleans, arrays, objects, null
+- Language-independent (works with Python, Java, JavaScript, etc.)
 
 ---
 
 ## Key Takeaways
 
- **Databases** provide permanent storage for application data
+### Databases
+- Store data permanently (survives server restarts)  
+- SQL uses tables with relationships (foreign keys)  
+- CRUD operations: INSERT, SELECT, UPDATE, DELETE  
+  -  Always use WHERE in UPDATE/DELETE to avoid disasters  
 
- **SQL databases** use tables with rows and columns (like spreadsheets)
+### APIs
+- REST uses HTTP methods (GET, POST, PUT, DELETE) + URLs  
+- Status codes communicate success and errors
+- JSON is the standard data format  
+- Path parameters identify resources, query parameters - filter them  
 
- **Primary keys** uniquely identify each row
+### Integration
+- APIs expose database data to the world  
+- Each API endpoint typically maps to database CRUD operations  
+- Backend validates requests before touching database  
+- ORMs (like SQLAlchemy) convert Python code to SQL automatically  
+- Postman helps test APIs without building a frontend  
 
- **Foreign keys** create relationships between tables
 
- **CRUD operations**: Create (INSERT), Read (SELECT), Update (UPDATE), Delete (DELETE)
+## Vocab Short Answers — Module 2
 
- **Always use WHERE** with UPDATE and DELETE to avoid disaster
+Fill the short vocabulary words that match the clues below. Type your answer (letters only) and click Submit. Only your total score will be shown.
 
- **Data types** define what kind of information each column can hold
+<div id="vocab-crossword" style="border:1px solid #e0e0e0;padding:12px;border-radius:6px;max-width:760px;">
+  <ol>
+    <li>
+      <div style="margin-bottom:6px"><strong>1.</strong> A structured collection of rows and columns in a relational database. (5 letters)</div>
+      <input name="w0" maxlength="5" style="width:120px;text-transform:uppercase" />
+    </li>
 
----
+    <li>
+      <div style="margin-bottom:6px"><strong>2.</strong> One record in a table. (3 letters)</div>
+      <input name="w1" maxlength="3" style="width:80px;text-transform:uppercase" />
+    </li>
 
-## Next Steps
+    <li>
+      <div style="margin-bottom:6px"><strong>3.</strong> Common format for API request and response bodies. (4 letters)</div>
+      <input name="w2" maxlength="4" style="width:100px;text-transform:uppercase" />
+    </li>
 
-In **Module 3**, we'll explore **APIs and HTTP Requests**! You'll learn:
-- How to design RESTful APIs
-- Understanding HTTP methods and status codes
-- Testing APIs with Postman
-- Handling errors gracefully
-- Building API endpoints that connect to your database
+    <li>
+      <div style="margin-bottom:6px"><strong>4.</strong> HTTP method used to create new resources via an API. (4 letters)</div>
+      <input name="w3" maxlength="4" style="width:100px;text-transform:uppercase" />
+    </li>
 
-Get ready to expose your database to the world through APIs!
+    <li>
+      <div style="margin-bottom:6px"><strong>5.</strong> SQL operation that combines rows from two tables based on a related column. (4 letters)</div>
+      <input name="w4" maxlength="4" style="width:100px;text-transform:uppercase" />
+    </li>
+  </ol>
 
+  <div style="margin-top:12px;">
+    <button id="vocab-submit">Submit</button>
+    <button id="vocab-reset" type="button" style="margin-left:8px">Reset</button>
+    <span id="vocab-result" style="margin-left:12px;font-weight:600"></span>
+  </div>
+</div>
+
+<script>
+(() => {
+  const answers = ['TABLE','ROW','JSON','POST','JOIN'];
+  const submitBtn = document.getElementById('vocab-submit');
+  const resetBtn = document.getElementById('vocab-reset');
+  const resultSpan = document.getElementById('vocab-result');
+  const container = document.getElementById('vocab-crossword');
+
+  function getInputs() { return Array.from(container.querySelectorAll('input')).map(i => i.value.trim().toUpperCase()); }
+
+  submitBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const vals = getInputs();
+    let score = 0;
+    for (let i = 0; i < answers.length; i++) if (vals[i] === answers[i]) score += 1;
+    resultSpan.textContent = `You scored ${score} / ${answers.length}`;
+    container.querySelectorAll('input').forEach(i => i.disabled = true);
+    submitBtn.disabled = true;
+  });
+
+  resetBtn.addEventListener('click', () => {
+    container.querySelectorAll('input').forEach(i => { i.value = ''; i.disabled = false; });
+    resultSpan.textContent = '';
+    submitBtn.disabled = false;
+  });
+})();
+</script>
+
+## Up Next
+In the next submodule, you'll learn about different backend frameworks. Keep progressing in order to receive a certificate for completing this module.

@@ -2,7 +2,7 @@
 layout: post
 title: "Mission 1 — Build the Base Database"
 description: "Submodule 1 of Frontend Development Mini-Quest"
-permalink: /digital-famine/cyber/submodule_1/
+permalink: /digital-famine/cybersecurity-game/submodule_1/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 1

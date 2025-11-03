@@ -150,7 +150,7 @@ class MansionLevel4 {
             </style>
             <div style="font-size: 48px; margin-bottom: 15px;">🎰</div>
             <h2 style="color: #f39c12; font-size: 32px; margin: 0 0 15px 0; font-weight: bold;">BLACKJACK TABLE</h2>
-            <p style="color: white; font-size: 20px; margin: 10px 0;">Win $25,000 to escape!</p>
+            <p style="color: white; font-size: 20px; margin: 10px 0;">Win $10,000 to escape!</p>
             <div style="margin-top: 25px; padding: 15px; background: #f39c12; border-radius: 10px;">
                 <p style="color: white; font-size: 24px; margin: 0; font-weight: bold;">Press [E] to Enter</p>
             </div>
