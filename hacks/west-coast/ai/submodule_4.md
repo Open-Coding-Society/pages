@@ -15,7 +15,7 @@ footer:
   previous: /west-coast/ai/submodule_3/
   home: /west-coast/ai/
 ---
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />

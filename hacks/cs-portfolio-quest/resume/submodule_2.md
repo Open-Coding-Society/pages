@@ -1,7 +1,7 @@
 ---
 layout: cs-portfolio-lesson
-title: "Submodule 2"
-description: "Submodule 2 of Resume Building Mini-Quest"
+title: "Personal Info and Skills"
+description: "Learn about why you need personal info and skills on your resume and add your own"
 permalink: /cs-portfolio-quest/resume/submodule_2/
 parent: "Resume Building"
 team: "Grinders"
@@ -116,27 +116,70 @@ date: 2025-10-21
   </section>
 
   <!-- STEP 5: SKILLS -->
-  <section data-step="4" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">Skills (code-related)</h2>
-    <div id="skillsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm"></div>
-    <div class="flex gap-2">
-      <input id="customSkill" class="flex-1 border rounded px-3 py-2" placeholder="Add custom skill (ex: Teamwork•)">
-      <button id="addSkillBtn" class="px-3 py-2 border rounded">Add</button>
+<section data-step="4" class="space-y-4 hidden">
+  <h2 class="text-xl font-semibold">Skills</h2>
+
+  <!-- Teaching block: Hard vs Soft skills (styled like the rest) -->
+  <div class="border rounded p-3 space-y-3">
+    <div class="font-medium">
+      Watch this video to learn about the different types of skills employers are looking for in a candidate
     </div>
-    <div id="skillTags" class="flex flex-wrap gap-2"></div>
-    <details class="border rounded p-3">
-      <summary class="font-medium cursor-pointer">Why this matters</summary>
-      <p class="text-sm mt-2">Skills are used to match you to roles. Include 8–12 that you can explain or demonstrate.</p>
-    </details>
-  </section>
+    <!-- Embedded video -->
+    <div class="relative rounded overflow-hidden" style="padding-top: 56.25%;">
+      <iframe
+        class="absolute inset-0 w-full h-full"
+        src="https://www.youtube.com/embed/0FFLFcB9xfQ"
+        title="Hard vs Soft Skills"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
+    </div>
+    <!-- Quick guidance (kept neutral) -->
+    <div class="text-sm bg-gray-700 border rounded p-3">
+      <b>How many of each?</b> Aim for <b>~8–12 total skills</b> tailored to the job:
+      <ul class="list-disc ml-5 mt-1">
+        <li><b>~60–80%</b> hard skills that match the posting (tools, languages, methods).</li>
+        <li><b>~20–40%</b> soft skills to show you can collaborate and deliver.</li>
+      </ul>
+      Keep only skills you can <i>explain and demonstrate</i>.
+    </div>
+  </div>
+
+  <!-- Selection UI split into Hard / Soft (equal size) -->
+  <div class="grid md:grid-cols-2 gap-4 items-stretch">
+    <!-- HARD -->
+    <div class="border rounded p-3 flex flex-col h-full">
+      <div class="font-medium mb-2">Hard Skills</div>
+      <div id="hardSkillsGrid" class="grid grid-cols-2 gap-2 text-sm mb-3"></div>
+      <div class="mt-auto">
+        <div class="flex gap-2">
+          <input id="customHardSkill" class="flex-1 border rounded px-3 py-2" placeholder="Add hard skill (e.g., Python)">
+          <button id="addHardSkillBtn" class="px-3 py-2 border rounded">Add</button>
+        </div>
+        <div id="hardSkillTags" class="flex flex-wrap gap-2 mt-2"></div>
+      </div>
+    </div>
+    <!-- SOFT -->
+    <div class="border rounded p-3 flex flex-col h-full">
+      <div class="font-medium mb-2">Soft Skills</div>
+      <div id="softSkillsGrid" class="grid grid-cols-2 gap-2 text-sm mb-3"></div>
+      <div class="mt-auto">
+        <div class="flex gap-2">
+          <input id="customSoftSkill" class="flex-1 border rounded px-3 py-2" placeholder="Add soft skill (e.g., Communication)">
+          <button id="addSoftSkillBtn" class="px-3 py-2 border rounded">Add</button>
+        </div>
+        <div id="softSkillTags" class="flex flex-wrap gap-2 mt-2"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
   <!-- STEP 6: REVIEW & SAVE -->
   <section data-step="5" class="space-y-3 hidden">
     <h2 class="text-xl font-semibold">Preview</h2>
-    <!-- Human-readable resume preview -->
-    <div id="resumePreview" class="border rounded p-4 space-y-2 text-sm leading-6">
-      <!-- Filled by JS as paragraph/resume form -->
-    </div>
+    <div id="resumePreview" class="border rounded p-4 space-y-2 text-sm leading-6"></div>
     <div class="grid md:grid-cols-2 gap-2">
       <button id="saveDraft" class="px-3 py-2 border rounded">Save Draft</button>
       <button id="submitFinal" class="px-3 py-2 border rounded">Submit Final</button>
@@ -147,9 +190,7 @@ date: 2025-10-21
   <!-- Bottom Nav -->
   <div class="flex justify-between mt-4">
     <button id="prevBtn" class="px-3 py-2 border rounded" disabled>Previous</button>
-    <!-- Normal Next (hidden on last step) -->
     <button id="nextBtn" class="px-3 py-2 border rounded">Next</button>
-    <!-- Next Module button (visible only on last step; enabled after Submit Final) -->
     <button
       id="nextModuleBtnNav"
       data-href="/cs-portfolio-quest/resume/submodule_3/"
@@ -157,6 +198,19 @@ date: 2025-10-21
       disabled
     >Next Module →</button>
   </div>
+
+  <!-- Floating Selected Sprite -->
+  <video id="floating-sprite" width="150" height="160" loop muted playsinline style="
+    position: fixed;
+    bottom: 20px;
+    right: -200px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 1000;
+  ">
+    <source id="floating-source" src="" type="video/mp4">
+  </video>
 </div>
 
 <script>
@@ -164,10 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------- State -------
   const state = {
     step: 0,
-    submitted: false, // becomes true after Submit Final
+    submitted: false,
     personal: { fullName:"", email:"", phone:"", location:"" },
     education: { school:"", degree:"", eduHighlights:"" },
-    skills: new Set()
+    skillsHard: new Set(),
+    skillsSoft: new Set()
   };
 
   // ------- DOM -------
@@ -202,44 +257,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const addressQuiz = $("#addressQuiz");
   const addressQuizResult = $("#addressQuizResult");
 
-  // Skills UI
-  const curated = ["JavaScript","Python","Java","HTML","CSS","React","Node.js","SQL","Git","Linux","Docker","AWS"];
-  const skillsGrid = $("#skillsGrid");
-  const customSkillInput = $("#customSkill");
-  const addSkillBtn = $("#addSkillBtn");
-  const skillTags = $("#skillTags");
+  // Skills (split) — equal count for even columns
+  const hardCurated = ["JavaScript","Python","Java","Flask","SQL","Git","Linux","Html"];
+  const softCurated = ["Communication","Teamwork","Leadership","Problem-Solving","Adaptability","Time Management"];
 
-  // ------- Build skills checklist -------
-  function renderSkillChecklist(){
-    if (!skillsGrid) return;
-    skillsGrid.innerHTML = "";
-    curated.forEach(label=>{
+  const hardSkillsGrid = $("#hardSkillsGrid");
+  const softSkillsGrid = $("#softSkillsGrid");
+
+  const customHardSkillInput = $("#customHardSkill");
+  const customSoftSkillInput = $("#customSoftSkill");
+
+  const addHardSkillBtn = $("#addHardSkillBtn");
+  const addSoftSkillBtn = $("#addSoftSkillBtn");
+
+  const hardSkillTags = $("#hardSkillTags");
+  const softSkillTags = $("#softSkillTags");
+
+  // ------- Build skills checklists -------
+  function renderChecklist(gridEl, list, dataAttr){
+    if (!gridEl) return;
+    gridEl.innerHTML = "";
+    list.forEach(label=>{
       const wrap = document.createElement('label');
       wrap.className = "flex items-center gap-2 p-2 border rounded";
-      wrap.innerHTML = `<input type="checkbox" data-skill="${label}" class="h-4 w-4"><span>${label}</span>`;
-      skillsGrid.appendChild(wrap);
+      wrap.innerHTML = `<input type="checkbox" data-${dataAttr}="${label}" class="h-4 w-4"><span>${label}</span>`;
+      gridEl.appendChild(wrap);
     });
   }
+
   function syncChecklist(){
-    if (!skillsGrid) return;
-    skillsGrid.querySelectorAll('input[type=checkbox][data-skill]').forEach(cb=>{
-      cb.checked = state.skills.has(cb.dataset.skill);
-    });
+    if (hardSkillsGrid){
+      hardSkillsGrid.querySelectorAll('input[type=checkbox][data-hard]').forEach(cb=>{
+        cb.checked = state.skillsHard.has(cb.dataset.hard);
+      });
+    }
+    if (softSkillsGrid){
+      softSkillsGrid.querySelectorAll('input[type=checkbox][data-soft]').forEach(cb=>{
+        cb.checked = state.skillsSoft.has(cb.dataset.soft);
+      });
+    }
   }
-  function renderCustomTags(){
-    if (!skillTags) return;
-    skillTags.innerHTML = "";
-    [...state.skills].forEach(s=>{
+
+  function renderTags(container, setRef){
+    if (!container) return;
+    container.innerHTML = "";
+    [...setRef].forEach(s=>{
       const tag = document.createElement('span');
       tag.className = "px-2 py-1 rounded bg-gray-100 text-gray-800 text-sm flex items-center gap-2";
-      tag.innerHTML = `${s} <button title="remove" class="font-bold">×</button>`;
+      tag.innerHTML = `${escapeHtml(s)} <button title="remove" class="font-bold">×</button>`;
       tag.querySelector('button').addEventListener('click', ()=>{
-        state.skills.delete(s);
+        setRef.delete(s);
         syncChecklist();
-        renderCustomTags();
+        renderTags(container, setRef);
         persist();
       });
-      skillTags.appendChild(tag);
+      container.appendChild(tag);
     });
   }
 
@@ -252,11 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
     progressLabel.textContent = `Step ${state.step+1} / ${steps.length}`;
     prevBtn.disabled = state.step===0;
 
-    // Hide the normal Next button on last step; show Next Module button there
     const onLast = state.step === steps.length - 1;
     nextBtn.classList.toggle('hidden', onLast);
     nextModuleBtnNav.classList.toggle('hidden', !onLast);
-    nextModuleBtnNav.disabled = !state.submitted; // only active after Submit Final
+    nextModuleBtnNav.disabled = !state.submitted;
 
     if (onLast) updateResumePreview();
     persist();
@@ -275,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.step < steps.length-1) showStep(state.step+1);
   });
 
-  // Next Module click → friendly popup then navigate
   if (nextModuleBtnNav){
     nextModuleBtnNav.addEventListener('click', (e)=>{
       e.preventDefault();
@@ -318,30 +388,57 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Skills
-  if (skillsGrid){
-    skillsGrid.addEventListener('change', (e)=>{
+  // HARD checklist + add
+  if (hardSkillsGrid){
+    hardSkillsGrid.addEventListener('change', (e)=>{
       const cb = e.target;
-      if (cb && cb.matches('input[type=checkbox][data-skill]')){
-        const s = cb.dataset.skill;
-        cb.checked ? state.skills.add(s) : state.skills.delete(s);
-        renderCustomTags();
+      if (cb && cb.matches('input[type=checkbox][data-hard]')){
+        const s = cb.dataset.hard;
+        cb.checked ? state.skillsHard.add(s) : state.skillsHard.delete(s);
+        renderTags(hardSkillTags, state.skillsHard);
         persist();
       }
     });
   }
-  if (addSkillBtn && customSkillInput){
-    addSkillBtn.addEventListener('click', ()=>{
-      const val = customSkillInput.value.trim();
+  if (addHardSkillBtn && customHardSkillInput){
+    addHardSkillBtn.addEventListener('click', ()=>{
+      const val = customHardSkillInput.value.trim();
       if (!val) return;
-      state.skills.add(val);
-      customSkillInput.value = "";
+      state.skillsHard.add(val);
+      customHardSkillInput.value = "";
       syncChecklist();
-      renderCustomTags();
+      renderTags(hardSkillTags, state.skillsHard);
       persist();
     });
-    customSkillInput.addEventListener('keydown', (e)=>{
-      if (e.key==='Enter'){ e.preventDefault(); addSkillBtn.click(); }
+    customHardSkillInput.addEventListener('keydown', (e)=>{
+      if (e.key==='Enter'){ e.preventDefault(); addHardSkillBtn.click(); }
+    });
+  }
+
+  // SOFT checklist + add
+  if (softSkillsGrid){
+    softSkillsGrid.addEventListener('change', (e)=>{
+      const cb = e.target;
+      if (cb && cb.matches('input[type=checkbox][data-soft]')){
+        const s = cb.dataset.soft;
+        cb.checked ? state.skillsSoft.add(s) : state.skillsSoft.delete(s);
+        renderTags(softSkillTags, state.skillsSoft);
+        persist();
+      }
+    });
+  }
+  if (addSoftSkillBtn && customSoftSkillInput){
+    addSoftSkillBtn.addEventListener('click', ()=>{
+      const val = customSoftSkillInput.value.trim();
+      if (!val) return;
+      state.skillsSoft.add(val);
+      customSoftSkillInput.value = "";
+      syncChecklist();
+      renderTags(softSkillTags, state.skillsSoft);
+      persist();
+    });
+    customSoftSkillInput.addEventListener('keydown', (e)=>{
+      if (e.key==='Enter'){ e.preventDefault(); addSoftSkillBtn.click(); }
     });
   }
 
@@ -370,7 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateResumePreview(){
     const P = state.personal;
     const E = state.education;
-    const skills = [...state.skills];
 
     const headerName = `<div class="text-lg font-bold">${escapeHtml(P.fullName || "Your Name")}</div>`;
     const contactLineParts = [];
@@ -394,24 +490,39 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="text-sm text-gray-500">Add your school, degree, and highlights</div>
         </div>`;
 
+    const hard = [...state.skillsHard];
+    const soft = [...state.skillsSoft];
+
     const skillsBlock = `
       <div class="mt-3">
         <div class="font-semibold">Skills</div>
-        ${skills.length
-          ? `<div class="text-sm">${skills.map(escapeHtml).join(", ")}</div>`
-          : `<div class="text-sm text-gray-500"> </div>`}
+        ${
+          hard.length || soft.length
+          ? `<div class="grid md:grid-cols-2 gap-2">
+               <div>
+                 <div class="text-sm font-medium">Hard</div>
+                 <div class="text-sm">${hard.map(escapeHtml).join(", ") || '<span class="text-gray-500">—</span>'}</div>
+               </div>
+               <div>
+                 <div class="text-sm font-medium">Soft</div>
+                 <div class="text-sm">${soft.map(escapeHtml).join(", ") || '<span class="text-gray-500">—</span>'}</div>
+               </div>
+             </div>`
+          : `<div class="text-sm text-gray-500">Add ~8–12 total skills (60–80% hard, 20–40% soft)</div>`
+        }
       </div>`;
 
     resumePreview.innerHTML = `${headerName}${contactLine}${educationBlock}${skillsBlock}`;
   }
 
   // ------- Persistence -------
-  const STORAGE_KEY = "resume_builder_no_experience_v2";
+  const STORAGE_KEY = "resume_builder_hard_soft_v1";
   function persist(){
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         ...state,
-        skills:[...state.skills]
+        skillsHard:[...state.skillsHard],
+        skillsSoft:[...state.skillsSoft]
       }));
     } catch(e){}
   }
@@ -424,14 +535,21 @@ document.addEventListener('DOMContentLoaded', () => {
       state.submitted = !!saved.submitted;
       Object.assign(state.personal, saved.personal||{});
       Object.assign(state.education, saved.education||{});
-      (saved.skills||[]).forEach(s=>state.skills.add(s));
+      (saved.skillsHard||[]).forEach(s=>state.skillsHard.add(s));
+      (saved.skillsSoft||[]).forEach(s=>state.skillsSoft.add(s));
 
       // reflect inputs
-      personalIds.forEach(id=>{ const el=$("#"+id); if (el) el.value = state.personal[id]||""; });$("#school").value = state.education.school || ""; $("#degree").value = state.education.degree || ""; $("#eduHighlights").value = state.education.eduHighlights || "";
+      personalIds.forEach(id=>{ const el=$("#"+id); if (el) el.value = state.personal[id]||""; });
+      const sch=$("#school"), deg=$("#degree"), hil=$("#eduHighlights");
+      if (sch) sch.value = state.education.school || "";
+      if (deg) deg.value = state.education.degree || "";
+      if (hil) hil.value = state.education.eduHighlights || "";
       syncChecklist();
-      renderCustomTags();
+      renderTags(hardSkillTags, state.skillsHard);
+      renderTags(softSkillTags, state.skillsSoft);
     } catch(e){}
   }
+
   // ------- Save Draft / Submit Final -------
   if (saveDraftBtn) saveDraftBtn.addEventListener('click', ()=>{
     persist();
@@ -451,7 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
       : "Something went wrong. Please try again.";
     saveMessage.className = "text-sm mt-2 " + (ok ? "text-green-700" : "text-red-700");
 
-    // Enable Next Module in bottom nav when submitted
     const onLast = state.step === steps.length - 1;
     if (ok && onLast && nextModuleBtnNav){
       nextModuleBtnNav.disabled = false;
@@ -466,19 +583,17 @@ document.addEventListener('DOMContentLoaded', () => {
         degree: state.education.degree,
         highlights: state.education.eduHighlights
       },
-      skills: [...state.skills]
+      skills: {
+        hard: [...state.skillsHard],
+        soft: [...state.skillsSoft]
+      }
     };
   }
 
-  // Friendly submit stub (no tech jargon shown to users)
+  // Friendly submit stub
   async function submitFinal(payload){
     console.log("Would submit this data:", payload);
-    // Example when ready:
-    // await fetch("/api/resume/submit", {
-    //   method:"POST",
-    //   headers:{'Content-Type':'application/json'},
-    //   body: JSON.stringify(payload)
-    // });
+    // await fetch("/api/resume/submit", { method:"POST", headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
     return true;
   }
 
@@ -494,8 +609,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ------- Boot -------
-  renderSkillChecklist();
+  renderChecklist(hardSkillsGrid, hardCurated, "hard");
+  renderChecklist(softSkillsGrid, softCurated, "soft");
   restore();
+  syncChecklist();
   showStep(0);
 });
+
+// ✅ Floating MP4 sprite logic (unchanged)
+const floatingSprite = document.getElementById("floating-sprite");
+const floatingSource = document.getElementById("floating-source");
+const savedCharacter = localStorage.getItem("selectedCharacter");
+if (savedCharacter) { showFloatingSprite(savedCharacter); }
+function showFloatingSprite(charId) {
+  const spriteMap = {
+    "char1": "{{site.baseurl}}/hacks/cs-portfolio-quest/resume/sprites/elephant_2.mp4",
+    "char2": "{{site.baseurl}}/hacks/cs-portfolio-quest/resume/sprites/hamster_2.mp4",
+    "char3": "{{site.baseurl}}/hacks/cs-portfolio-quest/resume/sprites/monkey_2.mp4"
+  };
+  const src = spriteMap[charId];
+  if (src) {
+    floatingSource.src = src;
+    floatingSprite.load();
+    floatingSprite.style.display = "block";
+    floatingSprite.play();
+  }
+}
 </script>

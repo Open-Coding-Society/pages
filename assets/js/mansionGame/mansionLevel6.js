@@ -15,12 +15,25 @@ class MansionLevel6 {
         let height = gameEnv.innerHeight;
         let path = gameEnv.path;
 
-    // Level music: play Legend of Zelda theme when entering this level
-    // Will be stopped when transitioning to the battle room below
-    const levelMusic = new Audio(path + "/assets/sounds/mansionGame/legendZelda.mp3");
-    levelMusic.loop = true;
-    levelMusic.volume = 0.3;
-    levelMusic.play().catch(err => console.warn('Level music failed to play:', err));
+
+        // Pause DOM audio elements
+        try {
+            const audioElements = document.querySelectorAll('audio'); // Selects all <audio> elements
+            audioElements.forEach(audio => {
+                try { if (!audio.paused) audio.pause(); } catch (e) {}
+            });
+        } catch (e) { /* ignore */ }
+
+        // Level music: play Legend of Zelda theme when entering this level
+        // update: now changed to mario castle theme
+        // Will be stopped when transitioning to the battle room below
+        let randomSong = ["marioCastle.mp3", "legendZelda.mp3"][Math.floor(Math.random()*2)]
+        const levelMusic = new Audio(path + `/assets/sounds/mansionGame/${randomSong}`);
+        levelMusic.loop = true;
+        levelMusic.volume = 0.3;
+        levelMusic.play().catch(err => console.warn('Level music failed to play:', err));
+        // Expose the level music so other modules (end screen, etc.) can stop it
+        try { if (typeof window !== 'undefined') window._levelMusic = levelMusic; } catch (e) {}
 
         // This is the background image data
         const image_src_chamber = path + "/images/mansionGame/bgBossIntroChamber.png"
@@ -40,7 +53,7 @@ class MansionLevel6 {
             greeting: "Hi, I am Spook.",
             src: sprite_src_mc,
             SCALE_FACTOR: MC_SCALE_FACTOR,
-            STEP_FACTOR: 600,
+            STEP_FACTOR: 300,
             ANIMATION_RATE: 10,
             INIT_POSITION: { x: (width / 2 - width / (5 * MC_SCALE_FACTOR)), y: height - (height / MC_SCALE_FACTOR)}, 
             pixels: {height: 2400, width: 3600},
@@ -60,8 +73,8 @@ class MansionLevel6 {
         // This is the zombie npc
         const sprite_src_zombie = path + "/images/mansionGame/zombieNpc.png";
         const sprite_greet_zombie = "Hi, I'm a zombie.";
-        const sprite_data_zombie = {
-            id: 'ZombieNPC',
+        const sprite_data_zombie1 = {
+            id: 'ZombieNPC1',
             greeting: sprite_greet_zombie,
             src: sprite_src_zombie,
             SCALE_FACTOR: 4,
@@ -76,15 +89,13 @@ class MansionLevel6 {
                 "I heard the boss is waiting for you...",
                 "Enter if you dare... he's waiting for you...",
                 "I heard the Reaper himself was in there.",
-                "The Reaper'll get you good.",
-                "You have no chance... his power is unstopable...",
+                "You have no chance... his power is unstoppable...",
                 "No one has survived a battle against the Reaper.",
-                "Haha? You want to battle my boss? You'll die within the first minute...",
-                "Go ahead. I aint stoppin' you, the Reaper'll finish you clean.",
+                "Haha! You want to battle my boss? You'll die within the first minute...",
+                "Go ahead. I aint stoppin' you. The Reaper'll finish you clean.",
                 "You are a fool to challenge the Reaper.",
                 "You will end up like me once you face the Reaper.",
                 "Are you the next opponent for my master? That's unfortunate for you.",
-                "Why I won't attack you? Well, my master will finish you off soon enough."
             ],
             reaction: function() {
                 // Don't do anything on touch
@@ -110,6 +121,55 @@ class MansionLevel6 {
                 );
             }
         };
+
+        const sprite_data_zombie2 = {
+            id: 'ZombieNPC2',
+            greeting: sprite_greet_zombie,
+            src: sprite_src_zombie,
+            SCALE_FACTOR: 4,
+            ANIMATION_RATE: 30,
+            pixels: {width: 3600, height: 1200},
+            INIT_POSITION: {x: (width * 5.5 / 16), y: (height * 1 / 4)},
+            orientation: {rows: 1, columns: 3 },
+            down: {row: 0, start: 0, columns: 3 , mirror: true},
+            hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
+            // Add dialogues array for random messages
+            dialogues: [
+                "Boss.js inherits and extends Enemy.js to add more danger.",
+                "When you enter the battle room, your player becomes a FightingPlayer object, which extends the Player class.",
+                "The arrows and fireballs that you fight with are all Projectile objects.",
+                "The Reaper's scythe is a Boomerang object- meaning, it moves in an ellipse.",
+                "I was supposed to be a harmless NPC... then they gave me dialogue arrays.",
+                "All of this runs in a continuous update loop — one tick at a time.",
+                "Both the arrows and fireballs are Projectile objects. Code reuse is peak!",
+                "If I ever freeze, check the console. I might've thrown an error.",
+                "The Reaper's attack is so powerful, it takes a Desmos graph to understand its power.", // reference to the desmos graph we used to calculate the scythe path!
+                "*brains*"
+            ],
+            reaction: function() {
+                // Don't do anything on touch
+                // The Zombie only speaks when interacted with
+            },
+            interact: function() {
+                // Clear any existing dialogue first to prevent duplicates
+                if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                    this.dialogueSystem.closeDialogue();
+                }
+                
+                // Create a new dialogue system if needed
+                if (!this.dialogueSystem) {
+                    this.dialogueSystem = new DialogueSystem();
+                }
+                
+                // Show portal dialogue with buttons
+                const whattosay = this.data.dialogues[Math.floor(Math.random() * this.data.dialogues.length)];
+                this.dialogueSystem.showDialogue(
+                    whattosay,
+                    "Coding God Zombie",
+                    this.spriteData.src
+                );
+            }
+        }; 
         
 
         // invisible sprite for door collision that handles going to lv6 battle room
@@ -217,6 +277,8 @@ class MansionLevel6 {
                                 const audio = new Audio(path + "/assets/sounds/mansionGame/SkeletonLord.mp3");
                                 audio.loop = true;
                                 audio.volume = 0.4;
+                                // Expose battle music so end screen can stop it later
+                                try { if (typeof window !== 'undefined') window._battleMusic = audio; } catch (e) {}
                                 audio.play().catch(error => console.error('Failed to play audio:', error));
 
                                 console.log("Starting battle level transition...");
@@ -391,7 +453,8 @@ class MansionLevel6 {
         this.classes = [
             {class: GameEnvBackground, data: image_data_chamber},
             {class: Player, data: sprite_data_mc},
-            {class: Npc, data: sprite_data_zombie},
+            {class: Npc, data: sprite_data_zombie1},
+            {class: Npc, data: sprite_data_zombie2}, // The second zombie is the one that talks about the code
             {class: Npc, data: sprite_data_bossdoor},
             {class: Npc, data: sprite_data_chair},
             {class: Npc, data: sprite_data_chair2}

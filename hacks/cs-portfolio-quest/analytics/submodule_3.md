@@ -630,7 +630,7 @@ author: "Curators Team"
 
           // Define modules and total submodules
           const lesson_modules = {
-              'AI Usage': 4,
+              'AI Usage': 3,
               'Backend Development': 6,
               'Data Visualization': 3,
               'Frontend Development': 6,

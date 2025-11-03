@@ -2,7 +2,7 @@
 layout: post
 title: "CSS Styling Fundamentals"
 description: "Mission 3"
-permalink: /digital-famine/cyber/submodule_3/
+permalink: /digital-famine/cybersecurity-game/submodule_3/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 3

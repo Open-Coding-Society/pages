@@ -93,6 +93,14 @@ date: 2025-10-21
     box-shadow: 0 10px 26px rgba(241, 196, 15, 0.36);
     transform: translateY(-4px);
   }
+  .cert-green {
+    background: linear-gradient(135deg, #1a7336ff 0%, #348340ff 100%);
+    box-shadow: 0 4px 12px rgba(75, 173, 68, 0.3); grid-column: 1 / -1;
+  }
+  .cert-yellow:hover {
+    box-shadow: 0 10px 26px rgba(15, 241, 102, 0.36);
+    transform: translateY(-4px);
+  }
   .cert-badge {
     background: rgba(0, 0, 0, 0.2);
     color: #fff;
@@ -281,7 +289,8 @@ date: 2025-10-21
 </style>
 
 <div class="container">
-  <h2 class="section-title">Earned Certificates</h2>
+  
+  <h2 class="section-title">Individual Module Certificates</h2>
   <div class="certificates-grid">
     <div class="cert-card cert-orange">
       <span class="cert-badge">Verified</span>
@@ -335,6 +344,19 @@ date: 2025-10-21
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('AI Usage', 'Open Coding Society', 'November 2025')">⬇ Download</button>
         <button class="btn btn-share">🔗 Share</button>
+      </div>
+    </div>
+  </div>
+  <h2 class="section-title">Overall Certificate</h2>
+  <div class="certificates-grid">
+    <div class="cert-card cert-green" >
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">Overall CS Portfolio Certificate</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('Computer Science Portfolio - Full Stack Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+        <button class="btn btn-share" onclick="addToLinkedIn('Computer Science Portfolio - Full Stack Development Java Usage')">Add to LinkedIn</button>
       </div>
     </div>
   </div>
@@ -545,8 +567,26 @@ window.downloadCert = async function () {
       link.click();
     }
 
+    function addToLinkedIn(courseName) {
+      const certId = 'CSPORTFOLIO-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      const url = new URL('https://www.linkedin.com/profile/add');
+      url.searchParams.append('startTask', 'CERTIFICATION_NAME');
+      url.searchParams.append('name', courseName);
+      url.searchParams.append('organizationName', 'Open Coding Society');
+      url.searchParams.append('issueYear', new Date().getFullYear());
+      url.searchParams.append('issueMonth', new Date().getMonth() + 1);
+      url.searchParams.append('certId', certId);
+      url.searchParams.append('certUrl', window.location.origin + '/cs-portfolio-verify/' + certId);
+      
+      window.open(url.toString(), '_blank');
+    }
+
+
     // replace the stub with the real implementation
     window.downloadCert = downloadCert;
+    window.addToLinkedIn = addToLinkedIn;
+
   } catch (err) {
     console.error('Failed to initialize certificate downloader:', err);
     // keep the user-friendly stub already assigned above
