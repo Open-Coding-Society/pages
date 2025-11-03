@@ -1,0 +1,525 @@
+---
+layout: cs-portfolio-lesson
+---
+
+{{content}}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: rgb(0, 0, 0);
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Chat Toggle Button */
+    .chat-toggle-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 55px;
+        height: 55px;
+        background: linear-gradient(135deg, #8e44ad, #6c3483);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(142, 68, 173, 0.4);
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chat-toggle-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 30px rgba(142, 68, 173, 0.5);
+    }
+
+    .chat-toggle-btn:active {
+        transform: scale(0.95);
+    }
+
+    .chat-toggle-btn.active {
+        background: linear-gradient(135deg, #6c3483, #5b2c6f);
+    }
+
+    /* Chat Modal */
+    .chat-modal {
+        position: fixed;
+        bottom: 75px;
+        right: 33px;
+        width: 400px;
+        height: 550px;
+        background: rgb(0, 0, 0);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(142, 68, 173, 0.3);
+    }
+
+    .chat-modal.open {
+        display: flex;
+        animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Chat Header */
+    .chat-header {
+        background: linear-gradient(135deg, #8e44ad, #6c3483);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+
+    .close-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+    .close-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Chat Body */
+    .chat-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Messages Area */
+    .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        background: linear-gradient(to bottom, #000000, #15181f);
+    }
+
+    .messages-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    .message-bubble, .ai-bubble {
+        max-width: 85%;
+        padding: 12px 16px;
+        margin: 8px 0;
+        border-radius: 18px;
+        word-wrap: break-word;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .message-bubble {
+        background: linear-gradient(135deg, #8e44ad, #6c3483);
+        color: white;
+        margin-left: auto;
+        margin-right: 0;
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 2px 8px rgba(142, 68, 173, 0.3);
+    }
+
+    .ai-bubble {
+        background: white;
+        color: #374151;
+        margin-left: 0;
+        margin-right: auto;
+        border-bottom-left-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f3f4f6;
+    }
+
+    .timestamp {
+        font-size: 10px;
+        opacity: 0.7;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .typing-indicator {
+        background: white;
+        color: #8e44ad;
+        padding: 12px 16px;
+        border-radius: 18px;
+        border-bottom-left-radius: 6px;
+        font-style: italic;
+        font-size: 13px;
+        max-width: 85%;
+        margin: 8px 0;
+        animation: pulse 1.5s infinite;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f3f4f6;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+    }
+
+    /* Input Area */
+    .input-container {
+        padding: 20px;
+        background: rgb(0, 0, 0);
+        border-top: 1px solid #15181f;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .message-input {
+        flex: 1;
+        padding: 10px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        outline: none;
+        font-size: 14px;
+        background: #000000;
+        color: white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+    }
+
+    .message-input:focus {
+        border-color: #8e44ad;
+        background: rgb(0, 0, 0);
+        box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.1);
+    }
+
+    .message-input::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Instructions */
+    .instructions {
+        background: linear-gradient(135deg, #1b1c20, #000000);
+        border: 1px solid #8e44ad;
+        border-radius: 12px;
+        padding: 16px;
+        margin: 8px 0;
+        font-size: 13px;
+        color: #a78bba;
+        box-shadow: 0 2px 8px rgba(142, 68, 173, 0.1);
+    }
+
+    .instructions h4 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: #8e44ad;
+        font-weight: 600;
+    }
+
+    .instructions ul {
+        margin: 0;
+        padding-left: 16px;
+    }
+
+    .instructions li {
+        margin: 4px 0;
+    }
+</style>
+
+<button class="chat-toggle-btn" id="chatToggle">💬</button>
+
+<div class="chat-modal" id="chatModal">
+    <div class="chat-header">
+        <h3>Certification Guide Bot</h3>
+        <button class="close-btn" id="closeChat">×</button>
+    </div>
+    
+    <div class="chat-body">
+        <div class="messages-container" id="messagesContainer">
+            <div class="instructions">
+                <h4>Welcome to the Certification Guide! 🎓</h4>
+                <ul>
+                    <li>Learn about your earned certificates & badges</li>
+                    <li>Get help adding certifications to LinkedIn</li>
+                    <li>Understand your skill mastery levels</li>
+                    <li>Download your certificates as images</li>
+                    <li>Ask questions about certification requirements</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="messageInput" 
+                class="message-input" 
+                placeholder="Ask about certificates or LinkedIn..."
+                maxlength="500"
+            >
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_KEY = 'AIzaSyAwUorzifmPEIX6M74Kd_as-C-7Ih6UyLs';
+
+    // Modal functionality
+    const chatToggle = document.getElementById('chatToggle');
+    const chatModal = document.getElementById('chatModal');
+    const closeChat = document.getElementById('closeChat');
+    const messageInput = document.getElementById('messageInput');
+    const messagesContainer = document.getElementById('messagesContainer');
+
+    let isOpen = false;
+    let hasInitialMessage = false;
+
+    // Certification context data
+    const certificationContext = `
+AVAILABLE CERTIFICATES:
+1. Frontend Development (Orange badge) - Verified by Open Coding Society, November 2025
+2. Backend Development (Red badge) - Verified by Open Coding Society, November 2025
+3. Data Visualization (Purple badge) - Verified by Open Coding Society, November 2025
+4. Resume Building (Teal badge) - Verified by Open Coding Society, November 2025
+5. AI Usage (Yellow badge) - Verified by Open Coding Society, November 2025
+
+LINKEDIN CERTIFICATION FIELDS:
+- Name: Official certificate title (e.g., "Python Data Analysis Certificate")
+- Issuing Organization: Organization that granted the certificate (e.g., "Open Coding Society")
+- Issue Date: Month and year when you received certification
+- Expiration Date: Leave blank if never expires, or fill in expiration date
+- Credential ID: Unique ID number from certificate (if available)
+- Credential URL: Public link where certificate can be verified
+
+OPTIONAL LINKEDIN FIELDS:
+- Skills: Relevant skills demonstrated by certification (e.g., "Cybersecurity", "Cloud Computing")
+- Media: Upload certificate PDF/image or link to showcase project
+
+BADGES EARNED:
+- Red Badge (Advanced)
+- Orange Badge (Intermediate)
+- Purple Badge (Mastery)
+- Teal Badge (Professional)
+- Yellow Badge (Specialist)
+
+CERTIFICATE FEATURES:
+- All certificates can be downloaded as high-quality PNG images
+- Certificates include student name, course title, issuing organization, and date
+- Each certificate is verified and includes official branding
+- Certificates are suitable for sharing on LinkedIn, portfolios, and resumes
+`;
+
+    async function sendToGeminiAPI(userMessage) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+
+        const systemPrompt = `You are the Certification Guide Bot, a helpful assistant that explains certifications, badges, and how to add them to LinkedIn. Your role is to:
+
+1. Explain the different certificates available (Frontend, Backend, Data Viz, Resume, AI Usage)
+2. Help users understand their skill mastery percentages
+3. Guide users on how to add certifications to LinkedIn profiles
+4. Explain what information goes in each LinkedIn certification field
+5. Answer questions about badges and their meanings
+6. Provide tips on showcasing certifications professionally
+7. Help users understand certificate verification and credibility
+
+CERTIFICATION SYSTEM CONTEXT:
+${certificationContext}
+
+Keep responses:
+- Clear and helpful
+- Professional but friendly
+- Focused on certifications and career development
+- Encouraging and supportive
+- Concise (2-4 sentences usually)
+- Do not use markdown/bolded text in responses
+
+Your name is Certification Guide Bot. Help users showcase their achievements!`;
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: `${systemPrompt}\n\nUser question: ${userMessage}` }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                console.error('Unexpected response structure:', data);
+                return "I received an unexpected response. Please try asking your question again.";
+            }
+        } catch (error) {
+            console.error('Error communicating with Gemini API:', error);
+            return "I'm having trouble connecting right now. Please try again in a moment.";
+        }
+    }
+
+    function toggleChat() {
+        isOpen = !isOpen;
+        if (isOpen) {
+            chatModal.classList.add('open');
+            chatToggle.classList.add('active');
+            chatToggle.innerHTML = '×';
+            messageInput.focus();
+            if (!hasInitialMessage) {
+                displayInitialMessage();
+            }
+        } else {
+            chatModal.classList.remove('open');
+            chatToggle.classList.remove('active');
+            chatToggle.innerHTML = '💬';
+        }
+    }
+
+    chatToggle.addEventListener('click', toggleChat);
+    closeChat.addEventListener('click', toggleChat);
+
+    function displayInitialMessage() {
+        const messages = [
+            "Hi! I can help you understand your certifications and add them to LinkedIn. What would you like to know?",
+            "Welcome! You have 5 certificates available. Need help adding them to your LinkedIn profile?",
+            "Hello! I'm here to guide you through your certifications and badges. What questions do you have?",
+            "Hey there! Want to learn how to showcase your certificates on LinkedIn or understand your skill levels?"
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        setTimeout(() => {
+            addMessageToChat(randomMessage, true);
+            hasInitialMessage = true;
+        }, 500);
+    }
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function addMessageToChat(message, isAI = false) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add(isAI ? 'ai-bubble' : 'message-bubble');
+        
+        const messageText = document.createElement('div');
+        messageText.textContent = message;
+        
+        const timestamp = document.createElement('span');
+        timestamp.classList.add('timestamp');
+        timestamp.textContent = getCurrentTime();
+        
+        messageElement.appendChild(messageText);
+        messageElement.appendChild(timestamp);
+        
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('typing-indicator');
+        typingIndicator.id = 'typingIndicator';
+        typingIndicator.textContent = 'Certification Guide is typing...';
+        messagesContainer.appendChild(typingIndicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return typingIndicator;
+    }
+
+    function hideTypingIndicator(indicator) {
+        if (indicator && indicator.parentNode) {
+            indicator.parentNode.removeChild(indicator);
+        }
+    }
+
+    messageInput.addEventListener('keypress', async function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            const userMessage = event.target.value.trim();
+            
+            if (!userMessage) return;
+            
+            addMessageToChat(userMessage);
+            event.target.value = '';
+            
+            const typingIndicator = showTypingIndicator();
+            
+            try {
+                const aiResponse = await sendToGeminiAPI(userMessage);
+                hideTypingIndicator(typingIndicator);
+                
+                setTimeout(() => {
+                    addMessageToChat(aiResponse, true);
+                }, 500);
+                
+            } catch (error) {
+                hideTypingIndicator(typingIndicator);
+                addMessageToChat("Sorry, I encountered an error. Please try again.", true);
+            }
+        }
+    });
+</script>

@@ -695,3 +695,5 @@ function showFloatingSprite(charId) {
 }
 
 </script>
+
+ 

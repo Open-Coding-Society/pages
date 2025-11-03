@@ -223,6 +223,82 @@ Final stop! In Seattle, learners archive or delete dishes (like *Clam Chowder in
   🎉 CRUD Complete!<br><small style="opacity:.9;font-size:14px;">Congratulations, Cleanup Crew!</small>
 </div>
 
+<!-- Quick Complete Button for Testing - Bottom Right Corner -->
+<button id="quickCompleteBtn" onclick="autoCompleteAllTasks()" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(139,92,246,0.9);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  transition: all 0.2s ease;
+" onmouseover="this.style.background='rgba(139,92,246,1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(139,92,246,0.9)'; this.style.transform='translateY(0)'">
+  Complete All Tasks
+</button>
+
+<script>
+function autoCompleteAllTasks() {
+  // Hide the button after clicking
+  document.getElementById('quickCompleteBtn').style.display = 'none';
+  
+  // Auto-complete the quizzes with correct answers
+  document.getElementById('archive-quiz').value = 'a';
+  checkArchiveQuiz();
+  
+  document.getElementById('hard-quiz').value = 'dish_ingredients';
+  checkHardQuiz();
+  
+  document.getElementById('analytics-quiz').value = 'b';
+  checkAnalyticsQuiz();
+  
+  // Run the interactive tasks in sequence
+  setTimeout(() => {
+    seedSeattle();
+  }, 500);
+  
+  setTimeout(() => {
+    viewSeattle();
+  }, 1000);
+  
+  setTimeout(() => {
+    // Set up some dish IDs for archive/delete operations
+    if (SeattleDB.dishes.length > 0) {
+      document.getElementById('archive-id').value = SeattleDB.dishes[0].id;
+      runArchive();
+    }
+  }, 1500);
+  
+  setTimeout(() => {
+    if (SeattleDB.dishes.length > 1) {
+      document.getElementById('hard-id').value = SeattleDB.dishes[1].id;
+      runHard();
+    }
+  }, 2000);
+  
+  setTimeout(() => {
+    runAnalytics();
+  }, 2500);
+  
+  // Mark all tasks as complete
+  setTimeout(() => {
+    completeTask('archive');
+    completeTask('harddelete');
+    completeTask('analytics');
+    completeTask('seed');
+    completeTask('view');
+    
+    showToast('🎉 All tasks completed! CRUD journey finished!', 4000);
+  }, 3000);
+}
+</script>
+
 ---
 
 ### 🧠 What Does DELETE Mean?
@@ -439,7 +515,7 @@ function seedSeattle(){
   logTo('terminal-seedsea', `🌱 Seeded ${SeattleDB.dishes.length} Seattle dishes from your itinerary:`);
   SeattleDB.dishes.forEach(d => logTo('terminal-seedsea', ` - ${d.name} (ID: ${d.id})`));
   showToast('Seattle dishes seeded — +10 XP');
-  completeTask?.('seed');
+  completeTask('seed'); // Mark task as complete
 }
 
 /* helper: clear any terminal */
@@ -515,26 +591,153 @@ function viewSeattle(){
   const archived=SeattleDB.dishes.filter(d=>d.deleted_at);
   logTo('terminal-viewsea',`Active Dishes (${active.length}):`,...active.map(d=>` - ${d.name} (${d.calories} cal, ID: ${d.id})`),`\nArchived Dishes (${archived.length}):`,...archived.map(d=>` - ${d.name} (${d.calories} cal, ID: ${d.id})`));
   showToast('Viewing dishes list');
-  completeTask?.('view');
+  completeTask('view'); // Mark task as complete
 }
 
 /* ========== quizzes ========== */
 function checkArchiveQuiz(){
   const val=document.getElementById('archive-quiz').value,termId='terminal-archive',term=document.getElementById(termId);
   if(!val){logTo(termId,'⚠️ Please choose an answer first.');flash(term,'rgba(251,191,36,0.15)');return;}
-  if(val==='a'){logTo(termId,'✅ Correct! Archiving keeps records for analytics and restoration.');showToast('+3 XP — You understood soft delete!');flash(term,'rgba(16,185,129,0.15)');}
+  if(val==='a'){
+    logTo(termId,'✅ Correct! Archiving keeps records for analytics and restoration.');
+    showToast('+3 XP — You understood soft delete!');
+    flash(term,'rgba(16,185,129,0.15)');
+    completeTask('archive'); // Mark archive concept as complete
+  }
   else{logTo(termId,'❌ Not quite. Soft delete preserves data for later reports.');flash(term,'rgba(239,68,68,0.15)');}
 }
 function checkHardQuiz(){
   const val=document.getElementById('hard-quiz').value.trim().toLowerCase(),termId='terminal-hard',term=document.getElementById(termId);
   if(!val){logTo(termId,'⚠️ Please enter your answer.');flash(term,'rgba(251,191,36,0.15)');return;}
-  if(val.includes('dish_ingredient')){logTo(termId,'✅ Correct! The join table dish_ingredients must be deleted with the dish.');showToast('+3 XP — Cascade delete learned!');flash(term,'rgba(16,185,129,0.15)');}
+  if(val.includes('dish_ingredient')){
+    logTo(termId,'✅ Correct! The join table dish_ingredients must be deleted with the dish.');
+    showToast('+3 XP — Cascade delete learned!');
+    flash(term,'rgba(16,185,129,0.15)');
+    completeTask('harddelete'); // Mark hard delete concept as complete
+  }
   else{logTo(termId,'❌ Hint: It starts with "dish_" and links dishes to ingredients.');flash(term,'rgba(239,68,68,0.15)');}
 }
 function checkAnalyticsQuiz(){
   const val=document.getElementById('analytics-quiz').value,termId='terminal-analytics',term=document.getElementById(termId);
   if(!val){logTo(termId,'⚠️ Please choose an answer.');flash(term,'rgba(251,191,36,0.15)');return;}
-  if(val==='b'){logTo(termId,'✅ Correct! GROUP BY groups rows for aggregate calculations.');showToast('+3 XP — Analytics concept clear!');flash(term,'rgba(16,185,129,0.15)');}
+  if(val==='b'){
+    logTo(termId,'✅ Correct! GROUP BY groups rows for aggregate calculations.');
+    showToast('+3 XP — Analytics concept clear!');
+    flash(term,'rgba(16,185,129,0.15)');
+    completeTask('analytics'); // Mark analytics concept as complete
+  }
   else{logTo(termId,'❌ Not quite. The correct answer is GROUP BY.');flash(term,'rgba(239,68,68,0.15)');}
 }
-</script>
+
+// Task completion tracking for Seattle
+window.taskProgress = {
+  archive: false,
+  harddelete: false,
+  analytics: false,
+  seed: false,
+  view: false
+};
+
+// Load progress from localStorage
+function loadTaskProgress() {
+  const saved = localStorage.getItem('sea_task_progress');
+  if (saved) {
+    try {
+      window.taskProgress = { ...window.taskProgress, ...JSON.parse(saved) };
+    } catch (e) {
+      console.error('Error loading task progress:', e);
+    }
+  }
+  updateProgressDisplay();
+}
+
+// Save progress to localStorage
+function saveTaskProgress() {
+  try {
+    localStorage.setItem('sea_task_progress', JSON.stringify(window.taskProgress));
+  } catch (e) {
+    console.error('Error saving task progress:', e);
+  }
+}
+
+// Mark task as complete
+window.completeTask = function(taskName) {
+  if (!window.taskProgress[taskName]) {
+    window.taskProgress[taskName] = true;
+    saveTaskProgress();
+    updateProgressDisplay();
+    checkModuleCompletion();
+  }
+};
+
+// Update progress display
+function updateProgressDisplay() {
+  const tasks = ['archive', 'harddelete', 'analytics', 'seed', 'view'];
+  let completedCount = 0;
+
+  tasks.forEach(task => {
+    const element = document.getElementById(`task-${task}`);
+    if (element) {
+      const statusSpan = element.querySelector('.status');
+      if (window.taskProgress[task]) {
+        statusSpan.textContent = 'Complete ✅';
+        statusSpan.className = 'status task-complete';
+        completedCount++;
+      } else {
+        statusSpan.textContent = 'Incomplete';
+        statusSpan.className = 'status';
+      }
+    }
+  });
+
+  // Update progress bar
+  const percentage = Math.round((completedCount / tasks.length) * 100);
+  const percentageElement = document.getElementById('completion-percentage');
+  const progressBar = document.getElementById('progress-bar');
+  
+  if (percentageElement) percentageElement.textContent = `${percentage}%`;
+  if (progressBar) progressBar.style.width = `${percentage}%`;
+}
+
+// Check if module is complete and mark Seattle as completed
+function checkModuleCompletion() {
+  const allTasks = Object.values(window.taskProgress);
+  const isComplete = allTasks.every(task => task === true);
+  
+  if (isComplete) {
+    // Show the completion notification
+    const notification = document.getElementById('unlockNotification');
+    if (notification) {
+      notification.innerHTML = `
+        🎉 CRUD Journey Complete!<br>
+        <small style="opacity:.9;font-size:14px;">Now share your adventure on the Seattle Showcase Wall!</small>
+      `;
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 6000);
+    }
+    markSeattleComplete();
+    console.log('🎉 Seattle module completed! CRUD journey finished.');
+  }
+}
+
+// Mark Seattle as complete in the main navigation
+function markSeattleComplete() {
+  try {
+    const saved = localStorage.getItem('city_progress');
+    let gameProgress = saved ? JSON.parse(saved) : { unlockedCities:[0,1,2,3], completedCities:[], totalCitiesCompleted:0 };
+    if (!gameProgress.completedCities.includes(3)) {
+      gameProgress.completedCities.push(3);
+      gameProgress.totalCitiesCompleted++;
+    }
+    localStorage.setItem('city_progress', JSON.stringify(gameProgress));
+    console.log('✅ Seattle Progress updated:', gameProgress);
+  } catch (e) {
+    console.error('Seattle completion failed:', e);
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadItineraryFoods();
+  loadTaskProgress();
+});
