@@ -74,7 +74,7 @@ class BlackjackGameManager {
         `;
         instructions.innerHTML = `
             🎰 CASINO CHALLENGE 🎰<br>
-            Choose your bet amount and try to reach $25,000!
+            Choose your bet amount and try to reach $10,000!
         `;
 
         gameContainer.appendChild(moneyDisplay);
