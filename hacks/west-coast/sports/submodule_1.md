@@ -17,7 +17,6 @@ footer:
   next: /west-coast/backend/submodule_2/
 ---
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,7 +31,6 @@ footer:
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
             color: #333;
             padding: 20px;
             line-height: 1.6;
@@ -692,6 +690,14 @@ footer:
             </div>
             <div class="simple-explanation">
                 <p><strong>4. You only get what you ask for</strong> - APIs return exactly the data you request, nothing more</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>API Keys: Your Access Pass</h2>
+            <div class="simple-explanation">
+                <h3>What is an API Key?</h3>
+                <p>Most real-world APIs require an <strong>API key</strong> - think of it like a membership card or password that proves you have permission to use the API. When you want to use a popular API (like Google Maps, weather services, or sports data), you typically need to sign up for an account, and the service will give you a unique API key. You include this key with every request you make, usually in the URL or request header. This helps API providers track who's using their service, prevent abuse, and sometimes charge for usage based on how many requests you make. For example, a request might look like: <code>/api/stadium?venue=petco&key=YOUR_API_KEY_HERE</code>. The API keys in this demo are simplified for learning purposes, but in real applications, keeping your API key secure and not sharing it publicly is crucial!</p>
             </div>
         </div>
 

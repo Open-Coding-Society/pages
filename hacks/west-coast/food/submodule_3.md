@@ -318,6 +318,22 @@ details[open] > summary {
 </style>
 
 # 🌉 San Francisco — UPDATE (CRUD Submodule 3)
+<!-- Progress Tracker -->
+<div class="progress-tracker">
+  <h3>🎯 San Francisco Progress Tracker</h3>
+  <div id="progress-display">
+    <div id="task-dimsum" class="task-item">Task 1: Dim Sum Menu - <span class="status">Incomplete</span></div>
+    <div id="task-chowmein" class="task-item">Task 2: Chowmein Order - <span class="status">Incomplete</span></div>
+    <div id="task-sourdough" class="task-item">Task 3: Update Sourdough - <span class="status">Incomplete</span></div>
+    <div id="task-view" class="task-item">Task 4: PUT Endpoint - <span class="status">Incomplete</span></div>
+  </div>
+  <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: 0.5rem;">
+    <strong>Completion: <span id="completion-percentage">0%</span></strong>
+    <div style="background: rgba(2,6,23,0.45); height: 8px; border-radius: 6px; margin-top: 0.5rem;">
+      <div id="progress-bar" style="background: linear-gradient(90deg, var(--success), #059669); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
+    </div>
+  </div>
+</div>
 
 **Quest Chapter:** *The Food Route*  
 **Focus:** U in CRUD — **UPDATE**  
@@ -330,54 +346,46 @@ Welcome! This interactive page lets learners *actually* update dishes, ingredien
   <button id="themeToggleBtn" class="sq-btn" title="Toggle dark / light">🌙 Dark</button>
 </div>
 
-<!-- Itinerary Foods Display -->
-<div class="itinerary-foods">
-  <h3>🍽️ Your San Francisco Food Selections</h3>
-  <div id="itinerary-foods-display"></div>
-</div>
-
 <!-- Progress Tracker -->
-<div class="progress-tracker">
-  <h3>🎯 San Francisco Progress Tracker</h3>
-  <div id="progress-display">
-    <div id="task-dimsum" class="task-item">Task 1: Dim Sum Menu Updates - <span class="status">Incomplete</span></div>
-    <div id="task-chowmein" class="task-item">Task 2: Chowmein Order Updates - <span class="status">Incomplete</span></div>
-    <div id="task-sourdough" class="task-item">Task 3: Update Sourdough - <span class="status">Incomplete</span></div>
-    <div id="task-seed" class="task-item">Task 4: Seed Pantry - <span class="status">Incomplete</span></div>
-    <div id="task-view" class="task-item">Task 5: View Updated Pantry - <span class="status">Incomplete</span></div>
-  </div>
-  <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: 0.5rem;">
-    <strong>Completion: <span id="completion-percentage">0%</span></strong>
-    <div style="background: rgba(2,6,23,0.45); height: 8px; border-radius: 6px; margin-top: 0.5rem;">
-      <div id="progress-bar" style="background: linear-gradient(90deg, var(--success), #059669); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
-    </div>
-  </div>
+<div class="sq-card">
+  <div class="sq-label">Fill in the blanks about updating Sourdough. Type the missing words below.</div>
+  <form id="sourdough-fill-blank" onsubmit="return checkSourdoughAnswers()" style="display:grid; gap:0.75rem;">
+    <label class="sq-label">1. What field is required to identify which dish to update?</label>
+    <input class="sq-field" type="text" id="blank-id" placeholder="Field name...">
+
+    <label class="sq-label">2. What field stores the number of calories?</label>
+    <input class="sq-field" type="text" id="blank-calories" placeholder="Field name...">
+
+    <label class="sq-label">3. What field stores the dish's category?</label>
+    <input class="sq-field" type="text" id="blank-category" placeholder="Field name...">
+
+    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="sourdough-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
 </div>
-
-<div class="sq-toast" id="sqToast">Sourdough updated — +50 XP</div>
-
-<!-- Unlock Notification -->
-<div id="unlockNotification" class="unlock-notification">
-  🎉 Seattle Unlocked!<br>
-  <small style="font-size: 13px; opacity: 0.95;">You can now continue to the next city!</small>
-</div>
-
-- **🧠 What Does UPDATE Mean?**  
-  - In databases, **UPDATE** = modifying existing records (dishes, ingredients, join rows).  
-  - On the web, a client form sends a PUT /api/dishes/{id} request.  
-  - The server updates:
-    - an existing **dish** record,  
-    - any missing **ingredient** entries,
-    - and **dish_ingredients** join records — ideally inside a transaction (all succeed or all fail).  
-  - Analogy: your database is like a **recipe book**. Updating a dish = modifying an existing **recipe card** and adjusting the ingredients while keeping track of all changes.
-
-## How this interactive page works (quick)
-- Each task has an editable code area (or an input form) and a **Run** button.
-- Running code appends output to the terminal area under the task.
-- The page includes a **mock backend** (`MockAPI`) that simulates `PUT /api/dishes/{id}`, `PUT /api/dishes/bulk`, and `GET /api/dishes?city=sf`. Data is stored in `localStorage` so progress persists across refreshes.
-- On success when updating Sourdough, a **toast** shows `+50 XP`.
-- **NEW:** The page now reads your itinerary from localStorage and displays only your selected San Francisco foods!
-
+<script>
+function checkSourdoughAnswers() {
+  const answers = {
+    blank_id: "id",
+    blank_calories: "calories",
+    blank_category: "category"
+  };
+  let correct = 0;
+  let total = Object.keys(answers).length;
+  for (const key in answers) {
+    const val = document.getElementById(key.replace('_', '-')).value.trim();
+    if (val.toLowerCase() === answers[key].toLowerCase()) correct++;
+  }
+  const feedback = document.getElementById('sourdough-feedback');
+  if (correct === total) {
+    feedback.textContent = '✅ All correct! You understand the Sourdough update.';
+    completeTask('sourdough');
+  } else {
+    feedback.textContent = `You got ${correct} out of ${total} correct. Try again!`;
+  }
+  return false;
+}
+</script>
 ---
 
 # %% Interactive: Mock Backend & Utilities
@@ -745,67 +753,88 @@ Welcome! This interactive page lets learners *actually* update dishes, ingredien
 ---
 
 # %% Interactive Task: DimSum Menu (Editable + Run)
-
-<div class="sq-card">
-  <div class="sq-label">Implement the <strong>DimSumMenu</strong> class with update methods <code>updatePrice()</code>, <code>updateDescription()</code>, <code>addOption()</code>, <code>removeOption()</code>.</div>
-
-  <textarea id="code-dimsum" class="code-editor">
-// class DimSumMenu implementation
+<!-- Example for reference -->
+<details open>
+  <summary>Example: DimSumMenu class</summary>
+  <pre class="sq-terminal" style="background: #181e2a; color: #e6eef6;">
 class DimSumMenu {
   constructor(id, name, options = []) {
     this.id = id;
     this.name = name;
     this.options = options;
   }
-
   updatePrice(itemId, newPrice) {
     const item = this.options.find(o => o.id === itemId);
     if (item) item.price = newPrice;
   }
-
   updateDescription(itemId, newDesc) {
     const item = this.options.find(o => o.id === itemId);
     if (item) item.description = newDesc;
   }
-
   addOption(option) {
     this.options.push(option);
   }
-
   removeOption(itemId) {
     const index = this.options.findIndex(o => o.id === itemId);
     if (index > -1) this.options.splice(index, 1);
   }
 }
-
-// example usage
-const menu = new DimSumMenu("m1", "Lunch Special");
-menu.addOption({ id: "d1", name: "Har Gow", price: 6.99 });
-menu.addOption({ id: "d2", name: "Siu Mai", price: 5.99 });
-console.log("Initial menu:", menu);
-
-menu.updatePrice("d1", 7.99);
-menu.updateDescription("d2", "Pork & shrimp dumplings");
-console.log("Updated menu:", menu);
-
-completeTask('dimsum'); // Mark task as complete
-  </textarea>
-
-  <div style="margin-top:0.5rem">
-    <button class="sq-btn sq-run" onclick="runEditor('code-dimsum','terminal-dimsum')">Run</button>
-    <button class="sq-btn" onclick="copyEditor('code-dimsum')">Copy</button>
-  </div>
-
-  <pre id="terminal-dimsum" class="sq-terminal"></pre>
-</div>
-
-# %% Interactive Task: ChowmeinOrder (Editable + Run)
+  </pre>
+</details>
 
 <div class="sq-card">
-  <div class="sq-label">Implement <strong>ChowmeinOrder</strong> with update methods <code>updateProtein()</code>, <code>updateNoodleType()</code>, <code>updateSpiceLevel()</code>, <code>updateExtras()</code>.</div>
+  <div class="sq-label">Fill in the blanks to complete the <strong>DimSumMenu</strong> class. Type the missing code in the input fields below.</div>
+  <form id="dimsum-fill-blank" onsubmit="return checkDimSumAnswers()" style="display:grid; gap:0.75rem;">
+    <label class="sq-label">1. What method updates the price of a menu item?</label>
+    <input class="sq-field" type="text" id="blank-updatePrice" placeholder="Method name...">
 
-  <textarea id="code-chowmein" class="code-editor">
-// ChowmeinOrder implementation
+    <label class="sq-label">2. What array holds all the menu options?</label>
+    <input class="sq-field" type="text" id="blank-options" placeholder="Property name...">
+
+    <label class="sq-label">3. What keyword is used to define a class in JavaScript?</label>
+    <input class="sq-field" type="text" id="blank-class" placeholder="Keyword...">
+
+    <label class="sq-label">4. What method adds a new option to the menu?</label>
+    <input class="sq-field" type="text" id="blank-addOption" placeholder="Method name...">
+
+    <label class="sq-label">5. What method removes an option from the menu?</label>
+    <input class="sq-field" type="text" id="blank-removeOption" placeholder="Method name...">
+
+    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="dimsum-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
+</div>
+<script>
+function checkDimSumAnswers() {
+  const answers = {
+    blank_updatePrice: "updatePrice",
+    blank_options: "options",
+    blank_class: "class",
+    blank_addOption: "addOption",
+    blank_removeOption: "removeOption"
+  };
+  let correct = 0;
+  let total = Object.keys(answers).length;
+  for (const key in answers) {
+    const val = document.getElementById(key.replace('_', '-')).value.trim();
+    if (val.toLowerCase() === answers[key].toLowerCase()) correct++;
+  }
+  const feedback = document.getElementById('dimsum-feedback');
+  if (correct === total) {
+    feedback.textContent = '✅ All correct! You understand the DimSumMenu class.';
+    completeTask('dimsum');
+  } else {
+    feedback.textContent = `You got ${correct} out of ${total} correct. Try again!`;
+  }
+  return false;
+}
+</script>
+
+# %% Interactive Task: ChowmeinOrder (Editable + Run)
+<!-- Example for reference -->
+<details open>
+  <summary>Example: ChowmeinOrder class</summary>
+  <pre class="sq-terminal" style="background: #181e2a; color: #e6eef6;">
 class ChowmeinOrder {
   constructor(id, protein, noodleType) {
     this.id = id;
@@ -814,49 +843,80 @@ class ChowmeinOrder {
     this.spiceLevel = "Medium";
     this.extras = [];
   }
-
-  updateProtein(newProtein) { 
-    this.protein = newProtein; 
-    console.log(`Updated protein to ${newProtein}`);
+  updateProtein(newProtein) {
+    this.protein = newProtein;
   }
-
-  updateNoodleType(newType) { 
+  updateNoodleType(newType) {
     this.noodleType = newType;
-    console.log(`Updated noodle type to ${newType}`);
   }
-
   updateSpiceLevel(level) {
     this.spiceLevel = level;
-    console.log(`Updated spice level to ${level}`);
   }
-
   updateExtras(newExtras) {
     this.extras = newExtras;
-    console.log(`Updated extras to ${newExtras.join(", ")}`);
   }
 }
+  </pre>
+</details>
 
-// example usage
-const order = new ChowmeinOrder("c1", "Chicken", "Egg Noodles");
-console.log("Initial order:", order);
+<div class="sq-card">
+  <div class="sq-label">Fill in the blanks about ChowmeinOrder. Type the missing words below.</div>
+  <form id="chowmein-fill-blank" onsubmit="return checkChowmeinAnswers()" style="display:grid; gap:0.75rem;">
+    <label class="sq-label">1. What property stores the type of noodle?</label>
+    <input class="sq-field" type="text" id="blank-noodleType" placeholder="Property name...">
 
-order.updateProtein("Shrimp");
-order.updateSpiceLevel("Hot");
-order.updateExtras(["Bean Sprouts", "Green Onions"]);
-console.log("Updated order:", order);
+    <label class="sq-label">2. What method changes the protein?</label>
+    <input class="sq-field" type="text" id="blank-updateProtein" placeholder="Method name...">
 
-completeTask('chowmein'); // Mark task as complete
-  </textarea>
+    <label class="sq-label">3. What property stores extra toppings?</label>
+    <input class="sq-field" type="text" id="blank-extras" placeholder="Property name...">
 
-  <div style="margin-top:0.5rem">
-    <button class="sq-btn sq-run" onclick="runEditor('code-chowmein','terminal-chowmein')">Run</button>
-    <button class="sq-btn" onclick="copyEditor('code-chowmein')">Copy</button>
-  </div>
-
-  <pre id="terminal-chowmein" class="sq-terminal"></pre>
+    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="chowmein-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
 </div>
+<script>
+function checkChowmeinAnswers() {
+  const answers = {
+    blank_noodleType: "noodleType",
+    blank_updateProtein: "updateProtein",
+    blank_extras: "extras"
+  };
+  let correct = 0;
+  let total = Object.keys(answers).length;
+  for (const key in answers) {
+    const val = document.getElementById(key.replace('_', '-')).value.trim();
+    if (val.toLowerCase() === answers[key].toLowerCase()) correct++;
+  }
+  const feedback = document.getElementById('chowmein-feedback');
+  if (correct === total) {
+    feedback.textContent = '✅ All correct! You understand ChowmeinOrder.';
+    completeTask('chowmein');
+  } else {
+    feedback.textContent = `You got ${correct} out of ${total} correct. Try again!`;
+  }
+  return false;
+}
+</script>
 
 # %% Interactive Task: Update the Sourdough (Form + Run)
+<!-- Example for reference -->
+<details open>
+  <summary>Example: Sourdough update payload</summary>
+  <pre class="sq-terminal" style="background: #181e2a; color: #e6eef6;">
+{
+  id: "d123",
+  name: "SF Sourdough",
+  category: "Artisan Bread",
+  calories: 180,
+  photo: "https://...",
+  ingredients: [
+    { name: "flour", qty: "3", unit: "cups" }
+  ],
+  city: "sf"
+}
+  </pre>
+</details>
 
 <div class="sq-card">
   <div class="sq-label">Use the form to update a <strong>Sourdough</strong>. Required fields: <em>id, name, category, ingredients (name, qty, unit), calories</em>. Photo may be a URL or uploaded file (stored as data URL).</div>
@@ -964,6 +1024,31 @@ completeTask('chowmein'); // Mark task as complete
 </script>
 
 # %% Interactive: Simulated PUT endpoint + Unit Test
+<!-- Example for reference -->
+<details open>
+  <summary>Example: PUT endpoint usage</summary>
+  <pre class="sq-terminal" style="background: #181e2a; color: #e6eef6;">
+// Update a dish using PUT
+const id = "d123";
+const payload = {
+  name: "Garlic Noodles",
+  category: "Noodles",
+  calories: 550,
+  photo: null,
+  ingredients: [
+    { name: "noodles", qty: "8", unit: "oz" },
+    { name: "garlic", qty: "6", unit: "cloves" },
+    { name: "butter", qty: "2", unit: "tbsp" }
+  ],
+  city: "sf"
+};
+const res = await window.MockAPIInstance.putDish(id, payload);
+if (res.status === 200) {
+  console.log("Update successful!");
+  console.log(res.body);
+}
+  </pre>
+</details>
 
 <div class="sq-card">
   <div class="sq-label">Simulate a `PUT /api/dishes/{id}` call programmatically (JS). There is also a simple unit test runner below to assert `200` and returned resource.</div>
@@ -973,28 +1058,24 @@ completeTask('chowmein'); // Mark task as complete
 (async function(){
   const id = "d123"; // must exist
   const payload = {
-    name: "Garlic Noodles",
-    category: "Noodles",
-    calories: 550,
-    photo: null,
-    ingredients: [
-      { name: "noodles", qty: "8", unit: "oz" },
-      { name: "garlic", qty: "6", unit: "cloves" },
-      { name: "butter", qty: "2", unit: "tbsp" }
-    ],
-    city: "sf"
-  };
-
-  const res = await window.MockAPIInstance.putDish(id, payload);
-  console.log("Status:", res.status);
-  console.log("Body:", res.body);
-})();
+  <textarea id="code-put" class="code-editor">
+// Fill in the blanks about the PUT endpoint. Type the missing words below.
   </textarea>
 
-  <div style="margin-top:0.5rem">
-    <button class="sq-btn sq-run" onclick="runEditor('code-put','terminal-put')">Run</button>
-    <button class="sq-btn" onclick="copyEditor('code-put')">Copy</button>
-  </div>
+  <form id="put-fill-blank" onsubmit="return checkPutAnswers()" style="display:grid; gap:0.75rem;">
+    <label class="sq-label">1. What HTTP method is used to update a dish?</label>
+    <input class="sq-field" type="text" id="blank-method" placeholder="Method...">
+
+    <label class="sq-label">2. What status code means the update was successful?</label>
+    <input class="sq-field" type="text" id="blank-status" placeholder="Status code...">
+
+    <label class="sq-label">3. What property in the payload contains the dish's name?</label>
+    <input class="sq-field" type="text" id="blank-name" placeholder="Property name...">
+
+    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="put-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
+
 
   <pre id="terminal-put" class="sq-terminal"></pre>
 

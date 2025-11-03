@@ -42,7 +42,6 @@ lxdData:
       Level: 4
       Description: "Learn how to design and develop dynamic UI elements inspired by global destinations to enhance your creative journey."
       Categories: ["UI", "Styling", "Structure"]
-      Video: "/west-coast/resume-video"
       Lessons: "/west-coast/travel/"
       Image: "/images/west-coast/resume.svg"
       Alt: "CS Portfolio Quest Resume"

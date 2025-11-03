@@ -3,19 +3,18 @@ layout: post
 title: "Mini-Game"
 description: "AI Mini-Game that tests knowledge from all three levels"
 permalink: /digital-famine/ai/submodule_4/
-breadcrumb: true
 microblog: true
 parent: "AI Usage"
 team: "Debuggers"
 submodule: 4
 categories: [CSP, Submodule, AIUsage]
 tags: [ai, debuggers, mini-game]
-author: "Debuggers Team"
+author: "Debuggers Team - Lillian Wu, Ruchika Kench, Anishka Sanghvi"
 date: 2025-10-21
 ---
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +25,7 @@ date: 2025-10-21
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
@@ -35,6 +35,7 @@ date: 2025-10-21
             justify-content: center;
             padding: 20px;
         }
+
         .game-container {
             background: #1e293b;
             border-radius: 12px;
@@ -51,7 +52,7 @@ date: 2025-10-21
             align-items: center;
             margin-bottom: 24px;
         }
-        
+
         .title {
             color: white;
             font-size: 28px;
@@ -60,13 +61,13 @@ date: 2025-10-21
             align-items: center;
             gap: 12px;
         }
-        
+
         .roadblock-counter {
             color: #fbbf24;
             font-weight: bold;
             font-size: 18px;
         }
-        
+
         .progress-bar {
             background: #374151;
             height: 12px;
@@ -74,13 +75,13 @@ date: 2025-10-21
             overflow: hidden;
             margin-bottom: 24px;
         }
-        
+
         .progress-fill {
             background: #fbbf24;
             height: 100%;
             transition: width 0.5s ease;
         }
-        
+
         .emoji-container {
             background: #374151;
             border: 4px solid #fbbf24;
@@ -90,7 +91,7 @@ date: 2025-10-21
             margin-bottom: 24px;
             font-size: 96px;
         }
-        
+
         .question {
             color: white;
             font-size: 20px;
@@ -100,14 +101,14 @@ date: 2025-10-21
             border-radius: 8px;
             margin-bottom: 24px;
         }
-        
+
         .options {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-bottom: 24px;
         }
-        
+
         .option-btn {
             width: 100%;
             text-align: left;
@@ -118,34 +119,35 @@ date: 2025-10-21
             border: 2px solid #4b5563;
             background: #374151;
             color: white;
-            cursor: pointer;
+            cursor: grab;
             transition: all 0.2s;
+            user-select: none;
         }
-        
+
         .option-btn:hover:not(:disabled) {
             background: #4b5563;
             border-color: #6b7280;
         }
-        
+
         .option-btn.selected {
             background: #ca8a04;
             border-color: #fbbf24;
         }
-        
+
         .option-btn.correct {
             background: #16a34a;
             border-color: #4ade80;
         }
-        
+
         .option-btn.incorrect {
             background: #dc2626;
             border-color: #f87171;
         }
-        
+
         .option-btn:disabled {
             cursor: not-allowed;
         }
-        
+
         .feedback {
             padding: 16px;
             border-radius: 8px;
@@ -157,17 +159,17 @@ date: 2025-10-21
             align-items: center;
             gap: 12px;
         }
-        
+
         .feedback.correct {
             background: #14532d;
             border-color: #4ade80;
         }
-        
+
         .feedback.incorrect {
             background: #7f1d1d;
             border-color: #f87171;
         }
-        
+
         .action-btn {
             width: 100%;
             padding: 16px;
@@ -178,25 +180,25 @@ date: 2025-10-21
             cursor: pointer;
             transition: all 0.2s;
         }
-        
+
         .action-btn.next {
             background: #16a34a;
             color: white;
         }
-        
+
         .action-btn.next:hover {
             background: #15803d;
         }
-        
+
         .action-btn.retry {
             background: #ca8a04;
             color: white;
         }
-        
+
         .action-btn.retry:hover {
             background: #a16207;
         }
-        
+
         .roadblock-overlay {
             position: fixed;
             inset: 0;
@@ -207,7 +209,7 @@ date: 2025-10-21
             z-index: 1000;
             animation: pulse 1s infinite;
         }
-        
+
         .roadblock-text {
             background: #dc2626;
             border: 4px solid #fbbf24;
@@ -219,30 +221,30 @@ date: 2025-10-21
             font-size: 28px;
             font-weight: bold;
         }
-        
+
         .victory-screen {
             text-align: center;
         }
-        
+
         .victory-emoji {
             font-size: 96px;
             margin-bottom: 24px;
             animation: bounce 1s infinite;
         }
-        
+
         .victory-title {
             font-size: 36px;
             font-weight: bold;
             color: #4ade80;
             margin-bottom: 16px;
         }
-        
+
         .victory-text {
             font-size: 20px;
             color: #d1d5db;
             margin-bottom: 24px;
         }
-        
+
         .treasure-box {
             background: #fef3c7;
             border: 4px solid #fbbf24;
@@ -250,13 +252,13 @@ date: 2025-10-21
             padding: 24px;
             margin-bottom: 24px;
         }
-        
+
         .treasure-text {
             font-size: 24px;
             font-weight: bold;
             color: #92400e;
         }
-        
+
         .play-again-btn {
             background: #16a34a;
             color: white;
@@ -267,21 +269,35 @@ date: 2025-10-21
             font-weight: bold;
             cursor: pointer;
         }
-        
+
         .play-again-btn:hover {
             background: #15803d;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
         }
-        
+
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
-        
+
         .hidden {
             display: none;
         }
@@ -361,19 +377,131 @@ date: 2025-10-21
             margin-top: 15px;
             font-weight: bold;
         }
+
+        .drag-drop-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .drop-zone {
+            background: #374151;
+            border: 3px dashed #6b7280;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+        }
+
+        .drop-zone.good {
+            border-color: #10b981;
+        }
+
+        .drop-zone.bad {
+            border-color: #ef4444;
+        }
+
+        .drop-zone-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .drop-zone.good .drop-zone-title {
+            background: #065f46;
+        }
+
+        .drop-zone.bad .drop-zone-title {
+            background: #7f1d1d;
+        }
+
+        .prompt-items {
+            background: #1e293b;
+            border: 2px solid #4b5563;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            min-height: 200px;
+        }
+
+        .prompt-items-title {
+            color: #fbbf24;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .prompt-item {
+            background: #334155;
+            border: 2px solid #64748b;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            color: white;
+            cursor: move;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: all 0.2s;
+        }
+
+        .prompt-item:hover {
+            background: #475569;
+            border-color: #94a3b8;
+        }
+
+        .prompt-item.dragging {
+            opacity: 0.5;
+        }
+
+        .prompt-item.in-zone {
+            cursor: move;
+        }
+
+        .check-answer-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            background: #fbbf24;
+            color: #1e293b;
+            transition: all 0.2s;
+        }
+
+        .check-answer-btn:hover {
+            background: #f59e0b;
+        }
+
+        .check-answer-btn:disabled {
+            background: #4b5563;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
     </style>
 </head>
+
 <body>
     <div id="code-entry-overlay" class="code-entry-overlay">
         <div class="code-entry-box">
             <div class="code-entry-title">🔐 Enter Vault Code</div>
-            <div class="code-entry-text">
-                You must collect the code numbers from all three modules to unlock the final challenge.<br><br>
-                Enter the 3-digit code in order (Module 1, Module 2, Module 3):
-            </div>
+            <p class="code-entry-text">
+                You've collected codes from all three modules.<br>
+                Enter the 3-digit code to unlock the final challenge!
+            </p>
             <input type="text" id="code-input" class="code-input" maxlength="3" placeholder="•••" autocomplete="off">
-            <button onclick="verifyCode()" class="code-submit-btn">Unlock Vault</button>
-            <div id="code-error" class="code-error hidden"></div>
+            <div id="code-error" style="color: #ef4444; margin-top: 10px; font-size: 16px;"></div>
+            <button onclick="verifyCode()" style="width: 100%; padding: 16px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px;">Unlock Vault</button>
+            <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">
+                Hint: Module 1 = 2, Module 2 = 6, Module 3 = 1
+            </p>
         </div>
     </div>
 
@@ -390,117 +518,92 @@ date: 2025-10-21
                 </div>
                 <div class="roadblock-counter" id="counter">Roadblock 1 / 3</div>
             </div>
-            
+
             <div class="progress-bar">
                 <div class="progress-fill" id="progress"></div>
             </div>
-            
+
             <div class="emoji-container" id="emoji">🚪</div>
-            
+
             <div class="question" id="question"></div>
-            
+
             <div class="options" id="options"></div>
-            
+
             <div id="feedback" class="hidden"></div>
-            
+
             <div id="action-button"></div>
         </div>
-        
+
         <div id="victory-screen" class="victory-screen hidden">
             <div class="victory-emoji">🔓</div>
             <h1 class="victory-title">🎉 VAULT UNLOCKED! 🎉</h1>
-            <p class="victory-text">Congratulations! You've successfully navigated through all roadblocks and opened the vault!</p>
+            <p class="victory-text">Congratulations! You've successfully navigated through all roadblocks and opened the
+                vault!</p>
             <div class="treasure-box">
                 <p class="treasure-text">💎 TREASURE ACQUIRED 💎</p>
             </div>
-            <button class="play-again-btn" onclick="resetGame()">Play Again</button>
         </div>
     </div>
 
     <script>
-        // Code verification function
-        function verifyCode() {
-            const input = document.getElementById('code-input').value;
-            const errorDiv = document.getElementById('code-error');
-            const correctCode = '261'; // Module 1=2, Module 2=6, Module 3=1
-
-            if (input === correctCode) {
-                // Hide the code entry overlay
-                document.getElementById('code-entry-overlay').classList.add('hidden');
-                // Show success message briefly
-                errorDiv.textContent = '✅ Code accepted! Loading vault challenge...';
-                errorDiv.style.color = '#10b981';
-                errorDiv.classList.remove('hidden');
-            } else {
-                // Show error
-                errorDiv.textContent = '❌ Incorrect code. Complete all modules to get the correct code.';
-                errorDiv.style.color = '#ef4444';
-                errorDiv.classList.remove('hidden');
-                document.getElementById('code-input').value = '';
-            }
-        }
-
-        // Allow Enter key to submit
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('code-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    verifyCode();
-                }
-            });
-        });
-
         const roadblocks = [
             {
                 id: 1,
                 emoji: '🚪',
-                question: "Which is a real-life example of Narrow AI?",
-                options: [
-                    { id: 'a', text: "A general-purpose robot that can do any human task" },
-                    { id: 'b', text: "Netflix recommendation system" },
-                    { id: 'c', text: "A sentient AI with consciousness" },
-                    { id: 'd', text: "A machine that can learn anything instantly" }
+                question: "A company develops an AI that can diagnose diseases using medical images. It can outperform human doctors in this one task, but cannot drive a car or play chess. Drag each statement to TRUE or FALSE:",
+                hint: "Think about whether the AI is specialized in only one area or capable of doing many human tasks",
+                isTrueFalse: true,
+                statements: [
+                    { id: 's1', text: "This AI is specialized in a single task (medical diagnosis)", answer: 'true' },
+                    { id: 's2', text: "This AI has human-level intelligence across all domains", answer: 'false' },
+                    { id: 's3', text: "This AI cannot perform tasks outside its training area", answer: 'true' },
+                    { id: 's4', text: "This AI can improve itself and create new technologies", answer: 'false' }
                 ],
-                correctAnswer: 'b',
-                roadblockText: "🚧 ROADBLOCK 1: AI Fundamentals Challenge 🚧"
+                roadblockText: "🚧 ROADBLOCK 1 🚧"
             },
             {
                 id: 2,
                 emoji: '🔐',
-                question: "Which is a type of prompt engineering?",
-                options: [
-                    { id: 'a', text: "Database Indexing" },
-                    { id: 'b', text: "Few-Shot Prompt" },
-                    { id: 'c', text: "Binary Compilation" },
-                    { id: 'd', text: "Network Routing" }
+                question: "Sort these prompts into Good (Detailed) or Bad (Vague) categories:",
+                isDragDrop: true,
+                prompts: [
+                    { id: 'p1', text: "Fix the ship.", category: 'bad' },
+                    { id: 'p2', text: "You're piloting a damaged spacecraft through an asteroid field. Write a 150-word distress signal to the nearest space station explaining your situation, current coordinates, and the help you need.", category: 'good' },
+                    { id: 'p3', text: "Tell me about space.", category: 'bad' },
+                    { id: 'p4', text: "Explain how a spacecraft's autopilot navigation system works to a cadet who has never used one before. Use an analogy comparing it to something on Earth and keep it under 100 words.", category: 'good' },
+                    { id: 'p5', text: "Help with the autopilot.", category: 'bad' },
+                    { id: 'p6', text: "Act as the ship's AI assistant. The oxygen recycler is malfunctioning and showing error code X-47. I'm not an engineer. Walk me through three simple diagnostic steps I can try, using clear numbered instructions.", category: 'good' }
                 ],
-                correctAnswer: 'b',
                 roadblockText: "🚧 ROADBLOCK 2: Prompt Engineering Challenge 🚧"
             },
             {
                 id: 3,
-                emoji: '🏛️',
-                question: "What is NOT a real life example of an AI API?",
-                options: [
-                    { id: 'a', text: "OpenAI GPT API" },
-                    { id: 'b', text: "Google Vision API" },
-                    { id: 'c', text: "MindReader Telepathy API" },
-                    { id: 'd', text: "AWS Rekognition API" }
+                emoji: '🌐',
+                question: "Sort these statements about AI APIs into TRUE or FALSE:",
+                hint: "Think about how AI APIs work and what they provide to developers",
+                isTrueFalse: true,
+                statements: [
+                    { id: 's1', text: "AI APIs allow developers to access pre-trained AI models without building from scratch", answer: 'true' },
+                    { id: 's2', text: "You need to train your own model before using any AI API", answer: 'false' },
+                    { id: 's3', text: "AI APIs can be integrated into applications using HTTP requests", answer: 'true' },
+                    { id: 's4', text: "All AI APIs are completely free with no usage limits", answer: 'false' }
                 ],
-                correctAnswer: 'c',
-                roadblockText: "🚧 ROADBLOCK 3: AI API Knowledge Challenge 🚧"
+                roadblockText: "🚧 ROADBLOCK 3: AI APIs Challenge 🚧"
             }
         ];
 
         let currentRoadblock = 0;
-        let selectedAnswer = null;
+        let placements = {};
         let showFeedback = false;
+        let dragDropState = {};
+        let draggedElement = null;
 
         function showRoadblockOverlay() {
             const overlay = document.getElementById('roadblock-overlay');
             const text = document.getElementById('roadblock-text');
             text.textContent = roadblocks[currentRoadblock].roadblockText;
             overlay.classList.remove('hidden');
-            
+
             setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 2500);
@@ -508,73 +611,430 @@ date: 2025-10-21
 
         function updateUI() {
             const current = roadblocks[currentRoadblock];
-            
+
             document.getElementById('counter').textContent = `Roadblock ${currentRoadblock + 1} / ${roadblocks.length}`;
             document.getElementById('progress').style.width = `${(currentRoadblock / roadblocks.length) * 100}%`;
             document.getElementById('emoji').textContent = current.emoji;
             document.getElementById('question').textContent = current.question;
-            
+
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
-            
-            current.options.forEach(option => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = `<span style="font-weight: bold; margin-right: 12px;">${option.id.toUpperCase()}.</span>${option.text}`;
-                btn.onclick = () => selectAnswer(option.id, btn);
-                btn.id = `option-${option.id}`;
-                optionsContainer.appendChild(btn);
-            });
-            
+
+            if (current.isDragDrop) {
+                setupDragDropUI(current);
+            } else if (current.isTrueFalse) {
+                setupTrueFalseUI(current);
+            } else {
+                current.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = `<span style="font-weight: bold; margin-right: 12px;">${option.id.toUpperCase()}.</span>${option.text}`;
+                    btn.onclick = () => selectAnswer(option.id, btn);
+                    btn.id = `option-${option.id}`;
+                    optionsContainer.appendChild(btn);
+                });
+            }
+
             document.getElementById('feedback').classList.add('hidden');
             document.getElementById('action-button').innerHTML = '';
         }
 
+        function setupDragDropUI(roadblock) {
+            const container = document.getElementById('options');
+
+            // Shuffle prompts
+            const shuffled = [...roadblock.prompts].sort(() => Math.random() - 0.5);
+
+            // Create prompt items container
+            const promptsDiv = document.createElement('div');
+            promptsDiv.className = 'prompt-items';
+            promptsDiv.id = 'prompt-items';
+            promptsDiv.innerHTML = '<div class="prompt-items-title">📝 Drag these prompts to sort them:</div>';
+
+            shuffled.forEach(prompt => {
+                const item = document.createElement('div');
+                item.className = 'prompt-item';
+                item.draggable = true;
+                item.id = prompt.id;
+                item.textContent = prompt.text;
+                item.dataset.category = prompt.category;
+
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+
+                promptsDiv.appendChild(item);
+            });
+
+            // Create drop zones
+            const dropContainer = document.createElement('div');
+            dropContainer.className = 'drag-drop-container';
+
+            const goodZone = document.createElement('div');
+            goodZone.className = 'drop-zone good';
+            goodZone.id = 'good-zone';
+            goodZone.innerHTML = '<div class="drop-zone-title">✅ Good (Detailed) Prompts</div>';
+
+            const badZone = document.createElement('div');
+            badZone.className = 'drop-zone bad';
+            badZone.id = 'bad-zone';
+            badZone.innerHTML = '<div class="drop-zone-title">❌ Bad (Vague) Prompts</div>';
+
+            [goodZone, badZone].forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+
+            dropContainer.appendChild(goodZone);
+            dropContainer.appendChild(badZone);
+
+            container.appendChild(promptsDiv);
+            container.appendChild(dropContainer);
+
+            // Add check answer button
+            const checkBtn = document.createElement('button');
+            checkBtn.className = 'check-answer-btn';
+            checkBtn.textContent = 'Check Answer';
+            checkBtn.onclick = checkDragDropAnswer;
+            container.appendChild(checkBtn);
+
+            // Initialize drag drop state
+            dragDropState = {};
+        }
+
+        function setupTrueFalseUI(roadblock) {
+            const container = document.getElementById('options');
+
+            // Shuffle statements
+            const shuffled = [...roadblock.statements].sort(() => Math.random() - 0.5);
+
+            // Create statements container
+            const statementsDiv = document.createElement('div');
+            statementsDiv.className = 'prompt-items';
+            statementsDiv.id = 'statement-items';
+            statementsDiv.innerHTML = '<div class="prompt-items-title">📝 Drag statements to TRUE or FALSE:</div>';
+
+            shuffled.forEach(statement => {
+                const item = document.createElement('div');
+                item.className = 'prompt-item';
+                item.draggable = true;
+                item.id = statement.id;
+                item.textContent = statement.text;
+                item.dataset.answer = statement.answer;
+
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+
+                statementsDiv.appendChild(item);
+            });
+
+            // Create TRUE/FALSE drop zones
+            const dropContainer = document.createElement('div');
+            dropContainer.className = 'drag-drop-container';
+
+            const trueZone = document.createElement('div');
+            trueZone.className = 'drop-zone good';
+            trueZone.id = 'true-zone';
+            trueZone.innerHTML = '<div class="drop-zone-title">✅ TRUE</div>';
+
+            const falseZone = document.createElement('div');
+            falseZone.className = 'drop-zone bad';
+            falseZone.id = 'false-zone';
+            falseZone.innerHTML = '<div class="drop-zone-title">❌ FALSE</div>';
+
+            [trueZone, falseZone].forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+
+            dropContainer.appendChild(trueZone);
+            dropContainer.appendChild(falseZone);
+
+            container.appendChild(statementsDiv);
+            container.appendChild(dropContainer);
+
+            // Add check answer button
+            const checkBtn = document.createElement('button');
+            checkBtn.className = 'check-answer-btn';
+            checkBtn.textContent = 'Check Answer';
+            checkBtn.onclick = checkTrueFalseAnswer;
+            container.appendChild(checkBtn);
+        }
+
+        function checkTrueFalseAnswer() {
+            const trueZone = document.getElementById('true-zone');
+            const falseZone = document.getElementById('false-zone');
+            const statementItems = document.getElementById('statement-items');
+
+            const trueItems = Array.from(trueZone.querySelectorAll('.prompt-item'));
+            const falseItems = Array.from(falseZone.querySelectorAll('.prompt-item'));
+            const unsortedItems = Array.from(statementItems.querySelectorAll('.prompt-item'));
+
+            // Check if all items have been sorted
+            if (unsortedItems.length > 0) {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '<span style="font-size: 24px;">❌</span><span>Please sort ALL statements before checking your answer.</span>';
+                feedback.classList.remove('hidden');
+
+                const actionButtonContainer = document.getElementById('action-button');
+                actionButtonContainer.innerHTML = '';
+                const actionBtn = document.createElement('button');
+                actionBtn.className = 'action-btn retry';
+                actionBtn.textContent = 'Continue Sorting';
+                actionBtn.onclick = () => {
+                    feedback.classList.add('hidden');
+                };
+                actionButtonContainer.appendChild(actionBtn);
+                return;
+            }
+
+            // Reset all item styles
+            [...trueItems, ...falseItems].forEach(item => {
+                item.style.background = '';
+                item.style.borderColor = '';
+            });
+
+            let allCorrect = true;
+
+            trueItems.forEach(item => {
+                if (item.dataset.answer !== 'true') {
+                    allCorrect = false;
+                    item.style.background = '#7f1d1d';
+                    item.style.borderColor = '#ef4444';
+                }
+            });
+
+            falseItems.forEach(item => {
+                if (item.dataset.answer !== 'false') {
+                    allCorrect = false;
+                    item.style.background = '#7f1d1d';
+                    item.style.borderColor = '#ef4444';
+                }
+            });
+
+            showFeedback = true;
+
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${allCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = allCorrect
+                ? '<span style="font-size: 24px;">✅</span><span>Perfect! All statements sorted correctly!</span>'
+                : '<span style="font-size: 24px;">❌</span><span>Not quite right. Red statements are in the wrong category.</span>';
+            feedback.classList.remove('hidden');
+
+            const actionButtonContainer = document.getElementById('action-button');
+            actionButtonContainer.innerHTML = '';
+
+            const actionBtn = document.createElement('button');
+            actionBtn.className = `action-btn ${allCorrect ? 'next' : 'retry'}`;
+
+            if (allCorrect) {
+                actionBtn.textContent = currentRoadblock < roadblocks.length - 1
+                    ? 'Proceed to Next Roadblock →'
+                    : 'Open Vault! 🔓';
+                actionBtn.onclick = nextRoadblock;
+            } else {
+                actionBtn.textContent = 'Try Again';
+                actionBtn.onclick = () => {
+                    showFeedback = false;
+                    updateUI();
+                };
+            }
+
+            actionButtonContainer.appendChild(actionBtn);
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            // Add visual feedback
+            const dropzone = e.target.classList.contains('drop-zone')
+                ? e.target
+                : e.target.closest('.drop-zone');
+
+            if (dropzone) {
+                dropzone.style.borderStyle = 'solid';
+                dropzone.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+            }
+
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            const dropzone = e.target.classList.contains('drop-zone')
+                ? e.target
+                : e.target.closest('.drop-zone');
+
+            if (dropzone) {
+                dropzone.style.borderStyle = 'dashed';
+                dropzone.style.backgroundColor = '#374151';
+            }
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            const dropzone = e.target.classList.contains('drop-zone')
+                ? e.target
+                : e.target.closest('.drop-zone');
+
+            if (dropzone && draggedElement) {
+                // Reset visual feedback
+                dropzone.style.borderStyle = 'dashed';
+                dropzone.style.backgroundColor = '#374151';
+
+                // Move the element
+                dropzone.appendChild(draggedElement);
+                draggedElement.classList.add('in-zone');
+            }
+
+            return false;
+        }
+
+        function checkDragDropAnswer() {
+            const goodZone = document.getElementById('good-zone');
+            const badZone = document.getElementById('bad-zone');
+            const promptItems = document.getElementById('prompt-items');
+
+            const goodItems = Array.from(goodZone.querySelectorAll('.prompt-item'));
+            const badItems = Array.from(badZone.querySelectorAll('.prompt-item'));
+            const unsortedItems = Array.from(promptItems.querySelectorAll('.prompt-item'));
+
+            // Check if all items have been sorted
+            if (unsortedItems.length > 0) {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '<span style="font-size: 24px;">❌</span><span>Please sort ALL prompts before checking your answer.</span>';
+                feedback.classList.remove('hidden');
+
+                // Clear and update button
+                const actionButtonContainer = document.getElementById('action-button');
+                actionButtonContainer.innerHTML = '';
+                const actionBtn = document.createElement('button');
+                actionBtn.className = 'action-btn retry';
+                actionBtn.textContent = 'Continue Sorting';
+                actionBtn.onclick = () => {
+                    feedback.classList.add('hidden');
+                };
+                actionButtonContainer.appendChild(actionBtn);
+                return;
+            }
+
+            // Reset all item styles
+            [...goodItems, ...badItems].forEach(item => {
+                item.style.background = '';
+                item.style.borderColor = '';
+            });
+
+            let allCorrect = true;
+
+            goodItems.forEach(item => {
+                if (item.dataset.category !== 'good') {
+                    allCorrect = false;
+                    item.style.background = '#7f1d1d';
+                    item.style.borderColor = '#ef4444';
+                }
+            });
+
+            badItems.forEach(item => {
+                if (item.dataset.category !== 'bad') {
+                    allCorrect = false;
+                    item.style.background = '#7f1d1d';
+                    item.style.borderColor = '#ef4444';
+                }
+            });
+
+            showFeedback = true;
+
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${allCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = allCorrect
+                ? '<span style="font-size: 24px;">✅</span><span>Perfect! All prompts sorted correctly!</span>'
+                : '<span style="font-size: 24px;">❌</span><span>Not quite right. Red prompts are in the wrong category.</span>';
+            feedback.classList.remove('hidden');
+
+            // Clear previous button and create new one
+            const actionButtonContainer = document.getElementById('action-button');
+            actionButtonContainer.innerHTML = '';
+
+            const actionBtn = document.createElement('button');
+            actionBtn.className = `action-btn ${allCorrect ? 'next' : 'retry'}`;
+
+            if (allCorrect) {
+                actionBtn.textContent = currentRoadblock < roadblocks.length - 1
+                    ? 'Proceed to Next Roadblock →'
+                    : 'Open Vault! 🔓';
+                actionBtn.onclick = nextRoadblock;
+            } else {
+                actionBtn.textContent = 'Try Again';
+                actionBtn.onclick = () => {
+                    showFeedback = false;
+                    updateUI();
+                };
+            }
+
+            actionButtonContainer.appendChild(actionBtn);
+        }
+
         function selectAnswer(answerId, btn) {
             if (showFeedback) return;
-            
+
             selectedAnswer = answerId;
             showFeedback = true;
-            
+
             const current = roadblocks[currentRoadblock];
             const isCorrect = selectedAnswer === current.correctAnswer;
-            
+
             document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-            
+
             btn.classList.add(isCorrect ? 'correct' : 'incorrect');
-            
+
             const feedback = document.getElementById('feedback');
             feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-            feedback.innerHTML = isCorrect 
+            feedback.innerHTML = isCorrect
                 ? '<span style="font-size: 24px;">✅</span><span>Correct! You may proceed.</span>'
-                : '<span style="font-size: 24px;">❌</span><span>Incorrect! Try another answer.</span>';
+                : '<span style="font-size: 24px;">❌</span><span>Incorrect! Try again.</span>';
             feedback.classList.remove('hidden');
-            
+
             const actionBtn = document.createElement('button');
             actionBtn.className = `action-btn ${isCorrect ? 'next' : 'retry'}`;
-            
+
             if (isCorrect) {
-                actionBtn.textContent = currentRoadblock < roadblocks.length - 1 
-                    ? 'Proceed to Next Roadblock →' 
+                actionBtn.textContent = currentRoadblock < roadblocks.length - 1
+                    ? 'Proceed to Next Roadblock →'
                     : 'Open Vault! 🔓';
                 actionBtn.onclick = nextRoadblock;
             } else {
                 actionBtn.textContent = 'Try Again';
                 actionBtn.onclick = retry;
             }
-            
+
             document.getElementById('action-button').appendChild(actionBtn);
         }
 
         function retry() {
             selectedAnswer = null;
             showFeedback = false;
-            
+
             document.querySelectorAll('.option-btn').forEach(btn => {
                 btn.disabled = false;
                 btn.classList.remove('correct', 'incorrect', 'selected');
             });
-            
+
             document.getElementById('feedback').classList.add('hidden');
             document.getElementById('action-button').innerHTML = '';
         }
@@ -582,8 +1042,6 @@ date: 2025-10-21
         function nextRoadblock() {
             if (currentRoadblock < roadblocks.length - 1) {
                 currentRoadblock++;
-                selectedAnswer = null;
-                showFeedback = false;
                 updateUI();
                 showRoadblockOverlay();
             } else {
@@ -598,17 +1056,41 @@ date: 2025-10-21
 
         function resetGame() {
             currentRoadblock = 0;
-            selectedAnswer = null;
-            showFeedback = false;
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('victory-screen').classList.add('hidden');
             updateUI();
             showRoadblockOverlay();
         }
 
+        function proceedForward() {
+            // Empty function - button doesn't lead anywhere yet
+            console.log('Proceeding forward...');
+        }
+
+        function verifyCode() {
+            const input = document.getElementById('code-input').value;
+            const errorDiv = document.getElementById('code-error');
+            const correctCode = '261'; // Module 1 = 2, Module 2 = 6, Module 3 = 1
+
+            if (input === correctCode) {
+                document.getElementById('code-entry-overlay').classList.add('hidden');
+                errorDiv.textContent = '';
+            } else {
+                errorDiv.textContent = '❌ Incorrect code. Try again!';
+                document.getElementById('code-input').value = '';
+            }
+        }
+
         // Initialize game
         updateUI();
         showRoadblockOverlay();
     </script>
+
+    <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 2px solid rgba(251, 191, 36, 0.3); padding: 1rem; text-align: center; z-index: 100;">
+        <a href="{{ '/digital-famine/ai/' | prepend: site.baseurl }}" style="display: inline-block; color: #fbbf24; text-decoration: none; font-size: 1rem; font-weight: 600; padding: 0.5rem 1.25rem; border: 2px solid rgba(251, 191, 36, 0.4); border-radius: 0.5rem; transition: all 0.2s ease; background: rgba(251, 191, 36, 0.1);">
+            ← Back to AI Quest Home
+        </a>
+    </footer>
 </body>
+
 </html>

@@ -10,6 +10,8 @@ categories: [CSP, Submodule, AIUsage]
 tags: [ai, submodule, thinkers]
 author: "Thinkers Team"
 date: 2025-10-21
+breadcrumb: true
+microblog: true
 ---
 
 <style>
@@ -24,26 +26,32 @@ date: 2025-10-21
         margin: 40px auto;
         padding: 20px;
         position: relative;
+        background: transparent;
     }
 
     .comic-header {
         text-align: center;
         margin-bottom: 40px;
         animation: fadeIn 1s ease-in;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .comic-header h1 {
         font-size: 48px;
-        color: #FFD700;
-        text-shadow: 3px 3px 0px #FF6B6B, 6px 6px 0px #4ECDC4;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         margin-bottom: 10px;
+        margin-top: 0;
         letter-spacing: 2px;
         font-family: 'Comic Sans MS', cursive;
     }
 
     .comic-header p {
         font-size: 18px;
-        color: #333;
+        color: white;
         font-style: italic;
         font-family: 'Comic Sans MS', cursive;
     }
@@ -59,12 +67,12 @@ date: 2025-10-21
     }
 
     .comic-panel {
-        background: #fff;
-        border: 5px solid #000;
+        background: #2C3E50;
+        border: 3px solid #34495e;
         border-radius: 15px;
         padding: 30px;
         margin: 20px 0;
-        box-shadow: 8px 8px 0px rgba(0,0,0,0.3);
+        box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
         position: relative;
     }
 
@@ -75,29 +83,29 @@ date: 2025-10-21
         right: -15px;
         width: 30px;
         height: 30px;
-        background: #FFD700;
+        background: #4a9eff;
         border-radius: 50%;
-        border: 3px solid #000;
+        border: 3px solid #34495e;
     }
 
     .speech-bubble {
-        background: #fff;
-        border: 3px solid #000;
+        background: #2C3E50;
+        border: 3px solid #34495e;
         border-radius: 20px;
         padding: 20px;
         margin: 15px 0;
         position: relative;
-        box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
     }
 
     .speech-bubble.bad {
-        background: #ffe0e0;
-        border-color: #ff4444;
+        background: #9B3434;
+        border-color: #c24444;
     }
 
     .speech-bubble.good {
-        background: #e0f7fa;
-        border-color: #00bcd4;
+        background: #1a7f37;
+        border-color: #2ea44f;
     }
 
     .speech-bubble::after {
@@ -109,58 +117,58 @@ date: 2025-10-21
         height: 0;
         border-left: 20px solid transparent;
         border-right: 0px solid transparent;
-        border-top: 20px solid #000;
+        border-top: 20px solid #34495e;
     }
 
     .speech-bubble.bad::after {
-        border-top-color: #ff4444;
+        border-top-color: #c24444;
     }
 
     .speech-bubble.good::after {
-        border-top-color: #00bcd4;
+        border-top-color: #2ea44f;
     }
 
     .speech-bubble h3 {
-        color: #000;
+        color: #fff;
         margin-bottom: 10px;
         font-size: 24px;
         font-family: 'Comic Sans MS', cursive;
     }
 
     .speech-bubble p {
-        color: #000;
+        color: #ccc;
         line-height: 1.6;
         font-size: 16px;
     }
 
     .star-method-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: 4px solid #000;
+        background: #1e5287;
+        border: 4px solid #4a9eff;
         border-radius: 15px;
         padding: 25px;
         margin: 20px 0;
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
         color: #fff;
     }
 
     .star-method-box h3 {
-        color: #FFD700;
+        color: #4a9eff;
         font-size: 28px;
         margin-bottom: 15px;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
         font-family: 'Comic Sans MS', cursive;
     }
 
     .star-method-box .star-component {
-        background: rgba(255,255,255,0.2);
+        background: rgba(0,0,0,0.3);
         border-radius: 10px;
         padding: 15px;
         margin: 10px 0;
-        border-left: 5px solid #FFD700;
+        border-left: 5px solid #4a9eff;
     }
 
     .star-component strong {
-        color: #FFD700;
+        color: #4a9eff;
         font-size: 20px;
         display: block;
         margin-bottom: 5px;
@@ -174,20 +182,20 @@ date: 2025-10-21
     }
 
     .transformer-tool {
-        background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-        border: 4px solid #000;
+        background: #1e5287;
+        border: 4px solid #4a9eff;
         border-radius: 15px;
         padding: 25px;
         margin: 20px 0;
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
         color: #fff;
     }
 
     .transformer-tool h3 {
-        color: #FFD700;
+        color: #4a9eff;
         font-size: 28px;
         margin-bottom: 15px;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
         font-family: 'Comic Sans MS', cursive;
     }
 
@@ -195,17 +203,19 @@ date: 2025-10-21
         width: 100%;
         min-height: 100px;
         padding: 15px;
-        border: 3px solid #000;
+        border: 3px solid #34495e;
         border-radius: 10px;
         font-family: 'Comic Sans MS', cursive;
         font-size: 14px;
         margin: 10px 0;
         resize: vertical;
+        background: #1a1a1a;
+        color: #fff;
     }
 
     .version-card {
-        background: #fff;
-        border: 3px solid #000;
+        background: #2C3E50;
+        border: 3px solid #34495e;
         border-radius: 10px;
         padding: 20px;
         margin: 15px 0;
@@ -213,74 +223,74 @@ date: 2025-10-21
     }
 
     .version-card h4 {
-        color: #4ECDC4;
+        color: #4a9eff;
         font-size: 20px;
         margin-bottom: 10px;
         font-family: 'Comic Sans MS', cursive;
     }
 
     .version-card p {
-        color: #000;
+        color: #ccc;
         line-height: 1.6;
         margin-bottom: 10px;
     }
 
     .version-card .pros-cons {
         font-size: 14px;
-        color: #666;
+        color: #999;
     }
 
     .interview-question-box {
-        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-        border: 4px solid #000;
+        background: #1e5287;
+        border: 4px solid #4a9eff;
         border-radius: 15px;
         padding: 25px;
         margin: 20px 0;
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
         color: #fff;
     }
 
     .interview-question-box h4 {
-        color: #FFD700;
+        color: #4a9eff;
         font-size: 24px;
         margin-bottom: 15px;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
         font-family: 'Comic Sans MS', cursive;
     }
 
     .interview-question-box .tip {
-        background: rgba(255,255,255,0.2);
+        background: rgba(0,0,0,0.3);
         border-radius: 10px;
         padding: 12px;
         margin: 8px 0;
-        border-left: 4px solid #FFD700;
+        border-left: 4px solid #4a9eff;
     }
 
     .interview-analyzer {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: 4px solid #000;
+        background: #1e5287;
+        border: 4px solid #4a9eff;
         border-radius: 15px;
         padding: 25px;
         margin: 20px 0;
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
         color: #fff;
     }
 
     .interview-analyzer h3 {
-        color: #FFD700;
+        color: #4a9eff;
         font-size: 28px;
         margin-bottom: 15px;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
         font-family: 'Comic Sans MS', cursive;
     }
 
     .analysis-result {
-        background: #fff;
-        border: 3px solid #000;
+        background: #2C3E50;
+        border: 3px solid #34495e;
         border-radius: 10px;
         padding: 20px;
         margin: 15px 0;
-        color: #000;
+        color: #ccc;
         display: none;
     }
 
@@ -292,53 +302,53 @@ date: 2025-10-21
         display: inline-block;
         padding: 8px 16px;
         border-radius: 20px;
-        border: 2px solid #000;
+        border: 2px solid #333;
         margin: 5px;
         font-weight: bold;
     }
 
     .score-badge.good {
-        background: #28a745;
+        background: #2ea44f;
         color: #fff;
     }
 
     .score-badge.medium {
-        background: #ffc107;
+        background: #f39c12;
         color: #000;
     }
 
     .score-badge.bad {
-        background: #dc3545;
+        background: #c24444;
         color: #fff;
     }
 
     .use-case-sorter {
-        background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
-        border: 4px solid #000;
+        background: #1e5287;
+        border: 4px solid #4a9eff;
         border-radius: 15px;
         padding: 25px;
         margin: 20px 0;
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
         color: #fff;
     }
 
     .use-case-sorter h3 {
-        color: #FFD700;
+        color: #4a9eff;
         font-size: 28px;
         margin-bottom: 15px;
-        text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
         font-family: 'Comic Sans MS', cursive;
     }
 
     .scenario-card {
-        background: #fff;
-        border: 3px solid #000;
+        background: #2C3E50;
+        border: 3px solid #34495e;
         border-radius: 10px;
         padding: 15px;
         margin: 10px 0;
         cursor: pointer;
         transition: all 0.3s ease;
-        color: #000;
+        color: #ccc;
         user-select: none;
     }
 
@@ -348,13 +358,13 @@ date: 2025-10-21
     }
 
     .scenario-card.correct {
-        background: #d4edda;
-        border-color: #28a745;
+        background: #1a7f37;
+        border-color: #2ea44f;
     }
 
     .scenario-card.incorrect {
-        background: #f8d7da;
-        border-color: #dc3545;
+        background: #9B3434;
+        border-color: #c24444;
     }
 
     .bucket-container {
@@ -365,8 +375,8 @@ date: 2025-10-21
     }
 
     .bucket {
-        background: rgba(255,255,255,0.2);
-        border: 3px dashed #FFD700;
+        background: rgba(0,0,0,0.2);
+        border: 3px dashed #4a9eff;
         border-radius: 10px;
         padding: 15px;
         min-height: 200px;
@@ -374,25 +384,25 @@ date: 2025-10-21
 
     .bucket h4 {
         text-align: center;
-        color: #FFD700;
+        color: #4a9eff;
         margin-bottom: 15px;
         font-family: 'Comic Sans MS', cursive;
     }
 
     .red-flag-list {
-        background: #fff;
-        border: 3px solid #ff4444;
+        background: #2C3E50;
+        border: 3px solid #c24444;
         border-radius: 10px;
         padding: 20px;
         margin: 15px 0;
     }
 
     .red-flag-list li {
-        color: #000;
+        color: #ccc;
         padding: 10px;
         margin: 8px 0;
-        border-left: 4px solid #ff4444;
-        background: #ffe0e0;
+        border-left: 4px solid #c24444;
+        background: #1a1a1a;
         border-radius: 5px;
         list-style: none;
     }
@@ -408,31 +418,25 @@ date: 2025-10-21
         align-items: center;
         margin-top: 40px;
         padding: 20px;
+        gap: 12px;
     }
 
     .nav-button {
-        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        background: #374151;
         color: #fff;
-        border: 4px solid #000;
-        border-radius: 50px;
-        padding: 15px 40px;
-        font-size: 20px;
-        font-weight: bold;
+        border: 1px solid #4b5563;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 500;
         cursor: pointer;
-        box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
-        transition: all 0.3s ease;
-        font-family: 'Comic Sans MS', cursive;
-        text-transform: uppercase;
+        transition: all 0.2s ease;
+        font-family: inherit;
     }
 
     .nav-button:hover:not(:disabled) {
-        transform: translate(-2px, -2px);
-        box-shadow: 7px 7px 0px rgba(0,0,0,0.3);
-    }
-
-    .nav-button:active:not(:disabled) {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        background: #1f2937;
+        transform: translateY(-1px);
     }
 
     .nav-button:disabled {
@@ -441,27 +445,25 @@ date: 2025-10-21
     }
 
     .page-indicator {
-        background: #FFD700;
-        color: #000;
-        border: 3px solid #000;
-        border-radius: 30px;
-        padding: 10px 25px;
-        font-size: 18px;
-        font-weight: bold;
-        box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
-        font-family: 'Comic Sans MS', cursive;
+        background: #1f2937;
+        color: #fff;
+        border: 1px solid #374151;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
     }
 
     .submit-area {
-        background: #fff3cd;
-        border: 4px dashed #ffc107;
+        background: #2a2a2a;
+        border: 4px dashed #c24444;
         border-radius: 15px;
         padding: 25px;
         margin: 20px 0;
     }
 
     .submit-area h3 {
-        color: #856404;
+        color: #c24444;
         margin-bottom: 15px;
         font-size: 24px;
         font-family: 'Comic Sans MS', cursive;
@@ -471,24 +473,26 @@ date: 2025-10-21
         width: 100%;
         min-height: 120px;
         padding: 15px;
-        border: 3px solid #000;
+        border: 3px solid #34495e;
         border-radius: 10px;
         font-family: 'Comic Sans MS', cursive;
         font-size: 14px;
         margin: 10px 0;
         resize: vertical;
+        background: #1a1a1a;
+        color: #fff;
     }
 
     .action-button {
-        background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+        background: linear-gradient(135deg, #2ea44f 0%, #2ea44f 100%);
         color: #fff;
-        border: 3px solid #000;
+        border: 3px solid #1a7f37;
         border-radius: 25px;
         padding: 12px 25px;
         font-size: 16px;
         font-weight: bold;
         cursor: pointer;
-        box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+        box-shadow: 4px 4px 0px rgba(30, 132, 73, 0.5);
         transition: all 0.3s ease;
         font-family: 'Comic Sans MS', cursive;
         margin: 5px;
@@ -496,24 +500,24 @@ date: 2025-10-21
 
     .action-button:hover {
         transform: translate(-2px, -2px);
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+        box-shadow: 6px 6px 0px rgba(30, 132, 73, 0.5);
     }
 
     .action-button:active {
         transform: translate(1px, 1px);
-        box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        box-shadow: 2px 2px 0px rgba(30, 132, 73, 0.5);
     }
 
     .status-box {
-        background: #d4edda;
-        border: 3px solid #28a745;
+        background: #1e5631;
+        border: 3px solid #2ea44f;
         border-radius: 15px;
         padding: 15px;
         margin: 15px 0;
-        color: #155724;
+        color: #a8e6cf;
         font-weight: bold;
         display: none;
-        box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+        box-shadow: 3px 3px 0px rgba(39, 174, 96, 0.3);
     }
 
     @media (max-width: 768px) {
@@ -558,78 +562,67 @@ date: 2025-10-21
         50% { transform: translateY(-10px); }
     }
 
-    /* Dark theme overrides */
     .post-content .comic-container h1,
     .post-content .comic-container h2,
     .post-content .comic-container h3,
-    .post-content .comic-container h4,
+    .post-content .comic-container h4 {
+        color: #fff !important;
+    }
+
     .post-content .comic-container p,
     .post-content .comic-container li,
-    .post-content .comic-container a,
-    .post-content .comic-container .speech-bubble h3,
-    .post-content .comic-container .speech-bubble p,
+    .post-content .comic-container a {
+        color: #ccc !important;
+    }
+
     .post-content .comic-container .comic-panel,
     .post-content .comic-container .version-card,
     .post-content .comic-container .analysis-result {
-        color: #000 !important;
+        background-color: #2C3E50 !important;
+        border-color: #34495e !important;
     }
 
-    .post-content .comic-container .comic-panel,
-    .post-content .comic-container .version-card,
-    .post-content .comic-container .analysis-result,
-    .post-content .comic-container .submit-area,
-    .post-content .comic-container .scenario-card {
-        background-color: #fff !important;
-        border-color: #000 !important;
-        color: #000 !important;
-    }
-
-    .post-content .comic-container .comic-header h1 {
-        color: #FFD700 !important;
-        text-shadow: 3px 3px 0px #FF6B6B, 6px 6px 0px #4ECDC4 !important;
+    .post-content .comic-container .submit-area {
+        background-color: #2a2a2a !important;
+        border-color: #c24444 !important;
     }
 
     .post-content #lesson-container .prose .comic-container select,
     .post-content #lesson-container .prose .comic-container input,
     .post-content #lesson-container .prose .comic-container textarea,
     .post-content #lesson-container .prose .comic-container option {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
-        -webkit-text-fill-color: #000000 !important;
+        background-color: #1a1a1a !important;
+        color: #fff !important;
+        border-color: #34495e !important;
+        -webkit-text-fill-color: #fff !important;
     }
 
     .post-content #lesson-container .prose .comic-container input::placeholder,
     .post-content #lesson-container .prose .comic-container textarea::placeholder {
-        color: #6c6c6c !important;
+        color: #777 !important;
         opacity: 1 !important;
     }
 
-    /* Ensure dropdown options are visible (replicated from submodule_1) */
     .post-content #lesson-container .prose .comic-container option {
-        background-color: #fff !important;
-        color: #000 !important;
+        background-color: #1a1a1a !important;
+        color: #fff !important;
     }
 
-    /* Broader dropdown fixes (some pages use different layout wrappers) */
-    .post-content .comic-container option,
     .comic-container option,
     .comic-container select,
     .interview-analyzer select,
     .interview-analyzer option {
-        background-color: #fff !important;
-        color: #000 !important;
+        background-color: #1a1a1a !important;
+        color: #fff !important;
     }
 
-    /* Try to force native dropdown to use our styling where possible */
     .comic-container select {
-        background-color: #fff !important;
-        color: #000 !important;
+        background-color: #1a1a1a !important;
+        color: #fff !important;
         -webkit-appearance: menulist-button !important;
         appearance: menulist-button !important;
     }
 
-    /* Hide IE/Edge default expand arrow so background shows consistently */
     .comic-container select::-ms-expand {
         display: none !important;
     }
@@ -903,13 +896,17 @@ Why not: [explanation]" style="min-height: 200px;"></textarea>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="navigation">
-        <button class="nav-button" id="prevBtn" onclick="changePage(-1)">◄ PREV</button>
+    <div class="navigation" id="pageNav">
+        <button class="nav-button" id="prevBtn" onclick="changePage(-1)">← Previous</button>
         <div class="page-indicator">
-            <span id="currentPage">1</span> / <span id="totalPages">3</span>
+            Page <span id="currentPage">1</span> of <span id="totalPages">3</span>
         </div>
-        <button class="nav-button" id="nextBtn" onclick="changePage(1)">NEXT ►</button>
+        <button class="nav-button" id="nextBtn" onclick="changePage(1)">Next →</button>
+    </div>
+
+    <!-- Module Navigation (only shows on page 3) -->
+    <div class="navigation" id="moduleNav" style="display: none;">
+        <a href="{{site.baseurl}}/cs-portfolio-quest/ai/" class="nav-button" style="text-decoration: none; display: inline-block; width: auto;">← Back to AI Module</a>
     </div>
 </div>
 
@@ -944,9 +941,17 @@ Why not: [explanation]" style="min-height: 200px;"></textarea>
 
         document.getElementById('prevBtn').disabled = pageNum === 1;
         document.getElementById('nextBtn').disabled = pageNum === totalPages;
-
-        if (pageNum === 3 && gamesPlayed === 0) {
-            initializeGame();
+        
+        // Show/hide module navigation on last page
+        const pageNav = document.querySelector('.navigation:not(#moduleNav)');
+        const moduleNav = document.getElementById('moduleNav');
+        
+        if (pageNum === totalPages) {
+            pageNav.style.display = 'none';
+            moduleNav.style.display = 'flex';
+        } else {
+            pageNav.style.display = 'flex';
+            moduleNav.style.display = 'none';
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -141,97 +141,10 @@ footer:
             color: #552583;
         }
 
-        .data-sources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .source-card {
-            background: white;
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .source-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-        }
-
-        .source-header {
-            padding: 40px;
-            text-align: center;
-            color: white;
-            font-size: 4em;
-        }
-
-        .database-header {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        }
-
-        .json-header {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        }
-
-        .live-header {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        }
-
-        .source-body {
-            padding: 35px;
-        }
-
-        .source-body h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
+        .concept-section h3 {
+            color: #552583;
             font-size: 1.8em;
-        }
-
-        .source-body p {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 20px;
-            font-size: 1.05em;
-        }
-
-        .example-box {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.95em;
-            overflow-x: auto;
-            border: 2px solid #3498db;
-        }
-
-        .pros-cons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .pro {
-            background: #d5f4e6;
-            padding: 12px 18px;
-            border-radius: 10px;
-            color: #27ae60;
-            font-size: 0.95em;
-            font-weight: 600;
-        }
-
-        .con {
-            background: #fadbd8;
-            padding: 12px 18px;
-            border-radius: 10px;
-            color: #e74c3c;
-            font-size: 0.95em;
-            font-weight: 600;
+            margin: 30px 0 15px 0;
         }
 
         .la-teams-showcase {
@@ -279,73 +192,63 @@ footer:
         .team-name {
             font-size: 1.8em;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
 
-        .team-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .stadium-name {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
         }
 
-        .stat-box {
-            background: rgba(255, 255, 255, 0.1);
+        .team-url {
+            background: rgba(0, 0, 0, 0.3);
             padding: 15px;
             border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 1.6em;
-            font-weight: bold;
-        }
-
-        .data-structure-demo {
-            background: white;
-            padding: 50px;
-            border-radius: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        }
-
-        .data-structure-demo h2 {
-            color: #552583;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        .data-structure-demo p {
-            text-align: center;
-            color: #555;
-            margin-bottom: 30px;
-            font-size: 1.15em;
-        }
-
-        .json-display {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 35px;
-            border-radius: 15px;
             font-family: 'Courier New', monospace;
-            font-size: 1em;
-            overflow-x: auto;
-            border: 3px solid #552583;
-            line-height: 1.8;
+            font-size: 0.85em;
+            word-break: break-all;
+            margin-top: 15px;
+            color: #4af626;
         }
 
-        .json-key { color: #9cdcfe; }
-        .json-string { color: #ce9178; }
-        .json-number { color: #b5cea8; }
+        .copy-button {
+            background: #FDB927;
+            color: #552583;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
 
-        .interactive-coding {
+        .copy-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            color: #4af626;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            user-select: all;
+            cursor: text;
+            border: 2px solid #FDB927;
+        }
+
+        .practice-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 50px;
             border-radius: 25px;
@@ -354,116 +257,188 @@ footer:
             color: white;
         }
 
-        .interactive-coding h2 {
+        .practice-section h2 {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             font-size: 2.5em;
         }
 
-        .interactive-coding > p {
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 1.2em;
-            opacity: 0.95;
-        }
-
-        .coding-workspace {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .code-editor {
+        .build-area {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
             backdrop-filter: blur(10px);
-        }
-
-        .code-editor h3 {
+            padding: 30px;
+            border-radius: 15px;
             margin-bottom: 20px;
-            font-size: 1.5em;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .editor-header {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px 15px;
-            border-radius: 8px 8px 0 0;
-            font-size: 0.9em;
-            margin-bottom: 0;
-        }
-
-        #codeInput {
-            width: 100%;
-            min-height: 250px;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            border: none;
-            border-radius: 0 0 8px 8px;
-            padding: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 1em;
-            resize: vertical;
-            line-height: 1.6;
-        }
-
-        .run-button {
-            background: #FDB927;
-            color: #552583;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
+        .build-area > p {
             font-size: 1.2em;
+            margin-bottom: 25px;
+        }
+
+        .build-step {
+            margin-bottom: 25px;
+        }
+
+        .step-label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
             font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
         }
 
-        .run-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(253, 185, 39, 0.6);
-        }
-
-        .output-panel {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-        }
-
-        .output-panel h3 {
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        #output {
-            background: #1e1e1e;
-            color: #4af626;
-            padding: 20px;
-            border-radius: 8px;
-            min-height: 300px;
-            font-family: 'Courier New', monospace;
-            font-size: 1em;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .hint-box {
-            background: rgba(253, 185, 39, 0.2);
-            border-left: 5px solid #FDB927;
-            padding: 20px;
+        .step-input {
+            width: 100%;
+            padding: 12px;
             border-radius: 10px;
-            margin-top: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s;
+            background: rgba(0, 0, 0, 0.2);
             color: white;
         }
 
-        .hint-box h4 {
-            margin-bottom: 10px;
-            font-size: 1.2em;
+        .step-input:focus {
+            outline: none;
+            border-color: #FDB927;
+        }
+
+        .step-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .url-output {
+            background: #1e1e1e;
+            color: #4af626;
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            margin: 20px 0;
+            word-break: break-all;
+            min-height: 60px;
+            user-select: all;
+            cursor: text;
+        }
+
+        .check-button {
+            background: #FDB927;
+            color: #552583;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .check-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.4);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d5f4e6;
+            color: #27ae60;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #fadbd8;
+            color: #e74c3c;
+            display: block;
+        }
+
+        .hint {
+            background: rgba(253, 185, 39, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-style: italic;
+            border-left: 4px solid #FDB927;
+        }
+
+        .challenge-section {
+            background: white;
+            padding: 50px;
+            border-radius: 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .challenge-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            color: #552583;
+        }
+
+        .challenge-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #dee2e6;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .challenge-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            color: #552583;
+        }
+
+        .challenge-card p {
+            color: #2c3e50;
+        }
+
+        .challenge-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            transition: border-color 0.3s;
+        }
+
+        .challenge-input:focus {
+            outline: none;
+            border-color: #FDB927;
+        }
+
+        .challenge-button {
+            background: linear-gradient(135deg, #552583 0%, #FDB927 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .challenge-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(253, 185, 39, 0.3);
         }
 
         .key-takeaways {
@@ -489,8 +464,12 @@ footer:
             margin-bottom: 18px;
         }
 
-        @media (max-width: 1000px) {
-            .coding-workspace {
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .teams-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -500,146 +479,85 @@ footer:
     <div class="container">
         <div class="header">
             <h1>🌟 Los Angeles Sports API</h1>
-            <p>Building Your Backend Data Foundation</p>
-            <div class="step-badge">📊 Step 2: Set Up the Data Source</div>
+            <p>Learn to Build API URLs Like a Pro!</p>
+            <div class="step-badge">📊 Step 2: Understanding API URLs</div>
         </div>
 
         <div class="concept-section">
-            <h2>📦 Step 2: Set Up the Data Source / Backend</h2>
-            <p>Before your API can serve data to users, it needs somewhere to get that data from! This is like preparing a well-stocked library for your API to fetch information.</p>
-            <ul>
-                <li><strong>Decide where the API will get its data</strong> — database, CSV/JSON file, or live sports stats</li>
-                <li><strong>Organize the data</strong> so it's easy for the API to access and retrieve quickly</li>
-                <li><strong>Structure your data properly</strong> — use clear keys, consistent formatting, and logical organization</li>
-                <li><strong>Choose the right storage method</strong> based on your project's size and requirements</li>
-            </ul>
-        </div>
+            <h2>📚 Understanding API URLs</h2>
+            <p>Just like finding seats at Dodger Stadium, API URLs have specific parts that tell you exactly where to go. Let's break down how to build the perfect API URL to get LA sports team data!</p>
+            
+            <h3>🏠 Base URL</h3>
+            <p>The foundation - like the stadium address</p>
+            <div class="code-box">https://www.thesportsdb.com/api/v1/json/</div>
 
-        <div class="data-sources-grid">
-            <div class="source-card">
-                <div class="source-header database-header">🗄️</div>
-                <div class="source-body">
-                    <h3>Database Storage</h3>
-                    <p>A structured system that stores large amounts of organized data. Perfect for complex queries and relationships between different data types.</p>
-                    <div class="example-box">
-SELECT team_name, stadium, capacity<br>
-FROM la_sports_teams<br>
-WHERE sport = 'Basketball'<br>
-ORDER BY championships DESC;
-                    </div>
-                    <div class="pros-cons">
-                        <div class="pro">✓ Lightning-fast queries</div>
-                        <div class="con">✗ Requires setup time</div>
-                        <div class="pro">✓ Handles massive data</div>
-                        <div class="con">✗ More complex to learn</div>
-                        <div class="pro">✓ Data relationships</div>
-                        <div class="con">✗ Needs maintenance</div>
-                    </div>
-                </div>
-            </div>
+            <h3>🔑 API Key</h3>
+            <p>Your ticket to access the data</p>
+            <div class="code-box">3</div>
 
-            <div class="source-card">
-                <div class="source-header json-header">📄</div>
-                <div class="source-body">
-                    <h3>JSON/CSV Files</h3>
-                    <p>Simple text files that store data in a readable format. Excellent for smaller datasets, prototypes, and getting started quickly.</p>
-                    <div class="example-box">
-{<br>
-&nbsp;&nbsp;"team": "Lakers",<br>
-&nbsp;&nbsp;"stadium": "Crypto.com Arena",<br>
-&nbsp;&nbsp;"capacity": 19068,<br>
-&nbsp;&nbsp;"championships": 17<br>
-}
-                    </div>
-                    <div class="pros-cons">
-                        <div class="pro">✓ Super easy to set up</div>
-                        <div class="con">✗ Slower for big datasets</div>
-                        <div class="pro">✓ Human-readable format</div>
-                        <div class="con">✗ Limited query options</div>
-                        <div class="pro">✓ No installation needed</div>
-                        <div class="con">✗ Hard to scale up</div>
-                    </div>
-                </div>
-            </div>
+            <h3>📍 Endpoint</h3>
+            <p>What section you're looking for</p>
+            <div class="code-box">searchteams.php</div>
 
-            <div class="source-card">
-                <div class="source-header live-header">📡</div>
-                <div class="source-body">
-                    <h3>Live API Connections</h3>
-                    <p>Connect to another API in real-time to get the freshest data. Your API becomes a middle layer that processes external data.</p>
-                    <div class="example-box">
-fetch('sports-api.com/teams/lakers')<br>
-&nbsp;&nbsp;.then(response => response.json())<br>
-&nbsp;&nbsp;.then(data => processData(data))<br>
-&nbsp;&nbsp;.catch(error => console.error(error));
-                    </div>
-                    <div class="pros-cons">
-                        <div class="pro">✓ Always up-to-date</div>
-                        <div class="con">✗ Depends on external API</div>
-                        <div class="pro">✓ No storage needed</div>
-                        <div class="con">✗ Can have delays</div>
-                        <div class="pro">✓ Real-time updates</div>
-                        <div class="con">✗ May have rate limits</div>
-                    </div>
-                </div>
-            </div>
+            <h3>🎯 Parameters</h3>
+            <p>Your specific seat number</p>
+            <div class="code-box">?t=Dodgers</div>
+
+            <h3 style="margin-top: 30px;">Complete URL Example:</h3>
+            <div class="code-box" style="font-size: 1.1em;">https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=Dodgers</div>
         </div>
 
         <div class="la-teams-showcase">
-            <h2>🏆 Your Los Angeles Sports Teams Data</h2>
+            <h2>🏟️ Your LA Sports Teams & Their API URLs</h2>
+            <p style="text-align: center; margin-bottom: 30px; font-size: 1.1em;">Here are the API URLs for your selected LA teams. Click "Copy URL" to copy the URL and test it in your browser!</p>
             <div class="teams-grid" id="teams-grid"></div>
         </div>
 
-        <div class="data-structure-demo">
-            <h2>📊 How Your LA Sports Data is Organized</h2>
-            <p>This is how your API's data source is structured as a JSON file. Each team has organized properties that the API can easily access:</p>
-            <div class="json-display" id="json-display"></div>
+        <div class="practice-section">
+            <h2>✏️ Practice: Build Your Own URL</h2>
+            <div id="practice-container"></div>
         </div>
 
-        <div class="interactive-coding">
-            <h2>💻 Interactive: Access Your Data Source</h2>
-            <p>Write code to retrieve data from YOUR LA sports teams data source. Try accessing different teams and their stats!</p>
+        <div class="challenge-section">
+            <h2>🎯 Challenge Time!</h2>
             
-            <div class="coding-workspace">
-                <div class="code-editor">
-                    <h3>Code Editor</h3>
-                    <div class="editor-header">JavaScript</div>
-                    <textarea id="codeInput" placeholder="// Write your code here to access the data...
-// Example:
-// const team1 = laTeams[0];
-// console.log(team1.name);
-// console.log(team1.championships);"></textarea>
-                    <button class="run-button" id="runButton">▶ Run Code</button>
-                    
-                    <div class="hint-box">
-                        <h4>💡 Try these challenges:</h4>
-                        • Access and display your first team's championship count<br>
-                        • Find which stadium has the largest capacity<br>
-                        • Calculate the total championships of your LA teams<br>
-                        • Display all team names in a list
-                    </div>
-                </div>
+            <div class="challenge-card">
+                <h3>Challenge 1: Build a URL for the LA Rams</h3>
+                <p>Create the complete API URL to search for the LA Rams team.</p>
+                <input type="text" class="challenge-input" id="challenge1" placeholder="Type your URL here...">
+                <button class="challenge-button" onclick="checkChallenge(1)">Check Answer</button>
+                <div class="feedback" id="feedback1"></div>
+                <div class="hint">💡 Hint: Replace "Dodgers" with "Rams" in the example URL</div>
+            </div>
 
-                <div class="output-panel">
-                    <h3>Output Console</h3>
-                    <div id="output">Ready to run your code...
+            <div class="challenge-card">
+                <h3>Challenge 2: Get ALL NBA Teams</h3>
+                <p>Build a URL to get all teams in the NBA league (not just one team).</p>
+                <input type="text" class="challenge-input" id="challenge2" placeholder="Type your URL here...">
+                <button class="challenge-button" onclick="checkChallenge(2)">Check Answer</button>
+                <div class="feedback" id="feedback2"></div>
+                <div class="hint">💡 Hint: Use endpoint "search_all_teams.php" with parameter "?l=NBA"</div>
+            </div>
 
-The 'laTeams' data is available for you to access!
-
-Try: console.log(laTeams);</div>
-                </div>
+            <div class="challenge-card">
+                <h3>Challenge 3: Search for USC Trojans Players</h3>
+                <p>Build a URL to search for players on the USC Trojans team.</p>
+                <input type="text" class="challenge-input" id="challenge3" placeholder="Type your URL here...">
+                <button class="challenge-button" onclick="checkChallenge(3)">Check Answer</button>
+                <div class="feedback" id="feedback3"></div>
+                <div class="hint">💡 Hint: Use endpoint "searchplayers.php" with parameter "?t=USC_Trojans" (use underscore for spaces)</div>
             </div>
         </div>
 
         <div class="key-takeaways">
             <h2>💡 Key Takeaways</h2>
             <ul>
-                <li><strong>Data sources are the foundation</strong> of any API — without organized data, there's nothing to serve to users!</li>
-                <li><strong>Three main storage types:</strong> Databases (powerful but complex), Files (simple but limited), Live APIs (current but dependent)</li>
-                <li><strong>Organization matters</strong> — well-structured data with clear keys and consistent formatting makes your API fast and reliable</li>
-                <li><strong>JSON is the standard</strong> — it's both human-readable and machine-friendly, making it perfect for APIs</li>
-                <li><strong>Choose the right tool</strong> — small projects use files, large projects need databases, real-time needs require live connections</li>
-                <li><strong>Think like a librarian</strong> — organize your data so it's easy to find, access, and understand</li>
+                <li><strong>API URLs have four main parts:</strong> Base URL, API Key, Endpoint, and Parameters — each serves a specific purpose</li>
+                <li><strong>Base URL is the foundation</strong> — it's like the street address of the API server</li>
+                <li><strong>API Keys authenticate requests</strong> — they're your ticket to access the data</li>
+                <li><strong>Endpoints specify what data you want</strong> — different endpoints return different types of information</li>
+                <li><strong>Parameters filter and customize results</strong> — use them to get exactly the data you need</li>
+                <li><strong>Practice building URLs</strong> — understanding URL structure is essential for working with any API</li>
             </ul>
         </div>
     </div>
@@ -655,7 +573,8 @@ Try: console.log(laTeams);</div>
                 capacity: 18000,
                 founded: 1970,
                 championships: 0,
-                icon: "🏀"
+                icon: "🏀",
+                searchName: "Los%20Angeles%20Clippers"
             },
             "Football - Chargers": {
                 id: 2,
@@ -665,7 +584,8 @@ Try: console.log(laTeams);</div>
                 capacity: 70240,
                 founded: 1960,
                 championships: 0,
-                icon: "🏈"
+                icon: "🏈",
+                searchName: "Chargers"
             },
             "Football - USC": {
                 id: 3,
@@ -675,7 +595,8 @@ Try: console.log(laTeams);</div>
                 capacity: 77500,
                 founded: 1888,
                 championships: 11,
-                icon: "🏈"
+                icon: "🏈",
+                searchName: "USC"
             },
             "Baseball - Dodgers": {
                 id: 4,
@@ -685,7 +606,8 @@ Try: console.log(laTeams);</div>
                 capacity: 56000,
                 founded: 1883,
                 championships: 7,
-                icon: "⚾"
+                icon: "⚾",
+                searchName: "Dodgers"
             },
             "Soccer - LA Galaxy": {
                 id: 5,
@@ -695,65 +617,49 @@ Try: console.log(laTeams);</div>
                 capacity: 27000,
                 founded: 1995,
                 championships: 5,
-                icon: "⚽"
+                icon: "⚽",
+                searchName: "LA%20Galaxy"
             }
         };
 
-        let laTeams = [];
-        let userSports = [];
+        let userTeams = [];
 
+        // Load user's itinerary from localStorage
         function loadUserItinerary() {
             try {
                 const itinerary = JSON.parse(localStorage.getItem('westCoastItinerary'));
                 if (itinerary && itinerary.cities && itinerary.cities['Los Angeles'] && 
                     itinerary.cities['Los Angeles'].sports) {
-                    userSports = itinerary.cities['Los Angeles'].sports;
+                    const userSports = itinerary.cities['Los Angeles'].sports;
                     
                     // Map user sports to team data
-                    laTeams = userSports.map(sport => COMPLETE_LA_TEAMS[sport.name]).filter(t => t);
+                    userTeams = userSports.map(sport => COMPLETE_LA_TEAMS[sport.name]).filter(t => t);
                     
-                    if (laTeams.length === 2) {
+                    if (userTeams.length === 2) {
                         displayUserTeams();
-                        displayUserJSON();
-                    } else {
-                        displayDefaultTeams();
+                        createPracticeAreas();
                     }
-                } else {
-                    displayDefaultTeams();
                 }
             } catch (error) {
                 console.error('Error loading itinerary:', error);
-                displayDefaultTeams();
             }
         }
 
+        // Display user's selected teams
         function displayUserTeams() {
             const grid = document.getElementById('teams-grid');
             let html = '';
 
-            laTeams.forEach(team => {
+            userTeams.forEach(team => {
+                const teamUrl = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${team.searchName}`;
+                const elementId = team.sport.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-') + '-url';
                 html += `
                     <div class="team-card">
                         <div class="team-icon">${team.icon}</div>
                         <div class="team-name">${team.name}</div>
-                        <div class="team-stats">
-                            <div class="stat-box">
-                                <div class="stat-label">Stadium</div>
-                                <div class="stat-value" style="font-size: ${team.stadium.length > 15 ? '0.9em' : '1em'};">${team.stadium.replace('Dignity Health Sports Park', 'DHSP')}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Capacity</div>
-                                <div class="stat-value">${team.capacity.toLocaleString()}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Founded</div>
-                                <div class="stat-value">${team.founded}</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Championships</div>
-                                <div class="stat-value">${team.championships}</div>
-                            </div>
-                        </div>
+                        <div class="stadium-name">${team.stadium}</div>
+                        <div class="team-url" id="${elementId}">${teamUrl}</div>
+                        <button class="copy-button" onclick="copyURL('${elementId}')">📋 Copy URL</button>
                     </div>
                 `;
             });
@@ -761,103 +667,146 @@ Try: console.log(laTeams);</div>
             grid.innerHTML = html;
         }
 
-        function displayUserJSON() {
-            const display = document.getElementById('json-display');
-            let json = '{\n  <span class="json-key">"la_teams"</span>: [\n';
+        // Create practice areas dynamically based on user teams
+        function createPracticeAreas() {
+            const container = document.getElementById('practice-container');
+            let html = '';
 
-            laTeams.forEach((team, idx) => {
-                json += '    {\n';
-                json += `      <span class="json-key">"id"</span>: <span class="json-number">${team.id}</span>,\n`;
-                json += `      <span class="json-key">"name"</span>: <span class="json-string">"${team.name}"</span>,\n`;
-                json += `      <span class="json-key">"sport"</span>: <span class="json-string">"${team.sport}"</span>,\n`;
-                json += `      <span class="json-key">"stadium"</span>: <span class="json-string">"${team.stadium}"</span>,\n`;
-                json += `      <span class="json-key">"capacity"</span>: <span class="json-number">${team.capacity}</span>,\n`;
-                json += `      <span class="json-key">"founded"</span>: <span class="json-number">${team.founded}</span>,\n`;
-                json += `      <span class="json-key">"championships"</span>: <span class="json-number">${team.championships}</span>\n`;
-                json += '    }' + (idx < laTeams.length - 1 ? ',' : '') + '\n';
+            userTeams.forEach((team, index) => {
+                const num = index + 1;
+                html += `
+                    <div class="build-area">
+                        <p>Now it's your turn! Fill in the blanks to create an API URL for the ${team.name}.</p>
+                        
+                        <div class="build-step">
+                            <div class="step-label">Step 1: Base URL</div>
+                            <input type="text" class="step-input" id="base-url-${num}" placeholder="Enter the base URL...">
+                        </div>
+
+                        <div class="build-step">
+                            <div class="step-label">Step 2: API Key</div>
+                            <input type="text" class="step-input" id="api-key-${num}" placeholder="Enter your API key...">
+                        </div>
+
+                        <div class="build-step">
+                            <div class="step-label">Step 3: Endpoint</div>
+                            <input type="text" class="step-input" id="endpoint-${num}" placeholder="Enter the endpoint...">
+                        </div>
+
+                        <div class="build-step">
+                            <div class="step-label">Step 4: Team Parameter</div>
+                            <input type="text" class="step-input" id="parameter-${num}" placeholder="Enter ?t=TeamName...">
+                        </div>
+
+                        <div class="build-step">
+                            <div class="step-label">Your Complete URL:</div>
+                            <div class="url-output" id="built-url-${num}">Fill in the fields above to build your URL...</div>
+                        </div>
+
+                        <button class="check-button" onclick="checkBuiltURL(${num})">✅ Check My URL</button>
+                        <div class="feedback" id="build-feedback-${num}"></div>
+                    </div>
+                `;
             });
 
-            json += '  ]\n}';
-            display.innerHTML = json;
+            container.innerHTML = html;
+
+            // Add event listeners for dynamic inputs
+            userTeams.forEach((team, index) => {
+                const num = index + 1;
+                document.getElementById(`base-url-${num}`)?.addEventListener('input', () => updateBuiltURL(num));
+                document.getElementById(`api-key-${num}`)?.addEventListener('input', () => updateBuiltURL(num));
+                document.getElementById(`endpoint-${num}`)?.addEventListener('input', () => updateBuiltURL(num));
+                document.getElementById(`parameter-${num}`)?.addEventListener('input', () => updateBuiltURL(num));
+            });
         }
 
-        function displayDefaultTeams() {
-            // Default to Lakers, Dodgers, Rams
-            laTeams = [
-                {
-                    id: 1,
-                    name: "Los Angeles Lakers",
-                    sport: "Basketball",
-                    stadium: "Crypto.com Arena",
-                    capacity: 19068,
-                    founded: 1947,
-                    championships: 17,
-                    icon: "🏀"
-                },
-                {
-                    id: 2,
-                    name: "Los Angeles Dodgers",
-                    sport: "Baseball",
-                    stadium: "Dodger Stadium",
-                    capacity: 56000,
-                    founded: 1883,
-                    championships: 7,
-                    icon: "⚾"
-                },
-                {
-                    id: 3,
-                    name: "Los Angeles Rams",
-                    sport: "Football",
-                    stadium: "SoFi Stadium",
-                    capacity: 70240,
-                    founded: 1936,
-                    championships: 2,
-                    icon: "🏈"
-                }
-            ];
-
-            displayUserTeams();
-            displayUserJSON();
+        function copyURL(elementId) {
+            const urlElement = document.getElementById(elementId);
+            const url = urlElement.textContent;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ URL copied to clipboard!\n\nNow paste it in your browser address bar to test it!');
+            }).catch(err => {
+                alert('Please select and copy the URL manually: ' + url);
+            });
         }
 
-        function runCode() {
-            const code = document.getElementById('codeInput').value;
-            const output = document.getElementById('output');
-            output.textContent = '';
-
-            // Create a custom console.log
-            const logs = [];
-            const customConsole = {
-                log: function(...args) {
-                    logs.push(args.map(arg => {
-                        if (typeof arg === 'object') {
-                            return JSON.stringify(arg, null, 2);
-                        }
-                        return String(arg);
-                    }).join(' '));
-                }
-            };
-
-            try {
-                // Create a function with the user's code
-                const userFunction = new Function('laTeams', 'console', code);
-                userFunction(laTeams, customConsole);
-                
-                if (logs.length > 0) {
-                    output.textContent = logs.join('\n');
-                } else {
-                    output.textContent = 'Code executed successfully! (No output)\n\nTip: Use console.log() to see results.';
-                }
-            } catch (error) {
-                output.textContent = '❌ Error: ' + error.message + '\n\nCheck your code and try again!';
-                output.style.color = '#ff6b6b';
-                setTimeout(() => {
-                    output.style.color = '#4af626';
-                }, 3000);
+        function updateBuiltURL(num) {
+            const base = document.getElementById(`base-url-${num}`)?.value || '';
+            const key = document.getElementById(`api-key-${num}`)?.value || '';
+            const endpoint = document.getElementById(`endpoint-${num}`)?.value || '';
+            const param = document.getElementById(`parameter-${num}`)?.value || '';
+            
+            let url = '';
+            if (base) url += base;
+            if (key) url += key + '/';
+            if (endpoint) url += endpoint;
+            if (param) url += param;
+            
+            const outputElement = document.getElementById(`built-url-${num}`);
+            if (outputElement) {
+                outputElement.textContent = url || 'Fill in the fields above to build your URL...';
             }
         }
 
-        document.getElementById('runButton').addEventListener('click', runCode);
+        function checkBuiltURL(num) {
+            const builtURL = document.getElementById(`built-url-${num}`).textContent.trim();
+            const feedback = document.getElementById(`build-feedback-${num}`);
+            
+            if (num <= userTeams.length) {
+                const team = userTeams[num - 1];
+                const correctURL = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${team.searchName}`;
+                const teamName = team.name;
+                
+                const alt1 = correctURL.replace(/%20/g, '+');
+                const alt2 = correctURL.replace(/%20/g, ' ');
+                
+                if (builtURL.toLowerCase() === correctURL.toLowerCase() || 
+                    builtURL.toLowerCase() === alt1.toLowerCase() || 
+                    builtURL.toLowerCase() === alt2.toLowerCase()) {
+                    feedback.className = 'feedback correct';
+                    feedback.textContent = `🎉 Perfect! You built the ${teamName} API URL correctly! Try copying and testing it in your browser.`;
+                } else {
+                    feedback.className = 'feedback incorrect';
+                    feedback.textContent = `❌ Not quite right. The correct answer is: ${correctURL}`;
+                }
+            }
+        }
+
+        function checkChallenge(challengeNum) {
+            const input = document.getElementById(`challenge${challengeNum}`).value.trim();
+            const feedback = document.getElementById(`feedback${challengeNum}`);
+            
+            let correct = false;
+            let correctAnswer = '';
+
+            switch(challengeNum) {
+                case 1:
+                    correctAnswer = 'https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=Rams';
+                    correct = input.toLowerCase() === correctAnswer.toLowerCase();
+                    break;
+                case 2:
+                    correctAnswer = 'https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?l=NBA';
+                    correct = input.toLowerCase() === correctAnswer.toLowerCase();
+                    break;
+                case 3:
+                    correctAnswer = 'https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?t=USC_Trojans';
+                    correct = input.toLowerCase() === correctAnswer.toLowerCase();
+                    break;
+            }
+
+            if (correct) {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '🎉 Correct! Great job! Copy this URL and test it in your browser to see the data.';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `❌ Not quite right. The correct answer is: ${correctAnswer}`;
+            }
+        }
 
         // Load user's itinerary on page load
         document.addEventListener('DOMContentLoaded', loadUserItinerary);
+    </script>
+</body>
+</html>

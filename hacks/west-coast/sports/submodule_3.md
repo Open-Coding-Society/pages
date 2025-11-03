@@ -17,12 +17,11 @@ footer:
   next: /west-coast/backend/submodule_4/
 ---
  
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>San Francisco - Making API Calls</title>
+    <title>San Francisco - Sending Requests & Receiving Responses</title>
     <style>
         * {
             margin: 0;
@@ -140,7 +139,7 @@ footer:
         }
 
         .stadium-card .info {
-            color: #666;
+            color: #000;
             margin: 5px 0;
         }
 
@@ -155,37 +154,6 @@ footer:
         .interactive-box h3 {
             color: #AA0000;
             margin-bottom: 15px;
-        }
-
-        .key-display {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            border: 2px solid #dee2e6;
-            margin: 15px 0;
-            color: #333;
-            font-size: 1em;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-        }
-
-        .generate-btn {
-            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-        }
-
-        .generate-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(170, 0, 0, 0.3);
         }
 
         .url-builder {
@@ -203,7 +171,7 @@ footer:
             margin-bottom: 5px;
         }
 
-        .url-part select, .url-part input {
+        .url-part select {
             width: 100%;
             padding: 12px;
             border: 2px solid #dee2e6;
@@ -211,7 +179,7 @@ footer:
             font-size: 1em;
         }
 
-        .url-part select:focus, .url-part input:focus {
+        .url-part select:focus {
             outline: none;
             border-color: #B3995D;
         }
@@ -295,6 +263,60 @@ footer:
             100% { transform: rotate(360deg); }
         }
 
+        .http-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+        }
+
+        .flow-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .flow-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .flow-label {
+            font-weight: bold;
+            color: #AA0000;
+            margin-bottom: 5px;
+        }
+
+        .flow-arrow {
+            font-size: 2em;
+            color: #B3995D;
+            margin: 0 10px;
+        }
+
+        .status-code-box {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-success {
+            color: #00ff00;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .status-error {
+            color: #ff6b6b;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
         .json-display {
             background: #2c3e50;
             color: #00ff00;
@@ -344,6 +366,20 @@ footer:
             margin: 15px 0;
         }
 
+        .code-block {
+            background: #2c3e50;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-comment {
+            color: #7f8c8d;
+        }
+
         .key-takeaway {
             background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
             color: white;
@@ -362,217 +398,16 @@ footer:
             font-weight: bold;
         }
 
-        /* Quiz Styles */
-        .quiz-section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 30px;
-            border: 3px solid #B3995D;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .quiz-section h2 {
-            color: #AA0000;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-
-        .quiz-question {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            display: none;
-        }
-
-        .quiz-question.active {
-            display: block;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .question-number {
-            background: #B3995D;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
-
-        .question-text {
-            color: #333;
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .quiz-options {
-            display: grid;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .quiz-option {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            border: 2px solid #dee2e6;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #333;
-            font-size: 1.05em;
-        }
-
-        .quiz-option:hover {
-            border-color: #B3995D;
-            background: #fff9e6;
-            transform: translateX(5px);
-        }
-
-        .quiz-option.selected {
-            border-color: #AA0000;
-            background: #ffe6e6;
-            font-weight: bold;
-        }
-
-        .quiz-option.correct {
-            border-color: #28a745;
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .quiz-option.incorrect {
-            border-color: #dc3545;
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .quiz-feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .quiz-feedback.show {
-            display: block;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .quiz-feedback.correct {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            color: #155724;
-        }
-
-        .quiz-feedback.incorrect {
-            background: #f8d7da;
-            border: 2px solid #dc3545;
-            color: #721c24;
-        }
-
-        .next-btn {
-            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1em;
-            display: none;
-        }
-
-        .next-btn.show {
-            display: inline-block;
-        }
-
-        .next-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .quiz-complete {
-            text-align: center;
-            padding: 40px;
-            display: none;
-        }
-
-        .quiz-complete.show {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        .quiz-score {
-            font-size: 3em;
-            color: #AA0000;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-
-        .restart-btn {
-            background: #B3995D;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1.1em;
-        }
-
-        .restart-btn:hover {
-            background: #9d864f;
-            transform: scale(1.05);
-        }
-
-        .drag-item {
-            background: white;
-            border: 2px solid #AA0000;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            cursor: move;
-            text-align: center;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .drag-item:hover {
-            background: #ffe6e6;
-        }
-
-        .drop-zone {
-            background: white;
-            border: 2px dashed #dee2e6;
-            padding: 20px;
-            margin: 10px 0;
-            border-radius: 8px;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-        }
-
-        .drop-zone.filled {
-            border-color: #28a745;
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .drop-zone.drag-over {
-            background: #fff9e6;
-            border-color: #B3995D;
-        }
-
         @media (max-width: 768px) {
             .stadium-cards {
                 grid-template-columns: 1fr;
+            }
+            .http-flow {
+                flex-direction: column;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
             }
         }
     </style>
@@ -580,8 +415,8 @@ footer:
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏟️ Stop 3: San Francisco</h1>
-            <p>Learn How to Make Complete API Calls</p>
+            <h1>🚀 Stop 3: San Francisco</h1>
+            <p>Sending Requests & Receiving Responses</p>
         </div>
 
         <div class="section">
@@ -590,116 +425,126 @@ footer:
         </div>
 
         <div class="section">
-            <h2><span class="step-number">1</span> Get Your API Key</h2>
+            <h2><span class="step-number">1</span> Understanding HTTP Communication</h2>
             <div class="explanation">
-                <h3>What is an API Key?</h3>
-                <p>An API key is like a special password that proves you have permission to access data. Think of it like a stadium pass - without it, you can't get in! Real sports apps need API keys to get live scores and stats.</p>
+                <h3>How Computers Talk to Each Other</h3>
+                <p>When you want stadium data, your computer (the client) needs to communicate with the server that stores the information. This happens through HTTP (Hypertext Transfer Protocol) - the language computers use to request and send data over the internet.</p>
             </div>
 
-            <div class="interactive-box">
-                <h3>🔑 Generate Your Access Key:</h3>
-                <div class="key-display" id="keyDisplay">Click the button below to generate your API key...</div>
-                <button class="generate-btn" onclick="generateKey()">🔓 Generate API Key</button>
-                <div id="keySuccess"></div>
+            <div class="http-flow">
+                <div class="flow-item">
+                    <div class="flow-icon">💻</div>
+                    <div class="flow-label">Your Computer</div>
+                    <div style="color: #666; font-size: 0.9em;">Sends HTTP Request</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-item">
+                    <div class="flow-icon">🌐</div>
+                    <div class="flow-label">Server</div>
+                    <div style="color: #666; font-size: 0.9em;">Processes Request</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-item">
+                    <div class="flow-icon">📦</div>
+                    <div class="flow-label">Response</div>
+                    <div style="color: #666; font-size: 0.9em;">Returns Data</div>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3>HTTP GET Request</h3>
+                <p>A GET request is like asking the server a question: "Can I please have information about this stadium?" The server then looks up the information and sends it back to you.</p>
             </div>
         </div>
 
         <div class="section">
-            <h2><span class="step-number">2</span> Build Your API Request</h2>
+            <h2><span class="step-number">2</span> Using HTTP Client Libraries</h2>
             <div class="explanation">
-                <h3>What is an API Request?</h3>
-                <p>An API request is like asking a specific question. You need to tell the computer: WHERE to look (URL), WHAT you want (which stadium), and WHO you are (your API key). Let's build one!</p>
+                <h3>What Are HTTP Client Libraries?</h3>
+                <p>HTTP client libraries are tools that make it easy to send requests and receive responses. Instead of writing complicated code, you can use simple functions like Python's <code>requests</code> library or JavaScript's <code>fetch()</code> function.</p>
             </div>
 
             <div class="interactive-box">
-                <h3>🔨 Build Your Request URL:</h3>
+                <h3>📚 Example Code:</h3>
+                <p style="color: #666; margin-bottom: 15px;"><strong>Python Example:</strong></p>
+                <div class="code-block">
+import requests<br><br>
+<span class="code-comment"># Send GET request to API</span><br>
+response = requests.get('https://api.sfsports.com/v1/stadium/levis_stadium')<br><br>
+<span class="code-comment"># Check if request was successful</span><br>
+if response.status_code == 200:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;data = response.json()  <span class="code-comment"># Convert JSON to Python dictionary</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;print(data)
+                </div>
+
+                <p style="color: #666; margin: 20px 0 15px 0;"><strong>JavaScript Example:</strong></p>
+                <div class="code-block">
+<span class="code-comment">// Send GET request to API</span><br>
+fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
+&nbsp;&nbsp;.then(response => response.json())  <span class="code-comment">// Parse JSON</span><br>
+&nbsp;&nbsp;.then(data => console.log(data))    <span class="code-comment">// Use the data</span><br>
+&nbsp;&nbsp;.catch(error => console.error(error));
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="step-number">3</span> Send a Request & See the Response</h2>
+            <div class="explanation">
+                <h3>Try It Yourself!</h3>
+                <p>Select a stadium below and click "Send Request" to see how your computer communicates with the server. Watch for the HTTP status code and the JSON response!</p>
+            </div>
+
+            <div class="interactive-box">
                 <div class="url-builder">
                     <div class="url-part">
-                        <label>Step 1: Select which stadium data you want:</label>
+                        <label>Select a stadium to request data:</label>
                         <select id="stadiumSelect" onchange="updateURL()">
                             <option value="">-- Choose a stadium --</option>
                         </select>
                     </div>
                     <div class="constructed-url" id="constructedURL">
-                        Select a stadium above to see your API request URL...
+                        Select a stadium above to see the request URL...
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="section">
-            <h2><span class="step-number">3</span> Send the Request & Get Data</h2>
-            <div class="explanation">
-                <h3>Making the API Call</h3>
-                <p>When you click "Send Request," your computer asks the server: "Give me information about this stadium." The server looks it up and sends back the data in JSON format - a way computers organize information.</p>
-            </div>
 
             <button class="call-btn" id="sendBtn" onclick="sendRequest()" disabled>
-                🚀 Send API Request
+                🚀 Send HTTP GET Request
             </button>
 
             <div id="responseArea" class="response-area"></div>
         </div>
 
-        <div class="key-takeaway">
-            <p>🎯 <span class="highlight">What You Learned:</span> Making an API call has 3 steps: Get permission (API key), Build your request (URL), Send it and receive data (JSON response). Every app that shows live sports data does exactly this!</p>
+        <div class="section">
+            <h2><span class="step-number">4</span> Understanding HTTP Status Codes</h2>
+            <div class="explanation">
+                <h3>What Are Status Codes?</h3>
+                <p>Every HTTP response includes a status code that tells you whether the request was successful or if something went wrong. Here are the most common ones:</p>
+            </div>
+
+            <div class="stadium-cards">
+                <div class="stadium-card">
+                    <h3 style="color: #28a745;">✅ 200 OK</h3>
+                    <div class="info">Success! The server found the data and is sending it to you.</div>
+                </div>
+                <div class="stadium-card">
+                    <h3 style="color: #ffc107;">⚠️ 404 Not Found</h3>
+                    <div class="info">The server couldn't find what you requested. Check your URL!</div>
+                </div>
+                <div class="stadium-card">
+                    <h3 style="color: #dc3545;">🔒 401 Unauthorized</h3>
+                    <div class="info">You don't have permission. Did you include your API key?</div>
+                </div>
+                <div class="stadium-card">
+                    <h3 style="color: #6c757d;">⚙️ 500 Server Error</h3>
+                    <div class="info">Something went wrong on the server's end. Try again later.</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Quiz Section -->
-        <div class="quiz-section">
-            <h2>🎯 Test Your Knowledge</h2>
-            
-            <div class="quiz-question active" id="q1">
-                <div class="question-number">Question 1 of 3</div>
-                <div class="question-text">What is an API key used for?</div>
-                <div class="quiz-options">
-                    <div class="quiz-option" onclick="selectOption(1, 0, false)">A) To make your computer faster</div>
-                    <div class="quiz-option" onclick="selectOption(1, 1, true)">B) To prove you have permission to access the data</div>
-                    <div class="quiz-option" onclick="selectOption(1, 2, false)">C) To encrypt your password</div>
-                    <div class="quiz-option" onclick="selectOption(1, 3, false)">D) To store data on your computer</div>
-                </div>
-                <div class="quiz-feedback" id="feedback1"></div>
-                <button class="next-btn" id="next1" onclick="nextQuestion(2)">Next Question →</button>
-            </div>
-
-            <div class="quiz-question" id="q2">
-                <div class="question-number">Question 2 of 3</div>
-                <div class="question-text">Drag the steps of making an API call into the correct order:</div>
-                <div style="margin: 20px 0;">
-                    <div style="margin-bottom: 20px;">
-                        <strong style="color: #AA0000;">Available Steps (drag these):</strong>
-                        <div id="draggables">
-                            <div class="drag-item" draggable="true" data-step="3">Receive the data response</div>
-                            <div class="drag-item" draggable="true" data-step="1">Get an API key</div>
-                            <div class="drag-item" draggable="true" data-step="2">Build the request URL</div>
-                        </div>
-                    </div>
-                    <div>
-                        <strong style="color: #AA0000;">Correct Order (drop here):</strong>
-                        <div class="drop-zone" data-position="1">1st: Drop here</div>
-                        <div class="drop-zone" data-position="2">2nd: Drop here</div>
-                        <div class="drop-zone" data-position="3">3rd: Drop here</div>
-                    </div>
-                </div>
-                <button class="generate-btn" onclick="checkDragDrop()" style="margin-top: 20px;">Check Answer</button>
-                <div class="quiz-feedback" id="feedback2"></div>
-                <button class="next-btn" id="next2" onclick="nextQuestion(3)">Next Question →</button>
-            </div>
-
-            <div class="quiz-question" id="q3">
-                <div class="question-number">Question 3 of 3</div>
-                <div class="question-text" id="q3-text">Which stadium has a larger capacity?</div>
-                <div class="quiz-options" id="q3-options"></div>
-                <div class="quiz-feedback" id="feedback3"></div>
-                <button class="next-btn" id="next3" onclick="showResults()">See Results →</button>
-            </div>
-
-            <div class="quiz-complete" id="quizComplete">
-                <h3 style="color: #AA0000; font-size: 2em; margin-bottom: 20px;">🎉 Quiz Complete!</h3>
-                <div class="quiz-score" id="finalScore">3/3</div>
-                <p style="color: #666; font-size: 1.2em; margin-bottom: 20px;" id="scoreMessage">Perfect! You understand APIs!</p>
-                <button class="restart-btn" onclick="restartQuiz()">🔄 Retake Quiz</button>
-            </div>
+        <div class="key-takeaway">
+            <p>🎯 <span class="highlight">What You Learned:</span> Sending an HTTP request is the physical act of communicating with a server. You use HTTP client libraries (like <code>requests</code> or <code>fetch</code>) to send GET requests. The server responds with a <span class="highlight">status code</span> (like 200 OK) and the requested data in <span class="highlight">JSON format</span>!</p>
         </div>
     </div>
 
@@ -770,9 +615,7 @@ footer:
 
         let stadiumData = {};
         let userSports = [];
-        let currentKey = null;
         let selectedStadium = null;
-        let score = 0;
 
         function loadUserItinerary() {
             try {
@@ -792,7 +635,6 @@ footer:
                     if (Object.keys(stadiumData).length === 2) {
                         displayUserStadiums();
                         populateStadiumSelect();
-                        generateQuiz();
                     } else {
                         displayDefaultStadiums();
                     }
@@ -833,20 +675,6 @@ footer:
             });
         }
 
-        function generateQuiz() {
-            const teams = Object.values(stadiumData);
-            if (teams.length === 2) {
-                const q3Options = document.getElementById('q3-options');
-                const larger = teams[0].capacity > teams[1].capacity ? 0 : 1;
-                
-                q3Options.innerHTML = `
-                    <div class="quiz-option" onclick="selectOption(3, 0, ${larger === 0})">A) ${teams[0].name} (${teams[0].capacity.toLocaleString()} fans)</div>
-                    <div class="quiz-option" onclick="selectOption(3, 1, ${larger === 1})">B) ${teams[1].name} (${teams[1].capacity.toLocaleString()} fans)</div>
-                    <div class="quiz-option" onclick="selectOption(3, 2, false)">C) They have the same capacity</div>
-                `;
-            }
-        }
-
         function displayDefaultStadiums() {
             stadiumData = {
                 chase_center: COMPLETE_SF_TEAMS["Basketball - Warriors"],
@@ -854,25 +682,6 @@ footer:
             };
             displayUserStadiums();
             populateStadiumSelect();
-            generateQuiz();
-        }
-
-        function generateKey() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let key = 'sf_';
-            for (let i = 0; i < 20; i++) {
-                key += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            currentKey = key;
-            document.getElementById('keyDisplay').textContent = key;
-            document.getElementById('keySuccess').innerHTML = `
-                <div class="success-message" style="margin-top: 15px;">
-                    ✅ <strong>Success!</strong> Your API key has been generated. You can now make requests!
-                </div>
-            `;
-            
-            updateURL();
         }
 
         function updateURL() {
@@ -880,21 +689,14 @@ footer:
             selectedStadium = stadium;
             
             if (!stadium) {
-                document.getElementById('constructedURL').textContent = 'Select a stadium above to see your API request URL...';
+                document.getElementById('constructedURL').textContent = 'Select a stadium above to see the request URL...';
                 document.getElementById('sendBtn').disabled = true;
                 return;
             }
             
             let url = `https://api.sfsports.com/v1/stadium/${stadium}?format=json`;
-            
-            if (currentKey) {
-                url += `&api_key=${currentKey}`;
-                document.getElementById('sendBtn').disabled = false;
-            } else {
-                document.getElementById('sendBtn').disabled = true;
-            }
-            
             document.getElementById('constructedURL').textContent = url;
+            document.getElementById('sendBtn').disabled = false;
         }
 
         function sendRequest() {
@@ -964,153 +766,10 @@ footer:
             }, 1500);
         }
 
-        // Quiz Functions
-        function selectOption(questionNum, optionIndex, isCorrect) {
-            const options = document.querySelectorAll(`#q${questionNum} .quiz-option`);
-            options.forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
-            
-            const selected = options[optionIndex];
-            selected.classList.add('selected');
-            
-            setTimeout(() => {
-                const feedback = document.getElementById(`feedback${questionNum}`);
-                if (isCorrect) {
-                    selected.classList.add('correct');
-                    feedback.className = 'quiz-feedback correct show';
-                    feedback.textContent = '✅ Correct! Great job!';
-                    score++;
-                } else {
-                    selected.classList.add('incorrect');
-                    feedback.className = 'quiz-feedback incorrect show';
-                    feedback.textContent = '❌ Not quite. Review the material and try again!';
-                }
-                document.getElementById(`next${questionNum}`).classList.add('show');
-            }, 300);
-        }
-
-        function nextQuestion(num) {
-            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
-            document.getElementById(`q${num}`).classList.add('active');
-        }
-
-        function showResults() {
-            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
-            const complete = document.getElementById('quizComplete');
-            complete.classList.add('show');
-            
-            document.getElementById('finalScore').textContent = `${score}/3`;
-            
-            const message = document.getElementById('scoreMessage');
-            if (score === 3) {
-                message.textContent = 'Perfect! You understand APIs!';
-            } else if (score === 2) {
-                message.textContent = 'Great job! You\'re almost there!';
-            } else {
-                message.textContent = 'Keep learning! Review the material and try again!';
-            }
-        }
-
-        function restartQuiz() {
-            score = 0;
-            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
-            document.getElementById('q1').classList.add('active');
-            document.getElementById('quizComplete').classList.remove('show');
-            
-            document.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('selected', 'correct', 'incorrect');
-            });
-            
-            document.querySelectorAll('.quiz-feedback').forEach(f => {
-                f.classList.remove('show');
-            });
-            
-            document.querySelectorAll('.next-btn').forEach(btn => {
-                btn.classList.remove('show');
-            });
-            
-            // Reset drag and drop
-            const draggables = document.getElementById('draggables');
-            const dropZones = document.querySelectorAll('.drop-zone');
-            
-            dropZones.forEach(zone => {
-                const item = zone.querySelector('.drag-item');
-                if (item) {
-                    draggables.appendChild(item);
-                }
-                zone.classList.remove('filled');
-            });
-        }
-
-        // Drag and Drop functionality
-        let draggedElement = null;
-
-        function setupDragDrop() {
-            const draggables = document.querySelectorAll('.drag-item');
-            const dropZones = document.querySelectorAll('.drop-zone');
-
-            draggables.forEach(item => {
-                item.addEventListener('dragstart', function(e) {
-                    draggedElement = this;
-                    this.style.opacity = '0.5';
-                });
-
-                item.addEventListener('dragend', function() {
-                    this.style.opacity = '1';
-                });
-            });
-
-            dropZones.forEach(zone => {
-                zone.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    this.classList.add('drag-over');
-                });
-
-                zone.addEventListener('dragleave', function() {
-                    this.classList.remove('drag-over');
-                });
-
-                zone.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    this.classList.remove('drag-over');
-                    
-                    if (draggedElement && this.children.length === 0) {
-                        this.appendChild(draggedElement);
-                        this.classList.add('filled');
-                    }
-                });
-            });
-        }
-
-        function checkDragDrop() {
-            const dropZones = document.querySelectorAll('.drop-zone');
-            let correct = true;
-
-            dropZones.forEach(zone => {
-                const expectedStep = zone.dataset.position;
-                const droppedItem = zone.querySelector('.drag-item');
-                
-                if (!droppedItem || droppedItem.dataset.step !== expectedStep) {
-                    correct = false;
-                }
-            });
-
-            const feedback = document.getElementById('feedback2');
-            const nextBtn = document.getElementById('next2');
-
-            if (correct) {
-                feedback.className = 'quiz-feedback correct show';
-                feedback.textContent = '✅ Perfect! You correctly ordered the API call steps!';
-                score++;
-            } else {
-                feedback.className = 'quiz-feedback incorrect show';
-                feedback.textContent = '❌ Not quite right. Remember: Get API key → Build request URL → Receive data response';
-            }
-
-            nextBtn.classList.add('show');
-        }
-
         // Load user's itinerary on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadUserItinerary();
-            setupDragDrop();
         });
+    </script>
+</body>
+</html>

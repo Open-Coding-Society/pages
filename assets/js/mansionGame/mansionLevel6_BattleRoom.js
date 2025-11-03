@@ -1,8 +1,8 @@
 import GameEnvBackground from "./GameEngine/GameEnvBackground.js";
-import Player from "./GameEngine/Player.js";
+import FightingPlayer from "./CustomGameClasses/FightingPlayer.js";
 import Boss from './CustomGameClasses/Boss.js';
 import showDeathScreen from './CustomGameClasses/DeathScreen.js';
-import { createBossHealthBar, createPlayerHealthBar } from './CustomGameClasses/HealthBars.js';
+import { createBossHealthBar, createPlayerHealthBar, updatePlayerHealthBar } from './CustomGameClasses/HealthBars.js';
 
 class MansionLevel6_BattleRoom {
     constructor(gameEnv) {
@@ -59,7 +59,7 @@ class MansionLevel6_BattleRoom {
             INIT_POSITION: {x: width / 2, y: height / 2},
             orientation: {rows: 1, columns: 1},
             down: {row: 0, start: 0, columns: 1},
-            hitbox: {widthPercentage: 0.4, heightPercentage: 0.4},
+            hitbox: {widthPercentage: 0.4, heightPercentage: 0},
             zIndex: 10,
             isKilling: false, // Flag to prevent multiple kills
             
@@ -77,7 +77,7 @@ class MansionLevel6_BattleRoom {
 
                 // Find all player objects
                 const players = this.gameEnv.gameObjects.filter(obj => 
-                    obj.constructor.name === 'Player'
+                    obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
                 );
                 
                 if (players.length === 0) return;
@@ -154,6 +154,9 @@ class MansionLevel6_BattleRoom {
                         } catch (e) { /* ignore */ }
                         
                         // Execute the death
+                        nearest.data.health = 0;
+                        const pct = Math.max(0, Math.min(100, nearest.data.health || 0));
+                        updatePlayerHealthBar(pct);
                         showDeathScreen(nearest);
                         break;
                     }
@@ -261,7 +264,7 @@ class MansionLevel6_BattleRoom {
 
         this.classes = [
             {class: GameEnvBackground, data: image_data_floor},
-            {class: Player, data: sprite_data_mc},
+            {class: FightingPlayer, data: sprite_data_mc},
             // {class: Boss, data: sprite_boss_data},
             // {class: Arm, data: leftArmData},
             // {class: Arm, data: rightArmData},
@@ -271,11 +274,33 @@ class MansionLevel6_BattleRoom {
         ];
 
         // Create health bar when battle room loads
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && !window.__mansionLevelEnded) {
             createBossHealthBar();
             createPlayerHealthBar();
         }
-
+        
+        // Create instructions (space to attack)
+        const container = document.createElement('div');
+        container.id = 'instructions-container';
+        Object.assign(container.style, {
+            position: 'absolute',
+            bottom: '80px',  // Moved further down in the battle room
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '5px',
+            width: '60%',
+            zIndex: '100'  // Lower z-index to keep it in the battle room
+        });
+        container.textContent = "WASD to move, SPACE to shoot";
+        container.style.color = '#00ffffff';
+        container.style.fontFamily = "'Press Start 2P', sans-serif";
+        container.style.fontSize = '16px';
+        container.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.5)';
+        const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
+        gameContainer.appendChild(container);
     }
 }
 
