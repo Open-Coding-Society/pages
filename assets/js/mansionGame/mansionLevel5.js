@@ -17,6 +17,13 @@ class MansionLevel5 {
     this.width = width;
     this.height = height;
 
+    // Pause DOM audio elements
+    try {
+        const audioElements = document.querySelectorAll('audio'); // Selects all <audio> elements
+        audioElements.forEach(audio => {
+            try { if (!audio.paused) audio.pause(); } catch (e) {}
+        });
+    } catch (e) { /* ignore */ }
 	// Background data
 	const image_background = path + "/images/mansionGame/background_lvl5.png"; // be sure to include the path
 	const image_data_background = {
