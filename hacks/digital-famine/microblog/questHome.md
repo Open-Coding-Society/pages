@@ -93,14 +93,26 @@ The system is now defunct, as humans took to the stars. We'll have the reestabli
          image: defaultImgUrl,
          longTitle: 'Backup Array Epsilon',
          description: 'Cold backup array; bring spare modules to reactivate.',
-         tags: ['backup','spare-parts']}
+         tags: ['backup','spare-parts']},
+        {id: 6, label: 'Threat Modeling', url: '{{ base.siteurl }}/digital-famine/microblog/threat-modeling/', title: 'Open Node 6',
+         image: defaultImgUrl,
+         longTitle: 'Backup Array Zeta',
+         description: 'Cold backup array; bring spare modules to reactivate.',
+         tags: ['backup','spare-parts']},
+        {id: 7, label: 'Vault', url: '{{ base.siteurl }}/digital-famine/microblog/vault/', title: 'Open Node 7',
+         image: defaultImgUrl,
+         longTitle: 'Main Admin Control Panel',
+         description: 'Admin control panel; gain access to next module and reestablish link.',
+         tags: ['admin']}
     ]);
 
     // create an array with edges
     var edges = new vis.DataSet([
         {from: 1, to: 2},
         {from: 2, to: 3},
-        {from: 3, to: 5}
+        {from: 3, to: 5},
+        {from: 3, to: 6},
+        {from: 5, to: 7}
     ]);
 
     // provide the data in the vis format
