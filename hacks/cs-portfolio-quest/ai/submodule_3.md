@@ -7,6 +7,7 @@ parent: "AI Usage"
 team: "Thinkers"
 submodule: 3
 categories: [CSP, Submodule, AIUsage]
+is_last_submodule: true
 tags: [ai, submodule, thinkers]
 author: "Thinkers Team"
 date: 2025-10-21
