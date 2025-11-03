@@ -5,7 +5,7 @@ title: Submodule 4- Cybersecurity planet
 description: >
   Learn how to develop blogs and projects that convey information effectively and are visually appealing
 author: CSA 2025-26
-permalink: /digital-famine/cyber/
+permalink: /digital-famine/cybersecurity-gam/
 breadcrumb: true
 lxdData:
   Title: "Frontend Development Modules"
@@ -16,8 +16,8 @@ lxdData:
       Level: 1
       Description: "Team-defined frontend development module"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
-      Video: "/digital-famine/cyber/submodule_1-video"
-      Lessons: "/digital-famine/cyber/submodule_1/"
+      Video: "/digital-famine/cybersecurity-game/submodule_1-video"
+      Lessons: "/digital-famine/cybersecurity-game/submodule_1/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "Frontend Submodule 1"
     - Title: "Submodule 2"
@@ -25,8 +25,8 @@ lxdData:
       Level: 2
       Description: "Team-defined frontend development module"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
-      Video: "/digital-famine/cyber/submodule_2-video"
-      Lessons: "/digital-famine/cyber/submodule_2/"
+      Video: "/digital-famine/cybersecurity-game/submodule_2-video"
+      Lessons: "/digital-famine/cybersecurity-game/submodule_2/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "Frontend Submodule 2"
     - Title: "Submodule 3"
@@ -34,8 +34,8 @@ lxdData:
       Level: 3
       Description: "Team-defined frontend development module"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
-      Video: "/digital-famine/cyber/submodule_3-video"
-      Lessons: "/digital-famine/cyber/submodule_3/"
+      Video: "/digital-famine/cybersecurity-game/submodule_3-video"
+      Lessons: "/digital-famine/cybersecurity-game/submodule_3/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "Frontend Submodule 3"
     - Title: "Submodule 4"
@@ -43,8 +43,8 @@ lxdData:
       Level: 4
       Description: "Team-defined frontend development module"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
-      Video: "/digital-famine/cyber/submodule_4-video"
-      Lessons: "/digital-famine/cyber/submodule_4/"
+      Video: "/digital-famine/cybersecurity-game/submodule_4-video"
+      Lessons: "/digital-famine/cybersecurity-game/submodule_4/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "Frontend Submodule 4"
     - Title: "Submodule 5"
@@ -52,8 +52,8 @@ lxdData:
       Level: 5
       Description: "Team-defined frontend development module"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
-      Video: "/digital-famine/cyber/submodule_5-video"
-      Lessons: "/digital-famine/cyber/submodule_5/"
+      Video: "/digital-famine/cybersecurity-game/submodule_5-video"
+      Lessons: "/digital-famine/cybersecurity-game/submodule_5/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "Frontend Submodule 5"
     - Title: "Submodule 6"
@@ -61,8 +61,8 @@ lxdData:
       Level: 6
       Description: "Team-defined frontend development module"
       Categories: ["Frontend", "HTML", "CSS", "Javascript"]
-      Video: "/digital-famine/cyber/submodule_6-video"
-      Lessons: "/digital-famine/cyber/submodule_6/"
+      Video: "/digital-famine/cybersecurity-game/submodule_6-video"
+      Lessons: "/digital-famine/cybersecurity-game/submodule_6/"
       Image: "/images/digital-famine/cyber.svg"
       Alt: "Frontend Submodule 6"
 ---

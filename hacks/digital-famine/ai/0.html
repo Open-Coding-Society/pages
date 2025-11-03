@@ -1,0 +1,761 @@
+---
+layout: base
+title: "AI APIs"
+description: "Going over how to use AI APIs"
+background: images/platformer/backgrounds/images.png.jpeg
+permalink: /digital-famine/ai/submodule_3/quiz
+breadcrumb: true
+microblog: true
+parent: "AI Usage"
+team: "Debuggers"
+submodule: 3
+categories: [CSP, Submodule, AIUsage]
+tags: [ai, API, flask, debuggers]
+author: "Debuggers Team - Lilian Wu, Rebecca Yan"
+date: 2025-10-21
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI API Adventure Quest</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #f59e0b, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+        
+        .story-intro {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .stat-box {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .question-container {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            line-height: 1.5;
+        }
+        
+        .options-container {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .option-btn {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(100, 116, 139, 0.5);
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: var(--light);
+            font-size: 1.1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-btn:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--secondary);
+            color: var(--light);
+        }
+        
+        .option-btn.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger);
+            color: var(--light);
+        }
+        
+        .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--secondary);
+            color: #a7f3d0;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: #fecaca;
+            display: block;
+        }
+        
+        .timer-container {
+            height: 8px;
+            background: rgba(100, 116, 139, 0.3);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            width: 100%;
+            transition: width 1s linear;
+        }
+        
+        .results-container {
+            text-align: center;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 16px;
+            padding: 30px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .results-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+            background: linear-gradient(90deg, #f59e0b, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .badge {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid var(--accent);
+        }
+        
+        .badge-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .code-reveal {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid var(--secondary);
+        }
+        
+        .code-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 10px 0;
+        }
+        
+        .retry-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .retry-btn:hover {
+            background: #4338ca;
+            transform: translateY(-3px);
+        }
+        
+        .story-element {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .character {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .character-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .character-dialog {
+            flex: 1;
+            padding: 12px 18px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .character-dialog:after {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid rgba(30, 41, 59, 0.8);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            top: -10px;
+            opacity: 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI API Adventure Quest</h1>
+            <p class="subtitle">Help AI Assistant Zippy fix the virus-infected code world!</p>
+        </header>
+        
+        <div class="story-intro">
+            <div class="character">
+                <div class="character-img">🤖</div>
+                <div class="character-dialog">
+                    <strong>Zippy:</strong> Oh no! The Code World has been infected by a virus! API interfaces are in chaos, and only passing knowledge tests can fix them. Can you help me before time runs out?
+                </div>
+            </div>
+            <p>The virus is rapidly destroying code structures. You must make the right choices within the time limit for each question to stop the virus from spreading!</p>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat-box">
+                <div class="stat-label">Time Left</div>
+                <div class="stat-value" id="time-left">30</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Repair Progress</div>
+                <div class="stat-value" id="progress">0/3</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Lives</div>
+                <div class="stat-value" id="lives">3</div>
+            </div>
+        </div>
+        
+        <div class="timer-container">
+            <div class="timer-bar" id="timer-bar"></div>
+        </div>
+        
+        <div id="question-1" class="question-container">
+            <div class="story-element">
+                <p>Level 1: <strong>API Identification Station</strong></p>
+                <p>The virus has tampered with API definitions. You need to identify which action demonstrates using an AI API.</p>
+            </div>
+            
+            <h2 class="question-title">Which of the following actions demonstrates using an AI API?</h2>
+            
+            <div class="options-container">
+                <button class="option-btn" data-correct="false">A) Copy and paste text to move your essay</button>
+                <button class="option-btn" data-correct="false">B) Build a snake game by coding yourself</button>
+                <button class="option-btn" data-correct="false">C) Using a phone to take pictures for your friends</button>
+                <button class="option-btn" data-correct="true">D) Using the customer service chatbot on a house renting website</button>
+            </div>
+            
+            <div class="feedback"></div>
+        </div>
+        
+        <div id="question-2" class="question-container hidden">
+            <div class="story-element">
+                <p>Level 2: <strong>Architecture Defense</strong></p>
+                <p>The virus is attacking the microblog architecture! Identify which layer handles user interactions.</p>
+            </div>
+            
+            <h2 class="question-title">In the microblog architecture, which layer handles user interactions like opening/closing the panel and posting messages?</h2>
+            
+            <div class="options-container">
+                <button class="option-btn" data-correct="false">A) Layout Layer</button>
+                <button class="option-btn" data-correct="true">B) JavaScript/UI Layer</button>
+                <button class="option-btn" data-correct="false">C) Backend/API Layer</button>
+                <button class="option-btn" data-correct="false">D) Database Layer</button>
+            </div>
+            
+            <div class="feedback"></div>
+        </div>
+        
+        <div id="question-3" class="question-container hidden">
+            <div class="story-element">
+                <p>Level 3: <strong>Code Protection</strong></p>
+                <p>The virus is trying to cause page refreshes! Stop it by identifying the correct code defense.</p>
+            </div>
+            
+            <h2 class="question-title">What is the purpose of calling <code>e.preventDefault()</code> in a form submission handler?</h2>
+            
+            <div class="options-container">
+                <button class="option-btn" data-correct="false">A) To validate the form data</button>
+                <button class="option-btn" data-correct="false">B) To send data to the API</button>
+                <button class="option-btn" data-correct="true">C) To stop the page from refreshing (default behavior)</button>
+                <button class="option-btn" data-correct="false">D) To close the modal window</button>
+            </div>
+            
+            <div class="feedback"></div>
+        </div>
+        
+        <div id="results-container" class="results-container">
+            <h2 class="results-title">Mission Complete!</h2>
+            
+            <div class="score-display" id="final-score">0/3</div>
+            
+            <div class="badge">
+                <h3 class="badge-title">🏆 API Builder Badge</h3>
+                <p>You've mastered the fundamentals of AI APIs!</p>
+            </div>
+            
+            <div id="code-reveal" class="code-reveal hidden">
+                <h3>🔑 Your Code Number</h3>
+                <div class="code-number">1</div>
+                <p>Remember this number! You'll need it along with the other module codes to unlock the final challenge.</p>
+            </div>
+            
+            <div id="retry-message" class="hidden">
+                <p>You need to get all questions correct to receive your code for the final challenge.</p>
+            </div>
+            
+            <button id="retry-btn" class="retry-btn">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            currentQuestion: 1,
+            score: 0,
+            lives: 3,
+            timeLeft: 30,
+            timer: null,
+            totalQuestions: 3
+        };
+
+        // DOM elements
+        const timeLeftEl = document.getElementById('time-left');
+        const progressEl = document.getElementById('progress');
+        const livesEl = document.getElementById('lives');
+        const timerBarEl = document.getElementById('timer-bar');
+        const resultsContainer = document.getElementById('results-container');
+        const finalScoreEl = document.getElementById('final-score');
+        const codeRevealEl = document.getElementById('code-reveal');
+        const retryMessageEl = document.getElementById('retry-message');
+        const retryBtn = document.getElementById('retry-btn');
+
+        // Initialize game
+        function initGame() {
+            gameState.currentQuestion = 1;
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.timeLeft = 30;
+            
+            updateStats();
+            showQuestion(1);
+            startTimer();
+            
+            // Hide results and show first question
+            resultsContainer.style.display = 'none';
+            document.getElementById('question-1').classList.remove('hidden');
+        }
+
+        // Update game stats display
+        function updateStats() {
+            timeLeftEl.textContent = gameState.timeLeft;
+            progressEl.textContent = `${gameState.score}/${gameState.totalQuestions}`;
+            livesEl.textContent = gameState.lives;
+            timerBarEl.style.width = `${(gameState.timeLeft / 30) * 100}%`;
+        }
+
+        // Show specific question
+        function showQuestion(questionNum) {
+            // Hide all questions
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.add('hidden');
+            });
+            
+            // Show the requested question
+            document.getElementById(`question-${questionNum}`).classList.remove('hidden');
+            
+            // Reset timer for new question
+            resetTimer();
+        }
+
+        // Start the timer
+        function startTimer() {
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+            }
+            
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateStats();
+                
+                if (gameState.timeLeft <= 0) {
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        // Reset timer for new question
+        function resetTimer() {
+            gameState.timeLeft = 30;
+            updateStats();
+        }
+
+        // Handle time running out
+        function timeUp() {
+            clearInterval(gameState.timer);
+            
+            gameState.lives--;
+            updateStats();
+            
+            if (gameState.lives <= 0) {
+                gameOver();
+            } else {
+                // Show time's up message and move to next question
+                const currentQuestionEl = document.getElementById(`question-${gameState.currentQuestion}`);
+                const feedbackEl = currentQuestionEl.querySelector('.feedback');
+                
+                feedbackEl.textContent = "⏰ Time's up! The virus gained some ground.";
+                feedbackEl.className = 'feedback incorrect';
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 2000);
+            }
+        }
+
+        // Handle answer selection
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Prevent multiple answers
+                if (this.classList.contains('disabled')) return;
+                
+                // Disable all options
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    b.classList.add('disabled');
+                });
+                
+                clearInterval(gameState.timer);
+                
+                const isCorrect = this.getAttribute('data-correct') === 'true';
+                const feedbackEl = this.closest('.question-container').querySelector('.feedback');
+                
+                if (isCorrect) {
+                    this.classList.add('correct');
+                    feedbackEl.textContent = getRandomSuccessMessage();
+                    feedbackEl.className = 'feedback correct';
+                    gameState.score++;
+                    
+                    // Add points animation
+                    addPointsAnimation(100);
+                } else {
+                    this.classList.add('incorrect');
+                    feedbackEl.textContent = getRandomFailureMessage();
+                    feedbackEl.className = 'feedback incorrect';
+                    gameState.lives--;
+                    
+                    // Highlight correct answer
+                    const correctBtn = this.parentElement.querySelector('[data-correct="true"]');
+                    correctBtn.classList.add('correct');
+                }
+                
+                updateStats();
+                
+                setTimeout(() => {
+                    if (gameState.lives <= 0) {
+                        gameOver();
+                    } else {
+                        nextQuestion();
+                    }
+                }, 2000);
+            });
+        });
+
+        // Move to next question or end game
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            
+            if (gameState.currentQuestion > gameState.totalQuestions) {
+                endGame();
+            } else {
+                showQuestion(gameState.currentQuestion);
+                startTimer();
+            }
+        }
+
+        // End the game
+        function endGame() {
+            clearInterval(gameState.timer);
+            
+            // Hide all questions
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.add('hidden');
+            });
+            
+            // Show results
+            resultsContainer.style.display = 'block';
+            finalScoreEl.textContent = `${gameState.score}/${gameState.totalQuestions}`;
+            
+            if (gameState.score === gameState.totalQuestions) {
+                codeRevealEl.classList.remove('hidden');
+                retryMessageEl.classList.add('hidden');
+                createConfetti();
+            } else {
+                codeRevealEl.classList.add('hidden');
+                retryMessageEl.classList.remove('hidden');
+            }
+        }
+
+        // Game over
+        function gameOver() {
+            clearInterval(gameState.timer);
+            
+            // Hide all questions
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.add('hidden');
+            });
+            
+            // Show results with game over message
+            resultsContainer.style.display = 'block';
+            finalScoreEl.textContent = `${gameState.score}/${gameState.totalQuestions}`;
+            
+            const resultsTitle = document.querySelector('.results-title');
+            resultsTitle.textContent = "Mission Failed!";
+            
+            codeRevealEl.classList.add('hidden');
+            retryMessageEl.classList.remove('hidden');
+            
+            const retryMsg = retryMessageEl.querySelector('p');
+            retryMsg.textContent = "The virus has taken over! Try again to save the code world.";
+        }
+
+        // Add points animation
+        function addPointsAnimation(points) {
+            const pointsEl = document.createElement('div');
+            pointsEl.textContent = `+${points}`;
+            pointsEl.style.position = 'fixed';
+            pointsEl.style.color = '#10b981';
+            pointsEl.style.fontWeight = 'bold';
+            pointsEl.style.fontSize = '1.5rem';
+            pointsEl.style.pointerEvents = 'none';
+            pointsEl.style.zIndex = '1000';
+            pointsEl.style.animation = 'floatUp 1s ease-out forwards';
+            
+            // Random position at top of screen
+            pointsEl.style.left = `${Math.random() * 80 + 10}%`;
+            pointsEl.style.top = '20%';
+            
+            document.body.appendChild(pointsEl);
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatUp {
+                    0% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(-100px); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Remove element after animation
+            setTimeout(() => {
+                pointsEl.remove();
+                style.remove();
+            }, 1000);
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#f59e0b', '#10b981', '#4f46e5', '#ef4444', '#8b5cf6'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `confetti ${Math.random() * 3 + 2}s linear forwards`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Random success messages
+        function getRandomSuccessMessage() {
+            const messages = [
+                "✅ Excellent! You stopped the virus from spreading!",
+                "✅ Perfect! The code defenses are holding strong!",
+                "✅ Great job! You're pushing the virus back!",
+                "✅ Correct! The API is functioning properly again!",
+                "✅ Well done! You're a natural code defender!"
+            ];
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        // Random failure messages
+        function getRandomFailureMessage() {
+            const messages = [
+                "❌ Oh no! The virus gained some ground.",
+                "❌ Incorrect! The virus is spreading faster.",
+                "❌ Wrong answer! Our defenses are weakening.",
+                "❌ Not quite! The virus is adapting to our attacks.",
+                "❌ Missed! The virus corrupted that section of code."
+            ];
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        // Retry button event
+        retryBtn.addEventListener('click', initGame);
+
+        // Initialize the game
+        initGame();
+    </script>
+</body>
+</html>

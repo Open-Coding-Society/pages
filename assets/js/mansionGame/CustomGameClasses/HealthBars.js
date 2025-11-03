@@ -62,20 +62,21 @@ export function createBossHealthBar() {
 
 // Remove the boss health bar
 export function removeBossHealthBar() {
-    const bar = document.getElementById('boss-health-bar');
-    if (bar && bar.parentNode) {
-        bar.parentNode.removeChild(bar);
+    const container = document.getElementById('boss-health-container');
+    if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
     }
 }
 
 // Update the boss health bar based on a percentage (0 to 100)
-export function updateBossHealthBar(percentage) {
+export function updateBossHealthBar(percentage, stage) {
     const fill = document.getElementById('boss-health-fill');
     if (fill) {
         // Ensure the percentage stays within the 0-100 range
         const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
         // Set the width of the health bar fill element
         fill.style.width = `${clampedPercentage}%`;
+        fill.style.backgroundColor = stage == 1 ? '#FF0000' : stage == 2 ? '#800000' : '#A020F0';
     }
 }
 
@@ -143,9 +144,9 @@ export function createPlayerHealthBar() {
 
 // Remove the player health bar
 export function removePlayerHealthBar() {
-    const bar = document.getElementById('player-health-bar');
-    if (bar && bar.parentNode) {
-        bar.parentNode.removeChild(bar);
+    const container = document.getElementById('player-health-container');
+    if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
     }
 }
 
@@ -157,5 +158,6 @@ export function updatePlayerHealthBar(percentage) {
         const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
         // Set the width of the health bar fill element
         fill.style.width = `${clampedPercentage}%`;
+        fill.style.backgroundColor = clampedPercentage > 60 ? '#00FF00' : clampedPercentage > 30 ? '#FFFF00' : '#FF0000';
     }
 }
