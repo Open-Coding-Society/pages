@@ -55,8 +55,8 @@ class Skeleton extends GameObject {
     super(gameEnv);
     this.x = data.x || 0;
     this.y = data.y || -50;
-    this.width = data.isKey ? 80 : 75; // Key: 80, Skeleton: 75 (bigger)
-    this.height = data.isKey ? 80 : 95; // Key: 80, Skeleton: 95 (bigger)
+    this.width = data.isKey ? 80 : 134; // Key: 80, Skeleton: 134 (67*2)
+    this.height = data.isKey ? 80 : 166; // Key: 80, Skeleton: 166 (83*2)
     this.scrollSpeed = data.scrollSpeed || 3;
     this.level = data.level;
     this.isKey = data.isKey || false;
@@ -214,7 +214,7 @@ class MansionLevel3 {
       greeting: "Hi, I am Spook.",
       src: sprite_src_mc,
       SCALE_FACTOR: MC_SCALE_FACTOR,
-      STEP_FACTOR: 80, // Slower movement (80 instead of 50)
+      STEP_FACTOR: 120, // Slower movement (increased from 80)
       ANIMATION_RATE: 10,
       INIT_POSITION: { x: (width / 2 - width / (5 * MC_SCALE_FACTOR)), y: height - (height / MC_SCALE_FACTOR)}, 
       pixels: {height: 2400, width: 3600},
@@ -228,7 +228,7 @@ class MansionLevel3 {
       upLeft: {row: 0, start: 0, columns: 3, rotate: Math.PI/16},
       upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
       hitbox: {widthPercentage: 0.45, heightPercentage: 0.2},
-      keypress: {up: 87, left: 65, down: 83, right: 68} // W, A, S, D
+      keypress: {left: 65, right: 68} // Only A (left) and D (right) - removed W and S
     };
 
     // Classes array - use ScrollingBackground instead of GameEnvBackground
@@ -271,6 +271,166 @@ class MansionLevel3 {
     document.body.appendChild(hud);
     console.log("HUD created!", hud);
     this.updateHUD();
+    
+    // Create instruction text at top center
+    const instructionText = document.createElement('div');
+    instructionText.id = 'mansion3-instruction';
+    instructionText.style.position = 'fixed';
+    instructionText.style.top = '60px';
+    instructionText.style.left = '50%';
+    instructionText.style.transform = 'translateX(-50%)';
+    instructionText.style.zIndex = '99999';
+    instructionText.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    instructionText.style.color = '#ffd700';
+    instructionText.style.padding = '10px 20px';
+    instructionText.style.borderRadius = '10px';
+    instructionText.style.fontFamily = 'Arial, sans-serif';
+    instructionText.style.fontSize = '18px';
+    instructionText.style.fontWeight = 'bold';
+    instructionText.textContent = 'Reach 300m to find the golden key';
+    
+    document.body.appendChild(instructionText);
+    
+    // Create mobile control arrows
+    this.createMobileControls();
+  }
+
+  createMobileControls() {
+    // Left arrow button
+    const leftArrow = document.createElement('div');
+    leftArrow.id = 'mansion3-left-arrow';
+    leftArrow.innerHTML = '◀';
+    leftArrow.style.position = 'fixed';
+    leftArrow.style.bottom = '100px';
+    leftArrow.style.left = '30px';
+    leftArrow.style.width = '80px';
+    leftArrow.style.height = '80px';
+    leftArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    leftArrow.style.color = 'white';
+    leftArrow.style.fontSize = '48px';
+    leftArrow.style.display = 'flex';
+    leftArrow.style.alignItems = 'center';
+    leftArrow.style.justifyContent = 'center';
+    leftArrow.style.borderRadius = '50%';
+    leftArrow.style.border = '3px solid white';
+    leftArrow.style.cursor = 'pointer';
+    leftArrow.style.zIndex = '99999';
+    leftArrow.style.userSelect = 'none';
+    
+    // Right arrow button
+    const rightArrow = document.createElement('div');
+    rightArrow.id = 'mansion3-right-arrow';
+    rightArrow.innerHTML = '▶';
+    rightArrow.style.position = 'fixed';
+    rightArrow.style.bottom = '100px';
+    rightArrow.style.right = '30px';
+    rightArrow.style.width = '80px';
+    rightArrow.style.height = '80px';
+    rightArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    rightArrow.style.color = 'white';
+    rightArrow.style.fontSize = '48px';
+    rightArrow.style.display = 'flex';
+    rightArrow.style.alignItems = 'center';
+    rightArrow.style.justifyContent = 'center';
+    rightArrow.style.borderRadius = '50%';
+    rightArrow.style.border = '3px solid white';
+    rightArrow.style.cursor = 'pointer';
+    rightArrow.style.zIndex = '99999';
+    rightArrow.style.userSelect = 'none';
+    
+    document.body.appendChild(leftArrow);
+    document.body.appendChild(rightArrow);
+    
+    // Helper function to dispatch keyboard events
+    const dispatchKeyEvent = (type, keyCode) => {
+      const event = new KeyboardEvent(type, {
+        keyCode: keyCode,
+        which: keyCode,
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(event);
+    };
+    
+    // Left arrow controls
+    const handleLeftPress = () => {
+      dispatchKeyEvent('keydown', 65); // 'A' key
+    };
+    
+    const handleLeftRelease = () => {
+      dispatchKeyEvent('keyup', 65);
+    };
+    
+    // Right arrow controls
+    const handleRightPress = () => {
+      dispatchKeyEvent('keydown', 68); // 'D' key
+    };
+    
+    const handleRightRelease = () => {
+      dispatchKeyEvent('keyup', 68);
+    };
+    
+    // Touch events for left arrow
+    leftArrow.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      leftArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+      handleLeftPress();
+    });
+    
+    leftArrow.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      leftArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      handleLeftRelease();
+    });
+    
+    // Mouse events for left arrow (desktop fallback)
+    leftArrow.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      leftArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+      handleLeftPress();
+    });
+    
+    leftArrow.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      leftArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      handleLeftRelease();
+    });
+    
+    leftArrow.addEventListener('mouseleave', (e) => {
+      leftArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      handleLeftRelease();
+    });
+    
+    // Touch events for right arrow
+    rightArrow.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      rightArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+      handleRightPress();
+    });
+    
+    rightArrow.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      rightArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      handleRightRelease();
+    });
+    
+    // Mouse events for right arrow (desktop fallback)
+    rightArrow.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      rightArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+      handleRightPress();
+    });
+    
+    rightArrow.addEventListener('mouseup', (e) => {
+      e.preventDefault();
+      rightArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      handleRightRelease();
+    });
+    
+    rightArrow.addEventListener('mouseleave', (e) => {
+      rightArrow.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      handleRightRelease();
+    });
   }
 
   updateHUD() {
@@ -315,11 +475,18 @@ class MansionLevel3 {
       this.spawnSkeleton();
     }
 
-    // Spawn key after score > 300
-    if (this.score > 300 && !this.keySpawned) {
-      console.log("🔑 SPAWNING KEY at score:", this.score);
+    // Spawn key after 300m distance
+    const distance = Math.floor(this.score / 10);
+    if (distance >= 300 && !this.keySpawned) {
+      console.log("🔑 SPAWNING KEY at distance:", distance);
       this.spawnKey();
       this.keySpawned = true;
+      
+      // Remove instruction text when key spawns
+      const instructionText = document.getElementById('mansion3-instruction');
+      if (instructionText) {
+        instructionText.remove();
+      }
     }
 
     // Increase difficulty over time
@@ -475,6 +642,23 @@ class MansionLevel3 {
     if (hud) {
       hud.remove();
       console.log("✅ HUD removed");
+    }
+    
+    // Remove instruction text
+    const instructionText = document.getElementById('mansion3-instruction');
+    if (instructionText) {
+      instructionText.remove();
+    }
+    
+    // Remove mobile control arrows
+    const leftArrow = document.getElementById('mansion3-left-arrow');
+    if (leftArrow) {
+      leftArrow.remove();
+    }
+    
+    const rightArrow = document.getElementById('mansion3-right-arrow');
+    if (rightArrow) {
+      rightArrow.remove();
     }
     
     // Clear any skeletons
