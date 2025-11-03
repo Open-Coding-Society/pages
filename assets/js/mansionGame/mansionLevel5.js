@@ -73,6 +73,7 @@ class MansionLevel5 {
         hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
         zIndex: 10,
         isKilling: false, // Flag to prevent multiple kills
+		frameCount: 0,
         
         // The update method with all functionality inline
         update: function() {
@@ -80,21 +81,32 @@ class MansionLevel5 {
             if (this.isKilling) {
                 return;
             }
+			
+			this.frameCount++;
             
             // player
             let nearest = player;
 
+
             // Move towards nearest player
             const speed = 0.8; // Adjust speed as needed
-            const dx = nearest.position.x - this.position.x;
-            const dy = nearest.position.y - this.position.y;
-            const angle = Math.atan2(dy, dx);
+			const dy = 0;
+			const dx = 0;
+		    const angle = 0;
+
+			if (this.frameCount % 10 == 0)
+			{
+				dx = nearest.position.x - this.position.x;
+				dy = nearest.position.y - this.position.y;
+				angle = Math.atan2(dy, dx);
+			}
             
             // Update position
             this.position.x += Math.cos(angle) * speed;
             this.position.y += Math.sin(angle) * speed;
             
             // Check for collision with player
+			if (this.frameCount % 10 == 0)
             {
                 // Calculate distance for hitbox collision
                 const playerX = nearest.position.x + nearest.width / 2;
@@ -288,7 +300,7 @@ class MansionLevel5 {
 
     bindShootKey() {
         window.addEventListener("keydown", (event) => {
-            if (event.code === "KeyC") {
+            if (event.code === "Space") {
                 this.shootLaser();
             }
         })
