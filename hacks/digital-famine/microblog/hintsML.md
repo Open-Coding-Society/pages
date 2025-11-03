@@ -11,6 +11,10 @@ tags: [microblogging, submodule, unzippers]
 author: "Jaynee Chauhan, Michelle Ji"
 date: 2025-10-28
 breadcrumb: true
+footer:
+  previous: /digital-famine/microblog/hints/
+  home: /digital-famine/
+  next: /digital-famine/microblog/hintsAI/
 ---
 
 ## Media Literacy  
