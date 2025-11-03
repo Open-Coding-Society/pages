@@ -191,6 +191,12 @@ class MansionLevel1_Pantry {
               keyImg.style.animation = 'keyGlow 2s ease-in-out infinite alternate';
 
               // Create a keyframe animation for the glow pulse
+
+              const levelMusic = new Audio(path + "/assets/sounds/mansionGame/victory_sound.mp3");
+              levelMusic.loop = false;
+              levelMusic.volume = 0.1;
+              levelMusic.play().catch(err => console.warn('Level music failed to play:', err));
+
               const styleSheet = document.createElement('style');
               styleSheet.textContent = `
               @keyframes keyGlow {
