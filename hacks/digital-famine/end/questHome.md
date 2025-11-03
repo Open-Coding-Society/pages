@@ -36,10 +36,10 @@ lxdData:
       Lessons: "/digital-famine/end/submodule_3/"
       Image: "/images/digital-famine/Planet3-Scene.png"
       Alt: "end Submodule 3"
-    - Title: "Submodule 4"
+    - Title: "Cyber Defense Protocol"
       Genre: "Project Creation"
       Level: 4
-      Description: "Team-defined end development module"
+      Description: "Apply your cyber skills to navigate the final security systems and restore the lost knowledge of humanity."
       Categories: ["end", "Flask", "Spring", "Databases"]
       Lessons: "/digital-famine/end/submodule_4/"
       Image: "/images/digital-famine/Planet4-Scene.jpg"

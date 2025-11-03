@@ -134,18 +134,18 @@ microblog: true
 <h2>Learning Objectives</h2>
 
 <ul>
-  <li>- Define Frontend Development and its role in a web application.</li>
-  <li>- Identify the three core technologies (HTML, CSS, JS) and their respective functions.</li>
-  <li>- Differentiate between the Client-Side (Frontend) and the Server-Side (Backend).</li>
-  <li>- Explain the concept of synergy between the core technologies.</li>
+  <li>Define Frontend Development and its role in a web application.</li>
+  <li>Identify the three core technologies (HTML, CSS, JS) and their respective functions.</li>
+  <li>Differentiate between the Client-Side (Frontend) and the Server-Side (Backend).</li>
+  <li>Explain the concept of synergy between the core technologies.</li>
 </ul>
 
 <h2>Prerequisites</h2>
 
 <ul>
-    <li>- Basic curiosity about how websites work.</li>
-    <li>- Familiarity with web browsers.</li>
-    <li>- No prior coding experience required!</li>
+    <li>Basic curiosity about how websites work.</li>
+    <li>Familiarity with web browsers.</li>
+    <li>No prior coding experience required!</li>
 </ul>
 
 <h2>Frontend Basics: The User's World</h2>
@@ -311,9 +311,9 @@ Initial State Button
 
 <p>To prepare for upcoming modules, consider these questions:</p>
 <ol>
-  <li>- If a website looks visually broken but all the text and links are present and functional, which core technology is likely malfunctioning?</li>
-  <li>- Where would you define the order of two separate &lt;p&gt; elements on a page: HTML, CSS, or JavaScript?</li>
-  <li>- What is the fundamental difference between client-side and server-side code execution?</li>
+  <li>If a website looks visually broken but all the text and links are present and functional, which core technology is likely malfunctioning?</li>
+  <li>Where would you define the order of two separate &lt;p&gt; elements on a page: HTML, CSS, or JavaScript?</li>
+  <li>What is the fundamental difference between client-side and server-side code execution?</li>
 </ol>
 <p></p>
 

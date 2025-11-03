@@ -451,7 +451,7 @@ date: 2025-10-24
       <div class="hud-container">
         <div class="hud-card">
           <h3>⚡ SYSTEMS STATUS</h3>
-          <div class="hud-value" id="intro-progress">0/10</div>
+          <div class="hud-value" id="intro-progress">0/5</div>
           <div class="progress-bar">
             <div class="progress-fill" id="intro-progress-bar" style="width: 0%"></div>
           </div>
@@ -474,7 +474,7 @@ date: 2025-10-24
         <h2 style="margin-bottom: 1rem;">🚀 Mission Brief</h2>
         <p style="line-height: 1.8; color: var(--text-muted); margin-bottom: 1.5rem;">
           The RSV-Phoenix has lost primary satellite connection during its Mars approach sequence. 
-          You are receiving 10 diagnostic transmissions through backup channels. Each transmission 
+          You are receiving 5 diagnostic transmissions through backup channels. Each transmission 
           may contain <strong style="color: var(--success)">VALID signal data</strong> or 
           <strong style="color: var(--danger)">CORRUPTED interference</strong>.
         </p>
@@ -496,7 +496,7 @@ date: 2025-10-24
       <div class="hud-container">
         <div class="hud-card">
           <h3>⚡ SIGNALS PROCESSED</h3>
-          <div class="hud-value" id="mission-progress">0/10</div>
+          <div class="hud-value" id="mission-progress">0/5</div>
           <div class="progress-bar">
             <div class="progress-fill" id="mission-progress-bar" style="width: 0%"></div>
           </div>
@@ -519,7 +519,7 @@ date: 2025-10-24
             </div>
             <div class="signal-status">
               <div class="signal-dot" id="signal-dot" style="background: var(--signal-good)"></div>
-              <span id="signal-count">Signal 1/10</span>
+              <span id="signal-count">Signal 1/5</span>
             </div>
           </div>
 
@@ -556,7 +556,7 @@ date: 2025-10-24
       <div class="console-card">
         <div class="results-panel">
           <h2 style="font-size: 2rem; margin-bottom: 1rem;">🛰️ REPAIR SEQUENCE COMPLETE</h2>
-          <div class="results-score" id="final-score">0/10</div>
+          <div class="results-score" id="final-score">0/5</div>
           
           <div class="hud-container" style="max-width: 500px; margin: 2rem auto;">
             <div class="hud-card">
@@ -593,6 +593,7 @@ date: 2025-10-24
       }
     })();
 
+    // Only 5 signals now
     const signals = [
       {
         id: "RSV-PHX-001",
@@ -609,20 +610,6 @@ date: 2025-10-24
         explanation: "CORRUPTED: Unverified source, sensational fear language, conspiracy framing, no technical specifics, urgency manipulation tactics, attacks official sources without evidence. Classic misinformation signature."
       },
       {
-        id: "ESA-COLLAB-112",
-        source: "@ESA_Operations • Verified European Space Agency • Darmstadt, Germany",
-        content: "Coordinating deep space network handoff with NASA for RSV-Phoenix. ESA ground stations Madrid & New Norcia providing telemetry support during Mars approach phase. Signal acquisition window: 0430-0820 UTC. Joint mission ops protocol active.",
-        answer: "valid",
-        explanation: "VALID: Official ESA verified account, specific ground stations named, precise time windows, international cooperation context, professional terminology. Legitimate coordination between space agencies."
-      },
-      {
-        id: "SCAM-CRYPTO-891",
-        source: "@MarsToken_Official • Unverified Account • Link in bio",
-        content: "🚀 BREAKING: Phoenix crew secretly invested in $MARS coin before launch! Token going 10,000% when they land! Elon & NASA insiders already bought in! LAST CHANCE before moon! Limited presale ends in 3 HOURS! Link: bit.ly/marscoin-scam",
-        answer: "corrupted",
-        explanation: "CORRUPTED: Financial scam pattern, false celebrity association, artificial urgency (3 hours!), unrealistic promises (10,000%), suspicious shortened URL, unverified source. Malicious phishing attempt."
-      },
-      {
         id: "MIT-AERO-229",
         source: "@Dr_Rodriguez_MIT • Verified Aerospace Professor • Cambridge, MA",
         content: "Fascinating engineering challenge with Phoenix's entry corridor. New paper analyzing hypersonic thermal dynamics during Mars EDL available on arXiv:2025.10847. Peer review pending. Models suggest Phoenix's ablative shield design offers 15% safety margin improvement over Curiosity.",
@@ -637,32 +624,11 @@ date: 2025-10-24
         explanation: "CORRUPTED: Pure clickbait structure, multiple exclamation marks, vague sensational claims, 'they don't want you to know' conspiracy framing, no specific evidence, manipulation tactics, unverified anonymous source."
       },
       {
-        id: "JPL-NAV-156",
-        source: "@NASA_JPL_Navigation • Verified Jet Propulsion Laboratory • Pasadena, CA",
-        content: "RSV-Phoenix navigation update: Mid-course correction burn completed successfully at 14:23:41 UTC. Achieved 99.7% target accuracy. New trajectory projects landing ellipse center: 18.38°S 77.58°E. Next maneuver scheduled T+96 hours. Data archived at jpl.nasa.gov/missions/phoenix",
-        answer: "valid",
-        explanation: "VALID: Official JPL verified account, precise timestamps and coordinates, specific accuracy metrics, procedural updates, verifiable data archive link. Standard mission operations communication."
-      },
-      {
-        id: "CONSPIRACY-774",
-        source: "@MarsHoax_Exposed • Unverified Account • VPN Location",
-        content: "PROOF that Phoenix mission is FAKE! Launch footage shows CGI glitches at 3:47. Hollywood production confirmed by whistleblower (identity protected). All Mars missions are staged in Nevada desert. DM me for encrypted files (small donation requested). Don't trust mainstream space media!",
-        answer: "corrupted",
-        explanation: "CORRUPTED: Conspiracy theory pattern, claims of 'proof' without evidence, anonymous 'whistleblower', requests payment for information, attacks all mainstream sources, unverified account with hidden location."
-      },
-      {
         id: "SPACEX-COORD-203",
         source: "@SpaceX_Tracking • Verified SpaceX Operations • Hawthorne, CA",
         content: "Starlink constellation providing comm relay support for RSV-Phoenix during trans-Mars coast phase. Network handoff to NASA DSN for Mars orbit insertion sequence. Anticipate brief signal dropout during atmospheric entry (expected ~7min blackout per mission profile).",
         answer: "valid",
         explanation: "VALID: Verified SpaceX source, explains technical coordination role, realistic details (7min blackout is standard for Mars entry), professional cooperation between private and government space entities."
-      },
-      {
-        id: "FAKE-NASA-666",
-        source: "@NASA_0fficial • Unverified Account • Recent creation date",
-        content: "🔴 EMERGENCY: All personnel must verify credentials immediately! Phoenix communications compromised by foreign actors. Click link to authenticate your NASA account access: nasa-verification-portal.ru/login. DO NOT share this message. TIME SENSITIVE.",
-        answer: "corrupted",
-        explanation: "CORRUPTED: Phishing attack. Fake NASA account (note '0' instead of 'O'), suspicious Russian domain (.ru), urgency tactics, credential harvesting attempt, requests login information. Malicious security threat."
       }
     ];
 
@@ -671,7 +637,7 @@ date: 2025-10-24
     let hasAnswered = false;
 
     const updateMeters = () => {
-      const progress = (currentIndex / 10) * 100;
+      const progress = (currentIndex / 5) * 100;
       const accuracy = currentIndex > 0 ? Math.round((correctCount / currentIndex) * 100) : 0;
       
       ['intro', 'mission'].forEach(prefix => {
@@ -681,7 +647,7 @@ date: 2025-10-24
         const accuracyText = document.getElementById(`${prefix}-accuracy`);
         
         if (progressBar) progressBar.style.width = `${progress}%`;
-        if (progressText) progressText.textContent = `${currentIndex}/10`;
+        if (progressText) progressText.textContent = `${currentIndex}/5`;
         if (accuracyBar) accuracyBar.style.width = `${accuracy}%`;
         if (accuracyText) accuracyText.textContent = `${accuracy}%`;
       });
@@ -697,7 +663,7 @@ date: 2025-10-24
       hasAnswered = false;
 
       document.getElementById('signal-id').textContent = signal.id;
-      document.getElementById('signal-count').textContent = `Signal ${currentIndex + 1}/10`;
+      document.getElementById('signal-count').textContent = `Signal ${currentIndex + 1}/5`;
       document.getElementById('signal-source').textContent = signal.source;
       document.getElementById('signal-content').textContent = signal.content;
       
@@ -759,15 +725,13 @@ date: 2025-10-24
       document.getElementById('mission-section').classList.add('hidden');
       document.getElementById('results-section').classList.remove('hidden');
 
-      // Compute final percentage once and mark module complete if passed
-      const pct = Math.round((correctCount / 10) * 100);
+      const pct = Math.round((correctCount / 5) * 100);
 
-      // If score is high enough, mark module as complete
       if (pct >= 70 && window.markCurrentModuleComplete) {
         window.markCurrentModuleComplete();
       }
 
-      document.getElementById('final-score').textContent = `${correctCount} / 10 Correct`;
+      document.getElementById('final-score').textContent = `${correctCount} / 5 Correct`;
       document.getElementById('final-accuracy').textContent = `${pct}%`;
       document.getElementById('final-accuracy-bar').style.width = `${pct}%`;
 
@@ -801,8 +765,8 @@ date: 2025-10-24
 
     document.getElementById('test-btn').addEventListener('click', () => {
       // Auto-complete with 100% score
-      currentIndex = 10;
-      correctCount = 10;
+      currentIndex = 5;
+      correctCount = 5;
       updateMeters();
       showResults();
       

@@ -29,7 +29,7 @@ footer:
   margin-bottom: 20px;
 }
 .options button {
-  display: block;
+  display: block; 
   width: 100%;
   margin: 8px 0;
   padding: 12px;
