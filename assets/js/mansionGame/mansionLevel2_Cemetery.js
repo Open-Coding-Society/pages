@@ -424,8 +424,11 @@ class MansionLevel2_Cemetery {
    */
   endGameWithVictory() {
     if (this.statusDisplay) {
-      this.statusDisplay.innerHTML = '🏆 VICTORY! You completed all 7 rounds! Restarting...';
+      this.statusDisplay.innerHTML = '🏆 VICTORY! You completed all 7 rounds!';
     }
+
+    // Show the key earned popup
+    this.showKeyEarnedPopup();
 
     setTimeout(() => {
       // Reset all game state to allow replay
@@ -438,6 +441,101 @@ class MansionLevel2_Cemetery {
       this.refreshUserInterface();
       this.beginNewRound();
     }, 5000);
+  }
+
+  /**
+   * Displays a popup showing the player has earned a key
+   */
+  showKeyEarnedPopup() {
+    // Create popup overlay
+    const popup = document.createElement('div');
+    popup.id = 'keyEarnedPopup';
+    Object.assign(popup.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      zIndex: '2000',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      animation: 'fadeIn 0.5s ease-in'
+    });
+
+    // Create key image
+    const keyImage = document.createElement('img');
+    const path = this.gameEnv.path || '';
+    keyImage.src = path + '/images/mansionGame/key_lvl3.png';
+    Object.assign(keyImage.style, {
+      width: '300px',
+      height: 'auto',
+      marginBottom: '20px',
+      animation: 'bounce 1s ease-in-out infinite',
+      imageRendering: 'pixelated'  // Keep the pixel art style crisp
+    });
+
+    // Create congratulations text
+    const congratsText = document.createElement('div');
+    congratsText.innerHTML = '🎉 YOU EARNED A KEY! 🎉';
+    Object.assign(congratsText.style, {
+      color: 'gold',
+      fontSize: '32px',
+      fontWeight: 'bold',
+      fontFamily: 'Arial, sans-serif',
+      textAlign: 'center',
+      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+      marginBottom: '10px'
+    });
+
+    // Create description text
+    const descText = document.createElement('div');
+    descText.innerHTML = 'You have successfully completed the Cemetery Memory Game!';
+    Object.assign(descText.style, {
+      color: 'white',
+      fontSize: '18px',
+      fontFamily: 'Arial, sans-serif',
+      textAlign: 'center',
+      maxWidth: '500px',
+      padding: '0 20px'
+    });
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Assemble popup
+    popup.appendChild(keyImage);
+    popup.appendChild(congratsText);
+    popup.appendChild(descText);
+    document.body.appendChild(popup);
+
+    // Auto-remove popup after 4 seconds
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.style.animation = 'fadeOut 0.5s ease-out';
+        setTimeout(() => {
+          if (popup.parentNode) {
+            popup.parentNode.removeChild(popup);
+          }
+        }, 500);
+      }
+    }, 4000);
+
+    // Store reference for cleanup
+    this.keyPopup = popup;
   }
 
   /**
@@ -458,6 +556,12 @@ class MansionLevel2_Cemetery {
     if (this.uiContainer && this.uiContainer.parentNode) {
       this.uiContainer.parentNode.removeChild(this.uiContainer);
     }
+    
+    // Remove key popup if it exists
+    if (this.keyPopup && this.keyPopup.parentNode) {
+      this.keyPopup.parentNode.removeChild(this.keyPopup);
+    }
+    
     console.log("Cemetery Memory Game - Cleaned up and destroyed");
   }
 }
