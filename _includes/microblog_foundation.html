@@ -1,28 +1,54 @@
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<!-- Floating Microblog Button (upper right, below header) -->
+<button id="microblog-toggle-btn" class="microblog-fab microblog-fab-top" aria-label="Open Microblog">💬 Microblog</button>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- Microblog Side Panel -->
+<aside id="microblog-panel" class="microblog-panel" tabindex="-1" aria-label="Microblog panel">
+  <div class="microblog-panel-header">
+    <button id="microblog-close-btn" class="microblog-close-btn" aria-label="Close Microblog">&times;</button>
+    <h2 class="microblog-panel-title">Microblog</h2>
+  </div>
+  <div class="microblog-panel-content">
+    <!-- MicroBlog Container -->
+    <div id="microblog-playground">
+      <em>Loading microblog posts...</em>
+    </div>
+  </div>
+</aside>
 
-<!-- MicroBlog Container -->
-<div id="microblog-playground">
-  <em>Loading microblog posts...</em>
-</div>
+<script>
+// Microblog panel open/close logic
+const microblogPanel = document.getElementById('microblog-panel');
+const microblogFab = document.getElementById('microblog-toggle-btn');
+const microblogCloseBtn = document.getElementById('microblog-close-btn');
+
+function openMicroblogPanel() {
+  microblogPanel.classList.add('open');
+  microblogFab.style.display = 'none';
+}
+function closeMicroblogPanel() {
+  microblogPanel.classList.remove('open');
+  microblogFab.style.display = '';
+}
+microblogFab.onclick = openMicroblogPanel;
+microblogCloseBtn.onclick = closeMicroblogPanel;
+</script>
 
 <!-- Create/Edit Modal Overlay using Tailwind -->
 <div id="microblog-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-  <div class="bg-blue-500 rounded-lg shadow-lg w-full max-w-lg mx-2 p-6 relative">
-    <button id="modal-close" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-    <h2 id="modal-title" class="text-xl font-bold mb-4">Create Microblog Post</h2>
+  <div class="microblog-modal-panel">
+    <div class="microblog-modal-header">
+      <button id="modal-close" class="microblog-modal-close" aria-label="Close Modal">&times;</button>
+      <h2 id="modal-title" class="microblog-modal-title">Create Microblog Post</h2>
+    </div>
     <form id="microblog-form" class="space-y-4">
       <input type="hidden" id="post-id" name="id">
       <div>
         <label class="block text-sm font-medium text-gray-700">Topic</label>
         <input id="topic-id" name="topicId" type="text" class="mt-1 block w-full border border-gray-300 rounded-md p-2" readonly>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Content <span class="text-red-500">*</span></label>
-        <textarea id="content" name="content" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+      <div class="microblog-form-group">
+        <label for="content" class="microblog-form-label">Content <span class="required">*</span></label>
+        <textarea id="content" name="content" required class=""></textarea>
       </div>
       <div class="flex justify-end space-x-2">
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
@@ -33,14 +59,16 @@
 
 <!-- Reply Modal -->
 <div id="reply-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-  <div class="bg-blue-500 rounded-lg shadow-lg w-full max-w-lg mx-2 p-6 relative">
-    <button id="reply-modal-close" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-    <h2 id="reply-modal-title" class="text-xl font-bold mb-4">Reply to Post</h2>
+  <div class="microblog-modal-panel">
+    <div class="microblog-modal-header">
+      <button id="reply-modal-close" class="microblog-modal-close" aria-label="Close Reply Modal">&times;</button>
+      <h2 id="reply-modal-title" class="microblog-modal-title">Reply to Post</h2>
+    </div>
     <form id="reply-form" class="space-y-4">
       <input type="hidden" id="reply-post-id" name="postId">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Content <span class="text-red-500">*</span></label>
-        <textarea id="reply-content" name="content" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+      <div class="microblog-form-group">
+        <label for="reply-content" class="microblog-form-label">Content <span class="required">*</span></label>
+        <textarea id="reply-content" name="content" required class=""></textarea>
       </div>
       <div class="flex justify-end space-x-2">
         <button type="button" id="reply-cancel-btn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Cancel</button>
@@ -130,7 +158,7 @@ async function loadRepliesForPost(postId) {
         const repliesHtml = replies.map(reply => {
           const replyDate = reply.timestamp ? new Date(reply.timestamp).toLocaleString() : '';
           return `
-            <div class="reply-item ml-4 mt-2 p-2 bg-gray-100 rounded border-l-4 border-green-500">
+            <div class="reply-item ml-4 mt-2 p-2 rounded border-l-4 border-green-500">
               <div class="text-sm text-gray-600">
                 ${reply.userName || 'Anonymous'} - ${replyDate}
               </div>
@@ -194,17 +222,17 @@ async function renderMicroblogTable() {
         // API call to Read former Posts
         const data = await fetchPosts(pageArg);
         // SVG icons for Create (+) and Edit (pencil)
-        const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
-        const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 ml-1 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
-        const replyIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 ml-1 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>`;
+        const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
+        const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
+        const replyIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>`;
         // Single page icon (default)
-        const pageIcon = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white mx-1 cursor-pointer" id="page-icon"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="4" width="12" height="16" rx="2" fill="white" stroke="white" stroke-width="1.5"/><rect x="8" y="6" width="8" height="12" rx="1" fill="purple" stroke="white" stroke-width="1.5"/></svg></span>`;
+        const pageIcon = `<span class="microblog-filter-icon microblog-filter-page" id="page-icon" title="Show this page only"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="4" width="12" height="16" rx="2" fill="white" stroke="white" stroke-width="1.5"/><rect x="8" y="6" width="8" height="12" rx="1" fill="#9333ea" stroke="white" stroke-width="1.5"/></svg></span>`;
         // Many pages icon (secondary option)
-        const manyPagesIcon = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white mx-1 cursor-pointer" id="many-pages-icon"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><g><rect x="7" y="15" width="10" height="6" rx="2" fill="#60a5fa" stroke="white" stroke-width="1.2"/><rect x="5" y="11" width="12" height="6" rx="2" fill="#2563eb" stroke="white" stroke-width="1.2"/><rect x="3" y="7" width="12" height="6" rx="2" fill="#1e40af" stroke="white" stroke-width="1.2"/></g></svg></span>`;
+        const manyPagesIcon = `<span class="microblog-filter-icon microblog-filter-many" id="many-pages-icon" title="Show all pages"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><g><rect x="7" y="15" width="10" height="6" rx="2" fill="#60a5fa" stroke="white" stroke-width="1.2"/><rect x="5" y="11" width="12" height="6" rx="2" fill="#2563eb" stroke="white" stroke-width="1.2"/><rect x="3" y="7" width="12" height="6" rx="2" fill="#1e40af" stroke="white" stroke-width="1.2"/></g></svg></span>`;
         // Create and Page Icons
         const controlsInfo = `
-          <span id="filter-icons" class="flex items-center" style="color:white;">
-            <button id="create-btn" class="bg-green-600 text-white px-2 py-1 rounded-full hover:bg-green-700 flex items-center justify-center w-8 h-8">${createIcon}</button>
+          <span id="filter-icons" class="microblog-filter-controls">
+            <button id="create-btn" class="microblog-btn microblog-btn-create" title="Create Post">${createIcon}</button>
             ${pageIcon}
             ${manyPagesIcon}
           </span>

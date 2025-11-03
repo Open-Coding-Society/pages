@@ -11,974 +11,832 @@ tags: [backend, submodule, zombies]
 author: "Zombies Team"
 date: 2025-10-21
 microblog: True
+footer:
+  previous: /west-coast/backend/submodule_3/
+  home: /west-coast/sports/
 ---
 
 
-# Submodule 4
-
-<!-- Style and Formatting -->
-<style>
-   * {
-       margin: 0;
-       padding: 0;
-       box-sizing: border-box;
-   }
-
-
-   body {
-       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-       background: linear-gradient(135deg, #0c4c88 0%, #69be28 100%);
-       padding: 20px;
-       min-height: 100vh;
-   }
-
-
-   .container {
-       max-width: 1400px;
-       margin: 0 auto;
-   }
-
-
-   .header {
-       background: linear-gradient(135deg, #001489 0%, #A5ACAF 100%);
-       color: white;
-       padding: 40px;
-       text-align: center;
-       border-radius: 20px;
-       margin-bottom: 30px;
-       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-   }
-
-
-   .header h1 {
-       font-size: 2.5em;
-       margin-bottom: 10px;
-   }
-
-
-   .header p {
-       font-size: 1.2em;
-       opacity: 0.9;
-   }
-
-
-   .concept-section {
-       background: white;
-       padding: 35px;
-       border-radius: 15px;
-       margin-bottom: 30px;
-       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-       border-left: 6px solid #69be28;
-   }
-
-
-   .concept-section h2 {
-       color: #2c3e50 !important;
-       margin-bottom: 20px;
-       font-size: 1.9em;
-   }
-
-
-   .coding-concepts {
-       display: grid;
-       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-       gap: 20px;
-       margin-top: 20px;
-   }
-
-
-   .concept-card {
-       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-       color: white;
-       padding: 25px;
-       border-radius: 15px;
-       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-       transition: transform 0.3s;
-   }
-
-
-   .concept-card:hover {
-       transform: translateY(-5px);
-   }
-
-
-   .concept-card h3 {
-       margin-bottom: 15px;
-       font-size: 1.4em;
-   }
-
-
-   .concept-card p {
-       line-height: 1.6;
-       opacity: 0.95;
-   }
-
-
-   .interactive-section {
-       background: white;
-       padding: 35px;
-       border-radius: 15px;
-       margin-bottom: 30px;
-       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-   }
-
-
-   .interactive-section h2 {
-       color: #2c3e50 !important;
-       margin-bottom: 25px;
-       font-size: 1.9em;
-       text-align: center;
-   }
-
-
-   .filter-controls {
-       display: flex;
-       gap: 15px;
-       justify-content: center;
-       margin-bottom: 30px;
-       flex-wrap: wrap;
-   }
-
-
-   .filter-btn {
-       background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-       color: white;
-       border: none;
-       padding: 12px 30px;
-       border-radius: 10px;
-       cursor: pointer;
-       font-size: 1em;
-       font-weight: bold;
-       transition: all 0.3s;
-       box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
-   }
-
-
-   .filter-btn:hover {
-       transform: translateY(-3px);
-       box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-   }
-
-
-   .filter-btn.active {
-       background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-   }
-
-
-   .stadium-grid {
-       display: grid;
-       grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-       gap: 30px;
-       margin-bottom: 30px;
-   }
-
-
-   .stadium-card {
-       background: white;
-       border-radius: 20px;
-       overflow: hidden;
-       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-       transition: transform 0.3s, opacity 0.3s;
-   }
-
-
-   .stadium-card.hidden {
-       display: none;
-   }
-
-
-   .stadium-card:hover {
-       transform: translateY(-10px);
-   }
-
-
-   .seahawks-header {
-       background: linear-gradient(135deg, #002244 0%, #69be28 100%);
-       padding: 30px;
-       text-align: center;
-       color: white;
-   }
-
-
-   .mariners-header {
-       background: linear-gradient(135deg, #0C2C56 0%, #005C5C 100%);
-       padding: 30px;
-       text-align: center;
-       color: white;
-   }
-
-
-   .stadium-card h2 {
-       font-size: 2em;
-       margin-bottom: 10px;
-   }
-
-
-   .stadium-body {
-       padding: 30px;
-   }
-
-
-   .info-section {
-       margin-bottom: 25px;
-   }
-
-
-   .info-section h3 {
-       color: #2c3e50 !important;
-       margin-bottom: 15px;
-       font-size: 1.3em;
-       border-bottom: 2px solid #ecf0f1;
-       padding-bottom: 10px;
-   }
-
-
-   .info-grid {
-       display: grid;
-       grid-template-columns: repeat(2, 1fr);
-       gap: 12px;
-   }
-
-
-   .info-item {
-       background: #f8f9fa;
-       padding: 12px;
-       border-radius: 8px;
-       border-left: 3px solid #3498db;
-   }
-
-
-   .info-label {
-       font-size: 0.85em;
-       color: #7f8c8d;
-       margin-bottom: 5px;
-   }
-
-
-   .info-value {
-       font-size: 1.1em;
-       font-weight: bold;
-       color: #2c3e50;
-   }
-
-
-   .api-btn {
-       background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-       color: white;
-       border: none;
-       padding: 12px 25px;
-       border-radius: 8px;
-       cursor: pointer;
-       font-size: 1em;
-       font-weight: bold;
-       width: 100%;
-       margin-top: 15px;
-       transition: all 0.3s;
-   }
-
-
-   .api-btn:hover {
-       transform: scale(1.05);
-       box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
-   }
-
-
-   .api-response {
-       background: #2c3e50;
-       color: #00ff00;
-       padding: 15px;
-       border-radius: 8px;
-       font-family: 'Courier New', monospace;
-       font-size: 0.85em;
-       margin-top: 15px;
-       white-space: pre-wrap;
-       max-height: 200px;
-       overflow-y: auto;
-       display: none;
-   }
-
-
-   .api-response.active {
-       display: block;
-       animation: slideIn 0.3s ease-out;
-   }
-
-
-   @keyframes slideIn {
-       from {
-           opacity: 0;
-           transform: translateY(-10px);
-       }
-       to {
-           opacity: 1;
-           transform: translateY(0);
-       }
-   }
-
-
-   .code-demo {
-       background: white;
-       padding: 35px;
-       border-radius: 15px;
-       margin-bottom: 30px;
-       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-   }
-
-
-   .code-demo h2 {
-       color: #2c3e50 !important;
-       margin-bottom: 25px;
-       font-size: 1.9em;
-       text-align: center;
-   }
-
-
-   .code-tabs {
-       display: flex;
-       gap: 10px;
-       margin-bottom: 20px;
-       flex-wrap: wrap;
-   }
-
-
-   .code-tab {
-       background: #ecf0f1;
-       color: #2c3e50;
-       border: none;
-       padding: 12px 25px;
-       border-radius: 8px 8px 0 0;
-       cursor: pointer;
-       font-weight: bold;
-       transition: all 0.3s;
-   }
-
-
-   .code-tab.active {
-       background: #2c3e50;
-       color: #00ff00;
-   }
-
-
-   .code-block {
-       background: #2c3e50;
-       color: #00ff00;
-       padding: 25px;
-       border-radius: 0 10px 10px 10px;
-       font-family: 'Courier New', monospace;
-       font-size: 0.9em;
-       white-space: pre-wrap;
-       max-height: 400px;
-       overflow-y: auto;
-       display: none;
-   }
-
-
-   .code-block.active {
-       display: block;
-   }
-
-
-   .code-comment {
-       color: #95a5a6;
-   }
-
-
-   .code-keyword {
-       color: #e74c3c;
-   }
-
-
-   .code-string {
-       color: #f39c12;
-   }
-
-
-   .code-function {
-       color: #3498db;
-   }
-
-
-   .documentation {
-       background: white;
-       padding: 35px;
-       border-radius: 15px;
-       margin-bottom: 30px;
-       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-   }
-
-
-   .documentation h2 {
-       color: #2c3e50 !important;
-       margin-bottom: 25px;
-       font-size: 1.9em;
-       text-align: center;
-   }
-
-
-   .doc-section {
-       background: #f8f9fa;
-       padding: 25px;
-       border-radius: 10px;
-       margin-bottom: 20px;
-       border-left: 4px solid #3498db;
-   }
-
-
-   .doc-section h3 {
-       color: #2c3e50 !important;
-       margin-bottom: 15px;
-   }
-
-
-   .endpoint {
-       background: white;
-       padding: 15px;
-       border-radius: 8px;
-       margin-bottom: 15px;
-       border: 2px solid #ecf0f1;
-   }
-
-
-   .endpoint-path {
-       background: #2c3e50;
-       color: #00ff00;
-       padding: 8px 15px;
-       border-radius: 5px;
-       font-family: 'Courier New', monospace;
-       margin-bottom: 10px;
-       display: inline-block;
-   }
-
-
-   .endpoint-desc {
-       color: #555 !important;
-       line-height: 1.6;
-       margin: 10px 0;
-   }
-
-
-   .param-list {
-       background: #f8f9fa;
-       padding: 15px;
-       border-radius: 5px;
-       margin-top: 10px;
-   }
-
-
-   .param-list dt {
-       font-weight: bold;
-       color: #2c3e50;
-       margin-top: 10px;
-   }
-
-
-   .param-list dd {
-       color: #555;
-       margin-left: 20px;
-       margin-bottom: 10px;
-   }
-
-
-   .learning-goals {
-       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-       color: white;
-       padding: 40px;
-       border-radius: 20px;
-       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-   }
-
-
-   .learning-goals h2 {
-       text-align: center;
-       margin-bottom: 25px;
-       font-size: 2em;
-   }
-
-
-   .learning-goals ul {
-       line-height: 2;
-       font-size: 1.1em;
-       list-style: none;
-   }
-
-
-   .learning-goals li {
-       margin-bottom: 15px;
-       padding-left: 35px;
-       position: relative;
-   }
-
-
-   .learning-goals li:before {
-       content: "✓";
-       position: absolute;
-       left: 0;
-       font-weight: bold;
-       font-size: 1.3em;
-   }
-
-
-   .map-container {
-       background: #f8f9fa;
-       padding: 20px;
-       border-radius: 10px;
-       margin-top: 20px;
-       text-align: center;
-   }
-
-
-   .map-placeholder {
-       background: #ecf0f1;
-       height: 200px;
-       border-radius: 10px;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       font-size: 1.2em;
-       color: #7f8c8d;
-   }
-
-
-   @media (max-width: 768px) {
-       .stadium-grid {
-           grid-template-columns: 1fr;
-       }
-   }
-</style>
-
-<!-- End of Formatting and Beginning of info for stadiums -->
-
-<!-- Header Section - Displays title "Seattle Sports + Travel + Data" -->
-
-<div class="container">
-   <div class="header">
-       <h1> Seattle Sports + Travel + Data</h1>
-       <p>Lumen Field & T-Mobile Park - Interactive Dashboard</p>
-   </div>
-
-<!-- Concept Section – Explains four coding concepts (Variables, Conditionals, Functions, APIs) using simple language. -->
-
-   <div class="concept-section">
-       <h2> Coding Concepts in Action</h2>
-       <div class="coding-concepts">
-           <div class="concept-card">
-               <h3> Variables</h3>
-               <p>Store city names, stadium info, coordinates, and ticket prices. Think of variables as labeled boxes that hold data!</p>
-           </div>
-           <div class="concept-card">
-               <h3> Conditionals</h3>
-               <p>Decide what info to show based on user input (like "show football stadiums only"). IF this, THEN that!</p>
-           </div>
-           <div class="concept-card">
-               <h3> Functions</h3>
-               <p>Handle repeated tasks like getStadiumInfo() and filterBySport(). Write once, use many times!</p>
-           </div>
-           <div class="concept-card">
-               <h3> APIs</h3>
-               <p>Pull live data like team schedules, weather, or ticket prices from external sources.</p>
-           </div>
-       </div>
-   </div>
-
-<!-- Interactive Section – Lets users click buttons to filter stadiums: -->
-   <div class="interactive-section">
-       <h2> Interactive Filter - Try Conditionals!</h2>
-       <div class="filter-controls">
-           <button class="filter-btn active" onclick="filterStadiums('all')">Show All </button>
-           <button class="filter-btn" onclick="filterStadiums('football')">Football Only </button>
-           <button class="filter-btn" onclick="filterStadiums('baseball')">Baseball Only </button>
-       </div>
-
-<!-- beginning of Seattle Seahawk section -->
-       <div class="stadium-grid">
-           <div class="stadium-card" data-sport="football">
-               <div class="seahawks-header">
-                   <h2> Lumen Field</h2>
-                   <p>Home of the Seattle Seahawks</p>
-               </div>
-               <div class="stadium-body">
-                   <div class="info-section">
-                       <h3> Location Data (Variables)</h3>
-                       <div class="info-grid">
-                           <div class="info-item">
-                               <div class="info-label">City</div>
-                               <div class="info-value">Seattle, WA</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Coordinates</div>
-                               <div class="info-value">47.5952°N, 122.3316°W</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Capacity</div>
-                               <div class="info-value">68,740</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Opened</div>
-                               <div class="info-value">2002</div>
-                           </div>
-                       </div>
-                   </div>
-
-
-                   <div class="info-section">
-                       <h3> Ticket Pricing</h3>
-                       <div class="info-grid">
-                           <div class="info-item">
-                               <div class="info-label">Average Price</div>
-                               <div class="info-value">$125</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Price Range</div>
-                               <div class="info-value">$65 - $350</div>
-                           </div>
-                       </div>
-                   </div>
-
-
-                   <button class="api-btn" onclick="fetchStadiumData('lumen')">
-                        Call API - Get Live Data
-                   </button>
-                   <div id="lumen-response" class="api-response"></div>
-               </div>
-           </div>
-
-<!-- end of seahawk section and beginning of Mariners section -->
-           <div class="stadium-card" data-sport="baseball">
-               <div class="mariners-header">
-                   <h2> T-Mobile Park</h2>
-                   <p>Home of the Seattle Mariners</p>
-               </div>
-               <div class="stadium-body">
-                   <div class="info-section">
-                       <h3> Location Data (Variables)</h3>
-                       <div class="info-grid">
-                           <div class="info-item">
-                               <div class="info-label">City</div>
-                               <div class="info-value">Seattle, WA</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Coordinates</div>
-                               <div class="info-value">47.5914°N, 122.3326°W</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Capacity</div>
-                               <div class="info-value">47,929</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Opened</div>
-                               <div class="info-value">1999</div>
-                           </div>
-                       </div>
-                   </div>
-
-
-                   <div class="info-section">
-                       <h3> Ticket Pricing</h3>
-                       <div class="info-grid">
-                           <div class="info-item">
-                               <div class="info-label">Average Price</div>
-                               <div class="info-value">$45</div>
-                           </div>
-                           <div class="info-item">
-                               <div class="info-label">Price Range</div>
-                               <div class="info-value">$15 - $175</div>
-                           </div>
-                       </div>
-                   </div>
-
-
-                   <button class="api-btn" onclick="fetchStadiumData('tmobile')">
-                        Call API - Get Live Data
-                   </button>
-                   <div id="tmobile-response" class="api-response"></div>
-               </div>
-           </div>
-       </div>
-   </div>
-<!-- End of Mariners section -->
-
-<!-- Code Demo Section – Shows example code for each concept (Variables, Conditionals, Functions, API) in color-coded blocks that you can toggle between with buttons. -->
-   <div class="code-demo">
-       <h2> Code Examples</h2>
-       <div class="code-tabs">
-           <button class="code-tab active" onclick="showCode('variables')">Variables</button>
-           <button class="code-tab" onclick="showCode('conditionals')">Conditionals</button>
-           <button class="code-tab" onclick="showCode('functions')">Functions</button>
-           <button class="code-tab" onclick="showCode('api')">API Call</button>
-       </div>
-
-
-       <div id="code-variables" class="code-block active"><span class="code-comment">// VARIABLES - Storing stadium data</span>
-
-
-<span class="code-keyword">let</span> city = <span class="code-string">"Seattle"</span>;
-<span class="code-keyword">let</span> stadiumName = <span class="code-string">"Lumen Field"</span>;
-<span class="code-keyword">let</span> coordinates = { lat: 47.5952, lng: -122.3316 };
-<span class="code-keyword">let</span> ticketPrice = 125;
-<span class="code-keyword">let</span> capacity = 68740;
-
-
-<span class="code-comment">// Variables store data for easy access and reuse</span>
-console.log(`${stadiumName} in ${city} holds ${capacity} fans`);</div>
-
-
-       <div id="code-conditionals" class="code-block"><span class="code-comment">// CONDITIONALS - Filtering based on sport</span>
-
-
-<span class="code-keyword">function</span> <span class="code-function">filterBySport</span>(sport) {
-   <span class="code-keyword">if</span> (sport === <span class="code-string">"football"</span>) {
-       <span class="code-comment">// Show only football stadiums</span>
-       showStadium(<span class="code-string">"Lumen Field"</span>);
-   } <span class="code-keyword">else if</span> (sport === <span class="code-string">"baseball"</span>) {
-       <span class="code-comment">// Show only baseball stadiums</span>
-       showStadium(<span class="code-string">"T-Mobile Park"</span>);
-   } <span class="code-keyword">else</span> {
-       <span class="code-comment">// Show all stadiums</span>
-       showAllStadiums();
-   }
-}
-
-
-<span class="code-comment">// Conditionals make decisions based on conditions</span>
-<span class="code-function">filterBySport</span>(<span class="code-string">"football"</span>); <span class="code-comment">// Shows Lumen Field only</span></div>
-
-
-       <div id="code-functions" class="code-block"><span class="code-comment">// FUNCTIONS - Reusable code blocks</span>
-
-
-<span class="code-keyword">function</span> <span class="code-function">getStadiumInfo</span>(stadiumId) {
-   <span class="code-keyword">const</span> stadiums = {
-       lumen: {
-           name: <span class="code-string">"Lumen Field"</span>,
-           sport: <span class="code-string">"Football"</span>,
-           capacity: 68740,
-           tickets: { avg: 125, min: 65, max: 350 }
-       },
-       tmobile: {
-           name: <span class="code-string">"T-Mobile Park"</span>,
-           sport: <span class="code-string">"Baseball"</span>,
-           capacity: 47929,
-           tickets: { avg: 45, min: 15, max: 175 }
-       }
-   };
-  
-   <span class="code-keyword">return</span> stadiums[stadiumId];
-}
-
-
-<span class="code-comment">// Call the function whenever needed</span>
-<span class="code-keyword">let</span> info = <span class="code-function">getStadiumInfo</span>(<span class="code-string">"lumen"</span>);
-console.log(info);</div>
-
-
-       <div id="code-api" class="code-block"><span class="code-comment">// API - Fetching live data</span>
-
-
-<span class="code-keyword">async function</span> <span class="code-function">fetchStadiumData</span>(stadiumId) {
-   <span class="code-keyword">try</span> {
-       <span class="code-comment">// Make API request</span>
-       <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> fetch(
-           <span class="code-string">`https://api.sports.com/stadiums/${stadiumId}`</span>
-       );
-      
-       <span class="code-comment">// Parse JSON response</span>
-       <span class="code-keyword">const</span> data = <span class="code-keyword">await</span> response.json();
-      
-       <span class="code-comment">// Return stadium info with live updates</span>
-       <span class="code-keyword">return</span> {
-           stadium: data.name,
-           nextGame: data.schedule.next,
-           weather: data.weather.current,
-           ticketsAvailable: data.tickets.available
-       };
-      
-   } <span class="code-keyword">catch</span> (error) {
-       console.error(<span class="code-string">"API Error:"</span>, error);
-   }
-}
-
-
-<span class="code-comment">// APIs connect your code to real-world data!</span></div>
-   </div>
-
-<!-- End of Code Demo Section and Beginning of API Documentation Section - Describing API used -->
-
-   <div class="documentation">
-       <h2> API Documentation</h2>
-      
-       <div class="doc-section">
-           <h3>Available Endpoints</h3>
-          
-           <div class="endpoint">
-               <div class="endpoint-path">GET /api/stadium/{stadium_id}</div>
-               <p class="endpoint-desc"><strong>Description:</strong> Retrieves detailed information about a specific stadium.</p>
-               <div class="param-list">
-                   <strong>Parameters:</strong>
-                   <dl>
-                       <dt>stadium_id (required)</dt>
-                       <dd>String - Either "lumen" or "tmobile"</dd>
-                   </dl>
-                   <strong>Returns:</strong>
-                   <dl>
-                       <dt>name</dt>
-                       <dd>String - Stadium name</dd>
-                       <dt>sport</dt>
-                       <dd>String - Sport type (Football/Baseball)</dd>
-                       <dt>capacity</dt>
-                       <dd>Number - Maximum seating capacity</dd>
-                       <dt>coordinates</dt>
-                       <dd>Object - Latitude and longitude</dd>
-                       <dt>tickets</dt>
-                       <dd>Object - Average, min, and max prices</dd>
-                   </dl>
-               </div>
-           </div>
-
-
-           <div class="endpoint">
-               <div class="endpoint-path">GET /api/filter?sport={sport_type}</div>
-               <p class="endpoint-desc"><strong>Description:</strong> Filters stadiums by sport type.</p>
-               <div class="param-list">
-                   <strong>Parameters:</strong>
-                   <dl>
-                       <dt>sport_type (required)</dt>
-                       <dd>String - "football", "baseball", or "all"</dd>
-                   </dl>
-                   <strong>Returns:</strong>
-                   <dl>
-                       <dt>stadiums</dt>
-                       <dd>Array - List of matching stadiums</dd>
-                       <dt>count</dt>
-                       <dd>Number - Total number of results</dd>
-                   </dl>
-               </div>
-           </div>
-       </div>
-
-
-       <div class="doc-section">
-           <h3>Testing & Refinement</h3>
-           <p class="endpoint-desc">✓ All endpoints tested with valid and invalid inputs<br>
-           ✓ Error handling implemented for missing parameters<br>
-           ✓ Response times optimized to under 200ms<br>
-           ✓ Documentation kept up-to-date with all changes</p>
-       </div>
-   </div>
-
-<!-- Learning Goals Section -->
-
-   <div class="learning-goals">
-       <h2> Learning Goals Achieved</h2>
-       <ul>
-           <li>Connected coding concepts (variables, conditionals, functions, APIs) to real-world sports and travel</li>
-           <li>Learned how variables store important data like city names, coordinates, and ticket prices</li>
-           <li>Used conditionals to filter and display information based on user choices</li>
-           <li>Created reusable functions to handle repeated tasks efficiently</li>
-           <li>Understood how APIs pull live data from external sources</li>
-           <li>Practiced testing code to ensure it works correctly</li>
-           <li>Created clear documentation for API endpoints and parameters</li>
-           <li>Refined the application by fixing bugs and adding new features</li>
-       </ul>
-   </div>
-</div>
-
-<!-- End of Learning Goals section and beginning of script-->
-
-
-<script>
-    // Stores all stadium information in local Javascript object (mini database)
-   const stadiumDatabase = {
-       lumen: {
-           name: "Lumen Field",
-           team: "Seattle Seahawks",
-           sport: "Football",
-           city: "Seattle, WA",
-           capacity: 68740,
-           opened: 2002,
-           coordinates: { lat: 47.5952, lng: -122.3316 },
-           tickets: { average: 125, min: 65, max: 350 },
-           nextGame: "vs 49ers - Sunday 1:00 PM",
-           weather: "Partly Cloudy, 62°F"
-       },
-       tmobile: {
-           name: "T-Mobile Park",
-           team: "Seattle Mariners",
-           sport: "Baseball",
-           city: "Seattle, WA",
-           capacity: 47929,
-           opened: 1999,
-           coordinates: { lat: 47.5914, lng: -122.3326 },
-           tickets: { average: 45, min: 15, max: 175 },
-           nextGame: "vs Yankees - Tuesday 7:10 PM",
-           weather: "Clear, 68°F"
-       }
-   };
-
-// Controls which stadium cards appear based on the selected sport button
-   function filterStadiums(sport) {
-       const cards = document.querySelectorAll('.stadium-card');
-       const buttons = document.querySelectorAll('.filter-btn');
-      
-       buttons.forEach(btn => btn.classList.remove('active'));
-       event.target.classList.add('active');
-      
-       if (sport === 'all') {
-           cards.forEach(card => card.classList.remove('hidden'));
-       } else {
-           cards.forEach(card => {
-               if (card.dataset.sport === sport) {
-                   card.classList.remove('hidden');
-               } else {
-                   card.classList.add('hidden');
-               }
-           });
-       }
-   }
-
-//retrives a single stadium's data from the "stadiumDatabase"
-   function getStadiumInfo(stadiumId) {
-       return stadiumDatabase[stadiumId];
-   }
-
-//Stimulates an API call(fake backend request)
-//After 0.5s delay, retrieves stadium info from "stadiumDatabase", Formats data like a JSON API response, and Displays data below the button
-   function fetchStadiumData(stadiumId) {
-       const responseDiv = document.getElementById(`${stadiumId}-response`);
-      
-       setTimeout(() => {
-           const data = getStadiumInfo(stadiumId);
-           const apiResponse = {
-               status: 200,
-               message: "Success",
-               data: {
-                   stadium: data.name,
-                   team: data.team,
-                   capacity: data.capacity,
-                   nextGame: data.nextGame,
-                   weather: data.weather,
-                   ticketPrice: `${data.tickets.average}`,
-                   coordinates: data.coordinates
-               },
-               timestamp: new Date().toISOString()
-           };
-
-
-           responseDiv.textContent = JSON.stringify(apiResponse, null, 2);
-           responseDiv.classList.add('active');
-          
-           responseDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-       }, 500);
-   }
-
-// Handles switching between 4 code examples (Variables, conditionals, Functions, and API Calls) when clicking each code-tab button
-   function showCode(type) {
-       const tabs = document.querySelectorAll('.code-tab');
-       const blocks = document.querySelectorAll('.code-block');
-      
-       tabs.forEach(tab => tab.classList.remove('active'));
-       blocks.forEach(block => block.classList.remove('active'));
-      
-       event.target.classList.add('active');
-       document.getElementById(`code-${type}`).classList.add('active');
-   }
-</script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stop 4: Seattle — Parsing and Utilizing the Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+       
+        }
+
+
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+           
+            background: white;
+            border-radius: 20px;
+         
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #002244 0%, #69BE28 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .concept-box {
+            background: #ffffff;
+            padding: 25px;
+            border-left: 5px solid #69BE28;
+            margin: 25px;
+            border-radius: 8px;
+        }
+
+
+
+        .concept-box h2 {
+            color: #002244 !important;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .concept-box p {
+            color: #000000 !important;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .concept-box li {
+            color: #000000 !important;
+            line-height: 1.8;
+        }
+
+        .concept-box p strong {
+            color: #000000 !important;
+        }
+
+        .concept-box code {
+            background: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #d63384;
+            font-family: 'Courier New', monospace;
+        }
+
+        .analogy-box {
+            background: white;
+            padding: 35px;
+            margin: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 3px solid #69BE28;
+        }
+
+        .analogy-box h2 {
+            color: #002244 !important;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .analogy-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #dee2e6;
+        }
+
+
+
+        .analogy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .highlight-card {
+            background: linear-gradient(135deg, #002244 0%, #69BE28 100%);
+            border-color: #002244;
+        }
+
+        .highlight-card h3,
+        .highlight-card p {
+            color: white !important;
+        }
+
+        .analogy-icon {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #002244;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .highlight-card .analogy-icon {
+            color: white;
+        }
+
+        .analogy-card h3 {
+            color: #002244 !important;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .analogy-card p {
+            color: #495057 !important;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .interactive-section {
+            background: white;
+            padding: 35px;
+            margin: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 3px solid #002244;
+        }
+
+        .interactive-section h2 {
+            color: #002244 !important;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .section-description {
+            text-align: center;
+            color: #495057 !important;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        .team-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .team-btn {
+            background: white;
+            color: #002244;
+            border: 3px solid #dee2e6;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .team-btn:hover {
+            border-color: #69BE28;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-btn.football:hover {
+            background: linear-gradient(135deg, #002244 0%, #69BE28 100%);
+            color: white;
+        }
+
+        .team-btn.baseball:hover {
+            background: linear-gradient(135deg, #0C2C56 0%, #005C5C 100%);
+            color: white;
+        }
+
+        .team-btn.hockey:hover {
+            background: linear-gradient(135deg, #001628 0%, #96D8D8 100%);
+            color: white;
+        }
+
+        .team-btn.college:hover {
+            background: linear-gradient(135deg, #4B2E83 0%, #B7A57A 100%);
+            color: white;
+        }
+
+        .json-display {
+            background: #2c3e50;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .parsed-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #69BE28;
+            margin: 20px 0;
+        }
+
+        .parsed-display h3 {
+            color: #002244 !important;
+            margin-bottom: 15px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #69BE28;
+        }
+
+        .stat-label {
+            color: #002244 !important;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            color: #495057 !important;
+            font-family: 'Courier New', monospace;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #002244 0%, #69BE28 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 34, 68, 0.3);
+        }
+
+        .key-learning {
+            background: linear-gradient(135deg, #002244 0%, #69BE28 100%);
+            color: white;
+            padding: 25px;
+            margin: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .key-learning h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .calculation-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #002244;
+        }
+
+        .calculation-box h4 {
+            color: #002244 !important;
+            margin-bottom: 10px;
+        }
+
+        .calculation-result {
+            background: #69BE28;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .code-example {
+            background: #2c3e50;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-comment {
+            color: #7f8c8d;
+        }
+
+        .code-keyword {
+            color: #3498db;
+        }
+
+        .code-string {
+            color: #2ecc71;
+        }
+
+        .code-number {
+            color: #e74c3c;
+        }
+
+        .no-sports-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ffc107;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .debug-info {
+            background: #e3f2fd;
+            border: 2px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+   
+    <div class="container">
+        <div class="header">
+            <h1>Stop 4: Seattle — "Parsing and Utilizing the Data"</h1>
+            <p>Transform JSON into Actionable Insights</p>
+        </div>
+
+        <div class="concept-box">
+            <h2>Coding Concept: JSON Parsing & Data Utilization</h2>
+            <p><strong>The raw response data needs to be converted into a usable format for analysis.</strong></p>
+            <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                <li><strong>Action:</strong> The received JSON text is parsed (converted) into a native data structure (like a list of dictionaries/objects)</li>
+                <li><strong>Purpose:</strong> Once parsed, you can easily access specific stats (e.g., team wins, player points per game) by referencing the correct keys and indexes</li>
+                <li><strong>Usage:</strong> Use this data for calculations, visualizations, or storing it in a database for your statistical analysis</li>
+            </ul>
+        </div>
+
+        <div class="analogy-box">
+            <h2>Understanding JSON Parsing: The Sports Statistics Analogy</h2>
+            <div class="analogy-grid">
+                <div class="analogy-card">
+                    <div class="analogy-icon">Raw Data</div>
+                    <h3>The Game Footage</h3>
+                    <p>Raw JSON is like unprocessed game footage - contains all the data but needs organization</p>
+                </div>
+                <div class="analogy-card">
+                    <div class="analogy-icon">Parser</div>
+                    <h3>The Stats Crew</h3>
+                    <p>JSON parser is like the statistics crew that watches and organizes every play into categories</p>
+                </div>
+                <div class="analogy-card">
+                    <div class="analogy-icon">Structure</div>
+                    <h3>The Stat Sheet</h3>
+                    <p>Parsed data becomes an organized stat sheet - easy to read and analyze specific metrics</p>
+                </div>
+                <div class="analogy-card highlight-card">
+                    <div class="analogy-icon">Access</div>
+                    <h3>Quick Lookup</h3>
+                    <p>You can now instantly find any stat: "Show me rushing yards" or "What's the win percentage?"</p>
+                </div>
+                <div class="analogy-card">
+                    <div class="analogy-icon">Calculate</div>
+                    <h3>Advanced Analytics</h3>
+                    <p>Perform calculations like averages, totals, and trends from the organized data</p>
+                </div>
+                <div class="analogy-card">
+                    <div class="analogy-icon">Visualize</div>
+                    <h3>Create Graphics</h3>
+                    <p>Transform parsed stats into charts, graphs, and visual reports for analysis</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="interactive-section">
+            <h2>Interactive JSON Parsing Demo</h2>
+            <p class="section-description">Select a Seattle sports team to see raw JSON and how it's parsed</p>
+            
+            <!-- Debug info -->
+            <div class="debug-info" id="debugInfo" style="display: none;"></div>
+            
+            <div class="team-buttons" id="teamButtons">
+                <!-- Team buttons will be dynamically inserted here -->
+            </div>
+
+            <div id="rawJsonSection" style="display: none;">
+                <h3 style="color: #002244; margin: 20px 0 10px 0;">Step 1: Raw JSON Response from API</h3>
+                <div class="json-display" id="rawJson"></div>
+            </div>
+
+            <div id="parseSection" style="display: none;">
+                <button class="action-btn" onclick="parseData()">📊 Parse JSON into Usable Data</button>
+                <div class="code-example" id="codeExample"></div>
+            </div>
+
+            <div id="parsedSection" style="display: none;">
+                <div class="parsed-display">
+                    <h3>Step 2: Parsed Data Structure</h3>
+                    <div id="parsedData"></div>
+                </div>
+            </div>
+
+            <div id="utilizationSection" style="display: none;">
+                <h3 style="color: #002244; margin: 20px 0;">Step 3: Utilizing the Data</h3>
+                <button class="action-btn" onclick="calculateWinPercentage()">Calculate Win %</button>
+                <button class="action-btn" onclick="calculateAveragePoints()">Calculate Avg Points</button>
+                <button class="action-btn" onclick="getTotalAttendance()">Get Total Attendance</button>
+                
+                <div class="calculation-box" id="calculationResult" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="interactive-section">
+            <h2>Practical JSON Parsing Examples</h2>
+            <p class="section-description">See how different programming concepts extract and use the data</p>
+
+            <div class="calculation-box">
+                <h4>Example 1: Accessing Nested Data</h4>
+                <div class="code-example"><span class="code-comment">// Access team name from parsed JSON</span>
+<span class="code-keyword">const</span> teamName = parsedData.<span class="code-string">team</span>.<span class="code-string">name</span>;
+<span class="code-comment">// Result: "Seattle Seahawks"</span></div>
+            </div>
+
+            <div class="calculation-box">
+                <h4>Example 2: Iterating Through Arrays</h4>
+                <div class="code-example"><span class="code-comment">// Loop through all games to find total points</span>
+<span class="code-keyword">let</span> totalPoints = <span class="code-number">0</span>;
+parsedData.<span class="code-string">games</span>.<span class="code-keyword">forEach</span>(game => {
+    totalPoints += game.<span class="code-string">points</span>;
+});
+<span class="code-comment">// Calculate average</span>
+<span class="code-keyword">const</span> average = totalPoints / parsedData.<span class="code-string">games</span>.<span class="code-string">length</span>;</div>
+            </div>
+
+            <div class="calculation-box">
+                <h4>Example 3: Filtering Data</h4>
+                <div class="code-example"><span class="code-comment">// Find only winning games</span>
+<span class="code-keyword">const</span> wins = parsedData.<span class="code-string">games</span>.<span class="code-keyword">filter</span>(
+    game => game.<span class="code-string">result</span> === <span class="code-string">"Win"</span>
+);
+<span class="code-comment">// Result: array of only winning games</span></div>
+            </div>
+       
+        </div>
+
+        <div class="key-learning">
+            <h3>Key Learning</h3>
+            <p>JSON parsing transforms raw text data into structured objects you can navigate, calculate with, and analyze - just like converting raw game footage into organized statistics that coaches can actually use to make decisions!</p>
+        </div>
+    </div>
+
+    <script>
+        const teamDatabase = {
+            football: {
+                sportName: 'Football - Seahawks',
+                team: {
+                    name: "Seattle Seahawks",
+                    sport: "Football",
+                    league: "NFL",
+                    stadium: "Lumen Field",
+                    capacity: 68740
+                },
+                season: {
+                    year: 2024,
+                    wins: 7,
+                    losses: 3,
+                    gamesPlayed: 10
+                },
+                games: [
+                    { week: 1, opponent: "Broncos", points: 26, opponentPoints: 20, result: "Win", attendance: 68740 },
+                    { week: 2, opponent: "Patriots", points: 23, opponentPoints: 20, result: "Win", attendance: 65878 },
+                    { week: 3, opponent: "Dolphins", points: 24, opponentPoints: 3, result: "Win", attendance: 68231 },
+                    { week: 4, opponent: "Lions", points: 29, opponentPoints: 42, result: "Loss", attendance: 68654 },
+                    { week: 5, opponent: "Giants", points: 29, opponentPoints: 20, result: "Win", attendance: 68122 }
+                ]
+            },
+            baseball: {
+                sportName: 'Baseball - Mariners',
+                team: {
+                    name: "Seattle Mariners",
+                    sport: "Baseball",
+                    league: "MLB",
+                    stadium: "T-Mobile Park",
+                    capacity: 47929
+                },
+                season: {
+                    year: 2024,
+                    wins: 85,
+                    losses: 77,
+                    gamesPlayed: 162
+                },
+                games: [
+                    { game: 1, opponent: "Red Sox", runs: 5, opponentRuns: 3, result: "Win", attendance: 44128 },
+                    { game: 2, opponent: "Red Sox", runs: 2, opponentRuns: 4, result: "Loss", attendance: 42567 },
+                    { game: 3, opponent: "Angels", runs: 7, opponentRuns: 2, result: "Win", attendance: 38934 },
+                    { game: 4, opponent: "Angels", runs: 3, opponentRuns: 5, result: "Loss", attendance: 41223 },
+                    { game: 5, opponent: "Astros", runs: 6, opponentRuns: 4, result: "Win", attendance: 47929 }
+                ]
+            },
+            hockey: {
+                sportName: 'Ice Hockey - Kraken',
+                team: {
+                    name: "Seattle Kraken",
+                    sport: "Hockey",
+                    league: "NHL",
+                    stadium: "Climate Pledge Arena",
+                    capacity: 17151
+                },
+                season: {
+                    year: 2024,
+                    wins: 8,
+                    losses: 5,
+                    gamesPlayed: 13
+                },
+                games: [
+                    { game: 1, opponent: "Blues", goals: 3, opponentGoals: 2, result: "Win", attendance: 17151 },
+                    { game: 2, opponent: "Predators", goals: 3, opponentGoals: 0, result: "Win", attendance: 17151 },
+                    { game: 3, opponent: "Avalanche", goals: 2, opponentGoals: 5, result: "Loss", attendance: 17023 },
+                    { game: 4, opponent: "Hurricanes", goals: 4, opponentGoals: 1, result: "Win", attendance: 17151 },
+                    { game: 5, opponent: "Islanders", goals: 3, opponentGoals: 2, result: "Win", attendance: 16987 }
+                ]
+            },
+            college: {
+                sportName: 'College Football - Huskies',
+                team: {
+                    name: "Washington Huskies",
+                    sport: "Football",
+                    league: "NCAA",
+                    stadium: "Husky Stadium",
+                    capacity: 70138
+                },
+                season: {
+                    year: 2024,
+                    wins: 5,
+                    losses: 4,
+                    gamesPlayed: 9
+                },
+                games: [
+                    { week: 1, opponent: "Weber State", points: 35, opponentPoints: 3, result: "Win", attendance: 65234 },
+                    { week: 2, opponent: "Eastern Michigan", points: 30, opponentPoints: 9, result: "Win", attendance: 58432 },
+                    { week: 3, opponent: "Washington State", points: 24, opponentPoints: 19, result: "Win", attendance: 70138 },
+                    { week: 4, opponent: "Northwestern", points: 24, opponentPoints: 5, result: "Win", attendance: 52341 },
+                    { week: 5, opponent: "Rutgers", points: 21, opponentPoints: 18, result: "Win", attendance: 61287 }
+                ]
+            },
+
+        };
+
+        let currentTeam = null;
+        let parsedDataGlobal = null;
+
+        // Load user's selected sports from itinerary - EXACT COPY from first file
+        function loadUserSports() {
+            try {
+                const itinerary = JSON.parse(localStorage.getItem('westCoastItinerary'));
+                if (itinerary && itinerary.cities && itinerary.cities.Seattle) {
+                    const seattleSports = itinerary.cities.Seattle.sports;
+                    return seattleSports.map(sport => sport.name);
+                }
+            } catch (e) {
+                console.error('Error loading itinerary:', e);
+            }
+            return null;
+        }
+
+        // Map sport names to team keys - EXACT COPY from first file
+        function mapSportToKey(sportName) {
+            const sportMap = {
+                'Football - Seahawks': 'football',
+                'Baseball - Mariners': 'baseball',
+                'Ice Hockey - Kraken': 'hockey',
+                'College Football - Huskies': 'college'
+            };
+            return sportMap[sportName];
+        }
+
+        // Initialize team buttons - EXACT LOGIC from first file
+        function initializeTeamButtons() {
+            const teamButtonsContainer = document.getElementById('teamButtons');
+            const userSports = loadUserSports();
+            
+            // Debug info
+            const debugDiv = document.getElementById('debugInfo');
+            let debugText = `localStorage data: ${localStorage.getItem('westCoastItinerary')}\n\n`;
+            debugText += `User sports found: ${userSports ? userSports.join(', ') : 'None'}\n`;
+            debugDiv.textContent = debugText;
+            debugDiv.style.display = 'block';
+            
+            if (userSports && userSports.length > 0) {
+                // Show only user's selected sports
+                userSports.forEach(sportName => {
+                    const sportKey = mapSportToKey(sportName);
+                    if (sportKey && teamDatabase[sportKey]) {
+                        const sport = teamDatabase[sportKey];
+                        const button = document.createElement('button');
+                        button.className = `team-btn ${sportKey}`;
+                        button.onclick = () => loadTeamData(sportKey);
+                        
+                        let emoji = '🏈';
+                        if (sportKey === 'baseball') emoji = '⚾';
+                        else if (sportKey === 'hockey') emoji = '🏒';
+                        
+                        button.innerHTML = `${emoji} ${sport.team.name}<br><small>${sportName}</small>`;
+                        teamButtonsContainer.appendChild(button);
+                    }
+                });
+            } else {
+                // Fallback: show all teams if no itinerary found
+                Object.keys(teamDatabase).forEach(key => {
+                    const sport = teamDatabase[key];
+                    const button = document.createElement('button');
+                    button.className = `team-btn ${key}`;
+                    button.onclick = () => loadTeamData(key);
+                    
+                    let emoji = '🏈';
+                    if (key === 'baseball') emoji = '⚾';
+                    else if (key === 'hockey') emoji = '🏒';
+                    
+                    button.innerHTML = `${emoji} ${sport.team.name}<br><small>${sport.sportName}</small>`;
+                    teamButtonsContainer.appendChild(button);
+                });
+            }
+        }
+
+        function loadTeamData(team) {
+            currentTeam = team;
+            const data = teamDatabase[team];
+            
+            // Show raw JSON
+            document.getElementById('rawJsonSection').style.display = 'block';
+            document.getElementById('rawJson').textContent = JSON.stringify(data, null, 2);
+            
+            // Show parse button
+            document.getElementById('parseSection').style.display = 'block';
+            document.getElementById('codeExample').innerHTML = `<span class="code-comment">// Code to parse the JSON:</span>
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> fetch(<span class="code-string">'/api/team/${team}'</span>);
+<span class="code-keyword">const</span> rawText = <span class="code-keyword">await</span> response.<span class="code-string">text</span>();
+<span class="code-keyword">const</span> parsedData = JSON.<span class="code-string">parse</span>(rawText);
+
+<span class="code-comment">// Now parsedData is a JavaScript object!</span>`;
+            
+            // Hide other sections
+            document.getElementById('parsedSection').style.display = 'none';
+            document.getElementById('utilizationSection').style.display = 'none';
+            document.getElementById('calculationResult').style.display = 'none';
+        }
+
+        function parseData() {
+            if (!currentTeam) return;
+            
+            parsedDataGlobal = teamDatabase[currentTeam];
+            
+            // Show parsed structure
+            document.getElementById('parsedSection').style.display = 'block';
+            
+            let parsedHTML = `
+                <div class="stat-row">
+                    <span class="stat-label">Team Name:</span>
+                    <span class="stat-value">${parsedDataGlobal.team.name}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Sport:</span>
+                    <span class="stat-value">${parsedDataGlobal.team.sport}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Stadium:</span>
+                    <span class="stat-value">${parsedDataGlobal.team.stadium}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Season Record:</span>
+                    <span class="stat-value">${parsedDataGlobal.season.wins}W - ${parsedDataGlobal.season.losses}L</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Games in Dataset:</span>
+                    <span class="stat-value">${parsedDataGlobal.games.length} games</span>
+                </div>
+            `;
+            
+            document.getElementById('parsedData').innerHTML = parsedHTML;
+            document.getElementById('utilizationSection').style.display = 'block';
+        }
+
+        function calculateWinPercentage() {
+            if (!parsedDataGlobal) return;
+            
+            const wins = parsedDataGlobal.season.wins;
+            const total = parsedDataGlobal.season.gamesPlayed;
+            const percentage = ((wins / total) * 100).toFixed(1);
+            
+            const resultBox = document.getElementById('calculationResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <h4>Win Percentage Calculation</h4>
+                <div class="code-example"><span class="code-comment">// Accessing parsed data:</span>
+<span class="code-keyword">const</span> wins = parsedData.season.wins;  <span class="code-comment">// ${wins}</span>
+<span class="code-keyword">const</span> total = parsedData.season.gamesPlayed;  <span class="code-comment">// ${total}</span>
+<span class="code-keyword">const</span> percentage = (wins / total) * <span class="code-number">100</span>;</div>
+                <div class="calculation-result">
+                    ${parsedDataGlobal.team.name} Win Percentage: ${percentage}%
+                </div>
+            `;
+        }
+
+        function calculateAveragePoints() {
+            if (!parsedDataGlobal) return;
+            
+            const pointsKey = parsedDataGlobal.team.sport === 'Baseball' ? 'runs' : 
+                            parsedDataGlobal.team.sport === 'Hockey' ? 'goals' : 'points';
+            
+            let total = 0;
+            parsedDataGlobal.games.forEach(game => {
+                total += game[pointsKey];
+            });
+            const average = (total / parsedDataGlobal.games.length).toFixed(1);
+            
+            const resultBox = document.getElementById('calculationResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <h4>Average ${pointsKey.charAt(0).toUpperCase() + pointsKey.slice(1)} Calculation</h4>
+                <div class="code-example"><span class="code-comment">// Loop through games array:</span>
+<span class="code-keyword">let</span> total = <span class="code-number">0</span>;
+parsedData.games.<span class="code-keyword">forEach</span>(game => {
+    total += game.${pointsKey};
+});
+<span class="code-keyword">const</span> average = total / parsedData.games.length;</div>
+                <div class="calculation-result">
+                    Average ${pointsKey.charAt(0).toUpperCase() + pointsKey.slice(1)} per Game: ${average}
+                </div>
+            `;
+        }
+
+        function getTotalAttendance() {
+            if (!parsedDataGlobal) return;
+            
+            let total = 0;
+            parsedDataGlobal.games.forEach(game => {
+                total += game.attendance;
+            });
+            
+            const resultBox = document.getElementById('calculationResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+                <h4>Total Attendance Calculation</h4>
+                <div class="code-example"><span class="code-comment">// Sum attendance from all games:</span>
+<span class="code-keyword">let</span> totalAttendance = <span class="code-number">0</span>;
+parsedData.games.<span class="code-keyword">forEach</span>(game => {
+    totalAttendance += game.attendance;
+});
+<span class="code-comment">// Result: ${total.toLocaleString()}</span></div>
+                <div class="calculation-result">
+                    Total Attendance (${parsedDataGlobal.games.length} games): ${total.toLocaleString()} fans
+                </div>
+            `;
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', initializeTeamButtons);
+    </script>
+</body>
+</html>

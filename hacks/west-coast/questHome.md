@@ -1,20 +1,20 @@
 ---
 layout: post 
 tailwind: True
-title: Building a Computer Science Linkedin Profile
+title: West Coast Journey Through Code
 description: >
   Understand how to ideate, develop, and describe computer science projects for future career success!
-author: CSA 2025-26
+author: CSP 2025-26
 permalink: /west-coast
 lxdData:
   Title: "Learning Modules"
-  Description: "Build critical project development skills and earn a certificate upon completion!"
+  Description: "Learn important aspects of code while you travel across the west coast!"
   Topics:
     - Title: "C1: AI Itenerary"
       Genre: "Project Creation"
       Level: 1
       Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
-      Categories: ["Frontend", "HTML", "CSS","Javascript"]
+      Categories: ["AI", "Conext", "Prompting","Generation"]
       Video: "/west-coast/frontend-video"
       Lessons: "/west-coast/ai/"
       Image: "/images/west-coast/frontend.svg"
@@ -32,7 +32,7 @@ lxdData:
       Genre: "Practice"
       Level: 3
       Description: "Learn about how to visualize data from various sources for effective representation and application, such as machine learning"
-      Categories: ["Visualization", "ML", "Collation"]
+      Categories: ["API's", "Backend", "Databases"]
       Video: "/west-coast/data-viz-video"
       Lessons: "/west-coast/sports/"
       Image: "/images/west-coast/data-viz.svg"
@@ -42,7 +42,6 @@ lxdData:
       Level: 4
       Description: "Learn how to design and develop dynamic UI elements inspired by global destinations to enhance your creative journey."
       Categories: ["UI", "Styling", "Structure"]
-      Video: "/west-coast/resume-video"
       Lessons: "/west-coast/travel/"
       Image: "/images/west-coast/resume.svg"
       Alt: "CS Portfolio Quest Resume"

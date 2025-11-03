@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Submodule 5"
-description: "Task 5 of the End Quest"
+title: "Knowledge Restoration Protocol"
+description: "Final End Quest game: Restore Earth's digital knowledge across multiple domains"
 permalink: /digital-famine/end/submodule_5/
 parent: "End Quest"
 team: "CodeMaxxers"
@@ -14,7 +14,7 @@ microblog: true
 date: 2025-10-29
 ---
 
-# Submodule 5: Knowledge Restoration Protocol
+# Knowledge Restoration Protocol
 
 ## Restore Earth's Digital Wisdom
 

@@ -417,6 +417,182 @@
   from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
   to { transform: translateX(-50%) translateY(0); opacity: 1; }
 }
+
+/* Showcase Wall Styles - ADD TO EXISTING STYLES */
+.showcase-wall {
+  background: linear-gradient(135deg, 
+    rgba(30, 30, 46, 0.95) 0%, 
+    rgba(45, 45, 65, 0.95) 50%, 
+    rgba(30, 30, 46, 0.95) 100%);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  margin: 1rem 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.showcase-wall.locked {
+  opacity: 0.5;
+  border-color: rgba(107, 114, 128, 0.3);
+}
+
+.showcase-header {
+  padding: 1rem 1.5rem;
+  background: rgba(139, 92, 246, 0.1);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.showcase-header:hover {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+.showcase-toggle {
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.showcase-toggle.expanded {
+  transform: rotate(180deg);
+}
+
+.showcase-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.showcase-content.expanded {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.showcase-item {
+  background: rgba(55, 65, 81, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.showcase-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.showcase-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+.showcase-caption {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.showcase-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #a78bfa;
+}
+
+.upload-form {
+  background: rgba(75, 85, 99, 0.3);
+  border: 2px dashed rgba(139, 92, 246, 0.4);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  margin: 1.5rem;
+}
+
+.upload-input, .upload-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  background: rgba(30, 30, 46, 0.8);
+  color: white;
+  margin: 0.5rem 0;
+  font-family: inherit;
+}
+
+.upload-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.upload-button {
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.city-upload-btn {
+  position: absolute;
+  top: 20px;
+  left: 80px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+.city-upload-btn:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
+}
+
+.city-upload-btn.show {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .showcase-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  .city-upload-btn {
+    left: 60px;
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+}
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
@@ -568,10 +744,175 @@
         </a>
       </div>
 
+    </div> 
+  </div>  
+</div>     
+
+<!-- SHOWCASE WALLS (GitHub Issues Integration) -->
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
+  <div class="container mx-auto px-8 py-16">
+    <div class="max-w-5xl mx-auto mt-16">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-white cute-heading mb-4">🎨 City Showcase Walls</h2>
+        <p class="text-gray-400 cute-text">Complete cities to unlock their showcase walls and share your journey via GitHub Issues!</p>
+      </div>
+
+      <!-- San Diego Showcase Wall -->
+      <div class="showcase-wall" id="showcase-0">
+        <div class="showcase-header" onclick="toggleCityShowcase(0)">
+          <div>
+            <h3 class="text-lg font-bold text-white cute-heading flex items-center">
+              ☀️ San Diego Showcase Wall
+              <span id="showcase-count-0" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
+            </h3>
+            <p class="text-sm text-gray-400 cute-text">Share your CREATE journey experiences!</p>
+          </div>
+          <span class="showcase-toggle text-white">▼</span>
+        </div>
+        <div class="showcase-content" id="showcase-content-0">
+          <div class="upload-form" id="upload-form-0" style="display: none;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your San Diego Experience</h4>
+            <p class="text-gray-300 mb-4">Click below to open a GitHub Issue and share your CREATE journey with everyone!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/34" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to San Diego Showcase
+            </a>
+            <p class="text-xs text-gray-500 mt-3">Opens GitHub Issues in a new tab. You can add images by dragging them into the issue description.</p>
+          </div>
+          
+          <!-- GitHub Issues Link -->
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all San Diego showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/34" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse San Diego Stories
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Los Angeles Showcase Wall -->
+      <div class="showcase-wall locked" id="showcase-1">
+        <div class="showcase-header" onclick="toggleCityShowcase(1)">
+          <div>
+            <h3 class="text-lg font-bold text-white cute-heading flex items-center">
+              🌴 Los Angeles Showcase Wall
+              <span id="showcase-count-1" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
+            </h3>
+            <p class="text-sm text-gray-400 cute-text">Complete San Diego to unlock and share your READ adventures!</p>
+          </div>
+          <span class="showcase-toggle text-white">▼</span>
+        </div>
+        <div class="showcase-content" id="showcase-content-1">
+          <div class="upload-form" id="upload-form-1" style="display: none;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your Los Angeles Experience</h4>
+            <p class="text-gray-300 mb-4">Share your READ and Query mastery experiences!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/35" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to Los Angeles Showcase
+            </a>
+          </div>
+          
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all Los Angeles showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/35" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse Los Angeles Stories
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- San Francisco Showcase Wall -->
+      <div class="showcase-wall locked" id="showcase-2">
+        <div class="showcase-header" onclick="toggleCityShowcase(2)">
+          <div>
+            <h3 class="text-lg font-bold text-white cute-heading flex items-center">
+              🌁 San Francisco Showcase Wall
+              <span id="showcase-count-2" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
+            </h3>
+            <p class="text-sm text-gray-400 cute-text">Complete Los Angeles to unlock and share your UPDATE journey!</p>
+          </div>
+          <span class="showcase-toggle text-white">▼</span>
+        </div>
+        <div class="showcase-content" id="showcase-content-2">
+          <div class="upload-form" id="upload-form-2" style="display: none;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your San Francisco Experience</h4>
+            <p class="text-gray-300 mb-4">Share your UPDATE mastery and experiences!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/36" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to San Francisco Showcase
+            </a>
+          </div>
+          
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all San Francisco showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/36" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse San Francisco Stories
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seattle Showcase Wall -->
+      <div class="showcase-wall locked" id="showcase-3">
+        <div class="showcase-header" onclick="toggleCityShowcase(3)">
+          <div>
+            <h3 class="text-lg font-bold text-white cute-heading flex items-center">
+              🌲 Seattle Showcase Wall
+              <span id="showcase-count-3" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
+            </h3>
+            <p class="text-sm text-gray-400 cute-text">Complete San Francisco to unlock and share your DELETE journey!</p>
+          </div>
+          <span class="showcase-toggle text-white">▼</span>
+        </div>
+        <div class="showcase-content" id="showcase-content-3">
+          <div class="upload-form" id="upload-form-3" style="display: none;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your Seattle Experience</h4>
+            <p class="text-gray-300 mb-4">Share your DELETE and ANALYTICS mastery!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/37" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to Seattle Showcase
+            </a>
+          </div>
+          
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all Seattle showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/37" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse Seattle Stories
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-
 <!-- IMAGE MODAL -->
 <div id="imageModal" class="image-modal" onclick="closeImageModal()">
   <div class="image-modal-content" onclick="event.stopPropagation()">
@@ -620,7 +961,7 @@ let gameProgress = {
 
 // Load progress from localStorage
 function loadGameProgress() {
-  const saved = localStorage.getItem('mchopiee_city_progress');
+  const saved = localStorage.getItem('city_progress');
   if (saved) {
     try {
       gameProgress = JSON.parse(saved);
@@ -639,7 +980,7 @@ function loadGameProgress() {
 // Save progress to localStorage
 function saveGameProgress() {
   try {
-    localStorage.setItem('mchopiee_city_progress', JSON.stringify(gameProgress));
+    localStorage.setItem('city_progress', JSON.stringify(gameProgress));
   } catch (e) {
     console.error('Error saving game progress:', e);
   }
@@ -832,5 +1173,186 @@ window.refreshCityProgress = function() {
   loadGameProgress();
   initializeCityLocking();
   console.log('Updated progress:', gameProgress);
+};
+
+// Showcase data for each city
+let cityShowcaseData = [[], [], [], []]; // Array for each city
+
+// Load showcase data
+function loadCityShowcaseData() {
+  const saved = localStorage.getItem('city_showcase_data');
+  if (saved) {
+    try {
+      cityShowcaseData = JSON.parse(saved);
+    } catch (e) {
+      console.error('Error loading showcase data:', e);
+      cityShowcaseData = [[], [], [], []];
+    }
+  }
+}
+
+// Save showcase data
+function saveCityShowcaseData() {
+  try {
+    localStorage.setItem('city_showcase_data', JSON.stringify(cityShowcaseData));
+  } catch (e) {
+    console.error('Error saving showcase data:', e);
+  }
+}
+
+// Toggle city showcase
+window.toggleCityShowcase = function(cityIndex) {
+  const content = document.getElementById(`showcase-content-${cityIndex}`);
+  const toggle = content.parentElement.querySelector('.showcase-toggle');
+  
+  // Don't allow toggle if locked
+  const showcaseWall = document.getElementById(`showcase-${cityIndex}`);
+  if (showcaseWall.classList.contains('locked')) {
+    return;
+  }
+  
+  if (content.classList.contains('expanded')) {
+    content.classList.remove('expanded');
+    toggle.classList.remove('expanded');
+  } else {
+    content.classList.add('expanded');
+    toggle.classList.add('expanded');
+    renderCityShowcase(cityIndex);
+  }
+};
+
+// Render city showcase
+function renderCityShowcase(cityIndex) {
+  const grid = document.getElementById(`showcase-grid-${cityIndex}`);
+  const showcaseItems = cityShowcaseData[cityIndex] || [];
+  
+  if (showcaseItems.length === 0) {
+    const cityNames = ['San Diego', 'Los Angeles', 'San Francisco', 'Seattle'];
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #9ca3af;">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">🎨</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #e5e7eb;">No ${cityNames[cityIndex]} showcases yet!</h4>
+        <p>Be the first to share your ${cityNames[cityIndex]} journey.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  grid.innerHTML = showcaseItems.map((item, index) => `
+    <div class="showcase-item">
+      <img src="${item.image}" alt="Showcase" class="showcase-image" onclick="openImageModal('${item.image}', 'City Showcase')">
+      <div class="showcase-caption">${item.caption}</div>
+      <div class="showcase-meta">
+        <span>${new Date(item.timestamp).toLocaleDateString()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Upload to city showcase
+window.uploadToCity = function(cityIndex) {
+  const uploadForm = document.getElementById(`upload-form-${cityIndex}`);
+  const imageInput = uploadForm.querySelector('input[type="file"]');
+  const captionInput = uploadForm.querySelector('textarea');
+  const uploadBtn = uploadForm.querySelector('.upload-button');
+  
+  const caption = captionInput.value.trim();
+  const imageFile = imageInput.files[0];
+  
+  if (!caption) {
+    alert('Please add a caption for your showcase!');
+    return;
+  }
+  
+  if (!imageFile) {
+    alert('Please select an image to upload!');
+    return;
+  }
+  
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = '📤 Uploading...';
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const showcaseItem = {
+      id: Date.now(),
+      image: e.target.result,
+      caption: caption,
+      timestamp: new Date().toISOString()
+    };
+    
+    cityShowcaseData[cityIndex].unshift(showcaseItem);
+    saveCityShowcaseData();
+    
+    // Clear form
+    captionInput.value = '';
+    imageInput.value = '';
+    
+    // Re-render showcase
+    renderCityShowcase(cityIndex);
+    updateShowcaseCounts();
+    
+    // Show success
+    if (typeof showToast !== 'undefined') {
+      showToast('🎉 Added to showcase wall!', 3000);
+    }
+    
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = '📸 Add to Showcase Wall';
+  };
+  
+  reader.readAsDataURL(imageFile);
+};
+
+// Update showcase counts and unlock status
+function updateShowcaseWalls() {
+  for (let i = 0; i < 4; i++) {
+    const showcaseWall = document.getElementById(`showcase-${i}`);
+    const uploadForm = document.getElementById(`upload-form-${i}`);
+    
+    if (gameProgress.completedCities.includes(i)) {
+      // Unlock showcase wall
+      showcaseWall.classList.remove('locked');
+      uploadForm.style.display = 'block';
+    }
+  }
+  
+  updateShowcaseCounts();
+}
+
+// Update showcase post counts
+function updateShowcaseCounts() {
+  for (let i = 0; i < 4; i++) {
+    const countElement = document.getElementById(`showcase-count-${i}`);
+    const count = cityShowcaseData[i] ? cityShowcaseData[i].length : 0;
+    countElement.textContent = `(${count} post${count !== 1 ? 's' : ''})`;
+  }
+}
+
+// Add toast function if not exists
+if (typeof showToast === 'undefined') {
+  window.showToast = function(message, duration = 3000) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669);
+      color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; z-index: 10000;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
+  };
+}
+
+// Initialize showcase data on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadCityShowcaseData();
+  updateShowcaseCounts();
+});
+
+// Hook into existing updateProgressDisplay function
+const originalUpdateProgressDisplay = updateProgressDisplay;
+updateProgressDisplay = function() {
+  originalUpdateProgressDisplay();
+  updateShowcaseWalls();
 };
 </script>

@@ -759,7 +759,14 @@ date: 2025-10-24
       document.getElementById('mission-section').classList.add('hidden');
       document.getElementById('results-section').classList.remove('hidden');
 
+      // Compute final percentage once and mark module complete if passed
       const pct = Math.round((correctCount / 10) * 100);
+
+      // If score is high enough, mark module as complete
+      if (pct >= 70 && window.markCurrentModuleComplete) {
+        window.markCurrentModuleComplete();
+      }
+
       document.getElementById('final-score').textContent = `${correctCount} / 10 Correct`;
       document.getElementById('final-accuracy').textContent = `${pct}%`;
       document.getElementById('final-accuracy-bar').style.width = `${pct}%`;
@@ -798,6 +805,11 @@ date: 2025-10-24
       correctCount = 10;
       updateMeters();
       showResults();
+      
+      // Mark module as complete through progression system
+      if (window.markCurrentModuleComplete) {
+        window.markCurrentModuleComplete();
+      }
     });
 
     document.getElementById('btn-valid').addEventListener('click', () => handleAnswer('valid'));

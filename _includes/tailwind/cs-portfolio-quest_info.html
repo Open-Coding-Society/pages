@@ -260,24 +260,20 @@
     <!-- Module Cards Grid (unchanged styling) -->
     <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12">
       {% for topic in page.lxdData.Topics %}
-        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2 card-hover-effects" data-module="c{{ topic.Level }}">
+        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2 card-hover-effects"
+         data-module="c{{ topic.Level }}"
+         data-total="{{ topic.LessonCount | default: 6 }}">
           
           <!-- Module Status Badge -->
           <div class="module-status">
             <span class="status-badge status-locked module-badge">Locked</span>
           </div>
           
-          <!-- Image with Play Overlay -->
+          <!-- Image-->
           <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
-            <a href="{{ topic.Video }}" class="block w-full h-full group video-link">
-              <img src="{{ site.baseurl }}{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110">
-              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div class="iridescent bg-white bg-opacity-90 rounded-full p-3">
-                  <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path d="M8 5v10l8-5z"/></svg>
-                </div>
-              </div>
-            </a>
+            <img src="{{ site.baseurl }}{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110">
           </div>
+
           
           <!-- Module Progress Bar -->
           <div class="px-6">
@@ -298,10 +294,10 @@
                 {% endfor %}
               </div>
             </div>
-            <div class="flex gap-2">
-              <a href="{{ site.baseurl }}{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition lesson-link">Start Module</a>
-              <a href="{{ topic.Video }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition video-link">Watch Video</a>
-            </div>
+          <div class="flex gap-2">
+            <a href="{{ site.baseurl }}{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition lesson-link">Start Module</a>
+          </div>
+
           </div>
         </div>
       {% endfor %}
@@ -314,51 +310,64 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const NS = "cs-portfolio-quest";
-  const LESSON_COUNT = 6;
+  const DEFAULT_TOTAL = 6;
 
-  // Helpers that operate on SLUGS (e.g., "frontend", "ai-usage")
+  // key helpers (unchanged idea)
   const key = (slug,n) => `${NS}:${slug}:lesson:${n}`;
   const lessonDone = (slug,n) => localStorage.getItem(key(slug,n)) === "done";
-  const moduleCountDone = (slug) => { let c=0; for (let i=1;i<=LESSON_COUNT;i++) if (lessonDone(slug,i)) c++; return c; };
-  const moduleCompleted = (slug) => moduleCountDone(slug) === LESSON_COUNT;
 
-  // Find all module cards in page order and extract their mini-quest slug
-  const cards = Array.from(document.querySelectorAll('[data-module]'));
+  // derive slug from the lesson link (your original fallback)
   function getSlugFromCard(card) {
-    // prefer an explicit data attribute if you decide to add one later:
-    // const explicit = card.dataset.slug; if (explicit) return explicit;
-    const link = card.querySelector(".lesson-link"); // points to the mini-quest landing page
+    const link = card.querySelector(".lesson-link");
     if (!link) return null;
     try {
       const url = new URL(link.getAttribute("href"), window.location.origin);
-      // expected path: /cs-portfolio-quest/<slug>/...
       const parts = url.pathname.split("/").filter(Boolean);
       const i = parts.indexOf("cs-portfolio-quest");
       return (i >= 0 && parts[i+1]) ? parts[i+1] : null;
     } catch { return null; }
   }
 
-  const modules = cards.map(card => ({
-    card,
-    slug: getSlugFromCard(card)
-  })).filter(m => !!m.slug);
+  // per-card total: data-total if present, else 6
+  function getTotal(card) {
+    const t = Number(card.dataset.total);
+    return Number.isFinite(t) && t > 0 ? t : DEFAULT_TOTAL;
+  }
 
-  // Iterate in visual order; unlock module N when module N-1 is completed.
+  // count done up to a passed total
+  function moduleCountDone(slug, total) {
+    let c = 0;
+    for (let i = 1; i <= total; i++) if (lessonDone(slug, i)) c++;
+    return c;
+  }
+
+  // collect modules in visual order
+  const cards = Array.from(document.querySelectorAll('[data-module]'));
+  const modules = cards.map(card => {
+    const slug = getSlugFromCard(card);
+    if (!slug) return null;
+    const total = getTotal(card);
+    return { card, slug, total };
+  }).filter(Boolean);
+
+  // render + gating
   let completedModules = 0;
 
   modules.forEach((m, idx) => {
-    const { card, slug } = m;
+    const { card, slug, total } = m;
     const badge = card.querySelector(".module-badge");
     const bar   = card.querySelector(".module-progress-bar");
     const link  = card.querySelector(".lesson-link");
 
-    const doneCnt   = moduleCountDone(slug);
-    const completed = doneCnt === LESSON_COUNT;
-    const available = idx === 0 ? true : moduleCompleted(modules[idx-1].slug);
+    const doneCnt   = moduleCountDone(slug, total);
+    const completed = doneCnt >= total;
+    const prevIsDone = idx === 0
+      ? true
+      : moduleCountDone(modules[idx-1].slug, modules[idx-1].total) >= modules[idx-1].total;
 
-    // progress bar inside card
+    // progress bar
     if (bar) {
-      const pct = Math.round((doneCnt/LESSON_COUNT)*100);
+      const pct = Math.round((doneCnt / total) * 100);
       bar.style.width = pct + "%";
       bar.className = "progress-bar module-progress-bar" + (completed ? " completed" : doneCnt ? " partial" : "");
     }
@@ -366,25 +375,36 @@ document.addEventListener("DOMContentLoaded", function () {
     // badge
     if (badge) {
       if (completed) { badge.textContent = "Completed"; badge.className = "status-badge status-completed module-badge"; completedModules++; }
-      else if (available) { badge.textContent = "Available"; badge.className = "status-badge status-current module-badge"; }
+      else if (prevIsDone) { badge.textContent = "Available"; badge.className = "status-badge status-current module-badge"; }
       else { badge.textContent = "Locked"; badge.className = "status-badge status-locked module-badge"; }
     }
 
     // CTA
     if (link) {
-      if (available) { link.textContent = completed ? "Review" : "Start Module"; link.style.opacity=""; link.style.pointerEvents=""; link.setAttribute("aria-disabled","false"); }
-      else { link.textContent = "Locked"; link.style.opacity="0.5"; link.style.pointerEvents="none"; link.setAttribute("aria-disabled","true"); }
+      if (prevIsDone) {
+        link.textContent = completed ? "Review" : "Start Module";
+        link.style.opacity = "";
+        link.style.pointerEvents = "";
+        link.setAttribute("aria-disabled", "false");
+      } else {
+        link.textContent = "Locked";
+        link.style.opacity = "0.5";
+        link.style.pointerEvents = "none";
+        link.setAttribute("aria-disabled", "true");
+      }
     }
   });
 
-  // overall progress bar/text at top of page
+  // overall progress
   const overall = document.getElementById("overall-progress");
   const progressText = document.getElementById("progress-text");
-  if (overall) overall.style.width = ((completedModules / modules.length)*100) + "%";
+  if (overall) overall.style.width = ((completedModules / modules.length) * 100) + "%";
   if (progressText) {
-    progressText.textContent = completedModules === modules.length
+    const allDone = modules.length > 0 && completedModules === modules.length;
+    progressText.textContent = allDone
       ? "🎉 Congratulations! All modules completed!"
       : `${completedModules}/${modules.length} modules completed`;
+    progressText.classList.toggle("completed", allDone);
   }
 });
 </script>

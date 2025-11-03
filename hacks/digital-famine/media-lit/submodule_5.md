@@ -3,6 +3,9 @@ layout: post
 title: "Media Literacy Vault"
 description: "Enter the vault code with numbers gathered through the mission to get your Media Literacy certificate"
 permalink: /digital-famine/media-lit/submodule_5/
+footer:
+  previous: /digital-famine/media-lit/submodule_4/
+  home: /hacks/navigation
 parent: "Analytics/Admin"
 team: "Scratchers"
 submodule: 3
@@ -110,3 +113,19 @@ date: 2025-10-28
     });
   </script>
 </div>
+
+<script>
+let progress = JSON.parse(localStorage.getItem('planetProgression')) || {
+  microblog: false,
+  medialit: false,
+  ai: false,
+  cyber: false,
+  current: 'medialit'
+};
+
+// ✅ Automatically mark Media Literacy Planet as complete
+progress.medialit = true;
+
+// Save progress
+localStorage.setItem('planetProgression', JSON.stringify(progress));
+</script>

@@ -4,8 +4,8 @@ import Player from './GameEngine/Player.js';
 import Npc from './GameEngine/Npc.js';
 // import GameControl from './GameEngine/GameControl.js';
 import GameLevel1 from './mansionLevel1.js';
-// import GameLevel2 from './mansionLevel2.js';
-// import GameLevel3 from './mansionLevel3.js';
+import GameLevel2 from './mansionLevel2.js';
+import GameLevel3 from './mansionLevel3.js';
 // import GameLevel4 from './mansionLevel4.js';
 import GameLevel5 from './mansionLevel5.js';
 import GameLevel6 from './mansionLevel6.js';
@@ -270,7 +270,8 @@ class MansionLevelMain {
         }
       };
 
-      const sprite_src_level2door = path + "/images/gamify/lineDoorCollisionSprite.png"; // replace with your door sprite if needed
+      // Level 2 door
+      const sprite_src_level2door = path + "/images/gamify/lineDoorCollisionSprite.png";
       const sprite_greet_level2door = "Would you like to enter the second level? Press E";
       const sprite_data_level2door = {
         id: 'Level2Door',
@@ -283,58 +284,25 @@ class MansionLevelMain {
         orientation: {rows: 1, columns: 1},
         down: {row: 0, start: 0, columns: 1},
         hitbox: {widthPercentage: 0.2, heightPercentage: 0.3},
-        dialogues: [
-          "Level 2 awaits. Do you wish to enter?"
-        ],
-        reaction: function() {
-          // no immediate reaction; interaction handled in interact()
-        },
+        dialogues: ["Level 2 awaits. Do you wish to enter?"],
+        reaction: function() {},
         interact: function() {
-          // show a simple dialogue asking the player to enter the first level
-          if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-            this.dialogueSystem.closeDialogue();
-          }
-
-          if (!this.dialogueSystem) {
-            this.dialogueSystem = new DialogueSystem();
-          }
-
-          this.dialogueSystem.showDialogue(
-            "Would you like to enter Level 2?",
-            "Level 2",
-            this.spriteData.src
-          );
-
+          if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) this.dialogueSystem.closeDialogue();
+          if (!this.dialogueSystem) this.dialogueSystem = new DialogueSystem();
+          this.dialogueSystem.showDialogue("Would you like to enter Level 2?", "Level 2", this.spriteData.src);
           this.dialogueSystem.addButtons([
-            {
-              text: "Enter",
-              primary: true,
-              action: () => {
+            { text: "Enter", primary: true, action: () => {
                 this.dialogueSystem.closeDialogue();
-
-                // transition to new level — replace THIS_FILE_HERE with your level class
                 if (gameEnv && gameEnv.gameControl) {
                   const gameControl = gameEnv.gameControl;
-
-                  // Store original classes so you can return later if desired
                   gameControl._originalLevelClasses = gameControl.levelClasses;
-
-                  // TODO: Replace THIS_FILE_HERE with your pantry level import at top:
-                  // import THIS_FILE_HERE from './path/to/yourPantryLevel.js'
-                  // For now we set a placeholder so the developer will replace it.
                   gameControl.levelClasses = [GameLevel2];
                   gameControl.currentLevelIndex = 0;
                   gameControl.isPaused = false;
                   gameControl.transitionToLevel();
                 }
-              }
-            },
-            {
-              text: "Not Now",
-              action: () => {
-                this.dialogueSystem.closeDialogue();
-              }
-            }
+            } },
+            { text: "Not Now", action: () => { this.dialogueSystem.closeDialogue(); } }
           ]);
         }
       };

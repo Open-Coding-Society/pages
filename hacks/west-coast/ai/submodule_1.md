@@ -11,6 +11,9 @@ categories: [CSP, Submodule, AIUsage]
 tags: [AI, submodule, AI_Functionality]
 author: "TheSprinters"
 date: 2025-10-21
+footer:
+  home: /west-coast/ai/
+  next: /west-coast/ai/submodule_2/
 ---
 <style>
     * {
