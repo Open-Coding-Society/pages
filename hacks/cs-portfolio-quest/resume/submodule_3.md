@@ -13,7 +13,7 @@ date: 2025-10-21
 ---
 
 <html>
-<title>Impact & Experience Builder - Dark Mode</title>
+<title>Impact & Experience Builder</title>
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <style>
   body {
