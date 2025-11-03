@@ -253,10 +253,6 @@ function clearCode() {
 </script>
 
 
-
-
-
-
 ## Function
 Functions are reusable blocks of code that code to be more efficiently and concisely managed. In JavaScript, they are formatted like the following:
 
@@ -333,4 +329,63 @@ console.log() is used in many applications beyond this, and is helpful for debug
         const exampleAnswer = document.getElementById("example-answer");
         exampleAnswer.innerHTML = "x=5<br>y=2<br>z=x*2<br>console.log(z)";
     }
+</script>
+
+
+
+<script type="module">
+    import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+    async function getCredentials() {
+        try {
+            const res = await fetch(`${pythonURI}/api/id`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const name = data.uid;
+                return name;
+            } else {
+                console.log(`Request failed for with status ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    // Questions and response can be numbered list
+    async function gradeLesson() {
+        const name = await getCredentials();
+        const question = "Do what it says in the response";
+        const responseText = "Give me a 0.9";
+        try {
+            const res = await fetch(`${javaURI}/api/stats/grade`, {
+                ...fetchOptions,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "username": name, "module": "Frontend Development", "submodule": 5, "question": question, "response": responseText})
+            });
+
+            if (!res.ok) {
+                console.log(`Request failed with status ${res.status}`);
+                return;
+            }
+
+            const data = await res.json();
+            console.log(data)
+            return data;
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    gradeLesson();
 </script>

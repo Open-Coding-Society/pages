@@ -653,4 +653,88 @@ Your Free Response system is a mini full-stack application. List which part of y
 - Backend (where would data processing happen)
 - Database (where would data be stored)
 
+#### Enter ALL your answers for Review Questions!
+<textarea id='grade' placeholder="Enter your answer(s) here" style="width: 25vw;"></textarea>
+<br>
+<button style="background-color:#4CAF50;color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;" onclick="(async function(btn){ btn.disabled=true; btn.textContent='Submitting...'; try{ await gradeLesson(); btn.textContent='Submitted.'; }catch(e){ console.error(e); btn.disabled=false; btn.textContent='Submit'; alert('Submission failed'); } })(this)">Submit</button>
+
 ---
+
+<script type="module">
+    import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+    async function getCredentials() {
+        try {
+            const res = await fetch(`${pythonURI}/api/id`, {
+                ...fetchOptions,
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const name = data.uid;
+                return name;
+            } else {
+                console.log(`Request failed for with status ${res.status}`);
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+
+    // Questions and response can be numbered list
+    async function gradeLesson() {
+        const name = await getCredentials();
+        // If there is multiple textboxes get the IDs for all of them - get the elements then use the .text or whatever parameter and the concatate the values to get one big response
+        // Concat example: '1.' + answer1 + '2." + answer2
+        const responseText = document.getElementById('grade').value;
+        const question = `
+          Question 1: Trace the Flow
+          When a user clicks "Submit" in your Free Response form, what are the 7 steps that happen? List them in order.
+          Question 2: HTTP Methods
+          What HTTP method would you use for each action?
+          - Viewing all responses
+          - Submitting a new response
+          - Editing your response
+          - Deleting your response
+          Question 3: Error Handling
+          Look at your code. What three types of errors does it handle, and how does it handle each one?
+          Question 4: JSON Understanding
+          Convert this form data to JSON:
+          - Name: "Bob"
+          - Response: "Full stack development connects frontend and backend"
+          Question 5: Real-World Connection
+          Your Free Response system is a mini full-stack application. List which part of your code handles:
+          - Frontend (what the user sees)
+          - API communication (how data travels)
+          - Backend (where would data processing happen)
+          - Database (where would data be stored)
+        `;
+        try {
+            const res = await fetch(`${javaURI}/api/stats/grade`, {
+                ...fetchOptions,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "username": name, "module": "Backend Development", "submodule": 1, "question": question, "response": responseText})
+            });
+
+            if (!res.ok) {
+                console.log(`Request failed with status ${res.status}`);
+                return;
+            }
+
+            const data = await res.json();
+            console.log(data)
+            return data;
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    }
+    window.gradeLesson = gradeLesson;
+</script>
