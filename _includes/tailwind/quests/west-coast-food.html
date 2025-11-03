@@ -748,13 +748,13 @@
   </div>  
 </div>     
 
-<!-- SHOWCASE WALLS (One for each city) -->
+<!-- SHOWCASE WALLS (GitHub Issues Integration) -->
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
   <div class="container mx-auto px-8 py-16">
     <div class="max-w-5xl mx-auto mt-16">
       <div class="text-center mb-8">
         <h2 class="text-3xl font-bold text-white cute-heading mb-4">🎨 City Showcase Walls</h2>
-        <p class="text-gray-400 cute-text">Complete cities to unlock their showcase walls and share your journey!</p>
+        <p class="text-gray-400 cute-text">Complete cities to unlock their showcase walls and share your journey via GitHub Issues!</p>
       </div>
 
       <!-- San Diego Showcase Wall -->
@@ -763,20 +763,37 @@
           <div>
             <h3 class="text-lg font-bold text-white cute-heading flex items-center">
               ☀️ San Diego Showcase Wall
-              <span id="showcase-count-0" class="ml-2 text-sm text-purple-400">(0 posts)</span>
+              <span id="showcase-count-0" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
             </h3>
-            <p class="text-sm text-gray-400 cute-text">Share your CREATE journey and Baja Bowl experiences!</p>
+            <p class="text-sm text-gray-400 cute-text">Share your CREATE journey experiences!</p>
           </div>
           <span class="showcase-toggle text-white">▼</span>
         </div>
         <div class="showcase-content" id="showcase-content-0">
           <div class="upload-form" id="upload-form-0" style="display: none;">
-            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Add to San Diego Wall</h4>
-            <input type="file" class="upload-input" accept="image/*" placeholder="Choose image...">
-            <textarea class="upload-textarea" placeholder="Share your San Diego experience, what you learned, or a fun memory!"></textarea>
-            <button class="upload-button" onclick="uploadToCity(0)">📸 Add to San Diego Wall</button>
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your San Diego Experience</h4>
+            <p class="text-gray-300 mb-4">Click below to open a GitHub Issue and share your CREATE journey with everyone!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/34" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to San Diego Showcase
+            </a>
+            <p class="text-xs text-gray-500 mt-3">Opens GitHub Issues in a new tab. You can add images by dragging them into the issue description.</p>
           </div>
-          <div class="showcase-grid" id="showcase-grid-0"></div>
+          
+          <!-- GitHub Issues Link -->
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all San Diego showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/34" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse San Diego Stories
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -786,7 +803,7 @@
           <div>
             <h3 class="text-lg font-bold text-white cute-heading flex items-center">
               🌴 Los Angeles Showcase Wall
-              <span id="showcase-count-1" class="ml-2 text-sm text-purple-400">(0 posts)</span>
+              <span id="showcase-count-1" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
             </h3>
             <p class="text-sm text-gray-400 cute-text">Complete San Diego to unlock and share your READ adventures!</p>
           </div>
@@ -794,12 +811,27 @@
         </div>
         <div class="showcase-content" id="showcase-content-1">
           <div class="upload-form" id="upload-form-1" style="display: none;">
-            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Add to Los Angeles Wall</h4>
-            <input type="file" class="upload-input" accept="image/*" placeholder="Choose image...">
-            <textarea class="upload-textarea" placeholder="Share your Los Angeles experience and query mastery!"></textarea>
-            <button class="upload-button" onclick="uploadToCity(1)">📸 Add to Los Angeles Wall</button>
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your Los Angeles Experience</h4>
+            <p class="text-gray-300 mb-4">Share your READ and Query mastery experiences!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/35" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to Los Angeles Showcase
+            </a>
           </div>
-          <div class="showcase-grid" id="showcase-grid-1"></div>
+          
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all Los Angeles showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/35" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse Los Angeles Stories
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -809,7 +841,7 @@
           <div>
             <h3 class="text-lg font-bold text-white cute-heading flex items-center">
               🌁 San Francisco Showcase Wall
-              <span id="showcase-count-2" class="ml-2 text-sm text-purple-400">(0 posts)</span>
+              <span id="showcase-count-2" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
             </h3>
             <p class="text-sm text-gray-400 cute-text">Complete Los Angeles to unlock and share your UPDATE journey!</p>
           </div>
@@ -817,12 +849,27 @@
         </div>
         <div class="showcase-content" id="showcase-content-2">
           <div class="upload-form" id="upload-form-2" style="display: none;">
-            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Add to San Francisco Wall</h4>
-            <input type="file" class="upload-input" accept="image/*" placeholder="Choose image...">
-            <textarea class="upload-textarea" placeholder="Share your San Francisco gourmet pop-up experiences!"></textarea>
-            <button class="upload-button" onclick="uploadToCity(2)">📸 Add to San Francisco Wall</button>
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your San Francisco Experience</h4>
+            <p class="text-gray-300 mb-4">Share your UPDATE mastery and experiences!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/36" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to San Francisco Showcase
+            </a>
           </div>
-          <div class="showcase-grid" id="showcase-grid-2"></div>
+          
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all San Francisco showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/36" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse San Francisco Stories
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -832,26 +879,40 @@
           <div>
             <h3 class="text-lg font-bold text-white cute-heading flex items-center">
               🌲 Seattle Showcase Wall
-              <span id="showcase-count-3" class="ml-2 text-sm text-purple-400">(0 posts)</span>
+              <span id="showcase-count-3" class="ml-2 text-sm text-purple-400">(GitHub Issues)</span>
             </h3>
-            <p class="text-sm text-gray-400 cute-text">Complete San Francisco to unlock and share your DELETE & ANALYZE mastery!</p>
+            <p class="text-sm text-gray-400 cute-text">Complete San Francisco to unlock and share your DELETE journey!</p>
           </div>
           <span class="showcase-toggle text-white">▼</span>
         </div>
         <div class="showcase-content" id="showcase-content-3">
           <div class="upload-form" id="upload-form-3" style="display: none;">
-            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Add to Seattle Wall</h4>
-            <input type="file" class="upload-input" accept="image/*" placeholder="Choose image...">
-            <textarea class="upload-textarea" placeholder="Share your Seattle sustainable cleanup and analytics journey!"></textarea>
-            <button class="upload-button" onclick="uploadToCity(3)">📸 Add to Seattle Wall</button>
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">📸 Share Your Seattle Experience</h4>
+            <p class="text-gray-300 mb-4">Share your DELETE and ANALYTICS mastery!</p>
+            <a href="https://github.com/McHopiee/SyntaxTerrors/issues/37" 
+               target="_blank" 
+               class="upload-button" 
+               style="text-decoration: none; display: inline-block;">
+              🚀 Post to Seattle Showcase
+            </a>
           </div>
-          <div class="showcase-grid" id="showcase-grid-3"></div>
+          
+          <div style="padding: 1.5rem;">
+            <h4 class="text-lg font-bold text-white cute-heading mb-3">🎨 Community Showcases</h4>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 1rem;">
+              <p class="text-gray-300 mb-3">View all Seattle showcases on GitHub:</p>
+              <a href="https://github.com/McHopiee/SyntaxTerrors/issues/37" 
+                 target="_blank" 
+                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                📖 Browse Seattle Stories
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <!-- IMAGE MODAL -->
 <div id="imageModal" class="image-modal" onclick="closeImageModal()">
   <div class="image-modal-content" onclick="event.stopPropagation()">
