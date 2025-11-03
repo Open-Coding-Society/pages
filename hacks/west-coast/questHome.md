@@ -14,7 +14,7 @@ lxdData:
       Genre: "Project Creation"
       Level: 1
       Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
-      Categories: ["Frontend", "HTML", "CSS","Javascript"]
+      Categories: ["AI", "Conext", "Prompting","Generation"]
       Video: "/west-coast/frontend-video"
       Lessons: "/west-coast/ai/"
       Image: "/images/west-coast/frontend.svg"
@@ -32,7 +32,7 @@ lxdData:
       Genre: "Practice"
       Level: 3
       Description: "Learn about how to visualize data from various sources for effective representation and application, such as machine learning"
-      Categories: ["Visualization", "ML", "Collation"]
+      Categories: ["API's", "Backend", "Databases"]
       Video: "/west-coast/data-viz-video"
       Lessons: "/west-coast/sports/"
       Image: "/images/west-coast/data-viz.svg"
