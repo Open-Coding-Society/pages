@@ -353,47 +353,20 @@ Welcome! This interactive page lets learners *actually* update dishes, ingredien
   <button id="themeToggleBtn" class="sq-btn" title="Toggle dark / light">🌙 Dark</button>
 </div>
 
-<!-- Progress Tracker -->
-<div class="sq-card">
-  <div class="sq-label">Fill in the blanks about updating Sourdough. Type the missing words below.</div>
-  <form id="sourdough-fill-blank" onsubmit="return checkSourdoughAnswers()" style="display:grid; gap:0.75rem;">
-    <label class="sq-label">1. What field is required to identify which dish to update?</label>
-    <input class="sq-field" type="text" id="blank-id" placeholder="Field name...">
+<!-- intro -->
+# Understanding UPDATE in CRUD
 
-    <label class="sq-label">2. What field stores the number of calories?</label>
-    <input class="sq-field" type="text" id="blank-calories" placeholder="Field name...">
+The UPDATE operation in CRUD allows you to modify existing records in a database. Here are the key points:
 
-    <label class="sq-label">3. What field stores the dish's category?</label>
-    <input class="sq-field" type="text" id="blank-category" placeholder="Field name...">
-
-    <button class="sq-btn sq-run" type="submit">Check Answers</button>
-    <div id="sourdough-feedback" class="small" style="margin-top:0.5rem"></div>
-  </form>
-</div>
-<script>
-function checkSourdoughAnswers() {
-  const answers = {
-    blank_id: "id",
-    blank_calories: "calories",
-    blank_category: "category"
-  };
-  let correct = 0;
-  let total = Object.keys(answers).length;
-  for (const key in answers) {
-    const val = document.getElementById(key.replace('_', '-')).value.trim();
-    if (val.toLowerCase() === answers[key].toLowerCase()) correct++;
-  }
-  const feedback = document.getElementById('sourdough-feedback');
-  if (correct === total) {
-    feedback.textContent = '✅ All correct! You understand the Sourdough update.';
-    completeTask('sourdough');
-  } else {
-    feedback.textContent = `You got ${correct} out of ${total} correct. Try again!`;
-  }
-  return false;
-}
-</script>
----
+- **Purpose**: Modifies existing data without creating new records
+- **Required Information**: 
+  - Unique identifier (ID) to locate the record
+  - New values for fields you want to update
+- **HTTP Method**: Uses PUT or PATCH requests in REST APIs
+- **Common Use Cases**: 
+  - Updating user profiles
+  - Modifying product details
+  - Changing status or settings---
 
 # %% Interactive: Mock Backend & Utilities
 
