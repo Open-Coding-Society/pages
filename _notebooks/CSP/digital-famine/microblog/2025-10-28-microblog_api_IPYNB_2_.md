@@ -416,7 +416,7 @@ Then visit `http://localhost:4000/docs` instead.
         .footer {
             text-align: center;
             margin-top: 40px;
-            color: #7f8c8d;
+            color: #000000ff;
             font-size: 0.9rem;
         }
         
