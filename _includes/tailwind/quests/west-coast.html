@@ -5,10 +5,35 @@
 </div>
 {% endif %}
 
+<!-- Welcome Popup -->
+<div id="welcome-popup" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 popup-overlay" style="display: none;">
+  <div class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 rounded-2xl p-8 max-w-2xl mx-4 shadow-2xl border-2 border-cyan-400 popup-content">
+    <div class="text-center mb-6">
+      <h2 class="text-4xl font-bold text-cyan-300 mb-4">🚗 Welcome to West Coast Quest! 🌴</h2>
+      <div class="w-20 h-1 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mx-auto mb-6"></div>
+    </div>
+    <div class="text-gray-200 space-y-4 text-lg leading-relaxed">
+      <p class="text-center font-semibold text-cyan-200">Embark on an epic road trip along the West Coast!</p>
+      <p>Travel through vibrant cities while exploring:</p>
+      <ul class="space-y-2 ml-6">
+        <li>🍕 <span class="text-yellow-300 font-semibold">Delicious Local Foods</span> - Discover culinary treasures in each city</li>
+        <li>🏖️ <span class="text-green-300 font-semibold">Amazing Travel Destinations</span> - Explore iconic landmarks and hidden gems</li>
+        <li>⚾ <span class="text-orange-300 font-semibold">Exciting Sports Culture</span> - Experience the athletic spirit of the West Coast</li>
+      </ul>
+      <p class="pt-4 text-center text-purple-300 font-semibold">Along the way, you'll learn important Computer Science principles through real-world examples and interactive lessons!</p>
+    </div>
+    <div class="mt-8 text-center">
+      <button id="close-popup" class="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg font-bold text-lg hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+        Start Your Journey! 🚀
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Progress Overview -->
 <div class="mb-8 text-center">
-  <div class="bg-red-800 rounded-lg p-6 max-w-2xl mx-auto">
-    <h3 class="text-white font-semibold mb-3">Learning Progress</h3>
+  <div class="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 rounded-lg p-6 max-w-2xl mx-auto border-2 border-cyan-500">
+    <h3 class="text-cyan-300 font-semibold mb-3 text-xl">Learning Progress</h3>
     <div class="module-progress">
       <div class="progress-bar" id="overall-progress"></div>
     </div>
@@ -17,13 +42,13 @@
 </div>
 
 <div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
-  <!-- Pearly glow effect around container -->
-  <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
+  <!-- Enhanced glow effect around container -->
+  <div class="absolute -inset-1 bg-gradient-to-r from-cyan-300 via-purple-300 to-pink-300 rounded-xl opacity-50 blur-xl"></div>
   <div class="relative z-10"> <!-- Wrapper div to ensure content stays above the glow -->
 
     <!-- Title and Description -->
     <div class="text-center mb-12">
-      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">{{ page.lxdData.Title }}</h2>
+      <h2 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-4">{{ page.lxdData.Title }}</h2>
       <p class="text-xl text-gray-300 max-w-4xl mx-auto">{{ page.lxdData.Description }}</p>
     </div>
 
@@ -41,26 +66,16 @@
           {% assign module_image = "images/WC_TravelModule.jpg" %}
         {% endif %}
         
-        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2 card-hover-effects" data-module="c{{ topic.Level }}">
+        <div class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2 card-hover-effects border-2 border-purple-700 hover:border-cyan-400" data-module="c{{ topic.Level }}">
           
           <!-- Module Status Badge -->
           <div class="module-status">
             <span class="status-badge status-locked module-badge">Locked</span>
           </div>
           
-          <!-- Image with Play Overlay -->
-          <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
-            <a href="{{ topic.Video }}" class="block w-full h-full group video-link">
-              <img src="{{ site.baseurl }}/{{ module_image }}" alt="{{ topic.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110">
-              <!-- Play Button Overlay -->
-              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div class="iridescent bg-white bg-opacity-90 rounded-full p-3">
-                  <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8 5v10l8-5z"/>
-                  </svg>
-                </div>
-              </div>
-            </a>
+          <!-- Image -->
+          <div class="relative h-40 overflow-hidden bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 mb-4">
+            <img src="{{ site.baseurl }}/{{ module_image }}" alt="{{ topic.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110 group-hover:brightness-110">
           </div>
           
           <!-- Module Progress Bar -->
@@ -71,20 +86,19 @@
           </div>
           
           <div class="p-6 pt-2">
-            <h3 class="text-xl font-bold text-white mb-1">{{ topic.Title }}</h3>
-            <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
+            <h3 class="text-xl font-bold text-cyan-300 mb-1">{{ topic.Title }}</h3>
+            <p class="text-sm text-purple-300 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
             <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
             <div class="mb-4">
-              <span class="text-sm font-semibold text-gray-200">Categories:</span>
+              <span class="text-sm font-semibold text-cyan-300">Categories:</span>
               <div class="flex flex-wrap gap-1 mt-1">
                 {% for cat in topic.Categories %}
-                  <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
+                  <span class="bg-gradient-to-r from-purple-800 to-indigo-800 text-cyan-200 text-xs px-2 py-1 rounded-full border border-purple-600">{{ cat }}</span>
                 {% endfor %}
               </div>
             </div>
             <div class="flex gap-2">
               <a href="{{ site.baseurl }}{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition lesson-link">Start Module</a>
-              <a href="{{ topic.Video }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition video-link">Watch Video</a>
             </div>
           </div>
         </div>
@@ -93,8 +107,64 @@
   </div>
 </div>
 
+<style>
+.popup-overlay {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup-content {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899);
+}
+</style>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Show welcome popup on page load
+    const popup = document.getElementById('welcome-popup');
+    const closeBtn = document.getElementById('close-popup');
+    
+    // Check if user has seen the popup before (optional - remove these lines to show every time)
+    const hasSeenPopup = sessionStorage.getItem('west-coast-popup-seen');
+    
+    if (!hasSeenPopup && popup) {
+        popup.style.display = 'flex';
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            popup.style.display = 'none';
+            sessionStorage.setItem('west-coast-popup-seen', 'true');
+        });
+        
+        // Close popup when clicking outside
+        popup.addEventListener('click', function(e) {
+            if (e.target === popup) {
+                popup.style.display = 'none';
+                sessionStorage.setItem('west-coast-popup-seen', 'true');
+            }
+        });
+    }
+    
     // Only run progress tracking on the main plagiarism navigation page
     // Should run on /plagiarism or /plagiarism/ 
     const currentPath = window.location.pathname;

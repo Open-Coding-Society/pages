@@ -1,11 +1,12 @@
 ---
 layout: cs-portfolio-lesson
-title: "Submodule 2"
+title: "Search & Data Filtering with Spring Boot"
 description: "Search & Data Filtering with Spring Boot"
 permalink: /cs-portfolio-quest/data-viz/submodule_2/
 parent: "Data Visualization"
 team: "Applicators"
 submodule: 2
+microblog: true
 categories: [CSP, Submodule, DataVisualization]
 tags: [spring-boot, search, jpql, pagination]
 author: "Applicators Team"
@@ -557,3 +558,4 @@ initEnablers();
 renderQuiz();
 </script>
 </body>
+

@@ -2,7 +2,7 @@
 layout: post
 title: "Markdown to HTML"
 description: "Mission 2"
-permalink: /digital-famine/cyber/submodule_2/
+permalink: /digital-famine/cybersecurity-game/submodule_2/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 2

@@ -1,20 +1,21 @@
+// Blackjack.js - A simple embedded Blackjack game for our mansion game's casino level
 class BlackjackGameManager {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
         this.money = 1000;
         this.currentBet = 0;
-        this.goalMoney = 25000;
+        this.goalMoney = 10000;
         this.gameActive = false;
         this.overlay = null;
         this.roundInProgress = false;
     }
-
+// Start the games
     startGame() {
         if (this.gameActive) return;
         this.gameActive = true;
         this.createOverlay();
     }
-
+// Overlay
     createOverlay() {
         this.overlay = document.createElement('div');
         this.overlay.id = 'blackjack-overlay';
@@ -34,12 +35,12 @@ class BlackjackGameManager {
             opacity: 0;
             transition: opacity 0.8s ease-in-out;
         `;
-        
+// Fade out the main game canvas        
         if (this.gameEnv && this.gameEnv.canvas) {
             this.gameEnv.canvas.style.transition = 'opacity 0.8s ease-in-out';
             this.gameEnv.canvas.style.opacity = '0';
         }
-
+// Game container
         const gameContainer = document.createElement('div');
         gameContainer.id = 'embedded-blackjack';
         gameContainer.style.cssText = `
@@ -50,7 +51,7 @@ class BlackjackGameManager {
             border-radius: 15px;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
         `;
-
+// Money display and instructions
         const moneyDisplay = document.createElement('div');
         moneyDisplay.id = 'money-display';
         moneyDisplay.style.cssText = `
@@ -61,7 +62,7 @@ class BlackjackGameManager {
             margin-bottom: 20px;
         `;
         moneyDisplay.innerHTML = `Current Money: $${this.money} | Goal: $${this.goalMoney}`;
-
+// Instructions
         const instructions = document.createElement('div');
         instructions.style.cssText = `
             background: #f39c12;
@@ -74,28 +75,28 @@ class BlackjackGameManager {
         `;
         instructions.innerHTML = `
             🎰 CASINO CHALLENGE 🎰<br>
-            Choose your bet amount and try to reach $25,000!
+            Choose your bet amount and try to reach $10,000!
         `;
-
+// Append elements
         gameContainer.appendChild(moneyDisplay);
         gameContainer.appendChild(instructions);
         this.overlay.appendChild(gameContainer);
         document.body.appendChild(this.overlay);
-        
+// Fade in overlay        
         setTimeout(() => {
             this.overlay.style.opacity = '1';
         }, 50);
 
         this.loadBlackjackHTML(gameContainer);
     }
-
+// Update money display
     updateMoneyDisplay() {
         const moneyDisplay = document.getElementById('money-display');
         const moneyColor = this.money >= 0 ? '#2ecc71' : '#e74c3c';
         const moneyText = this.money >= 0 ? `$${this.money}` : `-$${Math.abs(this.money)} (DEBT)`;
         moneyDisplay.innerHTML = `<span style="color: ${moneyColor}">Current Money: ${moneyText}</span> | <span style="color: white;">Goal: $${this.goalMoney}</span>`;
     }
-
+// Load HTML structure
     loadBlackjackHTML(container) {
         const blackjackHTML = `
             <div id="betting-area" style="background: #34495e; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
@@ -141,7 +142,7 @@ class BlackjackGameManager {
         container.innerHTML += blackjackHTML;
         this.initializeBlackjack();
     }
-
+// Initialize game logic
     initializeBlackjack() {
         setTimeout(() => {
             const bettingArea = document.getElementById("betting-area");
@@ -200,7 +201,7 @@ class BlackjackGameManager {
                     startRound();
                 });
             });
-
+// Game logic functions
             const createDeck = () => {
                 const suits = ["♠", "♥", "♦", "♣"];
                 const values = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
@@ -265,7 +266,7 @@ class BlackjackGameManager {
 
                 document.getElementById("dealer-points").textContent = getCardValue(firstCard);
             };
-
+// End round
             const endRound = (result) => {
                 gameOver = true;
                 this.roundInProgress = false;
@@ -303,7 +304,7 @@ class BlackjackGameManager {
                     }, 1000);
                 }
             };
-
+// Check game over conditions
             const checkGameOver = () => {
                 const playerValue = calculateHand(playerHand);
                 const dealerValue = calculateHand(dealerHand);
@@ -322,7 +323,7 @@ class BlackjackGameManager {
                     }
                 }
             };
-
+// Start a new round
             const startRound = () => {
                 this.roundInProgress = true;
                 deck = createDeck();
@@ -388,7 +389,7 @@ class BlackjackGameManager {
             exitBtn.addEventListener("click", () => this.exitGame());
         }, 100);
     }
-
+// Exit game
     exitGame() {
         if (this.overlay) {
             this.overlay.style.opacity = '0';
@@ -419,3 +420,5 @@ class BlackjackGameManager {
 }
 
 export default BlackjackGameManager;
+
+// End of Blackjack.js

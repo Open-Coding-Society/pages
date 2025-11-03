@@ -18,13 +18,13 @@ class MansionLevel1 {
     const gc = gameEnv.gameControl;
     if (!gc.levelMusic) {
       gc.levelMusic = new Audio(path + "/assets/sounds/mansionGame/shadow_music_level1.mp3");
-      gc.levelMusic.loop = true;
+      gc.levelMusic.loop = false;
       gc.levelMusic.volume = 0.2;
       // Play and ignore promise rejection (browser may block autoplay until user gesture)
       gc.levelMusic.play().catch(err => console.warn('Level music play blocked or failed:', err));
     } else {
       // if previously created, ensure volume/loop are set
-      gc.levelMusic.loop = true;
+      gc.levelMusic.loop = false;
       gc.levelMusic.volume = gc.levelMusic.volume || 0.3;
       if (gc.levelMusic.paused) {
         gc.levelMusic.play().catch(err => console.warn('Resuming music failed:', err));

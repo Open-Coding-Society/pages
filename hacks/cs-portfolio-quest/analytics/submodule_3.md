@@ -9,6 +9,7 @@ submodule: 3
 categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team"
+microblog: true
 ---
 
 
@@ -385,6 +386,10 @@ author: "Curators Team"
       grid-template-columns: 1fr;
     }
   }
+  #lessonCompleteButton {
+    display: none !important;
+  }
+
 </style>
 
 <div class="analytics-container">
@@ -397,7 +402,7 @@ author: "Curators Team"
         <span class="metric-title">Class Average</span>
         <div class="metric-icon" style="background: rgba(234, 140, 51, 0.2);">📊</div>
       </div>
-      <div class="metric-value">84.5%</div>
+      <div class="metric-value" id="class-average">84.5%</div>
       <div class="metric-subtitle" id="students-enrolled">6 students enrolled</div>
     </div>
 
@@ -415,8 +420,8 @@ author: "Curators Team"
         <span class="metric-title">Top Performer</span>
         <div class="metric-icon" style="background: rgba(59, 130, 246, 0.2);">🏆</div>
       </div>
-      <div class="metric-value">96%</div>
-      <div class="metric-subtitle">Patel, Priya</div>
+      <div class="metric-value" id="top-grade">96%</div>
+      <div class="metric-subtitle" id="top-scorer">Patel, Priya</div>
     </div>
 
     <div class="metric-card">
@@ -548,7 +553,7 @@ author: "Curators Team"
       let csv = 'Student Name,Overall Average,Module 1 Progress,Module 1 Average,Module 2 Progress,Module 2 Average,Module 3 Progress,Module 3 Average,Module 4 Progress,Module 4 Average,Module 5 Progress,Module 5 Average\n';
 
       const data = await fetchPeople();
-      const { students, completions } = data;
+      const { students, completions, grades, topScorer } = data;
       
       students.forEach(s => {
         const overall = calculateOverallAverage(s.modules);
@@ -603,6 +608,9 @@ author: "Curators Team"
   async function fetchPeople() {
     const students = [];
     const completions = [];
+    const grades = [];
+
+    let topScorer = { username: null, score: 0 };
 
     const lessonData = await getLessonData();
     console.log(lessonData);
@@ -630,7 +638,7 @@ author: "Curators Team"
 
           // Define modules and total submodules
           const lesson_modules = {
-              'AI Usage': 4,
+              'AI Usage': 3,
               'Backend Development': 6,
               'Data Visualization': 3,
               'Frontend Development': 6,
@@ -681,13 +689,44 @@ author: "Curators Team"
 
           // const randomProgress = () =>
           //   Math.floor(Math.random() * 5) * 25; // random 0, 25, 50, 75, 100
+          const moduleGrades = {};
+
+          Object.keys(lesson_modules).forEach(m => {
+            const totalSubmodules = lesson_modules[m];
+            const grades = [];
+
+            for (let sub = 1; sub <= totalSubmodules; sub++) {
+              const entry = filtered.find(item => item.module === m && item.submodule === sub);
+
+              if (entry && entry.grades && typeof entry.grades === 'number') {
+                grades.push(entry.grades * 100);
+              } else {
+                grades.push(55);
+              }
+            }
+
+            moduleGrades[m] = grades;
+          });
+          console.log("Module grades:", moduleGrades);
+
+          const moduleAverages = Object.values(moduleGrades).map(arr =>
+            arr.reduce((a, b) => a + b, 0) / arr.length
+          );
+          const overallAverageGrade =
+            moduleAverages.reduce((a, b) => a + b, 0) / moduleAverages.length;
+          grades.push(overallAverageGrade);
+
+          if (overallAverageGrade > topScorer.score) {
+            topScorer.username = data.uid;
+            topScorer.score = overallAverageGrade;
+          }
 
           const modules = {
-            "Module 1": { progress: frontendCompletion, lessons: randomLessons(6) },  // 6 lessons
-            "Module 2": { progress: backendCompletion, lessons: randomLessons(6) },  // 6 lessons
-            "Module 3": { progress: datavizCompletion, lessons: randomLessons(3) },  // 3 lessons
-            "Module 4": { progress: resumeCompletion, lessons: randomLessons(6) },  // 6 lessons
-            "Module 5": { progress: aiCompletion, lessons: randomLessons(4) },  // 4 lessons
+            "Module 1": { progress: frontendCompletion, lessons: moduleGrades["Frontend Development"]  },  // 6 lessons
+            "Module 2": { progress: backendCompletion, lessons: moduleGrades["Backend Development"]  },  // 6 lessons
+            "Module 3": { progress: datavizCompletion, lessons: moduleGrades["Data Visualization"]  },  // 3 lessons
+            "Module 4": { progress: resumeCompletion, lessons: moduleGrades["Resume Building"]  },  // 6 lessons
+            "Module 5": { progress: aiCompletion, lessons: moduleGrades["AI Usage"]  },  // 4 lessons
           };
 
           students.push({
@@ -708,7 +747,9 @@ author: "Curators Team"
     }
     return {
       students,
-      completions
+      completions,
+      grades,
+      topScorer
     };
   }
 
@@ -733,12 +774,14 @@ author: "Curators Team"
   async function main() {
     console.log("In main function");
     const data = await fetchPeople();
-    const { students, completions } = data;
+    const { students, completions, grades, topScorer } = data;
     const percentageAverage = completions.length > 0 ? completions.reduce((sum, value) => sum + value, 0) / completions.length : 0;
     const modulesCompletedAverage = 25 * percentageAverage/100;
+    const gradesAverage = grades.length > 0 ? grades.reduce((sum, value) => sum + value, 0) / grades.length : 0;
     // truncate display values to 2 decimals
     const displayPercentage = Number(percentageAverage).toFixed(2);
     const displayModulesCompleted = Number(modulesCompletedAverage).toFixed(2);
+    const displayGradesAveraged = Number(gradesAverage).toFixed(2);
     console.log("Students array:", students);
     console.log("Completions array:", completions);
 
@@ -747,15 +790,26 @@ author: "Curators Team"
     if (progressPercentageEl) {
       progressPercentageEl.innerText = `${displayPercentage}%`;
     }
-      const modulesCompletedEl = document.getElementById("modules-completed");
+    const modulesCompletedEl = document.getElementById("modules-completed");
     if (modulesCompletedEl) {
       modulesCompletedEl.innerText = `${displayModulesCompleted}`;
     }
-      const studentsEnrolledEl = document.getElementById("students-enrolled");
-      if (studentsEnrolledEl) {
-          studentsEnrolledEl.innerText = `${students.length} students enrolled`;
-      }
-
+    const studentsEnrolledEl = document.getElementById("students-enrolled");
+    if (studentsEnrolledEl) {
+      studentsEnrolledEl.innerText = `${students.length} students enrolled`;
+    }
+    const classAverageEl = document.getElementById("class-average");
+    if (classAverageEl) {
+      classAverageEl.innerText = `${displayGradesAveraged}%`;
+    }
+    const topGradeEl = document.getElementById("top-grade");
+    if (topGradeEl) {
+      topGradeEl.innerText = `${topScorer.score}%`;
+    }
+    const topScorerEl = document.getElementById("top-scorer");
+    if (topScorerEl) {
+      topScorerEl.innerText = `${topScorer.username}`;
+    }    
 
     let currentSort = { key: 'name', direction: 'asc' };
     let expandedRow = null;
