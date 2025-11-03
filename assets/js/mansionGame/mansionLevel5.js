@@ -229,7 +229,7 @@ class MansionLevel5 {
         SCALE_FACTOR: 1,
         ANIMATION_RATE: 100,
         pixels: {width: 256, height: 256},
-        INIT_POSITION: { x: (width / 2), y: (height / 2) },
+        INIT_POSITION: { x: 100, y: 100 },
         orientation: {rows: 1, columns: 1},
         down: {row: 0, start: 0, columns: 1},
         hitbox: {widthPercentage: 0.2, heightPercentage: 0.3},
