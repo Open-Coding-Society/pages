@@ -10,6 +10,7 @@ categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team"
 date: 2025-10-21
+microblog: true
 ---
 
 # Submodule 2: Certfication
@@ -356,64 +357,6 @@ date: 2025-10-21
       <div class="cert-actions">
         <button class="btn btn-download" onclick="downloadCert('Computer Science Portfolio - Full Stack Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
         <button class="btn btn-share" onclick="addToLinkedIn('Computer Science Portfolio - Full Stack Development Java Usage')">Add to LinkedIn</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="skills-card">
-    <h2 class="section-title">Skills Mastery</h2>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Data Analysis</span>
-        <span class="skill-percentage">92%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 92%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Python</span>
-        <span class="skill-percentage">88%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 88%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">AI Ethics</span>
-        <span class="skill-percentage">85%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 85%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Machine Learning</span>
-        <span class="skill-percentage">78%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 78%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Statistics</span>
-        <span class="skill-percentage">90%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 90%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">SQL</span>
-        <span class="skill-percentage">82%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 82%"></div>
       </div>
     </div>
   </div>
