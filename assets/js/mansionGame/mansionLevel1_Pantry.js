@@ -166,10 +166,10 @@ class MansionLevel1_Pantry {
       setTimeout(() => {
         try {
           const dsFinal = new DialogueSystem({ id: 'collected_all' + Math.random().toString(36).slice(2, 8) });
-          dsFinal.showDialogue('You have collected all the items and completed the level!', 'Pantry');
+          dsFinal.showDialogue('You have collected all the items and completed the level! Click "Collect Key" to exit.', 'Pantry');
           dsFinal.addButtons([
             {
-              text: 'Close',
+              text: 'COLLECT KEY',
               primary: true,
               action: () => {
               dsFinal.closeDialogue();
