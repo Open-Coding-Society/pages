@@ -1,6 +1,6 @@
 ---
 layout: cs-portfolio-lesson
-title: "Submodule 2"
+title: "Search & Data Filtering with Spring Boot"
 description: "Search & Data Filtering with Spring Boot"
 permalink: /cs-portfolio-quest/data-viz/submodule_2/
 parent: "Data Visualization"

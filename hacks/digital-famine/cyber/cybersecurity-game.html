@@ -2,7 +2,13 @@
 layout: page
 title: Cybersecurity Game - Alien Defense
 permalink: /digital-famine/cybersecurity-game/
-microblog: true
+microblog: True
+breadcrumb: True
+footer:
+  previous: /digital-famine
+  home: /digital-famine/cybersecurity-game
+  next: /digital-famine/cybersecurity-game/mission-1-lesson
+author: "Dhyan Soni, Aaryav Lal, Aditya Srivastava, West Stefany, Sathwik Kintada"
 ---
 
 <div class="cyber-page">
@@ -17,84 +23,9 @@ microblog: true
   <p>This narrative-driven experience blends database work, secure coding, and cryptography. Players earn a vault PIN by completing automated checks in every mission and use it to reclaim the Sacred Page that ends the invasion.</p>
 </section>
 
-<section class="mission-overview mission-flow">
-  <h2>🔑 Mission Path to the Sacred Vault</h2>
-  <p>An at-a-glance journey showing how each mission unlocks the next stage and culminates in the final vault protocol.</p>
-  <div class="mermaid-card">
-    <div class="mermaid mission-path-diagram">
-flowchart LR
-    subgraph Entry["🚀 Launch Sequence"]
-        direction LR
-        Start[🌍 Landing Page<br/>Splash Screen] --> Breach[🚨 Alien Breach Alert]
-        Breach --> Brief[📋 Mission Briefing]
-    end
- 
-    Brief --> M1Scan
-
-    subgraph MissionOne["🔧 Mission 1 — Build the Base Database"]
-        direction TB
-        M1Scan[🛠️ Scan System Damage]
-        M1Learn[📚 Learn SQL Basics]
-        M1Build[💻 Rebuild Tables]
-        M1Test{✅ Test Passed?}
-        M1Reward[🎁 Code 1 — ALPHA-7X9K]
-        M1Scan --> M1Learn --> M1Build --> M1Test
-        M1Test -->|No| M1Learn
-        M1Test -->|Yes| M1Reward
-    end
-
-    M1Reward --> M2Probe
-
-    subgraph MissionTwo["🐛 Mission 2 — Patch the Wormhole"]
-        direction TB
-        M2Probe[🛰️ Probe Vulnerability]
-        M2Learn[📚 Learn SQL Injection Defense]
-        M2Fix[🔐 Harden Queries]
-        M2Test{✅ Breach Closed?}
-        M2Reward[🎁 Code 2 — BRAVO-4M8Q]
-        M2Probe --> M2Learn --> M2Fix --> M2Test
-        M2Test -->|No| M2Learn
-        M2Test -->|Yes| M2Reward
-    end
-
-    M2Reward --> M3Queue
-
-    subgraph MissionThree["🔐 Mission 3 — Encrypt the Launch Codes"]
-        direction TB
-        M3Queue[📦 Queue Launch Codes]
-        M3Learn[📚 Learn Hashing & SHA-256]
-        M3Hash[⚙️ Hash Codes]
-        M3Test{✅ Shield Verified?}
-        M3Reward[🎁 Code 3 — CHARLIE-2N5P]
-        M3Queue --> M3Learn --> M3Hash --> M3Test
-        M3Test -->|No| M3Learn
-        M3Test -->|Yes| M3Reward
-    end
-
-    M3Reward --> Combine[🔓 Combine All Codes]
-    Combine --> Final[🏆 Final Protocol<br/>Earth Saved]
-    Final --> Score[📊 Score Screen]
-    Score --> NextSteps[🚀 Continue Learning]
-
-    classDef entryNode fill:#ff5252,stroke:#ff9d9d,color:#1a0808,font-weight:bold,stroke-width:3px;
-    classDef missionNode fill:#1b253f,stroke:#67d4ff,color:#e8f6ff,stroke-width:2px;
-    classDef retryNode fill:#25314f,stroke:#82ffa4,color:#e8ffef,stroke-dasharray: 6 4;
-    classDef rewardNode fill:#f9d949,stroke:#ffe58a,color:#281f00,font-weight:bold;
-    classDef finaleNode fill:#4caf50,stroke:#a5ffcc,color:#041b0d,font-weight:bold;
-    classDef connector fill:#0f1427,stroke:#67d4ff,color:#e8f6ff;
-
-    class Start,Breach,Brief entryNode;
-    class M1Scan,M1Learn,M1Build,M2Probe,M2Learn,M2Fix,M3Queue,M3Learn,M3Hash,Combine,Score,NextSteps connector;
-    class M1Test,M2Test,M3Test retryNode;
-    class M1Reward,M2Reward,M3Reward rewardNode;
-    class Final finaleNode;
-    </div>
-  </div>
-</section>
-
 <section class="mission-grid">
   <article class="mission-card">
-  <a class="mission-card-link" href="{{ '/digital-famine/cyber/mission-1-lesson/' | prepend: site.baseurl }}">
+  <a class="mission-card-link" href="{{ '/digital-famine/cybersecurity-game/mission-1-lesson/' | prepend: site.baseurl }}">
       <header>
         <p class="mission-label">Mission 1</p>
         <h3>Build the Base Database</h3>
@@ -110,7 +41,7 @@ flowchart LR
   </article>
 
   <article class="mission-card">
-  <a class="mission-card-link" href="{{ '/digital-famine/cyber/mission-2-lesson/' | prepend: site.baseurl }}">
+  <a class="mission-card-link" href="{{ '/digital-famine/cybersecurity-game/mission-2-lesson/' | prepend: site.baseurl }}">
       <header>
         <p class="mission-label">Mission 2</p>
         <h3>Patch the Wormhole</h3>
@@ -126,7 +57,7 @@ flowchart LR
   </article>
 
   <article class="mission-card">
-  <a class="mission-card-link" href="{{ '/digital-famine/cyber/mission-3-lesson/' | prepend: site.baseurl }}">
+  <a class="mission-card-link" href="{{ '/digital-famine/cybersecurity-game/mission-3-lesson/' | prepend: site.baseurl }}">
       <header>
         <p class="mission-label">Mission 3</p>
         <h3>Encrypt the Launch Codes</h3>
@@ -142,7 +73,7 @@ flowchart LR
   </article>
 
   <article class="mission-card finale">
-  <a class="mission-card-link" href="{{ '/digital-famine/cyber/vault/' | prepend: site.baseurl }}">
+  <a class="mission-card-link" href="{{ '/digital-famine/cybersecurity-game/vault-quiz/' | prepend: site.baseurl }}">
       <header>
         <p class="mission-label">Final Sequence</p>
         <h3>The Vault &amp; The Sacred Page</h3>

@@ -60,7 +60,7 @@ date: 2025-10-30
                     class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-purple-600"
                     data-section="0">
                     <span class="text-2xl mb-1">✍️</span>
-                    <span class="text-xs text-center">Introduction</span>
+                    <span class="text-xs text-center">Prompt Engineering</span>
                 </button>
                 <div class="w-8 h-0.5 bg-purple-500/30"></div>
                 <button onclick="goToSection(1)"
@@ -94,8 +94,8 @@ date: 2025-10-30
                 <button onclick="goToSection(5)"
                     class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-slate-700/50"
                     data-section="5">
-                    <span class="text-2xl mb-1">🏆</span>
-                    <span class="text-xs text-center">Quiz</span>
+                    <span class="text-2xl mb-1">⚡</span>
+                    <span class="text-xs text-center">Challenge</span>
                 </button>
             </div>
         </div>
@@ -105,16 +105,9 @@ date: 2025-10-30
                 <div class="bg-slate-800/70 backdrop-blur border border-purple-500/50 rounded-lg p-8">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-4xl pulse">✍️</span>
-                        <h2 class="text-3xl font-bold text-purple-400">Welcome to Prompt Engineering</h2>
+                        <h2 class="text-3xl font-bold text-purple-400">Prompt Engineering</h2>
                     </div>
                     <div class="space-y-4 text-lg">
-                        <p>Prompt engineering is both an art and a science. It empowers you to unlock the full potential
-                            of AI systems by communicating with them effectively to generate the exact output you need.
-                        </p>
-                        <p class="text-purple-300">Whether you're coding, creating content, or solving problems,
-                            mastering prompt engineering can dramatically enhance your productivity and lead to more
-                            accurate AI responses.</p>
-
                         <div class="flex justify-center my-6">
                             <img src="{{ '/images/digital-famine/prompt_engineering.jpeg' | prepend: site.baseurl }}"
                                 alt="Prompt Engineering Illustration"
@@ -135,21 +128,6 @@ date: 2025-10-30
                                     <p class="text-sm">Enables AI to learn from your input and improve its responses
                                         over time.</p>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-4 mt-6 text-center">
-                            <div class="bg-slate-900/50 p-4 rounded-lg border border-purple-500/30">
-                                <p class="text-purple-400 font-semibold">Time</p>
-                                <p class="text-2xl">30-40 min</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-4 rounded-lg border border-purple-500/30">
-                                <p class="text-purple-400 font-semibold">Difficulty</p>
-                                <p class="text-2xl">⭐⭐☆☆☆</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-4 rounded-lg border border-purple-500/30">
-                                <p class="text-purple-400 font-semibold">Badge</p>
-                                <p class="text-2xl text-yellow-400">Prompt Master</p>
                             </div>
                         </div>
                     </div>
@@ -284,6 +262,7 @@ date: 2025-10-30
                                             <p class="text-sm">"What's the weather like in London tomorrow?"</p>
                                         </div>
                                         <div class="bg-red-900/30 p-3 rounded">
+                                            <p class="text-xs text-red-300 mb-1">❌ Bad:</p>
                                             <p class="text-xs text-red-300 mb-1">❌ Bad:</p>
                                             <p class="text-sm">"London weather?"</p>
                                         </div>
@@ -469,107 +448,83 @@ date: 2025-10-30
                     </div>
                 </div>
                 <button onclick="goToSection(5)"
-                    class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-lg font-semibold text-lg">Take the
-                    Quiz</button>
+                    class="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-lg font-semibold text-lg">Try the
+                    Interactive Challenge</button>
             </div>
         </div>
 
         <div id="section-5" class="mission-section section-hidden">
             <div class="space-y-6">
                 <div class="bg-slate-800/70 backdrop-blur border border-purple-500/30 rounded-lg p-8">
-                    <h2 class="text-3xl font-bold mb-6">🏆 Knowledge Check</h2>
+                    <h2 class="text-3xl font-bold mb-6">🎯 Interactive Prompt Challenge</h2>
+                    <p class="text-lg mb-6">See the difference between good and bad prompts! Write both versions and
+                        compare the AI responses.</p>
 
-                    <div class="question-block mb-6" id="question1">
-                        <h3 class="text-xl mb-4">Question 1: Which of the following is an example of a few-shot prompt?
-                        </h3>
-                        <div class="space-y-2">
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(1, 'A', false)">A) "Summarize this article in 5 bullet
-                                points."</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(1, 'B', true)">B) "Here are 2 example summaries. Write a third in
-                                the same style."</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(1, 'C', false)">C) "You are a history teacher. Explain the causes
-                                of World War I."</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(1, 'D', false)">D) "Write a 200-word essay about climate
-                                change."</button>
+                    <!-- Bad Prompt Section -->
+                    <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-6 mb-6">
+                        <h3 class="text-2xl font-bold text-red-300 mb-4">❌ Bad Prompt</h3>
+                        <p class="mb-4 text-gray-300">Write a vague, incomplete, or poorly structured prompt:</p>
+                        <textarea id="bad-prompt" rows="3" placeholder="Example: 'write something about dogs'"
+                            class="w-full p-3 rounded text-white bg-slate-700 border border-red-500/30 mb-3"></textarea>
+                        <div class="flex gap-2">
+                            <button onclick="generateBadPrompt()"
+                                class="px-6 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold">Generate
+                                Bad Response</button>
+                            <button onclick="autoFillBad()"
+                                class="px-6 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white font-semibold">Auto-fill</button>
                         </div>
-                        <div id="feedback1" class="feedback mt-3 p-3 rounded-lg"></div>
+
+                        <div class="mt-4">
+                            <label class="block font-semibold mb-2 text-red-300">AI Response to Bad Prompt:</label>
+                            <pre id="output-bad"
+                                class="bg-slate-900/50 border border-red-500/20 p-4 rounded whitespace-pre-wrap text-gray-300 min-h-[100px]">(Click Generate to see response)</pre>
+                        </div>
                     </div>
 
-                    <div class="question-block mb-6" id="question2">
-                        <h3 class="text-xl mb-4">Question 2: What is the main difference between a zero-shot prompt and
-                            an instructional prompt?</h3>
-                        <div class="space-y-2">
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(2, 'A', false)">A) Zero-shot prompts are longer</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(2, 'B', true)">B) Instructional prompts use direct command verbs
-                                while zero-shot prompts are simple instructions without examples</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(2, 'C', false)">C) Zero-shot prompts always include
-                                examples</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(2, 'D', false)">D) Instructional prompts require images</button>
+                    <!-- Good Prompt Section -->
+                    <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-6 mb-6">
+                        <h3 class="text-2xl font-bold text-green-300 mb-4">✅ Good Prompt</h3>
+                        <p class="mb-4 text-gray-300">Write a clear, specific, and well-structured prompt:</p>
+                        <textarea id="good-prompt" rows="3"
+                            placeholder="Example: 'Write a 150-word informative paragraph about Golden Retrievers, focusing on their temperament and why they make good family pets.'"
+                            class="w-full p-3 rounded text-white bg-slate-700 border border-green-500/30 mb-3"></textarea>
+                        <div class="flex gap-2">
+                            <button onclick="generateGoodPrompt()"
+                                class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-semibold">Generate
+                                Good Response</button>
+                            <button onclick="autoFillGood()"
+                                class="px-6 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white font-semibold">Auto-fill</button>
                         </div>
-                        <div id="feedback2" class="feedback mt-3 p-3 rounded-lg"></div>
+
+                        <div class="mt-4">
+                            <label class="block font-semibold mb-2 text-green-300">AI Response to Good Prompt:</label>
+                            <pre id="output-good"
+                                class="bg-slate-900/50 border border-green-500/20 p-4 rounded whitespace-pre-wrap text-gray-300 min-h-[100px]">(Click Generate to see response)</pre>
+                        </div>
                     </div>
 
-                    <div class="question-block mb-6" id="question3">
-                        <h3 class="text-xl mb-4">Question 3: Which of the following demonstrates a contextual prompt?
-                        </h3>
-                        <div class="space-y-2">
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(3, 'A', false)">A) "Explain photosynthesis."</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(3, 'B', false)">B) "Write something about biology."</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(3, 'C', true)">C) "This is for undergrads in behavioral economics.
-                                Rephrase in simpler language."</button>
-                            <button
-                                class="option-btn w-full text-left p-4 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all"
-                                onclick="checkAnswer(3, 'D', false)">D) "You are a scientist. Describe your
-                                work."</button>
-                        </div>
-                        <div id="feedback3" class="feedback mt-3 p-3 rounded-lg"></div>
+                    <!-- Tips Section -->
+                    <div class="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 mb-6">
+                        <h4 class="text-xl font-bold text-purple-300 mb-3">💡 What Makes a Good Prompt?</h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>✓ Be specific about what you want</li>
+                            <li>✓ Include context and desired format</li>
+                            <li>✓ Use clear, complete sentences</li>
+                            <li>✓ Specify tone, length, or style if needed</li>
+                            <li>✗ Avoid vague requests</li>
+                            <li>✗ Don't use incomplete sentences</li>
+                            <li>✗ Avoid ambiguous language</li>
+                        </ul>
                     </div>
 
-                    <div id="score-container" class="section-hidden text-center">
-                        <div class="bg-yellow-900/30 border-2 border-yellow-500 rounded-lg p-8">
-                            <h3 class="text-3xl font-bold text-yellow-400 mb-4">🎉 Quiz Complete!</h3>
-                            <p id="final-score" class="text-2xl mb-4"></p>
-                            <div class="bg-slate-900/70 p-6 rounded mb-4">
-                                <p class="text-lg font-semibold text-green-400">Badge Earned: Prompt Master 🏆</p>
-                                <p class="text-sm text-gray-300 mt-2">You've mastered the art of prompt engineering!</p>
-                            </div>
-                            <div id="code-reveal" class="section-hidden mb-4">
-                                <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-6">
-                                    <p class="text-xl font-bold text-green-400 mb-2">🔑 Your Code Number: 6</p>
-                                    <p class="text-sm text-gray-300">Remember this number! You'll need it along with the other module codes to unlock the final challenge.</p>
-                                </div>
-                            </div>
-                            <div id="retry-message" class="section-hidden mb-4">
-                                <div class="bg-red-900/30 border-2 border-red-500 rounded-lg p-6">
-                                    <p class="text-xl font-bold text-red-400 mb-2">⚠️ Try Again!</p>
-                                    <p class="text-sm text-gray-300">You need to get all questions correct to receive your code for the final challenge.</p>
-                                </div>
-                            </div>
-                            <button onclick="resetQuiz()"
-                                class="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold">Try
-                                Again</button>
+                    <!-- Complete Section -->
+                    <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6 text-center">
+                        <h3 class="text-2xl font-bold text-blue-300 mb-3">🎉 Challenge Complete!</h3>
+                        <p class="mb-4 text-gray-300">Now you understand the power of good prompting!</p>
+                        <div class="bg-green-900/30 border-2 border-green-500 rounded-lg p-6">
+                            <p class="text-xl font-bold text-green-400 mb-2">🔑 Your Code Number: 6</p>
+                            <p class="text-sm text-gray-300">Remember this number! You'll need it along with the other
+                                module codes to unlock the final challenge.</p>
                         </div>
                     </div>
                 </div>
@@ -577,12 +532,19 @@ date: 2025-10-30
         </div>
     </div>
 
-    <script>
-        let score = 0;
-        let questionsAnswered = 0;
-        const totalQuestions = 3;
+    <!-- Module script - Import API first -->
+    <script type="module">
+        // Import the modular API (same as plagiarism code)
+        import { queryGemini } from '{{ site.baseurl }}/assets/js/api/gemini.js';
 
-        function goToSection(n) {
+        // Store queryGemini globally so non-module code can use it
+        window.queryGeminiAPI = queryGemini;
+    </script>
+
+    <!-- Non-module script for all UI functions that need to be available immediately -->
+    <script>
+        // Define UI navigation function
+        window.goToSection = function(n) {
             document.querySelectorAll('.mission-section').forEach(s => s.classList.add('section-hidden'));
             document.getElementById('section-' + n).classList.remove('section-hidden');
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -591,71 +553,155 @@ date: 2025-10-30
             });
             document.querySelector('.nav-btn[data-section="' + n + '"]').classList.add('bg-purple-600');
             window.scrollTo(0, 0);
-        }
+        };
 
-        function checkAnswer(questionNum, selectedOption, isCorrect) {
-            const feedbackDiv = document.getElementById('feedback' + questionNum);
-            const buttons = document.querySelectorAll('#question' + questionNum + ' .option-btn');
+        // Define auto-fill functions
+        window.autoFillBad = function() {
+            console.log('autoFillBad called');
+            const textarea = document.getElementById('bad-prompt');
+            if (!textarea.value.trim()) {
+                textarea.value = "tell me about space";
+                setTimeout(() => { window.generateBadPrompt(); }, 50);
+            }
+        };
 
-            buttons.forEach(btn => btn.disabled = true);
+        window.autoFillGood = function() {
+            console.log('autoFillGood called');
+            const textarea = document.getElementById('good-prompt');
+            if (!textarea.value.trim()) {
+                textarea.value = "Write a 200-word informative explanation about the Solar System, including details about the eight planets, their order from the Sun, and one unique characteristic of each planet.";
+                setTimeout(() => { window.generateGoodPrompt(); }, 50);
+            }
+        };
 
-            event.target.classList.add(isCorrect ? 'bg-green-600' : 'bg-red-600');
+        // Define generate functions
+        window.generateBadPrompt = async function() {
+            const badPrompt = document.getElementById('bad-prompt').value.trim();
+            const outputEl = document.getElementById('output-bad');
 
-            if (isCorrect) {
-                feedbackDiv.textContent = '✅ Correct! Great job!';
-                feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg bg-green-900/30 border border-green-500/50 text-green-300';
-                score++;
-            } else {
-                const correctAnswers = { 1: 'B', 2: 'B', 3: 'C' };
-                buttons.forEach(btn => {
-                    if (btn.textContent.startsWith(correctAnswers[questionNum] + ')')) {
-                        btn.classList.add('bg-green-600');
-                    }
+            if (!badPrompt) {
+                outputEl.textContent = 'Please enter a bad prompt above.';
+                return;
+            }
+
+            outputEl.textContent = 'Generating response...';
+
+            // Wait for queryGeminiAPI to be available
+            if (!window.queryGeminiAPI) {
+                outputEl.textContent = 'Loading API... Please try again in a moment.';
+                return;
+            }
+
+            try {
+                const result = await window.queryGeminiAPI({
+                    prompt: "You are an AI assistant. Respond to this user prompt as you normally would, but because the prompt is vague or poorly structured, your response will naturally be less helpful or generic.",
+                    text: badPrompt,
+                    parseJSON: false  // We want plain text response
                 });
-                feedbackDiv.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
-                feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300';
+
+                if (result.text) {
+                    outputEl.textContent = result.text;
+                } else {
+                    outputEl.textContent = 'Error: No response from AI';
+                }
+            } catch (error) {
+                console.error('Gemini API error:', error);
+                outputEl.textContent = `Error: ${error.message}`;
+            }
+        };
+
+        window.generateGoodPrompt = async function() {
+            const goodPrompt = document.getElementById('good-prompt').value.trim();
+            const outputEl = document.getElementById('output-good');
+
+            if (!goodPrompt) {
+                outputEl.textContent = 'Please enter a good prompt above.';
+                return;
             }
 
-            questionsAnswered++;
+            outputEl.textContent = 'Generating response...';
 
-            if (questionsAnswered === totalQuestions) {
-                setTimeout(() => {
-                    document.querySelectorAll('.question-block').forEach(block => block.style.display = 'none');
-                    document.getElementById('score-container').classList.remove('section-hidden');
-                    document.getElementById('final-score').textContent = `You scored ${score} out of ${totalQuestions}!`;
-
-                    if (score === totalQuestions) {
-                        document.getElementById('code-reveal').classList.remove('section-hidden');
-                    } else {
-                        document.getElementById('retry-message').classList.remove('section-hidden');
-                    }
-                }, 1500);
+            // Wait for queryGeminiAPI to be available
+            if (!window.queryGeminiAPI) {
+                outputEl.textContent = 'Loading API... Please try again in a moment.';
+                return;
             }
-        }
 
-        function resetQuiz() {
-            score = 0;
-            questionsAnswered = 0;
+            try {
+                const result = await window.queryGeminiAPI({
+                    prompt: "You are an AI assistant. Respond to this well-structured user prompt with a comprehensive, clear, and helpful response that addresses all aspects of the request.",
+                    text: goodPrompt,
+                    parseJSON: false  // We want plain text response
+                });
 
-            document.querySelectorAll('.question-block').forEach(block => {
-                block.style.display = 'block';
-            });
+                if (result.text) {
+                    outputEl.textContent = result.text;
+                } else {
+                    outputEl.textContent = 'Error: No response from AI';
+                }
+            } catch (error) {
+                console.error('Gemini API error:', error);
+                outputEl.textContent = `Error: ${error.message}`;
+            }
+        };
 
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = false;
-                btn.classList.remove('bg-green-600', 'bg-red-600');
-            });
+        // Test functions when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Page loaded. Testing function availability:');
+            console.log('goToSection:', typeof window.goToSection);
+            console.log('autoFillBad:', typeof window.autoFillBad);
+            console.log('autoFillGood:', typeof window.autoFillGood);
+            console.log('generateBadPrompt:', typeof window.generateBadPrompt);
+            console.log('generateGoodPrompt:', typeof window.generateGoodPrompt);
 
-            document.querySelectorAll('.feedback').forEach(feedback => {
-                feedback.textContent = '';
-                feedback.className = 'feedback mt-3 p-3 rounded-lg';
-            });
+            // Test if we can access the elements
+            console.log('bad-prompt element:', document.getElementById('bad-prompt'));
+            console.log('good-prompt element:', document.getElementById('good-prompt'));
 
-            document.getElementById('score-container').classList.add('section-hidden');
-            document.getElementById('code-reveal').classList.add('section-hidden');
-            document.getElementById('retry-message').classList.add('section-hidden');
-        }
+            // Test goToSection manually
+            if (typeof window.goToSection === 'function') {
+                console.log('goToSection is accessible globally');
+            } else {
+                console.error('goToSection is NOT accessible globally');
+            }
+        });
     </script>
+
+    <footer class="module-footer">
+        <a href="{{ '/digital-famine/ai/' | prepend: site.baseurl }}" class="footer-link">
+            ← Back to AI Quest Home
+        </a>
+    </footer>
+
+    <style>
+        .module-footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 2px solid rgba(139, 92, 246, 0.3);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-link {
+            display: inline-block;
+            color: #a78bfa;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .footer-link:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+    </style>
 </body>
 
 </html>

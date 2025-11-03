@@ -360,12 +360,12 @@ date: 2025-10-22
           console.log(`Total time spent:`, totalTime);
           const modulesComplete = filtered.length
           console.log(`Modules Completed:`, modulesComplete);
-          const modulesIncomplete = 25 - filtered.length
+          const modulesIncomplete = 24 - filtered.length
           console.log(`Modules Incomplete:`, modulesIncomplete);
 
           // Define modules and total submodules
           const modules = {
-              'AI Usage': 4,
+              'AI Usage': 3,
               'Backend Development': 6,
               'Data Visualization': 3,
               'Frontend Development': 6,

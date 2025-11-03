@@ -10,6 +10,7 @@ categories: [CSP, Submodule, Backend]
 tags: [backend, submodule, encrypters]
 author: "Encrypters Team"
 date: 2025-10-21
+
 ---
 
 # Module 4: Flask – Python Backend
@@ -273,5 +274,15 @@ CORS(app)
 
 **Next Steps:**  
 Continue by connecting your Flask API to a frontend (like React or Vue) and test endpoints with Postman or Thunder Client.
+
+
+
+
+
+
+
+
+
+
 
 

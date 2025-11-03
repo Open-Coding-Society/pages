@@ -6,17 +6,18 @@ microblog: true
 ---
 
 <div class="ai-page">
-  <section class="ai-hero">
-    <p class="tagline">🤖 Interactive Learning Journey</p>
-    <h1>AI Usage Quest: Streamline Your Development</h1>
-    <p>Master AI tools and prompting techniques through four progressive modules. Learn to leverage AI for
-      frontend/backend development, data visualization, and professional growth.</p>
-  </section>
+  <div class="back-navigation">
+    <a href="{{ '/digital-famine/' | prepend: site.baseurl }}" class="back-button">
+      ← Back to Digital Famine
+    </a>
+  </div>
 
-  <section class="mission-overview">
-    <h2>🧠 Overview</h2>
-    <p>This hands-on experience takes you from understanding AI fundamentals to building with AI APIs. Each module
-      builds on the previous, culminating in a mini-game that tests your mastery of AI integration.</p>
+  <section class="ai-hero">
+    <h1>AI Usage Quest</h1>
+    <p class="mission-statement"><strong>Purpose:</strong> Master AI fundamentals, prompt engineering, and API
+      integration through interactive modules.</p>
+    <p class="mission-statement"><strong>Mission:</strong> Complete three progressive lessons and unlock the final vault
+      challenge to prove your AI mastery.</p>
   </section>
 
   <section class="mission-grid">
@@ -29,11 +30,8 @@ microblog: true
         <figure class="mission-media">
           <img src="{{ '/images/digital-famine/ai.jpeg' | prepend: site.baseurl }}"
             alt="Understanding different types of artificial intelligence" loading="lazy">
-          <figcaption>Explore Narrow AI, General AI, and Super AI through interactive examples.</figcaption>
         </figure>
-        <p class="concept">Concept: AI Fundamentals & Classification</p>
-        <p class="mission-blurb">Discover the three main types of AI and understand how each powers different aspects of
-          modern technology, from voice assistants to future innovations.</p>
+        <p class="mission-blurb">Explore Narrow AI, General AI, and Super AI through interactive examples.</p>
         <span class="mission-link-text">Start Learning</span>
       </a>
     </article>
@@ -47,11 +45,8 @@ microblog: true
         <figure class="mission-media">
           <img src="{{ '/images/digital-famine/robot.jpg' | prepend: site.baseurl }}"
             alt="Mastering AI prompting techniques" loading="lazy">
-          <figcaption>Learn to communicate effectively with AI through strategic prompting.</figcaption>
         </figure>
-        <p class="concept">Concept: Text, Voice & Visual Prompts</p>
-        <p class="mission-blurb">Master the art of prompt engineering with hands-on practice in zero-shot, few-shot, and
-          contextual prompting techniques for maximum AI effectiveness.</p>
+        <p class="mission-blurb">Learn to communicate effectively with AI through strategic prompting.</p>
         <span class="mission-link-text">Start Learning</span>
       </a>
     </article>
@@ -65,11 +60,8 @@ microblog: true
         <figure class="mission-media">
           <img src="{{ '/images/digital-famine/Introduction-to-APIs.png' | prepend: site.baseurl }}"
             alt="Integrating AI APIs into applications" loading="lazy">
-          <figcaption>Build real applications by integrating powerful AI APIs into your projects.</figcaption>
         </figure>
-        <p class="concept">Concept: API Integration & Flask</p>
-        <p class="mission-blurb">Learn to harness AI capabilities through APIs, building practical applications that
-          leverage ChatGPT, image generation, and more.</p>
+        <p class="mission-blurb">Build real applications by integrating powerful AI APIs into your projects.</p>
         <span class="mission-link-text">Start Learning</span>
       </a>
     </article>
@@ -83,26 +75,11 @@ microblog: true
         <figure class="mission-media">
           <img src="{{ '/images/digital-famine/trophy.webp' | prepend: site.baseurl }}" alt="Final AI challenge game"
             loading="lazy">
-          <figcaption>Test your complete AI knowledge in an interactive challenge.</figcaption>
         </figure>
-        <p class="mission-blurb">Apply everything you've learned about AI types, prompting, and APIs in this
-          comprehensive interactive challenge that brings it all together.</p>
+        <p class="mission-blurb">Test your complete AI knowledge in an interactive challenge.</p>
         <span class="mission-link-text">Take the Challenge</span>
       </a>
     </article>
-  </section>
-
-  <section class="technical-notes">
-    <h2>🧩 What You'll Learn</h2>
-    <ul>
-      <li><strong>AI Fundamentals:</strong> Understand Narrow AI, General AI, and Super AI with real-world applications.
-      </li>
-      <li><strong>Effective Prompting:</strong> Master text, voice, and visual prompting techniques for optimal AI
-        responses.</li>
-      <li><strong>API Integration:</strong> Learn to build applications using AI APIs with Python and Flask.</li>
-      <li><strong>Practical Skills:</strong> Apply AI to frontend/backend development, data visualization, and
-        professional tools.</li>
-    </ul>
   </section>
 </div>
 
@@ -162,6 +139,29 @@ microblog: true
     z-index: 1;
   }
 
+  .back-navigation {
+    margin-bottom: 1.5rem;
+  }
+
+  .back-button {
+    display: inline-block;
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 2px solid rgba(96, 165, 250, 0.4);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    background: rgba(96, 165, 250, 0.1);
+  }
+
+  .back-button:hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.6);
+    transform: translateX(-3px);
+  }
+
   .ai-hero {
     background: radial-gradient(120% 120% at 50% 0%, #1e3a8a 0%, #0f172a 55%, #000000 100%);
     color: #f1f5f9;
@@ -182,7 +182,18 @@ microblog: true
 
   .ai-hero h1 {
     font-size: clamp(2rem, 5vw, 2.9rem);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mission-statement {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+    color: #e2e8f0;
+  }
+
+  .mission-statement:last-child {
+    margin-bottom: 0;
   }
 
   .mission-overview,
@@ -206,16 +217,16 @@ microblog: true
 
   .mission-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.75rem;
-    margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .mission-card {
     background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
     color: #cbd5e1;
-    padding: 2rem;
-    border-radius: 1.35rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(96, 165, 250, 0.25);
