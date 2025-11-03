@@ -1327,12 +1327,6 @@ function autoCompleteAllTasks() {
   
   // Fill in all the form blanks automatically
   
-  // Sourdough fill-in-the-blanks
-  document.getElementById('blank-id').value = 'id';
-  document.getElementById('blank-calories').value = 'calories';  
-  document.getElementById('blank-category').value = 'category';
-  checkSourdoughAnswers();
-  
   // DimSum fill-in-the-blanks
   document.getElementById('blank-updatePrice').value = 'updatePrice';
   document.getElementById('blank-options').value = 'options';
