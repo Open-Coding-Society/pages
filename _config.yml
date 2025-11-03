@@ -49,10 +49,6 @@ future: true
 #   silence_deprecations: [import]
 incremental: true
 
-# Syntax highlighting
-markdown: kramdown
-highlighter: rouge
-
 remote_theme: jekyll/minima
 plugins:
   - jekyll-remote-theme
