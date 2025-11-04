@@ -14,7 +14,7 @@ breadcrumb: true
 footer:
   previous: /navigation/search/microblogapi/
   home: /digital-famine/
-  next: /digital-famine/microblog/decentralization/
+  next: /digital-famine/microblog/mcq/
 ---
 
 # Submodule 4
