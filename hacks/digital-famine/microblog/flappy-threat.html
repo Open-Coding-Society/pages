@@ -12,6 +12,86 @@ author: "Sloane Sommers, Krishna Visvanath"
 date: 2025-11-03
 breadcrumb: true
 ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scrolling Stars</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: black;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+
+<script>
+  const numStars = 150; // number of stars
+  const stars = [];
+
+  // Create stars
+  for(let i = 0; i < numStars; i++){
+    const star = document.createElement('div');
+    star.className = 'star';
+    
+    // Random initial position
+    star.x = Math.random() * window.innerWidth;
+    star.y = Math.random() * window.innerHeight;
+    
+    // Random size
+    star.size = Math.random() * 2 + 1;
+    star.style.width = star.size + 'px';
+    star.style.height = star.size + 'px';
+    
+    // Random speed
+    star.speed = Math.random() * 0.5 + 0.2;
+    
+    star.style.left = star.x + 'px';
+    star.style.top = star.y + 'px';
+    
+    document.body.appendChild(star);
+    stars.push(star);
+  }
+
+  // Animate stars
+  function animateStars() {
+    for(let i = 0; i < stars.length; i++){
+      const star = stars[i];
+      star.y += star.speed; // move star downwards
+      
+      if(star.y > window.innerHeight){ // reset to top if it goes off-screen
+        star.y = 0;
+        star.x = Math.random() * window.innerWidth;
+      }
+      
+      star.style.top = star.y + 'px';
+      star.style.left = star.x + 'px';
+    }
+    requestAnimationFrame(animateStars);
+  }
+
+  animateStars();
+
+  // Optional: adjust stars when window resizes
+  window.addEventListener('resize', () => {
+    for(let i = 0; i < stars.length; i++){
+      if(stars[i].x > window.innerWidth) stars[i].x = Math.random() * window.innerWidth;
+      if(stars[i].y > window.innerHeight) stars[i].y = Math.random() * window.innerHeight;
+    }
+  });
+</script>
+
+</body>
+</html>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +110,7 @@ html,body{
 button{background:#ffcc00;border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer}
 #gameCanvas{background:#00172b;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
 .info-box{position:fixed;top:20px;right:20px;width:300px;background:#f7f7f8;color:#111;padding:14px;border-radius:10px;display:none;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+#pauseOverlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:460px;height:620px;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);border-radius:12px;cursor:pointer;color:#fff;font-weight:800;font-size:20px}
 </style>
 </head>
 <body>
@@ -40,6 +121,7 @@ button{background:#ffcc00;border:none;border-radius:8px;padding:8px 12px;font-we
 </div>
 <canvas id="gameCanvas" width="480" height="640"></canvas>
 <div class="info-box" id="infoBox"><h3 id="infoTitle"></h3><p id="infoText"></p></div>
+<div id="pauseOverlay">Click to continue</div>
 
 <script>
 const canvas=document.getElementById("gameCanvas"),ctx=canvas.getContext("2d"),
@@ -55,6 +137,7 @@ const cards=[
 ];
 
 let bird,pipes,score,frame,gravity,jump,loopId,active=false;
+let pausedForCard=false;
 function reset(){
  bird={x:80,y:canvas.height/2,vy:0,r:12};
  pipes=[];frame=0;score=0;gravity=0.5;jump=-8;
@@ -77,8 +160,12 @@ function drawPipe(p){
 function showCard(card){
  infoTitle.textContent=card.title;infoText.textContent=card.text;
  infoBox.style.display="block";infoBox.style.opacity=1;
- clearTimeout(infoBox.hide);
- infoBox.hide=setTimeout(()=>{infoBox.style.opacity=0;setTimeout(()=>infoBox.style.display="none",500)},3500);
+ // Pause the game while a card is visible and show an overlay that the player clicks to continue
+ pausedForCard = true;
+ active = false;
+ cancelAnimationFrame(loopId);
+ const overlay = document.getElementById('pauseOverlay');
+ overlay.style.display = 'flex';
 }
 function gameOver(){
  active=false;
@@ -121,6 +208,26 @@ function loop(){
 btn.onclick=reset;
 canvas.onclick=flap;
 document.addEventListener("keydown",e=>{if(e.code==="Space")flap();});
+
+// Resume handler: if paused by a card, clicking overlay or canvas resumes the game
+const overlayEl = document.getElementById('pauseOverlay');
+function resumeFromCard(){
+  if(!pausedForCard) return;
+  pausedForCard = false;
+  overlayEl.style.display = 'none';
+  infoBox.style.opacity = 0;
+  setTimeout(()=>infoBox.style.display = 'none', 200);
+  active = true;
+  // give the bird a small flap immediately when resuming so play doesn't drop instantly
+  try{ if(bird) bird.vy = jump; }catch(e){}
+  loop();
+}
+
+overlayEl.addEventListener('click', resumeFromCard);
+canvas.addEventListener('click', ()=>{
+  if(pausedForCard) return resumeFromCard();
+  flap();
+});
 </script>
 </body>
 </html>
