@@ -296,7 +296,7 @@ class MansionLevel5 {
 
     bindShootKey() {
         window.addEventListener("keydown", (event) => {
-            if (event.code === "Space") {
+            if (event.code === "KeyC") {
                 this.shootLaser();
             }
         })
@@ -428,7 +428,7 @@ class MansionLevel5 {
 
     // Method to spawn a batch of zombies
     spawnZombieBatch() {
-        const numZombies = 1; // spawn zombies per batch
+        const numZombies = 2; // spawn zombies per batch
         
         for (let i = 0; i < numZombies; i++) {
             const side = Math.floor(Math.random() * 4);
@@ -649,7 +649,7 @@ class MansionLevel5 {
             <div>
             'W','A','S','D' to move around <br>
             'C' to shoot <br>
-            Kill 10 zombies to progress <br>
+            Kill 20 zombies to progress <br>
             Press 'E' to enter the door at the end
             </div>
         `
@@ -666,7 +666,7 @@ class MansionLevel5 {
                 <div style="font-size: 14px;">${this.zombiesKilled} zombie kills</div>
             `;
 
-            if (this.zombiesKilled >= 10 && this.spawnZombies) 
+            if (this.zombiesKilled >= 20 && this.spawnZombies) 
             {
                 console.log("Level completed")
                 this.spawnZombies = false;
