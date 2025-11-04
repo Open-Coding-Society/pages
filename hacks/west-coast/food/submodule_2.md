@@ -5,9 +5,9 @@ title: "Los Angeles"
 description: "City Two of Food - Los Angeles"
 parent: "Los Angeles"
 team: "Syntax Terrors"
-submodule: 1
+submodule: 2
 categories: [CSP]
-tags: [food, losangeles]
+tags: [food, losangeles, read, crud]
 author: "Syntax Terrors"
 date: 2025-10-24
 footer:
@@ -17,25 +17,18 @@ footer:
 permalink: /west-coast/food/LA/
 ---
 
-# 🍊 **Los Angeles — Read & Query**
-**Objective:** Learn how to retrieve, filter, and display data from your Food Route database — just like reading restaurant menus across the city!
+# 🍊 Los Angeles — READ & QUERY (CRUD Submodule 2)
 
----
+**Quest Chapter:** *The Food Route*  
+**Focus:** R in CRUD — **READ & QUERY**  
+**Location:** Los Angeles, CA 🌆🌮  
 
-## 🌆 **Scene Setup: The LA Menu Mission**
-You’ve made it to **Los Angeles**, where food is an art form and information is everything.  
-Your task? To *query* the database and uncover details about dishes, chefs, and ratings hidden across the city’s digital menu boards.
-
-🧠 You’ll learn to:
-- Use **SELECT** to read data.
-- Filter with **WHERE**.
-- Sort and limit results.
-- Display menu results dynamically.
+Welcome to LA! This interactive page teaches database READ operations through LA's diverse food scene. Master SELECT queries, filtering, pagination, and search techniques.
 
 ---
 
 <style>
-/* === Theme variables matching submodule 1 === */
+/* === Theme variables matching other submodules === */
 :root{
   --bg-0: #060712;            /* page background deep */
   --bg-1: rgba(8,12,25,0.75); /* card background translucent */
@@ -51,10 +44,9 @@ Your task? To *query* the database and uncover details about dishes, chefs, and 
   --terminal-bg: #071827;
   --input-border: rgba(148,163,184,0.12);
   --input-bg: rgba(255,255,255,0.02);
-  --code-bg: linear-gradient(180deg, rgba(8,12,25,0.6), rgba(12,16,28,0.6));
 }
 
-/* Base page */
+/* Base page styling */
 body {
   background: radial-gradient(1200px 500px at 10% 10%, rgba(59,130,246,0.06), transparent),
               radial-gradient(900px 400px at 90% 80%, rgba(139,92,246,0.05), transparent),
@@ -68,843 +60,855 @@ body {
 }
 
 /* Headings */
-h1, h2, h3, h4 { color: #e6e9ff; margin-top: 0.25rem; }
-strong { color: #f8f9ff; }
+h1, h2, h3, h4 { 
+  color: #e6e9ff; 
+  margin-top: 0.25rem; 
+}
+strong { 
+  color: #f8f9ff; 
+}
 
-.table-container {
-  width: 90%;
-  margin: 20px auto;
-  border-collapse: collapse;
+.sq-card {
+  border-radius: .8rem;
+  padding: 1.2rem;
+  background: var(--bg-1);
+  box-shadow: 0 8px 32px rgba(2,6,23,0.45);
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--card-border);
+}
+
+.sq-card, .sq-card h3, .sq-card p, .sq-card label, .sq-card input, .sq-card select, .sq-card pre, .sq-card ul, .sq-card li {
+  color: var(--text) !important;
+}
+
+.sq-card h3 {
+  color: var(--accent-1) !important;
+  margin-bottom: 0.75rem;
+}
+
+.sq-btn {
+  background: linear-gradient(90deg, var(--accent-3), rgba(6,182,212,0.15));
+  color: white;
+  border: 1px solid rgba(6,182,212,0.18);
+  border-radius: 8px;
+  padding: .6rem 1.1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(6,182,212,0.12);
+  transition: all 0.3s ease;
   font-family: Inter, ui-sans-serif, system-ui;
+}
+
+.sq-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(6,182,212,0.2);
+}
+
+.sq-toast {
+  position: fixed;
+  right: 1.5rem;
+  top: 1.5rem;
+  background: linear-gradient(135deg, var(--success), #059669);
+  color: white;
+  padding: .7rem 1.2rem;
+  border-radius: .7rem;
+  font-weight: 600;
+  display: none;
+  z-index: 9999;
+  box-shadow: 0 20px 60px rgba(139,92,246,0.4);
+}
+
+.progress-tracker {
   background: var(--bg-1);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  overflow: hidden;
+  padding: 1.2rem;
+  border-radius: 1rem;
+  margin: 1.2rem 0;
+  color: var(--text);
   box-shadow: 0 8px 32px rgba(2,6,23,0.45);
 }
 
-.table-container th {
+.progress-tracker h3 {
+  color: var(--accent-2) !important;
+  margin: 0 0 1rem 0;
+}
+
+.task-complete {
+  color: var(--success) !important;
+  font-weight: 700;
+}
+
+.unlock-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
   color: white;
-  padding: 12px;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.table-container td {
-  background: var(--bg-1);
-  color: var(--text);
-  padding: 12px;
-  font-size: 1.1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.table-container tr:nth-child(even) td {
-  background: rgba(255,255,255,0.02);
-}
-
-.code-button {
-  background: linear-gradient(90deg, var(--accent-3), rgba(6,182,212,0.15));
-  color: white;
-  font-family: Inter, ui-sans-serif, system-ui;
-  font-weight: 600;
-  font-size: 1rem;
-  border: 1px solid rgba(6,182,212,0.18);
-  border-radius: 8px;
-  padding: 10px 20px;
-  margin: 20px auto;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(6,182,212,0.12);
-}
-
-.code-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(6,182,212,0.2);
-}
-
-.code-snippet {
+  padding: 28px 56px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 20px;
+  z-index: 10000;
+  box-shadow: 0 20px 60px rgba(139,92,246,0.4);
   display: none;
+  text-align: center;
+}
+
+.sq-field {
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--input-border);
+  width: 100%;
+  background: var(--input-bg);
+  color: var(--text);
+  outline: none;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.01);
+  font-size: 0.95rem;
+  font-family: Inter, ui-sans-serif, system-ui;
+}
+
+.sq-field:focus {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+.sq-field option {
+  background: var(--terminal-bg);
+  color: var(--text);
+}
+
+.sq-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-weight: 600;
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui;
+}
+
+.code-editor {
   background: var(--terminal-bg);
   color: var(--text);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
-  padding: 15px;
-  border-radius: 8px;
-  margin-top: 10px;
-  width: 90%;
-  overflow-x: auto;
-  border: 1px solid var(--card-border);
-}
-
-.code-section {
-  text-align: center;
-}
-
-/* Itinerary Foods Display */
-.itinerary-foods {
-  background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.06));
-  border: 2px solid var(--card-border);
-  padding: 1.5rem;
-  border-radius: 12px;
-  margin: 1.5rem auto;
-  width: 90%;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
-}
-
-.itinerary-foods h3 {
-  color: var(--accent-1);
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.food-item {
-  background: rgba(255, 255, 255, 0.02);
-  border-left: 4px solid var(--accent-1);
-  border-radius: 10px;
   padding: 1rem;
-  margin: 0.75rem 0;
-  transition: transform 0.2s ease;
-  color: var(--text);
-}
-
-.food-item:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(139,92,246,0.2);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.food-item h4 {
-  color: var(--accent-2);
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-}
-
-.food-item p {
-  color: var(--muted);
-  margin: 0;
-  font-size: 0.95rem;
-}
-
-.no-itinerary-msg {
-  text-align: center;
-  color: var(--muted);
-  padding: 2rem;
-  font-style: italic;
-  background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
+  border: 1px solid var(--card-border);
+  width: 100%;
+  min-height: 200px;
+  resize: vertical;
+  font-size: 0.9rem;
 }
 
-/* Dropdown explanations */
-.topic-dropdown {
-  width: 90%;
-  max-width: 700px;
-  margin: 20px auto;
-  font-family: Inter, ui-sans-serif, system-ui;
-}
-
-.topic-dropdown summary {
-  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
-  color: white;
-  padding: 12px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
-}
-
-.topic-dropdown details[open] summary {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.topic-dropdown div {
-  background: var(--bg-1);
+.sq-terminal {
+  background: var(--terminal-bg);
   color: var(--text);
-  padding: 12px;
-  border-radius: 0 0 10px 10px;
-  font-size: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  padding: 1rem;
+  border-radius: 8px;
   border: 1px solid var(--card-border);
-  border-top: none;
+  min-height: 100px;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  overflow-x: auto;
 }
 
-/* Quiz styling */
-.quiz-container {
-  background: var(--bg-1);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(2,6,23,0.45);
-  padding: 25px;
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-}
-
-.quiz-container h2 {
-  text-align: center;
-  color: var(--accent-1);
-  margin-bottom: 20px;
+.quiz-block {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(99,102,241,0.2);
 }
 
 .quiz-question {
-  margin-bottom: 20px;
-  color: var(--text);
+  margin: 0.5rem 0;
 }
 
-.quiz-option {
-  display: block;
-  background: rgba(255,255,255,0.02);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  border-radius: 8px;
-  padding: 10px 16px;
-  margin: 8px 0;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  text-align: left;
+.quiz-question input[type="radio"] {
+  margin-right: 0.5rem;
 }
 
-.quiz-option:hover {
-  background: rgba(255,255,255,0.05);
-  transform: scale(1.02);
-  border-color: var(--accent-2);
-}
-
-.quiz-option.correct {
-  background: rgba(16,185,129,0.2);
-  border-color: var(--success);
-}
-
-.quiz-option.incorrect {
-  background: rgba(251,113,133,0.2);
-  border-color: var(--danger);
-}
-
-#quiz-result, #fill-result {
-  margin-top: 20px;
-  text-align: center;
+.quiz-feedback {
+  margin-top: 0.5rem;
   font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--success);
 }
 
-/* XP Progress Bar */
-.progress-container {
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-  background: var(--bg-1);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
-}
-
-.progress-bar {
-  background: rgba(2,6,23,0.45);
-  border-radius: 12px;
-  overflow: hidden;
-  height: 16px;
-}
-
-.progress-fill {
-  background: linear-gradient(90deg, var(--success), #059669);
-  height: 100%;
-  width: 0%;
-  transition: width 1s ease-in-out;
-}
-
-.progress-text {
-  margin-top: 8px;
-  font-weight: bold;
-  text-align: right;
-  font-family: Inter, ui-sans-serif, system-ui;
-  color: var(--text);
-}
-
-/* Fill-in-the-blanks styling */
-.fill-container {
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-  background: var(--bg-1);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 20px;
-  font-family: Inter, ui-sans-serif, system-ui;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
-}
-
-.fill-container h3 {
-  color: var(--accent-2);
-}
-
-.fill-container input {
-  padding: 8px;
+/* Task items styling */
+.task-item {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgba(255,255,255,0.02);
   border-radius: 6px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  color: var(--text);
-  width: 200px;
-  margin: 0 6px;
+  border-left: 3px solid var(--accent-3);
 }
 
-.fill-container button {
-  background: linear-gradient(90deg, var(--accent-3), rgba(6,182,212,0.15));
-  color: white;
-  border: 1px solid rgba(6,182,212,0.18);
+/* Collapsible styling */
+details {
+  border: 1px solid var(--card-border);
   border-radius: 8px;
-  padding: 8px 14px;
+  margin-bottom: 1rem;
+  background: var(--bg-1);
+  box-shadow: 0 4px 12px rgba(2,6,23,0.3);
+}
+
+details summary {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-1));
+  color: white;
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  list-style: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(6,182,212,0.12);
 }
 
-.fill-container button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(6,182,212,0.2);
-}
-
-/* Task completion styling */
-.task-complete { 
-  color: var(--success) !important; 
-  font-weight: 700; 
-}
-
-/* Filter the table to show only itinerary foods */
-.table-container tr.hidden-row {
+details summary::-webkit-details-marker {
   display: none;
 }
-</style>
 
-<!-- Itinerary Foods Display -->
-<div class="itinerary-foods">
-  <h3>🍽️ Your Los Angeles Food Selections</h3>
-  <div id="itinerary-foods-display"></div>
-</div>
-
-<div class="table-container">
-<table id="food-table">
-  <tr>
-    <th>Food</th>
-    <th>Description</th>
-  </tr>
-  <tr data-food="Korean BBQ">
-    <td>🍖 Korean BBQ</td>
-    <td>Sizzling short ribs, spicy pork belly, and endless banchan cooked right at your table.</td>
-  </tr>
-  <tr data-food="Street Tacos (al pastor)">
-    <td>🌮 Street Tacos (al pastor)</td>
-    <td>Authentic flavors from taco trucks with marinated pork, cilantro, onion, and pineapple.</td>
-  </tr>
-  <tr data-food="In-N-Out Burger">
-    <td>🍔 In-N-Out Burger</td>
-    <td>California's iconic fast-food favorite known for fresh ingredients and "Animal Style" fries.</td>
-  </tr>
-  <tr data-food="Avocado Toast">
-    <td>🥑 Avocado Toast</td>
-    <td>The brunch classic topped with poached eggs, microgreens, and local sourdough.</td>
-  </tr>
-  <tr data-food="Ramen & Fusion Dishes">
-    <td>🍜 Ramen & Fusion Dishes</td>
-    <td>Creative blends of global flavors found in Little Tokyo and beyond.</td>
-  </tr>
-  <tr data-food="Erewhon">
-    <td>🥤 Erewhon</td>
-    <td>The trendy health market known for luxury smoothies and influencer culture.</td>
-  </tr>
-</table>
-</div>
-<!-- ============================= -->
-<!-- 2️⃣ LA Food Learning Tasks -->
-<!-- ============================= -->
-<div class="topic-dropdown">
-  <details open>
-    <summary>🍴 LA Food Tasks — Practice</summary>
-    <div>
-      <ol>
-        <li>
-          <strong>Korean BBQ:</strong> Use a <code>SELECT</code> query with <code>WHERE</code> to list all Korean BBQ dishes and their prices.
-          <br>
-          <em>Hint: Filter by category or dish name containing "Korean BBQ".</em>
-        </li>
-
-        <li>
-          <strong>Street Tacos (al pastor):</strong> Retrieve the top 5 street taco dishes sorted by rating.
-          <br>
-          <em>Hint: Use <code>ORDER BY rating DESC LIMIT 5</code> to get the highest-rated tacos.</em>
-        </li>
-
-        <li>
-          <strong>In-N-Out Burger:</strong> Paginate the burger menu showing 3 items per page. Retrieve the results for page 2.
-          <br>
-          <em>Hint: Use <code>LIMIT</code> and <code>OFFSET</code> to get the correct page.</em>
-        </li>
-
-        <li>
-          <strong>Avocado Toast:</strong> Find all dishes containing "avocado" using <code>LIKE</code> or full-text search.
-          <br>
-          <em>Hint: Try <code>WHERE name LIKE '%avocado%'</code>.</em>
-        </li>
-
-        <li>
-          <strong>Ramen & Fusion Dishes:</strong> Create a query to find all dishes with "noodles" in the ingredients column and explain why adding an index on ingredients would improve query speed.
-          <br>
-          <em>Hint: Use <code>ILIKE '%noodles%'</code> and think about indexing.</em>
-        </li>
-
-        <li>
-          <strong>Erewhon 🥤:</strong> Retrieve all Erewhon smoothies under 400 calories and sort them by calories ascending.
-          <br>
-          <em>Hint: Combine <code>WHERE calories &lt; 400</code> with <code>ORDER BY calories ASC</code>.</em>
-        </li>
-      </ol>
-    </div>
-  </details>
-</div>
-
-
----
-<!-- ============================= -->
-<!-- 🍊 LA Submodule Learning + Quiz -->
-<!-- ============================= -->
-
-<style>
-/* Dropdown explanations */
-.topic-dropdown {
-  width: 90%;
-  max-width: 700px;
-  margin: 20px auto;
-  font-family: Inter, ui-sans-serif, system-ui;
+details summary::before {
+  content: "▶";
+  margin-right: 0.5rem;
+  transition: transform 0.3s ease;
 }
 
-.topic-dropdown summary {
-  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
-  color: white;
-  padding: 12px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+details[open] summary::before {
+  transform: rotate(90deg);
 }
 
-.topic-dropdown details[open] summary {
+details[open] summary {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.topic-dropdown div {
-  background: var(--bg-1);
-  color: var(--text);
-  padding: 12px;
-  border-radius: 0 0 10px 10px;
-  font-size: 1rem;
-  border: 1px solid var(--card-border);
+details .sq-card {
+  margin: 0;
   border-top: none;
-}
-
-/* Quiz styling */
-.quiz-container {
-  background: var(--bg-1);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(2,6,23,0.45);
-  padding: 25px;
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-}
-
-.quiz-container h2 {
-  text-align: center;
-  color: var(--accent-1);
-  margin-bottom: 20px;
-}
-
-.quiz-question {
-  margin-bottom: 20px;
-  color: var(--text);
-}
-
-.quiz-option {
-  display: block;
-  background: rgba(255,255,255,0.02);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  border-radius: 8px;
-  padding: 10px 16px;
-  margin: 8px 0;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  text-align: left;
-}
-
-.quiz-option:hover {
-  background: rgba(255,255,255,0.05);
-  transform: scale(1.02);
-  border-color: var(--accent-2);
-}
-
-.quiz-option.correct {
-  background: rgba(16,185,129,0.2);
-  border-color: var(--success);
-}
-
-.quiz-option.incorrect {
-  background: rgba(251,113,133,0.2);
-  border-color: var(--danger);
-}
-
-#quiz-result, #fill-result {
-  margin-top: 20px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--success);
-}
-
-/* XP Progress Bar */
-.progress-container {
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-  background: var(--bg-1);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
-}
-
-.progress-bar {
-  background: rgba(2,6,23,0.45);
-  border-radius: 12px;
-  overflow: hidden;
-  height: 16px;
-}
-
-.progress-fill {
-  background: linear-gradient(90deg, var(--success), #059669);
-  height: 100%;
-  width: 0%;
-  transition: width 1s ease-in-out;
-}
-
-.progress-text {
-  margin-top: 8px;
-  font-weight: bold;
-  text-align: right;
-  font-family: Inter, ui-sans-serif, system-ui;
-  color: var(--text);
-}
-
-/* Fill-in-the-blanks styling */
-.fill-container {
-  width: 90%;
-  max-width: 700px;
-  margin: 30px auto;
-  background: var(--bg-1);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 20px;
-  font-family: Inter, ui-sans-serif, system-ui;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
-}
-
-.fill-container h3 {
-  color: var(--accent-2);
-}
-
-.fill-container input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--input-border);
-  background: var(--input-bg);
-  color: var(--text);
-  width: 200px;
-  margin: 0 6px;
-}
-
-.fill-container button {
-  background: linear-gradient(90deg, var(--accent-3), rgba(6,182,212,0.15));
-  color: white;
-  border: 1px solid rgba(6,182,212,0.18);
-  border-radius: 8px;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(6,182,212,0.12);
-}
-
-.fill-container button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(6,182,212,0.2);
-}
-
-/* Task completion styling */
-.task-complete { 
-  color: var(--success) !important; 
-  font-weight: 700; 
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 </style>
 
-<!-- ============================= -->
-<!-- 1️⃣ Dropdown Explanations -->
-<!-- ============================= -->
-<div class="topic-dropdown">
-  <details>
-    <summary>SELECT</summary>
-    <div>Retrieves data from a table. Example: <code>SELECT name, price FROM dishes;</code></div>
-  </details>
-  <details>
-    <summary>WHERE</summary>
-    <div>Filters rows based on a condition. Example: <code>SELECT * FROM dishes WHERE city='la';</code></div>
-  </details>
-  <details>
-    <summary>Pagination (page & per)</summary>
-    <div>Returns a subset of results. Example: <code>/api/dishes?city=la&page=1&per=10</code></div>
-  </details>
-  <details>
-    <summary>Full-text / LIKE Search</summary>
-    <div>Search for partial matches. Example: <code>WHERE ingredient ILIKE '%avocado%'</code></div>
-  </details>
-  <details>
-    <summary>Indices</summary>
-    <div>Speeds up queries on a column. Example: <code>CREATE INDEX idx_ingredient_name ON ingredient(name);</code></div>
-  </details>
-</div>
-
-<!-- ============================= -->
-<!-- 2️⃣ Quiz: 5 Questions, 40 XP -->
-<!-- ============================= -->
-<div class="quiz-container">
-  <h2>🧠 LA SQL Quiz (40 XP)</h2>
-
-  <div class="quiz-question">
-    <p>1️⃣ Which SQL command retrieves rows from a table?</p>
-    <button class="quiz-option" onclick="checkAnswer(this,true)">SELECT</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">INSERT</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">UPDATE</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">DELETE</button>
+<!-- Progress Tracker -->
+<div class="progress-tracker">
+  <h3>🎯 Los Angeles Progress Tracker</h3>
+  <div id="progress-display">
+    <div id="task-koreanbbq" class="task-item">🍖 Korean BBQ - <span class="status">Incomplete</span></div>
+    <div id="task-streettacos" class="task-item">🌮 Street Tacos (al pastor) - <span class="status">Incomplete</span></div>
+    <div id="task-innout" class="task-item">🍔: In-N-Out Burger - <span class="status">Incomplete</span></div>
+    <div id="task-avocado" class="task-item">🥑 Avocado Toast - <span class="status">Incomplete</span></div>
+    <div id="task-ramen" class="task-item">🍜 Ramen & Fusion Dishes - <span class="status">Incomplete</span></div>
+    <div id="task-erewhon" class="task-item">🥤 Erewhon - <span class="status">Incomplete</span></div>
   </div>
-
-  <div class="quiz-question">
-    <p>2️⃣ Which clause filters rows based on a condition?</p>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">GROUP BY</button>
-    <button class="quiz-option" onclick="checkAnswer(this,true)">WHERE</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">ORDER BY</button>
-  </div>
-
-  <div class="quiz-question">
-    <p>3️⃣ Which query would show only 10 results per page?</p>
-    <button class="quiz-option" onclick="checkAnswer(this,true)">LIMIT 10 OFFSET 0</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">SELECT TOP 10</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">WHERE row<10</button>
-  </div>
-
-  <div class="quiz-question">
-    <p>4️⃣ Which keyword allows partial text matching?</p>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">FULLTEXT</button>
-    <button class="quiz-option" onclick="checkAnswer(this,true)">LIKE</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">MATCH</button>
-  </div>
-
-  <div class="quiz-question">
-    <p>5️⃣ Which SQL command creates an index for faster queries?</p>
-    <button class="quiz-option" onclick="checkAnswer(this,true)">CREATE INDEX</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">CREATE TABLE</button>
-    <button class="quiz-option" onclick="checkAnswer(this,false)">ALTER TABLE</button>
-  </div>
-
-  <div id="quiz-result"></div>
-</div>
-
-<!-- ============================= -->
-<!-- 3️⃣ Fill-in-the-blanks: 50 XP -->
-<!-- ============================= -->
-<div class="fill-container">
-  <h3>📝 Fill in the blanks (50 XP)</h3>
-  <p>Write the SQL to find dishes with 'halibut' and calories over 300:</p>
-  <input type="text" id="blank1" placeholder="SELECT ...">
-  <input type="text" id="blank2" placeholder="FROM ...">
-  <input type="text" id="blank3" placeholder="WHERE ...">
-  <button onclick="checkBlanks()">Submit</button>
-  <div id="fill-result"></div>
-</div>
-
-<!-- ============================= -->
-<!-- 4️⃣ LA XP Progress Bar -->
-<!-- ============================= -->
-<div class="progress-container">
-  <div class="progress-bar">
-    <div id="progress-fill" class="progress-fill"></div>
-  </div>
-  <div class="progress-text">XP: <span id="total-xp">0</span> / 90</div>
-</div>
-
-<!-- ============================= -->
-<!-- ⚙️ JS Logic -->
-<!-- ============================= -->
-<script>
-// -----------------------------
-// Quiz XP (5 questions, 8 XP each = 40 XP max)
-// -----------------------------
-let score = 0;
-let totalQuestions = 5;
-let answered = 0;
-let laXP = parseInt(localStorage.getItem("laXP")) || 0;
-let quizCompleted = false;
-
-function updateProgressBar() {
-  const progressFill = document.getElementById("progress-fill");
-  const progressText = document.getElementById("total-xp");
-  const percent = Math.min((laXP / 90)*100, 100);
-  progressFill.style.width = percent + "%";
-  progressText.textContent = laXP;
-}
-
-function checkAnswer(button, correct) {
-  const parent = button.parentElement;
-  if (parent.classList.contains('answered')) return;
-  parent.classList.add('answered');
-
-  if (correct) {
-    button.classList.add('correct');
-    score++;
-  } else {
-    button.classList.add('incorrect');
-  }
-
-  const options = parent.querySelectorAll('.quiz-option');
-  options.forEach(opt => opt.disabled = true);
-
-  answered++;
-  
-  if (answered === totalQuestions) {
-    finishQuiz();
-  }
-}
-
-function finishQuiz() {
-  const earnedXP = score * 8; // 8 XP per correct answer
-  const resultElement = document.getElementById("quiz-result");
-  
-  if (score === totalQuestions) {
-    // Perfect score - full 40 XP
-    if (!quizCompleted) {
-      laXP += 40;
-      localStorage.setItem("laXP", laXP);
-      updateProgressBar();
-      quizCompleted = true;
-      
-      // Mark Korean BBQ task as complete when quiz is perfected
-      if (typeof completeLATask === 'function') {
-        completeLATask('koreanbbq');
-      }
-      
-      // Check if we've reached 90 XP and unlock next city
-      checkXPCompletion();
-    }
-    resultElement.innerHTML = `
-      <div style="color: #4caf50; font-size: 1.3rem;">
-        🎉 Perfect Score! You earned 40 XP!
-      </div>
-    `;
-  } else {
-    // Partial score - show what they earned and retry option
-    resultElement.innerHTML = `
-      <div style="color: #ff9800; font-size: 1.1rem;">
-        📊 Score: ${score}/${totalQuestions} (${earnedXP} XP earned)<br>
-        <span style="font-size: 0.9rem;">Get all 5 correct for the full 40 XP!</span><br>
-        <button onclick="retakeQuiz()" style="
-          background: linear-gradient(135deg, #4caf50, #45a049);
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          margin-top: 10px;
-          transition: transform 0.2s ease;
-        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-          🔄 Retake Quiz
-        </button>
-      </div>
-    `;
-  }
-}
-
-function retakeQuiz() {
-  // Reset quiz state
-  score = 0;
-  answered = 0;
-  
-  // Reset all question containers
-  const questions = document.querySelectorAll('.quiz-question');
-  questions.forEach(question => {
-    question.classList.remove('answered');
-    const options = question.querySelectorAll('.quiz-option');
-    options.forEach(option => {
-      option.disabled = false;
-      option.classList.remove('correct', 'incorrect');
-    });
-  });
-  
-  // Clear result
-  document.getElementById("quiz-result").innerHTML = '';
-  
-  // Show encouragement message
-  const resultElement = document.getElementById("quiz-result");
-  resultElement.innerHTML = `
-    <div style="color: #2196f3; font-size: 1rem;">
-      🔄 Quiz reset! Try again for the full 40 XP!
+  <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: 0.5rem;">
+    <strong>Completion: <span id="completion-percentage">0%</span></strong>
+    <div style="background: rgba(2,6,23,0.45); height: 8px; border-radius: 6px; margin-top: 0.5rem;">
+      <div id="progress-bar" style="background: linear-gradient(90deg, var(--success), #059669); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
     </div>
-  `;
-  
-  setTimeout(() => {
-    resultElement.innerHTML = '';
-  }, 2000);
-}
+  </div>
+</div>
 
-// -----------------------------
-// Fill-in-the-blanks XP (50 XP)
-// -----------------------------
-function checkBlanks() {
-  const a = document.getElementById("blank1").value.trim().toUpperCase();
-  const b = document.getElementById("blank2").value.trim().toUpperCase();
-  const c = document.getElementById("blank3").value.trim().toUpperCase();
-  const result = document.getElementById("fill-result");
+<div class="sq-toast" id="sqToast">Korean BBQ query — +15 XP</div>
 
-  if(a==="SELECT NAME, PRICE" && b==="FROM DISHES" && c==="WHERE NAME LIKE '%HALIBUT%' AND CALORIES>300") {
-    result.textContent = "✅ Correct! +50 XP";
-    if(!window.fillXPAdded) {
-      laXP += 50;
-      window.fillXPAdded = true;
-      localStorage.setItem("laXP", laXP);
-      updateProgressBar();
-      
-      // Mark fill-in-the-blanks task as complete
-      completeLATask('streettacos');
-      
-      // Check if we've reached 90 XP and unlock next city
-      checkXPCompletion();
-    }
-  } else {
-    result.textContent = "❌ Try again! Hint: Use SELECT, FROM, WHERE with LIKE and calories filter.";
+<!-- Unlock Notification -->
+<div id="unlockNotification" class="unlock-notification">
+  🎉 San Francisco Unlocked!<br>
+  <small style="font-size: 13px; opacity: 0.95;">You can now continue to the next city!</small>
+</div>
+
+- **🧠 What Does READ Mean?**  
+  - In databases, **READ** = retrieving existing records using SELECT queries.  
+  <br>
+  - On the web, a client sends GET /api/dishes requests with filters.  
+  <br>
+  - The server processes:
+    - **SELECT** statements to fetch data,  
+    - **WHERE** clauses to filter results, and  
+    - **ORDER BY**, **LIMIT** for sorting and pagination.  
+  <br>
+  - Analogy: your database is like a **restaurant directory**. Reading = **searching** the directory for specific cuisines, prices, or ratings.
+
+---
+
+<!-- Task 1: Korean BBQ -->
+<details open>
+  <summary>🍖 Korean BBQ SELECT Query</summary>
+  <div class="sq-card">
+    <div class="sq-label">Practice <strong>SELECT</strong> queries to retrieve Korean BBQ dishes from our database. Learn basic data retrieval patterns.</div>
+    <textarea id="code-koreanbbq" class="code-editor">
+// Korean BBQ - Basic SELECT operations
+const koreanBBQQuery = {
+  // Basic SELECT query
+  getAllKoreanBBQ: () => {
+    return `
+      SELECT dish_id, name, protein, marinated_hours, grill_temperature, price
+      FROM korean_bbq_dishes 
+      WHERE cuisine_type = 'Korean BBQ'
+      ORDER BY price ASC;
+    `;
+  },
+
+  // SELECT with specific filters
+  getSpicyKoreanBBQ: () => {
+    return `
+      SELECT name, spice_level, banchan_count, price
+      FROM korean_bbq_dishes 
+      WHERE spice_level >= 3 
+        AND cuisine_type = 'Korean BBQ'
+        AND city = 'la'
+      ORDER BY spice_level DESC;
+    `;
+  },
+
+  // SELECT with calculated fields
+  getBBQWithTotalCost: () => {
+    return `
+      SELECT 
+        name,
+        price,
+        (price * 1.09) AS price_with_tax,
+        CASE 
+          WHEN price < 15 THEN 'Budget'
+          WHEN price < 25 THEN 'Mid-range'
+          ELSE 'Premium'
+        END as price_category
+      FROM korean_bbq_dishes
+      WHERE cuisine_type = 'Korean BBQ';
+    `;
   }
-}
+};
 
-// Add this to the <script> section at the bottom of submodule_2.md
+// Execute queries and display results
+console.log("🍖 Korean BBQ Query Examples:");
+console.log("1. All Korean BBQ:", koreanBBQQuery.getAllKoreanBBQ());
+console.log("2. Spicy Korean BBQ:", koreanBBQQuery.getSpicyKoreanBBQ());
+console.log("3. BBQ with Tax:", koreanBBQQuery.getBBQWithTotalCost());
 
-// Task completion tracking for LA
-window.laTaskProgress = {
+// Mock execution
+const sampleResults = [
+  { name: "Galbi Short Ribs", protein: "beef", price: 28.99, spice_level: 2 },
+  { name: "Bulgogi", protein: "beef", price: 22.50, spice_level: 1 },
+  { name: "Spicy Pork Belly", protein: "pork", price: 24.99, spice_level: 4 }
+];
+
+console.log("📊 Sample Korean BBQ Results:", sampleResults);
+completeTask('koreanbbq');
+    </textarea>
+    <div style="margin-top:0.5rem" class="editor-actions">
+      <button class="sq-btn sq-run" onclick="runEditor('code-koreanbbq','terminal-koreanbbq')">🍖 Run BBQ Queries</button>
+      <button class="sq-btn" onclick="copyEditor('code-koreanbbq')">Copy Code</button>
+    </div>
+    <pre id="terminal-koreanbbq" class="sq-terminal"></pre>
+    
+    <div class="quiz-block">
+      <strong>🧩 Quick Quiz:</strong>
+      <div class="quiz-question" data-answer="b">
+        <p>1️⃣ What does ORDER BY price ASC do?</p>
+        <label><input type="radio" name="q1-bbq" value="a"> Shows highest prices first</label><br>
+        <label><input type="radio" name="q1-bbq" value="b"> Shows lowest prices first</label><br>
+        <label><input type="radio" name="q1-bbq" value="c"> Filters by price range</label>
+      </div>
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answer</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</details>
+
+<!-- Task 2: Street Tacos (al pastor) -->
+<details>
+  <summary>🌮 Street Tacos WHERE Filtering</summary>
+  <div class="sq-card">
+    <div class="sq-label">Master <strong>WHERE</strong> clauses to filter al pastor tacos by location, price, and authenticity ratings.</div>
+    <textarea id="code-streettacos" class="code-editor">
+// Street Tacos (al pastor) - WHERE clause filtering
+const tacoQueries = {
+  // Filter by location and authenticity
+  getAuthenticTacos: () => {
+    return `
+      SELECT vendor_name, location, authenticity_score, price_per_taco
+      FROM street_tacos 
+      WHERE taco_type = 'al pastor'
+        AND authenticity_score >= 4.5
+        AND city = 'la'
+        AND has_pineapple = true;
+    `;
+  },
+
+  // Price range filtering
+  getBudgetTacos: () => {
+    return `
+      SELECT vendor_name, location, price_per_taco, rating
+      FROM street_tacos 
+      WHERE taco_type = 'al pastor'
+        AND price_per_taco BETWEEN 2.00 AND 4.00
+        AND rating >= 4.0
+      ORDER BY price_per_taco ASC;
+    `;
+  },
+
+  // Complex filtering with multiple conditions
+  getPremiumTacos: () => {
+    return `
+      SELECT 
+        vendor_name, 
+        location,
+        price_per_taco,
+        authenticity_score,
+        CASE 
+          WHEN authenticity_score >= 4.8 THEN 'Exceptional'
+          WHEN authenticity_score >= 4.5 THEN 'Excellent'
+          ELSE 'Good'
+        END as quality_tier
+      FROM street_tacos 
+      WHERE taco_type = 'al pastor'
+        AND (authenticity_score > 4.5 OR rating > 4.5)
+        AND vendor_type IN ('food_truck', 'street_cart')
+      ORDER BY authenticity_score DESC;
+    `;
+  }
+};
+
+// Execute the queries
+console.log("🌮 Al Pastor Taco Filtering:");
+console.log("1. Authentic Tacos:", tacoQueries.getAuthenticTacos());
+console.log("2. Budget Tacos:", tacoQueries.getBudgetTacos());
+console.log("3. Premium Tacos:", tacoQueries.getPremiumTacos());
+
+// Mock results
+const tacoResults = [
+  { vendor: "Leo's Taco Truck", location: "Highland Park", price: 3.25, authenticity: 4.8 },
+  { vendor: "Mariscos Jalisco", location: "Boyle Heights", price: 3.50, authenticity: 4.9 },
+  { vendor: "King Taco", location: "Multiple", price: 2.75, authenticity: 4.2 }
+];
+
+console.log("📊 Found", tacoResults.length, "al pastor vendors");
+completeTask('streettacos');
+    </textarea>
+    <div style="margin-top:0.5rem" class="editor-actions">
+      <button class="sq-btn sq-run" onclick="runEditor('code-streettacos','terminal-streettacos')">🌮 Filter Tacos</button>
+      <button class="sq-btn" onclick="copyEditor('code-streettacos')">Copy Code</button>
+    </div>
+    <pre id="terminal-streettacos" class="sq-terminal"></pre>
+    
+    <div class="quiz-block">
+      <strong>🧩 Quick Quiz:</strong>
+      <div class="quiz-question" data-answer="c">
+        <p>1️⃣ What does BETWEEN 2.00 AND 4.00 filter?</p>
+        <label><input type="radio" name="q2-taco" value="a"> Exactly $2.00 or $4.00</label><br>
+        <label><input type="radio" name="q2-taco" value="b"> Less than $2.00</label><br>
+        <label><input type="radio" name="q2-taco" value="c"> Prices from $2.00 to $4.00 inclusive</label>
+      </div>
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answer</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</details>
+
+<!-- Task 3: In-N-Out Burger -->
+<details>
+  <summary>🍔 In-N-Out Burger Pagination & LIMIT</summary>
+  <div class="sq-card">
+    <div class="sq-label">Learn <strong>LIMIT</strong> and <strong>OFFSET</strong> for pagination. Browse In-N-Out menu items across multiple pages.</div>
+    <textarea id="code-innout" class="code-editor">
+// In-N-Out Burger - Pagination and LIMIT queries
+const inNOutPagination = {
+  // Basic pagination
+  getMenuPage: (page = 1, itemsPerPage = 5) => {
+    const offset = (page - 1) * itemsPerPage;
+    return `
+      SELECT item_name, category, price, calories, secret_menu
+      FROM innout_menu 
+      WHERE available = true
+      ORDER BY category, price ASC
+      LIMIT ${itemsPerPage} OFFSET ${offset};
+    `;
+  },
+
+  // Top items with LIMIT
+  getTopBurgers: (limit = 3) => {
+    return `
+      SELECT item_name, rating, order_count, price
+      FROM innout_menu 
+      WHERE category = 'burger'
+        AND available = true
+      ORDER BY rating DESC, order_count DESC
+      LIMIT ${limit};
+    `;
+  },
+
+  // Secret menu items
+  getSecretMenu: () => {
+    return `
+      SELECT item_name, description, estimated_price, popularity_score
+      FROM innout_menu 
+      WHERE secret_menu = true
+        AND item_name IN ('Animal Style', 'Protein Style', '4x4', 'Flying Dutchman')
+      ORDER BY popularity_score DESC;
+    `;
+  },
+
+  // Count total items for pagination
+  getTotalCount: () => {
+    return `
+      SELECT 
+        COUNT(*) as total_items,
+        COUNT(CASE WHEN secret_menu = true THEN 1 END) as secret_items,
+        COUNT(CASE WHEN category = 'burger' THEN 1 END) as burger_count
+      FROM innout_menu 
+      WHERE available = true;
+    `;
+  }
+};
+
+// Demonstrate pagination
+console.log("🍔 In-N-Out Pagination Examples:");
+console.log("Page 1:", inNOutPagination.getMenuPage(1, 5));
+console.log("Page 2:", inNOutPagination.getMenuPage(2, 5));
+console.log("Top 3 Burgers:", inNOutPagination.getTopBurgers(3));
+console.log("Secret Menu:", inNOutPagination.getSecretMenu());
+
+// Mock pagination results
+const mockPage1 = [
+  { item: "Hamburger", category: "burger", price: 2.65, calories: 390 },
+  { item: "Cheeseburger", category: "burger", price: 2.95, calories: 480 },
+  { item: "Double-Double", category: "burger", price: 3.85, calories: 670 },
+  { item: "French Fries", category: "sides", price: 1.95, calories: 395 },
+  { item: "Chocolate Shake", category: "drinks", price: 2.40, calories: 590 }
+];
+
+console.log("📖 Page 1 Results:", mockPage1);
+console.log("📊 Showing 5 items per page");
+
+completeTask('innout');
+    </textarea>
+    <div style="margin-top:0.5rem" class="editor-actions">
+      <button class="sq-btn sq-run" onclick="runEditor('code-innout','terminal-innout')">🍔 Paginate Menu</button>
+      <button class="sq-btn" onclick="copyEditor('code-innout')">Copy Code</button>
+    </div>
+    <pre id="terminal-innout" class="sq-terminal"></pre>
+    
+    <div class="quiz-block">
+      <strong>🧩 Quick Quiz:</strong>
+      <div class="quiz-question" data-answer="a">
+        <p>1️⃣ For page 3 with 10 items per page, what should OFFSET be?</p>
+        <label><input type="radio" name="q3-innout" value="a"> 20</label><br>
+        <label><input type="radio" name="q3-innout" value="b"> 30</label><br>
+        <label><input type="radio" name="q3-innout" value="c"> 10</label>
+      </div>
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answer</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</details>
+
+<!-- Task 4: Avocado Toast -->
+<details>
+  <summary>🥑 Avocado Toast LIKE Search</summary>
+  <div class="sq-card">
+    <div class="sq-label">Master <strong>LIKE</strong> and pattern matching to search for avocado-based dishes across LA brunch spots.</div>
+    <textarea id="code-avocado" class="code-editor">
+// Avocado Toast - LIKE search and pattern matching
+const avocadoSearch = {
+  // Basic LIKE search
+  findAvocadoDishes: () => {
+    return `
+      SELECT dish_name, restaurant, price, description
+      FROM brunch_menu 
+      WHERE dish_name ILIKE '%avocado%'
+        OR description ILIKE '%avocado%'
+        AND city = 'la'
+      ORDER BY price ASC;
+    `;
+  },
+
+  // Advanced pattern matching
+  findToastVariations: () => {
+    return `
+      SELECT 
+        dish_name,
+        restaurant,
+        price,
+        toppings,
+        bread_type
+      FROM brunch_menu 
+      WHERE (dish_name ILIKE '%toast%' OR dish_name ILIKE '%bread%')
+        AND (toppings ILIKE '%avocado%' OR description ILIKE '%avocado%')
+        AND price BETWEEN 8.00 AND 25.00
+      ORDER BY restaurant, price;
+    `;
+  },
+
+  // Search with multiple patterns
+  findHealthyOptions: () => {
+    return `
+      SELECT 
+        dish_name,
+        restaurant,
+        price,
+        calories,
+        healthy_tags
+      FROM brunch_menu 
+      WHERE dish_name ILIKE ANY(ARRAY['%avocado%', '%quinoa%', '%kale%', '%superfood%'])
+        OR healthy_tags && ARRAY['vegan', 'gluten-free', 'organic']
+        AND calories < 600
+      ORDER BY calories ASC;
+    `;
+  },
+
+  // Full-text search simulation
+  searchByKeywords: (keywords) => {
+    const keywordPattern = keywords.split(' ').map(k => `%${k}%`).join('');
+    return `
+      SELECT 
+        dish_name,
+        restaurant,
+        price,
+        description,
+        ts_rank(to_tsvector('english', description), plainto_tsquery('english', '${keywords}')) AS rank
+      FROM brunch_menu 
+      WHERE to_tsvector('english', description) @@ plainto_tsquery('english', '${keywords}')
+        AND city = 'la'
+      ORDER BY rank DESC, price ASC;
+    `;
+  }
+};
+
+// Execute searches
+console.log("🥑 Avocado Toast Search Patterns:");
+console.log("1. Find Avocado Dishes:", avocadoSearch.findAvocadoDishes());
+console.log("2. Toast Variations:", avocadoSearch.findToastVariations());
+console.log("3. Healthy Options:", avocadoSearch.findHealthyOptions());
+console.log("4. Keyword Search:", avocadoSearch.searchByKeywords("avocado sourdough"));
+
+// Mock search results
+const searchResults = [
+  { dish: "Classic Avocado Toast", restaurant: "République", price: 14.00, description: "Smashed avocado on sourdough" },
+  { dish: "Avocado Benedict", restaurant: "Guelaguetza", price: 18.50, description: "Poached eggs over avocado" },
+  { dish: "Superfood Bowl", restaurant: "Café Gratitude", price: 16.00, description: "Quinoa, avocado, kale" }
+];
+
+console.log("🔍 Search Results:", searchResults);
+console.log("📊 Found", searchResults.length, "matching dishes");
+
+completeTask('avocado');
+    </textarea>
+    <div style="margin-top:0.5rem" class="editor-actions">
+      <button class="sq-btn sq-run" onclick="runEditor('code-avocado','terminal-avocado')">🥑 Search Avocado</button>
+      <button class="sq-btn" onclick="copyEditor('code-avocado')">Copy Code</button>
+    </div>
+    <pre id="terminal-avocado" class="sq-terminal"></pre>
+    
+    <div class="quiz-block">
+      <strong>🧩 Quick Quiz:</strong>
+      <div class="quiz-question" data-answer="b">
+        <p>1️⃣ What does ILIKE '%avocado%' find?</p>
+        <label><input type="radio" name="q4-avocado" value="a"> Exactly "avocado"</label><br>
+        <label><input type="radio" name="q4-avocado" value="b"> Any text containing "avocado"</label><br>
+        <label><input type="radio" name="q4-avocado" value="c"> Text starting with "avocado"</label>
+      </div>
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answer</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</details>
+
+<!-- Task 5: Ramen & Fusion Dishes -->
+<details>
+  <summary>🍜 Ramen JOINs & Complex Queries</summary>
+  <div class="sq-card">
+    <div class="sq-label">Practice <strong>JOIN</strong> operations and complex queries to explore LA's ramen and fusion scene with restaurant ratings.</div>
+    <textarea id="code-ramen" class="code-editor">
+// Ramen & Fusion Dishes - JOIN operations and complex queries
+const ramenQueries = {
+  // Basic JOIN between ramen dishes and restaurants
+  getRamenWithRestaurants: () => {
+    return `
+      SELECT 
+        r.restaurant_name,
+        r.neighborhood,
+        r.rating as restaurant_rating,
+        d.dish_name,
+        d.broth_type,
+        d.spice_level,
+        d.price,
+        d.fusion_style
+      FROM restaurants r
+      JOIN dishes d ON r.restaurant_id = d.restaurant_id
+      WHERE d.category = 'ramen'
+        AND r.city = 'la'
+        AND r.rating >= 4.0
+      ORDER BY r.rating DESC, d.price ASC;
+    `;
+  },
+
+  // Complex JOIN with aggregates
+  getFusionPopularity: () => {
+    return `
+      SELECT 
+        d.fusion_style,
+        COUNT(*) as dish_count,
+        AVG(d.price) as avg_price,
+        AVG(r.rating) as avg_restaurant_rating,
+        MAX(d.spice_level) as max_spice
+      FROM dishes d
+      JOIN restaurants r ON d.restaurant_id = r.restaurant_id
+      WHERE d.category IN ('ramen', 'fusion')
+        AND r.city = 'la'
+        AND d.fusion_style IS NOT NULL
+      GROUP BY d.fusion_style
+      HAVING COUNT(*) >= 2
+      ORDER BY avg_restaurant_rating DESC;
+    `;
+  },
+
+  // Multi-table JOIN with ingredients
+  getRamenIngredients: () => {
+    return `
+      SELECT 
+        r.restaurant_name,
+        d.dish_name,
+        d.broth_type,
+        STRING_AGG(i.ingredient_name, ', ') as toppings,
+        COUNT(di.ingredient_id) as topping_count
+      FROM restaurants r
+      JOIN dishes d ON r.restaurant_id = d.restaurant_id
+      JOIN dish_ingredients di ON d.dish_id = di.dish_id
+      JOIN ingredients i ON di.ingredient_id = i.ingredient_id
+      WHERE d.category = 'ramen'
+        AND r.neighborhood IN ('Little Tokyo', 'Sawtelle', 'West LA')
+      GROUP BY r.restaurant_name, d.dish_name, d.broth_type
+      HAVING COUNT(di.ingredient_id) >= 5
+      ORDER BY topping_count DESC;
+    `;
+  },
+
+  // Subquery for top-rated fusion
+  getTopFusionRamen: () => {
+    return `
+      SELECT 
+        r.restaurant_name,
+        d.dish_name,
+        d.fusion_style,
+        d.price,
+        r.rating
+      FROM restaurants r
+      JOIN dishes d ON r.restaurant_id = d.restaurant_id
+      WHERE r.rating >= (
+        SELECT AVG(rating) + 0.5 
+        FROM restaurants 
+        WHERE city = 'la'
+      )
+      AND d.category = 'ramen'
+      AND d.fusion_style IS NOT NULL
+      ORDER BY r.rating DESC, d.price ASC;
+    `;
+  }
+};
+
+// Execute complex queries
+console.log("🍜 Ramen & Fusion Analysis:");
+console.log("1. Ramen with Restaurants:", ramenQueries.getRamenWithRestaurants());
+console.log("2. Fusion Popularity:", ramenQueries.getFusionPopularity());
+console.log("3. Ramen Ingredients:", ramenQueries.getRamenIngredients());
+console.log("4. Top Fusion Ramen:", ramenQueries.getTopFusionRamen());
+
+// Mock complex results
+const fusionResults = [
+  { style: "Korean-Japanese", dish_count: 8, avg_price: 16.50, avg_rating: 4.4 },
+  { style: "Mexican-Japanese", dish_count: 5, avg_price: 14.25, avg_rating: 4.2 },
+  { style: "Vietnamese-Japanese", dish_count: 6, avg_price: 15.75, avg_rating: 4.3 }
+];
+
+console.log("🌐 Fusion Analysis:", fusionResults);
+console.log("📊 Korean-Japanese fusion is most popular!");
+
+completeTask('ramen');
+    </textarea>
+    <div style="margin-top:0.5rem" class="editor-actions">
+      <button class="sq-btn sq-run" onclick="runEditor('code-ramen','terminal-ramen')">🍜 Analyze Ramen</button>
+      <button class="sq-btn" onclick="copyEditor('code-ramen')">Copy Code</button>
+    </div>
+    <pre id="terminal-ramen" class="sq-terminal"></pre>
+    
+    <div class="quiz-block">
+      <strong>🧩 Quick Quiz:</strong>
+      <div class="quiz-question" data-answer="c">
+        <p>1️⃣ What does GROUP BY fusion_style do?</p>
+        <label><input type="radio" name="q5-ramen" value="a"> Sorts by fusion style</label><br>
+        <label><input type="radio" name="q5-ramen" value="b"> Filters fusion styles</label><br>
+        <label><input type="radio" name="q5-ramen" value="c"> Groups rows by fusion style for aggregation</label>
+      </div>
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answer</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</details>
+
+<!-- Task 6: Erewhon -->
+<details>
+  <summary>🥤 Erewhon Analytics & Indexing</summary>
+  <div class="sq-card">
+    <div class="sq-label">Learn database <strong>indexing</strong> and performance optimization through Erewhon's premium smoothie analytics.</div>
+    <div style="display:grid; grid-template-columns: 1fr; gap:0.5rem;">
+      <label class="sq-label">Smoothie Name Filter</label>
+      <input id="smoothie-name" class="sq-field" placeholder="Green Goddess" value="Green Goddess" />
+
+      <label class="sq-label">Max Calories</label>
+      <input id="max-calories" type="number" class="sq-field" placeholder="400" value="400" />
+
+      <label class="sq-label">Min Price</label>
+      <input id="min-price" type="number" step="0.01" class="sq-field" placeholder="15.00" value="15.00" />
+
+      <label class="sq-label">Ingredient Filter</label>
+      <select id="ingredient-filter" class="sq-field">
+        <option value="collagen">Collagen</option>
+        <option value="spirulina">Spirulina</option>
+        <option value="adaptogens">Adaptogens</option>
+        <option value="maca">Maca Root</option>
+      </select>
+
+      <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
+        <button class="sq-btn sq-run" onclick="queryErewhonSmoothies()">🥤 Query Smoothies</button>
+        <button class="sq-btn" onclick="analyzeErewhonPerformance()">📊 Analyze Performance</button>
+        <button class="sq-btn" onclick="clearTerm('terminal-erewhon')">Clear Terminal</button>
+      </div>
+
+      <div id="terminal-erewhon" class="sq-terminal" style="margin-top:0.5rem"></div>
+    </div>
+
+    <div class="quiz-block">
+      <strong>🧩 Quick Quiz:</strong>
+      <div class="quiz-question" data-answer="a">
+        <p>1️⃣ Why would you create an index on the 'ingredients' column?</p>
+        <label><input type="radio" name="q6-erewhon" value="a"> To speed up WHERE clauses on ingredients</label><br>
+        <label><input type="radio" name="q6-erewhon" value="b"> To save storage space</label><br>
+        <label><input type="radio" name="q6-erewhon" value="c"> To enforce data validation</label>
+      </div>
+      <button class="sq-btn sq-run" onclick="submitQuiz(this)">Submit Answer</button>
+      <div class="quiz-feedback small" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+</details>
+
+---
+
+## 🎉 Module Complete — Los Angeles READ Mastery
+
+Congratulations! You've mastered **READ operations** through LA's diverse food scene:
+- 🍖 **Korean BBQ**: Basic SELECT queries and ordering
+- 🌮 **Street Tacos**: WHERE clause filtering and conditions  
+- 🍔 **In-N-Out**: LIMIT, OFFSET, and pagination
+- 🥑 **Avocado Toast**: LIKE searches and pattern matching
+- 🍜 **Ramen & Fusion**: JOIN operations and aggregations
+- 🥤 **Erewhon**: Performance optimization and indexing
+
+**San Francisco — UPDATE module unlocked!** 🌉 Continue to learn data modification!
+
+<script>
+// Task completion tracking
+window.taskProgress = {
   koreanbbq: false,
   streettacos: false,
   innout: false,
@@ -913,40 +917,116 @@ window.laTaskProgress = {
   erewhon: false
 };
 
+// Erewhon-specific functions
+window.queryErewhonSmoothies = async function() {
+  clearTerm('terminal-erewhon');
+  
+  const name = document.getElementById('smoothie-name').value.trim();
+  const maxCalories = parseInt(document.getElementById('max-calories').value);
+  const minPrice = parseFloat(document.getElementById('min-price').value);
+  const ingredient = document.getElementById('ingredient-filter').value;
+  
+  const query = `
+    SELECT 
+      smoothie_name, 
+      price, 
+      calories, 
+      ingredients,
+      influencer_rating,
+      wellness_score
+    FROM erewhon_smoothies 
+    WHERE smoothie_name ILIKE '%${name}%'
+      AND calories <= ${maxCalories}
+      AND price >= ${minPrice}
+      AND ingredients @> ARRAY['${ingredient}']
+      AND city = 'la'
+    ORDER BY wellness_score DESC, price ASC;
+  `;
+  
+  logTo('terminal-erewhon', '[Client] Executing Erewhon query...');
+  logTo('terminal-erewhon', query);
+  
+  // Mock results
+  const mockResults = [
+    { name: "Green Goddess Supreme", price: 22.50, calories: 380, wellness_score: 95, ingredients: [ingredient, "spirulina", "chlorella"] },
+    { name: "Adaptogenic Blend", price: 24.00, calories: 320, wellness_score: 92, ingredients: [ingredient, "ashwagandha", "reishi"] },
+    { name: "Beauty Elixir", price: 26.50, calories: 290, wellness_score: 88, ingredients: [ingredient, "biotin", "vitamin C"] }
+  ];
+  
+  logTo('terminal-erewhon', `[Server] Found ${mockResults.length} premium smoothies`);
+  logTo('terminal-erewhon', JSON.stringify(mockResults, null, 2));
+  
+  completeTask('erewhon');
+};
+
+window.analyzeErewhonPerformance = function() {
+  clearTerm('terminal-erewhon');
+  
+  logTo('terminal-erewhon', '📊 Erewhon Performance Analysis:');
+  logTo('terminal-erewhon', '');
+  
+  const indexAnalysis = `
+    -- Current query performance (without index)
+    EXPLAIN ANALYZE 
+    SELECT * FROM erewhon_smoothies 
+    WHERE ingredients @> ARRAY['collagen'];
+    
+    -- Execution time: ~45ms for 10,000 records
+    -- Seq Scan on erewhon_smoothies (cost=0.00..2500.00 rows=100)
+    
+    -- CREATE INDEX for better performance
+    CREATE INDEX idx_smoothie_ingredients 
+    ON erewhon_smoothies USING GIN (ingredients);
+    
+    -- After index creation
+    -- Execution time: ~2ms for same query
+    -- Bitmap Index Scan using idx_smoothie_ingredients (cost=12.00..116.00)
+    
+    -- Performance improvement: 95% faster!
+  `;
+  
+  logTo('terminal-erewhon', indexAnalysis);
+  logTo('terminal-erewhon', '');
+  logTo('terminal-erewhon', '💡 Key Insights:');
+  logTo('terminal-erewhon', '• GIN index perfect for array/JSONB searches');
+  logTo('terminal-erewhon', '• 20x performance improvement on ingredient queries');
+  logTo('terminal-erewhon', '• Essential for Erewhon\'s real-time smoothie filtering');
+};
+
 // Load progress from localStorage
-function loadLATaskProgress() {
+function loadTaskProgress() {
   const saved = localStorage.getItem('la_task_progress');
   if (saved) {
     try {
-      window.laTaskProgress = { ...window.laTaskProgress, ...JSON.parse(saved) };
+      window.taskProgress = { ...window.taskProgress, ...JSON.parse(saved) };
     } catch (e) {
-      console.error('Error loading LA task progress:', e);
+      console.error('Error loading task progress:', e);
     }
   }
-  updateLAProgressDisplay();
+  updateProgressDisplay();
 }
 
 // Save progress to localStorage
-function saveLATaskProgress() {
+function saveTaskProgress() {
   try {
-    localStorage.setItem('la_task_progress', JSON.stringify(window.laTaskProgress));
+    localStorage.setItem('la_task_progress', JSON.stringify(window.taskProgress));
   } catch (e) {
-    console.error('Error saving LA task progress:', e);
+    console.error('Error saving task progress:', e);
   }
 }
 
-// Mark LA task as complete
-window.completeLATask = function(taskName) {
-  if (!window.laTaskProgress[taskName]) {
-    window.laTaskProgress[taskName] = true;
-    saveLATaskProgress();
-    updateLAProgressDisplay();
-    checkLAModuleCompletion();
+// Mark task as complete
+window.completeTask = function(taskName) {
+  if (!window.taskProgress[taskName]) {
+    window.taskProgress[taskName] = true;
+    saveTaskProgress();
+    updateProgressDisplay();
+    checkModuleCompletion();
   }
 };
 
 // Update progress display
-function updateLAProgressDisplay() {
+function updateProgressDisplay() {
   const tasks = ['koreanbbq', 'streettacos', 'innout', 'avocado', 'ramen', 'erewhon'];
   let completedCount = 0;
 
@@ -954,7 +1034,7 @@ function updateLAProgressDisplay() {
     const element = document.getElementById(`task-${task}`);
     if (element) {
       const statusSpan = element.querySelector('.status');
-      if (window.laTaskProgress[task]) {
+      if (window.taskProgress[task]) {
         statusSpan.textContent = 'Complete ✅';
         statusSpan.className = 'status task-complete';
         completedCount++;
@@ -965,22 +1045,22 @@ function updateLAProgressDisplay() {
     }
   });
 
-  // Update progress bar if it exists
+  // Update progress bar
   const percentage = Math.round((completedCount / tasks.length) * 100);
-  const percentageElement = document.getElementById('la-completion-percentage');
-  const progressBar = document.getElementById('la-progress-bar');
+  const percentageElement = document.getElementById('completion-percentage');
+  const progressBar = document.getElementById('progress-bar');
   
   if (percentageElement) percentageElement.textContent = `${percentage}%`;
   if (progressBar) progressBar.style.width = `${percentage}%`;
 }
 
-// Check if LA module is complete and unlock next city
-function checkLAModuleCompletion() {
-  const allTasks = Object.values(window.laTaskProgress);
+// Check if module is complete and unlock next city
+function checkModuleCompletion() {
+  const allTasks = Object.values(window.taskProgress);
   const isComplete = allTasks.every(task => task === true);
   
   if (isComplete) {
-    const notification = document.getElementById('laUnlockNotification');
+    const notification = document.getElementById('unlockNotification');
     if (notification) {
       notification.style.display = 'block';
       setTimeout(() => notification.style.display = 'none', 4000);
@@ -990,27 +1070,16 @@ function checkLAModuleCompletion() {
   }
 }
 
-// Add this new function to check XP completion:
-function checkXPCompletion() {
-  if (laXP >= 90) {
-    // Show unlock notification
-    const notification = document.getElementById('laUnlockNotification');
-    if (notification) {
-      notification.style.display = 'block';
-      setTimeout(() => notification.style.display = 'none', 4000);
-    }
-    
-    // Unlock San Francisco (city index 2)
-    unlockSanFrancisco();
-    console.log('🎉 Los Angeles XP completed (90/90)! San Francisco should now be unlocked.');
-  }
-}
-
-// Unlock San Francisco (city index 2)
+// Unlock San Francisco
 function unlockSanFrancisco() {
   try {
     const saved = localStorage.getItem('city_progress'); 
-    let gameProgress = saved ? JSON.parse(saved) : { unlockedCities:[0,1], completedCities:[], totalCitiesCompleted:0 };
+    let gameProgress = saved ? JSON.parse(saved) : { 
+      unlockedCities: [0, 1], 
+      completedCities: [], 
+      totalCitiesCompleted: 0 
+    };
+    
     if (!gameProgress.completedCities.includes(1)) {
       gameProgress.completedCities.push(1);
       gameProgress.totalCitiesCompleted++;
@@ -1018,48 +1087,127 @@ function unlockSanFrancisco() {
     if (!gameProgress.unlockedCities.includes(2)) {
       gameProgress.unlockedCities.push(2);
     }
+    
     localStorage.setItem('city_progress', JSON.stringify(gameProgress));
-    console.log('✅ LA Progress updated:', gameProgress);
+    console.log('✅ LA completed! SF unlocked. Progress:', gameProgress);
+    
+    // Try to notify parent window
+    if (window.parent && window.parent.markCityCompleted) {
+      window.parent.markCityCompleted(1);
+    }
+    
   } catch (e) {
-    console.error('LA Unlock failed:', e);
+    console.error('❌ LA Unlock failed:', e);
   }
 }
 
+// Auto complete function for testing
+function autoCompleteAllTasks() {
+  document.getElementById('quickCompleteBtn').style.display = 'none';
+  
+  // Auto-fill the Erewhon form and query
+  document.getElementById('smoothie-name').value = 'Green Goddess';
+  document.getElementById('max-calories').value = '400';
+  document.getElementById('min-price').value = '15.00';
+  document.getElementById('ingredient-filter').value = 'collagen';
+  
+  // Complete tasks in sequence
+  setTimeout(() => queryErewhonSmoothies(), 500);
+  
+  // Mark all tasks as complete
+  setTimeout(() => {
+    completeTask('koreanbbq');
+    completeTask('streettacos');
+    completeTask('innout');
+    completeTask('avocado');
+    completeTask('ramen');
+    completeTask('erewhon');
+    
+    showToast('🎉 All READ tasks completed! San Francisco unlocked!', 4000);
+  }, 1000);
+}
+
+// Add showToast function if it doesn't exist
+if (typeof showToast === 'undefined') {
+  window.showToast = function(message, duration = 3000) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669);
+      color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; z-index: 10000;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
+  };
+}
+
+// Quiz functionality
+window.submitQuiz = function(button) {
+  const quizContainer = button.closest('.quiz-block');
+  const question = quizContainer.querySelector('.quiz-question');
+  const selectedInput = question.querySelector('input[type="radio"]:checked');
+  const feedback = quizContainer.querySelector('.quiz-feedback');
+  
+  if (!selectedInput) {
+    feedback.textContent = '⚠️ Please select an answer first.';
+    feedback.style.color = '#fb7185';
+    return;
+  }
+  
+  const correctAnswer = question.getAttribute('data-answer');
+  const userAnswer = selectedInput.value;
+  
+  if (userAnswer === correctAnswer) {
+    feedback.textContent = '✅ Correct! Great job understanding READ operations.';
+    feedback.style.color = '#10b981';
+  } else {
+    feedback.textContent = '❌ Try again! Review the concepts above.';
+    feedback.style.color = '#fb7185';
+  }
+};
+
+// Utility functions for code editors and terminals
+window.runEditor = function(editorId, terminalId) {
+  const code = document.getElementById(editorId).value;
+  const terminal = document.getElementById(terminalId);
+  terminal.textContent = '> Running code...\n\n' + 
+    '// Code executed successfully\n' +
+    '// Check console for detailed output\n';
+  
+  try {
+    eval(code);
+  } catch (e) {
+    terminal.textContent += '\n❌ Error: ' + e.message;
+  }
+};
+
+window.copyEditor = function(editorId) {
+  const code = document.getElementById(editorId).value;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('📋 Code copied to clipboard!');
+  });
+};
+
+window.clearTerm = function(terminalId) {
+  document.getElementById(terminalId).textContent = '';
+};
+
+window.logTo = function(terminalId, message, data = null) {
+  const terminal = document.getElementById(terminalId);
+  terminal.textContent += message + '\n';
+  if (data) {
+    terminal.textContent += JSON.stringify(data, null, 2) + '\n';
+  }
+  terminal.scrollTop = terminal.scrollHeight;
+};
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  loadLATaskProgress();
+  loadTaskProgress();
 });
-
-// Initialize
-updateProgressBar();
 </script>
 
-<!-- Unlock Notification -->
-<div id="laUnlockNotification" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, rgba(255,105,180,0.98), rgba(255,69,180,0.98)); color: white; padding: 20px 36px; border-radius: 14px; font-weight: 700; font-size: 16px; z-index: 10000; box-shadow: 0 30px 80px rgba(255,20,147,0.6); display: none; text-align: center;">
-  🎉 San Francisco Unlocked!<br>
-  <small style="font-size: 13px; opacity: 0.95;">You can now continue to the next city!</small>
-</div>
-
-<!-- Progress Tracker -->
-<div class="progress-container" style="background: linear-gradient(135deg, rgba(255,179,71,0.08), rgba(255,105,180,0.06)); border: 1px solid rgba(255,179,71,0.14); padding: 1rem; border-radius: 0.75rem; margin: 1rem 0; color: #333; box-shadow: 0 8px 30px rgba(255,20,147,0.15);">
-  <h3 style="color: #ff6f61; margin: 0 0 0.6rem 0;">🎯 Los Angeles Progress Tracker</h3>
-  <div id="la-progress-display">
-    <div id="task-koreanbbq" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 1: Korean BBQ Quiz - <span class="status">Incomplete</span></div>
-    <div id="task-streettacos" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 2: Street Tacos Filter - <span class="status">Incomplete</span></div>
-    <div id="task-innout" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 3: In-N-Out Pagination - <span class="status">Incomplete</span></div>
-    <div id="task-avocado" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 4: Avocado Search - <span class="status">Incomplete</span></div>
-    <div id="task-ramen" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 5: Ramen Indexing - <span class="status">Incomplete</span></div>
-    <div id="task-erewhon" class="task-item" style="margin: 0.35rem 0; color: #666;">Task 6: Erewhon Calories - <span class="status">Incomplete</span></div>
-  </div>
-  <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 0.5rem;">
-    <strong>Completion: <span id="la-completion-percentage">0%</span></strong>
-    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 6px; margin-top: 0.5rem;">
-      <div id="la-progress-bar" style="background: linear-gradient(90deg, #ff6f61, #ff1493); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Quick Complete Button for Testing - Bottom Right Corner -->
+<!-- Quick Complete Button -->
 <button id="quickCompleteBtn" onclick="autoCompleteAllTasks()" style="
   position: fixed;
   bottom: 20px;
@@ -1078,55 +1226,3 @@ updateProgressBar();
 " onmouseover="this.style.background='rgba(139,92,246,1)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(139,92,246,0.9)'; this.style.transform='translateY(0)'">
   Complete All Tasks
 </button>
-
-<script>
-function autoCompleteAllTasks() {
-  // Hide the button after clicking
-  document.getElementById('quickCompleteBtn').style.display = 'none';
-  
-  // Auto-complete the quiz with perfect answers
-  const questions = document.querySelectorAll('.quiz-question');
-  questions.forEach((question, index) => {
-    // Get the correct answer buttons based on the quiz structure
-    if (index === 0) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // SELECT
-    if (index === 1) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // WHERE
-    if (index === 2) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // LIMIT 10 OFFSET 0
-    if (index === 3) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // LIKE
-    if (index === 4) question.querySelector('button[onclick="checkAnswer(this,true)"]').click(); // CREATE INDEX
-  });
-  
-  // Auto-fill the fill-in-the-blanks
-  setTimeout(() => {
-    document.getElementById('blank1').value = 'SELECT NAME, PRICE';
-    document.getElementById('blank2').value = 'FROM DISHES';
-    document.getElementById('blank3').value = "WHERE NAME LIKE '%HALIBUT%' AND CALORIES>300";
-    checkBlanks();
-  }, 1000);
-  
-  // Mark all tasks as complete
-  setTimeout(() => {
-    completeLATask('koreanbbq');
-    completeLATask('streettacos');
-    completeLATask('innout');
-    completeLATask('avocado');
-    completeLATask('ramen');
-    completeLATask('erewhon');
-    
-    showToast('🎉 All tasks completed! San Francisco unlocked!', 4000);
-  }, 2000);
-}
-
-// Add showToast function if it doesn't exist
-if (typeof showToast === 'undefined') {
-  window.showToast = function(message, duration = 3000) {
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-      position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669);
-      color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; z-index: 10000;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), duration);
-  };
-}
-</script>
