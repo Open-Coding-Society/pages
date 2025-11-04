@@ -38,13 +38,16 @@ export function addLevelNavigationButtons(gameInstance) {
     prevButton.onclick = function() {
         console.log("Previous Level button clicked");
         console.log("Transitioning to the previous level...");
-        if (gameInstance && typeof gameInstance.loadPreviousLevel === 'function') {
-            gameInstance.loadPreviousLevel();
-        } else if (gameInstance && typeof gameInstance.changeLevel === 'function' && typeof gameInstance.currentLevel === 'number') {
-            // fallback if your game uses a different API
-            gameInstance.changeLevel(gameInstance.currentLevel - 1);
+        if (gameInstance && gameInstance.gameControl) {
+            const currentIndex = gameInstance.gameControl.currentLevelIndex;
+            if (currentIndex > 0) {
+                gameInstance.gameControl.currentLevelIndex = currentIndex - 1;
+                gameInstance.gameControl.transitionToLevel();
+            } else {
+                console.warn("Already at the first level");
+            }
         } else {
-            console.warn("gameInstance.loadPreviousLevel() is not defined. Implement it on your Game class or pass a gameInstance with that method.");
+            console.error("gameInstance.gameControl not found");
         }
     };
     prevButton.style.cssText = `
@@ -62,7 +65,18 @@ export function addLevelNavigationButtons(gameInstance) {
     nextButton.onclick = function() {
         console.log("Next Level button clicked");
         console.log("Transitioning to the next level...");
-        gameInstance.loadNextLevel();
+        if (gameInstance && gameInstance.gameControl) {
+            const currentIndex = gameInstance.gameControl.currentLevelIndex;
+            const totalLevels = gameInstance.gameControl.levelClasses.length;
+            if (currentIndex < totalLevels - 1) {
+                gameInstance.gameControl.currentLevelIndex = currentIndex + 1;
+                gameInstance.gameControl.transitionToLevel();
+            } else {
+                console.warn("Already at the last level");
+            }
+        } else {
+            console.error("gameInstance.gameControl not found");
+        }
     };
     nextButton.style.cssText = `
         background-color: #6ae378ff;
@@ -413,19 +427,41 @@ function openCheatsMenu(gameInstance) {
         levelButton.onclick = () => {
             console.log(`Jumping to ${level.name} (${level.id})`);
             
-            // Try different methods to change level
-            if (gameInstance && typeof gameInstance.loadLevel === 'function') {
-                gameInstance.loadLevel(level.id);
-            } else if (gameInstance && typeof gameInstance.changeLevel === 'function') {
-                gameInstance.changeLevel(index);
-            } else if (gameInstance && gameInstance.currentLevel !== undefined) {
-                gameInstance.currentLevel = index;
-                if (typeof gameInstance.loadNextLevel === 'function') {
-                    gameInstance.loadNextLevel();
-                }
+            // Close the cheats menu
+            const cheatsOverlay = document.getElementById("cheatsMenuOverlay");
+            if (cheatsOverlay) {
+                cheatsOverlay.remove();
+            }
+            
+            // For mansion game, we need to dynamically import and load the level
+            const levelMap = {
+                "mansionLevelMain": () => import('../mansionLevelMain.js'),
+                "mansionLevel1_Pantry": () => import('../mansionLevel1_Pantry.js'),
+                "mansionLevel1": () => import('../mansionLevel1.js'),
+                "mansionLevel2": () => import('../mansionLevel2.js'),
+                "mansionLevel3": () => import('../mansionLevel3.js'),
+                "mansionLevel4": () => import('../mansionLevel4.js'),
+                "mansionLevel5": () => import('../mansionLevel5.js'),
+                "mansionLevel6_BattleRoom": () => import('../mansionLevel6_BattleRoom.js'),
+                "mansionLevel6": () => import('../mansionLevel6.js')
+            };
+            
+            if (levelMap[level.id]) {
+                levelMap[level.id]().then(module => {
+                    const LevelClass = module.default;
+                    if (gameInstance && gameInstance.gameControl) {
+                        gameInstance.gameControl.levelClasses = [LevelClass];
+                        gameInstance.gameControl.currentLevelIndex = 0;
+                        gameInstance.gameControl.transitionToLevel();
+                    } else {
+                        console.error("gameInstance.gameControl not found");
+                    }
+                }).catch(err => {
+                    console.error(`Failed to load level ${level.id}:`, err);
+                    alert(`Error loading ${level.name}: ${err.message}`);
+                });
             } else {
-                console.warn("Could not change level. Check your Game class API.");
-                alert(`Attempting to load level: ${level.id}\nIf this doesn't work, update your Game class to support loadLevel(levelId).`);
+                console.warn(`Level ${level.id} not found in levelMap`);
             }
             
             modal.style.display = "none";
