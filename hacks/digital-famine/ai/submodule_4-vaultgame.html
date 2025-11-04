@@ -299,7 +299,7 @@ date: 2025-10-21
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .code-entry-overlay {
@@ -498,7 +498,9 @@ date: 2025-10-21
             </p>
             <input type="text" id="code-input" class="code-input" maxlength="3" placeholder="•••" autocomplete="off">
             <div id="code-error" style="color: #ef4444; margin-top: 10px; font-size: 16px;"></div>
-            <button onclick="verifyCode()" style="width: 100%; padding: 16px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px;">Unlock Vault</button>
+            <button onclick="verifyCode()"
+                style="width: 100%; padding: 16px; background: #16a34a; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px;">Unlock
+                Vault</button>
             <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">
                 Hint: Module 1 = 2, Module 2 = 6, Module 3 = 1
             </p>
@@ -599,18 +601,24 @@ date: 2025-10-21
         let draggedElement = null;
 
         function showRoadblockOverlay() {
+            console.log('showRoadblockOverlay called');
             const overlay = document.getElementById('roadblock-overlay');
             const text = document.getElementById('roadblock-text');
+            console.log('Overlay element:', overlay);
             text.textContent = roadblocks[currentRoadblock].roadblockText;
             overlay.classList.remove('hidden');
+            console.log('Roadblock overlay shown, will hide in 2.5s');
 
             setTimeout(() => {
                 overlay.classList.add('hidden');
+                console.log('Roadblock overlay hidden');
             }, 2500);
         }
 
         function updateUI() {
+            console.log('updateUI called, currentRoadblock:', currentRoadblock);
             const current = roadblocks[currentRoadblock];
+            console.log('Current roadblock data:', current);
 
             document.getElementById('counter').textContent = `Roadblock ${currentRoadblock + 1} / ${roadblocks.length}`;
             document.getElementById('progress').style.width = `${(currentRoadblock / roadblocks.length) * 100}%`;
@@ -1068,26 +1076,35 @@ date: 2025-10-21
         }
 
         function verifyCode() {
+            console.log('verifyCode called');
             const input = document.getElementById('code-input').value;
+            console.log('Input value:', input);
             const errorDiv = document.getElementById('code-error');
             const correctCode = '261'; // Module 1 = 2, Module 2 = 6, Module 3 = 1
 
             if (input === correctCode) {
-                document.getElementById('code-entry-overlay').classList.add('hidden');
+                console.log('Code is correct! Starting game...');
+                const overlay = document.getElementById('code-entry-overlay');
+                overlay.classList.add('hidden');
+                console.log('Code entry overlay classes:', overlay.className);
+                console.log('Code entry overlay display:', window.getComputedStyle(overlay).display);
                 errorDiv.textContent = '';
+
+                // Initialize game after successful code entry
+                updateUI();
+                showRoadblockOverlay();
             } else {
+                console.log('Code is incorrect');
                 errorDiv.textContent = '❌ Incorrect code. Try again!';
                 document.getElementById('code-input').value = '';
             }
         }
-
-        // Initialize game
-        updateUI();
-        showRoadblockOverlay();
     </script>
 
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 2px solid rgba(251, 191, 36, 0.3); padding: 1rem; text-align: center; z-index: 100;">
-        <a href="{{ '/digital-famine/ai/' | prepend: site.baseurl }}" style="display: inline-block; color: #fbbf24; text-decoration: none; font-size: 1rem; font-weight: 600; padding: 0.5rem 1.25rem; border: 2px solid rgba(251, 191, 36, 0.4); border-radius: 0.5rem; transition: all 0.2s ease; background: rgba(251, 191, 36, 0.1);">
+    <footer
+        style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); border-top: 2px solid rgba(251, 191, 36, 0.3); padding: 1rem; text-align: center; z-index: 100;">
+        <a href="{{ '/digital-famine/ai/' | prepend: site.baseurl }}"
+            style="display: inline-block; color: #fbbf24; text-decoration: none; font-size: 1rem; font-weight: 600; padding: 0.5rem 1.25rem; border: 2px solid rgba(251, 191, 36, 0.4); border-radius: 0.5rem; transition: all 0.2s ease; background: rgba(251, 191, 36, 0.1);">
             ← Back to AI Quest Home
         </a>
     </footer>

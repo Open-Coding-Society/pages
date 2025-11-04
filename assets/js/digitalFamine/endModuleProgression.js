@@ -622,10 +622,11 @@ export function addModuleFooterControls() {
   
   // Check if buttons already exist
   if (document.getElementById('module-complete-btn')) {
-    refreshModuleUI(state, moduleNum);
+    console.log('Footer buttons already exist, skipping recreation');
     return;
   }
   
+  // Clear existing footer content
   footer.innerHTML = '';
   
   // Style footer
@@ -652,7 +653,8 @@ export function addModuleFooterControls() {
   
   // Previous Module button
   const prevModuleBtn = document.createElement('button');
-  prevModuleBtn.innerHTML = '⬅️ Previous Module';
+  prevModuleBtn.id = 'prev-module-btn';
+  prevModuleBtn.innerHTML = '⬅️ Previous';
   prevModuleBtn.className = 'medium filledHighlight primary';
   prevModuleBtn.style.cssText = `
     background: linear-gradient(135deg, #667eea, #764ba2);
@@ -677,7 +679,7 @@ export function addModuleFooterControls() {
   
   // Return to Quest Home button
   const homeBtn = document.createElement('button');
-  homeBtn.innerHTML = '🏠 Quest Home';
+  homeBtn.innerHTML = '🏠 Home';
   homeBtn.className = 'medium filledHighlight primary';
   homeBtn.style.cssText = `
     background: linear-gradient(135deg, #667eea, #764ba2);
@@ -732,10 +734,11 @@ export function addModuleFooterControls() {
   
   // Reset current module button
   const resetModuleBtn = document.createElement('button');
-  resetModuleBtn.innerHTML = '🔄 Reset Module';
+  resetModuleBtn.id = 'reset-module-btn';
+  resetModuleBtn.innerHTML = '🔄 Reset';
   resetModuleBtn.className = 'medium filledHighlight primary';
   resetModuleBtn.style.cssText = `
-    background: linear-gradient(135deg, #f97316, #ea580c);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
     border: 2px solid rgba(255,255,255,0.3);
     padding: 10px 20px;
@@ -752,28 +755,25 @@ export function addModuleFooterControls() {
   // Next Module button
   const nextModuleBtn = document.createElement('button');
   nextModuleBtn.id = 'next-module-btn';
-  nextModuleBtn.innerHTML = 'Next Module ➡️';
+  nextModuleBtn.innerHTML = 'Next ➡️';
   nextModuleBtn.className = 'medium filledHighlight primary';
-  
-  const canGoNext = moduleNum < 5 && isModuleUnlocked(moduleNum + 1);
-  
   nextModuleBtn.style.cssText = `
-    background: ${canGoNext ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #6b7280, #4b5563)'};
+    background: linear-gradient(135deg, #22c55e, #16a34a);
     color: white;
     border: 2px solid rgba(255,255,255,0.3);
     padding: 10px 20px;
     border-radius: 8px;
     font-weight: bold;
     font-size: 14px;
-    cursor: ${canGoNext ? 'pointer' : 'not-allowed'};
+    cursor: pointer;
     transition: all 0.3s ease;
-    opacity: ${canGoNext ? '1' : '0.5'};
   `;
   nextModuleBtn.onmouseover = () => nextModuleBtn.style.transform = 'scale(1.05)';
   nextModuleBtn.onmouseout = () => nextModuleBtn.style.transform = 'scale(1)';
   nextModuleBtn.onclick = () => navigateToNextModule();
   
-  if (!canGoNext || moduleNum === 5) {
+  // Disable if on last module
+  if (moduleNum === 5) {
     nextModuleBtn.disabled = true;
     nextModuleBtn.style.opacity = '0.5';
     nextModuleBtn.style.cursor = 'not-allowed';
@@ -932,18 +932,78 @@ function autoCompleteCurrentModule() {
   if (!moduleNum) return;
   
   if (confirm(`🎮 Auto-complete Module ${moduleNum}? This will mark it as finished and unlock the next module.`)) {
-    const state = completeModule(moduleNum, true);
-    // Completion popup removed for a smoother UX; UI is refreshed below.
-    refreshModuleUI(state, moduleNum);
+    const state = completeModule(moduleNum);
     
-    if (moduleNum < 5) {
-      setTimeout(() => {
-        const nextBtn = document.getElementById('next-module-btn');
-        if (nextBtn && !nextBtn.disabled) {
-          nextBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
-          nextBtn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.5)';
+    // Show success message
+    showSuccessMessage(`✅ Module ${moduleNum} completed! ${moduleNum < 5 ? `Module ${moduleNum + 1} is now unlocked!` : 'All modules complete!'}`);
+    
+    // Update the auto-complete button to show completed status
+    const btn = document.getElementById('module-complete-btn');
+    if (btn) {
+      btn.innerHTML = '✅ Completed';
+      btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+      btn.disabled = true;
+      btn.style.opacity = '0.8';
+      btn.style.cursor = 'default';
+    }
+    
+    // Update progress indicator
+    const footer = document.getElementById('masterFooter');
+    if (footer) {
+      const progressDivs = footer.querySelectorAll('div');
+      progressDivs.forEach(div => {
+        if (div.innerHTML && div.innerHTML.includes('Progress:')) {
+          div.innerHTML = `📋 Progress: ${state.completed.length}/5 modules`;
         }
-      }, 100);
+      });
+    }
+    
+    // CRITICAL: Enable the Next button so user can proceed
+    const nextBtn = document.getElementById('next-module-btn');
+    console.log('🔍 Looking for Next button...', nextBtn ? 'FOUND' : 'NOT FOUND');
+    console.log('Current module:', moduleNum);
+    
+    if (nextBtn) {
+      console.log('Next button current state:', {
+        disabled: nextBtn.disabled,
+        opacity: nextBtn.style.opacity,
+        pointerEvents: nextBtn.style.pointerEvents
+      });
+      
+      if (moduleNum < 5) {
+        // Force enable the button
+        nextBtn.disabled = false;
+        nextBtn.style.setProperty('opacity', '1', 'important');
+        nextBtn.style.setProperty('cursor', 'pointer', 'important');
+        nextBtn.style.setProperty('pointer-events', 'auto', 'important');
+        nextBtn.style.setProperty('background', 'linear-gradient(135deg, #22c55e, #16a34a)', 'important');
+        
+        // Add a visual indicator that next module is ready
+        nextBtn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.5)';
+        nextBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
+        
+        console.log('✅ Next button ENABLED! New state:', {
+          disabled: nextBtn.disabled,
+          opacity: nextBtn.style.opacity,
+          pointerEvents: nextBtn.style.pointerEvents
+        });
+        console.log('Next module', moduleNum + 1, 'is unlocked:', isModuleUnlocked(moduleNum + 1));
+      }
+    } else {
+      console.error('❌ Next button NOT FOUND in DOM!');
+    }
+    
+    // Also ensure Previous button and Reset Module button stay functional
+    const prevBtn = document.getElementById('prev-module-btn');
+    if (prevBtn && moduleNum > 1) {
+      prevBtn.disabled = false;
+      prevBtn.style.setProperty('pointer-events', 'auto', 'important');
+    }
+    
+    const resetModuleBtn = document.getElementById('reset-module-btn');
+    if (resetModuleBtn) {
+      resetModuleBtn.disabled = false;
+      resetModuleBtn.style.setProperty('pointer-events', 'auto', 'important');
     }
   }
 }
@@ -1020,9 +1080,6 @@ export function initEndModuleProgression() {
       return;
     }
     
-    // Set up completion monitoring
-    monitorForCompletion();
-    
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', addModuleFooterControls);
     } else {
@@ -1037,27 +1094,6 @@ export function initEndModuleProgression() {
   }
   
   console.log('✅ End module progression system initialized');
-  
-  // Log current state for debugging
-  const state = getProgressState();
-  console.log('Current progression state:', state);
-  
-  // Make functions globally available for testing
-  window.debugModuleProgression = {
-    getState: getProgressState,
-    completeModule: completeModule,
-    isUnlocked: isModuleUnlocked,
-    isCompleted: isModuleCompleted,
-    refresh: () => {
-      const state = getProgressState();
-      const moduleNum = getCurrentModuleNumber();
-      if (moduleNum) {
-        refreshModuleUI(state, moduleNum);
-      } else {
-        updateQuestDisplay();
-      }
-    }
-  };
 }
 
 // Check access immediately
@@ -1068,6 +1104,3 @@ if (currentModule) {
 
 // Auto-initialize
 initEndModuleProgression();
-
-// Export completion function for external use
-export { completeModule as markModuleComplete };
