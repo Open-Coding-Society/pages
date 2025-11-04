@@ -313,7 +313,7 @@ date: 2025-10-29
       data-href="/cs-portfolio-quest/resume/"
       class="px-3 py-2 border rounded hidden bg-red-600 text-white disabled:opacity-60"
       disabled
-    >Next Module →</button>
+    > Back to homepage →</button>
   </div>
 
   <!-- Floating Selected Sprite -->
