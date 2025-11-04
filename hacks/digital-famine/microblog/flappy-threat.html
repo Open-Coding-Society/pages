@@ -1,0 +1,126 @@
+---
+layout: none
+title: "Flappy Threat Model"
+description: "Flappy Bird Threat Game"
+permalink: /digital-famine/microblog/Flappy-Threat-Model/
+parent: "AI Usage"
+team: "Thinkers"
+submodule: 2
+categories: [CSP, Submodule, Microblogging]
+tags: [microblogging, submodule, unzippers]
+author: "Sloane Sommers"
+date: 2025-11-03
+breadcrumb: true
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flappy Threat Model</title>
+<style>
+html,body{
+  margin:0;padding:0;
+  background:linear-gradient(180deg,#0b1220,#071827);
+  color:#cfe8ff;font-family:Inter,system-ui,sans-serif;
+  height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+#hud{display:flex;justify-content:space-between;align-items:center;width:480px;margin-bottom:10px}
+button{background:#ffcc00;border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer}
+#gameCanvas{background:#00172b;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+.info-box{position:fixed;top:20px;right:20px;width:300px;background:#f7f7f8;color:#111;padding:14px;border-radius:10px;display:none;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+</style>
+</head>
+<body>
+<div id="hud">
+  <div><strong>Flappy Threat Model</strong></div>
+  <div>Score: <span id="score">0</span></div>
+  <button id="startBtn">Start Game</button>
+</div>
+<canvas id="gameCanvas" width="480" height="640"></canvas>
+<div class="info-box" id="infoBox"><h3 id="infoTitle"></h3><p id="infoText"></p></div>
+
+<script>
+const canvas=document.getElementById("gameCanvas"),ctx=canvas.getContext("2d"),
+btn=document.getElementById("startBtn"),scoreEl=document.getElementById("score"),
+infoBox=document.getElementById("infoBox"),infoTitle=document.getElementById("infoTitle"),infoText=document.getElementById("infoText");
+
+const cards=[
+ {title:"Threat Modeling — Intro",text:"Nothing is fully secure. Threat models prepare you for the most probable attackers."},
+ {title:"PII",text:"PII means Personally Identifiable Information — names, addresses, IDs, etc."},
+ {title:"Adversaries",text:"Who wants your data? Advertisers, hackers, governments, acquaintances."},
+ {title:"Risk Level",text:"Not all data is equal. Losing memes ≠ losing bank info."},
+ {title:"Defense",text:"Use MFA and password managers for protection."}
+];
+
+let bird,pipes,score,frame,gravity,jump,loopId,active=false;
+function reset(){
+ bird={x:80,y:canvas.height/2,vy:0,r:12};
+ pipes=[];frame=0;score=0;gravity=0.5;jump=-8;
+ scoreEl.textContent=score;
+ infoBox.style.display="none";
+ active=true;
+ cancelAnimationFrame(loopId);
+ loop();
+}
+function flap(){if(active)bird.vy=jump;}
+function spawnPipe(){
+ const gap=150,top=Math.random()*(canvas.height-gap-80)+40;
+ pipes.push({x:canvas.width,top,gap});
+}
+function drawPipe(p){
+ ctx.fillStyle="#2b6b2b";
+ ctx.fillRect(p.x,0,50,p.top);
+ ctx.fillRect(p.x,p.top+p.gap,50,canvas.height-p.top-p.gap);
+}
+function showCard(card){
+ infoTitle.textContent=card.title;infoText.textContent=card.text;
+ infoBox.style.display="block";infoBox.style.opacity=1;
+ clearTimeout(infoBox.hide);
+ infoBox.hide=setTimeout(()=>{infoBox.style.opacity=0;setTimeout(()=>infoBox.style.display="none",500)},3500);
+}
+function gameOver(){
+ active=false;
+ ctx.fillStyle="rgba(0,0,0,0.5)";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="#fff";
+ ctx.font="24px sans-serif";
+ ctx.textAlign="center";
+ ctx.fillText("Game Over",canvas.width/2,canvas.height/2);
+ ctx.font="16px sans-serif";
+ ctx.fillText("Click Start to play again",canvas.width/2,canvas.height/2+30);
+}
+function loop(){
+ ctx.fillStyle="#70c5ce";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ bird.vy+=gravity;
+ bird.y+=bird.vy;
+ ctx.fillStyle="#ff0";
+ ctx.beginPath();ctx.arc(bird.x,bird.y,bird.r,0,Math.PI*2);ctx.fill();
+
+ if(frame%90===0)spawnPipe();
+ pipes.forEach((p,i)=>{
+  p.x-=3;
+  drawPipe(p);
+  if(!p.passed&&p.x+50<bird.x){
+    p.passed=true;score++;scoreEl.textContent=score;
+    showCard(cards[(score-1)%cards.length]);
+  }
+  if(bird.x+bird.r>p.x&&bird.x-bird.r<p.x+50&&(bird.y-bird.r<p.top||bird.y+bird.r>p.top+p.gap)){
+    gameOver();
+  }
+  if(p.x+50<0)pipes.splice(i,1);
+ });
+
+ if(bird.y+bird.r>canvas.height||bird.y-bird.r<0)gameOver();
+ frame++;
+ if(active)loopId=requestAnimationFrame(loop);
+}
+btn.onclick=reset;
+canvas.onclick=flap;
+document.addEventListener("keydown",e=>{if(e.code==="Space")flap();});
+</script>
+</body>
+</html>
