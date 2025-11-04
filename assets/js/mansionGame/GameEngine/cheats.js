@@ -482,10 +482,7 @@ function openCheatsMenu(gameInstance) {
         border: 2px solid #95a5a6;
         text-align: center;
     `;
-    placeholderSection.innerText = "More cheats coming soon...";
-    placeholderSection.style.color = "#95a5a6";
-    placeholderSection.style.fontSize = "10px";
-    cheatsContainer.appendChild(placeholderSection);
+    
     
     // Close button
     const closeButton = document.createElement("button");
