@@ -426,7 +426,7 @@ footer:
         font-family: 'Courier New', monospace;
         margin: 15px 0;
         transition: border-color 0.3s;
-        color: #000 !important;
+        color: #38d907ff !important;
     }
 
     .challenge-input:focus {
@@ -527,6 +527,7 @@ footer:
 
         <div class="practice-section">
             <h2>✏️ Practice: Build Your Own URL</h2>
+            <button class="check-button" style="margin-bottom: 30px;" onclick="autofillAll()">⚙️ Autofill All Fields</button>
             <div id="practice-container"></div>
         </div>
 
@@ -816,6 +817,24 @@ footer:
 
         // Load user's itinerary on page load
         document.addEventListener('DOMContentLoaded', loadUserItinerary);
+        function autofillAll() {
+            userTeams.forEach((team, index) => {
+                const num = index + 1;
+
+        // Autofill correct values
+                document.getElementById(`base-url-${num}`).value = 'https://www.thesportsdb.com/api/v1/json/';
+                document.getElementById(`api-key-${num}`).value = '3';
+                document.getElementById(`endpoint-${num}`).value = 'searchteams.php';
+                document.getElementById(`parameter-${num}`).value = `?t=${team.searchName.replace(/%20/g, ' ')}`;
+
+        // Update display and feedback
+                updateBuiltURL(num);
+                const feedback = document.getElementById(`build-feedback-${num}`);
+                feedback.className = 'feedback correct';
+                feedback.textContent = `✅ Autofilled successfully for ${team.name}!`;
+    });
+}
+
     </script>
 </body>
 </html>
