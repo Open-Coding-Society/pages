@@ -11,9 +11,13 @@ microblog: true
 </div>
 
 <style>
-    .element-class {
-        scrollbar-gutter: stable both-edges;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
 </style>
 
 <script type="module">
