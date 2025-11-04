@@ -159,6 +159,13 @@ date: 2025-10-21
 • Improved load times by 40%"></textarea>
       <p class="text-xs mt-1 text-gray-600">Include internships, jobs, projects, and volunteer work</p>
     </div>
+    <!-- ⬇️ Added: Demo + Previously Saved buttons for Step 4 -->
+    <div class="pt-2 flex gap-2 flex-wrap items-center">
+      <button onclick="fillDummyData()" class="px-3 py-2 border rounded">Fill with Demo Data</button>
+      <button onclick="fillFromSaved()" class="px-3 py-2 border rounded">Fill with Previously Collected Data</button>
+      <span class="fillSavedNote text-xs text-gray-600"></span>
+    </div>
+    <!-- /Added -->
     <button onclick="generateProfile()" id="generateBtn" class="px-3 py-2 border rounded">
       <span id="generateIcon">Generate LinkedIn Profile</span>
     </button>
@@ -695,5 +702,3 @@ function showFloatingSprite(charId) {
 }
 
 </script>
-
- 

@@ -38,13 +38,16 @@ export function addLevelNavigationButtons(gameInstance) {
     prevButton.onclick = function() {
         console.log("Previous Level button clicked");
         console.log("Transitioning to the previous level...");
-        if (gameInstance && typeof gameInstance.loadPreviousLevel === 'function') {
-            gameInstance.loadPreviousLevel();
-        } else if (gameInstance && typeof gameInstance.changeLevel === 'function' && typeof gameInstance.currentLevel === 'number') {
-            // fallback if your game uses a different API
-            gameInstance.changeLevel(gameInstance.currentLevel - 1);
+        if (gameInstance && gameInstance.gameControl) {
+            const currentIndex = gameInstance.gameControl.currentLevelIndex;
+            if (currentIndex > 0) {
+                gameInstance.gameControl.currentLevelIndex = currentIndex - 1;
+                gameInstance.gameControl.transitionToLevel();
+            } else {
+                console.warn("Already at the first level");
+            }
         } else {
-            console.warn("gameInstance.loadPreviousLevel() is not defined. Implement it on your Game class or pass a gameInstance with that method.");
+            console.error("gameInstance.gameControl not found");
         }
     };
     prevButton.style.cssText = `
@@ -62,7 +65,18 @@ export function addLevelNavigationButtons(gameInstance) {
     nextButton.onclick = function() {
         console.log("Next Level button clicked");
         console.log("Transitioning to the next level...");
-        gameInstance.loadNextLevel();
+        if (gameInstance && gameInstance.gameControl) {
+            const currentIndex = gameInstance.gameControl.currentLevelIndex;
+            const totalLevels = gameInstance.gameControl.levelClasses.length;
+            if (currentIndex < totalLevels - 1) {
+                gameInstance.gameControl.currentLevelIndex = currentIndex + 1;
+                gameInstance.gameControl.transitionToLevel();
+            } else {
+                console.warn("Already at the last level");
+            }
+        } else {
+            console.error("gameInstance.gameControl not found");
+        }
     };
     nextButton.style.cssText = `
         background-color: #6ae378ff;
@@ -140,145 +154,146 @@ export function addLevelNavigationButtons(gameInstance) {
         font-size: 12px;
         font: 'Press Start 2P', monospace;
     `;
-/**
- * Creates and opens the info menu popup
- */
-function openInfoMenu() {
-    // Check if modal already exists
-    if (document.getElementById("infoModal")) {
-        document.getElementById("infoModal").style.display = "flex";
-        return;
-    }
 
-    // Create modal overlay
-    const modal = document.createElement("div");
-    modal.id = "infoModal";
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-        backdrop-filter: blur(5px);
-    `;
-
-    // Create modal content
-    const modalContent = document.createElement("div");
-    modalContent.style.cssText = `
-        background: linear-gradient(145deg, #34495e, #2c3e50);
-        border: 4px solid #e67e22;
-        border-radius: 15px;
-        padding: 30px;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0 0 30px rgba(230, 126, 34, 0.5);
-        font-family: 'Press Start 2P', monospace;
-        color: #ecf0f1;
-    `;
-
-    // Modal title
-    const title = document.createElement("h2");
-    title.innerText = "ℹ️ GAME INFO ℹ️";
-    title.style.cssText = `
-        text-align: center;
-        color: #e67e22;
-        margin-bottom: 25px;
-        font-size: 18px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    `;
-
-    // Info container
-    const infoContainer = document.createElement("div");
-    infoContainer.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    `;
-
-    // Placeholder info values
-    const infoSection = document.createElement("div");
-    infoSection.style.cssText = `
-        background: rgba(0, 0, 0, 0.3);
-        padding: 15px;
-        border-radius: 10px;
-        border: 2px solid #e67e22;
-        text-align: left;
-        color: #e67e22;
-        font-size: 12px;
-    `;
-    infoSection.innerHTML = `
-        <strong>Game Title:</strong> Mansion Adventure<br>
-        <strong>Version:</strong> 1.0.0<br>
-        <strong>Developer:</strong> DNHS CSSE Per. 1<br>
-        <strong>Description:</strong> Find all the keys to escape the haunted mansion!<br>
-        <strong>Controls:</strong> WASD keys to move.<br>
-        <strong>More info coming soon...</strong>
-    `;
-
-    // Close button
-    const closeButton = document.createElement("button");
-    closeButton.innerText = "✖ Close";
-    closeButton.style.cssText = `
-        margin-top: 20px;
-        padding: 12px 20px;
-        background: linear-gradient(145deg, #e67e22, #d35400);
-        color: white;
-        border: 2px solid #ecf0f1;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 12px;
-        font-family: 'Press Start 2P', monospace;
-        width: 100%;
-        transition: all 0.3s ease;
-    `;
-    closeButton.onmouseover = () => {
-        closeButton.style.transform = "scale(1.05)";
-    };
-    closeButton.onmouseout = () => {
-        closeButton.style.transform = "scale(1)";
-    };
-    closeButton.onclick = () => {
-        modal.style.display = "none";
-    };
-
-    // Assemble modal
-    infoContainer.appendChild(infoSection);
-    modalContent.appendChild(title);
-    modalContent.appendChild(infoContainer);
-    modalContent.appendChild(closeButton);
-    modal.appendChild(modalContent);
-    // Add modal to document
-    document.body.appendChild(modal);
-    // Close modal when clicking outside
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.style.display = "none";
+    /**
+     * Creates and opens the info menu popup
+     */
+    function openInfoMenu() {
+        // Check if modal already exists
+        if (document.getElementById("infoModal")) {
+            document.getElementById("infoModal").style.display = "flex";
+            return;
         }
-    };
-    console.log("Info menu opened");
-}
+
+        // Create modal overlay
+        const modal = document.createElement("div");
+        modal.id = "infoModal";
+        modal.style.cssText = `
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+        `;
+
+        // Create modal content
+        const modalContent = document.createElement("div");
+        modalContent.style.cssText = `
+            background: linear-gradient(145deg, #34495e, #2c3e50);
+            border: 4px solid #e67e22;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(230, 126, 34, 0.5);
+            font-family: 'Press Start 2P', monospace;
+            color: #ecf0f1;
+        `;
+
+        // Modal title
+        const title = document.createElement("h2");
+        title.innerText = "ℹ️ GAME INFO ℹ️";
+        title.style.cssText = `
+            text-align: center;
+            color: #e67e22;
+            margin-bottom: 25px;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        `;
+
+        // Info container
+        const infoContainer = document.createElement("div");
+        infoContainer.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        `;
+
+        // Placeholder info values
+        const infoSection = document.createElement("div");
+        infoSection.style.cssText = `
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e67e22;
+            text-align: left;
+            color: #e67e22;
+            font-size: 12px;
+        `;
+        infoSection.innerHTML = `
+            <strong>Game Title:</strong> Mansion Adventure<br>
+            <strong>Version:</strong> 1.0.0<br>
+            <strong>Developer:</strong> DNHS CSSE Per. 1<br>
+            <strong>Description:</strong> Find all the keys to escape the haunted mansion!<br>
+            <strong>Controls:</strong> WASD keys to move.<br>
+            <strong>More info coming soon...</strong>
+        `;
+
+        // Close button
+        const closeButton = document.createElement("button");
+        closeButton.innerText = "✖ Close";
+        closeButton.style.cssText = `
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(145deg, #e67e22, #d35400);
+            color: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'Press Start 2P', monospace;
+            width: 100%;
+            transition: all 0.3s ease;
+        `;
+        closeButton.onmouseover = () => {
+            closeButton.style.transform = "scale(1.05)";
+        };
+        closeButton.onmouseout = () => {
+            closeButton.style.transform = "scale(1)";
+        };
+        closeButton.onclick = () => {
+            modal.style.display = "none";
+        };
+
+        // Assemble modal
+        infoContainer.appendChild(infoSection);
+        modalContent.appendChild(title);
+        modalContent.appendChild(infoContainer);
+        modalContent.appendChild(closeButton);
+        modal.appendChild(modalContent);
+        // Add modal to document
+        document.body.appendChild(modal);
+        // Close modal when clicking outside
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+        console.log("Info menu opened");
+    }
 
     // Add Cheats Menu, Home, and Info to center container
     centerContainer.appendChild(cheatsButton);
     centerContainer.appendChild(homeButton);
     centerContainer.appendChild(infoButton);
 
-        // Clear footer before adding new layout
-        footer.innerHTML = "";
-        // Add buttons to footer in correct positions
-        footer.appendChild(prevButton); // far left
-        footer.appendChild(centerContainer); // center
-        footer.appendChild(nextButton); // far right
-        console.log("Level navigation and cheats buttons added to footer");
+    // Clear footer before adding new layout
+    footer.innerHTML = "";
+    // Add buttons to footer in correct positions
+    footer.appendChild(prevButton); // far left
+    footer.appendChild(centerContainer); // center
+    footer.appendChild(nextButton); // far right
+    console.log("Level navigation and cheats buttons added to footer");
 }
 
 /**
- * Creates and opens the cheats menu popup
+ * Creates and opens the cheats menu popup with level select
  * @param {Game} gameInstance - The game instance to control
  */
 function openCheatsMenu(gameInstance) {
@@ -312,9 +327,11 @@ function openCheatsMenu(gameInstance) {
         border: 4px solid #a46ae3ff;
         border-radius: 15px;
         padding: 30px;
-        max-width: 500px;
+        max-width: 600px;
+        max-height: 80vh;
         width: 90%;
-        box-shadow: 0 0 30px rgba(52, 152, 219, 0.5);
+        overflow-y: auto;
+        box-shadow: 0 0 30px rgba(164, 106, 227, 0.5);
         font-family: 'Press Start 2P', monospace;
         color: #ecf0f1;
     `;
@@ -338,6 +355,125 @@ function openCheatsMenu(gameInstance) {
         gap: 15px;
     `;
     
+    // Level Select Section
+    const levelSelectSection = document.createElement("div");
+    levelSelectSection.style.cssText = `
+        background: rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        border-radius: 10px;
+        border: 2px solid #a46ae3ff;
+    `;
+    
+    const levelTitle = document.createElement("h3");
+    levelTitle.innerText = "🚪 LEVEL SELECT 🚪";
+    levelTitle.style.cssText = `
+        text-align: center;
+        color: #a46ae3ff;
+        margin-bottom: 15px;
+        font-size: 14px;
+    `;
+    levelSelectSection.appendChild(levelTitle);
+    
+    // Define your levels based on the file list
+    const levels = [
+        { name: "Main Menu", id: "mansionLevelMain" },
+        { name: "Level 1: Pantry", id: "mansionLevel1_Pantry" },
+        { name: "Level 1", id: "mansionLevel1" },
+        { name: "Level 2", id: "mansionLevel2" },
+        { name: "Level 3", id: "mansionLevel3" },
+        { name: "Level 4: Casino", id: "mansionLevel4" },
+        { name: "Level 5", id: "mansionLevel5" },
+        { name: "Level 6: Battle Room", id: "mansionLevel6_BattleRoom" },
+        { name: "Level 6", id: "mansionLevel6" }
+    ];
+    
+    // Create level buttons grid
+    const levelGrid = document.createElement("div");
+    levelGrid.style.cssText = `
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+    `;
+    
+    levels.forEach((level, index) => {
+        const levelButton = document.createElement("button");
+        levelButton.innerText = level.name;
+        levelButton.title = `Jump to ${level.name}`;
+        levelButton.style.cssText = `
+            padding: 15px 10px;
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 10px;
+            font-family: 'Press Start 2P', monospace;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.3;
+        `;
+        
+        levelButton.onmouseover = () => {
+            levelButton.style.transform = "scale(1.05)";
+            levelButton.style.background = "linear-gradient(145deg, #2ecc71, #27ae60)";
+        };
+        levelButton.onmouseout = () => {
+            levelButton.style.transform = "scale(1)";
+            levelButton.style.background = "linear-gradient(145deg, #3498db, #2980b9)";
+        };
+        
+        levelButton.onclick = () => {
+            console.log(`Jumping to ${level.name} (${level.id})`);
+            
+            // Close the cheats menu
+            const cheatsOverlay = document.getElementById("cheatsMenuOverlay");
+            if (cheatsOverlay) {
+                cheatsOverlay.remove();
+            }
+            
+            // For mansion game, we need to dynamically import and load the level
+            const levelMap = {
+                "mansionLevelMain": () => import('../mansionLevelMain.js'),
+                "mansionLevel1_Pantry": () => import('../mansionLevel1_Pantry.js'),
+                "mansionLevel1": () => import('../mansionLevel1.js'),
+                "mansionLevel2": () => import('../mansionLevel2.js'),
+                "mansionLevel3": () => import('../mansionLevel3.js'),
+                "mansionLevel4": () => import('../mansionLevel4.js'),
+                "mansionLevel5": () => import('../mansionLevel5.js'),
+                "mansionLevel6_BattleRoom": () => import('../mansionLevel6_BattleRoom.js'),
+                "mansionLevel6": () => import('../mansionLevel6.js')
+            };
+            
+            if (levelMap[level.id]) {
+                levelMap[level.id]().then(module => {
+                    const LevelClass = module.default;
+                    if (gameInstance && gameInstance.gameControl) {
+                        gameInstance.gameControl.levelClasses = [LevelClass];
+                        gameInstance.gameControl.currentLevelIndex = 0;
+                        gameInstance.gameControl.transitionToLevel();
+                    } else {
+                        console.error("gameInstance.gameControl not found");
+                    }
+                }).catch(err => {
+                    console.error(`Failed to load level ${level.id}:`, err);
+                    alert(`Error loading ${level.name}: ${err.message}`);
+                });
+            } else {
+                console.warn(`Level ${level.id} not found in levelMap`);
+            }
+            
+            modal.style.display = "none";
+        };
+        
+        levelGrid.appendChild(levelButton);
+    });
+    
+    levelSelectSection.appendChild(levelGrid);
+    cheatsContainer.appendChild(levelSelectSection);
+    
+    // Additional cheats placeholder
     const placeholderSection = document.createElement("div");
     placeholderSection.style.cssText = `
         background: rgba(0, 0, 0, 0.3);
@@ -346,9 +482,7 @@ function openCheatsMenu(gameInstance) {
         border: 2px solid #95a5a6;
         text-align: center;
     `;
-    placeholderSection.innerText = "More cheats coming soon...";
-    placeholderSection.style.color = "#95a5a6";
-    placeholderSection.style.fontSize = "10px";
+    
     
     // Close button
     const closeButton = document.createElement("button");
@@ -375,21 +509,24 @@ function openCheatsMenu(gameInstance) {
     closeButton.onclick = () => {
         modal.style.display = "none";
     };
+    
     // Assemble modal
-    cheatsContainer.appendChild(placeholderSection);
     modalContent.appendChild(title);
     modalContent.appendChild(cheatsContainer);
     modalContent.appendChild(closeButton);
     modal.appendChild(modalContent);
+    
     // Add modal to document
     document.body.appendChild(modal);
+    
     // Close modal when clicking outside
     modal.onclick = (e) => {
         if (e.target === modal) {
             modal.style.display = "none";
         }
     };
-    console.log("Cheats menu opened");
+    
+    console.log("Cheats menu opened with level select");
 }
 
 /**
