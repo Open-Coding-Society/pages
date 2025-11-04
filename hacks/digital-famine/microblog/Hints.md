@@ -6,7 +6,7 @@ author: Jaynee Chauhan, Michelle Ji
 description: >
   Do you need some help? Don't worry we won't tell ;)
 author: CSP 2025-26
-permalink: /digital-famine/microblog/hints
+permalink: /digital-famine/microblog/hints/
 breadcrumb: true
 footer:
   home: /digital-famine/
@@ -21,7 +21,7 @@ lxdData:
       Description: "Click here for some Media Literacy hints"
       Categories: ["Quest 1", "Quest 2"]
       Lessons: "/digital-famine/microblog/hintsML/"
-      Image: "/images/digital-famine/ai.svg"
+      Image: "/images/digital-famine/mediaawareness.png"
       Alt: "ML Submodule 1"
     - Title: "AI hints"
       Genre: "Assessment"
@@ -29,7 +29,7 @@ lxdData:
       Description: "Click here for some AI hints"
       Categories: ["Quest 1", "Quest 2", "Quest 3"]
       Lessons: "/digital-famine/microblog/hintsAI/"
-      Image: "/images/digital-famine/ai.svg"
+      Image: "/images/digital-famine/ai.jpeg"
       Alt: "AI Submodule 2"
     - Title: "Cybersecurity Hints"
       Genre: "Assessment"
@@ -37,7 +37,7 @@ lxdData:
       Description: "Click here for some Cybersecurity hints!"
       Categories: ["Quest 1", "Quest 2", "Quest 3"]
       Lessons: "/digital-famine/microblog/hintsCyber/"
-      Image: "/images/digital-famine/ai.svg"
+      Image: "/images/digital-famine/cyber.svg"
       Alt: "CS Submodule 3"
 ---
 {%- include tailwind/cs-portfolio-quest_info.html -%}
