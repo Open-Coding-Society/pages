@@ -55,7 +55,8 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Your reflection</label>
       <textarea id="mindset" rows="3" class="w-full border rounded px-3 py-2" placeholder="What mindset will you bring?"></textarea>
     </div>
-    <div><button id="toStep2" class="px-3 py-2 border rounded">Continue →</button></div>
+    <!-- per-section continue hidden -->
+    <div class="hidden"><button id="toStep2" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 2: Voice -->
@@ -94,7 +95,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Your notes</label>
       <textarea id="toneNotes" rows="3" class="w-full border rounded px-3 py-2" placeholder="What will you practice?"></textarea>
     </div>
-    <div><button id="toStep3" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep3" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 3: Body language -->
@@ -119,7 +120,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Two improvements you’ll try</label>
       <textarea id="bodyNotes" rows="3" class="w-full border rounded px-3 py-2" placeholder="e.g., maintain eye contact, stop fidgeting"></textarea>
     </div>
-    <div><button id="toStep4" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep4" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 4: STAR -->
@@ -139,7 +140,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Your STAR answer</label>
       <textarea id="starExample" rows="5" class="w-full border rounded px-3 py-2" placeholder="Tell me about a time you worked in a team..."></textarea>
     </div>
-    <div><button id="toStep5" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep5" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 5: Common Qs -->
@@ -159,7 +160,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Draft your 60-second pitch</label>
       <textarea id="aboutYourself" rows="5" class="w-full border rounded px-3 py-2" placeholder="Write your pitch..."></textarea>
     </div>
-    <div><button id="toStep6" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep6" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 6: Project demo -->
@@ -178,7 +179,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Your project pitch (60–90s)</label>
       <textarea id="projectPitch" rows="5" class="w-full border rounded px-3 py-2" placeholder="Write your pitch..."></textarea>
     </div>
-    <div><button id="toStep7" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep7" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 7: Explain tech -->
@@ -194,7 +195,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Your explanation</label>
       <textarea id="technicalExplanation" rows="5" class="w-full border rounded px-3 py-2" placeholder="Loops, APIs, databases, etc."></textarea>
     </div>
-    <div><button id="toStep8" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep8" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 8: Your questions -->
@@ -218,7 +219,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Write 3 questions</label>
       <textarea id="questionsToAsk" rows="4" class="w-full border rounded px-3 py-2" placeholder="Your questions..."></textarea>
     </div>
-    <div><button id="toStep9" class="px-3 py-2 border rounded">Continue →</button></div>
+    <div class="hidden"><button id="toStep9" class="px-3 py-2 border rounded">Continue →</button></div>
   </section>
 
   <!-- STEP 9: Tough questions -->
@@ -236,7 +237,7 @@ date: 2025-10-29
       <label class="block text-sm font-medium">Your strategy</label>
       <textarea id="toughQuestions" rows="4" class="w-full border rounded px-3 py-2" placeholder="Write your approach..."></textarea>
     </div>
-    <div><button id="toStep10" class="px-3 py-2 border rounded">Practice with ELIO →</button></div>
+    <div class="hidden"><button id="toStep10" class="px-3 py-2 border rounded">Practice with ELIO →</button></div>
   </section>
 
   <!-- STEP 10: ELIO mock interview -->
@@ -305,31 +306,32 @@ date: 2025-10-29
     <p id="saveMessage" class="text-sm"></p>
   </section>
 
-  <!-- Bottom Navigation (Submodule 3 style: no generic Next, only Previous + Next Module) -->
-  <div class="flex justify-between mt-4">
+  <!-- Bottom Navigation: Previous (left) + Next (right on same row). On last step, show "Back to homepage". -->
+  <div class="flex justify-between items-center mt-4">
     <button id="prevBtn" class="px-3 py-2 border rounded" disabled>Previous</button>
-    <button
-      id="nextModuleBtnNav"
-      data-href="/cs-portfolio-quest/resume/"
-      class="px-3 py-2 border rounded hidden bg-red-600 text-white disabled:opacity-60"
-      disabled
-    >Next Module →</button>
+    <div class="flex gap-2 items-center">
+      <button id="nextBtn" class="px-3 py-2 border rounded">Continue →</button>
+      <button
+        id="nextModuleBtnNav"
+        data-href="/cs-portfolio-quest/resume/"
+        class="px-3 py-2 border rounded hidden bg-red-600 text-white disabled:opacity-60"
+        disabled
+      >Back to homepage →</button>
+    </div>
   </div>
 
   <!-- Floating Selected Sprite -->
-<video id="floating-sprite" width="150" height="160" loop muted playsinline style="
-  position: fixed;
-  bottom: 20px;
-  right: -200px;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  display: none;
-  z-index: 1000;
-">
-  <source id="floating-source" src="" type="video/mp4">
-</video>
-
-
+  <video id="floating-sprite" width="150" height="160" loop muted playsinline style="
+    position: fixed;
+    bottom: 20px;
+    right: -200px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 1000;
+  ">
+    <source id="floating-source" src="" type="video/mp4">
+  </video>
 </div>
 
 <style>
@@ -380,32 +382,16 @@ document.addEventListener('DOMContentLoaded', () => {
     vocalVideoFrame.src = vocalVideos[currentVocalVideoIndex];
     vocalVideoCounter.textContent = `Video ${currentVocalVideoIndex + 1} / ${vocalVideos.length}`;
 
-    // Hide/show buttons based on position
-    if (currentVocalVideoIndex === 0) {
-      prevVocalBtn.style.visibility = 'hidden';
-    } else {
-      prevVocalBtn.style.visibility = 'visible';
-    }
-
-    if (currentVocalVideoIndex === vocalVideos.length - 1) {
-      nextVocalBtn.style.visibility = 'hidden';
-    } else {
-      nextVocalBtn.style.visibility = 'visible';
-    }
+    prevVocalBtn.style.visibility = currentVocalVideoIndex === 0 ? 'hidden' : 'visible';
+    nextVocalBtn.style.visibility = currentVocalVideoIndex === vocalVideos.length - 1 ? 'hidden' : 'visible';
   }
 
   prevVocalBtn?.addEventListener('click', () => {
-    if (currentVocalVideoIndex > 0) {
-      currentVocalVideoIndex--;
-      updateVocalVideo();
-    }
+    if (currentVocalVideoIndex > 0) { currentVocalVideoIndex--; updateVocalVideo(); }
   });
 
   nextVocalBtn?.addEventListener('click', () => {
-    if (currentVocalVideoIndex < vocalVideos.length - 1) {
-      currentVocalVideoIndex++;
-      updateVocalVideo();
-    }
+    if (currentVocalVideoIndex < vocalVideos.length - 1) { currentVocalVideoIndex++; updateVocalVideo(); }
   });
 
   // --------- State & storage (Submodule 3 pattern) ----------
@@ -421,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressLabel = $('#progressLabel');
 
   const prevBtn = $('#prevBtn');
+  const nextBtn = $('#nextBtn');
   const nextModuleBtnNav = $('#nextModuleBtnNav');
 
   const saveDraftBtn = $('#saveDraft');
@@ -443,31 +430,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   fieldIds.forEach(id => { const el = $("#"+id); if (el) el.addEventListener('input', persist); });
 
-  // navigation (Submodule 3 style: internal buttons + bottom Previous)
+  // navigation
   function showStep(i){
     state.step = Math.max(0, Math.min(steps.length-1, i));
     steps.forEach((el,idx)=>el.classList.toggle('hidden', idx!==state.step));
     const pct = ((state.step+1)/steps.length)*100;
     progressBar.style.width = pct + '%';
     progressLabel.textContent = `Step ${state.step+1} / ${steps.length}`;
-    prevBtn.disabled = state.step===0;
 
-    const onLast = state.step === steps.length - 1;
-    nextModuleBtnNav.classList.toggle('hidden', !onLast);
+    // left/right controls on same row
+    prevBtn.disabled = state.step===0;
+    nextBtn.classList.toggle('hidden', state.step === steps.length - 1);
+    nextModuleBtnNav.classList.toggle('hidden', state.step !== steps.length - 1);
     nextModuleBtnNav.disabled = !state.submitted;
     nextModuleBtnNav.classList.toggle('bg-green-600', !!state.submitted);
     nextModuleBtnNav.classList.toggle('bg-red-600', !state.submitted);
 
     persist();
   }
-  prevBtn.addEventListener('click', ()=>showStep(state.step-1));
 
-  // internal “Continue →” buttons (IDs toStep2..toStep10)
-  const jumpers = [
-    ["#toStep2",1],["#toStep3",2],["#toStep4",3],["#toStep5",4],
-    ["#toStep6",5],["#toStep7",6],["#toStep8",7],["#toStep9",8],["#toStep10",9]
-  ];
-  jumpers.forEach(([sel,idx])=>{ const b = $(sel); if (b) b.addEventListener('click', ()=>showStep(idx)); });
+  prevBtn.addEventListener('click', ()=>showStep(state.step-1));
+  nextBtn.addEventListener('click', ()=>showStep(state.step+1));
+
+  // hide all per-section inline continue buttons (in case any remain)
+  [
+    "#toStep2","#toStep3","#toStep4","#toStep5",
+    "#toStep6","#toStep7","#toStep8","#toStep9","#toStep10"
+  ].forEach(sel => {
+    const b = $(sel);
+    if (b) b.classList.add('hidden');
+  });
 
   if (nextModuleBtnNav){
     nextModuleBtnNav.addEventListener('click', (e)=>{
@@ -486,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   submitFinalBtn?.addEventListener('click', async ()=>{
-    // You can add a real POST later if desired
     state.submitted = true;
     persist();
     saveMessage.textContent = "Submitted! Your practice set is marked complete.";
@@ -496,19 +487,19 @@ document.addEventListener('DOMContentLoaded', () => {
     nextModuleBtnNav.classList.add('bg-green-600');
   });
 
-  // ----- Bind ELIO buttons (critical for speech to trigger via user gesture)
+  // ----- Bind ELIO buttons
   document.getElementById('startInterviewBtn')?.addEventListener('click', startELIOInterview);
   document.getElementById('nextQuestionBtn')?.addEventListener('click', nextQuestion);
   document.getElementById('endInterviewBtn')?.addEventListener('click', endELIOInterview);
 
-  // Warm up voices as early as possible (some browsers need this)
+  // Warm up voices
   if (window.speechSynthesis) {
     const warm = () => { speechSynthesis.onvoiceschanged = null; speechSynthesis.getVoices(); };
     speechSynthesis.onvoiceschanged = warm;
     setTimeout(() => speechSynthesis.getVoices(), 200);
   }
 
-  // ------- Boot
+  // boot
   showStep(0);
 });
 
@@ -528,14 +519,14 @@ const interviewQuestions = [
 ];
 
 const startBtn = () => document.getElementById('startInterviewBtn');
-const nextBtn  = () => document.getElementById('nextQuestionBtn');
+const nextBtnQ  = () => document.getElementById('nextQuestionBtn');
 const endBtn   = () => document.getElementById('endInterviewBtn');
 
 function startELIOInterview(){
   interviewActive = true;
   currentQuestionIndex = 0;
   startBtn()?.classList.add('hidden');
-  nextBtn()?.classList.remove('hidden');
+  nextBtnQ()?.classList.remove('hidden');
   endBtn()?.classList.remove('hidden');
   document.getElementById('elioScanner')?.classList.add('active');
   document.getElementById('elioScannerOrigin')?.classList.add('active');
@@ -546,11 +537,11 @@ function askQuestion(){
   if (currentQuestionIndex < interviewQuestions.length){
     const q = interviewQuestions[currentQuestionIndex];
     qEl.textContent = q;
-    speakText(q); // say it out loud
+    speakText(q);
   } else {
     qEl.textContent = "Great job! That concludes our interview. Review your recording.";
     speakText("Great job! That concludes our interview.");
-    nextBtn()?.classList.add('hidden');
+    nextBtnQ()?.classList.add('hidden');
     document.getElementById('elioScanner')?.classList.remove('active');
     document.getElementById('elioScannerOrigin')?.classList.remove('active');
   }
@@ -560,24 +551,21 @@ function endELIOInterview(){
   interviewActive = false;
   document.getElementById('elioQuestion').textContent = "Interview ended. Click “Start Interview” to try again!";
   startBtn()?.classList.remove('hidden');
-  nextBtn()?.classList.add('hidden');
+  nextBtnQ()?.classList.add('hidden');
   endBtn()?.classList.add('hidden');
   document.getElementById('elioScanner')?.classList.remove('active');
   document.getElementById('elioScannerOrigin')?.classList.remove('active');
   currentQuestionIndex = 0;
 }
 
-// ---- Robust TTS: waits for voices if needed, with fallback
+// ---- Robust TTS
 function speakText(text){
   if (!('speechSynthesis' in window)) return;
 
   const trySpeak = () => {
     if (speechSynthesis.speaking) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US';
-    u.rate = 1.0;
-    u.pitch = 1.0;
-    u.volume = 1.0;
+    u.lang = 'en-US'; u.rate = 1.0; u.pitch = 1.0; u.volume = 1.0;
     const voices = speechSynthesis.getVoices() || [];
     const preferred = voices.find(v =>
       v.lang?.toLowerCase().startsWith('en') &&
@@ -591,7 +579,6 @@ function speakText(text){
   if (!voicesNow || voicesNow.length === 0){
     const once = () => { speechSynthesis.onvoiceschanged = null; trySpeak(); };
     speechSynthesis.onvoiceschanged = once;
-    // safety fallback in case onvoiceschanged never fires
     setTimeout(() => { if (speechSynthesis.getVoices().length) trySpeak(); }, 400);
   } else {
     trySpeak();
@@ -698,5 +685,4 @@ function showFloatingSprite(charId) {
     floatingSprite.play();
   }
 }
-
 </script>

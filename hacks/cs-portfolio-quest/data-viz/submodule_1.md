@@ -6,11 +6,11 @@ permalink: /cs-portfolio-quest/data-viz/submodule_1/
 parent: "Data Visualization"
 team: "Applicators"
 submodule: 1
-microblog: true
 categories: [CSP, Submodule, DataVisualization]
 tags: [spring-boot, rest, jpa, sqlite]
 author: "Applicators Team"
 date: 2025-10-21
+microblog: true
 ---
 
 # Submodule 1 · Company Profile & REST APIs — Minimal Interactive (Styling Preserved)
