@@ -7,8 +7,18 @@ microblog: true
 
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
-    <canvas id='gameCanvas'></canvas>
+    <canvas id='gameCanvas' width="800" height="600"></canvas>
 </div>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+</style>
 
 <script type="module">
     // Adnventure Game assets locations

@@ -26,6 +26,7 @@ lxdData:
       Lessons: "/cs-portfolio-quest/data-viz/submodule_2/"
       Image: "/images/cs-portfolio-quest/data-viz/s2.png"
       Alt: "Data Viz Submodule 2"
+microblog: True
 ---
 
 {%- include tailwind/cs-portfolio-mini_quest_info.html -%}

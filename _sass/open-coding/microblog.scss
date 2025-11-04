@@ -252,4 +252,80 @@
   overflow-y: auto;
 }
 
+/* Guest Signup Styles */
+.guest-signup-toggle-btn {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: auto;
+}
+.guest-signup-toggle-btn:hover {
+  background: #059669;
+}
+
+.guest-signup-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.guest-signup-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.guest-form-group {
+  margin-bottom: 0.75rem;
+}
+
+.guest-form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  color: #222;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.guest-submit-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.guest-submit-btn:hover:not(:disabled) {
+  background: #1e40af;
+}
+
+.guest-submit-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.guest-status {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+  min-height: 1.2rem;
+}
+
 /* Add more microblog-specific styles as needed */
