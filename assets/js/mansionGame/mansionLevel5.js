@@ -649,7 +649,7 @@ class MansionLevel5 {
             <div>
             'W','A','S','D' to move around <br>
             'C' to shoot <br>
-            Kill 20 zombies to progress <br>
+            Kill 10 zombies to progress <br>
             Press 'E' to enter the door at the end
             </div>
         `
