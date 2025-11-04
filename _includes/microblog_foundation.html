@@ -87,7 +87,9 @@ window.handleGuestSignup = async function(event) {
   };
 
   try {
-    // Step 1: Create guest account using Flask backend
+    let accountExists = false;
+
+    // Step 1: Try to create guest account using Flask backend
     statusMessage.textContent = 'Creating guest account...';
     const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
       method: 'POST',
@@ -98,14 +100,15 @@ window.handleGuestSignup = async function(event) {
     });
 
     if (!signupResponse.ok) {
-      const errorText = await signupResponse.text();
-      throw new Error(`Signup failed: ${errorText}`);
+      // Account might already exist, so we'll try to login instead
+      accountExists = true;
+      statusMessage.textContent = 'Account exists, logging in...';
+    } else {
+      await signupResponse.json();
+      statusMessage.textContent = 'Account created! Logging in...';
     }
 
-    await signupResponse.json();
-    statusMessage.textContent = 'Account created! Logging in...';
-
-    // Step 2: Auto-login with the same credentials
+    // Step 2: Login with the credentials (whether account was just created or already existed)
     const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
       method: 'POST',
       headers: {
@@ -116,7 +119,7 @@ window.handleGuestSignup = async function(event) {
     });
 
     if (!loginResponse.ok) {
-      throw new Error('Auto-login failed');
+      throw new Error('Login failed - please check your credentials');
     }
 
     await loginResponse.json();
