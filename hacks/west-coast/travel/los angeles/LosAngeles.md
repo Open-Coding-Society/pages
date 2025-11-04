@@ -3059,7 +3059,31 @@ button:active {
 </div>
 
 <!-- WALK OF FAME QUIZ -->
+<section class="quiz-section quiz-section-item" data-destination="Hollywood Walk of Fame" style="display: none;">
+  <h2>🧠 Quick Quiz: Build Your Own Button!</h2>
+  <p>Fill in the blanks to complete your HTML file. If you get both right, your button will appear!</p>
 
+  <form id="button-quiz-4">
+    <label for="q4-1">
+      1️⃣ Complete this code structure to add a button inside the body: <br>
+      <code>&lt;body&gt;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;________&gt;Click Me!&lt;/________&gt;<br>
+      &lt;/body&gt;</code>
+    </label><br>
+    <input type="text" id="q4-1" placeholder="Type your answer here"><br><br>
+
+    <label for="q4-2">
+      2️⃣ Add the missing part to make your button show an alert when clicked: <br>
+      <code>&lt;button ________="alert('Hello!')"&gt;Click Me!&lt;/button&gt;</code>
+    </label><br>
+    <input type="text" id="q4-2" placeholder="Type your answer here"><br><br>
+
+    <button type="button" onclick="checkAnswers4()">Check Answers</button>
+  </form>
+
+  <div id="quiz-result-4" class="quiz-result"></div>
+  <div id="button-demo-4" class="button-demo"></div>
+</section>
 
 <script>
 // Load itinerary from localStorage and show only selected destinations
@@ -3210,7 +3234,7 @@ function checkAnswers2() {
   demo.innerHTML = "";
   let score = 0;
 
-  if (a1 === "button") score++;
+  if (a1 === "doctype") score++;
   if (a2 === "onclick") score++;
 
   result.textContent = "✅ You got " + score + "/2 correct!";
