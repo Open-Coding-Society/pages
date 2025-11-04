@@ -7,7 +7,7 @@ microblog: true
 
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
-    <canvas id='gameCanvas'></canvas>
+    <canvas id='gameCanvas' width="800" height="600"></canvas>
 </div>
 
 <style>
