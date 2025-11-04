@@ -1,0 +1,136 @@
+.museum-container {
+ background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+ min-height: 100vh;
+ padding: 2rem 0;
+}
+
+
+.museum-title {
+ text-align: center;
+ color: #f4f4f4;
+ font-size: 3rem;
+ text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+ margin-bottom: 1rem;
+}
+
+
+.museum-subtitle {
+ text-align: center;
+ color: #b8860b;
+ font-style: italic;
+ margin-bottom: 3rem;
+}
+
+
+.exhibit-cards {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+ gap: 2rem;
+ max-width: 1200px;
+ margin: 0 auto;
+ padding: 0 2rem;
+}
+
+
+.exhibit-card {
+ background: rgba(255, 255, 255, 0.1);
+ border: 2px solid #b8860b;
+ border-radius: 15px;
+ padding: 2rem;
+ position: relative;
+ transition: all 0.3s ease;
+ backdrop-filter: blur(10px);
+ box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+
+.course-badge {
+ position: absolute;
+ top: -10px;
+ right: -10px;
+ padding: 0.5rem 1rem;
+ border-radius: 20px;
+ font-size: 0.8rem;
+ font-weight: bold;
+ color: white;
+ text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+ z-index: 10;
+}
+
+
+.course-badge.csa {
+ background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+ border: 2px solid #ff8a80;
+}
+
+
+.course-badge.csp {
+ background: linear-gradient(45deg, #4ecdc4, #44a08d);
+ border: 2px solid #80cbc4;
+}
+
+
+.course-badge.csse {
+ background: linear-gradient(45deg, #a8e6cf, #88d8a3);
+ border: 2px solid #c8e6c9;
+}
+
+
+.exhibit-card:hover {
+ transform: translateY(-10px);
+ box-shadow: 0 15px 40px rgba(184, 134, 11, 0.3);
+ border-color: #ffd700;
+}
+
+
+.exhibit-icon {
+ font-size: 3rem;
+ text-align: center;
+ margin-bottom: 1rem;
+}
+
+
+.exhibit-title {
+ color: #ffd700;
+ font-size: 1.5rem;
+ margin-bottom: 1rem;
+ text-align: center;
+}
+
+
+.exhibit-description {
+ color: #f0f0f0;
+ text-align: center;
+ line-height: 1.6;
+ margin-bottom: 1.5rem;
+}
+
+
+.exhibit-link {
+ display: block;
+ background: linear-gradient(45deg, #b8860b, #ffd700);
+ color: #1a1a2e;
+ text-decoration: none;
+ padding: 0.8rem 1.5rem;
+ border-radius: 25px;
+ text-align: center;
+ font-weight: bold;
+ transition: all 0.3s ease;
+}
+
+
+.exhibit-link:hover {
+ background: linear-gradient(45deg, #ffd700, #ffed4e);
+ transform: scale(1.05);
+ color: #1a1a2e;
+ text-decoration: none;
+}
+
+
+.closing-message {
+ text-align: center;
+ color: #b8860b;
+ font-style: italic;
+ margin-top: 3rem;
+ font-size: 1.1rem;
+}

@@ -887,6 +887,29 @@ body {
   background: linear-gradient(180deg, transparent, rgba(255,255,255,0.1), transparent);
 }
 
+/* Personalization Notice */
+.personalization-notice {
+  max-width: 1000px;
+  margin: 0 auto 40px;
+  background: linear-gradient(135deg, #4a9eff, #1e3a5f);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+  text-align: center;
+}
+
+.personalization-notice h3 {
+  color: white;
+  font-size: 1.8em;
+  margin-bottom: 15px;
+}
+
+.personalization-notice p {
+  color: white;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
 @media (max-width: 768px) {
   .main-header h1 {
     font-size: 2.2em;
@@ -926,11 +949,17 @@ body {
 <!-- Main Header -->
 <div class="main-header">
   <h1>🎵 San Diego Audio Tour</h1>
-  <p>A Journey Through Four Iconic Locations</p>
+  <p id="headerSubtitle">A Journey Through Four Iconic Locations</p>
+</div>
+
+<!-- Personalization Notice -->
+<div class="personalization-notice" id="personalizationNotice" style="display: none;">
+  <h3>✨ Your Personalized Experience</h3>
+  <p id="personalizationText"></p>
 </div>
 
 <!-- Balboa Park -->
-<div class="location">
+<div class="location" id="location-balboa">
   <div class="location-header">
     <h2>🏛️ Balboa Park</h2>
     <p>Learn about HTML audio with the majestic Spreckels Organ!</p>
@@ -1055,7 +1084,7 @@ body {
 <div class="divider"></div>
 
 <!-- La Jolla Beach -->
-<div class="location">
+<div class="location" id="location-lajolla">
   <div class="location-header">
     <h2>🌊 La Jolla Beach</h2>
     <p>Learn HTML audio with the soothing sounds of the Pacific Ocean!</p>
@@ -1165,7 +1194,7 @@ body {
 <div class="divider"></div>
 
 <!-- Petco Park -->
-<div class="location">
+<div class="location" id="location-petco">
   <div class="location-header">
     <h2>⚾ Petco Park</h2>
     <p>Learn HTML audio with the exciting sounds of baseball!</p>
@@ -1280,7 +1309,7 @@ body {
 <div class="divider"></div>
 
 <!-- San Diego Zoo -->
-<div class="location">
+<div class="location" id="location-zoo">
   <div class="location-header">
     <h2>🦁 San Diego Zoo</h2>
     <p>Learn HTML audio with the wild sounds of the famous San Diego Zoo!</p>
@@ -1396,6 +1425,81 @@ body {
 </div>
 
 <script>
+// PERSONALIZATION FEATURE - Load user's selected destinations from localStorage
+(function() {
+  const DESTINATION_MAP = {
+    'Petco Park': 'location-petco',
+    'San Diego Zoo': 'location-zoo',
+    'Balboa Park': 'location-balboa',
+    'La Jolla': 'location-lajolla'
+  };
+
+  function loadPersonalization() {
+    try {
+      const itineraryData = localStorage.getItem('westCoastItinerary');
+      
+      if (itineraryData) {
+        const itinerary = JSON.parse(itineraryData);
+        
+        // Check if San Diego data exists in the itinerary
+        if (itinerary.cities && itinerary.cities['San Diego']) {
+          const sanDiegoDestinations = itinerary.cities['San Diego'].destinations;
+          
+          if (sanDiegoDestinations && sanDiegoDestinations.length > 0) {
+            // Show personalization notice
+            const notice = document.getElementById('personalizationNotice');
+            const noticeText = document.getElementById('personalizationText');
+            notice.style.display = 'block';
+            noticeText.textContent = `Based on your itinerary, we're showing you: ${sanDiegoDestinations.join(' and ')}! These were your selected destinations from the trip planner.`;
+            
+            // Update header subtitle
+            const headerSubtitle = document.getElementById('headerSubtitle');
+            headerSubtitle.textContent = `Your Personalized Journey: ${sanDiegoDestinations.join(' & ')}`;
+            
+            // Hide all locations first
+            Object.values(DESTINATION_MAP).forEach(locationId => {
+              const locationElement = document.getElementById(locationId);
+              if (locationElement) {
+                locationElement.style.display = 'none';
+              }
+            });
+            
+            // Show only the selected destinations
+            sanDiegoDestinations.forEach(destination => {
+              const locationId = DESTINATION_MAP[destination];
+              if (locationId) {
+                const locationElement = document.getElementById(locationId);
+                if (locationElement) {
+                  locationElement.style.display = 'block';
+                }
+              }
+            });
+            
+            return true; // Personalization applied
+          }
+        }
+      }
+    } catch (error) {
+      console.log('No personalization data found or error loading:', error);
+    }
+    
+    return false; // No personalization applied, show all locations
+  }
+
+  // Apply personalization on page load
+  const personalized = loadPersonalization();
+  
+  if (!personalized) {
+    // If no personalization, ensure all locations are visible
+    Object.values(DESTINATION_MAP).forEach(locationId => {
+      const locationElement = document.getElementById(locationId);
+      if (locationElement) {
+        locationElement.style.display = 'block';
+      }
+    });
+  }
+})();
+
 // Hide intro after 3 seconds
 setTimeout(function() {
   document.getElementById('intro').classList.add('hidden');
@@ -1554,15 +1658,6 @@ const DESTINATIONS = [
     country: "Hawaii, USA",
     description: "A lush island paradise famous for golden beaches, waterfalls, and volcanic landscapes.",
     bestTime: "April to October",
-    climate: "Warm tropical",
-    activities: "Snorkeling, hiking Haleakalā, surfing, scenic drives along Hana Highway"
-  },
-  {
-    keywords: ["mountain", "hiking", "nature", "alps"],
-    name: "Zermatt",
-    country: "Switzerland",
-    description: "A picturesque alpine village located at the base of the iconic Matterhorn mountain.",
-    bestTime: "June to September (hiking), December to March (skiing)",
     climate: "Cool mountain climate",
     activities: "Hiking, skiing, cable car rides, glacier tours"
   },
@@ -1624,7 +1719,7 @@ function generateDestination() {
       climate: "Mild temperate",
       activities: "Temple visits, tea ceremonies, exploring Arashiyama bamboo forest"
     });
-    showAIStatus("🌸 No exact match found, but here’s a great suggestion: Kyoto!", "success");
+    showAIStatus("🌸 No exact match found, but here's a great suggestion: Kyoto!", "success");
   }
 }
 

@@ -2,12 +2,17 @@
 layout: post
 title: "Alien Defense — Mission 1: Build the Base Database"
 description: "Learn database fundamentals through hands-on SQLite construction"
-permalink: /digital-famine/cyber/mission-1-lesson/
+permalink: /digital-famine/cybersecurity-game/mission-1-lesson/
 categories: [CSP, Submodule, Database]
 tags: [sql, database, fundamentals, sqlite]
 author: "Aditya Srivastava"
-microblog: true
+microblog: True
+breadcrumb: True
 date: 2025-10-26
+footer:
+  previous: /digital-famine/cybersecurity-game
+  home: /digital-famine/cybersecurity-game
+  next: /digital-famine/cybersecurity-game/mission-2-lesson
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -16,11 +21,17 @@ date: 2025-10-26
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mission 1: Build the Base Database</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sql.js.org/dist/sql-wasm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <style>
-        body {
-            background: linear-gradient(to bottom right, #0f172a, #581c87, #0f172a);
+        body.mission1-body-bg {
+            background:
+                radial-gradient(140% 120% at 20% -10%, rgba(120, 214, 255, 0.18) 0%, transparent 60%),
+                radial-gradient(120% 120% at 80% 0%, rgba(156, 39, 176, 0.16) 0%, transparent 65%),
+                radial-gradient(120% 160% at 50% 100%, rgba(33, 150, 243, 0.12) 0%, transparent 55%),
+                linear-gradient(185deg, #020410 0%, #050a1c 45%, #0b132d 100%);
             min-height: 100vh;
+            color: #f5f7ff;
+            background-attachment: fixed;
         }
         .pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -30,18 +41,127 @@ date: 2025-10-26
             50% { opacity: .5; }
         }
         .section-hidden { display: none; }
+        .mission1-container {
+            position: relative;
+            padding: 3.5rem 1.8rem 4rem;
+            background: radial-gradient(120% 150% at 50% 0%, rgba(32, 45, 80, 0.85) 0%, rgba(10, 14, 28, 0.95) 45%, rgba(2, 4, 12, 0.98) 100%);
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.55);
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        .mission1-container::before {
+            content: "";
+            position: absolute;
+            inset: -10% -20%;
+            background: radial-gradient(circle at 20% 20%, rgba(120, 214, 255, 0.18), transparent 60%),
+                        radial-gradient(circle at 80% 15%, rgba(156, 39, 176, 0.18), transparent 65%),
+                        radial-gradient(circle at 50% 80%, rgba(33, 150, 243, 0.12), transparent 55%);
+            opacity: 0.85;
+            pointer-events: none;
+        }
+        .mission1-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 85px 85px;
+            opacity: 0.22;
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+        .mission1-container > * {
+            position: relative;
+            z-index: 1;
+        }
+        .mission1-card, .mission-section > div > div.bg-slate-800\/70, .mission-section > div > div.bg-slate-800\/50 {
+            background: rgba(8, 12, 24, 0.85) !important;
+            color: #e6edff !important;
+            border-radius: 1.25rem !important;
+            border: 1px solid rgba(120, 214, 255, 0.2) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35) !important;
+        }
+        .mission1-card h2, .mission1-card h3, .mission1-card h4 {
+            color: #78d6ff !important;
+        }
+        .mission-section button {
+            background: linear-gradient(90deg, #2196F3 0%, #9c27b0 100%) !important;
+            color: #fff !important;
+            border: none !important;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.12);
+        }
+        .mission-section button:hover {
+            background: linear-gradient(90deg, #1565c0 0%, #6a1b9a 100%) !important;
+        }
+        .mission-section .bg-blue-900\/20, .mission-section .bg-red-900\/20, .mission-section .bg-green-900\/20 {
+            background: rgba(33, 150, 243, 0.10) !important;
+            border: 1px solid rgba(120, 214, 255, 0.18) !important;
+        }
+        .mission-section .bg-slate-950 {
+            background: rgba(12, 18, 34, 0.9) !important;
+            color: #9bd9ff !important;
+        }
+        .mission-section table th, .mission-section table td {
+            color: #e6edff !important;
+        }
+        .mission-section .text-blue-300, .mission-section .text-red-300, .mission-section .text-green-300, .mission-section .text-purple-300 {
+            color: #78d6ff !important;
+        }
+        .mission-section .border-blue-500\/30, .mission-section .border-red-500\/30, .mission-section .border-green-500\/30, .mission-section .border-purple-500\/30 {
+            border-color: rgba(120, 214, 255, 0.25) !important;
+        }
+        .mission-section .text-red-400, .mission-section .text-green-400, .mission-section .text-yellow-400 {
+            color: #f9d949 !important;
+        }
+        .mission-section .bg-yellow-900\/30 {
+            background: rgba(249, 217, 73, 0.12) !important;
+            border-color: #ffe58a !important;
+        }
+        .mission-section .bg-slate-900\/50, .mission-section .bg-slate-900\/70 {
+            background: rgba(19, 28, 48, 0.95) !important;
+        }
+        .mission-section .border-purple-500\/30 {
+            border-color: rgba(120, 214, 255, 0.25) !important;
+        }
+        .mission-section .text-purple-400 {
+            color: #78d6ff !important;
+        }
+        .mission-section .text-blue-400 {
+            color: #78d6ff !important;
+        }
+        .mission-section .text-red-400 {
+            color: #f9d949 !important;
+        }
+        .mission-section .text-green-300 {
+            color: #82ffa4 !important;
+        }
+        .mission-section .text-yellow-400 {
+            color: #ffe58a !important;
+        }
+        .mission-section .text-gray-300 {
+            color: #c9d8ff !important;
+        }
+        .mission-section .font-semibold {
+            font-weight: 600 !important;
+        }
+        .mission-section .rounded-lg {
+            border-radius: 1.25rem !important;
+        }
+        .mission-section .font-mono {
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace !important;
+        }
+        @media (max-width: 680px) {
+            .mission1-container {
+                padding: 1.6rem 0.5rem 2rem;
+            }
+        }
     </style>
 </head>
-<body class="text-white">
-    <div class="border-b border-purple-500/30 bg-slate-900/50 backdrop-blur">
-        <div class="max-w-7xl mx-auto px-4 py-6">
-            <h1 class="text-4xl font-bold text-center mb-2">Cybersecurity Game - Alien Defense</h1>
-            <p class="text-center text-purple-300 text-lg">Mission 1: Build the Base Database</p>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="bg-slate-800/50 backdrop-blur border border-purple-500/30 rounded-lg p-6 mb-8">
+<body class="mission1-body-bg">
+    <div class="mission1-container">
+        <div class="mission1-card" style="margin-bottom:2rem;">
             <div class="flex items-center justify-between overflow-x-auto pb-2 gap-2">
                 <button onclick="goToSection(0)" class="nav-btn flex flex-col items-center min-w-[100px] px-3 py-2 rounded-lg transition-all bg-purple-600" data-section="0">
                     <span class="text-2xl mb-1">📡</span>
@@ -88,7 +208,7 @@ date: 2025-10-26
                         <div class="grid grid-cols-3 gap-4 mt-6 text-center">
                             <div class="bg-slate-900/50 p-4 rounded-lg border border-purple-500/30">
                                 <p class="text-purple-400 font-semibold">Time</p>
-                                <p class="text-2xl">45-60 min</p>
+                                <p class="text-2xl">15 min</p>
                             </div>
                             <div class="bg-slate-900/50 p-4 rounded-lg border border-purple-500/30">
                                 <p class="text-purple-400 font-semibold">Difficulty</p>
@@ -96,7 +216,7 @@ date: 2025-10-26
                             </div>
                             <div class="bg-slate-900/50 p-4 rounded-lg border border-purple-500/30">
                                 <p class="text-purple-400 font-semibold">Reward</p>
-                                <p class="text-2xl text-yellow-400">ALPHA-7X9K</p>
+                                <p class="text-2xl text-yellow-400">Vault Code</p>
                             </div>
                         </div>
                     </div>
@@ -177,8 +297,14 @@ date: 2025-10-26
                     <h2 class="text-3xl font-bold mb-6">🛡️ Build the Agents Table</h2>
                     <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
                         <h3 class="text-xl font-semibold text-blue-300 mb-3">🎯 Your Mission</h3>
-                        <p class="mb-4">Click to create the Agents table with all required columns:</p>
-                        <button id="create-agents-btn" onclick="createAgentsTable()" class="w-full py-3 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700">Create Agents Table</button>
+                        <p class="mb-4">Write the SQL to create the <b>Agents</b> table below. When ready, click <b>Run SQL</b> to build your table.</p>
+                        <div class="flex gap-2 mb-2">
+                            <textarea id="agents-sql" class="w-full text-white bg-slate-900 p-3 rounded-lg font-mono" rows="4" placeholder="CREATE TABLE Agents (agent_id INTEGER PRIMARY KEY, codename TEXT UNIQUE, clearance_level INTEGER, location TEXT, status TEXT);" disabled></textarea>
+                            <button id="agents-hint-btn" type="button" class="rounded-lg px-4 py-2 font-semibold bg-blue-700 hover:bg-blue-800" style="min-width:110px;" disabled onclick="showAgentsHint()">Show Hint</button>
+                        </div>
+                        <button id="run-agents-sql" onclick="runAgentsSQL()" class="w-full py-3 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 mb-2" disabled>Run SQL</button>
+                        <div id="agents-sql-loading" class="text-blue-300 font-semibold mb-2">Loading database...</div>
+                        <div id="agents-sql-feedback" class="text-red-400 font-semibold mb-2"></div>
                     </div>
                     <div id="agents-result" class="section-hidden">
                         <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-6">
@@ -210,8 +336,14 @@ date: 2025-10-26
                     <h2 class="text-3xl font-bold mb-6">🎯 Build Alien Sightings Table</h2>
                     <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
                         <h3 class="text-xl font-semibold text-red-300 mb-3">🎯 Your Mission</h3>
-                        <p class="mb-4">Click to create the Sightings table:</p>
-                        <button id="create-sightings-btn" onclick="createSightingsTable()" class="w-full py-3 rounded-lg font-semibold bg-red-600 hover:bg-red-700">Create Sightings Table</button>
+                        <p class="mb-4">Write the SQL to create the <b>Alien_Sightings</b> table below. When ready, click <b>Run SQL</b> to build your table.</p>
+                        <div class="flex gap-2 mb-2">
+                            <textarea id="sightings-sql" class="w-full text-white bg-slate-900 p-3 rounded-lg font-mono" rows="5" placeholder="CREATE TABLE Alien_Sightings (sighting_id INTEGER PRIMARY KEY, timestamp TEXT, location TEXT, threat_level INTEGER, description TEXT, verified_by INTEGER);" disabled></textarea>
+                            <button id="sightings-hint-btn" type="button" class="rounded-lg px-4 py-2 font-semibold bg-red-700 hover:bg-red-800" style="min-width:110px;" disabled onclick="showSightingsHint()">Show Hint</button>
+                        </div>
+                        <button id="run-sightings-sql" onclick="runSightingsSQL()" class="w-full py-3 rounded-lg font-semibold bg-red-600 hover:bg-red-700 mb-2" disabled>Run SQL</button>
+                        <div id="sightings-sql-loading" class="text-red-300 font-semibold mb-2">Loading database...</div>
+                        <div id="sightings-sql-feedback" class="text-red-400 font-semibold mb-2"></div>
                     </div>
                     <div id="sightings-result" class="section-hidden">
                         <div class="bg-green-900/20 border border-green-500/30 rounded-lg p-6">
@@ -251,15 +383,59 @@ date: 2025-10-26
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('mission1-body-bg');
+            });
+        </script>
 
     <script>
         let db = null;
+
+        function showAgentsHint() {
+            document.getElementById('agents-sql').value =
+`CREATE TABLE Agents (
+    agent_id,
+    codename,
+    clearance_level,
+    location,
+    status
+);`;
+        }
+
+        function showSightingsHint() {
+            document.getElementById('sightings-sql').value =
+`CREATE TABLE Alien_Sightings (
+    sighting_id,
+    timestamp,
+    location,
+    threat_level,
+    description,
+    verified_by
+);`;
+        }
+
         async function initDatabase() {
             try {
-                const SQL = await initSqlJs({ locateFile: file => 'https://sql.js.org/dist/' + file });
+                const SQL = await initSqlJs({
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                });
                 db = new SQL.Database();
-            } catch (e) { console.error(e); }
+                // Enable SQL input/button and hide loading for both editors
+                document.getElementById('agents-sql').disabled = false;
+                document.getElementById('run-agents-sql').disabled = false;
+                document.getElementById('agents-sql-loading').style.display = 'none';
+                document.getElementById('agents-hint-btn').disabled = false;
+                document.getElementById('sightings-sql').disabled = false;
+                document.getElementById('run-sightings-sql').disabled = false;
+                document.getElementById('sightings-sql-loading').style.display = 'none';
+                document.getElementById('sightings-hint-btn').disabled = false;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('agents-sql-loading').textContent = 'Failed to load database.';
+                document.getElementById('sightings-sql-loading').textContent = 'Failed to load database.';
+            }
         }
         function goToSection(n) {
             document.querySelectorAll('.mission-section').forEach(s => s.classList.add('section-hidden'));
@@ -268,27 +444,90 @@ date: 2025-10-26
             document.querySelector('.nav-btn[data-section="' + n + '"]').classList.add('bg-purple-600');
             window.scrollTo(0, 0);
         }
-        function createAgentsTable() {
-            if (!db) return;
-            db.run('CREATE TABLE Agents (agent_id INTEGER PRIMARY KEY, codename TEXT UNIQUE, clearance_level INTEGER, location TEXT, status TEXT)');
-            [['Shadow',9,'New York','active'],['Phoenix',7,'Tokyo','active'],['Cipher',8,'Berlin','active'],['Ghost',10,'Classified','standby'],['Radar',6,'London','compromised']].forEach(a => db.run('INSERT INTO Agents VALUES (?,?,?,?,?)', [null].concat(a)));
-            const r = db.exec('SELECT * FROM Agents')[0].values;
-            const tb = document.getElementById('agents-tbody');
-            r.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = '<td class="py-2 px-3">' + row[0] + '</td><td class="py-2 px-3">' + row[1] + '</td><td class="py-2 px-3">' + row[2] + '</td><td class="py-2 px-3">' + row[3] + '</td><td class="py-2 px-3">' + row[4] + '</td>'; tb.appendChild(tr); });
-            document.getElementById('agents-result').classList.remove('section-hidden');
-            document.getElementById('continue-to-sightings').classList.remove('section-hidden');
-            document.getElementById('create-agents-btn').disabled = true;
+        function runAgentsSQL() {
+            const sql = document.getElementById('agents-sql').value.trim();
+            const feedback = document.getElementById('agents-sql-feedback');
+            feedback.textContent = '';
+            if (!db) { feedback.textContent = 'Database not initialized.'; return; }
+            // Basic validation: must start with CREATE TABLE Agents and have all columns
+            const required = [
+                /CREATE\s+TABLE\s+Agents/i,
+                /agent_id\s+INTEGER\s+PRIMARY\s+KEY/i,
+                /codename\s+TEXT\s+UNIQUE/i,
+                /clearance_level\s+INTEGER/i,
+                /location\s+TEXT/i,
+                /status\s+TEXT/i
+            ];
+            let valid = true;
+            for (const r of required) if (!r.test(sql)) valid = false;
+            if (!valid) {
+                feedback.textContent = 'Your SQL must create the Agents table with all required columns and types.';
+                return;
+            }
+            try {
+                db.run(sql);
+                // Insert starter data
+                [['Shadow',9,'New York','active'],['Phoenix',7,'Tokyo','active'],['Cipher',8,'Berlin','active'],['Ghost',10,'Classified','standby'],['Radar',6,'London','compromised']].forEach(a => db.run('INSERT INTO Agents VALUES (?,?,?,?,?)', [null].concat(a)));
+                const r = db.exec('SELECT * FROM Agents')[0].values;
+                const tb = document.getElementById('agents-tbody');
+                tb.innerHTML = '';
+                r.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = '<td class="py-2 px-3">' + row[0] + '</td><td class="py-2 px-3">' + row[1] + '</td><td class="py-2 px-3">' + row[2] + '</td><td class="py-2 px-3">' + row[3] + '</td><td class="py-2 px-3">' + row[4] + '</td>'; tb.appendChild(tr); });
+                document.getElementById('agents-result').classList.remove('section-hidden');
+                document.getElementById('continue-to-sightings').classList.remove('section-hidden');
+                document.getElementById('run-agents-sql').disabled = true;
+                document.getElementById('agents-sql').disabled = true;
+                feedback.textContent = '';
+            } catch (e) {
+                feedback.textContent = 'SQL Error: ' + e.message;
+            }
         }
-        function createSightingsTable() {
-            if (!db) return;
-            db.run('CREATE TABLE Alien_Sightings (sighting_id INTEGER PRIMARY KEY, timestamp TEXT, location TEXT, threat_level INTEGER, description TEXT, verified_by INTEGER)');
-            [['2025-10-26T14:23','Nevada Desert',4,'Triangular craft',1],['2025-10-26T16:45','Pacific Ocean',3,'Submerged lights',2],['2025-10-26T19:12','Amazon',2,'Energy readings',3],['2025-10-26T21:30','Arctic',5,'Multiple craft',4],['2025-10-26T23:08','Sahara',3,'Ground markings',1],['2025-10-27T01:15','Antarctic',4,'Atmospheric disturbance',2],['2025-10-27T03:42','Himalayas',2,'Radar contact',3],['2025-10-27T05:55','Mediterranean',3,'Submersible object',5]].forEach(s => db.run('INSERT INTO Alien_Sightings VALUES (?,?,?,?,?,?)', [null].concat(s)));
-            const r = db.exec('SELECT s.sighting_id,s.location,s.threat_level,s.description,a.codename FROM Alien_Sightings s JOIN Agents a ON s.verified_by=a.agent_id')[0].values;
-            const tb = document.getElementById('sightings-tbody');
-            r.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = '<td class="py-2 px-3">' + row[0] + '</td><td class="py-2 px-3">' + row[1] + '</td><td class="py-2 px-3">' + row[2] + '</td><td class="py-2 px-3">' + row[3] + '</td><td class="py-2 px-3">' + row[4] + '</td>'; tb.appendChild(tr); });
-            document.getElementById('sightings-result').classList.remove('section-hidden');
-            document.getElementById('continue-to-validation').classList.remove('section-hidden');
-            document.getElementById('create-sightings-btn').disabled = true;
+
+        function runSightingsSQL() {
+            const sql = document.getElementById('sightings-sql').value.trim();
+            const feedback = document.getElementById('sightings-sql-feedback');
+            feedback.textContent = '';
+            if (!db) { feedback.textContent = 'Database not initialized.'; return; }
+            // Basic validation: must start with CREATE TABLE Alien_Sightings and have all columns
+            const required = [
+                /CREATE\s+TABLE\s+Alien_Sightings/i,
+                /sighting_id\s+INTEGER\s+PRIMARY\s+KEY/i,
+                /timestamp\s+TEXT/i,
+                /location\s+TEXT/i,
+                /threat_level\s+INTEGER/i,
+                /description\s+TEXT/i,
+                /verified_by\s+INTEGER/i
+            ];
+            let valid = true;
+            for (const r of required) if (!r.test(sql)) valid = false;
+            if (!valid) {
+                feedback.textContent = 'Your SQL must create the Alien_Sightings table with all required columns and types.';
+                return;
+            }
+            try {
+                db.run(sql);
+                // Insert starter data
+                [
+                    ['2025-10-26T14:23','Nevada Desert',4,'Triangular craft',1],
+                    ['2025-10-26T16:45','Pacific Ocean',3,'Submerged lights',2],
+                    ['2025-10-26T19:12','Amazon',2,'Energy readings',3],
+                    ['2025-10-26T21:30','Arctic',5,'Multiple craft',4],
+                    ['2025-10-26T23:08','Sahara',3,'Ground markings',1],
+                    ['2025-10-27T01:15','Antarctic',4,'Atmospheric disturbance',2],
+                    ['2025-10-27T03:42','Himalayas',2,'Radar contact',3],
+                    ['2025-10-27T05:55','Mediterranean',3,'Submersible object',5]
+                ].forEach(s => db.run('INSERT INTO Alien_Sightings VALUES (?,?,?,?,?,?)', [null].concat(s)));
+                const r = db.exec('SELECT s.sighting_id,s.location,s.threat_level,s.description,a.codename FROM Alien_Sightings s JOIN Agents a ON s.verified_by=a.agent_id')[0].values;
+                const tb = document.getElementById('sightings-tbody');
+                tb.innerHTML = '';
+                r.forEach(row => { const tr = document.createElement('tr'); tr.innerHTML = '<td class="py-2 px-3">' + row[0] + '</td><td class="py-2 px-3">' + row[1] + '</td><td class="py-2 px-3">' + row[2] + '</td><td class="py-2 px-3">' + row[3] + '</td><td class="py-2 px-3">' + row[4] + '</td>'; tb.appendChild(tr); });
+                document.getElementById('sightings-result').classList.remove('section-hidden');
+                document.getElementById('continue-to-validation').classList.remove('section-hidden');
+                document.getElementById('run-sightings-sql').disabled = true;
+                document.getElementById('sightings-sql').disabled = true;
+                feedback.textContent = '';
+            } catch (e) {
+                feedback.textContent = 'SQL Error: ' + e.message;
+            }
         }
         function runValidation() {
             let p = 0;
@@ -304,7 +543,7 @@ date: 2025-10-26
             document.getElementById('validation-results').classList.remove('section-hidden');
             document.getElementById('validation-start').classList.add('section-hidden');
         }
-        window.addEventListener('load', initDatabase);
+    window.addEventListener('load', initDatabase);
     </script>
 </body>
 </html>
