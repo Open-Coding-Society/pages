@@ -3210,7 +3210,7 @@ function checkAnswers2() {
   demo.innerHTML = "";
   let score = 0;
 
-  if (a1 === "doctype") score++;
+  if (a1 === "button") score++;
   if (a2 === "onclick") score++;
 
   result.textContent = "✅ You got " + score + "/2 correct!";
