@@ -396,8 +396,9 @@ details[open] > summary {
     <div id="task-dimsum" class="task-item">Task 1: Dim Sum Menu - <span class="status">Incomplete</span></div>
     <div id="task-chowmein" class="task-item">Task 2: Chowmein Order - <span class="status">Incomplete</span></div>
     <div id="task-sourdough" class="task-item">Task 3: Update Sourdough - <span class="status">Incomplete</span></div>
-    <div id="task-seed" class="task-item">Task 4: Seed Pantry - <span class="status">Incomplete</span></div>
-    <div id="task-view" class="task-item">Task 5: View Pantry - <span class="status">Incomplete</span></div>
+    <div id="task-dungeness" class="task-item">Task 4: Update Validation (Dungeness) - <span class="status">Incomplete</span></div>
+    <div id="task-ghirardelli" class="task-item">Task 5: Update Response Handling (Ghirardelli) - <span class="status">Incomplete</span></div>
+    <div id="task-cioppino" class="task-item">Task 6: Update Best Practices (Cioppino) - <span class="status">Incomplete</span></div>
   </div>
   <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.01); border-radius: 0.5rem;">
     <strong>Completion: <span id="completion-percentage">0%</span></strong>
@@ -624,7 +625,7 @@ class ChowmeinOrder {
 
 ---
 
-# %% Interactive: Simulated PUT endpoint + Unit Test
+#  Interactive: Simulated PUT endpoint + Unit Test
 
 <!-- Example for reference -->
 <details open>
@@ -676,6 +677,91 @@ if (res.status === 200) {
 </div>
 
 ---
+
+##  Interactive Task: Dungeness Crab (Quick Quiz)
+
+<!-- Example / quick reference for learners -->
+<details open>
+  <summary>Example: Dungeness Crab — quick facts</summary>
+  <pre class="sq-terminal" style="background: #131722; color: #e6eef6;">
+When updating a Dungeness Crab dish in our database, proper validation is crucial.
+For example, when updating the recipe we must validate:
+1. Required fields: name="Dungeness Crab", ingredients list present
+2. Data types: calories=600 (must be a number)
+3. Record exists: dish ID must exist before updating
+This prevents data corruption and ensures accurate crab recipes.
+  </pre>
+</details>
+
+<div class="sq-card">
+  <div class="sq-label">Quick quiz about <strong>UPDATE Validation</strong> using the Dungeness Crab example. Fill in the blanks.</div>
+  <form id="dungeness-quiz" onsubmit="return checkDungeness()" style="display:grid; gap:0.5rem;">
+    <label class="sq-label">1. What HTTP status code should be returned if validation fails?</label>
+    <input class="sq-field" id="dungeness-type" placeholder="e.g., 400" />
+
+    <label class="sq-label">2. What property must be present to identify the record to update?</label>
+    <input class="sq-field" id="dungeness-region" placeholder="e.g., id" />
+
+    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="dungeness-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
+</div>
+
+## %% Interactive Task: Ghirardelli Chocolate (Quick Quiz)
+
+<!-- Example / quick reference for learners -->
+<details open>
+  <summary>Example: Ghirardelli — quick facts</summary>
+  <pre class="sq-terminal" style="background: #131722; color: #e6eef6;">
+  After updating Ghirardelli Chocolate's ingredients or recipe,
+  the API returns important response data:
+  - 200 OK status (update successful)
+  - Updated chocolate recipe in response body
+  - Last modified timestamp for recipe versioning
+  This helps track changes to our chocolate recipes.
+    </pre>
+  </details>
+
+  <div class="sq-card">
+    <div class="sq-label">Quick quiz about <strong>UPDATE Response Handling</strong>. Fill in the blanks.</div>
+    <form id="ghirardelli-quiz" onsubmit="return checkGhirardelli()" style="display:grid; gap:0.5rem;">
+      <label class="sq-label">1. What property in the response shows when the record was last modified?</label>
+      <input class="sq-field" id="ghir-prod" placeholder="e.g., updatedAt" />
+
+      <label class="sq-label">2. Which HTTP status code indicates a successful update?</label>
+      <input class="sq-field" id="ghir-square" placeholder="e.g., 200" />    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="ghir-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
+</div>
+
+##  Interactive Task: Cioppino (Quick Quiz)
+
+<!-- Example / quick reference for learners -->
+<details open>
+  <summary>Example: Cioppino — quick facts</summary>
+  <pre class="sq-terminal" style="background: #131722; color: #e6eef6;">
+  When updating a complex Cioppino recipe with many ingredients:
+  - Use transactions (update recipe and ingredients together)
+  - Check for concurrent recipe edits
+  - Validate all seafood ingredients exist
+  - Show clear errors if an ingredient is missing
+  This keeps our Cioppino recipe data accurate and complete.
+    </pre>
+  </details>
+
+  <div class="sq-card">
+    <div class="sq-label">Quick quiz about <strong>UPDATE Best Practices</strong>. Fill in the blanks.</div>
+    <form id="cioppino-quiz" onsubmit="return checkCioppino()" style="display:grid; gap:0.5rem;">
+      <label class="sq-label">1. What ensures multiple updates happen together or not at all?</label>
+      <input class="sq-field" id="cioppino-cuisine" placeholder="e.g., transaction" />
+
+      <label class="sq-label">2. What should you check before updating related records?</label>
+      <input class="sq-field" id="cioppino-ing" placeholder="e.g., existence" />    <button class="sq-btn sq-run" type="submit">Check Answers</button>
+    <div id="cioppino-feedback" class="small" style="margin-top:0.5rem"></div>
+  </form>
+</div>
+
+
 
 # %% Interactive Task: Seed Pantry (Initial Data)
 
@@ -747,8 +833,9 @@ Click through to begin exploring **removing dishes and cleaning up records** in 
     dimsum: false,
     chowmein: false,
     sourdough: false,
-    seed: false,
-    view: false
+    dungeness: false,
+    ghirardelli: false,
+    cioppino: false
   };
 
   // Load progress from localStorage
@@ -785,7 +872,7 @@ Click through to begin exploring **removing dishes and cleaning up records** in 
 
   // Update progress display
   function updateProgressDisplay() {
-    const tasks = ['dimsum', 'chowmein', 'sourdough', 'seed', 'view'];
+  const tasks = ['dimsum', 'chowmein', 'sourdough', 'dungeness', 'ghirardelli', 'cioppino'];
     let completedCount = 0;
 
     tasks.forEach(task => {
@@ -1165,7 +1252,6 @@ Click through to begin exploring **removing dishes and cleaning up records** in 
     const res = await window.MockAPIInstance.postBulk(seed);
     if (res.status === 201) {
       logTo('terminal-seed', '✅ Seed success:', res.body);
-      completeTask('seed');
       showToast('Pantry seeded successfully!');
     } else {
       logTo('terminal-seed', '❌ Seed failed', res);
@@ -1181,7 +1267,6 @@ Click through to begin exploring **removing dishes and cleaning up records** in 
     }
     logTo('terminal-pantry','[Server] 200 OK — Dishes for city=sf:');
     dishes.forEach(d => logTo('terminal-pantry', JSON.stringify(d, null, 2)));
-    completeTask('view');
     showToast('Pantry viewed successfully!');
   };
 
@@ -1296,6 +1381,63 @@ function checkChowmeinAnswers() {
   return false;
 }
 
+function checkDungeness() {
+  const status = document.getElementById('dungeness-type').value.trim().toLowerCase();
+  const identifier = document.getElementById('dungeness-region').value.trim().toLowerCase();
+  let correct = 0;
+  if (status.includes('400')) correct++;
+  if (identifier.includes('id')) correct++;
+  const fb = document.getElementById('dungeness-feedback');
+  if (correct === 2) {
+    fb.textContent = '✅ Correct — You understand validation requirements!';
+    fb.style.color = 'var(--success)';
+    completeTask('dungeness');
+    showToast('Validation quiz completed!');
+  } else {
+    fb.textContent = `You got ${correct} / 2. Try again!`;
+    fb.style.color = 'var(--danger)';
+  }
+  return false;
+}
+
+function checkGhirardelli() {
+  const timestamp = document.getElementById('ghir-prod')?.value.trim().toLowerCase() || '';
+  const status = document.getElementById('ghir-square')?.value.trim().toLowerCase() || '';
+  let correct = 0;
+  if (timestamp.includes('updated') || timestamp.includes('timestamp')) correct++;
+  if (status === '200') correct++;
+  const fb = document.getElementById('ghir-feedback');
+  if (correct === 2) {
+    fb.textContent = '✅ Nice — You know UPDATE responses!';
+    fb.style.color = 'var(--success)';
+    completeTask('ghirardelli');
+    showToast('Response handling quiz completed!');
+  } else {
+    fb.textContent = `You got ${correct} / 2. Try again!`;
+    fb.style.color = 'var(--danger)';
+  }
+  return false;
+}
+
+function checkCioppino() {
+  const atomicity = document.getElementById('cioppino-cuisine')?.value.trim().toLowerCase() || '';
+  const check = document.getElementById('cioppino-ing')?.value.trim().toLowerCase() || '';
+  let correct = 0;
+  if (atomicity.includes('transaction')) correct++;
+  if (check.includes('exist')) correct++;
+  const fb = document.getElementById('cioppino-feedback');
+  if (correct === 2) {
+    fb.textContent = '✅ Great — You know UPDATE best practices!';
+    fb.style.color = 'var(--success)';
+    completeTask('cioppino');
+    showToast('Best practices quiz completed!');
+  } else {
+    fb.textContent = `You got ${correct} / 2. Try again!`;
+    fb.style.color = 'var(--danger)';
+  }
+  return false;
+}
+
 function checkPutAnswers() {
   const answers = {
     blank_method: "PUT",
@@ -1340,6 +1482,19 @@ function autoCompleteAllTasks() {
   document.getElementById('blank-updateProtein').value = 'updateProtein';
   document.getElementById('blank-extras').value = 'extras';
   checkChowmeinAnswers();
+
+  // Update-focused quiz answers
+  document.getElementById('dungeness-type').value = '400';
+  document.getElementById('dungeness-region').value = 'id';
+  checkDungeness();
+
+  if (document.getElementById('ghir-prod')) document.getElementById('ghir-prod').value = 'updatedAt';
+  if (document.getElementById('ghir-square')) document.getElementById('ghir-square').value = '200';
+  if (typeof checkGhirardelli === 'function') checkGhirardelli();
+
+  if (document.getElementById('cioppino-cuisine')) document.getElementById('cioppino-cuisine').value = 'transaction';
+  if (document.getElementById('cioppino-ing')) document.getElementById('cioppino-ing').value = 'existence';
+  if (typeof checkCioppino === 'function') checkCioppino();
   
   // PUT endpoint fill-in-the-blanks
   document.getElementById('blank-method').value = 'PUT';
