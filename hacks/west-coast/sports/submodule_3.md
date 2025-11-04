@@ -407,6 +407,163 @@ footer:
             color: white;
         }
 
+        /* Quiz Styles */
+        .quiz-question {
+            background: #242b4d;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 2px solid #2d3561;
+            display: none;
+        }
+
+        .quiz-question.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .question-number {
+            background: #B3995D;
+            color: #0a0e27;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            color: #e0e0e0;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .quiz-option {
+            background: #1a1f3a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 2px solid #2d3561;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #b0b0b0;
+            font-size: 1.05em;
+        }
+
+        .quiz-option:hover {
+            border-color: #B3995D;
+            background: #242b4d;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            border-color: #4fc3f7;
+            background: #1a237e;
+            color: #fff;
+        }
+
+        .quiz-option.correct {
+            border-color: #4caf50;
+            background: #1b5e20;
+            color: #fff;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #f44336;
+            background: #b71c1c;
+            color: #fff;
+        }
+
+        .quiz-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 1.05em;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .quiz-feedback.correct {
+            background: #1b5e20;
+            border: 2px solid #4caf50;
+            color: #fff;
+        }
+
+        .quiz-feedback.incorrect {
+            background: #b71c1c;
+            border: 2px solid #f44336;
+            color: #fff;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1em;
+            display: none;
+            transition: all 0.3s;
+        }
+
+        .next-btn.show {
+            display: inline-block;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(179, 153, 93, 0.5);
+        }
+
+        .quiz-complete {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .quiz-complete.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .quiz-score {
+            font-size: 3em;
+            color: #B3995D;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            background: #B3995D;
+            color: #0a0e27;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            background: #9d864f;
+            transform: scale(1.05);
+        }
+
         @media (max-width: 768px) {
             .stadium-cards {
                 grid-template-columns: 1fr;
@@ -554,6 +711,70 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
 
         <div class="key-takeaway">
             <p>🎯 <span class="highlight">What You Learned:</span> Sending an HTTP request is the physical act of communicating with a server. You use HTTP client libraries (like <code>requests</code> or <code>fetch</code>) to send GET requests. The server responds with a <span class="highlight">status code</span> (like 200 OK) and the requested data in <span class="highlight">JSON format</span>!</p>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="section" style="margin-top: 30px;">
+            <h2>🎯 Test Your Knowledge: Quick Quiz</h2>
+            
+            <div class="quiz-question active" id="quiz-q1">
+                <div class="question-number">Question 1 of 4</div>
+                <div class="question-text">What does HTTP stand for?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(1, 0, false)">A) HyperText Transmission Protocol</div>
+                    <div class="quiz-option" onclick="selectQuizOption(1, 1, true)">B) HyperText Transfer Protocol</div>
+                    <div class="quiz-option" onclick="selectQuizOption(1, 2, false)">C) HighText Transfer Process</div>
+                    <div class="quiz-option" onclick="selectQuizOption(1, 3, false)">D) HyperType Transfer Protocol</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-feedback1"></div>
+                <button class="next-btn" id="quiz-next1" onclick="nextQuizQuestion(2)">Next Question →</button>
+            </div>
+
+            <div class="quiz-question" id="quiz-q2">
+                <div class="question-number">Question 2 of 4</div>
+                <div class="question-text">Which HTTP status code means "Success"?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(2, 0, false)">A) 404</div>
+                    <div class="quiz-option" onclick="selectQuizOption(2, 1, false)">B) 500</div>
+                    <div class="quiz-option" onclick="selectQuizOption(2, 2, true)">C) 200</div>
+                    <div class="quiz-option" onclick="selectQuizOption(2, 3, false)">D) 401</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-feedback2"></div>
+                <button class="next-btn" id="quiz-next2" onclick="nextQuizQuestion(3)">Next Question →</button>
+            </div>
+
+            <div class="quiz-question" id="quiz-q3">
+                <div class="question-number">Question 3 of 4</div>
+                <div class="question-text">What is the purpose of an HTTP client library like 'requests' or 'fetch'?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(3, 0, false)">A) To store data in a database</div>
+                    <div class="quiz-option" onclick="selectQuizOption(3, 1, true)">B) To make it easy to send requests and receive responses</div>
+                    <div class="quiz-option" onclick="selectQuizOption(3, 2, false)">C) To create websites</div>
+                    <div class="quiz-option" onclick="selectQuizOption(3, 3, false)">D) To write HTML code</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-feedback3"></div>
+                <button class="next-btn" id="quiz-next3" onclick="nextQuizQuestion(4)">Next Question →</button>
+            </div>
+
+            <div class="quiz-question" id="quiz-q4">
+                <div class="question-number">Question 4 of 4</div>
+                <div class="question-text">In the HTTP communication flow, what happens after the server processes a request?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="selectQuizOption(4, 0, false)">A) The client sends another request</div>
+                    <div class="quiz-option" onclick="selectQuizOption(4, 1, false)">B) The server deletes the data</div>
+                    <div class="quiz-option" onclick="selectQuizOption(4, 2, true)">C) The server sends back a response with data</div>
+                    <div class="quiz-option" onclick="selectQuizOption(4, 3, false)">D) The connection is closed permanently</div>
+                </div>
+                <div class="quiz-feedback" id="quiz-feedback4"></div>
+                <button class="next-btn" id="quiz-next4" onclick="showQuizResults()">See Results →</button>
+            </div>
+
+            <div class="quiz-complete" id="quiz-complete">
+                <h3 style="color: #B3995D; font-size: 2em; margin-bottom: 20px;">🎉 Quiz Complete!</h3>
+                <div class="quiz-score" id="quiz-final-score">0/4</div>
+                <p style="color: #b0b0b0; font-size: 1.2em; margin-bottom: 20px;" id="quiz-score-message">Great job!</p>
+                <button class="restart-btn" onclick="restartQuiz()">🔄 Retake Quiz</button>
+            </div>
         </div>
     </div>
 
@@ -776,6 +997,92 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
         document.addEventListener('DOMContentLoaded', function() {
             loadUserItinerary();
         });
+
+        // Quiz Functions
+        let quizScore = 0;
+        let currentQuizQ = 1;
+
+        function selectQuizOption(questionNum, optionIdx, isCorrect) {
+            const question = document.getElementById('quiz-q' + questionNum);
+            const options = question.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('quiz-feedback' + questionNum);
+            const nextBtn = document.getElementById('quiz-next' + questionNum);
+
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                opt.classList.remove('selected');
+            });
+
+            options[optionIdx].classList.add('selected');
+
+            if (isCorrect) {
+                options[optionIdx].classList.add('correct');
+                feedback.textContent = '✓ Correct!';
+                feedback.className = 'quiz-feedback correct show';
+                quizScore++;
+            } else {
+                options[optionIdx].classList.add('incorrect');
+                if (questionNum === 1) {
+                    feedback.textContent = '✗ Not quite. HTTP stands for HyperText Transfer Protocol - it\'s the foundation of data communication on the web!';
+                } else if (questionNum === 2) {
+                    feedback.textContent = '✗ Not quite. Status code 200 means "OK" or success. 404 means not found, 500 is a server error, and 401 means unauthorized.';
+                } else if (questionNum === 3) {
+                    feedback.textContent = '✗ Not quite. HTTP client libraries like requests and fetch make it easy to send HTTP requests and receive responses without writing complex code!';
+                } else if (questionNum === 4) {
+                    feedback.textContent = '✗ Not quite. After processing a request, the server sends back a response containing the requested data!';
+                }
+                feedback.className = 'quiz-feedback incorrect show';
+            }
+
+            nextBtn.classList.add('show');
+        }
+
+        function nextQuizQuestion(num) {
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            document.getElementById('quiz-q' + num).classList.add('active');
+            currentQuizQ = num;
+        }
+
+        function showQuizResults() {
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            const complete = document.getElementById('quiz-complete');
+            complete.classList.add('show');
+
+            document.getElementById('quiz-final-score').textContent = quizScore + '/4';
+            
+            const message = document.getElementById('quiz-score-message');
+            if (quizScore === 4) {
+                message.textContent = 'Perfect score! You mastered HTTP requests! 🎉';
+            } else if (quizScore === 3) {
+                message.textContent = 'Great job! You understand HTTP communication! 👏';
+            } else if (quizScore === 2) {
+                message.textContent = 'Good effort! Review the material and try again! 📚';
+            } else {
+                message.textContent = 'Keep learning! Practice makes perfect! 💪';
+            }
+        }
+
+        function restartQuiz() {
+            quizScore = 0;
+            currentQuizQ = 1;
+
+            document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+            document.getElementById('quiz-q1').classList.add('active');
+            document.getElementById('quiz-complete').classList.remove('show');
+
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.style.pointerEvents = 'auto';
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            document.querySelectorAll('.quiz-feedback').forEach(f => {
+                f.classList.remove('show');
+            });
+
+            document.querySelectorAll('.next-btn').forEach(btn => {
+                btn.classList.remove('show');
+            });
+        }
     </script>
 </body>
 </html>
