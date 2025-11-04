@@ -1,6 +1,6 @@
 ---
 layout: cs-portfolio-lesson
-title: "Submodule 2"
+title: "Search & Data Filtering with Spring Boot"
 description: "Search & Data Filtering with Spring Boot"
 permalink: /cs-portfolio-quest/data-viz/submodule_2/
 parent: "Data Visualization"
@@ -10,6 +10,7 @@ categories: [CSP, Submodule, DataVisualization]
 tags: [spring-boot, search, jpql, pagination]
 author: "Applicators Team"
 date: 2025-10-21
+microblog: true
 ---
 
 # Submodule 2 · Search & Data Filtering — **Concluding Module (Black · Interactive · Compact)**
@@ -557,3 +558,4 @@ initEnablers();
 renderQuiz();
 </script>
 </body>
+

@@ -32,7 +32,7 @@ lxdData:
       Genre: "User Interface"
       Level: 4
       Description: "Learn UI, Fun Destinations, Travel Quest"
-      Lessons: "/west-coast/analytics/submodule_4/"
+      Lessons: "/west-coast/analytics/seattle/"
       Image: "/images/west-coast/seattle.png"
 footer: 
     home: /west-coast/travel/

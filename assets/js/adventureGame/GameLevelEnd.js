@@ -77,7 +77,7 @@ class GameLevelEnd {
         /* These are default controls but shown for this 2-player setup
         // keypress: { up: 87, left: 65, down: 83, right: 68 }, // Using W, A, S, D for Steve
         touchOptions: {
-          interactLabel: "E",
+          interactLabel: "e",
           position: "left"
         }
         */
@@ -107,7 +107,7 @@ class GameLevelEnd {
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
         keypress: { up: 73, left: 74, down: 75, right: 76, interact: 85 }, // Using I, J, K, L for Alex to differentiate from Steve
         touchOptions: {
-          interactLabel: "U",
+          interactLabel: "u",
           position: "right"
         }
     };

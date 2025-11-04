@@ -43,8 +43,7 @@ lxdData:
       Description: "Learn to write about your CS projects for inclusion on your resume, both in technical and non-technical terms"
       Categories: ["CV", "Resume", "Blogging"]
       Lessons: "/cs-portfolio-quest/resume/"
-      LessonCount: 6
-      Image: "/images/cs-portfolio-quest/resume/resumemain.png"
+      Image: "/images/cs-portfolio-quest/resume/ModuleBackground.png"
       Alt: "CS Portfolio Quest Resume"
     - Title: "C5: AI Usage"
       Genre: "Assessment"

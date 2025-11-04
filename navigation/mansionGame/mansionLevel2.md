@@ -1,8 +1,7 @@
 ---
 layout: opencs
-title: Mansion Level 2
+title: Adventure Game
 permalink: /gamify/mansion2
-microblog: true
 ---
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
@@ -11,7 +10,7 @@ microblog: true
 <script type="module">
     // Adnventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
-    import MansionLevel4 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
+    import MansionLevel2 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Web Server Environment data
     const environment = {
@@ -21,7 +20,7 @@ microblog: true
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [MansionLevel4]
+        gameLevelClasses: [MansionLevel2]
     }
     // Launch Adventure Game
     Game.main(environment);

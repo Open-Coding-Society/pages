@@ -7,7 +7,7 @@ class TouchControls {
      * @param {object} gameEnv - Game environment
      * @param {object} options - { keyMap, interactLabel, position, id }
      *   keyMap: {up, left, down, right, interact} (keyCodes)
-     *   interactLabel: string (e.g. 'E' or 'U')
+     *   interactLabel: string (e.g. 'e' or 'u')
      *   position: 'left' | 'right' (default: 'left')
      *   id: string (for unique DOM id)
      */
@@ -89,8 +89,9 @@ class TouchControls {
                 }
                 .interact-button {
                     position: absolute;
-                    top: 52px;
-                    left: 52px;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     width: 45px;
                     height: 45px;
                     background: rgba(100, 255, 100, 0.8);
@@ -265,6 +266,10 @@ class TouchControls {
             case 76: key = 'l'; break;
             case 85: key = 'u'; break;
             default: key = undefined;
+        }
+        // Special handling: if this is the interact button, set key to match interactLabel if possible
+        if (this.buttonMap && this.buttonMap.interact === keyCode && this.interactLabel) {
+            key = this.interactLabel;
         }
         const event = new KeyboardEvent(type, {
             keyCode: keyCode,

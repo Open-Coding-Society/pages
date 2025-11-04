@@ -10,24 +10,23 @@ lxdData:
   Title: "Data Visualization Modules"
   Description: "Master data visualization techniques and tools for effective data representation!"
   Topics:
-    - Title: "Submodule 1"
+    - Title: "Submodule 1: Building Company Profiles with Spring Boot & REST APIs"
       Genre: "Practice"
       Level: 1
-      Description: "Team-defined data visualization module"
+      Description: "Spring Boot RESTful Company Profile System"
       Categories: ["Visualization", "ML", "Collation"]
-      Video: "/cs-portfolio-quest/data-viz/submodule_1-video"
       Lessons: "/cs-portfolio-quest/data-viz/submodule_1/"
-      Image: "/images/cs-portfolio-quest/data-viz.svg"
+      Image: "/images/cs-portfolio-quest/data-viz/s1.png"
       Alt: "Data Viz Submodule 1"
-    - Title: "Submodule 2"
+    - Title: "Submodule 2: Search & Data Filtering with Spring Boot"
       Genre: "Practice"
       Level: 2
-      Description: "Team-defined data visualization module"
+      Description: "Search & Data Filtering with Spring Boot"
       Categories: ["Visualization", "ML", "Collation"]
-      Video: "/cs-portfolio-quest/data-viz/submodule_2-video"
       Lessons: "/cs-portfolio-quest/data-viz/submodule_2/"
-      Image: "/images/cs-portfolio-quest/data-viz.svg"
+      Image: "/images/cs-portfolio-quest/data-viz/s2.png"
       Alt: "Data Viz Submodule 2"
+microblog: True
 ---
 
 {%- include tailwind/cs-portfolio-mini_quest_info.html -%}
@@ -53,7 +52,7 @@ lxdData:
     btn.disabled = true;
     fb.innerHTML = 'Grading...';
     try {
-      const res = await fetch(`${javaURI}/api/grade`, {
+      const res = await fetch(`${javaURI}/api/gemini-frq/grade`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',

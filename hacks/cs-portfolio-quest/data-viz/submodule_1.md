@@ -10,6 +10,7 @@ categories: [CSP, Submodule, DataVisualization]
 tags: [spring-boot, rest, jpa, sqlite]
 author: "Applicators Team"
 date: 2025-10-21
+microblog: true
 ---
 
 # Submodule 1 · Company Profile & REST APIs — Minimal Interactive (Styling Preserved)
@@ -534,3 +535,4 @@ function builderAdd(){
 uiEP(); renderList(); renderQuiz();
 </script>
 </body>
+

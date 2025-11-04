@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: certchatbot
 title: "Submodule 2: Certificates and Badges"
 description: "Submodule 2 of Analytics/Admin Mini-Quest"
 permalink: /cs-portfolio-quest/analytics/submodule_2/
@@ -10,9 +10,10 @@ categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team"
 date: 2025-10-21
+microblog: true
 ---
 
-# Submodule 2
+# Submodule 2: Certfication
 
 <style>
   * {
@@ -75,6 +76,31 @@ date: 2025-10-21
   }
   .cert-purple:hover {
     box-shadow: 0 8px 20px rgba(142, 68, 173, 0.4);
+  }
+  .cert-teal {
+    background: linear-gradient(135deg, #16a085 0%, #138d75 100%);
+    box-shadow: 0 4px 12px rgba(22, 160, 133, 0.32);
+  }
+  .cert-teal:hover {
+    box-shadow: 0 10px 26px rgba(22, 160, 133, 0.4);
+    transform: translateY(-4px);
+  }
+  .cert-yellow {
+    background: linear-gradient(135deg, #f1c40f 0%, #d4ac0d 100%);
+    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.28);
+    color: #111;
+  }
+  .cert-yellow:hover {
+    box-shadow: 0 10px 26px rgba(241, 196, 15, 0.36);
+    transform: translateY(-4px);
+  }
+  .cert-green {
+    background: linear-gradient(135deg, #1a7336ff 0%, #348340ff 100%);
+    box-shadow: 0 4px 12px rgba(75, 173, 68, 0.3); grid-column: 1 / -1;
+  }
+  .cert-yellow:hover {
+    box-shadow: 0 10px 26px rgba(15, 241, 102, 0.36);
+    transform: translateY(-4px);
   }
   .cert-badge {
     background: rgba(0, 0, 0, 0.2);
@@ -261,218 +287,294 @@ date: 2025-10-21
       font-size: 1.25rem;
     }
   }
+  #lessonCompleteButton {
+    display: none !important;
+  }
+
 </style>
 
 <div class="container">
-  <h2 class="section-title">Earned Certificates</h2>
+  
+  <h2 class="section-title">Individual Module Certificates</h2>
   <div class="certificates-grid">
-    <div class="cert-card cert-red">
-      <span class="cert-badge">Verified</span>
-      <h3 class="cert-title">Advanced Python Programming</h3>
-      <div class="cert-org">Open Coding Society</div>
-      <div class="cert-date">September 2024</div>
-      <div class="cert-actions">
-        <button class="btn btn-download" onclick="downloadCert('Advanced Python Programming', 'Data Science Academy', 'September 2024')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
-      </div>
-    </div>
     <div class="cert-card cert-orange">
       <span class="cert-badge">Verified</span>
-      <h3 class="cert-title">Data Analysis with Python</h3>
+      <h3 class="cert-title">Frontend Development</h3>
       <div class="cert-org">Open Coding Society</div>
-      <div class="cert-date">June 2024</div>
+      <div class="cert-date">November 2025</div>
       <div class="cert-actions">
-        <button class="btn btn-download" onclick="downloadCert('Data Analysis with Python', 'Data Science Institute', 'June 2024')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
+        <button class="btn btn-download" onclick="downloadCert('Frontend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
       </div>
     </div>
+
+    <div class="cert-card cert-red">
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">Backend Development</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('Backend Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+      </div>
+    </div>
+
     <div class="cert-card cert-purple">
       <span class="cert-badge">Verified</span>
-      <h3 class="cert-title">Machine Learning Fundamentals</h3>
+      <h3 class="cert-title">Data Visualization</h3>
       <div class="cert-org">Open Coding Society</div>
-      <div class="cert-date">July 2024</div>
+      <div class="cert-date">November 2025</div>
       <div class="cert-actions">
-        <button class="btn btn-download" onclick="downloadCert('Machine Learning Fundamentals', 'AI Learning Hub', 'July 2024')">⬇ Download</button>
-        <button class="btn btn-share">🔗 Share</button>
+        <button class="btn btn-download" onclick="downloadCert('Data Visualization', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+      </div>
+    </div>
+
+    <div class="cert-card cert-teal">
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">Resume Building</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('Resume Building', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+      </div>
+    </div>
+
+    <div class="cert-card cert-yellow">
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">AI Usage</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('AI Usage', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+      </div>
+    </div>
+  </div>
+  <h2 class="section-title">Overall Certificate</h2>
+  <div class="certificates-grid">
+    <div class="cert-card cert-green" >
+      <span class="cert-badge">Verified</span>
+      <h3 class="cert-title">Overall CS Portfolio Certificate</h3>
+      <div class="cert-org">Open Coding Society</div>
+      <div class="cert-date">November 2025</div>
+      <div class="cert-actions">
+        <button class="btn btn-download" onclick="downloadCert('Computer Science Portfolio - Full Stack Development', 'Open Coding Society', 'November 2025')">⬇ Download</button>
+        <button class="btn btn-share" onclick="addToLinkedIn('Computer Science Portfolio - Full Stack Development Java Usage')">Add to LinkedIn</button>
       </div>
     </div>
   </div>
 
-  <div class="skills-card">
-    <h2 class="section-title">Skills Mastery</h2>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Data Analysis</span>
-        <span class="skill-percentage">92%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 92%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Python</span>
-        <span class="skill-percentage">88%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 88%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">AI Ethics</span>
-        <span class="skill-percentage">85%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 85%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Machine Learning</span>
-        <span class="skill-percentage">78%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 78%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">Statistics</span>
-        <span class="skill-percentage">90%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 90%"></div>
-      </div>
-    </div>
-    <div class="skill-item">
-      <div class="skill-header">
-        <span class="skill-name">SQL</span>
-        <span class="skill-percentage">82%</span>
-      </div>
-      <div class="skill-bar">
-        <div class="skill-progress" style="width: 82%"></div>
-      </div>
-    </div>
-  </div>
+  
+<!-- Instructional Card -->
+<div style="
+  width: 100%;
+  background-color: #121212;
+  border: 1px solid #d1d9e0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 40px;
+  box-shadow: 0 2px 8px rgba(117, 47, 47, 0.08);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  line-height: 1.6;
+">
 
-  <div class="badges-card">
-    <h2 class="section-title">Achievement Badges</h2>
-    <div class="badges-grid">
-      <div class="badge badge-red">Python Master</div>
-      <div class="badge badge-orange">Data Wizard</div>
-      <div class="badge badge-purple">Quick Learner</div>
-      <div class="badge badge-red">Streak Champion</div>
-      <div class="badge badge-teal">Problem Solver</div>
-      <div class="badge badge-yellow">AI Enthusiast</div>
-    </div>
-    <div class="badges-footer">5 badges earned • 4 more to unlock</div>
-  </div>
+  <h2 style="text-align: center; color: #004182;">How to Fill Out Your Certification</h2>
+
+  <!-- Screenshot image -->
+  <center><img src="{{site.baseurl}}/images/cs-portfolio-quest/analytics/LinkdenReqs.png" height="625"></center>
+
+
+  <p style="text-align: center; max-width: 800px; margin: 0 auto 20px auto;">
+    Use the example above as a reference when adding your certification on LinkedIn. Below is a guide explaining what to fill out in each section.
+  </p>
+
+  <ul style="list-style-type: none; padding-left: 0; max-width: 800px; margin: 0 auto;">
+    <li><strong>Name:</strong> Enter the official title of your certificate (e.g., “Python Data Analysis Certificate” or “AWS Certified Developer”).</li>
+    <li><strong>Issuing Organization:</strong> Type the name of the organization that granted the certificate (e.g., “Coursera,” “Google,” “Microsoft”).</li>
+    <li><strong>Issue Date:</strong> Select the month and year when you received your certification.</li>
+    <li><strong>Expiration Date:</strong> Leave this blank if the certification never expires, or fill in the date when it becomes invalid.</li>
+    <li><strong>Credential ID:</strong> If your certificate includes a unique ID number, enter it here. Otherwise, you can leave it empty.</li>
+    <li><strong>Credential URL:</strong> Paste the link where your certificate can be verified or viewed online (for example, the public certificate link from your organization).</li>
+  </ul>
+
+  <h3 style="color: #004182; margin-top: 30px; text-align: center;">Optional Sections</h3>
+  <ul style="list-style-type: none; padding-left: 0; max-width: 800px; margin: 0 auto;">
+    <li><strong>Skills:</strong> Add relevant skills that this certification demonstrates, such as “Cybersecurity,” “Cloud Computing,” or “Data Analysis.”</li>
+    <li><strong>Media:</strong> Upload a copy of your certificate (PDF or image) or link to a project or document that showcases your achievement.</li>
+  </ul>
+
+  <p style="text-align: center; color: #333; margin-top: 20px;">
+    Once everything is complete, click <strong>Save</strong> to publish your certification to your LinkedIn profile.
+  </p>
 </div>
+
 
 <canvas id="certCanvas"></canvas>
 
-<script>
-function downloadCert(course, org, date) {
-  const canvas = document.getElementById('certCanvas');
-  const ctx = canvas.getContext('2d');
-  
-  canvas.width = 1400;
-  canvas.height = 1000;
-  
-// Background - elegant cream
-  ctx.fillStyle = '#f8f6f0';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // Outer border - navy
-  ctx.strokeStyle = '#2c3e50';
-  ctx.lineWidth = 25;
-  ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-  
-  // Inner border - gold accent
-  ctx.strokeStyle = '#c9b037';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
-  
-  // Decorative corners
-  ctx.fillStyle = '#c9b037';
-  ctx.beginPath();
-  ctx.arc(80, 80, 15, 0, Math.PI * 2);
-  ctx.arc(canvas.width - 80, 80, 15, 0, Math.PI * 2);
-  ctx.arc(80, canvas.height - 80, 15, 0, Math.PI * 2);
-  ctx.arc(canvas.width - 80, canvas.height - 80, 15, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Title
+<script type="module">
+// Provide a safe global stub immediately so inline onclick handlers won't fail
+window.downloadCert = async function () {
+  // temporary stub while module initializes
+  alert('Preparing certificate... If this message persists, the certificate system failed to initialize.');
+};
+
+(async () => {
+  try {
+    const cfg = await import('{{ site.baseurl }}/assets/js/api/config.js');
+    const { pythonURI, fetchOptions } = cfg;
+
+    async function getCredentials() {
+      try {
+        const res = await fetch(`${pythonURI}/api/id`, {
+          ...fetchOptions,
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          return data.name || 'Student Name';
+        } else {
+          console.log(`Request failed with status ${res.status}`);
+        }
+      } catch (err) {
+        console.log(`Error fetching credentials: ${err}`);
+      }
+      return 'Student Name';
+    }
+
+    async function downloadCert(course, org, date) {
+      const name = await getCredentials();
+
+      const canvas = document.getElementById('certCanvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = 1400;
+      canvas.height = 1000;
+
+      // Background - elegant cream
+      ctx.fillStyle = '#f8f6f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Outer border - navy
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 25;
+      ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+      // Inner border - gold accent
+      ctx.strokeStyle = '#c9b037';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
+
+      // Decorative corners
+      ctx.fillStyle = '#c9b037';
+      ctx.beginPath();
+      ctx.arc(80, 80, 15, 0, Math.PI * 2);
+      ctx.arc(canvas.width - 80, 80, 15, 0, Math.PI * 2);
+      ctx.arc(80, canvas.height - 80, 15, 0, Math.PI * 2);
+      ctx.arc(canvas.width - 80, canvas.height - 80, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Title
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 60px Georgia';
+      ctx.textAlign = 'center';
+      ctx.fillText('CERTIFICATE', canvas.width / 2, 200);
+
+      ctx.font = 'bold 48px Georgia';
+      ctx.fillText('OF COMPLETION', canvas.width / 2, 260);
+
+      // Decorative line under title
+      ctx.strokeStyle = '#c9b037';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(400, 290);
+      ctx.lineTo(1000, 290);
+      ctx.stroke();
+
+      // "This is to certify that"
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = '28px Arial';
+      ctx.fillText('This is to certify that', canvas.width / 2, 380);
+
+      // Student name (from API)
+      ctx.fillStyle = '#ea8c33';
+      ctx.font = 'italic bold 52px Georgia';
+      ctx.fillText(name, canvas.width / 2, 470);
+
+      // Underline
+      ctx.strokeStyle = '#ea8c33';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(400, 490);
+      ctx.lineTo(1000, 490);
+      ctx.stroke();
+
+      // "has successfully completed"
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = '28px Arial';
+      ctx.fillText('has successfully completed the course', canvas.width / 2, 560);
+
+      // Course name
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 44px Arial';
+      ctx.fillText(course, canvas.width / 2, 650);
+
+      // Organization
+      ctx.fillStyle = '#555';
+      ctx.font = '26px Arial';
+      ctx.fillText('Issued by ' + org, canvas.width / 2, 710);
+
+  // Date — use current date to ensure certificate is issued today
+  const issuanceDate = new Date();
+  const formattedDate = issuanceDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  // match the Advanced Python Programming accent (red) for the date
   ctx.fillStyle = '#2c3e50';
-  ctx.font = 'bold 60px Georgia';
-  ctx.textAlign = 'center';
-  ctx.fillText('CERTIFICATE', canvas.width / 2, 200);
-  
-  ctx.font = 'bold 48px Georgia';
-  ctx.fillText('OF COMPLETION', canvas.width / 2, 260);
-  
-  // Decorative line under title
-  ctx.strokeStyle = '#c9b037';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(400, 290);
-  ctx.lineTo(1000, 290);
-  ctx.stroke();
-  // "This is to certify that"
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '28px Arial';
-  ctx.fillText('This is to certify that', canvas.width / 2, 380);
-  
-  // Student name
-  ctx.fillStyle = '#ea8c33';
-  ctx.font = 'italic bold 52px Georgia';
-  ctx.fillText('Student Name', canvas.width / 2, 470);
-  
-  // Underline
-  ctx.strokeStyle = '#ea8c33';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(400, 490);
-  ctx.lineTo(1000, 490);
-  ctx.stroke();
-  
-  // "has successfully completed"
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '28px Arial';
-  ctx.fillText('has successfully completed the course', canvas.width / 2, 560);
-  
-  // Course name
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 44px Arial';
-  ctx.fillText(course, canvas.width / 2, 650);
-  
-  // Organization
-  ctx.fillStyle = '#b0b0b0';
-  ctx.font = '26px Arial';
-  ctx.fillText('Issued by ' + org, canvas.width / 2, 710);
-  
-  // Date
-  ctx.fillStyle = '#ea8c33';
   ctx.font = 'bold 24px Arial';
-  ctx.fillText('Date: ' + date, canvas.width / 2, 800);
-  
-  // Signature line
-  ctx.strokeStyle = '#ea8c33';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(500, 880);
-  ctx.lineTo(900, 880);
-  ctx.stroke();
-  
-  ctx.fillStyle = '#b0b0b0';
-  ctx.font = '20px Arial';
-  ctx.fillText('Authorized Signature', canvas.width / 2, 920);
-  
-  // Download
-  const link = document.createElement('a');
-  link.download = course.replace(/\s+/g, '_') + '_Certificate.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-}
+  ctx.fillText('Date: ' + formattedDate, canvas.width / 2, 800);
+
+      // Signature line
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(500, 880);
+      ctx.lineTo(900, 880);
+      ctx.stroke();
+
+      // signature name: larger and lifted above the line to match 'OF COMPLETION'
+      ctx.fillStyle = '#555';
+      ctx.font = 'bold 48px Georgia';
+      // place slightly above the signature line
+      ctx.fillText('John Mortenson', canvas.width / 2, 860);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.download = `${course.replace(/\s+/g, '_')}_Certificate.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function addToLinkedIn(courseName) {
+      const certId = 'CSPORTFOLIO-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      const url = new URL('https://www.linkedin.com/profile/add');
+      url.searchParams.append('startTask', 'CERTIFICATION_NAME');
+      url.searchParams.append('name', courseName);
+      url.searchParams.append('organizationName', 'Open Coding Society');
+      url.searchParams.append('issueYear', new Date().getFullYear());
+      url.searchParams.append('issueMonth', new Date().getMonth() + 1);
+      url.searchParams.append('certId', certId);
+      url.searchParams.append('certUrl', window.location.origin + '/cs-portfolio-verify/' + certId);
+      
+      window.open(url.toString(), '_blank');
+    }
+
+
+    // replace the stub with the real implementation
+    window.downloadCert = downloadCert;
+    window.addToLinkedIn = addToLinkedIn;
+
+  } catch (err) {
+    console.error('Failed to initialize certificate downloader:', err);
+    // keep the user-friendly stub already assigned above
+  }
+})();
+
 </script>
