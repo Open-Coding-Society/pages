@@ -108,6 +108,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-se
   background:rgba(255,216,155,0.2);
   transform:translateY(-2px);
 }
+.nav-links a.hidden-nav{
+  display:none;
+}
 
 /* Location Sections */
 .location{
@@ -117,6 +120,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-se
 }
 .location:nth-child(even){
   background:#1a2a44;
+}
+.location.hidden-location{
+  display:none;
 }
 .location-header{
   text-align:center;
@@ -486,6 +492,27 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-se
   margin-bottom: 18px;
 }
 
+.personalization-notice {
+  background: rgba(78, 204, 163, 0.2);
+  border: 2px solid #4ecca3;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 30px auto;
+  max-width: 800px;
+  text-align: center;
+}
+
+.personalization-notice h3 {
+  color: #4ecca3;
+  margin-bottom: 10px;
+  font-size: 1.8em;
+}
+
+.personalization-notice p {
+  color: #e0e6ed;
+  font-size: 1.1em;
+}
+
 @media (max-width: 768px) {
   .hero h1{font-size:2.5em}
   .location-header h2{font-size:2.5em}
@@ -503,12 +530,17 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-se
 
 <nav class="nav">
   <ul class="nav-links">
-    <li><a href="#alcatraz">🏛️ Alcatraz</a></li>
-    <li><a href="#golden-gate">🌉 Golden Gate</a></li>
-    <li><a href="#palace">🏛️ Palace of Fine Arts</a></li>
-    <li><a href="#painted-ladies">🏠 Painted Ladies</a></li>
+    <li><a href="#alcatraz" id="nav-alcatraz">🏛️ Alcatraz</a></li>
+    <li><a href="#golden-gate" id="nav-golden-gate">🌉 Golden Gate</a></li>
+    <li><a href="#palace" id="nav-palace">🏛️ Palace of Fine Arts</a></li>
+    <li><a href="#painted-ladies" id="nav-painted-ladies">🏠 Painted Ladies</a></li>
   </ul>
 </nav>
+
+<div class="personalization-notice" id="personalization-notice" style="display:none;">
+  <h3>✨ Personalized for You!</h3>
+  <p>Based on your itinerary quiz, we're showing you your selected San Francisco destinations.</p>
+</div>
 
 <!-- ALCATRAZ -->
 <div class="location" id="alcatraz">
@@ -998,6 +1030,64 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-se
 </div>
 
 <script>
+// Destination mapping
+const DESTINATION_MAP = {
+  'Alcatraz': 'alcatraz',
+  'Golden Gate Bridge': 'golden-gate',
+  'Palace of Fine Arts': 'palace',
+  'The Painted Ladies': 'painted-ladies'
+};
+
+// Load itinerary from localStorage and filter destinations
+function loadItineraryAndFilter() {
+  try {
+    const itineraryData = localStorage.getItem('westCoastItinerary');
+    
+    if (itineraryData) {
+      const itinerary = JSON.parse(itineraryData);
+      
+      // Check if San Francisco exists in the itinerary
+      if (itinerary.cities && itinerary.cities['San Francisco']) {
+        const sfData = itinerary.cities['San Francisco'];
+        const selectedDestinations = sfData.destinations || [];
+        
+        if (selectedDestinations.length > 0) {
+          // Show personalization notice
+          document.getElementById('personalization-notice').style.display = 'block';
+          
+          // Hide all destinations first
+          const allDestinations = ['alcatraz', 'golden-gate', 'palace', 'painted-ladies'];
+          allDestinations.forEach(dest => {
+            const section = document.getElementById(dest);
+            const navLink = document.getElementById('nav-' + dest);
+            if (section) section.classList.add('hidden-location');
+            if (navLink) navLink.classList.add('hidden-nav');
+          });
+          
+          // Show only selected destinations
+          selectedDestinations.forEach(destName => {
+            const destId = DESTINATION_MAP[destName];
+            if (destId) {
+              const section = document.getElementById(destId);
+              const navLink = document.getElementById('nav-' + destId);
+              if (section) section.classList.remove('hidden-location');
+              if (navLink) navLink.classList.remove('hidden-nav');
+            }
+          });
+          
+          console.log('Filtered to show destinations:', selectedDestinations);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error loading itinerary:', error);
+    // If there's an error, show all destinations (default behavior)
+  }
+}
+
+// Run on page load
+loadItineraryAndFilter();
+
 function setupQuiz(location) {
   const checkBtn = document.getElementById(`${location}-check`);
   
@@ -1203,7 +1293,7 @@ function generateDestination() {
       climate: "Mild temperate",
       activities: "Temple visits, tea ceremonies, exploring Arashiyama bamboo forest"
     });
-    showAIStatus("🌸 No exact match found, but here’s a great suggestion: Kyoto!", "success");
+    showAIStatus("🌸 No exact match found, but here's a great suggestion: Kyoto!", "success");
   }
 }
 

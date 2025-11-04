@@ -44,7 +44,7 @@ footer:
 
         .header {
             background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-            color: white;
+            color: black;
             padding: 40px;
             border-radius: 15px;
             text-align: center;
@@ -55,11 +55,14 @@ footer:
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+            color: black;
+            opacity: 1;
         }
 
         .header p {
             font-size: 1.2em;
-            opacity: 0.95;
+            color: black !important;
+            opacity: 1;
         }
 
         .section {
@@ -71,7 +74,7 @@ footer:
         }
 
         .section h2 {
-            color: #AA0000;
+            color: #AA0000 !important;
             margin-bottom: 20px;
             font-size: 1.8em;
             border-bottom: 3px solid #B3995D;
@@ -101,13 +104,13 @@ footer:
         }
 
         .explanation h3 {
-            color: #AA0000;
+            color: #AA0000 !important;
             margin-bottom: 10px;
             font-size: 1.2em;
         }
 
         .explanation p {
-            color: #555;
+            color: #555 !important;
             line-height: 1.8;
         }
 
@@ -133,7 +136,7 @@ footer:
         }
 
         .stadium-card h3 {
-            color: #AA0000;
+            color: #AA0000 !important;
             margin-bottom: 10px;
             font-size: 1.3em;
         }
@@ -152,7 +155,7 @@ footer:
         }
 
         .interactive-box h3 {
-            color: #AA0000;
+            color: #AA0000 !important;
             margin-bottom: 15px;
         }
 
@@ -174,7 +177,7 @@ footer:
         .url-part select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #dee2e6;
+            border: 2px solid #dee2e2;
             border-radius: 8px;
             font-size: 1em;
         }
@@ -382,7 +385,7 @@ footer:
 
         .key-takeaway {
             background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-            color: white;
+            color: black;
             padding: 30px;
             border-radius: 12px;
             text-align: center;
@@ -392,10 +395,11 @@ footer:
         }
 
         .highlight {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.4);
             padding: 3px 8px;
             border-radius: 4px;
             font-weight: bold;
+            color: black;
         }
 
         @media (max-width: 768px) {
@@ -549,7 +553,6 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
     </div>
 
     <script>
-        // COMPLETE SF TEAMS DATABASE
         const COMPLETE_SF_TEAMS = {
             "Football - 49ers": {
                 id: "levis_stadium",
@@ -624,7 +627,6 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
                     itinerary.cities['San Francisco'].sports) {
                     userSports = itinerary.cities['San Francisco'].sports;
                     
-                    // Map user sports to stadium data
                     userSports.forEach(sport => {
                         const teamData = COMPLETE_SF_TEAMS[sport.name];
                         if (teamData) {
@@ -766,7 +768,6 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
             }, 1500);
         }
 
-        // Load user's itinerary on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadUserItinerary();
         });
