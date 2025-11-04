@@ -317,7 +317,7 @@ class MansionLevel5 {
 
         console.log("Shooting lasers")
 
-        const laserNum = 10;
+        const laserNum = 8;
 
         for (let i = 0; i < laserNum; i++)
         {
@@ -428,7 +428,7 @@ class MansionLevel5 {
 
     // Method to spawn a batch of zombies
     spawnZombieBatch() {
-        const numZombies = 2; // spawn zombies per batch
+        const numZombies = 1; // spawn zombies per batch
         
         for (let i = 0; i < numZombies; i++) {
             const side = Math.floor(Math.random() * 4);
@@ -498,7 +498,7 @@ class MansionLevel5 {
     
     
             // Move towards nearest player
-            const speed = 0.8; // Adjust speed as needed
+            const speed = 1.2; // Adjust speed as needed
             const dx = nearest.position.x - currentZombie.position.x;
             const dy = nearest.position.y - currentZombie.position.y;
             const angle = Math.atan2(dy, dx);
@@ -666,8 +666,11 @@ class MansionLevel5 {
                 <div style="font-size: 14px;">${this.zombiesKilled} zombie kills</div>
             `;
 
-            if (this.zombiesKilled >= 20 && this.spawnZombies) 
+            if (this.zombiesKilled >= 10 && this.spawnZombies) 
             {
+                document.body.removeChild(tutorial);
+                document.body.removeChild(kills);
+
                 console.log("Level completed")
                 this.spawnZombies = false;
                 const finishDoor = new Npc(this.finishDoorData, this.gameEnv);

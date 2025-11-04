@@ -10,6 +10,12 @@ microblog: true
     <canvas id='gameCanvas'></canvas>
 </div>
 
+<style>
+    .element-class {
+        scrollbar-gutter: stable both-edges;
+    }
+</style>
+
 <script type="module">
     // Adnventure Game assets locations
     import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
