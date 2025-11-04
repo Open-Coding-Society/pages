@@ -16,7 +16,6 @@ footer:
   home: /west-coast/sports/
   next: /west-coast/backend/submodule_4/
 ---
- 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,8 +30,8 @@ footer:
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            background: #0a0e27;
+            color: #e0e0e0;
             padding: 20px;
             line-height: 1.6;
         }
@@ -44,7 +43,7 @@ footer:
 
         .header {
             background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-            color: black;
+            color: white;
             padding: 40px;
             border-radius: 15px;
             text-align: center;
@@ -55,26 +54,26 @@ footer:
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            color: black;
-            opacity: 1;
+            color: white;
         }
 
         .header p {
             font-size: 1.2em;
-            color: black !important;
-            opacity: 1;
+            color: white;
+            opacity: 0.95;
         }
 
         .section {
-            background: white;
+            background: #1a1f3a;
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2d3561;
         }
 
         .section h2 {
-            color: #AA0000 !important;
+            color: #B3995D;
             margin-bottom: 20px;
             font-size: 1.8em;
             border-bottom: 3px solid #B3995D;
@@ -96,7 +95,7 @@ footer:
         }
 
         .explanation {
-            background: #f8f9fa;
+            background: #242b4d;
             padding: 20px;
             border-radius: 10px;
             border-left: 5px solid #B3995D;
@@ -104,13 +103,13 @@ footer:
         }
 
         .explanation h3 {
-            color: #AA0000 !important;
+            color: #B3995D;
             margin-bottom: 10px;
             font-size: 1.2em;
         }
 
         .explanation p {
-            color: #555 !important;
+            color: #b0b0b0;
             line-height: 1.8;
         }
 
@@ -122,32 +121,32 @@ footer:
         }
 
         .stadium-card {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            background: #242b4d;
             padding: 20px;
             border-radius: 10px;
-            border: 3px solid #dee2e6;
+            border: 2px solid #2d3561;
             transition: all 0.3s;
         }
 
         .stadium-card:hover {
             border-color: #B3995D;
             transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 20px rgba(179, 153, 93, 0.3);
         }
 
         .stadium-card h3 {
-            color: #AA0000 !important;
+            color: #B3995D;
             margin-bottom: 10px;
             font-size: 1.3em;
         }
 
         .stadium-card .info {
-            color: #000;
+            color: #b0b0b0;
             margin: 5px 0;
         }
 
         .interactive-box {
-            background: #f8f9fa;
+            background: #242b4d;
             padding: 25px;
             border-radius: 10px;
             margin: 20px 0;
@@ -155,7 +154,7 @@ footer:
         }
 
         .interactive-box h3 {
-            color: #AA0000 !important;
+            color: #B3995D;
             margin-bottom: 15px;
         }
 
@@ -170,16 +169,18 @@ footer:
         .url-part label {
             display: block;
             font-weight: bold;
-            color: #AA0000;
+            color: #B3995D;
             margin-bottom: 5px;
         }
 
         .url-part select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #dee2e2;
+            border: 2px solid #2d3561;
             border-radius: 8px;
             font-size: 1em;
+            background: #1a1f3a;
+            color: #e0e0e0;
         }
 
         .url-part select:focus {
@@ -188,7 +189,7 @@ footer:
         }
 
         .constructed-url {
-            background: #2c3e50;
+            background: #0a0e27;
             color: #00ff00;
             padding: 20px;
             border-radius: 10px;
@@ -197,11 +198,12 @@ footer:
             word-break: break-all;
             margin-top: 15px;
             min-height: 60px;
+            border: 1px solid #2d3561;
         }
 
         .call-btn {
             background: #B3995D;
-            color: white;
+            color: #0a0e27;
             border: none;
             padding: 15px 40px;
             border-radius: 8px;
@@ -219,7 +221,7 @@ footer:
         }
 
         .call-btn:disabled {
-            background: #ccc;
+            background: #444;
             cursor: not-allowed;
         }
 
@@ -247,12 +249,12 @@ footer:
         .loading {
             text-align: center;
             padding: 30px;
-            color: #AA0000;
+            color: #B3995D;
             font-weight: bold;
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
+            border: 4px solid #242b4d;
             border-top: 4px solid #AA0000;
             border-radius: 50%;
             width: 40px;
@@ -272,9 +274,9 @@ footer:
             justify-content: space-between;
             margin: 30px 0;
             padding: 20px;
-            background: white;
+            background: #242b4d;
             border-radius: 10px;
-            border: 2px solid #dee2e6;
+            border: 2px solid #2d3561;
         }
 
         .flow-item {
@@ -289,7 +291,7 @@ footer:
 
         .flow-label {
             font-weight: bold;
-            color: #AA0000;
+            color: #B3995D;
             margin-bottom: 5px;
         }
 
@@ -300,12 +302,13 @@ footer:
         }
 
         .status-code-box {
-            background: #2c3e50;
+            background: #0a0e27;
             color: white;
             padding: 20px;
             border-radius: 10px;
             margin: 20px 0;
             font-family: 'Courier New', monospace;
+            border: 1px solid #2d3561;
         }
 
         .status-success {
@@ -321,7 +324,7 @@ footer:
         }
 
         .json-display {
-            background: #2c3e50;
+            background: #0a0e27;
             color: #00ff00;
             padding: 20px;
             border-radius: 8px;
@@ -331,10 +334,11 @@ footer:
             max-height: 300px;
             overflow-y: auto;
             margin: 15px 0;
+            border: 1px solid #2d3561;
         }
 
         .parsed-data {
-            background: white;
+            background: #242b4d;
             border: 3px solid #B3995D;
             border-radius: 10px;
             padding: 20px;
@@ -345,38 +349,39 @@ footer:
             display: flex;
             justify-content: space-between;
             padding: 12px;
-            background: #f8f9fa;
+            background: #1a1f3a;
             border-radius: 6px;
             margin-bottom: 10px;
         }
 
         .data-label {
             font-weight: bold;
-            color: #AA0000;
+            color: #B3995D;
         }
 
         .data-value {
-            color: #333;
+            color: #e0e0e0;
             font-family: 'Courier New', monospace;
         }
 
         .success-message {
-            background: #d4edda;
-            border: 2px solid #28a745;
+            background: #1b5e20;
+            border: 2px solid #4caf50;
             padding: 15px;
             border-radius: 8px;
-            color: #155724;
+            color: #fff;
             margin: 15px 0;
         }
 
         .code-block {
-            background: #2c3e50;
+            background: #0a0e27;
             color: #00ff00;
             padding: 20px;
             border-radius: 10px;
             font-family: 'Courier New', monospace;
             margin: 15px 0;
             overflow-x: auto;
+            border: 1px solid #2d3561;
         }
 
         .code-comment {
@@ -385,7 +390,7 @@ footer:
 
         .key-takeaway {
             background: linear-gradient(135deg, #AA0000 0%, #B3995D 100%);
-            color: black;
+            color: white;
             padding: 30px;
             border-radius: 12px;
             text-align: center;
@@ -395,11 +400,11 @@ footer:
         }
 
         .highlight {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.2);
             padding: 3px 8px;
             border-radius: 4px;
             font-weight: bold;
-            color: black;
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -439,19 +444,19 @@ footer:
                 <div class="flow-item">
                     <div class="flow-icon">💻</div>
                     <div class="flow-label">Your Computer</div>
-                    <div style="color: #666; font-size: 0.9em;">Sends HTTP Request</div>
+                    <div style="color: #888; font-size: 0.9em;">Sends HTTP Request</div>
                 </div>
                 <div class="flow-arrow">→</div>
                 <div class="flow-item">
                     <div class="flow-icon">🌐</div>
                     <div class="flow-label">Server</div>
-                    <div style="color: #666; font-size: 0.9em;">Processes Request</div>
+                    <div style="color: #888; font-size: 0.9em;">Processes Request</div>
                 </div>
                 <div class="flow-arrow">→</div>
                 <div class="flow-item">
                     <div class="flow-icon">📦</div>
                     <div class="flow-label">Response</div>
-                    <div style="color: #666; font-size: 0.9em;">Returns Data</div>
+                    <div style="color: #888; font-size: 0.9em;">Returns Data</div>
                 </div>
             </div>
 
@@ -470,7 +475,7 @@ footer:
 
             <div class="interactive-box">
                 <h3>📚 Example Code:</h3>
-                <p style="color: #666; margin-bottom: 15px;"><strong>Python Example:</strong></p>
+                <p style="color: #b0b0b0; margin-bottom: 15px;"><strong>Python Example:</strong></p>
                 <div class="code-block">
 import requests<br><br>
 <span class="code-comment"># Send GET request to API</span><br>
@@ -481,7 +486,7 @@ if response.status_code == 200:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;print(data)
                 </div>
 
-                <p style="color: #666; margin: 20px 0 15px 0;"><strong>JavaScript Example:</strong></p>
+                <p style="color: #b0b0b0; margin: 20px 0 15px 0;"><strong>JavaScript Example:</strong></p>
                 <div class="code-block">
 <span class="code-comment">// Send GET request to API</span><br>
 fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
@@ -529,7 +534,7 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
 
             <div class="stadium-cards">
                 <div class="stadium-card">
-                    <h3 style="color: #28a745;">✅ 200 OK</h3>
+                    <h3 style="color: #4caf50;">✅ 200 OK</h3>
                     <div class="info">Success! The server found the data and is sending it to you.</div>
                 </div>
                 <div class="stadium-card">
@@ -537,11 +542,11 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
                     <div class="info">The server couldn't find what you requested. Check your URL!</div>
                 </div>
                 <div class="stadium-card">
-                    <h3 style="color: #dc3545;">🔒 401 Unauthorized</h3>
+                    <h3 style="color: #ff6b6b;">🔒 401 Unauthorized</h3>
                     <div class="info">You don't have permission. Did you include your API key?</div>
                 </div>
                 <div class="stadium-card">
-                    <h3 style="color: #6c757d;">⚙️ 500 Server Error</h3>
+                    <h3 style="color: #9e9e9e;">⚙️ 500 Server Error</h3>
                     <div class="info">Something went wrong on the server's end. Try again later.</div>
                 </div>
             </div>
@@ -725,9 +730,9 @@ fetch('https://api.sfsports.com/v1/stadium/levis_stadium')<br>
                     <div class="success-message">
                         ✅ <strong>Request Successful!</strong> The server found the data and sent it back.
                     </div>
-                    <h3 style="color: #AA0000; margin: 20px 0 10px 0;">📥 Raw JSON Response:</h3>
+                    <h3 style="color: #B3995D; margin: 20px 0 10px 0;">📥 Raw JSON Response:</h3>
                     <div class="json-display">${JSON.stringify(response, null, 2)}</div>
-                    <h3 style="color: #AA0000; margin: 20px 0 10px 0;">📊 Parsed Data (Easy to Read):</h3>
+                    <h3 style="color: #B3995D; margin: 20px 0 10px 0;">📊 Parsed Data (Easy to Read):</h3>
                     <div class="parsed-data">
                         <div class="data-row">
                             <span class="data-label">Stadium Name:</span>
