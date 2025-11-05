@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Code Runner
+description: Write, test, and run code in Python, Java, and JavaScript.
 permalink: /code
 ---
 
@@ -51,6 +52,7 @@ permalink: /code
   }
 
   .control-group label {
+    color: white;
     font-weight: 600;
   }
 
@@ -183,6 +185,102 @@ permalink: /code
     opacity: 0.8;
   }
 
+  /* Dark theme overrides */
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+
+  .editor-container {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+  }
+
+  .CodeMirror {
+    background-color: #1e1e1e;
+    color: #f8f8f2;
+  }
+
+  .output-section {
+    background-color: #2e2e2e;
+    border: 1px solid #444;
+  }
+
+  .output-header {
+    background-color: #333;
+    color: #f8f8f2;
+  }
+
+  .output-content {
+    background-color: #1e1e1e;
+    color: #f8f8f2;
+  }
+
+  .examples-section {
+    background-color: #2e2e2e;
+    border: 1px solid #444;
+  }
+
+  .example-btn {
+    background-color: #444;
+    color: #f8f8f2;
+  }
+
+  .example-btn:hover {
+    background-color: #555;
+  }
+
+  .info-section {
+    background-color: #2e2e2e;
+    border: 1px solid #444;
+  }
+
+  /* Control bar styles */
+  .control-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #222;
+    color: #f5f5f5;
+    padding: 0.75rem 1rem;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .control-bar button {
+    background: none;
+    border: none;
+    color: #f5f5f5;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .control-bar select {
+    background: #fff;
+    color: #222;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Help panel styles */
+  .help-panel {
+    background: #222;
+    color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  .help-panel strong {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .help-panel ul {
+    margin-top: 0.5rem;
+    margin-left: 1.2rem;
+  }
+
   @media (max-width: 768px) {
     .controls-section {
       flex-direction: column;
@@ -201,40 +299,36 @@ permalink: /code
 </style>
 
 <div class="code-runner-container">
-  <div class="header-section">
-    <h2>Code Runner</h2>
-    <p>Write, test, and run code in Python, Java, and JavaScript</p>
-  </div>
 
-  <div class="controls-section">
-    <div class="control-group">
-      <label for="language">Language:</label>
-      <select id="language">
+  <div class="editor-container" style="background:#222; color:#f5f5f5; border-radius:10px; padding:0; max-width:700px; margin:auto;">
+    <div class="control-bar" style="display:flex; align-items:center; gap:1rem; background:#222; color:#f5f5f5; padding:0.75rem 1rem; border-radius:10px 10px 0 0;">
+      <button id="runBtn" title="Run" style="background:none; border:none; color:#f5f5f5; font-size:1.3rem; cursor:pointer;">▶</button>
+      <select id="language" style="background:#fff; color:#222; border-radius:4px; padding:0.25rem 0.5rem;">
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="javascript">JavaScript</option>
       </select>
-    </div>
-
-    <div class="control-group">
-      <label for="fontSize">Font Size:</label>
-      <select id="fontSize">
-        <option value="12">12px</option>
-        <option value="14" selected>14px</option>
+      <select id="fontSize" style="background:#fff; color:#222; border-radius:4px; padding:0.25rem 0.5rem;">
+        <option value="14">14px</option>
         <option value="16">16px</option>
         <option value="18">18px</option>
+        <option value="20">20px</option>
       </select>
+      <button id="copyBtn" title="Copy" style="background:none; border:none; color:#f5f5f5; font-size:1.2rem; cursor:pointer;">⎘</button>
+      <button id="clearBtn" title="Clear" style="background:none; border:none; color:#f5f5f5; font-size:1.2rem; cursor:pointer;">⎚</button>
+      <button id="helpBtn" title="Help" style="background:none; border:none; color:#f5f5f5; font-size:1.2rem; cursor:pointer;">?</button>
     </div>
-
-    <div class="btn-group">
-      <button id="clearBtn" class="secondary-btn">🗑️ Clear</button>
-      <button id="copyBtn" class="secondary-btn">📋 Copy Code</button>
-      <button id="runBtn" class="run-btn large primary">▶ Run Code</button>
+    <div id="help-panel" class="help-panel" style="display:none;">
+      <strong>Tips & Shortcuts:</strong>
+      <ul>
+        <li>Ctrl+Enter: Run code</li>
+        <li>Ctrl+C: Copy selection</li>
+        <li>Ctrl+L: Clear editor</li>
+        <li>Use dropdowns to change language and font</li>
+      </ul>
     </div>
-  </div>
-
-  <div class="editor-container">
-    <textarea id="editor">print("Hello, world!")</textarea>
+    <textarea id="editor" style="display:none;"></textarea>
+    <div id="codemirror-editor" style="min-height:300px; background:#181818; color:#f5f5f5; border-radius:0 0 10px 10px; padding:1rem; font-family:monospace;"></div>
   </div>
 
   <div class="output-section">
@@ -250,22 +344,6 @@ permalink: /code
     <span id="charCount">Characters: 22</span>
     <span id="execTime"></span>
   </div>
-
-  <div class="examples-section">
-    <h3>Test Examples</h3>
-    <div class="example-buttons" id="exampleButtons"></div>
-  </div>
-
-  <div class="info-section">
-    <h4>Tips & Shortcuts</h4>
-    <ul>
-      <li><strong>Run Code:</strong> Click the Run button or press Ctrl+Enter (Cmd+Enter on Mac)</li>
-      <li><strong>Clear Editor:</strong> Quickly clear all code to start fresh</li>
-      <li><strong>Copy Code:</strong> Copy your code to clipboard with one click</li>
-      <li><strong>Test Examples:</strong> Load pre-made examples to test compiler features</li>
-    </ul>
-  </div>
-</div>
 
 <script type="module">
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
