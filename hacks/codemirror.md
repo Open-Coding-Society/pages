@@ -326,6 +326,10 @@ permalink: /code
         <li>Ctrl+L: Clear editor</li>
         <li>Use dropdowns to change language and font</li>
       </ul>
+      <div class="examples-section" style="margin-top:1rem;">
+        <h3 style="margin-top:0;">Sample Selector</h3>
+        <div id="exampleButtons" class="example-buttons"></div>
+      </div>
     </div>
     <textarea id="editor" style="display:none;"></textarea>
     <div id="codemirror-editor" style="min-height:300px; background:#181818; color:#f5f5f5; border-radius:0 0 10px 10px; padding:1rem; font-family:monospace;"></div>
@@ -442,10 +446,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const langSelect = document.getElementById("language");
   const fontSizeSelect = document.getElementById("fontSize");
   const outputDiv = document.getElementById("output");
-  const exampleButtonsDiv = document.getElementById("exampleButtons");
   const lineCountSpan = document.getElementById("lineCount");
   const charCountSpan = document.getElementById("charCount");
   const execTimeSpan = document.getElementById("execTime");
+  const helpBtn = document.getElementById("helpBtn");
+  const helpPanel = document.getElementById("help-panel");
+
+  // Help button toggle
+  helpBtn.addEventListener("click", () => {
+    helpPanel.style.display = helpPanel.style.display === "none" ? "block" : "none";
+  });
 
   // Update stats
   function updateStats() {
@@ -455,7 +465,6 @@ document.addEventListener("DOMContentLoaded", () => {
     lineCountSpan.textContent = `Lines: ${lines}`;
     charCountSpan.textContent = `Characters: ${chars}`;
   }
-
   editor.on('change', updateStats);
 
   // Font size changer
@@ -466,20 +475,23 @@ document.addEventListener("DOMContentLoaded", () => {
     editor.refresh();
   });
 
-  // Load examples for current language
+  // Sample Selector logic (inside Help panel)
   function loadExamples(lang) {
+    const exampleButtonsDiv = document.getElementById("exampleButtons");
+    if (!exampleButtonsDiv) return;
     exampleButtonsDiv.innerHTML = '';
-    examples[lang].forEach((example, index) => {
-      const btn = document.createElement('button');
-      btn.className = 'example-btn';
-      btn.textContent = example.name;
-      btn.onclick = () => {
-        editor.setValue(example.code);
-        outputDiv.textContent = 'Click "Run Code" to see output here...';
-        execTimeSpan.textContent = '';
-      };
-      exampleButtonsDiv.appendChild(btn);
-    });
+    if (examples[lang]) {
+      examples[lang].forEach((example, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'example-btn';
+        btn.textContent = example.name;
+        btn.onclick = () => {
+          editor.setValue(example.code);
+          updateStats();
+        };
+        exampleButtonsDiv.appendChild(btn);
+      });
+    }
   }
 
   // Language switcher
