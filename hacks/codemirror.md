@@ -21,12 +21,18 @@ permalink: /code
     font-weight: 600;
   }
 
-  select, button {
+  select, button, .icon-btn {
     padding: 8px 16px;
     border-radius: 6px;
     border: 1px solid rgba(128, 128, 128, 0.3);
-    font-size: 14px;
+    font-size: 1.2em;
     cursor: pointer;
+    background: none;
+    color: #f5f5f5;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   select {
@@ -279,9 +285,9 @@ permalink: /code
         <option value="18">18px</option>
         <option value="20">20px</option>
       </select>
-      <button id="copyBtn" title="Copy">⎘</button>
-      <button id="clearBtn" title="Clear">⎚</button>
-      <button id="helpBtn" title="Help">?</button>
+      <span id="copyBtn" class="icon-btn" title="Copy">⎘</span>
+      <span id="clearBtn" class="icon-btn" title="Clear">⎚</span>
+      <span id="helpBtn" class="icon-btn" title="Help">?</span>
     </div>
     <div id="help-panel" class="help-panel">
       <strong>Tips & Shortcuts:</strong>
@@ -296,7 +302,7 @@ permalink: /code
     <textarea id="editor"></textarea>
     <div class="output-section">
       <div class="output-header">
-        <span>Output <span id="copyOutputIcon" title="Copy Output" style="cursor:pointer; font-size:1.2em; margin-left:8px;">⎘</span></span>
+        <span>Output <span id="copyOutputIcon" title="Copy Output" class="icon-btn">⎘</span></span>
       </div>
       <div class="output-content" id="output">Click "Run Code" to see output here...</div>
     </div>
