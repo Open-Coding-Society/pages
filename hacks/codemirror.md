@@ -321,13 +321,10 @@ permalink: /code
     <div id="help-panel" class="help-panel" style="display:none;">
       <strong>Tips & Shortcuts:</strong>
       <ul>
-        <li>Ctrl+Enter: Run code</li>
-        <li>Ctrl+C: Copy selection</li>
-        <li>Ctrl+L: Clear editor</li>
         <li>Use dropdowns to change language and font</li>
       </ul>
       <div class="examples-section" style="margin-top:1rem;">
-        <h3 style="margin-top:0;">Sample Selector</h3>
+        <h3 style="margin-top:0;">Code Fill</h3>
         <div id="exampleButtons" class="example-buttons"></div>
       </div>
     </div>
