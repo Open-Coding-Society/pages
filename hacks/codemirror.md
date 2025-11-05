@@ -157,21 +157,6 @@ permalink: /code
   }
 
   /* Dark theme overrides */
-  body {
-    background-color: #121212;
-    color: #e0e0e0;
-  }
-
-  .editor-container {
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-  }
-
-  .CodeMirror {
-    background-color: #1e1e1e;
-    color: #f8f8f2;
-  }
-
   .output-section {
     background-color: #2e2e2e;
     border: 1px solid #444;
