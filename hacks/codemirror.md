@@ -16,41 +16,6 @@ permalink: /code
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
 
 <style>
-  .code-runner-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  .header-section {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  .header-section h2 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-  }
-
-  .header-section p {
-    font-size: 1.1em;
-    opacity: 0.8;
-  }
-
-  .controls-section {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
   .control-group label {
     color: white;
     font-weight: 600;
