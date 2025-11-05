@@ -332,15 +332,13 @@ permalink: /code
       </div>
     </div>
     <textarea id="editor" style="display:none;"></textarea>
-    <div id="codemirror-editor" style="min-height:300px; background:#181818; color:#f5f5f5; border-radius:0 0 10px 10px; padding:1rem; font-family:monospace;"></div>
-  </div>
-
-  <div class="output-section">
-    <div class="output-header">
-      <span>Output</span>
-      <button id="copyOutputBtn" style="padding: 4px 12px; font-size: 12px;">Copy Output</button>
+    <div class="output-section" style="background:#222; color:#f5f5f5; border-radius:0 0 10px 10px; margin-top:-10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); border:1px solid #333;">
+      <div class="output-header" style="background:#222; color:#f5f5f5; border-radius:0 0 10px 10px; display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #333;">
+        <span>Output</span>
+        <button id="copyOutputBtn" style="padding: 4px 12px; font-size: 12px;">Copy Output</button>
+      </div>
+      <div class="output-content" id="output" style="background:#181818; color:#f5f5f5; padding:16px; font-family:'Courier New', monospace; white-space:pre-wrap; min-height:100px; max-height:300px; overflow-y:auto; border-radius:0 0 10px 10px;">Click "Run Code" to see output here...</div>
     </div>
-    <div class="output-content" id="output">Click "Run Code" to see output here...</div>
   </div>
 
   <div class="stats" id="stats">
