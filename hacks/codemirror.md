@@ -300,41 +300,41 @@ permalink: /code
 
 <div class="code-runner-container">
 
-  <div class="editor-container" style="background:#222; color:#f5f5f5; border-radius:10px; padding:0; max-width:700px; margin:auto;">
-    <div class="control-bar" style="display:flex; align-items:center; gap:1rem; background:#222; color:#f5f5f5; padding:0.75rem 1rem; border-radius:10px 10px 0 0;">
-      <button id="runBtn" title="Run" style="background:none; border:none; color:#f5f5f5; font-size:1.3rem; cursor:pointer;">▶</button>
-      <select id="language" style="background:#fff; color:#222; border-radius:4px; padding:0.25rem 0.5rem;">
+  <div class="editor-container">
+    <div class="control-bar">
+      <button id="runBtn" title="Run">▶</button>
+      <select id="language">
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="javascript">JavaScript</option>
       </select>
-      <select id="fontSize" style="background:#fff; color:#222; border-radius:4px; padding:0.25rem 0.5rem;">
+      <select id="fontSize">
         <option value="14">14px</option>
         <option value="16">16px</option>
         <option value="18">18px</option>
         <option value="20">20px</option>
       </select>
-      <button id="copyBtn" title="Copy" style="background:none; border:none; color:#f5f5f5; font-size:1.2rem; cursor:pointer;">⎘</button>
-      <button id="clearBtn" title="Clear" style="background:none; border:none; color:#f5f5f5; font-size:1.2rem; cursor:pointer;">⎚</button>
-      <button id="helpBtn" title="Help" style="background:none; border:none; color:#f5f5f5; font-size:1.2rem; cursor:pointer;">?</button>
+      <button id="copyBtn" title="Copy">⎘</button>
+      <button id="clearBtn" title="Clear">⎚</button>
+      <button id="helpBtn" title="Help">?</button>
     </div>
-    <div id="help-panel" class="help-panel" style="display:none;">
+    <div id="help-panel" class="help-panel">
       <strong>Tips & Shortcuts:</strong>
       <ul>
         <li>Use dropdowns to change language and font</li>
       </ul>
-      <div class="examples-section" style="margin-top:1rem;">
-        <h3 style="margin-top:0;">Code Fill</h3>
+      <div class="examples-section">
+        <h3>Code Fill</h3>
         <div id="exampleButtons" class="example-buttons"></div>
       </div>
     </div>
-    <textarea id="editor" style="display:none;"></textarea>
-    <div class="output-section" style="background:#222; color:#f5f5f5; border-radius:0 0 10px 10px; margin-top:-10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); border:1px solid #333;">
-      <div class="output-header" style="background:#222; color:#f5f5f5; border-radius:0 0 10px 10px; display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #333;">
+    <textarea id="editor"></textarea>
+    <div class="output-section">
+      <div class="output-header">
         <span>Output</span>
-        <button id="copyOutputBtn" style="padding: 4px 12px; font-size: 12px;">Copy Output</button>
+        <button id="copyOutputBtn">Copy Output</button>
       </div>
-      <div class="output-content" id="output" style="background:#181818; color:#f5f5f5; padding:16px; font-family:'Courier New', monospace; white-space:pre-wrap; min-height:100px; max-height:300px; overflow-y:auto; border-radius:0 0 10px 10px;">Click "Run Code" to see output here...</div>
+      <div class="output-content" id="output">Click "Run Code" to see output here...</div>
     </div>
   </div>
 
