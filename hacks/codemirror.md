@@ -296,8 +296,7 @@ permalink: /code
     <textarea id="editor"></textarea>
     <div class="output-section">
       <div class="output-header">
-        <span>Output</span>
-        <button id="copyOutputBtn">Copy Output</button>
+        <span>Output <span id="copyOutputIcon" title="Copy Output" style="cursor:pointer; font-size:1.2em; margin-left:8px;">⎘</span></span>
       </div>
       <div class="output-content" id="output">Click "Run Code" to see output here...</div>
     </div>
@@ -490,16 +489,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // Copy output button
-  document.getElementById("copyOutputBtn").onclick = () => {
+  // Copy output icon
+  document.getElementById("copyOutputIcon").onclick = () => {
     const output = outputDiv.textContent;
+    const icon = document.getElementById("copyOutputIcon");
+    const original = icon.textContent;
     navigator.clipboard.writeText(output).then(() => {
-      const btn = document.getElementById("copyOutputBtn");
-      const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
+      icon.textContent = '✔';
       setTimeout(() => {
-        btn.textContent = originalText;
-      }, 1500);
+        icon.textContent = original;
+      }, 1200);
     });
   };
 
