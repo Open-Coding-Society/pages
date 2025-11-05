@@ -277,10 +277,10 @@ permalink: /code
     <div id="help-panel" class="help-panel">
       <strong>Tips & Shortcuts:</strong>
       <ul>
-        <li>Use dropdowns to change language and font</li>
+        <li>Use dropdowns to change language and text size</li>
+        <li>Click buttons to fill editor with a code sample</li>
       </ul>
       <div class="examples-section">
-        <h3>Code Fill</h3>
         <div id="exampleButtons" class="example-buttons"></div>
       </div>
     </div>
