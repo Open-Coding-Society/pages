@@ -403,8 +403,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const helpPanel = document.getElementById("help-panel");
 
   // Help button toggle
+  // Ensure help panel is hidden initially
+  helpPanel.style.display = "none";
   helpBtn.addEventListener("click", () => {
-    helpPanel.style.display = helpPanel.style.display === "none" ? "block" : "none";
+    if (helpPanel.style.display === "none" || !helpPanel.style.display) {
+      helpPanel.style.display = "block";
+    } else {
+      helpPanel.style.display = "none";
+    }
   });
 
   // Update stats
