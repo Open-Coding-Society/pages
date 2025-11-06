@@ -194,7 +194,6 @@ permalink: /code
     align-items: center;
     gap: 1rem;
     background: #222;
-    color: #f5f5f5;
     padding: 0.75rem 1rem;
     border-radius: 10px 10px 0 0;
   }
@@ -202,14 +201,12 @@ permalink: /code
   .control-bar button {
     background: none;
     border: none;
-    color: #f5f5f5;
     font-size: 1.2rem;
     cursor: pointer;
   }
 
   .control-bar select {
-    background: #fff;
-    color: #222;
+    color: #cbc4c4ff;
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
   }
