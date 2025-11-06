@@ -28,7 +28,6 @@ permalink: /code
     font-size: 1.2em;
     cursor: pointer;
     background: none;
-    color: #f5f5f5;
     transition: all 0.2s;
     display: inline-flex;
     align-items: center;
@@ -164,12 +163,10 @@ permalink: /code
 
   .output-header {
     background-color: #333;
-    color: #f8f8f2;
   }
 
   .output-content {
     background-color: #1e1e1e;
-    color: #f8f8f2;
   }
 
   .examples-section {
@@ -220,10 +217,8 @@ permalink: /code
   /* Help panel styles */
   .help-panel {
     background: #222;
-    color: #f5f5f5;
     padding: 1rem;
     border-radius: 0 0 10px 10px;
-    margin-bottom: 1rem;
     display: none;
   }
 
