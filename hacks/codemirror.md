@@ -139,14 +139,6 @@ permalink: /code
     margin-left: 20px;
   }
 
-  .stats {
-    display: flex;
-    gap: 20px;
-    margin-top: 10px;
-    font-size: 13px;
-    opacity: 0.8;
-  }
-
   /* Dark theme overrides */
   .output-section {
     background-color: #2e2e2e;
@@ -266,6 +258,10 @@ permalink: /code
       </div>
     </div>
     <textarea id="editor"></textarea>
+    <div class="control-bar">
+       <span id="lineCount">Lines: 1</span>
+       <span id="charCount">Characters: 22</span>
+    </div>
     <div class="output-section">
       <div class="control-bar">
         <span>Output</span>
@@ -273,11 +269,9 @@ permalink: /code
       </div>
       <div class="output-content" id="output">Click "Run Code" to see output here...</div>
     </div>
-  </div>
-  <div class="stats" id="stats">
-    <span id="lineCount">Lines: 1</span>
-    <span id="charCount">Characters: 22</span>
-    <span id="execTime"></span>
+    <div class="control-bar">
+      <span id="execTime"></span>
+    </div>
   </div>
 
 <script type="module">
