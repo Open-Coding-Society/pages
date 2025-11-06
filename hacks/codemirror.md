@@ -82,14 +82,6 @@ permalink: /code
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
 
-  .output-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
-    font-weight: 600;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
 
   .output-content {
     padding: 16px;
@@ -161,9 +153,6 @@ permalink: /code
     border: 1px solid #444;
   }
 
-  .output-header {
-    background-color: #333;
-  }
 
   .output-content {
     background-color: #1e1e1e;
@@ -278,13 +267,13 @@ permalink: /code
     </div>
     <textarea id="editor"></textarea>
     <div class="output-section">
-      <div class="output-header">
-        <span>Output <span id="copyOutputIcon" title="Copy Output" class="icon-btn">⎘</span></span>
+      <div class="control-bar">
+        <span>Output</span>
+        <span id="copyOutputIcon" title="Copy Output" class="icon-btn">⎘</span>
       </div>
       <div class="output-content" id="output">Click "Run Code" to see output here...</div>
     </div>
   </div>
-
   <div class="stats" id="stats">
     <span id="lineCount">Lines: 1</span>
     <span id="charCount">Characters: 22</span>
