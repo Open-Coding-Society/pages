@@ -16,6 +16,12 @@ permalink: /code
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
 
 <style>
+
+  .CodeMirror {
+    height: 400px;
+    font-size: 14px;
+  }
+
   .control-group label {
     color: white;
     font-weight: 600;
@@ -38,28 +44,9 @@ permalink: /code
     min-width: 150px;
   }
 
-  .btn-group {
-    display: flex;
-    gap: 10px;
-    margin-left: auto;
-  }
-
-  button {
-    transition: all 0.2s;
-  }
-
   button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-
-  .run-btn {
-    font-weight: 600;
-    padding: 10px 24px;
-  }
-
-  .secondary-btn {
-    opacity: 0.9;
   }
 
   .editor-container {
@@ -68,11 +55,6 @@ permalink: /code
     overflow: hidden;
     margin-bottom: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-
-  .CodeMirror {
-    height: 400px;
-    font-size: 14px;
   }
 
   .output-section {
@@ -216,11 +198,6 @@ permalink: /code
       align-items: stretch;
     }
 
-    .btn-group {
-      margin-left: 0;
-      width: 100%;
-    }
-
     .example-buttons {
       flex-direction: column;
     }
@@ -243,9 +220,9 @@ permalink: /code
         <option value="18">18px</option>
         <option value="20">20px</option>
       </select>
-      <span id="copyBtn" class="icon-btn" title="Copy">⎘</span>
-      <span id="clearBtn" class="icon-btn" title="Clear">⎚</span>
-      <span id="helpBtn" class="icon-btn" title="Help">?</span>
+      <button id="copyBtn" title="Copy">⎘</button>
+      <button id="clearBtn" title="Clear">⎚</button>
+      <button id="helpBtn" title="Help">?</button>
     </div>
     <div id="help-panel" class="help-panel">
       <strong>Tips & Shortcuts:</strong>
@@ -265,7 +242,7 @@ permalink: /code
     <div class="output-section">
       <div class="control-bar">
         <span>Output</span>
-        <span id="copyOutputIcon" title="Copy Output" class="icon-btn">⎘</span>
+        <button id="copyOutputIcon" title="Copy Output">⎘</button>
       </div>
       <div class="output-content" id="output">Click "Run Code" to see output here...</div>
     </div>
@@ -490,7 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const body = JSON.stringify({ code });
     const options = { ...fetchOptions, method: "POST", body };
-    
+
     fetch(runURL, options)
       .then(res => res.json())
       .then(result => {
