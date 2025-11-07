@@ -65,10 +65,8 @@ permalink: /code
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
 
-
   .output-content {
     padding: 16px;
-    font-family: 'Courier New', monospace;
     white-space: pre-wrap;
     min-height: 100px;
     max-height: 300px;
@@ -80,23 +78,6 @@ permalink: /code
     padding: 20px;
     border-radius: 8px;
     border: 1px solid rgba(128, 128, 128, 0.3);
-  }
-
-  .examples-section h3 {
-    margin-bottom: 15px;
-  }
-
-  .example-buttons {
-    gap: 10px;
-  }
-
-  .example-btn {
-    font-size: 13px;
-  }
-
-  .example-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
 
   /* Dark theme overrides */
@@ -112,15 +93,6 @@ permalink: /code
   .examples-section {
     background-color: #2e2e2e;
     border: 1px solid #444;
-  }
-
-  .example-btn {
-    background-color: #444;
-    color: #f8f8f2;
-  }
-
-  .example-btn:hover {
-    background-color: #555;
   }
 
   /* Control bar styles */
@@ -363,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (examples[lang]) {
       examples[lang].forEach((example, index) => {
         const btn = document.createElement('button');
-        btn.className = 'example-btn';
+        btn.className= "small filledHighlight secondary"
         btn.textContent = example.name;
         btn.onclick = () => {
           editor.setValue(example.code);
