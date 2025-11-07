@@ -28,21 +28,25 @@ permalink: /code
     font-weight: 600;
   }
 
-  select, button, .icon-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    font-size: 1.2em;
-    cursor: pointer;
-    background: none;
-    transition: all 0.2s;
-    display: inline-flex;
+  /* Control bar styles */
+  .control-bar {
+    display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 1rem;
+    background: #222;
+    padding: 0.75rem 1rem;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .control-bar select {
+    color: #cbc4c4ff;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
   }
 
   select {
     min-width: 150px;
+    background: none
   }
 
   button:hover {
@@ -74,7 +78,6 @@ permalink: /code
   }
 
   .examples-section {
-    margin-top: 40px;
     padding: 20px;
     border-radius: 8px;
     border: 1px solid rgba(128, 128, 128, 0.3);
@@ -93,29 +96,6 @@ permalink: /code
   .examples-section {
     background-color: #2e2e2e;
     border: 1px solid #444;
-  }
-
-  /* Control bar styles */
-  .control-bar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: #222;
-    padding: 0.75rem 1rem;
-    border-radius: 10px 10px 0 0;
-  }
-
-  .control-bar button {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-  }
-
-  .control-bar select {
-    color: #cbc4c4ff;
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
   }
 
   /* Help panel styles */
@@ -149,7 +129,6 @@ permalink: /code
 </style>
 
 <div class="code-runner-container">
-
   <div class="editor-container">
     <div class="control-bar">
       <button id="runBtn" title="Run">▶</button>
@@ -164,8 +143,8 @@ permalink: /code
         <option value="18">18px</option>
         <option value="20">20px</option>
       </select>
-      <button id="copyBtn" title="Copy">⎘</button>
-      <button id="clearBtn" title="Clear">⎚</button>
+      <button id="copyBtn" title="Copy Code">⎘</button>
+      <button id="clearBtn" title="Clear Code">⎚</button>
       <button id="helpBtn" title="Help">?</button>
     </div>
     <div id="help-panel" class="help-panel">
@@ -180,8 +159,8 @@ permalink: /code
     </div>
     <textarea id="editor"></textarea>
     <div class="control-bar">
-       <span id="lineCount">Lines: 1</span>
-       <span id="charCount">Characters: 22</span>
+      <span id="lineCount">Lines: 1</span>
+      <span id="charCount">Characters: 22</span>
     </div>
     <div class="output-section">
       <div class="control-bar">
@@ -194,6 +173,7 @@ permalink: /code
       <span id="execTime"></span>
     </div>
   </div>
+</div>
 
 <script type="module">
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -335,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (examples[lang]) {
       examples[lang].forEach((example, index) => {
         const btn = document.createElement('button');
-        btn.className= "small filledHighlight secondary"
+        btn.className= "small"
         btn.textContent = example.name;
         btn.onclick = () => {
           editor.setValue(example.code);
