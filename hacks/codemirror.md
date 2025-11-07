@@ -1,5 +1,6 @@
 ---
 layout: post
+show_reading_time: false
 title: Code Runner
 description: Write, test, and run code in Python, Java, and JavaScript.
 permalink: /code
