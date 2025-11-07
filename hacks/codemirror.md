@@ -87,17 +87,10 @@ permalink: /code
   }
 
   .example-buttons {
-    display: flex;
     gap: 10px;
-    flex-wrap: wrap;
   }
 
   .example-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    cursor: pointer;
-    transition: all 0.2s;
     font-size: 13px;
   }
 
@@ -106,28 +99,11 @@ permalink: /code
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   }
 
-  .info-section {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    font-size: 14px;
-  }
-
-  .info-section h4 {
-    margin-bottom: 8px;
-  }
-
-  .info-section ul {
-    margin-left: 20px;
-  }
-
   /* Dark theme overrides */
   .output-section {
     background-color: #2e2e2e;
     border: 1px solid #444;
   }
-
 
   .output-content {
     background-color: #1e1e1e;
@@ -145,11 +121,6 @@ permalink: /code
 
   .example-btn:hover {
     background-color: #555;
-  }
-
-  .info-section {
-    background-color: #2e2e2e;
-    border: 1px solid #444;
   }
 
   /* Control bar styles */
