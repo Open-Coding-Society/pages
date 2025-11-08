@@ -2,8 +2,10 @@
 title: Fetch of Flask Backend Jokes
 layout: post
 description: An introductory example of Frontend talking to Backend Python Flask application serving jokes.  
-permalink: /python/flask/jokes
+permalink: /python/flask/api/jokes
 image: /images/jokes.png
+breadcrumb: true
+show_reading_time: false
 ---
 
 <!-- HTML table fragment for page -->

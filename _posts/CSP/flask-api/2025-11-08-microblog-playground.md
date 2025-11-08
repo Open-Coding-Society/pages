@@ -1,6 +1,7 @@
 ---
 layout: post
 microblog: True
+categories: [API Usage]
 title: Microblog Article
 description: A new way to have others engage with your articles through microblogging.
 author: John Mortensen
@@ -10,7 +11,6 @@ permalink: /microblog
 ## Microblogging
 
 The premise is to have an engaging way to chat on articles.
-
 
 ## See Microblog Live
 
@@ -48,9 +48,7 @@ permalink: /your-path
 ---
 ```
 
-- Use `layout: opencs` to ensure the microblog overlay and dependencies are included.
 - Set `microblog: True` to activate the feature.
-
 
 ### To Test Microblogging
 
@@ -64,9 +62,8 @@ python main.py
 
 ### Key Files
 
-- `_layouts/opencs.html` — Main layout that injects the microblog overlay and required scripts.
+- `_includes/microblog_foundation.html` — Code that injects the microblog overlay one the screen.
 - `assets/js/api/microblog.js` — Handles the microblog panel’s interactivity and API calls.
-
 
 ### API Reference
 
