@@ -3,7 +3,7 @@ layout: post
 toc: True
 title: Microblog Reference 
 description: Instructor-Led Demonstration of API Consumption with Promise Patterns for Digital Citizenship Quest Projects
-permalink: /microblog/reference
+permalink: /python/flask/api/microblog/reference
 author: John Mortensen
 ---
 

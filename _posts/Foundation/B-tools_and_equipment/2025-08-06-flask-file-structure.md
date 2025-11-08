@@ -5,8 +5,7 @@ data: flask
 title: Flask File Structure
 description: An overview of the file structure of flask
 categories: ['Python Flask']
-permalink: /flask-structure-overview
-menu: nav/flask.html
+permalink: /python/flask/anatomy
 author: Anusha Khobare
 breadcrumb: True 
 ---

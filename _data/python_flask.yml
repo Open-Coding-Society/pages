@@ -1,0 +1,38 @@
+# backend tools illustrations
+Title: "Python Flask and Backend"
+Description: "As you move deeper into web development, understanding backend development becomes essential. Flask is a lightweight web framework that allows you to build powerful backend applications in Python. It enables routing, templating, and integration with databases or APIs."
+
+Topics:
+  - title: "Anatomy of a Flask App"
+    image: "/course-brag/flask.png"
+    link: "/python/flask/anatomy"
+    alt: "Anatomy of a Flask Application"
+    keyPoints:
+      - "Review Flask file structure"
+      - "Exampine API routes"
+      - "Review Model files and SQLAlchemy"
+    subtitle: "Python Flask File Structure"
+    description: "Flask anatomy covers the essential components of a Flask application, including how to set up routes, handle requests, and serve responses. Understanding the structure of a Flask app is crucial for building efficient backend services."
+
+  - title: "API creation and endpoints"
+    image: "/course-brag/flask.png"
+    link: "/python/flask/api"
+    alt: "Creating Flask APIs"
+    keyPoints:
+      - "Create API routes"
+      - "Fetch data from frontend"
+      - "Manage server responses and JSON"
+    subtitle: "Full API Creation"
+    description: "Flask anatomy covers the essential components of a Flask application, including how to set up routes, handle requests, and serve responses. Understanding the structure of a Flask app is crucial for building efficient backend services."
+
+
+  - title: "Backend UI"
+    image: "/backend_ui.png"
+    link: "/flask-backend-ui"
+    alt: "Backend User Interface"
+    keyPoints:
+      - "Display backend data"
+      - "Create admin dashboards"
+      - "Improve accessibility for devs"
+    subtitle: "Interface for Admins"
+    description: "Backend UIs present data from your database or APIs in a visual format. These dashboards help developers and admins manage, monitor, and debug application content and behavior."
