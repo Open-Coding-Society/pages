@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Web APIs and Local Storage Documentation
-description: Comprehensive guide to Web APIs and Local Storage implementation in JavaScript
-categories: [CSSE]
+description: This documentation provides a comprehensive overview of Web APIs and Local Storage, based on our notebooks. It covers key concepts, implementation details, and practical examples.
+categories: [JavaScript]
 type: docs
 courses: { csse: {week: 17} }
 author: Zhengji Li
@@ -156,10 +156,6 @@ questions:
 ---
 
 {% include tailwind/lesson.html %}
-
-# Web APIs and Local Storage Documentation
-
-This documentation provides a comprehensive overview of Web APIs and Local Storage, based on our notebooks. It covers key concepts, implementation details, and practical examples.
 
 ## Web APIs Overview
 
