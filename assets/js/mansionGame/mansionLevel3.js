@@ -55,8 +55,22 @@ class Skeleton extends GameObject {
     super(gameEnv);
     this.x = data.x || 0;
     this.y = data.y || -50;
-    this.width = data.isKey ? 80 : 134; // Key: 80, Skeleton: 134 (67*2)
-    this.height = data.isKey ? 80 : 166; // Key: 80, Skeleton: 166 (83*2)
+    // Allow explicit width/height or a scale multiplier to control drawn size.
+    // Backwards-compatible defaults: Key: 80x80, Skeleton: 134x166
+    const defaultWidth = data.isKey ? 80 : 134;
+    const defaultHeight = data.isKey ? 80 : 166;
+
+    if (typeof data.width === 'number' && typeof data.height === 'number') {
+      this.width = data.width;
+      this.height = data.height;
+    } else if (typeof data.scale === 'number') {
+      // scale is a multiplier (e.g. 0.5 for half size)
+      this.width = Math.round(defaultWidth * data.scale);
+      this.height = Math.round(defaultHeight * data.scale);
+    } else {
+      this.width = defaultWidth;
+      this.height = defaultHeight;
+    }
     this.scrollSpeed = data.scrollSpeed || 3;
     this.level = data.level;
     this.isKey = data.isKey || false;
@@ -183,10 +197,10 @@ class MansionLevel3 {
 
     console.log("✅ Game environment:", { width, height, path });
 
-    // Game state
-    this.lives = 3;
+    // Game state - REMOVED LIVES, ONLY SCORE + TIMER
     this.score = 0;
-    this.scrollSpeed = 10; // Much faster scrolling
+  this.applesCollected = 0;
+    this.scrollSpeed = 10;
     this.difficulty = 1;
     this.gameEnv = gameEnv;
     this.dialogueSystem = new DialogueSystem();
@@ -194,19 +208,24 @@ class MansionLevel3 {
     this.keySpawned = false;
     this.gameEnded = false;
     this.gameWon = false;
+    
+    // TIMER: 60 seconds (60 * 60 frames at 60fps)
+    this.timeRemaining = 60;
+    this.frameCounter = 0;
+    this.startTime = Date.now();
 
     // Background - scrolling staircase
     this.backgroundY = 0;
-    const image_background = path + "/images/mansionGame/stairs_lvl3.png";
+    const image_background = path + "/images/mansionGame/Bucketbckgrnd.png";
     const image_data_background = {
         name: 'background',
-        greeting: `LIVES: ${'❤️'.repeat(this.lives) + '🖤'.repeat(3 - this.lives)} | Distance: ${this.score} | Dodge skeletons, get the key!`,
+        greeting: `Score: ${this.score} | Distance: ${this.score} | Hit skeletons for points!`,
         src: image_background,
         pixels: {height: 580, width: 1038},
-        mode: 'cover', // Fill the entire screen
+        mode: 'cover',
     };
 
-    // Player setup - MUST match exact format from mansionLevel1
+    // Player setup
     const sprite_src_mc = path + "/images/gamify/spookMcWalk.png";
     const MC_SCALE_FACTOR = 6;
     const playerData = {
@@ -214,7 +233,7 @@ class MansionLevel3 {
       greeting: "Hi, I am Spook.",
       src: sprite_src_mc,
       SCALE_FACTOR: MC_SCALE_FACTOR,
-      STEP_FACTOR: 120, // Slower movement (increased from 80)
+      STEP_FACTOR: 120,
       ANIMATION_RATE: 10,
       INIT_POSITION: { x: (width / 2 - width / (5 * MC_SCALE_FACTOR)), y: height - (height / MC_SCALE_FACTOR)}, 
       pixels: {height: 2400, width: 3600},
@@ -228,16 +247,14 @@ class MansionLevel3 {
       upLeft: {row: 0, start: 0, columns: 3, rotate: Math.PI/16},
       upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
       hitbox: {widthPercentage: 0.45, heightPercentage: 0.2},
-      keypress: {left: 65, right: 68} // Only A (left) and D (right) - removed W and S
+      keypress: {left: 65, right: 68}
     };
 
-    // Classes array - use ScrollingBackground instead of GameEnvBackground
     this.classes = [
       { class: ScrollingBackground, data: image_data_background },
       { class: Player, data: playerData }
     ];
 
-    // Create HUD overlay for lives and score
     this.createHUD();
 
     console.log("✅ MansionLevel3 classes created:", this.classes.length);
@@ -245,17 +262,15 @@ class MansionLevel3 {
   }
 
   createHUD() {
-    // Remove existing HUD if any
     const existingHUD = document.getElementById('mansion3-hud');
     if (existingHUD) {
       existingHUD.remove();
     }
 
-    // Create HUD container
     const hud = document.createElement('div');
     hud.id = 'mansion3-hud';
     hud.style.position = 'fixed';
-    hud.style.top = '80px'; // Moved lower to avoid cut-off
+    hud.style.top = '80px';
     hud.style.left = '20px';
     hud.style.zIndex = '99999';
     hud.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
@@ -272,7 +287,6 @@ class MansionLevel3 {
     console.log("HUD created!", hud);
     this.updateHUD();
     
-    // Create instruction text at top center
     const instructionText = document.createElement('div');
     instructionText.id = 'mansion3-instruction';
     instructionText.style.position = 'fixed';
@@ -287,16 +301,14 @@ class MansionLevel3 {
     instructionText.style.fontFamily = 'Arial, sans-serif';
     instructionText.style.fontSize = '18px';
     instructionText.style.fontWeight = 'bold';
-    instructionText.textContent = 'Reach 300m to find the golden key';
+  instructionText.textContent = 'Hit skeletons for +25 points! Collect apples shown in the HUD';
     
     document.body.appendChild(instructionText);
     
-    // Create mobile control arrows
     this.createMobileControls();
   }
 
   createMobileControls() {
-    // Left arrow button
     const leftArrow = document.createElement('div');
     leftArrow.id = 'mansion3-left-arrow';
     leftArrow.innerHTML = '◀';
@@ -317,7 +329,6 @@ class MansionLevel3 {
     leftArrow.style.zIndex = '99999';
     leftArrow.style.userSelect = 'none';
     
-    // Right arrow button
     const rightArrow = document.createElement('div');
     rightArrow.id = 'mansion3-right-arrow';
     rightArrow.innerHTML = '▶';
@@ -341,7 +352,6 @@ class MansionLevel3 {
     document.body.appendChild(leftArrow);
     document.body.appendChild(rightArrow);
     
-    // Helper function to dispatch keyboard events
     const dispatchKeyEvent = (type, keyCode) => {
       const event = new KeyboardEvent(type, {
         keyCode: keyCode,
@@ -352,25 +362,22 @@ class MansionLevel3 {
       document.dispatchEvent(event);
     };
     
-    // Left arrow controls
     const handleLeftPress = () => {
-      dispatchKeyEvent('keydown', 65); // 'A' key
+      dispatchKeyEvent('keydown', 65);
     };
     
     const handleLeftRelease = () => {
       dispatchKeyEvent('keyup', 65);
     };
     
-    // Right arrow controls
     const handleRightPress = () => {
-      dispatchKeyEvent('keydown', 68); // 'D' key
+      dispatchKeyEvent('keydown', 68);
     };
     
     const handleRightRelease = () => {
       dispatchKeyEvent('keyup', 68);
     };
     
-    // Touch events for left arrow
     leftArrow.addEventListener('touchstart', (e) => {
       e.preventDefault();
       leftArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
@@ -383,7 +390,6 @@ class MansionLevel3 {
       handleLeftRelease();
     });
     
-    // Mouse events for left arrow (desktop fallback)
     leftArrow.addEventListener('mousedown', (e) => {
       e.preventDefault();
       leftArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
@@ -401,7 +407,6 @@ class MansionLevel3 {
       handleLeftRelease();
     });
     
-    // Touch events for right arrow
     rightArrow.addEventListener('touchstart', (e) => {
       e.preventDefault();
       rightArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
@@ -414,7 +419,6 @@ class MansionLevel3 {
       handleRightRelease();
     });
     
-    // Mouse events for right arrow (desktop fallback)
     rightArrow.addEventListener('mousedown', (e) => {
       e.preventDefault();
       rightArrow.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
@@ -436,63 +440,67 @@ class MansionLevel3 {
   updateHUD() {
     const hud = document.getElementById('mansion3-hud');
     if (hud) {
-      const distance = Math.floor(this.score / 10);
-      
       hud.innerHTML = `
-        <div style="margin-bottom: 8px; font-size: 24px; color: #ff0000; font-weight: bold;">LIVES: ${this.lives}/3</div>
-        <div style="font-size: 22px; color: #00ff00; font-weight: bold;">Distance: ${distance}m</div>
+        <div style="margin-bottom: 8px; font-size: 28px; color: #00ff00; font-weight: bold;">SCORE: ${this.score}</div>
+        <div style="margin-bottom: 8px; font-size: 24px; color: #ff0000; font-weight: bold;">TIME: ${this.timeRemaining}s</div>
+        <div style="font-size: 22px; color: #ffd700; font-weight: bold;">Apples: ${this.applesCollected}</div>
       `;
     } else {
       console.log("HUD not found!");
     }
   }
 
-  // Update method called every frame by the game engine
   update() {
-    // Stop updating if game has ended
     if (this.gameEnded || this.gameWon) {
       return;
     }
 
-    this.score++;
+    // UPDATE TIMER
+    const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+    this.timeRemaining = Math.max(0, 60 - elapsedSeconds);
+    
+    // END GAME WHEN TIMER REACHES 0
+    if (this.timeRemaining <= 0) {
+      this.timeUp();
+      return;
+    }
 
-    // Scroll background to simulate climbing stairs
     const background = this.gameEnv.gameObjects.find(obj => obj instanceof ScrollingBackground);
     if (background) {
       background.scroll(this.scrollSpeed);
     }
 
-    // Update HUD every 30 frames
     if (this.score % 30 === 0) {
       this.updateHUD();
       this.updateScoreDisplay();
     }
 
-    // Spawn skeletons
     this.spawnTimer++;
     if (this.spawnTimer > 40) {
       this.spawnTimer = 0;
       this.spawnSkeleton();
     }
 
-    // Spawn key after 300m distance
+    // Keep existing key spawn logic tied to score-derived distance for now
     const distance = Math.floor(this.score / 10);
     if (distance >= 300 && !this.keySpawned) {
       console.log("🔑 SPAWNING KEY at distance:", distance);
       this.spawnKey();
       this.keySpawned = true;
       
-      // Remove instruction text when key spawns
       const instructionText = document.getElementById('mansion3-instruction');
       if (instructionText) {
-        instructionText.remove();
+        instructionText.textContent = 'Golden Key spawned! Collect it to win!';
+        instructionText.style.color = '#ffd700';
       }
     }
 
-    // Increase difficulty over time
     if (this.score % 500 === 0) {
       this.scrollSpeed = Math.min(this.scrollSpeed + 0.3, 6);
     }
+    
+    // Update HUD every frame to keep timer accurate
+    this.updateHUD();
   }
 
   spawnSkeleton() {
@@ -502,7 +510,9 @@ class MansionLevel3 {
       scrollSpeed: this.scrollSpeed,
       level: this,
       isKey: false,
-      imageSrc: this.gameEnv.path + "/images/mansionGame/skeleton_lvl3.png"
+      imageSrc: this.gameEnv.path + "/images/mansionGame/Apple.png",
+      // Make the apple smaller on spawn. Adjust this value to taste: 0.5 = half size, 0.7 = 70%.
+      scale: 0.6
     };
 
     const skeleton = new Skeleton(skeletonData, this.gameEnv);
@@ -525,72 +535,26 @@ class MansionLevel3 {
   }
 
   hitSkeleton() {
-    console.log("💀 HIT SKELETON! Lives before:", this.lives);
-    this.lives--;
-    console.log("Lives after:", this.lives);
+    console.log("💀 HIT SKELETON! Score before:", this.score);
+    this.score += 25;
+    this.applesCollected += 1;
+    console.log("Score after:", this.score);
     this.updateHUD();
     this.updateScoreDisplay();
-    
-    if (this.lives <= 0) {
-      console.log("GAME OVER!");
-      this.gameOver();
-    }
   }
 
-  winGame() {
-    console.log("🎉 YOU WIN!");
+  timeUp() {
+    console.log("⏰ TIME'S UP!");
     
-    // Stop spawning and pause game
-    this.keySpawned = true;
-    this.gameWon = true;
-    
-    // Clear all skeletons
-    this.gameEnv.gameObjects = this.gameEnv.gameObjects.filter(
-      obj => !(obj instanceof Skeleton)
-    );
-    
-    const dialogueSystem = new DialogueSystem();
-    dialogueSystem.showDialogue(
-      'You collected the golden key! Moving to next level...',
-      'Victory!',
-      this.gameEnv.path + '/images/mansionGame/key_lvl3.png'
-    );
-    
-    dialogueSystem.addButtons([
-      {
-        text: 'Continue',
-        primary: true,
-        action: () => {
-          dialogueSystem.closeDialogue();
-          // Remove HUD before transition
-          const hud = document.getElementById('mansion3-hud');
-          if (hud) hud.remove();
-          
-          if (this.gameEnv && this.gameEnv.gameControl) {
-            const gameControl = this.gameEnv.gameControl;
-            gameControl.levelClasses = [MansionLevel4];
-            gameControl.currentLevelIndex = 0;
-            gameControl.transitionToLevel();
-          }
-        }
-      }
-    ]);
-  }
-
-  gameOver() {
-    console.log("💀 GAME OVER!");
-    
-    // Stop the game
     this.gameEnded = true;
     
-    // Clear all skeletons
     this.gameEnv.gameObjects = this.gameEnv.gameObjects.filter(
       obj => !(obj instanceof Skeleton)
     );
     
     const dialogueSystem = new DialogueSystem();
     dialogueSystem.showDialogue(
-      'You ran out of lives! Try again?',
+      `Time's up! Final Score: ${this.score}`,
       'Game Over',
       this.gameEnv.path + '/images/mansionGame/skeleton_lvl3.png'
     );
@@ -609,24 +573,60 @@ class MansionLevel3 {
     ]);
   }
 
+  winGame() {
+    console.log("🎉 YOU WIN!");
+    
+    this.keySpawned = true;
+    this.gameWon = true;
+    
+    this.gameEnv.gameObjects = this.gameEnv.gameObjects.filter(
+      obj => !(obj instanceof Skeleton)
+    );
+    
+    const dialogueSystem = new DialogueSystem();
+    dialogueSystem.showDialogue(
+      `You collected the golden key! Final Score: ${this.score}`,
+      'Victory!',
+      this.gameEnv.path + '/images/mansionGame/key_lvl3.png'
+    );
+    
+    dialogueSystem.addButtons([
+      {
+        text: 'Continue',
+        primary: true,
+        action: () => {
+          dialogueSystem.closeDialogue();
+          const hud = document.getElementById('mansion3-hud');
+          if (hud) hud.remove();
+          
+          if (this.gameEnv && this.gameEnv.gameControl) {
+            const gameControl = this.gameEnv.gameControl;
+            gameControl.levelClasses = [MansionLevel4];
+            gameControl.currentLevelIndex = 0;
+            gameControl.transitionToLevel();
+          }
+        }
+      }
+    ]);
+  }
+
   restart() {
-    this.lives = 3;
     this.score = 0;
-    this.scrollSpeed = 10; // Match initial scroll speed
+    this.scrollSpeed = 10;
     this.keySpawned = false;
     this.spawnTimer = 0;
+    this.timeRemaining = 60;
+    this.startTime = Date.now();
     this.updateHUD();
     this.updateScoreDisplay();
     
-    // Clear all falling objects
     this.gameEnv.gameObjects = this.gameEnv.gameObjects.filter(
       obj => !(obj instanceof Skeleton)
     );
   }
 
   updateScoreDisplay() {
-    const livesText = '❤️'.repeat(Math.max(0, this.lives)) + '🖤'.repeat(Math.max(0, 3 - this.lives));
-    const displayText = `LIVES: ${livesText} | Distance: ${Math.floor(this.score / 60)} | Dodge skeletons, get the key!`;
+    const displayText = `Score: ${this.score} | Time: ${this.timeRemaining}s | Apples: ${this.applesCollected} | Hit skeletons for +25 points!`;
     
     const background = this.classes.find(c => c.data.name === 'background');
     if (background) {
@@ -637,20 +637,17 @@ class MansionLevel3 {
   destroy() {
     console.log("🧹 Cleaning up MansionLevel3...");
     
-    // Remove the HUD element
     const hud = document.getElementById('mansion3-hud');
     if (hud) {
       hud.remove();
       console.log("✅ HUD removed");
     }
     
-    // Remove instruction text
     const instructionText = document.getElementById('mansion3-instruction');
     if (instructionText) {
       instructionText.remove();
     }
     
-    // Remove mobile control arrows
     const leftArrow = document.getElementById('mansion3-left-arrow');
     if (leftArrow) {
       leftArrow.remove();
@@ -661,7 +658,6 @@ class MansionLevel3 {
       rightArrow.remove();
     }
     
-    // Clear any skeletons
     if (this.gameEnv && this.gameEnv.gameObjects) {
       this.gameEnv.gameObjects = this.gameEnv.gameObjects.filter(
         obj => !(obj instanceof Skeleton)
