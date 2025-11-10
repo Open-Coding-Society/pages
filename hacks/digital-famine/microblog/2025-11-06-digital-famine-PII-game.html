@@ -1,0 +1,352 @@
+---
+layout: post
+title: "PII Protection Interactive Game"
+description: "A fun drag-and-drop simulation that teaches users about Personally Identifiable Information (PII) and how to protect it online."
+permalink: /pii-game/
+tags: ["Interactive", "Privacy", "PII", "Cybersecurity"]
+date: 2025-11-06
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Detective — PII Drag & Drop</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #0d0d0f;
+      color: #f8f8f8;
+      text-align: center;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #00aaff;
+      font-size: 2.5rem;
+    }
+
+    .info {
+      max-width: 700px;
+      margin: 1rem auto;
+      font-size: 1.2rem;
+    }
+
+    .card-area {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      background-color: #1a1a20;
+      padding: 20px;
+      border-radius: 15px;
+      width: 80%;
+      min-height: 150px;
+    }
+
+    .card {
+      background-color: #222;
+      border: 2px solid #555;
+      border-radius: 10px;
+      padding: 10px 15px;
+      cursor: grab;
+      font-weight: bold;
+      color: #fff;
+      width: 180px;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      background-color: #333;
+    }
+
+    .bins {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .bin {
+      width: 250px;
+      min-height: 120px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .bin .card {
+      margin-top: 8px;
+    }
+
+    #private-bin {
+      background-color: #2b1a2b;
+      border: 2px solid #a264ff;
+    }
+
+    #share-bin {
+      background-color: #0b2b1a;
+      border: 2px solid #4aff8f;
+    }
+
+    .bin:hover {
+      transform: scale(1.05);
+    }
+
+    .controls {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      background-color: #008cba;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #00aaff;
+    }
+
+    #reset {
+      background-color: #b23b3b;
+    }
+
+    #reset:hover {
+      background-color: #d94b4b;
+    }
+
+    .scoreboard {
+      margin-top: 1rem;
+      background: #121218;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+    }
+
+    #explanation-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #181820;
+      border-radius: 10px;
+      width: 60%;
+      margin-left: auto;
+      margin-right: auto;
+      display: none;
+    }
+
+    canvas#confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="game-container">
+    <h1>Data Detective — PII Drag & Drop</h1>
+    <p class="info">
+      Decide what to <strong>Share</strong> and what to <strong>Keep Private</strong>.  
+      Drag or tap each card into the right bin, earn points, and click a card to learn why each choice matters!
+    </p>
+
+    <div class="card-area" id="card-area"></div>
+
+    <div class="bins">
+      <div id="private-bin" class="bin" ondrop="drop(event)" ondragover="allowDrop(event)">
+        Keep Private<br /><small>Personal details that identify you</small>
+      </div>
+      <div id="share-bin" class="bin" ondrop="drop(event)" ondragover="allowDrop(event)">
+        Share<br /><small>Safe public information</small>
+      </div>
+    </div>
+
+    <div class="scoreboard">
+      Round: <span id="round">1</span>/3 | Score: <span id="score">0</span>
+    </div>
+
+    <div class="controls">
+      <button onclick="submitRound()">Submit Round</button>
+      <button id="reset" onclick="resetGame()">Reset</button>
+    </div>
+
+    <div id="explanation-box"></div>
+  </div>
+
+  <script>
+    const cardsData = [
+      { text: "Home address", correct: "private", explanation: "Reveals your exact location — keep private." },
+      { text: "Favorite color", correct: "share", explanation: "Harmless general info — safe to share." },
+      { text: "Social Security number", correct: "private", explanation: "Highly sensitive — never share it." },
+      { text: "School name", correct: "share", explanation: "Generally fine to share in context." },
+      { text: "Credit card number", correct: "private", explanation: "Can be used for theft — keep private." },
+      { text: "Pet’s name", correct: "share", explanation: "Usually fine unless it’s a password hint." },
+      { text: "Email address", correct: "private", explanation: "Can lead to spam or scams — protect it." },
+      { text: "Hobby or interest", correct: "share", explanation: "Safe to share — part of your public profile." },
+      { text: "Phone number", correct: "private", explanation: "Can be used for scams or spam — protect it." },
+      { text: "Birthday", correct: "private", explanation: "Can help guess passwords or identity info — keep private." },
+      { text: "Graduation year", correct: "share", explanation: "General info — safe to share." },
+      { text: "City you live in", correct: "share", explanation: "Fine to share broadly — not specific enough to identify you." }
+    ];
+
+    let round = 1;
+    let score = 0;
+    let usedCards = [];
+
+    function loadRound() {
+      const cardArea = document.getElementById("card-area");
+      cardArea.innerHTML = "";
+
+      const newCards = cardsData
+        .filter(c => !usedCards.includes(c.text))
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 4);
+
+      usedCards.push(...newCards.map(c => c.text));
+
+      newCards.forEach(card => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.draggable = true;
+        div.textContent = card.text;
+        div.dataset.correct = card.correct;
+        div.dataset.explanation = card.explanation;
+        div.ondragstart = drag;
+
+        // ✅ Click to show explanation
+        div.addEventListener("click", () => {
+          const box = document.getElementById("explanation-box");
+          box.style.display = "block";
+          box.innerHTML = `<strong>${card.text}</strong>: ${card.explanation}`;
+        });
+
+        cardArea.appendChild(div);
+      });
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.textContent);
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      const text = ev.dataTransfer.getData("text");
+      const card = [...document.querySelectorAll(".card")].find(c => c.textContent === text);
+      if (card) ev.target.appendChild(card);
+    }
+
+    function submitRound() {
+      const privateBin = document.getElementById("private-bin");
+      const shareBin = document.getElementById("share-bin");
+
+      let roundScore = 0;
+
+      document.querySelectorAll(".card").forEach(card => {
+        const parentId = card.parentElement.id;
+        if (
+          (parentId === "private-bin" && card.dataset.correct === "private") ||
+          (parentId === "share-bin" && card.dataset.correct === "share")
+        ) {
+          roundScore += 1;
+        }
+      });
+
+      score += roundScore;
+      document.getElementById("score").textContent = score;
+
+      if (round < 3) {
+        round++;
+        document.getElementById("round").textContent = round;
+        loadRound();
+      } else {
+        launchConfetti();
+        setTimeout(() => alert(`🎉 Game Over! Final Score: ${score} / 12`), 500);
+      }
+    }
+
+    function resetGame() {
+      round = 1;
+      score = 0;
+      usedCards = [];
+      document.getElementById("round").textContent = round;
+      document.getElementById("score").textContent = score;
+      document.getElementById("explanation-box").style.display = "none";
+      document.querySelectorAll("#private-bin, #share-bin").forEach(bin => (bin.innerHTML = bin.innerHTML.split("<br>")[0]));
+      loadRound();
+    }
+
+    // 🎉 Confetti that disappears after 3s
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = "block";
+
+      const confetti = Array.from({ length: 100 }).map(() => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 0.5 + 0.5,
+        color: `hsl(${Math.random() * 360}, 100%, 70%)`
+      }));
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, false);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        });
+        update();
+        animationFrame = requestAnimationFrame(draw);
+      }
+
+      function update() {
+        confetti.forEach(p => {
+          p.y += p.d * 4;
+          if (p.y > canvas.height) p.y = -10;
+        });
+      }
+
+      let animationFrame = requestAnimationFrame(draw);
+
+      setTimeout(() => {
+        cancelAnimationFrame(animationFrame);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.display = "none";
+      }, 3000);
+    }
+
+    loadRound();
+  </script>
+</body>
+</html>

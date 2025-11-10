@@ -79,7 +79,7 @@ The system is now defunct, as humans took to the stars. We'll have the reestabli
          longTitle: 'Orbital Hub Gamma',
          description: 'Orbital hub with degraded power systems.',
          tags: ['orbital','maintenance']},
-        {id: 3, label: 'PII quiz', url: '{{ base.siteurl }}/digital-famine/microblog/mcq/', title: 'Open Node 3',
+        {id: 3, label: 'PII quiz', url: '{{ base.siteurl }}/digital-famine/microblog/pii-game/', title: 'Open Node 3',
          image: defaultImgUrl,
          longTitle: 'Tactical Beacon Beta',
          description: 'Short-range beacon used for local operative coordination.',
