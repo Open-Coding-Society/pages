@@ -3,14 +3,13 @@ toc: True
 layout: post
 data: flask
 title: Backend UI
-description: An overview of Backend UI
+description: An overview of backend UI for Flask Jinja
 categories: ['Python Flask']
-permalink: /flask-backend-ui
+permalink: /python/flask/jinja_ui
 menu: nav/flask.html
 author: Vibha Mandayam
 breadcrumb: True 
 ---
-# Backend UI with Flask and Jinja
 
 ## 1. What is Backend UI?
 

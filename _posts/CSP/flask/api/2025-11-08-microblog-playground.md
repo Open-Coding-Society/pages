@@ -1,7 +1,7 @@
 ---
 layout: post
 microblog: True
-categories: [API Usage]
+categories: [Python Flask]
 title: Microblog Article
 description: A new way to have others engage with your articles through microblogging.
 author: John Mortensen

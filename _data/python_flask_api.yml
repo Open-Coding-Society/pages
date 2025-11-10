@@ -3,7 +3,7 @@ Title: "API Foundations"
 Description: "These sections introduce the essential skills developers need to work with APIs effectively."
 Topics:
   - title: "Joke API"
-    image: "/basic-api/joke-api.jpg"
+    image: "/backend/flask/ha_ha.svg"
     link: "/python/flask/api/jokes"
     alt: "Joke API"
     keyPoints:

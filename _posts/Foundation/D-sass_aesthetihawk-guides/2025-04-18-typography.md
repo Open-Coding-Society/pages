@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Aesthetihawk Guide - Typography
-categories: [Aesthetihawk]
+categories: [SASS]
 permalink: /aesthetihawk-guide-typography
 author: Aashray Reddy
 menu: nav/aesthetihawk-guide.html
