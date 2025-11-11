@@ -14,12 +14,19 @@ permalink: /tools/
 sticky_rank: 1
 ---
 
-<!-- Infographic - this depends on page.infoGraph frontmatter being set -->
-{%- include tailwind/infograph.html -%}
+## Track, Communicate, Share
 
-## Why Development Tools Matter
+Development is about "failing fast".
 
-Development tools are the foundation of modern software engineering. They enable collaboration, streamline workflows, and make coding more efficient. These develpment tools will not only help you succeed in this class but also prepare you for real-world software development.
 
-<!-- Questions with localstorage - this depends on page.questions frontmatter being set -->
+<div class="my-4">
+	<ul class="list-disc list-inside space-y-1">
+		<li>Use Microblog on this page to get community help on tools.</li>
+		<li>Prompts below will make your tools journey productive.</li>
+		<li>Skipping steps will NOT work!</li>
+	</ul>
+</div>
+
 {%- include tailwind/questions.html -%}
+
+{%- include tailwind/infograph.html -%}
