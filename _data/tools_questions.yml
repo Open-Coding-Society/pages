@@ -1,8 +1,11 @@
 # filepath: _data/tools_questions.yml
 questions:
-  - id: "tools-burndown-link"
-    title: "Issue and Burndown List"
+  - id: "tools-setup-memories"
+    title: "Tools Setup Memories"
+    question: "Write down your biggest success and biggest challenge."
+  - id: "tools-setup-issue-link"
+    title: "Tools Setup--Issue Link"
     question: "Provide a link to your GitHub Issue."
   - id: "tools-setup-time"
-    title: "Tools Setup Time and Memories"
-    question: "How long did it take? Write down your biggest success and biggest challenge."
+    title: "Tools Setup Time"
+    question: "Estimate how long it took you to set up your tools (in minutes)."
