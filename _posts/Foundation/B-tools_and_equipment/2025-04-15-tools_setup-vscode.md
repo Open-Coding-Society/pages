@@ -23,7 +23,7 @@ You are using Ubuntu, Kali, MacOS in this step.
 
 Use same repo that you modified in vscode.dev.
 
-Change the commands below to use your own organization name (not "opencs" of "jm1021").  This is your personal template repository (not "open-coding-society/student.git").
+Change the commands below to use your own organization name (**not** "opencs" of "jm1021").  This is your personal template repository (**not** "open-coding-society/student.git").
 
 For example, if your GitHub organization is **jm1021** and your repo is ****student**, use:
 
