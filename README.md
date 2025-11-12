@@ -92,9 +92,9 @@ git clone <this-repo> # git clone https://github.com/open-coding-society/pages.g
 cd <repo-dir>/scripts # cd pages 
 ```
 
-#### Windows WSL and/or Ubuntu Users
+#### Windows WSL and/or Ubuntu or Kali Users
 
-- Execute the script: `./activate_ubuntu.sh`
+- Execute the script: `./activate_ubuntu.sh` or `./activate_kali.sh`
 
 #### macOS Users
 
@@ -327,13 +327,13 @@ In the front matter, you can also define things like a title and description for
 
 - The courses will tell us which menu item it will be under, in this case, the `csa` menu, and the `week` tells it what row (week) it will appear under that menu.
 
-## 🌐 Open Coding Society: Instructional Framework
+## Open Coding Society: Instructional Framework
 
 A flexible, inclusive, and modern teaching model grounded in **Connectivism**, with structured learning through **Merrill**, **Fink**, **UDL**, **Agile**, and select **Gagné** elements. This framework prepares learners to thrive in collaborative, networked, AI-augmented environments.
 
 ---
 
-### 🌐 Guiding Philosophy: Connectivism
+### Guiding Philosophy: Connectivism
 
 > “Learning is a process of connecting specialized nodes or information sources.” – George Siemens
 
@@ -345,7 +345,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 - **Decision-making** (what to learn, when to seek help, what tools to use) is a critical skill
 - **Diverse collaboration** and **community contribution** are essential for relevant, authentic learning
 
-#### 🌐 Connectivist Practices in OCS education
+#### Connectivist Practices in OCS education
 
 - Promote **open collaboration** via GitHub, blogs, scrum-team projects and cross-class projects
 - Encourage learners to **curate, remix, and build upon** knowledge from global networks
@@ -356,7 +356,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 
 ---
 
-### 🧱 Instructional Core: Merrill’s First Principles of Instruction
+### Instructional Core: Merrill’s First Principles of Instruction
 
 > “Make instruction Effective, Efficient, Engaging.”
 
@@ -368,7 +368,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 
 ---
 
-### 🌱 Learning Depth: Fink’s Significant Learning
+### Learning Depth: Fink’s Significant Learning
 
 > Emphasize holistic, transformative learning.  These words and associated actions help learners become assets to the Connectivist landscape. 
 
@@ -382,7 +382,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 
 ---
 
-### ♿️ Access & Inclusion: Universal Design for Learning (UDL)
+### Access & Inclusion: Universal Design for Learning (UDL)
 
 > Proactively reduce barriers and support diverse learners. OCS maintains social and coding platforms that support UDL thinking (GitHub, YouTube, LinkedIn, X)
 
@@ -394,17 +394,17 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 
 ---
 
-### 🧭 Structure & Ceremonies: Agile + Design Thinking + Gagné (selective)
+### Structure & Ceremonies: Agile + Design Thinking + Gagné (selective)
 
 > Use classroom **ceremonies** for rhythm, reflection, and real-world alignment.
 
-#### 🎯 Gagné Elements (selective use)
+#### Gagné Elements (selective use)
 
 - **Gain Attention** – Start with prompts, demos, tech news, or student input
 - **Set Objectives** – Clarify sprint, lesson, or project goals
 - **Reflection** – Use reflections and live reviews at the end of lessons/sprints
 
-#### 🧠 Agile & Design Thinking Ceremonies
+#### Agile & Design Thinking Ceremonies
 
 - **Empathy** – Interviews, personas, build "Point of View" and “How Might We…” prompts
 - **Ideation** – Brainstorms, sticky notes, sketches, synthesize
@@ -418,7 +418,7 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 
 ---
 
-## 🔁 Summary of Learning Philosophies
+## Summary of Learning Philosophies
 
 | Layer | Model | Role |
 |-------|-------|------|
