@@ -125,26 +125,27 @@ WGU emphasizes structure and routine; I emphasize ownership and relevance. Authe
 | **A2d. Learning Distractions** | Explicitly teach life skills such as time management and organization. | I use GitHub Projects and milestone planning to teach prioritization. Students learn to break down complex tasks into manageable issues and to maintain focus across competing classes and responsibilities.  Student are encouraged to work in the moment and use classroom time as the largest part of their 5-hour commit to build projects and code. |
 | **A2e. Experiential** | Design authentic learning and outcomes. | Students develop real-world full-stack projects connected to their interests (e.g., “Night at the Museum,” “Gamify-FinTech, Facial Recognition, Quest based adventure games”). They deploy applications using Flask, GitHub Pages, and Docker—mirroring professional software workflows. |
 
-### A4 Summary of Table
 
-Build models or mindmap around experential learning that make each individual feel needed and productive.  Focus organization to avoid pitfalls of issolation by having students build and create in small authentic groups with a showcase as a goal.   I remember one afternon working befor showcase in onlin learning where student continued to work for 3 hours between classroom and event, she said "I feel like I am doing something important".
+### A5. Conclusion
+
+Addressing the five core challenges in K–12 e-learning—social, emotional, learning, distraction, and experiential—through intentional, evidence-based strategies leads to more engaged, resilient, and successful students. By fostering community, supporting emotional growth, differentiating instruction, teaching self-management, and promoting authentic learning, we create digital environments where every learner can thrive.
 
 ```mermaid
 mindmap
-  root((K–12 E-Learning Challenges))
-    Social
-      Communication
-      Checkpoints
-    Emotional
-      Failure Expected
-      Peer Accountable
-    Learning
-      UDL Principles
-      Modalities
-    Distraction
+  root((E-Learning Solutions))
+    1. Social
+      Peer Reviews
+      Community Updates
+    2. Emotional
+      Reflection Prompts
+      Normalizing Frustration
+    3. Learning
+      UDL & Modalities
+      Flexible Scaffolding
+    4. Distraction
       Kanban Boards
-      Showcase Event
-    Experiential
-      Authenticity
-      Relevance
+      Time Management
+    5. Experiential
+      Authentic Projects
+      Public Showcases
 ```
