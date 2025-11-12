@@ -133,19 +133,19 @@ Addressing the five core challenges in K–12 e-learning—social, emotional, le
 ```mermaid
 mindmap
   root((E-Learning Solutions))
-    1. Social
+    Social
       Peer Reviews
       Community Updates
-    2. Emotional
+    Emotional
       Reflection Prompts
       Normalizing Frustration
-    3. Learning
+    Learning
       UDL & Modalities
       Flexible Scaffolding
-    4. Distraction
+    Distraction
       Kanban Boards
       Time Management
-    5. Experiential
+    Experiential
       Authentic Projects
       Public Showcases
 ```
