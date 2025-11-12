@@ -134,16 +134,16 @@ mindmap
   root((K–12 E-Learning Challenges))
     Social
       Communication
-      Feedback
+      Checkpoints
     Emotional
-      Frustration
-      Cyberbullying
+      Failure Expected
+      Peer Accountable
     Learning
       UDL Principles
-      Accessibility
+      Modalities
     Distraction
-      Time Management
-      Self-Regulation
+      Kanban Boards
+      Showcase Event
     Experiential
       Authenticity
       Relevance
