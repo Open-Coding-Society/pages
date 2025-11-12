@@ -1,0 +1,15 @@
+# Jekyll-style configuration for D295 WGU files
+
+# Directory defaults for all D295 files
+defaults:
+  categories: ["WGU"]
+  tags: ["wgu", "d296"]
+  author: "John Mortensen"
+
+# File-specific overrides
+files:
+  Design-for-Whole-Child-WGU-E-learning:
+    title: "D296 Task 1: Designing for the Whole Child"
+    description: "WGU D296 assessment focusing on designing for the Whole Child in K–12 E-Learning"
+    permalink: "/wgu/d296/task1-design-whole-child/"
+  
