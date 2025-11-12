@@ -19,13 +19,15 @@ The following commands are universal for all machine types, terminals, and proje
 
 ### Setup a directory for projects
 
-Change **opencs and open-coding-society/student.git** to match the name of your organization and repo.
+Change the commands below to use your own organization name (not "opencs") and your own repository (not "open-coding-society/student.git").
+
+For example, if your GitHub organization is **jm1021** and your repo is ****student**, use:
 
    ```bash
-   cd # move to your home directory
-   mkdir -p opencs # use your organization, not opencs
-   cd opencs # user your oganization, noot opencs
-   git clone https://github.com/open-coding-society/student.git # clone from your organization, not open-code-society
+   cd                # move to your home directory
+   mkdir -p jm1021   # use your organization name here
+   cd jm1021         # use your organization name here
+   git clone https://github.com/jm1021/student.git   # use your organization/repo here
    ```
 
 ### Prepare project prior to opening VS Code
