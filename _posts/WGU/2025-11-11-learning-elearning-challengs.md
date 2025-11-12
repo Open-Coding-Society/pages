@@ -12,26 +12,8 @@ toc: True
 Designing meaningful online learning experiences requires an understanding of the real challenges that K–12 students face when learning in digital environments.  
 While WGU materials emphasize empathy for the learner, much of my perspective comes from daily experience teaching **Computer Science and Web Development** through both **in-person and online modalities**.
 
-Over the past 7 years of teaching, 1.5 years of online teaching, I have witnessed the differences between:
-
-- **In-class hybrid instruction**, where students collaborate, receive immediate interaction with peers, and build together.
-- **Fully online learning**, where motivation, structure, and emotional engagement must be deliberately designed into the experience, through elements like breakout rooms, and cameo teacher appearences.
-
-Understanding these differences is essential for instructional designers, because *effective digital design is not merely content delivery — it is the architecture of engagement, for social-emotional-learning, and authentic opportunity.*
-
-# Designing for the Whole Child in K–12 E-Learning  
-**Professional Development Reflection**  
-*By [Your Name]*  
-*Western Governors University – Task A*
-
----
-
-## A1. Introduction
-
-Designing meaningful online learning experiences requires an understanding of the real challenges that K–12 students face when learning in digital environments.  
-While WGU materials emphasize empathy for the learner, much of my perspective comes from daily experience teaching **Computer Science and Web Development** through both **in-person and online modalities**.
-
 Over the past 1.5 years of online teaching, I have witnessed the differences between:
+
 - **In-class hybrid instruction**, where students collaborate, receive immediate feedback, and build together.
 - **Fully online learning**, where motivation, structure, and emotional engagement must be deliberately designed into the experience.
 
@@ -114,6 +96,7 @@ Students see their work hosted publicly, connected to professional skills.  Havi
 Contrast:
 WGU emphasizes structure and routine; I emphasize ownership and relevance. Authentic learning transforms routine tasks into personal narratives of capability.
 
+---
 
 ### A3. Teacher Response Table
 
@@ -122,9 +105,8 @@ WGU emphasizes structure and routine; I emphasize ownership and relevance. Authe
 | **A2a. Social** | Provide time for communication and routine feedback. | I prioritize community through structured peer code reviews, GitHub collaboration, and open feedback sessions. Students post daily updates in our Kanban boards and share progress through standups. This mirrors real-world development communication. |
 | **A2b. Emotional** | Integrate opportunities to cultivate emotional intelligence. | Students participate in reflective prompts after sprints to discuss frustrations, breakthroughs, and teamwork dynamics. This builds emotional awareness and self-regulation as part of agile iteration. |
 | **A2c. Learning Challenges** | Apply UDL (Universal Design for Learning) as the foundation for course development. | Each sprint includes multimodal resources—text tutorials, demos, and interactive examples—to meet diverse learner needs. Students can choose to submit evidence of learning through video walkthroughs, GitHub commits, or written reflections. |
-| **A2d. Learning Distractions** | Explicitly teach life skills such as time management and organization. | I use GitHub Projects and milestone planning to teach prioritization. Students learn to break down complex tasks into manageable issues and to maintain focus across competing classes and responsibilities.  Student are encouraged to work in the moment and use classroom time as the largest part of their 5-hour commit to build projects and code. |
+| **A2d. Learning Distractions** | Explicitly teach life skills such as time management and organization. | I use GitHub Projects and milestone planning to teach prioritization. Students learn to break down complex tasks into manageable issues and to maintain focus across competing classes and responsibilities.  Students are encouraged to work in the moment and use classroom time as the largest part of their 5-hour commitment to build projects and code. |
 | **A2e. Experiential** | Design authentic learning and outcomes. | Students develop real-world full-stack projects connected to their interests (e.g., “Night at the Museum,” “Gamify-FinTech, Facial Recognition, Quest based adventure games”). They deploy applications using Flask, GitHub Pages, and Docker—mirroring professional software workflows. |
-
 
 ### A5. Conclusion
 
