@@ -45,7 +45,7 @@ show_reading_time: false
   }; // clones and replaces method
 
 
-  // fetch the API and build the table
+  // fetch the API to obtain jokes data
   fetch(getURL, fetchOptions)
     .then(response => {
       if (response.status !== 200) {
@@ -54,6 +54,7 @@ show_reading_time: false
       }
       response.json().then(data => {
         console.log(data);
+        // format response data into a table
         for (const row of data) {
           // make "tr element" for each "row of data"
           const tr = document.createElement("tr");
@@ -82,6 +83,7 @@ show_reading_time: false
           };
           boohoo.appendChild(boohooBtn);
 
+          // finish row and append to DOM container
           tr.appendChild(joke);
           tr.appendChild(haha);
           tr.appendChild(boohoo);
@@ -93,11 +95,12 @@ show_reading_time: false
       error(err + ": " + getURL);
     });
 
-  // Function to refresh only the haha and boohoo counts every 5 seconds
+  // Function and interval to refresh the haha and boohoo counts every 5 seconds
   function refreshReactions() {
     fetch(getURL, fetchOptions)
       .then(response => response.json())
       .then(data => {
+        // update all reaction data
         for (const row of data) {
           const hahaBtn = document.getElementById(HAHA + row.id);
           if (hahaBtn) hahaBtn.innerHTML = row.haha;
@@ -110,7 +113,6 @@ show_reading_time: false
         console.error('Refresh error:', err);
       });
   }
-
   // Call refreshReactions every 5 seconds
   setInterval(refreshReactions, 5000);
 
