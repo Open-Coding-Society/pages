@@ -44,62 +44,75 @@ show_reading_time: false
     method: 'PUT',
   }; // clones and replaces method
 
-  // fetch the API
-  fetch(getURL,fetchOptions)
-    // response is a RESTful "promise" on any successful fetch
+
+  // fetch the API and build the table
+  fetch(getURL, fetchOptions)
     .then(response => {
-      // check for response errors
       if (response.status !== 200) {
-          error('GET API response failure: ' + response.status);
-          return;
+        error('GET API response failure: ' + response.status);
+        return;
       }
-      // valid response will have JSON data
       response.json().then(data => {
-          console.log(data);
-          for (const row of data) {
-            // make "tr element" for each "row of data"
-            const tr = document.createElement("tr");
+        console.log(data);
+        for (const row of data) {
+          // make "tr element" for each "row of data"
+          const tr = document.createElement("tr");
 
-            // td for joke cell
-            const joke = document.createElement("td");
-              joke.innerHTML = row.id + ". " + row.joke;  // add fetched data to innerHTML
+          // td for joke cell
+          const joke = document.createElement("td");
+          joke.innerHTML = row.id + ". " + row.joke;
 
-            // td for haha cell with onclick actions
-            const haha = document.createElement("td");
-              const haha_but = document.createElement('button');
-              haha_but.id = HAHA+row.id   // establishes a HAHA JS id for cell
-              haha_but.innerHTML = row.haha;  // add fetched "haha count" to innerHTML
-              haha_but.onclick = function () {
-                // onclick function call with "like parameters"
-                reaction(HAHA, likeURL+row.id, haha_but.id);  
-              };
-              haha.appendChild(haha_but);  // add "haha button" to haha cell
+          // td for haha cell with onclick actions
+          const haha = document.createElement("td");
+          const hahaBtn = document.createElement('button');
+          hahaBtn.id = HAHA + row.id;
+          hahaBtn.innerHTML = row.haha;
+          hahaBtn.onclick = function () {
+            reaction(HAHA, likeURL + row.id, hahaBtn.id);
+          };
+          haha.appendChild(hahaBtn);
 
-            // td for boohoo cell with onclick actions
-            const boohoo = document.createElement("td");
-              const boohoo_but = document.createElement('button');
-              boohoo_but.id = BOOHOO+row.id  // establishes a BOOHOO JS id for cell
-              boohoo_but.innerHTML = row.boohoo;  // add fetched "boohoo count" to innerHTML
-              boohoo_but.onclick = function () {
-                // onclick function call with "jeer parameters"
-                reaction(BOOHOO, jeerURL+row.id, boohoo_but.id);  
-              };
-              boohoo.appendChild(boohoo_but);  // add "boohoo button" to boohoo cell
+          // td for boohoo cell with onclick actions
+          const boohoo = document.createElement("td");
+          const boohooBtn = document.createElement('button');
+          boohooBtn.id = BOOHOO + row.id;
+          boohooBtn.innerHTML = row.boohoo;
+          boohooBtn.onclick = function () {
+            reaction(BOOHOO, jeerURL + row.id, boohooBtn.id);
+          };
+          boohoo.appendChild(boohooBtn);
 
-            // this builds ALL td's (cells) into tr (row) element
-            tr.appendChild(joke);
-            tr.appendChild(haha);
-            tr.appendChild(boohoo);
-
-            // this adds all the tr (row) work above to the HTML "result" container
-            resultContainer.appendChild(tr);
-          }
+          tr.appendChild(joke);
+          tr.appendChild(haha);
+          tr.appendChild(boohoo);
+          resultContainer.appendChild(tr);
+        }
       })
-  })
-  // catch fetch errors (ie Nginx ACCESS to server blocked)
-  .catch(err => {
-    error(err + ": " + getURL);
-  });
+    })
+    .catch(err => {
+      error(err + ": " + getURL);
+    });
+
+  // Function to refresh only the haha and boohoo counts every 5 seconds
+  function refreshReactions() {
+    fetch(getURL, fetchOptions)
+      .then(response => response.json())
+      .then(data => {
+        for (const row of data) {
+          const hahaBtn = document.getElementById(HAHA + row.id);
+          if (hahaBtn) hahaBtn.innerHTML = row.haha;
+          const boohooBtn = document.getElementById(BOOHOO + row.id);
+          if (boohooBtn) boohooBtn.innerHTML = row.boohoo;
+        }
+      })
+      .catch(err => {
+        // Optionally handle refresh errors
+        console.error('Refresh error:', err);
+      });
+  }
+
+  // Call refreshReactions every 5 seconds
+  setInterval(refreshReactions, 5000);
 
   // Reaction function to likes or jeers user actions
   function reaction(type, postURL, elemID) {
