@@ -103,16 +103,19 @@ c. **Supporting Tool:**
 a. **Current Alignment:**  
 
 - In-person, students can choose project topics but follow the same technical steps.
-- *Example:* All students build the same basic Flask app, but build or adapt APIs to meet their prototype from Trimester 1 (ie Digital Famine or West Coast Quest frontend).
+- *Example:* All students build the same basic Flask app, but build or adapt APIs to meet their prototype project from Trimester 1 (ie Digital Famine or West Coast Quest frontend).
+- Additionally students are expected to build project according to requirements to meeting College Board performance task.
 
 b. **Improvement for E-Learning:**  
 
 - Allow students to personalize their Flask project (e.g., custom API themes, unique endpoints, or UI tweaks).
-- Allow student to propose new ideas or modification from their Trimester 1 project.  
+- Allow student to propose new ideas or modification from their Trimester 1 project. 
+- Since teams have been regrouped in different classes in Trimester 2, projects will be a mash down, from 20+ person teams to 6 or 12 person teams.  This project will be a reduction of ideas to their personal favorite concepts.  These smaller projects will be delivered to Instructor repo. 
 
 c. **Supporting Tool:**  
 
 - GitHub branching and project templates, allowing students to fork and customize their own version.
+- GitHub PRs (Team) and GitHub Pages blog (CB Requirements) for final submission.
 
 ---
 
