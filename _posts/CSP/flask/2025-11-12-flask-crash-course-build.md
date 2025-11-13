@@ -151,18 +151,22 @@ c. **Supporting Tool:**
 
 The following actionable steps and deliverables will guide your progress through the sprint and ensure alignment with APCSP Create Performance Task requirements:
 
-### 1. Flask Login System
 
-**Focus:** Authentication (cookies, sessions), user profiles, and personalized data.
+### 1. Flask Login System (Foundational)
+
+**Focus:** Understanding and using authentication (cookies, sessions), user identification, and authorization as a foundation for all other deliverables.
+
+**Usage:**
+- Students will use Flask's login-required features to ensure users are identified and authorized before accessing or modifying quest and API/Admin features.
+- The login system is critical for enabling personalized quest experiences and secure data management.
 
 **Tasks:**
-
-- Implement user registration, login, and logout using Flask sessions.
-- Store and retrieve user data (e.g., profile details, quest progress, and achievements).
-- Integrate analytics or “quest prediction” tools into each user record to track engagement or outcomes.
+- Demonstrate and practice user registration, login, and logout using Flask sessions.
+- Apply login-required decorators to protect quest and admin routes.
+- Store and retrieve user data (e.g., profile details, quest progress, and achievements) as part of the quest and admin deliverables.
 
 **Deliverable:**
-A functioning login system connected to your project’s database, enabling individualized experiences.
+A demonstrated understanding and correct usage of authentication and authorization, supporting secure and individualized quest and admin features.
 
 ### 2. Quest Simplification & Experience Design
 
