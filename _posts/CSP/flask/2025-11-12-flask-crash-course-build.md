@@ -10,6 +10,23 @@ permalink: /python/flask/crash-course-build
 
 ### CSP Trimester 2: Full Stack Development — Sprint 4
 
+### Visual Timeline (Gantt)
+
+```mermaid
+gantt
+  title CSP Sprint 4 Timeline
+  dateFormat  YYYY-MM-DD
+  section Milestones
+  Week 1             :active,  wk1, 2025-11-11, 7d
+  Checkpoint #1      :         cp1, 2025-11-18, 1d 
+  Week 2             :         wk2, 2025-11-18, 3d
+  Checkpoint #2      :         cp2, 2025-11-21, 1d 
+  Week 3             :         wk3, 2025-11-21, 14d
+  Checkpoint #3      :         cp3, 2025-12-05, 1d
+  Week #4            :         wk4, 2025-12-05, 7d
+  Final Presentation :         cp4, 2025-12-12, 1d
+```
+
 **Overview:**
 
 This sprint moves beyond the prototype phase of your Moving West Coast Travel or Digital Famine project. You will transition from a front-end demo to a fully functional full-stack application, integrating a live backend using Python Flask.
@@ -211,18 +228,7 @@ Below is a visual timeline of the sprint, including key milestones and deliverab
 | Checkpoint #3            | Fri, Dec 5     | API endpoints, database integration, and admin dashboard prototype           |
 | Sprint Close / Final Pres| Fri, Dec 12    | Full-stack quest system live demo and individual APCSP deliverables          |
 
-### Visual Timeline (Mermaid Gantt)
 
-```mermaid
-gantt
-  title CSP Sprint 4 Timeline
-  dateFormat  YYYY-MM-DD
-  section Milestones
-  Checkpoint #1      :done,    cp1, 2025-11-18, 2d
-  Checkpoint #2      :active,  cp2, 2025-11-21, 5d
-  Checkpoint #3      :         cp3, 2025-12-05, 7d
-  Final Presentation :         cp4, 2025-12-12, 1d
-```
 
 ### Instructor Notes / Guidance
 
