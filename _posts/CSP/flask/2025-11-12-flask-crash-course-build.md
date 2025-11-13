@@ -35,15 +35,19 @@ Computer Science, Grades 10–12
 a. **Current Alignment:**  
 
 - In-person, students practice digital literacy by using command-line tools, GitHub, and VS Code, but communication is mostly verbal or via in-class collaboration.
-- *Example:* Students clone a repo and run Flask locally, but may not document their process or communicate progress online.
+- *Example:* Students clone a repo and run Flask locally, but may not document their process or communicate progress online effectively.
 
 b. **Improvement for E-Learning:**  
 
-- Integrate digital communication by requiring students to document progress in GitHub Issues, use Pull Requests (PRs) for code review, and participate in online discussion microblog.
+- Create a virtual group in Slack for 6 person team in Slack.  Also, create #announcement and #coding channels for daily communication between Instructor and Students.
+- Ensure students participate in Slack by have the students emoji instructional material distribution and perform peer reviews in Slack and commenting on GitHub issues.  
+- For a formal peer review, two students will use Microblog feature to capture review directly on Jupyter Notebook to assess meeting Instructor Checkpoint requirements.
+- Create required personal portfolio blogging requirements to go with formative, knowledge acquistion phases.  This can be done in Jupyter Notebook that contains foundational learning code cells. 
+- Use Pull Requests (PRs) for team integration checkpoint and final review.
 
 c. **Supporting Tool:**  
 
-- GitHub Issues and Pull Requests for asynchronous communication and digital literacy practice.
+- Slack, VSCode, GitHub code, GitHub Issues, Kanban Board, and Pull Requests for asynchronous communication and digital literacy practice.
 
 ---
 
@@ -58,8 +62,10 @@ a. **Current Alignment:**
 
 b. **Improvement for E-Learning:**  
 
-- Use formative checkpoints in the Jupyter notebook, with students submitting screenshots or code snippets for feedback.
-- Schedule regular virtual check-ins or feedback sessions.
+- Use formative checkpoints in the Jupyter Notebook, with students submitting screenshots and/or code snippets for feedback.
+- Schedule regular virtual check-ins or feedback sessions.  
+- These sessions would best be done in synchronous 3-person groups where there is a community of Instructor and students with their peer reviewers.  
+- Assessments could be done with Scrum master (representative of 3 to 6) and Instructor in Office Hours format (scheduled) if alignment of Students and Instructor is not virtually possibile.  
 
 c. **Supporting Tool:**  
 
@@ -74,15 +80,19 @@ c. **Supporting Tool:**
 a. **Current Alignment:**  
 
 - In-person, students reflect verbally or in journals, but not always consistently.
-- *Example:* End-of-lesson reflections or group discussions/checkpoints.
+- *Example:* End-of-lesson reflections or group discussions/checkpoints where verbal communication assist instructor to see if standards are being achieved.
 
 b. **Improvement for E-Learning:**  
 
-- Add self-check quizzes, reflection prompts, and peer review tasks in the notebook and on GitHub.
+- Add self-check lists, reflection prompts, and peer review tasks in a Jupyter Notebook and on GitHub.  Have milestones that meet expectations of progressive learning.
+- Break down project into a Sprint and Four checkpoints.  Progressing toward Fronte End (FE) to Back End (BE) quest addition to Digital Famine or West Coast Travel.
+  - Knowledge acquistion (formative).  Weeks 1 and 2, mostly journal and proof of understand of Demos and provided materials.  Individual: Code commits and Issue.
+  - Ideation and Integration (formative).  Week 3, showing application of Full-Stack in former Front End (FE) prototype project.  This will show main idea of project and Full Stack (FE) to Back End (BE).  Team: Code commits, Individual PRs to Team Repo, and Issue(s).
+  - Working prototype. Week 4, showing working prototype that meeting college board requirements for individual performance taks.  Team and Individual:  Individual Blog on Requirements, Team PR to Instructur Repo.
 
 c. **Supporting Tool:**  
 
-- Embedded Microblog Forms or Jupyter notebook markdown cells for reflection and self-assessment.
+- Embedded Microblog Forms or Jupyter Notebook markdown cells for reflection and self-assessment.
 
 ---
 
@@ -93,11 +103,12 @@ c. **Supporting Tool:**
 a. **Current Alignment:**  
 
 - In-person, students can choose project topics but follow the same technical steps.
-- *Example:* All students build the same basic Flask app, but build or adapt APIs to meet their prototype Digital Famine or West Coast Quest frontend.
+- *Example:* All students build the same basic Flask app, but build or adapt APIs to meet their prototype from Trimester 1 (ie Digital Famine or West Coast Quest frontend).
 
 b. **Improvement for E-Learning:**  
 
 - Allow students to personalize their Flask project (e.g., custom API themes, unique endpoints, or UI tweaks).
+- Allow student to propose new ideas or modification from their Trimester 1 project.  
 
 c. **Supporting Tool:**  
 
@@ -115,7 +126,7 @@ a. **Current Alignment:**
 
 b. **Improvement for E-Learning:**  
 
-- Ensure all instructions, code, and resources are available in accessible formats (e.g., alt text for images, captions for videos, readable markdown).
+- Ensure all instructions, code, and resources are available in accessible formats (e.g., alt text for images, captions for videos, readable markdown, ability to customize colors/contrast, and providing screen reader compatibility).
 
 c. **Supporting Tool:**  
 
