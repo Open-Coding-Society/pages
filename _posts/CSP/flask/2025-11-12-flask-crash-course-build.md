@@ -125,7 +125,8 @@ By the end of this sprint, each student should be able to:
 
 ## B. Standards-Based Evaluation & Improvements
 
-### 1. Standard B: Content, Indicator B3
+### 1. Standard B: Content, Indicator B3  
+*Source: [NSQOL Standards](https://nsqol.org/the-standards/quality-online-courses/)*
 
 **Digital literacy and communication skills are incorporated and taught as an integral part of the curriculum.**
 
@@ -147,7 +148,8 @@ c. **Supporting Tool:**
 
 ---
 
-### 2. Standard C: Instructional Design, Indicator C8
+### 2. Standard C: Instructional Design, Indicator C8  
+*Source: [NSQOL Standards](https://nsqol.org/the-standards/quality-online-courses/)*
 
 **The course design provides opportunities for learner-instructor interaction, including opportunities for regular feedback about learner progress.**
 
@@ -169,7 +171,8 @@ c. **Supporting Tool:**
 
 ---
 
-### 3. Standard D: Learner Assessment, Indicator D3
+### 3. Standard D: Learner Assessment, Indicator D3  
+*Source: [NSQOL Standards](https://nsqol.org/the-standards/quality-online-courses/)*
 
 **Assessment practices provide frequent and varied opportunities for self-monitoring and reflection of learning.**
 
@@ -191,7 +194,8 @@ c. **Supporting Tool:**
 
 ---
 
-### 4. Standard F: Course Technology, Indicator F3
+### 4. Standard F: Course Technology, Indicator F3  
+*Source: [NSQOL Standards](https://nsqol.org/the-standards/quality-online-courses/)*
 
 **The course technology allows for customization and personalization.**
 
@@ -214,7 +218,8 @@ c. **Supporting Tool:**
 
 ---
 
-### 5. Additional Standard (e.g., Standard E: Accessibility, Indicator E2)
+### 5. Additional Standard (e.g., Standard E: Accessibility, Indicator E2)  
+*Source: [NSQOL Standards](https://nsqol.org/the-standards/quality-online-courses/)*
 
 **The course provides alternative means of access to course materials.**
 
