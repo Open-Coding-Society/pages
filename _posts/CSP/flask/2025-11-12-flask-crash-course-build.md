@@ -146,7 +146,55 @@ c. **Supporting Tool:**
 
 ---
 
-## C. Next Steps
+
+## C. Next Steps & Major Deliverables
+
+The following actionable steps and deliverables will guide your progress through the sprint and ensure alignment with APCSP Create Performance Task requirements:
+
+### 1. Flask Login System
+
+**Focus:** Authentication (cookies, sessions), user profiles, and personalized data.
+
+**Tasks:**
+
+- Implement user registration, login, and logout using Flask sessions.
+- Store and retrieve user data (e.g., profile details, quest progress, and achievements).
+- Integrate analytics or “quest prediction” tools into each user record to track engagement or outcomes.
+
+**Deliverable:**
+A functioning login system connected to your project’s database, enabling individualized experiences.
+
+### 2. Quest Simplification & Experience Design
+
+**Focus:** Refine your quest flow and enhance usability and motivation.
+
+**Tasks:**
+
+- Simplify or redesign your existing quest structure, reducing 20+ steps into 6–8 meaningful stages.
+- Apply your best UI/UX ideas to improve clarity and engagement.
+- Convert static lessons or activities into interactive challenges — such as code races, timed events, or live competitions.
+- Record user performance and outcomes into your database for analytics or leaderboard features.
+
+**Deliverable:**
+An interactive, engaging, and data-driven quest experience that demonstrates thoughtful design and backend integration.
+
+### 3. API / Database Design & Admin Interface
+
+**Focus:** Data modeling, CRUD operations, and administrative management tools.
+
+**Tasks:**
+
+- Design a database schema for storing quests, user progress, and results.
+- Build Flask routes and API endpoints for data access and updates.
+- Create an Admin Dashboard (using Python/Jinja) to view and manage users, quests, and progress.
+- Ensure data integrity and security across all operations.
+
+**Deliverable:**
+A fully operational backend with a simple yet functional admin UI for managing application data.
+
+---
+
+Other steps:
 
 - Build out each lesson step in the notebook, with formative tasks and checkpoints.
 - Use infographics and visual guides to scaffold learning.
