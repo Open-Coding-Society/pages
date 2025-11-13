@@ -6,18 +6,27 @@ categories: [Python Flask]
 permalink: /python/flask/crash-course-build
 ---
 
+
 ## A. Unit Description
 
-**1. Topic of the Unit:**  
-Crash Course on Building a Flask Web Server (with progressive, interactive steps)
+### CSP Trimester 2: Full Stack Development — Sprint 4
 
-**2. Purpose of the Unit**  
-To introduce students to backend web development using Flask, guiding them from basic server setup to a full-stack application with persistent storage, user authentication, and interactive frontend features.
+**Overview:**
 
-**3. Subject and Grade:**  
+This sprint moves beyond the prototype phase of your Moving West Coast Travel or Digital Famine project. You will transition from a front-end demo to a fully functional full-stack application, integrating a live backend using Python Flask.
+
+The goal is to demonstrate your ability to design, develop, and deploy a web application that includes:
+
+- Persistent data management
+- User interaction and authentication
+- Dynamic content and performance tracking
+
+These components will fulfill your APCSP Create Performance Task requirements, including code, video, and written reflection.
+
+**Subject and Grade:**  
 Computer Science, Grades 10–12
 
-**4. Overview of In-Person Delivery:**  
+**Delivery Model:**
 
 - Teacher-led demonstrations of Flask server setup and coding
 - Students follow along on their own devices, building each component step-by-step
