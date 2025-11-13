@@ -10,23 +10,6 @@ permalink: /python/flask/crash-course-build
 
 ### CSP Trimester 2: Full Stack Development — Sprint 4
 
-### Visual Timeline (Gantt)
-
-```mermaid
-gantt
-  title CSP Sprint 4 Timeline
-  dateFormat  YYYY-MM-DD
-  section Milestones
-  Week 1             :active,  wk1, 2025-11-11, 7d
-  Checkpoint #1      :         cp1, 2025-11-18, 1d 
-  Week 2             :         wk2, 2025-11-18, 3d
-  Checkpoint #2      :         cp2, 2025-11-21, 1d 
-  Week 3             :         wk3, 2025-11-21, 14d
-  Checkpoint #3      :         cp3, 2025-12-05, 1d
-  Week #4            :         wk4, 2025-12-05, 7d
-  Final Presentation :         cp4, 2025-12-12, 1d
-```
-
 **Overview:**
 
 This sprint moves beyond the prototype phase of your Moving West Coast Travel or Digital Famine project. You will transition from a front-end demo to a fully functional full-stack application, integrating a live backend using Python Flask.
@@ -48,6 +31,95 @@ Computer Science, Grades 10–12
 - Students follow along on their own devices, building each component step-by-step
 - Peer collaboration and live troubleshooting occurs during demonstration
 - Formative checkpoints and group discussions after each major milestone
+
+#### Visual Timeline (Gantt)
+
+```mermaid
+gantt
+  title CSP Sprint 4 Timeline
+  dateFormat  YYYY-MM-DD
+  section Milestones
+  Week 1             :active,  wk1, 2025-11-11, 7d
+  Checkpoint #1      :         cp1, 2025-11-18, 1d 
+  Week 2             :         wk2, 2025-11-18, 3d
+  Checkpoint #2      :         cp2, 2025-11-21, 1d 
+  Week 3             :         wk3, 2025-11-21, 14d
+  Checkpoint #3      :         cp3, 2025-12-05, 1d
+  Week #4            :         wk4, 2025-12-05, 7d
+  Final Presentation :         cp4, 2025-12-12, 1d
+```
+
+#### Visual Timeline (Table)
+
+| Milestone                | Date           | Description                                                                 |
+|--------------------------|----------------|-----------------------------------------------------------------------------|
+| Checkpoint #1            | Tue, Nov 18    | Backend setup, login prototype, and team plan for quest/API simplification   |
+| Checkpoint #2            | Fri, Nov 21    | Quest redesign: interactive features, UI/UX improvements, and user tracking  |
+| Checkpoint #3            | Fri, Dec 5     | API endpoints, database integration, and admin dashboard prototype           |
+| Sprint Close / Final Pres| Fri, Dec 12    | Full-stack quest system live demo and individual APCSP deliverables          |
+
+---
+
+### Major Deliverables
+
+The following systems and deliverables will guide your progress through the sprint and ensure alignment with APCSP Create Performance Task requirements:
+
+#### 1. Flask Login System (Foundational)
+
+**Focus:** Understanding and using authentication (cookies, sessions), user identification, and authorization as a foundation for all other deliverables.
+
+**Usage:**
+
+- Students will use Flask's login-required features to ensure users are identified and authorized before accessing or modifying quest and API/Admin features.
+- The login system is critical for enabling personalized quest experiences and secure data management.
+
+**Tasks:**
+
+- Demonstrate and practice user registration, login, and logout using Flask sessions.
+- Apply login-required decorators to protect quest and admin routes.
+- Store and retrieve user data (e.g., profile details, quest progress, and achievements) as part of the quest and admin deliverables.
+
+**Deliverable:**
+A demonstrated understanding and correct usage of authentication and authorization, supporting secure and individualized quest and admin features.
+
+#### 2. Quest Simplification & Experience Design
+
+**Focus:** Refine your quest flow and enhance usability and motivation.
+
+**Tasks:**
+
+- Simplify or redesign your existing quest structure, reducing 20+ steps into 6–8 meaningful stages for your team.
+- Apply your best UI/UX ideas to improve clarity and engagement of user/learner.
+- Convert static lessons or activities into interactive challenges — such as code races, timed events, or live competitions.
+- Record user performance and outcomes into your database for analytics or leaderboard features.
+
+**Deliverable:**
+An interactive, engaging, and data-driven quest experience that demonstrates thoughtful design and backend integration.
+
+#### 3. API / Database Design & Admin Interface
+
+**Focus:** Data modeling, CRUD operations, and administrative management tools.
+
+**Tasks:**
+
+- Design a database schema for storing quests, user progress, and results.
+- Build Flask routes and API endpoints for data access and updates.
+- Create an Admin Dashboard (using Python/Jinja) to view and manage users, quests, and progress.
+- Ensure data integrity and security across all operations.
+
+**Deliverable:**
+A fully operational backend with a simple yet functional admin UI for managing application data.
+
+---
+
+#### Instructor Requirements / Guidance
+
+By the end of this sprint, each student should be able to:
+
+- Explain their individual contribution and its impact on the full system.
+- Show how that individual contribution meets College Board requirements.
+- Demonstrate understanding of how frontend and backend communicate.
+- Prepare to record a 1-minute silent video showing their individual contribution, user features, and data management.
 
 ---
 
@@ -163,78 +235,6 @@ c. **Supporting Tool:**
 
 ---
 
-## C. Next Steps & Major Deliverables
+## C. Sources
 
-The following actionable steps and deliverables will guide your progress through the sprint and ensure alignment with APCSP Create Performance Task requirements:
-
-### 1. Flask Login System (Foundational)
-
-**Focus:** Understanding and using authentication (cookies, sessions), user identification, and authorization as a foundation for all other deliverables.
-
-**Usage:**
-
-- Students will use Flask's login-required features to ensure users are identified and authorized before accessing or modifying quest and API/Admin features.
-- The login system is critical for enabling personalized quest experiences and secure data management.
-
-**Tasks:**
-
-- Demonstrate and practice user registration, login, and logout using Flask sessions.
-- Apply login-required decorators to protect quest and admin routes.
-- Store and retrieve user data (e.g., profile details, quest progress, and achievements) as part of the quest and admin deliverables.
-
-**Deliverable:**
-A demonstrated understanding and correct usage of authentication and authorization, supporting secure and individualized quest and admin features.
-
-### 2. Quest Simplification & Experience Design
-
-**Focus:** Refine your quest flow and enhance usability and motivation.
-
-**Tasks:**
-
-- Simplify or redesign your existing quest structure, reducing 20+ steps into 6–8 meaningful stages for your team.
-- Apply your best UI/UX ideas to improve clarity and engagement of user/learner.
-- Convert static lessons or activities into interactive challenges — such as code races, timed events, or live competitions.
-- Record user performance and outcomes into your database for analytics or leaderboard features.
-
-**Deliverable:**
-An interactive, engaging, and data-driven quest experience that demonstrates thoughtful design and backend integration.
-
-### 3. API / Database Design & Admin Interface
-
-**Focus:** Data modeling, CRUD operations, and administrative management tools.
-
-**Tasks:**
-
-- Design a database schema for storing quests, user progress, and results.
-- Build Flask routes and API endpoints for data access and updates.
-- Create an Admin Dashboard (using Python/Jinja) to view and manage users, quests, and progress.
-- Ensure data integrity and security across all operations.
-
-**Deliverable:**
-A fully operational backend with a simple yet functional admin UI for managing application data.
-
----
-
-## D. Timeline & Checkpoints
-
-Below is a visual timeline of the sprint, including key milestones and deliverables:
-
-### Timeline Table
-
-| Milestone                | Date           | Description                                                                 |
-|--------------------------|----------------|-----------------------------------------------------------------------------|
-| Checkpoint #1            | Tue, Nov 18    | Backend setup, login prototype, and team plan for quest/API simplification   |
-| Checkpoint #2            | Fri, Nov 21    | Quest redesign: interactive features, UI/UX improvements, and user tracking  |
-| Checkpoint #3            | Fri, Dec 5     | API endpoints, database integration, and admin dashboard prototype           |
-| Sprint Close / Final Pres| Fri, Dec 12    | Full-stack quest system live demo and individual APCSP deliverables          |
-
-
-
-### Instructor Notes / Guidance
-
-By the end of this sprint, each student should be able to:
-
-- Explain their individual contribution and its impact on the full system.
-- Show how that individual contribution meets College Board requirements.
-- Demonstrate understanding of how frontend and backend communicate.
-- Prepare to record a 1-minute silent video showing their individual contribution, user features, and data management.
+- National Standards for Quality Online Courses. [NSQOL Standards](https://nsqol.org/the-standards/quality-online-courses/)
