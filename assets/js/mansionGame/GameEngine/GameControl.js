@@ -1,5 +1,6 @@
 // GameControl.js with improved level transition handling
 import GameLevel from "./GameLevel.js";
+import PauseMenu from "../ui/PauseMenu.js";
 
 class GameControl {
     /**
@@ -19,6 +20,7 @@ class GameControl {
         this.gameLoopCounter = 0;
         this.isPaused = false;
         this.exitKeyListener = this.handleExitKey.bind(this);
+        this.pauseKeyListener = this.handlePauseKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
         
@@ -31,6 +33,14 @@ class GameControl {
     
     start() {
         this.addExitKeyListener();
+        // Add listener for opening the pause menu (toggle with 'p')
+        document.addEventListener('keydown', this.pauseKeyListener);
+        // Create a pause menu instance (attached to the game container)
+        try {
+            this.pauseMenu = new PauseMenu(this);
+        } catch (e) {
+            console.warn('PauseMenu could not be initialized:', e);
+        }
         this.transitionToLevel();
     }
 
@@ -197,6 +207,56 @@ class GameControl {
         if (event.key === 'Escape') {
             this.currentLevel.continue = false;
         }
+    }
+
+    /**
+     * Handle pause-key to toggle pause menu (default: 'p')
+     */
+    handlePauseKey(event) {
+        // Don't interfere with typing in inputs
+        const tag = event.target && event.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
+
+        if (event.key === 'p' || event.key === 'P') {
+            if (this.isPaused) {
+                this.hidePauseMenu();
+            } else {
+                this.showPauseMenu();
+            }
+        }
+    }
+
+    showPauseMenu() {
+        // Pause the game loop and show the UI
+        this.pause();
+        if (this.pauseMenu && typeof this.pauseMenu.show === 'function') {
+            this.pauseMenu.show();
+        }
+    }
+
+    hidePauseMenu() {
+        if (this.pauseMenu && typeof this.pauseMenu.hide === 'function') {
+            this.pauseMenu.hide();
+        }
+        this.resume();
+    }
+
+    /**
+     * Restart the current level by destroying and transitioning to it again
+     */
+    restartLevel() {
+        if (this.currentLevel) {
+            try {
+                this.currentLevel.destroy();
+            } catch (e) {
+                console.error('Error destroying level during restart:', e);
+            }
+        }
+        // ensure interaction handlers cleaned
+        this.cleanupInteractionHandlers();
+        // Recreate the same level
+        this.currentLevel = null;
+        this.transitionToLevel();
     }
     
     // Helper method to add exit key listener
