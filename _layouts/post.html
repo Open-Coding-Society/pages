@@ -44,10 +44,10 @@ Check if this is a CSP course post with week 0-36
 
     .lesson-player {
       display: flex;
-      height: 100vh;
+      height: calc(100vh - 80px);
       width: 100vw;
       position: fixed;
-      top: 0;
+      top: 80px;
       left: 0;
       z-index: 1000;
     }
@@ -526,9 +526,9 @@ Check if this is a CSP course post with week 0-36
       <!-- Top Bar -->
       <div class="lesson-topbar">
         <div class="topbar-actions">
-          <a href="{{ site.baseurl }}/csp" class="back-btn">
+          <a href="{{ site.baseurl }}/navigation/section/csp" class="back-btn">
             <i class="fas fa-arrow-left"></i>
-            Back to Curriculum
+            Back to Timeline View
           </a>
           <div class="breadcrumbs">
             <i class="fas fa-home"></i>
