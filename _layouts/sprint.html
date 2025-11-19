@@ -381,12 +381,12 @@ layout: post
                   {% assign parts = entry | split: "||" %}
                   {% assign isAssignment = parts[2] == "assignment" %}
                   
-                  <div class="item-card" data-type="{{ isAssignment | default: false | string | replace: 'true', 'assignment' | replace: 'false', 'lesson' }}" data-item-id="{{ parts[1] }}">
+                  <div class="item-card" data-type="{{ isAssignment | default: false | string | replace: 'true', 'assignment' | replace: 'false', 'lesson' }}" data-item-id="{{ parts[1] | slugify }}">
                     <div class="item-content">
                       <button class="completion-toggle">
                         <i class="fas fa-circle status-icon incomplete"></i>
                       </button>
-                      <a href="{{ site.baseurl }}{{ parts[1] }}" class="item-link">
+                        <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
                         {% if isAssignment %}
                           <i class="fas fa-file-alt type-icon assignment"></i>
                         {% else %}
@@ -422,8 +422,9 @@ layout: post
 </div>
 
 <script>
-  // Completion tracking (shared with post.html)
-  const STORAGE_KEY = 'csp-lesson-completion';
+  // Completion tracking (course-specific)
+  const CURRENT_COURSE = '{{ page.course }}';
+  const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
   
   // Load completion data from localStorage
   function loadCompletionData() {
@@ -585,11 +586,6 @@ layout: post
       bar.style.width = `${progress}%`;
     });
   }
-  
-  // Sync completion data when window gains focus (when switching between views)
-  window.addEventListener('focus', function() {
-    initializeCompletion();
-  });
   
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {

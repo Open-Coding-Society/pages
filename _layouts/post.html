@@ -3,17 +3,30 @@ layout: opencs
 ---
 
 {% comment %}
-Check if this is a CSP course post with week 0-36
+Check if this is a course lesson and determine which course context to use
 {% endcomment %}
-{% assign is_csp_lesson = false %}
+{% assign is_course_lesson = false %}
+{% assign current_course = null %}
+{% assign current_week = null %}
+
+{% comment %}Default to first available course, will be overridden by JavaScript{% endcomment %}
+{% comment %}Set default course and will be updated by JavaScript{% endcomment %}
 {% if page.courses.csp %}
-  {% assign csp_week = page.courses.csp.week | plus: 0 %}
-  {% if csp_week >= 0 and csp_week <= 36 %}
-    {% assign is_csp_lesson = true %}
-  {% endif %}
+  {% assign current_course = 'csp' %}
+  {% assign current_week = page.courses.csp.week | plus: 0 %}
+{% elsif page.courses.csa %}
+  {% assign current_course = 'csa' %}
+  {% assign current_week = page.courses.csa.week | plus: 0 %}
+{% elsif page.courses.csse %}
+  {% assign current_course = 'csse' %}
+  {% assign current_week = page.courses.csse.week | plus: 0 %}
 {% endif %}
 
-{% if is_csp_lesson %}
+{% if current_course != null and current_week != null %}
+  {% assign is_course_lesson = true %}
+{% endif %}
+
+{% if is_course_lesson %}
   {% comment %}
   === TWO-PANE LESSON PLAYER FOR CSP COURSES ===
   {% endcomment %}
@@ -102,6 +115,35 @@ Check if this is a CSP course post with week 0-36
       height: 100%;
       background: #60a5fa;
       transition: width 0.3s ease;
+    }
+
+    /* Course Selector */
+    .course-selector {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #222222;
+    }
+
+    .course-selector label {
+      display: block;
+      color: #cccccc;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .course-selector select {
+      width: 100%;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 4px;
+      color: #e0e0e0;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .course-selector select:focus {
+      outline: none;
+      border-color: #60a5fa;
     }
 
     /* Sprint Navigation */
@@ -468,8 +510,37 @@ Check if this is a CSP course post with week 0-36
     <!-- LEFT SIDEBAR -->
     <div class="lesson-sidebar">
       <div class="sidebar-header">
-        <h2>Computer Science Principles</h2>
+        {% if current_course == 'csp' %}
+          <h2>Computer Science Principles</h2>
+        {% elsif current_course == 'csa' %}
+          <h2>Computer Science A</h2>
+        {% elsif current_course == 'csse' %}
+          <h2>Computer Science & Software Engineering</h2>
+        {% endif %}
         <p>Del Norte High School</p>
+        
+        {% comment %}Course selector for multi-course lessons{% endcomment %}
+        {% assign course_count = 0 %}
+        {% if page.courses.csp %}{% assign course_count = course_count | plus: 1 %}{% endif %}
+        {% if page.courses.csa %}{% assign course_count = course_count | plus: 1 %}{% endif %}
+        {% if page.courses.csse %}{% assign course_count = course_count | plus: 1 %}{% endif %}
+        
+        {% if course_count > 1 %}
+          <div class="course-selector">
+            <label for="course-select">Switch Course View:</label>
+            <select id="course-select" onchange="switchCourse()">
+              {% if page.courses.csp %}
+                <option value="csp" {% if current_course == 'csp' %}selected{% endif %}>Computer Science Principles</option>
+              {% endif %}
+              {% if page.courses.csa %}
+                <option value="csa" {% if current_course == 'csa' %}selected{% endif %}>Computer Science A</option>
+              {% endif %}
+              {% if page.courses.csse %}
+                <option value="csse" {% if current_course == 'csse' %}selected{% endif %}>CS & Software Engineering</option>
+              {% endif %}
+            </select>
+          </div>
+        {% endif %}
         
         <div class="course-progress-section">
           <div class="progress-label">
@@ -483,10 +554,10 @@ Check if this is a CSP course post with week 0-36
       </div>
 
       <div class="sprint-nav">
-        {% assign cspCourse = site.data.csp %}
+        {% assign courseData = site.data[current_course] %}
         {% for i in (1..9) %}
           {% assign sprintKey = "Sprint" | append: i %}
-          {% assign sprint = cspCourse[sprintKey] %}
+          {% assign sprint = courseData[sprintKey] %}
           
           {% if sprint %}
             <div class="sprint-section">
@@ -501,8 +572,8 @@ Check if this is a CSP course post with week 0-36
               <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
                 {% for week in (sprint.start..sprint.end) %}
                   {% for post in posts %}
-                    {% if post.courses.csp %}
-                      {% assign postWeek = post.courses.csp.week | plus: 0 %}
+                    {% if post.courses[current_course] %}
+                      {% assign postWeek = post.courses[current_course].week | plus: 0 %}
                       {% if postWeek == week %}
                         <a href="{{ site.baseurl }}{{ post.url }}" 
                            class="lesson-item {% if page.url == post.url %}active{% endif %}"
@@ -526,14 +597,14 @@ Check if this is a CSP course post with week 0-36
       <!-- Top Bar -->
       <div class="lesson-topbar">
         <div class="topbar-actions">
-          <a href="{{ site.baseurl }}/navigation/section/csp" class="back-btn">
+          <a href="{{ site.baseurl }}/navigation/section/{{ current_course }}" class="back-btn">
             <i class="fas fa-arrow-left"></i>
             Back to Timeline View
           </a>
           <div class="breadcrumbs">
             <i class="fas fa-home"></i>
             <i class="fas fa-chevron-right"></i>
-            <span>Week {{ page.courses.csp.week }}</span>
+            <span>Week {{ current_week }}</span>
             <i class="fas fa-chevron-right"></i>
             <span class="current">{{ page.title }}</span>
           </div>
@@ -551,7 +622,7 @@ Check if this is a CSP course post with week 0-36
             <div class="lesson-meta">
               <span><i class="fas fa-clock"></i> {% include reading_time.html %}</span>
               <span>•</span>
-              <span>Week {{ page.courses.csp.week }}</span>
+              <span>Week {{ current_week }}</span>
               {% if page.assignment %}
                 <span>•</span>
                 <span><i class="fas fa-file-alt"></i> Assignment</span>
@@ -598,7 +669,13 @@ Check if this is a CSP course post with week 0-36
   </div>
 
   <script>
-    const STORAGE_KEY = 'csp-lesson-completion';
+    // Simple course detection from URL parameter or default
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCourse = urlParams.get('course');
+    let CURRENT_COURSE = urlCourse || '{{ current_course }}';
+    let currentWeek = {{ current_week }};
+    
+    const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
     const currentUrl = window.location.pathname;
     const currentLessonId = currentUrl;
 
@@ -710,6 +787,38 @@ Check if this is a CSP course post with week 0-36
       } else {
         alert('You\'ve reached the last lesson!');
       }
+    }
+
+    // Update course-dependent UI elements
+    function updateCourseUI() {
+      const courseNames = {
+        'csp': 'Computer Science Principles',
+        'csa': 'Computer Science A', 
+        'csse': 'Computer Science & Software Engineering'
+      };
+      
+      // Update header title
+      const headerTitle = document.querySelector('.sidebar-header h2');
+      if (headerTitle && courseNames[CURRENT_COURSE]) {
+        headerTitle.textContent = courseNames[CURRENT_COURSE];
+      }
+      
+      // Update course selector
+      const courseSelect = document.getElementById('course-select');
+      if (courseSelect) {
+        courseSelect.value = CURRENT_COURSE;
+      }
+    }
+    
+    // Switch course context
+    function switchCourse() {
+      const select = document.getElementById('course-select');
+      const newCourse = select.value;
+      
+      // Update URL with course parameter
+      const url = new URL(window.location);
+      url.searchParams.set('course', newCourse);
+      window.location.href = url.toString();
     }
 
 
