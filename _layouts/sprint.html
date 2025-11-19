@@ -167,9 +167,6 @@ layout: post
   }
 
   .item-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
     padding: 12px;
     background: #151515;
     border: 1px solid #2a2a2a;
@@ -181,6 +178,13 @@ layout: post
     background: #1a1a1a;
   }
 
+  .item-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
   .completion-toggle {
     background: none;
     border: none;
@@ -188,20 +192,27 @@ layout: post
     margin: 0;
     cursor: pointer;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
   }
 
-  .item-card a {
+  .item-link {
     display: flex;
     align-items: center;
     gap: 12px;
     text-decoration: none;
     flex: 1;
+    min-width: 0;
   }
 
   .status-icon {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
   }
 
   .status-icon.completed {
@@ -319,11 +330,17 @@ layout: post
       {% assign totalItems = 0 %}
       {% assign completedItems = 0 %}
       
-      {% for post in posts %}
+                    {% for post in posts %}
         {% if post.courses[page.course] %}
           {% assign week = post.courses[page.course].week | plus: 0 %}
           {% if week == index %}
-            {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: post.type %}
+            {% comment %} Check if assignment field exists, default to lesson if not {% endcomment %}
+            {% if post.assignment == true %}
+              {% assign itemType = "assignment" %}
+            {% else %}
+              {% assign itemType = "lesson" %}
+            {% endif %}
+            {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
             {% assign entries = entries | push: entry %}
             {% assign totalItems = totalItems | plus: 1 %}
           {% endif %}
@@ -355,7 +372,7 @@ layout: post
                 {% else %}
                   {% assign progress = 0 %}
                 {% endif %}
-                <div class="progress-bar-fill" style="width: {{ progress }}%;"></div>
+                <div class="progress-bar-fill" style="width: {{ progress }}%"></div>
               </div>
 
               <div class="items-grid">
@@ -364,19 +381,19 @@ layout: post
                   {% assign isAssignment = parts[2] == "assignment" %}
                   
                   <div class="item-card" data-type="{% if isAssignment %}assignment{% else %}lesson{% endif %}" data-item-id="{{ parts[1] | slugify }}">
-                    <button class="completion-toggle">
-                      <i class="fas fa-circle status-icon incomplete"></i>
-                    </button>
-                    
-                    <a href="{{ site.baseurl }}{{ parts[1] }}">
-                      {% if isAssignment %}
-                        <i class="fas fa-file-alt type-icon assignment"></i>
-                      {% else %}
-                        <i class="fas fa-code type-icon lesson"></i>
-                      {% endif %}
-                      
-                      <span class="item-title">{{ parts[0] }}</span>
-                    </a>
+                    <div class="item-content">
+                      <button class="completion-toggle">
+                        <i class="fas fa-circle status-icon incomplete"></i>
+                      </button>
+                      <a href="{{ site.baseurl }}{{ parts[1] }}" class="item-link">
+                        {% if isAssignment %}
+                          <i class="fas fa-file-alt type-icon assignment"></i>
+                        {% else %}
+                          <i class="fas fa-code type-icon lesson"></i>
+                        {% endif %}
+                        <span class="item-title">{{ parts[0] }}</span>
+                      </a>
+                    </div>
                   </div>
                 {% endfor %}
               </div>
@@ -427,9 +444,8 @@ layout: post
     }
   }
   
-  // Toggle completion status - Global function
-  window.toggleCompletion = function(button) {
-    console.log('Toggle completion called', button);
+  // Toggle completion status
+  function toggleCompletion(button) {
     try {
       const itemCard = button.closest('.item-card');
       if (!itemCard) {
@@ -438,11 +454,8 @@ layout: post
       }
       
       const itemId = itemCard.dataset.itemId;
-      console.log('Item ID:', itemId);
-      
       const completionData = loadCompletionData();
       const isCompleted = completionData[itemId] || false;
-      console.log('Current completion status:', isCompleted);
       
       // Toggle status
       completionData[itemId] = !isCompleted;
@@ -451,8 +464,6 @@ layout: post
       // Update UI
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
-      
-      console.log('Toggled to:', !isCompleted);
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
     }
@@ -494,21 +505,21 @@ layout: post
       const progress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
       
       // Update badge
-      completionBadge.textContent = `${completedItems}/${totalItems} Complete`;
+      if (completionBadge) {
+        completionBadge.textContent = `${completedItems}/${totalItems} Complete`;
+      }
       
       // Update progress bar
-      progressFill.style.width = `${progress}%`;
+      if (progressFill) {
+        progressFill.style.width = `${progress}%`;
+      }
     });
   }
   
   // Initialize completion states on page load
   function initializeCompletion() {
-    console.log('Initializing completion system...');
-    
     const completionData = loadCompletionData();
     const itemCards = document.querySelectorAll('.item-card');
-    
-    console.log('Found', itemCards.length, 'item cards');
     
     itemCards.forEach(card => {
       const itemId = card.dataset.itemId;
@@ -521,18 +532,38 @@ layout: post
         toggleButton.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          window.toggleCompletion(this);
+          toggleCompletion(this);
         });
       }
     });
     
     updateProgressBars();
-    console.log('Completion system initialized');
   }
   
   // Filter functionality
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const itemCards = document.querySelectorAll('.item-card');
+  
+  function applyFilters() {
+    const itemCards = document.querySelectorAll('.item-card');
+    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    
+    itemCards.forEach(card => {
+      const type = card.dataset.type;
+      const isCompleted = card.classList.contains('completed');
+      
+      if (activeFilter === 'all') {
+        card.style.display = 'block';
+      } else if (activeFilter === 'lessons' && type === 'lesson') {
+        card.style.display = 'block';
+      } else if (activeFilter === 'assignments' && type === 'assignment') {
+        card.style.display = 'block';
+      } else if (activeFilter === 'incomplete' && !isCompleted) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
   
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -540,28 +571,14 @@ layout: post
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
-      const filter = btn.dataset.filter;
-      
-      // Show/hide items based on filter
-      itemCards.forEach(card => {
-        const type = card.dataset.type;
-        const isCompleted = card.classList.contains('completed');
-        
-        if (filter === 'all') {
-          card.style.display = 'block';
-        } else if (filter === 'lessons' && type === 'lesson') {
-          card.style.display = 'block';
-        } else if (filter === 'assignments' && type === 'assignment') {
-          card.style.display = 'block';
-        } else if (filter === 'incomplete' && !isCompleted) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+      // Apply filters
+      applyFilters();
     });
   });
   
   // Initialize when page loads
-  document.addEventListener('DOMContentLoaded', initializeCompletion);
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeCompletion();
+    applyFilters();
+  });
 </script>
