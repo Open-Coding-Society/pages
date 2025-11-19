@@ -1,6 +1,6 @@
 // GameControl.js with improved level transition handling
 import GameLevel from "./GameLevel.js";
-import PauseMenu from "../ui/PauseMenu.js";
+import PauseMenu from "../../PauseMenu.js";
 
 class GameControl {
     /**
