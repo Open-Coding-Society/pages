@@ -725,6 +725,14 @@ Check if this is a CSP course post with week 0-36
 
     }
 
+    // Sync completion data when window gains focus (when switching between views)
+    window.addEventListener('focus', function() {
+      if (document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
     // Auto-expand current sprint
     document.addEventListener('DOMContentLoaded', function() {
       // Only initialize lesson player mode if we're in a lesson player

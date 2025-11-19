@@ -157,6 +157,7 @@ layout: post
     height: 100%;
     background: #60a5fa;
     transition: width 0.3s ease;
+    width: 0%;
   }
 
   .items-grid {
@@ -372,7 +373,7 @@ layout: post
                 {% else %}
                   {% assign progress = 0 %}
                 {% endif %}
-                <div class="progress-bar-fill" style="width: {{ progress }}%"></div>
+                <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
               </div>
 
               <div class="items-grid">
@@ -380,7 +381,7 @@ layout: post
                   {% assign parts = entry | split: "||" %}
                   {% assign isAssignment = parts[2] == "assignment" %}
                   
-                  <div class="item-card" data-type="{{ isAssignment | default: false | string | replace: 'true', 'assignment' | replace: 'false', 'lesson' }}" data-item-id="{{ parts[1] | slugify }}">
+                  <div class="item-card" data-type="{{ isAssignment | default: false | string | replace: 'true', 'assignment' | replace: 'false', 'lesson' }}" data-item-id="{{ parts[1] }}">
                     <div class="item-content">
                       <button class="completion-toggle">
                         <i class="fas fa-circle status-icon incomplete"></i>
@@ -421,8 +422,8 @@ layout: post
 </div>
 
 <script>
-  // Completion tracking
-  const STORAGE_KEY = 'csp-completion-data';
+  // Completion tracking (shared with post.html)
+  const STORAGE_KEY = 'csp-lesson-completion';
   
   // Load completion data from localStorage
   function loadCompletionData() {
@@ -576,8 +577,23 @@ layout: post
     });
   });
   
+  // Initialize progress bars from data attributes
+  function initializeProgressBars() {
+    const progressBars = document.querySelectorAll('.progress-bar-fill');
+    progressBars.forEach(bar => {
+      const progress = bar.dataset.progress || 0;
+      bar.style.width = `${progress}%`;
+    });
+  }
+  
+  // Sync completion data when window gains focus (when switching between views)
+  window.addEventListener('focus', function() {
+    initializeCompletion();
+  });
+  
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
+    initializeProgressBars();
     initializeCompletion();
     applyFilters();
   });
