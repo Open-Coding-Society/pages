@@ -10,6 +10,14 @@ export default class PauseMenu {
 
         this._ensureCssLoaded();
         this._createDom();
+        // Register ourselves on the provided GameControl so Escape can toggle the menu
+        try {
+            if (this.gameControl) {
+                this.gameControl.pauseMenu = this;
+            }
+        } catch (e) {
+            console.warn('PauseMenu: could not register with gameControl', e);
+        }
     }
 
     _ensureCssLoaded() {
@@ -44,20 +52,26 @@ export default class PauseMenu {
         btnResume.innerText = 'Resume';
         btnResume.addEventListener('click', () => this._onResume());
 
-        const btnRestart = document.createElement('button');
-        btnRestart.className = 'pause-btn restart';
-        btnRestart.innerText = 'Restart Level';
-        btnRestart.addEventListener('click', () => this._onRestart());
+    const btnRestart = document.createElement('button');
+    btnRestart.className = 'pause-btn restart';
+    btnRestart.innerText = 'Restart Level';
+    btnRestart.addEventListener('click', () => this._onRestart());
 
-        const btnExit = document.createElement('button');
-        btnExit.className = 'pause-btn exit';
-        btnExit.innerText = 'Exit to Home';
-        btnExit.addEventListener('click', () => this._onExit());
+    const btnSkipLevel = document.createElement('button');
+    btnSkipLevel.className = 'pause-btn skip-level';
+    btnSkipLevel.innerText = 'Skip Level';
+    btnSkipLevel.addEventListener('click', () => this._onEndLevel());
 
-        panel.appendChild(title);
-        panel.appendChild(btnResume);
-        panel.appendChild(btnRestart);
-        panel.appendChild(btnExit);
+    const btnExit = document.createElement('button');
+    btnExit.className = 'pause-btn exit';
+    btnExit.innerText = 'Exit to Home';
+    btnExit.addEventListener('click', () => this._onExit());
+
+    panel.appendChild(title);
+    panel.appendChild(btnResume);
+    panel.appendChild(btnRestart);
+    panel.appendChild(btnSkipLevel);
+    panel.appendChild(btnExit);
         overlay.appendChild(panel);
 
         parent.appendChild(overlay);
@@ -101,6 +115,22 @@ export default class PauseMenu {
         if (this.gameControl && typeof this.gameControl.restartLevel === 'function') {
             this.hide();
             this.gameControl.restartLevel();
+        }
+    }
+
+    _onEndLevel() {
+        // End the current level by signaling the GameControl's current level
+        try {
+            if (this.gameControl) {
+                this.hide();
+                if (typeof this.gameControl.endLevel === 'function') {
+                    this.gameControl.endLevel();
+                } else if (this.gameControl.currentLevel) {
+                    this.gameControl.currentLevel.continue = false;
+                }
+            }
+        } catch (e) {
+            console.warn('PauseMenu: could not end level:', e);
         }
     }
 
