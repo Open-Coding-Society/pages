@@ -44,6 +44,12 @@ active_tab: dashboard
                        ⓘ Help 
                     </a>
                 </li>
+                <li class="me-2">
+                    <a href="#" id="tab-preferences"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Preferences
+                    </a>
+                </li>
             </ul>
             <!-- sliding underline indicator -->
             <div id="tab-underline"
@@ -319,6 +325,295 @@ active_tab: dashboard
         See the full <a href="/dashboard/help/analytics" class="text-blue-400 underline hover:text-blue-200">Analytics Help page</a> for detailed docs and examples.
     </div>
 </div>
+            <!-- Preferences tab content -->
+            <div id="tab-content-preferences" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-4xl mx-auto">
+                <h2 class="text-xl font-semibold mb-4">Preferences</h2>
+                <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally for this browser.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left: Controls -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700 space-y-6">
+                        <section>
+                            <h3 class="font-medium mb-2">Text Preferences</h3>
+                            <div class="flex flex-col gap-3">
+                                <label class="text-sm text-neutral-400">Base font size: <span id="font-size-label">16</span>px</label>
+                                <input type="range" id="pref-font-size" min="12" max="22" value="16" />
+
+                                <label class="text-sm text-neutral-400">Font family</label>
+                                <select id="pref-font-family" class="bg-neutral-700 text-white rounded px-2 py-1">
+                                    <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial">Inter / System</option>
+                                    <option value="Georgia, 'Times New Roman', Times, serif">Serif (Georgia)</option>
+                                    <option value="'Courier New', Courier, monospace">Monospace</option>
+                                </select>
+
+                                <label class="text-sm text-neutral-400">Text color</label>
+                                <input type="color" id="pref-text-color" value="#e6eef8" />
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="font-medium mb-2">Background Preferences</h3>
+                            <div class="flex flex-col gap-3">
+                                <label class="text-sm text-neutral-400">Background color</label>
+                                <input type="color" id="pref-bg-color" value="#0b1220" />
+
+                                <label class="text-sm text-neutral-400">Content max width (px)</label>
+                                <input type="number" id="pref-content-width" value="1200" min="600" max="2000" class="bg-neutral-700 text-white rounded px-2 py-1" />
+
+                                <div class="flex gap-2">
+                                    <button id="save-preferences" type="button" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">Save</button>
+                                    <button id="reset-preferences" type="button" class="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600 transition text-white font-semibold">Reset</button>
+                                </div>
+                                <p id="preferences-status" class="text-sm text-neutral-400 mt-2"></p>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right: Themes -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                        <h3 class="font-medium mb-3">Themes</h3>
+                        <p class="text-sm text-neutral-400 mb-3">Select a preset or save your current settings as a custom theme (up to 3 custom slots).</p>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4" id="preset-themes">
+                            <!-- preset buttons inserted by JS -->
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="text-sm text-neutral-400">Custom theme name</label>
+                            <div class="flex gap-2 mt-2">
+                                <input id="new-theme-name" class="flex-1 bg-neutral-700 text-white rounded px-2 py-1" placeholder="My theme name" />
+                                <button id="save-theme-btn" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Save Theme</button>
+                            </div>
+                            <p class="text-sm text-neutral-400 mt-2">Custom themes will appear below. You can delete a custom theme to free a slot.</p>
+                        </div>
+
+                        <div id="custom-themes" class="grid grid-cols-2 gap-3">
+                            <!-- custom theme buttons inserted by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                /* Global CSS variables and conservative overrides for applying preferences site-wide */
+                :root {
+                    --pref-bg-color: #0b1220;
+                    --pref-text-color: #e6eef8;
+                    --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+                    --pref-font-size: 16px;
+                    --pref-content-max-width: 1200px;
+                }
+
+                /* Apply to top-level elements to have wide effect without changing existing classes */
+                html, body {
+                    background: var(--pref-bg-color) !important;
+                    color: var(--pref-text-color) !important;
+                    font-family: var(--pref-font-family) !important;
+                    font-size: var(--pref-font-size) !important;
+                }
+
+                /* Constrain main content wrapper if present */
+                .w-full { max-width: var(--pref-content-max-width); margin: 0 auto; }
+                </style>
+
+                <script>
+                (function () {
+                    const PRESETS = {
+                        'Dark (default)': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 16, width: 1200 },
+                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 16, width: 1200 },
+                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 16, width: 1200 },
+                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 17, width: 1100 }
+                    };
+
+                    const MAX_CUSTOM = 3;
+                    const storageKey = 'sitePreferences';
+                    const themesKey = 'siteThemes';
+
+                    function applyPreferences(prefs = {}){
+                        const bg = prefs.bg || PRESETS['Dark (default)'].bg;
+                        const text = prefs.text || PRESETS['Dark (default)'].text;
+                        const font = prefs.font || PRESETS['Dark (default)'].font;
+                        const size = prefs.size || PRESETS['Dark (default)'].size;
+                        const width = prefs.width || PRESETS['Dark (default)'].width;
+
+                        try {
+                            document.documentElement.style.setProperty('--pref-bg-color', bg);
+                            document.documentElement.style.setProperty('--pref-text-color', text);
+                            document.documentElement.style.setProperty('--pref-font-family', font);
+                            document.documentElement.style.setProperty('--pref-font-size', size + 'px');
+                            document.documentElement.style.setProperty('--pref-content-max-width', width + 'px');
+
+                            // direct style for body for maximum reach
+                            document.body.style.background = bg;
+                            document.body.style.color = text;
+                            document.body.style.fontFamily = font;
+                            document.documentElement.style.fontSize = size + 'px';
+                        } catch (e) { console.error('applyPreferences error', e); }
+                    }
+
+                    function loadPreferences() {
+                        try {
+                            const raw = localStorage.getItem(storageKey);
+                            if (!raw) return null;
+                            const prefs = JSON.parse(raw);
+                            applyPreferences(prefs);
+                            return prefs;
+                        } catch (e) { console.error('loadPreferences error', e); return null; }
+                    }
+
+                    function savePreferences(prefs){
+                        try {
+                            localStorage.setItem(storageKey, JSON.stringify(prefs));
+                            applyPreferences(prefs);
+                        } catch (e) { console.error('savePreferences error', e); }
+                    }
+
+                    function resetPreferences(){
+                        localStorage.removeItem(storageKey);
+                        const def = PRESETS['Dark (default)'];
+                        savePreferences({ bg: def.bg, text: def.text, font: def.font, size: def.size, width: def.width });
+                    }
+
+                    function loadThemes(){
+                        try {
+                            const raw = localStorage.getItem(themesKey);
+                            return raw ? JSON.parse(raw) : {};
+                        } catch (e) { console.error('loadThemes error', e); return {}; }
+                    }
+
+                    function saveThemes(obj){
+                        try { localStorage.setItem(themesKey, JSON.stringify(obj)); } catch(e){console.error('saveThemes error', e);}    
+                    }
+
+                    function renderPresets(){
+                        const container = document.getElementById('preset-themes');
+                        container.innerHTML = '';
+                        Object.keys(PRESETS).forEach(name => {
+                            const btn = document.createElement('button');
+                            btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white';
+                            btn.textContent = name;
+                            btn.addEventListener('click', () => {
+                                const p = PRESETS[name];
+                                savePreferences({ bg: p.bg, text: p.text, font: p.font, size: p.size, width: p.width });
+                                showStatus('Applied preset: ' + name);
+                            });
+                            container.appendChild(btn);
+                        });
+                    }
+
+                    function renderCustomThemes(){
+                        const container = document.getElementById('custom-themes');
+                        container.innerHTML = '';
+                        const themes = loadThemes();
+                        const keys = Object.keys(themes);
+                        if (!keys.length) {
+                            container.innerHTML = '<p class="text-neutral-400">No custom themes saved.</p>';
+                            return;
+                        }
+                        keys.forEach(name => {
+                            const theme = themes[name];
+                            const wrap = document.createElement('div');
+                            wrap.className = 'flex gap-2';
+                            const btn = document.createElement('button');
+                            btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-left';
+                            btn.textContent = name;
+                            btn.addEventListener('click', () => { savePreferences(theme); showStatus('Applied custom theme: ' + name); });
+                            const del = document.createElement('button');
+                            del.className = 'px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white';
+                            del.textContent = 'Delete';
+                            del.addEventListener('click', () => { deleteTheme(name); });
+                            wrap.appendChild(btn);
+                            wrap.appendChild(del);
+                            container.appendChild(wrap);
+                        });
+                    }
+
+                    function saveThemeAs(name){
+                        if (!name) { showStatus('Please provide a name for the theme.'); return; }
+                        const themes = loadThemes();
+                        const keys = Object.keys(themes);
+                        if (keys.length >= MAX_CUSTOM && !themes[name]) { showStatus('Max custom themes reached. Delete one to add another.'); return; }
+                        const prefs = currentFormValues();
+                        themes[name] = prefs;
+                        saveThemes(themes);
+                        renderCustomThemes();
+                        showStatus('Saved theme: ' + name);
+                    }
+
+                    function deleteTheme(name){
+                        const themes = loadThemes();
+                        if (themes[name]) delete themes[name];
+                        saveThemes(themes);
+                        renderCustomThemes();
+                        showStatus('Deleted theme: ' + name);
+                    }
+
+                    function currentFormValues(){
+                        return {
+                            bg: document.getElementById('pref-bg-color').value,
+                            text: document.getElementById('pref-text-color').value,
+                            font: document.getElementById('pref-font-family').value,
+                            size: Number(document.getElementById('pref-font-size').value),
+                            width: Number(document.getElementById('pref-content-width').value)
+                        };
+                    }
+
+                    function populateForm(prefs){
+                        if (!prefs) return;
+                        document.getElementById('pref-bg-color').value = prefs.bg || PRESETS['Dark (default)'].bg;
+                        document.getElementById('pref-text-color').value = prefs.text || PRESETS['Dark (default)'].text;
+                        document.getElementById('pref-font-family').value = prefs.font || PRESETS['Dark (default)'].font;
+                        document.getElementById('pref-font-size').value = prefs.size || PRESETS['Dark (default)'].size;
+                        document.getElementById('font-size-label').textContent = prefs.size || PRESETS['Dark (default)'].size;
+                        document.getElementById('pref-content-width').value = prefs.width || PRESETS['Dark (default)'].width;
+                    }
+
+                    function showStatus(msg){
+                        const el = document.getElementById('preferences-status');
+                        if (!el) return;
+                        el.textContent = msg;
+                        setTimeout(()=> el.textContent = '', 3000);
+                    }
+
+                    // Wire up events
+                    document.addEventListener('DOMContentLoaded', function (){
+                        renderPresets();
+                        renderCustomThemes();
+
+                        // init form from saved prefs or defaults
+                        const saved = loadPreferences();
+                        if (saved) populateForm(saved);
+                        else populateForm(PRESETS['Dark (default)']);
+
+                        document.getElementById('pref-font-size').addEventListener('input', function(e){
+                            document.getElementById('font-size-label').textContent = e.target.value;
+                        });
+
+                        document.getElementById('save-preferences').addEventListener('click', function(){
+                            const prefs = currentFormValues();
+                            savePreferences(prefs);
+                            showStatus('Preferences saved locally.');
+                        });
+
+                        document.getElementById('reset-preferences').addEventListener('click', function(){
+                            resetPreferences();
+                            populateForm(PRESETS['Dark (default)']);
+                            showStatus('Preferences reset to default (dark).');
+                        });
+
+                        document.getElementById('save-theme-btn').addEventListener('click', function(){
+                            const name = document.getElementById('new-theme-name').value.trim();
+                            saveThemeAs(name);
+                        });
+                    });
+
+                    // Expose loadPreferences for window.onload call
+                    window.loadPreferences = async function(){ loadPreferences(); };
+
+                    // Apply preferences immediately (in case user navigates directly)
+                    try{ loadPreferences(); } catch(e){}
+                })();
+                </script>
+
             <!-- Grade analytics tab content -->
             <div id="tab-content-grade-analytics" class="tab-content hidden">
                 <div class="items-center justify-center text-neutral-300" id="grade-analytics-container">
@@ -768,6 +1063,12 @@ active_tab: dashboard
 
         await fetchData();
 
+        // load and apply saved preferences (if any)
+        try {
+            if (window.loadPreferences) await window.loadPreferences();
+        } catch (e) {
+            console.error('Error loading preferences on window.onload', e);
+        }
     };
 </script>
 
@@ -778,7 +1079,7 @@ active_tab: dashboard
     // call the function with your tab ids and initial tab
     document.addEventListener('DOMContentLoaded', function () {
         setupTabSwitcher(
-            ['github', 'grade', 'admin-search', 'help', 'grade-analytics'],
+            ['github', 'grade', 'admin-search', 'help', 'preferences', 'grade-analytics'],
             'github'
             );
     });
