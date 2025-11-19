@@ -1,0 +1,456 @@
+<style>
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Floating Action Button */
+    .admin-fab {
+      position: fixed;
+      right: 2rem;
+      top: 9rem;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(240, 147, 251, 0.15);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
+    }
+
+    @media (max-width: 600px) {
+      .admin-fab {
+        right: 1rem;
+        top: 5rem;
+        padding: 1.2rem 2.2rem;
+        font-size: 1.5rem;
+        min-width: 56px;
+        min-height: 56px;
+        border-radius: 50%;
+        box-shadow: 0 2px 12px rgba(240, 147, 251, 0.18);
+      }
+    }
+
+    /* Side Panel */
+    .admin-panel {
+      position: fixed;
+      top: 5rem;
+      right: 0;
+      width: 400px;
+      max-width: 90vw;
+      height: calc(100vh - 5rem - 3rem);
+      margin-bottom: 3rem;
+      background: white;
+      box-shadow: -2px 0 12px rgba(0,0,0,0.12);
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateX(100%);
+    }
+
+    .admin-panel.open {
+      transform: translateX(0);
+    }
+
+    @media (max-width: 600px) {
+      .admin-panel {
+        width: 100vw;
+        max-width: 100vw;
+        top: 1rem;
+        height: calc(100vh - 1rem);
+      }
+    }
+
+    .admin-panel-header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .admin-close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .admin-close-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .admin-panel-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .admin-panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    /* Table Styles */
+    #admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    #admin-table thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    #admin-table th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    #admin-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    #admin-table tr:hover {
+      background: #f9fafb;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      margin: 0 4px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .action-btn svg {
+      width: 18px;
+      height: 18px;
+      color: #6b7280;
+    }
+
+    .action-btn.delete:hover svg {
+      color: #ef4444;
+    }
+
+    .action-btn.edit:hover svg {
+      color: #3b82f6;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1002;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-panel {
+      background: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+</style>
+
+  <!-- Floating Admin Button -->
+  <button id="admin-toggle-btn" class="admin-fab" aria-label="Open Admin Panel">
+    ⚙️ Admin
+  </button>
+
+  <!-- Admin Side Panel -->
+  <aside id="admin-panel" class="admin-panel" tabindex="-1" aria-label="Admin panel">
+    <div class="admin-panel-header">
+      <button id="admin-close-btn" class="admin-close-btn" aria-label="Close Admin Panel">&times;</button>
+      <h2 class="admin-panel-title">Admin Dashboard</h2>
+    </div>
+
+    <div class="admin-panel-content">
+      <div id="admin-container">
+        <em>Loading admin data...</em>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Edit/Create Modal -->
+  <div id="admin-modal" class="modal-overlay">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <button id="modal-close" class="modal-close" aria-label="Close Modal">&times;</button>
+        <h2 id="modal-title" class="modal-title">Create User</h2>
+      </div>
+      <div class="modal-body">
+        <form id="admin-form">
+          <input type="hidden" id="user-id" name="id">
+          
+          <div class="form-group">
+            <label for="username">Username <span style="color: red;">*</span></label>
+            <input type="text" id="username" name="username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span style="color: red;">*</span></label>
+            <input type="email" id="email" name="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" name="role">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Admin Button -->
+  <button id="admin-toggle-btn" class="admin-fab" aria-label="Open Admin Panel">
+    ⚙️ Admin
+  </button>
+
+  <!-- Admin Side Panel -->
+  <aside id="admin-panel" class="admin-panel" tabindex="-1" aria-label="Admin panel">
+    <div class="admin-panel-header">
+      <button id="admin-close-btn" class="admin-close-btn" aria-label="Close Admin Panel">&times;</button>
+      <h2 class="admin-panel-title">Admin Dashboard</h2>
+    </div>
+
+    <div class="admin-panel-content">
+      <div id="admin-container">
+        <em>Loading admin data...</em>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Edit/Create Modal -->
+  <div id="admin-modal" class="modal-overlay">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <button id="modal-close" class="modal-close" aria-label="Close Modal">&times;</button>
+        <h2 id="modal-title" class="modal-title">Create User</h2>
+      </div>
+      <div class="modal-body">
+        <form id="admin-form">
+          <input type="hidden" id="user-id" name="id">
+          
+          <div class="form-group">
+            <label for="username">Username <span style="color: red;">*</span></label>
+            <input type="text" id="username" name="username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span style="color: red;">*</span></label>
+            <input type="email" id="email" name="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" name="role">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
