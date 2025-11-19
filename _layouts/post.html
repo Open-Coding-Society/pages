@@ -442,6 +442,224 @@ Check if this is a course lesson and determine which course context to use
       color: #ffffff;
     }
 
+    /* Assignment Submission Widget */
+    .assignment-submission {
+      margin-top: 48px;
+      padding: 24px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+    }
+
+    .assignment-submission h3 {
+      color: #ffffff;
+      font-size: 1.25rem;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .assignment-submission-icon {
+      color: #60a5fa;
+    }
+
+    .submission-options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .submission-tab {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #cccccc;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .submission-tab:hover {
+      background: #0f0f0f;
+      color: #ffffff;
+    }
+
+    .submission-tab.active {
+      background: #60a5fa;
+      color: #0a0a0a;
+      border-color: #60a5fa;
+    }
+
+    .submission-form {
+      display: none;
+    }
+
+    .submission-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #e0e0e0;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="url"],
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0f0f0f;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #60a5fa;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .file-upload-area {
+      border: 2px dashed #2a2a2a;
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .file-upload-area:hover {
+      border-color: #60a5fa;
+      background: #0f0f0f;
+    }
+
+    .file-upload-area.dragover {
+      border-color: #60a5fa;
+      background: #0f0f0f;
+    }
+
+    .file-upload-icon {
+      font-size: 48px;
+      color: #60a5fa;
+      margin-bottom: 12px;
+    }
+
+    .file-upload-text {
+      color: #cccccc;
+      margin-bottom: 8px;
+    }
+
+    .file-upload-hint {
+      color: #666666;
+      font-size: 12px;
+    }
+
+    .file-list {
+      margin-top: 16px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: #0f0f0f;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-name {
+      color: #e0e0e0;
+      font-size: 14px;
+    }
+
+    .file-size {
+      color: #999999;
+      font-size: 12px;
+    }
+
+    .remove-file {
+      background: transparent;
+      border: none;
+      color: #999999;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .remove-file:hover {
+      background: #1a1a1a;
+      color: #ff6b6b;
+    }
+
+    .submit-btn {
+      padding: 12px 24px;
+      background: #60a5fa;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #93c5fd;
+    }
+
+    .submit-btn:disabled {
+      background: #2a2a2a;
+      color: #666666;
+      cursor: not-allowed;
+    }
+
+    .submission-status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .submission-status.success {
+      display: block;
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid #60a5fa;
+      color: #60a5fa;
+    }
+
+    .submission-status.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+    }
+
     /* Bottom Navigation */
     .lesson-bottom {
       border-top: 1px solid #222222;
@@ -640,6 +858,85 @@ Check if this is a course lesson and determine which course context to use
             {%- endif -%}
 
             {{ content }}
+
+            {% if page.assignment %}
+            <div class="assignment-submission">
+              <h3>
+                <i class="fas fa-upload assignment-submission-icon"></i>
+                Submit Assignment
+              </h3>
+              
+              <div class="submission-options">
+                <button class="submission-tab active" onclick="switchSubmissionType('github')">
+                  <i class="fab fa-github"></i> GitHub Issue
+                </button>
+                <button class="submission-tab" onclick="switchSubmissionType('link')">
+                  <i class="fas fa-link"></i> Link Submission
+                </button>
+                <button class="submission-tab" onclick="switchSubmissionType('file')">
+                  <i class="fas fa-file-upload"></i> File Upload
+                </button>
+              </div>
+
+              <!-- GitHub Issue Form -->
+              <form class="submission-form active" id="github-form">
+                <div class="form-group">
+                  <label for="github-issue-url">GitHub Issue URL</label>
+                  <input type="url" id="github-issue-url" placeholder="https://github.com/username/repo/issues/123" required>
+                </div>
+                <div class="form-group">
+                  <label for="github-notes">Notes (Optional)</label>
+                  <textarea id="github-notes" placeholder="Add any additional comments about your submission..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                  <i class="fas fa-check"></i>
+                  Submit GitHub Issue
+                </button>
+              </form>
+
+              <!-- Link Submission Form -->
+              <form class="submission-form" id="link-form">
+                <div class="form-group">
+                  <label for="submission-link">Submission Link</label>
+                  <input type="url" id="submission-link" placeholder="https://..." required>
+                </div>
+                <div class="form-group">
+                  <label for="link-description">Description</label>
+                  <textarea id="link-description" placeholder="Describe what you're submitting..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                  <i class="fas fa-check"></i>
+                  Submit Link
+                </button>
+              </form>
+
+              <!-- File Upload Form -->
+              <form class="submission-form" id="file-form">
+                <div class="form-group">
+                  <label>Upload Files</label>
+                  <div class="file-upload-area" id="file-upload-area">
+                    <input type="file" id="file-input" multiple style="display: none;">
+                    <div class="file-upload-icon">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-text">Click to upload or drag and drop</div>
+                    <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
+                  </div>
+                  <div class="file-list" id="file-list"></div>
+                </div>
+                <div class="form-group">
+                  <label for="file-notes">Notes (Optional)</label>
+                  <textarea id="file-notes" placeholder="Add any additional comments..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn" id="file-submit-btn" disabled>
+                  <i class="fas fa-check"></i>
+                  Submit Files
+                </button>
+              </form>
+
+              <div class="submission-status" id="submission-status"></div>
+            </div>
+            {% endif %}
           </div>
 
           {%- if page.comments -%}
@@ -828,10 +1125,6 @@ Check if this is a course lesson and determine which course context to use
       // Apply minimal body styles for lesson player (keep header visible)
       document.body.style.margin = '0';
       document.body.style.padding = '0';
-      
-      // Don't hide site navigation - keep header visible
-
-
     }
 
     // Sync completion data when window gains focus (when switching between views)
@@ -863,6 +1156,166 @@ Check if this is a course lesson and determine which course context to use
       updateCompleteButton();
       updateUI();
     });
+
+    // Assignment submission handlers
+    if (document.getElementById('github-form')) {
+      // Submission type switching
+      function switchSubmissionType(type) {
+        // Update tabs
+        document.querySelectorAll('.submission-tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        event.target.closest('.submission-tab').classList.add('active');
+
+        // Update forms
+        document.querySelectorAll('.submission-form').forEach(form => {
+          form.classList.remove('active');
+        });
+        document.getElementById(`${type}-form`).classList.add('active');
+
+        // Clear status
+        document.getElementById('submission-status').style.display = 'none';
+      }
+      window.switchSubmissionType = switchSubmissionType;
+
+      // File upload handling
+      const fileUploadArea = document.getElementById('file-upload-area');
+      const fileInput = document.getElementById('file-input');
+      const fileList = document.getElementById('file-list');
+      const fileSubmitBtn = document.getElementById('file-submit-btn');
+      let selectedFiles = [];
+
+      if (fileUploadArea) {
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+          fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          fileUploadArea.classList.remove('dragover');
+          handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+          handleFiles(e.target.files);
+        });
+      }
+
+      function handleFiles(files) {
+        Array.from(files).forEach(file => {
+          if (file.size > 10 * 1024 * 1024) {
+            showStatus('error', `File ${file.name} is too large (max 10MB)`);
+            return;
+          }
+          selectedFiles.push(file);
+        });
+        updateFileList();
+      }
+
+      function updateFileList() {
+        fileList.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.innerHTML = `
+            <div class="file-info">
+              <i class="fas fa-file"></i>
+              <div>
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${formatFileSize(file.size)}</div>
+              </div>
+            </div>
+            <button type="button" class="remove-file" onclick="removeFile(${index})">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          fileList.appendChild(fileItem);
+        });
+        fileSubmitBtn.disabled = selectedFiles.length === 0;
+      }
+
+      function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+      }
+      window.removeFile = removeFile;
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+      }
+
+      // Form submissions
+      document.getElementById('github-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = document.getElementById('github-issue-url').value;
+        const notes = document.getElementById('github-notes').value;
+        
+        saveSubmission('github', { url, notes });
+        showStatus('success', 'GitHub issue submitted successfully!');
+        this.reset();
+      });
+
+      document.getElementById('link-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const link = document.getElementById('submission-link').value;
+        const description = document.getElementById('link-description').value;
+        
+        saveSubmission('link', { link, description });
+        showStatus('success', 'Link submitted successfully!');
+        this.reset();
+      });
+
+      document.getElementById('file-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const notes = document.getElementById('file-notes').value;
+        
+        const fileNames = selectedFiles.map(f => f.name);
+        saveSubmission('file', { files: fileNames, notes });
+        
+        showStatus('success', `${selectedFiles.length} file(s) submitted successfully!`);
+        selectedFiles = [];
+        updateFileList();
+        this.reset();
+      });
+
+      function saveSubmission(type, data) {
+        const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
+        const lessonId = window.location.pathname;
+        
+        if (!submissions[lessonId]) {
+          submissions[lessonId] = [];
+        }
+        
+        submissions[lessonId].push({
+          type,
+          data,
+          timestamp: new Date().toISOString()
+        });
+        
+        localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+      }
+
+      function showStatus(type, message) {
+        const status = document.getElementById('submission-status');
+        status.className = `submission-status ${type}`;
+        status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        
+        setTimeout(() => {
+          status.style.display = 'none';
+        }, 5000);
+      }
+    }
   </script>
 
 {% else %}
@@ -938,6 +1391,228 @@ Check if this is a course lesson and determine which course context to use
       margin-top: 2rem;
       padding-top: 1rem;
       border-top: 1px solid #ddd;
+    }
+
+    /* Assignment Submission Widget */
+    .assignment-submission {
+      margin-top: 48px;
+      padding: 24px;
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+    }
+
+    .assignment-submission h3 {
+      color: #333;
+      font-size: 1.25rem;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .assignment-submission-icon {
+      color: #2563eb;
+    }
+
+    .submission-options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .submission-tab {
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .submission-tab:hover {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .submission-tab.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .submission-form {
+      display: none;
+    }
+
+    .submission-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="url"],
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: white;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      color: #333;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .file-upload-area {
+      border: 2px dashed #d0d0d0;
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .file-upload-area:hover {
+      border-color: #2563eb;
+      background: #f0f7ff;
+    }
+
+    .file-upload-area.dragover {
+      border-color: #2563eb;
+      background: #f0f7ff;
+    }
+
+    .file-upload-icon {
+      font-size: 48px;
+      color: #2563eb;
+      margin-bottom: 12px;
+    }
+
+    .file-upload-text {
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .file-upload-hint {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .file-list {
+      margin-top: 16px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-name {
+      color: #333;
+      font-size: 14px;
+    }
+
+    .file-size {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .remove-file {
+      background: transparent;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .remove-file:hover {
+      background: #fee;
+      color: #dc2626;
+    }
+
+    .submit-btn {
+      padding: 12px 24px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .submit-btn:disabled {
+      background: #d0d0d0;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .submission-status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .submission-status.success {
+      display: block;
+      background: #dbeafe;
+      border: 1px solid #2563eb;
+      color: #1e40af;
+    }
+
+    .submission-status.error {
+      display: block;
+      background: #fee2e2;
+      border: 1px solid #dc2626;
+      color: #991b1b;
     }
   </style>
 
@@ -1027,6 +1702,243 @@ Check if this is a course lesson and determine which course context to use
       {%- endif -%}
 
       {{ content }}
+
+      {% if page.assignment %}
+      <div class="assignment-submission">
+        <h3>
+          <i class="fas fa-upload assignment-submission-icon"></i>
+          Submit Assignment
+        </h3>
+        
+        <div class="submission-options">
+          <button class="submission-tab active" onclick="switchSubmissionType('github')">
+            <i class="fab fa-github"></i> GitHub Issue
+          </button>
+          <button class="submission-tab" onclick="switchSubmissionType('link')">
+            <i class="fas fa-link"></i> Link Submission
+          </button>
+          <button class="submission-tab" onclick="switchSubmissionType('file')">
+            <i class="fas fa-file-upload"></i> File Upload
+          </button>
+        </div>
+
+        <!-- GitHub Issue Form -->
+        <form class="submission-form active" id="github-form-blog">
+          <div class="form-group">
+            <label for="github-issue-url-blog">GitHub Issue URL</label>
+            <input type="url" id="github-issue-url-blog" placeholder="https://github.com/username/repo/issues/123" required>
+          </div>
+          <div class="form-group">
+            <label for="github-notes-blog">Notes (Optional)</label>
+            <textarea id="github-notes-blog" placeholder="Add any additional comments about your submission..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-check"></i>
+            Submit GitHub Issue
+          </button>
+        </form>
+
+        <!-- Link Submission Form -->
+        <form class="submission-form" id="link-form-blog">
+          <div class="form-group">
+            <label for="submission-link-blog">Submission Link</label>
+            <input type="url" id="submission-link-blog" placeholder="https://..." required>
+          </div>
+          <div class="form-group">
+            <label for="link-description-blog">Description</label>
+            <textarea id="link-description-blog" placeholder="Describe what you're submitting..." required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-check"></i>
+            Submit Link
+          </button>
+        </form>
+
+        <!-- File Upload Form -->
+        <form class="submission-form" id="file-form-blog">
+          <div class="form-group">
+            <label>Upload Files</label>
+            <div class="file-upload-area" id="file-upload-area-blog">
+              <input type="file" id="file-input-blog" multiple style="display: none;">
+              <div class="file-upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="file-upload-text">Click to upload or drag and drop</div>
+              <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
+            </div>
+            <div class="file-list" id="file-list-blog"></div>
+          </div>
+          <div class="form-group">
+            <label for="file-notes-blog">Notes (Optional)</label>
+            <textarea id="file-notes-blog" placeholder="Add any additional comments..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="file-submit-btn-blog" disabled>
+            <i class="fas fa-check"></i>
+            Submit Files
+          </button>
+        </form>
+
+        <div class="submission-status" id="submission-status-blog"></div>
+      </div>
+
+      <script>
+        // Submission type switching
+        function switchSubmissionType(type) {
+          // Update tabs
+          document.querySelectorAll('.submission-tab').forEach(tab => {
+            tab.classList.remove('active');
+          });
+          event.target.closest('.submission-tab').classList.add('active');
+
+          // Update forms
+          document.querySelectorAll('.submission-form').forEach(form => {
+            form.classList.remove('active');
+          });
+          const formId = type + '-form-blog';
+          document.getElementById(formId).classList.add('active');
+
+          // Clear status
+          document.getElementById('submission-status-blog').style.display = 'none';
+        }
+
+        // File upload handling
+        const fileUploadAreaBlog = document.getElementById('file-upload-area-blog');
+        const fileInputBlog = document.getElementById('file-input-blog');
+        const fileListBlog = document.getElementById('file-list-blog');
+        const fileSubmitBtnBlog = document.getElementById('file-submit-btn-blog');
+        let selectedFilesBlog = [];
+
+        if (fileUploadAreaBlog) {
+          fileUploadAreaBlog.addEventListener('click', () => fileInputBlog.click());
+
+          fileUploadAreaBlog.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadAreaBlog.classList.add('dragover');
+          });
+
+          fileUploadAreaBlog.addEventListener('dragleave', () => {
+            fileUploadAreaBlog.classList.remove('dragover');
+          });
+
+          fileUploadAreaBlog.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadAreaBlog.classList.remove('dragover');
+            handleFilesBlog(e.dataTransfer.files);
+          });
+
+          fileInputBlog.addEventListener('change', (e) => {
+            handleFilesBlog(e.target.files);
+          });
+        }
+
+        function handleFilesBlog(files) {
+          Array.from(files).forEach(file => {
+            if (file.size > 10 * 1024 * 1024) {
+              showStatusBlog('error', `File ${file.name} is too large (max 10MB)`);
+              return;
+            }
+            selectedFilesBlog.push(file);
+          });
+          updateFileListBlog();
+        }
+
+        function updateFileListBlog() {
+          fileListBlog.innerHTML = '';
+          selectedFilesBlog.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+              <div class="file-info">
+                <i class="fas fa-file"></i>
+                <div>
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-size">${formatFileSizeBlog(file.size)}</div>
+                </div>
+              </div>
+              <button type="button" class="remove-file" onclick="removeFileBlog(${index})">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            fileListBlog.appendChild(fileItem);
+          });
+          fileSubmitBtnBlog.disabled = selectedFilesBlog.length === 0;
+        }
+
+        function removeFileBlog(index) {
+          selectedFilesBlog.splice(index, 1);
+          updateFileListBlog();
+        }
+
+        function formatFileSizeBlog(bytes) {
+          if (bytes === 0) return '0 Bytes';
+          const k = 1024;
+          const sizes = ['Bytes', 'KB', 'MB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Form submissions
+        document.getElementById('github-form-blog').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const url = document.getElementById('github-issue-url-blog').value;
+          const notes = document.getElementById('github-notes-blog').value;
+          
+          saveSubmissionBlog('github', { url, notes });
+          showStatusBlog('success', 'GitHub issue submitted successfully!');
+          this.reset();
+        });
+
+        document.getElementById('link-form-blog').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const link = document.getElementById('submission-link-blog').value;
+          const description = document.getElementById('link-description-blog').value;
+          
+          saveSubmissionBlog('link', { link, description });
+          showStatusBlog('success', 'Link submitted successfully!');
+          this.reset();
+        });
+
+        document.getElementById('file-form-blog').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const notes = document.getElementById('file-notes-blog').value;
+          
+          const fileNames = selectedFilesBlog.map(f => f.name);
+          saveSubmissionBlog('file', { files: fileNames, notes });
+          
+          showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
+          selectedFilesBlog = [];
+          updateFileListBlog();
+          this.reset();
+        });
+
+        function saveSubmissionBlog(type, data) {
+          const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
+          const lessonId = window.location.pathname;
+          
+          if (!submissions[lessonId]) {
+            submissions[lessonId] = [];
+          }
+          
+          submissions[lessonId].push({
+            type,
+            data,
+            timestamp: new Date().toISOString()
+          });
+          
+          localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+        }
+
+        function showStatusBlog(type, message) {
+          const status = document.getElementById('submission-status-blog');
+          status.className = `submission-status ${type}`;
+          status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+          
+          setTimeout(() => {
+            status.style.display = 'none';
+          }, 5000);
+        }
+      </script>
+      {% endif %}
     </div>
     {%- if page.comments -%}
       {%- include utterances.html -%}
