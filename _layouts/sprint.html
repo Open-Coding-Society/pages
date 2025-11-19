@@ -380,7 +380,7 @@ layout: post
                   {% assign parts = entry | split: "||" %}
                   {% assign isAssignment = parts[2] == "assignment" %}
                   
-                  <div class="item-card" data-type="{% if isAssignment %}assignment{% else %}lesson{% endif %}" data-item-id="{{ parts[1] | slugify }}">
+                  <div class="item-card" data-type="{{ isAssignment | default: false | string | replace: 'true', 'assignment' | replace: 'false', 'lesson' }}" data-item-id="{{ parts[1] | slugify }}">
                     <div class="item-content">
                       <button class="completion-toggle">
                         <i class="fas fa-circle status-icon incomplete"></i>
