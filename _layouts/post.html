@@ -9,8 +9,7 @@ Check if this is a course lesson and determine which course context to use
 {% assign current_course = null %}
 {% assign current_week = null %}
 
-{% comment %}Default to first available course, will be overridden by JavaScript{% endcomment %}
-{% comment %}Set default course and will be updated by JavaScript{% endcomment %}
+{% comment %}Since files are now course-specific, get the single course{% endcomment %}
 {% if page.courses.csp %}
   {% assign current_course = 'csp' %}
   {% assign current_week = page.courses.csp.week | plus: 0 %}
@@ -115,35 +114,6 @@ Check if this is a course lesson and determine which course context to use
       height: 100%;
       background: #60a5fa;
       transition: width 0.3s ease;
-    }
-
-    /* Course Selector */
-    .course-selector {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #222222;
-    }
-
-    .course-selector label {
-      display: block;
-      color: #cccccc;
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .course-selector select {
-      width: 100%;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 4px;
-      color: #e0e0e0;
-      padding: 8px;
-      font-size: 14px;
-    }
-
-    .course-selector select:focus {
-      outline: none;
-      border-color: #60a5fa;
     }
 
     /* Sprint Navigation */
@@ -737,29 +707,6 @@ Check if this is a course lesson and determine which course context to use
         {% endif %}
         <p>Del Norte High School</p>
         
-        {% comment %}Course selector for multi-course lessons{% endcomment %}
-        {% assign course_count = 0 %}
-        {% if page.courses.csp %}{% assign course_count = course_count | plus: 1 %}{% endif %}
-        {% if page.courses.csa %}{% assign course_count = course_count | plus: 1 %}{% endif %}
-        {% if page.courses.csse %}{% assign course_count = course_count | plus: 1 %}{% endif %}
-        
-        {% if course_count > 1 %}
-          <div class="course-selector">
-            <label for="course-select">Switch Course View:</label>
-            <select id="course-select" onchange="switchCourse()">
-              {% if page.courses.csp %}
-                <option value="csp" {% if current_course == 'csp' %}selected{% endif %}>Computer Science Principles</option>
-              {% endif %}
-              {% if page.courses.csa %}
-                <option value="csa" {% if current_course == 'csa' %}selected{% endif %}>Computer Science A</option>
-              {% endif %}
-              {% if page.courses.csse %}
-                <option value="csse" {% if current_course == 'csse' %}selected{% endif %}>CS & Software Engineering</option>
-              {% endif %}
-            </select>
-          </div>
-        {% endif %}
-        
         <div class="course-progress-section">
           <div class="progress-label">
             <span>Course Progress</span>
@@ -966,11 +913,9 @@ Check if this is a course lesson and determine which course context to use
   </div>
 
   <script>
-    // Simple course detection from URL parameter or default
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlCourse = urlParams.get('course');
-    let CURRENT_COURSE = urlCourse || '{{ current_course }}';
-    let currentWeek = {{ current_week }};
+    // Course is now determined by the specific file being viewed
+    const CURRENT_COURSE = '{{ current_course }}';
+    const currentWeek = {{ current_week }};
     
     const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
     const currentUrl = window.location.pathname;
@@ -1085,40 +1030,6 @@ Check if this is a course lesson and determine which course context to use
         alert('You\'ve reached the last lesson!');
       }
     }
-
-    // Update course-dependent UI elements
-    function updateCourseUI() {
-      const courseNames = {
-        'csp': 'Computer Science Principles',
-        'csa': 'Computer Science A', 
-        'csse': 'Computer Science & Software Engineering'
-      };
-      
-      // Update header title
-      const headerTitle = document.querySelector('.sidebar-header h2');
-      if (headerTitle && courseNames[CURRENT_COURSE]) {
-        headerTitle.textContent = courseNames[CURRENT_COURSE];
-      }
-      
-      // Update course selector
-      const courseSelect = document.getElementById('course-select');
-      if (courseSelect) {
-        courseSelect.value = CURRENT_COURSE;
-      }
-    }
-    
-    // Switch course context
-    function switchCourse() {
-      const select = document.getElementById('course-select');
-      const newCourse = select.value;
-      
-      // Update URL with course parameter
-      const url = new URL(window.location);
-      url.searchParams.set('course', newCourse);
-      window.location.href = url.toString();
-    }
-
-
 
     // Hide site header and apply lesson player styling
     function initLessonPlayer() {
