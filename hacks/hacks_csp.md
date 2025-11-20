@@ -6,9 +6,8 @@ assignment: true
 description: >
   A guided sequence of hands-on and learning tasks to help you master the frameworks that power our course.
 author: John Mortensen
-courses: {'csa': {'week': 1}}
+courses: {'csp': {'week': 1}}
 type: hacks
-canonical_id: onboarding-adventure
 permalink: /hacks
 lxdData:
   Title: "Learning Experience Designer Home"
