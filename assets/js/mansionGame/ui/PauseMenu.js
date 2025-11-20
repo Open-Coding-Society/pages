@@ -119,16 +119,39 @@ export default class PauseMenu {
     }
 
     _onEndLevel() {
-        // End the current level by signaling the GameControl's current level
+        // End the current level by signaling the GameControl's public API.
+        // Preferred: call `gameControl.endLevel()` if available (Adventure uses this).
+        // Fallback: dispatch a synthetic 'L' keydown event so controllers that listen
+        // for the skip key behave identically without modifying controller code.
         try {
-            if (this.gameControl) {
+            if (!this.gameControl) return;
+            // Prefer controller-level hide & resume so the game loop resumes and
+            // can process the level-ending logic immediately.
+            if (typeof this.gameControl.hidePauseMenu === 'function') {
+                try { this.gameControl.hidePauseMenu(); } catch (e) { /* ignore */ }
+            } else if (typeof this.gameControl.resume === 'function') {
+                try { this.gameControl.resume(); } catch (e) { /* ignore */ }
+            } else {
+                // fallback to hiding our UI if controller doesn't provide resume helper
                 this.hide();
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else if (this.gameControl.currentLevel) {
-                    this.gameControl.currentLevel.continue = false;
-                }
             }
+
+            if (typeof this.gameControl.endLevel === 'function') {
+                this.gameControl.endLevel();
+                return;
+            }
+
+            // Fallback: if controllers listen for the 'L' key to skip levels,
+            // synthesize a keydown event. This preserves existing controller behavior
+            // without requiring changes to GameControl.
+            const event = new KeyboardEvent('keydown', {
+                key: 'L',
+                code: 'KeyL',
+                keyCode: 76,
+                which: 76,
+                bubbles: true,
+            });
+            document.dispatchEvent(event);
         } catch (e) {
             console.warn('PauseMenu: could not end level:', e);
         }
