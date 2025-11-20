@@ -385,7 +385,7 @@ layout: post
                     {% assign itemType = "lesson" %}
                   {% endif %}
                   
-                  <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] | slugify }}">
+                  <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}">
                     <div class="item-content">
                       <button class="completion-toggle">
                         <i class="fas fa-circle status-icon incomplete"></i>
@@ -590,6 +590,18 @@ layout: post
       bar.style.width = `${progress}%`;
     });
   }
+  
+  // Sync completion data when window gains focus (when switching between views)
+  window.addEventListener('focus', function() {
+    initializeCompletion();
+  });
+  
+  // Listen for storage changes from other tabs/windows (cross-tab sync)
+  window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY) {
+      initializeCompletion();
+    }
+  });
   
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
