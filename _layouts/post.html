@@ -918,8 +918,8 @@ Check if this is a course lesson and determine which course context to use
     const currentWeek = '{{ current_week }}';
     
     const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
-    const currentUrl = window.location.pathname;
-    const currentLessonId = currentUrl;
+    // Use consistent lesson ID format (URL path without baseurl)
+    const currentLessonId = '{{ page.url }}';
 
     // Toggle sprint expansion
     function toggleSprint(sprintId) {
@@ -1038,9 +1038,25 @@ Check if this is a course lesson and determine which course context to use
       document.body.style.padding = '0';
     }
 
-    // Sync completion data when window gains focus (when switching between views)
+    // Sync completion data when window gains focus or becomes visible (when switching between views)
     window.addEventListener('focus', function() {
       if (document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Also sync when page becomes visible (handles tab switching)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Listen for storage changes from other tabs/windows (cross-tab sync)
+    window.addEventListener('storage', function(e) {
+      if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
         updateCompleteButton();
         updateUI();
       }
