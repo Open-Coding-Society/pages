@@ -41,7 +41,7 @@ For example, if your GitHub organization is **jm1021** and your repo is ****stud
    ./scripts/venv.sh # Activate the virtual environment (observe the prompt change)
    source venv/bin/activate # Prefix (venv) in path
    bundle install # Ensure Ruby gems for GitHub Pages is installed in (venv)
-   code . p # Open the project in VS Code
+   code . # Open the project in VS Code
    ```
 
 ### Authenticate with GitHub
@@ -64,12 +64,12 @@ The development cycle involves iterative steps of running the server, making cha
 ```text
 +-------------------+       +-------------------+       +-------------------+       +-------------------+       +-------------------+
 |                   |       |                   |       |                   |       |                   |       |                   |
-|    Run Server     | ----> |   Make Changes    | ----> |     Commit        | ----> |      Test         | ----> |     Sync          |
+|   Make Server     | ----> |   Change Code     | ----> |     Commit        | ----> |      Test         | ----> |     Sync          |
 |                   |       |                   |       |                   |       |                   |       |                   |
 +-------------------+       +-------------------+       +-------------------+       +-------------------+       +-------------------+
         |                           |                           |                           |                           |
         v                           v                           v                           v                           v
- Start Local Server           Edit Code Files             Save Changes Locally         Verify Changes           Push Changes to Remote
+ Start Local Server           Edit Code Files           Stage Changes Locally        Verify Local Changes        Push Changes to Cloud
 ```
 
 ### Open Project and Make
@@ -104,27 +104,29 @@ And it will do everything listed in the `Makefile`.
 
 6. Type `make` This runs a build to a local server. Repeat this command as often as you make changes.
 
-7. Hover then Cmd or Ctl Click on the Server address **<http://127.0.0.1> ...** provided in the terminal output from the make command.
+7. Hover then Cmd or Ctl Click on the localhost Server Address **<http://localhost:> ...** provided in the terminal output from the make command.
 
 ```bash
 ### Congratulations!!! An output similar to below means tool and equipment success ###
-johnmortensen@Johns-MBP pages % make
+(venv) johnmortensen@Mac pages % make
 Stopping server...
 Stopping logging process...
-Starting server...
-Server PID: 48190
-Terminal logging starting, watching server...
-Server started in 3 seconds
-Configuration file: /Users/johnmortensen/vscode/pages/_config.yml
-To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
-            Source: /Users/johnmortensen/vscode/pages
-       Destination: /Users/johnmortensen/vscode/pages/_site
- Incremental build: disabled. Enable with --incremental
+Starting server with current config/Gemfile...
+Server PID: 40638
+appending output to nohup.out
+Server started in 17 seconds
+    Server address: http://localhost:4500/
+Terminal logging starting, watching server for regeneration...
+Server started in 0 seconds
+Configuration file: /Users/johnmortensen/opencs/pages/_config.yml
+            Source: /Users/johnmortensen/opencs/pages
+       Destination: /Users/johnmortensen/opencs/pages/_site
+ Incremental build: enabled
       Generating... 
       Remote Theme: Using theme jekyll/minima
-                    done in 2.493 seconds.
- Auto-regeneration: enabled for '/Users/johnmortensen/vscode/pages'
-    Server address: http://127.0.0.1:4100/pages/
+                    done in 16.396 seconds.
+ Auto-regeneration: enabled for '/Users/johnmortensen/opencs/pages'
+    Server address: http://localhost:4500/
 ```
 
 #### Make workflow (local build: make, make clean, make stop, make convert)
@@ -181,41 +183,60 @@ The SDLC adds the important steps of Make and Test to the workflow. This ensures
    * If successful, you will see log output in the prompt:
 
    ```text
-   Stopping server...
-   Stopping logging process...
-   Detected theme: minima
-   Will call: serve-minima
-   Stopping server...
-   Stopping logging process...
-   Starting server with Minima theme...
-   Server PID: 57693
-   Server started in 17 seconds
-    Server address: http://127.0.0.1:4500/
+       Server address: http://localhost:4500/
    ```
 
-   * If delayed open 2nd terminal an run command `cat \tmp\jekyl4500.log`.  The log shoown is if things are right.
+   * If delayed open 2nd terminal using + and execute command `cat \tmp\jekyl4500.log`.  This keeps ongoing history of logs if things are right a below, if things are wrong you will see errors.  
 
    ```text
-   Configuration file: /Users/johnmortensen/open/pages/_config.yml
-   To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
-               Source: /Users/johnmortensen/open/pages
-         Destination: /Users/johnmortensen/open/pages/_site
-   Incremental build: disabled. Enable with --incremental
+   (venv) johnmortensen@Mac pages % cat /tmp/jekyll4500.log 
+   Configuration file: /Users/johnmortensen/opencs/pages/_config.yml
+               Source: /Users/johnmortensen/opencs/pages
+         Destination: /Users/johnmortensen/opencs/pages/_site
+   Incremental build: enabled
          Generating... 
          Remote Theme: Using theme jekyll/minima
+                     done in 16.396 seconds.
+   Auto-regeneration: enabled for '/Users/johnmortensen/opencs/pages'
+      Server address: http://localhost:4500/
+   Server running... press ctrl-c to stop.
+         Regenerating: 1 file(s) changed at 2025-11-20 06:20:27
+                     _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_setup-vscode.md
+         Remote Theme: Using theme jekyll/minima
+                     ...done in 16.992685 seconds.
+                     
+         Regenerating: 1 file(s) changed at 2025-11-20 06:22:30
+                     _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_setup-vscode.md
+         Remote Theme: Using theme jekyll/minima
+                     ...done in 16.763741 seconds.
    ```
 
-   * Open the localhost Server address in deskop or cloud computer browser `http://127.0.0.1:4500/`
+   * Open the localhost Server address in deskop or cloud computer browser `http://localhost:4500/`
    * Test your changes before you commit.
-   * If there are errors, make adjustments, commit, and run make again.
 
-4. Sync Changes to GitHub:
+4. Errors in terminal
+   * Most likely cause is `(venv)` in prompt `(venv) johnmortensen@Mac pages %`.  This will fail 100% of the time
+   * If there are errors in coding the will show in terminal (with a delay/timeout) and be in log: `cat /tmp/jekyll4500.log`
+   * Most likely error, is what you just changed!!!  Easiest fix is to undo, see if it fixes things.  Then try again.
+
+5. Regeneration messages
+   * Most changes will show regeneration message in terminal after you save file.
+   * If you see a message in terminal like the one below, you can test your localhost change by refreshing page you are working on.
+
+   ```text
+   Regenerating: 1 file(s) changed at 2025-11-20 06:40:18
+                     _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_setup-vscode.md
+         Remote Theme: Using theme jekyll/minima
+                     ...done in 16.537365 seconds.
+   ```
+
+6. Sync Changes to GitHub:
 
    * Never sync changes before you test, as this activates Actions on GitHub.
    * Click the "Sync Changes" button in the Source Control view.
    * This pushes your local commits to the remote GitHub repository.
 
-5. Update GitHub Pages:
+7. Update GitHub Pages:
 
    * GitHub Pages Action automatically rebuilds your site with the latest changes.
    * Visit your public website at https://<yourGitHubID>.github.io/student to see the updates.

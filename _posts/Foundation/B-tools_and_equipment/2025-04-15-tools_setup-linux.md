@@ -20,12 +20,11 @@ Welcome to your journey of setting up your Operating System and Tools! This setu
 ```mermaid
 flowchart TD
     A["💻 Open Terminal"] 
-    A1["💻 Launch Terminal"]
     B["📁 Linux Commands<br>mkdir, cd, ls"]
     C["📁 Clone Project<br>git clone https://<your-repo>"]
     D["🛠️ Activate Tools<br>Ruby, Python, Git"]
 
-    A --> A1 --> B --> C --> D 
+    A --> B --> C --> D 
 ```
 
 ## Shell Commands
