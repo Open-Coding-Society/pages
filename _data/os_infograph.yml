@@ -37,7 +37,7 @@ Topics:
     subtitle: "Apple Terminal + Brew"
     description: "MacOS is Unix-based and supports Linux commands natively. After installing Homebrew, you’ll run a setup script to configure Python, Ruby, Jupyter, and more. Custom symlinks are used to ensure tools work properly across Intel and Apple Silicon Macs. You'll use the Terminal for cloning, installing, and verifying your setup."
 
-  - title: "Linx"
+  - title: "Linux"
     image: "tux.png"
     link: "/tools/os/linux"
     alt: "Linux Development"

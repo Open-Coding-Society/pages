@@ -25,9 +25,8 @@ flowchart TD
     B["📁 Linux Commands<br>mkdir, cd, ls"]
     C["📁 Clone Project<br>git clone https://<your-repo>"]
     D["🛠️ Activate Tools<br>Ruby, Python, Git"]
-    E["🔄 SDLC<br>code → make → test → commit"]
 
-    A --> A1 --> A2 --> B --> C --> D --> E
+    A --> A1 --> A2 --> B --> C --> D
 ```
 
 ## Shell Commands
@@ -143,7 +142,3 @@ cd opencs/student
 source venv/bin/activate
 code .
 ```
-
----
-
-{% include slim_sidebar.html %}
