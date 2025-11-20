@@ -4,7 +4,7 @@ layout: aesthetihawk
 active_tab: dashboard
 ---
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
 <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
 <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/tabs.css" />
@@ -336,14 +336,21 @@ active_tab: dashboard
                         <section>
                             <h3 class="font-medium mb-2">Text Preferences</h3>
                             <div class="flex flex-col gap-3">
-                                <label class="text-sm text-neutral-400">Base font size: <span id="font-size-label">16</span>px</label>
-                                <input type="range" id="pref-font-size" min="12" max="22" value="16" />
+                                <label class="text-sm text-neutral-400">Base font size: <span id="font-size-label">14</span>px</label>
+                                <input type="range" id="pref-font-size" min="12" max="22" value="14" />
 
                                 <label class="text-sm text-neutral-400">Font family</label>
                                 <select id="pref-font-family" class="bg-neutral-700 text-white rounded px-2 py-1">
                                     <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial">Inter / System</option>
-                                    <option value="Georgia, 'Times New Roman', Times, serif">Serif (Georgia)</option>
-                                    <option value="'Courier New', Courier, monospace">Monospace</option>
+                                    <option value="Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial">Roboto</option>
+                                    <option value="'Open Sans', Arial, sans-serif">Open Sans</option>
+                                    <option value="Lato, Arial, sans-serif">Lato</option>
+                                    <option value="Montserrat, Arial, sans-serif">Montserrat</option>
+                                    <option value="'Noto Sans', Arial, sans-serif">Noto Sans</option>
+                                    <option value="Merriweather, Georgia, serif">Merriweather (Serif)</option>
+                                    <option value="Georgia, 'Times New Roman', Times, serif">Georgia / Times</option>
+                                    <option value="'Courier New', Courier, monospace">Courier New (Monospace)</option>
+                                    <option value="Arial, Helvetica, sans-serif">Arial / Helvetica</option>
                                 </select>
 
                                 <label class="text-sm text-neutral-400">Text color</label>
@@ -399,12 +406,14 @@ active_tab: dashboard
                     --pref-bg-color: #0b1220;
                     --pref-text-color: #e6eef8;
                     --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-                    --pref-font-size: 16px;
+                    --pref-font-size: 14px;
                     --pref-content-max-width: 1200px;
                 }
 
-                /* Apply to top-level elements to have wide effect without changing existing classes */
-                html, body {
+                /* Apply preferences to body only. Avoid changing root `html` font-size
+                   because that would scale `rem`-based layout (effectively zooming the page).
+                   Setting font-size on `body` changes text without affecting rem-based layout. */
+                body {
                     background: var(--pref-bg-color) !important;
                     color: var(--pref-text-color) !important;
                     font-family: var(--pref-font-family) !important;
@@ -418,10 +427,10 @@ active_tab: dashboard
                 <script>
                 (function () {
                     const PRESETS = {
-                        'Dark (default)': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 16, width: 1200 },
-                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 16, width: 1200 },
-                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 16, width: 1200 },
-                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 17, width: 1100 }
+                        'Dark (default)': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
+                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
+                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
+                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, width: 1200 }
                     };
 
                     const MAX_CUSTOM = 3;
@@ -442,11 +451,10 @@ active_tab: dashboard
                             document.documentElement.style.setProperty('--pref-font-size', size + 'px');
                             document.documentElement.style.setProperty('--pref-content-max-width', width + 'px');
 
-                            // direct style for body for maximum reach
+                            // direct style for body for maximum reach (avoid changing root html font-size)
                             document.body.style.background = bg;
                             document.body.style.color = text;
                             document.body.style.fontFamily = font;
-                            document.documentElement.style.fontSize = size + 'px';
                         } catch (e) { console.error('applyPreferences error', e); }
                     }
 
