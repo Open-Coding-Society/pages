@@ -726,7 +726,7 @@ Check if this is a course lesson and determine which course context to use
           
           {% if sprint %}
             <div class="sprint-section">
-              <button class="sprint-toggle" onclick="toggleSprint({{ i }})">
+              <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')">
                 <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
                 <div class="sprint-info">
                   <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
@@ -915,7 +915,7 @@ Check if this is a course lesson and determine which course context to use
   <script>
     // Course is now determined by the specific file being viewed
     const CURRENT_COURSE = '{{ current_course }}';
-    const currentWeek = {{ current_week }};
+    const currentWeek = '{{ current_week }}';
     
     const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
     const currentUrl = window.location.pathname;
