@@ -41,7 +41,7 @@ For example, if your GitHub organization is **jm1021** and your repo is ****stud
    ./scripts/venv.sh # Activate the virtual environment (observe the prompt change)
    source venv/bin/activate # Prefix (venv) in path
    bundle install # Ensure Ruby gems for GitHub Pages is installed in (venv)
-   code . p # Open the project in VS Code
+   code . # Open the project in VS Code
    ```
 
 ### Authenticate with GitHub
@@ -64,12 +64,12 @@ The development cycle involves iterative steps of running the server, making cha
 ```text
 +-------------------+       +-------------------+       +-------------------+       +-------------------+       +-------------------+
 |                   |       |                   |       |                   |       |                   |       |                   |
-|    Run Server     | ----> |   Make Changes    | ----> |     Commit        | ----> |      Test         | ----> |     Sync          |
+|   Make Server     | ----> |   Change Code     | ----> |     Commit        | ----> |      Test         | ----> |     Sync          |
 |                   |       |                   |       |                   |       |                   |       |                   |
 +-------------------+       +-------------------+       +-------------------+       +-------------------+       +-------------------+
         |                           |                           |                           |                           |
         v                           v                           v                           v                           v
- Start Local Server           Edit Code Files             Save Changes Locally         Verify Changes           Push Changes to Remote
+ Start Local Server           Edit Code Files           Stage Changes Locally        Verify Local Changes        Push Changes to Cloud
 ```
 
 ### Open Project and Make
@@ -104,27 +104,29 @@ And it will do everything listed in the `Makefile`.
 
 6. Type `make` This runs a build to a local server. Repeat this command as often as you make changes.
 
-7. Hover then Cmd or Ctl Click on the Server address **<http://127.0.0.1> ...** provided in the terminal output from the make command.
+7. Hover then Cmd or Ctl Click on the localhost Server Address **<http://localhost:> ...** provided in the terminal output from the make command.
 
 ```bash
 ### Congratulations!!! An output similar to below means tool and equipment success ###
-johnmortensen@Johns-MBP pages % make
+(venv) johnmortensen@Mac pages % make
 Stopping server...
 Stopping logging process...
-Starting server...
-Server PID: 48190
-Terminal logging starting, watching server...
-Server started in 3 seconds
-Configuration file: /Users/johnmortensen/vscode/pages/_config.yml
-To use retry middleware with Faraday v2.0+, install `faraday-retry` gem
-            Source: /Users/johnmortensen/vscode/pages
-       Destination: /Users/johnmortensen/vscode/pages/_site
- Incremental build: disabled. Enable with --incremental
+Starting server with current config/Gemfile...
+Server PID: 40638
+appending output to nohup.out
+Server started in 17 seconds
+    Server address: http://localhost:4500/
+Terminal logging starting, watching server for regeneration...
+Server started in 0 seconds
+Configuration file: /Users/johnmortensen/opencs/pages/_config.yml
+            Source: /Users/johnmortensen/opencs/pages
+       Destination: /Users/johnmortensen/opencs/pages/_site
+ Incremental build: enabled
       Generating... 
       Remote Theme: Using theme jekyll/minima
-                    done in 2.493 seconds.
- Auto-regeneration: enabled for '/Users/johnmortensen/vscode/pages'
-    Server address: http://127.0.0.1:4100/pages/
+                    done in 16.396 seconds.
+ Auto-regeneration: enabled for '/Users/johnmortensen/opencs/pages'
+    Server address: http://localhost:4500/
 ```
 
 #### Make workflow (local build: make, make clean, make stop, make convert)
