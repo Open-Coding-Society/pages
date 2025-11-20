@@ -1,116 +1,596 @@
 ---
-layout: post 
+layout: post
 ---
-
-{% comment %} 
-Setup course data
-{% endcomment %}
 
 {% assign shared = site.data.cs %}
 {% assign course = site.data[page.course] %}
 {% assign units = page.units | split: ',' %}
-
-{% comment %} 
-Load all posts
-{% endcomment %}
 {% assign posts = null | compact %}
-{% assign posts = posts | concat:site.posts | concat:site.pages %}
+{% assign posts = posts | concat: site.posts | concat: site.pages %}
 
-{% comment %} 
-Iterate through Course Units
-{% endcomment %}
-{% for unit in units %}
-  {% comment %} 
-  Extract unit data for the Sprint
-  {% endcomment %}
-  {% assign unitKey = "Sprint" | append: unit %}
-  {% assign unitData = course[unitKey] %}
-  {% assign courseUnit = course[unitKey] %}
-  {% assign start = unitData.start %}
-  {% assign end = unitData.end %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  {% comment %} 
-  Override unit data with shared unit data if available, ie common between courses
-  {% endcomment %}
-  {% if courseUnit.shared %}
-    {% assign unitData = shared[courseUnit.shared] %}
-  {% endif %}
+<style>
+  body {
+    background: #0a0a0a;
+  }
 
-  {% comment %} 
-  Heading content for the Sprint
-  {% endcomment %}
-  <h2>{{ unitKey }}: {{ unitData.title }}</h2>
-  <h3>Weeks: {{ start }} - {{ end }}</h3>
-  <p>{{ unitData.description }}</p>
+  .timeline-header {
+    margin-bottom: 32px;
+  }
 
-  {% comment %} 
-  Text based illustration for Sprint objectives
-  {% endcomment %}
-  {% if unitData.illustration %}
-    <details>
-      <summary>Textual Illustration of Goals</summary>
-      <pre>
-        <p>{{ unitData.illustration }}</p>
-      </pre>
-    </details>
-    <br/>
-  {% endif %}
+  .timeline-header h1 {
+    color: #ffffff;
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
 
-  {% comment %} 
-  Mermaid based illustration for Sprint objectives
-  {% endcomment %}
-  {% if unitData.mermaid_figure %}
-    <details>
-      <summary>Grapical Illustration of Goals</summary>
-      <div class="mermaid">
-        {{ unitData.mermaid_figure }}
-      </div>
-    </details>
-    <br/>
-  {% endif %}
+  .timeline-header-description {
+    color: #999999;
+    margin-bottom: 24px;
+  }
 
-  {% comment %} 
-  Column Headings for Articles, ie Blogs
-  {% endcomment %}
-  <table>
-    <tr>
-      <th>Title</th>
-      <th>Type</th>
-    </tr>
+  .timeline-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 
-    {% comment %} 
-    Generate a table of posts for the current Sprint
-    {% endcomment %}
+  .filter-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+
+  .filter-btn:hover {
+    background: #1a1a1a;
+  }
+
+  .filter-btn.active {
+    background: #1a1a1a;
+    border-color: #60a5fa;
+    color: #60a5fa;
+  }
+
+  .timeline-container {
+    margin-top: 32px;
+  }
+
+  .week-card {
+    background: #0f0f0f;
+    border: 1px solid #222222;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+  }
+
+  .week-card:hover {
+    border-color: #2a2a2a;
+  }
+
+  .week-content-wrapper {
+    display: flex;
+    gap: 24px;
+  }
+
+  .week-indicator {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .week-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 2px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #60a5fa;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .week-connector {
+    width: 1px;
+    height: 32px;
+    background: #222222;
+    margin-top: 8px;
+  }
+
+  .week-card:last-child .week-connector {
+    display: none;
+  }
+
+  .week-main-content {
+    flex: 1;
+  }
+
+  .week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .week-title-group h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    margin: 0 0 4px 0;
+  }
+
+  .week-sprint {
+    color: #60a5fa;
+    font-size: 14px;
+  }
+
+  .completion-badge {
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #cccccc;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: #60a5fa;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .item-card {
+    padding: 12px;
+    background: #151515;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+
+  .item-card:hover {
+    background: #1a1a1a;
+  }
+
+  .item-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .completion-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .item-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .status-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+
+  .status-icon.completed {
+    color: #60a5fa;
+  }
+
+  .status-icon.incomplete {
+    color: #444444;
+  }
+
+  .type-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+
+  .type-icon.lesson {
+    color: #60a5fa;
+  }
+
+  .type-icon.assignment {
+    color: #f59e0b;
+  }
+
+  .item-title {
+    color: #e0e0e0;
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .item-card.completed .item-title {
+    color: #999999;
+  }
+
+  .assignment-due {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f59e0b;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .load-more {
+    text-align: center;
+    margin-top: 24px;
+  }
+
+  .load-more-btn {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    color: #60a5fa;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .load-more-btn:hover {
+    background: #1a1a1a;
+    color: #93c5fd;
+  }
+
+  @media (max-width: 768px) {
+    .items-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .week-content-wrapper {
+      gap: 16px;
+    }
+    
+    .week-circle {
+      width: 48px;
+      height: 48px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="timeline-header">
+  <h1>Course Timeline</h1>
+  <p class="timeline-header-description">Track your progress through Computer Science Principles</p>
+  
+  <div class="timeline-filters">
+    <button class="filter-btn active" data-filter="all">
+      <i class="fas fa-filter"></i> All Items
+    </button>
+    <button class="filter-btn" data-filter="lessons">
+      Lessons Only
+    </button>
+    <button class="filter-btn" data-filter="assignments">
+      Assignments Only
+    </button>
+    <button class="filter-btn" data-filter="incomplete">
+      Incomplete Only
+    </button>
+  </div>
+</div>
+
+<div class="timeline-container">
+  {% for unit in units %}
+    {% assign unitKey = "Sprint" | append: unit %}
+    {% assign unitData = course[unitKey] %}
+    {% assign courseUnit = course[unitKey] %}
+    {% assign start = unitData.start %}
+    {% assign end = unitData.end %}
+
+    {% if courseUnit.shared %}
+      {% assign unitData = shared[courseUnit.shared] %}
+    {% endif %}
 
     {% for index in (start..end) %}
-      {% comment %}
-      Locate posts in the matching weeks of Sprint
-      {% endcomment %}
       {% assign entries = null | compact %}
-      {% for post in posts %}
+      {% assign totalItems = 0 %}
+      {% assign completedItems = 0 %}
+      
+                    {% for post in posts %}
         {% if post.courses[page.course] %}
           {% assign week = post.courses[page.course].week | plus: 0 %}
           {% if week == index %}
-            {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: post.type %}
+            {% comment %} Check if assignment field exists, default to lesson if not {% endcomment %}
+            {% if post.assignment == true %}
+              {% assign itemType = "assignment" %}
+            {% else %}
+              {% assign itemType = "lesson" %}
+            {% endif %}
+            {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
             {% assign entries = entries | push: entry %}
+            {% assign totalItems = totalItems | plus: 1 %}
           {% endif %}
         {% endif %}
       {% endfor %}
 
-      {% comment %}
-      Render the located posts 
-      {% endcomment %}
-      {% for entry in entries %}
-        {% assign parts = entry | split: "||" %}
-        <tr>
-          <td>
-            <a href="{{ site.baseurl }}{{ parts[1] }}">{{ parts[0] }}</a>
-          </td>
-          <td>
-            {{ parts[2] }}
-          </td>
-        </tr>
-      {% endfor %}
+      {% if entries.size > 0 %}
+        <div class="week-card">
+          <div class="week-content-wrapper">
+            <div class="week-indicator">
+              <div class="week-circle">W{{ index }}</div>
+              <div class="week-connector"></div>
+            </div>
+
+            <div class="week-main-content">
+              <div class="week-header">
+                <div class="week-title-group">
+                  <h3>Week {{ index }}: {{ unitData.title }}</h3>
+                  <div class="week-sprint">{{ unitKey }}: {{ unitData.title }}</div>
+                </div>
+                <div class="completion-badge">
+                  {{ completedItems }}/{{ totalItems }} Complete
+                </div>
+              </div>
+
+              <div class="progress-bar-container">
+                {% if totalItems > 0 %}
+                  {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
+                {% else %}
+                  {% assign progress = 0 %}
+                {% endif %}
+                <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
+              </div>
+
+              <div class="items-grid">
+                {% for entry in entries %}
+                  {% assign parts = entry | split: "||" %}
+                  {% assign isAssignment = parts[2] == "assignment" %}
+                  
+                  <div class="item-card" data-type="{{ isAssignment | default: false | string | replace: 'true', 'assignment' | replace: 'false', 'lesson' }}" data-item-id="{{ parts[1] | slugify }}">
+                    <div class="item-content">
+                      <button class="completion-toggle">
+                        <i class="fas fa-circle status-icon incomplete"></i>
+                      </button>
+                        <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
+                        {% if isAssignment %}
+                          <i class="fas fa-file-alt type-icon assignment"></i>
+                        {% else %}
+                          <i class="fas fa-code type-icon lesson"></i>
+                        {% endif %}
+                        <span class="item-title">{{ parts[0] }}</span>
+                      </a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+
+              {% assign assignmentCount = 0 %}
+              {% for entry in entries %}
+                {% assign parts = entry | split: "||" %}
+                {% if parts[2] == "assignment" %}
+                  {% assign assignmentCount = assignmentCount | plus: 1 %}
+                {% endif %}
+              {% endfor %}
+
+              {% if assignmentCount > 0 %}
+                <div class="assignment-due">
+                  <i class="fas fa-calendar"></i>
+                  <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
     {% endfor %}
-  </table>
-{% endfor %}
+  {% endfor %}
+</div>
+
+<script>
+  // Completion tracking (course-specific)
+  const CURRENT_COURSE = '{{ page.course }}';
+  const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
+  
+  // Load completion data from localStorage
+  function loadCompletionData() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error('Error loading completion data:', e);
+      return {};
+    }
+  }
+  
+  // Save completion data to localStorage
+  function saveCompletionData(data) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Error saving completion data:', e);
+    }
+  }
+  
+  // Toggle completion status
+  function toggleCompletion(button) {
+    try {
+      const itemCard = button.closest('.item-card');
+      if (!itemCard) {
+        console.error('Could not find item card');
+        return;
+      }
+      
+      const itemId = itemCard.dataset.itemId;
+      const completionData = loadCompletionData();
+      const isCompleted = completionData[itemId] || false;
+      
+      // Toggle status
+      completionData[itemId] = !isCompleted;
+      saveCompletionData(completionData);
+      
+      // Update UI
+      updateItemUI(itemCard, !isCompleted);
+      updateProgressBars();
+    } catch (error) {
+      console.error('Error in toggleCompletion:', error);
+    }
+  }
+  
+  // Update item UI based on completion status
+  function updateItemUI(itemCard, isCompleted) {
+    const statusIcon = itemCard.querySelector('.status-icon');
+    
+    if (isCompleted) {
+      statusIcon.classList.remove('fa-circle', 'incomplete');
+      statusIcon.classList.add('fa-circle-check', 'completed');
+      itemCard.classList.add('completed');
+    } else {
+      statusIcon.classList.remove('fa-circle-check', 'completed');
+      statusIcon.classList.add('fa-circle', 'incomplete');
+      itemCard.classList.remove('completed');
+    }
+  }
+  
+  // Update progress bars for all weeks
+  function updateProgressBars() {
+    const weekCards = document.querySelectorAll('.week-card');
+    
+    weekCards.forEach(weekCard => {
+      const itemCards = weekCard.querySelectorAll('.item-card');
+      const completionBadge = weekCard.querySelector('.completion-badge');
+      const progressFill = weekCard.querySelector('.progress-bar-fill');
+      
+      let totalItems = itemCards.length;
+      let completedItems = 0;
+      
+      itemCards.forEach(card => {
+        if (card.classList.contains('completed')) {
+          completedItems++;
+        }
+      });
+      
+      const progress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+      
+      // Update badge
+      if (completionBadge) {
+        completionBadge.textContent = `${completedItems}/${totalItems} Complete`;
+      }
+      
+      // Update progress bar
+      if (progressFill) {
+        progressFill.style.width = `${progress}%`;
+      }
+    });
+  }
+  
+  // Initialize completion states on page load
+  function initializeCompletion() {
+    const completionData = loadCompletionData();
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    itemCards.forEach(card => {
+      const itemId = card.dataset.itemId;
+      const isCompleted = completionData[itemId] || false;
+      updateItemUI(card, isCompleted);
+      
+      // Add click event listener to the completion toggle button
+      const toggleButton = card.querySelector('.completion-toggle');
+      if (toggleButton) {
+        toggleButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleCompletion(this);
+        });
+      }
+    });
+    
+    updateProgressBars();
+  }
+  
+  // Filter functionality
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  
+  function applyFilters() {
+    const itemCards = document.querySelectorAll('.item-card');
+    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    
+    itemCards.forEach(card => {
+      const type = card.dataset.type;
+      const isCompleted = card.classList.contains('completed');
+      
+      if (activeFilter === 'all') {
+        card.style.display = 'block';
+      } else if (activeFilter === 'lessons' && type === 'lesson') {
+        card.style.display = 'block';
+      } else if (activeFilter === 'assignments' && type === 'assignment') {
+        card.style.display = 'block';
+      } else if (activeFilter === 'incomplete' && !isCompleted) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Update active state
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Apply filters
+      applyFilters();
+    });
+  });
+  
+  // Initialize progress bars from data attributes
+  function initializeProgressBars() {
+    const progressBars = document.querySelectorAll('.progress-bar-fill');
+    progressBars.forEach(bar => {
+      const progress = bar.dataset.progress || 0;
+      bar.style.width = `${progress}%`;
+    });
+  }
+  
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeProgressBars();
+    initializeCompletion();
+    applyFilters();
+  });
+</script>
