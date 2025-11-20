@@ -1,4 +1,6 @@
 import GameControl from './GameControl.js';
+// Auto-register a shared PauseMenu so pages don't need to import it.
+import PauseMenu from '../../mansionGame/ui/PauseMenu.js';
 class Game {
     constructor(environment) {
         this.environment = environment;
@@ -16,6 +18,14 @@ class Game {
         const gameLevelClasses = environment.gameLevelClasses;
         this.gameControl = new GameControl(this, gameLevelClasses);
         this.gameControl.start();
+        
+        // Instantiate PauseMenu
+        try {
+            new PauseMenu(this.gameControl, { parentId: 'gameContainer' });
+        } catch (err) {
+            // Non-fatal: if PauseMenu can't initialize (missing file/env), continue without it
+            console.warn('PauseMenu not initialized in Game:', err);
+        }
     }
 
     static main(environment) {
