@@ -126,6 +126,9 @@ serve-current: stop convert
 			cat $(LOG_FILE); \
 			exit 1; \
 		fi; \
+		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+			echo "Still starting... ($$COUNTER seconds elapsed)"; \
+		fi; \
 		sleep 1; \
 	done
 
