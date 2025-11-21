@@ -31,7 +31,7 @@ default: serve-current
 			echo "Server started in $$COUNTER seconds"; \
 			break; \
 		fi; \
-		if [ $$COUNTER -eq 120 ]; then \
+		if [ $$COUNTER -eq 300 ]; then \
 			echo "Server timed out after $$COUNTER seconds."; \
 			echo "Review errors from $(LOG_FILE)."; \
 			cat $(LOG_FILE); \
@@ -110,20 +110,26 @@ serve-yat: use-yat clean
 # General serve target (uses whatever is in _config.yml/Gemfile)
 serve-current: stop convert
 	@echo "Starting server with current config/Gemfile..."
-	@@nohup bundle install && bundle exec jekyll serve -H $(HOST) -P $(PORT) > $(LOG_FILE) 2>&1 & \
+	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) >> $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
 		echo "Server PID: $$PID"
-	@@until [ -f $(LOG_FILE) ]; do sleep 1; done
+	@until [ -f $(LOG_FILE) ]; do sleep 1; done
 	@for ((COUNTER = 0; ; COUNTER++)); do \
 		if grep -q "Server address:" $(LOG_FILE); then \
 			echo "Server started in $$COUNTER seconds"; \
 			grep "Server address:" $(LOG_FILE); \
 			break; \
 		fi; \
-		if [ $$COUNTER -eq 120 ]; then \
+		if [ $$COUNTER -eq 300 ]; then \
 			echo "Server timed out after $$COUNTER seconds."; \
 			echo "Review errors from $(LOG_FILE)."; \
-			cat $(LOG_FILE); \
+			grep -v "Server running... press ctrl-c to stop." $(LOG_FILE); \
+			exit 1; \
+		fi; \
+		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b" $(LOG_FILE); then \
+			echo "Fatal error detected during startup!"; \
+			echo "Review errors from $(LOG_FILE):"; \
+			grep -v "Server running... press ctrl-c to stop." $(LOG_FILE); \
 			exit 1; \
 		fi; \
 		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
