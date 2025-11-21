@@ -370,6 +370,7 @@ active_tab: dashboard
                                 <div class="flex gap-2">
                                     <button id="save-preferences" type="button" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">Save</button>
                                     <button id="reset-preferences" type="button" class="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600 transition text-white font-semibold">Reset</button>
+                                    <button id="restore-styles" type="button" class="px-4 py-2 rounded bg-red-700 hover:bg-red-800 transition text-white font-semibold">Restore original styling</button>
                                 </div>
                                 <p id="preferences-status" class="text-sm text-neutral-400 mt-2"></p>
                             </div>
@@ -410,14 +411,34 @@ active_tab: dashboard
                     --pref-content-max-width: 1200px;
                 }
 
-                /* Apply preferences to body only. Avoid changing root `html` font-size
-                   because that would scale `rem`-based layout (effectively zooming the page).
-                   Setting font-size on `body` changes text without affecting rem-based layout. */
+                /* Apply preferences to body only by default. We also provide a
+                   `.user-theme-active` class that can be toggled when the user
+                   has chosen a theme — it enforces the chosen colors across the
+                   entire page (uses !important to override third-party utilities).
+                   This is intentionally broad so user-selected themes override
+                   the default Jekyll/theme styles. */
                 body {
                     background: var(--pref-bg-color) !important;
                     color: var(--pref-text-color) !important;
                     font-family: var(--pref-font-family) !important;
                     font-size: var(--pref-font-size) !important;
+                }
+
+                /* When active, apply colors to everything. This is broad by design
+                   so that user themes override other CSS (Tailwind/Minima/Preline).
+                   We explicitly allow media elements to keep their backgrounds. */
+                .user-theme-active * {
+                    color: var(--text) !important;
+                    background-color: var(--background) !important;
+                    border-color: var(--panel) !important;
+                    fill: var(--text) !important;
+                    stroke: var(--text) !important;
+                }
+                .user-theme-active img,
+                .user-theme-active video,
+                .user-theme-active svg,
+                .user-theme-active iframe {
+                    background-color: transparent !important;
                 }
 
                 /* Constrain main content wrapper if present */
@@ -451,11 +472,115 @@ active_tab: dashboard
                             document.documentElement.style.setProperty('--pref-font-size', size + 'px');
                             document.documentElement.style.setProperty('--pref-content-max-width', width + 'px');
 
+                            // Mirror critical site-wide vars so SASS/compiled CSS that reference
+                            // --background / --text / --white1 / --panel reflect user prefs.
+                            // Also set a broad set of aliases used across the SASS maps so
+                            // more components pick up the runtime theme.
+                            const set = (name, value) => document.documentElement.style.setProperty(name, value);
+                                    set('--background', bg);
+                                    set('--bg-0', bg);
+                                    set('--bg-1', bg);
+                                    set('--bg-2', bg);
+                                    set('--bg-3', bg);
+                                    // compute a panel/border color that contrasts with background
+                                    function hexToRgb(hex){
+                                        hex = hex.replace('#','');
+                                        if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+                                        const bigint = parseInt(hex, 16);
+                                        return { r: (bigint>>16)&255, g:(bigint>>8)&255, b: bigint&255 };
+                                    }
+                                    function luminance(r,g,b){
+                                        const a = [r,g,b].map(v=>{
+                                            v /= 255;
+                                            return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+                                        });
+                                        return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
+                                    }
+                                    function rgbToHex(r,g,b){
+                                        return '#'+[r,g,b].map(v=>{ const s=v.toString(16); return s.length==1? '0'+s: s; }).join('');
+                                    }
+                                    // try to compute a subtle panel color (lighter on dark bg, darker on light bg)
+                                    let panelColor = bg;
+                                    try {
+                                        const rgb = hexToRgb(bg);
+                                        const lum = luminance(rgb.r,rgb.g,rgb.b);
+                                        // if dark background (lum < 0.5) lighten; else darken
+                                        const amount = 0.12; // 12%
+                                        let r = rgb.r, g = rgb.g, b = rgb.b;
+                                        if (lum < 0.5) {
+                                            r = Math.min(255, Math.round(r + (255 - r) * amount));
+                                            g = Math.min(255, Math.round(g + (255 - g) * amount));
+                                            b = Math.min(255, Math.round(b + (255 - b) * amount));
+                                        } else {
+                                            r = Math.max(0, Math.round(r * (1 - amount)));
+                                            g = Math.max(0, Math.round(g * (1 - amount)));
+                                            b = Math.max(0, Math.round(b * (1 - amount)));
+                                        }
+                                        panelColor = rgbToHex(r,g,b);
+                                    } catch(e){ panelColor = bg; }
+                                    set('--panel', panelColor);
+                            set('--popup-bg', bg);
+                            set('--surface', bg);
+
+                            set('--text', text);
+                            set('--white1', text);
+                            set('--white2', text);
+                            set('--white3', text);
+                            set('--text-muted', text);
+
+                            // Helpful aliases
+                            set('--accent', bg);
+                            set('--accent-700', bg);
+                            set('--orange', bg);
+
+                            // Copy to some status / control vars so badges and buttons update
+                            set('--status-indicator-base-bg', bg);
+                            set('--status-indicator-base-border', bg);
+                            set('--status-indicator-success-color', text);
+                            set('--success-green', text);
+
+                            // Ensure the user theme class is present so the CSS override applies
+                            document.documentElement.classList.add('user-theme-active');
+
                             // direct style for body for maximum reach (avoid changing root html font-size)
                             document.body.style.background = bg;
                             document.body.style.color = text;
                             document.body.style.fontFamily = font;
+                            // ensure body border visibility: set a subtle default border color if none
+                            try { document.body.style.setProperty('--panel-border-fallback', panelColor); } catch(e){}
                         } catch (e) { console.error('applyPreferences error', e); }
+                    }
+
+                    // Restore original site styling (remove all runtime overrides)
+                    function restoreOriginalStyling(){
+                        try {
+                            // Remove storage keys
+                            localStorage.removeItem(storageKey);
+                            localStorage.removeItem(themesKey);
+
+                            const root = document.documentElement;
+                            const body = document.body;
+
+                            // remove known custom properties we set
+                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback'];
+                            keys.forEach(k=>{ try{ root.style.removeProperty(k); body.style.removeProperty(k); }catch(e){} });
+
+                            // remove inline styles we may have set
+                            root.style.removeProperty('color');
+                            root.style.removeProperty('background-color');
+                            root.style.removeProperty('font-family');
+                            root.style.removeProperty('font-size');
+                            body.style.removeProperty('background');
+                            body.style.removeProperty('color');
+                            body.style.removeProperty('font-family');
+                            body.style.removeProperty('font-size');
+
+                            // remove the class
+                            root.classList.remove('user-theme-active');
+
+                            // small delay then reload to ensure the original CSS is re-applied
+                            setTimeout(()=> location.reload(), 80);
+                        } catch (e) { console.error('restoreOriginalStyling error', e); }
                     }
 
                     function loadPreferences() {
@@ -606,6 +731,11 @@ active_tab: dashboard
                             resetPreferences();
                             populateForm(PRESETS['Dark (default)']);
                             showStatus('Preferences reset to default (dark).');
+                        });
+
+                        document.getElementById('restore-styles').addEventListener('click', function(){
+                            restoreOriginalStyling();
+                            showStatus('Restoring original site styling...');
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', function(){
