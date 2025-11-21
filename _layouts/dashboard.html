@@ -440,6 +440,22 @@ active_tab: dashboard
                     background-color: transparent !important;
                 }
 
+                /* Inputs, selects, textareas and buttons should use a slightly
+                   darker tone of the theme background so contrast improves. */
+                .user-theme-active input,
+                .user-theme-active select,
+                .user-theme-active textarea {
+                    background-color: var(--ui-bg) !important;
+                    color: var(--text) !important;
+                    border: 1px solid var(--ui-border) !important;
+                }
+
+                .user-theme-active button {
+                    background-color: var(--ui-bg) !important;
+                    color: var(--text) !important;
+                    border: 1px solid var(--ui-border) !important;
+                }
+
                 /* Constrain main content wrapper if present */
                 .w-full { max-width: var(--pref-content-max-width); margin: 0 auto; }
                 </style>
@@ -518,6 +534,17 @@ active_tab: dashboard
                                         panelColor = rgbToHex(r,g,b);
                                     } catch(e){ panelColor = bg; }
                                     set('--panel', panelColor);
+                                    // compute darker tones for UI chrome (inputs/buttons)
+                                    try {
+                                        const rgb2 = hexToRgb(bg);
+                                        const dark = (v, amt) => Math.max(0, Math.round(v * (1 - amt)));
+                                        const uiAmt = 0.12; // darker tone for controls
+                                        const borderAmt = 0.22; // stronger darkening for borders
+                                        const ur = dark(rgb2.r, uiAmt), ug = dark(rgb2.g, uiAmt), ub = dark(rgb2.b, uiAmt);
+                                        const br = dark(rgb2.r, borderAmt), bgc = dark(rgb2.g, borderAmt), bb = dark(rgb2.b, borderAmt);
+                                        set('--ui-bg', rgbToHex(ur, ug, ub));
+                                        set('--ui-border', rgbToHex(br, bgc, bb));
+                                    } catch (e) { set('--ui-bg', bg); set('--ui-border', panelColor); }
                             set('--popup-bg', bg);
                             set('--surface', bg);
 
@@ -545,6 +572,20 @@ active_tab: dashboard
                             document.body.style.background = bg;
                             document.body.style.color = text;
                             document.body.style.fontFamily = font;
+                            // Apply inline styles to controls so they visibly pick up the darker UI tones
+                            try {
+                                const rootStyles = getComputedStyle(document.documentElement);
+                                const uiBg = (rootStyles.getPropertyValue('--ui-bg') || bg).trim();
+                                const uiBorder = (rootStyles.getPropertyValue('--ui-border') || panelColor).trim();
+                                const uiText = (rootStyles.getPropertyValue('--text') || text).trim();
+                                document.querySelectorAll('input, select, textarea, button').forEach(el => {
+                                    try {
+                                        el.style.backgroundColor = uiBg;
+                                        el.style.color = uiText;
+                                        el.style.borderColor = uiBorder;
+                                    } catch(e){}
+                                });
+                            } catch(e){}
                             // ensure body border visibility: set a subtle default border color if none
                             try { document.body.style.setProperty('--panel-border-fallback', panelColor); } catch(e){}
                         } catch (e) { console.error('applyPreferences error', e); }
@@ -561,7 +602,7 @@ active_tab: dashboard
                             const body = document.body;
 
                             // remove known custom properties we set
-                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback'];
+                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback','--ui-bg','--ui-border'];
                             keys.forEach(k=>{ try{ root.style.removeProperty(k); body.style.removeProperty(k); }catch(e){} });
 
                             // remove inline styles we may have set
@@ -573,6 +614,17 @@ active_tab: dashboard
                             body.style.removeProperty('color');
                             body.style.removeProperty('font-family');
                             body.style.removeProperty('font-size');
+
+                            // remove inline styles from controls we may have modified
+                            try {
+                                document.querySelectorAll('input, select, textarea, button').forEach(el => {
+                                    try {
+                                        el.style.removeProperty('background-color');
+                                        el.style.removeProperty('color');
+                                        el.style.removeProperty('border-color');
+                                    } catch(e){}
+                                });
+                            } catch(e){}
 
                             // remove the class
                             root.classList.remove('user-theme-active');
