@@ -369,7 +369,6 @@ active_tab: dashboard
 
                                 <div class="flex gap-2">
                                     <button id="save-preferences" type="button" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">Save</button>
-                                    <button id="reset-preferences" type="button" class="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600 transition text-white font-semibold">Reset</button>
                                     <button id="restore-styles" type="button" class="px-4 py-2 rounded bg-red-700 hover:bg-red-800 transition text-white font-semibold">Restore original styling</button>
                                 </div>
                                 <p id="preferences-status" class="text-sm text-neutral-400 mt-2"></p>
@@ -448,7 +447,7 @@ active_tab: dashboard
                 <script>
                 (function () {
                     const PRESETS = {
-                        'Dark (default)': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
+                        'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
                         'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
                         'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
                         'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, width: 1200 }
@@ -459,11 +458,11 @@ active_tab: dashboard
                     const themesKey = 'siteThemes';
 
                     function applyPreferences(prefs = {}){
-                        const bg = prefs.bg || PRESETS['Dark (default)'].bg;
-                        const text = prefs.text || PRESETS['Dark (default)'].text;
-                        const font = prefs.font || PRESETS['Dark (default)'].font;
-                        const size = prefs.size || PRESETS['Dark (default)'].size;
-                        const width = prefs.width || PRESETS['Dark (default)'].width;
+                        const bg = prefs.bg || PRESETS['Midnight'].bg;
+                        const text = prefs.text || PRESETS['Midnight'].text;
+                        const font = prefs.font || PRESETS['Midnight'].font;
+                        const size = prefs.size || PRESETS['Midnight'].size;
+                        const width = prefs.width || PRESETS['Midnight'].width;
 
                         try {
                             document.documentElement.style.setProperty('--pref-bg-color', bg);
@@ -600,12 +599,6 @@ active_tab: dashboard
                         } catch (e) { console.error('savePreferences error', e); }
                     }
 
-                    function resetPreferences(){
-                        localStorage.removeItem(storageKey);
-                        const def = PRESETS['Dark (default)'];
-                        savePreferences({ bg: def.bg, text: def.text, font: def.font, size: def.size, width: def.width });
-                    }
-
                     function loadThemes(){
                         try {
                             const raw = localStorage.getItem(themesKey);
@@ -692,12 +685,12 @@ active_tab: dashboard
 
                     function populateForm(prefs){
                         if (!prefs) return;
-                        document.getElementById('pref-bg-color').value = prefs.bg || PRESETS['Dark (default)'].bg;
-                        document.getElementById('pref-text-color').value = prefs.text || PRESETS['Dark (default)'].text;
-                        document.getElementById('pref-font-family').value = prefs.font || PRESETS['Dark (default)'].font;
-                        document.getElementById('pref-font-size').value = prefs.size || PRESETS['Dark (default)'].size;
-                        document.getElementById('font-size-label').textContent = prefs.size || PRESETS['Dark (default)'].size;
-                        document.getElementById('pref-content-width').value = prefs.width || PRESETS['Dark (default)'].width;
+                        document.getElementById('pref-bg-color').value = prefs.bg || PRESETS['Midnight'].bg;
+                        document.getElementById('pref-text-color').value = prefs.text || PRESETS['Midnight'].text;
+                        document.getElementById('pref-font-family').value = prefs.font || PRESETS['Midnight'].font;
+                        document.getElementById('pref-font-size').value = prefs.size || PRESETS['Midnight'].size;
+                        document.getElementById('font-size-label').textContent = prefs.size || PRESETS['Midnight'].size;
+                        document.getElementById('pref-content-width').value = prefs.width || PRESETS['Midnight'].width;
                     }
 
                     function showStatus(msg){
@@ -715,7 +708,7 @@ active_tab: dashboard
                         // init form from saved prefs or defaults
                         const saved = loadPreferences();
                         if (saved) populateForm(saved);
-                        else populateForm(PRESETS['Dark (default)']);
+                        else populateForm(PRESETS['Midnight']);
 
                         document.getElementById('pref-font-size').addEventListener('input', function(e){
                             document.getElementById('font-size-label').textContent = e.target.value;
@@ -725,12 +718,6 @@ active_tab: dashboard
                             const prefs = currentFormValues();
                             savePreferences(prefs);
                             showStatus('Preferences saved locally.');
-                        });
-
-                        document.getElementById('reset-preferences').addEventListener('click', function(){
-                            resetPreferences();
-                            populateForm(PRESETS['Dark (default)']);
-                            showStatus('Preferences reset to default (dark).');
                         });
 
                         document.getElementById('restore-styles').addEventListener('click', function(){
