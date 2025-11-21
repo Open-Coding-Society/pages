@@ -380,18 +380,20 @@ layout: post
                 {% for entry in entries %}
                   {% assign parts = entry | split: "||" %}
                   {% if parts[2] == "assignment" %}
+                    {% assign isAssignment = true %}
                     {% assign itemType = "assignment" %}
                   {% else %}
+                    {% assign isAssignment = false %}
                     {% assign itemType = "lesson" %}
                   {% endif %}
                   
-                  <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}">
+                  <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] | slugify }}">
                     <div class="item-content">
                       <button class="completion-toggle">
                         <i class="fas fa-circle status-icon incomplete"></i>
                       </button>
                         <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
-                        {% if itemType == "assignment" %}
+                        {% if isAssignment %}
                           <i class="fas fa-file-alt type-icon assignment"></i>
                         {% else %}
                           <i class="fas fa-code type-icon lesson"></i>
@@ -590,18 +592,6 @@ layout: post
       bar.style.width = `${progress}%`;
     });
   }
-  
-  // Sync completion data when window gains focus (when switching between views)
-  window.addEventListener('focus', function() {
-    initializeCompletion();
-  });
-  
-  // Listen for storage changes from other tabs/windows (cross-tab sync)
-  window.addEventListener('storage', function(e) {
-    if (e.key === STORAGE_KEY) {
-      initializeCompletion();
-    }
-  });
   
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
