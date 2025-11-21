@@ -1,6 +1,5 @@
 // GameControl.js with improved level transition handling
 import GameLevel from "./GameLevel.js";
-import PauseMenu from "../../adventureGame/GameEngine/PauseMenu.js";
 
 class GameControl {
     /**
@@ -18,9 +17,12 @@ class GameControl {
         this.currentLevel = null;
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
-        this.isPaused = false;
-        this.exitKeyListener = this.handleExitKey.bind(this);
-        this.pauseKeyListener = this.handlePauseKey.bind(this);
+    this.isPaused = false;
+    // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
+    this.pauseMenu = null;
+    this.skipKeyListener = this.handleSkipKey.bind(this);
+    this.exitKeyListener = this.handleExitKey.bind(this);
+    this.pauseKeyListener = this.handlePauseKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
         
@@ -33,14 +35,10 @@ class GameControl {
     
     start() {
         this.addExitKeyListener();
-        // Add listener for opening the pause menu (toggle with 'p')
+        // Add listener for opening the pause menu (toggle with 'p') and skip key (L)
         document.addEventListener('keydown', this.pauseKeyListener);
-        // Create a pause menu instance (attached to the game container)
-        try {
-            this.pauseMenu = new PauseMenu(this);
-        } catch (e) {
-            console.warn('PauseMenu could not be initialized:', e);
-        }
+        this.addSkipKeyListener();
+        // PauseMenu is initialized by the shared Game core (optional dynamic import).
         this.transitionToLevel();
     }
 
@@ -205,7 +203,24 @@ class GameControl {
      */
     handleExitKey(event) {
         if (event.key === 'Escape') {
-            this.currentLevel.continue = false;
+            // If a PauseMenu has been registered, toggle it. Do NOT end level from Escape.
+            if (this.pauseMenu) {
+                try {
+                    const isHidden = this.pauseMenu.container && this.pauseMenu.container.getAttribute('aria-hidden') === 'true';
+                    if (isHidden) {
+                        this.pause();
+                        if (typeof this.pauseMenu.show === 'function') this.pauseMenu.show();
+                    } else {
+                        if (typeof this.pauseMenu.hide === 'function') this.pauseMenu.hide();
+                        this.resume();
+                    }
+                } catch (e) {
+                    console.warn('Error toggling pause menu:', e);
+                }
+            } else {
+                // fallback: end the level when no pause menu is present
+                this.currentLevel.continue = false;
+            }
         }
     }
 
@@ -224,6 +239,32 @@ class GameControl {
                 this.showPauseMenu();
             }
         }
+    }
+
+    /**
+     * Handle skip-level key (default: 'L')
+     */
+    handleSkipKey(event) {
+        // Don't interfere with typing in inputs
+        const tag = event.target && event.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
+
+        if (event.key === 'l' || event.key === 'L') {
+            // Call the public API to end/skip the level
+            try {
+                this.endLevel();
+            } catch (e) {
+                console.warn('Error skipping level via L key:', e);
+            }
+        }
+    }
+
+    addSkipKeyListener() {
+        document.addEventListener('keydown', this.skipKeyListener);
+    }
+
+    removeSkipKeyListener() {
+        document.removeEventListener('keydown', this.skipKeyListener);
     }
 
     showPauseMenu() {
@@ -257,6 +298,15 @@ class GameControl {
         // Recreate the same level
         this.currentLevel = null;
         this.transitionToLevel();
+    }
+    
+    /**
+     * End the current level (public API)
+     */
+    endLevel() {
+        if (this.currentLevel) {
+            this.currentLevel.continue = false;
+        }
     }
     
     // Helper method to add exit key listener

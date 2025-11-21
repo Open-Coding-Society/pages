@@ -16,6 +16,8 @@ microblog: true
     import { initCheats } from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/cheats.js";
     import GameLevel3 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+        import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
+        import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/GameControl.js";
 
     // Web Server Environment data
 	
@@ -30,7 +32,7 @@ microblog: true
 
     }
     // Launch Adventure Game
-    const game = Game.main(environment);
+        const game = Core.main(environment, GameControl);
     
     // Initialize cheats/navigation buttons
     initCheats(game);

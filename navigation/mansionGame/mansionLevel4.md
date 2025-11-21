@@ -13,6 +13,10 @@ microblog: true
     import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
     import MansionLevel4 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel4.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+        import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
+        import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/GameControl.js";
+        import GameLevel4 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel4.js";
+        import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Web Server Environment data
     const environment = {
         path:"{{site.baseurl}}",
@@ -23,6 +27,6 @@ microblog: true
         gameCanvas: document.getElementById("gameCanvas"),
         gameLevelClasses: [MansionLevel4]
     }
-    // Launch Adventure Game
-    Game.main(environment);
+        // Launch Mansion Game using the central core and mansion GameControl
+        const game = Core.main(environment, GameControl);
 </script>
