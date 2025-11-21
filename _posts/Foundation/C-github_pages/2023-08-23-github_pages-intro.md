@@ -1,3 +1,14 @@
+---
+layout: post
+tailwind: True
+title: GitHub Pages LxD Series
+description: An interactive series for learning Frontend programming, GitHub Pages, and Jupyter Notebooks through hands-on mini-projects.
+type: hacks 
+courses: {'csse': {'week': 2}, 'csp': {'week': 2}, 'csa': {'week': 1}}
+permalink: /github/pages/
+author: John Mortensen
+---
+
 Welcome to your GitHub Pages mini-project journey! This series will guide you through essential skills for web programming with GitHub Pages.
 
 <div class="mermaid" style="padding:1rem; border-radius:0.5rem;">
