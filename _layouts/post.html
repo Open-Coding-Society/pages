@@ -970,7 +970,16 @@ Check if this is a course lesson and determine which course context to use
   <script>
     window.CURRENT_ASSIGNMENT_TITLE = "{{ page.title | default: '' | escape }}";
     console.log('Assignment title:', window.CURRENT_ASSIGNMENT_TITLE || '(none)');
-
+    
+    // Simple course detection from URL parameter or default
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCourse = urlParams.get('course');
+    let CURRENT_COURSE = urlCourse || '{{ current_course }}';
+    let currentWeek = {{ current_week }};
+    
+    const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
+    const currentUrl = window.location.pathname;
+    const currentLessonId = currentUrl;
 
     // Toggle sprint expansion
     function toggleSprint(sprintId) {
