@@ -968,6 +968,8 @@ Check if this is a course lesson and determine which course context to use
   </div>
 
   <script>
+    window.CURRENT_ASSIGNMENT_TITLE = "{{ page.title | default: '' | escape }}";
+    console.log('Assignment title:', window.CURRENT_ASSIGNMENT_TITLE || '(none)');
 
 
     // Toggle sprint expansion
