@@ -858,9 +858,11 @@ Check if this is a course lesson and determine which course context to use
             {%- endif -%}
 
             {{ content }}
+<!-- Replace the assignment submission section in _layouts/post.html with this -->
+<!-- Add this to the assignment submission widget to expose the assignment ID and user ID to JavaScript -->
 
             {% if page.assignment %}
-            <div class="assignment-submission">
+            <div class="assignment-submission" data-assignment-id="{{ page.id }}" data-user-id="USER_ID_PLACEHOLDER">
               <h3>
                 <i class="fas fa-upload assignment-submission-icon"></i>
                 Submit Assignment
@@ -966,15 +968,7 @@ Check if this is a course lesson and determine which course context to use
   </div>
 
   <script>
-    // Simple course detection from URL parameter or default
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlCourse = urlParams.get('course');
-    let CURRENT_COURSE = urlCourse || '{{ current_course }}';
-    let currentWeek = {{ current_week }};
-    
-    const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
-    const currentUrl = window.location.pathname;
-    const currentLessonId = currentUrl;
+
 
     // Toggle sprint expansion
     function toggleSprint(sprintId) {
@@ -1158,164 +1152,244 @@ Check if this is a course lesson and determine which course context to use
     });
 
     // Assignment submission handlers
-    if (document.getElementById('github-form')) {
-      // Submission type switching
-      function switchSubmissionType(type) {
-        // Update tabs
-        document.querySelectorAll('.submission-tab').forEach(tab => {
-          tab.classList.remove('active');
-        });
-        event.target.closest('.submission-tab').classList.add('active');
+  if (document.getElementById('github-form')) {
+    
+    // Get assignment ID from page data
+    const assignmentIdElement = document.querySelector('[data-assignment-id]');
+    const ASSIGNMENT_ID = assignmentIdElement ? assignmentIdElement.getAttribute('data-assignment-id') : null;
+    
+    // Configuration for Spring backend URL
+    const BACKEND_URL = 'http://localhost:8080'; // Adjust based on your Spring backend URL
 
-        // Update forms
-        document.querySelectorAll('.submission-form').forEach(form => {
-          form.classList.remove('active');
-        });
-        document.getElementById(`${type}-form`).classList.add('active');
-
-        // Clear status
-        document.getElementById('submission-status').style.display = 'none';
-      }
-      window.switchSubmissionType = switchSubmissionType;
-
-      // File upload handling
-      const fileUploadArea = document.getElementById('file-upload-area');
-      const fileInput = document.getElementById('file-input');
-      const fileList = document.getElementById('file-list');
-      const fileSubmitBtn = document.getElementById('file-submit-btn');
-      let selectedFiles = [];
-
-      if (fileUploadArea) {
-        fileUploadArea.addEventListener('click', () => fileInput.click());
-
-        fileUploadArea.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          fileUploadArea.classList.add('dragover');
-        });
-
-        fileUploadArea.addEventListener('dragleave', () => {
-          fileUploadArea.classList.remove('dragover');
-        });
-
-        fileUploadArea.addEventListener('drop', (e) => {
-          e.preventDefault();
-          fileUploadArea.classList.remove('dragover');
-          handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-          handleFiles(e.target.files);
-        });
-      }
-
-      function handleFiles(files) {
-        Array.from(files).forEach(file => {
-          if (file.size > 10 * 1024 * 1024) {
-            showStatus('error', `File ${file.name} is too large (max 10MB)`);
-            return;
-          }
-          selectedFiles.push(file);
-        });
-        updateFileList();
-      }
-
-      function updateFileList() {
-        fileList.innerHTML = '';
-        selectedFiles.forEach((file, index) => {
-          const fileItem = document.createElement('div');
-          fileItem.className = 'file-item';
-          fileItem.innerHTML = `
-            <div class="file-info">
-              <i class="fas fa-file"></i>
-              <div>
-                <div class="file-name">${file.name}</div>
-                <div class="file-size">${formatFileSize(file.size)}</div>
-              </div>
-            </div>
-            <button type="button" class="remove-file" onclick="removeFile(${index})">
-              <i class="fas fa-times"></i>
-            </button>
-          `;
-          fileList.appendChild(fileItem);
-        });
-        fileSubmitBtn.disabled = selectedFiles.length === 0;
-      }
-
-      function removeFile(index) {
-        selectedFiles.splice(index, 1);
-        updateFileList();
-      }
-      window.removeFile = removeFile;
-
-      function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-      }
-
-      // Form submissions
-      document.getElementById('github-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const url = document.getElementById('github-issue-url').value;
-        const notes = document.getElementById('github-notes').value;
-        
-        saveSubmission('github', { url, notes });
-        showStatus('success', 'GitHub issue submitted successfully!');
-        this.reset();
+    // Submission type switching
+    function switchSubmissionType(type) {
+      document.querySelectorAll('.submission-tab').forEach(tab => {
+        tab.classList.remove('active');
       });
+      event.target.closest('.submission-tab').classList.add('active');
 
-      document.getElementById('link-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const link = document.getElementById('submission-link').value;
-        const description = document.getElementById('link-description').value;
-        
-        saveSubmission('link', { link, description });
-        showStatus('success', 'Link submitted successfully!');
-        this.reset();
+      document.querySelectorAll('.submission-form').forEach(form => {
+        form.classList.remove('active');
       });
+      document.getElementById(`${type}-form`).classList.add('active');
 
-      document.getElementById('file-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const notes = document.getElementById('file-notes').value;
-        
-        const fileNames = selectedFiles.map(f => f.name);
-        saveSubmission('file', { files: fileNames, notes });
-        
-        showStatus('success', `${selectedFiles.length} file(s) submitted successfully!`);
-        selectedFiles = [];
-        updateFileList();
-        this.reset();
-      });
-
-      function saveSubmission(type, data) {
-        const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
-        const lessonId = window.location.pathname;
-        
-        if (!submissions[lessonId]) {
-          submissions[lessonId] = [];
-        }
-        
-        submissions[lessonId].push({
-          type,
-          data,
-          timestamp: new Date().toISOString()
-        });
-        
-        localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
-      }
-
-      function showStatus(type, message) {
-        const status = document.getElementById('submission-status');
-        status.className = `submission-status ${type}`;
-        status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-        
-        setTimeout(() => {
-          status.style.display = 'none';
-        }, 5000);
-      }
+      document.getElementById('submission-status').style.display = 'none';
     }
+    window.switchSubmissionType = switchSubmissionType;
+
+    // File upload handling
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const fileSubmitBtn = document.getElementById('file-submit-btn');
+    let selectedFiles = [];
+
+    if (fileUploadArea) {
+      fileUploadArea.addEventListener('click', () => fileInput.click());
+
+      fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+      });
+
+      fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+      });
+
+      fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+      });
+    }
+
+    function handleFiles(files) {
+      Array.from(files).forEach(file => {
+        if (file.size > 10 * 1024 * 1024) {
+          showStatus('error', `File ${file.name} is too large (max 10MB)`);
+          return;
+        }
+        selectedFiles.push(file);
+      });
+      updateFileList();
+    }
+
+    function updateFileList() {
+      fileList.innerHTML = '';
+      selectedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <i class="fas fa-file"></i>
+            <div>
+              <div class="file-name">${file.name}</div>
+              <div class="file-size">${formatFileSize(file.size)}</div>
+            </div>
+          </div>
+          <button type="button" class="remove-file" onclick="removeFile(${index})">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        fileList.appendChild(fileItem);
+      });
+      fileSubmitBtn.disabled = selectedFiles.length === 0;
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      updateFileList();
+    }
+    window.removeFile = removeFile;
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Form submissions - send to Spring backend
+    document.getElementById('github-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const url = document.getElementById('github-issue-url').value;
+      const notes = document.getElementById('github-notes').value;
+      
+      submitToBackend('github', { url, notes });
+    });
+
+    document.getElementById('link-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const link = document.getElementById('submission-link').value;
+      const description = document.getElementById('link-description').value;
+      
+      submitToBackend('link', { link, description });
+    });
+
+    document.getElementById('file-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const notes = document.getElementById('file-notes').value;
+      
+      const fileNames = selectedFiles.map(f => f.name);
+      submitToBackend('file', { files: fileNames, notes });
+    });
+
+    async function submitToBackend(submissionType, data) {
+        const BACKEND_URL = 'http://localhost:8585';
+        
+        try {
+            // Step 1: Get current user ID using the correct endpoint
+            const userResponse = await fetch(`${BACKEND_URL}/api/person/get`, {
+                credentials: 'include'
+            });
+            
+            if (!userResponse.ok) {
+                showStatus('error', 'You must be logged in to submit. Please log in and try again.');
+                return;
+            }
+            
+            const user = await userResponse.json();
+            const userId = user.id;
+            
+            console.log('Current user:', user.name, 'ID:', userId);
+            
+            // Step 2: Find the assignment by name
+            const assignmentsResponse = await fetch(`${BACKEND_URL}/api/assignments/`, {
+                credentials: 'include'
+            });
+            
+            if (!assignmentsResponse.ok) {
+                showStatus('error', 'Failed to fetch assignments');
+                return;
+            }
+            
+            const assignments = await assignmentsResponse.json();
+            console.log('Looking for assignment:', window.CURRENT_ASSIGNMENT_TITLE || '(none)');
+            console.log('Available assignments:', assignments.map(a => a.name));
+            
+            // Make the lookup defensive — ensure we have a title and the assignment entries include names
+            const assignmentTitleRaw = (window.CURRENT_ASSIGNMENT_TITLE || '').toString();
+            if (!assignmentTitleRaw.trim()) {
+              showStatus('error', 'This page has no assignment title, so the assignment cannot be matched. Contact your instructor.');
+              console.error('Missing CURRENT_ASSIGNMENT_TITLE for assignment lookup.');
+              return;
+            }
+
+            const assignmentTitle = assignmentTitleRaw.toLowerCase().trim();
+            const assignment = assignments.find(a => (
+              a && a.name && a.name.toString().toLowerCase().trim() === assignmentTitle
+            ));
+            
+            if (!assignment) {
+                showStatus('error', `Assignment "${window.CURRENT_ASSIGNMENT_TITLE}" not found in database. Contact your instructor.`);
+                console.error('Available assignments:', assignments.map(a => a.name));
+                return;
+            }
+            
+            const assignmentId = assignment.id;
+            console.log('Found assignment ID:', assignmentId);
+            
+            // Step 3: Submit to backend
+            const payload = {
+                submitterId: userId,
+                isGroup: false,
+                content: JSON.stringify(data),
+                comment: submissionType,
+                isLate: false
+            };
+            
+            console.log('Submitting payload:', payload);
+            
+            const response = await fetch(
+                `${BACKEND_URL}/api/submissions/submit/${assignmentId}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                }
+            );
+            
+            if (response.ok) {
+                showStatus('success', `${submissionType.charAt(0).toUpperCase() + submissionType.slice(1)} submitted successfully!`);
+                
+                // Reset the form
+                const formId = submissionType === 'file' ? 'file-form' : submissionType === 'github' ? 'github-form' : 'link-form';
+                document.getElementById(formId).reset();
+                
+                if (submissionType === 'file') {
+                    selectedFiles = [];
+                    updateFileList();
+                }
+            } else {
+                const errorText = await response.text();
+                console.error('Submission failed:', response.status, errorText);
+                showStatus('error', `Failed to submit: ${errorText}`);
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            showStatus('error', 'An error occurred. Check console for details. Make sure you are logged in and the backend is running at ' + BACKEND_URL);
+        }
+    }
+    
+    function showStatus(type, message) {
+      const status = document.getElementById('submission-status');
+      status.className = `submission-status ${type}`;
+      status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+      status.style.display = 'block';
+      
+      setTimeout(() => {
+        status.style.display = 'none';
+      }, 5000);
+    }
+  }
   </script>
 
 {% else %}
@@ -1782,6 +1856,9 @@ Check if this is a course lesson and determine which course context to use
       </div>
 
       <script>
+        window.CURRENT_ASSIGNMENT_TITLE = "{{ page.title | default: '' }}";
+        window.CURRENT_ASSIGNMENT_ID = null; // Will be looked up by title
+
         // Submission type switching
         function switchSubmissionType(type) {
           // Update tabs
