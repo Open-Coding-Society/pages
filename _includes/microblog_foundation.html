@@ -35,8 +35,15 @@
 </aside>
 
 <script type="module">
-// Import required functions from config
-import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+// Import required functions from config (always use relative import for browser compatibility)
+import { pythonURI as importedPythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+
+// Universal fallback for pythonURI
+window.pythonURI = importedPythonURI || (
+  (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:8587'
+    : 'https://flask.opencodingsociety.com'
+);
 
 // Microblog panel open/close logic
 const microblogPanel = document.getElementById('microblog-panel');
@@ -93,58 +100,59 @@ window.handleGuestSignup = async function(event) {
     statusMessage.textContent = 'Creating guest account...';
     const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(signupData)
     });
 
+    let userData;
     if (!signupResponse.ok) {
-      // Account might already exist, so we'll try to login instead
+      // Account might already exist, try login
       accountExists = true;
       statusMessage.textContent = 'Account exists, logging in...';
     } else {
-      await signupResponse.json();
+      userData = await signupResponse.json();
       statusMessage.textContent = 'Account created! Logging in...';
     }
 
-    // Step 2: Login with the credentials (whether account was just created or already existed)
+    // Step 2: Login with credentials
     const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify(signupData)
     });
 
-    if (!loginResponse.ok) {
-      throw new Error('Login failed - please check your credentials');
+    if (!loginResponse.ok) throw new Error('Login failed - please check your credentials');
+
+    const loginData = await loginResponse.json();
+
+    // Store the logged-in userId globally
+    window.currentUserId = loginData.userId || (userData && userData.userId) || null;
+
+    if (!window.currentUserId) {
+      throw new Error('Could not determine logged-in userId');
     }
 
-    await loginResponse.json();
-
-    // Success - stay on current page
+    // Success
     statusMessage.textContent = 'Success! You are now logged in.';
     statusMessage.style.color = 'green';
 
     // Hide the form after successful signup/login
     setTimeout(() => {
       guestSignupForm.style.display = 'none';
-      // Reset form
       document.getElementById('guest-username').value = '';
       document.getElementById('guest-password').value = '';
       submitButton.disabled = false;
       submitButton.textContent = 'Sign Up & Login';
     }, 2000);
 
-  } catch (error) {
+} catch (error) {
     console.error('Guest signup error:', error);
     statusMessage.textContent = `Error: ${error.message}`;
     statusMessage.style.color = 'red';
     submitButton.disabled = false;
     submitButton.textContent = 'Sign Up & Login';
-  }
+}
 };
 </script>
 
@@ -164,6 +172,10 @@ window.handleGuestSignup = async function(event) {
       <div class="microblog-form-group">
         <label for="content" class="microblog-form-label">Content <span class="required">*</span></label>
         <textarea id="content" name="content" required class=""></textarea>
+      </div>
+      <div class="microblog-form-group">
+        <label for="file-upload" class="microblog-form-label">Attach File (PDF, JPEG, DOC, DOCX, PNG):</label>
+        <input type="file" id="file-upload" name="file" accept=".pdf,.jpeg,.jpg,.png,.doc,.docx">
       </div>
       <div class="flex justify-end space-x-2">
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
@@ -197,7 +209,6 @@ window.handleGuestSignup = async function(event) {
 <script type="module">
 // Imports for APIs used on this page
 import { fetchPosts, createPost, updatePost, createReply, fetchReplies } from '/assets/js/api/microblog.js';
-
 // Default Key for New MicroBlog Posts
 const pagePermalink = '{{page.permalink}}';
 
@@ -240,7 +251,7 @@ document.getElementById('reply-form').onsubmit = async function(e) {
   const postId = document.getElementById('reply-post-id').value;
   const content = document.getElementById('reply-content').value;
   const topicPath = pagePermalink || (window.location ? window.location.pathname : 'default');
-  
+ 
   try {
     await createReply({ postId, content, topicPath });
     closeReplyModal();
@@ -256,20 +267,16 @@ async function loadRepliesForPost(postId) {
     const repliesData = await fetchReplies(postId);
     const replies = repliesData.replies || repliesData || [];
     if (replies.length > 0) {
-      // Find the row for this post
       const postRow = document.querySelector(`#post-row-${postId}`);
       if (postRow) {
-        // Check if replies section already exists
         let repliesRow = document.querySelector(`#replies-row-${postId}`);
         if (!repliesRow) {
-          // Create a new row for replies
           repliesRow = document.createElement('tr');
           repliesRow.id = `replies-row-${postId}`;
           repliesRow.className = 'replies-row';
           postRow.insertAdjacentElement('afterend', repliesRow);
         }
-        
-        // Format replies HTML
+       
         const repliesHtml = replies.map(reply => {
           const replyDate = reply.timestamp ? new Date(reply.timestamp).toLocaleString() : '';
           return `
@@ -281,7 +288,7 @@ async function loadRepliesForPost(postId) {
             </div>
           `;
         }).join('');
-        
+       
         repliesRow.innerHTML = `
           <td colspan="2" class="text-left p-2">
             <div class="replies-container">
@@ -304,54 +311,83 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Save Button Listner for Update and Create
+// Save Button Listener for Update and Create (with detailed error logging)
 document.getElementById('microblog-form').onsubmit = async function(e) {
-  e.preventDefault();
-  const id = document.getElementById('post-id').value;
-  const topicPath = document.getElementById('topic-id').value;
-  const content = document.getElementById('content').value;
-  try {
-    // API calls to Update and Create Posts
-    if (id) {
-      await updatePost({ id, content, topicPath });
-    } else {
-      await createPost({ content, topicPath });
+    e.preventDefault();
+
+    const id = document.getElementById('post-id').value;
+    const topicPath = document.getElementById('topic-id').value;
+    const content = document.getElementById('content').value;
+    const fileInput = document.getElementById('file-upload');
+    const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+    try {
+        if (id) {
+            // For update (you can add file update logic if needed)
+            await updatePost({ id, content, topicPath });
+            await renderMicroblogTable();
+        } else {
+            // Creating new post with optional file upload
+            const formData = new FormData();
+            formData.append('content', content);
+            formData.append('topicPath', topicPath);
+            formData.append('userId', window.currentUserId);
+            if (file) formData.append('file', file);
+
+            const resp = await fetch(`${pythonURI}/api/microblog`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+
+            if (!resp.ok) {
+                // Try to get detailed error info from backend
+                let errorText;
+                try {
+                    const data = await resp.json();
+                    errorText = JSON.stringify(data);
+                } catch {
+                    errorText = await resp.text();
+                }
+                throw new Error(`Failed to create post. Status: ${resp.status}, Response: ${errorText}`);
+            }
+        }
+
+        // Close modal and refresh table
+        closeModal();
+        renderMicroblogTable();
+    } catch (err) {
+        console.error('Detailed Microblog Save Error:', err);
+        alert('Error saving post: ' + err.message);
     }
-    closeModal();
-    renderMicroblogTable();
-  } catch (err) {
-    alert('Error saving post: ' + err.message);
-  }
 };
+
 
 // MicroBlog Table Manager
 async function renderMicroblogTable() {
     const container = document.getElementById('microblog-playground');
     try {
-        // Determine filter mode and pass page if needed
         let pageArg = undefined;
         if (window.__microblogFilterMode === undefined || window.__microblogFilterMode === 'page') {
-          // Use current page as filter; fallback to location.pathname or a default string
           pageArg = window.location ? window.location.pathname : 'default';
         }
-        // API call to Read former Posts
         const data = await fetchPosts(pageArg);
-        // SVG icons for Create (+) and Edit (pencil)
+        console.log("Microblog data fetched:", data);
         const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
         const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
         const replyIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>`;
-        // Single page icon (default)
         const pageIcon = `<span class="microblog-filter-icon microblog-filter-page" id="page-icon" title="Show this page only"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="4" width="12" height="16" rx="2" fill="white" stroke="white" stroke-width="1.5"/><rect x="8" y="6" width="8" height="12" rx="1" fill="#9333ea" stroke="white" stroke-width="1.5"/></svg></span>`;
-        // Many pages icon (secondary option)
         const manyPagesIcon = `<span class="microblog-filter-icon microblog-filter-many" id="many-pages-icon" title="Show all pages"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><g><rect x="7" y="15" width="10" height="6" rx="2" fill="#60a5fa" stroke="white" stroke-width="1.2"/><rect x="5" y="11" width="12" height="6" rx="2" fill="#2563eb" stroke="white" stroke-width="1.2"/><rect x="3" y="7" width="12" height="6" rx="2" fill="#1e40af" stroke="white" stroke-width="1.2"/></g></svg></span>`;
-        // Create and Page Icons
-        const controlsInfo = `
+        let controlsInfo = `
           <span id="filter-icons" class="microblog-filter-controls">
             <button id="create-btn" class="microblog-btn microblog-btn-create" title="Create Post">${createIcon}</button>
             ${pageIcon}
             ${manyPagesIcon}
           </span>
         `;
+
+
+
 
         // Table: Keys and Special Formatting
         const analytics = [
@@ -370,6 +406,9 @@ async function renderMicroblogTable() {
           { key: 'content' }
         ];
 
+
+
+
         // Table: columns
         let head = `
             <thead>
@@ -379,6 +418,9 @@ async function renderMicroblogTable() {
                 </tr>
             </thead>
         `;
+
+
+
 
         // Table: rows; generated from microblog data
         let genBody = '';
@@ -400,8 +442,21 @@ async function renderMicroblogTable() {
               }
               return `<div>${value}</div>`;
             }).join('');
-            genBody += `<tr id="post-row-${post.id}"><td class="text-left">${analyticsCell}</td><td class="text-left">${messageCell}</td></tr>`;
+            // Add download link if file exists
+            let fileLink = '';
+            if (post.file && post.file.url && post.file.filename) {
+              fileLink = `<div>
+                  <a href="${window.pythonURI}${post.file.url}" target="_blank" download>
+                    Download: ${post.file.filename}
+                  </a>
+                </div>`;
+            }
+
+            genBody += `<tr id="post-row-${post.id}"><td class="text-left">${analyticsCell}</td><td class="text-left">${messageCell}${fileLink}</td></tr>`;
         });
+
+
+
 
         // Table: body
         let body = `
@@ -409,6 +464,12 @@ async function renderMicroblogTable() {
             ${genBody}
         </tbody>
         `;
+
+
+
+
+
+
 
 
         // Table: set container with scrollable wrapper
@@ -420,6 +481,9 @@ async function renderMicroblogTable() {
           </table>
         </div>
         `;
+
+
+
 
         // Wait for DOM update, then initialize DataTables
         setTimeout(async () => {
@@ -500,7 +564,7 @@ async function renderMicroblogTable() {
               const postId = $(this).data('id');
               openReplyModal(postId);
             });
-            
+           
             // Load and display replies for each post
             for (const post of (data.microblogs || [])) {
               await loadRepliesForPost(post.id);
