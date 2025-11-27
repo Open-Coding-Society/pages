@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log("Credentials data:", data); // Debugging line
             window.user = data;
+
+            if (data && data.id) {  
+            window.currentUserId = data.id;  // Make it globally available for microblog  
+            sessionStorage.setItem('userId', data.id); // Optional: persist across reloads  
+            }
+            
             const loginArea = document.getElementById('loginArea');
             if (data) { // Update the login area based on the data
                 loginArea.innerHTML = `
