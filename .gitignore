@@ -43,3 +43,7 @@ _posts/**/*_DOCX_.md
 # Temporary DOCX files
 _docx/~$*
 *.tmp
+
+# Local Jekyll overrides
+_config_dev.yml
+Makefile.local
