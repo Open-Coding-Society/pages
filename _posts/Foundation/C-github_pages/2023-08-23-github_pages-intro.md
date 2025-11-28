@@ -11,7 +11,7 @@ author: John Mortensen
 
 Welcome to your GitHub Pages mini-project journey! This series will guide you through essential skills for web programming with GitHub Pages.
 
-<div class="mermaid" style="background:#6b7280; padding:1rem; border-radius:0.5rem;">
+<div class="mermaid" style="padding:1rem; border-radius:0.5rem;">
 graph TD
     A[Notebooks & Jokes] --> B[Anatomy]
     B --> C[Theme]
@@ -76,6 +76,8 @@ graph TD
   </tr>
 </table>
 
+---
+
 ## Markdown - How to Use This Series
 
 - **Start at the top** and follow the arrows to progress through each topic.
@@ -94,7 +96,7 @@ graph TD
 
 ---
 
-- [Notebooks & Jokes]({{site.baseurl}}/github/pages/jokes): Fun with JavaScript and Jupyter Notebooks
+- [Jupyter Notebooks & Jokes]({{site.baseurl}}/github/pages/jokes): Fun with JavaScript and Jupyter Notebooks
 - [Anatomy]({{site.baseurl}}/github/pages/anatomy): Explore the structure of a GitHub Pages site
 - [Theme]({{site.baseurl}}/github/pages/theme): Learn about theme templates and layout of SASS files for advanced styling
 - [Markdown]({{site.baseurl}}/github/pages/markdown): Master Markdown for content creation
@@ -140,4 +142,9 @@ graph TD
 
 ---
 
-> Ready to begin? Start building a LxD layout and articles to begin your LxD journey.
+## Hack
+
+> Ready to begin? Start building a LxD layout and articles on your personal Home Page (index.md).
+
+1. Pick a style to navigate to these items on you Home Page
+2. Move all the documents into you personal repository and get all the links working.
