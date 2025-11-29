@@ -10,7 +10,7 @@ breadcrumb: True
 comments: True
 ---
 
-## Team Building and Diversity
+## Instructor Oberservation -- Team Building and Diversity
 
 In my personal journey as an Engineer, I have studied, experienced, and worked with people from many cultures. I often try to look for similarities and/or growth opportunities in each new exposure.
 
@@ -58,15 +58,15 @@ The goal is not to label people—but to encourage us to look beyond the familia
 
 ### Today's Task: Building Your Team
 
-We’ll be forming **teams of 6**. If numbers require, we may have some teams of 5.
+We’ll be forming **teams of 5 or 6**. If numbers require or in small classes we will teams of 5.
 
-Each team will work as **two paired trios**, forming smaller working groups within your team.
+Each team will work as **two paired duos or trios**, forming smaller working groups within your team.
 
 ---
 
 ### Interview Each Other
 
-If you're bringing a friend, great—but only if your team gains diversity and stays goal-aligned. In years of teaching and a lifetime of engineering, I’ve found that all successful projects share two traits: **diversity** and **shared purpose**.
+If you're bringing a friend to the team, great—but only if your team gains diversity and stays goal-aligned. In years of teaching and a lifetime of engineering, I’ve found that all successful projects share two traits: **diversity** and **shared purpose**.
 
 Consider learning styles, collaboration habits, and problem-solving approaches. When we embrace these goals together, we build something stronger.
 
