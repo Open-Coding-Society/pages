@@ -98,6 +98,16 @@ layout: post
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .sprint-card.collapsed .sprint-toggle-icon {
+    transform: rotate(0deg);
+  }
+
+  .sprint-toggle-icon {
+    transition: transform 0.2s;
+    display: inline-flex;
   }
 
   .sprint-weeks {
@@ -110,13 +120,17 @@ layout: post
     display: none;
   }
 
+  .sprint-card.collapsed .sprint-title {
+    color: #cbd5f5;
+  }
+
   .week-card {
     background: #0f0f0f;
     border: 1px solid #222222;
     border-radius: 12px;
-    padding: 24px;
     margin-bottom: 16px;
     transition: all 0.2s;
+    overflow: hidden;
   }
 
   .week-card:hover {
@@ -126,6 +140,19 @@ layout: post
   .week-content-wrapper {
     display: flex;
     gap: 24px;
+  }
+
+  .week-main-content {
+    flex: 1;
+  }
+
+  .week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
   .week-indicator {
@@ -160,17 +187,12 @@ layout: post
     display: none;
   }
 
-  .week-main-content {
-    flex: 1;
-  }
-
-  .week-header {
+  .week-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .week-title-group h3 {
@@ -846,7 +868,7 @@ layout: post
       {% assign unitData = shared[courseUnit.shared] %}
     {% endif %}
 
-    <div class="sprint-card" data-sprint="{{ unitKey }}">
+    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}">
       <div class="sprint-header">
         <div>
           <p class="sprint-meta">{{ unitKey }}</p>
@@ -857,36 +879,38 @@ layout: post
         </div>
         <div class="sprint-controls">
           <div class="completion-badge">{{ start }} - {{ end }} Weeks</div>
-          <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="true">
-            Toggle Weeks
+          <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="false">
+            <span class="sprint-toggle-icon">▾</span> View Weeks
           </button>
         </div>
       </div>
 
       <div class="sprint-weeks">
-        {% for index in (start..end) %}
-          {% assign entries = null | compact %}
-          {% assign totalItems = 0 %}
-          {% assign completedItems = 0 %}
-          
-                      {% for post in posts %}
-            {% if post.courses[page.course] %}
-              {% assign week = post.courses[page.course].week | plus: 0 %}
-              {% if week == index %}
-                {% if post.assignment == true %}
-                  {% assign itemType = "assignment" %}
-                {% else %}
-                  {% assign itemType = "lesson" %}
+        <div class="sprint-body">
+          <h3 style="margin:0 0 12px 0; font-weight:700; color:#cbd5f5;">{{ unitKey }} — {{ unitData.title }}</h3>
+
+          {% for index in (start..end) %}
+            {% assign entries = null | compact %}
+            {% assign totalItems = 0 %}
+
+            {% for post in posts %}
+              {% if post.courses[page.course] %}
+                {% assign week = post.courses[page.course].week | plus: 0 %}
+                {% if week == index %}
+                  {% if post.assignment == true %}
+                    {% assign itemType = "assignment" %}
+                  {% else %}
+                    {% assign itemType = "lesson" %}
+                  {% endif %}
+                  {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
+                  {% assign entries = entries | push: entry %}
+                  {% assign totalItems = totalItems | plus: 1 %}
                 {% endif %}
-                {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
-                {% assign entries = entries | push: entry %}
-                {% assign totalItems = totalItems | plus: 1 %}
               {% endif %}
-            {% endif %}
-          {% endfor %}
+            {% endfor %}
 
           {% if entries.size > 0 %}
-            <div class="week-card" data-sprint="{{ unitKey }}">
+            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}">
               <div class="week-content-wrapper">
                 <div class="week-indicator">
                   <div class="week-circle">W{{ index }}</div>
@@ -896,8 +920,8 @@ layout: post
                 <div class="week-main-content">
                   <div class="week-header">
                     <div class="week-title-group">
-                      <h3>Week {{ index }}: {{ unitData.title }}</h3>
-                      <div class="week-sprint">{{ unitKey }}: {{ unitData.title }}</div>
+                      <h3 data-week-title>Week {{ index }}</h3>
+                      <div class="week-sprint" data-week-sprint>{{ unitKey }}: {{ unitData.title }}</div>
                     </div>
                     <div class="week-actions">
                       <div class="completion-badge">
@@ -928,13 +952,13 @@ layout: post
                         {% assign isAssignment = false %}
                         {% assign itemType = "lesson" %}
                       {% endif %}
-                      
+
                       <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] | slugify }}">
                         <div class="item-content">
                           <button class="completion-toggle">
                             <i class="fas fa-circle status-icon incomplete"></i>
                           </button>
-                            <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
+                          <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
                             {% if isAssignment %}
                               <i class="fas fa-file-alt type-icon assignment"></i>
                             {% else %}
@@ -967,7 +991,8 @@ layout: post
               </div>
             </div>
           {% endif %}
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
     </div>
   {% endfor %}
@@ -1067,11 +1092,28 @@ layout: post
   </div>
 </div>
 
+<!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
+<script id="course-skill-lib-json" type="application/json">
+  {{ site.data.certificate_skills | jsonify }}
+</script>
+
 <script>
   // Completion tracking (course-specific)
   const CURRENT_COURSE = '{{ page.course }}';
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
-  
+
+  // Load the skill library from the JSON script tag so the JS file itself contains no raw Liquid tokens
+  let COURSE_SKILL_LIBRARY = {};
+  try {
+    const el = document.getElementById('course-skill-lib-json');
+    if (el && el.textContent) {
+      COURSE_SKILL_LIBRARY = JSON.parse(el.textContent);
+    }
+  } catch (e) {
+    console.warn('Unable to parse COURSE_SKILL_LIBRARY, falling back to empty object', e);
+    COURSE_SKILL_LIBRARY = {};
+  }
+
   // Load completion data from localStorage
   function loadCompletionData() {
     try {
@@ -1233,9 +1275,6 @@ layout: post
     });
   }
   
-  // ===== CERTIFICATE SYSTEM FUNCTIONS =====
-
-  // Global variable for current modal week number
   let currentModalWeekNumber = null;
   let activeCertificateProfile = null;
 
@@ -1244,8 +1283,6 @@ layout: post
     csa: 'Computer Science A',
     csse: 'Computer Science and Software Engineering'
   };
-
-  const COURSE_SKILL_LIBRARY = {{ site.data.certificate_skills | default: {} | jsonify }};
 
   // Extract week number from week card
   function extractWeekNumber(weekCard) {
@@ -1311,6 +1348,14 @@ layout: post
         chip.textContent = skill;
         preview.appendChild(chip);
       });
+      const weekTitle = card.querySelector('[data-week-title]');
+      if (weekTitle) {
+        weekTitle.textContent = `Week ${weekNumber}: ${profile.theme}`;
+      }
+      const weekSprint = card.querySelector('[data-week-sprint]');
+      if (weekSprint) {
+        weekSprint.textContent = profile.courseName;
+      }
     });
   }
 
@@ -1558,22 +1603,9 @@ layout: post
   function initializeCertificateSystem() {
     console.log('Initializing certificate system');
 
-    // Make week cards clickable
     const weekCards = document.querySelectorAll('.week-card');
     console.log('Found', weekCards.length, 'week cards');
-    weekCards.forEach(card => {
-      card.classList.add('clickable');
-      card.addEventListener('click', (event) => {
-        if (event.target.closest('a') || event.target.closest('.completion-toggle') || event.target.closest('.progression-btn')) {
-          return;
-        }
-        event.preventDefault();
-        console.log('Week card clicked');
-        openProgressionModal(card);
-      });
-    });
 
-    // Dedicated progress buttons for clarity
     const progressButtons = document.querySelectorAll('.week-card .progression-btn');
     progressButtons.forEach(button => {
       button.addEventListener('click', (event) => {
@@ -1586,14 +1618,40 @@ layout: post
       });
     });
 
-    // Sprint toggles
-    document.querySelectorAll('.sprint-toggle-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        const sprintCard = button.closest('.sprint-card');
-        if (sprintCard) {
-          const isCollapsed = sprintCard.classList.toggle('collapsed');
-          button.setAttribute('aria-expanded', (!isCollapsed).toString());
+    weekCards.forEach(card => {
+      card.classList.add('clickable');
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('a') || event.target.closest('.completion-toggle') || event.target.closest('.progression-btn')) {
+          return;
         }
+        event.preventDefault();
+        openProgressionModal(card);
+      });
+    });
+
+    function toggleSprint(card, control) {
+      const isCollapsed = card.classList.toggle('collapsed');
+      if (control) {
+        control.setAttribute('aria-expanded', (!isCollapsed).toString());
+        control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
+      }
+    }
+
+    document.querySelectorAll('.sprint-card').forEach(card => {
+      const toggleBtn = card.querySelector('.sprint-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.querySelector('.sprint-toggle-icon').textContent = '▸';
+        toggleBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleSprint(card, toggleBtn);
+        });
+      }
+      card.querySelector('.sprint-header').addEventListener('click', (event) => {
+        if (event.target.closest('.sprint-controls')) {
+          return;
+        }
+        toggleSprint(card, toggleBtn);
       });
     });
 
@@ -1624,4 +1682,5 @@ layout: post
     initializeCertificateSystem();
     renderWeekSkillPreviews();
   });
+
 </script>
