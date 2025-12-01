@@ -47,3 +47,4 @@ _docx/~$*
 # Local Jekyll overrides
 _config_dev.yml
 Makefile.local
+jekyll_serve.sh
