@@ -5,7 +5,7 @@ title: AI Usage Quest
 description: >
   Learn to prompt AI to streamline frontend and backend development, data visualization, and resume building
 author: CSA 2025-26
-permalink: /cs-portfolio-quest/ai/
+permalink: /bigsix/ai
 lxdData:
   Title: "AI Usage Modules"
   Description: "Master AI tools and prompting techniques for efficient development!"

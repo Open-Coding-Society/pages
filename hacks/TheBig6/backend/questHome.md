@@ -5,7 +5,7 @@ title: "Backend Development Quest"
 description: >
   Learn about database structures, types, and integration with frontend for real-world full-stack development
 author: "CSA 2025-26"
-permalink: /cs-portfolio-quest/backend/
+permalink: /bigsix/backend
 lxdData:
   Title: "Backend Development Modules"
   Description: "Master backend development and database integration skills!"
