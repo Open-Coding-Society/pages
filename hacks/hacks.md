@@ -6,7 +6,7 @@ assignment: true
 description: >
   A guided sequence of hands-on and learning tasks to help you master the frameworks that power our course.
 author: John Mortensen
-courses: {'csse': {'week': 1}, 'csp': {'week': 1}, 'csa': {'week': 1}}
+courses: {'csse': {'week': 3}, 'csp': {'week': 3}, 'csa': {'week': 1}}
 type: hacks
 permalink: /hacks
 lxdData:

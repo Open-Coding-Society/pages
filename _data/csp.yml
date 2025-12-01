@@ -35,17 +35,17 @@ web_dev_layers: &web_dev_layers |
 Sprint1:
   shared: "Onboarding"
   start: 0
-  end: 4
+  end: 3
 Sprint2:
   title: Python / Flask Web Development 
   description: During these weeks, students will learn fundamentals of programming and blog their learnings.  There will be several student-led lectures (student teaching) that provide foundational concepts and help students learn programming and key principles required by the College Board.
-  start: 5
-  end: 8
+  start: 4
+  end: 7
 Sprint3:
   title: Creating a Web Application for N@tM
   description: The team Website should include rewl-world interests but also requires the use of a JavaScript frontend, a Python Flask backend, and deployed on AWS. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website, Frontend, and Backend. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
   illustration: *web_dev_layers
-  start: 9
+  start: 8
   end: 12
 Sprint4:
   title: Warm-up Create Performance Task, Data Abstraction, Computer Systems, Networks, Impact of Computing
