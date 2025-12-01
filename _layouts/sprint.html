@@ -2113,13 +2113,228 @@ function updateWeeklyProgress(stats, weekNum) {
     window.open(linkedInUrl, '_blank', 'noopener');
   }
 
+  function updateLeaderboard(userStats) {
+   let leaderboard = [];
+  
+   try {
+     const stored = localStorage.getItem(LEADERBOARD_KEY);
+     leaderboard = stored ? JSON.parse(stored) : [];
+   } catch (e) {
+     leaderboard = [];
+   }
+  
+   // Update or add user
+   const existingIndex = leaderboard.findIndex(u => u.username === userStats.username);
+  
+   if (existingIndex >= 0) {
+     leaderboard[existingIndex] = userStats;
+   } else {
+     leaderboard.push(userStats);
+   }
+  
+   // Sort by XP
+   leaderboard.sort((a, b) => b.xp - a.xp);
+  
+   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+ }
 
 
+ function refreshLeaderboardDisplay() {
+   const leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+   const currentUser = initializeUserStats();
+   const tbody = document.getElementById('leaderboard-body');
+  
+   if (!tbody) return;
+  
+   tbody.innerHTML = '';
+  
+   leaderboard.forEach((user, index) => {
+     const rank = index + 1;
+     const isCurrentUser = user.username === currentUser.username;
+     const completionRate = user.totalItems > 0
+       ? ((user.totalCompleted / user.totalItems) * 100).toFixed(1)
+       : 0;
+    
+     const row = document.createElement('tr');
+     if (isCurrentUser) row.classList.add('current-user');
+    
+     row.innerHTML = `
+       <td class="rank-cell ${rank <= 3 ? 'top-3' : ''}">
+         #${rank}
+       </td>
+       <td>
+         <div class="student-cell">
+           <div class="student-avatar">${user.username[0].toUpperCase()}</div>
+           <span>${user.username}${isCurrentUser ? ' (You)' : ''}</span>
+         </div>
+       </td>
+       <td>${completionRate}%</td>
+       <td>${user.currentStreak} days</td>
+       <td>${user.xp}</td>
+       <td class="badges-cell">
+         ${generateBadges(user)}
+       </td>
+     `;
+    
+     tbody.appendChild(row);
+   });
+  
+   // Update user stats display
+   updateUserStatsDisplay(currentUser, leaderboard);
+ }
 
 
+ function generateBadges(user) {
+   const badges = [];
+  
+   if (user.currentStreak >= 7) badges.push('Streak 7+');
+   if (user.currentStreak >= 30) badges.push('Streak 30+');
+   if (user.xp >= 1000) badges.push('XP 1000+');
+   if (user.longestStreak >= 14) badges.push('Longest Streak 14+');
+  
+   const weeklyCompleteCount = Object.values(user.weeklyProgress || {})
+     .filter(w => w.completed === w.total).length;
+   if (weeklyCompleteCount >= 5) badges.push('Weekly Master');
+  
+   return badges.map(b => `<span class="badge-icon" title="Achievement">${b}</span>`).join('');
+ }
 
 
+ function updateUserStatsDisplay(user, leaderboard) {
+   const rank = leaderboard.findIndex(u => u.username === user.username) + 1;
+   const completionRate = user.totalItems > 0
+     ? ((user.totalCompleted / user.totalItems) * 100).toFixed(1)
+     : 0;
+  
+   document.getElementById('user-rank').textContent = rank > 0 ? `#${rank}` : '--';
+   document.getElementById('user-streak').textContent = `${user.currentStreak} days`;
+   document.getElementById('user-xp').textContent = user.xp;
+   document.getElementById('user-completion').textContent = `${completionRate}%`;
+ }
 
+
+ // Data Visualization
+ function initializeCharts() {
+   createWeeklyProgressChart();
+   createQuestTimeline();
+ }
+
+
+ function createWeeklyProgressChart() {
+   const canvas = document.getElementById('weekly-progress-chart');
+   if (!canvas) return;
+  
+   const stats = initializeUserStats();
+   const weeklyData = stats.weeklyProgress || {};
+  
+   const weeks = Object.keys(weeklyData).sort((a, b) => parseInt(a) - parseInt(b));
+   const completionRates = weeks.map(week => {
+     const data = weeklyData[week];
+     return data.total > 0 ? (data.completed / data.total) * 100 : 0;
+   });
+  
+   new Chart(canvas, {
+     type: 'line',
+     data: {
+       labels: weeks.map(w => `Week ${w}`),
+       datasets: [{
+         label: 'Completion %',
+         data: completionRates,
+         borderColor: '#60a5fa',
+         backgroundColor: 'rgba(96, 165, 250, 0.1)',
+         tension: 0.4,
+         fill: true
+       }]
+     },
+     options: {
+       responsive: true,
+       maintainAspectRatio: true,
+       plugins: {
+         legend: { display: false },
+         tooltip: {
+           backgroundColor: '#1f1f1f',
+           titleColor: '#ffffff',
+           bodyColor: '#e0e0e0'
+         }
+       },
+       scales: {
+         y: {
+           beginAtZero: true,
+           max: 100,
+           ticks: { color: '#999999' },
+           grid: { color: '#2a2a2a' }
+         },
+         x: {
+           ticks: { color: '#999999' },
+           grid: { color: '#2a2a2a' }
+         }
+       }
+     }
+   });
+ }
+
+
+ function createQuestTimeline() {
+   const container = document.getElementById('quest-timeline');
+   if (!container) return;
+  
+   const completionData = loadCompletionData();
+   const timeline = [];
+  
+   // Build timeline from completion data
+   document.querySelectorAll('.item-card').forEach(card => {
+     const itemId = card.dataset.itemId;
+     if (completionData[itemId]) {
+       const title = card.querySelector('.item-title').textContent;
+       const weekCard = card.closest('.week-card');
+       const weekNum = extractWeekNumber(weekCard);
+      
+       timeline.push({
+         title,
+         week: weekNum,
+         date: new Date() // In real implementation, track actual completion date
+       });
+     }
+   });
+  
+   // Sort by date (most recent first)
+   timeline.sort((a, b) => b.date - a.date);
+  
+   container.innerHTML = timeline.slice(0, 10).map(item => `
+     <div class="timeline-item">
+       <div class="timeline-marker"></div>
+       <div class="timeline-content">
+         <div class="timeline-title">${item.title}</div>
+         <div class="timeline-date">Week ${item.week} • ${item.date.toLocaleDateString()}</div>
+       </div>
+     </div>
+   `).join('');
+ }
+
+
+ // Activity heatmap and challenge performance charts removed
+
+
+ function sortLeaderboard(criteria) {
+   const leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+  
+   leaderboard.sort((a, b) => {
+     switch(criteria) {
+       case 'completion':
+         const aRate = a.totalItems > 0 ? a.totalCompleted / a.totalItems : 0;
+         const bRate = b.totalItems > 0 ? b.totalCompleted / b.totalItems : 0;
+         return bRate - aRate;
+       case 'streak':
+         return b.currentStreak - a.currentStreak;
+       case 'xp':
+       default:
+         return b.xp - a.xp;
+     }
+   });
+  
+   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+   refreshLeaderboardDisplay();
+ }
 
   // Initialize certificate system
   function initializeCertificateSystem() {
