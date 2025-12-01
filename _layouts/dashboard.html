@@ -456,6 +456,25 @@ active_tab: dashboard
                     border: 1px solid var(--ui-border) !important;
                 }
 
+                /* Tab bar and sidebar mid-contrast shade */
+                .user-theme-active #tab-bar,
+                .user-theme-active #tab-bar a,
+                .user-theme-active #tab-bar .tab-btn {
+                    background-color: var(--panel-mid) !important;
+                    color: var(--text) !important;
+                }
+
+                /* Common sidebar selectors to receive the same mid-contrast shade */
+                .user-theme-active aside,
+                .user-theme-active .sidebar,
+                .user-theme-active #sidebar,
+                .user-theme-active .site-sidebar,
+                .user-theme-active .sidebar-container {
+                    background-color: var(--panel-mid) !important;
+                    color: var(--text) !important;
+                    border-color: var(--ui-border) !important;
+                }
+
                 /* Constrain main content wrapper if present */
                 .w-full { max-width: var(--pref-content-max-width); margin: 0 auto; }
                 </style>
@@ -534,6 +553,16 @@ active_tab: dashboard
                                         panelColor = rgbToHex(r,g,b);
                                     } catch(e){ panelColor = bg; }
                                     set('--panel', panelColor);
+                                    // compute a mid-tone between background and panelColor for tab/sidebar contrast
+                                    try {
+                                        const pRgb = hexToRgb(panelColor);
+                                        const bRgb = hexToRgb(bg);
+                                        const midR = Math.round((pRgb.r + bRgb.r) / 2);
+                                        const midG = Math.round((pRgb.g + bRgb.g) / 2);
+                                        const midB = Math.round((pRgb.b + bRgb.b) / 2);
+                                        const panelMid = rgbToHex(midR, midG, midB);
+                                        set('--panel-mid', panelMid);
+                                    } catch(e) { set('--panel-mid', panelColor); }
                                     // compute darker tones for UI chrome (inputs/buttons)
                                     try {
                                         const rgb2 = hexToRgb(bg);
@@ -586,6 +615,24 @@ active_tab: dashboard
                                     } catch(e){}
                                 });
                             } catch(e){}
+                            // Also apply inline styles to tab headers and tab content so
+                            // per-tab styles or utility classes don't hide the runtime theme.
+                            try {
+                                const rootStyles2 = getComputedStyle(document.documentElement);
+                                const tabBg = (rootStyles2.getPropertyValue('--panel-mid') || panelColor).trim();
+                                const tabText = (rootStyles2.getPropertyValue('--text') || text).trim();
+                                const tabBorder = (rootStyles2.getPropertyValue('--ui-border') || panelColor).trim();
+                                const tabSelectors = ['#tab-bar', '#tab-bar a', '.tab-btn', '.tab-content', '.tab-content *', '.rounded-xl', '.bg-neutral-800', '.bg-neutral-900'];
+                                tabSelectors.forEach(sel => {
+                                    document.querySelectorAll(sel).forEach(el => {
+                                        try {
+                                            el.style.backgroundColor = tabBg;
+                                            el.style.color = tabText;
+                                            el.style.borderColor = tabBorder;
+                                        } catch(e){}
+                                    });
+                                });
+                            } catch(e){}
                             // ensure body border visibility: set a subtle default border color if none
                             try { document.body.style.setProperty('--panel-border-fallback', panelColor); } catch(e){}
                         } catch (e) { console.error('applyPreferences error', e); }
@@ -602,7 +649,7 @@ active_tab: dashboard
                             const body = document.body;
 
                             // remove known custom properties we set
-                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback','--ui-bg','--ui-border'];
+                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--panel-mid','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback','--ui-bg','--ui-border'];
                             keys.forEach(k=>{ try{ root.style.removeProperty(k); body.style.removeProperty(k); }catch(e){} });
 
                             // remove inline styles we may have set
@@ -623,6 +670,20 @@ active_tab: dashboard
                                         el.style.removeProperty('color');
                                         el.style.removeProperty('border-color');
                                     } catch(e){}
+                                });
+                            } catch(e){}
+
+                            // remove inline styles from tab elements / per-tab cards we may have modified
+                            try {
+                                const tabSelectors = ['#tab-bar', '#tab-bar a', '.tab-btn', '.tab-content', '.tab-content *', '.rounded-xl', '.bg-neutral-800', '.bg-neutral-900'];
+                                tabSelectors.forEach(sel => {
+                                    document.querySelectorAll(sel).forEach(el => {
+                                        try {
+                                            el.style.removeProperty('background-color');
+                                            el.style.removeProperty('color');
+                                            el.style.removeProperty('border-color');
+                                        } catch(e){}
+                                    });
                                 });
                             } catch(e){}
 
