@@ -14,8 +14,6 @@ layout: post
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{% include pwa-head.html %}
-
 <style>
   body {
     background: #0a0a0a;
@@ -61,20 +59,6 @@ layout: post
     background: #1a1a1a;
     border-color: #60a5fa;
     color: #60a5fa;
-  }
-
-  .leaderboard-link {
-    text-decoration: none;
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    color: #ffffff !important;
-    border-color: #60a5fa;
-    font-weight: 500;
-  }
-
-  .leaderboard-link:hover {
-    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
   }
 
   .timeline-container {
@@ -394,144 +378,22 @@ layout: post
   }
 
   @media (max-width: 768px) {
-    .timeline-header h1 {
-      font-size: 2rem;
-    }
-
-    .timeline-filters {
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .filter-btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .sprint-card {
-      padding: 16px;
-    }
-
-    .sprint-header {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    .sprint-title {
-      font-size: 1.5rem;
-    }
-
-    .sprint-controls {
-      justify-content: space-between;
-      width: 100%;
+    .items-grid {
+      grid-template-columns: 1fr;
     }
 
     .week-content-wrapper {
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .week-indicator {
-      flex-direction: row;
-      align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
 
     .week-circle {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       font-size: 12px;
-    }
-
-    .week-connector {
-      display: none;
-    }
-
-    .week-main-content {
-      width: 100%;
-    }
-
-    .week-header {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    .week-title-group h3 {
-      font-size: 1.1rem;
     }
 
     .week-actions {
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .items-grid {
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .item-card {
-      padding: 10px;
-    }
-
-    .item-content {
-      gap: 8px;
-    }
-
-    .item-title {
-      font-size: 13px;
-    }
-
-    .progression-btn {
-      padding: 8px 12px;
-      font-size: 12px;
-    }
-
-    .completion-badge {
-      font-size: 12px;
-      padding: 3px 8px;
-    }
-
-    /* Modal responsiveness */
-    #progression-modal > div,
-    #certificate-list-modal > div {
-      margin: 20px auto;
-      padding: 20px;
-    }
-
-    #certificate-content {
-      padding: 40px 20px;
-    }
-
-    #certificate-student-name {
-      font-size: 36px;
-    }
-
-    #certificate-content .achievement-text {
-      font-size: 18px;
-    }
-
-    .certificate-modal .action-bar {
-      padding: 12px;
-    }
-
-    .action-btn {
-      padding: 8px 12px;
-      font-size: 12px;
-      margin: 0 4px;
-    }
-
-    .progression-task {
-      padding: 8px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .task-number {
-      order: -1;
+      justify-content: flex-start;
     }
   }
 
@@ -582,7 +444,6 @@ layout: post
     border: 1px solid #2a2a2a;
     border-radius: 12px;
     padding: 32px;
-    position: relative;
   }
 
   #progression-modal .close-btn {
@@ -591,36 +452,9 @@ layout: post
     right: 20px;
     background: transparent;
     border: none;
-    color: #e6eef8; /* bright so it's visible on dark background */
+    color: #999;
     font-size: 24px;
     cursor: pointer;
-    z-index: 2050; /* ensure it floats above modal content */
-  }
-
-  /* Certificate list & certificate modal close button styles */
-  #certificate-list-modal .close-btn {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    background: transparent;
-    border: none;
-    color: #e6eef8;
-    font-size: 22px;
-    cursor: pointer;
-    z-index: 2050;
-  }
-
-  /* Add similar X button style for the certificate modal */
-  #certificate-modal .close-btn {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    background: transparent;
-    border: none;
-    color: #333;
-    font-size: 26px;
-    cursor: pointer;
-    z-index: 2050;
   }
 
   #progression-modal h2 {
@@ -919,19 +753,17 @@ layout: post
     border: 1px solid #2a2a2a;
     border-radius: 12px;
     padding: 32px;
-    position: relative;
   }
 
   #certificate-list-modal .close-btn {
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: 20px;
+    right: 20px;
     background: transparent;
     border: none;
-    color: #e6eef8;
-    font-size: 22px;
+    color: #999;
+    font-size: 24px;
     cursor: pointer;
-    z-index: 2050;
   }
 
   #certificate-list-modal h2 {
@@ -1005,744 +837,9 @@ layout: post
     }
   }
 
-  .leaderboard-container {
- background: #111111;
- border: 1px solid #1f1f1f;
- border-radius: 16px;
- padding: 32px;
- margin-bottom: 24px;
-}
 
 
-.leaderboard-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 24px;
- flex-wrap: wrap;
- gap: 16px;
-}
 
-
-.leaderboard-header h2 {
- color: #ffffff;
- margin: 0;
-}
-
-
-.leaderboard-controls {
- display: flex;
- gap: 12px;
-}
-
-
-.leaderboard-stats-overview {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 16px;
- margin-bottom: 32px;
-}
-
-
-.stat-card {
- background: #0f0f0f;
- border: 1px solid #2a2a2a;
- border-radius: 12px;
- padding: 20px;
- display: flex;
- align-items: center;
- gap: 16px;
- transition: all 0.2s;
-}
-
-
-.stat-card:hover {
- border-color: #60a5fa;
- transform: translateY(-2px);
-}
-
-
-.stat-icon {
- font-size: 32px;
- flex-shrink: 0;
-}
-
-
-.stat-content {
- flex: 1;
-}
-
-
-.stat-label {
- color: #999999;
- font-size: 13px;
- margin-bottom: 4px;
-}
-
-
-.stat-value {
- color: #ffffff;
- font-size: 24px;
- font-weight: 600;
-}
-
-
-.leaderboard-table-container {
- overflow-x: auto;
- border-radius: 8px;
- border: 1px solid #2a2a2a;
-}
-
-
-.leaderboard-table {
- width: 100%;
- border-collapse: collapse;
-}
-
-
-.leaderboard-table thead {
- background: #0f0f0f;
-}
-
-
-.leaderboard-table th {
- padding: 16px;
- text-align: left;
- color: #60a5fa;
- font-weight: 600;
- border-bottom: 2px solid #2a2a2a;
-}
-
-
-.leaderboard-table th.sortable {
- cursor: pointer;
- user-select: none;
-}
-
-
-.leaderboard-table th.sortable:hover {
- color: #93c5fd;
-}
-
-
-.leaderboard-table tbody tr {
- border-bottom: 1px solid #1f1f1f;
- transition: background 0.2s;
-}
-
-
-.leaderboard-table tbody tr:hover {
- background: #0f0f0f;
-}
-
-
-.leaderboard-table tbody tr.current-user {
- background: rgba(96, 165, 250, 0.1);
- border-left: 3px solid #60a5fa;
-}
-
-
-.leaderboard-table td {
- padding: 16px;
- color: #e0e0e0;
-}
-
-
-.rank-cell {
- font-weight: 700;
- font-size: 18px;
-}
-
-
-.rank-cell.top-3 {
- color: #fbbf24;
-}
-
-
-.student-cell {
- display: flex;
- align-items: center;
- gap: 12px;
-}
-
-
-.student-avatar {
- width: 36px;
- height: 36px;
- border-radius: 50%;
- background: linear-gradient(135deg, #60a5fa, #3b82f6);
- display: flex;
- align-items: center;
- justify-content: center;
- color: white;
- font-weight: 600;
-}
-
-
-.badges-cell {
- display: flex;
- gap: 4px;
-}
-
-
-.badge-icon {
- font-size: 20px;
- opacity: 0.8;
- transition: opacity 0.2s;
-}
-
-
-.badge-icon:hover {
- opacity: 1;
- transform: scale(1.2);
-}
-
-
-/* Analytics Dashboard */
-.analytics-dashboard {
- background: #111111;
- border: 1px solid #1f1f1f;
- border-radius: 16px;
- padding: 32px;
-}
-
-
-.analytics-dashboard h2 {
- color: #ffffff;
- margin-bottom: 24px;
-}
-
-
-.charts-grid {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
- gap: 24px;
-}
-
-
-.chart-card {
- background: #0f0f0f;
- border: 1px solid #2a2a2a;
- border-radius: 12px;
- padding: 24px;
-}
-
-
-.chart-card h3 {
- color: #ffffff;
- margin: 0 0 20px 0;
- font-size: 16px;
-}
-
-
-#quest-timeline {
- max-height: 300px;
- overflow-y: auto;
-}
-
-
-.timeline-item {
- display: flex;
- gap: 16px;
- margin-bottom: 16px;
- padding-bottom: 16px;
- border-bottom: 1px solid #1f1f1f;
-}
-
-
-.timeline-item:last-child {
- border-bottom: none;
-}
-
-
-.timeline-marker {
- width: 12px;
- height: 12px;
- border-radius: 50%;
- background: #60a5fa;
- margin-top: 4px;
- flex-shrink: 0;
-}
-
-
-.timeline-content {
- flex: 1;
-}
-
-
-.timeline-title {
- color: #e0e0e0;
- font-weight: 600;
- margin-bottom: 4px;
-}
-
-
-.timeline-date {
- color: #999999;
- font-size: 13px;
-}
-
-
-#activity-heatmap {
- display: grid;
- grid-template-columns: repeat(7, 1fr);
- gap: 4px;
- max-width: 400px;
-}
-
-
-.heatmap-cell {
- aspect-ratio: 1;
- border-radius: 2px;
- background: #1a1a1a;
- transition: all 0.2s;
- cursor: pointer;
-}
-
-
-.heatmap-cell.level-0 { background: #1a1a1a; }
-.heatmap-cell.level-1 { background: #0e4429; }
-.heatmap-cell.level-2 { background: #006d32; }
-.heatmap-cell.level-3 { background: #26a641; }
-.heatmap-cell.level-4 { background: #39d353; }
-
-
-.heatmap-cell:hover {
- transform: scale(1.1);
- box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
-}
-
-
-@media (max-width: 768px) {
- .charts-grid {
-   grid-template-columns: 1fr;
- }
-  .leaderboard-stats-overview {
-   grid-template-columns: repeat(2, 1fr);
- }
-}
-
-.skills-achievements-section {
-  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-  border: 1px solid #2a2a2a;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-}
-
-.skills-achievements-section h2 {
-  color: #ffffff;
-  font-size: 1.75rem;
-  margin: 0 0 8px 0;
-}
-
-.skills-achievements-section .section-subtitle {
-  color: #999999;
-  font-size: 0.95rem;
-  margin: 0 0 24px 0;
-}
-
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.achievement-card {
-  background: #0f0f0f;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.achievement-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.achievement-card:hover {
-  border-color: #3a3a3a;
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.achievement-card:hover::before {
-  opacity: 1;
-}
-
-.achievement-card.active-quests::before {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-}
-
-.achievement-card.certificates::before {
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-}
-
-.achievement-card.tasks::before {
-  background: linear-gradient(90deg, #10b981, #059669);
-}
-
-.achievement-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.achievement-number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
-}
-
-.achievement-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.achievement-card.active-quests .achievement-icon {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.achievement-card.certificates .achievement-icon {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
-}
-
-.achievement-card.tasks .achievement-icon {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-}
-
-.achievement-label {
-  color: #999999;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.course-filter-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.course-filter-btn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  color: #e0e0e0;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.course-filter-btn:hover {
-  background: #1a1a1a;
-  border-color: #3a3a3a;
-}
-
-.course-filter-btn.active {
-  background: #1a1a1a;
-  border-color: #60a5fa;
-  color: #60a5fa;
-}
-
-/* Modal Analytics Button */
-.modal-action-buttons {
-  border-top: 1px solid #2a2a2a;
-  padding-top: 20px;
-  margin-top: 20px;
-}
-
-.modal-analytics-btn {
-  width: 100%;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal-analytics-btn:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
-}
-
-/* Mobile Responsive Overrides */
-@media (max-width: 768px) {
-  .achievements-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .achievement-number {
-    font-size: 2rem;
-  }
-  
-  .skills-achievements-section {
-    padding: 24px 20px;
-  }
-}
-
-/* Quick Help & Resources Section */
-.quick-help-resources {
-  background: #111111;
-  border: 1px solid #1f1f1f;
-  border-radius: 16px;
-  padding: 32px;
-  margin-top: 40px;
-  margin-bottom: 32px;
-}
-
-.quick-help-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.quick-help-header i {
-  font-size: 24px;
-  color: #ef4444;
-}
-
-.quick-help-header h2 {
-  color: #ffffff;
-  font-size: 1.5rem;
-  margin: 0;
-}
-
-.quick-help-description {
-  color: #999999;
-  margin: 0 0 24px 0;
-  font-size: 0.95rem;
-}
-
-.search-box {
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.search-box i {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #666666;
-  font-size: 16px;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 12px 16px 12px 44px;
-  background: #0a0a0a;
-  border: 1px solid #2a2a2a;
-  border-radius: 8px;
-  color: #e0e0e0;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.search-box input::placeholder {
-  color: #666666;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #60a5fa;
-  background: #0f0f0f;
-}
-
-.resources-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.resource-card {
-  background: #0f0f0f;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.2s;
-  cursor: pointer;
-  text-decoration: none;
-  display: block;
-  position: relative;
-}
-
-.resource-card:hover {
-  border-color: #3a3a3a;
-  background: #151515;
-  transform: translateY(-2px);
-}
-
-.resource-card-content {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.resource-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.resource-icon.green {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
-}
-
-.resource-icon.blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-}
-
-.resource-icon.red {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.resource-icon.orange {
-  background: rgba(249, 115, 22, 0.15);
-  color: #f97316;
-}
-
-.resource-icon.purple {
-  background: rgba(168, 85, 247, 0.15);
-  color: #a855f7;
-}
-
-.resource-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.resource-title {
-  color: #ffffff;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-}
-
-.resource-description {
-  color: #999999;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 0 0 12px 0;
-}
-
-.resource-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.resource-tag {
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.resource-tag.collaboration {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
-}
-
-.resource-tag.code-example {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-}
-
-.resource-tag.debugging {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.resource-tag.setup {
-  background: rgba(249, 115, 22, 0.15);
-  color: #f97316;
-}
-
-.resource-tag.concept {
-  background: rgba(168, 85, 247, 0.15);
-  color: #a855f7;
-}
-
-.resource-helps {
-  color: #666666;
-  font-size: 13px;
-}
-
-.resource-external {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  color: #666666;
-  font-size: 16px;
-  transition: all 0.2s;
-}
-
-.resource-card:hover .resource-external {
-  color: #60a5fa;
-}
-
-@media (max-width: 768px) {
-  .quick-help-resources {
-    padding: 24px 20px;
-  }
-  
-  .resource-card {
-    padding: 16px;
-  }
-  
-  .resource-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-  }
-  
-  .resource-title {
-    font-size: 1rem;
-  }
-}
 
 </style>
 
@@ -2224,6 +1321,10 @@ layout: post
   </div>
 </div>
 
+
+
+
+
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
   {{ site.data.certificate_skills | jsonify }}
@@ -2234,94 +1335,10 @@ layout: post
   const CURRENT_COURSE = '{{ page.course }}';
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
 
-  const LEADERBOARD_KEY = `${CURRENT_COURSE}-leaderboard`;
-const USER_STATS_KEY = `${CURRENT_COURSE}-user-stats`;
 
 
-// Enhanced user stats structure
-function initializeUserStats() {
- const defaultStats = {
-   username: localStorage.getItem('student-username') || 'Anonymous',
-   totalCompleted: 0,
-   totalItems: 0,
-   currentStreak: 0,
-   longestStreak: 0,
-   lastActivityDate: null,
-   weeklyProgress: {}, // { weekNum: { completed: X, total: Y, completedDate: timestamp } }
-   challengeScores: {}, // { challengeId: { score: X, attempts: Y, bestTime: Z } }
-   badges: [], // Achievement badges
-   xp: 0
- };
-  try {
-   const stored = localStorage.getItem(USER_STATS_KEY);
-   return stored ? { ...defaultStats, ...JSON.parse(stored) } : defaultStats;
- } catch (e) {
-   return defaultStats;
- }
-}
 
 
-function saveUserStats(stats) {
- localStorage.setItem(USER_STATS_KEY, JSON.stringify(stats));
- updateLeaderboard(stats);
-}
-
-
-// Track completion with enhanced metrics
-function enhancedToggleCompletion(button) {
- toggleCompletion(button); // Original function
-  const stats = initializeUserStats();
- const weekCard = button.closest('.week-card');
- const weekNum = extractWeekNumber(weekCard);
-  // Update stats
- updateStreaks(stats);
- updateWeeklyProgress(stats, weekNum);
- calculateXP(stats);
-  saveUserStats(stats);
- refreshLeaderboardDisplay();
-}
-
-
-function updateStreaks(stats) {
- const today = new Date().toDateString();
- const lastActivity = stats.lastActivityDate;
-  if (lastActivity === today) {
-   return; // Already counted today
- }
-  const yesterday = new Date();
- yesterday.setDate(yesterday.getDate() - 1);
-  if (lastActivity === yesterday.toDateString()) {
-   stats.currentStreak++;
- } else if (lastActivity !== today) {
-   stats.currentStreak = 1;
- }
-  stats.longestStreak = Math.max(stats.longestStreak, stats.currentStreak);
- stats.lastActivityDate = today;
-}
-
-
-function calculateXP(stats) {
- // XP calculation based on different metrics
- const completionXP = stats.totalCompleted * 10;
- const streakBonus = stats.currentStreak * 5;
- const weekCompletionBonus = Object.values(stats.weeklyProgress)
-   .filter(week => week.completed === week.total).length * 50;
-  stats.xp = completionXP + streakBonus + weekCompletionBonus;
-}
-
-
-function updateWeeklyProgress(stats, weekNum) {
- if (!stats.weeklyProgress) stats.weeklyProgress = {};
-  const weekCard = getWeekCardElement(weekNum);
- if (!weekCard) return;
-  const items = weekCard.querySelectorAll('.item-card');
- const completed = Array.from(items).filter(i => i.classList.contains('completed')).length;
-  stats.weeklyProgress[weekNum] = {
-   completed,
-   total: items.length,
-   completedDate: completed === items.length ? new Date().toISOString() : null
- };
-}
 
   // Load the skill library from the JSON script tag so the JS file itself contains no raw Liquid tokens
   let COURSE_SKILL_LIBRARY = {};
@@ -2356,6 +1373,7 @@ function updateWeeklyProgress(stats, weekNum) {
   }
   
   // Toggle completion status (enhanced with stats tracking)
+  // Toggle completion status (enhanced with stats tracking)
   function toggleCompletion(button) {
     try {
       const itemCard = button.closest('.item-card');
@@ -2376,25 +1394,10 @@ function updateWeeklyProgress(stats, weekNum) {
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
      
-     const stats = initializeUserStats();
-     const weekCard = button.closest('.week-card');
-     const weekNum = extractWeekNumber(weekCard);
-    
-     // Recalculate totals
-     const allItems = document.querySelectorAll('.item-card');
-     stats.totalItems = allItems.length;
-     stats.totalCompleted = Array.from(allItems).filter(c => c.classList.contains('completed')).length;
-    
-     updateStreaks(stats);
-     updateWeeklyProgress(stats, weekNum);
-     calculateXP(stats);
-     saveUserStats(stats);
-    
-     refreshLeaderboardDisplay();
-     initializeCharts();
-     
-     // NEW: Update achievements display
-     updateAchievementsDisplay();
+
+
+
+
 
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
@@ -2875,228 +1878,13 @@ function updateWeeklyProgress(stats, weekNum) {
     window.open(linkedInUrl, '_blank', 'noopener');
   }
 
-  function updateLeaderboard(userStats) {
-   let leaderboard = [];
-  
-   try {
-     const stored = localStorage.getItem(LEADERBOARD_KEY);
-     leaderboard = stored ? JSON.parse(stored) : [];
-   } catch (e) {
-     leaderboard = [];
-   }
-  
-   // Update or add user
-   const existingIndex = leaderboard.findIndex(u => u.username === userStats.username);
-  
-   if (existingIndex >= 0) {
-     leaderboard[existingIndex] = userStats;
-   } else {
-     leaderboard.push(userStats);
-   }
-  
-   // Sort by XP
-   leaderboard.sort((a, b) => b.xp - a.xp);
-  
-   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
- }
 
 
- function refreshLeaderboardDisplay() {
-   const leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
-   const currentUser = initializeUserStats();
-   const tbody = document.getElementById('leaderboard-body');
-  
-   if (!tbody) return;
-  
-   tbody.innerHTML = '';
-  
-   leaderboard.forEach((user, index) => {
-     const rank = index + 1;
-     const isCurrentUser = user.username === currentUser.username;
-     const completionRate = user.totalItems > 0
-       ? ((user.totalCompleted / user.totalItems) * 100).toFixed(1)
-       : 0;
-    
-     const row = document.createElement('tr');
-     if (isCurrentUser) row.classList.add('current-user');
-    
-     row.innerHTML = `
-       <td class="rank-cell ${rank <= 3 ? 'top-3' : ''}">
-         #${rank}
-       </td>
-       <td>
-         <div class="student-cell">
-           <div class="student-avatar">${user.username[0].toUpperCase()}</div>
-           <span>${user.username}${isCurrentUser ? ' (You)' : ''}</span>
-         </div>
-       </td>
-       <td>${completionRate}%</td>
-       <td>${user.currentStreak} days</td>
-       <td>${user.xp}</td>
-       <td class="badges-cell">
-         ${generateBadges(user)}
-       </td>
-     `;
-    
-     tbody.appendChild(row);
-   });
-  
-   // Update user stats display
-   updateUserStatsDisplay(currentUser, leaderboard);
- }
 
 
- function generateBadges(user) {
-   const badges = [];
-  
-   if (user.currentStreak >= 7) badges.push('Streak 7+');
-   if (user.currentStreak >= 30) badges.push('Streak 30+');
-   if (user.xp >= 1000) badges.push('XP 1000+');
-   if (user.longestStreak >= 14) badges.push('Longest Streak 14+');
-  
-   const weeklyCompleteCount = Object.values(user.weeklyProgress || {})
-     .filter(w => w.completed === w.total).length;
-   if (weeklyCompleteCount >= 5) badges.push('Weekly Master');
-  
-   return badges.map(b => `<span class="badge-icon" title="Achievement">${b}</span>`).join('');
- }
 
 
- function updateUserStatsDisplay(user, leaderboard) {
-   const rank = leaderboard.findIndex(u => u.username === user.username) + 1;
-   const completionRate = user.totalItems > 0
-     ? ((user.totalCompleted / user.totalItems) * 100).toFixed(1)
-     : 0;
-  
-   document.getElementById('user-rank').textContent = rank > 0 ? `#${rank}` : '--';
-   document.getElementById('user-streak').textContent = `${user.currentStreak} days`;
-   document.getElementById('user-xp').textContent = user.xp;
-   document.getElementById('user-completion').textContent = `${completionRate}%`;
- }
 
-
- // Data Visualization
- function initializeCharts() {
-   createWeeklyProgressChart();
-   createQuestTimeline();
- }
-
-
- function createWeeklyProgressChart() {
-   const canvas = document.getElementById('weekly-progress-chart');
-   if (!canvas) return;
-  
-   const stats = initializeUserStats();
-   const weeklyData = stats.weeklyProgress || {};
-  
-   const weeks = Object.keys(weeklyData).sort((a, b) => parseInt(a) - parseInt(b));
-   const completionRates = weeks.map(week => {
-     const data = weeklyData[week];
-     return data.total > 0 ? (data.completed / data.total) * 100 : 0;
-   });
-  
-   new Chart(canvas, {
-     type: 'line',
-     data: {
-       labels: weeks.map(w => `Week ${w}`),
-       datasets: [{
-         label: 'Completion %',
-         data: completionRates,
-         borderColor: '#60a5fa',
-         backgroundColor: 'rgba(96, 165, 250, 0.1)',
-         tension: 0.4,
-         fill: true
-       }]
-     },
-     options: {
-       responsive: true,
-       maintainAspectRatio: true,
-       plugins: {
-         legend: { display: false },
-         tooltip: {
-           backgroundColor: '#1f1f1f',
-           titleColor: '#ffffff',
-           bodyColor: '#e0e0e0'
-         }
-       },
-       scales: {
-         y: {
-           beginAtZero: true,
-           max: 100,
-           ticks: { color: '#999999' },
-           grid: { color: '#2a2a2a' }
-         },
-         x: {
-           ticks: { color: '#999999' },
-           grid: { color: '#2a2a2a' }
-         }
-       }
-     }
-   });
- }
-
-
- function createQuestTimeline() {
-   const container = document.getElementById('quest-timeline');
-   if (!container) return;
-  
-   const completionData = loadCompletionData();
-   const timeline = [];
-  
-   // Build timeline from completion data
-   document.querySelectorAll('.item-card').forEach(card => {
-     const itemId = card.dataset.itemId;
-     if (completionData[itemId]) {
-       const title = card.querySelector('.item-title').textContent;
-       const weekCard = card.closest('.week-card');
-       const weekNum = extractWeekNumber(weekCard);
-      
-       timeline.push({
-         title,
-         week: weekNum,
-         date: new Date() // In real implementation, track actual completion date
-       });
-     }
-   });
-  
-   // Sort by date (most recent first)
-   timeline.sort((a, b) => b.date - a.date);
-  
-   container.innerHTML = timeline.slice(0, 10).map(item => `
-     <div class="timeline-item">
-       <div class="timeline-marker"></div>
-       <div class="timeline-content">
-         <div class="timeline-title">${item.title}</div>
-         <div class="timeline-date">Week ${item.week} • ${item.date.toLocaleDateString()}</div>
-       </div>
-     </div>
-   `).join('');
- }
-
-
- // Activity heatmap and challenge performance charts removed
-
-
- function sortLeaderboard(criteria) {
-   const leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
-  
-   leaderboard.sort((a, b) => {
-     switch(criteria) {
-       case 'completion':
-         const aRate = a.totalItems > 0 ? a.totalCompleted / a.totalItems : 0;
-         const bRate = b.totalItems > 0 ? b.totalCompleted / b.totalItems : 0;
-         return bRate - aRate;
-       case 'streak':
-         return b.currentStreak - a.currentStreak;
-       case 'xp':
-       default:
-         return b.xp - a.xp;
-     }
-   });
-  
-   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
-   refreshLeaderboardDisplay();
- }
 
   // Initialize certificate system
   function initializeCertificateSystem() {
@@ -3187,99 +1975,13 @@ function updateWeeklyProgress(stats, weekNum) {
     });
   }
 
-  // ============================================
-  // NEW: PROFESSIONAL SKILLS ACHIEVEMENTS TRACKING
-  // ============================================
 
-  function updateAchievementsDisplay() {
-    const completionData = loadCompletionData();
-    
-    // Count active quests (weeks that are started but not complete)
-    let activeQuests = 0;
-    document.querySelectorAll('.week-card').forEach(weekCard => {
-      const items = weekCard.querySelectorAll('.item-card');
-      const completed = Array.from(items).filter(item => 
-        completionData[item.dataset.itemId]
-      ).length;
-      
-      // Active = has some completion but not all
-      if (completed > 0 && completed < items.length) {
-        activeQuests++;
-      }
-    });
-    
-    // Count certificates earned
-    const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
-    let earnedCerts = [];
-    try {
-      earnedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
-    } catch(e) {
-      earnedCerts = [];
-    }
-    
-    // Count total tasks completed
-    const totalCompleted = Object.values(completionData).filter(Boolean).length;
-    
-    // Update display
-    const activeEl = document.getElementById('active-quests-count');
-    const certsEl = document.getElementById('certificates-earned-count');
-    const tasksEl = document.getElementById('tasks-completed-count');
-    
-    if (activeEl) activeEl.textContent = activeQuests;
-    if (certsEl) certsEl.textContent = earnedCerts.length;
-    if (tasksEl) tasksEl.textContent = totalCompleted;
-  }
 
-  // Setup Analytics Button
-  function setupAnalyticsButton() {
-    const analyticsBtn = document.getElementById('modal-analytics-btn');
-    if (analyticsBtn) {
-      analyticsBtn.addEventListener('click', () => {
-        closeProgressionModal();
-        window.location.href = `${window.location.origin}/leaderboard?course=${CURRENT_COURSE}`;
-      });
-    }
-  }
 
-  // Setup Course Filters
-  function setupCourseFilters() {
-    const filterButtons = document.querySelectorAll('.course-filter-btn');
-    filterButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const courseFilter = btn.dataset.courseFilter;
-        console.log('Filter selected:', courseFilter);
-      });
-    });
-  }
 
-  function initializeResourceSearch() {
-  const searchInput = document.getElementById('resource-search');
-  const resourceCards = document.querySelectorAll('.resource-card');
+
+
   
-  if (!searchInput) return;
-  
-  searchInput.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase().trim();
-    
-    resourceCards.forEach(card => {
-      const title = card.querySelector('.resource-title').textContent.toLowerCase();
-      const description = card.querySelector('.resource-description').textContent.toLowerCase();
-      const tags = Array.from(card.querySelectorAll('.resource-tag'))
-        .map(tag => tag.textContent.toLowerCase())
-        .join(' ');
-      
-      const searchContent = `${title} ${description} ${tags}`;
-      
-      if (searchTerm === '' || searchContent.includes(searchTerm)) {
-        card.style.display = 'block';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  });
-}
 
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
@@ -3288,41 +1990,12 @@ function updateWeeklyProgress(stats, weekNum) {
     applyFilters();
     initializeCertificateSystem();
     renderWeekSkillPreviews();
-    initializeResourceSearch();
     
-    // NEW: Initialize achievements
-    updateAchievementsDisplay();
-    setupAnalyticsButton();
-    setupCourseFilters();
+
+
+
+
     
-    // NEW: Refresh analytics button when modal opens
-    document.querySelectorAll('.progression-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        setTimeout(setupAnalyticsButton, 100);
-      });
-    });
-    
-    // Prompt for username if not set (still needed for tracking)
-    if (!localStorage.getItem('student-username')) {
-      const username = prompt('Enter your name for the leaderboard:');
-      if (username) {
-        localStorage.setItem('student-username', username);
-        const stats = initializeUserStats();
-        stats.username = username;
-        saveUserStats(stats);
-      }
-    }
   });
 
-  // Lightweight mobile detection redirect to /mobile/ (only for small screens)
-  (function(){
-    try {
-      if (window.matchMedia('(max-width: 640px)').matches && !window.location.pathname.startsWith('/mobile')) {
-        // Avoid interfering with user-agent previews and bots
-        if (!navigator.userAgent.includes('Slackbot') && !navigator.userAgent.includes('Twitterbot')) {
-          window.location.replace('/mobile/');
-        }
-      }
-    } catch(e){}
-  })();
 </script>
