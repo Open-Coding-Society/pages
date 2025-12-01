@@ -5,7 +5,7 @@ title: Data Visualization Quest
 description: >
   Learn about how to visualize data from various sources for effective representation and application, such as machine learning
 author: CSA 2025-26
-permalink: /cs-portfolio-quest/data-viz/
+permalink: /bigsix/data-viz/
 lxdData:
   Title: "Data Visualization Modules"
   Description: "Master data visualization techniques and tools for effective data representation!"
