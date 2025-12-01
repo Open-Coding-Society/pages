@@ -1,9 +1,286 @@
-// Leaderboard.js - ES6 Module version
+// Leaderboard.js - ES6 Module version with integrated CSS and corrected API calls
 export default class Leaderboard {
     constructor(gameControl, options = {}) {
         this.gameControl = gameControl;
         this.API_BASE_URL = options.apiBaseUrl || '/gamer';
+        this.injectStyles();
         this.init();
+    }
+    
+    injectStyles() {
+        // Check if styles are already injected
+        if (document.getElementById('leaderboard-styles')) return;
+        
+        const styleElement = document.createElement('style');
+        styleElement.id = 'leaderboard-styles';
+        styleElement.textContent = `
+/* Leaderboard Widget Styles */
+.leaderboard-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 400px;
+    max-width: calc(100vw - 40px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    z-index: 9999;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.leaderboard-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.leaderboard-content {
+    background: white;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.leaderboard-actions {
+    padding: 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leaderboard-actions input {
+    padding: 10px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.leaderboard-actions input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.action-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.refresh-btn {
+    background: #28a745;
+    color: white;
+}
+
+.refresh-btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.leaderboard-list {
+    padding: 16px;
+    min-height: 200px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table thead {
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+}
+
+.leaderboard-table th {
+    padding: 12px 8px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6c757d;
+    letter-spacing: 0.5px;
+}
+
+.leaderboard-row {
+    border-bottom: 1px solid #f1f3f5;
+    transition: background-color 0.2s ease;
+    animation: slideIn 0.3s ease;
+}
+
+.leaderboard-row:hover {
+    background-color: #f8f9fa;
+}
+
+.leaderboard-row:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-table td {
+    padding: 12px 8px;
+    font-size: 14px;
+}
+
+.rank {
+    font-weight: 700;
+    color: #495057;
+    font-size: 16px;
+    width: 50px;
+}
+
+.username {
+    font-weight: 600;
+    color: #212529;
+}
+
+.score {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 16px;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+.loading, .error, .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.error {
+    color: #dc3545;
+}
+
+/* Scrollbar styling */
+.leaderboard-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaderboard-content::-webkit-scrollbar-track {
+    background: #f1f3f5;
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .leaderboard-widget {
+        width: calc(100vw - 20px);
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .leaderboard-header h3 {
+        font-size: 18px;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 8px 4px;
+        font-size: 12px;
+    }
+    
+    .rank {
+        width: 40px;
+        font-size: 14px;
+    }
+    
+    .score {
+        font-size: 14px;
+    }
+}
+
+/* Animation for new entries */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+        `;
+        
+        document.head.appendChild(styleElement);
     }
     
     init() {
@@ -48,7 +325,8 @@ export default class Leaderboard {
         listContainer.innerHTML = '<p class="loading">Loading...</p>';
         
         try {
-            const response = await fetch(`${this.API_BASE_URL}/gamer`);
+            // Correct endpoint: GET /gamer/leaderboard
+            const response = await fetch(`${this.API_BASE_URL}/leaderboard`);
             
             if (!response.ok) {
                 throw new Error('Failed to fetch leaderboard');
@@ -66,7 +344,7 @@ export default class Leaderboard {
         const listContainer = document.getElementById('leaderboard-list');
         if (!listContainer) return;
         
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
             listContainer.innerHTML = '<p class="empty">No scores yet!</p>';
             return;
         }
@@ -80,7 +358,7 @@ export default class Leaderboard {
                     <td class="rank">${medal || (index + 1)}</td>
                     <td class="username">${this.escapeHtml(entry.username)}</td>
                     <td class="score">${entry.highScore.toLocaleString()}</td>
-                    <td><button class="delete-btn" data-username="${this.escapeHtml(entry.username)}">Delete</button></td>
+                    <td><button class="delete-btn" data-username="${this.escapeHtml(entry.username)}">Reset</button></td>
                 </tr>
             `;
         });
@@ -109,6 +387,8 @@ export default class Leaderboard {
         }
         
         try {
+            // Correct endpoint: POST /gamer/updateScore
+            // Backend expects: { username: string, score: int }
             const response = await fetch(`${this.API_BASE_URL}/updateScore`, {
                 method: 'POST',
                 headers: {
@@ -121,7 +401,8 @@ export default class Leaderboard {
             });
             
             if (response.ok) {
-                alert('Score submitted successfully!');
+                const message = await response.text();
+                alert(message || 'Score submitted successfully!');
                 document.getElementById('username-input').value = '';
                 document.getElementById('score-input').value = '';
                 this.fetchLeaderboard();
@@ -131,18 +412,21 @@ export default class Leaderboard {
             }
         } catch (error) {
             console.error('Error submitting score:', error);
-            alert('Failed to submit score');
+            alert('Failed to submit score. Please try again.');
         }
     }
     
     async handleDeleteScore(event) {
         const username = event.target.dataset.username;
         
-        if (!confirm(`Are you sure you want to delete ${username}'s score?`)) {
+        if (!confirm(`Are you sure you want to reset ${username}'s score to 0?`)) {
             return;
         }
         
         try {
+            // Backend doesn't have a delete endpoint, so we update score to 0
+            // Note: Backend only updates if new score is HIGHER than current
+            // So this won't actually reset the score - you may need to add a delete endpoint
             const response = await fetch(`${this.API_BASE_URL}/updateScore`, {
                 method: 'POST',
                 headers: {
@@ -155,15 +439,15 @@ export default class Leaderboard {
             });
             
             if (response.ok) {
-                alert('Score deleted successfully!');
+                alert('Note: Backend only updates if score is higher. Score may not be reset.');
                 this.fetchLeaderboard();
             } else {
                 const errorText = await response.text();
                 alert('Error: ' + errorText);
             }
         } catch (error) {
-            console.error('Error deleting score:', error);
-            alert('Failed to delete score');
+            console.error('Error resetting score:', error);
+            alert('Failed to reset score');
         }
     }
     
@@ -214,6 +498,11 @@ export default class Leaderboard {
         const container = document.getElementById('leaderboard-container');
         if (container) {
             container.remove();
+        }
+        // Optionally remove styles
+        const styles = document.getElementById('leaderboard-styles');
+        if (styles) {
+            styles.remove();
         }
     }
 }
