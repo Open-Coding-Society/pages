@@ -2411,14 +2411,16 @@ function updateWeeklyProgress(stats, weekNum) {
     });
   }
 
-
-
-
-
-
+  setTimeout(() => {
+   document.querySelectorAll('.leaderboard-table th.sortable').forEach(header => {
+     header.addEventListener('click', function() {
+       const sortBy = this.dataset.sort;
+       sortLeaderboard(sortBy);
+     });
+   });
+ }, 100);
 
   
-
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
@@ -2428,9 +2430,21 @@ function updateWeeklyProgress(stats, weekNum) {
     renderWeekSkillPreviews();
     
 
-
-
-
+   // NEW: Initialize leaderboard and charts
+   refreshLeaderboardDisplay();
+   initializeCharts();
+  
+   // Prompt for username if not set
+   if (!localStorage.getItem('student-username')) {
+     const username = prompt('Enter your name for the leaderboard:');
+     if (username) {
+       localStorage.setItem('student-username', username);
+       const stats = initializeUserStats();
+       stats.username = username;
+       saveUserStats(stats);
+       refreshLeaderboardDisplay();
+     }
+   }
     
   });
 
