@@ -10,9 +10,9 @@ breadcrumb: True
 comments: True
 ---
 
-## Team Building and Diversity
+## Instructor Oberservation -- Team Building and Diversity
 
-In my personal journey, I have studied, experienced, and worked with people from many cultures. I often try to look for similarities and/or growth opportunities in each new exposure.
+In my personal journey as an Engineer, I have studied, experienced, and worked with people from many cultures. I often try to look for similarities and/or growth opportunities in each new exposure.
 
 ### Abrahamic Traditions → Structure & Discipline
 
@@ -58,15 +58,15 @@ The goal is not to label people—but to encourage us to look beyond the familia
 
 ### Today's Task: Building Your Team
 
-We’ll be forming **teams of 6**. If numbers require, we may have some teams of 5.
+We’ll be forming **teams of 5 or 6**. If numbers require or in small classes we will teams of 5.
 
-Each team will work as **two paired trios**, forming smaller working groups within your team.
+Each team will work as **two paired duos or trios**, forming smaller working groups within your team.
 
 ---
 
 ### Interview Each Other
 
-If you're bringing a friend, great—but only if your team gains diversity and stays goal-aligned. In years of teaching and a lifetime of engineering, I’ve found that all successful projects share two traits: **diversity** and **shared purpose**.
+If you're bringing a friend to the team, great—but only if your team gains diversity and stays goal-aligned. In years of teaching and a lifetime of engineering, I’ve found that all successful projects share two traits: **diversity** and **shared purpose**.
 
 Consider learning styles, collaboration habits, and problem-solving approaches. When we embrace these goals together, we build something stronger.
 
@@ -103,17 +103,18 @@ Let’s form teams that reflect the **best of what each of us has to offer**.
 ### Team Formation Process
 
 ```text
-👤 Individual Reflection → 🤝 Find Diverse Partners → 👥 Form Team of 6 → 🎯 Align Goals
-         ↓                        ↓                      ↓               ↓
-   "Who am I?"              "Who complements me?"    "What's our vision?"  "How do we succeed?"
+👤 Individual Reflection   → Find Diverse Partners   → 👥 Form Team of 6       → Align Goals
+          ↓                          ↓                         ↓                    ↓
+     "Who am I?"            "Who complements me?"     "What's our vision?"   "How do we succeed?"
 ```
 
-- [planner]({{site.baseurl}}/persona/planner)
-- [technologist]({{site.baseurl}}/persona/technologist)
-- [scrummer]({{site.baseurl}}/persona/scrummer)
-- [closer]({{site.baseurl}}/persona/closer)
+- Technical Personality
+  - [planner]({{site.baseurl}}/persona/planner)
+  - [technologist]({{site.baseurl}}/persona/technologist)
+  - [scrummer]({{site.baseurl}}/persona/scrummer)
+  - [closer]({{site.baseurl}}/persona/closer)
 
-**Pro Tip:** Great teams look like a **🌈 rainbow** - different colors and blending that create something beautiful together!
+**Pro Tip:** Great teams look like a **🌈 rainbow** - different colors and blending that create something great together!
 
 ### Next Steps
 
@@ -121,10 +122,10 @@ After forming a team you will need to start on the journey of acting as a team a
 
 #### **Team Roles & Responsibilities**
 
-- Teams need to consider roles. Some key roles will be discussed in the project requirements for the Sprint.
+- Teams 👥 need to consider roles. Some key roles will be discussed in the project requirements for the Sprint.
 
   ```text
-  👥 Scrum Master → 🏗️ Developer → 🎨 Designer → 📊 Product Owner
+  Scrum Master(planner) → Designer (technologist) → Developer (scrummer)  → Product Owner (closer)
   ```
 
 #### **Progress Management Tools**
@@ -132,7 +133,7 @@ After forming a team you will need to start on the journey of acting as a team a
 - Teams need to manage progress. At the top of every repository in GitHub there are Issue and Project management tabs. You will need to become familiar with Issues, Kanban, and Timelines.
 
   ```text
-  📋 Issues → 📊 Kanban Board → ⏱️ Timeline → 🚀 Deploy
+  📋 Issues → 📅 Kanban Board → ⏱️ Timeline → 🔄 Deploy
   ```
 
 #### **Agile Ceremonies**
@@ -140,7 +141,7 @@ After forming a team you will need to start on the journey of acting as a team a
 - Ceremonies are key activities for teams. Sticky notes and Scrum boards are a fun and engaging way to start working as a team.
 
   ```text
-  📅 Sprint Planning → 🔄 Daily Standups → 📈 Sprint Review → 🔍 Retrospective
+  Sprint Planning → Daily Standups → Sprint Review → Retrospective
   ```
 
 ### 📊 Team Success Indicators
@@ -164,9 +165,9 @@ Your team is on track when you see:
 Before finalizing your team, take a moment to consider:
 
 > **"How do I see myself at the end of this course?"**
-> 
+>
 > **"Can I imagine myself as a collaborator? A coder? A team leader?"**
-> 
+>
 > **"What unique perspective do I bring to a team?"**
 
 **Action Item:** Each of you should write your answers in your GitHub Issues as your first individual contribution to the team.  Move comments to Done as you complete the task.  Link the comment as soon as you start it to utterance location below.
