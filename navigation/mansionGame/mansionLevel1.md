@@ -11,7 +11,7 @@ microblog: true
 </div>
 
 <script type="module">
-    // Mansion Game assets locations (use central Core + GameControl)
+    // Mansion Game assets locations (use central core + GameControl)
     import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/cheats.js";
