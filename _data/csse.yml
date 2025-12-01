@@ -2,11 +2,11 @@
 Sprint1:
   shared: "Onboarding"
   start: 0
-  end: 4
+  end: 3
 Sprint2:
   title: JavaScript Student Teaching
   description: A key focus of this course is to make Web Games using JavaScript. Understanding fundamentals like control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices are essentiial. Students will be teaching lessons on these topics to their peers.  Each student will be responsible for a portion of the lesson, a popcorn hack, and homework.  Students will be graded on their teaching, the popcorn hack, and the homework they assign.  Students will also be graded on their participation in learning from their peers.
-  start: 5
+  start: 4
   end: 7
 Sprint3:
   title: Creating a game for N@tM
