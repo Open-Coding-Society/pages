@@ -1,10 +1,21 @@
-// Leaderboard Module - Can be integrated into any page
-(function() {
-    // Configuration
-    const API_BASE_URL = '/gamer'; // Adjust this to your backend URL if needed
+// Leaderboard.js - ES6 Module version
+export default class Leaderboard {
+    constructor(gameControl, options = {}) {
+        this.gameControl = gameControl;
+        this.API_BASE_URL = options.apiBaseUrl || '/gamer';
+        this.init();
+    }
     
-    // Create leaderboard HTML structure.
-    function createLeaderboardHTML() {
+    init() {
+        this.createLeaderboardHTML();
+        this.fetchLeaderboard();
+        this.attachEventListeners();
+        
+        // Auto-refresh every 30 seconds
+        this.refreshInterval = setInterval(() => this.fetchLeaderboard(), 30000);
+    }
+    
+    createLeaderboardHTML() {
         const leaderboardContainer = document.createElement('div');
         leaderboardContainer.id = 'leaderboard-container';
         leaderboardContainer.className = 'leaderboard-widget';
@@ -30,29 +41,30 @@
         document.body.appendChild(leaderboardContainer);
     }
     
-    // Fetch and display leaderboard
-    async function fetchLeaderboard() {
+    async fetchLeaderboard() {
         const listContainer = document.getElementById('leaderboard-list');
+        if (!listContainer) return;
+        
         listContainer.innerHTML = '<p class="loading">Loading...</p>';
         
         try {
-            const response = await fetch(`${API_BASE_URL}/leaderboard`);
+            const response = await fetch(`${this.API_BASE_URL}/gamer`);
             
             if (!response.ok) {
                 throw new Error('Failed to fetch leaderboard');
             }
             
             const leaderboardData = await response.json();
-            displayLeaderboard(leaderboardData);
+            this.displayLeaderboard(leaderboardData);
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
             listContainer.innerHTML = '<p class="error">Failed to load leaderboard</p>';
         }
     }
     
-    // Display leaderboard data
-    function displayLeaderboard(data) {
+    displayLeaderboard(data) {
         const listContainer = document.getElementById('leaderboard-list');
+        if (!listContainer) return;
         
         if (data.length === 0) {
             listContainer.innerHTML = '<p class="empty">No scores yet!</p>';
@@ -66,9 +78,9 @@
             html += `
                 <tr class="leaderboard-row">
                     <td class="rank">${medal || (index + 1)}</td>
-                    <td class="username">${escapeHtml(entry.username)}</td>
+                    <td class="username">${this.escapeHtml(entry.username)}</td>
                     <td class="score">${entry.highScore.toLocaleString()}</td>
-                    <td><button class="delete-btn" data-username="${escapeHtml(entry.username)}">Delete</button></td>
+                    <td><button class="delete-btn" data-username="${this.escapeHtml(entry.username)}">Delete</button></td>
                 </tr>
             `;
         });
@@ -76,14 +88,13 @@
         html += '</tbody></table>';
         listContainer.innerHTML = html;
         
-        // Add delete button listeners
+        // Re-attach delete button listeners
         document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', handleDeleteScore);
+            btn.addEventListener('click', (e) => this.handleDeleteScore(e));
         });
     }
     
-    // Submit score
-    async function submitScore() {
+    async submitScore() {
         const username = document.getElementById('username-input').value.trim();
         const score = parseInt(document.getElementById('score-input').value);
         
@@ -98,7 +109,7 @@
         }
         
         try {
-            const response = await fetch(`${API_BASE_URL}/updateScore`, {
+            const response = await fetch(`${this.API_BASE_URL}/updateScore`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -113,7 +124,7 @@
                 alert('Score submitted successfully!');
                 document.getElementById('username-input').value = '';
                 document.getElementById('score-input').value = '';
-                fetchLeaderboard();
+                this.fetchLeaderboard();
             } else {
                 const errorText = await response.text();
                 alert('Error: ' + errorText);
@@ -124,8 +135,7 @@
         }
     }
     
-    // Delete score (reset to 0)
-    async function handleDeleteScore(event) {
+    async handleDeleteScore(event) {
         const username = event.target.dataset.username;
         
         if (!confirm(`Are you sure you want to delete ${username}'s score?`)) {
@@ -133,7 +143,7 @@
         }
         
         try {
-            const response = await fetch(`${API_BASE_URL}/updateScore`, {
+            const response = await fetch(`${this.API_BASE_URL}/updateScore`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -146,7 +156,7 @@
             
             if (response.ok) {
                 alert('Score deleted successfully!');
-                fetchLeaderboard();
+                this.fetchLeaderboard();
             } else {
                 const errorText = await response.text();
                 alert('Error: ' + errorText);
@@ -157,9 +167,10 @@
         }
     }
     
-    // Toggle leaderboard visibility
-    function toggleLeaderboard() {
+    toggleLeaderboard() {
         const container = document.getElementById('leaderboard-container');
+        if (!container) return;
+        
         const content = container.querySelector('.leaderboard-content');
         const toggleBtn = document.getElementById('toggle-leaderboard');
         
@@ -172,8 +183,20 @@
         }
     }
     
-    // Escape HTML to prevent XSS
-    function escapeHtml(text) {
+    attachEventListeners() {
+        document.getElementById('submit-score-btn')?.addEventListener('click', () => this.submitScore());
+        document.getElementById('refresh-leaderboard-btn')?.addEventListener('click', () => this.fetchLeaderboard());
+        document.getElementById('toggle-leaderboard')?.addEventListener('click', () => this.toggleLeaderboard());
+        
+        // Allow Enter key to submit score
+        document.getElementById('score-input')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.submitScore();
+            }
+        });
+    }
+    
+    escapeHtml(text) {
         const map = {
             '&': '&amp;',
             '<': '&lt;',
@@ -184,31 +207,13 @@
         return text.replace(/[&<>"']/g, m => map[m]);
     }
     
-    // Initialize leaderboard when DOM is ready
-    function init() {
-        createLeaderboardHTML();
-        fetchLeaderboard();
-        
-        // Add event listeners
-        document.getElementById('submit-score-btn').addEventListener('click', submitScore);
-        document.getElementById('refresh-leaderboard-btn').addEventListener('click', fetchLeaderboard);
-        document.getElementById('toggle-leaderboard').addEventListener('click', toggleLeaderboard);
-        
-        // Allow Enter key to submit score
-        document.getElementById('score-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                submitScore();
-            }
-        });
-        
-        // Auto-refresh every 30 seconds
-        setInterval(fetchLeaderboard, 30000);
+    destroy() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        const container = document.getElementById('leaderboard-container');
+        if (container) {
+            container.remove();
+        }
     }
-    
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
+}
