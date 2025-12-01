@@ -5,7 +5,7 @@ title: Resume
 description: >
   Learn how to develop resumes.
 author: CSA 2025-26
-permalink: /cs-portfolio-quest/resume/
+permalink: /bigsix/resume
 lxdData:
   Title: "Resume Building Modules"
   Description: "Master resume building."
