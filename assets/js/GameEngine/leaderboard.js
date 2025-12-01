@@ -3,7 +3,7 @@
     // Configuration
     const API_BASE_URL = '/gamer'; // Adjust this to your backend URL if needed
     
-    // Create leaderboard HTML structure
+    // Create leaderboard HTML structure.
     function createLeaderboardHTML() {
         const leaderboardContainer = document.createElement('div');
         leaderboardContainer.id = 'leaderboard-container';
