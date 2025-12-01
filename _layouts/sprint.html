@@ -1658,10 +1658,22 @@ function updateWeeklyProgress(stats, weekNum) {
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
      
-
-
-
-
+     const stats = initializeUserStats();
+     const weekCard = button.closest('.week-card');
+     const weekNum = extractWeekNumber(weekCard);
+    
+     // Recalculate totals
+     const allItems = document.querySelectorAll('.item-card');
+     stats.totalItems = allItems.length;
+     stats.totalCompleted = Array.from(allItems).filter(c => c.classList.contains('completed')).length;
+    
+     updateStreaks(stats);
+     updateWeeklyProgress(stats, weekNum);
+     calculateXP(stats);
+     saveUserStats(stats);
+    
+     refreshLeaderboardDisplay();
+     initializeCharts();
 
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
