@@ -9,7 +9,7 @@ permalink: /github/pages/anatomy
 comments: True
 ---
 
-<div class="lesson-part" data-part="1" style="display:block; color: #ccc;">
+<div class="lesson-part" data-part="1" style="display:block;">
 
 <h2>Anatomy of GitHub Pages files</h2>
 
@@ -36,17 +36,15 @@ comments: True
 
 <p>Please note that there are many other key files and directories in a GitHub Pages project, but we will highlight those as the development progresses.</p>
 
-<div class="frq-box" data-frq-id="1" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+<div class="frq-box" data-frq-id="1" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
     <b>FRQ 1:</b> What is the purpose of the <code>.gitignore</code> file and why is it important in a project's file structure?<br><br>
-    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
     <button class="grade-button" style="margin-top: 10px;">Grade</button>
     <div class="feedback-box"></div>
 </div>
 </div>
-
 <hr />
-
-<div class="lesson-part" data-part="2" style="display:none; color: #ccc;">
+<div class="lesson-part" data-part="2" style="display:none;">
 
 <h2>Configuration Notes, behind the scenes</h2>
 
@@ -69,17 +67,15 @@ remote_theme: pages-themes/time-machine@v0.2.0</code></pre>
 
 <p>Under <code>_includes/theme</code> you will see directories that correspond to your selection. In each of these directories there is a <code>base.html</code>. This is the foundation for the page: head, body, footer. When you select a layout in the frontmatter of your pages, it ultimately includes the <code>base.html</code> from one of these directories. To understand how a web page is formed, these are excellent studies.</p>
 
-<div class="frq-box" data-frq-id="2" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+<div class="frq-box" data-frq-id="2" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
     <b>FRQ 2:</b> Describe the function of the <code>_config.yml</code> file in a Jekyll project. How does it relate to the <code>remote_theme</code> setting?<br><br>
-    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
     <button class="grade-button" style="margin-top: 10px;">Grade</button>
     <div class="feedback-box"></div>
 </div>
 </div>
-
 <hr />
-
-<div class="lesson-part" data-part="3" style="display:none; color: #ccc;">
+<div class="lesson-part" data-part="3" style="display:none;">
 
 <h2>Customizations</h2>
 
@@ -100,17 +96,15 @@ title: My Title</code></pre>
 
 <p>Look at some of the layouts that form schedule, search, blogs, and each post. Between this structure and Jekyll you can automate almost any reconfiguration of the notebooks and posts.</p>
 
-<div class="frq-box" data-frq-id="3" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+<div class="frq-box" data-frq-id="3" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
     <b>FRQ 3:</b> What is the purpose of "frontmatter" in a Jekyll Markdown file, and how does the <code>layout</code> key specifically function?<br><br>
-    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
     <button class="grade-button" style="margin-top: 10px;">Grade</button>
     <div class="feedback-box"></div>
 </div>
 </div>
-
 <hr />
-
-<div class="lesson-part" data-part="4" style="display:none; color: #ccc;">
+<div class="lesson-part" data-part="4" style="display:none;">
 
 <h3>Making a Submenu</h3>
 
@@ -133,17 +127,15 @@ title: My Title</code></pre>
 
 <p>Look how the same submenu is included on all of the pages it calls, you will notice this in the frontmatter menu key.</p>
 
-<div class="frq-box" data-frq-id="4" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+<div class="frq-box" data-frq-id="4" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
     <b>FRQ 4:</b> Explain the role of <code>{{site.baseurl}}</code> in Jekyll. Why is it important to use this variable instead of a hardcoded path like <code>/images/logo.png</code>?<br><br>
-    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
     <button class="grade-button" style="margin-top: 10px;">Grade</button>
     <div class="feedback-box"></div>
 </div>
 </div>
-
 <hr />
-
-<div class="lesson-part" data-part="5" style="display:none; color: #ccc;">
+<div class="lesson-part" data-part="5" style="display:none;">
 
 <h3>Style revolves around _sass</h3>
 
@@ -165,9 +157,9 @@ title: My Title</code></pre>
 // Styles for nighthawk theme, do not remove
 @import "nighthawk/main";</code></pre>
 
-<div class="frq-box" data-frq-id="5" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+<div class="frq-box" data-frq-id="5" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
     <b>FRQ 5:</b> Explain the purpose of the <code>@import</code> rule within an SCSS file like <code>custom-styles.scss</code>. How does this allow for theme customization?<br><br>
-    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+    <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
     <button class="grade-button" style="margin-top: 10px;">Grade</button>
     <div class="feedback-box"></div>
 </div>
