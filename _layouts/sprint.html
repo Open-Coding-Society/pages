@@ -1516,10 +1516,94 @@ layout: post
   const CURRENT_COURSE = '{{ page.course }}';
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
 
+  const LEADERBOARD_KEY = `${CURRENT_COURSE}-leaderboard`;
+const USER_STATS_KEY = `${CURRENT_COURSE}-user-stats`;
 
 
+// Enhanced user stats structure
+function initializeUserStats() {
+ const defaultStats = {
+   username: localStorage.getItem('student-username') || 'Anonymous',
+   totalCompleted: 0,
+   totalItems: 0,
+   currentStreak: 0,
+   longestStreak: 0,
+   lastActivityDate: null,
+   weeklyProgress: {}, // { weekNum: { completed: X, total: Y, completedDate: timestamp } }
+   challengeScores: {}, // { challengeId: { score: X, attempts: Y, bestTime: Z } }
+   badges: [], // Achievement badges
+   xp: 0
+ };
+  try {
+   const stored = localStorage.getItem(USER_STATS_KEY);
+   return stored ? { ...defaultStats, ...JSON.parse(stored) } : defaultStats;
+ } catch (e) {
+   return defaultStats;
+ }
+}
 
 
+function saveUserStats(stats) {
+ localStorage.setItem(USER_STATS_KEY, JSON.stringify(stats));
+ updateLeaderboard(stats);
+}
+
+
+// Track completion with enhanced metrics
+function enhancedToggleCompletion(button) {
+ toggleCompletion(button); // Original function
+  const stats = initializeUserStats();
+ const weekCard = button.closest('.week-card');
+ const weekNum = extractWeekNumber(weekCard);
+  // Update stats
+ updateStreaks(stats);
+ updateWeeklyProgress(stats, weekNum);
+ calculateXP(stats);
+  saveUserStats(stats);
+ refreshLeaderboardDisplay();
+}
+
+
+function updateStreaks(stats) {
+ const today = new Date().toDateString();
+ const lastActivity = stats.lastActivityDate;
+  if (lastActivity === today) {
+   return; // Already counted today
+ }
+  const yesterday = new Date();
+ yesterday.setDate(yesterday.getDate() - 1);
+  if (lastActivity === yesterday.toDateString()) {
+   stats.currentStreak++;
+ } else if (lastActivity !== today) {
+   stats.currentStreak = 1;
+ }
+  stats.longestStreak = Math.max(stats.longestStreak, stats.currentStreak);
+ stats.lastActivityDate = today;
+}
+
+
+function calculateXP(stats) {
+ // XP calculation based on different metrics
+ const completionXP = stats.totalCompleted * 10;
+ const streakBonus = stats.currentStreak * 5;
+ const weekCompletionBonus = Object.values(stats.weeklyProgress)
+   .filter(week => week.completed === week.total).length * 50;
+  stats.xp = completionXP + streakBonus + weekCompletionBonus;
+}
+
+
+function updateWeeklyProgress(stats, weekNum) {
+ if (!stats.weeklyProgress) stats.weeklyProgress = {};
+  const weekCard = getWeekCardElement(weekNum);
+ if (!weekCard) return;
+  const items = weekCard.querySelectorAll('.item-card');
+ const completed = Array.from(items).filter(i => i.classList.contains('completed')).length;
+  stats.weeklyProgress[weekNum] = {
+   completed,
+   total: items.length,
+   completedDate: completed === items.length ? new Date().toISOString() : null
+ };
+}
 
   // Load the skill library from the JSON script tag so the JS file itself contains no raw Liquid tokens
   let COURSE_SKILL_LIBRARY = {};
