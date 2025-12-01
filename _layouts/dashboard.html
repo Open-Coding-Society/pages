@@ -456,9 +456,6 @@ active_tab: dashboard
                     border: 1px solid var(--ui-border) !important;
                 }
 
-                /* Tab bar and sidebar mid-contrast shade */
-                .user-theme-active #tab-bar,
-                .user-theme-active #tab-bar a,
                 .user-theme-active #tab-bar .tab-btn {
                     background-color: var(--panel-mid) !important;
                     color: var(--text) !important;
@@ -622,7 +619,8 @@ active_tab: dashboard
                                 const tabBg = (rootStyles2.getPropertyValue('--panel-mid') || panelColor).trim();
                                 const tabText = (rootStyles2.getPropertyValue('--text') || text).trim();
                                 const tabBorder = (rootStyles2.getPropertyValue('--ui-border') || panelColor).trim();
-                                const tabSelectors = ['#tab-bar', '#tab-bar a', '.tab-btn', '.tab-content', '.tab-content *', '.rounded-xl', '.bg-neutral-800', '.bg-neutral-900'];
+                                // Only style the actual tab buttons and their children
+                                const tabSelectors = ['.tab-btn', '.tab-btn *'];
                                 tabSelectors.forEach(sel => {
                                     document.querySelectorAll(sel).forEach(el => {
                                         try {
@@ -673,9 +671,9 @@ active_tab: dashboard
                                 });
                             } catch(e){}
 
-                            // remove inline styles from tab elements / per-tab cards we may have modified
+                            // remove inline styles from tab buttons we may have modified
                             try {
-                                const tabSelectors = ['#tab-bar', '#tab-bar a', '.tab-btn', '.tab-content', '.tab-content *', '.rounded-xl', '.bg-neutral-800', '.bg-neutral-900'];
+                                const tabSelectors = ['.tab-btn', '.tab-btn *'];
                                 tabSelectors.forEach(sel => {
                                     document.querySelectorAll(sel).forEach(el => {
                                         try {
