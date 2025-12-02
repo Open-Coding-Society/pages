@@ -493,17 +493,20 @@ active_tab: profile
         }
     }
     // Remove class
+    // Remove a class
     async function removeClass(button) {
         const entry = button.closest('.class-entry');
         const index = parseInt(entry.dataset.index);
         const classToRemove = currentUserClasses[index];
 
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, {
+            // Use query param for DELETE (simpler and works with your API)
+            const url = new URL(`${pythonURI}/api/user/class`);
+            url.searchParams.append('class', classToRemove);
+
+            const response = await fetch(url.toString(), {
                 method: 'DELETE',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ class: classToRemove })
+                credentials: 'include', // ensures cookies are sent
             });
 
             if (!response.ok) throw new Error('Failed to remove class');
@@ -517,6 +520,7 @@ active_tab: profile
             alert('Error removing class. Please try again.');
         }
     }
+
     async function updateClassInAPI(index, newClass) {
         const updatedClasses = [...currentUserClasses];
         updatedClasses[index] = newClass;
