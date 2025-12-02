@@ -35,48 +35,11 @@ export default class PauseMenu {
                     // ignore storage errors
                 }
 
-                // Expose a helper to add points from game code
-                if (!this.gameControl.addPoints) {
-                    this.gameControl.addPoints = (amount = 0) => {
-                        this.stats.points = (this.stats.points || 0) + Number(amount || 0);
-                        this._updateStatsDisplay();
-                        this._saveStatsToStorage();
-                    };
-                }
-
-                // general stat increment helper so games can increment arbitrary counters
-                if (!this.gameControl.incrementStat) {
-                    this.gameControl.incrementStat = (statName, amount = 1) => {
-                        try {
-                            if (!this.stats[statName]) this.stats[statName] = 0;
-                            this.stats[statName] = (this.stats[statName] || 0) + Number(amount || 0);
-                            this._updateStatsDisplay();
-                            this._saveStatsToStorage();
-                        } catch (e) {
-                            console.warn('incrementStat error', e);
-                        }
-                    };
-                }
-
-                // Wrap handleLevelEnd to increment completed-level counter so we count natural completes and skips.
-                if (!this.gameControl._pauseMenuWrapped && typeof this.gameControl.handleLevelEnd === 'function') {
-                    const origHandle = this.gameControl.handleLevelEnd.bind(this.gameControl);
-                    this.gameControl.handleLevelEnd = (...args) => {
-                        try {
-                            // increment the configured counter variable (default: levelsCompleted)
-                            if (!this.stats[this.counterVar]) this.stats[this.counterVar] = 0;
-                            this.stats[this.counterVar] = (this.stats[this.counterVar] || 0) + 1;
-                            // mirror the stat value onto the gameControl instance for easy per-game access
-                            try { this.gameControl[this.counterVar] = this.stats[this.counterVar]; } catch (e) { /* ignore */ }
-                            this._updateStatsDisplay();
-                            this._saveStatsToStorage();
-                        } catch (e) {
-                            /* ignore */
-                        }
-                        return origHandle(...args);
-                    };
-                    this.gameControl._pauseMenuWrapped = true;
-                }
+                // Load any existing stats into gameControl so game logic can own the values
+                // PauseMenu will only display the configured variable from gameControl.
+                // Keep this.stats as a mirror of gameControl.stats when present.
+                if (!this.gameControl.stats) this.gameControl.stats = Object.assign({ levelsCompleted: 0, points: 0 }, this.gameControl.stats || {});
+                this.stats = this.gameControl.stats;
             }
         } catch (e) {
             console.warn('PauseMenu: could not initialize stats on gameControl', e);
@@ -296,8 +259,8 @@ export default class PauseMenu {
             this.hide();
             this.gameControl.game.returnHome();
         } else {
-            // Navigate to the canonical homepage for this site
-            window.location.href = '/homepage/';
+            // Navigate to the canonical homepage for this site (use absolute permalink)
+            window.location.href = 'https://pages.opencodingsociety.com/homepage/';
         }
     }
 

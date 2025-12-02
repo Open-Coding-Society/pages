@@ -184,6 +184,15 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
+        // Increment configured per-game counter (PauseMenu displays this variable)
+        try {
+            const cv = (this.pauseMenuOptions && this.pauseMenuOptions.counterVar) || 'levelsCompleted';
+            this[cv] = (this[cv] || 0) + 1;
+            if (this.stats) this.stats[cv] = this[cv];
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) { /* ignore */ }
+
         // Alert the user that the level has ended
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             alert("Level ended.");
@@ -314,6 +323,32 @@ class GameControl {
     endLevel() {
         if (this.currentLevel) {
             this.currentLevel.continue = false;
+        }
+    }
+
+    /**
+     * Increment an arbitrary stat on this GameControl (keeps PauseMenu in sync if present)
+     */
+    incrementStat(statName, amount = 1) {
+        try {
+            this[statName] = (this[statName] || 0) + Number(amount || 0);
+            if (this.stats) this.stats[statName] = this[statName];
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('incrementStat error', e);
+        }
+    }
+
+    addPoints(amount = 0) {
+        try {
+            this.points = (this.points || 0) + Number(amount || 0);
+            if (!this.stats) this.stats = { points: this.points };
+            this.stats.points = this.points;
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('addPoints error', e);
         }
     }
     
