@@ -15,7 +15,7 @@ lxdData:
       Level: 1
       Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
       Categories: ["Frontend", "HTML", "CSS","Javascript"]
-      Lessons: "/cs-portfolio-quest/frontend/"
+      Lessons: "/bigsix/frontend/main/"
       LessonCount: 6
       Image: "/images/cs-portfolio-quest/frontend/mainpage.png"
       Alt: "CS Portfolio Quest Frontend"
@@ -33,7 +33,7 @@ lxdData:
       Level: 3
       Description: "Learn about how to visualize data from various sources for effective representation and application, such as machine learning"
       Categories: ["Visualization", "ML", "Collation"]
-      Lessons: "/cs-portfolio-quest/data-viz/"
+      Lessons: "/bigsix/dataviz/main/"
       LessonCount: 2
       Image: "/images/cs-portfolio-quest/datavisualization/data_visualization_main.png"
       Alt: "CS Portfolio Quest Data Visualization"
@@ -42,7 +42,7 @@ lxdData:
       Level: 4
       Description: "Learn to write about your CS projects for inclusion on your resume, both in technical and non-technical terms"
       Categories: ["CV", "Resume", "Blogging"]
-      Lessons: "/cs-portfolio-quest/resume/"
+      Lessons: "/bigsix/resume/main/"
       Image: "/images/cs-portfolio-quest/resume/ModuleBackground.png"
       Alt: "CS Portfolio Quest Resume"
     - Title: "C5: AI Usage"
