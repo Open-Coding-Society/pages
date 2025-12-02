@@ -301,15 +301,29 @@ active_tab: profile
 
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOMContentLoaded fired'); // ADD THIS
+        
         // Store original values
         saveOriginalValues();
         
         // Load user classes
-        loadUserClasses(); // ADD THIS LINE
+        loadUserClasses();
 
         const form = document.getElementById('profileSettingsForm');
         form.addEventListener('input', checkForChanges);
         form.addEventListener('change', checkForChanges);
+
+        // Attach event listener to Add Class button
+        const addClassBtn = document.getElementById('addClassBtn');
+        console.log('Add Class Button:', addClassBtn); // ADD THIS
+        if (addClassBtn) {
+            addClassBtn.addEventListener('click', function() {
+                console.log('Add Class button clicked!'); // ADD THIS
+                addClass();
+            });
+        } else {
+            console.error('addClassBtn not found!'); // ADD THIS
+        }
 
         // Set up toggle switch
         const toggle = document.querySelector('#kasmChangeInput');
@@ -322,13 +336,6 @@ active_tab: profile
             } else {
                 toggleDot.classList.remove('translate-x-3');
                 toggle.classList.remove('bg-blue-600');
-            }
-        });
-
-        // Set up beforeunload event
-        window.addEventListener('beforeunload', function (e) {
-            if (formChanged) {
-                showUnsavedChangesAlert();
             }
         });
     });
@@ -535,16 +542,6 @@ active_tab: profile
         }
     }
 
-    // show toast, auto-hide, allow manual close
-    function showUnsavedChangesAlert() {
-        const saveButton = document.getElementById('saveChangesBtn');
-
-        // trigger reflow so shake always retriggers
-        saveButton.classList.remove('shake-animation');
-        void saveButton.offsetWidth;
-        saveButton.classList.add('shake-animation');
-
-    }
 
     // save all changes in one go
     async function saveChanges() {
