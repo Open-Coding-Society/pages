@@ -394,22 +394,144 @@ layout: post
   }
 
   @media (max-width: 768px) {
-    .items-grid {
-      grid-template-columns: 1fr;
+    .timeline-header h1 {
+      font-size: 2rem;
+    }
+
+    .timeline-filters {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .sprint-card {
+      padding: 16px;
+    }
+
+    .sprint-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .sprint-title {
+      font-size: 1.5rem;
+    }
+
+    .sprint-controls {
+      justify-content: space-between;
+      width: 100%;
     }
 
     .week-content-wrapper {
-      gap: 16px;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .week-indicator {
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
     }
 
     .week-circle {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       font-size: 12px;
     }
 
+    .week-connector {
+      display: none;
+    }
+
+    .week-main-content {
+      width: 100%;
+    }
+
+    .week-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .week-title-group h3 {
+      font-size: 1.1rem;
+    }
+
     .week-actions {
-      justify-content: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .items-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .item-card {
+      padding: 10px;
+    }
+
+    .item-content {
+      gap: 8px;
+    }
+
+    .item-title {
+      font-size: 13px;
+    }
+
+    .progression-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .completion-badge {
+      font-size: 12px;
+      padding: 3px 8px;
+    }
+
+    /* Modal responsiveness */
+    #progression-modal > div,
+    #certificate-list-modal > div {
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    #certificate-content {
+      padding: 40px 20px;
+    }
+
+    #certificate-student-name {
+      font-size: 36px;
+    }
+
+    #certificate-content .achievement-text {
+      font-size: 18px;
+    }
+
+    .certificate-modal .action-bar {
+      padding: 12px;
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      margin: 0 4px;
+    }
+
+    .progression-task {
+      padding: 8px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .task-number {
+      order: -1;
     }
   }
 
