@@ -954,7 +954,7 @@ layout: post
                         {% assign itemType = "lesson" %}
                       {% endif %}
 
-                      <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] | slugify }}">
+                      <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}">
                         <div class="item-content">
                           <button class="completion-toggle">
                             <i class="fas fa-circle status-icon incomplete"></i>
@@ -1155,6 +1155,11 @@ layout: post
       // Update UI
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
+      
+      // Trigger cross-view sync by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId, completed: !isCompleted }
+      }));
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
     }
@@ -1666,6 +1671,44 @@ layout: post
         openCertificateListModal(currentModalWeekNumber);
       }
     });
+  }
+
+  // Cross-view synchronization - sync when switching between timeline and two-pane views
+  window.addEventListener('focus', function() {
+    updateAllCompletionStates();
+  });
+  
+  // Sync when page becomes visible (handles tab switching)
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      updateAllCompletionStates();
+    }
+  });
+  
+  // Listen for storage changes from other tabs/windows (cross-tab sync)
+  window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY) {
+      updateAllCompletionStates();
+    }
+  });
+  
+  // Listen for completion changes from other views (same-window sync)
+  window.addEventListener('completionChanged', function(e) {
+    updateAllCompletionStates();
+  });
+
+  // Update all completion states from localStorage
+  function updateAllCompletionStates() {
+    const completionData = loadCompletionData();
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    itemCards.forEach(card => {
+      const itemId = card.dataset.itemId;
+      const isCompleted = completionData[itemId] || false;
+      updateItemUI(card, isCompleted);
+    });
+    
+    updateProgressBars();
   }
 
   // Initialize when page loads

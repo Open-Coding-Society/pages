@@ -966,11 +966,17 @@ Check if this is a course lesson and determine which course context to use
     // Toggle lesson completion
     function toggleComplete() {
       const completionData = loadCompletionData();
-      completionData[currentLessonId] = !completionData[currentLessonId];
+      const isCompleted = completionData[currentLessonId] || false;
+      completionData[currentLessonId] = !isCompleted;
       saveCompletionData(completionData);
       
       updateCompleteButton();
       updateUI();
+      
+      // Trigger cross-view sync by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId: currentLessonId, completed: !isCompleted }
+      }));
     }
 
     // Update the complete button state
@@ -1064,6 +1070,14 @@ Check if this is a course lesson and determine which course context to use
     // Listen for storage changes from other tabs/windows (cross-tab sync)
     window.addEventListener('storage', function(e) {
       if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Listen for completion changes from other views (same-window sync)
+    window.addEventListener('completionChanged', function(e) {
+      if (document.querySelector('.lesson-player')) {
         updateCompleteButton();
         updateUI();
       }
