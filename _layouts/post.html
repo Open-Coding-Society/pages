@@ -738,22 +738,25 @@ Check if this is a course lesson and determine which course context to use
                 {% for week in (sprint.start..sprint.end) %}
                   {% for post in posts %}
                     {% if post.courses[current_course] %}
-                      {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
-                      {% assign course_count = 0 %}
-                      {% for course in post.courses %}
-                        {% assign course_count = course_count | plus: 1 %}
-                      {% endfor %}
-                      {% if course_count == 1 %}
-                        {% assign postWeek = post.courses[current_course].week | plus: 0 %}
-                        {% if postWeek == week %}
-                          <a href="{{ site.baseurl }}{{ post.url }}" 
-                             class="lesson-item {% if page.url == post.url %}active{% endif %}"
-                             data-lesson-id="{{ post.url }}">
-                            <i class="fas fa-circle lesson-status-icon incomplete"></i>
-                            <span class="lesson-title">{{ post.title }}</span>
-                          </a>
+                      {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
+                      {% unless post.path contains "_IPYNB_2_.md" %}
+                        {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                        {% assign course_count = 0 %}
+                        {% for course in post.courses %}
+                          {% assign course_count = course_count | plus: 1 %}
+                        {% endfor %}
+                        {% if course_count == 1 %}
+                          {% assign postWeek = post.courses[current_course].week | plus: 0 %}
+                          {% if postWeek == week %}
+                            <a href="{{ site.baseurl }}{{ post.url }}" 
+                               class="lesson-item {% if page.url == post.url %}active{% endif %}"
+                               data-lesson-id="{{ post.url }}">
+                              <i class="fas fa-circle lesson-status-icon incomplete"></i>
+                              <span class="lesson-title">{{ post.title }}</span>
+                            </a>
+                          {% endif %}
                         {% endif %}
-                      {% endif %}
+                      {% endunless %}
                     {% endif %}
                   {% endfor %}
                 {% endfor %}

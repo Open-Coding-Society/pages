@@ -1722,12 +1722,14 @@ layout: post
 
             {% for post in posts %}
               {% if post.courses[page.course] %}
-                {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
-                {% assign course_count = 0 %}
-                {% for course in post.courses %}
-                  {% assign course_count = course_count | plus: 1 %}
-                {% endfor %}
-                {% if course_count == 1 %}
+                {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
+                {% unless post.path contains "_IPYNB_2_.md" %}
+                  {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                  {% assign course_count = 0 %}
+                  {% for course in post.courses %}
+                    {% assign course_count = course_count | plus: 1 %}
+                  {% endfor %}
+                  {% if course_count == 1 %}
                   {% assign week = post.courses[page.course].week | plus: 0 %}
                   {% if week == index %}
                     {% if post.assignment == true %}
@@ -1739,7 +1741,8 @@ layout: post
                     {% assign entries = entries | push: entry %}
                     {% assign totalItems = totalItems | plus: 1 %}
                   {% endif %}
-                {% endif %}
+                  {% endif %}
+                {% endunless %}
               {% endif %}
             {% endfor %}
 
