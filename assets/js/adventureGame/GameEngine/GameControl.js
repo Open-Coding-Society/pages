@@ -20,6 +20,14 @@ class GameControl {
         this.isPaused = false;
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
+    // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
+    // Games can override these values if they want to count a different stat name/label.
+    this.pauseMenuOptions = {
+        counterVar: 'levelsCompleted',
+        counterLabel: 'Levels completed'
+    };
+    // use a unique storage key so stats are per-game
+    this.pauseMenuOptions.storageKey = 'pauseMenuStats:adventure';
     this.skipKeyListener = this.handleSkipKey.bind(this);
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 

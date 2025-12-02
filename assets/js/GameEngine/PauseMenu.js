@@ -8,6 +8,10 @@ export default class PauseMenu {
             cssPath: '/assets/css/pause-menu.css'
         }, options);
 
+        // configurable counter variable and label
+        this.counterVar = this.options.counterVar || 'levelsCompleted';
+        this.counterLabelText = this.options.counterLabel || 'Levels completed';
+
         this._ensureCssLoaded();
         this._createDom();
         // Register ourselves on the provided GameControl so Escape can toggle the menu
@@ -17,6 +21,105 @@ export default class PauseMenu {
             }
         } catch (e) {
             console.warn('PauseMenu: could not register with gameControl', e);
+        }
+        // Initialize stats storage on the GameControl so other code (and backend) can access it later.
+        try {
+            if (this.gameControl) {
+                if (!this.gameControl.stats) this.gameControl.stats = { levelsCompleted: 0, points: 0 };
+                this.stats = this.gameControl.stats;
+
+                // Try to load persisted stats from localStorage for this game
+                try {
+                    this._loadStatsFromStorage();
+                } catch (e) {
+                    // ignore storage errors
+                }
+
+                // Expose a helper to add points from game code
+                if (!this.gameControl.addPoints) {
+                    this.gameControl.addPoints = (amount = 0) => {
+                        this.stats.points = (this.stats.points || 0) + Number(amount || 0);
+                        this._updateStatsDisplay();
+                        this._saveStatsToStorage();
+                    };
+                }
+
+                // general stat increment helper so games can increment arbitrary counters
+                if (!this.gameControl.incrementStat) {
+                    this.gameControl.incrementStat = (statName, amount = 1) => {
+                        try {
+                            if (!this.stats[statName]) this.stats[statName] = 0;
+                            this.stats[statName] = (this.stats[statName] || 0) + Number(amount || 0);
+                            this._updateStatsDisplay();
+                            this._saveStatsToStorage();
+                        } catch (e) {
+                            console.warn('incrementStat error', e);
+                        }
+                    };
+                }
+
+                // Wrap handleLevelEnd to increment completed-level counter so we count natural completes and skips.
+                if (!this.gameControl._pauseMenuWrapped && typeof this.gameControl.handleLevelEnd === 'function') {
+                    const origHandle = this.gameControl.handleLevelEnd.bind(this.gameControl);
+                    this.gameControl.handleLevelEnd = (...args) => {
+                        try {
+                            // increment the configured counter variable (default: levelsCompleted)
+                            if (!this.stats[this.counterVar]) this.stats[this.counterVar] = 0;
+                            this.stats[this.counterVar] = (this.stats[this.counterVar] || 0) + 1;
+                            // mirror the stat value onto the gameControl instance for easy per-game access
+                            try { this.gameControl[this.counterVar] = this.stats[this.counterVar]; } catch (e) { /* ignore */ }
+                            this._updateStatsDisplay();
+                            this._saveStatsToStorage();
+                        } catch (e) {
+                            /* ignore */
+                        }
+                        return origHandle(...args);
+                    };
+                    this.gameControl._pauseMenuWrapped = true;
+                }
+            }
+        } catch (e) {
+            console.warn('PauseMenu: could not initialize stats on gameControl', e);
+        }
+    }
+
+    _storageKey() {
+        // Priority for storage key:
+        // 1. explicit option passed to PauseMenu (options.storageKey)
+        // 2. per-game option set on GameControl (gameControl.pauseMenuOptions.storageKey)
+        // 3. fallback to a path-based key
+        if (this.options && this.options.storageKey) return this.options.storageKey;
+        if (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.storageKey) {
+            return this.gameControl.pauseMenuOptions.storageKey;
+        }
+        const id = (this.gameControl && (this.gameControl.path || this.gameControl.game?.path)) || 'default';
+        return `pauseMenuStats:${id}`;
+    }
+
+    _loadStatsFromStorage() {
+        try {
+            if (typeof window === 'undefined' || !window.localStorage) return;
+            const key = this._storageKey();
+            const raw = window.localStorage.getItem(key);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+                this.gameControl.stats = Object.assign({ levelsCompleted: 0, points: 0 }, parsed);
+                this.stats = this.gameControl.stats;
+            }
+        } catch (e) {
+            // ignore storage errors
+        }
+    }
+
+    _saveStatsToStorage() {
+        try {
+            if (typeof window === 'undefined' || !window.localStorage) return;
+            const key = this._storageKey();
+            // persist the full stats object to support arbitrary counters
+            window.localStorage.setItem(key, JSON.stringify(this.stats || { }));
+        } catch (e) {
+            // ignore storage errors
         }
     }
 
@@ -43,19 +146,26 @@ export default class PauseMenu {
         const panel = document.createElement('div');
         panel.className = 'pause-panel';
 
-        const title = document.createElement('h2');
-        title.className = 'pause-title';
-        title.innerText = 'Paused';
+    // Prominent counter at the top showing configured counter
+    const counterWrap = document.createElement('div');
+    counterWrap.className = 'pause-counter-wrap';
+    const counterLabel = document.createElement('div');
+    counterLabel.className = 'pause-counter-label';
+    counterLabel.innerText = this.counterLabelText;
+    const counterNumber = document.createElement('div');
+    counterNumber.className = 'pause-counter-number';
+    counterNumber.innerText = '0';
+    counterWrap.appendChild(counterLabel);
+    counterWrap.appendChild(counterNumber);
+
+    const title = document.createElement('h2');
+    title.className = 'pause-title';
+    title.innerText = 'Paused';
 
         const btnResume = document.createElement('button');
         btnResume.className = 'pause-btn resume';
         btnResume.innerText = 'Resume';
         btnResume.addEventListener('click', () => this._onResume());
-
-    const btnRestart = document.createElement('button');
-    btnRestart.className = 'pause-btn restart';
-    btnRestart.innerText = 'Restart Level';
-    btnRestart.addEventListener('click', () => this._onRestart());
 
     const btnSkipLevel = document.createElement('button');
     btnSkipLevel.className = 'pause-btn skip-level';
@@ -67,9 +177,25 @@ export default class PauseMenu {
     btnExit.innerText = 'Exit to Home';
     btnExit.addEventListener('click', () => this._onExit());
 
+    // Stats display (levels completed / points). These are kept in gameControl.stats
+    const statsWrap = document.createElement('div');
+    statsWrap.className = 'pause-stats';
+
+    const levelsLabel = document.createElement('div');
+    levelsLabel.className = 'pause-stat levels';
+    levelsLabel.innerText = this.counterLabelText + ': 0';
+
+    const pointsLabel = document.createElement('div');
+    pointsLabel.className = 'pause-stat points';
+    pointsLabel.innerText = 'Points: 0';
+
+    statsWrap.appendChild(levelsLabel);
+    statsWrap.appendChild(pointsLabel);
+
+    panel.appendChild(counterWrap);
     panel.appendChild(title);
     panel.appendChild(btnResume);
-    panel.appendChild(btnRestart);
+    panel.appendChild(statsWrap);
     panel.appendChild(btnSkipLevel);
     panel.appendChild(btnExit);
         overlay.appendChild(panel);
@@ -83,6 +209,11 @@ export default class PauseMenu {
                 this._onResume();
             }
         };
+
+            // references to the stat nodes for updates
+            this._levelsLabel = levelsLabel;
+            this._pointsLabel = pointsLabel;
+            this._counterNumber = counterNumber;
     }
 
     show() {
@@ -93,6 +224,8 @@ export default class PauseMenu {
         // trap focus to first button
         const btn = this.container.querySelector('button');
         if (btn) btn.focus();
+        // refresh stats display when opened
+        this._updateStatsDisplay();
     }
 
     hide() {
@@ -112,6 +245,7 @@ export default class PauseMenu {
     }
 
     _onRestart() {
+        // Restart removed from UI; keep method in case external callers use it.
         if (this.gameControl && typeof this.gameControl.restartLevel === 'function') {
             this.hide();
             this.gameControl.restartLevel();
@@ -119,16 +253,38 @@ export default class PauseMenu {
     }
 
     _onEndLevel() {
-        // End the current level by signaling the GameControl's current level
+        // End the current level by signaling the GameControl's public API.
+        // Prefer calling controller helpers (hidePauseMenu/resume + endLevel).
+        // Fallback: synthesize an 'L' keydown event for controllers that listen for it.
         try {
-            if (this.gameControl) {
+            if (!this.gameControl) return;
+
+            // Hide our UI and let the controller resume if it provides helpers.
+            if (typeof this.gameControl.hidePauseMenu === 'function') {
+                try { this.gameControl.hidePauseMenu(); } catch (e) { /* ignore */ }
+            } else if (typeof this.gameControl.resume === 'function') {
+                try { this.gameControl.resume(); } catch (e) { /* ignore */ }
+            } else {
+                // fallback to hiding our UI if controller doesn't provide resume helper
                 this.hide();
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else if (this.gameControl.currentLevel) {
-                    this.gameControl.currentLevel.continue = false;
-                }
             }
+
+            if (typeof this.gameControl.endLevel === 'function') {
+                this.gameControl.endLevel();
+                return;
+            }
+
+            // Fallback: if controllers listen for the 'L' key to skip levels,
+            // synthesize a keydown event. This preserves existing controller behavior
+            // without requiring changes to GameControl.
+            const event = new KeyboardEvent('keydown', {
+                key: 'L',
+                code: 'KeyL',
+                keyCode: 76,
+                which: 76,
+                bubbles: true,
+            });
+            document.dispatchEvent(event);
         } catch (e) {
             console.warn('PauseMenu: could not end level:', e);
         }
@@ -140,7 +296,34 @@ export default class PauseMenu {
             this.hide();
             this.gameControl.game.returnHome();
         } else {
-            window.location.href = '/';
+            // Navigate to the canonical homepage for this site
+            window.location.href = '/homepage/';
         }
+    }
+
+    _updateStatsDisplay() {
+        try {
+            const lvl = (this.stats?.[this.counterVar] || 0);
+            if (this._levelsLabel) this._levelsLabel.innerText = this.counterLabelText + ': ' + lvl;
+            if (this._pointsLabel) this._pointsLabel.innerText = 'Points: ' + (this.stats?.points || 0);
+            if (this._counterNumber) this._counterNumber.innerText = String(lvl);
+        } catch (e) {
+            /* ignore */
+        }
+    }
+
+    // Public helper to increment points (also exposed as gameControl.addPoints)
+    addPoints(amount = 0) {
+        try {
+            this.stats.points = (this.stats.points || 0) + Number(amount || 0);
+            this._updateStatsDisplay();
+        } catch (e) {
+            console.warn('PauseMenu.addPoints error', e);
+        }
+    }
+
+    // Return current stats object for backend saving or inspection
+    getStats() {
+        return Object.assign({}, (this.stats || { levelsCompleted: 0, points: 0 }));
     }
 }
