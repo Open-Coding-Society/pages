@@ -684,12 +684,290 @@ Check if this is a course lesson and determine which course context to use
     }
 
     @media (max-width: 768px) {
+      .lesson-player {
+        flex-direction: column;
+        height: auto;
+        position: static;
+        width: 100%;
+      }
+
       .lesson-sidebar {
         display: none;
       }
-      
+
+      .lesson-main {
+        flex: none;
+        width: 100%;
+      }
+
+      .floating-menu-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        background: #60a5fa;
+        border: none;
+        border-radius: 50%;
+        color: #ffffff;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .floating-menu-btn:hover {
+        background: #3b82f6;
+        transform: scale(1.1);
+      }
+
+      .floating-menu-btn:active {
+        transform: scale(0.95);
+      }
+
+      .timeline-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        max-width: 800px;
+        height: 80vh;
+        background: #0a0a0a;
+        border: 1px solid #222222;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        z-index: 2000;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .timeline-modal.open {
+        display: flex;
+      }
+
+      .timeline-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.7);
+        z-index: 1999;
+        display: none;
+      }
+
+      .timeline-modal-overlay.open {
+        display: block;
+      }
+
+      .timeline-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid #1f1f1f;
+        background: #111111;
+      }
+
+      .timeline-modal-header h3 {
+        color: #ffffff;
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .timeline-close-btn {
+        background: transparent;
+        border: none;
+        color: #999999;
+        font-size: 24px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .timeline-close-btn:hover {
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+
+      .timeline-modal-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+      }
+
+      /* Sprint cards in modal - matching timeline view */
+      .modal-sprint-card {
+        background: #111111;
+        border: 1px solid #1f1f1f;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      }
+
+      .modal-sprint-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #1f2338;
+      }
+
+      .modal-sprint-title {
+        color: #f8fafc;
+        font-size: 1.2rem;
+        margin: 0;
+      }
+
+      .modal-sprint-toggle {
+        background: transparent;
+        border: 1px solid #2a2a2a;
+        color: #60a5fa;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+
+      .modal-sprint-toggle:hover {
+        background: #1a1a1a;
+      }
+
+      .modal-lessons {
+        display: none;
+      }
+
+      .modal-lessons.expanded {
+        display: block;
+      }
+
+      .modal-lesson-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #0f0f0f;
+        border: 1px solid #222222;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #e0e0e0;
+        transition: all 0.2s;
+        margin-bottom: 8px;
+      }
+
+      .modal-lesson-item:hover {
+        background: #1a1a1a;
+        border-color: #60a5fa;
+      }
+
+      .modal-lesson-item.active {
+        background: #1a1a1a;
+        border-color: #60a5fa;
+        color: #60a5fa;
+      }
+
+      .modal-lesson-status {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      .modal-lesson-status.completed {
+        color: #60a5fa;
+      }
+
+      .modal-lesson-status.incomplete {
+        color: #444444;
+      }
+
+      .modal-lesson-title {
+        flex: 1;
+        font-size: 14px;
+      }
+
+      .lesson-topbar {
+        padding: 12px 16px;
+      }
+
+      .topbar-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .breadcrumbs {
+        font-size: 12px;
+      }
+
       .lesson-content {
         padding: 16px;
+      }
+
+      .lesson-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .lesson-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .lesson-bottom {
+        padding: 16px;
+      }
+
+      .lesson-bottom-inner {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .bottom-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .assignment-submission {
+        margin-top: 24px;
+        padding: 16px;
+      }
+
+      .submission-options {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .submission-tab {
+        width: 100%;
+        text-align: center;
+      }
+
+      .file-upload-area {
+        padding: 20px;
+      }
+
+      .file-upload-icon {
+        font-size: 32px;
       }
     }
   </style>
@@ -922,6 +1200,27 @@ Check if this is a course lesson and determine which course context to use
     </div>
   </div>
 
+  <!-- Floating hamburger menu (mobile only) -->
+  <button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Timeline modal overlay -->
+  <div class="timeline-modal-overlay" id="timeline-modal-overlay"></div>
+
+  <!-- Timeline modal (mobile only) -->
+  <div class="timeline-modal" id="timeline-modal">
+    <div class="timeline-modal-header">
+      <h3>Course Timeline</h3>
+      <button class="timeline-close-btn" id="timeline-close-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="timeline-modal-content" id="timeline-modal-content">
+      <!-- Sprint cards will be populated by JavaScript -->
+    </div>
+  </div>
+
   <script>
     // Course is now determined by the specific file being viewed
     const CURRENT_COURSE = '{{ current_course }}';
@@ -1086,6 +1385,170 @@ Check if this is a course lesson and determine which course context to use
       }
     });
     
+    // Mobile floating menu functionality
+    function initMobileEnhancements() {
+      const floatingBtn = document.getElementById('floating-menu-btn');
+      const timelineModal = document.getElementById('timeline-modal');
+      const overlay = document.getElementById('timeline-modal-overlay');
+      const closeBtn = document.getElementById('timeline-close-btn');
+      const modalContent = document.getElementById('timeline-modal-content');
+      
+      if (window.innerWidth <= 768) {
+        // Show floating button on mobile
+        if (floatingBtn) floatingBtn.style.display = 'flex';
+        
+        // Populate timeline modal
+        populateTimelineModal();
+        
+        // Open timeline modal
+        function openTimelineModal() {
+          timelineModal.classList.add('open');
+          overlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+        
+        // Close timeline modal
+        function closeTimelineModal() {
+          timelineModal.classList.remove('open');
+          overlay.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+        
+        // Event listeners
+        floatingBtn.addEventListener('click', openTimelineModal);
+        closeBtn.addEventListener('click', closeTimelineModal);
+        overlay.addEventListener('click', closeTimelineModal);
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && timelineModal.classList.contains('open')) {
+            closeTimelineModal();
+          }
+        });
+        
+        // Close when lesson is selected
+        modalContent.addEventListener('click', function(e) {
+          if (e.target.closest('.modal-lesson-item')) {
+            closeTimelineModal();
+          }
+        });
+        
+      } else {
+        // Desktop - hide floating button
+        if (floatingBtn) floatingBtn.style.display = 'none';
+      }
+    }
+    
+    // Populate timeline modal by reading all lesson items and grouping by sprint
+    function populateTimelineModal() {
+      const modalContent = document.getElementById('timeline-modal-content');
+      const completionData = loadCompletionData();
+      
+      if (!modalContent) return;
+      
+      modalContent.innerHTML = '';
+      
+      // Get ALL lesson items from the sidebar (including hidden/collapsed ones)
+      const allLessonItems = document.querySelectorAll('.lesson-item');
+      const sprintGroups = {};
+      
+      // Group lessons by their parent sprint
+      allLessonItems.forEach(item => {
+        const lessonId = item.dataset.lessonId;
+        const lessonTitle = item.querySelector('.lesson-title').textContent;
+        const isCompleted = completionData[lessonId] || false;
+        const isActive = item.classList.contains('active');
+        
+        // Find the sprint this lesson belongs to
+        const sprintSection = item.closest('.sprint-section');
+        if (sprintSection) {
+          const sprintTitle = sprintSection.querySelector('.sprint-title').textContent;
+          
+          if (!sprintGroups[sprintTitle]) {
+            sprintGroups[sprintTitle] = [];
+          }
+          
+          sprintGroups[sprintTitle].push({
+            id: lessonId,
+            title: lessonTitle,
+            url: item.href,
+            completed: isCompleted,
+            active: isActive
+          });
+        }
+      });
+      
+      // Create sprint cards for each group
+      Object.keys(sprintGroups).forEach(sprintTitle => {
+        const lessons = sprintGroups[sprintTitle];
+        const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
+        
+        const sprintCard = document.createElement('div');
+        sprintCard.className = 'modal-sprint-card';
+        
+        sprintCard.innerHTML = `
+          <div class="modal-sprint-header">
+            <h3 class="modal-sprint-title">${sprintTitle}</h3>
+            <button class="modal-sprint-toggle" onclick="toggleModalSprint('${sprintId}')">
+              <i class="fas fa-chevron-down"></i> View Lessons
+            </button>
+          </div>
+          <div class="modal-lessons" id="modal-${sprintId}">
+            ${lessons.map(lesson => `
+              <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
+                <i class="fas ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+                <span class="modal-lesson-title">${lesson.title}</span>
+              </a>
+            `).join('')}
+          </div>
+        `;
+        
+        modalContent.appendChild(sprintCard);
+        
+        // Auto-expand sprint with active lesson
+        const hasActiveLesson = lessons.some(lesson => lesson.active);
+        if (hasActiveLesson) {
+          setTimeout(() => {
+            const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+            if (lessonsContainer) {
+              lessonsContainer.classList.add('expanded');
+              const toggleBtn = sprintCard.querySelector('.modal-sprint-toggle i');
+              if (toggleBtn) {
+                toggleBtn.classList.remove('fa-chevron-down');
+                toggleBtn.classList.add('fa-chevron-up');
+              }
+            }
+          }, 0);
+        }
+      });
+    }
+    
+    // Toggle sprint expansion in modal
+    function toggleModalSprint(sprintId) {
+      const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+      const toggleBtn = document.querySelector(`[onclick="toggleModalSprint('${sprintId}')"] i`);
+      
+      if (lessonsContainer && toggleBtn) {
+        lessonsContainer.classList.toggle('expanded');
+        
+        if (lessonsContainer.classList.contains('expanded')) {
+          toggleBtn.classList.remove('fa-chevron-down');
+          toggleBtn.classList.add('fa-chevron-up');
+        } else {
+          toggleBtn.classList.remove('fa-chevron-up');
+          toggleBtn.classList.add('fa-chevron-down');
+        }
+      }
+    }
+    
+    // Make toggle function globally available
+    window.toggleModalSprint = toggleModalSprint;
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      initMobileEnhancements();
+    });
+
     // Auto-expand current sprint
     document.addEventListener('DOMContentLoaded', function() {
       // Only initialize lesson player mode if we're in a lesson player
@@ -1106,6 +1569,7 @@ Check if this is a course lesson and determine which course context to use
       
       updateCompleteButton();
       updateUI();
+      initMobileEnhancements();
     });
 
     // Assignment submission handlers
