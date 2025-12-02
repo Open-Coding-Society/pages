@@ -255,13 +255,37 @@ export default class PauseMenu {
 
     _onExit() {
         // return home via Game instance if available
-        if (this.gameControl && this.gameControl.game && typeof this.gameControl.game.returnHome === 'function') {
-            this.hide();
-            this.gameControl.game.returnHome();
-        } else {
-            // Navigate to the canonical homepage for this site (use absolute permalink)
-            window.location.href = 'https://pages.opencodingsociety.com/homepage/';
+        const fallback = (this.options && this.options.homeUrl) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.homeUrl) || 'https://pages.opencodingsociety.com/homepage/';
+        try {
+            const original = String(window.location.href);
+            if (this.gameControl && this.gameControl.game && typeof this.gameControl.game.returnHome === 'function') {
+                try {
+                    this.hide();
+                } catch (e) { /* ignore */ }
+                try {
+                    this.gameControl.game.returnHome();
+                } catch (e) {
+                    // if returnHome throws, fallback below
+                }
+
+                // If returnHome didn't navigate away within 300ms, navigate to fallback
+                setTimeout(() => {
+                    try {
+                        if (String(window.location.href) === original) {
+                            window.location.href = fallback;
+                        }
+                    } catch (e) {
+                        window.location.href = fallback;
+                    }
+                }, 300);
+                return;
+            }
+        } catch (e) {
+            // proceed to fallback
         }
+
+        // final fallback: navigate to canonical homepage
+        window.location.href = fallback;
     }
 
     _updateStatsDisplay() {
