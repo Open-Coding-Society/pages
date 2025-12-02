@@ -2,7 +2,7 @@
 layout: cs-portfolio-lesson
 title: "Frontend Development — All-in-One Interactive Lesson"
 description: "Compact lesson combining Markdown, HTML, CSS, Sass, Tailwind, and JavaScript with interactive playgrounds"
-permalink: /bigsix/frontend/main/
+permalink: /bigsix/frontend_lesson
 parent: "Frontend Development"
 team: "Creators"
 categories: [CSP, Frontend, Interactive]

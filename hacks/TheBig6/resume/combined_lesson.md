@@ -2,7 +2,7 @@
 layout: cs-portfolio-lesson
 title: "Resume — All-in-One Interactive Lesson"
 description: "Compact interactive lesson combining contact, skills, education, experiences, PDF export, LinkedIn builder and interview practice"
-permalink: /bigsix/resume/main/
+permalink: /bigsix/resume_lesson
 parent: "Resume Building"
 team: "Grinders"
 categories: [CSP, Resume]
