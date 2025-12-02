@@ -895,16 +895,23 @@ layout: post
 
             {% for post in posts %}
               {% if post.courses[page.course] %}
-                {% assign week = post.courses[page.course].week | plus: 0 %}
-                {% if week == index %}
-                  {% if post.assignment == true %}
-                    {% assign itemType = "assignment" %}
-                  {% else %}
-                    {% assign itemType = "lesson" %}
+                {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                {% assign course_count = 0 %}
+                {% for course in post.courses %}
+                  {% assign course_count = course_count | plus: 1 %}
+                {% endfor %}
+                {% if course_count == 1 %}
+                  {% assign week = post.courses[page.course].week | plus: 0 %}
+                  {% if week == index %}
+                    {% if post.assignment == true %}
+                      {% assign itemType = "assignment" %}
+                    {% else %}
+                      {% assign itemType = "lesson" %}
+                    {% endif %}
+                    {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
+                    {% assign entries = entries | push: entry %}
+                    {% assign totalItems = totalItems | plus: 1 %}
                   {% endif %}
-                  {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
-                  {% assign entries = entries | push: entry %}
-                  {% assign totalItems = totalItems | plus: 1 %}
                 {% endif %}
               {% endif %}
             {% endfor %}
