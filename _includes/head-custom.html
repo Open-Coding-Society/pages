@@ -20,4 +20,15 @@
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {%- endif -%}
 
+{%- comment -%}
+  Global user preference system
+  - CSS and JS are loaded after theme styles so that user-selected
+    preferences (stored in localStorage) can override Minima,
+    Tailwind, Aesthetihawk, etc.
+  - user-preferences.js exposes window.SitePreferences used by the
+    dashboard Preferences tab.
+{%- endcomment -%}
+<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/user-preferences.css">
+<script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
+
 

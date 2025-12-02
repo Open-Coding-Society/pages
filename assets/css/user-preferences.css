@@ -1,0 +1,127 @@
+:root {
+  --pref-bg-color: #0b1220;
+  --pref-text-color: #e6eef8;
+  --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --pref-font-size: 14px;
+  --pref-content-max-width: 1200px;
+}
+
+/* Base overrides for root and body – JS sets vars, CSS enforces them. */
+html,
+body {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* When active, aggressively override most theme colors to respect user prefs.
+   This is broad on purpose so it can beat Minima, Tailwind, Preline, etc. */
+/* When the theme is active, aggressively restyle key containers and text.
+   We target common layout wrappers so large dark blocks also get recolored. */
+/* Root and major shells */
+.user-theme-active,
+.user-theme-active body,
+.user-theme-active body.dark,
+.user-theme-active body.min-h-screen,
+.user-theme-active body.bg-neutral-800,
+.user-theme-active .min-h-screen,
+.user-theme-active .min-h-screen.bg-neutral-900,
+.user-theme-active .ml-64.p-8,
+.user-theme-active .ml-64.p-8.bg-neutral-900 {
+  color: var(--text) !important;
+  background-color: var(--background) !important;
+}
+
+/* Make sure all normal text inherits theme colors */
+/* Make sure all normal text inherits theme colors.
+   We intentionally leave very specific utility classes (e.g. text-red-500)
+   alone, but OpenCS content should follow the user text color. */
+.user-theme-active * {
+  color: var(--text) !important;
+}
+
+/* OpenCS content areas should also inherit user text color and font */
+.user-theme-active .opencs_root,
+.user-theme-active .opencs_root *,
+.user-theme-active .opencs_root .post-header,
+.user-theme-active .opencs_root .post-content {
+  color: var(--text) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* Minima + generic content wrappers */
+.user-theme-active .page-content,
+.user-theme-active .wrapper,
+.user-theme-active main,
+.user-theme-active article,
+.user-theme-active .post,
+.user-theme-active .content,
+.user-theme-active .opencs_root {
+  /* Ensure OpenCS layout can't override the themed background vars */
+  --background: var(--pref-bg-color) !important;
+  --text: var(--pref-text-color) !important;
+  background-color: var(--background) !important;
+}
+
+.user-theme-active .card,
+.user-theme-active .panel,
+.user-theme-active .box,
+.user-theme-active .bg-neutral-800,
+.user-theme-active .bg-neutral-900,
+.user-theme-active .bg-slate-800,
+.user-theme-active .bg-slate-900,
+/* Other common dark Tailwind backgrounds used in posts/dashboards */
+.user-theme-active .bg-gray-900,
+.user-theme-active .bg-gray-950,
+.user-theme-active .bg-zinc-900,
+.user-theme-active .bg-slate-950 {
+  background-color: var(--panel) !important;
+  border-color: var(--ui-border) !important;
+}
+
+.user-theme-active .border-neutral-700,
+.user-theme-active .border-neutral-800,
+.user-theme-active .border-gray-800,
+.user-theme-active .border-gray-900,
+.user-theme-active .border-zinc-800 {
+  border-color: var(--ui-border) !important;
+}
+
+.user-theme-active img,
+.user-theme-active video,
+.user-theme-active svg,
+.user-theme-active iframe {
+  background-color: transparent !important;
+}
+
+.user-theme-active input,
+.user-theme-active select,
+.user-theme-active textarea {
+  background-color: var(--ui-bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+
+.user-theme-active button {
+  background-color: var(--ui-bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+
+.user-theme-active aside,
+.user-theme-active .sidebar,
+.user-theme-active #sidebar,
+.user-theme-active .site-sidebar,
+.user-theme-active .sidebar-container {
+  background-color: var(--panel-mid) !important;
+  color: var(--text) !important;
+  border-color: var(--ui-border) !important;
+}
+
+/* Constrain main content wrapper if present */
+.w-full {
+  max-width: var(--pref-content-max-width);
+  margin: 0 auto;
+}

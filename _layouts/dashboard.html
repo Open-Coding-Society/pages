@@ -400,85 +400,15 @@ active_tab: dashboard
                     </div>
                 </div>
 
-                <style>
-                /* Global CSS variables and conservative overrides for applying preferences site-wide */
-                :root {
-                    --pref-bg-color: #0b1220;
-                    --pref-text-color: #e6eef8;
-                    --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-                    --pref-font-size: 14px;
-                    --pref-content-max-width: 1200px;
-                }
-
-                /* Apply preferences to body only by default. We also provide a
-                   `.user-theme-active` class that can be toggled when the user
-                   has chosen a theme — it enforces the chosen colors across the
-                   entire page (uses !important to override third-party utilities).
-                   This is intentionally broad so user-selected themes override
-                   the default Jekyll/theme styles. */
-                body {
-                    background: var(--pref-bg-color) !important;
-                    color: var(--pref-text-color) !important;
-                    font-family: var(--pref-font-family) !important;
-                    font-size: var(--pref-font-size) !important;
-                }
-
-                /* When active, apply colors to everything. This is broad by design
-                   so that user themes override other CSS (Tailwind/Minima/Preline).
-                   We explicitly allow media elements to keep their backgrounds. */
-                .user-theme-active * {
-                    color: var(--text) !important;
-                    background-color: var(--background) !important;
-                    border-color: var(--panel) !important;
-                    fill: var(--text) !important;
-                    stroke: var(--text) !important;
-                }
-                .user-theme-active img,
-                .user-theme-active video,
-                .user-theme-active svg,
-                .user-theme-active iframe {
-                    background-color: transparent !important;
-                }
-
-                /* Inputs, selects, textareas and buttons should use a slightly
-                   darker tone of the theme background so contrast improves. */
-                .user-theme-active input,
-                .user-theme-active select,
-                .user-theme-active textarea {
-                    background-color: var(--ui-bg) !important;
-                    color: var(--text) !important;
-                    border: 1px solid var(--ui-border) !important;
-                }
-
-                .user-theme-active button {
-                    background-color: var(--ui-bg) !important;
-                    color: var(--text) !important;
-                    border: 1px solid var(--ui-border) !important;
-                }
-
-                .user-theme-active #tab-bar .tab-btn {
-                    background-color: var(--panel-mid) !important;
-                    color: var(--text) !important;
-                }
-
-                /* Common sidebar selectors to receive the same mid-contrast shade */
-                .user-theme-active aside,
-                .user-theme-active .sidebar,
-                .user-theme-active #sidebar,
-                .user-theme-active .site-sidebar,
-                .user-theme-active .sidebar-container {
-                    background-color: var(--panel-mid) !important;
-                    color: var(--text) !important;
-                    border-color: var(--ui-border) !important;
-                }
-
-                /* Constrain main content wrapper if present */
-                .w-full { max-width: var(--pref-content-max-width); margin: 0 auto; }
-                </style>
+                <!-- Preferences UI: the styling logic itself now lives in global
+                     assets (assets/css/user-preferences.css and
+                     assets/js/user-preferences.js). This script only manages
+                     localStorage and calls the shared SitePreferences helper
+                     so the same theme is applied across every page. -->
 
                 <script>
                 (function () {
-                    const PRESETS = {
+                    const PRESETS = window.SitePreferences?.PRESETS || {
                         'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
                         'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
                         'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
@@ -489,208 +419,10 @@ active_tab: dashboard
                     const storageKey = 'sitePreferences';
                     const themesKey = 'siteThemes';
 
-                    function applyPreferences(prefs = {}){
-                        const bg = prefs.bg || PRESETS['Midnight'].bg;
-                        const text = prefs.text || PRESETS['Midnight'].text;
-                        const font = prefs.font || PRESETS['Midnight'].font;
-                        const size = prefs.size || PRESETS['Midnight'].size;
-                        const width = prefs.width || PRESETS['Midnight'].width;
-
-                        try {
-                            document.documentElement.style.setProperty('--pref-bg-color', bg);
-                            document.documentElement.style.setProperty('--pref-text-color', text);
-                            document.documentElement.style.setProperty('--pref-font-family', font);
-                            document.documentElement.style.setProperty('--pref-font-size', size + 'px');
-                            document.documentElement.style.setProperty('--pref-content-max-width', width + 'px');
-
-                            // Mirror critical site-wide vars so SASS/compiled CSS that reference
-                            // --background / --text / --white1 / --panel reflect user prefs.
-                            // Also set a broad set of aliases used across the SASS maps so
-                            // more components pick up the runtime theme.
-                            const set = (name, value) => document.documentElement.style.setProperty(name, value);
-                                    set('--background', bg);
-                                    set('--bg-0', bg);
-                                    set('--bg-1', bg);
-                                    set('--bg-2', bg);
-                                    set('--bg-3', bg);
-                                    // compute a panel/border color that contrasts with background
-                                    function hexToRgb(hex){
-                                        hex = hex.replace('#','');
-                                        if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
-                                        const bigint = parseInt(hex, 16);
-                                        return { r: (bigint>>16)&255, g:(bigint>>8)&255, b: bigint&255 };
-                                    }
-                                    function luminance(r,g,b){
-                                        const a = [r,g,b].map(v=>{
-                                            v /= 255;
-                                            return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
-                                        });
-                                        return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
-                                    }
-                                    function rgbToHex(r,g,b){
-                                        return '#'+[r,g,b].map(v=>{ const s=v.toString(16); return s.length==1? '0'+s: s; }).join('');
-                                    }
-                                    // try to compute a subtle panel color (lighter on dark bg, darker on light bg)
-                                    let panelColor = bg;
-                                    try {
-                                        const rgb = hexToRgb(bg);
-                                        const lum = luminance(rgb.r,rgb.g,rgb.b);
-                                        // if dark background (lum < 0.5) lighten; else darken
-                                        const amount = 0.12; // 12%
-                                        let r = rgb.r, g = rgb.g, b = rgb.b;
-                                        if (lum < 0.5) {
-                                            r = Math.min(255, Math.round(r + (255 - r) * amount));
-                                            g = Math.min(255, Math.round(g + (255 - g) * amount));
-                                            b = Math.min(255, Math.round(b + (255 - b) * amount));
-                                        } else {
-                                            r = Math.max(0, Math.round(r * (1 - amount)));
-                                            g = Math.max(0, Math.round(g * (1 - amount)));
-                                            b = Math.max(0, Math.round(b * (1 - amount)));
-                                        }
-                                        panelColor = rgbToHex(r,g,b);
-                                    } catch(e){ panelColor = bg; }
-                                    set('--panel', panelColor);
-                                    // compute a mid-tone between background and panelColor for tab/sidebar contrast
-                                    try {
-                                        const pRgb = hexToRgb(panelColor);
-                                        const bRgb = hexToRgb(bg);
-                                        const midR = Math.round((pRgb.r + bRgb.r) / 2);
-                                        const midG = Math.round((pRgb.g + bRgb.g) / 2);
-                                        const midB = Math.round((pRgb.b + bRgb.b) / 2);
-                                        const panelMid = rgbToHex(midR, midG, midB);
-                                        set('--panel-mid', panelMid);
-                                    } catch(e) { set('--panel-mid', panelColor); }
-                                    // compute darker tones for UI chrome (inputs/buttons)
-                                    try {
-                                        const rgb2 = hexToRgb(bg);
-                                        const dark = (v, amt) => Math.max(0, Math.round(v * (1 - amt)));
-                                        const uiAmt = 0.12; // darker tone for controls
-                                        const borderAmt = 0.22; // stronger darkening for borders
-                                        const ur = dark(rgb2.r, uiAmt), ug = dark(rgb2.g, uiAmt), ub = dark(rgb2.b, uiAmt);
-                                        const br = dark(rgb2.r, borderAmt), bgc = dark(rgb2.g, borderAmt), bb = dark(rgb2.b, borderAmt);
-                                        set('--ui-bg', rgbToHex(ur, ug, ub));
-                                        set('--ui-border', rgbToHex(br, bgc, bb));
-                                    } catch (e) { set('--ui-bg', bg); set('--ui-border', panelColor); }
-                            set('--popup-bg', bg);
-                            set('--surface', bg);
-
-                            set('--text', text);
-                            set('--white1', text);
-                            set('--white2', text);
-                            set('--white3', text);
-                            set('--text-muted', text);
-
-                            // Helpful aliases
-                            set('--accent', bg);
-                            set('--accent-700', bg);
-                            set('--orange', bg);
-
-                            // Copy to some status / control vars so badges and buttons update
-                            set('--status-indicator-base-bg', bg);
-                            set('--status-indicator-base-border', bg);
-                            set('--status-indicator-success-color', text);
-                            set('--success-green', text);
-
-                            // Ensure the user theme class is present so the CSS override applies
-                            document.documentElement.classList.add('user-theme-active');
-
-                            // direct style for body for maximum reach (avoid changing root html font-size)
-                            document.body.style.background = bg;
-                            document.body.style.color = text;
-                            document.body.style.fontFamily = font;
-                            // Apply inline styles to controls so they visibly pick up the darker UI tones
-                            try {
-                                const rootStyles = getComputedStyle(document.documentElement);
-                                const uiBg = (rootStyles.getPropertyValue('--ui-bg') || bg).trim();
-                                const uiBorder = (rootStyles.getPropertyValue('--ui-border') || panelColor).trim();
-                                const uiText = (rootStyles.getPropertyValue('--text') || text).trim();
-                                document.querySelectorAll('input, select, textarea, button').forEach(el => {
-                                    try {
-                                        el.style.backgroundColor = uiBg;
-                                        el.style.color = uiText;
-                                        el.style.borderColor = uiBorder;
-                                    } catch(e){}
-                                });
-                            } catch(e){}
-                            // Also apply inline styles to tab headers and tab content so
-                            // per-tab styles or utility classes don't hide the runtime theme.
-                            try {
-                                const rootStyles2 = getComputedStyle(document.documentElement);
-                                const tabBg = (rootStyles2.getPropertyValue('--panel-mid') || panelColor).trim();
-                                const tabText = (rootStyles2.getPropertyValue('--text') || text).trim();
-                                const tabBorder = (rootStyles2.getPropertyValue('--ui-border') || panelColor).trim();
-                                // Only style the actual tab buttons and their children
-                                const tabSelectors = ['.tab-btn', '.tab-btn *'];
-                                tabSelectors.forEach(sel => {
-                                    document.querySelectorAll(sel).forEach(el => {
-                                        try {
-                                            el.style.backgroundColor = tabBg;
-                                            el.style.color = tabText;
-                                            el.style.borderColor = tabBorder;
-                                        } catch(e){}
-                                    });
-                                });
-                            } catch(e){}
-                            // ensure body border visibility: set a subtle default border color if none
-                            try { document.body.style.setProperty('--panel-border-fallback', panelColor); } catch(e){}
-                        } catch (e) { console.error('applyPreferences error', e); }
-                    }
-
-                    // Restore original site styling (remove all runtime overrides)
-                    function restoreOriginalStyling(){
-                        try {
-                            // Remove storage keys
-                            localStorage.removeItem(storageKey);
-                            localStorage.removeItem(themesKey);
-
-                            const root = document.documentElement;
-                            const body = document.body;
-
-                            // remove known custom properties we set
-                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--panel-mid','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback','--ui-bg','--ui-border'];
-                            keys.forEach(k=>{ try{ root.style.removeProperty(k); body.style.removeProperty(k); }catch(e){} });
-
-                            // remove inline styles we may have set
-                            root.style.removeProperty('color');
-                            root.style.removeProperty('background-color');
-                            root.style.removeProperty('font-family');
-                            root.style.removeProperty('font-size');
-                            body.style.removeProperty('background');
-                            body.style.removeProperty('color');
-                            body.style.removeProperty('font-family');
-                            body.style.removeProperty('font-size');
-
-                            // remove inline styles from controls we may have modified
-                            try {
-                                document.querySelectorAll('input, select, textarea, button').forEach(el => {
-                                    try {
-                                        el.style.removeProperty('background-color');
-                                        el.style.removeProperty('color');
-                                        el.style.removeProperty('border-color');
-                                    } catch(e){}
-                                });
-                            } catch(e){}
-
-                            // remove inline styles from tab buttons we may have modified
-                            try {
-                                const tabSelectors = ['.tab-btn', '.tab-btn *'];
-                                tabSelectors.forEach(sel => {
-                                    document.querySelectorAll(sel).forEach(el => {
-                                        try {
-                                            el.style.removeProperty('background-color');
-                                            el.style.removeProperty('color');
-                                            el.style.removeProperty('border-color');
-                                        } catch(e){}
-                                    });
-                                });
-                            } catch(e){}
-
-                            // remove the class
-                            root.classList.remove('user-theme-active');
-
-                            // small delay then reload to ensure the original CSS is re-applied
-                            setTimeout(()=> location.reload(), 80);
-                        } catch (e) { console.error('restoreOriginalStyling error', e); }
+                    function applyPreferences(prefs) {
+                        if (window.SitePreferences && typeof window.SitePreferences.applyPreferences === 'function') {
+                            window.SitePreferences.applyPreferences(prefs);
+                        }
                     }
 
                     function loadPreferences() {
@@ -723,6 +455,7 @@ active_tab: dashboard
 
                     function renderPresets(){
                         const container = document.getElementById('preset-themes');
+                        if (!container) return;
                         container.innerHTML = '';
                         Object.keys(PRESETS).forEach(name => {
                             const btn = document.createElement('button');
@@ -730,7 +463,8 @@ active_tab: dashboard
                             btn.textContent = name;
                             btn.addEventListener('click', () => {
                                 const p = PRESETS[name];
-                                savePreferences({ bg: p.bg, text: p.text, font: p.font, size: p.size, width: p.width });
+                                const prefs = { bg: p.bg, text: p.text, font: p.font, size: p.size, width: p.width };
+                                savePreferences(prefs);
                                 showStatus('Applied preset: ' + name);
                             });
                             container.appendChild(btn);
@@ -739,6 +473,7 @@ active_tab: dashboard
 
                     function renderCustomThemes(){
                         const container = document.getElementById('custom-themes');
+                        if (!container) return;
                         container.innerHTML = '';
                         const themes = loadThemes();
                         const keys = Object.keys(themes);
@@ -828,12 +563,23 @@ active_tab: dashboard
                         document.getElementById('save-preferences').addEventListener('click', function(){
                             const prefs = currentFormValues();
                             savePreferences(prefs);
-                            showStatus('Preferences saved locally.');
+                            showStatus('Preferences saved locally and applied site-wide.');
                         });
 
                         document.getElementById('restore-styles').addEventListener('click', function(){
-                            restoreOriginalStyling();
+                            // Clear stored preferences/themes
+                            localStorage.removeItem(storageKey);
+                            localStorage.removeItem(themesKey);
+
+                            // Ask global preference engine to remove overrides
+                            if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
+                                window.SitePreferences.resetPreferences();
+                            }
+
                             showStatus('Restoring original site styling...');
+
+                            // Optional reload so any server-side defaults reapply cleanly
+                            setTimeout(() => location.reload(), 100);
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', function(){
