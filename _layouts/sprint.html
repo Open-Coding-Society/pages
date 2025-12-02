@@ -201,10 +201,7 @@ layout: post
     margin: 0 0 4px 0;
   }
 
-  .week-sprint {
-    color: #60a5fa;
-    font-size: 14px;
-  }
+
 
   .week-actions {
     display: flex;
@@ -837,9 +834,7 @@ layout: post
 </style>
 
 <div class="timeline-header">
-  <h1>Course Timeline</h1>
-  <p class="timeline-header-description">Track your progress through Computer Science Principles</p>
-  
+  <h1>Course Timeline</h1>  
   <div class="timeline-filters">
     <button class="filter-btn active" data-filter="all">
       <i class="fas fa-filter"></i> All Items
@@ -928,7 +923,6 @@ layout: post
                   <div class="week-header">
                     <div class="week-title-group">
                       <h3 data-week-title>Week {{ index }}</h3>
-                      <div class="week-sprint" data-week-sprint>{{ unitKey }}: {{ unitData.title }}</div>
                     </div>
                     <div class="week-actions">
                       <div class="completion-badge">
@@ -965,7 +959,7 @@ layout: post
                           <button class="completion-toggle">
                             <i class="fas fa-circle status-icon incomplete"></i>
                           </button>
-                          <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
+                          <a href="{{ site.baseurl }}{{ parts[1] }}" class="item-link">
                             {% if isAssignment %}
                               <i class="fas fa-file-alt type-icon assignment"></i>
                             {% else %}
@@ -1312,10 +1306,6 @@ layout: post
     if (uniqueTitles.length > 0) {
       return uniqueTitles;
     }
-    const sprintLabel = weekCard.querySelector('.week-sprint')?.textContent.trim();
-    if (sprintLabel) {
-      return [sprintLabel];
-    }
     const header = weekCard.querySelector('.week-title-group h3')?.textContent.trim();
     return header ? [header] : [];
   }
@@ -1359,10 +1349,7 @@ layout: post
       if (weekTitle) {
         weekTitle.textContent = `Week ${weekNumber}: ${profile.theme}`;
       }
-      const weekSprint = card.querySelector('[data-week-sprint]');
-      if (weekSprint) {
-        weekSprint.textContent = profile.courseName;
-      }
+
     });
   }
 
