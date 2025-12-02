@@ -100,68 +100,75 @@ active_tab: profile
             </div>
         </div>
     </div>
-
-   <!-- Group Management Section -->
-<div class="bg-white rounded-lg shadow-md p-8 mb-6 border border-gray-200">
-    <h1 class="text-2xl font-semibold mb-8 text-gray-900">Group Management</h1>
+<!-- Group Management Section -->
+<div class="bg-neutral-900 rounded-lg shadow-md p-8 mb-6 border border-neutral-700">
+    <h1 class="text-2xl font-semibold mb-8 text-white">Group Management</h1>
 
     <!-- Create New Group Section -->
-    <div class="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
-        <h2 class="text-lg font-semibold mb-6 text-gray-900">Create New Group</h2>
+    <div class="bg-neutral-900 rounded-lg p-6 mb-8 border border-neutral-700">
+        <h2 class="text-lg font-semibold mb-6 text-gray-200">Create New Group</h2>
 
         <!-- Class Period -->
         <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Class Period</label>
-            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option>Select class period</option>
+            <label class="block text-sm font-semibold text-gray-200 mb-2">Class Period</label>
+            <select id="classPeriodSelect" class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="">Select class period</option>
+                <option value="Period 1">Period 1</option>
+                <option value="Period 2">Period 2</option>
+                <option value="Period 3">Period 3</option>
+                <option value="Period 4">Period 4</option>
+                <option value="Period 5">Period 5</option>
             </select>
         </div>
 
         <!-- Group Name -->
         <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Group Name</label>
-            <input type="text" placeholder="e.g., Curators" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-semibold text-gray-200 mb-2">Group Name</label>
+            <input type="text" id="groupNameInput" placeholder="e.g., Curators" class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
 
         <!-- Group Members -->
         <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-900 mb-2">Group Members</label>
-            <div class="flex gap-2">
-                <input type="text" placeholder="Enter member name" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <button type="button" class="px-6 py-3 bg-white border border-gray-300 text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors">
+            <label class="block text-sm font-semibold text-gray-200 mb-2">Group Members</label>
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="memberNameInput" placeholder="Enter member name" class="flex-1 px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <button type="button" id="addMemberBtn" class="px-6 py-3 bg-neutral-700 border border-neutral-600 text-gray-200 font-medium rounded-lg hover:bg-neutral-600 transition-colors">
                     Add
                 </button>
+            </div>
+            <div id="membersList" class="bg-neutral-800 rounded-lg p-3 mb-4 min-h-10">
+                <div class="text-gray-400 text-sm">No members added yet</div>
             </div>
         </div>
 
         <!-- Create Group Button -->
-        <button type="button" class="w-full px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors">
+        <button type="button" id="createGroupBtn" class="w-full px-6 py-3 bg-neutral-950 text-white font-semibold rounded-lg hover:bg-black transition-colors">
             Create Group
         </button>
     </div>
 
     <!-- Existing Groups Section -->
-    <div>
-        <h2 class="text-lg font-semibold mb-6 text-gray-900">Existing Groups</h2>
+    <div class="bg-neutral-900 rounded-lg p-6 border border-neutral-700">
+        <h2 class="text-lg font-semibold mb-6 text-gray-200">Existing Groups</h2>
 
         <!-- Period Tabs -->
-        <div class="flex gap-2 mb-6 pb-4 border-b border-gray-200">
-            <button class="px-6 py-2 rounded-full bg-white border border-gray-300 text-gray-900 font-medium hover:bg-gray-50 transition-colors">
+        <div class="flex gap-2 mb-6 pb-4 border-b border-neutral-700">
+            <button class="periodTab px-6 py-2 rounded-full bg-neutral-800 border border-neutral-600 text-gray-300 font-medium hover:bg-neutral-700 transition-colors active" data-period="All">
                 All
             </button>
-            <button class="px-6 py-2 rounded-full bg-gray-200 text-gray-900 font-medium hover:bg-gray-300 transition-colors">
+            <button class="periodTab px-6 py-2 rounded-full bg-neutral-800 border border-neutral-600 text-gray-300 font-medium hover:bg-neutral-700 transition-colors" data-period="Period 1">
                 Period 1
             </button>
-            <button class="px-6 py-2 rounded-full bg-gray-200 text-gray-900 font-medium hover:bg-gray-300 transition-colors">
+            <button class="periodTab px-6 py-2 rounded-full bg-neutral-800 border border-neutral-600 text-gray-300 font-medium hover:bg-neutral-700 transition-colors" data-period="Period 2">
                 Period 2
             </button>
-            <button class="px-6 py-2 rounded-full bg-gray-200 text-gray-900 font-medium hover:bg-gray-300 transition-colors">
+            <button class="periodTab px-6 py-2 rounded-full bg-neutral-800 border border-neutral-600 text-gray-300 font-medium hover:bg-neutral-700 transition-colors" data-period="Period 3">
                 Period 3
             </button>
-            <button class="px-6 py-2 rounded-full bg-gray-200 text-gray-900 font-medium hover:bg-gray-300 transition-colors">
+            <button class="periodTab px-6 py-2 rounded-full bg-neutral-800 border border-neutral-600 text-gray-300 font-medium hover:bg-neutral-700 transition-colors" data-period="Period 4">
                 Period 4
             </button>
-            <button class="px-6 py-2 rounded-full bg-gray-200 text-gray-900 font-medium hover:bg-gray-300 transition-colors">
+            <button class="periodTab px-6 py-2 rounded-full bg-neutral-800 border border-neutral-600 text-gray-300 font-medium hover:bg-neutral-700 transition-colors" data-period="Period 5">
                 Period 5
             </button>
         </div>
@@ -169,48 +176,169 @@ active_tab: profile
         <!-- Groups Table -->
         <table class="w-full">
             <thead>
-                <tr class="border-b border-gray-300">
-                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Group Name</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Class Period</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-900">Members</th>
+                <tr class="border-b border-neutral-700">
+                    <th class="text-left py-3 px-4 font-semibold text-gray-200">Group Name</th>
+                    <th class="text-left py-3 px-4 font-semibold text-gray-200">Class Period</th>
+                    <th class="text-left py-3 px-4 font-semibold text-gray-200">Members</th>
+                    <th class="text-left py-3 px-4 font-semibold text-gray-200">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-4 text-gray-700">Curators</td>
-                    <td class="py-4 px-4 text-gray-700">Period 1</td>
-                    <td class="py-4 px-4 text-gray-700">2</td>
-                </tr>
-                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-4 text-gray-700">Researchers</td>
-                    <td class="py-4 px-4 text-gray-700">Period 1</td>
-                    <td class="py-4 px-4 text-gray-700">3</td>
-                </tr>
-                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-4 text-gray-700">Designers</td>
-                    <td class="py-4 px-4 text-gray-700">Period 2</td>
-                    <td class="py-4 px-4 text-gray-700">2</td>
-                </tr>
-                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-4 text-gray-700">Developers</td>
-                    <td class="py-4 px-4 text-gray-700">Period 3</td>
-                    <td class="py-4 px-4 text-gray-700">3</td>
-                </tr>
-                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-4 text-gray-700">Analysts</td>
-                    <td class="py-4 px-4 text-gray-700">Period 4</td>
-                    <td class="py-4 px-4 text-gray-700">1</td>
-                </tr>
-                <tr class="border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-4 px-4 text-gray-700">Writers</td>
-                    <td class="py-4 px-4 text-gray-700">Period 5</td>
-                    <td class="py-4 px-4 text-gray-700">2</td>
-                </tr>
+            <tbody id="groupsTableBody">
             </tbody>
         </table>
     </div>
 </div>
-</form>
+
+<script>
+let groups = [];
+let currentFilter = 'All';
+let currentMembers = [];
+
+// Load groups from storage on page load
+async function loadGroups() {
+    try {
+        const result = await window.storage.get('user-groups');
+        if (result) {
+            groups = JSON.parse(result.value);
+            renderTable();
+        }
+    } catch (error) {
+        console.log('No saved groups yet');
+    }
+}
+
+// Save groups to storage
+async function saveGroups() {
+    try {
+        await window.storage.set('user-groups', JSON.stringify(groups));
+    } catch (error) {
+        console.error('Error saving groups:', error);
+    }
+}
+
+// Add member to current group
+document.getElementById('addMemberBtn').addEventListener('click', () => {
+    const memberName = document.getElementById('memberNameInput').value.trim();
+    if (memberName) {
+        currentMembers.push(memberName);
+        document.getElementById('memberNameInput').value = '';
+        renderMembersList();
+    }
+});
+
+// Render members list
+function renderMembersList() {
+    const membersList = document.getElementById('membersList');
+    if (currentMembers.length === 0) {
+        membersList.innerHTML = '<div class="text-gray-400 text-sm">No members added yet</div>';
+        return;
+    }
+    membersList.innerHTML = currentMembers.map((member, index) => `
+        <div class="flex justify-between items-center text-gray-300 py-2">
+            <span>${member}</span>
+            <button type="button" class="text-red-400 hover:text-red-300 text-sm" onclick="removeMember(${index})">Remove</button>
+        </div>
+    `).join('');
+}
+
+// Remove member from current group
+window.removeMember = function(index) {
+    currentMembers.splice(index, 1);
+    renderMembersList();
+};
+
+// Create new group
+document.getElementById('createGroupBtn').addEventListener('click', () => {
+    const period = document.getElementById('classPeriodSelect').value;
+    const groupName = document.getElementById('groupNameInput').value.trim();
+    
+    if (!period || !groupName || currentMembers.length === 0) {
+        alert('Please fill in all fields and add at least one member');
+        return;
+    }
+    
+    const newGroup = {
+        id: Date.now(),
+        name: groupName,
+        period: period,
+        members: [...currentMembers]
+    };
+    
+    groups.push(newGroup);
+    saveGroups();
+    renderTable();
+    
+    // Reset form
+    document.getElementById('classPeriodSelect').value = '';
+    document.getElementById('groupNameInput').value = '';
+    currentMembers = [];
+    renderMembersList();
+});
+
+// Render groups table
+function renderTable() {
+    const tbody = document.getElementById('groupsTableBody');
+    let filteredGroups = groups;
+    
+    if (currentFilter !== 'All') {
+        filteredGroups = groups.filter(g => g.period === currentFilter);
+    }
+    
+    if (filteredGroups.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="py-4 px-4 text-gray-400 text-center">No groups</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = filteredGroups.map(group => `
+        <tr class="border-b border-neutral-800 hover:bg-neutral-800">
+            <td class="py-4 px-4 text-gray-300">${group.name}</td>
+            <td class="py-4 px-4 text-gray-300">${group.period}</td>
+            <td class="py-4 px-4 text-gray-300">${group.members.length}</td>
+            <td class="py-4 px-4 text-gray-300">
+                <button onclick="editGroup(${group.id})" class="text-blue-400 hover:text-blue-300 mr-3">Edit</button>
+                <button onclick="deleteGroup(${group.id})" class="text-red-400 hover:text-red-300">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Delete group
+window.deleteGroup = function(id) {
+    if (confirm('Are you sure you want to delete this group?')) {
+        groups = groups.filter(g => g.id !== id);
+        saveGroups();
+        renderTable();
+    }
+};
+
+// Edit group
+window.editGroup = function(id) {
+    const group = groups.find(g => g.id === id);
+    if (!group) return;
+    
+    document.getElementById('classPeriodSelect').value = group.period;
+    document.getElementById('groupNameInput').value = group.name;
+    currentMembers = [...group.members];
+    renderMembersList();
+    
+    // Delete old group and recreate on save
+    groups = groups.filter(g => g.id !== id);
+    saveGroups();
+};
+
+// Period tab filtering
+document.querySelectorAll('.periodTab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.periodTab').forEach(b => b.classList.remove('bg-neutral-700'));
+        btn.classList.add('bg-neutral-700');
+        currentFilter = btn.dataset.period;
+        renderTable();
+    });
+});
+
+// Load groups on page load
+loadGroups();
+</script>
 
 <div class="flex justify-between items-center mb-8">
     <button id="saveChangesBtn" disabled
