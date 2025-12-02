@@ -358,7 +358,6 @@ active_tab: profile
     }
 
     // Check if form values have changed
-    // Check if form values have changed
     function checkForChanges() {
         const form = document.getElementById('profileSettingsForm');
         const inputs = form.querySelectorAll('input, select');
@@ -368,19 +367,15 @@ active_tab: profile
 
         // Check standard inputs - only compare if they have original values
         inputs.forEach(input => {
-            // Skip if this input wasn't in the original values (new fields, etc.)
-            if (input.id && originalValues[input.id] === undefined) {
-                return;
-            }
+            // Skip if this input doesn't have an id
+            if (!input.id) return;
 
             if (input.type === 'checkbox') {
-                if (originalValues[input.id] !== input.checked) {
+                if (originalValues[input.id] !== undefined && originalValues[input.id] !== input.checked) {
                     formChanged = true;
                 }
-            } else if (input.id) {
-                // Only mark as changed if the current value is different from original
-                // This allows empty fields to stay empty without blocking saves
-                if (originalValues[input.id] !== input.value) {
+            } else {
+                if (originalValues[input.id] !== undefined && originalValues[input.id] !== input.value) {
                     formChanged = true;
                 }
             }
@@ -388,19 +383,8 @@ active_tab: profile
 
         // Check class entries
         const classEntries = document.querySelectorAll('.class-entry');
-        if (classEntries.length !== originalValues.classEntries.length) {
+        if (classEntries.length !== (originalValues.classEntries?.length || 0)) {
             formChanged = true;
-        } else {
-            classEntries.forEach((entry, index) => {
-                const name = entry.querySelector('.class-name').value;
-                const year = entry.querySelector('.class-year').value;
-
-                if (index >= originalValues.classEntries.length ||
-                    originalValues.classEntries[index].name !== name ||
-                    originalValues.classEntries[index].year !== year) {
-                    formChanged = true;
-                }
-            });
         }
 
         // Update save button
