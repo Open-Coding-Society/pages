@@ -89,5 +89,3 @@ permalink: /navigation/blogs/
 </script>
 
 ## Course Materials
-
-<!-- Auto Generated Blogs -->
