@@ -57,6 +57,11 @@ jobs:
           else
             echo "No DOCX files found, skipping conversion"
           fi
+
+      - name: Split multi-course files
+        run: |
+          source venv/bin/activate  # Activate virtual environment
+          python scripts/split_multi_course_files.py  # Run course splitting
       - name: Build with Jekyll
         run: |
           bundle exec jekyll build  # Build your Jekyll site
