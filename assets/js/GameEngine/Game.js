@@ -19,11 +19,14 @@ class GameCore {
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
 
-    // Try to dynamically load the PauseMenu
-    import('../mansionGame/ui/PauseMenu.js')
+    // Try to dynamically load the centralized PauseMenu (prefer the shared one)
+    import('./PauseMenu.js')
         .then(mod => {
-            try { new mod.default(this.gameControl, { parentId: 'gameContainer' }); }
-            catch (e) { console.warn('PauseMenu init failed:', e); }
+            try {
+                // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
+                const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
+                new mod.default(this.gameControl, pmOptions);
+            } catch (e) { console.warn('PauseMenu init failed:', e); }
         })
         .catch(() => {
             // no-op: PauseMenu is optional
