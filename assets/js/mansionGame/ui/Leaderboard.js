@@ -177,14 +177,14 @@ export default class Leaderboard {
 
 .rank {
     font-weight: 700;
-    color: #495057;
+    color: #fbfdffff;
     font-size: 16px;
     width: 50px;
 }
 
 .username {
     font-weight: 600;
-    color: #212529;
+    color: #ffffffff;
 }
 
 .score {

@@ -34,7 +34,7 @@ class GameCore {
         .then(mod => {
             try { 
                 new mod.default(this.gameControl, { 
-                    apiBaseUrl: '/gamer'  // Adjust as needed
+                    apiBaseUrl: 'http://localhost:8585/api/gamer'  // Adjust as needed
                 }); 
             }
             catch (e) { console.warn('Leaderboard init failed:', e); }
