@@ -9,295 +9,13 @@ layout: post
 {% assign posts = posts | concat: site.posts | concat: site.pages %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="/assets/css/timeline.css">
 
-<style>
-  body {
-    background: #0a0a0a;
-  }
-
-  .timeline-header {
-    margin-bottom: 32px;
-  }
-
-  .timeline-header h1 {
-    color: #ffffff;
-    font-size: 2.5rem;
-    margin-bottom: 8px;
-  }
-
-  .timeline-header-description {
-    color: #999999;
-    margin-bottom: 24px;
-  }
-
-  .timeline-filters {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    padding: 8px 16px;
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    border-radius: 6px;
-    color: #e0e0e0;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 14px;
-  }
-
-  .filter-btn:hover {
-    background: #1a1a1a;
-  }
-
-  .filter-btn.active {
-    background: #1a1a1a;
-    border-color: #60a5fa;
-    color: #60a5fa;
-  }
-
-  .timeline-container {
-    margin-top: 32px;
-  }
-
-  .week-card {
-    background: #0f0f0f;
-    border: 1px solid #222222;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 16px;
-    transition: all 0.2s;
-  }
-
-  .week-card:hover {
-    border-color: #2a2a2a;
-  }
-
-  .week-content-wrapper {
-    display: flex;
-    gap: 24px;
-  }
-
-  .week-indicator {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .week-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: #1a1a1a;
-    border: 2px solid #2a2a2a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #60a5fa;
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .week-connector {
-    width: 1px;
-    height: 32px;
-    background: #222222;
-    margin-top: 8px;
-  }
-
-  .week-card:last-child .week-connector {
-    display: none;
-  }
-
-  .week-main-content {
-    flex: 1;
-  }
-
-  .week-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .week-title-group h3 {
-    color: #ffffff;
-    font-size: 1.25rem;
-    margin: 0 0 4px 0;
-  }
-
-  .week-sprint {
-    color: #60a5fa;
-    font-size: 14px;
-  }
-
-  .completion-badge {
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    color: #cccccc;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
-
-  .progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background: #1a1a1a;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: #60a5fa;
-    transition: width 0.3s ease;
-    width: 0%;
-  }
-
-  .items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .item-card {
-    padding: 12px;
-    background: #151515;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    transition: background 0.2s;
-  }
-
-  .item-card:hover {
-    background: #1a1a1a;
-  }
-
-  .item-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-  }
-
-  .completion-toggle {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-  }
-
-  .item-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .status-icon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    font-size: 16px;
-  }
-
-  .status-icon.completed {
-    color: #60a5fa;
-  }
-
-  .status-icon.incomplete {
-    color: #444444;
-  }
-
-  .type-icon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-  }
-
-  .type-icon.lesson {
-    color: #60a5fa;
-  }
-
-  .type-icon.assignment {
-    color: #f59e0b;
-  }
-
-  .item-title {
-    color: #e0e0e0;
-    flex: 1;
-    font-size: 14px;
-  }
-
-  .item-card.completed .item-title {
-    color: #999999;
-  }
-
-  .assignment-due {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #f59e0b;
-    font-size: 14px;
-    margin-top: 8px;
-  }
-
-  .load-more {
-    text-align: center;
-    margin-top: 24px;
-  }
-
-  .load-more-btn {
-    padding: 10px 24px;
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    color: #60a5fa;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .load-more-btn:hover {
-    background: #1a1a1a;
-    color: #93c5fd;
-  }
-
-  @media (max-width: 768px) {
-    .items-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .week-content-wrapper {
-      gap: 16px;
-    }
-    
-    .week-circle {
-      width: 48px;
-      height: 48px;
-      font-size: 12px;
-    }
-  }
-</style>
 
 <div class="timeline-header">
-  <h1>Course Timeline</h1>
-  <p class="timeline-header-description">Track your progress through Computer Science Principles</p>
-  
+  <h1>Course Timeline</h1>  
   <div class="timeline-filters">
     <button class="filter-btn active" data-filter="all">
       <i class="fas fa-filter"></i> All Items
@@ -326,112 +44,261 @@ layout: post
       {% assign unitData = shared[courseUnit.shared] %}
     {% endif %}
 
-    {% for index in (start..end) %}
-      {% assign entries = null | compact %}
-      {% assign totalItems = 0 %}
-      {% assign completedItems = 0 %}
-      
-                    {% for post in posts %}
-        {% if post.courses[page.course] %}
-          {% assign week = post.courses[page.course].week | plus: 0 %}
-          {% if week == index %}
-            {% comment %} Check if assignment field exists, default to lesson if not {% endcomment %}
-            {% if post.assignment == true %}
-              {% assign itemType = "assignment" %}
-            {% else %}
-              {% assign itemType = "lesson" %}
-            {% endif %}
-            {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
-            {% assign entries = entries | push: entry %}
-            {% assign totalItems = totalItems | plus: 1 %}
+    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}">
+      <div class="sprint-header">
+        <div>
+          <p class="sprint-meta">{{ unitKey }}</p>
+          <h2 class="sprint-title">{{ unitData.title }}</h2>
+          {% if unitData.description %}
+            <p class="sprint-meta">{{ unitData.description }}</p>
           {% endif %}
-        {% endif %}
-      {% endfor %}
+        </div>
+        <div class="sprint-controls">
+          <div class="completion-badge">{{ start }} - {{ end }} Weeks</div>
+          <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="false">
+            <span class="sprint-toggle-icon">▾</span> View Weeks
+          </button>
+        </div>
+      </div>
 
-      {% if entries.size > 0 %}
-        <div class="week-card">
-          <div class="week-content-wrapper">
-            <div class="week-indicator">
-              <div class="week-circle">W{{ index }}</div>
-              <div class="week-connector"></div>
-            </div>
+      <div class="sprint-weeks">
+        <div class="sprint-body">
+          <h3 style="margin:0 0 12px 0; font-weight:700; color:#cbd5f5;">{{ unitKey }} — {{ unitData.title }}</h3>
 
-            <div class="week-main-content">
-              <div class="week-header">
-                <div class="week-title-group">
-                  <h3>Week {{ index }}: {{ unitData.title }}</h3>
-                  <div class="week-sprint">{{ unitKey }}: {{ unitData.title }}</div>
-                </div>
-                <div class="completion-badge">
-                  {{ completedItems }}/{{ totalItems }} Complete
-                </div>
-              </div>
+          {% for index in (start..end) %}
+            {% assign entries = null | compact %}
+            {% assign totalItems = 0 %}
 
-              <div class="progress-bar-container">
-                {% if totalItems > 0 %}
-                  {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
-                {% else %}
-                  {% assign progress = 0 %}
-                {% endif %}
-                <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
-              </div>
-
-              <div class="items-grid">
-                {% for entry in entries %}
-                  {% assign parts = entry | split: "||" %}
-                  {% if parts[2] == "assignment" %}
-                    {% assign isAssignment = true %}
-                    {% assign itemType = "assignment" %}
-                  {% else %}
-                    {% assign isAssignment = false %}
-                    {% assign itemType = "lesson" %}
+            {% for post in posts %}
+              {% if post.courses[page.course] %}
+                {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
+                {% unless post.path contains "_IPYNB_2_.md" %}
+                  {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                  {% assign course_count = 0 %}
+                  {% for course in post.courses %}
+                    {% assign course_count = course_count | plus: 1 %}
+                  {% endfor %}
+                  {% if course_count == 1 %}
+                  {% assign week = post.courses[page.course].week | plus: 0 %}
+                  {% if week == index %}
+                    {% if post.assignment == true %}
+                      {% assign itemType = "assignment" %}
+                    {% else %}
+                      {% assign itemType = "lesson" %}
+                    {% endif %}
+                    {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
+                    {% assign entries = entries | push: entry %}
+                    {% assign totalItems = totalItems | plus: 1 %}
                   {% endif %}
-                  
-                  <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] | slugify }}">
-                    <div class="item-content">
-                      <button class="completion-toggle">
-                        <i class="fas fa-circle status-icon incomplete"></i>
+                  {% endif %}
+                {% endunless %}
+              {% endif %}
+            {% endfor %}
+
+          {% if entries.size > 0 %}
+            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}">
+              <div class="week-content-wrapper">
+                <div class="week-indicator">
+                  <div class="week-circle">W{{ index }}</div>
+                  <div class="week-connector"></div>
+                </div>
+
+                <div class="week-main-content">
+                  <div class="week-header">
+                    <div class="week-title-group">
+                      <h3 data-week-title>Week {{ index }}</h3>
+                    </div>
+                    <div class="week-actions">
+                      <div class="completion-badge">
+                        {{ completedItems }}/{{ totalItems }} Complete
+                      </div>
+                      <button class="progression-btn" type="button">
+                        Progress & Certificates
                       </button>
-                        <a href="{{ site.baseurl }}{{ parts[1] }}?course={{ page.course }}" class="item-link">
-                        {% if isAssignment %}
-                          <i class="fas fa-file-alt type-icon assignment"></i>
-                        {% else %}
-                          <i class="fas fa-code type-icon lesson"></i>
-                        {% endif %}
-                        <span class="item-title">{{ parts[0] }}</span>
-                      </a>
                     </div>
                   </div>
-                {% endfor %}
-              </div>
 
-              {% assign assignmentCount = 0 %}
-              {% for entry in entries %}
-                {% assign parts = entry | split: "||" %}
-                {% if parts[2] == "assignment" %}
-                  {% assign assignmentCount = assignmentCount | plus: 1 %}
-                {% endif %}
-              {% endfor %}
+                  <div class="progress-bar-container">
+                    {% if totalItems > 0 %}
+                      {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
+                    {% else %}
+                      {% assign progress = 0 %}
+                    {% endif %}
+                    <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
+                  </div>
 
-              {% if assignmentCount > 0 %}
-                <div class="assignment-due">
-                  <i class="fas fa-calendar"></i>
-                  <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+                  <div class="items-grid">
+                    {% for entry in entries %}
+                      {% assign parts = entry | split: "||" %}
+                      {% if parts[2] == "assignment" %}
+                        {% assign isAssignment = true %}
+                        {% assign itemType = "assignment" %}
+                      {% else %}
+                        {% assign isAssignment = false %}
+                        {% assign itemType = "lesson" %}
+                      {% endif %}
+
+                      <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}">
+                        <div class="item-content">
+                          <button class="completion-toggle">
+                            <i class="fas fa-circle status-icon incomplete"></i>
+                          </button>
+                          <a href="{{ site.baseurl }}{{ parts[1] }}" class="item-link">
+                            {% if isAssignment %}
+                              <i class="fas fa-file-alt type-icon assignment"></i>
+                            {% else %}
+                              <i class="fas fa-code type-icon lesson"></i>
+                            {% endif %}
+                            <span class="item-title">{{ parts[0] }}</span>
+                          </a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                  {% assign assignmentCount = 0 %}
+                  {% for entry in entries %}
+                    {% assign parts = entry | split: "||" %}
+                    {% if parts[2] == "assignment" %}
+                      {% assign assignmentCount = assignmentCount | plus: 1 %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if assignmentCount > 0 %}
+                    <div class="assignment-due">
+                      <i class="fas fa-calendar"></i>
+                      <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+                    </div>
+                  {% endif %}
+
+                  <div class="week-skills-row" data-week-skills></div>
                 </div>
-              {% endif %}
+              </div>
             </div>
-          </div>
+          {% endif %}
+          {% endfor %}
         </div>
-      {% endif %}
-    {% endfor %}
+      </div>
+    </div>
   {% endfor %}
 </div>
+
+<!-- ============================= -->
+<!--   PROGRESSION MODAL (DARK)   -->
+<!-- ============================= -->
+<div id="progression-modal">
+  <button id="close-progression-modal" class="close-btn">&times;</button>
+
+  <div>
+    <h2>Week <span id="modal-week-number"></span> Progress</h2>
+    <p class="week-theme" id="modal-week-theme"></p>
+
+    <div class="progress-bar-container" style="margin-bottom: 16px;">
+      <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
+    </div>
+
+    <div id="task-list"></div>
+
+    <div id="certificate-status" style="margin-top: 24px;"></div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   CERTIFICATE LIST MODAL      -->
+<!-- ============================= -->
+<div id="certificate-list-modal">
+  <button id="close-certificate-list-modal" class="close-btn">&times;</button>
+
+  <div>
+    <h2>Week <span id="list-modal-week-number"></span> Certificates</h2>
+    <div id="certificate-list"></div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--     CERTIFICATE MODAL         -->
+<!-- ============================= -->
+<div id="certificate-modal">
+  <div class="action-bar">
+    <button id="download-certificate-btn" class="action-btn">Download PNG</button>
+    <button id="print-certificate-btn" class="action-btn secondary-btn">Print</button>
+    <button id="linkedin-share-btn" class="action-btn">Add to LinkedIn</button>
+    <button id="close-certificate-modal" class="action-btn secondary-btn">Close</button>
+  </div>
+
+  <div id="certificate-content">
+    <div>
+      <div class="certificate-heading">
+        <div class="certificate-emblem">
+          <img id="certificate-logo" src="{{ '/assets/images/ocs-logo.png' | relative_url }}" alt="Open Coding Society Logo">
+        </div>
+        <div class="header-text">Open Coding Society</div>
+        <div class="certify-text">Certificate of Completion</div>
+        <div class="certificate-subtitle">Presented to</div>
+      </div>
+
+      <div
+        contenteditable="true"
+        id="certificate-student-name"
+      ></div>
+
+      <div class="achievement-text">
+        Has successfully completed the module:
+        <br><strong id="certificate-week-theme"></strong><br>
+        as part of the course<br>
+        <strong id="certificate-course-name"></strong>.
+      </div>
+
+      <div class="skill-focus-pill">
+        <span id="certificate-skill-focus">Skill Focus</span>
+      </div>
+
+      <div id="certificate-date"></div>
+
+      <div class="certificate-divider"></div>
+
+      <!-- Skills -->
+      <div id="certificate-skills">
+        <h3 class="skills-heading">Skills Demonstrated</h3>
+        <div id="skills-container"></div>
+      </div>
+
+      <!-- Signature -->
+      <div class="signature-section">
+        <div class="signature">
+          <div class="signature-line"></div>
+          <div class="signature-name">John Mortensen</div>
+          <div class="signature-title">Course Instructor</div>
+          <div class="signature-subtitle">Open Coding Society</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
+<script id="course-skill-lib-json" type="application/json">
+  {{ site.data.certificate_skills | jsonify }}
+</script>
 
 <script>
   // Completion tracking (course-specific)
   const CURRENT_COURSE = '{{ page.course }}';
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
-  
+
+  // Load the skill library from the JSON script tag so the JS file itself contains no raw Liquid tokens
+  let COURSE_SKILL_LIBRARY = {};
+  try {
+    const el = document.getElementById('course-skill-lib-json');
+    if (el && el.textContent) {
+      COURSE_SKILL_LIBRARY = JSON.parse(el.textContent);
+    }
+  } catch (e) {
+    console.warn('Unable to parse COURSE_SKILL_LIBRARY, falling back to empty object', e);
+    COURSE_SKILL_LIBRARY = {};
+  }
+
   // Load completion data from localStorage
   function loadCompletionData() {
     try {
@@ -472,6 +339,11 @@ layout: post
       // Update UI
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
+      
+      // Trigger cross-view sync by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId, completed: !isCompleted }
+      }));
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
     }
@@ -593,10 +465,476 @@ layout: post
     });
   }
   
+  let currentModalWeekNumber = null;
+  let activeCertificateProfile = null;
+
+  const COURSE_LABELS = {
+    csp: 'Computer Science Principles',
+    csa: 'Computer Science A',
+    csse: 'Computer Science and Software Engineering'
+  };
+
+  // Extract week number from week card
+  function extractWeekNumber(weekCard) {
+    const weekCircle = weekCard.querySelector('.week-circle');
+    if (weekCircle) {
+      const text = weekCircle.textContent.trim();
+      const match = text.match(/W(\d+)/);
+      return match ? parseInt(match[1]) : null;
+    }
+    return null;
+  }
+
+  function getWeekCardElement(weekNumber) {
+    return Array.from(document.querySelectorAll('.week-card')).find(card => extractWeekNumber(card) === weekNumber);
+  }
+
+  function collectSkillsFromWeekCard(weekCard) {
+    const titles = Array.from(weekCard.querySelectorAll('.item-title')).map(el => el.textContent.trim()).filter(Boolean);
+    const uniqueTitles = [...new Set(titles)];
+    if (uniqueTitles.length > 0) {
+      return uniqueTitles;
+    }
+    const header = weekCard.querySelector('.week-title-group h3')?.textContent.trim();
+    return header ? [header] : [];
+  }
+
+  function buildCertificateProfile(weekCard, weekNumber) {
+    const overrides = COURSE_SKILL_LIBRARY?.[CURRENT_COURSE]?.[weekNumber] || null;
+    let theme = overrides?.theme || overrides?.title || overrides?.certificate || '';
+    const weekHeader = weekCard.querySelector('.week-title-group h3')?.textContent.trim() || `Week ${weekNumber}`;
+    if (!theme) {
+      const headerParts = weekHeader.split(':');
+      theme = headerParts.length > 1 ? headerParts[1].trim() : weekHeader;
+    }
+    const skills = (overrides?.skills && overrides.skills.length > 0) ? overrides.skills : collectSkillsFromWeekCard(weekCard);
+    if (skills.length === 0) {
+      skills.push(theme);
+    }
+    return {
+      weekNumber,
+      theme,
+      displayName: overrides?.certificate || `Week ${weekNumber}: ${theme}`,
+      courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
+      skills
+    };
+  }
+
+  function renderWeekSkillPreviews() {
+    document.querySelectorAll('.week-card').forEach(card => {
+      const preview = card.querySelector('[data-week-skills]');
+      if (!preview) return;
+      const weekNumber = extractWeekNumber(card);
+      const profile = buildCertificateProfile(card, weekNumber);
+      if (!profile) return;
+      preview.innerHTML = '';
+      profile.skills.slice(0, 6).forEach(skill => {
+        const chip = document.createElement('span');
+        chip.className = 'skill-chip';
+        chip.textContent = skill;
+        preview.appendChild(chip);
+      });
+      const weekTitle = card.querySelector('[data-week-title]');
+      if (weekTitle) {
+        weekTitle.textContent = `Week ${weekNumber}: ${profile.theme}`;
+      }
+
+    });
+  }
+
+  // Get available certificates for a week
+  function getAvailableCertificates(weekNumber) {
+    console.log('Getting certificates for week:', weekNumber);
+    const weekCard = getWeekCardElement(weekNumber);
+
+    if (!weekCard) {
+      console.log('Week card not found for week:', weekNumber);
+      return [];
+    }
+
+    const itemCards = weekCard.querySelectorAll('.item-card');
+    console.log('Found', itemCards.length, 'item cards');
+    if (itemCards.length === 0) {
+      return [];
+    }
+
+    const allCompleted = Array.from(itemCards).every(card => card.classList.contains('completed'));
+    if (!allCompleted) {
+      console.log('Week not fully completed, certificates locked.');
+      return [];
+    }
+
+    const profile = buildCertificateProfile(weekCard, weekNumber);
+    if (!profile) {
+      return [];
+    }
+
+    const certificates = (profile.skills || []).map(skillName => {
+      return {
+        weekNumber: profile.weekNumber,
+        theme: profile.theme,
+        courseName: profile.courseName,
+        skill: skillName,
+        displayName: `${profile.theme} – ${skillName}`,
+        slug: `${CURRENT_COURSE}-${profile.weekNumber}-${skillName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      };
+    });
+
+    return certificates;
+  }
+
+  // Open progression modal
+  function openProgressionModal(weekCard) {
+    const weekNumber = extractWeekNumber(weekCard);
+    console.log('Opening progression modal for week:', weekNumber);
+    if (!weekNumber) {
+      console.log('No week number found, returning');
+      return;
+    }
+
+    currentModalWeekNumber = weekNumber;
+    console.log('Set currentModalWeekNumber to:', currentModalWeekNumber);
+
+    // Set week number and theme
+    document.getElementById('modal-week-number').textContent = weekNumber;
+    const weekTitle = weekCard.querySelector('h3').textContent.split(':')[1]?.trim() || '';
+    document.getElementById('modal-week-theme').textContent = weekTitle;
+
+    // Populate task list
+    const taskList = document.getElementById('task-list');
+    taskList.innerHTML = '';
+
+    const itemCards = weekCard.querySelectorAll('.item-card');
+    itemCards.forEach((card, index) => {
+      const title = card.querySelector('.item-title').textContent;
+      const isCompleted = card.classList.contains('completed');
+      const taskDiv = document.createElement('div');
+      taskDiv.className = 'progression-task';
+      taskDiv.innerHTML = `
+        <input type="checkbox" id="task-${index}" ${isCompleted ? 'checked' : ''}>
+        <label for="task-${index}">${title}</label>
+        <span class="task-number">#${index + 1}</span>
+      `;
+
+      // Add change listener
+      const checkbox = taskDiv.querySelector('input[type="checkbox"]');
+      checkbox.addEventListener('change', function() {
+        const toggleBtn = card.querySelector('.completion-toggle');
+        if (toggleBtn) {
+          toggleCompletion(toggleBtn);
+          updateModalProgress();
+          updateCertificateStatus();
+        }
+      });
+
+      taskList.appendChild(taskDiv);
+    });
+
+    updateModalProgress();
+    updateCertificateStatus();
+
+    // Show modal
+    document.getElementById('progression-modal').style.display = 'block';
+  }
+
+  // Close progression modal
+  function closeProgressionModal() {
+    document.getElementById('progression-modal').style.display = 'none';
+  }
+
+  // Update modal progress
+  function updateModalProgress() {
+    const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
+    const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked');
+    const progress = checkboxes.length > 0 ? (checked.length / checkboxes.length) * 100 : 0;
+    document.getElementById('modal-progress-fill').style.width = `${progress}%`;
+  }
+
+  // Update certificate status
+  function updateCertificateStatus() {
+    const availableCertificates = getAvailableCertificates(currentModalWeekNumber);
+    const certificateStatus = document.getElementById('certificate-status');
+
+    if (availableCertificates.length > 0) {
+      certificateStatus.innerHTML = `
+        <button id="view-certificate-btn">🎓 View Your Certificate</button>
+      `;
+    } else {
+      certificateStatus.innerHTML = `
+        <p style="color: #666; text-align: center;">Complete all tasks to unlock certificates</p>
+      `;
+    }
+  }
+
+  // Open certificate list modal
+  function openCertificateListModal(weekNumber) {
+    document.getElementById('list-modal-week-number').textContent = weekNumber;
+    const certificateList = document.getElementById('certificate-list');
+    certificateList.innerHTML = '';
+
+    const availableCertificates = getAvailableCertificates(weekNumber);
+
+    if (availableCertificates.length === 0) {
+      certificateList.innerHTML = '<p style="color: #666; text-align: center;">No certificates available yet</p>';
+    } else {
+      availableCertificates.forEach(profile => {
+        const button = document.createElement('button');
+        button.textContent = `${profile.displayName}`;
+        button.addEventListener('click', () => {
+          openCertificateModal(profile);
+        });
+        certificateList.appendChild(button);
+      });
+    }
+
+    document.getElementById('certificate-list-modal').style.display = 'block';
+  }
+
+  // Open certificate modal
+  function openCertificateModal(profile) {
+    activeCertificateProfile = profile;
+    document.getElementById('certificate-week-theme').textContent = profile.theme;
+    document.getElementById('certificate-course-name').textContent = profile.courseName;
+
+    // Set date
+    const now = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('certificate-date').textContent = now.toLocaleDateString('en-US', options);
+
+    // Set skills
+    const skillFocus = profile.skill || profile.theme;
+    document.getElementById('certificate-skill-focus').textContent = skillFocus;
+
+    const skillsContainer = document.getElementById('skills-container');
+    skillsContainer.innerHTML = '';
+    const skillTag = document.createElement('span');
+    skillTag.className = 'skill-tag';
+    skillTag.textContent = skillFocus;
+    skillsContainer.appendChild(skillTag);
+
+    // Close list modal and open certificate modal
+    document.getElementById('certificate-list-modal').style.display = 'none';
+    document.getElementById('certificate-modal').style.display = 'block';
+  }
+
+  // Close certificate modal
+  function closeCertificateModal() {
+    document.getElementById('certificate-modal').style.display = 'none';
+  }
+
+  // Close certificate list modal
+  function closeCertificateListModal() {
+    document.getElementById('certificate-list-modal').style.display = 'none';
+  }
+
+  // Download certificate
+  function downloadCertificate() {
+    const certificateContent = document.getElementById('certificate-content');
+    html2canvas(certificateContent, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      logging: false,
+      useCORS: true
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'certificate.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
+
+  // Print certificate
+  function printCertificate() {
+    window.print();
+  }
+
+  // Share on LinkedIn by opening the certification form with prefilled data
+  function shareOnLinkedIn() {
+    const profile = activeCertificateProfile;
+    const certificateName = profile?.displayName || profile?.theme || document.getElementById('certificate-week-theme')?.textContent.trim() || 'Course Module Completion';
+    const courseName = profile?.courseName || document.getElementById('certificate-course-name')?.textContent.trim() || 'Open Coding Society';
+    const studentName = document.getElementById('certificate-student-name')?.textContent.trim() || 'Learner';
+    const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';
+    const skillFocus = profile?.skill || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
+
+    let issueMonth = '';
+    let issueYear = '';
+
+    if (issueDateText) {
+      const parsedDate = new Date(issueDateText);
+      if (!isNaN(parsedDate.getTime())) {
+        issueMonth = (parsedDate.getMonth() + 1).toString();
+        issueYear = parsedDate.getFullYear().toString();
+      }
+    }
+
+    const params = new URLSearchParams({
+      startTask: 'CERTIFICATION_NAME',
+      name: `${certificateName}`,
+      organizationName: 'Open Coding Society',
+      issueYear,
+      issueMonth,
+      description: `Awarded to ${studentName} for demonstrating ${skillFocus} during ${courseName}.`,
+      credentialUrl: window.location.href
+    });
+
+    const linkedInUrl = `https://www.linkedin.com/profile/add?${params.toString()}`;
+    window.open(linkedInUrl, '_blank', 'noopener');
+  }
+
+  // Initialize certificate system
+  function initializeCertificateSystem() {
+    console.log('Initializing certificate system');
+
+    const weekCards = document.querySelectorAll('.week-card');
+    console.log('Found', weekCards.length, 'week cards');
+
+    const progressButtons = document.querySelectorAll('.week-card .progression-btn');
+    progressButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const weekCard = button.closest('.week-card');
+        if (weekCard) {
+          openProgressionModal(weekCard);
+        }
+      });
+    });
+
+    weekCards.forEach(card => {
+      card.classList.add('clickable');
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('a') || event.target.closest('.completion-toggle') || event.target.closest('.progression-btn')) {
+          return;
+        }
+        event.preventDefault();
+        openProgressionModal(card);
+      });
+    });
+
+    function toggleSprint(card, control) {
+      const isCollapsed = card.classList.toggle('collapsed');
+      if (control) {
+        control.setAttribute('aria-expanded', (!isCollapsed).toString());
+        control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
+      }
+    }
+
+    document.querySelectorAll('.sprint-card').forEach(card => {
+      const toggleBtn = card.querySelector('.sprint-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.querySelector('.sprint-toggle-icon').textContent = '▸';
+        toggleBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleSprint(card, toggleBtn);
+        });
+      }
+      card.querySelector('.sprint-header').addEventListener('click', (event) => {
+        if (event.target.closest('.sprint-controls')) {
+          return;
+        }
+        toggleSprint(card, toggleBtn);
+      });
+    });
+
+    // Close buttons
+    document.getElementById('close-progression-modal').addEventListener('click', closeProgressionModal);
+    document.getElementById('close-certificate-list-modal').addEventListener('click', closeCertificateListModal);
+    document.getElementById('close-certificate-modal').addEventListener('click', closeCertificateModal);
+
+    // Certificate actions
+    document.getElementById('download-certificate-btn').addEventListener('click', downloadCertificate);
+    document.getElementById('print-certificate-btn').addEventListener('click', printCertificate);
+    document.getElementById('linkedin-share-btn').addEventListener('click', shareOnLinkedIn);
+
+    // View certificate button
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'view-certificate-btn') {
+        closeProgressionModal();
+        openCertificateListModal(currentModalWeekNumber);
+      }
+    });
+  }
+
+  // Cross-view synchronization - sync when switching between timeline and two-pane views
+  window.addEventListener('focus', function() {
+    updateAllCompletionStates();
+  });
+  
+  // Sync when page becomes visible (handles tab switching)
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      updateAllCompletionStates();
+    }
+  });
+  
+  // Listen for storage changes from other tabs/windows (cross-tab sync)
+  window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY) {
+      updateAllCompletionStates();
+    }
+  });
+  
+  // Listen for completion changes from other views (same-window sync)
+  window.addEventListener('completionChanged', function(e) {
+    updateAllCompletionStates();
+  });
+
+  // Update all completion states from localStorage
+  function updateAllCompletionStates() {
+    const completionData = loadCompletionData();
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    itemCards.forEach(card => {
+      const itemId = card.dataset.itemId;
+      const isCompleted = completionData[itemId] || false;
+      updateItemUI(card, isCompleted);
+    });
+    
+    updateProgressBars();
+  }
+
+  // Mobile-specific enhancements
+  function initMobileEnhancements() {
+    if (window.innerWidth <= 768) {
+      // Auto-collapse all sprints on mobile for better navigation
+      document.querySelectorAll('.sprint-card:not(.collapsed)').forEach(card => {
+        card.classList.add('collapsed');
+      });
+      
+      // Add touch-friendly interactions for modals
+      document.querySelectorAll('.progression-btn').forEach(btn => {
+        btn.style.minHeight = '44px'; // iOS recommended touch target size
+      });
+      
+      // Improve modal close buttons for mobile
+      document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.style.minWidth = '44px';
+        btn.style.minHeight = '44px';
+        btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
+      });
+    }
+  }
+
+  // Handle orientation changes
+  window.addEventListener('orientationchange', function() {
+    setTimeout(function() {
+      updateProgressBars();
+      initMobileEnhancements();
+    }, 100);
+  });
+
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
     initializeCompletion();
     applyFilters();
+    initializeCertificateSystem();
+    renderWeekSkillPreviews();
+    initMobileEnhancements();
   });
+
 </script>
