@@ -33,7 +33,8 @@ def parse_markdown_front_matter(content):
         return None, content
     
     front_matter_text = content[3:end_match.start() + 3]
-    body_content = content[end_match.end() + 4:]
+    # The end_match.end() already includes the \n after ---, so we only need to add 3 for the original offset
+    body_content = content[end_match.end() + 3:]
     
     try:
         front_matter = yaml.safe_load(front_matter_text)
