@@ -6,7 +6,7 @@ comments: false
 ---
 
 <style>
-  /* Simple modal styles */
+  /* Simple modal styles  */
   .modal-backdrop {
     position: fixed;
     inset: 0;
