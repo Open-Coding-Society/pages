@@ -5,7 +5,7 @@ title: Analytics and Mastery Certificate Quest
 description: >
   Analytics and Mastery Certificate - Demonstrate comprehensive understanding and earn your CS Portfolio certificate
 author: CSA 2025-26
-permalink: /cs-portfolio-quest/analytics/
+permalink: /bigsix/analytics
 lxdData:
   Title: "Analytics and Mastery Modules"
   Description: "Complete your CS Portfolio journey and earn your mastery certificate!"
