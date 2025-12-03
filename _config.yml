@@ -19,8 +19,8 @@ title: Open Coding
 description: "Class of 2026"
 owner_name: Open Coding Society 
 github_username: open-coding-society 
-github_repo: "certifier-pages" 
-baseurl: "/certifier-pages" 
+github_repo: "pages" 
+baseurl: "" 
 future: true
 
 
