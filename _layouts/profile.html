@@ -492,7 +492,7 @@ active_tab: profile
             alert('Error adding class. Please try again.');
         }
     }
-    // Remove class
+
     // Remove a class
     async function removeClass(button) {
         const entry = button.closest('.class-entry');
@@ -500,13 +500,15 @@ active_tab: profile
         const classToRemove = currentUserClasses[index];
 
         try {
-            // Use query param for DELETE (simpler and works with your API)
-            const url = new URL(`${pythonURI}/api/user/class`);
-            url.searchParams.append('class', classToRemove);
-
-            const response = await fetch(url.toString(), {
-                method: 'DELETE',
-                credentials: 'include', // ensures cookies are sent
+            // Use POST with action parameter instead of DELETE
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'remove',
+                    class: classToRemove 
+                })
             });
 
             if (!response.ok) throw new Error('Failed to remove class');
