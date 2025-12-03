@@ -86,6 +86,15 @@ show_reading_time: false
             <div class="form-group">
                 <input type="password" id="signupPassword" placeholder="Password" required>
             </div>
+            <!-- Courses selection (required) -->
+            <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select your course(s) <span style="color: red">(required)</span></label>
+                <div id="signupCourses" style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <label><input type="checkbox" name="signupCourse" value="CSSE"> CSSE</label>
+                    <label><input type="checkbox" name="signupCourse" value="CSP"> CSP</label>
+                    <label><input type="checkbox" name="signupCourse" value="CSA"> CSA</label>
+                </div>
+            </div>
             <!-- Confirm Password Field -->
             <div class="form-group">
                 <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
@@ -193,6 +202,13 @@ show_reading_time: false
             return false;
         }
 
+        // Ensure at least one course is selected
+        const courseChecks = document.querySelectorAll('input[name="signupCourse"]:checked');
+        if (!courseChecks || courseChecks.length === 0) {
+            alert('Please select at least one course (CSA, CSSE, or CSP).');
+            return false;
+        }
+
         return true;
     }
 
@@ -276,6 +292,10 @@ show_reading_time: false
             password: document.getElementById("signupPassword").value,
             kasm_server_needed: document.getElementById("kasmNeeded").checked,
         };
+
+        // Collect selected courses (CSA, CSSE, CSP)
+        const selectedCourses = Array.from(document.querySelectorAll('input[name="signupCourse"]:checked')).map(c => c.value);
+        signupFormData.classes = selectedCourses;
 
         // Show OAuth verification
         showOAuthVerification();
@@ -508,6 +528,12 @@ show_reading_time: false
             kasm_server_needed: document.getElementById("kasmNeeded").checked,
         };
 
+        // Ensure classes are included in the data payload (either from signupFormData or UI)
+        if (!data.classes || !Array.isArray(data.classes) || data.classes.length === 0) {
+            const uiCourses = Array.from(document.querySelectorAll('input[name="signupCourse"]:checked')).map(c => c.value);
+            data.classes = uiCourses;
+        }
+
         const signupDataJava = {
             uid: data.uid,
             sid: data.sid,
@@ -516,10 +542,17 @@ show_reading_time: false
             name: data.name,
             password: data.password,
             kasmServerNeeded: data.kasm_server_needed,
+            // include classes for Java payload as well (if your Java endpoint accepts it)
+            class: data.classes || [],
         };
 
         if (verifiedSchoolEmail) {
             console.log("Account created with verified school email:", verifiedSchoolEmail);
+        }
+
+        // Ensure compatibility: backend may accept `class` or `classes`
+        if (!data.class && data.classes) {
+            data.class = data.classes;
         }
 
         console.log("Sending this data to Flask:", JSON.stringify(data, null, 2));

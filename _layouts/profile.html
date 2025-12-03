@@ -100,6 +100,39 @@ active_tab: profile
         </div>
     </div>
 
+    <!-- Courses Section -->
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Courses</h2>
+            <div class="flex items-center space-x-3">
+                <select id="coursesSelect" name="courses"
+                    class="px-3 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-sm text-gray-200 focus:outline-none"
+                    onchange="checkForChanges()">
+                       <option value="">Select a course...</option>
+                       <option value="CSSE">CSSE — Computer Science & Software Engineering</option>
+                       <option value="CSP">CSP — Computer Science Principles</option>
+                       <option value="CSA">CSA — Computer Science A</option>
+                </select>
+
+                <button type="button" id="addCourseBtn"
+                    class="px-3 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none text-sm"
+                    onclick="(async ()=>{ const sel=document.getElementById('coursesSelect'); if(sel && sel.value){ addCourseToUI(sel.value); sel.selectedIndex=0; checkForChanges(); } })()">
+                    Add Course
+                </button>
+
+                <button type="button" id="clearCoursesBtn"
+                    class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none text-sm"
+                    onclick="(async ()=>{ if(confirm('Clear all courses for your account?')){ await clearAllCourses(); checkForChanges(); } })()">
+                    Clear Courses
+                </button>
+            </div>
+        </div>
+
+        <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+            <!-- Course chips will be added here dynamically -->
+        </div>
+    </div>
+
     <!-- Classes Section -->
     <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <div class="flex justify-between items-center mb-4">
@@ -262,6 +295,55 @@ active_tab: profile
             });
         });
     });
+</script>
+
+<script type="module">
+    import { addCourse, removeCourse as removeCourseAPI, clearCourses as clearCoursesAPI } from '{{site.baseurl}}/assets/js/aesthetihawk/profile/addCourses.js';
+
+    // Expose wrappers used by inline onclick handlers for the Courses UI
+    window.addCourseToUI = async function(name) {
+        const container = document.getElementById('coursesContainer');
+        if (!container || !name) return;
+        const existing = Array.from(container.querySelectorAll('.course-item')).map(ci => ci.dataset.name);
+        if (existing.includes(name)) return;
+        try {
+            await addCourse(name);
+            const chip = document.createElement('div');
+            chip.className = 'course-item flex items-center justify-between bg-neutral-700 text-gray-200 px-3 py-1 rounded-lg';
+            chip.style.gap = '8px';
+            chip.dataset.name = name;
+            chip.innerHTML = `<span class="truncate mr-2">${name}</span><button type="button" class="text-red-400 hover:text-red-600 ml-2 text-sm" onclick="removeCourse(this)">Remove</button>`;
+            container.appendChild(chip);
+            if (typeof checkForChanges === 'function') checkForChanges();
+        } catch (err) {
+            console.error('Failed to add course via API:', err.message || err);
+        }
+    };
+
+    window.removeCourse = async function(button) {
+        const chip = button.closest('.course-item');
+        if (!chip) return;
+        const name = chip.dataset.name || chip.textContent.trim();
+        try {
+            await removeCourseAPI(name);
+            chip.remove();
+            if (typeof checkForChanges === 'function') checkForChanges();
+        } catch (err) {
+            console.error('Failed to remove course via API:', err.message || err);
+        }
+    };
+
+    window.clearAllCourses = async function() {
+        try {
+            await clearCoursesAPI();
+            const container = document.getElementById('coursesContainer');
+            if (container) container.innerHTML = `<p class="text-gray-400 text-center py-4">No courses selected.</p>`;
+            if (typeof checkForChanges === 'function') checkForChanges();
+        } catch (err) {
+            console.error('Failed to clear courses via API:', err.message || err);
+        }
+    };
+
 </script>
 
 <script type="module">
@@ -534,9 +616,32 @@ active_tab: profile
             const data = await response.json();
             currentUserClasses = data.class || [];
             renderClasses(currentUserClasses);
+            // also render courses (separate UI)
+            if (typeof renderCourses === 'function') renderCourses(currentUserClasses);
         } catch (error) {
             console.error('Error loading classes:', error);
         }
+    }
+
+    // Render courses as chips in the Courses section
+    function renderCourses(classes) {
+        const container = document.getElementById('coursesContainer');
+        if (!container) return;
+
+        if (!classes || classes.length === 0) {
+            container.innerHTML = `<p class="text-gray-400 text-center py-4">No courses selected.</p>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        classes.forEach(name => {
+            const chip = document.createElement('div');
+            chip.className = 'course-item flex items-center justify-between bg-neutral-700 text-gray-200 px-3 py-1 rounded-lg';
+            chip.style.gap = '8px';
+            chip.dataset.name = name;
+            chip.innerHTML = `<span class="truncate mr-2">${name}</span><button type="button" class="text-red-400 hover:text-red-600 ml-2 text-sm" onclick="removeCourse(this)">Remove</button>`;
+            container.appendChild(chip);
+        });
     }
 
     // Render classes in the UI
