@@ -2,7 +2,7 @@
 layout: cs-portfolio-lesson
 title: "Analytics — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson covering the admin dashboard, certificates, and mastery questions."
-permalink: /bigsix/analytics/main/
+permalink: /bigsix/analytics_lesson
 parent: "Analytics/Admin"
 team: "Curators"
 categories: [CSP, Analytics, Interactive]
