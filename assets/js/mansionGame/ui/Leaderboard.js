@@ -2,7 +2,7 @@
 export default class Leaderboard {
     constructor(gameControl, options = {}) {
         this.gameControl = gameControl;
-        this.API_BASE_URL = options.apiBaseUrl || '/gamer';
+        this.API_BASE_URL = options.apiBaseUrl || '/api/gamer';
         this.injectStyles();
         this.init();
     }
@@ -19,8 +19,9 @@ export default class Leaderboard {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 400px;
+    width: 350px;
     max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 100px);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -71,8 +72,9 @@ export default class Leaderboard {
 
 .leaderboard-content {
     background: white;
-    max-height: 600px;
+    max-height: 400px;
     overflow-y: auto;
+    display: none;
 }
 
 .leaderboard-actions {
@@ -177,14 +179,14 @@ export default class Leaderboard {
 
 .rank {
     font-weight: 700;
-    color: #fbfdffff;
+    color: #fdfeffff;
     font-size: 16px;
     width: 50px;
 }
 
 .username {
     font-weight: 600;
-    color: #ffffffff;
+    color: #f8fcffff;
 }
 
 .score {
@@ -300,9 +302,9 @@ export default class Leaderboard {
         leaderboardContainer.innerHTML = `
             <div class="leaderboard-header">
                 <h3>🏆 Leaderboard</h3>
-                <button id="toggle-leaderboard" class="toggle-btn">−</button>
+                <button id="toggle-leaderboard" class="toggle-btn">+</button>
             </div>
-            <div class="leaderboard-content">
+            <div class="leaderboard-content" style="display: none;">
                 <div class="leaderboard-actions">
                     <input type="text" id="username-input" placeholder="Username" />
                     <input type="number" id="score-input" placeholder="Score" min="0" />
@@ -325,7 +327,7 @@ export default class Leaderboard {
         listContainer.innerHTML = '<p class="loading">Loading...</p>';
         
         try {
-            // Correct endpoint: GET /gamer/leaderboard
+            // GET /api/gamer/leaderboard
             const response = await fetch(`${this.API_BASE_URL}/leaderboard`);
             
             if (!response.ok) {
@@ -387,9 +389,9 @@ export default class Leaderboard {
         }
         
         try {
-            // Correct endpoint: POST /gamer/updateScore
+            // POST /api/gamer/score
             // Backend expects: { username: string, score: int }
-            const response = await fetch(`${this.API_BASE_URL}/updateScore`, {
+            const response = await fetch(`${this.API_BASE_URL}/score`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -401,11 +403,12 @@ export default class Leaderboard {
             });
             
             if (response.ok) {
-                const message = await response.text();
-                alert(message || 'Score submitted successfully!');
+                alert('Score submitted successfully!');
                 document.getElementById('username-input').value = '';
                 document.getElementById('score-input').value = '';
                 this.fetchLeaderboard();
+            } else if (response.status === 404) {
+                alert('Player not found. Please register first!');
             } else {
                 const errorText = await response.text();
                 alert('Error: ' + errorText);
@@ -424,10 +427,10 @@ export default class Leaderboard {
         }
         
         try {
-            // Backend doesn't have a delete endpoint, so we update score to 0
+            // POST /api/gamer/score with score of 0
             // Note: Backend only updates if new score is HIGHER than current
-            // So this won't actually reset the score - you may need to add a delete endpoint
-            const response = await fetch(`${this.API_BASE_URL}/updateScore`, {
+            // For a proper reset, we need to add a DELETE endpoint to the backend
+            const response = await fetch(`${this.API_BASE_URL}/score`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -439,7 +442,7 @@ export default class Leaderboard {
             });
             
             if (response.ok) {
-                alert('Note: Backend only updates if score is higher. Score may not be reset.');
+                alert('Note: Score can only be updated if it\'s higher than current score.\nTo fully reset, you may need to add a DELETE endpoint to your backend.');
                 this.fetchLeaderboard();
             } else {
                 const errorText = await response.text();
