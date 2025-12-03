@@ -52,4 +52,8 @@ _posts/**/*_content.md
 _notebooks/**/*_csp.ipynb
 _notebooks/**/*_csa.ipynb
 _notebooks/**/*_csse.ipynb
+_notebooks/**/*_csp.md
+_notebooks/**/*_csa.md
+_notebooks/**/*_csse.md
+_notebooks/**/*_content.md
 
