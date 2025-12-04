@@ -43,3 +43,17 @@ _posts/**/*_DOCX_.md
 # Temporary DOCX files
 _docx/~$*
 *.tmp
+
+# Auto-generated course-specific files (build-time only)
+_posts/**/*_csp.md
+_posts/**/*_csa.md
+_posts/**/*_csse.md
+_posts/**/*_content.md
+_notebooks/**/*_csp.ipynb
+_notebooks/**/*_csa.ipynb
+_notebooks/**/*_csse.ipynb
+_notebooks/**/*_csp.md
+_notebooks/**/*_csa.md
+_notebooks/**/*_csse.md
+_notebooks/**/*_content.md
+

@@ -29,19 +29,6 @@
     box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
   }
 
-  @media (max-width: 600px) {
-    .admin-fab {
-      right: 1rem;
-      top: 5rem;
-      padding: 1.2rem 2.2rem;
-      font-size: 1.5rem;
-      min-width: 56px;
-      min-height: 56px;
-      border-radius: 50%;
-      box-shadow: 0 2px 12px rgba(240, 147, 251, 0.18);
-    }
-  }
-
   /* Side Panel */
   .admin-panel {
     position: fixed;
@@ -70,17 +57,25 @@
     visibility: visible;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     .admin-panel {
-      left: 0;
-      top: 0.5rem;
-      width: 100vw;
-      max-width: 100vw;
-      height: calc(100vh - 1rem);
-      transform: translateX(0) scale(1);
-      opacity: 1;
-      visibility: visible;
-      border-radius: 0;
+      width: 95vw;
+      max-width: 95vw;
+      height: 85vh;
+      border-radius: 12px;
+    }
+
+    .admin-fab {
+      right: 2rem;
+      top: 9rem;
+      bottom: auto;
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .admin-panel {
+      width: 1000px;
     }
   }
 
@@ -413,9 +408,58 @@
 </div>
 
 <script type="module">
+  import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   // Wait for DOM to be fully loaded
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', async function () {
     console.log("Admin panel script loaded.");
+
+    async function getCredentials() {
+      try {
+        const res = await fetch(`${pythonURI}/api/id`, {
+          ...fetchOptions,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const role = data.role;
+          console.log(role);
+          return role;
+        } else {
+          console.log(`Request failed for with status ${res.status}`);
+        }
+      } catch (err) {
+        console.log(`Error: ${err}`);
+      }
+    }
+
+    async function getUsers() {
+      try {
+        const res = await fetch(`${pythonURI}/api/user`, {
+          ...fetchOptions,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("In get users function", data)
+          return data;
+        } else {
+          console.log(`Request failed for with status ${res.status}`);
+        }
+      } catch (err) {
+        console.log(`Error: ${err}`);
+      }
+    }
+
+    const role = await getCredentials();
+    const users = await getUsers();
 
     // Admin panel open/close logic
     const adminPanel = document.getElementById('admin-panel');
@@ -426,6 +470,61 @@
       adminFab.addEventListener('click', function () {
         adminPanel.classList.add('open');
         adminFab.style.display = 'none';
+        console.log("Admin panel opened.");
+        console.log("Role:", role);
+        console.log("Users:", users);
+
+        // Show a message if the current user is not an admin
+        const container = document.getElementById('admin-container') || document.getElementById('admin-modal-content');
+
+        if (!role || String(role) !== 'Admin') {
+          container.innerHTML = '<p style="color:#de1010; font-size:16px;">This admin panel is only available to admin users.</p>';
+          return;
+        }
+
+        // If user is admin, render a 3-column table (Username, Completion, Notes)
+        if (role && String(role) === 'Admin') {
+          // small helper to escape HTML
+          function escapeHtml(str) {
+            return String(str || '')
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+          }
+
+          const container = document.getElementById('admin-container') || document.getElementById('admin-modal-content');
+          if (!container) {
+            console.warn('No admin container found to render admin table.');
+            return;
+          }
+
+          const rows = (Array.isArray(users) ? users : []).map(u => `\
+            <tr>\
+              <td>${escapeHtml(u.name || u.username || u.email || '(unknown)')}</td>\
+              <td><input type="text" class="completion-input" placeholder="Completion"></td>\
+              <td><textarea class="notes-input" placeholder="Notes"></textarea></td>\
+            </tr>\
+          `).join('');
+
+          const tableHtml = `\
+            <table id="admin-table">\
+              <thead>\
+                <tr>\
+                  <th>Username</th>\
+                  <th>Completion</th>\
+                  <th>Notes</th>\
+                </tr>\
+              </thead>\
+              <tbody>\
+                ${rows}\
+              </tbody>\
+            </table>\
+          `;
+
+          container.innerHTML = tableHtml;
+        }
       });
 
       adminCloseBtn.addEventListener('click', function () {

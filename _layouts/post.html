@@ -9,8 +9,7 @@ Check if this is a course lesson and determine which course context to use
 {% assign current_course = null %}
 {% assign current_week = null %}
 
-{% comment %}Default to first available course, will be overridden by JavaScript{% endcomment %}
-{% comment %}Set default course and will be updated by JavaScript{% endcomment %}
+{% comment %}Since files are now course-specific, get the single course{% endcomment %}
 {% if page.courses.csp %}
   {% assign current_course = 'csp' %}
   {% assign current_week = page.courses.csp.week | plus: 0 %}
@@ -35,694 +34,7 @@ Check if this is a course lesson and determine which course context to use
   {% assign posts = posts | concat: site.posts | concat: site.pages %}
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    /* Keep site header and navigation visible - removed hiding styles */
-    
-    /* Apply minimal body styles when lesson player is active */
-    body:has(.lesson-player) {
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Override any parent container constraints only for lesson player */
-    .lesson-player .container,
-    .lesson-player .main-content,
-    .lesson-player .wrapper {
-      max-width: none !important;
-      width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    .lesson-player {
-      display: flex;
-      height: calc(100vh - 80px);
-      width: 100vw;
-      position: fixed;
-      top: 80px;
-      left: 0;
-      z-index: 1000;
-    }
-
-    /* LEFT SIDEBAR */
-    .lesson-sidebar {
-      width: 500px;
-      border-right: 1px solid #222222;
-      background: #0f0f0f;
-      overflow-y: auto;
-      flex-shrink: 0;
-    }
-
-    .sidebar-header {
-      padding: 32px 24px;
-      border-bottom: 1px solid #222222;
-    }
-
-    .sidebar-header h2 {
-      color: #ffffff;
-      font-size: 1.25rem;
-      margin: 0 0 8px 0;
-    }
-
-    .sidebar-header p {
-      color: #999999;
-      margin: 0 0 16px 0;
-      font-size: 14px;
-    }
-
-    .course-progress-section {
-      margin-top: 16px;
-    }
-
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      color: #cccccc;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-
-    .progress-bar-sidebar {
-      width: 100%;
-      height: 8px;
-      background: #1a1a1a;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .progress-bar-sidebar-fill {
-      height: 100%;
-      background: #60a5fa;
-      transition: width 0.3s ease;
-    }
-
-    /* Course Selector */
-    .course-selector {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #222222;
-    }
-
-    .course-selector label {
-      display: block;
-      color: #cccccc;
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .course-selector select {
-      width: 100%;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 4px;
-      color: #e0e0e0;
-      padding: 8px;
-      font-size: 14px;
-    }
-
-    .course-selector select:focus {
-      outline: none;
-      border-color: #60a5fa;
-    }
-
-    /* Sprint Navigation */
-    .sprint-nav {
-      padding: 24px 16px;
-    }
-
-    .sprint-section {
-      margin-bottom: 8px;
-    }
-
-    .sprint-toggle {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px;
-      background: none;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-      text-align: left;
-    }
-
-    .sprint-toggle:hover {
-      background: #1a1a1a;
-    }
-
-    .sprint-chevron {
-      width: 16px;
-      height: 16px;
-      color: #999999;
-      flex-shrink: 0;
-    }
-
-    .sprint-info {
-      flex: 1;
-    }
-
-    .sprint-title {
-      color: #e0e0e0;
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
-
-    .sprint-weeks {
-      color: #60a5fa;
-      font-size: 12px;
-    }
-
-    .lesson-list {
-      margin-left: 24px;
-      margin-top: 4px;
-    }
-
-    .lesson-item {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 12px;
-      background: none;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-      text-align: left;
-      text-decoration: none;
-    }
-
-    .lesson-item:hover {
-      background: #151515;
-    }
-
-    .lesson-item.active {
-      background: #1a1a1a;
-    }
-
-    .lesson-item.active .lesson-title {
-      color: #ffffff;
-    }
-
-    .lesson-status-icon {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-
-    .lesson-status-icon.completed {
-      color: #60a5fa;
-    }
-
-    .lesson-status-icon.incomplete {
-      color: #444444;
-    }
-
-    .lesson-title {
-      color: #cccccc;
-      font-size: 14px;
-      flex: 1;
-    }
-
-    /* MAIN CONTENT AREA */
-    .lesson-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Top Bar */
-    .lesson-topbar {
-      border-bottom: 1px solid #222222;
-      background: #0a0a0a;
-      padding: 16px 24px;
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .back-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: transparent;
-      border: none;
-      color: #60a5fa;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .back-btn:hover {
-      background: #1a1a1a;
-      color: #93c5fd;
-    }
-
-    .breadcrumbs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #999999;
-      font-size: 14px;
-    }
-
-    .breadcrumbs .current {
-      color: #e0e0e0;
-    }
-
-    .topbar-progress {
-      width: 100%;
-      height: 4px;
-      background: #1a1a1a;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .topbar-progress-fill {
-      height: 100%;
-      background: #60a5fa;
-      width: 15%;
-      transition: width 0.3s ease;
-    }
-
-    /* Lesson Content */
-    .lesson-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 48px 64px;
-      background: #0a0a0a;
-    }
-
-    .lesson-content-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .lesson-header h1 {
-      color: #ffffff;
-      font-size: 2rem;
-      margin: 0 0 12px 0;
-    }
-
-    .lesson-meta {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      color: #60a5fa;
-      font-size: 14px;
-      margin-bottom: 32px;
-    }
-
-    .lesson-body {
-      color: #cccccc;
-      line-height: 1.7;
-    }
-
-    .lesson-body h2 {
-      color: #ffffff;
-      font-size: 1.5rem;
-      margin: 32px 0 16px 0;
-    }
-
-    .lesson-body h3 {
-      color: #ffffff;
-      font-size: 1.25rem;
-      margin: 24px 0 12px 0;
-    }
-
-    .lesson-body h4 {
-      color: #e0e0e0;
-      font-size: 1.1rem;
-      margin: 20px 0 10px 0;
-    }
-
-    .lesson-body p {
-      margin-bottom: 16px;
-    }
-
-    .lesson-body ul, .lesson-body ol {
-      margin-bottom: 16px;
-      padding-left: 24px;
-    }
-
-    .lesson-body li {
-      margin-bottom: 8px;
-    }
-
-    .lesson-body a {
-      color: #60a5fa;
-      text-decoration: none;
-    }
-
-    .lesson-body a:hover {
-      text-decoration: underline;
-    }
-
-    .lesson-body code {
-      background: #1a1a1a;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 0.9em;
-      color: #e0e0e0;
-    }
-
-    .lesson-body pre {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
-      padding: 16px;
-      overflow-x: auto;
-      margin-bottom: 16px;
-    }
-
-    .lesson-body pre code {
-      background: none;
-      padding: 0;
-    }
-
-    .lesson-body blockquote {
-      border-left: 4px solid #60a5fa;
-      padding-left: 16px;
-      margin-left: 0;
-      color: #999999;
-    }
-
-    .lesson-body img {
-      max-width: 100%;
-      border-radius: 8px;
-      margin: 16px 0;
-    }
-
-    .lesson-body table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 16px 0;
-    }
-
-    .lesson-body table th,
-    .lesson-body table td {
-      border: 1px solid #2a2a2a;
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    .lesson-body table th {
-      background: #1a1a1a;
-      color: #ffffff;
-    }
-
-    /* Assignment Submission Widget */
-    .assignment-submission {
-      margin-top: 48px;
-      padding: 24px;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 12px;
-    }
-
-    .assignment-submission h3 {
-      color: #ffffff;
-      font-size: 1.25rem;
-      margin: 0 0 16px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .assignment-submission-icon {
-      color: #60a5fa;
-    }
-
-    .submission-options {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .submission-tab {
-      padding: 8px 16px;
-      background: transparent;
-      border: 1px solid #2a2a2a;
-      border-radius: 6px;
-      color: #cccccc;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .submission-tab:hover {
-      background: #0f0f0f;
-      color: #ffffff;
-    }
-
-    .submission-tab.active {
-      background: #60a5fa;
-      color: #0a0a0a;
-      border-color: #60a5fa;
-    }
-
-    .submission-form {
-      display: none;
-    }
-
-    .submission-form.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      color: #e0e0e0;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-
-    .form-group input[type="text"],
-    .form-group input[type="url"],
-    .form-group textarea {
-      width: 100%;
-      padding: 10px 12px;
-      background: #0f0f0f;
-      border: 1px solid #2a2a2a;
-      border-radius: 6px;
-      color: #ffffff;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: #60a5fa;
-    }
-
-    .form-group textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .file-upload-area {
-      border: 2px dashed #2a2a2a;
-      border-radius: 8px;
-      padding: 32px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .file-upload-area:hover {
-      border-color: #60a5fa;
-      background: #0f0f0f;
-    }
-
-    .file-upload-area.dragover {
-      border-color: #60a5fa;
-      background: #0f0f0f;
-    }
-
-    .file-upload-icon {
-      font-size: 48px;
-      color: #60a5fa;
-      margin-bottom: 12px;
-    }
-
-    .file-upload-text {
-      color: #cccccc;
-      margin-bottom: 8px;
-    }
-
-    .file-upload-hint {
-      color: #666666;
-      font-size: 12px;
-    }
-
-    .file-list {
-      margin-top: 16px;
-    }
-
-    .file-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      background: #0f0f0f;
-      border-radius: 6px;
-      margin-bottom: 8px;
-    }
-
-    .file-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .file-name {
-      color: #e0e0e0;
-      font-size: 14px;
-    }
-
-    .file-size {
-      color: #999999;
-      font-size: 12px;
-    }
-
-    .remove-file {
-      background: transparent;
-      border: none;
-      color: #999999;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-
-    .remove-file:hover {
-      background: #1a1a1a;
-      color: #ff6b6b;
-    }
-
-    .submit-btn {
-      padding: 12px 24px;
-      background: #60a5fa;
-      color: #0a0a0a;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .submit-btn:hover {
-      background: #93c5fd;
-    }
-
-    .submit-btn:disabled {
-      background: #2a2a2a;
-      color: #666666;
-      cursor: not-allowed;
-    }
-
-    .submission-status {
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 6px;
-      display: none;
-    }
-
-    .submission-status.success {
-      display: block;
-      background: rgba(96, 165, 250, 0.1);
-      border: 1px solid #60a5fa;
-      color: #60a5fa;
-    }
-
-    .submission-status.error {
-      display: block;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid #ef4444;
-      color: #ef4444;
-    }
-
-    /* Bottom Navigation */
-    .lesson-bottom {
-      border-top: 1px solid #222222;
-      background: #0f0f0f;
-      padding: 24px 64px;
-    }
-
-    .lesson-bottom-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .bottom-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 14px;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #2a2a2a;
-      color: #e0e0e0;
-    }
-
-    .btn-outline:hover {
-      background: #1a1a1a;
-      color: #ffffff;
-    }
-
-    .btn-primary {
-      background: #60a5fa;
-      color: #0a0a0a;
-    }
-
-    .btn-primary:hover {
-      background: #93c5fd;
-    }
-
-    @media (max-width: 768px) {
-      .lesson-sidebar {
-        display: none;
-      }
-      
-      .lesson-content {
-        padding: 16px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/assets/css/lesson-player.css">
 
   <div class="lesson-player">
     <!-- LEFT SIDEBAR -->
@@ -736,29 +48,6 @@ Check if this is a course lesson and determine which course context to use
           <h2>Computer Science & Software Engineering</h2>
         {% endif %}
         <p>Del Norte High School</p>
-        
-        {% comment %}Course selector for multi-course lessons{% endcomment %}
-        {% assign course_count = 0 %}
-        {% if page.courses.csp %}{% assign course_count = course_count | plus: 1 %}{% endif %}
-        {% if page.courses.csa %}{% assign course_count = course_count | plus: 1 %}{% endif %}
-        {% if page.courses.csse %}{% assign course_count = course_count | plus: 1 %}{% endif %}
-        
-        {% if course_count > 1 %}
-          <div class="course-selector">
-            <label for="course-select">Switch Course View:</label>
-            <select id="course-select" onchange="switchCourse()">
-              {% if page.courses.csp %}
-                <option value="csp" {% if current_course == 'csp' %}selected{% endif %}>Computer Science Principles</option>
-              {% endif %}
-              {% if page.courses.csa %}
-                <option value="csa" {% if current_course == 'csa' %}selected{% endif %}>Computer Science A</option>
-              {% endif %}
-              {% if page.courses.csse %}
-                <option value="csse" {% if current_course == 'csse' %}selected{% endif %}>CS & Software Engineering</option>
-              {% endif %}
-            </select>
-          </div>
-        {% endif %}
         
         <div class="course-progress-section">
           <div class="progress-label">
@@ -779,7 +68,7 @@ Check if this is a course lesson and determine which course context to use
           
           {% if sprint %}
             <div class="sprint-section">
-              <button class="sprint-toggle" onclick="toggleSprint({{ i }})">
+              <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')">
                 <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
                 <div class="sprint-info">
                   <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
@@ -791,15 +80,25 @@ Check if this is a course lesson and determine which course context to use
                 {% for week in (sprint.start..sprint.end) %}
                   {% for post in posts %}
                     {% if post.courses[current_course] %}
-                      {% assign postWeek = post.courses[current_course].week | plus: 0 %}
-                      {% if postWeek == week %}
-                        <a href="{{ site.baseurl }}{{ post.url }}" 
-                           class="lesson-item {% if page.url == post.url %}active{% endif %}"
-                           data-lesson-id="{{ post.url }}">
-                          <i class="fas fa-circle lesson-status-icon incomplete"></i>
-                          <span class="lesson-title">{{ post.title }}</span>
-                        </a>
-                      {% endif %}
+                      {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
+                      {% unless post.path contains "_IPYNB_2_.md" %}
+                        {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                        {% assign course_count = 0 %}
+                        {% for course in post.courses %}
+                          {% assign course_count = course_count | plus: 1 %}
+                        {% endfor %}
+                        {% if course_count == 1 %}
+                          {% assign postWeek = post.courses[current_course].week | plus: 0 %}
+                          {% if postWeek == week %}
+                            <a href="{{ site.baseurl }}{{ post.url }}" 
+                               class="lesson-item {% if page.url == post.url %}active{% endif %}"
+                               data-lesson-id="{{ post.url }}">
+                              <i class="fas fa-circle lesson-status-icon incomplete"></i>
+                              <span class="lesson-title">{{ post.title }}</span>
+                            </a>
+                          {% endif %}
+                        {% endif %}
+                      {% endunless %}
                     {% endif %}
                   {% endfor %}
                 {% endfor %}
@@ -965,16 +264,35 @@ Check if this is a course lesson and determine which course context to use
     </div>
   </div>
 
+  <!-- Floating hamburger menu (mobile only) -->
+  <button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Timeline modal overlay -->
+  <div class="timeline-modal-overlay" id="timeline-modal-overlay"></div>
+
+  <!-- Timeline modal (mobile only) -->
+  <div class="timeline-modal" id="timeline-modal">
+    <div class="timeline-modal-header">
+      <h3>Course Timeline</h3>
+      <button class="timeline-close-btn" id="timeline-close-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="timeline-modal-content" id="timeline-modal-content">
+      <!-- Sprint cards will be populated by JavaScript -->
+    </div>
+  </div>
+
   <script>
-    // Simple course detection from URL parameter or default
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlCourse = urlParams.get('course');
-    let CURRENT_COURSE = urlCourse || '{{ current_course }}';
-    let currentWeek = {{ current_week }};
+    // Course is now determined by the specific file being viewed
+    const CURRENT_COURSE = '{{ current_course }}';
+    const currentWeek = '{{ current_week }}';
     
     const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
-    const currentUrl = window.location.pathname;
-    const currentLessonId = currentUrl;
+    // Use consistent lesson ID format (URL path without baseurl)
+    const currentLessonId = '{{ page.url }}';
 
     // Toggle sprint expansion
     function toggleSprint(sprintId) {
@@ -1014,11 +332,17 @@ Check if this is a course lesson and determine which course context to use
     // Toggle lesson completion
     function toggleComplete() {
       const completionData = loadCompletionData();
-      completionData[currentLessonId] = !completionData[currentLessonId];
+      const isCompleted = completionData[currentLessonId] || false;
+      completionData[currentLessonId] = !isCompleted;
       saveCompletionData(completionData);
       
       updateCompleteButton();
       updateUI();
+      
+      // Trigger cross-view sync by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId: currentLessonId, completed: !isCompleted }
+      }));
     }
 
     // Update the complete button state
@@ -1086,40 +410,6 @@ Check if this is a course lesson and determine which course context to use
       }
     }
 
-    // Update course-dependent UI elements
-    function updateCourseUI() {
-      const courseNames = {
-        'csp': 'Computer Science Principles',
-        'csa': 'Computer Science A', 
-        'csse': 'Computer Science & Software Engineering'
-      };
-      
-      // Update header title
-      const headerTitle = document.querySelector('.sidebar-header h2');
-      if (headerTitle && courseNames[CURRENT_COURSE]) {
-        headerTitle.textContent = courseNames[CURRENT_COURSE];
-      }
-      
-      // Update course selector
-      const courseSelect = document.getElementById('course-select');
-      if (courseSelect) {
-        courseSelect.value = CURRENT_COURSE;
-      }
-    }
-    
-    // Switch course context
-    function switchCourse() {
-      const select = document.getElementById('course-select');
-      const newCourse = select.value;
-      
-      // Update URL with course parameter
-      const url = new URL(window.location);
-      url.searchParams.set('course', newCourse);
-      window.location.href = url.toString();
-    }
-
-
-
     // Hide site header and apply lesson player styling
     function initLessonPlayer() {
       // Apply minimal body styles for lesson player (keep header visible)
@@ -1127,7 +417,7 @@ Check if this is a course lesson and determine which course context to use
       document.body.style.padding = '0';
     }
 
-    // Sync completion data when window gains focus (when switching between views)
+    // Sync completion data when window gains focus or becomes visible (when switching between views)
     window.addEventListener('focus', function() {
       if (document.querySelector('.lesson-player')) {
         updateCompleteButton();
@@ -1135,6 +425,194 @@ Check if this is a course lesson and determine which course context to use
       }
     });
     
+    // Also sync when page becomes visible (handles tab switching)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Listen for storage changes from other tabs/windows (cross-tab sync)
+    window.addEventListener('storage', function(e) {
+      if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Listen for completion changes from other views (same-window sync)
+    window.addEventListener('completionChanged', function(e) {
+      if (document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Mobile floating menu functionality
+    function initMobileEnhancements() {
+      const floatingBtn = document.getElementById('floating-menu-btn');
+      const timelineModal = document.getElementById('timeline-modal');
+      const overlay = document.getElementById('timeline-modal-overlay');
+      const closeBtn = document.getElementById('timeline-close-btn');
+      const modalContent = document.getElementById('timeline-modal-content');
+      
+      if (window.innerWidth <= 768) {
+        // Show floating button on mobile
+        if (floatingBtn) floatingBtn.style.display = 'flex';
+        
+        // Populate timeline modal
+        populateTimelineModal();
+        
+        // Open timeline modal
+        function openTimelineModal() {
+          timelineModal.classList.add('open');
+          overlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+        
+        // Close timeline modal
+        function closeTimelineModal() {
+          timelineModal.classList.remove('open');
+          overlay.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+        
+        // Event listeners
+        floatingBtn.addEventListener('click', openTimelineModal);
+        closeBtn.addEventListener('click', closeTimelineModal);
+        overlay.addEventListener('click', closeTimelineModal);
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && timelineModal.classList.contains('open')) {
+            closeTimelineModal();
+          }
+        });
+        
+        // Close when lesson is selected
+        modalContent.addEventListener('click', function(e) {
+          if (e.target.closest('.modal-lesson-item')) {
+            closeTimelineModal();
+          }
+        });
+        
+      } else {
+        // Desktop - hide floating button
+        if (floatingBtn) floatingBtn.style.display = 'none';
+      }
+    }
+    
+    // Populate timeline modal by reading all lesson items and grouping by sprint
+    function populateTimelineModal() {
+      const modalContent = document.getElementById('timeline-modal-content');
+      const completionData = loadCompletionData();
+      
+      if (!modalContent) return;
+      
+      modalContent.innerHTML = '';
+      
+      // Get ALL lesson items from the sidebar (including hidden/collapsed ones)
+      const allLessonItems = document.querySelectorAll('.lesson-item');
+      const sprintGroups = {};
+      
+      // Group lessons by their parent sprint
+      allLessonItems.forEach(item => {
+        const lessonId = item.dataset.lessonId;
+        const lessonTitle = item.querySelector('.lesson-title').textContent;
+        const isCompleted = completionData[lessonId] || false;
+        const isActive = item.classList.contains('active');
+        
+        // Find the sprint this lesson belongs to
+        const sprintSection = item.closest('.sprint-section');
+        if (sprintSection) {
+          const sprintTitle = sprintSection.querySelector('.sprint-title').textContent;
+          
+          if (!sprintGroups[sprintTitle]) {
+            sprintGroups[sprintTitle] = [];
+          }
+          
+          sprintGroups[sprintTitle].push({
+            id: lessonId,
+            title: lessonTitle,
+            url: item.href,
+            completed: isCompleted,
+            active: isActive
+          });
+        }
+      });
+      
+      // Create sprint cards for each group
+      Object.keys(sprintGroups).forEach(sprintTitle => {
+        const lessons = sprintGroups[sprintTitle];
+        const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
+        
+        const sprintCard = document.createElement('div');
+        sprintCard.className = 'modal-sprint-card';
+        
+        sprintCard.innerHTML = `
+          <div class="modal-sprint-header">
+            <h3 class="modal-sprint-title">${sprintTitle}</h3>
+            <button class="modal-sprint-toggle" onclick="toggleModalSprint('${sprintId}')">
+              <i class="fas fa-chevron-down"></i> View Lessons
+            </button>
+          </div>
+          <div class="modal-lessons" id="modal-${sprintId}">
+            ${lessons.map(lesson => `
+              <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
+                <i class="fas ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+                <span class="modal-lesson-title">${lesson.title}</span>
+              </a>
+            `).join('')}
+          </div>
+        `;
+        
+        modalContent.appendChild(sprintCard);
+        
+        // Auto-expand sprint with active lesson
+        const hasActiveLesson = lessons.some(lesson => lesson.active);
+        if (hasActiveLesson) {
+          setTimeout(() => {
+            const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+            if (lessonsContainer) {
+              lessonsContainer.classList.add('expanded');
+              const toggleBtn = sprintCard.querySelector('.modal-sprint-toggle i');
+              if (toggleBtn) {
+                toggleBtn.classList.remove('fa-chevron-down');
+                toggleBtn.classList.add('fa-chevron-up');
+              }
+            }
+          }, 0);
+        }
+      });
+    }
+    
+    // Toggle sprint expansion in modal
+    function toggleModalSprint(sprintId) {
+      const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+      const toggleBtn = document.querySelector(`[onclick="toggleModalSprint('${sprintId}')"] i`);
+      
+      if (lessonsContainer && toggleBtn) {
+        lessonsContainer.classList.toggle('expanded');
+        
+        if (lessonsContainer.classList.contains('expanded')) {
+          toggleBtn.classList.remove('fa-chevron-down');
+          toggleBtn.classList.add('fa-chevron-up');
+        } else {
+          toggleBtn.classList.remove('fa-chevron-up');
+          toggleBtn.classList.add('fa-chevron-down');
+        }
+      }
+    }
+    
+    // Make toggle function globally available
+    window.toggleModalSprint = toggleModalSprint;
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      initMobileEnhancements();
+    });
+
     // Auto-expand current sprint
     document.addEventListener('DOMContentLoaded', function() {
       // Only initialize lesson player mode if we're in a lesson player
@@ -1155,6 +633,7 @@ Check if this is a course lesson and determine which course context to use
       
       updateCompleteButton();
       updateUI();
+      initMobileEnhancements();
     });
 
     // Assignment submission handlers
