@@ -104,12 +104,12 @@ function updateNavigation(isLoggedIn) {
         const href = link.getAttribute('href');
         
         // Replace Blogs with Courses for logged-in users
-        if (href && href.includes('/navigation/blog')) {
+        if (href && href.includes('/navigation/blogs')) {
             if (isLoggedIn) {
                 link.setAttribute('href', `${baseurl}/navigation/courses/`);
                 link.textContent = 'Courses';
             } else {
-                link.setAttribute('href', `${baseurl}/navigation/blog/`);
+                link.setAttribute('href', `${baseurl}/navigation/blogs/`);
                 link.textContent = 'Blogs';
             }
         }
