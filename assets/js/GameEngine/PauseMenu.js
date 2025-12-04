@@ -8,9 +8,13 @@ export default class PauseMenu {
             cssPath: '/assets/css/pause-menu.css'
         }, options);
 
-        // configurable counter variable and label
-        this.counterVar = this.options.counterVar || 'levelsCompleted';
-        this.counterLabelText = this.options.counterLabel || 'Levels completed';
+    // configurable counter variable and label
+    this.counterVar = this.options.counterVar || 'levelsCompleted';
+    this.counterLabelText = this.options.counterLabel || 'Levels completed';
+    // single logical score variable name for PauseMenu; can be mapped to any game stat
+    this.scoreVar = this.options.scoreVar || this.counterVar;
+    // local cached score value (kept in sync with gameControl.stats when present)
+    this.score = 0;
 
         this._ensureCssLoaded();
         this._createDom();
@@ -40,10 +44,42 @@ export default class PauseMenu {
                 // Keep this.stats as a mirror of gameControl.stats when present.
                 if (!this.gameControl.stats) this.gameControl.stats = Object.assign({ levelsCompleted: 0, points: 0 }, this.gameControl.stats || {});
                 this.stats = this.gameControl.stats;
+                // initialize our local score from the (possibly loaded) stats
+                try { this._updateStatsDisplay(); } catch (e) { /* ignore */ }
             }
         } catch (e) {
             console.warn('PauseMenu: could not initialize stats on gameControl', e);
         }
+    }
+
+    // Returns whether per-level mode is enabled. Preference order:
+    // 1. explicit option on this.options
+    // 2. per-game option on gameControl.pauseMenuOptions
+    // 3. default false
+    isPerLevelMode() {
+        if (this.options && typeof this.options.counterPerLevel !== 'undefined') return !!this.options.counterPerLevel;
+        if (this.gameControl && this.gameControl.pauseMenuOptions && typeof this.gameControl.pauseMenuOptions.counterPerLevel !== 'undefined') return !!this.gameControl.pauseMenuOptions.counterPerLevel;
+        return false;
+    }
+
+    // Set per-level mode programmatically. This updates both local options and the gameControl's pauseMenuOptions
+    // so the mode is consistent for persistence and future PauseMenu instances.
+    setPerLevelMode(enabled) {
+        const flag = !!enabled;
+        if (!this.options) this.options = {};
+        this.options.counterPerLevel = flag;
+        try {
+            if (this.gameControl && this.gameControl.pauseMenuOptions) {
+                this.gameControl.pauseMenuOptions.counterPerLevel = flag;
+            }
+        } catch (e) { /* ignore */ }
+        // refresh UI and persist
+        this._updateStatsDisplay();
+        this._saveStatsToStorage();
+    }
+
+    togglePerLevelMode() {
+        this.setPerLevelMode(!this.isPerLevelMode());
     }
 
     _storageKey() {
@@ -109,7 +145,7 @@ export default class PauseMenu {
         const panel = document.createElement('div');
         panel.className = 'pause-panel';
 
-    // Prominent counter at the top showing configured counter
+    // Prominent counter at the top showing configured counter (single unified display)
     const counterWrap = document.createElement('div');
     counterWrap.className = 'pause-counter-wrap';
     const counterLabel = document.createElement('div');
@@ -140,25 +176,10 @@ export default class PauseMenu {
     btnExit.innerText = 'Exit to Home';
     btnExit.addEventListener('click', () => this._onExit());
 
-    // Stats display (levels completed / points). These are kept in gameControl.stats
-    const statsWrap = document.createElement('div');
-    statsWrap.className = 'pause-stats';
-
-    const levelsLabel = document.createElement('div');
-    levelsLabel.className = 'pause-stat levels';
-    levelsLabel.innerText = this.counterLabelText + ': 0';
-
-    const pointsLabel = document.createElement('div');
-    pointsLabel.className = 'pause-stat points';
-    pointsLabel.innerText = 'Points: 0';
-
-    statsWrap.appendChild(levelsLabel);
-    statsWrap.appendChild(pointsLabel);
-
+    // Only append the single counter and controls (remove duplicate stats area)
     panel.appendChild(counterWrap);
     panel.appendChild(title);
     panel.appendChild(btnResume);
-    panel.appendChild(statsWrap);
     panel.appendChild(btnSkipLevel);
     panel.appendChild(btnExit);
         overlay.appendChild(panel);
@@ -173,10 +194,8 @@ export default class PauseMenu {
             }
         };
 
-            // references to the stat nodes for updates
-            this._levelsLabel = levelsLabel;
-            this._pointsLabel = pointsLabel;
-            this._counterNumber = counterNumber;
+        // reference to the single counter node for updates
+        this._counterNumber = counterNumber;
     }
 
     show() {
@@ -290,10 +309,17 @@ export default class PauseMenu {
 
     _updateStatsDisplay() {
         try {
-            const lvl = (this.stats?.[this.counterVar] || 0);
-            if (this._levelsLabel) this._levelsLabel.innerText = this.counterLabelText + ': ' + lvl;
-            if (this._pointsLabel) this._pointsLabel.innerText = 'Points: ' + (this.stats?.points || 0);
-            if (this._counterNumber) this._counterNumber.innerText = String(lvl);
+            const cv = this.counterVar || 'levelsCompleted';
+            const perLevel = (this.options && this.options.counterPerLevel) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.counterPerLevel);
+            let val = 0;
+            if (perLevel) {
+                const levelKey = (this.gameControl && typeof this.gameControl.currentLevelIndex !== 'undefined') ? String(this.gameControl.currentLevelIndex) : ((this.gameControl && this.gameControl.currentLevel && this.gameControl.currentLevel.id) || '0');
+                val = (this.stats && this.stats.levels && (this.stats.levels[levelKey] || 0)) || 0;
+            } else {
+                val = (this.stats && typeof this.stats[cv] !== 'undefined') ? (this.stats[cv] || 0) : (this.gameControl && typeof this.gameControl[cv] !== 'undefined' ? (this.gameControl[cv] || 0) : 0);
+            }
+            this.score = val;
+            if (this._counterNumber) this._counterNumber.innerText = String(val);
         } catch (e) {
             /* ignore */
         }

@@ -26,6 +26,8 @@ class GameControl {
         counterVar: 'levelsCompleted',
         counterLabel: 'Levels completed'
     };
+    // Whether to show per-level counts. We want a single cumulative counter for levels completed.
+    this.pauseMenuOptions.counterPerLevel = false;
     // use a unique storage key so stats are per-game
     this.pauseMenuOptions.storageKey = 'pauseMenuStats:adventure';
     this.skipKeyListener = this.handleSkipKey.bind(this);
@@ -168,11 +170,19 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
-        // Increment configured per-game counter (PauseMenu displays this variable)
+        // Increment configured per-game counter (PauseMenu displays this variable).
         try {
             const cv = (this.pauseMenuOptions && this.pauseMenuOptions.counterVar) || 'levelsCompleted';
-            this[cv] = (this[cv] || 0) + 1;
-            if (this.stats) this.stats[cv] = this[cv];
+            const perLevel = (this.pauseMenuOptions && this.pauseMenuOptions.counterPerLevel) || false;
+            if (!this.stats) this.stats = {};
+            if (perLevel) {
+                if (!this.stats.levels) this.stats.levels = {};
+                const levelKey = (typeof this.currentLevelIndex !== 'undefined') ? String(this.currentLevelIndex) : ((this.currentLevel && this.currentLevel.id) || '0');
+                this.stats.levels[levelKey] = (this.stats.levels[levelKey] || 0) + 1;
+            } else {
+                this[cv] = (this[cv] || 0) + 1;
+                this.stats[cv] = this[cv];
+            }
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
             if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) { /* ignore */ }
