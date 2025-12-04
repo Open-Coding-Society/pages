@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Group 1",
+    "period": "1",
+    "members": [
+      "Ava Thompson",
+      "Liam Rodriguez",
+      "Sophia Bennett",
+      "Ethan Collins",
+      "Mia Patterson",
+      "Noah Greene"
+    ]
+  },
+  {
+    "name": "Group 2",
+    "period": "2",
+    "members": [
+      "Oliver Hayes",
+      "Isabella Cruz",
+      "James Foster",
+      "Charlotte Rivera",
+      "Benjamin Reed",
+      "Harper Sullivan"
+    ]
+  },
+  {
+    "name": "Group 3",
+    "period": "3",
+    "members": [
+      "Elijah Cooper",
+      "Amelia Brooks",
+      "Lucas Morgan",
+      "Evelyn Price",
+      "Henry Bailey",
+      "Abigail Torres"
+    ]
+  },
+  {
+    "name": "Group 4",
+    "period": "4",
+    "members": [
+      "Alexander Gray",
+      "Scarlett Holmes",
+      "William Ortiz",
+      "Emily Chambers",
+      "Michael Barrett",
+      "Victoria Shaw"
+    ]
+  },
+  {
+    "name": "Group 5",
+    "period": "5",
+    "members": [
+      "Daniella Avanzani",
+      "Yoonchae Jeung",
+      "Manon Bannerman",
+      "Sophia Laforteza",
+      "Megan Skiendiel",
+      "Lara Rajagopalan"
+    ]
+  }
+]

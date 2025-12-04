@@ -100,139 +100,76 @@ active_tab: profile
         </div>
     </div>
 
-    <!-- Classes Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Classes</h2>
-            <button type="button" id="addClassBtn"
-                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
-                Add Class
-            </button>
-        </div>
-    
-        <div id="classesContainer">
-            <!-- Classes will be loaded here dynamically -->
-            <p class="text-gray-400 text-center py-4">Loading classes...</p>
+<!-- TODO: Create a div that uses the similar style as the rest of the divs above this. It should display the group that the current user is a part of. View the code above this page to see how to get the username of the current user. Then pull from pythonuri/api/user to see which sections, periods, and groups the current user is in. -->
+<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <h2 class="text-xl font-semibold mb-6">Class Information</h2>
+
+    <div id="groupContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
+            Loading class information...
         </div>
     </div>
+</div>
 
-    <!-- Group Management Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-        <h2 class="text-xl font-semibold mb-6">Group Management</h2>
+<script type="module">
+    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
 
-        <!-- Create New Group Section -->
-        <div class="bg-neutral-900 rounded-lg p-6 mb-8 border border-neutral-700">
-            <h3 class="text-lg font-semibold mb-6 text-gray-300">Create New Group</h3>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const groupContainer = document.getElementById('groupContainer');
+        const uidInput = document.getElementById('uidChangeInput');
 
-            <!-- Class Period -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Class Period</label>
-                <select class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option class="text-gray-500">Select class period</option>
-                    <option class="text-gray-300">Period 1</option>
-                    <option class="text-gray-300">Period 2</option>
-                    <option class="text-gray-300">Period 3</option>
-                    <option class="text-gray-300">Period 4</option>
-                    <option class="text-gray-300">Period 5</option>
-                </select>
-            </div>
+        // Wait briefly for the main profile script (setUserData) to populate the UID
+        let attempts = 0;
+        while (!uidInput.value && attempts < 20) {
+            await new Promise(r => setTimeout(r, 100));
+            attempts++;
+        }
 
-            <!-- Group Name -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Group Name</label>
-                <input type="text" placeholder="e.g., Curators" class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
+        const currentUid = uidInput.value;
 
-            <!-- Group Members -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Group Members</label>
-                <div class="flex gap-2">
-                    <input type="text" placeholder="Enter member name" class="flex-1 px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button type="button" class="px-6 py-3 bg-neutral-800 border border-neutral-600 text-gray-300 font-medium rounded-lg hover:bg-neutral-700 transition-colors">
-                        Add
-                    </button>
-                </div>
-            </div>
+        if (!currentUid) {
+            groupContainer.innerHTML = `<p class="text-gray-400 col-span-2">Unable to verify user identity for group data.</p>`;
+            return;
+        }
 
-            <!-- Create Group Button -->
-            <button type="button" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
-                Create Group
-            </button>
-        </div>
+        try {
+            // Fetch all users to find the current one (based on prompt instructions)
+            const response = await fetch(`${pythonURI}/api/user`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
 
-        <!-- Existing Groups Section -->
-        <div>
-            <h3 class="text-lg font-semibold mb-6 text-gray-300">Existing Groups</h3>
+            if (!response.ok) throw new Error('Failed to fetch user data');
 
-            <!-- Period Tabs -->
-            <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-neutral-700">
-                <button class="px-6 py-2 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
-                    All
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 1
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 2
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 3
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 4
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 5
-                </button>
-            </div>
+            const users = await response.json();
+            const currentUser = users.find(user => user.uid === currentUid);
 
-            <!-- Groups Table -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-neutral-700">
-                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Group Name</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Class Period</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Members</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Curators</td>
-                            <td class="py-4 px-4 text-gray-400">Period 1</td>
-                            <td class="py-4 px-4 text-gray-400">2</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Researchers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 1</td>
-                            <td class="py-4 px-4 text-gray-400">3</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Designers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 2</td>
-                            <td class="py-4 px-4 text-gray-400">2</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Developers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 3</td>
-                            <td class="py-4 px-4 text-gray-400">3</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Analysts</td>
-                            <td class="py-4 px-4 text-gray-400">Period 4</td>
-                            <td class="py-4 px-4 text-gray-400">1</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Writers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 5</td>
-                            <td class="py-4 px-4 text-gray-400">2</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</form>
+            if (currentUser && currentUser.sections && currentUser.sections.length > 0) {
+                // Map sections to the grid layout matching the form style
+                groupContainer.innerHTML = currentUser.sections.map(section => `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Class Name</label>
+                        <input type="text" readonly
+                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
+                            value="${section.name}">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Details</label>
+                        <input type="text" readonly
+                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
+                            value="${section.abbreviation} (${section.year})">
+                    </div>
+                `).join('');
+            } else {
+                groupContainer.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No active groups or sections found.</p>`;
+            }
+        } catch (error) {
+            console.error("Error loading group info:", error);
+            groupContainer.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
+        }
+    });
+</script>
 
 <div class="flex justify-between items-center mb-8">
     <button id="saveChangesBtn" disabled
@@ -295,7 +232,7 @@ active_tab: profile
         const changePfpBox = document.getElementById('change-pfp');
         console.log("Change pfp button clicked");
         if (changePfpBox) {
-            changePfpBox.style.visibility = 'visible'; // Make the modal visible
+            changePfpBox.style.visibility = 'visible';
         } else {
             console.error('Change PFP modal not found in the DOM.');
         }
