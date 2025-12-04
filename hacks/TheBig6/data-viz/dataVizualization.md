@@ -2,7 +2,7 @@
 layout: cs-portfolio-lesson
 title: "Data Visualization — All-in-One Interactive Lesson"
 description: "Compact lesson combining REST APIs, Spring Boot, CRUD, search, filtering, pagination, and data queries"
-permalink: /bigsix/dataviz/main/
+permalink: /bigsix/dataviz_lesson
 parent: "Data Visualization"
 team: "Applicators"
 categories: [CSP, DataVisualization, Interactive]
