@@ -15,7 +15,7 @@ lxdData:
       Level: 1
       Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
       Categories: ["Frontend", "HTML", "CSS","Javascript"]
-      Lessons: "/bigsix/frontend/main/"
+      Lessons: "/bigsix/frontend/frontend_lesson/"
       LessonCount: 6
       Image: "/images/cs-portfolio-quest/frontend/mainpage.png"
       Alt: "CS Portfolio Quest Frontend"
@@ -42,7 +42,7 @@ lxdData:
       Level: 4
       Description: "Learn to write about your CS projects for inclusion on your resume, both in technical and non-technical terms"
       Categories: ["CV", "Resume", "Blogging"]
-      Lessons: "/bigsix/resume/main/"
+      Lessons: "/bigsix/resume/resume_lesson/"
       Image: "/images/cs-portfolio-quest/resume/ModuleBackground.png"
       Alt: "CS Portfolio Quest Resume"
     - Title: "C5: AI Usage"
