@@ -166,7 +166,7 @@ hide: true
 
   ////////// event control /////////
 
-// Add event listener for keydown events
+// Add event listener for keydown event
   window.addEventListener("keydown", (event) => {
       const activeElement = document.activeElement;
       const isTyping = activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA";

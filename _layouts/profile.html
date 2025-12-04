@@ -8,7 +8,6 @@ active_tab: profile
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/shake.css">
 </head>
 
-
 <form id="profileSettingsForm">
     <!-- Personal Information Section -->
     <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
@@ -106,39 +105,130 @@ active_tab: profile
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Classes</h2>
             <button type="button" id="addClassBtn"
-                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
-                onclick="addClass()">
+                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
                 Add Class
             </button>
         </div>
-
+    
         <div id="classesContainer">
-            <!-- Classes will be added here dynamically -->
-            <div class="class-entry mb-4 p-4 border rounded-lg border-neutral-700 border">
-                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                    <div class="flex-grow mb-2 md:mb-0">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Class
-                            Name</label>
-                        <input type="text"
-                            class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            value="Computer Science" onchange="checkForChanges()">
-                    </div>
-                    <div class="w-full md:w-1/3">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Year</label>
-                        <select
-                            class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            onchange="checkForChanges()">
-                            <option>2025</option>
-                            <option>2026</option>
-                            <option>2027</option>
-                            <option>2028</option>
-                        </select>
-                    </div>
+            <!-- Classes will be loaded here dynamically -->
+            <p class="text-gray-400 text-center py-4">Loading classes...</p>
+        </div>
+    </div>
+
+    <!-- Group Management Section -->
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Group Management</h2>
+
+        <!-- Create New Group Section -->
+        <div class="bg-neutral-900 rounded-lg p-6 mb-8 border border-neutral-700">
+            <h3 class="text-lg font-semibold mb-6 text-gray-300">Create New Group</h3>
+
+            <!-- Class Period -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-300 mb-2">Class Period</label>
+                <select class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option class="text-gray-500">Select class period</option>
+                    <option class="text-gray-300">Period 1</option>
+                    <option class="text-gray-300">Period 2</option>
+                    <option class="text-gray-300">Period 3</option>
+                    <option class="text-gray-300">Period 4</option>
+                    <option class="text-gray-300">Period 5</option>
+                </select>
+            </div>
+
+            <!-- Group Name -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-300 mb-2">Group Name</label>
+                <input type="text" placeholder="e.g., Curators" class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Group Members -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-300 mb-2">Group Members</label>
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Enter member name" class="flex-1 px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button type="button" class="px-6 py-3 bg-neutral-800 border border-neutral-600 text-gray-300 font-medium rounded-lg hover:bg-neutral-700 transition-colors">
+                        Add
+                    </button>
                 </div>
-                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
-                    onclick="removeClass(this)">
-                    Remove
+            </div>
+
+            <!-- Create Group Button -->
+            <button type="button" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+                Create Group
+            </button>
+        </div>
+
+        <!-- Existing Groups Section -->
+        <div>
+            <h3 class="text-lg font-semibold mb-6 text-gray-300">Existing Groups</h3>
+
+            <!-- Period Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-neutral-700">
+                <button class="px-6 py-2 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
+                    All
                 </button>
+                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
+                    Period 1
+                </button>
+                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
+                    Period 2
+                </button>
+                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
+                    Period 3
+                </button>
+                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
+                    Period 4
+                </button>
+                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
+                    Period 5
+                </button>
+            </div>
+
+            <!-- Groups Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-neutral-700">
+                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Group Name</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Class Period</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Members</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
+                            <td class="py-4 px-4 text-gray-400">Curators</td>
+                            <td class="py-4 px-4 text-gray-400">Period 1</td>
+                            <td class="py-4 px-4 text-gray-400">2</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
+                            <td class="py-4 px-4 text-gray-400">Researchers</td>
+                            <td class="py-4 px-4 text-gray-400">Period 1</td>
+                            <td class="py-4 px-4 text-gray-400">3</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
+                            <td class="py-4 px-4 text-gray-400">Designers</td>
+                            <td class="py-4 px-4 text-gray-400">Period 2</td>
+                            <td class="py-4 px-4 text-gray-400">2</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
+                            <td class="py-4 px-4 text-gray-400">Developers</td>
+                            <td class="py-4 px-4 text-gray-400">Period 3</td>
+                            <td class="py-4 px-4 text-gray-400">3</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
+                            <td class="py-4 px-4 text-gray-400">Analysts</td>
+                            <td class="py-4 px-4 text-gray-400">Period 4</td>
+                            <td class="py-4 px-4 text-gray-400">1</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
+                            <td class="py-4 px-4 text-gray-400">Writers</td>
+                            <td class="py-4 px-4 text-gray-400">Period 5</td>
+                            <td class="py-4 px-4 text-gray-400">2</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -151,7 +241,6 @@ active_tab: profile
         Save Changes
     </button>
 </div>
-
 
 <!-- toasts -->
 <script type="module">
@@ -183,7 +272,6 @@ active_tab: profile
     // external functions
     import { getUserData } from '{{site.baseurl}}/assets/js/aesthetihawk/profile/getUserData.js';
     import { setUserData } from '{{site.baseurl}}/assets/js/aesthetihawk/profile/setUserData.js';
-
 
     // this runs on page load
     document.addEventListener("DOMContentLoaded", async () => {
@@ -230,7 +318,6 @@ active_tab: profile
         }
     };
 
-
     window.getUserData = getUserData; // get the data
     window.setUserData = setUserData; // setting the user data to display
     document.addEventListener("DOMContentLoaded", async () => {
@@ -241,7 +328,6 @@ active_tab: profile
         }
     });
 
-
     window.changeClass = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
         // change the class info p box
@@ -250,7 +336,6 @@ active_tab: profile
         const classDisplayedInfo = document.getElementById("classDisplayedInfo");
         classDisplayedInfo.textContent = classInput + " " + classInputYear;
     }
-
 
     window.changeProfilePicture = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
@@ -314,18 +399,42 @@ active_tab: profile
     }
 </script>
 
-<script>
+<script type="module">
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
     // Store original form values
     let originalValues = {};
     let formChanged = false;
+    let currentUserClasses = []; // ADD THIS LINE
 
     // how long toast stays (ms)
     const toastDuration = 10000;
 
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOMContentLoaded fired'); // ADD THIS
+        
         // Store original values
         saveOriginalValues();
+        
+        // Load user classes
+        loadUserClasses();
+
+        const form = document.getElementById('profileSettingsForm');
+        form.addEventListener('input', checkForChanges);
+        form.addEventListener('change', checkForChanges);
+
+        // Attach event listener to Add Class button
+        const addClassBtn = document.getElementById('addClassBtn');
+        console.log('Add Class Button:', addClassBtn); // ADD THIS
+        if (addClassBtn) {
+            addClassBtn.addEventListener('click', function() {
+                console.log('Add Class button clicked!'); // ADD THIS
+                addClass();
+            });
+        } else {
+            console.error('addClassBtn not found!'); // ADD THIS
+        }
 
         // Set up toggle switch
         const toggle = document.querySelector('#kasmChangeInput');
@@ -340,15 +449,8 @@ active_tab: profile
                 toggle.classList.remove('bg-blue-600');
             }
         });
-
-        // Set up beforeunload event
-        window.addEventListener('beforeunload', function (e) {
-            if (formChanged) {
-                showUnsavedChangesAlert();
-            }
-        });
     });
-
+    
     // Save original form values
     function saveOriginalValues() {
         const form = document.getElementById('profileSettingsForm');
@@ -382,14 +484,17 @@ active_tab: profile
 
         formChanged = false;
 
-        // Check standard inputs
+        // Check standard inputs - only compare if they have original values
         inputs.forEach(input => {
+            // Skip if this input doesn't have an id
+            if (!input.id) return;
+
             if (input.type === 'checkbox') {
-                if (originalValues[input.id] !== input.checked) {
+                if (originalValues[input.id] !== undefined && originalValues[input.id] !== input.checked) {
                     formChanged = true;
                 }
-            } else if (input.id && originalValues[input.id] !== undefined) {
-                if (originalValues[input.id] !== input.value) {
+            } else {
+                if (originalValues[input.id] !== undefined && originalValues[input.id] !== input.value) {
                     formChanged = true;
                 }
             }
@@ -397,19 +502,8 @@ active_tab: profile
 
         // Check class entries
         const classEntries = document.querySelectorAll('.class-entry');
-        if (classEntries.length !== originalValues.classEntries.length) {
+        if (classEntries.length !== (originalValues.classEntries?.length || 0)) {
             formChanged = true;
-        } else {
-            classEntries.forEach((entry, index) => {
-                const name = entry.querySelector('.class-name').value;
-                const year = entry.querySelector('.class-year').value;
-
-                if (index >= originalValues.classEntries.length ||
-                    originalValues.classEntries[index].name !== name ||
-                    originalValues.classEntries[index].year !== year) {
-                    formChanged = true;
-                }
-            });
         }
 
         // Update save button
@@ -423,56 +517,146 @@ active_tab: profile
             saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
         }
     }
+    
+    async function loadUserClasses() {
+        try {
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                console.error('Failed to load classes');
+                return;
+            }
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+        } catch (error) {
+            console.error('Error loading classes:', error);
+        }
+    }
+
+    // Render classes in the UI
+    function renderClasses(classes) {
+        const container = document.getElementById('classesContainer');
+        
+        if (!container) return;
+
+        if (!classes || classes.length === 0) {
+            container.innerHTML = `
+                <p class="text-gray-400 text-center py-4">No classes added yet. Click "Add Class" to get started.</p>
+            `;
+            return;
+        }
+
+        container.innerHTML = classes.map((classAbbr, index) => `
+            <div class="class-entry mb-4 p-4 border rounded-lg border-neutral-700" data-index="${index}">
+                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
+                    <div class="flex-grow mb-2 md:mb-0">
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Class Name</label>
+                        <select class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="updateClassInAPI(${index}, this.value)">
+                            <option value="CSSE" ${classAbbr === 'CSSE' ? 'selected' : ''}>Computer Science and Software Engineering</option>
+                            <option value="CSP" ${classAbbr === 'CSP' ? 'selected' : ''}>Computer Science Principles</option>
+                            <option value="CSA" ${classAbbr === 'CSA' ? 'selected' : ''}>Computer Science A</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
+                    Remove
+                </button>
+            </div>
+        `).join('');
+    }
 
     // Add new class
-    function addClass() {
-        const container = document.getElementById('classesContainer');
-        const classEntry = document.createElement('div');
-        classEntry.className = 'class-entry mb-4 p-4 border border-gray-700 rounded-lg';
+    async function addClass() {
+        // Determine which class to add
+        let newClass = 'CSP';
+        if (currentUserClasses.includes('CSP')) {
+            if (!currentUserClasses.includes('CSSE')) newClass = 'CSSE';
+            else if (!currentUserClasses.includes('CSA')) newClass = 'CSA';
+            else {
+                alert('All available classes have been added.');
+                return;
+            }
+        }
 
-        classEntry.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                        <div class="flex-grow mb-2 md:mb-0">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Class Name</label>
-                            <input type="text" 
-                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                placeholder="Enter class name" onchange="checkForChanges()">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Year</label>
-                            <select class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="checkForChanges()">
-                                <option>2025</option>
-                                <option>2026</option>
-                                <option>2027</option>
-                                <option>2028</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
-                        Remove
-                    </button>
-                `;
+        try {
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class: newClass })
+            });
 
-        container.appendChild(classEntry);
-        checkForChanges();
+            if (!response.ok) throw new Error('Failed to add class');
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            checkForChanges();
+        } catch (error) {
+            console.error('Error adding class:', error);
+            alert('Error adding class. Please try again.');
+        }
     }
 
-    // Remove class
-    function removeClass(button) {
-        const classEntry = button.closest('.class-entry');
-        classEntry.remove();
-        checkForChanges();
+    // Remove a class
+    async function removeClass(button) {
+        const entry = button.closest('.class-entry');
+        const index = parseInt(entry.dataset.index);
+        const classToRemove = currentUserClasses[index];
+
+        try {
+            // Use POST with action parameter instead of DELETE
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'remove',
+                    class: classToRemove 
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to remove class');
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            checkForChanges();
+        } catch (error) {
+            console.error('Error removing class:', error);
+            alert('Error removing class. Please try again.');
+        }
     }
 
-    // show toast, auto-hide, allow manual close
-    function showUnsavedChangesAlert() {
-        const saveButton = document.getElementById('saveChangesBtn');
+    async function updateClassInAPI(index, newClass) {
+        const updatedClasses = [...currentUserClasses];
+        updatedClasses[index] = newClass;
 
-        // trigger reflow so shake always retriggers
-        saveButton.classList.remove('shake-animation');
-        void saveButton.offsetWidth;
-        saveButton.classList.add('shake-animation');
+        try {
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class: updatedClasses })
+            });
 
+            if (!response.ok) throw new Error('Failed to update class');
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            checkForChanges();
+        } catch (error) {
+            console.error('Error updating class:', error);
+            alert('Error updating class. Please try again.');
+            renderClasses(currentUserClasses); // Revert on error
+        }
     }
 
     // save all changes in one go
@@ -682,4 +866,10 @@ active_tab: profile
             window.location.reload();
         }
     }
+    window.loadUserClasses = loadUserClasses;
+    window.addClass = addClass;
+    window.removeClass = removeClass;
+    window.updateClassInAPI = updateClassInAPI;
+    window.saveChanges = saveChanges;
+    window.checkForChanges = checkForChanges;
 </script>
