@@ -12,28 +12,11 @@ date: 2025-12-02
 ---
 
 <style>
-:root {
-  --bg: #0b0b0b;
-  --text: #e6e6e6;
-  --muted: #c0c0c0;
-  --border: #2a2a2a;
-  --panel: #141414;
-  --panel-2: #1b1b1b;
-  --accent: #60a5fa;
-  --accent-2: #a78bfa;
-}
+
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  line-height: 1.6;
-}
+
 
 h1, h2, h3 { color: var(--text); margin-top: 20px; }
 p, li, label, small { color: var(--muted); }
