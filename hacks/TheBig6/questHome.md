@@ -1,7 +1,7 @@
 ---
 layout: post 
 tailwind: True
-title: Building a Computer Science Linkedin Profile
+title: The Big 6 Modules For Computer Science
 description: >
   Understand how to ideate, develop, and describe computer science projects for future career success!
 author: CSA 2025-26
