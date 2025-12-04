@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add click event listener for dropdown toggle
                 const dropdownButton = loginArea.querySelector('.dropbtn');
                 const dropdownContent = loginArea.querySelector('.dropdown-content');
+                
+                updateNavigation(true); // User is logged in
 
                 dropdownButton.addEventListener('click', (event) => {
                     event.preventDefault(); // Prevent redirection
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // User is not authenticated, then "Login" link is shown
                 loginArea.innerHTML = `<a href="${baseurl}/login">Login</a>`;
+                updateNavigation(false); // User is not logged in
             }
             // Set loginArea opacity to 1
             loginArea.style.opacity = "1";
@@ -61,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (loginArea) {
                 loginArea.innerHTML = `<a href="${baseurl}/login">Login</a>`;
             }
+            updateNavigation(false); // Also update nav on error
         });
 });
 
@@ -86,5 +90,28 @@ function getCredentials(baseurl) {
         console.error("Fetch error: ", err);
         // Return null instead of throwing to handle the error gracefully
         return null;
+    });
+}
+
+function updateNavigation(isLoggedIn) {
+    const trigger = document.querySelector('.trigger');
+    if (!trigger) return;
+
+    // Find all page links in navigation
+    const links = trigger.querySelectorAll('.page-link');
+    
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // Replace Blogs with Courses for logged-in users
+        if (href && href.includes('/navigation/blog')) {
+            if (isLoggedIn) {
+                link.setAttribute('href', `${baseurl}/navigation/courses/`);
+                link.textContent = 'Courses';
+            } else {
+                link.setAttribute('href', `${baseurl}/navigation/blog/`);
+                link.textContent = 'Blogs';
+            }
+        }
     });
 }
