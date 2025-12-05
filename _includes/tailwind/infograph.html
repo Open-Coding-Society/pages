@@ -10,19 +10,19 @@
     <!-- Rows Section -->
     <div id="rows" class="grid gap-4 p-6">
       {% for topic in data.Topics %}
-        <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md">
+        <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md module-card">
           <!-- Image Column -->
           <div class="text-center relative">
             <a href="{{ site.baseurl }}{{ topic.link }}" class="block relative group">
-              <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="rounded-lg mx-auto h-40 object-cover">
+              <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="rounded-lg mx-auto h-40 object-cover module-img">
               
               <!-- Always visible emoji in upper left -->
-              <div class="absolute top-2 left-2 text-2xl bg-white bg-opacity-90 rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+              <div class="absolute top-2 left-2 text-2xl rounded-full w-8 h-8 flex items-center justify-center shadow-lg module-emoji" style="background-color: rgba(255,255,255,0.9); color: #0b1220;">
                 📖
               </div>
               
               <!-- Hover overlay with "Click to Read" -->
-              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+              <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center module-overlay" style="background-color: rgba(0,0,0,0.5);">
                 <div class="text-white text-center">
                   <div class="text-sm font-semibold">Click to Read</div>
                 </div>
