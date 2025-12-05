@@ -100,7 +100,6 @@ active_tab: profile
         </div>
     </div>
 
-<!-- TODO: Create a div that uses the similar style as the rest of the divs above this. It should display the group that the current user is a part of. View the code above this page to see how to get the username of the current user. Then pull from pythonuri/api/user to see which sections, periods, and groups the current user is in. -->
 <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
     <h2 class="text-xl font-semibold mb-6">Class Information</h2>
 
@@ -111,12 +110,24 @@ active_tab: profile
     </div>
 </div>
 
+<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
+
+    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
+            Loading group information...
+        </div>
+    </div>
+</div>
+
+
 <script type="module">
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI } from '{{site.baseurl}}/assets/js/api/config.js';
 
     document.addEventListener("DOMContentLoaded", async () => {
         const groupContainer = document.getElementById('groupContainer');
         const uidInput = document.getElementById('uidChangeInput');
+        const springGroupInfo = document.getElementById('springGroupInfo');
 
         // Wait briefly for the main profile script (setUserData) to populate the UID
         let attempts = 0;
@@ -128,12 +139,13 @@ active_tab: profile
         const currentUid = uidInput.value;
 
         if (!currentUid) {
-            groupContainer.innerHTML = `<p class="text-gray-400 col-span-2">Unable to verify user identity for group data.</p>`;
+            groupContainer.innerHTML = `<p class="text-gray-400 col-span-2">Unable to verify user identity for class data.</p>`;
+            springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
             return;
         }
 
         try {
-            // Fetch all users to find the current one (based on prompt instructions)
+            // Fetch all users to find the current one
             const response = await fetch(`${pythonURI}/api/user`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -167,6 +179,53 @@ active_tab: profile
         } catch (error) {
             console.error("Error loading group info:", error);
             groupContainer.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
+        }
+
+        try {
+            const groupResp = await fetch(`${javaURI}/api/groups`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+
+            if (groupResp.status === 401) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
+                return;
+            }
+            if (!groupResp.ok) throw new Error('Failed to fetch group data');
+
+            const groups = await groupResp.json();
+            const userGroups = (groups || []).filter(group =>
+                Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
+            );
+
+            if (userGroups.length > 0) {
+                springGroupInfo.innerHTML = userGroups.map(group => `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Group Name</label>
+                        <input type="text" readonly
+                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
+                            value="${group.name}">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Period</label>
+                        <input type="text" readonly
+                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
+                            value="${group.period}">
+                    </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Members & GitHub IDs</label>
+                        <div class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300">
+                            ${group.members.map(member => `${member.name} (${member.uid})`).join(', ')}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
+            }
+        } catch (error) {
+            console.error("Error loading spring group info:", error);
+            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
         }
     });
 </script>
