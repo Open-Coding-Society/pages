@@ -6,16 +6,15 @@ search_exclude: true
 permalink: /navigation/courses/
 ---
 
-## My Courses
 
-Review your courses regularly to align with Sprint Objectives.
+## My Courses
 
 <div id="userCourses" style="text-align:center;">
     <p>Loading your courses...</p>
 </div>
 
 <script type="module">
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, baseurl } from '{{site.baseurl}}/assets/js/api/config.js';
 
     async function displayUserCourses() {
         const container = document.getElementById('userCourses');
@@ -36,7 +35,10 @@ Review your courses regularly to align with Sprint Objectives.
             const classes = data.class || [];
 
             if (classes.length === 0) {
-                container.innerHTML = '<p>You are not enrolled in any courses yet.</p>';
+                container.innerHTML = `
+                    <p>You are not enrolled in any courses yet.</p>
+                    <p><a href="${baseurl}/profile">Go to your Profile</a> to set your course.</p>
+                `;
                 return;
             }
 
