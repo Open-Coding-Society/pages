@@ -408,7 +408,7 @@
 </div>
 
 <script type="module">
-  import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   // Wait for DOM to be fully loaded
   document.addEventListener('DOMContentLoaded', async function () {
     console.log("Admin panel script loaded.");
@@ -436,9 +436,9 @@
       }
     }
 
-    async function getUsers() {
+    async function getGrades() {
       try {
-        const res = await fetch(`${pythonURI}/api/user`, {
+        const res = await fetch(`${javaURI}/api/grades`, {
           ...fetchOptions,
           method: "GET",
           headers: {
@@ -448,7 +448,7 @@
 
         if (res.ok) {
           const data = await res.json();
-          console.log("In get users function", data)
+          console.log("In get grades function", data)
           return data;
         } else {
           console.log(`Request failed for with status ${res.status}`);
@@ -459,7 +459,7 @@
     }
 
     const role = await getCredentials();
-    const users = await getUsers();
+    const grades = await getGrades();
 
     // Admin panel open/close logic
     const adminPanel = document.getElementById('admin-panel');
@@ -472,7 +472,7 @@
         adminFab.style.display = 'none';
         console.log("Admin panel opened.");
         console.log("Role:", role);
-        console.log("Users:", users);
+        console.log("Grades:", grades);
 
         // Show a message if the current user is not an admin
         const container = document.getElementById('admin-container') || document.getElementById('admin-modal-content');
@@ -482,7 +482,7 @@
           return;
         }
 
-        // If user is admin, render a 3-column table (Username, Completion, Notes)
+        // If user is admin, render a 4-column table (UID, Assignment, Score, Classes)
         if (role && String(role) === 'Admin') {
           // small helper to escape HTML
           function escapeHtml(str) {
@@ -500,11 +500,12 @@
             return;
           }
 
-          const rows = (Array.isArray(users) ? users : []).map(u => `\
+          const rows = (Array.isArray(grades) ? grades : []).map(g => `\
             <tr>\
-              <td>${escapeHtml(u.name || u.username || u.email || '(unknown)')}</td>\
-              <td><input type="text" class="completion-input" placeholder="Completion"></td>\
-              <td><textarea class="notes-input" placeholder="Notes"></textarea></td>\
+              <td>${escapeHtml(g.uid || g.studentId || '(unknown)')}</td>\
+              <td>${escapeHtml(g.assignment)}</td>\
+              <td>${escapeHtml(g.score)}</td>\
+              <td>${escapeHtml(g.classes || g.course || g.class)}</td>\
             </tr>\
           `).join('');
 
@@ -512,9 +513,10 @@
             <table id="admin-table">\
               <thead>\
                 <tr>\
-                  <th>Username</th>\
-                  <th>Completion</th>\
-                  <th>Notes</th>\
+                  <th>UID</th>\
+                  <th>Assignment</th>\
+                  <th>Score</th>\
+                  <th>Classes</th>\
                 </tr>\
               </thead>\
               <tbody>\
