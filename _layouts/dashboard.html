@@ -326,312 +326,118 @@ active_tab: dashboard
     </div>
 </div>
             <!-- Preferences tab content -->
-            <div id="tab-content-preferences" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-4xl mx-auto">
-                <h2 class="text-xl font-semibold mb-4">Preferences</h2>
-                <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally for this browser.</p>
+            <div id="tab-content-preferences" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
+                <h2 class="text-xl font-semibold mb-2">Preferences</h2>
+                <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Left: Controls -->
-                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700 space-y-6">
-                        <section>
-                            <h3 class="font-medium mb-2">Text Preferences</h3>
-                            <div class="flex flex-col gap-3">
-                                <label class="text-sm text-neutral-400">Base font size: <span id="font-size-label">14</span>px</label>
-                                <input type="range" id="pref-font-size" min="12" max="22" value="14" />
+                    <!-- Column 1: Text -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-medium">Text</h3>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="text">Save</button>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="text-sm text-neutral-400">Font size: <span id="font-size-label">14</span>px</label>
+                                <input type="range" id="pref-font-size" min="12" max="22" value="14" class="w-full mt-1" />
+                            </div>
 
+                            <div>
                                 <label class="text-sm text-neutral-400">Font family</label>
-                                <select id="pref-font-family" class="bg-neutral-700 text-white rounded px-2 py-1">
+                                <select id="pref-font-family" class="w-full bg-neutral-700 text-white rounded px-2 py-1 mt-1">
                                     <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial">Inter / System</option>
                                     <option value="Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial">Roboto</option>
                                     <option value="'Open Sans', Arial, sans-serif">Open Sans</option>
                                     <option value="Lato, Arial, sans-serif">Lato</option>
                                     <option value="Montserrat, Arial, sans-serif">Montserrat</option>
-                                    <option value="'Noto Sans', Arial, sans-serif">Noto Sans</option>
-                                    <option value="Merriweather, Georgia, serif">Merriweather (Serif)</option>
-                                    <option value="Georgia, 'Times New Roman', Times, serif">Georgia / Times</option>
-                                    <option value="'Courier New', Courier, monospace">Courier New (Monospace)</option>
-                                    <option value="Arial, Helvetica, sans-serif">Arial / Helvetica</option>
+                                    <option value="Georgia, 'Times New Roman', Times, serif">Georgia (Serif)</option>
+                                    <option value="'Source Code Pro', monospace">Source Code Pro</option>
                                 </select>
+                            </div>
 
+                            <div>
                                 <label class="text-sm text-neutral-400">Text color</label>
-                                <input type="color" id="pref-text-color" value="#e6eef8" />
+                                <input type="color" id="pref-text-color" value="#e6eef8" class="w-full h-8 mt-1 rounded" />
                             </div>
-                        </section>
-
-                        <section>
-                            <h3 class="font-medium mb-2">Background Preferences</h3>
-                            <div class="flex flex-col gap-3">
-                                <label class="text-sm text-neutral-400">Background color</label>
-                                <input type="color" id="pref-bg-color" value="#0b1220" />
-
-                                <label class="text-sm text-neutral-400">Content max width (px)</label>
-                                <input type="number" id="pref-content-width" value="1200" min="600" max="2000" class="bg-neutral-700 text-white rounded px-2 py-1" />
-
-                                <div class="flex gap-2">
-                                    <button id="save-preferences" type="button" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">Save</button>
-                                    <button id="restore-styles" type="button" class="px-4 py-2 rounded bg-red-700 hover:bg-red-800 transition text-white font-semibold">Restore original styling</button>
-                                </div>
-                                <p id="preferences-status" class="text-sm text-neutral-400 mt-2"></p>
-                            </div>
-                        </section>
+                        </div>
                     </div>
 
-                    <!-- Right: Themes -->
+                    <!-- Column 2: Colors -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
-                        <h3 class="font-medium mb-3">Themes</h3>
-                        <p class="text-sm text-neutral-400 mb-3">Select a preset or save your current settings as a custom theme (up to 3 custom slots).</p>
-
-                        <div class="grid grid-cols-2 gap-3 mb-4" id="preset-themes">
-                            <!-- preset buttons inserted by JS -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-medium">Colors</h3>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="colors">Save</button>
                         </div>
-
-                        <div class="mb-4">
-                            <label class="text-sm text-neutral-400">Custom theme name</label>
-                            <div class="flex gap-2 mt-2">
-                                <input id="new-theme-name" class="flex-1 bg-neutral-700 text-white rounded px-2 py-1" placeholder="My theme name" />
-                                <button id="save-theme-btn" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Save Theme</button>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="text-sm text-neutral-400">Background color</label>
+                                <input type="color" id="pref-bg-color" value="#0b1220" class="w-full h-8 mt-1 rounded" />
                             </div>
-                            <p class="text-sm text-neutral-400 mt-2">Custom themes will appear below. You can delete a custom theme to free a slot.</p>
-                        </div>
-
-                        <div id="custom-themes" class="grid grid-cols-2 gap-3">
-                            <!-- custom theme buttons inserted by JS -->
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Accent color</label>
+                                <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <style>
-                /* Global CSS variables and conservative overrides for applying preferences site-wide */
-                :root {
-                    --pref-bg-color: #0b1220;
-                    --pref-text-color: #e6eef8;
-                    --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-                    --pref-font-size: 14px;
-                    --pref-content-max-width: 1200px;
-                }
+                <!-- Actions Row -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex gap-3">
+                            <button id="save-preferences" type="button" class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-medium">Save All</button>
+                            <button id="restore-styles" type="button" class="px-4 py-2 rounded bg-red-700 hover:bg-red-800 text-white font-medium">Reset</button>
+                        </div>
+                        <p id="preferences-status" class="text-sm text-neutral-400"></p>
+                    </div>
+                </div>
 
-                /* Apply preferences to body only by default. We also provide a
-                   `.user-theme-active` class that can be toggled when the user
-                   has chosen a theme — it enforces the chosen colors across the
-                   entire page (uses !important to override third-party utilities).
-                   This is intentionally broad so user-selected themes override
-                   the default Jekyll/theme styles. */
-                body {
-                    background: var(--pref-bg-color) !important;
-                    color: var(--pref-text-color) !important;
-                    font-family: var(--pref-font-family) !important;
-                    font-size: var(--pref-font-size) !important;
-                }
+                <!-- Themes Section -->
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Preset Themes -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                        <h3 class="font-medium mb-3">Preset Themes</h3>
+                        <div class="grid grid-cols-2 gap-2" id="preset-themes"></div>
+                    </div>
 
-                /* When active, apply colors to everything. This is broad by design
-                   so that user themes override other CSS (Tailwind/Minima/Preline).
-                   We explicitly allow media elements to keep their backgrounds. */
-                .user-theme-active * {
-                    color: var(--text) !important;
-                    background-color: var(--background) !important;
-                    border-color: var(--panel) !important;
-                    fill: var(--text) !important;
-                    stroke: var(--text) !important;
-                }
-                .user-theme-active img,
-                .user-theme-active video,
-                .user-theme-active svg,
-                .user-theme-active iframe {
-                    background-color: transparent !important;
-                }
+                    <!-- Custom Themes -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                        <h3 class="font-medium mb-3">Custom Themes</h3>
+                        <div class="flex gap-2 mb-3">
+                            <input id="new-theme-name" class="flex-1 bg-neutral-700 text-white rounded px-2 py-1" placeholder="Theme name" />
+                            <button id="save-theme-btn" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Save</button>
+                        </div>
+                        <div id="custom-themes" class="grid grid-cols-1 gap-2"></div>
+                    </div>
+                </div>
 
-                /* Inputs, selects, textareas and buttons should use a slightly
-                   darker tone of the theme background so contrast improves. */
-                .user-theme-active input,
-                .user-theme-active select,
-                .user-theme-active textarea {
-                    background-color: var(--ui-bg) !important;
-                    color: var(--text) !important;
-                    border: 1px solid var(--ui-border) !important;
-                }
-
-                .user-theme-active button {
-                    background-color: var(--ui-bg) !important;
-                    color: var(--text) !important;
-                    border: 1px solid var(--ui-border) !important;
-                }
-
-                /* Constrain main content wrapper if present */
-                .w-full { max-width: var(--pref-content-max-width); margin: 0 auto; }
-                </style>
+                <!-- Preferences UI: the styling logic itself now lives in global
+                     assets (assets/css/user-preferences.css and
+                     assets/js/user-preferences.js). This script only manages
+                     localStorage and calls the shared SitePreferences helper
+                     so the same theme is applied across every page. -->
 
                 <script>
                 (function () {
-                    const PRESETS = {
-                        'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
-                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
-                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, width: 1200 },
-                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, width: 1200 }
+                    const PRESETS = window.SitePreferences?.PRESETS || {
+                        'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#3b82f6' },
+                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#2563eb' },
+                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#10b981' },
+                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, accent: '#b45309' },
+                        'Cyberpunk': { bg: '#0a0a0f', text: '#f0f0f0', font: "'Source Code Pro', monospace", size: 14, accent: '#f72585' },
+                        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' }
                     };
 
                     const MAX_CUSTOM = 10;
                     const storageKey = 'sitePreferences';
                     const themesKey = 'siteThemes';
 
-                    function applyPreferences(prefs = {}){
-                        const bg = prefs.bg || PRESETS['Midnight'].bg;
-                        const text = prefs.text || PRESETS['Midnight'].text;
-                        const font = prefs.font || PRESETS['Midnight'].font;
-                        const size = prefs.size || PRESETS['Midnight'].size;
-                        const width = prefs.width || PRESETS['Midnight'].width;
-
-                        try {
-                            document.documentElement.style.setProperty('--pref-bg-color', bg);
-                            document.documentElement.style.setProperty('--pref-text-color', text);
-                            document.documentElement.style.setProperty('--pref-font-family', font);
-                            document.documentElement.style.setProperty('--pref-font-size', size + 'px');
-                            document.documentElement.style.setProperty('--pref-content-max-width', width + 'px');
-
-                            // Mirror critical site-wide vars so SASS/compiled CSS that reference
-                            // --background / --text / --white1 / --panel reflect user prefs.
-                            // Also set a broad set of aliases used across the SASS maps so
-                            // more components pick up the runtime theme.
-                            const set = (name, value) => document.documentElement.style.setProperty(name, value);
-                                    set('--background', bg);
-                                    set('--bg-0', bg);
-                                    set('--bg-1', bg);
-                                    set('--bg-2', bg);
-                                    set('--bg-3', bg);
-                                    // compute a panel/border color that contrasts with background
-                                    function hexToRgb(hex){
-                                        hex = hex.replace('#','');
-                                        if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
-                                        const bigint = parseInt(hex, 16);
-                                        return { r: (bigint>>16)&255, g:(bigint>>8)&255, b: bigint&255 };
-                                    }
-                                    function luminance(r,g,b){
-                                        const a = [r,g,b].map(v=>{
-                                            v /= 255;
-                                            return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
-                                        });
-                                        return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
-                                    }
-                                    function rgbToHex(r,g,b){
-                                        return '#'+[r,g,b].map(v=>{ const s=v.toString(16); return s.length==1? '0'+s: s; }).join('');
-                                    }
-                                    // try to compute a subtle panel color (lighter on dark bg, darker on light bg)
-                                    let panelColor = bg;
-                                    try {
-                                        const rgb = hexToRgb(bg);
-                                        const lum = luminance(rgb.r,rgb.g,rgb.b);
-                                        // if dark background (lum < 0.5) lighten; else darken
-                                        const amount = 0.12; // 12%
-                                        let r = rgb.r, g = rgb.g, b = rgb.b;
-                                        if (lum < 0.5) {
-                                            r = Math.min(255, Math.round(r + (255 - r) * amount));
-                                            g = Math.min(255, Math.round(g + (255 - g) * amount));
-                                            b = Math.min(255, Math.round(b + (255 - b) * amount));
-                                        } else {
-                                            r = Math.max(0, Math.round(r * (1 - amount)));
-                                            g = Math.max(0, Math.round(g * (1 - amount)));
-                                            b = Math.max(0, Math.round(b * (1 - amount)));
-                                        }
-                                        panelColor = rgbToHex(r,g,b);
-                                    } catch(e){ panelColor = bg; }
-                                    set('--panel', panelColor);
-                                    // compute darker tones for UI chrome (inputs/buttons)
-                                    try {
-                                        const rgb2 = hexToRgb(bg);
-                                        const dark = (v, amt) => Math.max(0, Math.round(v * (1 - amt)));
-                                        const uiAmt = 0.12; // darker tone for controls
-                                        const borderAmt = 0.22; // stronger darkening for borders
-                                        const ur = dark(rgb2.r, uiAmt), ug = dark(rgb2.g, uiAmt), ub = dark(rgb2.b, uiAmt);
-                                        const br = dark(rgb2.r, borderAmt), bgc = dark(rgb2.g, borderAmt), bb = dark(rgb2.b, borderAmt);
-                                        set('--ui-bg', rgbToHex(ur, ug, ub));
-                                        set('--ui-border', rgbToHex(br, bgc, bb));
-                                    } catch (e) { set('--ui-bg', bg); set('--ui-border', panelColor); }
-                            set('--popup-bg', bg);
-                            set('--surface', bg);
-
-                            set('--text', text);
-                            set('--white1', text);
-                            set('--white2', text);
-                            set('--white3', text);
-                            set('--text-muted', text);
-
-                            // Helpful aliases
-                            set('--accent', bg);
-                            set('--accent-700', bg);
-                            set('--orange', bg);
-
-                            // Copy to some status / control vars so badges and buttons update
-                            set('--status-indicator-base-bg', bg);
-                            set('--status-indicator-base-border', bg);
-                            set('--status-indicator-success-color', text);
-                            set('--success-green', text);
-
-                            // Ensure the user theme class is present so the CSS override applies
-                            document.documentElement.classList.add('user-theme-active');
-
-                            // direct style for body for maximum reach (avoid changing root html font-size)
-                            document.body.style.background = bg;
-                            document.body.style.color = text;
-                            document.body.style.fontFamily = font;
-                            // Apply inline styles to controls so they visibly pick up the darker UI tones
-                            try {
-                                const rootStyles = getComputedStyle(document.documentElement);
-                                const uiBg = (rootStyles.getPropertyValue('--ui-bg') || bg).trim();
-                                const uiBorder = (rootStyles.getPropertyValue('--ui-border') || panelColor).trim();
-                                const uiText = (rootStyles.getPropertyValue('--text') || text).trim();
-                                document.querySelectorAll('input, select, textarea, button').forEach(el => {
-                                    try {
-                                        el.style.backgroundColor = uiBg;
-                                        el.style.color = uiText;
-                                        el.style.borderColor = uiBorder;
-                                    } catch(e){}
-                                });
-                            } catch(e){}
-                            // ensure body border visibility: set a subtle default border color if none
-                            try { document.body.style.setProperty('--panel-border-fallback', panelColor); } catch(e){}
-                        } catch (e) { console.error('applyPreferences error', e); }
-                    }
-
-                    // Restore original site styling (remove all runtime overrides)
-                    function restoreOriginalStyling(){
-                        try {
-                            // Remove storage keys
-                            localStorage.removeItem(storageKey);
-                            localStorage.removeItem(themesKey);
-
-                            const root = document.documentElement;
-                            const body = document.body;
-
-                            // remove known custom properties we set
-                            const keys = ['--pref-bg-color','--pref-text-color','--pref-font-family','--pref-font-size','--pref-content-max-width','--background','--bg-0','--bg-1','--bg-2','--bg-3','--panel','--popup-bg','--surface','--text','--white1','--white2','--white3','--text-muted','--content-max-width','--base-font-size','--font-family-base','--pref-font-size','--pref-font-family','--pref-content-max-width','--panel-border-fallback','--ui-bg','--ui-border'];
-                            keys.forEach(k=>{ try{ root.style.removeProperty(k); body.style.removeProperty(k); }catch(e){} });
-
-                            // remove inline styles we may have set
-                            root.style.removeProperty('color');
-                            root.style.removeProperty('background-color');
-                            root.style.removeProperty('font-family');
-                            root.style.removeProperty('font-size');
-                            body.style.removeProperty('background');
-                            body.style.removeProperty('color');
-                            body.style.removeProperty('font-family');
-                            body.style.removeProperty('font-size');
-
-                            // remove inline styles from controls we may have modified
-                            try {
-                                document.querySelectorAll('input, select, textarea, button').forEach(el => {
-                                    try {
-                                        el.style.removeProperty('background-color');
-                                        el.style.removeProperty('color');
-                                        el.style.removeProperty('border-color');
-                                    } catch(e){}
-                                });
-                            } catch(e){}
-
-                            // remove the class
-                            root.classList.remove('user-theme-active');
-
-                            // small delay then reload to ensure the original CSS is re-applied
-                            setTimeout(()=> location.reload(), 80);
-                        } catch (e) { console.error('restoreOriginalStyling error', e); }
+                    function applyPreferences(prefs) {
+                        if (window.SitePreferences && typeof window.SitePreferences.applyPreferences === 'function') {
+                            window.SitePreferences.applyPreferences(prefs);
+                        }
                     }
 
                     function loadPreferences() {
@@ -648,6 +454,7 @@ active_tab: dashboard
                         try {
                             localStorage.setItem(storageKey, JSON.stringify(prefs));
                             applyPreferences(prefs);
+                            populateForm(prefs);
                         } catch (e) { console.error('savePreferences error', e); }
                     }
 
@@ -664,15 +471,16 @@ active_tab: dashboard
 
                     function renderPresets(){
                         const container = document.getElementById('preset-themes');
+                        if (!container) return;
                         container.innerHTML = '';
                         Object.keys(PRESETS).forEach(name => {
+                            const p = PRESETS[name];
                             const btn = document.createElement('button');
-                            btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white';
-                            btn.textContent = name;
+                            btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm flex items-center gap-2';
+                            btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${p.accent}"></span> ${name}`;
                             btn.addEventListener('click', () => {
-                                const p = PRESETS[name];
-                                savePreferences({ bg: p.bg, text: p.text, font: p.font, size: p.size, width: p.width });
-                                showStatus('Applied preset: ' + name);
+                                savePreferences({ ...p });
+                                showStatus('Applied: ' + name);
                             });
                             container.appendChild(btn);
                         });
@@ -680,11 +488,12 @@ active_tab: dashboard
 
                     function renderCustomThemes(){
                         const container = document.getElementById('custom-themes');
+                        if (!container) return;
                         container.innerHTML = '';
                         const themes = loadThemes();
                         const keys = Object.keys(themes);
                         if (!keys.length) {
-                            container.innerHTML = '<p class="text-neutral-400">No custom themes saved.</p>';
+                            container.innerHTML = '<p class="text-neutral-500 text-sm">No custom themes yet</p>';
                             return;
                         }
                         keys.forEach(name => {
@@ -692,12 +501,13 @@ active_tab: dashboard
                             const wrap = document.createElement('div');
                             wrap.className = 'flex gap-2';
                             const btn = document.createElement('button');
-                            btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-left';
-                            btn.textContent = name;
-                            btn.addEventListener('click', () => { savePreferences(theme); showStatus('Applied custom theme: ' + name); });
+                            btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm text-left flex items-center gap-2';
+                            btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${theme.accent || '#3b82f6'}"></span> ${name}`;
+                            btn.addEventListener('click', () => { savePreferences(theme); showStatus('Applied: ' + name); });
                             const del = document.createElement('button');
-                            del.className = 'px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white';
-                            del.textContent = 'Delete';
+                            del.className = 'px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs';
+                            del.textContent = 'X';
+                            del.title = 'Delete';
                             del.addEventListener('click', () => { deleteTheme(name); });
                             wrap.appendChild(btn);
                             wrap.appendChild(del);
@@ -706,15 +516,14 @@ active_tab: dashboard
                     }
 
                     function saveThemeAs(name){
-                        if (!name) { showStatus('Please provide a name for the theme.'); return; }
+                        if (!name) { showStatus('Enter a theme name'); return; }
                         const themes = loadThemes();
-                        const keys = Object.keys(themes);
-                        if (keys.length >= MAX_CUSTOM && !themes[name]) { showStatus('Max custom themes reached. Delete one to add another.'); return; }
-                        const prefs = currentFormValues();
-                        themes[name] = prefs;
+                        if (Object.keys(themes).length >= MAX_CUSTOM && !themes[name]) { showStatus('Max themes reached'); return; }
+                        themes[name] = currentFormValues();
                         saveThemes(themes);
                         renderCustomThemes();
-                        showStatus('Saved theme: ' + name);
+                        showStatus('Saved: ' + name);
+                        document.getElementById('new-theme-name').value = '';
                     }
 
                     function deleteTheme(name){
@@ -722,7 +531,7 @@ active_tab: dashboard
                         if (themes[name]) delete themes[name];
                         saveThemes(themes);
                         renderCustomThemes();
-                        showStatus('Deleted theme: ' + name);
+                        showStatus('Deleted: ' + name);
                     }
 
                     function currentFormValues(){
@@ -731,33 +540,49 @@ active_tab: dashboard
                             text: document.getElementById('pref-text-color').value,
                             font: document.getElementById('pref-font-family').value,
                             size: Number(document.getElementById('pref-font-size').value),
-                            width: Number(document.getElementById('pref-content-width').value)
+                            accent: document.getElementById('pref-accent-color').value
                         };
                     }
 
                     function populateForm(prefs){
                         if (!prefs) return;
-                        document.getElementById('pref-bg-color').value = prefs.bg || PRESETS['Midnight'].bg;
-                        document.getElementById('pref-text-color').value = prefs.text || PRESETS['Midnight'].text;
-                        document.getElementById('pref-font-family').value = prefs.font || PRESETS['Midnight'].font;
-                        document.getElementById('pref-font-size').value = prefs.size || PRESETS['Midnight'].size;
-                        document.getElementById('font-size-label').textContent = prefs.size || PRESETS['Midnight'].size;
-                        document.getElementById('pref-content-width').value = prefs.width || PRESETS['Midnight'].width;
+                        const d = PRESETS['Midnight'];
+                        document.getElementById('pref-bg-color').value = prefs.bg || d.bg;
+                        document.getElementById('pref-text-color').value = prefs.text || d.text;
+                        document.getElementById('pref-font-family').value = prefs.font || d.font;
+                        document.getElementById('pref-font-size').value = prefs.size || d.size;
+                        document.getElementById('font-size-label').textContent = prefs.size || d.size;
+                        document.getElementById('pref-accent-color').value = prefs.accent || d.accent;
                     }
 
                     function showStatus(msg){
                         const el = document.getElementById('preferences-status');
                         if (!el) return;
                         el.textContent = msg;
-                        setTimeout(()=> el.textContent = '', 3000);
+                        setTimeout(()=> el.textContent = '', 2500);
                     }
 
-                    // Wire up events
+                    function saveSectionPrefs(section){
+                        const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                        const form = currentFormValues();
+                        
+                        if (section === 'text') {
+                            current.font = form.font;
+                            current.size = form.size;
+                            current.text = form.text;
+                        } else if (section === 'colors') {
+                            current.bg = form.bg;
+                            current.accent = form.accent;
+                        }
+                        
+                        savePreferences(current);
+                        showStatus('Saved ' + section);
+                    }
+
                     document.addEventListener('DOMContentLoaded', function (){
                         renderPresets();
                         renderCustomThemes();
 
-                        // init form from saved prefs or defaults
                         const saved = loadPreferences();
                         if (saved) populateForm(saved);
                         else populateForm(PRESETS['Midnight']);
@@ -766,27 +591,37 @@ active_tab: dashboard
                             document.getElementById('font-size-label').textContent = e.target.value;
                         });
 
+                        document.querySelectorAll('.save-section-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                saveSectionPrefs(this.dataset.section);
+                            });
+                        });
+
                         document.getElementById('save-preferences').addEventListener('click', function(){
-                            const prefs = currentFormValues();
-                            savePreferences(prefs);
-                            showStatus('Preferences saved locally.');
+                            savePreferences(currentFormValues());
+                            showStatus('All preferences saved');
                         });
 
                         document.getElementById('restore-styles').addEventListener('click', function(){
-                            restoreOriginalStyling();
-                            showStatus('Restoring original site styling...');
+                            localStorage.removeItem(storageKey);
+                            localStorage.removeItem(themesKey);
+                            if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
+                                window.SitePreferences.resetPreferences();
+                            }
+                            showStatus('Reset complete');
+                            setTimeout(() => location.reload(), 100);
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', function(){
-                            const name = document.getElementById('new-theme-name').value.trim();
-                            saveThemeAs(name);
+                            saveThemeAs(document.getElementById('new-theme-name').value.trim());
+                        });
+                        
+                        document.getElementById('new-theme-name').addEventListener('keypress', function(e){
+                            if (e.key === 'Enter') saveThemeAs(this.value.trim());
                         });
                     });
 
-                    // Expose loadPreferences for window.onload call
                     window.loadPreferences = async function(){ loadPreferences(); };
-
-                    // Apply preferences immediately (in case user navigates directly)
                     try{ loadPreferences(); } catch(e){}
                 })();
                 </script>
@@ -1599,4 +1434,5 @@ active_tab: dashboard
         });
     });
 </script>
+
 
