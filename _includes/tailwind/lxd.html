@@ -1,7 +1,7 @@
 <div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
   <!-- Pearly glow effect around container -->
   <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
-  <div class="relative z-10"> <!-- Wrapper div to ensure content stays above the glow -->
+  <div class="relative z-10">
     <!-- Title and Description -->
     <div class="text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">{{ page.lxdData.Title }}</h1>
@@ -15,58 +15,426 @@
       <ul class="flex flex-wrap gap-4 justify-center">
         {% for prereq in page.lxdData.Prequisites %}
           <li>
-            {% if prereq.title == "Tools Setup" or prereq.title == "Agile Collaboration" %}
             <a href="{{ prereq.link }}" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition">
               {{ prereq.title }}
             </a>
-            {% else %}
-            <a href="{{ prereq.link }}" class="iridescent bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition">
-              {{ prereq.title }}
-            </a>
-            {% endif %}
           </li>
         {% endfor %}
       </ul>
     </div>
     {% endif %}
 
-    <!-- Topics Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12">
-      {% for topic in page.lxdData.Topics %}
-        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2">
-          <!-- Image with Play Overlay -->
-          <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
-            <a href="{{ topic.Game }}" class="block w-full h-full group">
-              <img src="{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-cover transition-all duration-300 group-hover:scale-110">
-              <!-- Play Button Overlay -->
-              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div class="iridescent bg-white bg-opacity-90 rounded-full p-3">
-                  <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8 5v10l8-5z"/>
-                  </svg>
+    <!-- Selection Panel -->
+    <div class="mb-8 bg-gray-800/50 rounded-xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-semibold text-white">My Onboarding Hacks</h2>
+        <div class="flex gap-3">
+          <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition font-semibold">
+            Select Hacks
+          </button>
+          <p id="hacks-status" class="text-sm text-gray-300 self-center">Loading...</p>
+        </div>
+      </div>
+
+
+
+    <!-- Modal for Hack Selection -->
+    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: rgba(0,0,0,0.8); overflow-y: auto;">
+      <div style="position: relative; background-color: #1a1a1a; padding: 24px; border-radius: 12px; max-width: 56rem; width: 90%; max-height: 85vh; overflow-y: auto; border: 1px solid #374151; z-index: 100000; margin: 40px auto;">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-white" style="color: white;">Choose Your Onboarding Hacks</h3>
+          <button id="modal-close-btn" class="text-gray-400 hover:text-white text-3xl font-bold leading-none" style="color: #9ca3af; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none;">&times;</button>
+        </div>
+        <p class="text-gray-300 mb-6" style="color: #d1d5db; margin-bottom: 1.5rem;">Select the hacks you want to work on. They'll appear at the top of the page for easy access.</p>
+        
+        <div id="hacks-checklist" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; max-height: 400px; overflow-y: auto; padding: 8px; margin-bottom: 1.5rem;">
+          <!-- Checkboxes will be populated here -->
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 16px; border-top: 1px solid #374151;">
+          <button id="modal-cancel-btn" style="padding: 8px 20px; border-radius: 8px; background-color: #374151; color: white; cursor: pointer; border: none; font-weight: 500;">
+            Cancel
+          </button>
+          <button id="modal-save-btn" style="padding: 8px 20px; border-radius: 8px; background-color: #16a34a; color: white; cursor: pointer; border: none; font-weight: 600;">
+            Save Selection
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Topics Cards Grid (Full List) -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-white mb-6">All Available Hacks</h2>
+      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6">
+        {% for topic in page.lxdData.Topics %}
+          <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2" data-game="{{ topic.Game }}">
+            <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
+              <a href="{{ topic.Game }}" class="block w-full h-full group">
+                <img src="{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-cover transition-all duration-300 group-hover:scale-110">
+                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <div class="bg-white bg-opacity-90 rounded-full p-3">
+                    <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path d="M8 5v10l8-5z"/></svg>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="p-6">
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="text-xl font-bold text-white">{{ topic.Title }}</h3>
+                <span class="inline-block px-2 py-1 text-xs rounded-full bg-gray-700 text-gray-300" data-status-badge>Not selected</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
+              <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
+              <div class="mb-4">
+                <span class="text-sm font-semibold text-gray-200">Categories:</span>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  {% for cat in topic.Categories %}
+                    <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
+                  {% endfor %}
                 </div>
               </div>
-            </a>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-white mb-1">{{ topic.Title }}</h3>
-            <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
-            <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
-            <div class="mb-4">
-              <span class="text-sm font-semibold text-gray-200">Categories:</span>
-              <div class="flex flex-wrap gap-1 mt-1">
-                {% for cat in topic.Categories %}
-                  <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
-                {% endfor %}
+              <div class="flex gap-2">
+                <a href="{{ topic.Game }}" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-center py-2 rounded-lg font-semibold transition">Play Game</a>
+                <a href="{{ topic.Lessons }}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-center py-2 rounded-lg font-semibold transition">Lessons</a>
               </div>
             </div>
-            <div class="flex gap-2">
-              <a href="{{ topic.Game }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition">Play Game</a>
-              <a href="{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition">Lessons</a>
-            </div>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  // Topics data from Jekyll
+  const HACK_TOPICS = {{ page.lxdData.Topics | jsonify }};
+  
+  // User's grade data
+  let userGradeData = {
+    selected_hacks: [],
+    hacks_completed: {}
+  };
+  
+  let isAuthenticated = false;
+
+  // API base URL - adjust if needed
+  const API_BASE = '';
+
+  // Load user's grade data from backend (with localStorage fallback)
+  async function loadGradeData() {
+    try {
+      const response = await fetch(`${API_BASE}/api/grade_data`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        isAuthenticated = true;
+        // Ensure the grade_data has proper structure
+        userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {} };
+        if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
+        if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
+        console.log('Loaded from backend:', userGradeData);
+        return true;
+      } else {
+        throw new Error('Backend not available');
+      }
+    } catch (error) {
+      console.log('Backend not available, using localStorage fallback');
+      isAuthenticated = false;
+      
+      // Try to load from localStorage
+      const stored = localStorage.getItem('onboarding_hacks_data');
+      if (stored) {
+        try {
+          userGradeData = JSON.parse(stored);
+          // Ensure proper structure
+          if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
+          if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
+          console.log('Loaded from localStorage:', userGradeData);
+        } catch (e) {
+          console.error('Error parsing localStorage data:', e);
+          userGradeData = { selected_hacks: [], hacks_completed: {} };
+        }
+      } else {
+        userGradeData = { selected_hacks: [], hacks_completed: {} };
+      }
+      return false;
+    }
+  }
+
+  // Save user's grade data to backend (with localStorage fallback)
+  async function saveGradeData() {
+    // Always try backend first if we think we're authenticated
+    if (isAuthenticated) {
+      try {
+        const response = await fetch(`${API_BASE}/api/grade_data`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ grade_data: userGradeData })
+        });
+
+        if (response.ok) {
+          console.log('Saved to backend');
+          return true;
+        } else {
+          throw new Error('Backend save failed');
+        }
+      } catch (error) {
+        console.log('Backend save failed, falling back to localStorage');
+        isAuthenticated = false;
+      }
+    }
+    
+    // Fallback to localStorage
+    try {
+      localStorage.setItem('onboarding_hacks_data', JSON.stringify(userGradeData));
+      console.log('Saved to localStorage:', userGradeData);
+      return true;
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+      return false;
+    }
+  }
+
+  // Render the checklist in the modal
+  function renderChecklist() {
+    const container = document.getElementById('hacks-checklist');
+    container.innerHTML = '';
+
+    HACK_TOPICS.forEach((topic, index) => {
+      const isChecked = (userGradeData.selected_hacks || []).includes(topic.Game);
+      
+      const label = document.createElement('label');
+      label.className = 'flex items-start gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-750 cursor-pointer transition border border-gray-700 hover:border-blue-500';
+      
+      label.innerHTML = `
+        <input type="checkbox" 
+               data-game="${topic.Game}" 
+               ${isChecked ? 'checked' : ''} 
+               class="mt-1 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500">
+        <div class="flex-1">
+          <div class="font-semibold text-white">${topic.Title}</div>
+          <div class="text-xs text-gray-400">Level ${topic.Level} • ${topic.Genre}</div>
+        </div>
+      `;
+      
+      container.appendChild(label);
+    });
+  }
+
+  // Render selected hacks at the top
+  function renderSelectedHacks() {
+    const container = document.getElementById('selected-hacks-container');
+    const selectedGames = userGradeData.selected_hacks || [];
+
+    if (selectedGames.length === 0) {
+      container.innerHTML = '<p class="text-gray-400 text-center py-8">No hacks selected. Click "Select Hacks" to choose your onboarding tasks.</p>';
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${selectedGames.map(gamePath => {
+          const topic = HACK_TOPICS.find(t => t.Game === gamePath);
+          if (!topic) return '';
+          
+          const isCompleted = userGradeData.hacks_completed && userGradeData.hacks_completed[gamePath];
+          
+          return `
+            <div class="bg-gray-800 rounded-xl p-4 border-2 ${isCompleted ? 'border-green-500' : 'border-blue-500'}">
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="text-lg font-bold text-white">${topic.Title}</h3>
+                <span class="inline-block px-2 py-1 text-xs rounded-full ${isCompleted ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'}">
+                  ${isCompleted ? '✓ Complete' : 'In Progress'}
+                </span>
+              </div>
+              <p class="text-sm text-gray-400 mb-1">Level ${topic.Level}</p>
+              <p class="text-sm text-gray-300 mb-3">${topic.Description}</p>
+              <div class="flex gap-2">
+                <a href="${topic.Game}" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-center py-2 px-3 rounded-lg text-sm font-semibold transition">
+                  Play
+                </a>
+                <a href="${topic.Lessons}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-center py-2 px-3 rounded-lg text-sm font-semibold transition">
+                  Learn
+                </a>
+                <button onclick="toggleComplete('${gamePath}')" class="px-3 py-2 rounded-lg ${isCompleted ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-gray-600 hover:bg-gray-500'} text-white text-sm transition">
+                  ${isCompleted ? '✓ Complete' : 'Incomplete'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  // Update status badges on all cards
+  function updateAllCardBadges() {
+    document.querySelectorAll('[data-game]').forEach(card => {
+      const gamePath = card.getAttribute('data-game');
+      const badge = card.querySelector('[data-status-badge]');
+      
+      if (badge) {
+        const isSelected = (userGradeData.selected_hacks || []).includes(gamePath);
+        const isCompleted = userGradeData.hacks_completed && userGradeData.hacks_completed[gamePath];
+        
+        if (isCompleted) {
+          badge.textContent = '✓ Completed';
+          badge.className = 'inline-block px-2 py-1 text-xs rounded-full bg-green-600 text-white';
+        } else if (isSelected) {
+          badge.textContent = 'Selected';
+          badge.className = 'inline-block px-2 py-1 text-xs rounded-full bg-blue-600 text-white';
+        } else {
+          badge.textContent = 'Not selected';
+          badge.className = 'inline-block px-2 py-1 text-xs rounded-full bg-gray-700 text-gray-300';
+        }
+      }
+    });
+  }
+
+  // Update status message
+  function updateStatus(message, isError = false) {
+    const statusEl = document.getElementById('hacks-status');
+    statusEl.textContent = message;
+    statusEl.className = `text-sm self-center ${isError ? 'text-red-400' : 'text-gray-300'}`;
+  }
+
+  // Toggle completion status
+  window.toggleComplete = async function(gamePath) {
+    if (!userGradeData.hacks_completed) {
+      userGradeData.hacks_completed = {};
+    }
+    
+    userGradeData.hacks_completed[gamePath] = !userGradeData.hacks_completed[gamePath];
+    
+    const saved = await saveGradeData();
+    if (saved) {
+      renderSelectedHacks();
+      updateAllCardBadges();
+      updateStatus('Progress saved!');
+      setTimeout(() => updateStatusDisplay(), 1500);
+    } else {
+      updateStatus('Failed to save progress', true);
+    }
+  };
+
+  // Update the status display with counts
+  function updateStatusDisplay() {
+    const selectedCount = (userGradeData.selected_hacks || []).length;
+    const completedCount = Object.values(userGradeData.hacks_completed || {}).filter(Boolean).length;
+    updateStatus(`${selectedCount} selected • ${completedCount} completed`);
+  }
+
+  // Modal functions
+  function openModal() {
+    console.log('Opening modal...');
+    const modal = document.getElementById('hacks-modal');
+    console.log('Modal element:', modal);
+    if (!modal) {
+      console.error('Modal not found!');
+      return;
+    }
+    renderChecklist();
+    // Force display with inline styles and scroll to top
+    modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+    // Scroll page to top when modal opens
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    console.log('Modal display:', modal.style.display);
+    console.log('Modal should be visible now');
+  }
+
+  function closeModal() {
+    console.log('Closing modal...');
+    const modal = document.getElementById('hacks-modal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.style.visibility = 'hidden';
+      modal.style.opacity = '0';
+      // Re-enable body scroll
+      document.body.style.overflow = '';
+    }
+  }
+
+  async function saveSelection() {
+    const checkboxes = document.querySelectorAll('#hacks-checklist input[type="checkbox"]');
+    userGradeData.selected_hacks = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.getAttribute('data-game'));
+
+    const saved = await saveGradeData();
+    
+    if (saved) {
+      closeModal();
+      renderSelectedHacks();
+      updateAllCardBadges();
+      updateStatus('Selection saved!');
+      setTimeout(() => updateStatusDisplay(), 1500);
+    } else {
+      updateStatus('Failed to save selection', true);
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Page loaded, initializing...');
+    
+    await loadGradeData();
+    renderSelectedHacks();
+    updateAllCardBadges();
+    updateStatusDisplay();
+
+    // Event listeners with logging
+    const selectBtn = document.getElementById('select-hacks-btn');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalSaveBtn = document.getElementById('modal-save-btn');
+    const modalOverlay = document.getElementById('modal-overlay');
+
+    console.log('Select button found:', selectBtn);
+
+    if (selectBtn) {
+      selectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Select hacks button clicked!');
+        openModal();
+      });
+    }
+
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+    }
+
+    if (modalCancelBtn) {
+      modalCancelBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+    }
+
+    if (modalSaveBtn) {
+      modalSaveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        saveSelection();
+      });
+    }
+
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', closeModal);
+    }
+  });
+</script>
