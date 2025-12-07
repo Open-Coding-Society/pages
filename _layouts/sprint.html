@@ -60,6 +60,20 @@ layout: post
     color: #60a5fa;
   }
 
+  .leaderboard-link {
+    text-decoration: none;
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    color: #ffffff !important;
+    border-color: #60a5fa;
+    font-weight: 500;
+  }
+
+  .leaderboard-link:hover {
+    background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+  }
+
   .timeline-container {
     margin-top: 32px;
   }
@@ -1173,6 +1187,9 @@ layout: post
     <button class="filter-btn" data-filter="incomplete">
       Incomplete Only
     </button>
+    <a href="{{ site.baseurl }}/leaderboard?course={{ page.course }}" class="filter-btn leaderboard-link">
+      <i class="fas fa-trophy"></i> View Leaderboard
+    </a>
   </div>
 </div>
 
