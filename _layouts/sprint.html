@@ -457,6 +457,7 @@ layout: post
     border: 1px solid #2a2a2a;
     border-radius: 12px;
     padding: 32px;
+    position: relative;
   }
 
   #progression-modal .close-btn {
@@ -465,9 +466,36 @@ layout: post
     right: 20px;
     background: transparent;
     border: none;
-    color: #999;
+    color: #e6eef8; /* bright so it's visible on dark background */
     font-size: 24px;
     cursor: pointer;
+    z-index: 2050; /* ensure it floats above modal content */
+  }
+
+  /* Certificate list & certificate modal close button styles */
+  #certificate-list-modal .close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    color: #e6eef8;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 2050;
+  }
+
+  /* Add similar X button style for the certificate modal */
+  #certificate-modal .close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    color: #333;
+    font-size: 26px;
+    cursor: pointer;
+    z-index: 2050;
   }
 
   #progression-modal h2 {
@@ -766,17 +794,19 @@ layout: post
     border: 1px solid #2a2a2a;
     border-radius: 12px;
     padding: 32px;
+    position: relative;
   }
 
   #certificate-list-modal .close-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 18px;
+    right: 18px;
     background: transparent;
     border: none;
-    color: #999;
-    font-size: 24px;
+    color: #e6eef8;
+    font-size: 22px;
     cursor: pointer;
+    z-index: 2050;
   }
 
   #certificate-list-modal h2 {
@@ -1346,9 +1376,8 @@ layout: post
 <!--   PROGRESSION MODAL (DARK)   -->
 <!-- ============================= -->
 <div id="progression-modal">
-  <button id="close-progression-modal" class="close-btn">&times;</button>
-
   <div>
+    <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
     <h2>Week <span id="modal-week-number"></span> Progress</h2>
     <p class="week-theme" id="modal-week-theme"></p>
 
@@ -1366,9 +1395,8 @@ layout: post
 <!--   CERTIFICATE LIST MODAL      -->
 <!-- ============================= -->
 <div id="certificate-list-modal">
-  <button id="close-certificate-list-modal" class="close-btn">&times;</button>
-
   <div>
+    <button id="close-certificate-list-modal" class="close-btn" aria-label="Close certificate list modal">&times;</button>
     <h2>Week <span id="list-modal-week-number"></span> Certificates</h2>
     <div id="certificate-list"></div>
   </div>
@@ -1378,6 +1406,9 @@ layout: post
 <!--     CERTIFICATE MODAL         -->
 <!-- ============================= -->
 <div id="certificate-modal">
+  <!-- Top-right X to close the modal quickly -->
+  <button id="close-certificate-modal-x" class="close-btn" aria-label="Close certificate modal">&times;</button>
+
   <div class="action-bar">
     <button id="download-certificate-btn" class="action-btn">Download PNG</button>
     <button id="print-certificate-btn" class="action-btn secondary-btn">Print</button>
@@ -2015,7 +2046,7 @@ function updateWeeklyProgress(stats, weekNum) {
     const certificateName = profile?.displayName || profile?.theme || document.getElementById('certificate-week-theme')?.textContent.trim() || 'Course Module Completion';
     const courseName = profile?.courseName || document.getElementById('certificate-course-name')?.textContent.trim() || 'Open Coding Society';
     const studentName = document.getElementById('certificate-student-name')?.textContent.trim() || 'Learner';
-    const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';
+    const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';  
     const skillFocus = profile?.skill || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
 
     let issueMonth = '';
@@ -2326,6 +2357,20 @@ function updateWeeklyProgress(stats, weekNum) {
     document.getElementById('close-progression-modal').addEventListener('click', closeProgressionModal);
     document.getElementById('close-certificate-list-modal').addEventListener('click', closeCertificateListModal);
     document.getElementById('close-certificate-modal').addEventListener('click', closeCertificateModal);
+    // Defensive binding for the newly added top-right X on the certificate modal
+    if (document.getElementById('close-certificate-modal-x')) {
+      document.getElementById('close-certificate-modal-x').addEventListener('click', closeCertificateModal);
+    }
+
+    // Allow closing modals with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        // Only attempt to close if modals are currently open
+        try { if (document.getElementById('progression-modal').style.display === 'block') closeProgressionModal(); } catch (err) {}
+        try { if (document.getElementById('certificate-list-modal').style.display === 'block') closeCertificateListModal(); } catch (err) {}
+        try { if (document.getElementById('certificate-modal').style.display === 'block') closeCertificateModal(); } catch (err) {}
+      }
+    });
 
     // Certificate actions
     document.getElementById('download-certificate-btn').addEventListener('click', downloadCertificate);
