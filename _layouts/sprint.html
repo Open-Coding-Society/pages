@@ -13,6 +13,8 @@ layout: post
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+{% include pwa-head.html %}
+
 <style>
   body {
     background: #0a0a0a;
@@ -2406,4 +2408,15 @@ function updateWeeklyProgress(stats, weekNum) {
     }
   });
 
+  // Lightweight mobile detection redirect to /mobile/ (only for small screens)
+  (function(){
+    try {
+      if (window.matchMedia('(max-width: 640px)').matches && !window.location.pathname.startsWith('/mobile')) {
+        // Avoid interfering with user-agent previews and bots
+        if (!navigator.userAgent.includes('Slackbot') && !navigator.userAgent.includes('Twitterbot')) {
+          window.location.replace('/mobile/');
+        }
+      }
+    } catch(e){}
+  })();
 </script>

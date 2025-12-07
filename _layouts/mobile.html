@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f1113">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" href="/favicon.ico">
+  <title>{{ page.title | default: site.title }}</title>
+  <link rel="stylesheet" href="/assets/mobile.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+    }
+  </script>
+  {% include head-custom.html %}
+</head>
+<body class="mobile-app">
+  <div id="mobile-root">
+    <header class="mobile-header">
+      <button id="mobile-back" class="icon-btn" aria-label="Back">←</button>
+      <div class="mobile-title">{{ page.title | default: site.title }}</div>
+      <button id="mobile-actions" class="icon-btn" aria-label="Actions">⋯</button>
+    </header>
+
+    <main id="mobile-content" role="main">
+      {{ content }}
+    </main>
+
+    <nav class="mobile-nav" role="navigation" aria-label="Primary Navigation">
+      <button class="nav-btn" data-target="home">Home</button>
+      <button class="nav-btn" data-target="courses">Courses</button>
+      <button class="nav-btn" data-target="progress">Progress</button>
+      <button class="nav-btn" data-target="profile">Profile</button>
+    </nav>
+  </div>
+
+  <script src="/assets/mobile.js" defer></script>
+</body>
+</html>
