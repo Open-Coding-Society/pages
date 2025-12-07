@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css">
+
 <div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
   <!-- Pearly glow effect around container -->
   <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
@@ -8,7 +11,7 @@
       <p class="text-xl text-gray-300 max-w-4xl mx-auto">{{ page.lxdData.Description }}</p>
     </div>
 
-    <!-- Prerequisites Section -->
+    <!-- Prerequisibodytes Section -->
     {% if page.lxdData.Prequisites %}
     <div class="mb-8">
       <h2 class="text-2xl font-semibold text-white mb-2">Prerequisites</h2>
@@ -105,6 +108,19 @@
           </div>
         {% endfor %}
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="submission-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background-color: rgba(0,0,0,0.8); overflow-y:auto;">
+  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:600px; width:90%; margin:40px auto; border:1px solid #374151;">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-2xl font-bold text-white">Submit Your Work</h3>
+      <button onclick="closeSubmissionModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer;">&times;</button>
+    </div>
+    <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white;" placeholder="Write your submission here..."></textarea>
+    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+      <button onclick="submitHack()" style="padding:8px 20px; border-radius:8px; background-color:#16a34a; color:white; border:none; font-weight:600;">Submit</button>
     </div>
   </div>
 </div>
@@ -269,8 +285,8 @@
                 <a href="${topic.Lessons}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-center py-2 px-3 rounded-lg text-sm font-semibold transition">
                   Learn
                 </a>
-                <button onclick="toggleComplete('${gamePath}')" class="px-3 py-2 rounded-lg ${isCompleted ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-gray-600 hover:bg-gray-500'} text-white text-sm transition">
-                  ${isCompleted ? '✓ Complete' : 'Incomplete'}
+                <button onclick="openSubmissionModal('${gamePath}')" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm transition">
+                  Submit 
                 </button>
               </div>
             </div>
@@ -279,6 +295,7 @@
       </div>
     `;
   }
+
 
   // Update status badges on all cards
   function updateAllCardBadges() {
@@ -389,11 +406,46 @@
       updateStatus('Failed to save selection', true);
     }
   }
-
-  // Initialize on page load
+  
+  let currentHackToSubmit = null;
+  
+  function openSubmissionModal(gamePath) {
+    currentHackToSubmit = gamePath;
+    document.getElementById('submission-text').value = ''; // clear previous input
+    const modal = document.getElementById('submission-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSubmissionModal() {
+    const modal = document.getElementById('submission-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  
+  async function submitHack() {
+    const text = document.getElementById('submission-text').value.trim();
+    if (!text) {
+      alert('Please write something before submitting.');
+      return;
+    }
+    
+    if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
+    userGradeData.hacks_submissions[currentHackToSubmit] = text;
+    
+    // Mark as completed
+    userGradeData.hacks_completed[currentHackToSubmit] = true;
+    await saveGradeData();
+    
+    renderSelectedHacks();
+    updateAllCardBadges();
+    closeSubmissionModal();
+    updateStatus('Submission saved!');
+    setTimeout(updateStatusDisplay, 1500);
+  }
+// Initialize on page load
   document.addEventListener('DOMContentLoaded', async () => {
     console.log('Page loaded, initializing...');
-    
+      
     await loadGradeData();
     renderSelectedHacks();
     updateAllCardBadges();
@@ -404,7 +456,6 @@
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalSaveBtn = document.getElementById('modal-save-btn');
-    const modalOverlay = document.getElementById('modal-overlay');
 
     console.log('Select button found:', selectBtn);
 
@@ -437,8 +488,6 @@
       });
     }
 
-    if (modalOverlay) {
-      modalOverlay.addEventListener('click', closeModal);
-    }
-  });
+  });  
+
 </script>
