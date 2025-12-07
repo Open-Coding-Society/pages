@@ -118,9 +118,29 @@
       <h3 class="text-2xl font-bold text-white">Submit Your Work</h3>
       <button onclick="closeSubmissionModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer;">&times;</button>
     </div>
+
+    <!-- Checklist -->
+    <div id="submission-checklist" class="mb-4">
+      <label class="flex items-center gap-2 text-white">
+        <input type="checkbox" class="submission-checkbox">
+        Hacks
+      </label>
+      <label class="flex items-center gap-2 text-white">
+        <input type="checkbox" class="submission-checkbox">
+        HW
+      </label>
+      <label class="flex items-center gap-2 text-white">
+        <input type="checkbox" class="submission-checkbox">
+        Functionality
+      </label>
+    </div>
+
     <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white;" placeholder="Write your submission here..."></textarea>
+
     <div style="display:flex; justify-content:flex-end; margin-top:16px;">
-      <button onclick="submitHack()" style="padding:8px 20px; border-radius:8px; background-color:#16a34a; color:white; border:none; font-weight:600;">Submit</button>
+      <button id="submission-btn" onclick="submitHack()" disabled style="padding:8px 20px; border-radius:8px; background-color:#16a34a; color:white; border:none; font-weight:600; opacity:0.5; cursor:not-allowed;">
+        Submit
+      </button>
     </div>
   </div>
 </div>
@@ -416,6 +436,35 @@
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
+  function updateSubmitButtonState() {
+    const checkboxes = document.querySelectorAll('#submission-checklist .submission-checkbox');
+    const btn = document.getElementById('submission-btn');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    btn.disabled = !allChecked;
+    btn.style.opacity = allChecked ? '1' : '0.5';
+    btn.style.cursor = allChecked ? 'pointer' : 'not-allowed';
+  }
+
+  // Add event listeners whenever modal opens
+  function openSubmissionModal(gamePath) {
+    currentHackToSubmit = gamePath;
+    document.getElementById('submission-text').value = ''; // clear previous input
+    const modal = document.getElementById('submission-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // reset checkboxes
+    const checkboxes = document.querySelectorAll('#submission-checklist .submission-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+
+    updateSubmitButtonState();
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateSubmitButtonState);
+    });
+  }
+  
   function closeSubmissionModal() {
     const modal = document.getElementById('submission-modal');
     modal.style.display = 'none';
