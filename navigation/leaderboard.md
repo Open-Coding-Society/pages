@@ -15,6 +15,23 @@ permalink: /leaderboard
     padding: 24px 16px;
   }
 
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-header h1 {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .page-header p {
+    color: #9ca3af;
+    font-size: 14px;
+    margin: 0;
+  }
+
   .back-nav {
     margin-bottom: 24px;
   }
@@ -27,21 +44,21 @@ permalink: /leaderboard
     text-decoration: none;
     font-size: 14px;
     padding: 8px 16px;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
+    background: #0f0f0f;
+    border: 1px solid #1f1f1f;
     border-radius: 6px;
     transition: all 0.2s;
   }
 
   .back-link:hover {
-    background: #252525;
+    background: #1a1a1a;
     border-color: #60a5fa;
   }
 
   .filter-btn {
     padding: 8px 16px;
-    background: transparent;
-    border: 1px solid #2a2a2a;
+    background: #0f0f0f;
+    border: 1px solid #1f1f1f;
     border-radius: 6px;
     color: #e0e0e0;
     cursor: pointer;
@@ -51,86 +68,116 @@ permalink: /leaderboard
 
   .filter-btn:hover {
     background: #1a1a1a;
+    border-color: #2a2a2a;
   }
 
-  .leaderboard-container {
-    background: #111111;
-    border: 1px solid #1f1f1f;
-    border-radius: 16px;
-    padding: 32px;
-    margin-bottom: 24px;
+  .filter-btn:focus {
+    outline: none;
+    border-color: #60a5fa;
   }
 
-  .leaderboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .leaderboard-header h2 {
-    color: #ffffff;
-    margin: 0;
-    font-size: 1.75rem;
-  }
-
-  .leaderboard-controls {
-    display: flex;
-    gap: 12px;
-  }
-
-  .leaderboard-stats-overview {
+  /* Stats Grid */
+  .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
   }
 
   .stat-card {
     background: #0f0f0f;
-    border: 1px solid #2a2a2a;
+    border: 1px solid #1f1f1f;
     border-radius: 12px;
     padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
     transition: all 0.2s;
   }
 
   .stat-card:hover {
+    border-color: #2a2a2a;
+  }
+
+  .stat-card.highlight {
     border-color: #60a5fa;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.05) 0%, transparent 100%);
   }
 
   .stat-icon {
-    font-size: 32px;
-    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 18px;
   }
 
-  .stat-content {
-    flex: 1;
-  }
+  .stat-icon.rank { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+  .stat-icon.streak { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  .stat-icon.xp { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+  .stat-icon.completion { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .stat-icon.certificates { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
 
   .stat-label {
-    color: #999999;
-    font-size: 13px;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     margin-bottom: 4px;
   }
 
   .stat-value {
     color: #ffffff;
-    font-size: 24px;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .stat-subtitle {
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  /* Leaderboard Section */
+  .leaderboard-section {
+    background: #0a0a0a;
+    border: 1px solid #1f1f1f;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .section-title {
+    color: #ffffff;
+    font-size: 18px;
     font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  .leaderboard-table-container {
-    overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid #2a2a2a;
+  .section-title i {
+    color: #60a5fa;
+    font-size: 16px;
   }
 
+  .section-controls {
+    display: flex;
+    gap: 12px;
+  }
+
+  /* Leaderboard Table */
   .leaderboard-table {
     width: 100%;
     border-collapse: collapse;
@@ -141,20 +188,30 @@ permalink: /leaderboard
   }
 
   .leaderboard-table th {
-    padding: 16px;
+    padding: 14px 20px;
     text-align: left;
-    color: #60a5fa;
-    font-weight: 600;
-    border-bottom: 2px solid #2a2a2a;
+    color: #6b7280;
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #1f1f1f;
   }
 
   .leaderboard-table th.sortable {
     cursor: pointer;
     user-select: none;
+    transition: color 0.2s;
   }
 
   .leaderboard-table th.sortable:hover {
-    color: #93c5fd;
+    color: #60a5fa;
+  }
+
+  .leaderboard-table th.sortable i {
+    margin-left: 6px;
+    font-size: 10px;
+    opacity: 0.5;
   }
 
   .leaderboard-table tbody tr {
@@ -162,28 +219,34 @@ permalink: /leaderboard
     transition: background 0.2s;
   }
 
+  .leaderboard-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
   .leaderboard-table tbody tr:hover {
     background: #0f0f0f;
   }
 
   .leaderboard-table tbody tr.current-user {
-    background: rgba(96, 165, 250, 0.1);
-    border-left: 3px solid #60a5fa;
+    background: rgba(96, 165, 250, 0.08);
   }
 
   .leaderboard-table td {
-    padding: 16px;
+    padding: 16px 20px;
     color: #e0e0e0;
+    font-size: 14px;
   }
 
   .rank-cell {
     font-weight: 700;
-    font-size: 18px;
+    font-size: 16px;
+    color: #6b7280;
+    width: 60px;
   }
 
-  .rank-cell.top-3 {
-    color: #fbbf24;
-  }
+  .rank-cell.gold { color: #fbbf24; }
+  .rank-cell.silver { color: #9ca3af; }
+  .rank-cell.bronze { color: #cd7c2f; }
 
   .student-cell {
     display: flex;
@@ -194,73 +257,116 @@ permalink: /leaderboard
   .student-avatar {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    border-radius: 8px;
+    background: linear-gradient(135deg, #1f1f1f 0%, #0f0f0f 100%);
+    border: 1px solid #2a2a2a;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #60a5fa;
     font-weight: 600;
+    font-size: 14px;
+  }
+
+  .student-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .student-name {
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  .student-tag {
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 500;
   }
 
   .badges-cell {
     display: flex;
+    gap: 6px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
     gap: 4px;
+    padding: 4px 8px;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #9ca3af;
   }
 
-  .badge-icon {
-    font-size: 20px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
+  .badge i {
+    font-size: 10px;
   }
 
-  .badge-icon:hover {
-    opacity: 1;
-    transform: scale(1.2);
-  }
+  .badge.streak { border-color: rgba(239, 68, 68, 0.3); color: #ef4444; }
+  .badge.xp { border-color: rgba(96, 165, 250, 0.3); color: #60a5fa; }
+  .badge.certificate { border-color: rgba(168, 85, 247, 0.3); color: #a855f7; }
+  .badge.master { border-color: rgba(34, 197, 94, 0.3); color: #22c55e; }
 
-  /* Analytics Dashboard */
-  .analytics-dashboard {
-    background: #111111;
+  /* Analytics Section */
+  .analytics-section {
+    background: #0a0a0a;
     border: 1px solid #1f1f1f;
     border-radius: 16px;
-    padding: 32px;
+    overflow: hidden;
   }
 
-  .analytics-dashboard h2 {
-    color: #ffffff;
-    margin-bottom: 24px;
-  }
-
-  .charts-grid {
+  .analytics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: #1f1f1f;
   }
 
-  .chart-card {
-    background: #0f0f0f;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
+  .analytics-card {
+    background: #0a0a0a;
     padding: 24px;
   }
 
-  .chart-card h3 {
+  .analytics-card h3 {
     color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
     margin: 0 0 20px 0;
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .analytics-card h3 i {
+    color: #60a5fa;
+    font-size: 14px;
   }
 
   #quest-timeline {
-    max-height: 300px;
+    max-height: 280px;
     overflow-y: auto;
+  }
+
+  #quest-timeline::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #quest-timeline::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+
+  #quest-timeline::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 2px;
   }
 
   .timeline-item {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
+    gap: 12px;
+    padding: 12px 0;
     border-bottom: 1px solid #1f1f1f;
   }
 
@@ -268,13 +374,17 @@ permalink: /leaderboard
     border-bottom: none;
   }
 
-  .timeline-marker {
-    width: 12px;
-    height: 12px;
+  .timeline-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #60a5fa;
-    margin-top: 4px;
+    margin-top: 6px;
     flex-shrink: 0;
+  }
+
+  .timeline-dot.certificate {
+    background: #a855f7;
   }
 
   .timeline-content {
@@ -282,33 +392,113 @@ permalink: /leaderboard
   }
 
   .timeline-title {
-    color: #ffffff;
+    color: #e0e0e0;
+    font-size: 13px;
     font-weight: 500;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
-  .timeline-date {
-    color: #999999;
+  .timeline-meta {
+    color: #6b7280;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+  }
+
+  .empty-state i {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  /* Certificates Section */
+  .certificates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .certificate-item {
+    background: #0f0f0f;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .certificate-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(168, 85, 247, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a855f7;
+    font-size: 16px;
+  }
+
+  .certificate-info {
+    flex: 1;
+  }
+
+  .certificate-name {
+    color: #ffffff;
     font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .certificate-date {
+    color: #6b7280;
+    font-size: 11px;
+  }
+
+  @media (max-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
   @media (max-width: 768px) {
-    .charts-grid {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .analytics-grid {
       grid-template-columns: 1fr;
     }
 
-    .leaderboard-header {
+    .section-header {
       flex-direction: column;
       align-items: flex-start;
+      gap: 12px;
     }
 
-    .leaderboard-controls {
+    .section-controls {
       width: 100%;
-      flex-direction: column;
     }
 
-    .leaderboard-stats-overview {
-      grid-template-columns: 1fr 1fr;
+    .section-controls .filter-btn {
+      flex: 1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -321,89 +511,104 @@ permalink: /leaderboard
     </a>
   </div>
 
-  <!-- Leaderboard Container -->
-  <div class="leaderboard-container">
-    <div class="leaderboard-header">
-      <h2>🏆 Course Leaderboard</h2>
-      <div class="leaderboard-controls">
-        <select id="leaderboard-scope" class="filter-btn">
-          <option value="global">Global Rankings</option>
-          <option value="friends">Friends Only</option>
-          <option value="class">Class Rankings</option>
-        </select>
-        <select id="leaderboard-timeframe" class="filter-btn">
-          <option value="alltime">All Time</option>
-          <option value="weekly">This Week</option>
-          <option value="monthly">This Month</option>
-        </select>
-      </div>
-    </div>
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Student Leaderboard</h1>
+    <p>Track your progress and see how you rank among your peers</p>
+  </div>
 
-    <!-- Stats Overview -->
-    <div class="leaderboard-stats-overview">
-      <div class="stat-card">
-        <div class="stat-icon">🏅</div>
-        <div class="stat-content">
-          <div class="stat-label">Your Rank</div>
-          <div class="stat-value" id="user-rank">--</div>
-        </div>
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    <div class="stat-card highlight">
+      <div class="stat-icon rank">
+        <i class="fas fa-trophy"></i>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon">🔥</div>
-        <div class="stat-content">
-          <div class="stat-label">Current Streak</div>
-          <div class="stat-value" id="user-streak">0 days</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-content">
-          <div class="stat-label">Total XP</div>
-          <div class="stat-value" id="user-xp">0</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-content">
-          <div class="stat-label">Completion</div>
-          <div class="stat-value" id="user-completion">0%</div>
-        </div>
-      </div>
+      <div class="stat-label">Your Rank</div>
+      <div class="stat-value" id="user-rank">--</div>
+      <div class="stat-subtitle" id="rank-change"></div>
     </div>
-
-    <!-- Leaderboard Table -->
-    <div class="leaderboard-table-container">
-      <table class="leaderboard-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Student</th>
-            <th class="sortable" data-sort="completion">Completion %</th>
-            <th class="sortable" data-sort="streak">Streak</th>
-            <th class="sortable" data-sort="xp">XP</th>
-            <th>Badges</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard-body">
-          <!-- Populated by JavaScript -->
-        </tbody>
-      </table>
+    <div class="stat-card">
+      <div class="stat-icon streak">
+        <i class="fas fa-fire"></i>
+      </div>
+      <div class="stat-label">Current Streak</div>
+      <div class="stat-value" id="user-streak">0</div>
+      <div class="stat-subtitle">days</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon xp">
+        <i class="fas fa-bolt"></i>
+      </div>
+      <div class="stat-label">Total XP</div>
+      <div class="stat-value" id="user-xp">0</div>
+      <div class="stat-subtitle">experience points</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon completion">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-label">Completion</div>
+      <div class="stat-value" id="user-completion">0%</div>
+      <div class="stat-subtitle" id="completion-detail">0 of 0 items</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon certificates">
+        <i class="fas fa-award"></i>
+      </div>
+      <div class="stat-label">Certificates</div>
+      <div class="stat-value" id="user-certificates">0</div>
+      <div class="stat-subtitle">earned</div>
     </div>
   </div>
 
-  <!-- Analytics Dashboard -->
-  <div class="analytics-dashboard">
-    <h2>📈 Your Progress Analytics</h2>
-    <div class="charts-grid">
-      <!-- Weekly Progress Chart -->
-      <div class="chart-card">
-        <h3>Weekly Progress Trend</h3>
-        <canvas id="weekly-progress-chart"></canvas>
+  <!-- Leaderboard Section -->
+  <div class="leaderboard-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fas fa-ranking-star"></i>
+        Rankings
+      </h2>
+      <div class="section-controls">
+        <select id="leaderboard-sort" class="filter-btn">
+          <option value="xp">Sort by XP</option>
+          <option value="completion">Sort by Completion</option>
+          <option value="streak">Sort by Streak</option>
+          <option value="certificates">Sort by Certificates</option>
+        </select>
       </div>
+    </div>
+    <table class="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Student</th>
+          <th class="sortable" data-sort="completion">Completion <i class="fas fa-sort"></i></th>
+          <th class="sortable" data-sort="streak">Streak <i class="fas fa-sort"></i></th>
+          <th class="sortable" data-sort="xp">XP <i class="fas fa-sort"></i></th>
+          <th>Achievements</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body">
+        <!-- Populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
 
-      <!-- Quest Completion Timeline -->
-      <div class="chart-card">
-        <h3>Quest Completion Timeline</h3>
+  <!-- Analytics Section -->
+  <div class="analytics-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        Progress Analytics
+      </h2>
+    </div>
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <h3><i class="fas fa-chart-area"></i> Weekly Progress</h3>
+        <canvas id="weekly-progress-chart" height="200"></canvas>
+      </div>
+      <div class="analytics-card">
+        <h3><i class="fas fa-clock-rotate-left"></i> Recent Activity</h3>
         <div id="quest-timeline"></div>
       </div>
     </div>
@@ -416,6 +621,8 @@ permalink: /leaderboard
   const CURRENT_COURSE = urlParams.get('course') || 'csp';
   const LEADERBOARD_KEY = `${CURRENT_COURSE}-leaderboard`;
   const USER_STATS_KEY = `${CURRENT_COURSE}-user-stats`;
+  const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
+  const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
 
   // Initialize user stats structure
   function initializeUserStats() {
@@ -427,6 +634,7 @@ permalink: /leaderboard
       longestStreak: 0,
       lastActivityDate: null,
       weeklyProgress: {},
+      earnedCertificates: [],
       badges: [],
       xp: 0
     };
@@ -436,6 +644,22 @@ permalink: /leaderboard
     } catch (e) {
       return defaultStats;
     }
+  }
+
+  // Get earned certificates count
+  function getEarnedCertificatesCount(user) {
+    // Check both user stats and dedicated certificates storage
+    const userCerts = user.earnedCertificates || [];
+    let storedCerts = [];
+    try {
+      storedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
+    } catch(e) {}
+    
+    // Also count completed weeks as certificates
+    const completedWeeks = Object.values(user.weeklyProgress || {})
+      .filter(w => w.completed === w.total && w.total > 0).length;
+    
+    return Math.max(userCerts.length, storedCerts.length, completedWeeks);
   }
 
   // Refresh leaderboard display
@@ -449,7 +673,16 @@ permalink: /leaderboard
     tbody.innerHTML = '';
 
     if (leaderboard.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No leaderboard data yet. Complete lessons to appear on the leaderboard!</td></tr>';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="fas fa-users"></i>
+              <p>No leaderboard data yet. Complete lessons to appear on the leaderboard.</p>
+            </div>
+          </td>
+        </tr>
+      `;
       return;
     }
 
@@ -459,23 +692,30 @@ permalink: /leaderboard
       const completionRate = user.totalItems > 0
         ? ((user.totalCompleted / user.totalItems) * 100).toFixed(1)
         : 0;
+      const certificatesCount = getEarnedCertificatesCount(user);
+
+      let rankClass = '';
+      if (rank === 1) rankClass = 'gold';
+      else if (rank === 2) rankClass = 'silver';
+      else if (rank === 3) rankClass = 'bronze';
 
       const row = document.createElement('tr');
       if (isCurrentUser) row.classList.add('current-user');
 
       row.innerHTML = `
-        <td class="rank-cell ${rank <= 3 ? 'top-3' : ''}">
-          #${rank}
-        </td>
+        <td class="rank-cell ${rankClass}">#${rank}</td>
         <td>
           <div class="student-cell">
             <div class="student-avatar">${user.username[0].toUpperCase()}</div>
-            <span>${user.username}${isCurrentUser ? ' (You)' : ''}</span>
+            <div class="student-info">
+              <span class="student-name">${user.username}</span>
+              ${isCurrentUser ? '<span class="student-tag">You</span>' : ''}
+            </div>
           </div>
         </td>
         <td>${completionRate}%</td>
         <td>${user.currentStreak} days</td>
-        <td>${user.xp}</td>
+        <td>${user.xp.toLocaleString()}</td>
         <td class="badges-cell">
           ${generateBadges(user)}
         </td>
@@ -487,20 +727,28 @@ permalink: /leaderboard
     updateUserStatsDisplay(currentUser, leaderboard);
   }
 
-  // Generate badge icons based on user achievements
+  // Generate badge elements based on user achievements
   function generateBadges(user) {
     const badges = [];
+    const certs = getEarnedCertificatesCount(user);
 
-    if (user.currentStreak >= 7) badges.push('🔥 7+ Streak');
-    if (user.currentStreak >= 30) badges.push('🌟 30+ Streak');
-    if (user.xp >= 1000) badges.push('⭐ 1000+ XP');
-    if (user.longestStreak >= 14) badges.push('🏆 14+ Best');
-
+    if (user.currentStreak >= 7) {
+      badges.push('<span class="badge streak"><i class="fas fa-fire"></i> ' + user.currentStreak + ' Day Streak</span>');
+    }
+    if (user.xp >= 500) {
+      badges.push('<span class="badge xp"><i class="fas fa-bolt"></i> ' + (user.xp >= 1000 ? '1K+' : '500+') + ' XP</span>');
+    }
+    if (certs > 0) {
+      badges.push('<span class="badge certificate"><i class="fas fa-award"></i> ' + certs + ' Cert' + (certs > 1 ? 's' : '') + '</span>');
+    }
+    
     const weeklyCompleteCount = Object.values(user.weeklyProgress || {})
-      .filter(w => w.completed === w.total).length;
-    if (weeklyCompleteCount >= 5) badges.push('📚 Weekly Master');
+      .filter(w => w.completed === w.total && w.total > 0).length;
+    if (weeklyCompleteCount >= 3) {
+      badges.push('<span class="badge master"><i class="fas fa-star"></i> Week Master</span>');
+    }
 
-    return badges.map(b => `<span class="badge-icon" title="${b}">${b.split(' ')[0]}</span>`).join('');
+    return badges.length > 0 ? badges.join('') : '<span style="color: #6b7280;">—</span>';
   }
 
   // Update user stats display in the stat cards
@@ -509,11 +757,20 @@ permalink: /leaderboard
     const completionRate = user.totalItems > 0
       ? ((user.totalCompleted / user.totalItems) * 100).toFixed(1)
       : 0;
+    const certificatesCount = getEarnedCertificatesCount(user);
 
-    document.getElementById('user-rank').textContent = rank > 0 ? `#${rank}` : '--';
-    document.getElementById('user-streak').textContent = `${user.currentStreak} days`;
-    document.getElementById('user-xp').textContent = user.xp;
-    document.getElementById('user-completion').textContent = `${completionRate}%`;
+    document.getElementById('user-rank').textContent = rank > 0 ? '#' + rank : '--';
+    document.getElementById('user-streak').textContent = user.currentStreak;
+    document.getElementById('user-xp').textContent = user.xp.toLocaleString();
+    document.getElementById('user-completion').textContent = completionRate + '%';
+    document.getElementById('completion-detail').textContent = user.totalCompleted + ' of ' + user.totalItems + ' items';
+    document.getElementById('user-certificates').textContent = certificatesCount;
+
+    // Show rank position context
+    const rankChange = document.getElementById('rank-change');
+    if (rank > 0 && leaderboard.length > 1) {
+      rankChange.textContent = 'of ' + leaderboard.length + ' students';
+    }
   }
 
   // Sort leaderboard by different criteria
@@ -528,6 +785,8 @@ permalink: /leaderboard
           return bRate - aRate;
         case 'streak':
           return b.currentStreak - a.currentStreak;
+        case 'certificates':
+          return getEarnedCertificatesCount(b) - getEarnedCertificatesCount(a);
         case 'xp':
         default:
           return b.xp - a.xp;
@@ -541,7 +800,7 @@ permalink: /leaderboard
   // Initialize charts
   function initializeCharts() {
     createWeeklyProgressChart();
-    createQuestTimeline();
+    createActivityTimeline();
   }
 
   // Create weekly progress chart
@@ -561,90 +820,144 @@ permalink: /leaderboard
     // Show placeholder if no data
     if (weeks.length === 0) {
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#999';
+      ctx.fillStyle = '#6b7280';
       ctx.textAlign = 'center';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('Complete lessons to see your progress!', canvas.width / 2, canvas.height / 2);
+      ctx.font = '14px system-ui, sans-serif';
+      ctx.fillText('Complete lessons to see your progress', canvas.width / 2, canvas.height / 2);
       return;
     }
 
     new Chart(canvas, {
       type: 'line',
       data: {
-        labels: weeks.map(w => `Week ${w}`),
+        labels: weeks.map(w => 'W' + w),
         datasets: [{
-          label: 'Completion %',
+          label: 'Completion',
           data: completionRates,
           borderColor: '#60a5fa',
           backgroundColor: 'rgba(96, 165, 250, 0.1)',
+          borderWidth: 2,
           tension: 0.4,
-          fill: true
+          fill: true,
+          pointBackgroundColor: '#60a5fa',
+          pointBorderColor: '#0a0a0a',
+          pointBorderWidth: 2,
+          pointRadius: 4
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: {
             backgroundColor: '#1f1f1f',
             titleColor: '#ffffff',
-            bodyColor: '#e0e0e0'
+            bodyColor: '#e0e0e0',
+            borderColor: '#2a2a2a',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: false,
+            callbacks: {
+              label: function(context) {
+                return context.parsed.y.toFixed(1) + '% complete';
+              }
+            }
           }
         },
         scales: {
           y: {
             beginAtZero: true,
             max: 100,
-            ticks: { color: '#999999' },
-            grid: { color: '#2a2a2a' }
+            ticks: { 
+              color: '#6b7280',
+              font: { size: 11 },
+              callback: function(value) {
+                return value + '%';
+              }
+            },
+            grid: { color: '#1f1f1f' }
           },
           x: {
-            ticks: { color: '#999999' },
-            grid: { color: '#2a2a2a' }
+            ticks: { 
+              color: '#6b7280',
+              font: { size: 11 }
+            },
+            grid: { display: false }
           }
         }
       }
     });
   }
 
-  // Create quest completion timeline
-  function createQuestTimeline() {
+  // Create activity timeline
+  function createActivityTimeline() {
     const container = document.getElementById('quest-timeline');
     if (!container) return;
 
     const stats = initializeUserStats();
     const weeklyProgress = stats.weeklyProgress || {};
+    const completionData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
-    // Build timeline from weekly progress
+    // Build timeline from various sources
     const timeline = [];
+    
+    // Add completed weeks
     Object.entries(weeklyProgress).forEach(([weekNum, data]) => {
       if (data.completedDate) {
         timeline.push({
-          title: `Week ${weekNum} Completed`,
-          week: weekNum,
-          date: new Date(data.completedDate)
+          type: 'certificate',
+          title: 'Week ' + weekNum + ' Certificate Earned',
+          date: new Date(data.completedDate),
+          icon: 'certificate'
         });
       }
     });
+
+    // Add recent completions (from today's activity)
+    if (stats.lastActivityDate) {
+      timeline.push({
+        type: 'activity',
+        title: 'Last activity recorded',
+        date: new Date(stats.lastActivityDate),
+        icon: 'activity'
+      });
+    }
 
     // Sort by date (most recent first)
     timeline.sort((a, b) => b.date - a.date);
 
     if (timeline.length === 0) {
-      container.innerHTML = '<p style="color: #999; text-align: center;">No completed quests yet. Start learning!</p>';
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-clock"></i>
+          <p>No activity yet. Start completing lessons!</p>
+        </div>
+      `;
       return;
     }
 
-    container.innerHTML = timeline.slice(0, 10).map(item => `
+    container.innerHTML = timeline.slice(0, 8).map(item => `
       <div class="timeline-item">
-        <div class="timeline-marker"></div>
+        <div class="timeline-dot ${item.icon}"></div>
         <div class="timeline-content">
           <div class="timeline-title">${item.title}</div>
-          <div class="timeline-date">Week ${item.week} • ${item.date.toLocaleDateString()}</div>
+          <div class="timeline-meta">${formatDate(item.date)}</div>
         </div>
       </div>
     `).join('');
+  }
+
+  // Format date for display
+  function formatDate(date) {
+    const now = new Date();
+    const diff = now - date;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return days + ' days ago';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
   // Initialize page
@@ -652,22 +965,34 @@ permalink: /leaderboard
     refreshLeaderboardDisplay();
     initializeCharts();
 
+    // Sort dropdown handler
+    const sortSelect = document.getElementById('leaderboard-sort');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function() {
+        sortLeaderboard(this.value);
+      });
+    }
+
     // Add click listeners for sortable columns
     document.querySelectorAll('.leaderboard-table th.sortable').forEach(header => {
       header.addEventListener('click', function() {
         const sortBy = this.dataset.sort;
         sortLeaderboard(sortBy);
+        
+        // Update dropdown to match
+        if (sortSelect) sortSelect.value = sortBy;
       });
     });
 
     // Prompt for username if not set
     if (!localStorage.getItem('student-username')) {
-      const username = prompt('Enter your name for the leaderboard:');
-      if (username) {
-        localStorage.setItem('student-username', username);
-        refreshLeaderboardDisplay();
-      }
+      setTimeout(() => {
+        const username = prompt('Enter your name for the leaderboard:');
+        if (username && username.trim()) {
+          localStorage.setItem('student-username', username.trim());
+          refreshLeaderboardDisplay();
+        }
+      }, 500);
     }
   });
 </script>
-

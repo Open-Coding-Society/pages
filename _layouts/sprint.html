@@ -2006,9 +2006,50 @@ function updateWeeklyProgress(stats, weekNum) {
     skillTag.textContent = skillFocus;
     skillsContainer.appendChild(skillTag);
 
+    // Track earned certificate
+    trackEarnedCertificate(profile);
+
     // Close list modal and open certificate modal
     document.getElementById('certificate-list-modal').style.display = 'none';
     document.getElementById('certificate-modal').style.display = 'block';
+  }
+
+  // Track earned certificates for leaderboard
+  function trackEarnedCertificate(profile) {
+    const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
+    let earnedCerts = [];
+    
+    try {
+      earnedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
+    } catch(e) {
+      earnedCerts = [];
+    }
+
+    // Create certificate record
+    const certRecord = {
+      id: profile.slug || `week-${profile.weekNumber}-${profile.skill}`,
+      weekNumber: profile.weekNumber,
+      theme: profile.theme,
+      skill: profile.skill,
+      earnedDate: new Date().toISOString()
+    };
+
+    // Check if already earned
+    const exists = earnedCerts.some(c => c.id === certRecord.id);
+    if (!exists) {
+      earnedCerts.push(certRecord);
+      localStorage.setItem(CERTIFICATES_KEY, JSON.stringify(earnedCerts));
+
+      // Update user stats with certificate count
+      const stats = initializeUserStats();
+      if (!stats.earnedCertificates) stats.earnedCertificates = [];
+      if (!stats.earnedCertificates.includes(certRecord.id)) {
+        stats.earnedCertificates.push(certRecord.id);
+        // Bonus XP for earning certificate
+        stats.xp += 100;
+        saveUserStats(stats);
+      }
+    }
   }
 
   // Close certificate modal
