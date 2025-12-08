@@ -1,42 +1,208 @@
-/* Mobile-first premium UI for Open Coding Society */
 :root{
-  --bg:#0f1113; --card:#0b0c0d; --muted:#9ca3af; --accent:#60a5fa; --surface: #0f1113;
+  --bg:#0f1113;
+  --panel:#0b0c0d;
+  --muted:#9aa0a6;
+  --accent:#7dd3fc;
+  --accent-2:#60a5fa;
+  --text:#e6eef6;
+  --success:#34d399;
+  --danger:#fb7185;
+  --radius:12px;
+  --gap:14px;
+  --max-width:960px;
+  --mobile-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body.mobile-app{background:var(--bg); color:#e6eef8; font-family: Inter, system-ui, -apple-system, 'Helvetica Neue', Arial; -webkit-font-smoothing:antialiased;}
 
-/* fluid typography */
-h1{font-size:clamp(20px,5.5vw,28px); margin:12px 0}
-h2{font-size:clamp(16px,4.2vw,20px); margin:8px 0}
-p{line-height:1.45; margin:8px 0}
+/* Everything mobile-only must be inside body.mobile to avoid desktop bleed */
+body.mobile{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--mobile-font);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.35;
+  margin:0;
+  min-height:100vh;
+}
 
-.mobile-header{position:sticky; top:0; z-index:2000; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; background:linear-gradient(180deg, rgba(15,17,19,0.9), rgba(15,17,19,0.6)); backdrop-filter: blur(6px);}
-.icon-btn{background:transparent; border:none; color:var(--accent); font-size:20px; padding:8px; border-radius:12px}
-.mobile-title{font-weight:700; font-size:16px}
+/* Layout */
+body.mobile #mobile-root{
+  max-width:var(--max-width);
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
 
-#mobile-content{padding:16px 16px 90px 16px}
-.cards{display:grid; grid-template-columns:1fr; gap:12px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; padding:16px; box-shadow: 0 6px 18px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.03)}
-.card h2{margin:0 0 6px 0}
-.muted{color:var(--muted)}
+/* Header */
+body.mobile .mobile-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  backdrop-filter: blur(6px);
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  position:sticky;
+  top:0;
+  z-index:40;
+}
 
-.mobile-nav{position:fixed; left:0; right:0; bottom:0; height:66px; display:flex; justify-content:space-around; align-items:center; gap:8px; background:linear-gradient(180deg, rgba(10,10,10,0.98), rgba(10,10,10,0.92)); padding:10px 12px; border-top-left-radius:14px; border-top-right-radius:14px; box-shadow:0 -8px 24px rgba(2,6,23,0.6); z-index:2100}
-.nav-btn{background:transparent; border:none; color:#cfe7ff; font-weight:600; padding:10px 12px; border-radius:12px}
-.nav-btn:active{transform:translateY(1px)}
+body.mobile .mobile-title{
+  flex:1;
+  text-align:center;
+  font-weight:600;
+  font-size:1rem;
+  color:var(--text);
+  padding:4px 0;
+}
 
-/* Modals */
-.mobile-modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:3000}
-.mobile-modal{width:min(680px, 94vw); background:var(--card); border-radius:16px; padding:16px; box-shadow:0 20px 40px rgba(2,6,23,0.6); transform-origin:center; transition:transform .28s cubic-bezier(.22,.9,.36,1), opacity .22s ease;}
-.mobile-modal.enter{transform:translateY(0); opacity:1}
-.mobile-modal.exit{transform:translateY(10px); opacity:0}
-.mobile-modal .modal-header{display:flex; align-items:center; justify-content:space-between; gap:12px}
-.mobile-modal .close{background:transparent; border:none; font-size:24px; color:var(--accent); padding:8px; border-radius:10px}
-.mobile-modal .modal-body{max-height:70vh; overflow:auto; padding-top:12px}
+/* Buttons */
+body.mobile .icon-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  padding:6px;
+  font-size:1.1rem;
+  border-radius:8px;
+}
 
-/* Prevent background scroll when modal open (class on body applied in JS) */
-.body-modal-open{height:100%; overflow:hidden}
+body.mobile .icon-btn:active,
+body.mobile .nav-btn:active{
+  opacity:0.9;
+}
 
-@media (min-width: 768px){
-  #mobile-content{padding:20px 36px 120px 36px}
+/* Main content */
+body.mobile #mobile-content{
+  padding:16px;
+  flex:1;
+  box-sizing:border-box;
+}
+
+/* Nav */
+body.mobile .mobile-nav{
+  display:flex;
+  gap:6px;
+  padding:10px;
+  border-top:1px solid rgba(255,255,255,0.03);
+  background:linear-gradient(0deg, rgba(255,255,255,0.01), transparent);
+  justify-content:space-between;
+  position:sticky;
+  bottom:0;
+  z-index:40;
+}
+
+body.mobile .nav-btn{
+  flex:1;
+  margin:0 4px;
+  padding:10px 8px;
+  font-size:0.95rem;
+  color:var(--muted);
+  background:transparent;
+  border-radius:10px;
+  border:1px solid transparent;
+}
+
+body.mobile .nav-btn.active{
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:#051025;
+  box-shadow:0 6px 18px rgba(11,22,33,0.45);
+  border-color:transparent;
+}
+
+/* Cards and panels */
+body.mobile .card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:var(--radius);
+  padding:12px;
+  margin-bottom:12px;
+  border:1px solid rgba(255,255,255,0.03);
+  box-shadow:0 6px 18px rgba(2,6,12,0.35);
+}
+
+/* Progress bar */
+body.mobile .progress-wrap{
+  height:10px;
+  background:rgba(255,255,255,0.03);
+  border-radius:999px;
+  overflow:hidden;
+}
+body.mobile .progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  width:0%;
+  transition:width .35s ease;
+}
+
+/* Badges / trophies */
+body.mobile .trophy-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;
+}
+body.mobile .trophy-tile{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+  color:var(--text);
+}
+
+/* Modal (simple centered modal) */
+body.mobile .modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(2,6,12,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:120;
+  padding:20px;
+}
+body.mobile .modal{
+  width:100%;
+  max-width:520px;
+  background:var(--panel);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 20px 50px rgba(2,6,12,0.6);
+  border:1px solid rgba(255,255,255,0.03);
+  color:var(--text);
+  position:relative;
+}
+body.mobile .modal .modal-close{
+  position:absolute;
+  right:10px;
+  top:10px;
+  background:transparent;
+  border:0;
+  font-size:1.15rem;
+  color:var(--muted);
+  padding:6px;
+  border-radius:8px;
+}
+
+/* Small utilities */
+body.mobile .muted{ color:var(--muted); font-size:0.9rem; }
+body.mobile .small{ font-size:0.86rem; }
+body.mobile .center{ text-align:center; }
+
+/* Accessibility / focus */
+body.mobile button:focus,
+body.mobile a:focus{
+  outline:3px solid rgba(125,211,252,0.12);
+  outline-offset:3px;
+  border-radius:8px;
+}
+
+/* Lightweight responsive tweaks for very small phones */
+@media (max-width:360px){
+  body.mobile #mobile-content{ padding:12px; }
+  body.mobile .mobile-title{ font-size:0.95rem; }
+  body.mobile .trophy-tile{ padding:10px; }
 }
