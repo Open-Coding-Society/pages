@@ -20,7 +20,7 @@ description: "Class of 2026"
 owner_name: Trevor Vick 
 github_username: Tvick22 
 github_repo: "reQUESTers" 
-baseurl: "https://tvick22.github.io/reQUESTers/" 
+baseurl: "/reQUESTers" 
 future: true
 
 
