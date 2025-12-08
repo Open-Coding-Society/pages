@@ -32,6 +32,9 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-2xl font-semibold text-white">My Onboarding Hacks</h2>
         <div class="flex gap-3">
+          <button id="open-grading-view-btn" onclick="openGradingView()" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition font-semibold">
+            Open Grading View
+          </button>
           <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition font-semibold">
             Select Hacks
           </button>
@@ -108,6 +111,24 @@
           </div>
         {% endfor %}
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grading View (Admin) -->
+<div id="grading-panel" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99998; background-color: rgba(0,0,0,0.8); overflow-y:auto;">
+  <div style="position: relative; background-color: #111827; padding:24px; border-radius:12px; max-width:1100px; width:90%; margin:40px auto; border:1px solid #374151;">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-sm text-purple-300 uppercase tracking-wide">Grading</p>
+        <h2 class="text-2xl font-bold text-white">Grading View</h2>
+        <p class="text-gray-300 text-sm">Assignments with submissions grouped by module. Click a rubric to edit scores.</p>
+      </div>
+      <button id="close-grading-view-btn" class="text-gray-300 hover:text-white text-2xl font-bold leading-none" aria-label="Close grading view">&times;</button>
+    </div>
+
+    <div id="grading-assignments" class="space-y-4">
+      <!-- Assignments and submissions render here -->
     </div>
   </div>
 </div>
@@ -203,6 +224,40 @@
   </div>
 </div>
 
+<!-- Grading Rubric Modal (per submission) -->
+<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; background-color: rgba(0,0,0,0.85); overflow-y:auto;">
+  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-sm text-purple-300 uppercase tracking-wide">Grader</p>
+        <h3 class="text-2xl font-bold text-white">Edit Rubric</h3>
+        <p id="grading-rubric-context" class="text-gray-300 text-sm"></p>
+      </div>
+      <button onclick="closeGradingRubricModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+
+    <div class="bg-gray-800 p-4 rounded-lg mb-4">
+      <label class="block text-white font-semibold mb-2">Total Points</label>
+      <input type="number" id="grading-total-points" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" />
+    </div>
+
+    <div id="grading-edit-categories" class="space-y-4 mb-4"></div>
+
+    <button onclick="addGradingCategory()" style="padding:8px 16px; border-radius:8px; background-color:#10b981; color:white; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
+      + Add Category
+    </button>
+
+    <div style="display:flex; justify-content:space-between; padding-top:16px; border-top:1px solid #374151;">
+      <button onclick="closeGradingRubricModal()" style="padding:8px 20px; border-radius:8px; background-color:#374151; color:white; border:none; font-weight:500; cursor:pointer;">
+        Cancel
+      </button>
+      <button onclick="saveGradingRubric()" style="padding:8px 20px; border-radius:8px; background-color:#10b981; color:white; border:none; font-weight:600; cursor:pointer;">
+        Save Rubric
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Topics data from Jekyll
   const HACK_TOPICS = {{ page.lxdData.Topics | jsonify }};
@@ -251,6 +306,10 @@
   };
   
   let isAuthenticated = false;
+  let isAdmin = true; // admin requirement disabled for now
+  let gradingAssignments = [];
+  let rubricTemplate = DEFAULT_RUBRIC;
+  let currentRubricContext = null;
   let currentHackToSubmit = null;
 
   // API base URL - adjust if needed
@@ -270,12 +329,14 @@
       if (response.ok) {
         const data = await response.json();
         isAuthenticated = true;
+        isAdmin = true; // admin requirement disabled for now
         userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, rubric: DEFAULT_RUBRIC };
         if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
         if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
         if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
         if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
         if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
+        rubricTemplate = userGradeData.rubric || DEFAULT_RUBRIC;
         console.log('Loaded from backend:', userGradeData);
         return true;
       } else {
@@ -284,6 +345,7 @@
     } catch (error) {
       console.log('Backend not available, using localStorage fallback');
       isAuthenticated = false;
+      isAdmin = true; // admin requirement disabled for now
       
       const stored = localStorage.getItem('onboarding_hacks_data');
       if (stored) {
@@ -792,12 +854,225 @@
     setTimeout(updateStatusDisplay, 1500);
   };
 
+  // -------------------------------
+  // Admin grading view helpers
+  // -------------------------------
+  async function loadGradingAssignments() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/assignment_submissions`, { credentials: 'include' });
+      if (!resp.ok) throw new Error('no assignments');
+      const payload = await resp.json();
+      gradingAssignments = payload.assignments || [];
+    } catch (err) {
+      gradingAssignments = [
+        {
+          id: 'animated-background',
+          title: 'Animated Background',
+          date: '2025-12-01',
+          submissions: [
+            {
+              id: 'alice-johnson',
+              student: 'Alice Johnson',
+              submitted_at: '2025-12-01T10:00:00Z',
+              text: "I completed all the onboarding tasks. Here is my introduction: Hi, I'm Alice and I love learning!",
+              rubric: JSON.parse(JSON.stringify(rubricTemplate)),
+              status: 'pending'
+            },
+            {
+              id: 'bob-smith',
+              student: 'Bob Smith',
+              submitted_at: '2025-12-01T09:30:00Z',
+              text: "Intro post plus screenshots attached.",
+              rubric: JSON.parse(JSON.stringify(rubricTemplate)),
+              status: 'pending'
+            }
+          ]
+        }
+      ];
+    }
+  }
+
+  function renderGradingAssignments() {
+    const container = document.getElementById('grading-assignments');
+    if (!container) return;
+
+    if (!gradingAssignments.length) {
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">No submissions available.</div>';
+      return;
+    }
+
+    container.innerHTML = gradingAssignments.map(assignment => `
+      <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide">${assignment.date}</p>
+            <h3 class="text-xl font-bold text-white">${assignment.title}</h3>
+          </div>
+          <span class="text-sm text-gray-300">${assignment.submissions.length} submissions</span>
+        </div>
+        <div class="space-y-3">
+          ${assignment.submissions.map(sub => `
+            <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <h4 class="text-lg font-semibold text-white">${sub.student}</h4>
+                  <p class="text-xs text-gray-400">${new Date(sub.submitted_at).toLocaleString()}</p>
+                </div>
+                <span class="inline-block px-2 py-1 text-xs rounded-full ${sub.status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}">
+                  ${sub.status === 'pending' ? 'Pending' : 'Graded'}
+                </span>
+              </div>
+              <p class="text-gray-200 text-sm mb-3">${sub.text}</p>
+              <div class="flex items-center gap-3">
+                <button onclick="openGradingRubricModal('${assignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                  Edit Rubric
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openGradingView() {
+    const panel = document.getElementById('grading-panel');
+    panel.style.display = 'flex';
+    panel.style.visibility = 'visible';
+    panel.style.opacity = '1';
+    renderGradingAssignments();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGradingView() {
+    const panel = document.getElementById('grading-panel');
+    panel.style.display = 'none';
+    panel.style.visibility = 'hidden';
+    panel.style.opacity = '0';
+    document.body.style.overflow = '';
+  }
+
+  function findSubmission(assignmentId, submissionId) {
+    const assignment = gradingAssignments.find(a => a.id === assignmentId);
+    if (!assignment) return null;
+    const submission = assignment.submissions.find(s => s.id === submissionId);
+    if (!submission) return null;
+    return { assignment, submission };
+  }
+
+  function openGradingRubricModal(assignmentId, submissionId) {
+    const context = findSubmission(assignmentId, submissionId);
+    if (!context) return;
+    currentRubricContext = { assignmentId, submissionId };
+    const rubric = context.submission.rubric || rubricTemplate;
+    document.getElementById('grading-total-points').value = rubric.total;
+    document.getElementById('grading-rubric-context').textContent = `${context.submission.student} • ${context.assignment.title}`;
+    renderGradingEdit(rubric);
+    const modal = document.getElementById('grading-rubric-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGradingRubricModal() {
+    const modal = document.getElementById('grading-rubric-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    currentRubricContext = null;
+  }
+
+  function renderGradingEdit(rubric) {
+    const container = document.getElementById('grading-edit-categories');
+    container.innerHTML = rubric.categories.map((cat, idx) => `
+      <div class="bg-gray-800 p-4 rounded-lg" data-gcat="${idx}">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="flex-1">
+            <label class="block text-white font-semibold mb-1 text-sm">Category</label>
+            <input type="text" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 mb-2" value="${cat.name}" data-gcat-name="${idx}">
+            <label class="block text-white font-semibold mb-1 text-sm">Weight</label>
+            <input type="number" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" value="${cat.weight}" data-gcat-weight="${idx}">
+          </div>
+          <button onclick="removeGradingCategory(${idx})" style="padding:6px 12px; border-radius:6px; background-color:#ef4444; color:white; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">Remove</button>
+        </div>
+        <div class="space-y-2" data-gsubcontainer="${idx}">
+          ${cat.subcategories.map((sub, sidx) => `
+            <div class="flex items-center gap-2 bg-gray-700 p-2 rounded" data-gsub="${idx}-${sidx}">
+              <input type="text" class="flex-1 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm" value="${sub.name}" data-gsub-name="${idx}-${sidx}">
+              <input type="number" step="0.01" class="w-24 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm" value="${sub.weight}" data-gsub-weight="${idx}-${sidx}">
+              <button onclick="removeGradingSub(${idx},${sidx})" style="padding:4px 8px; border-radius:4px; background-color:#ef4444; color:white; border:none; font-size:0.75rem; cursor:pointer;">×</button>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="addGradingSub(${idx})" style="padding:4px 12px; border-radius:6px; background-color:#6366f1; color:white; border:none; font-size:0.875rem; cursor:pointer; margin-top:8px;">+ Add Sub-criterion</button>
+      </div>
+    `).join('');
+  }
+
+  function addGradingCategory() {
+    const rubric = getCurrentRubric();
+    rubric.categories.push({ name: 'New Category', weight: 0, subcategories: [] });
+    renderGradingEdit(rubric);
+  }
+
+  function removeGradingCategory(idx) {
+    const rubric = getCurrentRubric();
+    rubric.categories.splice(idx, 1);
+    renderGradingEdit(rubric);
+  }
+
+  function addGradingSub(catIdx) {
+    const rubric = getCurrentRubric();
+    rubric.categories[catIdx].subcategories.push({ name: 'New Sub-criterion', weight: 0 });
+    renderGradingEdit(rubric);
+  }
+
+  function removeGradingSub(catIdx, subIdx) {
+    const rubric = getCurrentRubric();
+    rubric.categories[catIdx].subcategories.splice(subIdx, 1);
+    renderGradingEdit(rubric);
+  }
+
+  function getCurrentRubric() {
+    if (!currentRubricContext) return JSON.parse(JSON.stringify(rubricTemplate));
+    const ctx = findSubmission(currentRubricContext.assignmentId, currentRubricContext.submissionId);
+    if (!ctx) return JSON.parse(JSON.stringify(rubricTemplate));
+    if (!ctx.submission.rubric) ctx.submission.rubric = JSON.parse(JSON.stringify(rubricTemplate));
+    return ctx.submission.rubric;
+  }
+
+  function saveGradingRubric() {
+    if (!currentRubricContext) return;
+    const ctx = findSubmission(currentRubricContext.assignmentId, currentRubricContext.submissionId);
+    if (!ctx) return;
+    const rubric = getCurrentRubric();
+    rubric.total = parseFloat(document.getElementById('grading-total-points').value) || rubric.total;
+    rubric.categories = [];
+    document.querySelectorAll('[data-gcat]').forEach((catEl, catIdx) => {
+      const name = catEl.querySelector(`[data-gcat-name="${catIdx}"]`)?.value || 'Category';
+      const weight = parseFloat(catEl.querySelector(`[data-gcat-weight="${catIdx}"]`)?.value) || 0;
+      const category = { name, weight, subcategories: [] };
+      catEl.querySelectorAll('[data-gsub]').forEach(subEl => {
+        const [cidx, sidx] = subEl.getAttribute('data-gsub').split('-').map(Number);
+        const subName = subEl.querySelector(`[data-gsub-name="${cidx}-${sidx}"]`)?.value || 'Sub-criterion';
+        const subWeight = parseFloat(subEl.querySelector(`[data-gsub-weight="${cidx}-${sidx}"]`)?.value) || 0;
+        category.subcategories.push({ name: subName, weight: subWeight });
+      });
+      rubric.categories.push(category);
+    });
+    ctx.submission.rubric = rubric;
+    ctx.submission.status = 'graded';
+    closeGradingRubricModal();
+    renderGradingAssignments();
+  }
+
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', async () => {
     await loadGradeData();
+    await loadGradingAssignments();
     renderSelectedHacks();
     updateAllCardBadges();
     updateStatusDisplay();
+
+    const gradingBtn = document.getElementById('open-grading-view-btn');
 
     // Event listeners
     const selectBtn = document.getElementById('select-hacks-btn');
@@ -805,6 +1080,7 @@
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalSaveBtn = document.getElementById('modal-save-btn');
     const viewRubricBtn = document.getElementById('view-full-rubric-btn');
+    const closeGradingBtn = document.getElementById('close-grading-view-btn');
 
     if (selectBtn) {
       selectBtn.addEventListener('click', (e) => {
@@ -838,6 +1114,20 @@
       viewRubricBtn.addEventListener('click', (e) => {
         e.preventDefault();
         openFullRubricModal();
+      });
+    }
+
+    if (gradingBtn) {
+      gradingBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openGradingView();
+      });
+    }
+
+    if (closeGradingBtn) {
+      closeGradingBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeGradingView();
       });
     }
   });
