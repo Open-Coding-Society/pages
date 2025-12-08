@@ -17,7 +17,7 @@ date: 2025-12-01
 <div class="max-w-3xl mx-auto p-4">
   <h1 class="text-2xl font-bold mb-2">Resume — All-in-One</h1>
   <p class="text-gray-600 mb-4">Short, interactive steps. Autosaves locally.</p>
-
+  <a href="../" class="button">Back</a>
   <div class="border rounded p-3 mb-4">
     <div class="flex justify-between text-sm">
       <span>Progress</span><span id="progressLabel">Step 1 / 6</span>
