@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Course Leaderboard
+title: Your Analytics
 description: View student rankings, progress analytics, and achievements
 permalink: /leaderboard
 ---
@@ -513,7 +513,7 @@ permalink: /leaderboard
 
   <!-- Page Header -->
   <div class="page-header">
-    <h1>Student Leaderboard</h1>
+    <h1>Your Analytics</h1>
     <p>Track your progress and see how you rank among your peers</p>
   </div>
 
@@ -608,7 +608,7 @@ permalink: /leaderboard
         <canvas id="weekly-progress-chart" height="200"></canvas>
       </div>
       <div class="analytics-card">
-        <h3><i class="fas fa-clock-rotate-left"></i> Recent Activity</h3>
+        <h3><i class="fas fa-list-check"></i> Progress</h3>
         <div id="quest-timeline"></div>
       </div>
     </div>
