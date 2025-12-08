@@ -38,14 +38,14 @@ layout: opencs
   {%- endif -%}
   <ul class="post-list">
     {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-    {% assign seen_titles = "" | split: "" %}
+    {% assign seen_ids = "" | split: "" %}
     {%- for post in posts -%}
-      {% unless seen_titles contains post.title or post.title contains "Onboarding_adventure_content" %}
+      {% unless seen_ids contains post.canonical_id or post.permalink contains "Onboarding_adventure_content" %}
         <li>
           {%- include post_list_image_card.html -%}
         </li>
-        {% assign seen_titles = seen_titles | push: post.title %}
+        {% assign seen_ids = seen_ids | push: post.canonical_id %}
       {% endunless %}
     {%- endfor -%}
   </ul>
-{%- endif -%}
+  {%- endif -%}
