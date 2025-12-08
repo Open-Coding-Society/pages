@@ -1,4 +1,3 @@
-
 <!-- Favicon for browser tabs and bookmarks -->
 <link rel="icon" href="{{ '/favicon.ico' | relative_url }}" type="image/x-icon">
 
@@ -19,5 +18,21 @@
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {%- endif -%}
+
+{%- comment -%}
+  Global user preference system
+  - CSS and JS are loaded after theme styles so that user-selected
+    preferences (stored in localStorage) can override Minima,
+    Tailwind, Aesthetihawk, etc.
+  - user-preferences.js exposes window.SitePreferences used by the
+    dashboard Preferences tab.
+
+  Styles now come from the main compiled custom-styles.css, which
+  imports _sass/open-coding/user-preferences.scss via open-coding/_main.scss.
+{%- endcomment -%}
+<link rel="stylesheet" href="{{ "/assets/css/custom-styles.css" | relative_url }}">
+<script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
+
+
 
 

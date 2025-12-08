@@ -1,0 +1,92 @@
+#
+# Optional overrides for certificate themes/skills per course/week.
+# Keys should match `page.course` values (e.g., csp, csa, csse).
+# Each week entry may define `theme` (display title) and `skills` (array of tags).
+csp:
+  0:
+    theme: "Onboarding Challenge"
+    skills:
+      - "Linux + VSCode Setup"
+      - "GitHub Pages Launch"
+      - "Learning Experience Design"
+  1:
+    theme: "Tools & Equipment"
+    skills:
+      - "Hardware & Workspace Setup"
+      - "Command Line Navigation"
+      - "Developer Mindset"
+  2:
+    theme: "Agile Methodologies"
+    skills:
+      - "Scrum + Standups"
+      - "Planning Boards"
+      - "GitHub Pages LxD Series"
+  3:
+    theme: "Onboarding Adventure"
+    skills:
+      - "Sprint Planning"
+      - "Team Collaboration"
+      - "Portfolio Storytelling"
+  4:
+    theme: "Python / Flask Foundations"
+    skills:
+      - "Framework for Sprints"
+      - "REST APIs"
+      - "Pair Programming Labs"
+csa:
+  0:
+    theme: "Onboarding & Java Readiness"
+    skills:
+      - "Environment Setup"
+      - "Scrum Habits"
+      - "Student Teaching Prep"
+  1:
+    theme: "Framework for Sprints"
+    skills:
+      - "Agile Methodologies"
+      - "Tools & Equipment"
+      - "Onboarding Adventure"
+  2:
+    theme: "Developer Toolchain"
+    skills:
+      - "Python/Flask Backend Infograph"
+      - "Portfolio Foundations"
+  3:
+    theme: "Java / Spring Kickoff"
+    skills:
+      - "Transition to Full Stack"
+      - "Sprint 2 Planning"
+  4:
+    theme: "Spring Web Development"
+    skills:
+      - "Anatomy of a Spring Boot Project"
+      - "REST Controllers"
+      - "JWT Auth Concepts"
+csse:
+  0:
+    theme: "Onboarding Challenge"
+    skills:
+      - "Team Workflows"
+      - "Portfolio Setup"
+  1:
+    theme: "Framework for Sprints"
+    skills:
+      - "Tools & Equipment"
+      - "Agile Methodology Intro"
+      - "Onboarding Adventure"
+  2:
+    theme: "Python & Flask Backend"
+    skills:
+      - "Backend Infographics"
+      - "Data APIs"
+  3:
+    theme: "Java / Spring Web Development"
+    skills:
+      - "Transition to Full Stack"
+      - "REST API Strategy"
+  4:
+    theme: "JavaScript Student Teaching"
+    skills:
+      - "Framework for Sprints"
+      - "Classroom Facilitation"
+      - "Lesson Planning"

@@ -1,0 +1,582 @@
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Floating Action Button */
+  .admin-fab {
+    position: fixed;
+    right: 2rem;
+    top: 9rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(240, 147, 251, 0.15);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .admin-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
+  }
+
+  /* Side Panel */
+  .admin-panel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 720px;
+    max-width: 95vw;
+    height: 45vh;
+    background: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    transition: transform 0.28s cubic-bezier(.4, 0, .2, 1),
+      opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1300;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0;
+    visibility: hidden;
+    border-radius: 12px;
+  }
+
+  .admin-panel.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (max-width: 768px) {
+    .admin-panel {
+      width: 95vw;
+      max-width: 95vw;
+      height: 85vh;
+      border-radius: 12px;
+    }
+
+    .admin-fab {
+      right: 2rem;
+      top: 9rem;
+      bottom: auto;
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .admin-panel {
+      width: 1000px;
+    }
+  }
+
+  .admin-panel-header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .admin-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .admin-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .admin-panel-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .admin-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  /* Table Styles */
+  #admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  #admin-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  #admin-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  #admin-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  #admin-table tr:hover {
+    background: #f9fafb;
+  }
+
+  /* Action Buttons */
+  .action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    margin: 0 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-btn:hover {
+    background: #e5e7eb;
+  }
+
+  .action-btn svg {
+    width: 18px;
+    height: 18px;
+    color: #6b7280;
+  }
+
+  .action-btn.delete:hover svg {
+    color: #ef4444;
+  }
+
+  .action-btn.edit:hover svg {
+    color: #3b82f6;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2147483647;
+    /* ensure overlay sits above any transformed stacking contexts */
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal-panel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 16px;
+    width: calc(100% - 48px);
+    max-width: 800px;
+    /* increase height so modal can show more content without clipping */
+    max-height: 92vh;
+    height: auto;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .modal-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .modal-body {
+    padding: 28px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 15px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  .btn-secondary:hover {
+    background: #d1d5db;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .status-active {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+</style>
+
+<!-- Floating Admin Button -->
+<button id="admin-toggle-btn" class="admin-fab" aria-label="Open Admin Panel">
+  ⚙️ Admin
+</button>
+
+<!-- Admin Side Panel -->
+<aside id="admin-panel" class="admin-panel" tabindex="-1" aria-label="Admin panel">
+  <div class="admin-panel-header">
+    <button id="admin-close-btn" class="admin-close-btn" aria-label="Close Admin Panel">&times;</button>
+    <h2 class="admin-panel-title">Admin Dashboard</h2>
+  </div>
+
+  <div class="admin-panel-content">
+    <div id="admin-container">
+      <em>Loading admin data...</em>
+    </div>
+  </div>
+</aside>
+
+<!-- Edit/Create Modal -->
+<div id="admin-modal" class="modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <button id="modal-close" class="modal-close" aria-label="Close Modal">&times;</button>
+      <h2 id="modal-title" class="modal-title">Create User</h2>
+    </div>
+    <div class="modal-body">
+      <form id="admin-form">
+        <input type="hidden" id="user-id" name="id">
+
+        <div class="form-group">
+          <label for="username">Username <span style="color: red;">*</span></label>
+          <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email <span style="color: red;">*</span></label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  // Wait for DOM to be fully loaded
+  document.addEventListener('DOMContentLoaded', async function () {
+    console.log("Admin panel script loaded.");
+
+    async function getCredentials() {
+      try {
+        const res = await fetch(`${pythonURI}/api/id`, {
+          ...fetchOptions,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const role = data.role;
+          console.log(role);
+          return role;
+        } else {
+          console.log(`Request failed for with status ${res.status}`);
+        }
+      } catch (err) {
+        console.log(`Error: ${err}`);
+      }
+    }
+
+    async function getUsers() {
+      try {
+        const res = await fetch(`${pythonURI}/api/user`, {
+          ...fetchOptions,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("In get users function", data)
+          return data;
+        } else {
+          console.log(`Request failed for with status ${res.status}`);
+        }
+      } catch (err) {
+        console.log(`Error: ${err}`);
+      }
+    }
+
+    const role = await getCredentials();
+    const users = await getUsers();
+
+    // Admin panel open/close logic
+    const adminPanel = document.getElementById('admin-panel');
+    const adminFab = document.getElementById('admin-toggle-btn');
+    const adminCloseBtn = document.getElementById('admin-close-btn');
+
+    if (adminFab && adminPanel && adminCloseBtn) {
+      adminFab.addEventListener('click', function () {
+        adminPanel.classList.add('open');
+        adminFab.style.display = 'none';
+        console.log("Admin panel opened.");
+        console.log("Role:", role);
+        console.log("Users:", users);
+
+        // Show a message if the current user is not an admin
+        const container = document.getElementById('admin-container') || document.getElementById('admin-modal-content');
+
+        if (!role || String(role) !== 'Admin') {
+          container.innerHTML = '<p style="color:#de1010; font-size:16px;">This admin panel is only available to admin users.</p>';
+          return;
+        }
+
+        // If user is admin, render a 3-column table (Username, Completion, Notes)
+        if (role && String(role) === 'Admin') {
+          // small helper to escape HTML
+          function escapeHtml(str) {
+            return String(str || '')
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+          }
+
+          const container = document.getElementById('admin-container') || document.getElementById('admin-modal-content');
+          if (!container) {
+            console.warn('No admin container found to render admin table.');
+            return;
+          }
+
+          const rows = (Array.isArray(users) ? users : []).map(u => `\
+            <tr>\
+              <td>${escapeHtml(u.name || u.username || u.email || '(unknown)')}</td>\
+              <td><input type="text" class="completion-input" placeholder="Completion"></td>\
+              <td><textarea class="notes-input" placeholder="Notes"></textarea></td>\
+            </tr>\
+          `).join('');
+
+          const tableHtml = `\
+            <table id="admin-table">\
+              <thead>\
+                <tr>\
+                  <th>Username</th>\
+                  <th>Completion</th>\
+                  <th>Notes</th>\
+                </tr>\
+              </thead>\
+              <tbody>\
+                ${rows}\
+              </tbody>\
+            </table>\
+          `;
+
+          container.innerHTML = tableHtml;
+        }
+      });
+
+      adminCloseBtn.addEventListener('click', function () {
+        adminPanel.classList.remove('open');
+        adminFab.style.display = '';
+      });
+    }
+
+    // Modal open/close logic
+    const modal = document.getElementById('admin-modal');
+    // If the include is rendered inside a transformed/overflowing container,
+    // move the modal overlay into `document.body` so it can cover the full viewport
+    // and avoid clipping by parent stacking contexts.
+    if (modal && modal.parentElement !== document.body) {
+      try {
+        document.body.appendChild(modal);
+      } catch (err) {
+        console.warn('Could not move admin modal to body:', err);
+      }
+    }
+    const modalClose = document.getElementById('modal-close');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    if (modalClose && modal) {
+      modalClose.addEventListener('click', function () {
+        modal.classList.remove('active');
+      });
+    }
+
+    if (cancelBtn && modal) {
+      cancelBtn.addEventListener('click', function () {
+        modal.classList.remove('active');
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    }
+
+    // Form submission (placeholder)
+    const adminForm = document.getElementById('admin-form');
+    if (adminForm) {
+      adminForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        console.log('Form submitted');
+        if (modal) modal.classList.remove('active');
+        // Add your form handling logic here
+      });
+    }
+  });
+</script>

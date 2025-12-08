@@ -63,9 +63,9 @@ comments: True
 </code></pre>
 </li>
 </ul>
-    <div class="frq-box" data-frq-id="1" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+    <div class="frq-box" data-frq-id="1" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
         <b>FRQ 1:</b> Explain the relationship between Jekyll and Liquid. What is the role of <strong>Front Matter</strong> in making data accessible to both?<br><br>
-        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
         <button class="grade-button" style="margin-top: 10px;">Grade</button>
         <div class="feedback-box"></div>
     </div>
@@ -148,9 +148,9 @@ for (Post post : site.getPosts()) {
 // Include (Method)
 import static com.example.file.function;
 </code></pre>
-    <div class="frq-box" data-frq-id="2" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+    <div class="frq-box" data-frq-id="2" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
         <b>FRQ 2:</b> Compare the Liquid <strong>Loop</strong> construct to its equivalent in <strong>Python</strong>. How do both achieve the concept of iteration?<br><br>
-        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
         <button class="grade-button" style="margin-top: 10px;">Grade</button>
         <div class="feedback-box"></div>
     </div>
@@ -210,9 +210,9 @@ import static com.example.file.function;
 
 {% endraw %}
 </code></pre>
-    <div class="frq-box" data-frq-id="3" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+    <div class="frq-box" data-frq-id="3" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
         <b>FRQ 3:</b> Analyze the liquid code block in the blogging example. Describe the two filtering and sorting actions it performs on the posts.<br><br>
-        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
         <button class="grade-button" style="margin-top: 10px;">Grade</button>
         <div class="feedback-box"></div>
     </div>
@@ -243,9 +243,9 @@ import static com.example.file.function;
 &lt;/div&gt;
 {% endraw %}
 </code></pre>
-    <div class="frq-box" data-frq-id="4" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+    <div class="frq-box" data-frq-id="4" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
         <b>FRQ 4:</b> Based on the HTML included code, how is the display of the post image handled? What would happen if a post was missing the <code>image</code> front matter key?<br><br>
-        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
         <button class="grade-button" style="margin-top: 10px;">Grade</button>
         <div class="feedback-box"></div>
     </div>
@@ -256,9 +256,9 @@ import static com.example.file.function;
     <p>
         Jekyll and Liquid are powerful tools that extend the functionality of GitHub Pages beyond simple static hosting. By leveraging front matter and Liquid's programming constructs, developers can create complex, data-driven static websites, which serves as a valuable learning experience in modern web development principles.
     </p>
-    <div class="frq-box" data-frq-id="5" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; background:#f9f9f9; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal; color: #222;">
+    <div class="frq-box" data-frq-id="5" style="border:1px solid #ccc; padding:1rem; border-radius:8px; margin:1.5rem 0; box-sizing:border-box; overflow:auto; word-wrap:break-word; white-space:normal;">
         <b>FRQ 5:</b> Briefly summarize how the combination of <strong>Jekyll, Liquid, and Front Matter</strong> enables a static website to feel dynamic.<br><br>
-        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; background:#fff; color:#222; box-sizing:border-box;"></textarea>
+        <textarea rows="5" placeholder="Type your response here..." style="width:100%; border-radius:6px; border:1px solid #ccc; padding:0.5rem; margin-top:0.5rem; box-sizing:border-box;"></textarea>
         <button class="grade-button" style="margin-top: 10px;">Grade</button>
         <div class="feedback-box"></div>
     </div>

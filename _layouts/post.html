@@ -2,169 +2,1430 @@
 layout: opencs 
 ---
 
-<style>
-  /* === Post Header === */
-  .post-header h3 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
+{% comment %}
+Check if this is a course lesson and determine which course context to use
+{% endcomment %}
+{% assign is_course_lesson = false %}
+{% assign current_course = null %}
+{% assign current_week = null %}
 
-  .page-description {
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 1rem;
-  }
+{% comment %}Since files are now course-specific, get the single course{% endcomment %}
+{% if page.courses.csp %}
+  {% assign current_course = 'csp' %}
+  {% assign current_week = page.courses.csp.week | plus: 0 %}
+{% elsif page.courses.csa %}
+  {% assign current_course = 'csa' %}
+  {% assign current_week = page.courses.csa.week | plus: 0 %}
+{% elsif page.courses.csse %}
+  {% assign current_course = 'csse' %}
+  {% assign current_week = page.courses.csse.week | plus: 0 %}
+{% endif %}
 
-  /* === Meta Info (date, author, reading time) === */
-  .post-meta {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
-  }
-  .post-meta time {
-    font-weight: 500;
-  }
+{% if current_course != null and current_week != null %}
+  {% assign is_course_lesson = true %}
+{% endif %}
 
-  /* === Category & Breadcrumb Links === */
-  .category-tags-link {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    margin: 0.1rem;
-    font-size: 0.85rem;
-    background: #f5f5f5;
-    border-radius: 999px;
-    color: #333;
-    text-decoration: none;
-    transition: background 0.2s ease;
-  }
-  .category-tags-link:hover {
-    background: #e0e0e0;
-  }
+{% if is_course_lesson %}
+  {% comment %}
+  === TWO-PANE LESSON PLAYER FOR CSP COURSES ===
+  {% endcomment %}
+  
+  {% assign posts = null | compact %}
+  {% assign posts = posts | concat: site.posts | concat: site.pages %}
 
-  .post-header {
-    margin-bottom: 1rem;
-  }
-  .post-header a.category-tags-link {
-    margin-right: 0.3rem;
-  }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/lesson-player.css">
 
-  /* === Main Content Styling === */
-  .post-content {
-    line-height: 1.7;
-    font-size: 1rem;
-  }
-  .post-content h2,
-  .post-content h3 {
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 0.3rem;
-  }
-
-  /* === Comments Section Separator === */
-  .post-content + div,
-  .post-content + section {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #ddd;
-  }
-</style>
-
-<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
-
-  <header class="post-header">
-    {%- if page.menu -%}
-      {% include {{page.menu}} html=content %}
-    {%- endif -%}
-    {% if page.menu == 'nav/csp_units/csp_unit3_p4_fundamentals.html' %}
-      {% include csp/p4-progress-data.html %}
-      {% include csp/p4-progress-controller.html %}
-      {% unless page.permalink contains '/fundamentals' %}
-        {% include csp/p4-progress-widget.html %}
-      {% endunless %}
-    {% endif %}
-    {% if page.categories.size > 0 %}
-      Categories:
-      {% for category in  page.categories  %}
-        {%- assign prefix = category | slice: 0 -%}
-        <a class="category-tags-link" href="{{site.baseurl}}/search/#{{category|slugize}}">{{category}}</a>
-        {% unless forloop.last %}&nbsp;{% endunless %}
-      {% endfor %}
-    {% endif %}
-    {% if page.breadcrumb %}
-      {% assign parts = page.permalink | split: '/' %}
-      {% assign num_parts = parts.size | minus: 1 %}
-      {% assign parent_parts = '' %}
-      {% for i in (0..num_parts) %}
-        {% unless forloop.last %}
-          {% if parent_parts == '' %}
-            {% assign parent_parts = parts[i] %}
-          {% else %}
-            {% assign parent_parts = parent_parts | append: '/' | append: parts[i] %}
-          {% endif %}
-        {% endunless %}
-      {% endfor %}
-      Breadcrumb:
-      <a class="category-tags-link" href="{{ site.baseurl }}/{{ parent_parts }}">/{{ parent_parts }}</a>
-      {% assign data = site.data[page.data] %}
-      {% for topic in data.Topics %}
-        {% if page.permalink == topic.link %}
-          &raquo; <span class="font-bold">{{ topic.title }}</span>
+  <div class="lesson-player">
+    <!-- LEFT SIDEBAR -->
+    <div class="lesson-sidebar">
+      <div class="sidebar-header">
+        {% if current_course == 'csp' %}
+          <h2>Computer Science Principles</h2>
+        {% elsif current_course == 'csa' %}
+          <h2>Computer Science A</h2>
+        {% elsif current_course == 'csse' %}
+          <h2>Computer Science & Software Engineering</h2>
         {% endif %}
-      {% endfor %}
-    {% endif %}
-    <p class="post-meta post-meta-title">
-      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
-        {{ page.date | date: date_format }}
-      </time>
-      {%- if page.modified_date -%}
-        ~ 
-        {%- assign mdate = page.modified_date | date_to_xmlschema -%}
-        <time class="dt-modified" datetime="{{ mdate }}" itemprop="dateModified">
-          {{ mdate | date: date_format }}
-        </time>
-      {%- endif -%}
-      {%- if page.author -%}
-        • {% for author in page.author %}
-          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-            <span class="p-author h-card" itemprop="name">{{ author }}</span></span>
-            {%- if forloop.last == false %}, {% endif -%}
+        <p>Del Norte High School</p>
+        
+        <div class="course-progress-section">
+          <div class="progress-label">
+            <span>Course Progress</span>
+            <span id="progress-count">0/0</span>
+          </div>
+          <div class="progress-bar-sidebar">
+            <div class="progress-bar-sidebar-fill" id="sidebar-progress" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sprint-nav">
+        {% assign courseData = site.data[current_course] %}
+        {% for i in (1..9) %}
+          {% assign sprintKey = "Sprint" | append: i %}
+          {% assign sprint = courseData[sprintKey] %}
+          
+          {% if sprint %}
+            <div class="sprint-section">
+              <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')">
+                <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
+                <div class="sprint-info">
+                  <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
+                  <div class="sprint-weeks">Weeks {{ sprint.start }}-{{ sprint.end }}</div>
+                </div>
+              </button>
+              
+              <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
+                {% for week in (sprint.start..sprint.end) %}
+                  {% for post in posts %}
+                    {% if post.courses[current_course] %}
+                      {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
+                      {% unless post.path contains "_IPYNB_2_.md" %}
+                        {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                        {% assign course_count = 0 %}
+                        {% for course in post.courses %}
+                          {% assign course_count = course_count | plus: 1 %}
+                        {% endfor %}
+                        {% if course_count == 1 %}
+                          {% assign postWeek = post.courses[current_course].week | plus: 0 %}
+                          {% if postWeek == week %}
+                            <a href="{{ site.baseurl }}{{ post.url }}" 
+                               class="lesson-item {% if page.url == post.url %}active{% endif %}"
+                               data-lesson-id="{{ post.url }}">
+                              <i class="fas fa-circle lesson-status-icon incomplete"></i>
+                              <span class="lesson-title">{{ post.title }}</span>
+                            </a>
+                          {% endif %}
+                        {% endif %}
+                      {% endunless %}
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
         {% endfor %}
-      {%- endif -%}
-      {%- if page.show_reading_time != false -%}
-       • {% include reading_time.html -%}
-      {%- endif -%}
-    </p>
-    <h3>{{ page.title | escape }}</h3>
-    {%- if page.description -%}
-      {%- if site.html_escape.description -%}
-        <p class="page-description">{{ page.description | escape }}</p>
-      {%- else -%}
-        <p class="page-description">{{ page.description }}</p>
-      {%- endif -%}
-    {%- endif -%}
-  </header>
+      </div>
+    </div>
 
-  <div class="post-content e-content" itemprop="articleBody">
-    {%- if page.toc -%}
-      {% include toc.html html=content %}
-    {%- endif -%}
+    <!-- MAIN CONTENT -->
+    <div class="lesson-main">
+      <!-- Top Bar -->
+      <div class="lesson-topbar">
+        <div class="topbar-actions">
+          <a href="{{ site.baseurl }}/navigation/section/{{ current_course }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Timeline View
+          </a>
+          <div class="breadcrumbs">
+            <i class="fas fa-home"></i>
+            <i class="fas fa-chevron-right"></i>
+            <span>Week {{ current_week }}</span>
+            <i class="fas fa-chevron-right"></i>
+            <span class="current">{{ page.title }}</span>
+          </div>
+        </div>
+        <div class="topbar-progress">
+          <div class="topbar-progress-fill" id="lesson-progress"></div>
+        </div>
+      </div>
 
-    {%- if page.submenu -%}
-      {%- include submenu.html -%}
-    {%- endif -%}
+      <!-- Lesson Content -->
+      <div class="lesson-content">
+        <div class="lesson-content-inner">
+          <div class="lesson-header">
+            <h1>{{ page.title | escape }}</h1>
+            <div class="lesson-meta">
+              <span><i class="fas fa-clock"></i> {% include reading_time.html %}</span>
+              <span>•</span>
+              <span>Week {{ current_week }}</span>
+              {% if page.assignment %}
+                <span>•</span>
+                <span><i class="fas fa-file-alt"></i> Assignment</span>
+              {% endif %}
+            </div>
+          </div>
 
-    {{ content }}
+          <div class="lesson-body">
+            {%- if page.toc -%}
+              {% include toc.html html=content %}
+            {%- endif -%}
+
+            {%- if page.submenu -%}
+              {%- include submenu.html -%}
+            {%- endif -%}
+
+            {{ content }}
+
+            {% if page.assignment %}
+            <div class="assignment-submission">
+              <h3>
+                <i class="fas fa-upload assignment-submission-icon"></i>
+                Submit Assignment
+              </h3>
+              
+              <div class="submission-options">
+                <button class="submission-tab active" onclick="switchSubmissionType('github')">
+                  <i class="fab fa-github"></i> GitHub Issue
+                </button>
+                <button class="submission-tab" onclick="switchSubmissionType('link')">
+                  <i class="fas fa-link"></i> Link Submission
+                </button>
+                <button class="submission-tab" onclick="switchSubmissionType('file')">
+                  <i class="fas fa-file-upload"></i> File Upload
+                </button>
+              </div>
+
+              <!-- GitHub Issue Form -->
+              <form class="submission-form active" id="github-form">
+                <div class="form-group">
+                  <label for="github-issue-url">GitHub Issue URL</label>
+                  <input type="url" id="github-issue-url" placeholder="https://github.com/username/repo/issues/123" required>
+                </div>
+                <div class="form-group">
+                  <label for="github-notes">Notes (Optional)</label>
+                  <textarea id="github-notes" placeholder="Add any additional comments about your submission..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                  <i class="fas fa-check"></i>
+                  Submit GitHub Issue
+                </button>
+              </form>
+
+              <!-- Link Submission Form -->
+              <form class="submission-form" id="link-form">
+                <div class="form-group">
+                  <label for="submission-link">Submission Link</label>
+                  <input type="url" id="submission-link" placeholder="https://..." required>
+                </div>
+                <div class="form-group">
+                  <label for="link-description">Description</label>
+                  <textarea id="link-description" placeholder="Describe what you're submitting..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                  <i class="fas fa-check"></i>
+                  Submit Link
+                </button>
+              </form>
+
+              <!-- File Upload Form -->
+              <form class="submission-form" id="file-form">
+                <div class="form-group">
+                  <label>Upload Files</label>
+                  <div class="file-upload-area" id="file-upload-area">
+                    <input type="file" id="file-input" multiple style="display: none;">
+                    <div class="file-upload-icon">
+                      <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-text">Click to upload or drag and drop</div>
+                    <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
+                  </div>
+                  <div class="file-list" id="file-list"></div>
+                </div>
+                <div class="form-group">
+                  <label for="file-notes">Notes (Optional)</label>
+                  <textarea id="file-notes" placeholder="Add any additional comments..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn" id="file-submit-btn" disabled>
+                  <i class="fas fa-check"></i>
+                  Submit Files
+                </button>
+              </form>
+
+              <div class="submission-status" id="submission-status"></div>
+            </div>
+            {% endif %}
+          </div>
+
+          {%- if page.comments -%}
+            <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid #2a2a2a;">
+              {%- include utterances.html -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <!-- Bottom Navigation -->
+      <div class="lesson-bottom">
+        <div class="lesson-bottom-inner">
+          <div class="bottom-actions">
+            <button class="btn btn-outline" id="complete-btn" onclick="toggleComplete()">
+              <i class="fas fa-circle" id="complete-icon"></i>
+              <span id="complete-text">Mark Complete</span>
+            </button>
+          </div>
+          <button class="btn btn-primary" onclick="nextLesson()">
+            Next Lesson
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  {%- if page.comments -%}
-    {%- include utterances.html -%}
-  {%- endif -%}
-  {%- if site.disqus.shortname -%}
-    {%- include disqus_comments.html -%}
-  {%- endif -%}
-  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
-</article>
+
+  <!-- Floating hamburger menu (mobile only) -->
+  <button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Timeline modal overlay -->
+  <div class="timeline-modal-overlay" id="timeline-modal-overlay"></div>
+
+  <!-- Timeline modal (mobile only) -->
+  <div class="timeline-modal" id="timeline-modal">
+    <div class="timeline-modal-header">
+      <h3>Course Timeline</h3>
+      <button class="timeline-close-btn" id="timeline-close-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="timeline-modal-content" id="timeline-modal-content">
+      <!-- Sprint cards will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    // Course is now determined by the specific file being viewed
+    const CURRENT_COURSE = '{{ current_course }}';
+    const currentWeek = '{{ current_week }}';
+    
+    const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
+    // Use consistent lesson ID format (URL path without baseurl)
+    const currentLessonId = '{{ page.url }}';
+
+    // Toggle sprint expansion
+    function toggleSprint(sprintId) {
+      const lessons = document.getElementById(`sprint-${sprintId}-lessons`);
+      const chevron = document.getElementById(`chevron-${sprintId}`);
+      
+      if (lessons.style.display === 'none') {
+        lessons.style.display = 'block';
+        chevron.classList.remove('fa-chevron-right');
+        chevron.classList.add('fa-chevron-down');
+      } else {
+        lessons.style.display = 'none';
+        chevron.classList.remove('fa-chevron-down');
+        chevron.classList.add('fa-chevron-right');
+      }
+    }
+
+    // Load completion data
+    function loadCompletionData() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    // Save completion data
+    function saveCompletionData(data) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.error('Error saving completion data:', e);
+      }
+    }
+
+    // Toggle lesson completion
+    function toggleComplete() {
+      const completionData = loadCompletionData();
+      const isCompleted = completionData[currentLessonId] || false;
+      completionData[currentLessonId] = !isCompleted;
+      saveCompletionData(completionData);
+      
+      updateCompleteButton();
+      updateUI();
+      
+      // Trigger cross-view sync by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId: currentLessonId, completed: !isCompleted }
+      }));
+    }
+
+    // Update the complete button state
+    function updateCompleteButton() {
+      const completionData = loadCompletionData();
+      const isCompleted = completionData[currentLessonId] || false;
+      
+      const icon = document.getElementById('complete-icon');
+      const text = document.getElementById('complete-text');
+      
+      if (isCompleted) {
+        icon.classList.remove('fa-circle');
+        icon.classList.add('fa-circle-check');
+        text.textContent = 'Completed';
+      } else {
+        icon.classList.remove('fa-circle-check');
+        icon.classList.add('fa-circle');
+        text.textContent = 'Mark Complete';
+      }
+    }
+
+    // Update UI based on completion data
+    function updateUI() {
+      const completionData = loadCompletionData();
+      const lessonItems = document.querySelectorAll('.lesson-item');
+      
+      let total = lessonItems.length;
+      let completed = 0;
+      
+      lessonItems.forEach(item => {
+        const lessonId = item.dataset.lessonId;
+        const icon = item.querySelector('.lesson-status-icon');
+        
+        if (completionData[lessonId]) {
+          icon.classList.remove('fa-circle', 'incomplete');
+          icon.classList.add('fa-circle-check', 'completed');
+          completed++;
+        } else {
+          icon.classList.remove('fa-circle-check', 'completed');
+          icon.classList.add('fa-circle', 'incomplete');
+        }
+      });
+      
+      // Update progress bar
+      const progress = total > 0 ? (completed / total) * 100 : 0;
+      document.getElementById('sidebar-progress').style.width = `${progress}%`;
+      document.getElementById('progress-count').textContent = `${completed}/${total}`;
+      
+      // Update lesson progress bar (based on current position in course)
+      const lessonArray = Array.from(lessonItems);
+      const currentIndex = lessonArray.findIndex(item => item.classList.contains('active'));
+      const lessonProgress = total > 0 ? ((currentIndex + 1) / total) * 100 : 0;
+      document.getElementById('lesson-progress').style.width = `${lessonProgress}%`;
+    }
+
+    // Next lesson navigation
+    function nextLesson() {
+      const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+      const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+      
+      if (currentIndex >= 0 && currentIndex < lessonItems.length - 1) {
+        window.location.href = lessonItems[currentIndex + 1].href;
+      } else {
+        alert('You\'ve reached the last lesson!');
+      }
+    }
+
+    // Hide site header and apply lesson player styling
+    function initLessonPlayer() {
+      // Apply minimal body styles for lesson player (keep header visible)
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
+    }
+
+    // Sync completion data when window gains focus or becomes visible (when switching between views)
+    window.addEventListener('focus', function() {
+      if (document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Also sync when page becomes visible (handles tab switching)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Listen for storage changes from other tabs/windows (cross-tab sync)
+    window.addEventListener('storage', function(e) {
+      if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Listen for completion changes from other views (same-window sync)
+    window.addEventListener('completionChanged', function(e) {
+      if (document.querySelector('.lesson-player')) {
+        updateCompleteButton();
+        updateUI();
+      }
+    });
+    
+    // Mobile floating menu functionality
+    function initMobileEnhancements() {
+      const floatingBtn = document.getElementById('floating-menu-btn');
+      const timelineModal = document.getElementById('timeline-modal');
+      const overlay = document.getElementById('timeline-modal-overlay');
+      const closeBtn = document.getElementById('timeline-close-btn');
+      const modalContent = document.getElementById('timeline-modal-content');
+      
+      if (window.innerWidth <= 768) {
+        // Show floating button on mobile
+        if (floatingBtn) floatingBtn.style.display = 'flex';
+        
+        // Populate timeline modal
+        populateTimelineModal();
+        
+        // Open timeline modal
+        function openTimelineModal() {
+          timelineModal.classList.add('open');
+          overlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+        
+        // Close timeline modal
+        function closeTimelineModal() {
+          timelineModal.classList.remove('open');
+          overlay.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+        
+        // Event listeners
+        floatingBtn.addEventListener('click', openTimelineModal);
+        closeBtn.addEventListener('click', closeTimelineModal);
+        overlay.addEventListener('click', closeTimelineModal);
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && timelineModal.classList.contains('open')) {
+            closeTimelineModal();
+          }
+        });
+        
+        // Close when lesson is selected
+        modalContent.addEventListener('click', function(e) {
+          if (e.target.closest('.modal-lesson-item')) {
+            closeTimelineModal();
+          }
+        });
+        
+      } else {
+        // Desktop - hide floating button
+        if (floatingBtn) floatingBtn.style.display = 'none';
+      }
+    }
+    
+    // Populate timeline modal by reading all lesson items and grouping by sprint
+    function populateTimelineModal() {
+      const modalContent = document.getElementById('timeline-modal-content');
+      const completionData = loadCompletionData();
+      
+      if (!modalContent) return;
+      
+      modalContent.innerHTML = '';
+      
+      // Get ALL lesson items from the sidebar (including hidden/collapsed ones)
+      const allLessonItems = document.querySelectorAll('.lesson-item');
+      const sprintGroups = {};
+      
+      // Group lessons by their parent sprint
+      allLessonItems.forEach(item => {
+        const lessonId = item.dataset.lessonId;
+        const lessonTitle = item.querySelector('.lesson-title').textContent;
+        const isCompleted = completionData[lessonId] || false;
+        const isActive = item.classList.contains('active');
+        
+        // Find the sprint this lesson belongs to
+        const sprintSection = item.closest('.sprint-section');
+        if (sprintSection) {
+          const sprintTitle = sprintSection.querySelector('.sprint-title').textContent;
+          
+          if (!sprintGroups[sprintTitle]) {
+            sprintGroups[sprintTitle] = [];
+          }
+          
+          sprintGroups[sprintTitle].push({
+            id: lessonId,
+            title: lessonTitle,
+            url: item.href,
+            completed: isCompleted,
+            active: isActive
+          });
+        }
+      });
+      
+      // Create sprint cards for each group
+      Object.keys(sprintGroups).forEach(sprintTitle => {
+        const lessons = sprintGroups[sprintTitle];
+        const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
+        
+        const sprintCard = document.createElement('div');
+        sprintCard.className = 'modal-sprint-card';
+        
+        sprintCard.innerHTML = `
+          <div class="modal-sprint-header">
+            <h3 class="modal-sprint-title">${sprintTitle}</h3>
+            <button class="modal-sprint-toggle" onclick="toggleModalSprint('${sprintId}')">
+              <i class="fas fa-chevron-down"></i> View Lessons
+            </button>
+          </div>
+          <div class="modal-lessons" id="modal-${sprintId}">
+            ${lessons.map(lesson => `
+              <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
+                <i class="fas ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+                <span class="modal-lesson-title">${lesson.title}</span>
+              </a>
+            `).join('')}
+          </div>
+        `;
+        
+        modalContent.appendChild(sprintCard);
+        
+        // Auto-expand sprint with active lesson
+        const hasActiveLesson = lessons.some(lesson => lesson.active);
+        if (hasActiveLesson) {
+          setTimeout(() => {
+            const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+            if (lessonsContainer) {
+              lessonsContainer.classList.add('expanded');
+              const toggleBtn = sprintCard.querySelector('.modal-sprint-toggle i');
+              if (toggleBtn) {
+                toggleBtn.classList.remove('fa-chevron-down');
+                toggleBtn.classList.add('fa-chevron-up');
+              }
+            }
+          }, 0);
+        }
+      });
+    }
+    
+    // Toggle sprint expansion in modal
+    function toggleModalSprint(sprintId) {
+      const lessonsContainer = document.getElementById(`modal-${sprintId}`);
+      const toggleBtn = document.querySelector(`[onclick="toggleModalSprint('${sprintId}')"] i`);
+      
+      if (lessonsContainer && toggleBtn) {
+        lessonsContainer.classList.toggle('expanded');
+        
+        if (lessonsContainer.classList.contains('expanded')) {
+          toggleBtn.classList.remove('fa-chevron-down');
+          toggleBtn.classList.add('fa-chevron-up');
+        } else {
+          toggleBtn.classList.remove('fa-chevron-up');
+          toggleBtn.classList.add('fa-chevron-down');
+        }
+      }
+    }
+    
+    // Make toggle function globally available
+    window.toggleModalSprint = toggleModalSprint;
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      initMobileEnhancements();
+    });
+
+    // Auto-expand current sprint
+    document.addEventListener('DOMContentLoaded', function() {
+      // Only initialize lesson player mode if we're in a lesson player
+      if (document.querySelector('.lesson-player')) {
+        initLessonPlayer();
+      }
+      
+      const activeLesson = document.querySelector('.lesson-item.active');
+      if (activeLesson) {
+        const sprintSection = activeLesson.closest('.sprint-section');
+        if (sprintSection) {
+          const sprintToggle = sprintSection.querySelector('.sprint-toggle');
+          if (sprintToggle) {
+            sprintToggle.click();
+          }
+        }
+      }
+      
+      updateCompleteButton();
+      updateUI();
+      initMobileEnhancements();
+    });
+
+    // Assignment submission handlers
+    if (document.getElementById('github-form')) {
+      // Submission type switching
+      function switchSubmissionType(type) {
+        // Update tabs
+        document.querySelectorAll('.submission-tab').forEach(tab => {
+          tab.classList.remove('active');
+        });
+        event.target.closest('.submission-tab').classList.add('active');
+
+        // Update forms
+        document.querySelectorAll('.submission-form').forEach(form => {
+          form.classList.remove('active');
+        });
+        document.getElementById(`${type}-form`).classList.add('active');
+
+        // Clear status
+        document.getElementById('submission-status').style.display = 'none';
+      }
+      window.switchSubmissionType = switchSubmissionType;
+
+      // File upload handling
+      const fileUploadArea = document.getElementById('file-upload-area');
+      const fileInput = document.getElementById('file-input');
+      const fileList = document.getElementById('file-list');
+      const fileSubmitBtn = document.getElementById('file-submit-btn');
+      let selectedFiles = [];
+
+      if (fileUploadArea) {
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+          fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          fileUploadArea.classList.remove('dragover');
+          handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+          handleFiles(e.target.files);
+        });
+      }
+
+      function handleFiles(files) {
+        Array.from(files).forEach(file => {
+          if (file.size > 10 * 1024 * 1024) {
+            showStatus('error', `File ${file.name} is too large (max 10MB)`);
+            return;
+          }
+          selectedFiles.push(file);
+        });
+        updateFileList();
+      }
+
+      function updateFileList() {
+        fileList.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.innerHTML = `
+            <div class="file-info">
+              <i class="fas fa-file"></i>
+              <div>
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${formatFileSize(file.size)}</div>
+              </div>
+            </div>
+            <button type="button" class="remove-file" onclick="removeFile(${index})">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          fileList.appendChild(fileItem);
+        });
+        fileSubmitBtn.disabled = selectedFiles.length === 0;
+      }
+
+      function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+      }
+      window.removeFile = removeFile;
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+      }
+
+      // Form submissions
+      document.getElementById('github-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = document.getElementById('github-issue-url').value;
+        const notes = document.getElementById('github-notes').value;
+        
+        saveSubmission('github', { url, notes });
+        showStatus('success', 'GitHub issue submitted successfully!');
+        this.reset();
+      });
+
+      document.getElementById('link-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const link = document.getElementById('submission-link').value;
+        const description = document.getElementById('link-description').value;
+        
+        saveSubmission('link', { link, description });
+        showStatus('success', 'Link submitted successfully!');
+        this.reset();
+      });
+
+      document.getElementById('file-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const notes = document.getElementById('file-notes').value;
+        
+        const fileNames = selectedFiles.map(f => f.name);
+        saveSubmission('file', { files: fileNames, notes });
+        
+        showStatus('success', `${selectedFiles.length} file(s) submitted successfully!`);
+        selectedFiles = [];
+        updateFileList();
+        this.reset();
+      });
+
+      function saveSubmission(type, data) {
+        const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
+        const lessonId = window.location.pathname;
+        
+        if (!submissions[lessonId]) {
+          submissions[lessonId] = [];
+        }
+        
+        submissions[lessonId].push({
+          type,
+          data,
+          timestamp: new Date().toISOString()
+        });
+        
+        localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+      }
+
+      function showStatus(type, message) {
+        const status = document.getElementById('submission-status');
+        status.className = `submission-status ${type}`;
+        status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        
+        setTimeout(() => {
+          status.style.display = 'none';
+        }, 5000);
+      }
+    }
+  </script>
+
+{% else %}
+  {% comment %}
+  === REGULAR BLOG POST LAYOUT FOR NON-CSP POSTS ===
+  {% endcomment %}
+
+  <style>
+    /* === Post Header === */
+    .post-header h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .page-description {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    /* === Meta Info (date, author, reading time) === */
+    .post-meta {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .post-meta time {
+      font-weight: 500;
+    }
+
+    /* === Category & Breadcrumb Links === */
+    .category-tags-link {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      margin: 0.1rem;
+      font-size: 0.85rem;
+      background: #f5f5f5;
+      border-radius: 999px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .category-tags-link:hover {
+      background: #e0e0e0;
+    }
+
+    .post-header {
+      margin-bottom: 1rem;
+    }
+    .post-header a.category-tags-link {
+      margin-right: 0.3rem;
+    }
+
+    /* === Main Content Styling === */
+    .post-content {
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+    .post-content h2,
+    .post-content h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3rem;
+    }
+
+    /* === Comments Section Separator === */
+    .post-content + div,
+    .post-content + section {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ddd;
+    }
+
+    /* Assignment Submission Widget */
+    .assignment-submission {
+      margin-top: 48px;
+      padding: 24px;
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+    }
+
+    .assignment-submission h3 {
+      color: #333;
+      font-size: 1.25rem;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .assignment-submission-icon {
+      color: #2563eb;
+    }
+
+    .submission-options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .submission-tab {
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .submission-tab:hover {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .submission-tab.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .submission-form {
+      display: none;
+    }
+
+    .submission-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="url"],
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: white;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      color: #333;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .file-upload-area {
+      border: 2px dashed #d0d0d0;
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .file-upload-area:hover {
+      border-color: #2563eb;
+      background: #f0f7ff;
+    }
+
+    .file-upload-area.dragover {
+      border-color: #2563eb;
+      background: #f0f7ff;
+    }
+
+    .file-upload-icon {
+      font-size: 48px;
+      color: #2563eb;
+      margin-bottom: 12px;
+    }
+
+    .file-upload-text {
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .file-upload-hint {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .file-list {
+      margin-top: 16px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-name {
+      color: #333;
+      font-size: 14px;
+    }
+
+    .file-size {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .remove-file {
+      background: transparent;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .remove-file:hover {
+      background: #fee;
+      color: #dc2626;
+    }
+
+    .submit-btn {
+      padding: 12px 24px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .submit-btn:disabled {
+      background: #d0d0d0;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .submission-status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .submission-status.success {
+      display: block;
+      background: #dbeafe;
+      border: 1px solid #2563eb;
+      color: #1e40af;
+    }
+
+    .submission-status.error {
+      display: block;
+      background: #fee2e2;
+      border: 1px solid #dc2626;
+      color: #991b1b;
+    }
+  </style>
+
+  <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <header class="post-header">
+      {%- if page.menu -%}
+        {% include {{page.menu}} html=content %}
+      {%- endif -%}
+      {% if page.menu == 'nav/csp_units/csp_unit3_p4_fundamentals.html' %}
+        {% include csp/p4-progress-data.html %}
+        {% include csp/p4-progress-controller.html %}
+        {% unless page.permalink contains '/fundamentals' %}
+          {% include csp/p4-progress-widget.html %}
+        {% endunless %}
+      {% endif %}
+      {% if page.categories.size > 0 %}
+        Categories:
+        {% for category in  page.categories  %}
+          {%- assign prefix = category | slice: 0 -%}
+          <a class="category-tags-link" href="{{site.baseurl}}/search/#{{category|slugize}}">{{category}}</a>
+          {% unless forloop.last %}&nbsp;{% endunless %}
+        {% endfor %}
+      {% endif %}
+      {% if page.breadcrumb %}
+        {% assign parts = page.permalink | split: '/' %}
+        {% assign num_parts = parts.size | minus: 1 %}
+        {% assign parent_parts = '' %}
+        {% for i in (0..num_parts) %}
+          {% unless forloop.last %}
+            {% if parent_parts == '' %}
+              {% assign parent_parts = parts[i] %}
+            {% else %}
+              {% assign parent_parts = parent_parts | append: '/' | append: parts[i] %}
+            {% endif %}
+          {% endunless %}
+        {% endfor %}
+        Breadcrumb:
+        <a class="category-tags-link" href="{{ site.baseurl }}/{{ parent_parts }}">/{{ parent_parts }}</a>
+        {% assign data = site.data[page.data] %}
+        {% for topic in data.Topics %}
+          {% if page.permalink == topic.link %}
+            &raquo; <span class="font-bold">{{ topic.title }}</span>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <p class="post-meta post-meta-title">
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ page.date | date: date_format }}
+        </time>
+        {%- if page.modified_date -%}
+          ~ 
+          {%- assign mdate = page.modified_date | date_to_xmlschema -%}
+          <time class="dt-modified" datetime="{{ mdate }}" itemprop="dateModified">
+            {{ mdate | date: date_format }}
+          </time>
+        {%- endif -%}
+        {%- if page.author -%}
+          • {% for author in page.author %}
+            <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+              <span class="p-author h-card" itemprop="name">{{ author }}</span></span>
+              {%- if forloop.last == false %}, {% endif -%}
+          {% endfor %}
+        {%- endif -%}
+        {%- if page.show_reading_time != false -%}
+         • {% include reading_time.html -%}
+        {%- endif -%}
+      </p>
+      <h3>{{ page.title | escape }}</h3>
+      {%- if page.description -%}
+        {%- if site.html_escape.description -%}
+          <p class="page-description">{{ page.description | escape }}</p>
+        {%- else -%}
+          <p class="page-description">{{ page.description }}</p>
+        {%- endif -%}
+      {%- endif -%}
+    </header>
+
+    <div class="post-content e-content" itemprop="articleBody">
+      {%- if page.toc -%}
+        {% include toc.html html=content %}
+      {%- endif -%}
+
+      {%- if page.submenu -%}
+        {%- include submenu.html -%}
+      {%- endif -%}
+
+      {{ content }}
+
+      {% if page.assignment %}
+      <div class="assignment-submission">
+        <h3>
+          <i class="fas fa-upload assignment-submission-icon"></i>
+          Submit Assignment
+        </h3>
+        
+        <div class="submission-options">
+          <button class="submission-tab active" onclick="switchSubmissionType('github')">
+            <i class="fab fa-github"></i> GitHub Issue
+          </button>
+          <button class="submission-tab" onclick="switchSubmissionType('link')">
+            <i class="fas fa-link"></i> Link Submission
+          </button>
+          <button class="submission-tab" onclick="switchSubmissionType('file')">
+            <i class="fas fa-file-upload"></i> File Upload
+          </button>
+        </div>
+
+        <!-- GitHub Issue Form -->
+        <form class="submission-form active" id="github-form-blog">
+          <div class="form-group">
+            <label for="github-issue-url-blog">GitHub Issue URL</label>
+            <input type="url" id="github-issue-url-blog" placeholder="https://github.com/username/repo/issues/123" required>
+          </div>
+          <div class="form-group">
+            <label for="github-notes-blog">Notes (Optional)</label>
+            <textarea id="github-notes-blog" placeholder="Add any additional comments about your submission..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-check"></i>
+            Submit GitHub Issue
+          </button>
+        </form>
+
+        <!-- Link Submission Form -->
+        <form class="submission-form" id="link-form-blog">
+          <div class="form-group">
+            <label for="submission-link-blog">Submission Link</label>
+            <input type="url" id="submission-link-blog" placeholder="https://..." required>
+          </div>
+          <div class="form-group">
+            <label for="link-description-blog">Description</label>
+            <textarea id="link-description-blog" placeholder="Describe what you're submitting..." required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-check"></i>
+            Submit Link
+          </button>
+        </form>
+
+        <!-- File Upload Form -->
+        <form class="submission-form" id="file-form-blog">
+          <div class="form-group">
+            <label>Upload Files</label>
+            <div class="file-upload-area" id="file-upload-area-blog">
+              <input type="file" id="file-input-blog" multiple style="display: none;">
+              <div class="file-upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="file-upload-text">Click to upload or drag and drop</div>
+              <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
+            </div>
+            <div class="file-list" id="file-list-blog"></div>
+          </div>
+          <div class="form-group">
+            <label for="file-notes-blog">Notes (Optional)</label>
+            <textarea id="file-notes-blog" placeholder="Add any additional comments..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="file-submit-btn-blog" disabled>
+            <i class="fas fa-check"></i>
+            Submit Files
+          </button>
+        </form>
+
+        <div class="submission-status" id="submission-status-blog"></div>
+      </div>
+
+      <script>
+        // Submission type switching
+        function switchSubmissionType(type) {
+          // Update tabs
+          document.querySelectorAll('.submission-tab').forEach(tab => {
+            tab.classList.remove('active');
+          });
+          event.target.closest('.submission-tab').classList.add('active');
+
+          // Update forms
+          document.querySelectorAll('.submission-form').forEach(form => {
+            form.classList.remove('active');
+          });
+          const formId = type + '-form-blog';
+          document.getElementById(formId).classList.add('active');
+
+          // Clear status
+          document.getElementById('submission-status-blog').style.display = 'none';
+        }
+
+        // File upload handling
+        const fileUploadAreaBlog = document.getElementById('file-upload-area-blog');
+        const fileInputBlog = document.getElementById('file-input-blog');
+        const fileListBlog = document.getElementById('file-list-blog');
+        const fileSubmitBtnBlog = document.getElementById('file-submit-btn-blog');
+        let selectedFilesBlog = [];
+
+        if (fileUploadAreaBlog) {
+          fileUploadAreaBlog.addEventListener('click', () => fileInputBlog.click());
+
+          fileUploadAreaBlog.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadAreaBlog.classList.add('dragover');
+          });
+
+          fileUploadAreaBlog.addEventListener('dragleave', () => {
+            fileUploadAreaBlog.classList.remove('dragover');
+          });
+
+          fileUploadAreaBlog.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadAreaBlog.classList.remove('dragover');
+            handleFilesBlog(e.dataTransfer.files);
+          });
+
+          fileInputBlog.addEventListener('change', (e) => {
+            handleFilesBlog(e.target.files);
+          });
+        }
+
+        function handleFilesBlog(files) {
+          Array.from(files).forEach(file => {
+            if (file.size > 10 * 1024 * 1024) {
+              showStatusBlog('error', `File ${file.name} is too large (max 10MB)`);
+              return;
+            }
+            selectedFilesBlog.push(file);
+          });
+          updateFileListBlog();
+        }
+
+        function updateFileListBlog() {
+          fileListBlog.innerHTML = '';
+          selectedFilesBlog.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+              <div class="file-info">
+                <i class="fas fa-file"></i>
+                <div>
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-size">${formatFileSizeBlog(file.size)}</div>
+                </div>
+              </div>
+              <button type="button" class="remove-file" onclick="removeFileBlog(${index})">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            fileListBlog.appendChild(fileItem);
+          });
+          fileSubmitBtnBlog.disabled = selectedFilesBlog.length === 0;
+        }
+
+        function removeFileBlog(index) {
+          selectedFilesBlog.splice(index, 1);
+          updateFileListBlog();
+        }
+
+        function formatFileSizeBlog(bytes) {
+          if (bytes === 0) return '0 Bytes';
+          const k = 1024;
+          const sizes = ['Bytes', 'KB', 'MB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Form submissions
+        document.getElementById('github-form-blog').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const url = document.getElementById('github-issue-url-blog').value;
+          const notes = document.getElementById('github-notes-blog').value;
+          
+          saveSubmissionBlog('github', { url, notes });
+          showStatusBlog('success', 'GitHub issue submitted successfully!');
+          this.reset();
+        });
+
+        document.getElementById('link-form-blog').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const link = document.getElementById('submission-link-blog').value;
+          const description = document.getElementById('link-description-blog').value;
+          
+          saveSubmissionBlog('link', { link, description });
+          showStatusBlog('success', 'Link submitted successfully!');
+          this.reset();
+        });
+
+        document.getElementById('file-form-blog').addEventListener('submit', function(e) {
+          e.preventDefault();
+          const notes = document.getElementById('file-notes-blog').value;
+          
+          const fileNames = selectedFilesBlog.map(f => f.name);
+          saveSubmissionBlog('file', { files: fileNames, notes });
+          
+          showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
+          selectedFilesBlog = [];
+          updateFileListBlog();
+          this.reset();
+        });
+
+        function saveSubmissionBlog(type, data) {
+          const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
+          const lessonId = window.location.pathname;
+          
+          if (!submissions[lessonId]) {
+            submissions[lessonId] = [];
+          }
+          
+          submissions[lessonId].push({
+            type,
+            data,
+            timestamp: new Date().toISOString()
+          });
+          
+          localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+        }
+
+        function showStatusBlog(type, message) {
+          const status = document.getElementById('submission-status-blog');
+          status.className = `submission-status ${type}`;
+          status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+          
+          setTimeout(() => {
+            status.style.display = 'none';
+          }, 5000);
+        }
+      </script>
+      {% endif %}
+    </div>
+    {%- if page.comments -%}
+      {%- include utterances.html -%}
+    {%- endif -%}
+    {%- if site.disqus.shortname -%}
+      {%- include disqus_comments.html -%}
+    {%- endif -%}
+    <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+  </article>
+
+{% endif %}
