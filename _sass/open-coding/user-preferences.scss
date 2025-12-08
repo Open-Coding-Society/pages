@@ -1,0 +1,209 @@
+:root {
+  --pref-bg-color: #0b1220;
+  --pref-text-color: #e6eef8;
+  --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --pref-font-size: 14px;
+  --pref-accent-color: #3b82f6;
+  --text-muted: #a0a0a0;
+}
+
+.user-theme-active {
+  &, &.dark {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    font-family: var(--pref-font-family) !important;
+    font-size: var(--pref-font-size) !important;
+  }
+
+  body, body.dark, body.min-h-screen, body.bg-neutral-800 {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    font-family: var(--pref-font-family) !important;
+    font-size: var(--pref-font-size) !important;
+  }
+
+  & .min-h-screen, & .min-h-screen.bg-neutral-900,
+  & .ml-64.p-8, & .ml-64.p-8.bg-neutral-900 {
+    color: var(--pref-text-color) !important;
+    background-color: var(--pref-bg-color) !important;
+  }
+
+  // Use text color consistently, not var(--text) which may not be set
+  * {
+    color: inherit;
+  }
+  
+  // Explicit text color for main content
+  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6 {
+    color: var(--pref-text-color) !important;
+  }
+
+  // Muted text for secondary content  
+  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
+  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
+    color: var(--text-muted) !important;
+  }
+
+  .opencs_root,
+  .opencs_root *,
+  .opencs_root .post-header,
+  .opencs_root .post-content {
+    color: var(--pref-text-color) !important;
+    font-family: var(--pref-font-family) !important;
+    font-size: var(--pref-font-size) !important;
+  }
+
+  .page-content,
+  .wrapper,
+  main,
+  article,
+  .post,
+  .content,
+  .opencs_root {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  // Links with accent color
+  a:not(.tab-btn):not([class*="bg-"]):not(.accent-preset) {
+    color: var(--pref-accent-color) !important;
+    text-decoration: none !important;
+    
+    &:hover {
+      opacity: 0.8 !important;
+    }
+  }
+
+  input:focus, select:focus, textarea:focus, button:focus {
+    outline: 2px solid var(--pref-accent-color) !important;
+    outline-offset: 2px !important;
+  }
+
+  // Panels and cards
+  .card,
+  .panel,
+  .box,
+  .bg-neutral-800,
+  .bg-neutral-900,
+  .bg-slate-800,
+  .bg-slate-900,
+  .bg-gray-900,
+  .bg-gray-950,
+  .bg-zinc-900,
+  .bg-slate-950,
+  [class*="rounded-xl"],
+  [class*="rounded-lg"] {
+    background-color: var(--panel) !important;
+    border-color: var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+  }
+  
+  [class*="rounded-full"] {
+    border-radius: 9999px !important;
+  }
+
+  .border-neutral-700,
+  .border-neutral-800,
+  .border-gray-800,
+  .border-gray-900,
+  .border-zinc-800 {
+    border-color: var(--ui-border) !important;
+  }
+
+  img, video, svg, iframe {
+    background-color: transparent !important;
+  }
+  
+  // SVG icons should inherit text color
+  svg {
+    color: inherit !important;
+    fill: currentColor;
+  }
+
+  input, select, textarea {
+    background-color: var(--ui-bg) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+    
+    &::placeholder {
+      color: var(--text-muted) !important;
+    }
+  }
+
+  button {
+    background-color: var(--ui-bg) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+  }
+  
+  // Primary/accent buttons with proper contrast
+  button.bg-blue-600, button.bg-blue-700,
+  button.bg-green-600, button.bg-green-700,
+  .btn-primary,
+  .save-section-btn,
+  #save-preferences,
+  #save-theme-btn {
+    background-color: var(--pref-accent-color) !important;
+    border-color: var(--pref-accent-color) !important;
+    color: #fff !important;
+  }
+  
+  // Red/danger buttons
+  button.bg-red-600, button.bg-red-700,
+  #restore-styles {
+    background-color: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #fff !important;
+  }
+
+  // Accent color preset buttons keep their colors
+  .accent-preset {
+    border: 2px solid transparent !important;
+    
+    &:hover {
+      border-color: var(--pref-text-color) !important;
+    }
+  }
+
+  aside,
+  .sidebar,
+  #sidebar,
+  .site-sidebar,
+  .sidebar-container {
+    background-color: var(--panel-mid) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  .tab-btn {
+    color: var(--text-muted) !important;
+    
+    &.active, &[aria-current="page"] {
+      color: var(--pref-accent-color) !important;
+      border-color: var(--pref-accent-color) !important;
+    }
+  }
+  
+  #tab-underline {
+    background-color: var(--pref-accent-color) !important;
+  }
+  
+  ::selection {
+    background-color: var(--pref-accent-color) !important;
+    color: #fff !important;
+  }
+
+  // Color input styling
+  input[type="color"] {
+    padding: 0 !important;
+    border: 1px solid var(--ui-border) !important;
+    background-color: transparent !important;
+    cursor: pointer;
+  }
+
+  // Range input styling
+  input[type="range"] {
+    background-color: transparent !important;
+    border: none !important;
+  }
+}
