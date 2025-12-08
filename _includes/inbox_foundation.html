@@ -226,8 +226,17 @@ document.addEventListener('click', (e) => {
         if (confirm('Delete this announcement?')) el.remove();
       };
 
+      // Mark-as-read button (visual only)
+      const markBtn = document.createElement('button');
+      markBtn.type = 'button';
+      markBtn.className = 'inbox-mark-read';
+      markBtn.title = 'Mark as read';
+      markBtn.textContent = '✓';
+
       controls.appendChild(editBtn);
       controls.appendChild(delBtn);
+      // place a small checkmark to the right
+      controls.appendChild(markBtn);
 
       header.appendChild(h);
       header.appendChild(controls);
