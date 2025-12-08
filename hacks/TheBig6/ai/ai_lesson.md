@@ -74,6 +74,7 @@ date: 2025-12-02
   <div class="header">
     <h1>AI Development — All-in-One</h1>
     <p>A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development.</p>
+    <a href="../" class="button">Back</a>
   </div>
 
   <div class="progress-bar" id="progressBar"></div>

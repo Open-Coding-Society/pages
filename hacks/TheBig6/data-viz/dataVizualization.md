@@ -228,6 +228,7 @@ button:hover {
   <div class="header">
     <h1>Data Visualization — All-in-One</h1>
     <p>Interactive lessons: REST APIs, Spring Boot CRUD, search, filtering, pagination, and data queries.</p>
+    <a href="../" class="button">Back</a>
   </div>
 
   <div class="progress-bar" id="progressBar"></div>

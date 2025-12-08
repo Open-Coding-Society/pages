@@ -53,6 +53,7 @@ date: 2025-12-02
   <div class="header">
     <h1>Analytics — All-in-One</h1>
     <p>Interactive lesson covering the admin dashboard, certificates, and mastery questions.</p>
+    <a href="../" class="button">Back</a>
   </div>
 
   <div class="progress-bar" id="progressBar"></div>
