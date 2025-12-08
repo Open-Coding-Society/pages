@@ -11,7 +11,7 @@
       <p class="text-xl text-gray-300 max-w-4xl mx-auto">{{ page.lxdData.Description }}</p>
     </div>
 
-    <!-- Prerequisibodytes Section -->
+    <!-- Prerequisites Section -->
     {% if page.lxdData.Prequisites %}
     <div class="mb-8">
       <h2 class="text-2xl font-semibold text-white mb-2">Prerequisites</h2>
@@ -112,27 +112,26 @@
   </div>
 </div>
 
+<!-- Submission Modal -->
 <div id="submission-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background-color: rgba(0,0,0,0.8); overflow-y:auto;">
-  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:600px; width:90%; margin:40px auto; border:1px solid #374151;">
+  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:700px; width:90%; margin:40px auto; border:1px solid #374151;">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-2xl font-bold text-white">Submit Your Work</h3>
       <button onclick="closeSubmissionModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer;">&times;</button>
     </div>
 
-    <!-- Checklist -->
+    <!-- Dynamic Rubric Checklist -->
     <div id="submission-checklist" class="mb-4">
-      <label class="flex items-center gap-2 text-white">
-        <input type="checkbox" class="submission-checkbox">
-        Hacks
-      </label>
-      <label class="flex items-center gap-2 text-white">
-        <input type="checkbox" class="submission-checkbox">
-        HW
-      </label>
-      <label class="flex items-center gap-2 text-white">
-        <input type="checkbox" class="submission-checkbox">
-        Functionality
-      </label>
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-lg font-semibold text-white">Grading Rubric</h4>
+        <button id="view-full-rubric-btn" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm font-semibold transition">
+          View Full Rubric
+        </button>
+      </div>
+      
+      <div id="rubric-items-container" class="space-y-3 mb-4">
+        <!-- Rubric items will be dynamically loaded here -->
+      </div>
     </div>
 
     <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white;" placeholder="Write your submission here..."></textarea>
@@ -145,17 +144,74 @@
   </div>
 </div>
 
+<!-- Full Rubric Modal -->
+<div id="full-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100000; background-color: rgba(0,0,0,0.85); overflow-y:auto;">
+  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:800px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-white">Complete Grading Rubric</h3>
+      <button onclick="closeFullRubricModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer;">&times;</button>
+    </div>
+
+    <div id="full-rubric-content" class="space-y-4">
+      <!-- Full rubric will be dynamically loaded here -->
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:24px; padding-top:16px; border-top:1px solid #374151;">
+      <button onclick="closeFullRubricModal()" style="padding:8px 20px; border-radius:8px; background-color:#374151; color:white; border:none; font-weight:500; cursor:pointer;">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Topics data from Jekyll
   const HACK_TOPICS = {{ page.lxdData.Topics | jsonify }};
   
+  // Default rubric structure - this should match what graders use
+  const DEFAULT_RUBRIC = {
+    total: 0.90,
+    categories: [
+      {
+        name: "Individual Contribution",
+        weight: 0.45,
+        subcategories: [
+          { name: "Commits in GitHub", weight: 0.15 },
+          { name: "Collaboration", weight: 0.15 },
+          { name: "Soft skills integration", weight: 0.15 }
+        ]
+      },
+      {
+        name: "Technicals",
+        weight: 0.30,
+        subcategories: [
+          { name: "Code quality & organization", weight: 0.10 },
+          { name: "Implementation of features", weight: 0.10 },
+          { name: "Problem-solving approach", weight: 0.10 }
+        ]
+      },
+      {
+        name: "Presentation",
+        weight: 0.15,
+        subcategories: [
+          { name: "Clear documentation", weight: 0.05 },
+          { name: "Live demo/explanation", weight: 0.05 },
+          { name: "Response to questions", weight: 0.05 }
+        ]
+      }
+    ]
+  };
+  
   // User's grade data
   let userGradeData = {
     selected_hacks: [],
-    hacks_completed: {}
+    hacks_completed: {},
+    hacks_submissions: {},
+    rubric: DEFAULT_RUBRIC // Store the rubric that applies to this student
   };
   
   let isAuthenticated = false;
+  let currentHackToSubmit = null;
 
   // API base URL - adjust if needed
   const API_BASE = '';
@@ -174,10 +230,11 @@
       if (response.ok) {
         const data = await response.json();
         isAuthenticated = true;
-        // Ensure the grade_data has proper structure
-        userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {} };
+        userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, rubric: DEFAULT_RUBRIC };
         if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
         if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
+        if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
+        if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
         console.log('Loaded from backend:', userGradeData);
         return true;
       } else {
@@ -187,21 +244,21 @@
       console.log('Backend not available, using localStorage fallback');
       isAuthenticated = false;
       
-      // Try to load from localStorage
       const stored = localStorage.getItem('onboarding_hacks_data');
       if (stored) {
         try {
           userGradeData = JSON.parse(stored);
-          // Ensure proper structure
           if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
           if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
+          if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
+          if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
           console.log('Loaded from localStorage:', userGradeData);
         } catch (e) {
           console.error('Error parsing localStorage data:', e);
-          userGradeData = { selected_hacks: [], hacks_completed: {} };
+          userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, rubric: DEFAULT_RUBRIC };
         }
       } else {
-        userGradeData = { selected_hacks: [], hacks_completed: {} };
+        userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, rubric: DEFAULT_RUBRIC };
       }
       return false;
     }
@@ -209,7 +266,6 @@
 
   // Save user's grade data to backend (with localStorage fallback)
   async function saveGradeData() {
-    // Always try backend first if we think we're authenticated
     if (isAuthenticated) {
       try {
         const response = await fetch(`${API_BASE}/api/grade_data`, {
@@ -233,7 +289,6 @@
       }
     }
     
-    // Fallback to localStorage
     try {
       localStorage.setItem('onboarding_hacks_data', JSON.stringify(userGradeData));
       console.log('Saved to localStorage:', userGradeData);
@@ -243,6 +298,72 @@
       return false;
     }
   }
+
+  // Render dynamic rubric in submission modal
+  function renderSubmissionRubric() {
+    const container = document.getElementById('rubric-items-container');
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    
+    container.innerHTML = rubric.categories.map(category => `
+      <div class="bg-gray-800 p-3 rounded-lg">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" class="submission-checkbox mt-1 h-4 w-4 rounded border-gray-600 text-blue-600">
+          <div class="flex-1">
+            <div class="text-white font-medium">${category.name} (${category.weight.toFixed(2)})</div>
+            <ul class="text-sm text-gray-300 mt-1 space-y-1 ml-2">
+              ${category.subcategories.map(sub => `
+                <li>• ${sub.name} (${sub.weight.toFixed(2)})</li>
+              `).join('')}
+            </ul>
+          </div>
+        </label>
+      </div>
+    `).join('');
+  }
+
+  // Render full rubric modal
+  function renderFullRubric() {
+    const container = document.getElementById('full-rubric-content');
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    
+    container.innerHTML = `
+      <div class="bg-gray-800 p-4 rounded-lg mb-4">
+        <h4 class="text-xl font-bold text-white mb-2">Total Points: ${rubric.total.toFixed(2)}</h4>
+        <p class="text-gray-300 text-sm">This rubric shows how your work will be evaluated. Make sure to address all categories for full credit.</p>
+      </div>
+      
+      ${rubric.categories.map((category, idx) => `
+        <div class="bg-gray-800 p-4 rounded-lg">
+          <h4 class="text-lg font-bold text-white mb-3">${idx + 1}. ${category.name} (${category.weight.toFixed(2)} points)</h4>
+          <div class="space-y-2 ml-4">
+            ${category.subcategories.map((sub, subIdx) => `
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <span class="text-white font-medium">${String.fromCharCode(97 + subIdx)}. ${sub.name}</span>
+                </div>
+                <span class="text-blue-400 font-semibold ml-4">${sub.weight.toFixed(2)} pts</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  // Open full rubric modal
+  window.openFullRubricModal = function() {
+    renderFullRubric();
+    const modal = document.getElementById('full-rubric-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+
+  // Close full rubric modal
+  window.closeFullRubricModal = function() {
+    const modal = document.getElementById('full-rubric-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  };
 
   // Render the checklist in the modal
   function renderChecklist() {
@@ -305,7 +426,7 @@
                 <a href="${topic.Lessons}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-center py-2 px-3 rounded-lg text-sm font-semibold transition">
                   Learn
                 </a>
-                <button onclick="openSubmissionModal('${gamePath}')" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm transition">
+                <button onclick="openSubmissionModal('${gamePath}')" class="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm transition font-semibold">
                   Submit 
                 </button>
               </div>
@@ -315,7 +436,6 @@
       </div>
     `;
   }
-
 
   // Update status badges on all cards
   function updateAllCardBadges() {
@@ -348,25 +468,6 @@
     statusEl.className = `text-sm self-center ${isError ? 'text-red-400' : 'text-gray-300'}`;
   }
 
-  // Toggle completion status
-  window.toggleComplete = async function(gamePath) {
-    if (!userGradeData.hacks_completed) {
-      userGradeData.hacks_completed = {};
-    }
-    
-    userGradeData.hacks_completed[gamePath] = !userGradeData.hacks_completed[gamePath];
-    
-    const saved = await saveGradeData();
-    if (saved) {
-      renderSelectedHacks();
-      updateAllCardBadges();
-      updateStatus('Progress saved!');
-      setTimeout(() => updateStatusDisplay(), 1500);
-    } else {
-      updateStatus('Failed to save progress', true);
-    }
-  };
-
   // Update the status display with counts
   function updateStatusDisplay() {
     const selectedCount = (userGradeData.selected_hacks || []).length;
@@ -376,34 +477,22 @@
 
   // Modal functions
   function openModal() {
-    console.log('Opening modal...');
     const modal = document.getElementById('hacks-modal');
-    console.log('Modal element:', modal);
-    if (!modal) {
-      console.error('Modal not found!');
-      return;
-    }
+    if (!modal) return;
     renderChecklist();
-    // Force display with inline styles and scroll to top
     modal.style.display = 'flex';
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
-    // Scroll page to top when modal opens
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
-    console.log('Modal display:', modal.style.display);
-    console.log('Modal should be visible now');
   }
 
   function closeModal() {
-    console.log('Closing modal...');
     const modal = document.getElementById('hacks-modal');
     if (modal) {
       modal.style.display = 'none';
       modal.style.visibility = 'hidden';
       modal.style.opacity = '0';
-      // Re-enable body scroll
       document.body.style.overflow = '';
     }
   }
@@ -427,15 +516,7 @@
     }
   }
   
-  let currentHackToSubmit = null;
-  
-  function openSubmissionModal(gamePath) {
-    currentHackToSubmit = gamePath;
-    document.getElementById('submission-text').value = ''; // clear previous input
-    const modal = document.getElementById('submission-modal');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
+  // Update submit button state based on checkboxes
   function updateSubmitButtonState() {
     const checkboxes = document.querySelectorAll('#submission-checklist .submission-checkbox');
     const btn = document.getElementById('submission-btn');
@@ -446,32 +527,39 @@
     btn.style.cursor = allChecked ? 'pointer' : 'not-allowed';
   }
 
-  // Add event listeners whenever modal opens
-  function openSubmissionModal(gamePath) {
+  // Open submission modal
+  window.openSubmissionModal = function(gamePath) {
     currentHackToSubmit = gamePath;
-    document.getElementById('submission-text').value = ''; // clear previous input
+    document.getElementById('submission-text').value = userGradeData.hacks_submissions?.[gamePath] || '';
+    
     const modal = document.getElementById('submission-modal');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
-    // reset checkboxes
+    // Render the rubric based on current user data
+    renderSubmissionRubric();
+
+    // Reset checkboxes
     const checkboxes = document.querySelectorAll('#submission-checklist .submission-checkbox');
     checkboxes.forEach(cb => cb.checked = false);
 
     updateSubmitButtonState();
 
+    // Add event listeners to checkboxes
     checkboxes.forEach(cb => {
       cb.addEventListener('change', updateSubmitButtonState);
     });
-  }
+  };
   
-  function closeSubmissionModal() {
+  // Close submission modal
+  window.closeSubmissionModal = function() {
     const modal = document.getElementById('submission-modal');
     modal.style.display = 'none';
     document.body.style.overflow = '';
-  }
+  };
   
-  async function submitHack() {
+  // Submit hack
+  window.submitHack = async function() {
     const text = document.getElementById('submission-text').value.trim();
     if (!text) {
       alert('Please write something before submitting.');
@@ -490,28 +578,25 @@
     closeSubmissionModal();
     updateStatus('Submission saved!');
     setTimeout(updateStatusDisplay, 1500);
-  }
-// Initialize on page load
+  };
+
+  // Initialize on page load
   document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Page loaded, initializing...');
-      
     await loadGradeData();
     renderSelectedHacks();
     updateAllCardBadges();
     updateStatusDisplay();
 
-    // Event listeners with logging
+    // Event listeners
     const selectBtn = document.getElementById('select-hacks-btn');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const modalSaveBtn = document.getElementById('modal-save-btn');
-
-    console.log('Select button found:', selectBtn);
+    const viewRubricBtn = document.getElementById('view-full-rubric-btn');
 
     if (selectBtn) {
       selectBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('Select hacks button clicked!');
         openModal();
       });
     }
@@ -537,6 +622,10 @@
       });
     }
 
-  });  
-
-</script>
+    if (viewRubricBtn) {
+      viewRubricBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openFullRubricModal();
+      });
+    }
+  });
