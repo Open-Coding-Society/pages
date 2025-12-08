@@ -83,6 +83,7 @@ date: 2025-12-02
   <div class="header">
     <h1>Frontend Development — All-in-One</h1>
     <p>Interactive lessons: Markdown → HTML, CSS styling, Tailwind + Sass, JavaScript, and code sandbox.</p>
+    <a href="../" class="button">Back</a>
   </div>
 
   <div class="progress-bar" id="progressBar"></div>
