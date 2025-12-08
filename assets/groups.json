@@ -9,7 +9,8 @@
       "Ethan Collins",
       "Mia Patterson",
       "Noah Greene"
-    ]
+    ],
+    "class" : "CSA"
   },
   {
     "name": "Group 2",
@@ -21,7 +22,8 @@
       "Charlotte Rivera",
       "Benjamin Reed",
       "Harper Sullivan"
-    ]
+    ],
+    "class" : "CSP"
   },
   {
     "name": "Group 3",
@@ -33,7 +35,8 @@
       "Evelyn Price",
       "Henry Bailey",
       "Abigail Torres"
-    ]
+    ],
+    "class" : "CSSE"
   },
   {
     "name": "Group 4",
@@ -45,7 +48,8 @@
       "Emily Chambers",
       "Michael Barrett",
       "Victoria Shaw"
-    ]
+    ],
+    "class" : "CSP"
   },
   {
     "name": "Group 5",
@@ -57,6 +61,20 @@
       "Sophia Laforteza",
       "Megan Skiendiel",
       "Lara Rajagopalan"
-    ]
+    ],
+    "class" : "CSA"
+  },
+  {
+    "name": "Group 6",
+    "period": "5",
+    "members": [
+      "Daniela",
+      "Yoonchae",
+      "Manon",
+      "Sophia",
+      "Megan",
+      "Lara"
+    ],
+    "class" : "CSA"
   }
 ]

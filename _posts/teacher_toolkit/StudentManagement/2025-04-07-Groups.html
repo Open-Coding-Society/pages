@@ -12,45 +12,160 @@ comments: false
     <!-- Page Title -->
     <h2 class="text-2xl font-semibold text-white mb-6">Group Management</h2>
 
-    <!-- Period Filter Bar -->
+    <!-- Unified Filter Bar -->
     <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4 mb-6">
-      <div class="flex flex-wrap gap-3 justify-center">
-        <button 
-          class="period-filter-btn px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-indigo-600 text-white"
-          data-period="all"
-        >
-          All
-        </button>
-        <button 
-          class="period-filter-btn px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-neutral-700 text-gray-300 hover:bg-neutral-600"
-          data-period="1"
-        >
-          Period 1
-        </button>
-        <button 
-          class="period-filter-btn px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-neutral-700 text-gray-300 hover:bg-neutral-600"
-          data-period="2"
-        >
-          Period 2
-        </button>
-        <button 
-          class="period-filter-btn px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-neutral-700 text-gray-300 hover:bg-neutral-600"
-          data-period="3"
-        >
-          Period 3
-        </button>
-        <button 
-          class="period-filter-btn px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-neutral-700 text-gray-300 hover:bg-neutral-600"
-          data-period="4"
-        >
-          Period 4
-        </button>
-        <button 
-          class="period-filter-btn px-6 py-3 rounded-lg font-medium transition-all duration-200 bg-neutral-700 text-gray-300 hover:bg-neutral-600"
-          data-period="5"
-        >
-          Period 5
-        </button>
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="text-sm text-gray-300">
+          <span class="font-semibold text-white">Filters</span> · Narrow groups by period and class
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <!-- Period filter dropdown -->
+          <div class="relative" id="periodFilterWrapper">
+            <button
+              id="periodFilterButton"
+              type="button"
+              class="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg text-sm border border-neutral-600 hover:bg-neutral-600 transition-colors"
+              onclick="toggleDropdown('period')"
+            >
+              <span id="periodFilterLabel">All Periods</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div
+              id="periodDropdown"
+              class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20"
+            >
+              <div class="p-3 space-y-2 text-sm text-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    id="periodAllCheckbox"
+                    type="checkbox"
+                    class="accent-indigo-500"
+                    checked
+                    onchange="onPeriodAllChange(this)"
+                  />
+                  <span>All Periods</span>
+                </label>
+                <div class="border-t border-neutral-700 my-2"></div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 period-checkbox"
+                    value="1"
+                    onchange="onPeriodCheckboxChange(this)"
+                  />
+                  <span>Period 1</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 period-checkbox"
+                    value="2"
+                    onchange="onPeriodCheckboxChange(this)"
+                  />
+                  <span>Period 2</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 period-checkbox"
+                    value="3"
+                    onchange="onPeriodCheckboxChange(this)"
+                  />
+                  <span>Period 3</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 period-checkbox"
+                    value="4"
+                    onchange="onPeriodCheckboxChange(this)"
+                  />
+                  <span>Period 4</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 period-checkbox"
+                    value="5"
+                    onchange="onPeriodCheckboxChange(this)"
+                  />
+                  <span>Period 5</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Class filter dropdown -->
+          <div class="relative" id="classFilterWrapper">
+            <button
+              id="classFilterButton"
+              type="button"
+              class="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg text-sm border border-neutral-600 hover:bg-neutral-600 transition-colors"
+              onclick="toggleDropdown('class')"
+            >
+              <span id="classFilterLabel">All Classes</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div
+              id="classDropdown"
+              class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20"
+            >
+              <div class="p-3 space-y-2 text-sm text-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    id="classAllCheckbox"
+                    type="checkbox"
+                    class="accent-indigo-500"
+                    checked
+                    onchange="onClassAllChange(this)"
+                  />
+                  <span>All Classes</span>
+                </label>
+                <div class="border-t border-neutral-700 my-2"></div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 class-checkbox"
+                    value="CSSE"
+                    onchange="onClassCheckboxChange(this)"
+                  />
+                  <span>CSSE</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 class-checkbox"
+                    value="CSP"
+                    onchange="onClassCheckboxChange(this)"
+                  />
+                  <span>CSP</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="accent-indigo-500 class-checkbox"
+                    value="CSA"
+                    onchange="onClassCheckboxChange(this)"
+                  />
+                  <span>CSA</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clear filters -->
+          <button
+            type="button"
+            class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
+            onclick="clearAllFilters()"
+          >
+            Clear Filters
+          </button>
+        </div>
       </div>
     </div>
 
@@ -111,6 +226,32 @@ comments: false
             </select>
           </div>
 
+          <!-- Class selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Class</label>
+            <select
+              id="newGroupClass"
+              class="w-full px-4 py-2 bg-neutral-600 text-white border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">Select class</option>
+              <option value="CSSE">CSSE</option>
+              <option value="CSP">CSP</option>
+              <option value="CSA">CSA</option>
+            </select>
+          </div>
+
+          <!-- New: Period Admin toggle -->
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="newGroupPeriodAdmin"
+              class="accent-indigo-500 w-4 h-4"
+            />
+            <label for="newGroupPeriodAdmin" class="text-sm text-gray-200">
+              Mark as <span class="font-semibold">Period Admin</span> for this period
+            </label>
+          </div>
+
           <div>
             <label class="block text-sm font-medium text-gray-200 mb-2">Members (one per line)</label>
             <textarea
@@ -156,21 +297,24 @@ comments: false
 
 <script type="module">
 let allGroups = [];
-let currentPeriod = "all";
+let selectedPeriods = [];     // [] means "all periods"
+let selectedClasses = [];     // [] means "all classes"
 let searchQuery = "";
 
-// Fetch all groups from JSON file
+// ===== Data loading =====
 async function fetchGroups() {
   try {
     const response = await fetch('{{site.baseurl}}/assets/groups.json');
     if (!response.ok) throw new Error("Failed to fetch groups");
     const data = await response.json();
     
-    // Transform the data to match expected format
     allGroups = data.map((group, index) => ({
       id: index + 1,
       name: group.name,
       period: group.period,
+      class: group.class || "",
+      // new: periodAdmin flag from JSON, default false
+      periodAdmin: !!group.periodAdmin,
       members: group.members.map((memberName, memberIndex) => ({
         id: memberIndex + 1,
         name: memberName
@@ -185,32 +329,39 @@ async function fetchGroups() {
   }
 }
 
-// Render groups based on current filter and search
+// ===== Rendering =====
 function renderGroups() {
   const container = document.getElementById("groupsContainer");
   const emptyState = document.getElementById("emptyState");
   
-  // Filter groups by period
   let filteredGroups = allGroups;
-  if (currentPeriod !== "all") {
-    filteredGroups = allGroups.filter(group => 
-      group.period.toString() === currentPeriod.toString()
+
+  // Filter by selected periods (if any)
+  if (selectedPeriods.length > 0) {
+    filteredGroups = filteredGroups.filter(group =>
+      selectedPeriods.includes(String(group.period))
     );
   }
-  
+
+  // Filter by selected classes (if any)
+  if (selectedClasses.length > 0) {
+    filteredGroups = filteredGroups.filter(group =>
+      selectedClasses.includes((group.class || "").toUpperCase())
+    );
+  }
+
   // Filter by search query
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
     filteredGroups = filteredGroups.filter(group => {
       const nameMatch = group.name.toLowerCase().includes(query);
-      const memberMatch = group.members.some(member => 
+      const memberMatch = group.members.some(member =>
         member.name.toLowerCase().includes(query)
       );
       return nameMatch || memberMatch;
     });
   }
-  
-  // Clear container
+
   container.innerHTML = "";
   
   if (filteredGroups.length === 0) {
@@ -222,42 +373,87 @@ function renderGroups() {
   container.classList.remove("hidden");
   emptyState.classList.add("hidden");
   
-  // Create group cards
   filteredGroups.forEach(group => {
     const card = createGroupCard(group);
     container.appendChild(card);
   });
 }
 
-// Create a group card element (horizontal row)
 function createGroupCard(group) {
   const card = document.createElement("div");
   card.className = "bg-neutral-700 border border-neutral-600 rounded-lg hover:border-indigo-500 transition-all duration-200";
   
   const memberCount = group.members.length;
+  const classLabel = group.class || "Unassigned";
   
   card.innerHTML = `
     <div class="p-4">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-4 flex-1">
           <div class="flex items-center gap-3 min-w-0 flex-1">
             <h3 class="text-lg font-semibold text-white truncate">${group.name}</h3>
             <span class="inline-block px-3 py-1 text-xs font-medium bg-indigo-600 text-white rounded-full whitespace-nowrap">
               Period ${group.period}
             </span>
+            <span class="inline-block px-3 py-1 text-xs font-medium bg-emerald-600 text-white rounded-full whitespace-nowrap">
+              ${classLabel}
+            </span>
+            ${
+              group.periodAdmin
+                ? `<span class="inline-block px-3 py-1 text-xs font-semibold bg-amber-500 text-black rounded-full whitespace-nowrap">
+                     Period Admin
+                   </span>`
+                : ""
+            }
           </div>
           <div class="text-sm text-gray-300 whitespace-nowrap">
-            <span class="font-medium">${memberCount}</span> member${memberCount !== 1 ? 's' : ''}
+            <span class="font-medium">${memberCount}</span> member${memberCount !== 1 ? "s" : ""}
           </div>
         </div>
-        <button 
-          class="ml-4 text-gray-400 hover:text-indigo-400 transition-colors p-2"
-          onclick="toggleMembers(${group.id})"
-        >
-          <svg id="chevron-${group.id}" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
+
+        <div class="flex items-center gap-2">
+          <!-- Period Admin toggle button -->
+          <button
+            class="text-xs px-3 py-1 rounded-full border ${
+              group.periodAdmin
+                ? "border-amber-400 bg-amber-500 text-black hover:bg-amber-400"
+                : "border-neutral-500 text-gray-200 hover:bg-neutral-600"
+            } transition-colors"
+            title="${group.periodAdmin ? "Unmark as Period Admin" : "Mark as Period Admin"}"
+            onclick="togglePeriodAdmin(${group.id})"
+          >
+            ${group.periodAdmin ? "Admin ✔" : "Set Admin"}
+          </button>
+
+          <button 
+            class="text-gray-300 hover:text-green-400 transition-colors p-1"
+            title="Add member"
+            onclick="addMember(${group.id})"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </button>
+
+          <button 
+            class="text-gray-300 hover:text-red-400 transition-colors p-1"
+            title="Remove member"
+            onclick="removeMember(${group.id})"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+            </svg>
+          </button>
+
+          <button 
+            class="ml-2 text-gray-400 hover:text-indigo-400 transition-colors p-2"
+            onclick="toggleMembers(${group.id})"
+          >
+            <svg id="chevron-${group.id}" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       
       <div id="members-${group.id}" class="hidden mt-4 pt-4 border-t border-neutral-600">
@@ -269,7 +465,7 @@ function createGroupCard(group) {
               </div>
               <div class="text-white font-medium truncate">${member.name}</div>
             </div>
-          `).join('')}
+          `).join("")}
         </div>
       </div>
     </div>
@@ -278,7 +474,7 @@ function createGroupCard(group) {
   return card;
 }
 
-// Toggle member list visibility
+// ===== Member & admin management =====
 window.toggleMembers = function(groupId) {
   const membersList = document.getElementById(`members-${groupId}`);
   const chevron = document.getElementById(`chevron-${groupId}`);
@@ -286,56 +482,150 @@ window.toggleMembers = function(groupId) {
   chevron.classList.toggle("rotate-180");
 };
 
-// Toggle Add Group form
+window.addMember = function(groupId) {
+  const group = allGroups.find(g => g.id === groupId);
+  if (!group) return;
+
+  const name = prompt("Enter the new member's name:");
+  if (!name || !name.trim()) return;
+
+  const trimmedName = name.trim();
+
+  group.members.push({
+    id: group.members.length + 1,
+    name: trimmedName
+  });
+
+  renderGroups();
+};
+
+window.removeMember = function(groupId) {
+  const group = allGroups.find(g => g.id === groupId);
+  if (!group || group.members.length === 0) {
+    alert("This group has no members to remove.");
+    return;
+  }
+
+  const name = prompt("Enter the name of the member to remove (case-insensitive):");
+  if (!name || !name.trim()) return;
+
+  const target = name.trim().toLowerCase();
+  const index = group.members.findIndex(m => m.name.toLowerCase() === target);
+
+  if (index === -1) {
+    alert("Member not found in this group.");
+    return;
+  }
+
+  group.members.splice(index, 1);
+  renderGroups();
+};
+
+// Period Admin toggle logic
+window.togglePeriodAdmin = function(groupId) {
+  const group = allGroups.find(g => g.id === groupId);
+  if (!group) return;
+
+  const periodStr = String(group.period);
+
+  if (group.periodAdmin) {
+    // Only this group can unmark itself
+    const confirmUnmark = confirm(
+      `"${group.name}" is currently the Period Admin for Period ${group.period}.\n\nDo you want to remove this admin status?`
+    );
+    if (!confirmUnmark) return;
+
+    group.periodAdmin = false;
+    renderGroups();
+    alert(`"${group.name}" is no longer the Period Admin for Period ${group.period}.`);
+    return;
+  }
+
+  // Trying to set as Period Admin: ensure no other admin exists for this period
+  const existingAdmin = allGroups.find(
+    g => String(g.period) === periodStr && g.periodAdmin
+  );
+
+  if (existingAdmin) {
+    alert(
+      `"${existingAdmin.name}" is already the Period Admin for Period ${group.period}.\n` +
+      `They must unmark themselves as admin before another group can take over.`
+    );
+    return;
+  }
+
+  group.periodAdmin = true;
+  renderGroups();
+  alert(`"${group.name}" is now the Period Admin for Period ${group.period}.`);
+};
+
+// ===== Add group form =====
 window.toggleAddGroup = function() {
-  const collapsed = document.getElementById("addGroupCollapsed");
   const expanded = document.getElementById("addGroupExpanded");
   const chevron = document.getElementById("addGroupChevron");
-  
   expanded.classList.toggle("hidden");
   chevron.classList.toggle("rotate-180");
 };
 
-// Cancel add group
 window.cancelAddGroup = function() {
   document.getElementById("newGroupName").value = "";
   document.getElementById("newGroupPeriod").value = "";
+  document.getElementById("newGroupClass").value = "";
+  document.getElementById("newGroupPeriodAdmin").checked = false;
   document.getElementById("newGroupMembers").value = "";
   toggleAddGroup();
 };
 
-// Save new group
 window.saveNewGroup = function() {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
+  const className = document.getElementById("newGroupClass").value;
+  const periodAdminChecked = document.getElementById("newGroupPeriodAdmin").checked;
   const membersText = document.getElementById("newGroupMembers").value.trim();
   
   if (!name) {
     alert("Please enter a group name");
     return;
   }
-  
   if (!period) {
     alert("Please select a period");
     return;
   }
-  
+  if (!className) {
+    alert("Please select a class");
+    return;
+  }
   if (!membersText) {
     alert("Please enter at least one member");
     return;
   }
   
-  const members = membersText.split('\n').map(m => m.trim()).filter(m => m);
-  
+  const members = membersText.split("\n").map(m => m.trim()).filter(m => m);
   if (members.length === 0) {
     alert("Please enter at least one member");
     return;
   }
+
+  // If marking as Period Admin, ensure no existing admin for that period
+  if (periodAdminChecked) {
+    const existingAdmin = allGroups.find(
+      g => String(g.period) === String(period) && g.periodAdmin
+    );
+    if (existingAdmin) {
+      alert(
+        `"${existingAdmin.name}" is already the Period Admin for Period ${period}.\n` +
+        `They must unmark themselves as admin before another group can be created as Period Admin.`
+      );
+      return;
+    }
+  }
   
   const newGroup = {
     id: allGroups.length + 1,
-    name: name,
-    period: period,
+    name,
+    period,
+    class: className,
+    periodAdmin: !!periodAdminChecked,
     members: members.map((memberName, index) => ({
       id: index + 1,
       name: memberName
@@ -349,7 +639,144 @@ window.saveNewGroup = function() {
   alert(`Group "${name}" created successfully!`);
 };
 
-// Show empty state with message
+// ===== Filter helpers =====
+function updateFilterLabels() {
+  const periodLabel = document.getElementById("periodFilterLabel");
+  const classLabel = document.getElementById("classFilterLabel");
+
+  if (selectedPeriods.length === 0) {
+    periodLabel.textContent = "All Periods";
+  } else if (selectedPeriods.length === 1) {
+    periodLabel.textContent = `Period ${selectedPeriods[0]}`;
+  } else {
+    periodLabel.textContent = `${selectedPeriods.length} Periods`;
+  }
+
+  if (selectedClasses.length === 0) {
+    classLabel.textContent = "All Classes";
+  } else if (selectedClasses.length === 1) {
+    classLabel.textContent = selectedClasses[0];
+  } else {
+    classLabel.textContent = `${selectedClasses.length} Classes`;
+  }
+}
+
+// Dropdown toggling
+window.toggleDropdown = function(type) {
+  const periodDropdown = document.getElementById("periodDropdown");
+  const classDropdown = document.getElementById("classDropdown");
+
+  if (type === "period") {
+    periodDropdown.classList.toggle("hidden");
+    classDropdown.classList.add("hidden");
+  } else {
+    classDropdown.classList.toggle("hidden");
+    periodDropdown.classList.add("hidden");
+  }
+};
+
+// Period filters
+window.onPeriodAllChange = function(checkbox) {
+  const periodCheckboxes = document.querySelectorAll(".period-checkbox");
+  if (checkbox.checked) {
+    selectedPeriods = [];
+    periodCheckboxes.forEach(cb => cb.checked = false);
+  } else {
+    if (selectedPeriods.length === 0) {
+      checkbox.checked = true;
+    }
+  }
+  updateFilterLabels();
+  renderGroups();
+};
+
+window.onPeriodCheckboxChange = function(checkbox) {
+  const value = checkbox.value;
+  const allCheckbox = document.getElementById("periodAllCheckbox");
+
+  if (checkbox.checked) {
+    if (!selectedPeriods.includes(value)) {
+      selectedPeriods.push(value);
+    }
+    allCheckbox.checked = false;
+  } else {
+    selectedPeriods = selectedPeriods.filter(v => v !== value);
+    if (selectedPeriods.length === 0) {
+      allCheckbox.checked = true;
+    }
+  }
+
+  updateFilterLabels();
+  renderGroups();
+};
+
+// Class filters
+window.onClassAllChange = function(checkbox) {
+  const classCheckboxes = document.querySelectorAll(".class-checkbox");
+  if (checkbox.checked) {
+    selectedClasses = [];
+    classCheckboxes.forEach(cb => cb.checked = false);
+  } else {
+    if (selectedClasses.length === 0) {
+      checkbox.checked = true;
+    }
+  }
+  updateFilterLabels();
+  renderGroups();
+};
+
+window.onClassCheckboxChange = function(checkbox) {
+  const value = checkbox.value.toUpperCase();
+  const allCheckbox = document.getElementById("classAllCheckbox");
+
+  if (checkbox.checked) {
+    if (!selectedClasses.includes(value)) {
+      selectedClasses.push(value);
+    }
+    allCheckbox.checked = false;
+  } else {
+    selectedClasses = selectedClasses.filter(v => v !== value);
+    if (selectedClasses.length === 0) {
+      allCheckbox.checked = true;
+    }
+  }
+
+  updateFilterLabels();
+  renderGroups();
+};
+
+window.clearAllFilters = function() {
+  selectedPeriods = [];
+  selectedClasses = [];
+
+  const periodAll = document.getElementById("periodAllCheckbox");
+  const classAll = document.getElementById("classAllCheckbox");
+  periodAll.checked = true;
+  classAll.checked = true;
+
+  document.querySelectorAll(".period-checkbox").forEach(cb => cb.checked = false);
+  document.querySelectorAll(".class-checkbox").forEach(cb => cb.checked = false);
+
+  updateFilterLabels();
+  renderGroups();
+};
+
+// Close dropdowns when clicking outside
+document.addEventListener("click", (event) => {
+  const periodWrapper = document.getElementById("periodFilterWrapper");
+  const classWrapper = document.getElementById("classFilterWrapper");
+  const periodDropdown = document.getElementById("periodDropdown");
+  const classDropdown = document.getElementById("classDropdown");
+
+  if (!periodWrapper.contains(event.target)) {
+    periodDropdown.classList.add("hidden");
+  }
+  if (!classWrapper.contains(event.target)) {
+    classDropdown.classList.add("hidden");
+  }
+});
+
+// ===== Misc helpers =====
 function showEmptyState(message) {
   const container = document.getElementById("groupsContainer");
   const emptyState = document.getElementById("emptyState");
@@ -357,23 +784,6 @@ function showEmptyState(message) {
   emptyState.classList.remove("hidden");
   emptyState.querySelector("p").textContent = message;
 }
-
-// Period filter button click handler
-document.querySelectorAll(".period-filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    // Update active state
-    document.querySelectorAll(".period-filter-btn").forEach(b => {
-      b.classList.remove("bg-indigo-600", "text-white");
-      b.classList.add("bg-neutral-700", "text-gray-300");
-    });
-    btn.classList.remove("bg-neutral-700", "text-gray-300");
-    btn.classList.add("bg-indigo-600", "text-white");
-    
-    // Update filter and re-render
-    currentPeriod = btn.dataset.period;
-    renderGroups();
-  });
-});
 
 // Search input handler
 document.getElementById("searchInput").addEventListener("input", (e) => {
@@ -383,4 +793,5 @@ document.getElementById("searchInput").addEventListener("input", (e) => {
 
 // Initialize on page load
 fetchGroups();
+updateFilterLabels();
 </script>
