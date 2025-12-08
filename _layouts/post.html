@@ -166,9 +166,6 @@ Check if this is a course lesson and determine which course context to use
               </h3>
               
               <div class="submission-options">
-                <button class="submission-tab active" onclick="switchSubmissionType('github')">
-                  <i class="fab fa-github"></i> GitHub Issue
-                </button>
                 <button class="submission-tab" onclick="switchSubmissionType('link')">
                   <i class="fas fa-link"></i> Link Submission
                 </button>
@@ -176,22 +173,6 @@ Check if this is a course lesson and determine which course context to use
                   <i class="fas fa-file-upload"></i> File Upload
                 </button>
               </div>
-
-              <!-- GitHub Issue Form -->
-              <form class="submission-form active" id="github-form">
-                <div class="form-group">
-                  <label for="github-issue-url">GitHub Issue URL</label>
-                  <input type="url" id="github-issue-url" placeholder="https://github.com/username/repo/issues/123" required>
-                </div>
-                <div class="form-group">
-                  <label for="github-notes">Notes (Optional)</label>
-                  <textarea id="github-notes" placeholder="Add any additional comments about your submission..."></textarea>
-                </div>
-                <button type="submit" class="submit-btn">
-                  <i class="fas fa-check"></i>
-                  Submit GitHub Issue
-                </button>
-              </form>
 
               <!-- Link Submission Form -->
               <form class="submission-form" id="link-form">
@@ -637,7 +618,7 @@ Check if this is a course lesson and determine which course context to use
     });
 
     // Assignment submission handlers
-    if (document.getElementById('github-form')) {
+    if (document.getElementById('link-form')) {
       // Submission type switching
       function switchSubmissionType(type) {
         // Update tabs
@@ -734,17 +715,7 @@ Check if this is a course lesson and determine which course context to use
         return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
       }
 
-      // Form submissions
-      document.getElementById('github-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const url = document.getElementById('github-issue-url').value;
-        const notes = document.getElementById('github-notes').value;
-        
-        saveSubmission('github', { url, notes });
-        showStatus('success', 'GitHub issue submitted successfully!');
-        this.reset();
-      });
-
+      // Form submission
       document.getElementById('link-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const link = document.getElementById('submission-link').value;
@@ -1190,9 +1161,6 @@ Check if this is a course lesson and determine which course context to use
         </h3>
         
         <div class="submission-options">
-          <button class="submission-tab active" onclick="switchSubmissionType('github')">
-            <i class="fab fa-github"></i> GitHub Issue
-          </button>
           <button class="submission-tab" onclick="switchSubmissionType('link')">
             <i class="fas fa-link"></i> Link Submission
           </button>
@@ -1201,21 +1169,6 @@ Check if this is a course lesson and determine which course context to use
           </button>
         </div>
 
-        <!-- GitHub Issue Form -->
-        <form class="submission-form active" id="github-form-blog">
-          <div class="form-group">
-            <label for="github-issue-url-blog">GitHub Issue URL</label>
-            <input type="url" id="github-issue-url-blog" placeholder="https://github.com/username/repo/issues/123" required>
-          </div>
-          <div class="form-group">
-            <label for="github-notes-blog">Notes (Optional)</label>
-            <textarea id="github-notes-blog" placeholder="Add any additional comments about your submission..."></textarea>
-          </div>
-          <button type="submit" class="submit-btn">
-            <i class="fas fa-check"></i>
-            Submit GitHub Issue
-          </button>
-        </form>
 
         <!-- Link Submission Form -->
         <form class="submission-form" id="link-form-blog">
@@ -1355,17 +1308,6 @@ Check if this is a course lesson and determine which course context to use
           const i = Math.floor(Math.log(bytes) / Math.log(k));
           return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
-
-        // Form submissions
-        document.getElementById('github-form-blog').addEventListener('submit', function(e) {
-          e.preventDefault();
-          const url = document.getElementById('github-issue-url-blog').value;
-          const notes = document.getElementById('github-notes-blog').value;
-          
-          saveSubmissionBlog('github', { url, notes });
-          showStatusBlog('success', 'GitHub issue submitted successfully!');
-          this.reset();
-        });
 
         document.getElementById('link-form-blog').addEventListener('submit', function(e) {
           e.preventDefault();
