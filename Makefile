@@ -31,7 +31,7 @@ default: serve-current
 			echo "Server started in $$COUNTER seconds"; \
 			break; \
 		fi; \
-		if [ $$COUNTER -eq 120 ]; then \
+		if [ $$COUNTER -eq 300 ]; then \
 			echo "Server timed out after $$COUNTER seconds."; \
 			echo "Review errors from $(LOG_FILE)."; \
 			cat $(LOG_FILE); \
@@ -108,23 +108,32 @@ serve-yat: use-yat clean
 	@make serve-current
 
 # General serve target (uses whatever is in _config.yml/Gemfile)
-serve-current: stop convert
+serve-current: stop convert split-courses
 	@echo "Starting server with current config/Gemfile..."
-	@@nohup bundle install && bundle exec jekyll serve -H $(HOST) -P $(PORT) > $(LOG_FILE) 2>&1 & \
+	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) >> $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
 		echo "Server PID: $$PID"
-	@@until [ -f $(LOG_FILE) ]; do sleep 1; done
+	@until [ -f $(LOG_FILE) ]; do sleep 1; done
 	@for ((COUNTER = 0; ; COUNTER++)); do \
 		if grep -q "Server address:" $(LOG_FILE); then \
 			echo "Server started in $$COUNTER seconds"; \
 			grep "Server address:" $(LOG_FILE); \
 			break; \
 		fi; \
-		if [ $$COUNTER -eq 120 ]; then \
+		if [ $$COUNTER -eq 300 ]; then \
 			echo "Server timed out after $$COUNTER seconds."; \
 			echo "Review errors from $(LOG_FILE)."; \
-			cat $(LOG_FILE); \
+			grep -v "Server running... press ctrl-c to stop." $(LOG_FILE); \
 			exit 1; \
+		fi; \
+		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b" $(LOG_FILE); then \
+			echo "Fatal error detected during startup!"; \
+			echo "Review errors from $(LOG_FILE):"; \
+			grep -v "Server running... press ctrl-c to stop." $(LOG_FILE); \
+			exit 1; \
+		fi; \
+		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+			echo "Still starting... ($$COUNTER seconds elapsed)"; \
 		fi; \
 		sleep 1; \
 	done
@@ -136,7 +145,7 @@ build-cayman: use-cayman build-current
 build-so-simple: use-so-simple build-current
 build-yat: use-yat build-current
 
-build-current: clean
+build-current: clean convert split-courses
 	@bundle install
 	@bundle exec jekyll clean
 	@bundle exec jekyll build
@@ -144,6 +153,15 @@ build-current: clean
 # General serve/build for whatever is current
 serve: serve-current
 build: build-current
+
+# Multi-course file splitting
+split-courses:
+	@echo " ------ Splitting multi-course files... -------"
+	@python3 scripts/split_multi_course_files.py
+
+clean-courses:
+	@echo "🧹 Cleaning course-specific files..."
+	@python3 scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx
@@ -204,6 +222,8 @@ clean: stop
 	@find _posts -type f -name '*_GithubIssue_.md' -exec rm {} +
 	@echo "Cleaning converted DOCX files..."
 	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
+	@echo "Cleaning course-specific files..."
+	@make clean-courses
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -270,12 +290,14 @@ help:
 	@echo "Conversion Commands:"
 	@echo "  make convert        - Convert notebooks and DOCX files"
 	@echo "  make convert-docx   - Convert DOCX files only"
+	@echo "  make split-courses  - Split multi-course files automatically"
 	@echo "  make docx-only      - Convert DOCX and prepare for preview"
 	@echo "  make preview-docx   - Clean, convert DOCX, and serve"
 	@echo ""
 	@echo "Cleanup Commands:"
 	@echo "  make clean          - Remove all generated files"
 	@echo "  make clean-docx     - Remove DOCX-generated files only"
+	@echo "  make clean-courses  - Remove course-specific split files only"
 	@echo ""
 	@echo "Diagnostic Commands:"
 	@echo "  make convert-check  - Check notebooks for conversion warnings"

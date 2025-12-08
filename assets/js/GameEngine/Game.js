@@ -2,34 +2,50 @@
 
 class GameCore {
     constructor(environment, GameControlClass) {
-        this.environment = environment;
-        this.path = environment.path;
-        this.gameContainer = environment.gameContainer;
-        this.gameCanvas = environment.gameCanvas;
-        this.pythonURI = environment.pythonURI;
-        this.javaURI = environment.javaURI;
-        this.fetchOptions = environment.fetchOptions;
-        this.uid = null;
-        this.id = null;
-        this.gname = null;
+    this.environment = environment;
+    this.path = environment.path;
+    this.gameContainer = environment.gameContainer;
+    this.gameCanvas = environment.gameCanvas;
+    this.pythonURI = environment.pythonURI;
+    this.javaURI = environment.javaURI;
+    this.fetchOptions = environment.fetchOptions;
+    this.uid = null;
+    this.id = null;
+    this.gname = null;
 
-        this.initUser();
-        const gameLevelClasses = environment.gameLevelClasses;
-        // create GameControl using the engine-provided class
-        this.gameControl = new GameControlClass(this, gameLevelClasses);
-        this.gameControl.start();
+    this.initUser();
+    const gameLevelClasses = environment.gameLevelClasses;
+    // create GameControl using the engine-provided class
+    this.gameControl = new GameControlClass(this, gameLevelClasses);
+    this.gameControl.start();
 
-        // Try to dynamically load the PauseMenu so it's optional and non-blocking.
-        // The PauseMenu will register itself with the GameControl if it exists.
-        import('../mansionGame/ui/PauseMenu.js')
-            .then(mod => {
-                try { new mod.default(this.gameControl, { parentId: 'gameContainer' }); }
-                catch (e) { console.warn('PauseMenu init failed:', e); }
-            })
-            .catch(() => {
-                // no-op: PauseMenu is optional
-            });
-    }
+    // Try to dynamically load the centralized PauseMenu (prefer the shared one)
+    import('./PauseMenu.js')
+        .then(mod => {
+            try {
+                // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
+                const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
+                new mod.default(this.gameControl, pmOptions);
+            } catch (e) { console.warn('PauseMenu init failed:', e); }
+        })
+        .catch(() => {
+            // no-op: PauseMenu is optional
+        });
+
+    // Try to dynamically load the Leaderboard
+    import('../mansionGame/ui/Leaderboard.js')  // Adjust path as needed
+        .then(mod => {
+            try { 
+                new mod.default(this.gameControl, { 
+                    apiBaseUrl: 'http://localhost:8585/api/gamer'  // Adjust as needed
+                }); 
+            }
+            catch (e) { console.warn('Leaderboard init failed:', e); }
+        })
+        .catch(() => {
+            // no-op: Leaderboard is optional
+        });
+}
 
     static main(environment, GameControlClass) {
         return new GameCore(environment, GameControlClass);

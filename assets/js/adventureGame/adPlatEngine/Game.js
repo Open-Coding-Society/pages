@@ -43,6 +43,51 @@ class Game {
         
         // Create player immediately
         this.initGame();
+
+        // Initialize a PauseMenu adapter so we can reuse the centralized PauseMenu UI
+        try {
+            // prepare minimal adapter so PauseMenu can read/write stats and call control methods
+            this.stats = this.stats || { levelsCompleted: 0, points: 0 };
+            const adapter = {
+                pauseMenuOptions: {
+                    storageKey: 'pauseMenuStats:adventure',
+                    counterVar: 'levelsCompleted',
+                    counterLabel: 'Levels completed',
+                    counterPerLevel: false
+                },
+                stats: this.stats,
+                // called by PauseMenu to hide the menu and resume the game
+                hidePauseMenu: () => { try { this.resumeGame(); } catch (e) { /* ignore */ } },
+                resume: () => { try { this.resumeGame(); } catch (e) { /* ignore */ } },
+                // called by PauseMenu to end/skip the level — increment counter and restart/advance
+                endLevel: () => { 
+                    try {
+                        const cv = 'levelsCompleted';
+                        this.stats[cv] = (this.stats[cv] || 0) + 1;
+                        // update PauseMenu UI if present
+                        if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+                        if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+                    } catch (e) { /* ignore */ }
+                    try { this.resumeGame(); this.initGame(); } catch (e) { /* ignore */ } 
+                },
+                // provide currentLevelIndex for per-level mode compatibility
+                currentLevelIndex: 0,
+                currentLevel: { id: '0' },
+                game: this
+            };
+
+            import('../../GameEngine/PauseMenu.js').then(mod => {
+                try {
+                    const pm = new mod.default(adapter, adapter.pauseMenuOptions);
+                    // keep a reference so other methods can use the centralized PauseMenu
+                    this.pauseMenu = pm;
+                } catch (e) {
+                    console.warn('adPlatEngine: PauseMenu init failed', e);
+                }
+            }).catch(() => {/* optional PauseMenu not available */});
+        } catch (e) {
+            console.warn('Error initializing PauseMenu adapter for Adventure:', e);
+        }
         
         // Make game instance globally accessible
         window.game = this;
@@ -174,6 +219,12 @@ class Game {
      */
     pauseGame() {
         if (this.currentState === CONFIG.STATES.PLAYING) {
+            // Prefer centralized PauseMenu if available
+            if (this.pauseMenu && typeof this.pauseMenu.show === 'function') {
+                try { this.pauseMenu.show(); } catch (e) { /* ignore */ }
+                // leave state as PLAYING; PauseMenu will call resume when closed
+                return;
+            }
             this.setGameState(CONFIG.STATES.PAUSED);
         }
     }
@@ -182,6 +233,12 @@ class Game {
      * Resumes the game
      */
     resumeGame() {
+        // If PauseMenu is present prefer hiding it
+        if (this.pauseMenu && typeof this.pauseMenu.hide === 'function') {
+            try { this.pauseMenu.hide(); } catch (e) { /* ignore */ }
+            this.lastTime = performance.now();
+            return;
+        }
         if (this.currentState === CONFIG.STATES.PAUSED) {
             this.setGameState(CONFIG.STATES.PLAYING);
             this.lastTime = performance.now();

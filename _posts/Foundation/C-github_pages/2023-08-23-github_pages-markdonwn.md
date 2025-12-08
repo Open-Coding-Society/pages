@@ -206,7 +206,6 @@ The Teacher and many students from previous years have focused on the **minima**
   padding: 1rem;
   border: 1px solid #e1e1e1;
   border-radius: 10px;
-  background: #f9fafb;
 }
 .frq-block textarea {
   width: 100%;

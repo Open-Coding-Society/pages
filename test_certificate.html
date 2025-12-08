@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Certificate System Mock</title>
+  <style>
+    :root {
+      font-family: 'Libre Baskerville', 'Crimson Text', Georgia, serif;
+      color: #1f2937;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #101422, #05060b 65%);
+      padding: 40px 20px;
+    }
+
+    main {
+      width: min(1100px, 100%);
+      background: #0b0d17;
+      border: 1px solid #1f2338;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1f2338;
+      padding-bottom: 16px;
+      color: #e5e7eb;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    header p {
+      margin: 4px 0 0 0;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+
+    .mock-week-card {
+      background: #121427;
+      border: 1px solid #202442;
+      border-radius: 12px;
+      padding: 24px;
+      color: #e5e7eb;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .mock-week-card .week-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 2px solid #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .mock-week-card .items {
+      flex: 1;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mock-week-card .item-card {
+      border: 1px solid #272b4a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #0c0f20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mock-week-card .item-card.completed {
+      border-color: #34d399;
+      color: #6ee7b7;
+    }
+
+    .certificate-preview-shell {
+      background: #020409;
+      border-radius: 14px;
+      border: 1px solid #1f2338;
+      padding: 20px;
+    }
+
+    #certificate-content {
+      background: #fdfaf1;
+      padding: 90px 80px;
+      border: 3px solid #d4a574;
+      position: relative;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+      color: #1f2937;
+    }
+
+    #certificate-content::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      border: 1px solid rgba(212, 165, 116, 0.7);
+      pointer-events: none;
+    }
+
+    #certificate-content > div {
+      position: relative;
+      z-index: 1;
+    }
+
+    .certificate-heading {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .certificate-emblem {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      border: 3px solid #d4a574;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .certificate-emblem img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .header-text {
+      font-size: 14px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #505766;
+      margin-bottom: 12px;
+    }
+
+    .certify-text {
+      font-size: 30px;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .certificate-subtitle {
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    #certificate-student-name {
+      font-size: 62px;
+      color: #111827;
+      font-weight: 700;
+      border: none;
+      outline: none;
+      width: 100%;
+      margin: 32px auto 40px;
+    }
+
+    #certificate-student-name:empty::before {
+      content: 'Your Name';
+      color: #d1d5db;
+    }
+
+    .achievement-text {
+      color: #374151;
+      max-width: 720px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+      font-size: 22px;
+    }
+
+    .skill-focus-pill {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .skill-focus-pill span {
+      display: inline-block;
+      padding: 6px 20px;
+      border: 1px solid #d4a574;
+      border-radius: 999px;
+      font-size: 16px;
+      color: #92400e;
+      background: rgba(212, 165, 116, 0.18);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    #certificate-date {
+      text-align: center;
+      font-size: 18px;
+      color: #6b7280;
+      font-style: italic;
+      margin-bottom: 40px;
+    }
+
+    .certificate-divider {
+      width: 60%;
+      height: 1px;
+      background: transparent;
+      margin: 0 auto 48px;
+    }
+
+    #certificate-skills {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid #d1d5db;
+    }
+
+    .skills-heading {
+      text-align: center;
+      color: #0b0d17 !important;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    #skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .skill-tag {
+      padding: 6px 16px;
+      border: 1px solid #d4a574;
+      border-radius: 20px;
+      color: #1f2937;
+      font-size: 14px;
+      background: rgba(212, 165, 116, 0.1);
+    }
+
+    .signature-section {
+      display: flex;
+      justify-content: center;
+      margin-top: 48px;
+    }
+
+    .signature {
+      text-align: center;
+    }
+
+    .signature-line {
+      border-top: 2px solid #9ca3af;
+      padding-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    .signature-name {
+      font-size: 30px;
+      font-style: italic;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .signature-title {
+      font-weight: 600;
+      margin: 0;
+      color: #1f2937;
+    }
+
+    .signature-subtitle {
+      color: #4b5563;
+      margin: 2px 0 0 0;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        padding: 20px;
+      }
+
+      .mock-week-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #certificate-content {
+        padding: 50px 30px;
+      }
+
+      .signature-section {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Certificate System Mock</h1>
+        <p>This standalone page mirrors the sprint layout styles so you can tweak certificates without the whole site.</p>
+      </div>
+    </header>
+
+    <section class="mock-week-card">
+      <div class="week-circle">W1</div>
+      <div class="items">
+        <div class="item-card completed">
+          <span>Introduction to Python Programming</span>
+          <strong>✓</strong>
+        </div>
+        <div class="item-card completed">
+          <span>Basic HTML Structure</span>
+          <strong>✓</strong>
+        </div>
+        <div class="item-card">
+          <span>Loops and Conditionals</span>
+          <strong>•</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="certificate-preview-shell">
+      <div id="certificate-content">
+        <div>
+          <div class="certificate-heading">
+            <div class="certificate-emblem">
+              <img id="certificate-logo" src="assets/images/ocs-logo.png" alt="Open Coding Society Logo">
+            </div>
+            <div class="header-text">Open Coding Society</div>
+            <div class="certify-text">Certificate of Completion</div>
+            <div class="certificate-subtitle">Presented to</div>
+          </div>
+
+          <div id="certificate-student-name" contenteditable="true">Your Name</div>
+
+          <div class="achievement-text">
+            Has successfully completed the module:
+            <br><strong id="certificate-week-theme">General Programming</strong><br>
+            as part of the course<br>
+            <strong id="certificate-course-name">Computer Science Principles</strong>.
+          </div>
+
+          <div class="skill-focus-pill">
+            <span id="certificate-skill-focus">Framework for Sprints</span>
+          </div>
+
+          <div id="certificate-date">November 30, 2025</div>
+
+          <div class="certificate-divider"></div>
+
+          <div id="certificate-skills">
+            <h3 class="skills-heading">Skills Demonstrated</h3>
+            <div id="skills-container">
+              <span class="skill-tag">Python Programming</span>
+              <span class="skill-tag">HTML Foundations</span>
+              <span class="skill-tag">Problem Solving</span>
+            </div>
+          </div>
+
+          <div class="signature-section">
+            <div class="signature">
+              <div class="signature-line"></div>
+              <div class="signature-name">John Mortensen</div>
+              <p class="signature-title">Course Instructor</p>
+              <p class="signature-subtitle">Open Coding Society</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
