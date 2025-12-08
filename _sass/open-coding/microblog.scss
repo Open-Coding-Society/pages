@@ -156,38 +156,121 @@
 }
 
 /* Floating Action Button */
-.microblog-fab {
+
+/* Container that holds the microblog FAB and the inbox FAB so they sit adjacent */
+.micro-actions-wrapper {
   position: fixed;
   top: 5rem;
   right: 2rem;
   z-index: 1050;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  --fab-size: 56px; /* default diameter for circular FABs */
+}
+
+/* Floating Action Button */
+.microblog-fab {
   background: #2563eb;
   color: #fff;
   border: none;
   border-radius: 999px;
-  padding: 1rem 1.5rem;
-  font-size: 1.2rem;
+  padding: 0 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--fab-size, 56px);
+  min-width: calc(var(--fab-size, 56px) + 40px);
 }
 
-.microblog-fab:hover {
-  background: #1e40af;
-}
+.microblog-fab:hover { background: #1e40af; }
 
 @media (max-width: 600px) {
-  .microblog-fab {
-    right: 1rem;
-    top: 1rem;
-    padding: 1.2rem 2.2rem;
-    font-size: 1.5rem;
-    min-width: 56px;
-    min-height: 56px;
-    border-radius: 50%;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
-  }
+  .micro-actions-wrapper { top: 1rem; right: 1rem; }
+  .microblog-fab { font-size: 1.2rem; min-width: 56px; height: var(--fab-size,56px); }
+}
+
+/* Small Inbox FAB - sits to the left of the main microblog FAB */
+.inbox-fab {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: var(--fab-size, 56px);
+  height: var(--fab-size, 56px);
+  padding: 0;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+}
+.inbox-fab:hover { background: #059669; transform: translateY(-1px); }
+
+@media (max-width: 600px) {
+  .inbox-fab { width: var(--fab-size,56px); height: var(--fab-size,56px); font-size:1.35rem; }
+}
+
+/* Compact inbox panel - small, anchored near the inbox FAB */
+.inbox-panel--compact {
+  right: calc(2rem + 0px); /* sits near the micro-actions wrapper */
+  top: calc(5rem + 3px);
+  width: 420px;
+  max-width: 92vw;
+  height: auto;
+  min-height: 8rem;
+  max-height: calc(100vh - 6rem);
+  overflow: auto;
+  transform: translateX(8px) translateY(-8px) translateZ(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  border-radius: 0.5rem;
+}
+.inbox-panel--compact.open {
+  transform: translateX(0) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .inbox-panel--compact { right: 4.4rem; top: 4.2rem; }
+}
+
+/* Inbox-specific input sizing to make title smaller and same width as content */
+.inbox-panel--compact .microblog-input {
+  font-size: 0.95rem;
+  padding: 0.35rem 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+.inbox-panel--compact .microblog-textarea {
+  width: 100%;
+  min-height: 120px;
+  box-sizing: border-box;
+}
+
+/* Messages container: newest first visually (we prepend via JS too) */
+.inbox-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Simple visual for tabs inside inbox */
+.inbox-tabs .inbox-tab {
+  color: var(--white);
+  border: 1px solid transparent;
+}
+.inbox-tabs .inbox-tab:hover {
+  background: rgba(255,255,255,0.04);
 }
 
 /* Side Panel */
