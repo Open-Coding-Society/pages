@@ -8,6 +8,7 @@ description: >
 author: John Mortensen
 courses: {'csse': {'week': 1}, 'csp': {'week': 1}, 'csa': {'week': 1}}
 type: hacks
+canonical_id: onboarding-adventure
 permalink: /hacks
 lxdData:
   Title: "Learning Experience Designer Home"

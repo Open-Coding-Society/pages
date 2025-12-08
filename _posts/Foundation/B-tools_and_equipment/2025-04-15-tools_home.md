@@ -12,6 +12,7 @@ type: tech skills
 categories: [DevOps]
 permalink: /tools/
 sticky_rank: 1
+canonical_id: tool-setup
 ---
 
 <h2> Track, Communicate, Share </h2>

@@ -23,6 +23,7 @@ courses: {'csse': {'week': 4}, 'csp': {'week': 4}, 'csa': {'week': 1}}
 type: soft skills
 categories: [DevOps]
 permalink: /sprints/
+canonical_id: sprints-home
 ---
 
 <!-- Infographic - this depends on page.infoGraph frontmatter being set -->
