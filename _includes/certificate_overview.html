@@ -1,0 +1,166 @@
+{% assign certificate_items = include.certificates | default: page.certificates | compact %}
+{% if certificate_items and certificate_items.size > 0 %}
+<div class="certificate-overview" aria-label="Certificate progress overview">
+  <div class="certificate-grid">
+    {% for cert in certificate_items %}
+      {% assign certificate_title = cert.title | default: 'Certificate' %}
+      {% assign total_tasks = cert.total_tasks | default: 0 %}
+      {% assign completed_tasks = cert.completed_tasks | default: 0 %}
+      {% if total_tasks > 0 %}
+        {% assign percent_complete = completed_tasks | times: 100 | divided_by: total_tasks %}
+      {% else %}
+        {% assign percent_complete = 0 %}
+      {% endif %}
+      {% if percent_complete > 100 %}
+        {% assign percent_complete = 100 %}
+      {% endif %}
+      {% assign is_complete = false %}
+      {% if total_tasks > 0 and completed_tasks >= total_tasks %}
+        {% assign is_complete = true %}
+      {% endif %}
+      {% assign is_locked = false %}
+      {% if total_tasks > 0 and completed_tasks == 0 %}
+        {% assign is_locked = true %}
+      {% endif %}
+      {% assign card_classes = 'certificate-card certificate-card-button' %}
+      {% assign status_label = 'Locked' %}
+      {% if is_complete %}
+        {% assign status_label = 'Unlocked' %}
+      {% elsif completed_tasks > 0 %}
+        {% assign status_label = 'In Progress' %}
+      {% endif %}
+      {% assign initial = certificate_title | slice: 0, 1 | upcase %}
+      {% assign progress_percent = percent_complete | append: '%' %}
+      {% assign summary_text = cert.description | default: cert.summary | default: cert.blurb | default: 'Track your progress for ' | append: certificate_title %}
+      {% assign cleaned_summary = summary_text | strip_newlines | strip %}
+      {% assign final_link = nil %}
+      {% if cert.link %}
+        {% if cert.link contains '://' %}
+          {% assign final_link = cert.link %}
+        {% else %}
+          {% assign final_link = cert.link | relative_url %}
+        {% endif %}
+      {% endif %}
+      <button type="button"
+              class="{{ card_classes }}"
+              data-certificate-modal-trigger
+              data-title="{{ certificate_title | escape_once }}"
+              data-status="{{ status_label | escape_once }}"
+              data-progress="{{ percent_complete }}"
+              data-completed="{{ completed_tasks }}"
+              data-total="{{ total_tasks }}"
+              data-summary="{{ cleaned_summary | escape_once }}"
+              {% if final_link %}data-link="{{ final_link }}"{% endif %}>
+        <div class="certificate-card-body">
+          <div class="certificate-icon" aria-hidden="true">
+            <span>{{ initial }}</span>
+          </div>
+          <div class="certificate-info">
+            <div class="certificate-title-row">
+              <p class="certificate-status">{{ status_label }}</p>
+              <span class="certificate-percent">{{ progress_percent }}</span>
+            </div>
+            <h3 class="certificate-title">{{ certificate_title }}</h3>
+            <p class="certificate-progress-copy">
+              {{ completed_tasks }}<span class="divider">/</span>{{ total_tasks }} tasks completed
+            </p>
+            <div class="certificate-progress" role="presentation">
+              <span class="progress-bar" style="width: {{ progress_percent }};"></span>
+            </div>
+            <p class="certificate-progress-meta">{{ progress_percent }} complete</p>
+          </div>
+        </div>
+      </button>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="certificate-summary-overlay" data-certificate-modal-overlay hidden>
+  <div class="certificate-summary-modal" role="dialog" aria-modal="true" aria-labelledby="certificate-summary-title">
+    <button class="certificate-summary-close" type="button" aria-label="Close summary modal" data-close-certificate-modal>&times;</button>
+    <p class="certificate-summary-status" data-modal-status></p>
+    <h3 class="certificate-summary-title" id="certificate-summary-title" data-modal-title></h3>
+    <p class="certificate-summary-text" data-modal-summary></p>
+    <div class="certificate-summary-progress">
+      <div class="progress-track">
+        <div class="progress-bar" data-modal-progress-bar></div>
+      </div>
+      <p class="progress-label" data-modal-progress-label></p>
+    </div>
+    <div class="certificate-summary-actions">
+      <a class="summary-link" data-modal-link target="_blank" rel="noopener">Visit module</a>
+      <button type="button" class="summary-close-btn" data-close-certificate-modal>Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    if (window.certificateSummaryModalInitialized) return;
+    window.certificateSummaryModalInitialized = true;
+
+    function initCertificateSummaryModal() {
+      const overlay = document.querySelector('[data-certificate-modal-overlay]');
+      if (!overlay) return;
+
+      const titleEl = overlay.querySelector('[data-modal-title]');
+      const statusEl = overlay.querySelector('[data-modal-status]');
+      const summaryEl = overlay.querySelector('[data-modal-summary]');
+      const progressBar = overlay.querySelector('[data-modal-progress-bar]');
+      const progressLabel = overlay.querySelector('[data-modal-progress-label]');
+      const linkBtn = overlay.querySelector('[data-modal-link]');
+
+      const closeButtons = overlay.querySelectorAll('[data-close-certificate-modal]');
+      closeButtons.forEach(btn => btn.addEventListener('click', () => closeModal()));
+      overlay.addEventListener('click', event => {
+        if (event.target === overlay) {
+          closeModal();
+        }
+      });
+
+      function openModal() {
+        overlay.removeAttribute('hidden');
+        document.body.classList.add('certificate-summary-open');
+      }
+
+      function closeModal() {
+        overlay.setAttribute('hidden', '');
+        document.body.classList.remove('certificate-summary-open');
+      }
+
+      document.querySelectorAll('[data-certificate-modal-trigger]').forEach(card => {
+        card.addEventListener('click', () => {
+          const progress = parseInt(card.dataset.progress || '0', 10);
+          const completed = card.dataset.completed || '0';
+          const total = card.dataset.total || '0';
+          const title = card.dataset.title || 'Certificate';
+          const status = card.dataset.status || '';
+          const summary = card.dataset.summary || '';
+
+          titleEl.textContent = title;
+          statusEl.textContent = status;
+          summaryEl.textContent = summary;
+          progressBar.style.width = `${progress}%`;
+          progressLabel.textContent = `${progress}% complete — ${completed}/${total} tasks finished`;
+
+          if (card.dataset.link) {
+            linkBtn.href = card.dataset.link;
+            linkBtn.style.display = 'inline-flex';
+          } else {
+            linkBtn.removeAttribute('href');
+            linkBtn.style.display = 'none';
+          }
+
+          openModal();
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCertificateSummaryModal);
+    } else {
+      initCertificateSummaryModal();
+    }
+  })();
+</script>
+{% endif %}
