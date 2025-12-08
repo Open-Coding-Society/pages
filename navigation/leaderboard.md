@@ -983,16 +983,5 @@ permalink: /leaderboard
         if (sortSelect) sortSelect.value = sortBy;
       });
     });
-
-    // Prompt for username if not set
-    if (!localStorage.getItem('student-username')) {
-      setTimeout(() => {
-        const username = prompt('Enter your name for the leaderboard:');
-        if (username && username.trim()) {
-          localStorage.setItem('student-username', username.trim());
-          refreshLeaderboardDisplay();
-        }
-      }, 500);
-    }
   });
 </script>
