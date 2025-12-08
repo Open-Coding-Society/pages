@@ -40,7 +40,7 @@ layout: opencs
     {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
     {% assign seen_ids = "" | split: "" %}
     {%- for post in posts -%}
-      {% unless seen_ids contains post.canonical_id or post.permalink contains "Onboarding_adventure_content" %}
+      {% unless seen_ids contains post.canonical_id or post.title contains "_content" %}
         <li>
           {%- include post_list_image_card.html -%}
         </li>
@@ -48,4 +48,4 @@ layout: opencs
       {% endunless %}
     {%- endfor -%}
   </ul>
-  {%- endif -%}
+    {%- endif -%}
