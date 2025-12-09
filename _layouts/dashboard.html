@@ -423,6 +423,43 @@ active_tab: dashboard
                     </div>
                 </div>
 
+                <!-- Text-to-Speech Section -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">Text-to-Speech</h3>
+                        <div class="flex gap-2">
+                            <button type="button" id="tts-test-btn" class="px-3 py-1 text-sm rounded bg-purple-600 hover:bg-purple-700 text-white">Test Voice</button>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="tts">Save</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-neutral-400 mb-4">Configure text-to-speech settings. Select text on any page and use the TTS button in the sidebar to hear it read aloud.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-neutral-400">Voice</label>
+                            <select id="pref-tts-voice" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                <option value="">Loading voices...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Speed: <span id="tts-rate-label">1.0</span>x</label>
+                            <input type="range" id="pref-tts-rate" min="0.5" max="2" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Pitch: <span id="tts-pitch-label">1.0</span></label>
+                            <input type="range" id="pref-tts-pitch" min="0.5" max="2" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Volume: <span id="tts-volume-label">100</span>%</label>
+                            <input type="range" id="pref-tts-volume" min="0" max="1" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="text-sm text-neutral-400">Test Text</label>
+                        <input type="text" id="tts-test-text" class="w-full bg-neutral-700 text-white rounded px-3 py-2 mt-1" value="Hello! This is a test of the text-to-speech feature." placeholder="Enter text to test..." />
+                    </div>
+                    <p class="text-xs text-neutral-500 mt-3">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
+                </div>
+
                 <!-- Actions Row -->
                 <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -581,7 +618,11 @@ active_tab: dashboard
                             font: document.getElementById('pref-font-family').value,
                             size: Number(document.getElementById('pref-font-size').value),
                             accent: document.getElementById('pref-accent-color').value,
-                            language: document.getElementById('pref-language').value
+                            language: document.getElementById('pref-language').value,
+                            ttsVoice: document.getElementById('pref-tts-voice').value,
+                            ttsRate: Number(document.getElementById('pref-tts-rate').value),
+                            ttsPitch: Number(document.getElementById('pref-tts-pitch').value),
+                            ttsVolume: Number(document.getElementById('pref-tts-volume').value)
                         };
                     }
 
@@ -595,6 +636,15 @@ active_tab: dashboard
                         document.getElementById('font-size-label').textContent = prefs.size || d.size;
                         document.getElementById('pref-accent-color').value = prefs.accent || d.accent;
                         document.getElementById('pref-language').value = prefs.language || '';
+                        
+                        // TTS settings
+                        if (prefs.ttsVoice) document.getElementById('pref-tts-voice').value = prefs.ttsVoice;
+                        document.getElementById('pref-tts-rate').value = prefs.ttsRate || 1;
+                        document.getElementById('tts-rate-label').textContent = prefs.ttsRate || 1.0;
+                        document.getElementById('pref-tts-pitch').value = prefs.ttsPitch || 1;
+                        document.getElementById('tts-pitch-label').textContent = prefs.ttsPitch || 1.0;
+                        document.getElementById('pref-tts-volume').value = prefs.ttsVolume || 1;
+                        document.getElementById('tts-volume-label').textContent = Math.round((prefs.ttsVolume || 1) * 100);
                     }
 
                     function showStatus(msg){
@@ -629,15 +679,107 @@ active_tab: dashboard
                                 setTimeout(() => window.location.reload(), 500);
                                 return;
                             }
+                        } else if (section === 'tts') {
+                            current.ttsVoice = form.ttsVoice;
+                            current.ttsRate = form.ttsRate;
+                            current.ttsPitch = form.ttsPitch;
+                            current.ttsVolume = form.ttsVolume;
                         }
                         
                         savePreferences(current);
                         showStatus('Saved ' + section);
                     }
 
+                    // Initialize TTS voices dropdown
+                    function populateTTSVoices() {
+                        const select = document.getElementById('pref-tts-voice');
+                        if (!select) return;
+                        
+                        const voices = speechSynthesis.getVoices();
+                        select.innerHTML = '';
+                        
+                        if (voices.length === 0) {
+                            select.innerHTML = '<option value="">No voices available</option>';
+                            return;
+                        }
+                        
+                        // Add default option
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.textContent = 'Default Voice';
+                        select.appendChild(defaultOpt);
+                        
+                        // Group voices by language
+                        const voicesByLang = {};
+                        voices.forEach(voice => {
+                            const lang = voice.lang.split('-')[0];
+                            if (!voicesByLang[lang]) voicesByLang[lang] = [];
+                            voicesByLang[lang].push(voice);
+                        });
+                        
+                        // Add English voices first, then others
+                        const langs = Object.keys(voicesByLang).sort((a, b) => {
+                            if (a === 'en') return -1;
+                            if (b === 'en') return 1;
+                            return a.localeCompare(b);
+                        });
+                        
+                        langs.forEach(lang => {
+                            const group = document.createElement('optgroup');
+                            group.label = lang.toUpperCase();
+                            voicesByLang[lang].forEach(voice => {
+                                const opt = document.createElement('option');
+                                opt.value = voice.name;
+                                opt.textContent = `${voice.name} (${voice.lang})`;
+                                group.appendChild(opt);
+                            });
+                            select.appendChild(group);
+                        });
+                        
+                        // Restore saved voice
+                        const saved = loadPreferences();
+                        if (saved && saved.ttsVoice) {
+                            select.value = saved.ttsVoice;
+                        }
+                    }
+                    
+                    // Test TTS function
+                    function testTTS() {
+                        if (!('speechSynthesis' in window)) {
+                            showStatus('Text-to-speech not supported');
+                            return;
+                        }
+                        
+                        // Cancel any ongoing speech
+                        speechSynthesis.cancel();
+                        
+                        const text = document.getElementById('tts-test-text').value || 'Hello, this is a test.';
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        
+                        const voiceName = document.getElementById('pref-tts-voice').value;
+                        if (voiceName) {
+                            const voices = speechSynthesis.getVoices();
+                            const voice = voices.find(v => v.name === voiceName);
+                            if (voice) utterance.voice = voice;
+                        }
+                        
+                        utterance.rate = Number(document.getElementById('pref-tts-rate').value) || 1;
+                        utterance.pitch = Number(document.getElementById('pref-tts-pitch').value) || 1;
+                        utterance.volume = Number(document.getElementById('pref-tts-volume').value) || 1;
+                        
+                        speechSynthesis.speak(utterance);
+                    }
+
                     document.addEventListener('DOMContentLoaded', function (){
                         renderPresets();
                         renderCustomThemes();
+                        
+                        // Initialize TTS voices
+                        if ('speechSynthesis' in window) {
+                            populateTTSVoices();
+                            // Chrome loads voices asynchronously
+                            speechSynthesis.onvoiceschanged = populateTTSVoices;
+                        }
 
                         const saved = loadPreferences();
                         if (saved) populateForm(saved);
@@ -646,6 +788,20 @@ active_tab: dashboard
                         document.getElementById('pref-font-size').addEventListener('input', function(e){
                             document.getElementById('font-size-label').textContent = e.target.value;
                         });
+                        
+                        // TTS slider labels
+                        document.getElementById('pref-tts-rate').addEventListener('input', function(e){
+                            document.getElementById('tts-rate-label').textContent = e.target.value;
+                        });
+                        document.getElementById('pref-tts-pitch').addEventListener('input', function(e){
+                            document.getElementById('tts-pitch-label').textContent = e.target.value;
+                        });
+                        document.getElementById('pref-tts-volume').addEventListener('input', function(e){
+                            document.getElementById('tts-volume-label').textContent = Math.round(e.target.value * 100);
+                        });
+                        
+                        // TTS test button
+                        document.getElementById('tts-test-btn').addEventListener('click', testTTS);
 
                         document.querySelectorAll('.save-section-btn').forEach(btn => {
                             btn.addEventListener('click', function() {
