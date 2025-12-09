@@ -127,6 +127,14 @@
       <button id="close-grading-view-btn" class="text-gray-300 hover:text-white text-2xl font-bold leading-none" aria-label="Close grading view">&times;</button>
     </div>
 
+    <!-- Assignment Selection Dropdown -->
+    <div class="mb-6">
+      <label class="block text-white font-semibold mb-2 text-sm">Select Assignment:</label>
+      <select id="assignment-selector" class="w-full md:w-96 px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
+        <option value="">Loading assignments...</option>
+      </select>
+    </div>
+
     <div id="grading-assignments" class="space-y-4">
       <!-- Assignments and submissions render here -->
     </div>
@@ -315,6 +323,7 @@
   let isAuthenticated = false;
   let isAdmin = true; // admin requirement disabled for now
   let gradingAssignments = [];
+  let selectedAssignmentId = null; // Track which assignment is selected in dropdown
   let rubricTemplate = DEFAULT_RUBRIC;
   let currentRubricContext = null;
   let currentHackToSubmit = null;
@@ -975,7 +984,6 @@
     try {
       // Fetch all grades/submissions from the backend
       const resp = await fetch(`${API_BASE}/api/grades`, {
-
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -990,51 +998,88 @@
       // Handle both array and single object responses
       const gradesArray = Array.isArray(grades) ? grades : (grades.data || [grades]);
       
-      // Use this page's permalink as the assignment key filter
-      const assignmentKey = '{{ page.permalink | escape }}';
-      const assignmentTitle = '{{ page.lxdData.Title | escape }}';
-      
-      // Filter grades so we only see submissions for THIS permalink
-      const filtered = gradesArray.filter(grade => grade.assignment === assignmentKey);
-      
-      if (!filtered.length) {
+      if (!gradesArray.length) {
         gradingAssignments = [];
-        console.log('No submissions found for assignment key:', assignmentKey);
+        populateAssignmentDropdown();
+        console.log('No submissions found');
         return;
       }
       
-      // Map into a single assignment object for this page
-      const submissions = filtered.map(grade => ({
-        id: grade.id?.toString() || `${grade.uid}-${Date.now()}`,
-        student: grade.uid || 'Unknown Student',
-        submitted_at: grade.submitted_at || new Date().toISOString(),
-        text: grade.submission || 'No submission link provided',
-        submission_link: grade.submission || '',
-        score: grade.score || 0,
-        course: grade.course || '',
-        rubric: grade.rubric || JSON.parse(JSON.stringify(rubricTemplate)),
-        status: (grade.score !== null && grade.score !== undefined && grade.score > 0) ? 'graded' : 'pending'
-      }));
+      // Group grades by assignment key
+      const assignmentsMap = new Map();
       
-      // Choose a date to show (use first submission or today)
-      const firstDate = submissions[0].submitted_at;
-      const dateStr = firstDate ? new Date(firstDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-      
-      gradingAssignments = [
-        {
-          id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          title: assignmentTitle || assignmentKey,
-          date: dateStr,
-          submissions
+      gradesArray.forEach(grade => {
+        const assignmentKey = grade.assignment || 'Unknown Assignment';
+        
+        if (!assignmentsMap.has(assignmentKey)) {
+          // Choose a date to show (use first submission or today)
+          const dateStr = grade.submitted_at 
+            ? new Date(grade.submitted_at).toISOString().split('T')[0] 
+            : new Date().toISOString().split('T')[0];
+          
+          assignmentsMap.set(assignmentKey, {
+            id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            key: assignmentKey,
+            title: assignmentKey, // You can enhance this to fetch titles if available
+            date: dateStr,
+            submissions: []
+          });
         }
-      ];
+        
+        const assignment = assignmentsMap.get(assignmentKey);
+        assignment.submissions.push({
+          id: grade.id?.toString() || `${grade.uid}-${Date.now()}`,
+          student: grade.uid || 'Unknown Student',
+          submitted_at: grade.submitted_at || new Date().toISOString(),
+          text: grade.submission || 'No submission link provided',
+          submission_link: grade.submission || '',
+          score: grade.score || 0,
+          course: grade.course || '',
+          rubric: grade.rubric || JSON.parse(JSON.stringify(rubricTemplate)),
+          status: (grade.score !== null && grade.score !== undefined && grade.score > 0) ? 'graded' : 'pending'
+        });
+      });
       
-      console.log('Assignments for this permalink:', gradingAssignments);
+      // Convert map to array
+      gradingAssignments = Array.from(assignmentsMap.values());
+      
+      // Sort assignments by date (newest first)
+      gradingAssignments.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      console.log('All assignments loaded:', gradingAssignments);
+      
+      // Populate dropdown and select first assignment by default
+      populateAssignmentDropdown();
+      if (gradingAssignments.length > 0) {
+        selectedAssignmentId = gradingAssignments[0].id;
+        document.getElementById('assignment-selector').value = selectedAssignmentId;
+      }
       
     } catch (err) {
       console.error('Error loading grading assignments:', err);
       gradingAssignments = [];
+      populateAssignmentDropdown();
     }
+  }
+  
+  // Populate the assignment dropdown
+  function populateAssignmentDropdown() {
+    const selector = document.getElementById('assignment-selector');
+    if (!selector) return;
+    
+    selector.innerHTML = '';
+    
+    if (gradingAssignments.length === 0) {
+      selector.innerHTML = '<option value="">No assignments available</option>';
+      return;
+    }
+    
+    gradingAssignments.forEach(assignment => {
+      const option = document.createElement('option');
+      option.value = assignment.id;
+      option.textContent = `${assignment.title} (${assignment.submissions.length} submissions)`;
+      selector.appendChild(option);
+    });
   }
 
   function renderGradingAssignments() {
@@ -1042,21 +1087,36 @@
     if (!container) return;
 
     if (!gradingAssignments.length) {
-      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">No submissions available for this page yet.</div>';
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">No submissions available yet.</div>';
       return;
     }
 
-    container.innerHTML = gradingAssignments.map(assignment => `
+    // If no assignment is selected, show message
+    if (!selectedAssignmentId) {
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">Please select an assignment from the dropdown above.</div>';
+      return;
+    }
+
+    // Find the selected assignment
+    const selectedAssignment = gradingAssignments.find(a => a.id === selectedAssignmentId);
+    
+    if (!selectedAssignment) {
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">Selected assignment not found.</div>';
+      return;
+    }
+
+    // Render only the selected assignment
+    container.innerHTML = `
       <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <p class="text-xs text-gray-400 uppercase tracking-wide">${assignment.date}</p>
-            <h3 class="text-xl font-bold text-white">${assignment.title}</h3>
+            <p class="text-xs text-gray-400 uppercase tracking-wide">${selectedAssignment.date}</p>
+            <h3 class="text-xl font-bold text-white">${selectedAssignment.title}</h3>
           </div>
-          <span class="text-sm text-gray-300">${assignment.submissions.length} submissions</span>
+          <span class="text-sm text-gray-300">${selectedAssignment.submissions.length} submissions</span>
         </div>
         <div class="space-y-3">
-          ${assignment.submissions.map(sub => `
+          ${selectedAssignment.submissions.map(sub => `
             <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
               <div class="flex items-center justify-between mb-2">
                 <div>
@@ -1077,7 +1137,7 @@
               ` : ''}
               ${sub.score > 0 ? `<p class="text-gray-300 text-sm mb-3">Score: ${sub.score}</p>` : ''}
               <div class="flex items-center gap-3">
-                <button onclick="openGradingRubricModal('${assignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
                   Edit Rubric
                 </button>
               </div>
@@ -1085,7 +1145,7 @@
           `).join('')}
         </div>
       </div>
-    `).join('');
+    `;
   }
 
   function openGradingView() {
@@ -1360,7 +1420,7 @@
     if (gradeId) {
       const gradeData = {
         uid: ctx.submission.student,
-        assignment: '{{ page.permalink | escape }}',
+        assignment: ctx.assignment.key || ctx.assignment.id, // Use the assignment key from context
         score: totalPoints,
         course: ctx.submission.course || '',
         submission: ctx.submission.submission_link || ctx.submission.text
@@ -1489,6 +1549,15 @@
       closeGradingBtn.addEventListener('click', (e) => {
         e.preventDefault();
         closeGradingView();
+      });
+    }
+
+    // Assignment selector dropdown event listener
+    const assignmentSelector = document.getElementById('assignment-selector');
+    if (assignmentSelector) {
+      assignmentSelector.addEventListener('change', (e) => {
+        selectedAssignmentId = e.target.value || null;
+        renderGradingAssignments();
       });
     }
   });
