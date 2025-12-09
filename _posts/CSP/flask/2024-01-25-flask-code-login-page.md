@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Create A Login Page Flask Full-Stack web application
-description: Full Stack Development with Flask explained by terms and examples.
+title: Frontend Authentication with a Backend Flask Application
+description: Implement production-ready authentication with Flask backend and JavaScript frontend. Includes JWT token generation (HS256), httpOnly cookies, CORS configuration, password hashing, and decorator-based route protection.
 permalink: /flask-code-login
 author: Isabel Marilla
 menu: nav/flask.html
