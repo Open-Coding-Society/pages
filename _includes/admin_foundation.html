@@ -438,7 +438,7 @@
 
     async function getGrades() {
       try {
-        const res = await fetch(`${javaURI}/api/grades`, {
+        const res = await fetch(`${pythonURI}/api/assignment/?uid=toby`, {
           ...fetchOptions,
           method: "GET",
           headers: {
@@ -482,7 +482,7 @@
           return;
         }
 
-        // If user is admin, render a 4-column table (UID, Assignment, Score, Classes)
+        // If user is admin, render a 7-column table (UID, Assignment, Score, Classes, Content, Notes, Link)
         if (role && String(role) === 'Admin') {
           // small helper to escape HTML
           function escapeHtml(str) {
@@ -500,14 +500,31 @@
             return;
           }
 
-          const rows = (Array.isArray(grades) ? grades : []).map(g => `\
+          const rows = (Array.isArray(grades) ? grades : []).map(g => {
+            // Format content column
+            let contentHtml = '';
+            if (Array.isArray(g.content)) {
+              contentHtml = g.content.map(c => {
+                const filename = escapeHtml(c.filename || 'unknown');
+                const filePreview = c.file ? escapeHtml(c.file.substring(0, 10)) : '';
+                return `<div>${filename} (${filePreview})</div>`;
+              }).join('');
+            }
+
+            // Format link column
+            const linkHtml = g.link ? `<a href="${escapeHtml(g.link)}" target="_blank">${escapeHtml(g.link)}</a>` : '';
+
+            return `\
             <tr>\
               <td>${escapeHtml(g.uid || g.studentId || '(unknown)')}</td>\
-              <td>${escapeHtml(g.assignment)}</td>\
+              <td>${escapeHtml(g.title || g.assignment)}</td>\
               <td>${escapeHtml(g.score)}</td>\
-              <td>${escapeHtml(g.classes || g.course || g.class)}</td>\
+              <td>${escapeHtml(g.class || g.course || g.classes)}</td>\
+              <td>${contentHtml}</td>\
+              <td>${escapeHtml(g.notes)}</td>\
+              <td>${linkHtml}</td>\
             </tr>\
-          `).join('');
+          `}).join('');
 
           const tableHtml = `\
             <table id="admin-table">\
@@ -517,6 +534,9 @@
                   <th>Assignment</th>\
                   <th>Score</th>\
                   <th>Classes</th>\
+                  <th>Content</th>\
+                  <th>Notes</th>\
+                  <th>Link</th>\
                 </tr>\
               </thead>\
               <tbody>\
