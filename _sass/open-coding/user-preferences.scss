@@ -35,7 +35,7 @@
   .post,
   .content,
   .opencs_root {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
     border-color: var(--ui-border) !important;
   }
@@ -49,14 +49,14 @@
   .site-sidebar,
   .sidebar-container,
   .side-panel {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
     border-color: var(--ui-border) !important;
   }
 
   /* Infograph module cards: same plain color for every card */
   .module-card {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     border: 1px solid var(--ui-border) !important;
     color: var(--pref-text-color) !important;
     padding: 1rem !important;
@@ -65,7 +65,7 @@
 
   /* Ensure no alternating rule overrides the plain color */
   .module-card:nth-child(2n) {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
   }
 
   /* Columns transparent so card color remains visible */
@@ -103,7 +103,7 @@
   .question-card,
   .qa-box,
   .qa-section {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
     border: 1px solid var(--ui-border) !important;
   }
@@ -114,7 +114,7 @@
   .question-card textarea,
   input.question-input,
   textarea.question-input {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
     border: 1px solid rgba(0,0,0,0.18) !important;
     padding: 0.5rem !important;
@@ -128,7 +128,7 @@
   .microblog-post,
   [class*="rounded-xl"],
   [class*="rounded-lg"] {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     border-color: var(--ui-border) !important;
     color: var(--pref-text-color) !important;
   }
