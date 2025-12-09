@@ -319,7 +319,7 @@
   let currentRubricContext = null;
   let currentHackToSubmit = null;
 
-  // API base URL - adjust if needed
+  // API base URL - adjust if needed for same-origin API (used for /api/id and /api/grade_data)
   const API_BASE = '';
 
   // Load user's grade data from backend (with localStorage fallback)
@@ -647,7 +647,7 @@
     const container = document.getElementById('hacks-checklist');
     container.innerHTML = '';
 
-    HACK_TOPICS.forEach((topic, index) => {
+    HACK_TOPICS.forEach((topic) => {
       const isChecked = (userGradeData.selected_hacks || []).includes(topic.Game);
       
       const label = document.createElement('label');
@@ -853,9 +853,8 @@
       return;
     }
     
-    // Get assignment name from the current hack
-    const topic = HACK_TOPICS.find(t => t.Game === currentHackToSubmit);
-    const assignmentName = topic ? topic.Title : currentHackToSubmit;
+    // Use this page's permalink as the assignment key so grading view only shows submissions for this page
+    const assignmentName = '{{ page.permalink | escape }}';
     
     // Get user ID and class from credentials data (window.user loaded by login.js)
     let uid = null;
@@ -987,54 +986,52 @@
       const grades = await resp.json();
       console.log('Fetched grades from backend:', grades);
       
-      // Group submissions by assignment name
-      const assignmentsMap = new Map();
-      
       // Handle both array and single object responses
       const gradesArray = Array.isArray(grades) ? grades : (grades.data || [grades]);
       
-      gradesArray.forEach(grade => {
-        const assignmentName = grade.assignment || 'Unnamed Assignment';
-        
-        // Create assignment if it doesn't exist
-        if (!assignmentsMap.has(assignmentName)) {
-          assignmentsMap.set(assignmentName, {
-            id: assignmentName.toLowerCase().replace(/\s+/g, '-'),
-            title: assignmentName,
-            date: grade.submitted_at ? new Date(grade.submitted_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-            submissions: []
-          });
+      // Use this page's permalink as the assignment key filter
+      const assignmentKey = '{{ page.permalink | escape }}';
+      const assignmentTitle = '{{ page.lxdData.Title | escape }}';
+      
+      // Filter grades so we only see submissions for THIS permalink
+      const filtered = gradesArray.filter(grade => grade.assignment === assignmentKey);
+      
+      if (!filtered.length) {
+        gradingAssignments = [];
+        console.log('No submissions found for assignment key:', assignmentKey);
+        return;
+      }
+      
+      // Map into a single assignment object for this page
+      const submissions = filtered.map(grade => ({
+        id: grade.id?.toString() || `${grade.uid}-${Date.now()}`,
+        student: grade.uid || 'Unknown Student',
+        submitted_at: grade.submitted_at || new Date().toISOString(),
+        text: grade.submission || 'No submission link provided',
+        submission_link: grade.submission || '',
+        score: grade.score || 0,
+        course: grade.course || '',
+        rubric: grade.rubric || JSON.parse(JSON.stringify(rubricTemplate)),
+        status: (grade.score !== null && grade.score !== undefined && grade.score > 0) ? 'graded' : 'pending'
+      }));
+      
+      // Choose a date to show (use first submission or today)
+      const firstDate = submissions[0].submitted_at;
+      const dateStr = firstDate ? new Date(firstDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+      
+      gradingAssignments = [
+        {
+          id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          title: assignmentTitle || assignmentKey,
+          date: dateStr,
+          submissions
         }
-        
-        const assignment = assignmentsMap.get(assignmentName);
-        
-        // Create submission object
-        const submission = {
-          id: grade.id?.toString() || `${grade.uid}-${Date.now()}`,
-          student: grade.uid || 'Unknown Student',
-          submitted_at: grade.submitted_at || new Date().toISOString(),
-          text: grade.submission || 'No submission link provided',
-          submission_link: grade.submission || '',
-          score: grade.score || 0,
-          course: grade.course || '',
-          rubric: grade.rubric || JSON.parse(JSON.stringify(rubricTemplate)),
-          status: (grade.score !== null && grade.score !== undefined && grade.score > 0) ? 'graded' : 'pending'
-        };
-        
-        assignment.submissions.push(submission);
-      });
+      ];
       
-      // Convert map to array
-      gradingAssignments = Array.from(assignmentsMap.values());
-      
-      // Sort assignments by date (newest first)
-      gradingAssignments.sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      console.log('Grouped assignments:', gradingAssignments);
+      console.log('Assignments for this permalink:', gradingAssignments);
       
     } catch (err) {
       console.error('Error loading grading assignments:', err);
-      // Fallback to empty array or mock data if needed
       gradingAssignments = [];
     }
   }
@@ -1044,7 +1041,7 @@
     if (!container) return;
 
     if (!gradingAssignments.length) {
-      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">No submissions available.</div>';
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">No submissions available for this page yet.</div>';
       return;
     }
 
@@ -1362,7 +1359,7 @@
     if (gradeId) {
       const gradeData = {
         uid: ctx.submission.student,
-        assignment: ctx.assignment.title,
+        assignment: '{{ page.permalink | escape }}',
         score: totalPoints,
         course: ctx.submission.course || '',
         submission: ctx.submission.submission_link || ctx.submission.text
@@ -1494,3 +1491,4 @@
       });
     }
   });
+</script>
