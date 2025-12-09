@@ -58,6 +58,92 @@ Authentication is the process of verifying the identity of a user or system. In 
 4. **Authorization/Access Control**:
    - Determine what actions or resources a user can access based on their role or permissions.
 
+### Authentication Flow with HTTP and JWT
+
+```mermaid
+sequenceDiagram
+    participant User as 👤 User Browser
+    participant FE as 🌐 Frontend<br/>(JavaScript)
+    participant HTTP as 📡 HTTP Request
+    participant BE as ⚙️ Backend Flask<br/>(Python API)
+    participant DB as 🗄️ Database
+    participant JWT as 🔐 JWT Token<br/>Generator
+
+    Note over User,JWT: Login Authentication Flow
+
+    User->>FE: 1. Enter credentials<br/>(uid, password)
+    activate FE
+    
+    FE->>HTTP: 2. POST /api/authenticate<br/>Body: {uid, password}<br/>Headers: Content-Type
+    activate HTTP
+    
+    HTTP->>BE: 3. HTTP Request<br/>Method: POST<br/>Credentials in body
+    deactivate HTTP
+    activate BE
+    
+    BE->>DB: 4. Query user by uid<br/>SELECT * FROM users WHERE uid=?
+    activate DB
+    DB-->>BE: 5. Return user data<br/>(hashed password)
+    deactivate DB
+    
+    BE->>BE: 6. Validate password<br/>Compare hash(input) == stored_hash
+    
+    alt ✅ Valid Credentials
+        BE->>JWT: 7. Generate JWT<br/>Payload: {_uid: user._uid}<br/>Secret: SECRET_KEY<br/>Algorithm: HS256
+        activate JWT
+        JWT-->>BE: 8. Return signed token
+        deactivate JWT
+        
+        BE->>HTTP: 9. HTTP Response 200<br/>Set-Cookie: jwt_token<br/>Attributes: httpOnly, secure, SameSite
+        activate HTTP
+        HTTP-->>FE: 10. Response with cookie
+        deactivate HTTP
+        
+        FE->>User: 11. Login successful!<br/>Redirect to dashboard
+        deactivate FE
+        
+    else ❌ Invalid Credentials
+        BE->>HTTP: 12. HTTP Response 401<br/>Body: {message: "Invalid credentials"}
+        HTTP-->>FE: 13. Error response
+        FE->>User: 14. Display error message
+    end
+
+    Note over User,JWT: Subsequent Authenticated Requests
+
+    User->>FE: 15. Request protected resource
+    activate FE
+    FE->>HTTP: 16. GET /api/data<br/>Cookie: jwt_token (auto-sent)
+    activate HTTP
+    HTTP->>BE: 17. Request with JWT cookie
+    deactivate HTTP
+    activate BE
+    
+    BE->>BE: 18. @token_required decorator<br/>Decode JWT, verify signature<br/>Extract user from payload
+    
+    BE->>DB: 19. Validate user exists
+    activate DB
+    DB-->>BE: 20. User data
+    deactivate DB
+    
+    BE->>HTTP: 21. HTTP Response 200<br/>Body: requested data
+    activate HTTP
+    HTTP-->>FE: 22. Protected data
+    deactivate HTTP
+    FE->>User: 23. Display data
+    deactivate BE
+    deactivate FE
+```
+
+**Key HTTP & JWT Concepts Illustrated:**
+
+1. **HTTP POST Request** (Steps 2-3): Frontend sends credentials via HTTP POST with JSON body
+2. **Password Hashing** (Step 6): Backend compares hashed passwords, never plain-text
+3. **JWT Generation** (Steps 7-8): Creates signed token containing user identity using HS256 algorithm
+4. **HTTP Cookie** (Step 9): JWT stored in secure, httpOnly cookie (prevents XSS attacks)
+5. **Automatic Cookie Transmission** (Step 16): Browser automatically sends cookie with subsequent requests
+6. **Token Validation** (Step 18): `@token_required` decorator decodes JWT and verifies signature
+7. **CORS & Credentials** (Steps 2, 16): `credentials: 'include'` in fetch allows cross-origin cookie transmission
+
 ## Frontend HTML
 
 For our frontend, we need a basic outline for our UI. For example, here is the basic HTML login code I created for this site. The attributes we usually see for the login form include username and password.
