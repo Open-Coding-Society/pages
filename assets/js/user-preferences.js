@@ -1,6 +1,30 @@
 // Global site-wide theme preferences
-// Applies user-selected colors, fonts, and sizing across all pages.
+// Applies user-selected colors, fonts, sizing, and language translation across all pages.
 (function () {
+  // Supported languages for translation
+  const LANGUAGES = {
+    '': { name: 'Default (No Translation)', code: '' },
+    'es': { name: 'Spanish', code: 'es' },
+    'fr': { name: 'French', code: 'fr' },
+    'de': { name: 'German', code: 'de' },
+    'it': { name: 'Italian', code: 'it' },
+    'pt': { name: 'Portuguese', code: 'pt' },
+    'ru': { name: 'Russian', code: 'ru' },
+    'zh-CN': { name: 'Chinese (Simplified)', code: 'zh-CN' },
+    'zh-TW': { name: 'Chinese (Traditional)', code: 'zh-TW' },
+    'ja': { name: 'Japanese', code: 'ja' },
+    'ko': { name: 'Korean', code: 'ko' },
+    'ar': { name: 'Arabic', code: 'ar' },
+    'hi': { name: 'Hindi', code: 'hi' },
+    'vi': { name: 'Vietnamese', code: 'vi' },
+    'th': { name: 'Thai', code: 'th' },
+    'nl': { name: 'Dutch', code: 'nl' },
+    'pl': { name: 'Polish', code: 'pl' },
+    'tr': { name: 'Turkish', code: 'tr' },
+    'uk': { name: 'Ukrainian', code: 'uk' },
+    'he': { name: 'Hebrew', code: 'he' },
+  };
+
   const PRESETS = {
     Midnight: {
       bg: '#0b1220',
@@ -133,6 +157,131 @@
     // Turn on the high-priority theme class on <html> so global CSS rules
     // can override other themes consistently (Minima, Tailwind, etc.).
     document.documentElement.classList.add('user-theme-active');
+
+    // Apply language translation if set
+    const lang = prefs?.language || '';
+    applyLanguage(lang);
+  }
+
+  // Google Translate integration
+  function applyLanguage(langCode) {
+    // Store the selected language
+    document.documentElement.setAttribute('data-translate-lang', langCode);
+    
+    // Add CSS to hide Google Translate bar (injected once)
+    if (!document.getElementById('google-translate-hide-css')) {
+      const style = document.createElement('style');
+      style.id = 'google-translate-hide-css';
+      style.textContent = `
+        .goog-te-banner-frame, .goog-te-balloon-frame { display: none !important; }
+        body { top: 0 !important; position: static !important; }
+        .skiptranslate { display: none !important; }
+        .goog-te-gadget { display: none !important; }
+        #google_translate_element { display: none !important; }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Clear any existing Google Translate cookies first
+    clearGoogleTranslateCookies();
+    
+    if (!langCode) {
+      // Remove translation - reset to original
+      removeGoogleTranslate();
+      return;
+    }
+
+    // Set the Google Translate cookie to the desired language
+    const domain = window.location.hostname;
+    document.cookie = `googtrans=/en/${langCode}; path=/`;
+    document.cookie = `googtrans=/en/${langCode}; path=/; domain=${domain}`;
+    document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${domain}`;
+
+    // Initialize Google Translate if not already loaded
+    if (!window.googleTranslateElementInit) {
+      window.googleTranslateElementInit = function() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: Object.keys(LANGUAGES).filter(k => k).join(','),
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false
+        }, 'google_translate_element');
+      };
+    }
+
+    // Create hidden container for Google Translate widget
+    if (!document.getElementById('google_translate_element')) {
+      const container = document.createElement('div');
+      container.id = 'google_translate_element';
+      container.style.cssText = 'position: fixed; top: -9999px; left: -9999px; visibility: hidden;';
+      document.body.appendChild(container);
+    }
+
+    // Load Google Translate script if not present
+    if (!document.getElementById('google-translate-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    // Wait for Google Translate to be ready, then trigger translation
+    const attemptTranslation = (attempts = 0) => {
+      if (attempts > 50) return; // Give up after 5 seconds
+      
+      const select = document.querySelector('.goog-te-combo');
+      if (select) {
+        select.value = langCode;
+        select.dispatchEvent(new Event('change'));
+      } else {
+        setTimeout(() => attemptTranslation(attempts + 1), 100);
+      }
+    };
+    
+    setTimeout(() => attemptTranslation(), 500);
+  }
+
+  function clearGoogleTranslateCookies() {
+    const domain = window.location.hostname;
+    // Clear all possible googtrans cookie variations
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+  }
+
+  function removeGoogleTranslate() {
+    clearGoogleTranslateCookies();
+    
+    // Try to reset Google Translate to show original via the select dropdown
+    const select = document.querySelector('.goog-te-combo');
+    if (select) {
+      select.value = '';
+      select.dispatchEvent(new Event('change'));
+    }
+    
+    // Try clicking the "Show original" button in the banner frame
+    try {
+      const frame = document.querySelector('.goog-te-banner-frame');
+      if (frame && frame.contentDocument) {
+        const restoreBtn = frame.contentDocument.querySelector('.goog-te-button button');
+        if (restoreBtn) restoreBtn.click();
+      }
+    } catch (e) {
+      // Cross-origin frame access may fail, that's okay
+    }
+    
+    // If translation is still stuck, we need to reload the page
+    // Check if page is currently translated
+    const isTranslated = document.documentElement.classList.contains('translated-ltr') || 
+                         document.documentElement.classList.contains('translated-rtl') ||
+                         document.querySelector('html.translated-ltr, html.translated-rtl');
+    
+    if (isTranslated) {
+      // Force reload to clear translation
+      window.location.reload();
+    }
   }
 
   function resetPreferences() {
@@ -186,7 +335,9 @@
   window.SitePreferences = {
     applyPreferences,
     resetPreferences,
+    applyLanguage,
     PRESETS,
+    LANGUAGES,
   };
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
