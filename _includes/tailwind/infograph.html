@@ -11,7 +11,6 @@ layout: null
   --pref-accent-color: #3b82f6;
   --text-muted: #a0a0a0;
 
-  /* Panel/UI variables derived from user prefs */
   --panel: var(--pref-bg-color);
   --panel-mid: rgba(0,0,0,0.12);
   --ui-bg: rgba(0,0,0,0.06);
@@ -19,7 +18,6 @@ layout: null
   --emoji-bg: rgba(255,255,255,0.9);
 }
 
-/* Global user theme scoping */
 .user-theme-active,
 .user-theme-active.dark {
   background-color: var(--pref-bg-color) !important;
@@ -28,185 +26,91 @@ layout: null
   font-size: var(--pref-font-size) !important;
 }
 
-/* Ensure main containers adopt user background/text */
-.user-theme-active {
-  /* Page-level containers */
-  .page-content,
-  .wrapper,
-  main,
-  article,
-  .post,
-  .content,
-  .opencs_root,
-  .container,
-  .layout,
-  header,
-  .site-header,
-  .page-header,
-  .post-header,
-  .topbar,
-  .nav,
-  .hero {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
-    color: var(--pref-text-color) !important;
-    border-color: var(--ui-border) !important;
-  }
+/* Infograph container and cards use plain user color (no gradients) */
+.user-theme-active .container {
+  background-color: var(--panel) !important;
+  color: var(--pref-text-color) !important;
+}
 
-  /* Sidebars and aside regions */
-  aside,
-  .sidebar,
-  #sidebar,
-  .site-sidebar,
-  .sidebar-container,
-  .side-panel {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 86%, black 14%) , var(--panel-mid)) !important;
-    color: var(--pref-text-color) !important;
-    border-color: var(--ui-border) !important;
-  }
+.user-theme-active .module-card {
+  background-color: var(--panel) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--pref-text-color) !important;
+  padding: 1rem !important;
+  box-shadow: none !important;
+}
 
-  /* Infograph module cards and columns */
-  .module-card {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
-    border: 1px solid var(--ui-border) !important;
-    color: var(--pref-text-color) !important;
-    padding: 1rem !important;
-    box-shadow: none !important;
-  }
+/* Ensure identical color for every card */
+.user-theme-active .module-card:nth-child(2n) {
+  background-color: var(--panel) !important;
+}
 
-  .module-card:nth-child(2n) {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 82%, black 18%) 0%, rgba(0,0,0,0.18) 100%) !important;
-  }
+/* Keep columns transparent */
+.user-theme-active .module-image-col,
+.user-theme-active .module-keypoints-col,
+.user-theme-active .module-desc-col {
+  background: transparent !important;
+  color: var(--pref-text-color) !important;
+}
 
-  .module-image-col,
-  .module-keypoints-col,
-  .module-desc-col {
-    color: var(--pref-text-color) !important;
-    background: transparent !important;
-  }
+.user-theme-active .module-desc-col {
+  padding: 0.6rem !important;
+  border-radius: 0.375rem !important;
+}
 
-  .module-desc-col {
-    background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.12)) !important;
-    padding: 0.6rem !important;
-    border-radius: 0.375rem !important;
-  }
+.user-theme-active .module-img {
+  background-color: transparent !important;
+  border-radius: 0.5rem !important;
+  object-fit: cover !important;
+}
 
-  .module-img {
-    background-color: transparent !important;
-    border-radius: 0.5rem !important;
-    object-fit: cover !important;
-  }
+.user-theme-active .module-emoji {
+  background-color: var(--emoji-bg) !important;
+  color: #0b1220 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+}
 
-  .module-emoji {
-    background-color: var(--emoji-bg) !important;
-    color: #0b1220 !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
-  }
+.user-theme-active .module-overlay {
+  background-color: rgba(0,0,0,0.45) !important;
+}
 
-  .module-overlay {
-    background-color: rgba(0,0,0,0.45) !important;
-  }
+/* Questions: plain background; inputs also plain user color */
+.user-theme-active .question-box,
+.user-theme-active .question-card,
+.user-theme-active .qa-box,
+.user-theme-active .questions {
+  background-color: var(--panel) !important;
+  color: var(--pref-text-color) !important;
+  border: 1px solid var(--ui-border) !important;
+}
 
-  /* Links/icons inside infograph */
-  .module-card a,
-  .module-card svg,
-  header a,
-  .site-header a,
-  aside a,
-  .sidebar a {
-    color: var(--pref-accent-color) !important;
-    fill: currentColor !important;
-  }
+.user-theme-active .question-box input,
+.user-theme-active .question-box textarea,
+.user-theme-active .question-card input,
+.user-theme-active .question-card textarea {
+  background-color: var(--panel) !important;
+  color: var(--pref-text-color) !important;
+  border: 1px solid rgba(0,0,0,0.18) !important;
+  padding: 0.5rem !important;
+}
 
-  /* Generic cards/panels (applies to questions, microblog posts, etc.) */
-  .card,
-  .panel,
-  .box,
-  .question-box,
-  .question-card,
-  .qa-box,
-  .question,
-  .flashcard,
-  .flashcards,
-  .post,
-  .microblog-post,
-  [class*="rounded-xl"],
-  [class*="rounded-lg"] {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
-    border-color: var(--ui-border) !important;
-    color: var(--pref-text-color) !important;
-  }
+/* Topbar and sidebar full plain color */
+.user-theme-active .lesson-sidebar,
+.user-theme-active .lesson-topbar {
+  background-color: var(--panel) !important;
+  color: var(--pref-text-color) !important;
+  border-color: var(--ui-border) !important;
+}
 
-  /* Specifically ensure question boxes adopt user's background and readable text */
-  .questions,
-  .questions .question-box,
-  .question-box .question,
-  .qa-section,
-  .question-card {
-    background: linear-gradient(180deg, var(--panel) 0%, color-mix(in srgb, var(--panel) 86%, black 14%)) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
-  }
+/* Links/icons inherit accent */
+.user-theme-active a,
+.user-theme-active a:visited { color: var(--pref-accent-color) !important; }
+.user-theme-active svg { fill: currentColor !important; color: inherit !important; }
 
-  /* Make breadcrumb/top action bars use the full user gradient */
-  .breadcrumb,
-  .action-bar,
-  .toolbar,
-  .top-actions,
-  .back-to-timeline,
-  .sprint-banner,
-  .page-actions {
-    background: linear-gradient(90deg, var(--panel) 0%, color-mix(in srgb, var(--panel) 92%, black 8%)) !important;
-    color: var(--pref-text-color) !important;
-    border: none !important;
-  }
-
-  /* Force text color in common elements */
-  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
-    color: var(--pref-text-color) !important;
-  }
-
-  /* Muted secondary text */
-  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
-  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
-    color: var(--text-muted) !important;
-  }
-
-  /* Inputs/buttons */
-  input, select, textarea, button {
-    background-color: var(--ui-bg) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
-  }
-
-  button.bg-blue-600, button.bg-blue-700,
-  button.bg-green-600, button.bg-green-700,
-  .btn-primary,
-  .save-section-btn,
-  #save-preferences,
-  #save-theme-btn {
-    background-color: var(--pref-accent-color) !important;
-    border-color: var(--pref-accent-color) !important;
-    color: #fff !important;
-  }
-
-  button.bg-red-600, button.bg-red-700,
-  #restore-styles {
-    background-color: #dc2626 !important;
-    border-color: #dc2626 !important;
-    color: #fff !important;
-  }
-
-  /* Selection highlight */
-  ::selection {
-    background-color: var(--pref-accent-color) !important;
-    color: #fff !important;
-  }
-
-  /* Ensure SVG icons inherit text color */
-  svg {
-    color: inherit !important;
-    fill: currentColor !important;
-  }
+/* Force text color to ensure readability */
+.user-theme-active p, .user-theme-active span, .user-theme-active h1, .user-theme-active h2,
+.user-theme-active h3, .user-theme-active h4, .user-theme-active h5, .user-theme-active h6 {
+  color: var(--pref-text-color) !important;
 }
 </style>
 

@@ -1,4 +1,4 @@
-/* ---------- User theme: infograph, sidebar, questions, inputs ---------- */
+/* ---------- User theme: plain color (no gradients) ---------- */
 
 :root {
   --pref-bg-color: #0b1220;
@@ -8,7 +8,7 @@
   --pref-accent-color: #3b82f6;
   --text-muted: #a0a0a0;
 
-  /* --- Infograph + panel color fallbacks and UI variables --- */
+  /* Derived UI variables */
   --panel: var(--pref-bg-color);
   --panel-mid: rgba(0,0,0,0.12);
   --ui-bg: rgba(0,0,0,0.06);
@@ -16,279 +16,7 @@
   --emoji-bg: rgba(255,255,255,0.9);
 }
 
-.user-theme-active {
-  &, &.dark {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-    font-family: var(--pref-font-family) !important;
-    font-size: var(--pref-font-size) !important;
-  }
-
-  body, body.dark, body.min-h-screen, body.bg-neutral-800 {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-    font-family: var(--pref-font-family) !important;
-    font-size: var(--pref-font-size) !important;
-  }
-
-  & .min-h-screen, & .min-h-screen.bg-neutral-900,
-  & .ml-64.p-8, & .ml-64.p-8.bg-neutral-900 {
-    color: var(--pref-text-color) !important;
-    background-color: var(--pref-bg-color) !important;
-  }
-
-  // Use text color consistently, not var(--text) which may not be set
-  * {
-    color: inherit;
-  }
-  
-  // Explicit text color for main content
-  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6 {
-    color: var(--pref-text-color) !important;
-  }
-
-  // Muted text for secondary content  
-  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
-  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
-    color: var(--text-muted) !important;
-  }
-
-  .opencs_root,
-  .opencs_root *,
-  .opencs_root .post-header,
-  .opencs_root .post-content {
-    color: var(--pref-text-color) !important;
-    font-family: var(--pref-font-family) !important;
-    font-size: var(--pref-font-size) !important;
-  }
-
-  .page-content,
-  .wrapper,
-  main,
-  article,
-  .post,
-  .content,
-  .opencs_root {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-  }
-
-  // Links with accent color
-  a:not(.tab-btn):not([class*="bg-"]):not(.accent-preset) {
-    color: var(--pref-accent-color) !important;
-    text-decoration: none !important;
-    
-    &:hover {
-      opacity: 0.8 !important;
-    }
-  }
-
-  input:focus, select:focus, textarea:focus, button:focus {
-    outline: 2px solid var(--pref-accent-color) !important;
-    outline-offset: 2px !important;
-  }
-
-  // Panels and cards
-  .card,
-  .panel,
-  .box,
-  .bg-neutral-800,
-  .bg-neutral-900,
-  .bg-slate-800,
-  .bg-slate-900,
-  .bg-gray-900,
-  .bg-gray-950,
-  .bg-zinc-900,
-  .bg-slate-950,
-  [class*="rounded-xl"],
-  [class*="rounded-lg"] {
-    background-color: var(--panel) !important;
-    border-color: var(--ui-border) !important;
-    color: var(--pref-text-color) !important;
-  }
-  
-  [class*="rounded-full"] {
-    border-radius: 9999px !important;
-  }
-
-  .border-neutral-700,
-  .border-neutral-800,
-  .border-gray-800,
-  .border-gray-900,
-  .border-zinc-800 {
-    border-color: var(--ui-border) !important;
-  }
-
-  img, video, svg, iframe {
-    background-color: transparent !important;
-  }
-  
-  // SVG icons should inherit text color
-  svg {
-    color: inherit !important;
-    fill: currentColor;
-  }
-
-  input, select, textarea {
-    background-color: var(--ui-bg) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
-    
-    &::placeholder {
-      color: var(--text-muted) !important;
-    }
-  }
-
-  button {
-    background-color: var(--ui-bg) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
-  }
-  
-  // Primary/accent buttons with proper contrast
-  button.bg-blue-600, button.bg-blue-700,
-  button.bg-green-600, button.bg-green-700,
-  .btn-primary,
-  .save-section-btn,
-  #save-preferences,
-  #save-theme-btn {
-    background-color: var(--pref-accent-color) !important;
-    border-color: var(--pref-accent-color) !important;
-    color: #fff !important;
-  }
-  
-  // Red/danger buttons
-  button.bg-red-600, button.bg-red-700,
-  #restore-styles {
-    background-color: #dc2626 !important;
-    border-color: #dc2626 !important;
-    color: #fff !important;
-  }
-
-  // Accent color preset buttons keep their colors
-  .accent-preset {
-    border: 2px solid transparent !important;
-    
-    &:hover {
-      border-color: var(--pref-text-color) !important;
-    }
-  }
-
-  aside,
-  .sidebar,
-  #sidebar,
-  .site-sidebar,
-  .sidebar-container {
-    background-color: var(--panel-mid) !important;
-    color: var(--pref-text-color) !important;
-    border-color: var(--ui-border) !important;
-  }
-
-  .tab-btn {
-    color: var(--text-muted) !important;
-    
-    &.active, &[aria-current="page"] {
-      color: var(--pref-accent-color) !important;
-      border-color: var(--pref-accent-color) !important;
-    }
-  }
-  
-  #tab-underline {
-    background-color: var(--pref-accent-color) !important;
-  }
-  
-  ::selection {
-    background-color: var(--pref-accent-color) !important;
-    color: #fff !important;
-  }
-
-  // Color input styling
-  input[type="color"] {
-    padding: 0 !important;
-    border: 1px solid var(--ui-border) !important;
-    background-color: transparent !important;
-    cursor: pointer;
-  }
-
-  // Range input styling
-  input[type="range"] {
-    background-color: transparent !important;
-    border: none !important;
-  }
-
-  /* --- Infograph + panel color fallbacks and UI variables --- */
-  /* Add these near the top :root block or append to the file */
-  --panel: var(--pref-bg-color);
-  --panel-mid: rgba(0,0,0,0.12);
-  --ui-bg: rgba(0,0,0,0.06);
-  --ui-border: rgba(255,255,255,0.06);
-  --emoji-bg: rgba(255,255,255,0.9);
-}
-
-/* Infograph-specific visual rules when the user theme is active */
-.user-theme-active {
-  /* Ensure cards use user's preference color, with a subtle darker footer */
-  .module-card {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
-    border: 1px solid var(--ui-border) !important;
-    color: var(--pref-text-color) !important;
-    padding: 1rem !important;
-  }
-
-  /* Image sizing and safety */
-  .module-img {
-    background-color: transparent !important;
-    border-radius: 0.5rem !important;
-    object-fit: cover;
-  }
-
-  /* The small emoji circle — keep it light for readability */
-  .module-emoji {
-    background-color: var(--emoji-bg) !important;
-    color: #0b1220 !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-  }
-
-  /* Hover overlay should slightly darken but respect theme */
-  .module-overlay {
-    background-color: rgba(0,0,0,0.45) !important;
-  }
-
-  /* Allow the right-hand description column to be slightly darker for contrast */
-  .module-desc-col {
-    background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.14));
-    padding: 0.6rem;
-    border-radius: 0.375rem;
-  }
-
-  /* Keypoints column should remain transparent but use text color */
-  .module-keypoints-col ul li {
-    color: var(--pref-text-color) !important;
-  }
-
-  /* Alternate cards: slightly darker mid-panel for visual variety */
-  .module-card:nth-child(2n) {
-    background: linear-gradient(180deg, var(--panel) 0%, rgba(0,0,0,0.18) 100%) !important;
-  }
-
-  /* Ensure links/icons inside infograph inherit readable color */
-  .module-card a, .module-card svg {
-    color: var(--pref-accent-color) !important;
-    fill: currentColor !important;
-  }
-}
-
-/* ---------- User theme: infograph, sidebar, questions, inputs ---------- */
-
-:root {
-  --panel: var(--pref-bg-color);
-  --panel-mid: rgba(0,0,0,0.12);
-  --ui-bg: rgba(0,0,0,0.06);
-  --ui-border: rgba(255,255,255,0.06);
-  --emoji-bg: rgba(255,255,255,0.9);
-}
-
-/* Main theme scope */
+/* Scope the user theme */
 .user-theme-active,
 .user-theme-active.dark {
   background-color: var(--pref-bg-color) !important;
@@ -297,7 +25,7 @@
   font-size: var(--pref-font-size) !important;
 }
 
-/* Page-level containers: make infograph page background plain (no gradient) */
+/* Make main containers use plain user color (no gradients) */
 .user-theme-active {
   .container,
   .page-content,
@@ -312,29 +40,35 @@
     border-color: var(--ui-border) !important;
   }
 
-  /* Lesson player sidebar & topbar: full area uses the user's color/gradient */
+  /* Full sidebar and topbar use the plain user color */
   .lesson-sidebar,
-  .lesson-topbar {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+  .lesson-topbar,
+  aside,
+  .sidebar,
+  #sidebar,
+  .site-sidebar,
+  .sidebar-container,
+  .side-panel {
+    background-color: var(--panel) !important;
     color: var(--pref-text-color) !important;
     border-color: var(--ui-border) !important;
   }
 
-  /* Infograph module cards: every section uses same single gradient */
+  /* Infograph module cards: same plain color for every card */
   .module-card {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    background-color: var(--panel) !important;
     border: 1px solid var(--ui-border) !important;
     color: var(--pref-text-color) !important;
     padding: 1rem !important;
     box-shadow: none !important;
   }
 
-  /* Remove alternating gradient: ensure no nth-child alternate rules apply */
+  /* Ensure no alternating rule overrides the plain color */
   .module-card:nth-child(2n) {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    background-color: var(--panel) !important;
   }
 
-  /* Keep columns transparent so the card gradient is visible */
+  /* Columns transparent so card color remains visible */
   .module-image-col,
   .module-keypoints-col,
   .module-desc-col {
@@ -363,31 +97,30 @@
     background-color: rgba(0,0,0,0.45) !important;
   }
 
-  /* Questions: background plain; inputs/textareas use the gradient background */
+  /* Questions: background plain; inputs also plain user color */
   .questions,
   .question-box,
   .question-card,
   .qa-box,
   .qa-section {
-    background-color: var(--panel) !important; /* plain background */
+    background-color: var(--panel) !important;
     color: var(--pref-text-color) !important;
     border: 1px solid var(--ui-border) !important;
   }
 
-  /* Make input fields and textareas inside question boxes use the gradient */
   .question-box input,
   .question-box textarea,
   .question-card input,
   .question-card textarea,
   input.question-input,
   textarea.question-input {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, black 8%), var(--panel-mid)) !important;
+    background-color: var(--panel) !important;
     color: var(--pref-text-color) !important;
     border: 1px solid rgba(0,0,0,0.18) !important;
     padding: 0.5rem !important;
   }
 
-  /* Generic cards/panels (makes other cards use the same single gradient) */
+  /* Generic cards/panels use plain user color */
   .card,
   .panel,
   .box,
@@ -395,24 +128,50 @@
   .microblog-post,
   [class*="rounded-xl"],
   [class*="rounded-lg"] {
-    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    background-color: var(--panel) !important;
     border-color: var(--ui-border) !important;
     color: var(--pref-text-color) !important;
   }
 
   /* Links/icons */
-  a, a:visited, a:hover {
+  a, a:visited, a:hover,
+  .module-card a,
+  .module-card svg,
+  header a,
+  .site-header a,
+  aside a,
+  .sidebar a {
     color: var(--pref-accent-color) !important;
+    fill: currentColor !important;
   }
 
-  /* Force text color in common elements */
+  /* Force text color for readability */
   p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
     color: var(--pref-text-color) !important;
   }
 
+  /* Muted secondary text */
+  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
+  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
+    color: var(--text-muted) !important;
+  }
+
   /* Inputs/buttons default */
   input, select, textarea, button {
+    background-color: var(--ui-bg) !important;
     color: var(--pref-text-color) !important;
     border: 1px solid var(--ui-border) !important;
+  }
+
+  /* Buttons using accent color remain as before */
+  button.bg-blue-600, button.bg-blue-700,
+  button.bg-green-600, button.bg-green-700,
+  .btn-primary,
+  .save-section-btn,
+  #save-preferences,
+  #save-theme-btn {
+    background-color: var(--pref-accent-color) !important;
+    border-color: var(--pref-accent-color) !important;
+    color: #fff !important;
   }
 }
