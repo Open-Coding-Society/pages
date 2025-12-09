@@ -1,7 +1,6 @@
 <!-- Floating Microblog Button (upper right, below header) -->
 <button id="microblog-toggle-btn" class="microblog-fab microblog-fab-top" aria-label="Open Microblog">💬 Microblog</button>
 
-
 <!-- Microblog Side Panel -->
 <aside id="microblog-panel" class="microblog-panel" tabindex="-1" aria-label="Microblog panel">
   <div class="microblog-panel-header">
@@ -9,7 +8,6 @@
     <h2 class="microblog-panel-title">Microblog</h2>
     <button id="guest-signup-toggle" class="guest-signup-toggle-btn">Guest Signup</button>
   </div>
-
 
   <!-- Guest Signup Form (initially hidden) -->
   <div id="guest-signup-form" class="guest-signup-container" style="display: none;">
@@ -28,7 +26,6 @@
     </form>
   </div>
 
-
   <div class="microblog-panel-content">
     <!-- MicroBlog Container -->
     <div id="microblog-playground">
@@ -37,25 +34,14 @@
   </div>
 </aside>
 
-
 <script type="module">
-// Import required functions from config (always use relative import for browser compatibility)
-import { pythonURI as importedPythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
-
-
-// Universal fallback for pythonURI
-window.pythonURI = importedPythonURI || (
-  (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-    ? 'http://localhost:8587'
-    : 'https://flask.opencodingsociety.com'
-);
-
+// Import required functions from config
+import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 // Microblog panel open/close logic
 const microblogPanel = document.getElementById('microblog-panel');
 const microblogFab = document.getElementById('microblog-toggle-btn');
 const microblogCloseBtn = document.getElementById('microblog-close-btn');
-
 
 function openMicroblogPanel() {
   microblogPanel.classList.add('open');
@@ -68,11 +54,9 @@ function closeMicroblogPanel() {
 microblogFab.onclick = openMicroblogPanel;
 microblogCloseBtn.onclick = closeMicroblogPanel;
 
-
 // Guest signup toggle logic
 const guestSignupToggle = document.getElementById('guest-signup-toggle');
 const guestSignupForm = document.getElementById('guest-signup-form');
-
 
 guestSignupToggle.onclick = function() {
   if (guestSignupForm.style.display === 'none') {
@@ -82,17 +66,14 @@ guestSignupToggle.onclick = function() {
   }
 };
 
-
 // Guest signup handler with auto-login
 window.handleGuestSignup = async function(event) {
   event.preventDefault();
-
 
   const username = document.getElementById('guest-username').value;
   const password = document.getElementById('guest-password').value;
   const statusMessage = document.getElementById('guest-status-message');
   const submitButton = document.querySelector('.guest-submit-btn');
-
 
   // Disable button and show loading state
   submitButton.disabled = true;
@@ -100,99 +81,72 @@ window.handleGuestSignup = async function(event) {
   statusMessage.textContent = '';
   statusMessage.style.color = '#666';
 
-
   const signupData = {
     uid: username,
     password: password
   };
 
-
   try {
     let accountExists = false;
-
 
     // Step 1: Try to create guest account using Flask backend
     statusMessage.textContent = 'Creating guest account...';
     const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(signupData)
     });
 
-
-    let userData;
     if (!signupResponse.ok) {
-      // Account might already exist, try login
+      // Account might already exist, so we'll try to login instead
       accountExists = true;
       statusMessage.textContent = 'Account exists, logging in...';
     } else {
-      userData = await signupResponse.json();
+      await signupResponse.json();
       statusMessage.textContent = 'Account created! Logging in...';
     }
 
-
-    // Step 2: Login with credentials
+    // Step 2: Login with the credentials (whether account was just created or already existed)
     const loginResponse = await fetch(`${pythonURI}/api/authenticate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       credentials: 'include',
       body: JSON.stringify(signupData)
     });
 
-
-    if (!loginResponse.ok) throw new Error('Login failed - please check your credentials');
-
-
-    const loginData = await loginResponse.json();
-
-
-    // After authenticate sets the cookie, request /api/id to get the full user object (includes numeric `id`)
-    try {
-      const meResp = await fetch(`${pythonURI}/api/id`, { credentials: 'include' });
-      if (meResp && meResp.ok) {
-        const meJson = await meResp.json().catch(() => null) || {};
-        const numeric = meJson.id || meJson.userId;
-        if (numeric !== undefined && numeric !== null && !Number.isNaN(Number(numeric))) {
-          window.currentUserId = Number(numeric);
-        } else if (meJson.uid) {
-          // fallback to uid if numeric id not available
-          window.currentUserId = meJson.uid;
-        }
-      }
-    } catch (err) {
-      console.debug('Failed to fetch /api/id after login', err);
+    if (!loginResponse.ok) {
+      throw new Error('Login failed - please check your credentials');
     }
 
-    if (!window.currentUserId) {
-      throw new Error('Could not determine logged-in userId');
-    }
+    await loginResponse.json();
 
-
-    // Success
+    // Success - stay on current page
     statusMessage.textContent = 'Success! You are now logged in.';
     statusMessage.style.color = 'green';
-
 
     // Hide the form after successful signup/login
     setTimeout(() => {
       guestSignupForm.style.display = 'none';
+      // Reset form
       document.getElementById('guest-username').value = '';
       document.getElementById('guest-password').value = '';
       submitButton.disabled = false;
       submitButton.textContent = 'Sign Up & Login';
     }, 2000);
 
-
-} catch (error) {
+  } catch (error) {
     console.error('Guest signup error:', error);
     statusMessage.textContent = `Error: ${error.message}`;
     statusMessage.style.color = 'red';
     submitButton.disabled = false;
     submitButton.textContent = 'Sign Up & Login';
-}
+  }
 };
 </script>
-
 
 <!-- Create/Edit Modal Overlay using Tailwind -->
 <div id="microblog-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -211,17 +165,12 @@ window.handleGuestSignup = async function(event) {
         <label for="content" class="microblog-form-label">Content <span class="required">*</span></label>
         <textarea id="content" name="content" required class=""></textarea>
       </div>
-      <div class="microblog-form-group">
-        <label for="file-upload" class="microblog-form-label">Attach File (PDF, JPEG, DOC, DOCX, PNG):</label>
-        <input type="file" id="file-upload" name="file" accept=".pdf,.jpeg,.jpg,.png,.doc,.docx">
-      </div>
       <div class="flex justify-end space-x-2">
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
       </div>
     </form>
   </div>
 </div>
-
 
 <!-- Reply Modal -->
 <div id="reply-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -244,14 +193,13 @@ window.handleGuestSignup = async function(event) {
   </div>
 </div>
 
-
 <!--JavaScript Logic for MicroBlog -->
 <script type="module">
 // Imports for APIs used on this page
 import { fetchPosts, createPost, updatePost, createReply, fetchReplies } from '/assets/js/api/microblog.js';
+
 // Default Key for New MicroBlog Posts
 const pagePermalink = '{{page.permalink}}';
-
 
 // Create/Edit Modal Functions
 function openModal({ mode, post = {} }) {
@@ -268,7 +216,6 @@ document.getElementById('modal-close').onclick = closeModal;
 document.getElementById('microblog-modal').onclick = function(e) {
   if (e.target === this) closeModal();
 };
-
 
 // Reply Modal Functions
 function openReplyModal(postId) {
@@ -287,14 +234,13 @@ document.getElementById('reply-modal').onclick = function(e) {
   if (e.target === this) closeReplyModal();
 };
 
-
 // Reply Form Submission
 document.getElementById('reply-form').onsubmit = async function(e) {
   e.preventDefault();
   const postId = document.getElementById('reply-post-id').value;
   const content = document.getElementById('reply-content').value;
   const topicPath = pagePermalink || (window.location ? window.location.pathname : 'default');
- 
+  
   try {
     await createReply({ postId, content, topicPath });
     closeReplyModal();
@@ -304,23 +250,26 @@ document.getElementById('reply-form').onsubmit = async function(e) {
   }
 };
 
-
 // Load replies for a specific post
 async function loadRepliesForPost(postId) {
   try {
     const repliesData = await fetchReplies(postId);
     const replies = repliesData.replies || repliesData || [];
     if (replies.length > 0) {
+      // Find the row for this post
       const postRow = document.querySelector(`#post-row-${postId}`);
       if (postRow) {
+        // Check if replies section already exists
         let repliesRow = document.querySelector(`#replies-row-${postId}`);
         if (!repliesRow) {
+          // Create a new row for replies
           repliesRow = document.createElement('tr');
           repliesRow.id = `replies-row-${postId}`;
           repliesRow.className = 'replies-row';
           postRow.insertAdjacentElement('afterend', repliesRow);
         }
-       
+        
+        // Format replies HTML
         const repliesHtml = replies.map(reply => {
           const replyDate = reply.timestamp ? new Date(reply.timestamp).toLocaleString() : '';
           return `
@@ -332,7 +281,7 @@ async function loadRepliesForPost(postId) {
             </div>
           `;
         }).join('');
-       
+        
         repliesRow.innerHTML = `
           <td colspan="2" class="text-left p-2">
             <div class="replies-container">
@@ -348,7 +297,6 @@ async function loadRepliesForPost(postId) {
   }
 }
 
-
 // Utility function to escape HTML
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -356,321 +304,54 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-
-// Save Button Listener for Update and Create (with detailed error logging)
+// Save Button Listner for Update and Create
 document.getElementById('microblog-form').onsubmit = async function(e) {
-    e.preventDefault();
-
-    const id = document.getElementById('post-id').value;
-    const topicPath = document.getElementById('topic-id').value;
-    const content = document.getElementById('content').value;
-    const fileInput = document.getElementById('file-upload');
-    const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
-
-    // Helper: ensure we have a userId (try global then server-side lookup)
-    async function resolveCurrentUserId() {
-      if (window.currentUserId) return window.currentUserId;
-      // First try the /api/id endpoint which returns the current authenticated user
-      try {
-        const respId = await fetch(`${pythonURI}/api/id`, { credentials: 'include' });
-        if (respId && respId.ok) {
-          const data = await respId.json().catch(() => null) || {};
-          // Prefer numeric primary key `id` when available (server expects integer userId)
-          const numeric = data.id || data.userId;
-          if (numeric !== undefined && numeric !== null) {
-            const asInt = Number(numeric);
-            if (!Number.isNaN(asInt)) {
-              window.currentUserId = asInt;
-              return asInt;
-            }
-          }
-          // Fallback to username/uid if numeric id not present
-          const uidFallback = data.uid || data.username || null;
-          if (uidFallback) {
-            window.currentUserId = uidFallback;
-            return uidFallback;
-          }
-        }
-      } catch (err) {
-        console.debug('Could not resolve current user from /api/id', err);
-      }
-
-      // Fallback: try /api/user (may return user list or single user depending on auth)
-      try {
-        const resp = await fetch(`${pythonURI}/api/user`, { credentials: 'include' });
-        if (!resp.ok) return null;
-        const data = await resp.json().catch(() => null) || {};
-        // If /api/user returned an array with one element, prefer its numeric id
-        if (Array.isArray(data) && data.length === 1) {
-          const one = data[0] || {};
-          const numeric = one.id || one.userId;
-          if (numeric !== undefined && numeric !== null) {
-            const asInt = Number(numeric);
-            if (!Number.isNaN(asInt)) {
-              window.currentUserId = asInt;
-              return asInt;
-            }
-          }
-          const uidFallback = one.uid || one.username || null;
-          if (uidFallback) {
-            window.currentUserId = uidFallback;
-            return uidFallback;
-          }
-        }
-        // If /api/user returned an object, prefer numeric id then uid
-        const numericTop = data.id || data.userId;
-        if (numericTop !== undefined && numericTop !== null) {
-          const asInt = Number(numericTop);
-          if (!Number.isNaN(asInt)) {
-            window.currentUserId = asInt;
-            return asInt;
-          }
-        }
-        const uidTop = data.uid || data.username || null;
-        if (uidTop) {
-          window.currentUserId = uidTop;
-          return uidTop;
-        }
-      } catch (err) {
-        console.debug('Could not resolve current user id from /api/user', err);
-      }
-      return null;
+  e.preventDefault();
+  const id = document.getElementById('post-id').value;
+  const topicPath = document.getElementById('topic-id').value;
+  const content = document.getElementById('content').value;
+  try {
+    // API calls to Update and Create Posts
+    if (id) {
+      await updatePost({ id, content, topicPath });
+    } else {
+      await createPost({ content, topicPath });
     }
-
-    try {
-        if (id) {
-            // For update (you can add file update logic if needed)
-            await updatePost({ id, content, topicPath });
-            await renderMicroblogTable();
-        } else {
-            // Creating new post with optional file upload
-            const resolvedUserId = await resolveCurrentUserId();
-            if (!resolvedUserId) {
-              alert('Please sign in (use Guest Signup) before creating a post.');
-              return;
-            }
-
-            const formData = new FormData();
-            formData.append('content', content);
-            formData.append('topicPath', topicPath);
-            formData.append('userId', resolvedUserId);
-            if (file) formData.append('file', file);
-
-
-            // If there's a file attached, try to upload it first (two-step). If no file,
-            // send JSON with Content-Type to satisfy servers that expect application/json.
-            let resp;
-            if (file) {
-              // Try two-step upload first: POST file as multipart to a dedicated upload endpoint.
-              // If the backend exposes /api/microblog/upload (or similar) and returns a URL, we'll send JSON referencing the uploaded file.
-              const uploadCandidates = [
-                `${pythonURI}/api/microblog/upload`,
-                `${pythonURI}/api/upload`,
-                `${pythonURI}/api/files/upload`
-              ];
-
-              let uploadResult = null;
-              for (const uploadUrl of uploadCandidates) {
-                try {
-                  const fdUp = new FormData();
-                  fdUp.append('file', file);
-                  console.debug('Microblog: attempting direct file upload to', uploadUrl);
-                  const upResp = await fetch(uploadUrl, { method: 'POST', credentials: 'include', body: fdUp });
-                  if (!upResp.ok) {
-                    // Try next candidate
-                    console.debug('Microblog: upload endpoint responded', upResp.status, 'for', uploadUrl);
-                    continue;
-                  }
-                  const upJson = await upResp.json().catch(()=>null);
-                  // attempt to find a url in typical fields
-                  const url = (upJson && (upJson.url || upJson.fileUrl || upJson.path || upJson.location)) || null;
-                  if (url) {
-                    uploadResult = { uploadUrl, url, created: upJson };
-                    break;
-                  }
-                  // If upload succeeded but didn't return JSON url, maybe it returned text with path
-                  const upText = await upResp.text().catch(()=>null);
-                  if (upText && upText.trim()) {
-                    uploadResult = { uploadUrl, url: upText.trim(), created: upJson };
-                    break;
-                  }
-                } catch (e) {
-                  // network/404/etc - try next
-                  continue;
-                }
-              }
-
-              if (uploadResult && uploadResult.url) {
-                // use the returned URL when posting the microblog entry
-                const fileUrl = uploadResult.url.startsWith('http') ? uploadResult.url : (window.pythonURI + uploadResult.url);
-                const payload = { content, topicPath, userId: resolvedUserId, file: { url: fileUrl, filename: file.name } };
-                console.debug('Microblog: sending application/json with uploaded file reference', { topicPath, payload });
-                resp = await fetch(`${pythonURI}/api/microblog`, {
-                  method: 'POST',
-                  credentials: 'include',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-                });
-
-                // Attempt to cache the returned created post mapping to the uploaded file URL so rendering is immediate
-                try {
-                  const created = await resp.clone().json().catch(()=>null);
-                  if (created && created.id) {
-                    window.__microblog_embedded_files = window.__microblog_embedded_files || {};
-                    window.__microblog_embedded_files[created.id] = { url: fileUrl, filename: file.name, contentType: file.type };
-                  }
-                } catch (e) {}
-
-              } else {
-                // If direct upload failed or no upload endpoint, fallback to JSON-with-base64
-                // If the server rejects multipart/form-data we encode the file as base64 and send in JSON.
-              // This avoids 415 errors when the server expects application/json.
-              const MAX_BYTES = 10 * 1024 * 1024; // 10 MB limit — matches UI hint
-              if (file.size > MAX_BYTES) {
-                throw new Error('Attached file is too large (max 10MB). Please use a smaller file or upload via a dedicated file upload endpoint.');
-              }
-
-              // Read file as base64 and include data in JSON payload
-              const base64Data = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onerror = () => reject(new Error('Failed to read file'));
-                reader.onload = () => {
-                  // reader.result contains data:content/type;base64,.... we strip the prefix
-                  const result = reader.result || '';
-                  const commaIdx = result.indexOf(',');
-                  resolve(commaIdx >= 0 ? result.substring(commaIdx + 1) : result);
-                };
-                reader.readAsDataURL(file);
-              });
-
-              const payload = {
-                content,
-                topicPath,
-                userId: resolvedUserId,
-                file: {
-                  filename: file.name,
-                  contentType: file.type || 'application/octet-stream',
-                  base64: base64Data
-                }
-              };
-
-              console.debug('Microblog: sending JSON with embedded file (base64)', { topicPath, fileInfo: { name: file.name, size: file.size, type: file.type } });
-
-              resp = await fetch(`${pythonURI}/api/microblog`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-              });
-              // If server returns the created post, attach embedded file data to a temporary client cache
-              try {
-                const created = await resp.clone().json().catch(()=>null);
-                if (created && created.id) {
-                  window.__microblog_embedded_files = window.__microblog_embedded_files || {};
-                  window.__microblog_embedded_files[created.id] = { base64: base64Data, filename: file.name, contentType: file.type };
-                }
-              } catch (e) {
-                // ignore
-              }
-            } // end if (uploadResult...)
-          } // end if (file)
-
-            // No file attached -> send a simple JSON payload
-            else {
-              const payload = { content, topicPath, userId: resolvedUserId };
-              // Debug: indicate JSON is being sent and show payload summary (no sensitive data)
-              console.debug('Microblog: sending application/json', { topicPath, payload });
-              resp = await fetch(`${pythonURI}/api/microblog`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-              });
-            }
-
-
-            if (!resp.ok) {
-                // Try to get detailed error info from backend
-                let errorText;
-                try {
-                    const data = await resp.json();
-                    errorText = JSON.stringify(data);
-                } catch {
-                    errorText = await resp.text();
-                }
-              // If server returned 415, give an actionable message: server expected JSON but got multipart or unknown type
-              if (resp.status === 415) {
-                console.warn('Microblog create got 415 Unsupported Media Type — server expects application/json or has restricted types', { status: resp.status, response: errorText });
-                alert('Failed to create post: server expects JSON (Content-Type: application/json). If you attached a file the server may not accept multipart uploads.');
-                throw new Error(`Failed to create post. Status: ${resp.status}, Response: ${errorText}`);
-              }
-                throw new Error(`Failed to create post. Status: ${resp.status}, Response: ${errorText}`);
-            } else {
-              // success path — if the server returned the created post without file URL, we may still have embedded file stored in the client-side cache
-              try {
-                const created = await resp.json().catch(()=>null);
-                if (created && created.id && window.__microblog_embedded_files && window.__microblog_embedded_files[created.id]) {
-                  // ensure mapping exists (already filled above), keep it for rendering
-                }
-              } catch (e) {}
-            }
-        }
-
-
-        // Close modal and refresh table
-        closeModal();
-        renderMicroblogTable();
-    } catch (err) {
-        console.error('Detailed Microblog Save Error:', err);
-        alert('Error saving post: ' + err.message);
-    }
+    closeModal();
+    renderMicroblogTable();
+  } catch (err) {
+    alert('Error saving post: ' + err.message);
+  }
 };
-
-
-
 
 // MicroBlog Table Manager
 async function renderMicroblogTable() {
     const container = document.getElementById('microblog-playground');
     try {
+        // Determine filter mode and pass page if needed
         let pageArg = undefined;
-        // Determine which posts to fetch from the backend. 'page' uses the current page path;
-        // 'people' and 'me' fetch all posts (we filter client-side for 'me').
         if (window.__microblogFilterMode === undefined || window.__microblogFilterMode === 'page') {
+          // Use current page as filter; fallback to location.pathname or a default string
           pageArg = window.location ? window.location.pathname : 'default';
-        } else if (window.__microblogFilterMode === 'people') {
-          pageArg = undefined; // fetch all posts
-        } else if (window.__microblogFilterMode === 'me') {
-          pageArg = undefined; // fetch all posts then filter locally by current user
         }
+        // API call to Read former Posts
         const data = await fetchPosts(pageArg);
-        console.log("Microblog data fetched:", data);
+        // SVG icons for Create (+) and Edit (pencil)
         const createIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>`;
         const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z" /></svg>`;
         const replyIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="microblog-filter-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>`;
+        // Single page icon (default)
         const pageIcon = `<span class="microblog-filter-icon microblog-filter-page" id="page-icon" title="Show this page only"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="4" width="12" height="16" rx="2" fill="white" stroke="white" stroke-width="1.5"/><rect x="8" y="6" width="8" height="12" rx="1" fill="#9333ea" stroke="white" stroke-width="1.5"/></svg></span>`;
+        // Many pages icon (secondary option)
         const manyPagesIcon = `<span class="microblog-filter-icon microblog-filter-many" id="many-pages-icon" title="Show all pages"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><g><rect x="7" y="15" width="10" height="6" rx="2" fill="#60a5fa" stroke="white" stroke-width="1.2"/><rect x="5" y="11" width="12" height="6" rx="2" fill="#2563eb" stroke="white" stroke-width="1.2"/><rect x="3" y="7" width="12" height="6" rx="2" fill="#1e40af" stroke="white" stroke-width="1.2"/></g></svg></span>`;
-        // New icon: show only posts authored by current user
-        const meIcon = `<span class="microblog-filter-icon microblog-filter-me" id="my-posts-icon" title="Show my posts"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z"/><path d="M4 20c0-2.761 4-4 8-4s8 1.239 8 4v1H4v-1z"/></svg></span>`;
-            let controlsInfo = `
+        // Create and Page Icons
+        const controlsInfo = `
           <span id="filter-icons" class="microblog-filter-controls">
             <button id="create-btn" class="microblog-btn microblog-btn-create" title="Create Post">${createIcon}</button>
             ${pageIcon}
             ${manyPagesIcon}
-            ${meIcon}
           </span>
         `;
-
-
-
-
-
-
-
 
         // Table: Keys and Special Formatting
         const analytics = [
@@ -689,13 +370,6 @@ async function renderMicroblogTable() {
           { key: 'content' }
         ];
 
-
-
-
-
-
-
-
         // Table: columns
         let head = `
             <thead>
@@ -706,35 +380,9 @@ async function renderMicroblogTable() {
             </thead>
         `;
 
-
-
-
-
-
-
-
         // Table: rows; generated from microblog data
         let genBody = '';
-        // If user asked to see only their posts, filter client-side (backend may not support user filter)
-        let posts = (data.microblogs || []) || [];
-        if (window.__microblogFilterMode === 'me') {
-            // Require a logged-in user id (stored at window.currentUserId)
-            if (!window.currentUserId) {
-                container.innerHTML = `
-                <div class="p-4 text-sm text-gray-700">Please sign in (Guest Signup) to view your posts. Click <button id="guest-signup-inline" class="underline">Guest Signup</button> to create or login to an account.</div>
-                `;
-                // Bind signup button to open form
-                setTimeout(() => {
-                  const el = document.getElementById('guest-signup-inline');
-                  if (el) el.onclick = () => guestSignupForm.style.display = 'block';
-                }, 0);
-                return;
-            }
-            posts = posts.filter(p => String(p.userId) === String(window.currentUserId));
-        }
-
-
-        posts.forEach(post => {
+        (data.microblogs || []).forEach(post => {
             const analyticsCell = analytics.map(f => {
               let value = post[f.key] ?? '';
               if (f.format) value = f.format(value);
@@ -752,52 +400,8 @@ async function renderMicroblogTable() {
               }
               return `<div>${value}</div>`;
             }).join('');
-            // If server didn't return file info but we have a client-side embedded file (sent as base64), attach it
-            if ((!post.file || Object.keys(post.file).length === 0) && window.__microblog_embedded_files && window.__microblog_embedded_files[post.id]) {
-              const fed = window.__microblog_embedded_files[post.id];
-              post.file = { base64: fed.base64, filename: fed.filename, contentType: fed.contentType };
-            }
-
-            // Add download link if file exists. Support server URL or embedded base64 payloads.
-            let fileLink = '';
-            if (post.file) {
-              try {
-                let href = null;
-                let filename = post.file.filename || post.file.name || 'attachment';
-                if (post.file.url) {
-                  // server-provided path
-                  // allow either absolute or relative urls
-                  href = post.file.url.startsWith('http') ? post.file.url : (window.pythonURI + post.file.url);
-                } else if (post.file.base64) {
-                  // embedded base64 content in JSON
-                  const ct = post.file.contentType || post.file.contentType || 'application/octet-stream';
-                  href = `data:${ct};base64,${post.file.base64}`;
-                }
-
-                if (href) {
-                  // If it's an image, also show an inline thumbnail
-                  let thumb = '';
-                  if ((post.file.contentType || '').startsWith('image/') || (post.file.type || '').startsWith('image/') || filename.match(/\.(jpe?g|png|gif|webp|bmp)$/i)) {
-                    thumb = `<div class="microblog-file-thumb"><a href="${href}" target="_blank" download="${filename}"><img src="${href}" alt="${escapeHtml(filename)}" style="max-width:120px; display:block; margin-bottom:6px;"/></a></div>`;
-                  }
-
-                  fileLink = `<div>${thumb}<a href="${href}" target="_blank" download="${escapeHtml(filename)}">Download: ${escapeHtml(filename)}</a></div>`;
-                }
-              } catch (e) {
-                console.warn('Failed to render file link for post', e);
-              }
-            }
-
-
-            genBody += `<tr id="post-row-${post.id}"><td class="text-left">${analyticsCell}</td><td class="text-left">${messageCell}${fileLink}</td></tr>`;
+            genBody += `<tr id="post-row-${post.id}"><td class="text-left">${analyticsCell}</td><td class="text-left">${messageCell}</td></tr>`;
         });
-
-
-
-
-
-
-
 
         // Table: body
         let body = `
@@ -805,20 +409,6 @@ async function renderMicroblogTable() {
             ${genBody}
         </tbody>
         `;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         // Table: set container with scrollable wrapper
@@ -830,13 +420,6 @@ async function renderMicroblogTable() {
           </table>
         </div>
         `;
-
-
-
-
-
-
-
 
         // Wait for DOM update, then initialize DataTables
         setTimeout(async () => {
@@ -875,28 +458,16 @@ async function renderMicroblogTable() {
                       const pageIconEl = document.getElementById('page-icon');
                       const manyPagesIconEl = document.getElementById('many-pages-icon');
                       if (pageIconEl && manyPagesIconEl) {
-                        // Visual feedback for three choices: page, people, me
-                        const meIconEl = document.getElementById('my-posts-icon');
                         if (mode === 'page') {
                           pageIconEl.style.background = '#9333ea'; // purple
                           manyPagesIconEl.style.background = '#2563eb'; // blue
                           pageIconEl.style.opacity = '1';
                           manyPagesIconEl.style.opacity = '0.5';
-                          if (meIconEl) { meIconEl.style.opacity = '0.5'; meIconEl.style.background = ''; }
-                        } else if (mode === 'people') {
+                        } else {
                           manyPagesIconEl.style.background = '#2563eb';
                           pageIconEl.style.background = '#9333ea';
                           manyPagesIconEl.style.opacity = '1';
                           pageIconEl.style.opacity = '0.5';
-                          if (meIconEl) { meIconEl.style.opacity = '0.5'; meIconEl.style.background = ''; }
-                        } else if (mode === 'me') {
-                          // highlight 'me' and dim others
-                          if (meIconEl) {
-                            meIconEl.style.background = '#10b981'; // greenish accent for 'my posts'
-                            meIconEl.style.opacity = '1';
-                          }
-                          if (pageIconEl) pageIconEl.style.opacity = '0.5';
-                          if (manyPagesIconEl) manyPagesIconEl.style.opacity = '0.5';
                         }
                       }
                       // Re-render table with new filter
@@ -909,9 +480,6 @@ async function renderMicroblogTable() {
                       });
                       document.querySelectorAll('#many-pages-icon').forEach(el => {
                         el.onclick = () => setFilterMode('people');
-                      });
-                      document.querySelectorAll('#my-posts-icon').forEach(el => {
-                        el.onclick = () => setFilterMode('me');
                       });
                       // Only set default filter if not already set
                       if (!window.__microblogFilterModeInitialized) {
@@ -932,9 +500,9 @@ async function renderMicroblogTable() {
               const postId = $(this).data('id');
               openReplyModal(postId);
             });
-           
-            // Load and display replies for each visible post (avoid loading replies for hidden posts when filtering)
-            for (const post of (posts || [])) {
+            
+            // Load and display replies for each post
+            for (const post of (data.microblogs || [])) {
               await loadRepliesForPost(post.id);
             }
         }
