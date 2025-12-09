@@ -155,6 +155,12 @@
       </div>
     </div>
 
+    <!-- User ID (shown when not logged in) -->
+    <div id="uid-input-container" class="mb-4" style="display:none;">
+      <label class="block text-white font-semibold mb-2 text-sm">Your UID (Required if not logged in):</label>
+      <input type="text" id="submission-uid" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white; margin-bottom:12px;" placeholder="Enter your UID (e.g., STU001)" />
+    </div>
+
     <!-- Submission Link -->
     <div class="mb-4">
       <label class="block text-white font-semibold mb-2 text-sm">Submission Link (Required):</label>
@@ -805,15 +811,45 @@
   }
 
   // Open submission modal
-  window.openSubmissionModal = function(gamePath) {
+  window.openSubmissionModal = async function(gamePath) {
     currentHackToSubmit = gamePath;
     document.getElementById('submission-link').value = userGradeData.hacks_links?.[gamePath] || '';
     document.getElementById('submission-text').value = userGradeData.hacks_submissions?.[gamePath] || '';
     document.getElementById('submission-notes').value = userGradeData.hacks_notes?.[gamePath] || '';
+    document.getElementById('submission-uid').value = '';
     
     const modal = document.getElementById('submission-modal');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+
+    // Check if user is authenticated and show/hide UID input
+    // First check window.user (loaded by login.js), then try fetch
+    const uidContainer = document.getElementById('uid-input-container');
+    let userAuthenticated = false;
+    
+    if (window.user && window.user.uid) {
+      // Use credentials data already loaded
+      userAuthenticated = true;
+    } else {
+      // Try to fetch if window.user doesn't exist
+      try {
+        const userResp = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+        if (userResp.ok) {
+          const userData = await userResp.json();
+          if (userData && userData.uid) {
+            userAuthenticated = true;
+            window.user = userData; // Store for future use
+          }
+        }
+      } catch (e) {
+        // Authentication check failed
+      }
+    }
+    
+    // Show UID input if not authenticated, hide if authenticated
+    if (uidContainer) {
+      uidContainer.style.display = userAuthenticated ? 'none' : 'block';
+    }
 
     // Render the rubric based on current user data
     renderSubmissionRubric();
@@ -842,6 +878,7 @@
     const link = document.getElementById('submission-link').value.trim();
     const text = document.getElementById('submission-text').value.trim();
     const notes = document.getElementById('submission-notes').value.trim();
+    const manualUid = document.getElementById('submission-uid').value.trim();
     
     if (!link) {
       alert('Please provide a submission link.');
@@ -857,23 +894,69 @@
     const topic = HACK_TOPICS.find(t => t.Game === currentHackToSubmit);
     const assignmentName = topic ? topic.Title : currentHackToSubmit;
     
-    // Get user ID and class - try from API first, then localStorage, then use defaults
-    let uid = 'STU001';
+    // Get user ID and class from credentials data (window.user loaded by login.js)
+    let uid = null;
     let studentClass = 'A';
+    let userAuthenticated = false;
     
-    try {
-      const userResp = await fetch(`${API_BASE}/api/user`, { credentials: 'include' });
-      if (userResp.ok) {
-        const userData = await userResp.json();
-        uid = userData.uid || uid;
-        studentClass = userData.class || userData.className || studentClass;
+    // Always check window.user first (credentials data from console)
+    if (window.user && window.user.uid) {
+      uid = window.user.uid;
+      userAuthenticated = true;
+      
+      // Handle class: it's an array, use first element if available, otherwise use school
+      if (window.user.class && Array.isArray(window.user.class) && window.user.class.length > 0) {
+        studentClass = window.user.class[0];
+      } else if (window.user.school) {
+        studentClass = window.user.school;
       }
-    } catch (e) {
-      // Try localStorage
-      const storedUid = localStorage.getItem('student_uid');
+      
+      console.log('Using credentials from window.user:', { 
+        uid: window.user.uid, 
+        class: window.user.class, 
+        school: window.user.school,
+        selectedClass: studentClass 
+      });
+    } else {
+      // Fallback: try to fetch if window.user doesn't exist yet
+      try {
+        const userResp = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+        if (userResp.ok) {
+          const userData = await userResp.json();
+          if (userData && userData.uid) {
+            window.user = userData; // Store for future use
+            uid = userData.uid;
+            userAuthenticated = true;
+            
+            // Handle class array
+            if (userData.class && Array.isArray(userData.class) && userData.class.length > 0) {
+              studentClass = userData.class[0];
+            } else if (userData.school) {
+              studentClass = userData.school;
+            }
+            
+            console.log('Fetched user data:', userData);
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching user:', e);
+      }
+    }
+    
+    // If still not authenticated, require manual UID entry
+    if (!userAuthenticated) {
+      if (!manualUid) {
+        alert('Please enter your UID to submit (you are not logged in).');
+        return;
+      }
+      uid = manualUid;
       const storedClass = localStorage.getItem('student_class');
-      if (storedUid) uid = storedUid;
       if (storedClass) studentClass = storedClass;
+    }
+    
+    // Final fallback
+    if (!uid) {
+      uid = 'STU001';
     }
     
     // Prepare grade data for API
@@ -1146,8 +1229,28 @@
     renderGradingAssignments();
   }
 
+  // Load and log credentials data
+  async function loadCredentials() {
+    try {
+      const response = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Credentials data:', data);
+        window.user = data; // Store in window for global access
+        return data;
+      } else {
+        console.warn('Could not fetch credentials, status:', response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching credentials:', error);
+      return null;
+    }
+  }
+
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', async () => {
+    await loadCredentials(); // Load and log credentials first
     await loadGradeData();
     await loadGradingAssignments();
     renderSelectedHacks();
