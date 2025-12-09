@@ -28,12 +28,12 @@ The diagram below visualizes the complete authentication flow, from initial logi
 
 ```mermaid
 sequenceDiagram
-    participant User as 👤 User Browser
-    participant FE as 🌐 Frontend<br/>(JavaScript)
-    participant HTTP as 📡 HTTP Request
-    participant BE as ⚙️ Backend Flask<br/>(Python API)
-    participant DB as 🗄️ Database
-    participant JWT as 🔐 JWT Token<br/>Generator
+    participant User as User Browser
+    participant FE as Frontend<br/>(JavaScript)
+    participant HTTP as HTTP Request
+    participant BE as Backend Flask<br/>(Python API)
+    participant DB as Database
+    participant JWT as JWT Token<br/>Generator
 
     Note over User,JWT: Login Authentication Flow
 
