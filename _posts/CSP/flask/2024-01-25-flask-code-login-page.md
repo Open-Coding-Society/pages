@@ -8,8 +8,7 @@ toc: True
 courses: {'csp': {'week': 15}}
 ---
 
-
-### What You'll Learn
+## What You'll Learn
 
 - Authentication workflow and key concepts (credentials, sessions, JWT tokens, password hashing)
 - Frontend: HTML login form with API integration
