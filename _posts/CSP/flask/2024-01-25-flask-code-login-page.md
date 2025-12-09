@@ -8,12 +8,19 @@ toc: True
 courses: {'csp': {'week': 15}}
 ---
 
-## What You'll Learn
+## What you will Learn
 
-- Authentication workflow and key concepts (credentials, sessions, JWT tokens, password hashing)
-- Frontend: HTML login form with API integration
-- Backend: Flask authentication endpoints and `@token_required` decorator
-- Security: CORS configuration, httpOnly cookies, and error handling
+Authentication workflow and key concepts (HTML login, APIs, credentials, sessions, JWT tokens, password hashing).
+
+**Key HTTP & JWT Concepts Illustrated:**
+
+1. **HTTP POST Request** (Steps 2-3): Frontend sends credentials via HTTP POST with JSON body
+2. **Password Hashing** (Step 6): Backend compares hashed passwords, never plain-text
+3. **JWT Generation** (Steps 7-8): Creates signed token containing user identity using HS256 algorithm
+4. **HTTP Cookie** (Step 9): JWT stored in secure, httpOnly cookie (prevents XSS attacks)
+5. **Automatic Cookie Transmission** (Step 16): Browser automatically sends cookie with subsequent requests
+6. **Token Validation** (Step 18): `@token_required` decorator decodes JWT and verifies signature
+7. **CORS & Credentials** (Steps 2, 16): `credentials: 'include'` in fetch allows cross-origin cookie transmission
 
 ### Authentication Workflow with HTTP and JWT
 
@@ -92,16 +99,6 @@ sequenceDiagram
     deactivate BE
     deactivate FE
 ```
-
-**Key HTTP & JWT Concepts Illustrated:**
-
-1. **HTTP POST Request** (Steps 2-3): Frontend sends credentials via HTTP POST with JSON body
-2. **Password Hashing** (Step 6): Backend compares hashed passwords, never plain-text
-3. **JWT Generation** (Steps 7-8): Creates signed token containing user identity using HS256 algorithm
-4. **HTTP Cookie** (Step 9): JWT stored in secure, httpOnly cookie (prevents XSS attacks)
-5. **Automatic Cookie Transmission** (Step 16): Browser automatically sends cookie with subsequent requests
-6. **Token Validation** (Step 18): `@token_required` decorator decodes JWT and verifies signature
-7. **CORS & Credentials** (Steps 2, 16): `credentials: 'include'` in fetch allows cross-origin cookie transmission
 
 ## Frontend HTML
 
@@ -293,8 +290,6 @@ def token_required(roles=None):
 
     return decorator
 
-
-
 ```
 
 To summarize, the global variable `g.current_user` allows us to access and update user information  if they are logged in with the decorator `@token_required()`. This helps us avoid other, more tedious methods, like using local storage to store id information or decoding JWT tokens; The magic of a token being passed with every HTTP request allows us to use a decorator to obtain user information through `@token_required()`.   FYI, if the user isn't logged in, they won't be able to obtain information from the function guarded by the `@token_required()` decorator.
@@ -329,6 +324,7 @@ If you looked at the sign up code, you might have noticed the same import statem
 If we look closely, we see that login is imported from config.js. Let's take a look at config.js.
 
 ```python
+
 export var pythonURI;
 if (location.hostname === "localhost") {
         pythonURI = "http://localhost:8587";
