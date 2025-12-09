@@ -10,7 +10,7 @@ courses: {'csp': {'week': 15}}
 
 ## What you will Learn
 
-Authentication workflow and key concepts (HTML login, APIs, credentials, sessions, JWT tokens, password hashing).
+Authentication workflow and key concepts (HTML login, HTTP, APIs, credentials, sessions, JWT tokens, password hashingi, CORS).
 
 **Key HTTP & JWT Concepts Illustrated:**
 
