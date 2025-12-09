@@ -22,14 +22,17 @@ export class Transform {
         return Math.sqrt(dx*dx + dy*dy);
     }
 
-    updatePosition() {
+    pointAt(target) {
+        const dx = target.x - this.x;
+        const dy = target.y - this.y;
+        return Math.atan2(dy, dx);
+    }
 
+    updatePosition() {
         this.xv *= 0.9;
         this.yv *= 0.9;
 
         this.x += this.xv;
         this.y += this.yv;
-
     }
-
 }
