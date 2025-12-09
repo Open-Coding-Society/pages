@@ -383,6 +383,46 @@ active_tab: dashboard
                     </div>
                 </div>
 
+                <!-- Language/Translation Section -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">🌐 Language Translation</h3>
+                        <div class="flex gap-2">
+                            <button type="button" id="clear-translation-btn" class="px-3 py-1 text-sm rounded bg-orange-600 hover:bg-orange-700 text-white">Reset to English</button>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="language">Save</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-neutral-400 mb-4">Translate the entire site into your preferred language. This setting is saved and applies across all pages.</p>
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <label class="text-sm text-neutral-400">Site Language</label>
+                            <select id="pref-language" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                <option value="">Default (English - No Translation)</option>
+                                <option value="es">🇪🇸 Spanish (Español)</option>
+                                <option value="fr">🇫🇷 French (Français)</option>
+                                <option value="de">🇩🇪 German (Deutsch)</option>
+                                <option value="it">🇮🇹 Italian (Italiano)</option>
+                                <option value="pt">🇵🇹 Portuguese (Português)</option>
+                                <option value="ru">🇷🇺 Russian (Русский)</option>
+                                <option value="zh-CN">🇨🇳 Chinese Simplified (简体中文)</option>
+                                <option value="zh-TW">🇹🇼 Chinese Traditional (繁體中文)</option>
+                                <option value="ja">🇯🇵 Japanese (日本語)</option>
+                                <option value="ko">🇰🇷 Korean (한국어)</option>
+                                <option value="ar">🇸🇦 Arabic (العربية)</option>
+                                <option value="hi">🇮🇳 Hindi (हिन्दी)</option>
+                                <option value="vi">🇻🇳 Vietnamese (Tiếng Việt)</option>
+                                <option value="th">🇹🇭 Thai (ไทย)</option>
+                                <option value="nl">🇳🇱 Dutch (Nederlands)</option>
+                                <option value="pl">🇵🇱 Polish (Polski)</option>
+                                <option value="tr">🇹🇷 Turkish (Türkçe)</option>
+                                <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+                                <option value="he">🇮🇱 Hebrew (עברית)</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-neutral-500">Translation powered by Google Translate. Click "Reset to English" if translation gets stuck.</p>
+                    </div>
+                </div>
+
                 <!-- Actions Row -->
                 <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -540,7 +580,8 @@ active_tab: dashboard
                             text: document.getElementById('pref-text-color').value,
                             font: document.getElementById('pref-font-family').value,
                             size: Number(document.getElementById('pref-font-size').value),
-                            accent: document.getElementById('pref-accent-color').value
+                            accent: document.getElementById('pref-accent-color').value,
+                            language: document.getElementById('pref-language').value
                         };
                     }
 
@@ -553,6 +594,7 @@ active_tab: dashboard
                         document.getElementById('pref-font-size').value = prefs.size || d.size;
                         document.getElementById('font-size-label').textContent = prefs.size || d.size;
                         document.getElementById('pref-accent-color').value = prefs.accent || d.accent;
+                        document.getElementById('pref-language').value = prefs.language || '';
                     }
 
                     function showStatus(msg){
@@ -573,6 +615,20 @@ active_tab: dashboard
                         } else if (section === 'colors') {
                             current.bg = form.bg;
                             current.accent = form.accent;
+                        } else if (section === 'language') {
+                            const oldLang = current.language || '';
+                            const newLang = form.language;
+                            current.language = newLang;
+                            
+                            // Save first, then reload to apply language change
+                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            
+                            // Only reload if language actually changed
+                            if (oldLang !== newLang) {
+                                showStatus('Language saved! Reloading...');
+                                setTimeout(() => window.location.reload(), 500);
+                                return;
+                            }
                         }
                         
                         savePreferences(current);
@@ -608,8 +664,22 @@ active_tab: dashboard
                             if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
                                 window.SitePreferences.resetPreferences();
                             }
+                            // Also clear translation
+                            clearAllTranslationCookies();
                             showStatus('Reset complete');
                             setTimeout(() => location.reload(), 100);
+                        });
+
+                        // Clear translation / Reset to English button
+                        document.getElementById('clear-translation-btn').addEventListener('click', function(){
+                            clearAllTranslationCookies();
+                            // Update preference
+                            const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                            current.language = '';
+                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            document.getElementById('pref-language').value = '';
+                            showStatus('Translation cleared! Reloading...');
+                            setTimeout(() => location.reload(), 500);
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', function(){
@@ -620,6 +690,17 @@ active_tab: dashboard
                             if (e.key === 'Enter') saveThemeAs(this.value.trim());
                         });
                     });
+
+                    // Helper function to clear Google Translate cookies
+                    function clearAllTranslationCookies() {
+                        const domain = window.location.hostname;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+                        // Also try without domain for localhost
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                    }
 
                     window.loadPreferences = async function(){ loadPreferences(); };
                     try{ loadPreferences(); } catch(e){}
