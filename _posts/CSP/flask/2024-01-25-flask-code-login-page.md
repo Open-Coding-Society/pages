@@ -8,9 +8,9 @@ toc: True
 courses: {'csp': {'week': 15}}
 ---
 
-## What you will Learn
+## What You Will Learn
 
-Authentication workflow and key concepts (HTML login, HTTP, APIs, credentials, sessions, JWT tokens, password hashingi, CORS).
+Authentication workflow and key concepts (HTML login, HTTP, APIs, credentials, sessions, JWT tokens, password hashing, CORS).
 
 **Key HTTP & JWT Concepts Illustrated:**
 
@@ -316,15 +316,15 @@ Since the backend code is done for us, all we need is the frontend API layer to 
             }
         };
         login(options);
-    }```
+    }
+</script>
 ```
 
 If you looked at the sign up code, you might have noticed the same import statement from the frontend `API Service Layer`. You also might notice that the frontend `API Service Layer` is a lot shorter than the sign-up code. Why is that?
 
 If we look closely, we see that login is imported from config.js. Let's take a look at config.js.
 
-```python
-
+```javascript
 export var pythonURI;
 if (location.hostname === "localhost") {
         pythonURI = "http://localhost:8587";
@@ -396,28 +396,26 @@ Check out [this link](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 
 As you can see in the HTTP Request, the method is a POST, which corresponds to the method in the backend. It's important that we use the correct method for our specific API endpoint, or we will get errors. For example, for the _Security , the api endpoint is api/authenticate. Therefore, the correct api endpoint we should use is the request  is `/api/authenticate`.
 
-Here's the code in the backend API that sets up in endpoint:
+Here's the code in the backend API that sets up the endpoint:
 
-``` python
-user_api = Blueprint('user_api', __name__,  
-
-                   url_prefix='/api')
-
+```python
+user_api = Blueprint('user_api', __name__,
+                     url_prefix='/api')
 ```
 
-This code is for the user.py file under the api directory and is 'api' is  prefix for all api endpoints in user.py file. It is in the beginning of the user.py file.
+This code is for the user.py file under the api directory. The 'api' prefix is applied to all endpoints in the user.py file and is defined at the beginning of the file.
 
-``` python
+```python
 api.add_resource(_Security, '/authenticate')
 ```
 
-This adds the /authenticate to the the _Security class endpoint. Therefore,  the api endpoint is `api/user`
+This adds '/authenticate' to the _Security class endpoint. Therefore, the full API endpoint is `/api/authenticate`
 
 You can try using  [Postman](https://learning.postman.com/docs/introduction/overview/) to test out your  backend API on flask_2025 before starting this part! If you're running flask_2025 locally add the `api/user` to the [localhost](https://blog.hubspot.com/website/what-is-localhost#:~:text=Typically%2C%20you%20can%20access%20the,running%20on%20the%20same%20device.) link.
 
 ## Error Handling
 
-What does the try/catch error block do in the login function for config.js? The try block attempts to `send a payload` to the backend inorder to `process the response`.  If the payload is incorrectly formatted, or there is any other issue with the request, an error will be thrown. The catch block catches this error and logs an appropriate message to the console.
+What does the try/catch error block do in the login function for config.js? The try block attempts to `send a payload` to the backend in order to `process the response`.  If the payload is incorrectly formatted, or there is any other issue with the request, an error will be thrown. The catch block catches this error and logs an appropriate message to the console.
 
 > What's an example of an error we talked about?
 
