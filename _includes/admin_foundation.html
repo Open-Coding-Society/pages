@@ -520,14 +520,15 @@
                   <style>
                     body { margin: 0; background-color: #525659; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
                     .header { width: 100%; background: #333; color: white; padding: 10px; text-align: center; font-family: sans-serif; position: sticky; top: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; }
-                    #the-canvas { margin: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.5); background: white; }
+                    .pdf-page { margin: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.5); background: white; display: block; }
+                    #pdf-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
                   </style>
                 </head>
                 <body>
                   <div class="header">
                     <h2>Viewing: ${filename}</h2>
                   </div>
-                  <canvas id="the-canvas"></canvas>
+                  <div id="pdf-container"></div>
                   
                   <script type="module">
                     import * as pdfjsLib from 'https://mozilla.github.io/pdf.js/build/pdf.mjs';
@@ -540,30 +541,37 @@
 
                         var loadingTask = pdfjsLib.getDocument({data: pdfData});
                         loadingTask.promise.then(function(pdf) {
-                          console.log('PDF loaded');
+                          console.log('PDF loaded with ' + pdf.numPages + ' pages');
+                          var container = document.getElementById('pdf-container');
                           
-                          // Fetch the first page
-                          var pageNumber = 1;
-                          pdf.getPage(pageNumber).then(function(page) {
-                            console.log('Page loaded');
-                            
-                            var scale = 1.5;
-                            var viewport = page.getViewport({scale: scale});
+                          // Render all pages
+                          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                              // Create canvas for each page immediately to maintain order
+                              const canvas = document.createElement('canvas');
+                              canvas.className = 'pdf-page';
+                              container.appendChild(canvas);
+                              
+                              // Fetch and render the page
+                              pdf.getPage(pageNum).then(function(page) {
+                                console.log('Page ' + pageNum + ' loaded');
+                                
+                                var scale = 1.5;
+                                var viewport = page.getViewport({scale: scale});
 
-                            var canvas = document.getElementById('the-canvas');
-                            var context = canvas.getContext('2d');
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
+                                var context = canvas.getContext('2d');
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
 
-                            var renderContext = {
-                              canvasContext: context,
-                              viewport: viewport
-                            };
-                            var renderTask = page.render(renderContext);
-                            renderTask.promise.then(function () {
-                              console.log('Page rendered');
-                            });
-                          });
+                                var renderContext = {
+                                  canvasContext: context,
+                                  viewport: viewport
+                                };
+                                var renderTask = page.render(renderContext);
+                                renderTask.promise.then(function () {
+                                  console.log('Page ' + pageNum + ' rendered');
+                                });
+                              });
+                          }
                         }, function (reason) {
                           console.error(reason);
                           document.body.innerHTML += '<p style="color:red; text-align:center; background:white; padding:10px;">Error loading PDF: ' + reason + '</p>';
