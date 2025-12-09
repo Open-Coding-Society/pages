@@ -1,3 +1,5 @@
+/* ---------- User theme: infograph, sidebar, questions, inputs ---------- */
+
 :root {
   --pref-bg-color: #0b1220;
   --pref-text-color: #e6eef8;
@@ -5,6 +7,13 @@
   --pref-font-size: 14px;
   --pref-accent-color: #3b82f6;
   --text-muted: #a0a0a0;
+
+  /* --- Infograph + panel color fallbacks and UI variables --- */
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
 }
 
 .user-theme-active {
@@ -205,5 +214,205 @@
   input[type="range"] {
     background-color: transparent !important;
     border: none !important;
+  }
+
+  /* --- Infograph + panel color fallbacks and UI variables --- */
+  /* Add these near the top :root block or append to the file */
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
+}
+
+/* Infograph-specific visual rules when the user theme is active */
+.user-theme-active {
+  /* Ensure cards use user's preference color, with a subtle darker footer */
+  .module-card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    border: 1px solid var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+    padding: 1rem !important;
+  }
+
+  /* Image sizing and safety */
+  .module-img {
+    background-color: transparent !important;
+    border-radius: 0.5rem !important;
+    object-fit: cover;
+  }
+
+  /* The small emoji circle — keep it light for readability */
+  .module-emoji {
+    background-color: var(--emoji-bg) !important;
+    color: #0b1220 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  }
+
+  /* Hover overlay should slightly darken but respect theme */
+  .module-overlay {
+    background-color: rgba(0,0,0,0.45) !important;
+  }
+
+  /* Allow the right-hand description column to be slightly darker for contrast */
+  .module-desc-col {
+    background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.14));
+    padding: 0.6rem;
+    border-radius: 0.375rem;
+  }
+
+  /* Keypoints column should remain transparent but use text color */
+  .module-keypoints-col ul li {
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Alternate cards: slightly darker mid-panel for visual variety */
+  .module-card:nth-child(2n) {
+    background: linear-gradient(180deg, var(--panel) 0%, rgba(0,0,0,0.18) 100%) !important;
+  }
+
+  /* Ensure links/icons inside infograph inherit readable color */
+  .module-card a, .module-card svg {
+    color: var(--pref-accent-color) !important;
+    fill: currentColor !important;
+  }
+}
+
+/* ---------- User theme: infograph, sidebar, questions, inputs ---------- */
+
+:root {
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
+}
+
+/* Main theme scope */
+.user-theme-active,
+.user-theme-active.dark {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* Page-level containers: make infograph page background plain (no gradient) */
+.user-theme-active {
+  .container,
+  .page-content,
+  .wrapper,
+  main,
+  article,
+  .post,
+  .content,
+  .opencs_root {
+    background-color: var(--panel) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  /* Lesson player sidebar & topbar: full area uses the user's color/gradient */
+  .lesson-sidebar,
+  .lesson-topbar {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  /* Infograph module cards: every section uses same single gradient */
+  .module-card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    border: 1px solid var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+    padding: 1rem !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove alternating gradient: ensure no nth-child alternate rules apply */
+  .module-card:nth-child(2n) {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+  }
+
+  /* Keep columns transparent so the card gradient is visible */
+  .module-image-col,
+  .module-keypoints-col,
+  .module-desc-col {
+    background: transparent !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  .module-desc-col {
+    padding: 0.6rem !important;
+    border-radius: 0.375rem !important;
+  }
+
+  .module-img {
+    background-color: transparent !important;
+    border-radius: 0.5rem !important;
+    object-fit: cover !important;
+  }
+
+  .module-emoji {
+    background-color: var(--emoji-bg) !important;
+    color: #0b1220 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+  }
+
+  .module-overlay {
+    background-color: rgba(0,0,0,0.45) !important;
+  }
+
+  /* Questions: background plain; inputs/textareas use the gradient background */
+  .questions,
+  .question-box,
+  .question-card,
+  .qa-box,
+  .qa-section {
+    background-color: var(--panel) !important; /* plain background */
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+  }
+
+  /* Make input fields and textareas inside question boxes use the gradient */
+  .question-box input,
+  .question-box textarea,
+  .question-card input,
+  .question-card textarea,
+  input.question-input,
+  textarea.question-input {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, black 8%), var(--panel-mid)) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid rgba(0,0,0,0.18) !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Generic cards/panels (makes other cards use the same single gradient) */
+  .card,
+  .panel,
+  .box,
+  .post,
+  .microblog-post,
+  [class*="rounded-xl"],
+  [class*="rounded-lg"] {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    border-color: var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Links/icons */
+  a, a:visited, a:hover {
+    color: var(--pref-accent-color) !important;
+  }
+
+  /* Force text color in common elements */
+  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Inputs/buttons default */
+  input, select, textarea, button {
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
   }
 }

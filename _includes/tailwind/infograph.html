@@ -1,3 +1,215 @@
+---
+layout: null
+---
+
+<style>
+:root {
+  --pref-bg-color: #0b1220;
+  --pref-text-color: #e6eef8;
+  --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --pref-font-size: 14px;
+  --pref-accent-color: #3b82f6;
+  --text-muted: #a0a0a0;
+
+  /* Panel/UI variables derived from user prefs */
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
+}
+
+/* Global user theme scoping */
+.user-theme-active,
+.user-theme-active.dark {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* Ensure main containers adopt user background/text */
+.user-theme-active {
+  /* Page-level containers */
+  .page-content,
+  .wrapper,
+  main,
+  article,
+  .post,
+  .content,
+  .opencs_root,
+  .container,
+  .layout,
+  header,
+  .site-header,
+  .page-header,
+  .post-header,
+  .topbar,
+  .nav,
+  .hero {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  /* Sidebars and aside regions */
+  aside,
+  .sidebar,
+  #sidebar,
+  .site-sidebar,
+  .sidebar-container,
+  .side-panel {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 86%, black 14%) , var(--panel-mid)) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  /* Infograph module cards and columns */
+  .module-card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    border: 1px solid var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+    padding: 1rem !important;
+    box-shadow: none !important;
+  }
+
+  .module-card:nth-child(2n) {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 82%, black 18%) 0%, rgba(0,0,0,0.18) 100%) !important;
+  }
+
+  .module-image-col,
+  .module-keypoints-col,
+  .module-desc-col {
+    color: var(--pref-text-color) !important;
+    background: transparent !important;
+  }
+
+  .module-desc-col {
+    background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.12)) !important;
+    padding: 0.6rem !important;
+    border-radius: 0.375rem !important;
+  }
+
+  .module-img {
+    background-color: transparent !important;
+    border-radius: 0.5rem !important;
+    object-fit: cover !important;
+  }
+
+  .module-emoji {
+    background-color: var(--emoji-bg) !important;
+    color: #0b1220 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+  }
+
+  .module-overlay {
+    background-color: rgba(0,0,0,0.45) !important;
+  }
+
+  /* Links/icons inside infograph */
+  .module-card a,
+  .module-card svg,
+  header a,
+  .site-header a,
+  aside a,
+  .sidebar a {
+    color: var(--pref-accent-color) !important;
+    fill: currentColor !important;
+  }
+
+  /* Generic cards/panels (applies to questions, microblog posts, etc.) */
+  .card,
+  .panel,
+  .box,
+  .question-box,
+  .question-card,
+  .qa-box,
+  .question,
+  .flashcard,
+  .flashcards,
+  .post,
+  .microblog-post,
+  [class*="rounded-xl"],
+  [class*="rounded-lg"] {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-mid) 100%) !important;
+    border-color: var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Specifically ensure question boxes adopt user's background and readable text */
+  .questions,
+  .questions .question-box,
+  .question-box .question,
+  .qa-section,
+  .question-card {
+    background: linear-gradient(180deg, var(--panel) 0%, color-mix(in srgb, var(--panel) 86%, black 14%)) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+  }
+
+  /* Make breadcrumb/top action bars use the full user gradient */
+  .breadcrumb,
+  .action-bar,
+  .toolbar,
+  .top-actions,
+  .back-to-timeline,
+  .sprint-banner,
+  .page-actions {
+    background: linear-gradient(90deg, var(--panel) 0%, color-mix(in srgb, var(--panel) 92%, black 8%)) !important;
+    color: var(--pref-text-color) !important;
+    border: none !important;
+  }
+
+  /* Force text color in common elements */
+  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Muted secondary text */
+  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
+  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
+    color: var(--text-muted) !important;
+  }
+
+  /* Inputs/buttons */
+  input, select, textarea, button {
+    background-color: var(--ui-bg) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+  }
+
+  button.bg-blue-600, button.bg-blue-700,
+  button.bg-green-600, button.bg-green-700,
+  .btn-primary,
+  .save-section-btn,
+  #save-preferences,
+  #save-theme-btn {
+    background-color: var(--pref-accent-color) !important;
+    border-color: var(--pref-accent-color) !important;
+    color: #fff !important;
+  }
+
+  button.bg-red-600, button.bg-red-700,
+  #restore-styles {
+    background-color: #dc2626 !important;
+    border-color: #dc2626 !important;
+    color: #fff !important;
+  }
+
+  /* Selection highlight */
+  ::selection {
+    background-color: var(--pref-accent-color) !important;
+    color: #fff !important;
+  }
+
+  /* Ensure SVG icons inherit text color */
+  svg {
+    color: inherit !important;
+    fill: currentColor !important;
+  }
+}
+</style>
+
 <div>
   {% assign data = site.data[page.infoGraph] %}
   <div class="container">
@@ -12,7 +224,7 @@
       {% for topic in data.Topics %}
         <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md module-card">
           <!-- Image Column -->
-          <div class="text-center relative">
+          <div class="text-center relative module-image-col">
             <a href="{{ site.baseurl }}{{ topic.link }}" class="block relative group">
               <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="rounded-lg mx-auto h-40 object-cover module-img">
               
@@ -30,7 +242,7 @@
             </a>
           </div>
           <!-- Key Points Column -->
-          <div>
+          <div class="module-keypoints-col">
             <h3 class="text-xl font-semibold mb-2">{{ topic.title }}</h3>
             <ul class="list-disc list-inside">
               <!-- Loop through kepoints within Topic -->
@@ -40,7 +252,7 @@
             </ul>
           </div>
           <!-- Description Column -->
-          <div>
+          <div class="module-desc-col">
             <h3 class="text-xl font-semibold mb-2">{{ topic.subtitle }}</h3>
             <p class="text-sm">{{ topic.description }}</p>
           </div>
