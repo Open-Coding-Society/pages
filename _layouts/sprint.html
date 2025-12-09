@@ -1391,6 +1391,237 @@ layout: post
   }
 }
 
+/* Quick Help & Resources Section */
+.quick-help-resources {
+  background: #111111;
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+  margin-bottom: 32px;
+}
+
+.quick-help-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.quick-help-header i {
+  font-size: 24px;
+  color: #ef4444;
+}
+
+.quick-help-header h2 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.quick-help-description {
+  color: #999999;
+  margin: 0 0 24px 0;
+  font-size: 0.95rem;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666666;
+  font-size: 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  background: #0a0a0a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.search-box input::placeholder {
+  color: #666666;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #60a5fa;
+  background: #0f0f0f;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.resource-card {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  position: relative;
+}
+
+.resource-card:hover {
+  border-color: #3a3a3a;
+  background: #151515;
+  transform: translateY(-2px);
+}
+
+.resource-card-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.resource-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.resource-icon.green {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.resource-icon.blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.resource-icon.red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.resource-icon.orange {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+}
+
+.resource-icon.purple {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+}
+
+.resource-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.resource-title {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.resource-description {
+  color: #999999;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.resource-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.resource-tag {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.resource-tag.collaboration {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.resource-tag.code-example {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.resource-tag.debugging {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.resource-tag.setup {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+}
+
+.resource-tag.concept {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+}
+
+.resource-helps {
+  color: #666666;
+  font-size: 13px;
+}
+
+.resource-external {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #666666;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.resource-card:hover .resource-external {
+  color: #60a5fa;
+}
+
+@media (max-width: 768px) {
+  .quick-help-resources {
+    padding: 24px 20px;
+  }
+  
+  .resource-card {
+    padding: 16px;
+  }
+  
+  .resource-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .resource-title {
+    font-size: 1rem;
+  }
+}
+
 </style>
 
 <div class="timeline-header">
@@ -1449,22 +1680,7 @@ layout: post
       <p class="achievement-label">Tasks Completed</p>
     </div>
   </div>
-  
-  <div class="course-filter-buttons">
-    <button class="course-filter-btn active" data-course-filter="all">
-      <i class="fas fa-th"></i> All Quests
-    </button>
-    <button class="course-filter-btn" data-course-filter="csa">
-      <i class="fas fa-shield-alt"></i> CSA
-    </button>
-    <button class="course-filter-btn" data-course-filter="csp">
-      <i class="fas fa-clock"></i> CSP
-    </button>
-    <button class="course-filter-btn" data-course-filter="csse">
-      <i class="fas fa-puzzle-piece"></i> CSSE
-    </button>
-  </div>
-</div>
+
 
 {% if page.certificates %}
   {% include certificate_overview.html certificates=page.certificates %}
@@ -1619,6 +1835,167 @@ layout: post
       </div>
     </div>
   {% endfor %}
+</div>
+
+
+<div class="quick-help-resources">
+  <div class="quick-help-header">
+    <i class="fas fa-book"></i>
+    <h2>Quick Help & Resources</h2>
+  </div>
+  
+  <p class="quick-help-description">Supplemental guides to help when you're stuck or need clarification</p>
+  
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" placeholder="Search guides..." id="resource-search">
+  </div>
+  
+  <div class="resources-grid" id="resources-grid">
+    <!-- Resource 1: Live Review -->
+    <a href="https://pages.opencodingsociety.com/agile/live_reviews" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon green">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Live Review (Pair/Trio/Group)</h3>
+          <p class="resource-description">Guidelines for preparing and conducting live reviews during sprints. Explains checkpoint and final review types, showcase requirements, expectations for collaboration and accountability, and tips for professional presentations.</p>
+          <div class="resource-meta">
+            <span class="resource-tag collaboration">collaboration</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 2: Cookie Clicker -->
+    <a href="https://pages.opencodingsociety.com/toolkit/documentation/cookie" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon blue">
+          <i class="fas fa-code"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Cookie Clicker Developer Documentation</h3>
+          <p class="resource-description">Step-by-step guide to building a cookie-clicker game using Thymeleaf, Bootstrap, custom CSS and JavaScript. Covers HTML structure, CSS styling, physics-based animation and logic for clicks, counters and upgrades.</p>
+          <div class="resource-meta">
+            <span class="resource-tag code-example">code-example</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 3: Person Viewer -->
+    <a href="https://pages.opencodingsociety.com/toolkit/documentation/person" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon red">
+          <i class="fas fa-bug"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Person Viewer Developer Documentation</h3>
+          <p class="resource-description">Documentation for a person viewer page using Thymeleaf, Bootstrap and DataTables. Describes how to set up the HTML, enable sorting/searching, check for GitHub profile images and update links dynamically.</p>
+          <div class="resource-meta">
+            <span class="resource-tag debugging">debugging</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 4: Flask, Postman, and Backend UIs -->
+    <a href="https://pages.opencodingsociety.com/flask-overview" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon orange">
+          <i class="fas fa-cog"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Flask, Postman, and Backend UIs</h3>
+          <p class="resource-description">Overview of backend fundamentals with a live demo. Introduces Flask routes, Postman for API testing and simple backend UIs. Provides tips for teaching backend logic, key takeaways for students and a starter project with cloning and setup instructions.</p>
+          <div class="resource-meta">
+            <span class="resource-tag setup">setup</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 5: Flask Project Structure -->
+    <a href="https://pages.opencodingsociety.com/python/flask/anatomy" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon orange">
+          <i class="fas fa-cog"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Flask Project Structure Explained</h3>
+          <p class="resource-description">Interactive guide to a typical Flask project layout. Explains the purpose of main.py, __init__.py, API and models folders, database initialization scripts, templates and static files. Helps learners organize their backend projects properly.</p>
+          <div class="resource-meta">
+            <span class="resource-tag setup">setup</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 6: Flask APIs Guide -->
+    <a href="https://pages.opencodingsociety.com/flask-api" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon purple">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Flask APIs Guide</h3>
+          <p class="resource-description">Introductory lesson on APIs with Flask. Defines APIs with a restaurant menu analogy, lists common use cases and shows how to add an external API route. Includes example code for a weather endpoint and guidance on registering Blueprints.</p>
+          <div class="resource-meta">
+            <span class="resource-tag concept">concept</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 7: Postman Intro Guide -->
+    <a href="https://pages.opencodingsociety.com/postman-docs" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon orange">
+          <i class="fas fa-cog"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Postman Intro Guide</h3>
+          <p class="resource-description">Quick reference for using Postman to test APIs. Covers common HTTP status codes, methods, reasons to use Postman, how to write backend endpoints in VS Code and how to send requests and inspect responses in Postman.</p>
+          <div class="resource-meta">
+            <span class="resource-tag setup">setup</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+    
+    <!-- Resource 8: Network Stack & HTTP/TCP/IP -->
+    <a href="https://pages.opencodingsociety.com/csp%20big%20idea%204/2025/02/05/network_stack_IPYNB_2_.html" class="resource-card" target="_blank" rel="noopener">
+      <div class="resource-card-content">
+        <div class="resource-icon purple">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="resource-info">
+          <h3 class="resource-title">Network Stack & HTTP/TCP/IP</h3>
+          <p class="resource-description">Explains the full networking stack involved when a GitHub Pages frontend communicates with a backend hosted on AWS EC2. Discusses tools like Docker, Nginx and Certbot and details how HTTP requests traverse application, transport, network and physical layers.</p>
+          <div class="resource-meta">
+            <span class="resource-tag concept">concept</span>
+            <span class="resource-helps">• Helps with 2 quests</span>
+          </div>
+        </div>
+        <i class="fas fa-external-link-alt resource-external"></i>
+      </div>
+    </a>
+  </div>
 </div>
 
 <!-- ============================= -->
@@ -2755,6 +3132,33 @@ function updateWeeklyProgress(stats, weekNum) {
     });
   }
 
+  function initializeResourceSearch() {
+  const searchInput = document.getElementById('resource-search');
+  const resourceCards = document.querySelectorAll('.resource-card');
+  
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+    
+    resourceCards.forEach(card => {
+      const title = card.querySelector('.resource-title').textContent.toLowerCase();
+      const description = card.querySelector('.resource-description').textContent.toLowerCase();
+      const tags = Array.from(card.querySelectorAll('.resource-tag'))
+        .map(tag => tag.textContent.toLowerCase())
+        .join(' ');
+      
+      const searchContent = `${title} ${description} ${tags}`;
+      
+      if (searchTerm === '' || searchContent.includes(searchTerm)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+}
+
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
@@ -2762,6 +3166,7 @@ function updateWeeklyProgress(stats, weekNum) {
     applyFilters();
     initializeCertificateSystem();
     renderWeekSkillPreviews();
+    initializeResourceSearch();
     
     // NEW: Initialize achievements
     updateAchievementsDisplay();
