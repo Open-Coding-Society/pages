@@ -5,7 +5,8 @@ description: An Open Pathway to Computer Science
 sprite: /images/mario_animation.png
 permalink: /
 microblog: true
-admin: true
+inbox: true
+# admin: true
 hide: true
 ---
 
