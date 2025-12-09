@@ -438,7 +438,7 @@
 
     async function getGrades() {
       try {
-        const res = await fetch(`${pythonURI}/api/assignment/?uid=toby`, {
+        const res = await fetch(`${pythonURI}/api/assignment/`, {
           ...fetchOptions,
           method: "GET",
           headers: {
@@ -500,14 +500,162 @@
             return;
           }
 
-          const rows = (Array.isArray(grades) ? grades : []).map(g => {
+          // Define openPdfViewer function globally
+          window.fileDataStore = {}; // Store file data here
+
+          window.openPdfViewer = function (key, filename) {
+            const base64Data = window.fileDataStore[key];
+            if (!base64Data) {
+              alert('Error: File data not found.');
+              return;
+            }
+
+            const viewerWindow = window.open('', '_blank');
+            if (viewerWindow) {
+              const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <title>PDF Viewer - ${filename}</title>
+                  <style>
+                    body { margin: 0; background-color: #525659; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+                    .header { width: 100%; background: #333; color: white; padding: 10px; text-align: center; font-family: sans-serif; position: sticky; top: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; }
+                    #the-canvas { margin: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.5); background: white; }
+                  </style>
+                </head>
+                <body>
+                  <div class="header">
+                    <h2>Viewing: ${filename}</h2>
+                  </div>
+                  <canvas id="the-canvas"></canvas>
+                  
+                  <script type="module">
+                    import * as pdfjsLib from 'https://mozilla.github.io/pdf.js/build/pdf.mjs';
+                    
+                    try {
+                        var pdfData = atob('${base64Data}');
+                        
+                        // Set worker source
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
+
+                        var loadingTask = pdfjsLib.getDocument({data: pdfData});
+                        loadingTask.promise.then(function(pdf) {
+                          console.log('PDF loaded');
+                          
+                          // Fetch the first page
+                          var pageNumber = 1;
+                          pdf.getPage(pageNumber).then(function(page) {
+                            console.log('Page loaded');
+                            
+                            var scale = 1.5;
+                            var viewport = page.getViewport({scale: scale});
+
+                            var canvas = document.getElementById('the-canvas');
+                            var context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            var renderContext = {
+                              canvasContext: context,
+                              viewport: viewport
+                            };
+                            var renderTask = page.render(renderContext);
+                            renderTask.promise.then(function () {
+                              console.log('Page rendered');
+                            });
+                          });
+                        }, function (reason) {
+                          console.error(reason);
+                          document.body.innerHTML += '<p style="color:red; text-align:center; background:white; padding:10px;">Error loading PDF: ' + reason + '</p>';
+                        });
+                    } catch (e) {
+                        console.error(e);
+                        document.body.innerHTML += '<p style="color:red; text-align:center; background:white; padding:10px;">Error processing PDF data: ' + e.message + '</p>';
+                    }
+                  <\/script>
+                </body>
+                </html>
+              `;
+              viewerWindow.document.write(htmlContent);
+              viewerWindow.document.close();
+            } else {
+              alert('Please allow popups to view the PDF.');
+            }
+          };
+
+          // Function to download base64 file
+          window.downloadBase64File = function (key, filename) {
+            const base64Data = window.fileDataStore[key];
+            if (!base64Data) {
+              alert('Error: File data not found.');
+              return;
+            }
+
+            // Simple mime type inference
+            let mimeType = 'application/octet-stream';
+            if (filename.endsWith('.png')) mimeType = 'image/png';
+            else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) mimeType = 'image/jpeg';
+            else if (filename.endsWith('.txt')) mimeType = 'text/plain';
+
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mimeType });
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+
+            URL.revokeObjectURL(url);
+          };
+
+          const rows = (Array.isArray(grades) ? grades : []).map((g, rowIndex) => {
             // Format content column
             let contentHtml = '';
             if (Array.isArray(g.content)) {
-              contentHtml = g.content.map(c => {
+              contentHtml = g.content.map((c, contentIndex) => {
                 const filename = escapeHtml(c.filename || 'unknown');
+                const isPdf = filename.toLowerCase().endsWith('.pdf');
                 const filePreview = c.file ? escapeHtml(c.file.substring(0, 10)) : '';
-                return `<div>${filename} (${filePreview})</div>`;
+
+                let fileDisplay = `<span>${filename} (${filePreview})</span>`;
+
+                if (c.file) {
+                  // Generate unique key
+                  const fileKey = `file_${g.uid || g.studentId}_${rowIndex}_${contentIndex}`;
+                  // Store full base64 data
+                  window.fileDataStore[fileKey] = c.file;
+
+                  if (isPdf) {
+                    fileDisplay += `
+                        <button onclick="openPdfViewer('${fileKey}', '${filename}')" class="action-btn" title="View PDF">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </button>
+                       `;
+                  } else {
+                    // Download button for other file types
+                    fileDisplay += `
+                        <button onclick="downloadBase64File('${fileKey}', '${filename}')" class="action-btn" title="Download File">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        </button>
+                       `;
+                  }
+                }
+
+                return `<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">${fileDisplay}</div>`;
               }).join('');
             }
 
@@ -518,11 +666,18 @@
             <tr>\
               <td>${escapeHtml(g.uid || g.studentId || '(unknown)')}</td>\
               <td>${escapeHtml(g.title || g.assignment)}</td>\
-              <td>${escapeHtml(g.score)}</td>\
+              <td id="score-${escapeHtml(g.uid || g.studentId)}">${escapeHtml(g.score)}</td>\
               <td>${escapeHtml(g.class || g.course || g.classes)}</td>\
               <td>${contentHtml}</td>\
               <td>${escapeHtml(g.notes)}</td>\
               <td>${linkHtml}</td>\
+              <td>\
+                <button class="action-btn edit" onclick="openEditModal('${escapeHtml(g.uid)}', '${escapeHtml(g.title || g.assignment)}')">\
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">\
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />\
+                  </svg>\
+                </button>\
+              </td>\
             </tr>\
           `}).join('');
 
@@ -537,6 +692,7 @@
                   <th>Content</th>\
                   <th>Notes</th>\
                   <th>Link</th>\
+                  <th>Actions</th>\
                 </tr>\
               </thead>\
               <tbody>\
@@ -546,6 +702,44 @@
           `;
 
           container.innerHTML = tableHtml;
+
+          // Define openEditModal function globally so it can be called from onclick
+          window.openEditModal = async function (uid, title) {
+            const score = prompt(`Enter new score for ${title} (UID: ${uid}):`);
+            if (score !== null) {
+              try {
+                // Note: Trailing slash used based on previous fix experience
+                const res = await fetch(`${pythonURI}/api/assignment/`, {
+                  ...fetchOptions,
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    uid: uid,
+                    title: title,
+                    score: score
+                  })
+                });
+
+                if (res.ok) {
+                  alert('Score updated successfully!');
+                  const scoreCell = document.getElementById(`score-${uid}`);
+                  if (scoreCell) {
+                    scoreCell.innerText = score;
+                    // Update the internal data array as well if needed, though visual update is done
+                    // This ensures if we re-sort/filter without fetching, it might persist (if we had such logic)
+                  }
+                } else {
+                  alert(`Failed to update score: ${res.status}`);
+                  console.error('Update failed', res);
+                }
+              } catch (err) {
+                console.error('Error updating score:', err);
+                alert('Error updating score: ' + err.message);
+              }
+            }
+          };
         }
       });
 
