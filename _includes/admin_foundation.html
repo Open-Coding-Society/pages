@@ -659,6 +659,11 @@
               }).join('');
             }
 
+            // Helper to create safe CSS ID from string
+            function safeId(str) {
+              return String(str || '').replace(/[^a-zA-Z0-9-_]/g, '-');
+            }
+
             // Format link column
             const linkHtml = g.link ? `<a href="${escapeHtml(g.link)}" target="_blank">${escapeHtml(g.link)}</a>` : '';
 
@@ -666,7 +671,7 @@
             <tr>\
               <td>${escapeHtml(g.uid || g.studentId || '(unknown)')}</td>\
               <td>${escapeHtml(g.title || g.assignment)}</td>\
-              <td id="score-${escapeHtml(g.uid || g.studentId)}">${escapeHtml(g.score)}</td>\
+              <td id="score-${safeId(g.uid || g.studentId)}-${safeId(g.title || g.assignment)}">${escapeHtml(g.score)}</td>\
               <td>${escapeHtml(g.class || g.course || g.classes)}</td>\
               <td>${contentHtml}</td>\
               <td>${escapeHtml(g.notes)}</td>\
@@ -724,11 +729,13 @@
 
                 if (res.ok) {
                   alert('Score updated successfully!');
-                  const scoreCell = document.getElementById(`score-${uid}`);
+                  // Reconstruct the safe ID
+                  const safeUid = String(uid || '').replace(/[^a-zA-Z0-9-_]/g, '-');
+                  const safeTitle = String(title || '').replace(/[^a-zA-Z0-9-_]/g, '-');
+                  const scoreCell = document.getElementById(`score-${safeUid}-${safeTitle}`);
+
                   if (scoreCell) {
                     scoreCell.innerText = score;
-                    // Update the internal data array as well if needed, though visual update is done
-                    // This ensures if we re-sort/filter without fetching, it might persist (if we had such logic)
                   }
                 } else {
                   alert(`Failed to update score: ${res.status}`);
