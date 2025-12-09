@@ -1,62 +1,104 @@
 ---
 layout: post
-title: Create A Login Page Flask Full-Stack web application
-description: Full Stack Development with Flask explained by terms and examples.
+title: Frontend Authentication with a Backend Flask Application
+description: Implement production-ready authentication with Flask backend and JavaScript frontend. Includes JWT token generation (HS256), httpOnly cookies, CORS configuration, password hashing, and decorator-based route protection.
 permalink: /flask-code-login
 author: Isabel Marilla
-menu: nav/flask.html
 toc: True
+courses: {'csp': {'week': 15}}
 ---
 
-## Introduction
+## What You Will Learn
 
-In any web application, the login page is essential for user authentication and access control. In this tutorial, we'll explore the process of creating a login page using Flask, a lightweight and versatile Python web framework that is well-suited for full-stack web development.
+Authentication workflow and key concepts (HTML login, HTTP, APIs, credentials, sessions, JWT tokens, password hashing, CORS).
 
-### What You'll Learn
+**Key HTTP & JWT Concepts Illustrated:**
 
-In this step-by-step guide, you'll learn how to:
+1. **HTTP POST Request** (Steps 2-3): Frontend sends credentials via HTTP POST with JSON body
+2. **Password Hashing** (Step 6): Backend compares hashed passwords, never plain-text
+3. **JWT Generation** (Steps 7-8): Creates signed token containing user identity using HS256 algorithm
+4. **HTTP Cookie** (Step 9): JWT stored in secure, httpOnly cookie (prevents XSS attacks)
+5. **Automatic Cookie Transmission** (Step 16): Browser automatically sends cookie with subsequent requests
+6. **Token Validation** (Step 18): `@token_required` decorator decodes JWT and verifies signature
+7. **CORS & Credentials** (Steps 2, 16): `credentials: 'include'` in fetch allows cross-origin cookie transmission
 
-- Understand Authentication
-- Use a Flask application.
-- Design and implement a user login form.
-- Validate login credentials to ensure proper authentication.
-- Connect the front-end login form to the back-end Flask application.
+### Authentication Workflow with HTTP and JWT
 
-### Building the Login Page
+The diagram below visualizes the complete authentication flow, from initial login through subsequent authenticated requests:
 
-We'll start by  talk about what <strong> authentication </strong> means and our basic workflow. Then, we'll set up the basic UI outline for the login form. Then, we'll discuss the backend components, especially the user.py file under the api directory.  Next, we'll integrate the frontend with the backend using API calls. Finally, we'll cover implementing credential validation to ensure correct user authentication.
+```mermaid
+sequenceDiagram
+    participant User as User Browser
+    participant FE as Frontend<br/>(JavaScript)
+    participant HTTP as HTTP Request
+    participant BE as Backend Flask<br/>(Python API)
+    participant DB as Database
+    participant JWT as JWT Token<br/>Generator
 
-## What is Authentication?
+    Note over User,JWT: Login Authentication Flow
 
-Authentication is the process of verifying the identity of a user or system. In web applications, it typically involves checking user credentials (like usernames and passwords) to confirm their identity. Successful authentication allows users to access their accounts and perform actions based on their roles or permissions.
+    User->>FE: 1. Enter credentials<br/>(uid, password)
+    activate FE
+    
+    FE->>HTTP: 2. POST /api/authenticate<br/>Body: {uid, password}<br/>Headers: Content-Type
+    activate HTTP
+    
+    HTTP->>BE: 3. HTTP Request<br/>Method: POST<br/>Credentials in body
+    deactivate HTTP
+    activate BE
+    
+    BE->>DB: 4. Query user by uid<br/>SELECT * FROM users WHERE uid=?
+    activate DB
+    DB-->>BE: 5. Return user data<br/>(hashed password)
+    deactivate DB
+    
+    BE->>BE: 6. Validate password<br/>Compare hash(input) == stored_hash
+    
+    alt ✅ Valid Credentials
+        BE->>JWT: 7. Generate JWT<br/>Payload: {_uid: user._uid}<br/>Secret: SECRET_KEY<br/>Algorithm: HS256
+        activate JWT
+        JWT-->>BE: 8. Return signed token
+        deactivate JWT
+        
+        BE->>HTTP: 9. HTTP Response 200<br/>Set-Cookie: jwt_token<br/>Attributes: httpOnly, secure, SameSite
+        activate HTTP
+        HTTP-->>FE: 10. Response with cookie
+        deactivate HTTP
+        
+        FE->>User: 11. Login successful!<br/>Redirect to dashboard
+        deactivate FE
+        
+    else ❌ Invalid Credentials
+        BE->>HTTP: 12. HTTP Response 401<br/>Body: {message: "Invalid credentials"}
+        HTTP-->>FE: 13. Error response
+        FE->>User: 14. Display error message
+    end
 
-## Key Concepts in Authentication
+    Note over User,JWT: Subsequent Authenticated Requests
 
-- **Credentials**: Information used to verify identity, such as usernames, passwords, and sometimes additional factors like security questions or biometrics.
-
-- **Session Management**: Mechanism to keep track of authenticated users and manage their interactions with the web application. Sessions often involve storing session data on the server or using tokens to identify users. (Eg: Logging in on the backend site has a session id created for you)
-
-- **Token-Based Authentication**: A method where users receive a token (like a JSON Web Token, or JWT) upon successful login. This token is sent with each request to authenticate the user. (We use JWT for handling login with a full stack application.)
-
-- **Password Hashing**: Storing passwords in a secure manner by converting them into a hash using cryptographic algorithms. This ensures that plain-text passwords are not stored in the database (If you check out user.py under the model directory, you'll find the set_password function which generates the hashed password stored in the database)
-
-## Basic Workflow of Authentication
-
-1. **User Registration**:
-   - Users create an account by providing necessary information (e.g., username, password).
-   - Passwords are hashed and stored securely in the database.
-
-2. **User Login**:
-   - Users provide their credentials (e.g., username and password).
-   - The server verifies the credentials by comparing the hashed password with the stored hash.
-   - Upon successful authentication, the server creates a session or issues a token for the user.
-
-3. **Session Management**:
-   - For session-based authentication, a session ID is stored on the server and a cookie is sent to the client.
-   - For token-based authentication, the token is included in the HTTP headers of each request to authenticate the user.
-
-4. **Authorization/Access Control**:
-   - Determine what actions or resources a user can access based on their role or permissions.
+    User->>FE: 15. Request protected resource
+    activate FE
+    FE->>HTTP: 16. GET /api/data<br/>Cookie: jwt_token (auto-sent)
+    activate HTTP
+    HTTP->>BE: 17. Request with JWT cookie
+    deactivate HTTP
+    activate BE
+    
+    BE->>BE: 18. @token_required decorator<br/>Decode JWT, verify signature<br/>Extract user from payload
+    
+    BE->>DB: 19. Validate user exists
+    activate DB
+    DB-->>BE: 20. User data
+    deactivate DB
+    
+    BE->>HTTP: 21. HTTP Response 200<br/>Body: requested data
+    activate HTTP
+    HTTP-->>FE: 22. Protected data
+    deactivate HTTP
+    FE->>User: 23. Display data
+    deactivate BE
+    deactivate FE
+```
 
 ## Frontend HTML
 
@@ -248,8 +290,6 @@ def token_required(roles=None):
 
     return decorator
 
-
-
 ```
 
 To summarize, the global variable `g.current_user` allows us to access and update user information  if they are logged in with the decorator `@token_required()`. This helps us avoid other, more tedious methods, like using local storage to store id information or decoding JWT tokens; The magic of a token being passed with every HTTP request allows us to use a decorator to obtain user information through `@token_required()`.   FYI, if the user isn't logged in, they won't be able to obtain information from the function guarded by the `@token_required()` decorator.
@@ -276,14 +316,15 @@ Since the backend code is done for us, all we need is the frontend API layer to 
             }
         };
         login(options);
-    }```
+    }
+</script>
 ```
 
 If you looked at the sign up code, you might have noticed the same import statement from the frontend `API Service Layer`. You also might notice that the frontend `API Service Layer` is a lot shorter than the sign-up code. Why is that?
 
 If we look closely, we see that login is imported from config.js. Let's take a look at config.js.
 
-```python
+```javascript
 export var pythonURI;
 if (location.hostname === "localhost") {
         pythonURI = "http://localhost:8587";
@@ -355,28 +396,26 @@ Check out [this link](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 
 As you can see in the HTTP Request, the method is a POST, which corresponds to the method in the backend. It's important that we use the correct method for our specific API endpoint, or we will get errors. For example, for the _Security , the api endpoint is api/authenticate. Therefore, the correct api endpoint we should use is the request  is `/api/authenticate`.
 
-Here's the code in the backend API that sets up in endpoint:
+Here's the code in the backend API that sets up the endpoint:
 
-``` python
-user_api = Blueprint('user_api', __name__,  
-
-                   url_prefix='/api')
-
+```python
+user_api = Blueprint('user_api', __name__,
+                     url_prefix='/api')
 ```
 
-This code is for the user.py file under the api directory and is 'api' is  prefix for all api endpoints in user.py file. It is in the beginning of the user.py file.
+This code is for the user.py file under the api directory. The 'api' prefix is applied to all endpoints in the user.py file and is defined at the beginning of the file.
 
-``` python
+```python
 api.add_resource(_Security, '/authenticate')
 ```
 
-This adds the /authenticate to the the _Security class endpoint. Therefore,  the api endpoint is `api/user`
+This adds '/authenticate' to the _Security class endpoint. Therefore, the full API endpoint is `/api/authenticate`
 
 You can try using  [Postman](https://learning.postman.com/docs/introduction/overview/) to test out your  backend API on flask_2025 before starting this part! If you're running flask_2025 locally add the `api/user` to the [localhost](https://blog.hubspot.com/website/what-is-localhost#:~:text=Typically%2C%20you%20can%20access%20the,running%20on%20the%20same%20device.) link.
 
 ## Error Handling
 
-What does the try/catch error block do in the login function for config.js? The try block attempts to `send a payload` to the backend inorder to `process the response`.  If the payload is incorrectly formatted, or there is any other issue with the request, an error will be thrown. The catch block catches this error and logs an appropriate message to the console.
+What does the try/catch error block do in the login function for config.js? The try block attempts to `send a payload` to the backend in order to `process the response`.  If the payload is incorrectly formatted, or there is any other issue with the request, an error will be thrown. The catch block catches this error and logs an appropriate message to the console.
 
 > What's an example of an error we talked about?
 
@@ -386,16 +425,74 @@ Developers can always check the console and use Postman to understand how to deb
 
 In this case, we have a login message element that details the error so text pops up on their screen when they make a mistake.  However, alerting the user might be a viable option as well.
 
-# Conclusion
+## Glossary of Key Terms
 
-In this tutorial, we covered the essential steps to create a functional login page using Flask. Here's a quick recap of what we accomplished:
+### Authentication Concepts
 
-- **Understanding Authentication:** We discussed the importance of authentication in web applications and how it ensures that only authorized users can access specific resources.
-- **Using Flask:** We set up a basic Flask application, highlighting its simplicity and power for building web applications.
-- **Designing and Implementing a User Login Form:** We created a user-friendly login form using HTML.
-- **Validating Login Credentials:** We implemented backend logic to validate user credentials, ensuring proper authentication.
-- **Connecting Frontend to Backend:** We integrated the frontend login form with the backend Flask application using API calls, enabling seamless communication between the two.
+- **Authentication**: The process of verifying the identity of a user or system by checking credentials (usernames, passwords) to confirm their identity before granting access.
 
-By following this guide, you now have a solid foundation for creating a secure login system in Flask. This knowledge can be extended to implement other authentication features such as registration, password reset, and user roles. With Flask's versatility and your new skills, you're well-equipped for your project!
+- **Authorization/Access Control**: Determines what actions or resources an authenticated user can access based on their role or permissions.
+
+- **Credentials**: Information used to verify identity, such as usernames, passwords, and sometimes additional factors like security questions or biometrics.
+
+- **Session Management**: Mechanism to keep track of authenticated users and manage their interactions with the web application. Sessions can involve storing session data on the server or using tokens to identify users.
+
+- **Token-Based Authentication**: A method where users receive a token (like JWT) upon successful login. This token is sent with each request to authenticate the user without re-submitting credentials.
+
+### Security & Cryptography
+
+- **Password Hashing**: Storing passwords securely by converting them into a hash using cryptographic algorithms. This ensures plain-text passwords are never stored in the database. (See `set_password` function in user.py model directory)
+
+- **JWT (JSON Web Token)**: A compact, URL-safe token format for transmitting claims between parties. Consists of three parts: header, payload, and signature. Used for stateless authentication.
+
+- **HS256 Algorithm**: HMAC with SHA-256 hashing algorithm used to sign JWT tokens with a secret key, ensuring token integrity and authenticity.
+
+- **httpOnly Cookie**: A cookie flag that prevents JavaScript from accessing the cookie, protecting against XSS (Cross-Site Scripting) attacks.
+
+- **Secure Cookie**: A cookie flag that ensures the cookie is only transmitted over HTTPS connections, protecting against man-in-the-middle attacks.
+
+- **SameSite Cookie**: A cookie attribute that controls whether cookies are sent with cross-site requests, helping prevent CSRF (Cross-Site Request Forgery) attacks.
+
+### HTTP & Web Concepts
+
+- **CORS (Cross-Origin Resource Sharing)**: A security feature that allows or restricts resources on a web server to be requested from another domain. Essential for frontend-backend communication across different origins.
+
+- **credentials: 'include'**: A fetch option that tells the browser to include cookies and authorization headers with cross-origin requests.
+
+- **HTTP Status Codes**:
+  - **200 OK**: Successful request
+  - **401 Unauthorized**: Authentication required or failed
+  - **403 Forbidden**: User authenticated but lacks permissions
+  - **500 Internal Server Error**: Server-side error during processing
+
+### Flask-Specific Terms
+
+- **@token_required Decorator**: A Python decorator that guards API endpoints by validating JWT tokens in request cookies before allowing access to protected routes.
+
+- **Flask g Object**: A global object that stores data for the duration of a single request. Used to store `current_user` after JWT validation, making user data accessible throughout the request lifecycle.
+
+- **Blueprint**: Flask's way of organizing related routes. The `user_api` Blueprint groups all user-related endpoints under the `/api` prefix.
+
+- **Resource Class**: Flask-RESTful's way of defining API endpoints. Each HTTP method (GET, POST, PUT, DELETE) becomes a class method.
+
+### Workflow Stages
+
+1. **User Registration**: Users create an account by providing information (username, password). Passwords are hashed and stored securely in the database.
+
+2. **User Login**: Users provide credentials, server verifies by comparing hashed password with stored hash, then creates a session or issues a JWT token.
+
+3. **Session/Token Management**: For session-based auth, a session ID is stored on the server and a cookie sent to client. For token-based auth, the JWT is included in request cookies.
+
+4. **Protected Route Access**: Subsequent requests include the JWT cookie, which is validated by the `@token_required` decorator before granting access to protected resources.
+
+## Next Steps
+
+You now have a solid foundation for creating secure login systems in Flask. This knowledge can be extended to implement:
+
+- User registration and profile management
+- Password reset functionality
+- Role-based access control (RBAC)
+- Multi-factor authentication (MFA)
+- OAuth integration (Google, GitHub, etc.)
 
 Happy coding!

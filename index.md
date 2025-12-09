@@ -6,7 +6,7 @@ sprite: /images/mario_animation.png
 permalink: /
 microblog: true
 inbox: true
-# admin: true
+admin: true
 hide: true
 ---
 
