@@ -920,7 +920,7 @@
     // Send POST request to grades API to create a new grade
     try {
       console.log('Submitting grade data:', gradeData);
-      const response = await fetch('http://localhost:8585/api/grades', {
+      const response = await fetch(`${API_BASE}/api/grades`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -942,7 +942,7 @@
       
       // Check if it's a network/CORS error
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        alert('Warning: Could not connect to grading API. Make sure the API server is running at http://localhost:8585. Your submission was saved locally.');
+        alert(`Warning: Could not connect to grading API at ${API_BASE}. Your submission was saved locally.`);
       } else {
         alert(`Warning: Could not submit to grading API (${errorMsg}). Your submission was saved locally.`);
       }
@@ -974,7 +974,8 @@
   async function loadGradingAssignments() {
     try {
       // Fetch all grades/submissions from the backend
-      const resp = await fetch('http://localhost:8585/api/grades', {
+      const resp = await fetch(`${API_BASE}/api/grades`, {
+
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -1365,7 +1366,7 @@
         submission: ctx.submission.submission_link || ctx.submission.text
       };
       
-      fetch(`http://localhost:8585/api/grades/${gradeId}`, {
+      fetch(`${API_BASE}/api/grades/${gradeId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
