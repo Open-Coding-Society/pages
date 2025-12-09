@@ -158,9 +158,89 @@
     // can override other themes consistently (Minima, Tailwind, etc.).
     document.documentElement.classList.add('user-theme-active');
 
+    // Inject CSS to override Tailwind classes with our theme colors
+    injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted);
+
     // Apply language translation if set
     const lang = prefs?.language || '';
     applyLanguage(lang);
+  }
+
+  function injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted) {
+    const styleId = 'user-theme-override-css';
+    let style = document.getElementById(styleId);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+    
+    // Override Tailwind's neutral background classes when theme is active
+    style.textContent = `
+      html.user-theme-active,
+      html.user-theme-active body {
+        background-color: ${bg} !important;
+        color: ${text} !important;
+        font-family: ${font} !important;
+        font-size: ${size}px !important;
+      }
+      
+      /* Main content areas */
+      html.user-theme-active .bg-neutral-900,
+      html.user-theme-active .bg-neutral-800 {
+        background-color: ${bg} !important;
+      }
+      
+      /* Sidebar and panels - slightly different shade */
+      html.user-theme-active .fixed.left-0.bg-neutral-800,
+      html.user-theme-active div[class*="bg-neutral-800"].border {
+        background-color: ${panel} !important;
+      }
+      
+      /* Cards and content blocks */
+      html.user-theme-active .rounded-lg.bg-neutral-800,
+      html.user-theme-active .p-4.rounded-lg.bg-neutral-800 {
+        background-color: ${panel} !important;
+      }
+      
+      /* Text colors */
+      html.user-theme-active .text-neutral-100,
+      html.user-theme-active .text-neutral-50,
+      html.user-theme-active .text-white {
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .text-neutral-400,
+      html.user-theme-active .text-neutral-500 {
+        color: ${textMuted} !important;
+      }
+      
+      /* Borders */
+      html.user-theme-active .border-neutral-700,
+      html.user-theme-active .border-neutral-600 {
+        border-color: ${uiBorder} !important;
+      }
+      
+      /* Accent colors for links and active states */
+      html.user-theme-active .text-blue-500,
+      html.user-theme-active .border-blue-500 {
+        color: ${accent} !important;
+        border-color: ${accent} !important;
+      }
+      
+      /* Input fields */
+      html.user-theme-active .bg-neutral-700 {
+        background-color: ${panel} !important;
+      }
+      
+      html.user-theme-active input,
+      html.user-theme-active select,
+      html.user-theme-active textarea {
+        background-color: ${panel} !important;
+        color: ${text} !important;
+        border-color: ${uiBorder} !important;
+      }
+    `;
   }
 
   // Google Translate integration
@@ -284,9 +364,75 @@
     }
   }
 
+  // Text-to-Speech functionality
+  function getTTSSettings() {
+    const prefs = loadStoredPreferences() || {};
+    return {
+      voice: prefs.ttsVoice || '',
+      rate: parseFloat(prefs.ttsRate) || 1,
+      pitch: parseFloat(prefs.ttsPitch) || 1,
+      volume: parseFloat(prefs.ttsVolume) || 1
+    };
+  }
+
+  function speak(text, options = {}) {
+    if (!('speechSynthesis' in window)) {
+      console.warn('Text-to-speech not supported in this browser');
+      return null;
+    }
+
+    // Cancel any ongoing speech
+    speechSynthesis.cancel();
+
+    const settings = getTTSSettings();
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // Apply saved voice
+    const voiceName = options.voice || settings.voice;
+    if (voiceName) {
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => v.name === voiceName);
+      if (voice) utterance.voice = voice;
+    }
+
+    // Apply settings (options override saved settings)
+    utterance.rate = options.rate !== undefined ? options.rate : settings.rate;
+    utterance.pitch = options.pitch !== undefined ? options.pitch : settings.pitch;
+    utterance.volume = options.volume !== undefined ? options.volume : settings.volume;
+
+    speechSynthesis.speak(utterance);
+    return utterance;
+  }
+
+  function speakSelection() {
+    const selection = window.getSelection();
+    const text = selection ? selection.toString().trim() : '';
+    if (text) {
+      speak(text);
+      return true;
+    }
+    return false;
+  }
+
+  function stopSpeaking() {
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+    }
+  }
+
+  function isSpeaking() {
+    return 'speechSynthesis' in window && speechSynthesis.speaking;
+  }
+
   function resetPreferences() {
     const root = document.documentElement;
     root.classList.remove('user-theme-active');
+
+    // Remove injected CSS
+    const overrideStyle = document.getElementById('user-theme-override-css');
+    if (overrideStyle) {
+      overrideStyle.remove();
+    }
 
     const props = [
       '--pref-bg-color',
@@ -338,6 +484,12 @@
     applyLanguage,
     PRESETS,
     LANGUAGES,
+    // TTS functions
+    speak,
+    speakSelection,
+    stopSpeaking,
+    isSpeaking,
+    getTTSSettings,
   };
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
