@@ -155,12 +155,6 @@
       </div>
     </div>
 
-    <!-- User ID (shown when not logged in) -->
-    <div id="uid-input-container" class="mb-4" style="display:none;">
-      <label class="block text-white font-semibold mb-2 text-sm">Your UID (Required if not logged in):</label>
-      <input type="text" id="submission-uid" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white; margin-bottom:12px;" placeholder="Enter your UID (e.g., STU001)" />
-    </div>
-
     <!-- Submission Link -->
     <div class="mb-4">
       <label class="block text-white font-semibold mb-2 text-sm">Submission Link (Required):</label>
@@ -816,40 +810,10 @@
     document.getElementById('submission-link').value = userGradeData.hacks_links?.[gamePath] || '';
     document.getElementById('submission-text').value = userGradeData.hacks_submissions?.[gamePath] || '';
     document.getElementById('submission-notes').value = userGradeData.hacks_notes?.[gamePath] || '';
-    document.getElementById('submission-uid').value = '';
     
     const modal = document.getElementById('submission-modal');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-
-    // Check if user is authenticated and show/hide UID input
-    // First check window.user (loaded by login.js), then try fetch
-    const uidContainer = document.getElementById('uid-input-container');
-    let userAuthenticated = false;
-    
-    if (window.user && window.user.uid) {
-      // Use credentials data already loaded
-      userAuthenticated = true;
-    } else {
-      // Try to fetch if window.user doesn't exist
-      try {
-        const userResp = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
-        if (userResp.ok) {
-          const userData = await userResp.json();
-          if (userData && userData.uid) {
-            userAuthenticated = true;
-            window.user = userData; // Store for future use
-          }
-        }
-      } catch (e) {
-        // Authentication check failed
-      }
-    }
-    
-    // Show UID input if not authenticated, hide if authenticated
-    if (uidContainer) {
-      uidContainer.style.display = userAuthenticated ? 'none' : 'block';
-    }
 
     // Render the rubric based on current user data
     renderSubmissionRubric();
@@ -878,7 +842,6 @@
     const link = document.getElementById('submission-link').value.trim();
     const text = document.getElementById('submission-text').value.trim();
     const notes = document.getElementById('submission-notes').value.trim();
-    const manualUid = document.getElementById('submission-uid').value.trim();
     
     if (!link) {
       alert('Please provide a submission link.');
@@ -897,12 +860,10 @@
     // Get user ID and class from credentials data (window.user loaded by login.js)
     let uid = null;
     let studentClass = 'A';
-    let userAuthenticated = false;
     
     // Always check window.user first (credentials data from console)
     if (window.user && window.user.uid) {
       uid = window.user.uid;
-      userAuthenticated = true;
       
       // Handle class: it's an array, use first element if available, otherwise use school
       if (window.user.class && Array.isArray(window.user.class) && window.user.class.length > 0) {
@@ -926,7 +887,6 @@
           if (userData && userData.uid) {
             window.user = userData; // Store for future use
             uid = userData.uid;
-            userAuthenticated = true;
             
             // Handle class array
             if (userData.class && Array.isArray(userData.class) && userData.class.length > 0) {
@@ -943,15 +903,10 @@
       }
     }
     
-    // If still not authenticated, require manual UID entry
-    if (!userAuthenticated) {
-      if (!manualUid) {
-        alert('Please enter your UID to submit (you are not logged in).');
-        return;
-      }
-      uid = manualUid;
-      const storedClass = localStorage.getItem('student_class');
-      if (storedClass) studentClass = storedClass;
+    // Require authentication - if no UID found, show error
+    if (!uid) {
+      alert('You must be logged in to submit. Please log in and try again.');
+      return;
     }
     
     // Prepare grade data for API
@@ -1019,36 +974,68 @@
   // -------------------------------
   async function loadGradingAssignments() {
     try {
-      const resp = await fetch(`${API_BASE}/api/assignment_submissions`, { credentials: 'include' });
-      if (!resp.ok) throw new Error('no assignments');
-      const payload = await resp.json();
-      gradingAssignments = payload.assignments || [];
-    } catch (err) {
-      gradingAssignments = [
-        {
-          id: 'animated-background',
-          title: 'Animated Background',
-          date: '2025-12-01',
-          submissions: [
-            {
-              id: 'alice-johnson',
-              student: 'Alice Johnson',
-              submitted_at: '2025-12-01T10:00:00Z',
-              text: "I completed all the onboarding tasks. Here is my introduction: Hi, I'm Alice and I love learning!",
-              rubric: JSON.parse(JSON.stringify(rubricTemplate)),
-              status: 'pending'
-            },
-            {
-              id: 'bob-smith',
-              student: 'Bob Smith',
-              submitted_at: '2025-12-01T09:30:00Z',
-              text: "Intro post plus screenshots attached.",
-              rubric: JSON.parse(JSON.stringify(rubricTemplate)),
-              status: 'pending'
-            }
-          ]
+      // Fetch all grades/submissions from the backend
+      const resp = await fetch('http://localhost:8585/api/grades', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
         }
-      ];
+      });
+      
+      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+      
+      const grades = await resp.json();
+      console.log('Fetched grades from backend:', grades);
+      
+      // Group submissions by assignment name
+      const assignmentsMap = new Map();
+      
+      // Handle both array and single object responses
+      const gradesArray = Array.isArray(grades) ? grades : (grades.data || [grades]);
+      
+      gradesArray.forEach(grade => {
+        const assignmentName = grade.assignment || 'Unnamed Assignment';
+        
+        // Create assignment if it doesn't exist
+        if (!assignmentsMap.has(assignmentName)) {
+          assignmentsMap.set(assignmentName, {
+            id: assignmentName.toLowerCase().replace(/\s+/g, '-'),
+            title: assignmentName,
+            date: grade.submitted_at ? new Date(grade.submitted_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            submissions: []
+          });
+        }
+        
+        const assignment = assignmentsMap.get(assignmentName);
+        
+        // Create submission object
+        const submission = {
+          id: grade.id?.toString() || `${grade.uid}-${Date.now()}`,
+          student: grade.uid || 'Unknown Student',
+          submitted_at: grade.submitted_at || new Date().toISOString(),
+          text: grade.submission || 'No submission link provided',
+          submission_link: grade.submission || '',
+          score: grade.score || 0,
+          course: grade.course || '',
+          rubric: grade.rubric || JSON.parse(JSON.stringify(rubricTemplate)),
+          status: (grade.score !== null && grade.score !== undefined && grade.score > 0) ? 'graded' : 'pending'
+        };
+        
+        assignment.submissions.push(submission);
+      });
+      
+      // Convert map to array
+      gradingAssignments = Array.from(assignmentsMap.values());
+      
+      // Sort assignments by date (newest first)
+      gradingAssignments.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      console.log('Grouped assignments:', gradingAssignments);
+      
+    } catch (err) {
+      console.error('Error loading grading assignments:', err);
+      // Fallback to empty array or mock data if needed
+      gradingAssignments = [];
     }
   }
 
@@ -1082,7 +1069,15 @@
                   ${sub.status === 'pending' ? 'Pending' : 'Graded'}
                 </span>
               </div>
-              <p class="text-gray-200 text-sm mb-3">${sub.text}</p>
+              ${sub.submission_link ? `
+                <div class="mb-3">
+                  <p class="text-gray-300 text-sm mb-1">Submission Link:</p>
+                  <a href="${sub.submission_link}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 text-sm break-all">
+                    ${sub.submission_link}
+                  </a>
+                </div>
+              ` : ''}
+              ${sub.score > 0 ? `<p class="text-gray-300 text-sm mb-3">Score: ${sub.score}</p>` : ''}
               <div class="flex items-center gap-3">
                 <button onclick="openGradingRubricModal('${assignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
                   Edit Rubric
@@ -1142,29 +1137,136 @@
 
   function renderGradingEdit(rubric) {
     const container = document.getElementById('grading-edit-categories');
-    container.innerHTML = rubric.categories.map((cat, idx) => `
+    container.innerHTML = rubric.categories.map((cat, idx) => {
+      // Calculate subcategory total for this category
+      const subTotal = cat.subcategories.reduce((sum, sub) => sum + (parseFloat(sub.weight) || 0), 0);
+      const catWeight = parseFloat(cat.weight) || 0;
+      const subTotalMatch = Math.abs(subTotal - catWeight) < 0.01; // Allow small floating point differences
+      
+      return `
       <div class="bg-gray-800 p-4 rounded-lg" data-gcat="${idx}">
         <div class="flex items-start gap-3 mb-3">
           <div class="flex-1">
             <label class="block text-white font-semibold mb-1 text-sm">Category</label>
-            <input type="text" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 mb-2" value="${cat.name}" data-gcat-name="${idx}">
-            <label class="block text-white font-semibold mb-1 text-sm">Weight</label>
-            <input type="number" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" value="${cat.weight}" data-gcat-weight="${idx}">
+            <input type="text" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 mb-2 category-name-input" value="${cat.name}" data-gcat-name="${idx}">
+            <div class="flex items-center gap-2 mb-2">
+              <label class="block text-white font-semibold text-sm">Weight:</label>
+              <input type="number" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 category-weight-input" value="${cat.weight}" data-gcat-weight="${idx}">
+              <span class="text-xs text-gray-400">Sub-total: <span class="category-subtotal" data-cat-subtotal="${idx}">${subTotal.toFixed(2)}</span></span>
+              ${!subTotalMatch ? '<span class="text-xs text-red-400 ml-2">⚠ Mismatch</span>' : '<span class="text-xs text-green-400 ml-2">✓</span>'}
+            </div>
           </div>
           <button onclick="removeGradingCategory(${idx})" style="padding:6px 12px; border-radius:6px; background-color:#ef4444; color:white; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">Remove</button>
         </div>
         <div class="space-y-2" data-gsubcontainer="${idx}">
           ${cat.subcategories.map((sub, sidx) => `
             <div class="flex items-center gap-2 bg-gray-700 p-2 rounded" data-gsub="${idx}-${sidx}">
-              <input type="text" class="flex-1 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm" value="${sub.name}" data-gsub-name="${idx}-${sidx}">
-              <input type="number" step="0.01" class="w-24 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm" value="${sub.weight}" data-gsub-weight="${idx}-${sidx}">
+              <input type="text" class="flex-1 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm sub-name-input" value="${sub.name}" data-gsub-name="${idx}-${sidx}">
+              <input type="number" step="0.01" class="w-24 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm sub-weight-input" value="${sub.weight}" data-gsub-weight="${idx}-${sidx}">
               <button onclick="removeGradingSub(${idx},${sidx})" style="padding:4px 8px; border-radius:4px; background-color:#ef4444; color:white; border:none; font-size:0.75rem; cursor:pointer;">×</button>
             </div>
           `).join('')}
         </div>
         <button onclick="addGradingSub(${idx})" style="padding:4px 12px; border-radius:6px; background-color:#6366f1; color:white; border:none; font-size:0.875rem; cursor:pointer; margin-top:8px;">+ Add Sub-criterion</button>
       </div>
-    `).join('');
+    `;
+    }).join('');
+    
+    // Add event listeners for real-time calculation
+    updateGradingCalculations();
+    attachGradingCalculationListeners();
+  }
+  
+  let isUpdatingCalculations = false;
+  
+  function updateGradingCalculations() {
+    if (isUpdatingCalculations) return; // Prevent infinite loops
+    isUpdatingCalculations = true;
+    
+    try {
+      // First, update category weights based on subcategory sums
+      document.querySelectorAll('[data-gcat]').forEach(catEl => {
+        const catIdx = parseInt(catEl.getAttribute('data-gcat'));
+        const subInputs = catEl.querySelectorAll('[data-gsub-weight]');
+        const subTotal = Array.from(subInputs).reduce((sum, input) => {
+          return sum + (parseFloat(input.value) || 0);
+        }, 0);
+        
+        // Automatically update category weight to match subcategory total
+        const catWeightInput = catEl.querySelector(`[data-gcat-weight="${catIdx}"]`);
+        if (catWeightInput) {
+          const currentValue = parseFloat(catWeightInput.value) || 0;
+          const newValue = subTotal.toFixed(2);
+          if (Math.abs(currentValue - subTotal) >= 0.01) {
+            catWeightInput.value = newValue;
+          }
+        }
+        
+        // Update display
+        const subtotalEl = catEl.querySelector(`[data-cat-subtotal="${catIdx}"]`);
+        if (subtotalEl) {
+          subtotalEl.textContent = subTotal.toFixed(2);
+          
+          // Remove old indicator and add new one (always green now since we auto-update)
+          const matchIndicator = subtotalEl.parentElement.querySelector('.text-red-400, .text-green-400');
+          if (matchIndicator) {
+            matchIndicator.remove();
+          }
+          const indicator = document.createElement('span');
+          indicator.className = 'text-xs text-green-400 ml-2';
+          indicator.textContent = '✓';
+          subtotalEl.parentElement.appendChild(indicator);
+        }
+      });
+      
+      // Then, update total points based on sum of all category weights
+      const categoryWeights = Array.from(document.querySelectorAll('[data-gcat-weight]')).reduce((sum, input) => {
+        return sum + (parseFloat(input.value) || 0);
+      }, 0);
+      
+      const totalPointsInput = document.getElementById('grading-total-points');
+      if (totalPointsInput) {
+        const currentTotal = parseFloat(totalPointsInput.value) || 0;
+        const newTotal = categoryWeights.toFixed(2);
+        if (Math.abs(currentTotal - categoryWeights) >= 0.01) {
+          totalPointsInput.value = newTotal;
+        }
+      }
+      
+      // Show total calculation (now always matching since we auto-update)
+      let totalDisplay = document.getElementById('grading-total-display');
+      if (!totalDisplay && totalPointsInput) {
+        totalDisplay = document.createElement('div');
+        totalDisplay.id = 'grading-total-display';
+        totalDisplay.className = 'text-sm text-gray-300 mt-2';
+        if (totalPointsInput.parentElement) {
+          totalPointsInput.parentElement.appendChild(totalDisplay);
+        }
+      }
+      if (totalDisplay) {
+        totalDisplay.innerHTML = `Category weights sum: <span class="text-green-400 font-semibold">${categoryWeights.toFixed(2)}</span> ✓`;
+      }
+    } finally {
+      isUpdatingCalculations = false;
+    }
+  }
+  
+  function attachGradingCalculationListeners() {
+    // Use event delegation on the modal container to handle dynamically added inputs
+    const modal = document.getElementById('grading-rubric-modal');
+    if (!modal) return;
+    
+    // Listen to all input changes within the modal (event delegation prevents duplicate listeners)
+    modal.addEventListener('input', (e) => {
+      if (e.target.matches('.sub-weight-input, .category-weight-input')) {
+        updateGradingCalculations();
+      }
+    });
+    modal.addEventListener('change', (e) => {
+      if (e.target.matches('.sub-weight-input, .category-weight-input')) {
+        updateGradingCalculations();
+      }
+    });
   }
 
   function addGradingCategory() {
@@ -1203,8 +1305,41 @@
     if (!currentRubricContext) return;
     const ctx = findSubmission(currentRubricContext.assignmentId, currentRubricContext.submissionId);
     if (!ctx) return;
+    
+    // Validate totals before saving
+    const validationErrors = [];
+    
+    // Check each category: subcategories should sum to category weight
+    document.querySelectorAll('[data-gcat]').forEach((catEl, catIdx) => {
+      const catWeight = parseFloat(catEl.querySelector(`[data-gcat-weight="${catIdx}"]`)?.value) || 0;
+      const subInputs = catEl.querySelectorAll('[data-gsub-weight]');
+      const subTotal = Array.from(subInputs).reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
+      
+      if (Math.abs(subTotal - catWeight) >= 0.01) {
+        const catName = catEl.querySelector(`[data-gcat-name="${catIdx}"]`)?.value || `Category ${catIdx + 1}`;
+        validationErrors.push(`${catName}: Subcategories sum (${subTotal.toFixed(2)}) doesn't match category weight (${catWeight.toFixed(2)})`);
+      }
+    });
+    
+    // Check total: all category weights should sum to total points
+    const totalPoints = parseFloat(document.getElementById('grading-total-points').value) || 0;
+    const categoryWeights = Array.from(document.querySelectorAll('[data-gcat-weight]')).reduce((sum, input) => {
+      return sum + (parseFloat(input.value) || 0);
+    }, 0);
+    
+    if (Math.abs(categoryWeights - totalPoints) >= 0.01) {
+      validationErrors.push(`Total points (${totalPoints.toFixed(2)}) doesn't match sum of category weights (${categoryWeights.toFixed(2)})`);
+    }
+    
+    // Show errors if any
+    if (validationErrors.length > 0) {
+      alert('Please fix the following errors before saving:\n\n' + validationErrors.join('\n'));
+      return;
+    }
+    
+    // Save if validation passes
     const rubric = getCurrentRubric();
-    rubric.total = parseFloat(document.getElementById('grading-total-points').value) || rubric.total;
+    rubric.total = totalPoints;
     rubric.categories = [];
     document.querySelectorAll('[data-gcat]').forEach((catEl, catIdx) => {
       const name = catEl.querySelector(`[data-gcat-name="${catIdx}"]`)?.value || 'Category';
@@ -1219,7 +1354,55 @@
       rubric.categories.push(category);
     });
     ctx.submission.rubric = rubric;
+    ctx.submission.score = totalPoints; // Update local score
     ctx.submission.status = 'graded';
+    
+    // Send PUT request to backend to update the grade
+    const gradeId = ctx.submission.id;
+    if (gradeId) {
+      const gradeData = {
+        uid: ctx.submission.student,
+        assignment: ctx.assignment.title,
+        score: totalPoints,
+        course: ctx.submission.course || '',
+        submission: ctx.submission.submission_link || ctx.submission.text
+      };
+      
+      fetch(`http://localhost:8585/api/grades/${gradeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(gradeData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => {
+            throw new Error(`API error: ${response.status} - ${text}`);
+          });
+        }
+        return response.json();
+      })
+      .then(result => {
+        console.log('Grade updated successfully:', result);
+        // Update local submission with backend response if needed
+        if (result.score !== undefined) {
+          ctx.submission.score = result.score;
+        }
+      })
+      .catch(error => {
+        console.error('Error updating grade to API:', error);
+        const errorMsg = error.message || 'Unknown error';
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          alert('Warning: Could not connect to grading API. The rubric was saved locally but may not be synced with the backend.');
+        } else {
+          alert(`Warning: Could not update grade in API (${errorMsg}). The rubric was saved locally but may not be synced with the backend.`);
+        }
+      });
+    } else {
+      console.warn('No grade ID found for submission, skipping API update');
+    }
+    
     closeGradingRubricModal();
     renderGradingAssignments();
   }
