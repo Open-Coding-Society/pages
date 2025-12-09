@@ -1,15 +1,15 @@
 ---
 toc: true
 layout: post
-title: 1.1-1.4 Team Test
-description: Create a video and build a notebook to review all the key questions from Big Idea 1
-courses: { csp: {week: 14} }
-type: collab
+title:  Team Review and Video 
+description: Create a video and build a notebook to review all the key questions from Big Idea 1 and Create Performance Task
+permalink: /sprint4/retrospective
+courses: { csp: {week: 16} }
 ---
 
 ## Make a Video as a Team
 
-Test will be conducted by creating a video.  Make sure video has segments with transition pages.  Have each member of Agile Team in at least 1 segment.  Edit video effectively and try to keep it under 4 minutes.  The video can instruct user to pause and interact with a Jupyter Notebook, this does not count against video time.
+A review will be conducted by creating a video.  Make sure video has segments with transition pages.  Have each member of Agile Team in at least 1 segment.  Edit video effectively and try to keep it under 4 minutes.  The video can instruct user to pause and interact with a Jupyter Notebook or application, this does not count against video time.
 
 ### Collaboration Review
 
