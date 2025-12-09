@@ -503,7 +503,7 @@ comments: false
     toggleAddGroup();
   };
 
-  window.saveNewGroup = function () {
+  window.saveNewGroup = async function () {
     const name = document.getElementById("newGroupName").value.trim();
     const period = document.getElementById("newGroupPeriod").value;
     const className = document.getElementById("newGroupClass").value;
@@ -547,21 +547,39 @@ comments: false
       }
     }
 
+    // const response = await fetch(`${javaURI}/api/groups`);
     const newGroup = {
       id: allGroups.length + 1,
       name,
       period,
-      class: className,
-      periodAdmin: !!periodAdminChecked,
+      // class: className,
+      // periodAdmin: !!periodAdminChecked,
       members: members.map((memberName, index) => ({
         id: index + 1,
-        name: memberName
+        uid: "...",
+        name: memberName,
+        email: "..."
       }))
     };
 
-    allGroups.push(newGroup);
-    cancelAddGroup();
-    renderGroups();
+    // allGroups.push(newGroup);
+
+    try {
+      const response = await fetch(`${javaURI}/api/groups`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newGroup)
+      });
+
+      if (!response.ok) throw new Error('Failed to add group');
+
+      renderGroups();
+
+    } catch (error) {
+        console.error('Error adding group:', error);
+        alert('Error adding group. Please try again.');
+    }
 
     alert(`Group "${name}" created successfully!`);
   };
