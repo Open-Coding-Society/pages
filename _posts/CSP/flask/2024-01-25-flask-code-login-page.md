@@ -6,6 +6,7 @@ permalink: /flask-code-login
 author: Isabel Marilla
 menu: nav/flask.html
 toc: True
+courses: {'csp': {'week': 15}}
 ---
 
 ## Introduction
