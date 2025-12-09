@@ -837,9 +837,513 @@ layout: post
     }
   }
 
+  .leaderboard-container {
+ background: #111111;
+ border: 1px solid #1f1f1f;
+ border-radius: 16px;
+ padding: 32px;
+ margin-bottom: 24px;
+}
 
 
+.leaderboard-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-bottom: 24px;
+ flex-wrap: wrap;
+ gap: 16px;
+}
 
+
+.leaderboard-header h2 {
+ color: #ffffff;
+ margin: 0;
+}
+
+
+.leaderboard-controls {
+ display: flex;
+ gap: 12px;
+}
+
+
+.leaderboard-stats-overview {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+ gap: 16px;
+ margin-bottom: 32px;
+}
+
+
+.stat-card {
+ background: #0f0f0f;
+ border: 1px solid #2a2a2a;
+ border-radius: 12px;
+ padding: 20px;
+ display: flex;
+ align-items: center;
+ gap: 16px;
+ transition: all 0.2s;
+}
+
+
+.stat-card:hover {
+ border-color: #60a5fa;
+ transform: translateY(-2px);
+}
+
+
+.stat-icon {
+ font-size: 32px;
+ flex-shrink: 0;
+}
+
+
+.stat-content {
+ flex: 1;
+}
+
+
+.stat-label {
+ color: #999999;
+ font-size: 13px;
+ margin-bottom: 4px;
+}
+
+
+.stat-value {
+ color: #ffffff;
+ font-size: 24px;
+ font-weight: 600;
+}
+
+
+.leaderboard-table-container {
+ overflow-x: auto;
+ border-radius: 8px;
+ border: 1px solid #2a2a2a;
+}
+
+
+.leaderboard-table {
+ width: 100%;
+ border-collapse: collapse;
+}
+
+
+.leaderboard-table thead {
+ background: #0f0f0f;
+}
+
+
+.leaderboard-table th {
+ padding: 16px;
+ text-align: left;
+ color: #60a5fa;
+ font-weight: 600;
+ border-bottom: 2px solid #2a2a2a;
+}
+
+
+.leaderboard-table th.sortable {
+ cursor: pointer;
+ user-select: none;
+}
+
+
+.leaderboard-table th.sortable:hover {
+ color: #93c5fd;
+}
+
+
+.leaderboard-table tbody tr {
+ border-bottom: 1px solid #1f1f1f;
+ transition: background 0.2s;
+}
+
+
+.leaderboard-table tbody tr:hover {
+ background: #0f0f0f;
+}
+
+
+.leaderboard-table tbody tr.current-user {
+ background: rgba(96, 165, 250, 0.1);
+ border-left: 3px solid #60a5fa;
+}
+
+
+.leaderboard-table td {
+ padding: 16px;
+ color: #e0e0e0;
+}
+
+
+.rank-cell {
+ font-weight: 700;
+ font-size: 18px;
+}
+
+
+.rank-cell.top-3 {
+ color: #fbbf24;
+}
+
+
+.student-cell {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+}
+
+
+.student-avatar {
+ width: 36px;
+ height: 36px;
+ border-radius: 50%;
+ background: linear-gradient(135deg, #60a5fa, #3b82f6);
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: white;
+ font-weight: 600;
+}
+
+
+.badges-cell {
+ display: flex;
+ gap: 4px;
+}
+
+
+.badge-icon {
+ font-size: 20px;
+ opacity: 0.8;
+ transition: opacity 0.2s;
+}
+
+
+.badge-icon:hover {
+ opacity: 1;
+ transform: scale(1.2);
+}
+
+
+/* Analytics Dashboard */
+.analytics-dashboard {
+ background: #111111;
+ border: 1px solid #1f1f1f;
+ border-radius: 16px;
+ padding: 32px;
+}
+
+
+.analytics-dashboard h2 {
+ color: #ffffff;
+ margin-bottom: 24px;
+}
+
+
+.charts-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+ gap: 24px;
+}
+
+
+.chart-card {
+ background: #0f0f0f;
+ border: 1px solid #2a2a2a;
+ border-radius: 12px;
+ padding: 24px;
+}
+
+
+.chart-card h3 {
+ color: #ffffff;
+ margin: 0 0 20px 0;
+ font-size: 16px;
+}
+
+
+#quest-timeline {
+ max-height: 300px;
+ overflow-y: auto;
+}
+
+
+.timeline-item {
+ display: flex;
+ gap: 16px;
+ margin-bottom: 16px;
+ padding-bottom: 16px;
+ border-bottom: 1px solid #1f1f1f;
+}
+
+
+.timeline-item:last-child {
+ border-bottom: none;
+}
+
+
+.timeline-marker {
+ width: 12px;
+ height: 12px;
+ border-radius: 50%;
+ background: #60a5fa;
+ margin-top: 4px;
+ flex-shrink: 0;
+}
+
+
+.timeline-content {
+ flex: 1;
+}
+
+
+.timeline-title {
+ color: #e0e0e0;
+ font-weight: 600;
+ margin-bottom: 4px;
+}
+
+
+.timeline-date {
+ color: #999999;
+ font-size: 13px;
+}
+
+
+#activity-heatmap {
+ display: grid;
+ grid-template-columns: repeat(7, 1fr);
+ gap: 4px;
+ max-width: 400px;
+}
+
+
+.heatmap-cell {
+ aspect-ratio: 1;
+ border-radius: 2px;
+ background: #1a1a1a;
+ transition: all 0.2s;
+ cursor: pointer;
+}
+
+
+.heatmap-cell.level-0 { background: #1a1a1a; }
+.heatmap-cell.level-1 { background: #0e4429; }
+.heatmap-cell.level-2 { background: #006d32; }
+.heatmap-cell.level-3 { background: #26a641; }
+.heatmap-cell.level-4 { background: #39d353; }
+
+
+.heatmap-cell:hover {
+ transform: scale(1.1);
+ box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+}
+
+
+@media (max-width: 768px) {
+ .charts-grid {
+   grid-template-columns: 1fr;
+ }
+  .leaderboard-stats-overview {
+   grid-template-columns: repeat(2, 1fr);
+ }
+}
+
+.skills-achievements-section {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.skills-achievements-section h2 {
+  color: #ffffff;
+  font-size: 1.75rem;
+  margin: 0 0 8px 0;
+}
+
+.skills-achievements-section .section-subtitle {
+  color: #999999;
+  font-size: 0.95rem;
+  margin: 0 0 24px 0;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.achievement-card {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.achievement-card:hover {
+  border-color: #3a3a3a;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-card:hover::before {
+  opacity: 1;
+}
+
+.achievement-card.active-quests::before {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.achievement-card.certificates::before {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.achievement-card.tasks::before {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.achievement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.achievement-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.achievement-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.achievement-card.active-quests .achievement-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.achievement-card.certificates .achievement-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.achievement-card.tasks .achievement-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.achievement-label {
+  color: #999999;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.course-filter-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.course-filter-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-filter-btn:hover {
+  background: #1a1a1a;
+  border-color: #3a3a3a;
+}
+
+.course-filter-btn.active {
+  background: #1a1a1a;
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+/* Modal Analytics Button */
+.modal-action-buttons {
+  border-top: 1px solid #2a2a2a;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.modal-analytics-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-analytics-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
+}
+
+/* Mobile Responsive Overrides */
+@media (max-width: 768px) {
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .achievement-number {
+    font-size: 2rem;
+  }
+  
+  .skills-achievements-section {
+    padding: 24px 20px;
+  }
+}
 
 </style>
 
@@ -899,7 +1403,22 @@ layout: post
       <p class="achievement-label">Tasks Completed</p>
     </div>
   </div>
-
+  
+  <div class="course-filter-buttons">
+    <button class="course-filter-btn active" data-course-filter="all">
+      <i class="fas fa-th"></i> All Quests
+    </button>
+    <button class="course-filter-btn" data-course-filter="csa">
+      <i class="fas fa-shield-alt"></i> CSA
+    </button>
+    <button class="course-filter-btn" data-course-filter="csp">
+      <i class="fas fa-clock"></i> CSP
+    </button>
+    <button class="course-filter-btn" data-course-filter="csse">
+      <i class="fas fa-puzzle-piece"></i> CSSE
+    </button>
+  </div>
+</div>
 
 {% if page.certificates %}
   {% include certificate_overview.html certificates=page.certificates %}
@@ -1244,6 +1763,30 @@ layout: post
       
     </div>
   </div>
+<div id="progression-modal">
+  <div id="progression-modal">
+    <div>
+      <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
+      <h2>Week <span id="modal-week-number"></span> Progress</h2>
+      <p class="week-theme" id="modal-week-theme"></p>
+  
+      <div class="progress-bar-container" style="margin-bottom: 16px;">
+        <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
+      </div>
+  
+      <div id="task-list"></div>
+  
+      <div id="certificate-status" style="margin-top: 24px;"></div>
+      
+      <div class="modal-action-buttons">
+        <button id="modal-analytics-btn" class="modal-analytics-btn">
+          <i class="fas fa-chart-line"></i>
+          My Analytics
+        </button>
+      </div>
+      
+    </div>
+  </div>
 
 <!-- ============================= -->
 <!--   CERTIFICATE LIST MODAL      -->
@@ -1394,10 +1937,25 @@ layout: post
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
      
-
-
-
-
+     const stats = initializeUserStats();
+     const weekCard = button.closest('.week-card');
+     const weekNum = extractWeekNumber(weekCard);
+    
+     // Recalculate totals
+     const allItems = document.querySelectorAll('.item-card');
+     stats.totalItems = allItems.length;
+     stats.totalCompleted = Array.from(allItems).filter(c => c.classList.contains('completed')).length;
+    
+     updateStreaks(stats);
+     updateWeeklyProgress(stats, weekNum);
+     calculateXP(stats);
+     saveUserStats(stats);
+    
+     refreshLeaderboardDisplay();
+     initializeCharts();
+     
+     // NEW: Update achievements display
+     updateAchievementsDisplay();
 
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
@@ -1975,13 +2533,72 @@ layout: post
     });
   }
 
+  // ============================================
+  // NEW: PROFESSIONAL SKILLS ACHIEVEMENTS TRACKING
+  // ============================================
 
+  function updateAchievementsDisplay() {
+    const completionData = loadCompletionData();
+    
+    // Count active quests (weeks that are started but not complete)
+    let activeQuests = 0;
+    document.querySelectorAll('.week-card').forEach(weekCard => {
+      const items = weekCard.querySelectorAll('.item-card');
+      const completed = Array.from(items).filter(item => 
+        completionData[item.dataset.itemId]
+      ).length;
+      
+      // Active = has some completion but not all
+      if (completed > 0 && completed < items.length) {
+        activeQuests++;
+      }
+    });
+    
+    // Count certificates earned
+    const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
+    let earnedCerts = [];
+    try {
+      earnedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
+    } catch(e) {
+      earnedCerts = [];
+    }
+    
+    // Count total tasks completed
+    const totalCompleted = Object.values(completionData).filter(Boolean).length;
+    
+    // Update display
+    const activeEl = document.getElementById('active-quests-count');
+    const certsEl = document.getElementById('certificates-earned-count');
+    const tasksEl = document.getElementById('tasks-completed-count');
+    
+    if (activeEl) activeEl.textContent = activeQuests;
+    if (certsEl) certsEl.textContent = earnedCerts.length;
+    if (tasksEl) tasksEl.textContent = totalCompleted;
+  }
 
+  // Setup Analytics Button
+  function setupAnalyticsButton() {
+    const analyticsBtn = document.getElementById('modal-analytics-btn');
+    if (analyticsBtn) {
+      analyticsBtn.addEventListener('click', () => {
+        closeProgressionModal();
+        window.location.href = `${window.location.origin}/leaderboard?course=${CURRENT_COURSE}`;
+      });
+    }
+  }
 
-
-
-
-  
+  // Setup Course Filters
+  function setupCourseFilters() {
+    const filterButtons = document.querySelectorAll('.course-filter-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const courseFilter = btn.dataset.courseFilter;
+        console.log('Filter selected:', courseFilter);
+      });
+    });
+  }
 
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
@@ -1991,11 +2608,39 @@ layout: post
     initializeCertificateSystem();
     renderWeekSkillPreviews();
     
-
-
-
-
+    // NEW: Initialize achievements
+    updateAchievementsDisplay();
+    setupAnalyticsButton();
+    setupCourseFilters();
     
+    // NEW: Refresh analytics button when modal opens
+    document.querySelectorAll('.progression-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(setupAnalyticsButton, 100);
+      });
+    });
+    
+    // Prompt for username if not set (still needed for tracking)
+    if (!localStorage.getItem('student-username')) {
+      const username = prompt('Enter your name for the leaderboard:');
+      if (username) {
+        localStorage.setItem('student-username', username);
+        const stats = initializeUserStats();
+        stats.username = username;
+        saveUserStats(stats);
+      }
+    }
   });
 
+  // Lightweight mobile detection redirect to /mobile/ (only for small screens)
+  (function(){
+    try {
+      if (window.matchMedia('(max-width: 640px)').matches && !window.location.pathname.startsWith('/mobile')) {
+        // Avoid interfering with user-agent previews and bots
+        if (!navigator.userAgent.includes('Slackbot') && !navigator.userAgent.includes('Twitterbot')) {
+          window.location.replace('/mobile/');
+        }
+      }
+    } catch(e){}
+  })();
 </script>
