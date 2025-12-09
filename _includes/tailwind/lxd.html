@@ -155,6 +155,12 @@
       </div>
     </div>
 
+    <!-- Submission Link -->
+    <div class="mb-4">
+      <label class="block text-white font-semibold mb-2 text-sm">Submission Link (Required):</label>
+      <input type="url" id="submission-link" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white; margin-bottom:12px;" placeholder="https://example.com/your-work" />
+    </div>
+
     <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white; margin-bottom:12px;" placeholder="Write your submission here..."></textarea>
 
     <!-- Additional Notes Section -->
@@ -302,6 +308,7 @@
     hacks_completed: {},
     hacks_submissions: {},
     hacks_notes: {}, // Store additional notes
+    hacks_links: {}, // Store submission links
     rubric: DEFAULT_RUBRIC // Store the rubric that applies to this student
   };
   
@@ -330,11 +337,12 @@
         const data = await response.json();
         isAuthenticated = true;
         isAdmin = true; // admin requirement disabled for now
-        userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, rubric: DEFAULT_RUBRIC };
+        userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, hacks_links: {}, rubric: DEFAULT_RUBRIC };
         if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
         if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
         if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
         if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
+        if (!userGradeData.hacks_links) userGradeData.hacks_links = {};
         if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
         rubricTemplate = userGradeData.rubric || DEFAULT_RUBRIC;
         console.log('Loaded from backend:', userGradeData);
@@ -355,14 +363,15 @@
           if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
           if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
           if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
+          if (!userGradeData.hacks_links) userGradeData.hacks_links = {};
           if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
           console.log('Loaded from localStorage:', userGradeData);
         } catch (e) {
           console.error('Error parsing localStorage data:', e);
-          userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, rubric: DEFAULT_RUBRIC };
+          userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, hacks_links: {}, rubric: DEFAULT_RUBRIC };
         }
       } else {
-        userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, rubric: DEFAULT_RUBRIC };
+        userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, hacks_links: {}, rubric: DEFAULT_RUBRIC };
       }
       return false;
     }
@@ -798,6 +807,7 @@
   // Open submission modal
   window.openSubmissionModal = function(gamePath) {
     currentHackToSubmit = gamePath;
+    document.getElementById('submission-link').value = userGradeData.hacks_links?.[gamePath] || '';
     document.getElementById('submission-text').value = userGradeData.hacks_submissions?.[gamePath] || '';
     document.getElementById('submission-notes').value = userGradeData.hacks_notes?.[gamePath] || '';
     
@@ -829,17 +839,89 @@
   
   // Submit hack
   window.submitHack = async function() {
+    const link = document.getElementById('submission-link').value.trim();
     const text = document.getElementById('submission-text').value.trim();
     const notes = document.getElementById('submission-notes').value.trim();
+    
+    if (!link) {
+      alert('Please provide a submission link.');
+      return;
+    }
     
     if (!text) {
       alert('Please write something before submitting.');
       return;
     }
     
+    // Get assignment name from the current hack
+    const topic = HACK_TOPICS.find(t => t.Game === currentHackToSubmit);
+    const assignmentName = topic ? topic.Title : currentHackToSubmit;
+    
+    // Get user ID and class - try from API first, then localStorage, then use defaults
+    let uid = 'STU001';
+    let studentClass = 'A';
+    
+    try {
+      const userResp = await fetch(`${API_BASE}/api/user`, { credentials: 'include' });
+      if (userResp.ok) {
+        const userData = await userResp.json();
+        uid = userData.uid || uid;
+        studentClass = userData.class || userData.className || studentClass;
+      }
+    } catch (e) {
+      // Try localStorage
+      const storedUid = localStorage.getItem('student_uid');
+      const storedClass = localStorage.getItem('student_class');
+      if (storedUid) uid = storedUid;
+      if (storedClass) studentClass = storedClass;
+    }
+    
+    // Prepare grade data for API
+    const gradeData = {
+      uid: uid,
+      assignment: assignmentName,
+      score: 0, // Start with 0 until graded
+      course: studentClass, // Backend uses 'course' not 'class'
+      submission: link
+    };
+    
+    // Send POST request to grades API to create a new grade
+    try {
+      console.log('Submitting grade data:', gradeData);
+      const response = await fetch('http://localhost:8585/api/grades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(gradeData)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API response error:', response.status, errorText);
+        throw new Error(`API error: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Grade submitted successfully:', result);
+    } catch (error) {
+      console.error('Error submitting grade to API:', error);
+      const errorMsg = error.message || 'Unknown error';
+      
+      // Check if it's a network/CORS error
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        alert('Warning: Could not connect to grading API. Make sure the API server is running at http://localhost:8585. Your submission was saved locally.');
+      } else {
+        alert(`Warning: Could not submit to grading API (${errorMsg}). Your submission was saved locally.`);
+      }
+    }
+    
+    // Store locally
     if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
     if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
+    if (!userGradeData.hacks_links) userGradeData.hacks_links = {};
     
+    userGradeData.hacks_links[currentHackToSubmit] = link;
     userGradeData.hacks_submissions[currentHackToSubmit] = text;
     userGradeData.hacks_notes[currentHackToSubmit] = notes;
     
