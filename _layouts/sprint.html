@@ -1200,6 +1200,196 @@ layout: post
  }
 }
 
+.skills-achievements-section {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.skills-achievements-section h2 {
+  color: #ffffff;
+  font-size: 1.75rem;
+  margin: 0 0 8px 0;
+}
+
+.skills-achievements-section .section-subtitle {
+  color: #999999;
+  font-size: 0.95rem;
+  margin: 0 0 24px 0;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.achievement-card {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.achievement-card:hover {
+  border-color: #3a3a3a;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-card:hover::before {
+  opacity: 1;
+}
+
+.achievement-card.active-quests::before {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.achievement-card.certificates::before {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.achievement-card.tasks::before {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.achievement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.achievement-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.achievement-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.achievement-card.active-quests .achievement-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.achievement-card.certificates .achievement-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.achievement-card.tasks .achievement-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.achievement-label {
+  color: #999999;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.course-filter-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.course-filter-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-filter-btn:hover {
+  background: #1a1a1a;
+  border-color: #3a3a3a;
+}
+
+.course-filter-btn.active {
+  background: #1a1a1a;
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+/* Modal Analytics Button */
+.modal-action-buttons {
+  border-top: 1px solid #2a2a2a;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.modal-analytics-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-analytics-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
+}
+
+/* Mobile Responsive Overrides */
+@media (max-width: 768px) {
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .achievement-number {
+    font-size: 2rem;
+  }
+  
+  .skills-achievements-section {
+    padding: 24px 20px;
+  }
+}
 
 </style>
 
@@ -1223,6 +1413,58 @@ layout: post
     <a href="{{ site.baseurl }}/leaderboard?course={{ page.course }}" class="filter-btn leaderboard-link">
       <i class="fas fa-trophy"></i> View Leaderboard
     </a>
+  </div>
+</div>
+
+<div class="skills-achievements-section">
+  <h2>Professional Skills Achievements</h2>
+  <p class="section-subtitle">Complete quests to unlock LinkedIn-ready certificates</p>
+  
+  <div class="achievements-grid">
+    <div class="achievement-card active-quests">
+      <div class="achievement-header">
+        <div class="achievement-number" id="active-quests-count">0</div>
+        <div class="achievement-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+      </div>
+      <p class="achievement-label">Active Quests</p>
+    </div>
+    
+    <div class="achievement-card certificates">
+      <div class="achievement-header">
+        <div class="achievement-number" id="certificates-earned-count">0</div>
+        <div class="achievement-icon">
+          <i class="fas fa-award"></i>
+        </div>
+      </div>
+      <p class="achievement-label">Certificates Earned</p>
+    </div>
+    
+    <div class="achievement-card tasks">
+      <div class="achievement-header">
+        <div class="achievement-number" id="tasks-completed-count">0</div>
+        <div class="achievement-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+      <p class="achievement-label">Tasks Completed</p>
+    </div>
+  </div>
+  
+  <div class="course-filter-buttons">
+    <button class="course-filter-btn active" data-course-filter="all">
+      <i class="fas fa-th"></i> All Quests
+    </button>
+    <button class="course-filter-btn" data-course-filter="csa">
+      <i class="fas fa-shield-alt"></i> CSA
+    </button>
+    <button class="course-filter-btn" data-course-filter="csp">
+      <i class="fas fa-clock"></i> CSP
+    </button>
+    <button class="course-filter-btn" data-course-filter="csse">
+      <i class="fas fa-puzzle-piece"></i> CSSE
+    </button>
   </div>
 </div>
 
@@ -1376,20 +1618,29 @@ layout: post
 <!--   PROGRESSION MODAL (DARK)   -->
 <!-- ============================= -->
 <div id="progression-modal">
-  <div>
-    <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
-    <h2>Week <span id="modal-week-number"></span> Progress</h2>
-    <p class="week-theme" id="modal-week-theme"></p>
-
-    <div class="progress-bar-container" style="margin-bottom: 16px;">
-      <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
+  <div id="progression-modal">
+    <div>
+      <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
+      <h2>Week <span id="modal-week-number"></span> Progress</h2>
+      <p class="week-theme" id="modal-week-theme"></p>
+  
+      <div class="progress-bar-container" style="margin-bottom: 16px;">
+        <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
+      </div>
+  
+      <div id="task-list"></div>
+  
+      <div id="certificate-status" style="margin-top: 24px;"></div>
+      
+      <div class="modal-action-buttons">
+        <button id="modal-analytics-btn" class="modal-analytics-btn">
+          <i class="fas fa-chart-line"></i>
+          My Analytics
+        </button>
+      </div>
+      
     </div>
-
-    <div id="task-list"></div>
-
-    <div id="certificate-status" style="margin-top: 24px;"></div>
   </div>
-</div>
 
 <!-- ============================= -->
 <!--   CERTIFICATE LIST MODAL      -->
@@ -1635,6 +1886,9 @@ function updateWeeklyProgress(stats, weekNum) {
     
      refreshLeaderboardDisplay();
      initializeCharts();
+     
+     // NEW: Update achievements display
+     updateAchievementsDisplay();
 
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
@@ -2434,6 +2688,73 @@ function updateWeeklyProgress(stats, weekNum) {
     });
   }
 
+  // ============================================
+  // NEW: PROFESSIONAL SKILLS ACHIEVEMENTS TRACKING
+  // ============================================
+
+  function updateAchievementsDisplay() {
+    const completionData = loadCompletionData();
+    
+    // Count active quests (weeks that are started but not complete)
+    let activeQuests = 0;
+    document.querySelectorAll('.week-card').forEach(weekCard => {
+      const items = weekCard.querySelectorAll('.item-card');
+      const completed = Array.from(items).filter(item => 
+        completionData[item.dataset.itemId]
+      ).length;
+      
+      // Active = has some completion but not all
+      if (completed > 0 && completed < items.length) {
+        activeQuests++;
+      }
+    });
+    
+    // Count certificates earned
+    const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
+    let earnedCerts = [];
+    try {
+      earnedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
+    } catch(e) {
+      earnedCerts = [];
+    }
+    
+    // Count total tasks completed
+    const totalCompleted = Object.values(completionData).filter(Boolean).length;
+    
+    // Update display
+    const activeEl = document.getElementById('active-quests-count');
+    const certsEl = document.getElementById('certificates-earned-count');
+    const tasksEl = document.getElementById('tasks-completed-count');
+    
+    if (activeEl) activeEl.textContent = activeQuests;
+    if (certsEl) certsEl.textContent = earnedCerts.length;
+    if (tasksEl) tasksEl.textContent = totalCompleted;
+  }
+
+  // Setup Analytics Button
+  function setupAnalyticsButton() {
+    const analyticsBtn = document.getElementById('modal-analytics-btn');
+    if (analyticsBtn) {
+      analyticsBtn.addEventListener('click', () => {
+        closeProgressionModal();
+        window.location.href = `${window.location.origin}/leaderboard?course=${CURRENT_COURSE}`;
+      });
+    }
+  }
+
+  // Setup Course Filters
+  function setupCourseFilters() {
+    const filterButtons = document.querySelectorAll('.course-filter-btn');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const courseFilter = btn.dataset.courseFilter;
+        console.log('Filter selected:', courseFilter);
+      });
+    });
+  }
+
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
@@ -2441,6 +2762,18 @@ function updateWeeklyProgress(stats, weekNum) {
     applyFilters();
     initializeCertificateSystem();
     renderWeekSkillPreviews();
+    
+    // NEW: Initialize achievements
+    updateAchievementsDisplay();
+    setupAnalyticsButton();
+    setupCourseFilters();
+    
+    // NEW: Refresh analytics button when modal opens
+    document.querySelectorAll('.progression-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(setupAnalyticsButton, 100);
+      });
+    });
     
     // Prompt for username if not set (still needed for tracking)
     if (!localStorage.getItem('student-username')) {
