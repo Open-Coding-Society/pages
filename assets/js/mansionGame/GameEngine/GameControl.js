@@ -1,6 +1,5 @@
 // GameControl.js with improved level transition handling
 import GameLevel from "./GameLevel.js";
-import PauseMenu from "../../PauseMenu.js";
 
 class GameControl {
     /**
@@ -18,9 +17,22 @@ class GameControl {
         this.currentLevel = null;
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
-        this.isPaused = false;
-        this.exitKeyListener = this.handleExitKey.bind(this);
-        this.pauseKeyListener = this.handlePauseKey.bind(this);
+    this.isPaused = false;
+    // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
+    this.pauseMenu = null;
+    // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
+    // Games can override these values if they want to count a different stat name/label.
+    this.pauseMenuOptions = {
+        counterVar: 'levelsCompleted',
+        counterLabel: 'Levels completed',
+        // Use a cumulative levels-completed counter instead of per-level counts
+        counterPerLevel: false
+    };
+    // use a unique storage key so stats are per-game
+    this.pauseMenuOptions.storageKey = 'pauseMenuStats:mansion';
+    this.skipKeyListener = this.handleSkipKey.bind(this);
+    this.exitKeyListener = this.handleExitKey.bind(this);
+    this.pauseKeyListener = this.handlePauseKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
         
@@ -33,14 +45,10 @@ class GameControl {
     
     start() {
         this.addExitKeyListener();
-        // Add listener for opening the pause menu (toggle with 'p')
+        // Add listener for opening the pause menu (toggle with 'p') and skip key (L)
         document.addEventListener('keydown', this.pauseKeyListener);
-        // Create a pause menu instance (attached to the game container)
-        try {
-            this.pauseMenu = new PauseMenu(this);
-        } catch (e) {
-            console.warn('PauseMenu could not be initialized:', e);
-        }
+        this.addSkipKeyListener();
+        // PauseMenu is initialized by the shared Game core (optional dynamic import).
         this.transitionToLevel();
     }
 
@@ -178,6 +186,23 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
+        // Increment configured per-game counter (PauseMenu displays this variable)
+        try {
+            const cv = (this.pauseMenuOptions && this.pauseMenuOptions.counterVar) || 'levelsCompleted';
+            const perLevel = (this.pauseMenuOptions && this.pauseMenuOptions.counterPerLevel) || false;
+            if (!this.stats) this.stats = {};
+            if (perLevel) {
+                if (!this.stats.levels) this.stats.levels = {};
+                const levelKey = (typeof this.currentLevelIndex !== 'undefined') ? String(this.currentLevelIndex) : ((this.currentLevel && this.currentLevel.id) || '0');
+                this.stats.levels[levelKey] = (this.stats.levels[levelKey] || 0) + 1;
+            } else {
+                this[cv] = (this[cv] || 0) + 1;
+                this.stats[cv] = this[cv];
+            }
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) { /* ignore */ }
+
         // Alert the user that the level has ended
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             alert("Level ended.");
@@ -205,7 +230,24 @@ class GameControl {
      */
     handleExitKey(event) {
         if (event.key === 'Escape') {
-            this.currentLevel.continue = false;
+            // If a PauseMenu has been registered, toggle it. Do NOT end level from Escape.
+            if (this.pauseMenu) {
+                try {
+                    const isHidden = this.pauseMenu.container && this.pauseMenu.container.getAttribute('aria-hidden') === 'true';
+                    if (isHidden) {
+                        this.pause();
+                        if (typeof this.pauseMenu.show === 'function') this.pauseMenu.show();
+                    } else {
+                        if (typeof this.pauseMenu.hide === 'function') this.pauseMenu.hide();
+                        this.resume();
+                    }
+                } catch (e) {
+                    console.warn('Error toggling pause menu:', e);
+                }
+            } else {
+                // fallback: end the level when no pause menu is present
+                this.currentLevel.continue = false;
+            }
         }
     }
 
@@ -224,6 +266,32 @@ class GameControl {
                 this.showPauseMenu();
             }
         }
+    }
+
+    /**
+     * Handle skip-level key (default: 'L')
+     */
+    handleSkipKey(event) {
+        // Don't interfere with typing in inputs
+        const tag = event.target && event.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
+
+        if (event.key === 'l' || event.key === 'L') {
+            // Call the public API to end/skip the level
+            try {
+                this.endLevel();
+            } catch (e) {
+                console.warn('Error skipping level via L key:', e);
+            }
+        }
+    }
+
+    addSkipKeyListener() {
+        document.addEventListener('keydown', this.skipKeyListener);
+    }
+
+    removeSkipKeyListener() {
+        document.removeEventListener('keydown', this.skipKeyListener);
     }
 
     showPauseMenu() {
@@ -257,6 +325,41 @@ class GameControl {
         // Recreate the same level
         this.currentLevel = null;
         this.transitionToLevel();
+    }
+    
+    /**
+     * End the current level (public API)
+     */
+    endLevel() {
+        if (this.currentLevel) {
+            this.currentLevel.continue = false;
+        }
+    }
+
+    /**
+     * Increment an arbitrary stat on this GameControl (keeps PauseMenu in sync if present)
+     */
+    incrementStat(statName, amount = 1) {
+        try {
+            this[statName] = (this[statName] || 0) + Number(amount || 0);
+            if (this.stats) this.stats[statName] = this[statName];
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('incrementStat error', e);
+        }
+    }
+
+    addPoints(amount = 0) {
+        try {
+            this.points = (this.points || 0) + Number(amount || 0);
+            if (!this.stats) this.stats = { points: this.points };
+            this.stats.points = this.points;
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('addPoints error', e);
+        }
     }
     
     // Helper method to add exit key listener

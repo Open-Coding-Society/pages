@@ -1,7 +1,6 @@
-/* Simple pause menu styles (shared) */
 .pause-overlay {
   position: absolute;
-  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  inset: 0; 
   display: none;
   align-items: center;
   justify-content: center;
@@ -42,3 +41,45 @@
 .pause-btn.resume { background: linear-gradient(180deg,#3a8ef7,#1266d8); border: none; }
 .pause-btn.restart { background: linear-gradient(180deg,#e86b6b,#d43b3b); border: none; }
 .pause-btn.exit { background: linear-gradient(180deg,#666,#444); border: none; }
+
+/* Top counter showing levels completed */
+.pause-counter-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.pause-counter-label {
+  color: #bbb;
+  font-size: 0.9rem;
+}
+.pause-counter-number {
+  background: linear-gradient(180deg,#ffd166,#f7b733);
+  color: #111;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  min-width: 40px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* Stats area inside the panel */
+.pause-stats {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 8px 0 12px 0;
+}
+.pause-stat {
+  background: rgba(255,255,255,0.04);
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #ddd;
+  font-size: 0.95rem;
+}
+
+/* Make skip and exit buttons sit together */
+.pause-btn.skip-level, .pause-btn.exit { width: 48%; display: inline-block; }
+.pause-panel .pause-btn.skip-level { margin-right: 4%; }

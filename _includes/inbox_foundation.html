@@ -234,6 +234,7 @@ document.addEventListener('click', (e) => {
       controls.className = 'inbox-admin-controls';
       controls.style.display = 'none'; // Hidden by default, shown for admins
       controls.style.gap = '0.5rem';
+      controls.style.alignItems = 'center';
 
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
@@ -261,8 +262,21 @@ document.addEventListener('click', (e) => {
         if (confirm('Delete this announcement?')) el.remove();
       };
 
+      const markDoneBtn = document.createElement('button');
+      markDoneBtn.type = 'button';
+      markDoneBtn.className = 'microblog-btn-done';
+      markDoneBtn.title = 'Mark as done';
+      markDoneBtn.setAttribute('aria-label', 'Mark as done');
+      markDoneBtn.innerHTML = '&#10003;';
+      markDoneBtn.onclick = () => {
+        // visual toggle only for now
+        el.classList.toggle('inbox-done');
+        markDoneBtn.classList.toggle('done');
+      };
+
       controls.appendChild(editBtn);
       controls.appendChild(delBtn);
+      controls.appendChild(markDoneBtn);
       
       // Show controls if user is admin
       if (window.inboxUserIsAdmin) {

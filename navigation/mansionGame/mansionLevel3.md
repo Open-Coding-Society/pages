@@ -11,8 +11,9 @@ microblog: true
 </div>
 
 <script type="module">
-    // Adventure Game assets locations
-    import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
+    // Mansion Game assets locations (use central core + GameControl)
+    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/cheats.js";
     import GameLevel3 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -29,8 +30,8 @@ microblog: true
         gameLevelClasses: [GameLevel3]
 
     }
-    // Launch Adventure Game
-    const game = Game.main(environment);
+    // Launch Mansion Game using the central core and mansion GameControl
+    const game = Core.main(environment, GameControl);
     
     // Initialize cheats/navigation buttons
     initCheats(game);
