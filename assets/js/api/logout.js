@@ -6,7 +6,7 @@ export async function handleLogout() {
 
     // logout from python backend
     try {
-        await fetch(pythonURI + '/api/authenticate', {
+        await fetch(pythonURI + '/authenticate', {
             ...fetchOptions,
             method: 'DELETE'
         });
