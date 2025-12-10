@@ -10,8 +10,9 @@ permalink: /gamify/testWorld
 </div>
 
 <script type="module">
-    // Mansion Game assets locations
-    import Game from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/Game.js";
+    // Mansion Game assets locations (use central core + GameControl)
+    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/cheats.js";
     import GameLevelMain from "{{site.baseurl}}/assets/js/mansionGame/mansionLevelMain.js";
     import GameLevel1 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel1.js";
@@ -49,8 +50,8 @@ permalink: /gamify/testWorld
     * All other logic is controlled in the Cheats.js file.
     */
     
-    // Launch Mansion Game
-    const game = Game.main(environment);
+    // Launch Mansion Game using the central core and mansion GameControl
+    const game = Core.main(environment, GameControl);
     
     // Initialize cheats/debug features
     initCheats(game);

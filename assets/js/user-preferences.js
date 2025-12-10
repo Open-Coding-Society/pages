@@ -1,6 +1,30 @@
 // Global site-wide theme preferences
-// Applies user-selected colors, fonts, and sizing across all pages.
+// Applies user-selected colors, fonts, sizing, and language translation across all pages.
 (function () {
+  // Supported languages for translation
+  const LANGUAGES = {
+    '': { name: 'Default (No Translation)', code: '' },
+    'es': { name: 'Spanish', code: 'es' },
+    'fr': { name: 'French', code: 'fr' },
+    'de': { name: 'German', code: 'de' },
+    'it': { name: 'Italian', code: 'it' },
+    'pt': { name: 'Portuguese', code: 'pt' },
+    'ru': { name: 'Russian', code: 'ru' },
+    'zh-CN': { name: 'Chinese (Simplified)', code: 'zh-CN' },
+    'zh-TW': { name: 'Chinese (Traditional)', code: 'zh-TW' },
+    'ja': { name: 'Japanese', code: 'ja' },
+    'ko': { name: 'Korean', code: 'ko' },
+    'ar': { name: 'Arabic', code: 'ar' },
+    'hi': { name: 'Hindi', code: 'hi' },
+    'vi': { name: 'Vietnamese', code: 'vi' },
+    'th': { name: 'Thai', code: 'th' },
+    'nl': { name: 'Dutch', code: 'nl' },
+    'pl': { name: 'Polish', code: 'pl' },
+    'tr': { name: 'Turkish', code: 'tr' },
+    'uk': { name: 'Ukrainian', code: 'uk' },
+    'he': { name: 'Hebrew', code: 'he' },
+  };
+
   const PRESETS = {
     Midnight: {
       bg: '#0b1220',
@@ -133,11 +157,282 @@
     // Turn on the high-priority theme class on <html> so global CSS rules
     // can override other themes consistently (Minima, Tailwind, etc.).
     document.documentElement.classList.add('user-theme-active');
+
+    // Inject CSS to override Tailwind classes with our theme colors
+    injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted);
+
+    // Apply language translation if set
+    const lang = prefs?.language || '';
+    applyLanguage(lang);
+  }
+
+  function injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted) {
+    const styleId = 'user-theme-override-css';
+    let style = document.getElementById(styleId);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+    
+    // Override Tailwind's neutral background classes when theme is active
+    style.textContent = `
+      html.user-theme-active,
+      html.user-theme-active body {
+        background-color: ${bg} !important;
+        color: ${text} !important;
+        font-family: ${font} !important;
+        font-size: ${size}px !important;
+      }
+      
+      /* Main content areas */
+      html.user-theme-active .bg-neutral-900,
+      html.user-theme-active .bg-neutral-800 {
+        background-color: ${bg} !important;
+      }
+      
+      /* Sidebar and panels - slightly different shade */
+      html.user-theme-active .fixed.left-0.bg-neutral-800,
+      html.user-theme-active div[class*="bg-neutral-800"].border {
+        background-color: ${panel} !important;
+      }
+      
+      /* Cards and content blocks */
+      html.user-theme-active .rounded-lg.bg-neutral-800,
+      html.user-theme-active .p-4.rounded-lg.bg-neutral-800 {
+        background-color: ${panel} !important;
+      }
+      
+      /* Text colors */
+      html.user-theme-active .text-neutral-100,
+      html.user-theme-active .text-neutral-50,
+      html.user-theme-active .text-white {
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .text-neutral-400,
+      html.user-theme-active .text-neutral-500 {
+        color: ${textMuted} !important;
+      }
+      
+      /* Borders */
+      html.user-theme-active .border-neutral-700,
+      html.user-theme-active .border-neutral-600 {
+        border-color: ${uiBorder} !important;
+      }
+      
+      /* Accent colors for links and active states */
+      html.user-theme-active .text-blue-500,
+      html.user-theme-active .border-blue-500 {
+        color: ${accent} !important;
+        border-color: ${accent} !important;
+      }
+      
+      /* Input fields */
+      html.user-theme-active .bg-neutral-700 {
+        background-color: ${panel} !important;
+      }
+      
+      html.user-theme-active input,
+      html.user-theme-active select,
+      html.user-theme-active textarea {
+        background-color: ${panel} !important;
+        color: ${text} !important;
+        border-color: ${uiBorder} !important;
+      }
+    `;
+  }
+
+  // Google Translate integration
+  function applyLanguage(langCode) {
+    // Store the selected language
+    document.documentElement.setAttribute('data-translate-lang', langCode);
+    
+    // Add CSS to hide Google Translate bar (injected once)
+    if (!document.getElementById('google-translate-hide-css')) {
+      const style = document.createElement('style');
+      style.id = 'google-translate-hide-css';
+      style.textContent = `
+        .goog-te-banner-frame, .goog-te-balloon-frame { display: none !important; }
+        body { top: 0 !important; position: static !important; }
+        .skiptranslate { display: none !important; }
+        .goog-te-gadget { display: none !important; }
+        #google_translate_element { display: none !important; }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Clear any existing Google Translate cookies first
+    clearGoogleTranslateCookies();
+    
+    if (!langCode) {
+      // Remove translation - reset to original
+      removeGoogleTranslate();
+      return;
+    }
+
+    // Set the Google Translate cookie to the desired language
+    const domain = window.location.hostname;
+    document.cookie = `googtrans=/en/${langCode}; path=/`;
+    document.cookie = `googtrans=/en/${langCode}; path=/; domain=${domain}`;
+    document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${domain}`;
+
+    // Initialize Google Translate if not already loaded
+    if (!window.googleTranslateElementInit) {
+      window.googleTranslateElementInit = function() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: Object.keys(LANGUAGES).filter(k => k).join(','),
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false
+        }, 'google_translate_element');
+      };
+    }
+
+    // Create hidden container for Google Translate widget
+    if (!document.getElementById('google_translate_element')) {
+      const container = document.createElement('div');
+      container.id = 'google_translate_element';
+      container.style.cssText = 'position: fixed; top: -9999px; left: -9999px; visibility: hidden;';
+      document.body.appendChild(container);
+    }
+
+    // Load Google Translate script if not present
+    if (!document.getElementById('google-translate-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    // Wait for Google Translate to be ready, then trigger translation
+    const attemptTranslation = (attempts = 0) => {
+      if (attempts > 50) return; // Give up after 5 seconds
+      
+      const select = document.querySelector('.goog-te-combo');
+      if (select) {
+        select.value = langCode;
+        select.dispatchEvent(new Event('change'));
+      } else {
+        setTimeout(() => attemptTranslation(attempts + 1), 100);
+      }
+    };
+    
+    setTimeout(() => attemptTranslation(), 500);
+  }
+
+  function clearGoogleTranslateCookies() {
+    const domain = window.location.hostname;
+    // Clear all possible googtrans cookie variations
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+  }
+
+  function removeGoogleTranslate() {
+    clearGoogleTranslateCookies();
+    
+    // Try to reset Google Translate to show original via the select dropdown
+    const select = document.querySelector('.goog-te-combo');
+    if (select) {
+      select.value = '';
+      select.dispatchEvent(new Event('change'));
+    }
+    
+    // Try clicking the "Show original" button in the banner frame
+    try {
+      const frame = document.querySelector('.goog-te-banner-frame');
+      if (frame && frame.contentDocument) {
+        const restoreBtn = frame.contentDocument.querySelector('.goog-te-button button');
+        if (restoreBtn) restoreBtn.click();
+      }
+    } catch (e) {
+      // Cross-origin frame access may fail, that's okay
+    }
+    
+    // If translation is still stuck, we need to reload the page
+    // Check if page is currently translated
+    const isTranslated = document.documentElement.classList.contains('translated-ltr') || 
+                         document.documentElement.classList.contains('translated-rtl') ||
+                         document.querySelector('html.translated-ltr, html.translated-rtl');
+    
+    if (isTranslated) {
+      // Force reload to clear translation
+      window.location.reload();
+    }
+  }
+
+  // Text-to-Speech functionality
+  function getTTSSettings() {
+    const prefs = loadStoredPreferences() || {};
+    return {
+      voice: prefs.ttsVoice || '',
+      rate: parseFloat(prefs.ttsRate) || 1,
+      pitch: parseFloat(prefs.ttsPitch) || 1,
+      volume: parseFloat(prefs.ttsVolume) || 1
+    };
+  }
+
+  function speak(text, options = {}) {
+    if (!('speechSynthesis' in window)) {
+      console.warn('Text-to-speech not supported in this browser');
+      return null;
+    }
+
+    // Cancel any ongoing speech
+    speechSynthesis.cancel();
+
+    const settings = getTTSSettings();
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // Apply saved voice
+    const voiceName = options.voice || settings.voice;
+    if (voiceName) {
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => v.name === voiceName);
+      if (voice) utterance.voice = voice;
+    }
+
+    // Apply settings (options override saved settings)
+    utterance.rate = options.rate !== undefined ? options.rate : settings.rate;
+    utterance.pitch = options.pitch !== undefined ? options.pitch : settings.pitch;
+    utterance.volume = options.volume !== undefined ? options.volume : settings.volume;
+
+    speechSynthesis.speak(utterance);
+    return utterance;
+  }
+
+  function speakSelection() {
+    const selection = window.getSelection();
+    const text = selection ? selection.toString().trim() : '';
+    if (text) {
+      speak(text);
+      return true;
+    }
+    return false;
+  }
+
+  function stopSpeaking() {
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+    }
+  }
+
+  function isSpeaking() {
+    return 'speechSynthesis' in window && speechSynthesis.speaking;
   }
 
   function resetPreferences() {
     const root = document.documentElement;
     root.classList.remove('user-theme-active');
+
+    // Remove injected CSS
+    const overrideStyle = document.getElementById('user-theme-override-css');
+    if (overrideStyle) {
+      overrideStyle.remove();
+    }
 
     const props = [
       '--pref-bg-color',
@@ -186,7 +481,15 @@
   window.SitePreferences = {
     applyPreferences,
     resetPreferences,
+    applyLanguage,
     PRESETS,
+    LANGUAGES,
+    // TTS functions
+    speak,
+    speakSelection,
+    stopSpeaking,
+    isSpeaking,
+    getTTSSettings,
   };
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
