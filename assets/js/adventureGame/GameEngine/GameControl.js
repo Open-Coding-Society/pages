@@ -20,6 +20,16 @@ class GameControl {
         this.isPaused = false;
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
+    // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
+    // Games can override these values if they want to count a different stat name/label.
+    this.pauseMenuOptions = {
+        counterVar: 'levelsCompleted',
+        counterLabel: 'Levels completed'
+    };
+    // Whether to show per-level counts. We want a single cumulative counter for levels completed.
+    this.pauseMenuOptions.counterPerLevel = false;
+    // use a unique storage key so stats are per-game
+    this.pauseMenuOptions.storageKey = 'pauseMenuStats:adventure';
     this.skipKeyListener = this.handleSkipKey.bind(this);
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
@@ -160,6 +170,23 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
+        // Increment configured per-game counter (PauseMenu displays this variable).
+        try {
+            const cv = (this.pauseMenuOptions && this.pauseMenuOptions.counterVar) || 'levelsCompleted';
+            const perLevel = (this.pauseMenuOptions && this.pauseMenuOptions.counterPerLevel) || false;
+            if (!this.stats) this.stats = {};
+            if (perLevel) {
+                if (!this.stats.levels) this.stats.levels = {};
+                const levelKey = (typeof this.currentLevelIndex !== 'undefined') ? String(this.currentLevelIndex) : ((this.currentLevel && this.currentLevel.id) || '0');
+                this.stats.levels[levelKey] = (this.stats.levels[levelKey] || 0) + 1;
+            } else {
+                this[cv] = (this[cv] || 0) + 1;
+                this.stats[cv] = this[cv];
+            }
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) { /* ignore */ }
+
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
@@ -253,6 +280,32 @@ class GameControl {
     endLevel() {
         if (this.currentLevel) {
             this.currentLevel.continue = false;
+        }
+    }
+
+    /**
+     * Increment an arbitrary stat on this GameControl (keeps PauseMenu in sync if present)
+     */
+    incrementStat(statName, amount = 1) {
+        try {
+            this[statName] = (this[statName] || 0) + Number(amount || 0);
+            if (this.stats) this.stats[statName] = this[statName];
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('incrementStat error', e);
+        }
+    }
+
+    addPoints(amount = 0) {
+        try {
+            this.points = (this.points || 0) + Number(amount || 0);
+            if (!this.stats) this.stats = { points: this.points };
+            this.stats.points = this.points;
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('addPoints error', e);
         }
     }
 
