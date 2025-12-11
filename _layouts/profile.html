@@ -219,6 +219,11 @@ active_tab: profile
                             ${group.members.map(member => `${member.name} (${member.uid})`).join(', ')}
                         </div>
                     </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <button type="button" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors" onclick="leaveGroup('${group.id}', ${group.members.find(m => m.uid === currentUid).id})">
+                            Leave Group
+                        </button>
+                    </div>
                 `).join('');
             } else {
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
@@ -923,4 +928,29 @@ active_tab: profile
     window.checkForChanges = checkForChanges;
     window.fetchGradePrediction = fetchGradePrediction;
     window.displayGradePrediction = displayGradePrediction;
+
+    // Leave group function
+    window.leaveGroup = async function(groupId, personId) {
+        if (!confirm('Are you sure you want to leave this group?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to leave group: ${response.statusText}`);
+            }
+
+            // alert('Successfully left the group.');
+            window.location.reload();
+        } catch (error) {
+            console.error('Error leaving group:', error);
+            alert(`Error leaving group: ${error.message}`);
+        }
+    };
 </script>
