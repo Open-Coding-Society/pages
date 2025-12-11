@@ -243,8 +243,34 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: background 0.18s, transform 0.12s;
+  position: relative;
 }
 .inbox-fab:hover { background: #059669; transform: translateY(-1px); }
+
+/* Notification badge on inbox FAB */
+.inbox-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 2px solid var(--green-bg);
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.inbox-badge.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
 
 @media (max-width: 600px) {
   .inbox-fab { width: var(--fab-size,56px); height: var(--fab-size,56px); font-size:1.35rem; }
@@ -507,6 +533,23 @@
   color: #222;
   background: #fff;
   box-sizing: border-box;
+}
+
+/* Unread indicator for messages in the inbox */
+.inbox-message.unread {
+  border-left: 3px solid #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.inbox-message.unread::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
 }
 
 .guest-submit-btn {
