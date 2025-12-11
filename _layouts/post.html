@@ -34,7 +34,7 @@ Check if this is a course lesson and determine which course context to use
 {% assign posts = posts | concat: site.posts | concat: site.pages %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="/assets/css/lesson-player.css">
+<link rel="stylesheet" href="{{ '/assets/css/custom-styles.css' | relative_url }}">
 
 <div class="lesson-player">
   <!-- LEFT SIDEBAR -->
@@ -136,9 +136,9 @@ Check if this is a course lesson and determine which course context to use
         <div class="lesson-header">
           <h1>{{ page.title | escape }}</h1>
           <div class="lesson-meta">
+            {%- if page.show_reading_time != false -%}
             <span><i class="fas fa-clock"></i> {% include reading_time.html %}</span>
-            <span>•</span>
-            <span>Week {{ current_week }}</span>
+            {%- endif -%}
             {% if page.assignment %}
             <span>•</span>
             <span><i class="fas fa-file-alt"></i> Assignment</span>

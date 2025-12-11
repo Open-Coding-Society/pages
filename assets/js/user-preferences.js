@@ -116,6 +116,10 @@
     const font = prefs?.font || base.font;
     const size = prefs?.size || base.size;
     const accent = prefs?.accent || base.accent;
+    
+    // Styling preferences
+    const selectionColor = prefs?.selectionColor || accent;
+    const buttonStyle = prefs?.buttonStyle || 'rounded';
 
     const root = document.documentElement;
     root.style.setProperty('--pref-bg-color', bg);
@@ -123,6 +127,7 @@
     root.style.setProperty('--pref-font-family', font);
     root.style.setProperty('--pref-font-size', size + 'px');
     root.style.setProperty('--pref-accent-color', accent);
+    root.style.setProperty('--pref-selection-color', selectionColor);
 
     const set = (name, value) => root.style.setProperty(name, value);
     
@@ -159,14 +164,20 @@
     document.documentElement.classList.add('user-theme-active');
 
     // Inject CSS to override Tailwind classes with our theme colors
-    injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted);
+    injectThemeOverrideCSS({
+      bg, text, font, size, accent, panel, uiBorder, textMuted,
+      selectionColor, buttonStyle
+    });
 
     // Apply language translation if set
     const lang = prefs?.language || '';
     applyLanguage(lang);
   }
 
-  function injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted) {
+  function injectThemeOverrideCSS(opts) {
+    const { bg, text, font, size, accent, panel, uiBorder, textMuted,
+            selectionColor, buttonStyle } = opts;
+    
     const styleId = 'user-theme-override-css';
     let style = document.getElementById(styleId);
     if (!style) {
@@ -174,6 +185,11 @@
       style.id = styleId;
       document.head.appendChild(style);
     }
+    
+    // Generate button border-radius based on style
+    let btnRadius = '0.375rem'; // rounded (default)
+    if (buttonStyle === 'square') btnRadius = '0';
+    else if (buttonStyle === 'pill') btnRadius = '9999px';
     
     // Override Tailwind's neutral background classes when theme is active
     style.textContent = `
@@ -183,6 +199,25 @@
         color: ${text} !important;
         font-family: ${font} !important;
         font-size: ${size}px !important;
+      }
+      
+      /* Selection highlight color */
+      html.user-theme-active ::selection {
+        background-color: ${selectionColor} !important;
+        color: white !important;
+      }
+      html.user-theme-active ::-moz-selection {
+        background-color: ${selectionColor} !important;
+        color: white !important;
+      }
+      
+      /* Button border-radius based on style */
+      html.user-theme-active button,
+      html.user-theme-active .btn,
+      html.user-theme-active [class*="rounded"] button,
+      html.user-theme-active input[type="submit"],
+      html.user-theme-active input[type="button"] {
+        border-radius: ${btnRadius} !important;
       }
       
       /* Main content areas */
@@ -440,6 +475,8 @@
       '--pref-font-family',
       '--pref-font-size',
       '--pref-accent-color',
+      '--pref-selection-color',
+      '--pref-cursor-style',
       '--background',
       '--bg-0',
       '--bg-1',
