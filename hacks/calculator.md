@@ -3,74 +3,42 @@ title: JS Calculator
 comments: true
 hide: true
 layout: opencs
-description: A common way to become familiar with a language is to build a calculator.  This calculator shows off button with actions.
+description: A modern, responsive calculator built with JavaScript. Features all basic operations and a clean UI.
 permalink: /calculator
 ---
-
-<!-- 
-Hack 0: Right justify result
-Hack 1: Test conditions on small, big, and decimal numbers, report on findings. Fix issues.
-Hack 2: Add the common math operation that is missing from calculator
-Hack 3: Implement 1 number operation (ie SQRT) 
--->
-
-<!-- 
-HTML implementation of the calculator. 
--->
-
-<!-- 
-    Style and Action are aligned with HRML class definitions
-    style.css contains majority of style definition (number, operation, clear, and equals)
-    - The div calculator-container sets 4 elements to a row
-    Background is credited to Vanta JS and is implemented at bottom of this page
--->
-<style>
-  .calculator-output {
-    /*
-      calulator output
-      top bar shows the results of the calculator;
-      result to take up the entirety of the first row;
-      span defines 4 columns and 1 row
-    */
-    grid-column: span 4;
-    grid-row: span 1;
-  
-    border-radius: 10px;
-    padding: 0.25em;
-    font-size: 20px;
-    border: 5px solid black;
-  
-    display: flex;
-    align-items: center;
-  }
-  canvas {
-    filter: none;
-  }
-</style>
 
 <!-- Add a container for the animation -->
 <div id="animation">
   <div class="calculator-container">
-      <!--result-->
+      <!-- Display -->
       <div class="calculator-output" id="output">0</div>
-      <!--row 1-->
-      <div class="calculator-number">1</div>
-      <div class="calculator-number">2</div>
-      <div class="calculator-number">3</div>
-      <div class="calculator-operation">+</div>
-      <!--row 2-->
-      <div class="calculator-number">4</div>
-      <div class="calculator-number">5</div>
-      <div class="calculator-number">6</div>
-      <div class="calculator-operation">-</div>
-      <!--row 3-->
+      
+      <!-- Row 1: Clear, Special ops -->
+      <div class="calculator-clear">A/C</div>
+      <div class="calculator-special" data-action="sqrt">√</div>
+      <div class="calculator-special" data-action="percent">%</div>
+      <div class="calculator-operation">/</div>
+      
+      <!-- Row 2 -->
       <div class="calculator-number">7</div>
       <div class="calculator-number">8</div>
       <div class="calculator-number">9</div>
       <div class="calculator-operation">*</div>
-      <!--row 4-->
-      <div class="calculator-clear">A/C</div>
-      <div class="calculator-number">0</div>
+      
+      <!-- Row 3 -->
+      <div class="calculator-number">4</div>
+      <div class="calculator-number">5</div>
+      <div class="calculator-number">6</div>
+      <div class="calculator-operation">-</div>
+      
+      <!-- Row 4 -->
+      <div class="calculator-number">1</div>
+      <div class="calculator-number">2</div>
+      <div class="calculator-number">3</div>
+      <div class="calculator-operation">+</div>
+      
+      <!-- Row 5 -->
+      <div class="calculator-number zero">0</div>
       <div class="calculator-number">.</div>
       <div class="calculator-equals">=</div>
   </div>
@@ -78,67 +46,104 @@ HTML implementation of the calculator.
 
 <!-- JavaScript (JS) implementation of the calculator. -->
 <script>
-// initialize important variables to manage calculations
+// Initialize calculator state
 var firstNumber = null;
 var operator = null;
 var nextReady = true;
-// build objects containing key elements
+var lastResult = null;
+
+// Build objects containing key elements
 const output = document.getElementById("output");
 const numbers = document.querySelectorAll(".calculator-number");
 const operations = document.querySelectorAll(".calculator-operation");
 const clear = document.querySelectorAll(".calculator-clear");
 const equals = document.querySelectorAll(".calculator-equals");
+const specials = document.querySelectorAll(".calculator-special");
+
+// Format number for display (handle long decimals)
+function formatNumber(num) {
+    if (num === null || isNaN(num)) return "Error";
+    if (!isFinite(num)) return "Error";
+    
+    // Handle very large or very small numbers
+    if (Math.abs(num) > 999999999 || (Math.abs(num) < 0.0000001 && num !== 0)) {
+        return num.toExponential(4);
+    }
+    
+    // Round to avoid floating point issues
+    let result = Math.round(num * 100000000) / 100000000;
+    let str = result.toString();
+    
+    // Truncate if too long
+    if (str.length > 12) {
+        if (str.includes('.')) {
+            result = parseFloat(result.toPrecision(10));
+            str = result.toString();
+        }
+    }
+    
+    return str;
+}
 
 // Number buttons listener
 numbers.forEach(button => {
-  button.addEventListener("click", function() {
-    number(button.textContent);
-  });
+    button.addEventListener("click", function() {
+        number(button.textContent);
+    });
 });
 
 // Number action
-function number (value) { // function to input numbers into the calculator
-    if (value != ".") {
-        if (nextReady == true) { // nextReady is used to tell the computer when the user is going to input a completely new number
+function number(value) {
+    if (value !== ".") {
+        if (nextReady) {
             output.innerHTML = value;
-            if (value != "0") { // if statement to ensure that there are no multiple leading zeroes
+            if (value !== "0") {
                 nextReady = false;
             }
         } else {
-            output.innerHTML = output.innerHTML + value; // concatenation is used to add the numbers to the end of the input
+            // Limit input length
+            if (output.innerHTML.length < 12) {
+                output.innerHTML = output.innerHTML + value;
+            }
         }
-    } else { // special case for adding a decimal; can't have two decimals
-        if (output.innerHTML.indexOf(".") == -1) {
-            output.innerHTML = output.innerHTML + value;
-            nextReady = false;
+    } else {
+        // Decimal handling - only one decimal allowed
+        if (output.innerHTML.indexOf(".") === -1) {
+            if (nextReady) {
+                output.innerHTML = "0.";
+                nextReady = false;
+            } else {
+                output.innerHTML = output.innerHTML + value;
+            }
         }
     }
 }
 
 // Operation buttons listener
 operations.forEach(button => {
-  button.addEventListener("click", function() {
-    operation(button.textContent);
-  });
+    button.addEventListener("click", function() {
+        operation(button.textContent);
+    });
 });
 
 // Operator action
-function operation (choice) { // function to input operations into the calculator
-    if (firstNumber == null) { // once the operation is chosen, the displayed number is stored into the variable firstNumber
-        firstNumber = parseInt(output.innerHTML);
+function operation(choice) {
+    if (firstNumber === null) {
+        firstNumber = parseFloat(output.innerHTML);
         nextReady = true;
         operator = choice;
-        return; // exits function
+        return;
     }
-    // occurs if there is already a number stored in the calculator
-    firstNumber = calculate(firstNumber, parseFloat(output.innerHTML)); 
+    
+    // Chain calculations
+    firstNumber = calculate(firstNumber, parseFloat(output.innerHTML));
     operator = choice;
-    output.innerHTML = firstNumber.toString();
+    output.innerHTML = formatNumber(firstNumber);
     nextReady = true;
 }
 
-// Calculator
-function calculate (first, second) { // function to calculate the result of the equation
+// Calculator - performs the actual math
+function calculate(first, second) {
     let result = 0;
     switch (operator) {
         case "+":
@@ -151,41 +156,117 @@ function calculate (first, second) { // function to calculate the result of the 
             result = first * second;
             break;
         case "/":
+            if (second === 0) {
+                return NaN; // Division by zero
+            }
             result = first / second;
             break;
-        default: 
+        default:
+            result = first;
             break;
     }
     return result;
 }
 
+// Special operations listener
+specials.forEach(button => {
+    button.addEventListener("click", function() {
+        const action = button.dataset.action;
+        specialOperation(action);
+    });
+});
+
+// Special operations (single number operations)
+function specialOperation(action) {
+    let currentValue = parseFloat(output.innerHTML);
+    let result;
+    
+    switch (action) {
+        case "sqrt":
+            if (currentValue < 0) {
+                output.innerHTML = "Error";
+                nextReady = true;
+                return;
+            }
+            result = Math.sqrt(currentValue);
+            break;
+        case "percent":
+            if (firstNumber !== null) {
+                // Calculate percentage of first number
+                result = (firstNumber * currentValue) / 100;
+            } else {
+                result = currentValue / 100;
+            }
+            break;
+        default:
+            return;
+    }
+    
+    output.innerHTML = formatNumber(result);
+    nextReady = true;
+}
+
 // Equals button listener
 equals.forEach(button => {
-  button.addEventListener("click", function() {
-    equal();
-  });
+    button.addEventListener("click", function() {
+        equal();
+    });
 });
 
 // Equal action
-function equal () { // function used when the equals button is clicked; calculates equation and displays it
+function equal() {
+    if (firstNumber === null || operator === null) {
+        return;
+    }
+    
     firstNumber = calculate(firstNumber, parseFloat(output.innerHTML));
-    output.innerHTML = firstNumber.toString();
+    output.innerHTML = formatNumber(firstNumber);
+    lastResult = firstNumber;
+    firstNumber = null;
+    operator = null;
     nextReady = true;
 }
 
 // Clear button listener
 clear.forEach(button => {
-  button.addEventListener("click", function() {
-    clearCalc();
-  });
+    button.addEventListener("click", function() {
+        clearCalc();
+    });
 });
 
-// A/C action
-function clearCalc () { // clears calculator
+// A/C action - full clear
+function clearCalc() {
     firstNumber = null;
+    operator = null;
     output.innerHTML = "0";
     nextReady = true;
 }
+
+// Keyboard support
+document.addEventListener("keydown", function(event) {
+    const key = event.key;
+    
+    if (key >= "0" && key <= "9") {
+        number(key);
+    } else if (key === ".") {
+        number(".");
+    } else if (key === "+" || key === "-" || key === "*" || key === "/") {
+        operation(key);
+    } else if (key === "Enter" || key === "=") {
+        event.preventDefault();
+        equal();
+    } else if (key === "Escape" || key === "c" || key === "C") {
+        clearCalc();
+    } else if (key === "Backspace") {
+        // Allow backspace to delete last character
+        if (!nextReady && output.innerHTML.length > 1) {
+            output.innerHTML = output.innerHTML.slice(0, -1);
+        } else {
+            output.innerHTML = "0";
+            nextReady = true;
+        }
+    }
+});
 </script>
 
 <!-- 
