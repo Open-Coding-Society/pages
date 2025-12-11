@@ -13,7 +13,6 @@
   <div class="microblog-panel-content">
     <div class="inbox-tabs" style="display:flex; gap:0.5rem; padding:0.5rem;">
       <button id="tab-announcements" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Announcements</button>
-      <button id="tab-notifications" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Notifications</button>
     </div>
 
     <div id="announcements-content">
@@ -46,10 +45,6 @@
       </div>
       </div>
 
-    <div id="notifications-content" style="display:none; padding:0.5rem; color:var(--white);">
-      <em>(work in progress)</em>
-    </div>
-
   </div>
 </aside>
 
@@ -72,6 +67,7 @@ async function checkInboxAdminAccess() {
     if (isAdmin) {
       const inboxForm = document.getElementById('inbox-form');
       const inboxDivider = document.getElementById('inbox-form-divider');
+      
       if (inboxForm) inboxForm.style.display = 'block';
       if (inboxDivider) inboxDivider.style.display = 'block';
       
@@ -116,39 +112,9 @@ document.addEventListener('click', (e) => {
   if (inboxToggle && e.target === inboxToggle) return;
   closeInboxPanel();
 });
-
 </script>
 
 <script>
-// Tab switching logic for Inbox
-(function(){
-  const tabAnnouncements = document.getElementById('tab-announcements');
-  const tabNotifications = document.getElementById('tab-notifications');
-  const annContent = document.getElementById('announcements-content');
-  const notContent = document.getElementById('notifications-content');
-
-  function setActiveTab(tab){
-    if (tab === 'notifications'){
-      tabNotifications.style.background = 'rgba(255,255,255,0.06)';
-      tabAnnouncements.style.background = 'transparent';
-      annContent.style.display = 'none';
-      notContent.style.display = 'block';
-    } else {
-      tabAnnouncements.style.background = 'rgba(255,255,255,0.06)';
-      tabNotifications.style.background = 'transparent';
-      annContent.style.display = 'block';
-      notContent.style.display = 'none';
-    }
-  }
-
-  if (tabAnnouncements && tabNotifications){
-    tabAnnouncements.addEventListener('click', () => { setActiveTab('announcements'); openInboxPanel(); });
-    tabNotifications.addEventListener('click', () => { setActiveTab('notifications'); openInboxPanel(); });
-    // default active
-    setActiveTab('announcements');
-  }
-})();
-
 // Inbox form behavior (no persistence)
 ;(function(){
   const form = document.getElementById('inbox-form');
