@@ -223,26 +223,51 @@ comments: false
 <script type="module">
   import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   let allGroups = [];
-  let selectedPeriods = [];     // [] means "all periods"
-  let selectedClasses = [];     // [] means "all classes"
+  let allPeople = [];          // 👈 NEW: cache people from Person API
+  let selectedPeriods = [];    // [] means "all periods"
+  let selectedClasses = [];    // [] means "all classes"
   let searchQuery = "";
+
+  // ===== People loading =====
+  async function fetchPeople() {
+    try {
+      const response = await fetch(`${javaURI}/api/people`, fetchOptions);
+      if (!response.ok) throw new Error("Failed to fetch people");
+      const data = await response.json();
+
+      // Normalize the fields we care about
+      allPeople = data.map(person => ({
+        id: person.id,       // comes from Submitter superclass
+        name: person.name,
+        email: person.email,
+        uid: person.uid,
+        sid: person.sid
+        // (pfp, kasmServerNeeded, etc. exist, but we don't need them here)
+      }));
+
+      console.log("Loaded people:", allPeople.length);
+    } catch (error) {
+      console.error("Error loading people:", error);
+      // Optional: show some UI warning if you want
+    }
+  }
+
 
   // ===== Data loading =====
   async function fetchGroups() {
     try {
-      // const response = await fetch('{{site.baseurl}}/assets/groups.json');
-      const response = await fetch(`${javaURI}/api/groups`);
+      const response = await fetch(`${javaURI}/api/groups`, fetchOptions);
       if (!response.ok) throw new Error("Failed to fetch groups");
       const data = await response.json();
 
-      allGroups = data.map((group, index) => ({
-        id: index + 1,
+      allGroups = data.map((group) => ({
+        id: group.id,                     // ✅ use backend id
         name: group.name,
         period: group.period,
+        // backend doesn't have these yet -> default for now
         class: group.class || "",
-        // new: periodAdmin flag from JSON, default false
         periodAdmin: !!group.periodAdmin,
-        members: group.members.map((member) => ({
+        members: (group.members || []).map((member) => ({
           id: member.id,
           uid: member.uid,
           name: member.name,
@@ -257,6 +282,7 @@ comments: false
       showEmptyState("Error loading groups");
     }
   }
+
 
   // ===== Rendering =====
   function renderGroups() {
@@ -409,26 +435,62 @@ comments: false
     chevron.classList.toggle("rotate-180");
   };
 
-  window.addMember = function (groupId) {
+  window.addMember = async function (groupId) {
     const group = allGroups.find(g => g.id === groupId);
     if (!group) return;
 
-    const name = prompt("Enter the new member's name:");
+    const name = prompt("Enter the student's name to add:");
     if (!name || !name.trim()) return;
 
     const trimmedName = name.trim();
+    const lower = trimmedName.toLowerCase();
 
-    group.members.push({
-      id: group.members.length + 1,
-      name: trimmedName
-    });
+    const person = allPeople.find(p => p.name.toLowerCase() === lower);
+    if (!person) {
+      alert(`No student found with name "${trimmedName}".`);
+      return;
+    }
 
-    renderGroups();
+    try {
+      const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, {
+        ...fetchOptions,
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to add member');
+      }
+
+      const updatedGroup = await response.json();
+
+      // Update group in allGroups with the server's version
+      const index = allGroups.findIndex(g => g.id === updatedGroup.id);
+      if (index !== -1) {
+        allGroups[index] = {
+          ...allGroups[index],
+          members: (updatedGroup.members || []).map(m => ({
+            id: m.id,
+            uid: m.uid,
+            name: m.name,
+            email: m.email
+          }))
+        };
+      }
+
+      renderGroups();
+    } catch (err) {
+      console.error('Error adding member:', err);
+      alert('Error adding member. Please try again.');
+    }
   };
 
-  window.removeMember = function (groupId) {
+
+  window.removeMember = async function (groupId) {
     const group = allGroups.find(g => g.id === groupId);
-    if (!group || group.members.length === 0) {
+    if (!group) return;
+
+    if (group.members.length === 0) {
       alert("This group has no members to remove.");
       return;
     }
@@ -437,16 +499,49 @@ comments: false
     if (!name || !name.trim()) return;
 
     const target = name.trim().toLowerCase();
-    const index = group.members.findIndex(m => m.name.toLowerCase() === target);
 
-    if (index === -1) {
+    // Find the member in the group
+    const member = group.members.find(
+      m => m.name.toLowerCase() === target
+    );
+
+    if (!member) {
       alert("Member not found in this group.");
       return;
     }
 
-    group.members.splice(index, 1);
-    renderGroups();
+    // Send DELETE request to backend
+    try {
+      const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${member.id}`, {
+        ...fetchOptions,
+        method: "DELETE"
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to remove member");
+      }
+
+      // Updated group returned by backend
+      const updatedGroup = await response.json();
+
+      // Update local allGroups copy
+      const index = allGroups.findIndex(g => g.id === updatedGroup.id);
+      if (index !== -1) {
+        allGroups[index] = {
+          ...allGroups[index],
+          members: updatedGroup.members
+        };
+      }
+
+      renderGroups();
+      alert(`${member.name} was removed from the group.`);
+    } catch (err) {
+      console.error("Error removing member:", err);
+      alert("Error removing member. Please try again.");
+    }
   };
+
 
   // Period Admin toggle logic
   window.togglePeriodAdmin = function (groupId) {
@@ -527,62 +622,99 @@ comments: false
       return;
     }
 
-    const members = membersText.split("\n").map(m => m.trim()).filter(m => m);
-    if (members.length === 0) {
+    // 1) Parse textarea -> array of names / identifiers
+    const requestedLines = membersText
+      .split("\n")
+      .map(n => n.trim())
+      .filter(n => n.length > 0);
+
+    if (requestedLines.length === 0) {
       alert("Please enter at least one member");
       return;
     }
 
-    // If marking as Period Admin, ensure no existing admin for that period
-    if (periodAdminChecked) {
-      const existingAdmin = allGroups.find(
-        g => String(g.period) === String(period) && g.periodAdmin
+    // 2) Match each line to a Person (by name/email/uid)
+    const memberIds = [];
+    const unresolved = [];
+
+    requestedLines.forEach(line => {
+      const lower = line.toLowerCase();
+
+      const person = allPeople.find(p =>
+        (p.name && p.name.toLowerCase() === lower) ||
+        (p.email && p.email.toLowerCase() === lower) ||
+        (p.uid && p.uid.toLowerCase() === lower)
       );
-      if (existingAdmin) {
-        alert(
-          `"${existingAdmin.name}" is already the Period Admin for Period ${period}.\n` +
-          `They must unmark themselves as admin before another group can be created as Period Admin.`
-        );
-        return;
+
+      if (person) {
+        memberIds.push(person.id);
+      } else {
+        unresolved.push(line);
       }
+    });
+
+    if (unresolved.length > 0) {
+      alert(
+        "The following entries could not be matched to any Person (by name, email, or UID):\n\n" +
+        unresolved.join("\n") +
+        "\n\nMake sure they match exactly how they appear in the roster."
+      );
+      return;
     }
 
-    // const response = await fetch(`${javaURI}/api/groups`);
-    const newGroup = {
-      id: allGroups.length + 1,
+    // 3) Build payload that matches GroupCreateDto
+    const payload = {
       name,
       period,
-      // class: className,
-      // periodAdmin: !!periodAdminChecked,
-      members: members.map((memberName, index) => ({
-        id: index + 1,
-        uid: "...",
-        name: memberName,
-        email: "..."
-      }))
+      course: className,
+      memberIds
     };
 
-    // allGroups.push(newGroup);
+    console.log("Payload being sent:", payload);
 
     try {
       const response = await fetch(`${javaURI}/api/groups`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newGroup)
+        ...fetchOptions,
+        method: 'POST',
+        headers: {
+          ...(fetchOptions.headers || {}),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error('Failed to add group');
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to add group');
+      }
+
+      const savedGroup = await response.json();
+
+      // 4) Push returned group into allGroups in the same shape as fetchGroups()
+      allGroups.push({
+        id: savedGroup.id,
+        name: savedGroup.name,
+        period: savedGroup.period,
+        class: className,              // still front-end only for now
+        periodAdmin: !!periodAdminChecked,
+        members: (savedGroup.members || []).map(m => ({
+          id: m.id,
+          uid: m.uid,
+          name: m.name,
+          email: m.email
+        }))
+      });
 
       renderGroups();
-
+      cancelAddGroup();
+      alert(`Group "${name}" created successfully!`);
     } catch (error) {
-        console.error('Error adding group:', error);
-        alert('Error adding group. Please try again.');
+      console.error('Error adding group:', error);
+      alert('Error adding group. Please try again.');
     }
-
-    alert(`Group "${name}" created successfully!`);
   };
+
+
 
   // ===== Filter helpers =====
   function updateFilterLabels() {
@@ -737,6 +869,10 @@ comments: false
   });
 
   // Initialize on page load
-  fetchGroups();
-  updateFilterLabels();
+  (async function init() {
+    await fetchPeople();     // 👈 load people first
+    await fetchGroups();     // groups now can show real members from backend
+    updateFilterLabels();
+  })();
+
 </script>
