@@ -854,7 +854,7 @@
     }
     
     // Use this page's permalink as the assignment key so grading view only shows submissions for this page
-    const assignmentName = '{{ page.permalink | escape }}';
+    const assignmentName = currentHackToSubmit;;
     
     // Get user ID and class from credentials data (window.user loaded by login.js)
     let uid = null;
@@ -1000,22 +1000,28 @@
       const assignmentsMap = new Map();
       
       gradesArray.forEach(grade => {
-        const assignmentKey = grade.assignment || 'Unknown Assignment';
-        
-        if (!assignmentsMap.has(assignmentKey)) {
-          // Choose a date to show (use first submission or today)
-          const dateStr = grade.submitted_at 
-            ? new Date(grade.submitted_at).toISOString().split('T')[0] 
-            : new Date().toISOString().split('T')[0];
-          
-          assignmentsMap.set(assignmentKey, {
-            id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            key: assignmentKey,
-            title: assignmentKey, // You can enhance this to fetch titles if available
-            date: dateStr,
-            submissions: []
-          });
-        }
+          const assignmentKey = grade.assignment || 'Unknown Assignment';
+
+          // Try to match the assignment key to a hack by its Game path
+          const matchingTopic = HACK_TOPICS.find(t => t.Game === assignmentKey);
+
+          // Prefer the hack title if we find it, otherwise fall back to the raw key
+          const friendlyTitle = matchingTopic ? matchingTopic.Title : assignmentKey;
+
+          if (!assignmentsMap.has(assignmentKey)) {
+            const dateStr = grade.submitted_at 
+              ? new Date(grade.submitted_at).toISOString().split('T')[0] 
+              : new Date().toISOString().split('T')[0];
+
+            assignmentsMap.set(assignmentKey, {
+              id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              key: assignmentKey,
+              title: friendlyTitle,  // <-- NOW shows "Snake Game", "Calculator", etc.
+              date: dateStr,
+              submissions: []
+            });
+          }
+
         
         const assignment = assignmentsMap.get(assignmentKey);
         assignment.submissions.push({
