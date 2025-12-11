@@ -931,7 +931,7 @@ active_tab: dashboard
 
 <!-- Your GitHub analytics JS integrated -->
 <script type="module">
-    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
     const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
     const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
@@ -939,6 +939,41 @@ active_tab: dashboard
     const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
     const issuesUrl = `${pythonURI}/api/analytics/github/user/issues`;
 
+    const smartPredictBtn = document.getElementById("smartPredictBtn");
+    smartPredictBtn.onclick = async () => {
+        const userGradeEl = document.getElementById("userGrade");
+        try {
+            const train = await fetch(`${javaURI}/api/grade-prediction/train`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+        } catch (error) {
+            console.error("Error with training:", error);
+        }
+
+        try {
+            const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "assignment_completion_rate": 1.2,
+                    "average_assignment_score": 1,
+                    "collegeboard_quiz_average": 1,
+                    "office_hours_visits": 3,
+                    "conduct": 1,
+                    "work_habit": 1,
+                    "github_contributions": 0
+                })
+            });
+            const data = await predict.json();
+            console.log(data);
+            userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
+        } catch (error) {
+            console.error("Error fetching prediction:", error);
+        }
+    };
     async function fetchData() {
         try {
             const [profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes] = await Promise.all([
@@ -1019,29 +1054,13 @@ active_tab: dashboard
 
             // Grade prediction buttons and output are moved to new tab, so disable them here
             const predictGradeBtn = document.getElementById("predictGradeBtn");
-            const smartPredictBtn = document.getElementById("smartPredictBtn");
-            const userGradeEl = document.getElementById("userGrade");
+            
 
             predictGradeBtn.onclick = () => {
                 const grade = calculateGradeFromCommits(commitsCount);
                 userGradeEl.textContent = `Grade based on commits: ${grade}`;
             };
 
-            smartPredictBtn.onclick = () => {
-                const smartData = {
-                    total_commit_contributions: commitsCount,
-                    total_lines_added: commitsData.total_lines_added || 0,
-                    total_lines_deleted: commitsData.total_lines_deleted || 0,
-                    prs: prsArray.length,
-                    issues: issuesArray.length,
-                    public_repos: userProfile.public_repos || 0,
-                    public_gists: userProfile.public_gists || 0,
-                    followers: userProfile.followers || 0,
-                    following: userProfile.following || 0,
-                };
-                const grade = calculateSmartGrade(smartData);
-                userGradeEl.textContent = `Smart Grade: ${grade}`;
-            };
 
             // Info links to show modal details
             setupInfoModal("commits-info", commitsData);
