@@ -379,6 +379,20 @@ active_tab: dashboard
                                 <label class="text-sm text-neutral-400">Accent color</label>
                                 <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
                             </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Selection highlight color</label>
+                                <input type="color" id="pref-selection-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Button style</label>
+                                <select id="pref-button-style" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                    <option value="rounded">Rounded (Default)</option>
+                                    <option value="square">Square</option>
+                                    <option value="pill">Pill</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -622,7 +636,10 @@ active_tab: dashboard
                             ttsVoice: document.getElementById('pref-tts-voice').value,
                             ttsRate: Number(document.getElementById('pref-tts-rate').value),
                             ttsPitch: Number(document.getElementById('pref-tts-pitch').value),
-                            ttsVolume: Number(document.getElementById('pref-tts-volume').value)
+                            ttsVolume: Number(document.getElementById('pref-tts-volume').value),
+                            // Styling options in Colors section
+                            selectionColor: document.getElementById('pref-selection-color').value,
+                            buttonStyle: document.getElementById('pref-button-style').value
                         };
                     }
 
@@ -645,6 +662,10 @@ active_tab: dashboard
                         document.getElementById('tts-pitch-label').textContent = prefs.ttsPitch || 1.0;
                         document.getElementById('pref-tts-volume').value = prefs.ttsVolume || 1;
                         document.getElementById('tts-volume-label').textContent = Math.round((prefs.ttsVolume || 1) * 100);
+                        
+                        // Styling settings
+                        document.getElementById('pref-selection-color').value = prefs.selectionColor || '#3b82f6';
+                        document.getElementById('pref-button-style').value = prefs.buttonStyle || 'rounded';
                     }
 
                     function showStatus(msg){
@@ -665,6 +686,8 @@ active_tab: dashboard
                         } else if (section === 'colors') {
                             current.bg = form.bg;
                             current.accent = form.accent;
+                            current.selectionColor = form.selectionColor;
+                            current.buttonStyle = form.buttonStyle;
                         } else if (section === 'language') {
                             const oldLang = current.language || '';
                             const newLang = form.language;
@@ -844,6 +867,22 @@ active_tab: dashboard
                         
                         document.getElementById('new-theme-name').addEventListener('keypress', function(e){
                             if (e.key === 'Enter') saveThemeAs(this.value.trim());
+                        });
+                        
+                        // Live preview for selection color and button style
+                        ['pref-selection-color', 'pref-button-style'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                const applyLivePreview = function() {
+                                    const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                                    const form = currentFormValues();
+                                    current.selectionColor = form.selectionColor;
+                                    current.buttonStyle = form.buttonStyle;
+                                    applyPreferences(current);
+                                };
+                                el.addEventListener('change', applyLivePreview);
+                                el.addEventListener('input', applyLivePreview);
+                            }
                         });
                     });
 
