@@ -138,9 +138,7 @@ Check if this is a course lesson and determine which course context to use
           <div class="lesson-meta">
             {%- if page.show_reading_time != false -%}
             <span><i class="fas fa-clock"></i> {% include reading_time.html %}</span>
-            <span>•</span>
             {%- endif -%}
-            <span>Week {{ current_week }}</span>
             {% if page.assignment %}
             <span>•</span>
             <span><i class="fas fa-file-alt"></i> Assignment</span>
