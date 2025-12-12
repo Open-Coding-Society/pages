@@ -137,48 +137,72 @@ active_tab: dashboard
             <div id="tab-content-grade" class="tab-content hidden px-6 py-4 text-neutral-200">
                 <h2 class="text-xl font-semibold mb-4">Grade Predictor</h2>
                 <p class="mb-4 text-neutral-400 max-w-prose">
-                    This tool estimates your GitHub-based grade using two methods:
+                    This tool estimates your grade using the smart model. Adjust each slider to reflect your self-assessment or teacher's assessment for each skill (1 = lowest, 5 = highest).
                 </p>
 
-                <ul class="list-disc list-inside text-neutral-300 mb-4">
-                    <li><strong>Basic Grade:</strong> Based on total commits.</li>
-                    <li><strong>Smart Grade:</strong> Includes commits, code changes, PRs, issues, followers, and more.</li>
-                </ul>
+                <form id="smart-grade-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label for="slider-attendance" class="block text-sm text-neutral-300 mb-1">Attendance</label>
+                        <input type="range" id="slider-attendance" name="attendance" min="1" max="5" value="4" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-attendance">4</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-work_habits" class="block text-sm text-neutral-300 mb-1">Work Habits</label>
+                        <input type="range" id="slider-work_habits" name="work_habits" min="1" max="5" value="5" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-work_habits">5</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-behavior" class="block text-sm text-neutral-300 mb-1">Behavior</label>
+                        <input type="range" id="slider-behavior" name="behavior" min="1" max="5" value="4" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-behavior">4</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-timeliness" class="block text-sm text-neutral-300 mb-1">Timeliness</label>
+                        <input type="range" id="slider-timeliness" name="timeliness" min="1" max="5" value="5" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-timeliness">5</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-tech_sense" class="block text-sm text-neutral-300 mb-1">Tech Sense</label>
+                        <input type="range" id="slider-tech_sense" name="tech_sense" min="1" max="5" value="4" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-tech_sense">4</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-tech_talk" class="block text-sm text-neutral-300 mb-1">Tech Talk</label>
+                        <input type="range" id="slider-tech_talk" name="tech_talk" min="1" max="5" value="4" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-tech_talk">4</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-tech_growth" class="block text-sm text-neutral-300 mb-1">Tech Growth</label>
+                        <input type="range" id="slider-tech_growth" name="tech_growth" min="1" max="5" value="5" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-tech_growth">5</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-advocacy" class="block text-sm text-neutral-300 mb-1">Advocacy</label>
+                        <input type="range" id="slider-advocacy" name="advocacy" min="1" max="5" value="4" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-advocacy">4</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-communication" class="block text-sm text-neutral-300 mb-1">Communication</label>
+                        <input type="range" id="slider-communication" name="communication" min="1" max="5" value="5" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-communication">5</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-integrity" class="block text-sm text-neutral-300 mb-1">Integrity</label>
+                        <input type="range" id="slider-integrity" name="integrity" min="1" max="5" value="5" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-integrity">5</span></span>
+                    </div>
+                    <div>
+                        <label for="slider-organization" class="block text-sm text-neutral-300 mb-1">Organization</label>
+                        <input type="range" id="slider-organization" name="organization" min="1" max="5" value="4" class="w-full" />
+                        <span class="text-xs text-neutral-400">Value: <span id="val-organization">4</span></span>
+                    </div>
+                </form>
 
-                <div class="overflow-x-auto mb-4">
-                    <table class="w-full text-sm text-left text-neutral-300 border border-neutral-700">
-                        <thead class="bg-neutral-800 text-neutral-400">
-                            <tr>
-                                <th class="px-4 py-2">Metric</th>
-                                <th class="px-4 py-2">Included In</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-neutral-900">
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Commits</td><td class="px-4 py-2">Basic & Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Lines Changed</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Pull Requests</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Issues</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Repos / Gists</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Followers / Following</td><td class="px-4 py-2">Smart</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="text-sm text-neutral-400 mb-4">
-                    <strong>Grade Scale:</strong> A (90%), B (80%), C (70%), F (55%) — based on engagement.
-                </div>
-
-                <div class="flex gap-4 mb-4">
-                    <button id="predictGradeBtn"
-                        class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">
-                        Predict Grade (Commits)
-                    </button>
-                    <button id="smartPredictBtn"
-                        class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition text-white font-semibold">
-                        Smart Predict Grade
-                    </button>
-                </div>
-                <p id="userGrade" class="text-xl font-semibold"></p>
+                <button id="smartPredictBtn"
+                    class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition text-white font-semibold">
+                    Smart Predict Grade
+                </button>
+                <p id="userGrade" class="text-xl font-semibold mt-4"></p>
             </div>
 
             <!-- admin search tab content -->
@@ -324,7 +348,6 @@ active_tab: dashboard
         <br>
         See the full <a href="/dashboard/help/analytics" class="text-blue-400 underline hover:text-blue-200">Analytics Help page</a> for detailed docs and examples.
     </div>
-</div>
             <!-- Preferences tab content -->
             <div id="tab-content-preferences" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
@@ -939,11 +962,26 @@ active_tab: dashboard
     const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
     const issuesUrl = `${pythonURI}/api/analytics/github/user/issues`;
 
+    // Remove old predictGradeBtn logic and update smartPredictBtn logic:
     const smartPredictBtn = document.getElementById("smartPredictBtn");
     smartPredictBtn.onclick = async () => {
+        console.log("HI AADI")
         const userGradeEl = document.getElementById("userGrade");
+        userGradeEl.textContent = "Predicting...";
+        // Collect slider values
+        const fields = [
+            "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+            "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+        ];
+        const body = {};
+        fields.forEach(f => {
+            body[f] = Number(document.getElementById(`slider-${f}`).value);
+        });
+
+        console.log("Sending smart grade prediction with body:", body);
+
         try {
-            const train = await fetch(`${javaURI}/api/grade-prediction/train`, {
+            await fetch(`${javaURI}/api/grade-prediction/train`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
@@ -957,23 +995,82 @@ active_tab: dashboard
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "assignment_completion_rate": 1.2,
-                    "average_assignment_score": 1,
-                    "collegeboard_quiz_average": 1,
-                    "office_hours_visits": 3,
-                    "conduct": 1,
-                    "work_habit": 1,
-                    "github_contributions": 0
-                })
+                body: JSON.stringify(body)
             });
             const data = await predict.json();
-            console.log(data);
+            console.log("Prediction response:", data);
             userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
         } catch (error) {
             console.error("Error fetching prediction:", error);
+            userGradeEl.textContent = "Error predicting grade.";
         }
     };
+
+    // Update slider value labels live
+    document.addEventListener('DOMContentLoaded', function () {
+        [
+            "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+            "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+        ].forEach(f => {
+            const slider = document.getElementById(`slider-${f}`);
+            const label = document.getElementById(`val-${f}`);
+            if (slider && label) {
+                slider.addEventListener('input', () => { label.textContent = slider.value; });
+            }
+        });
+    });
+
+    // Attach smartPredictBtn handler ONCE, using correct userGrade element
+    document.addEventListener('DOMContentLoaded', function () {
+        const smartPredictBtn = document.getElementById("smartPredictBtn");
+        if (smartPredictBtn) {
+            smartPredictBtn.onclick = async () => {
+                const userGradeEl = document.getElementById("userGrade");
+                if (!userGradeEl) {
+                    console.error('userGrade element not found');
+                    return;
+                }
+                userGradeEl.textContent = "Predicting...";
+                // Collect slider values
+                const fields = [
+                    "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+                    "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+                ];
+                const body = {};
+                fields.forEach(f => {
+                    body[f] = Number(document.getElementById(`slider-${f}`).value);
+                });
+
+                console.log("Sending smart grade prediction with body:", body);
+
+                try {
+                    await fetch(`${javaURI}/api/grade-prediction/train`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+                } catch (error) {
+                    console.error("Error with training:", error);
+                }
+
+                try {
+                    const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    const data = await predict.json();
+                    console.log("Prediction response:", data);
+                    userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
+                } catch (error) {
+                    console.error("Error fetching prediction:", error);
+                    userGradeEl.textContent = "Error predicting grade.";
+                }
+            };
+        }
+    });
+
     async function fetchData() {
         try {
             const [profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes] = await Promise.all([
