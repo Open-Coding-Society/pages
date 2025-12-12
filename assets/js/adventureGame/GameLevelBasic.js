@@ -101,7 +101,7 @@ class GameLevelBasic {
             { class: GamEnvBackground, data: image_data_desert },
             { class: Player, data: sprite_data_chillguy },
             { class: Npc, data: sprite_data_r2d2 },
-            { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/3) }, size: 20, points: 5 } },
+            { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/2) }, size: 20, points: 5 } },
         ];
   }
 

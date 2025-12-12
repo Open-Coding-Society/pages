@@ -860,7 +860,8 @@ class GameLevelDesert {
       { class: Npc, data: sprite_data_crypto },
       { class: Npc, data: sprite_data_minesweeper },
       { class: Npc, data: sprite_data_chickenj },
-      { class: Npc, data: sprite_data_endportal } 
+      { class: Npc, data: sprite_data_endportal },
+      { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/2) }, size: 20, points: 5 } }
     ];
   }
 
