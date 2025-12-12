@@ -152,7 +152,8 @@
 
   /* Muted secondary text */
   .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
-  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
+  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500,
+  .post-meta, .post-meta-description {
     color: var(--text-muted) !important;
   }
 
@@ -173,5 +174,41 @@
     background-color: var(--pref-accent-color) !important;
     border-color: var(--pref-accent-color) !important;
     color: #fff !important;
+  }
+
+  /* Lesson player specific overrides */
+  .lesson-player,
+  .lesson-main,
+  .main-content,
+  .content-wrapper,
+  .lesson-content {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+  }
+  
+  .lesson-sidebar,
+  .sidebar-header,
+  .sprint-nav,
+  .sprint-section,
+  .lesson-item {
+    background-color: var(--panel) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+  
+  .sidebar-header h2,
+  .sidebar-header p,
+  .sprint-toggle,
+  .lesson-title,
+  .progress-label {
+    color: var(--pref-text-color) !important;
+  }
+  
+  /* Tailwind background class overrides */
+  [class*="bg-neutral-"],
+  [class*="bg-gray-"],
+  [class*="bg-slate-"],
+  [class*="bg-zinc-"] {
+    background-color: var(--pref-bg-color) !important;
   }
 }

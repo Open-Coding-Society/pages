@@ -120,6 +120,15 @@
     padding: 20px;
   }
 
+  /* Responsive Table Container */
+  #admin-container {
+    overflow-x: auto;
+    width: 100%;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+  }
+
   /* Table Styles */
   #admin-table {
     width: 100%;
@@ -139,11 +148,13 @@
     padding: 12px;
     text-align: left;
     font-weight: 600;
+    white-space: nowrap;
   }
 
   #admin-table td {
     padding: 12px;
     border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
   }
 
   #admin-table tr:hover {

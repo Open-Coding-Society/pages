@@ -35,7 +35,7 @@
     },
     Light: {
       bg: '#ffffff',
-      text: '#0f172a',
+      text: '#FF80AA',
       font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
       size: 14,
       accent: '#2563eb',
@@ -49,7 +49,7 @@
     },
     Sepia: {
       bg: '#f4ecd8',
-      text: '#3b2f2f',
+      text: '#A52A2A',
       font: "Georgia, 'Times New Roman', Times, serif",
       size: 14,
       accent: '#b45309',
@@ -116,6 +116,10 @@
     const font = prefs?.font || base.font;
     const size = prefs?.size || base.size;
     const accent = prefs?.accent || base.accent;
+    
+    // Styling preferences
+    const selectionColor = prefs?.selectionColor || accent;
+    const buttonStyle = prefs?.buttonStyle || 'rounded';
 
     const root = document.documentElement;
     root.style.setProperty('--pref-bg-color', bg);
@@ -123,6 +127,7 @@
     root.style.setProperty('--pref-font-family', font);
     root.style.setProperty('--pref-font-size', size + 'px');
     root.style.setProperty('--pref-accent-color', accent);
+    root.style.setProperty('--pref-selection-color', selectionColor);
 
     const set = (name, value) => root.style.setProperty(name, value);
     
@@ -150,8 +155,17 @@
     set('--ui-bg', uiBg);
     set('--ui-border', uiBorder);
     
-    // Text colors that work on panels
-    const textMuted = adjustColor(text, lightBg ? 40 : -40);
+    // Text colors that work on panels - muted text should still be readable
+    // For light backgrounds: we want a medium-dark gray that contrasts with white
+    // For dark backgrounds: we want a medium-light gray that contrasts with dark
+    let textMuted;
+    if (lightBg) {
+      // Light background: use a dark gray for muted text (good contrast on white)
+      textMuted = '#6b7280'; // Tailwind gray-500, works well on light backgrounds
+    } else {
+      // Dark background: make the light text slightly dimmer
+      textMuted = adjustColor(text, -60);
+    }
     set('--text-muted', textMuted);
 
     // Turn on the high-priority theme class on <html> so global CSS rules
@@ -159,14 +173,20 @@
     document.documentElement.classList.add('user-theme-active');
 
     // Inject CSS to override Tailwind classes with our theme colors
-    injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted);
+    injectThemeOverrideCSS({
+      bg, text, font, size, accent, panel, uiBorder, textMuted,
+      selectionColor, buttonStyle
+    });
 
     // Apply language translation if set
     const lang = prefs?.language || '';
     applyLanguage(lang);
   }
 
-  function injectThemeOverrideCSS(bg, text, font, size, accent, panel, uiBorder, textMuted) {
+  function injectThemeOverrideCSS(opts) {
+    const { bg, text, font, size, accent, panel, uiBorder, textMuted,
+            selectionColor, buttonStyle } = opts;
+    
     const styleId = 'user-theme-override-css';
     let style = document.getElementById(styleId);
     if (!style) {
@@ -174,6 +194,11 @@
       style.id = styleId;
       document.head.appendChild(style);
     }
+    
+    // Generate button border-radius based on style
+    let btnRadius = '0.375rem'; // rounded (default)
+    if (buttonStyle === 'square') btnRadius = '0';
+    else if (buttonStyle === 'pill') btnRadius = '9999px';
     
     // Override Tailwind's neutral background classes when theme is active
     style.textContent = `
@@ -183,6 +208,25 @@
         color: ${text} !important;
         font-family: ${font} !important;
         font-size: ${size}px !important;
+      }
+      
+      /* Selection highlight color */
+      html.user-theme-active ::selection {
+        background-color: ${selectionColor} !important;
+        color: white !important;
+      }
+      html.user-theme-active ::-moz-selection {
+        background-color: ${selectionColor} !important;
+        color: white !important;
+      }
+      
+      /* Button border-radius based on style */
+      html.user-theme-active button,
+      html.user-theme-active .btn,
+      html.user-theme-active [class*="rounded"] button,
+      html.user-theme-active input[type="submit"],
+      html.user-theme-active input[type="button"] {
+        border-radius: ${btnRadius} !important;
       }
       
       /* Main content areas */
@@ -215,6 +259,20 @@
         color: ${textMuted} !important;
       }
       
+      /* Gray text classes - common for descriptions */
+      html.user-theme-active .text-gray-300,
+      html.user-theme-active .text-gray-400,
+      html.user-theme-active .text-gray-500,
+      html.user-theme-active .text-gray-600 {
+        color: ${textMuted} !important;
+      }
+      
+      /* Blog post meta and descriptions - these have hardcoded colors in themes */
+      html.user-theme-active .post-meta,
+      html.user-theme-active .post-meta-description {
+        color: ${textMuted} !important;
+      }
+      
       /* Borders */
       html.user-theme-active .border-neutral-700,
       html.user-theme-active .border-neutral-600 {
@@ -239,6 +297,75 @@
         background-color: ${panel} !important;
         color: ${text} !important;
         border-color: ${uiBorder} !important;
+      }
+      
+      /* Lesson player overrides - these have hardcoded dark colors */
+      html.user-theme-active .lesson-player {
+        background-color: ${bg} !important;
+      }
+      
+      html.user-theme-active .lesson-sidebar {
+        background-color: ${panel} !important;
+        border-color: ${uiBorder} !important;
+      }
+      
+      html.user-theme-active .lesson-sidebar,
+      html.user-theme-active .sidebar-header,
+      html.user-theme-active .sprint-nav,
+      html.user-theme-active .sprint-section,
+      html.user-theme-active .lesson-item {
+        background-color: ${panel} !important;
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .lesson-main,
+      html.user-theme-active .main-content,
+      html.user-theme-active .lesson-content,
+      html.user-theme-active .content-wrapper {
+        background-color: ${bg} !important;
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .sidebar-header h2,
+      html.user-theme-active .sidebar-header p,
+      html.user-theme-active .sprint-toggle,
+      html.user-theme-active .lesson-title {
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .progress-bar-sidebar {
+        background-color: ${uiBorder} !important;
+      }
+      
+      /* Module cards in lesson player */
+      html.user-theme-active .module-card,
+      html.user-theme-active [class*="bg-neutral"],
+      html.user-theme-active [class*="bg-gray"],
+      html.user-theme-active [class*="bg-slate"],
+      html.user-theme-active [class*="bg-zinc"] {
+        background-color: ${panel} !important;
+        color: ${text} !important;
+      }
+      
+      /* All headings and paragraphs */
+      html.user-theme-active h1,
+      html.user-theme-active h2,
+      html.user-theme-active h3,
+      html.user-theme-active h4,
+      html.user-theme-active h5,
+      html.user-theme-active h6,
+      html.user-theme-active p,
+      html.user-theme-active li,
+      html.user-theme-active span,
+      html.user-theme-active div {
+        color: ${text} !important;
+      }
+      
+      /* Except for buttons and special elements */
+      html.user-theme-active button,
+      html.user-theme-active .btn,
+      html.user-theme-active a.btn {
+        color: inherit !important;
       }
     `;
   }
@@ -440,6 +567,8 @@
       '--pref-font-family',
       '--pref-font-size',
       '--pref-accent-color',
+      '--pref-selection-color',
+      '--pref-cursor-style',
       '--background',
       '--bg-0',
       '--bg-1',

@@ -1,5 +1,8 @@
 <!-- Small Inbox Button (appears to the left of the microblog FAB) -->
-<button id="inbox-toggle-btn" class="inbox-fab" aria-label="Open Inbox">📥</button>
+<button id="inbox-toggle-btn" class="inbox-fab" aria-label="Open Inbox">
+  📥
+  <div id="inbox-badge" class="inbox-badge hidden" title="Unread announcements">!</div>
+</button>
 
 <!-- Compact Inbox Panel (opened by the small inbox FAB) -->
 <aside id="inbox-panel" class="microblog-panel inbox-panel--compact" tabindex="-1" aria-label="Inbox panel">
@@ -10,7 +13,6 @@
   <div class="microblog-panel-content">
     <div class="inbox-tabs" style="display:flex; gap:0.5rem; padding:0.5rem;">
       <button id="tab-announcements" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Announcements</button>
-      <button id="tab-notifications" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Notifications</button>
     </div>
 
     <div id="announcements-content">
@@ -43,10 +45,6 @@
       </div>
       </div>
 
-    <div id="notifications-content" style="display:none; padding:0.5rem; color:var(--white);">
-      <em>(work in progress)</em>
-    </div>
-
   </div>
 </aside>
 
@@ -69,6 +67,7 @@ async function checkInboxAdminAccess() {
     if (isAdmin) {
       const inboxForm = document.getElementById('inbox-form');
       const inboxDivider = document.getElementById('inbox-form-divider');
+      
       if (inboxForm) inboxForm.style.display = 'block';
       if (inboxDivider) inboxDivider.style.display = 'block';
       
@@ -113,39 +112,9 @@ document.addEventListener('click', (e) => {
   if (inboxToggle && e.target === inboxToggle) return;
   closeInboxPanel();
 });
-
 </script>
 
 <script>
-// Tab switching logic for Inbox
-(function(){
-  const tabAnnouncements = document.getElementById('tab-announcements');
-  const tabNotifications = document.getElementById('tab-notifications');
-  const annContent = document.getElementById('announcements-content');
-  const notContent = document.getElementById('notifications-content');
-
-  function setActiveTab(tab){
-    if (tab === 'notifications'){
-      tabNotifications.style.background = 'rgba(255,255,255,0.06)';
-      tabAnnouncements.style.background = 'transparent';
-      annContent.style.display = 'none';
-      notContent.style.display = 'block';
-    } else {
-      tabAnnouncements.style.background = 'rgba(255,255,255,0.06)';
-      tabNotifications.style.background = 'transparent';
-      annContent.style.display = 'block';
-      notContent.style.display = 'none';
-    }
-  }
-
-  if (tabAnnouncements && tabNotifications){
-    tabAnnouncements.addEventListener('click', () => { setActiveTab('announcements'); openInboxPanel(); });
-    tabNotifications.addEventListener('click', () => { setActiveTab('notifications'); openInboxPanel(); });
-    // default active
-    setActiveTab('announcements');
-  }
-})();
-
 // Inbox form behavior (no persistence)
 ;(function(){
   const form = document.getElementById('inbox-form');
@@ -153,6 +122,20 @@ document.addEventListener('click', (e) => {
   const addLinkBtn = document.getElementById('add-link-btn');
   const messagesEl = document.getElementById('inbox-messages');
   const clearBtn = document.getElementById('inbox-clear-btn');
+  const badge = document.getElementById('inbox-badge');
+
+  // Update badge visibility based on unread messages
+  function updateBadge() {
+    const unreadMessages = messagesEl.querySelectorAll('.inbox-message.unread');
+    const unreadCount = unreadMessages.length;
+    
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount > 9 ? '!' : unreadCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
 
   function createLinkRow(url='', label=''){
     const row = document.createElement('div');
@@ -209,12 +192,13 @@ document.addEventListener('click', (e) => {
     }).filter(l => l.url);
 
     // Build announcement object
-    const ann = { id: 'ann-' + Date.now() + '-' + Math.floor(Math.random()*1000), title, content, links };
+    const ann = { id: 'ann-' + Date.now() + '-' + Math.floor(Math.random()*1000), title, content, links, unread: true };
 
     function buildMessageElement(announcement){
       const el = document.createElement('div');
-      el.className = 'inbox-message';
+      el.className = 'inbox-message' + (announcement.unread ? ' unread' : '');
       el.dataset.annId = announcement.id;
+      el.dataset.unread = announcement.unread ? 'true' : 'false';
       el.style.padding = '0.75rem';
       el.style.border = '1px solid rgba(255,255,255,0.06)';
       el.style.borderRadius = '6px';
@@ -259,19 +243,28 @@ document.addEventListener('click', (e) => {
       delBtn.className = 'microblog-btn-cancel';
       delBtn.textContent = 'Delete';
       delBtn.onclick = () => {
-        if (confirm('Delete this announcement?')) el.remove();
+        if (confirm('Delete this announcement?')) {
+          el.remove();
+          updateBadge();
+        }
       };
 
       const markDoneBtn = document.createElement('button');
       markDoneBtn.type = 'button';
       markDoneBtn.className = 'microblog-btn-done';
-      markDoneBtn.title = 'Mark as done';
-      markDoneBtn.setAttribute('aria-label', 'Mark as done');
+      markDoneBtn.title = 'Mark as read';
+      markDoneBtn.setAttribute('aria-label', 'Mark as read');
       markDoneBtn.innerHTML = '&#10003;';
       markDoneBtn.onclick = () => {
-        // visual toggle only for now
+        // Mark as read: remove unread class and update dataset
+        const wasUnread = el.dataset.unread === 'true';
+        el.classList.remove('unread');
+        el.dataset.unread = 'false';
+        // visual toggle for done state
         el.classList.toggle('inbox-done');
         markDoneBtn.classList.toggle('done');
+        // Update badge if there are no more unread messages
+        if (wasUnread) updateBadge();
       };
 
       controls.appendChild(editBtn);
@@ -335,6 +328,8 @@ document.addEventListener('click', (e) => {
         // Prepend to ensure newest announcements appear first
         if (messagesEl.prepend) messagesEl.prepend(msgEl); else messagesEl.insertBefore(msgEl, messagesEl.firstChild);
       }
+      // Update badge with new unread count
+      updateBadge();
     }
 
     // reset form
