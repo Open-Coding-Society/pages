@@ -41,44 +41,144 @@
     padding: 3px;
   }
   
-// STYLING FOR CALCULATOR
-  /* class to create the calculator's container; uses CSS grid dsiplay to partition off buttons */
-  .calculator-container { 
-    width: 90vw; /* this width and height is specified for mobile devices by default */
-    height: 80vh;
-    margin: 0 auto;
-  
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* fr is a special unit; learn more here: https://css-tricks.com/introduction-fr-css-unit/  */
-    grid-template-rows: 0.5fr repeat(4, 1fr);
-    gap: 10px 10px;
-  }
-  
-  @media (min-width: 600px) { 
-    .calculator-container {
-        width: 40vw;
-        height: 80vh;
-    }
+// ==========================================
+// MODERN RESPONSIVE CALCULATOR STYLING
+// ==========================================
+
+/* Animation container */
+#animation {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Calculator container - simple grid layout */
+.calculator-container { 
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #313131; /* light gray background */
+  border: 2px solid #000; /* simple border */
+  border-radius: 8px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto repeat(5, 1fr);
+  gap: 8px;
+}
+
+/* Output display */
+.calculator-output {
+  grid-column: span 4;
+  background: #595555; /* lighter gray */
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 2rem;
+  font-family: monospace;
+  color: #000; /* black text */
+  text-align: right;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+/* Base button style */
+@mixin calc-button {
+  border-radius: 4px;
+  border: 1px solid #000;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000; /* black background */
+  color: #fff; /* white text */
+  transition: background 0.2s ease;
+}
+
+/* Number buttons */
+.calculator-number {
+  @include calc-button;
+
+  &:hover {
+    background: #333; /* dark gray on hover */
   }
 
-  /* styling for the calculator number button */
-  .calculator-number {
-    @extend .button;
+  &.zero {
+    grid-column: span 2;
+  }
+}
+
+/* Operation buttons (+, -, *, /) */
+.calculator-operation {
+  @include calc-button;
+
+  &:hover {
+    background: #333;
+  }
+}
+
+/* Clear button */
+.calculator-clear {
+  @include calc-button;
+
+  &:hover {
+    background: #333;
+  }
+}
+
+/* Equals button */
+.calculator-equals {
+  @include calc-button;
+
+  &:hover {
+    background: #333;
+  }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 480px) {
+  .calculator-container {
+    max-width: 100%;
+    padding: 0.75rem;
+    gap: 6px;
+    border-radius: 6px;
   }
 
-  /* styling for the calculator operation button */
-  .calculator-operation {
-    @extend .button;
+  .calculator-output {
+    min-height: 50px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1.5rem;
   }
-  
-  /* styling for the calculator clear button */
-  .calculator-clear {
-    @extend .button;
-    background-color: #e68b1c;
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .calculator-container {
+    max-width: 350px;
   }
-  
-  /* styling for the calculator equals button */
+}
+
+@media (min-width: 769px) {
+  .calculator-container {
+    max-width: 400px;
+  }
+
+  .calculator-number,
+  .calculator-operation,
+  .calculator-clear,
   .calculator-equals {
-    @extend .button;
-    background-color: #e70f0f;
+    min-height: 60px;
   }
+}
+
+/* Disable canvas filter if present */
+canvas {
+  filter: none;
+}
+
+
