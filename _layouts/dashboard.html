@@ -241,20 +241,145 @@ score += gists * 0.5
 
             <!-- admin search tab content -->
             <div id="tab-content-admin-search" class="tab-content hidden px-6 py-4 text-neutral-200">
-                <h2 class="text-xl font-semibold mb-4">Admin: Search User Commits</h2>
-
-                <div class="mb-4 max-w-md">
-                    <label for="uid-input" class="block mb-2 font-medium text-neutral-300">Enter User ID (UID):</label>
-                    <input type="text" id="uid-input" class="w-full rounded px-3 py-2 bg-neutral-700 text-white border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. github username or UID" />
-                    <p id="uid-error" class="mt-1 text-red-500 text-sm min-h-[1.25rem]"></p>
+                <h2 class="text-xl font-semibold mb-4">Admin: Search & Evaluate Users</h2>
+                <div id="admin-people-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <p class="col-span-full text-neutral-400" id="admin-people-loading">Loading users...</p>
                 </div>
+                <!-- Modal for evaluation -->
+                <div id="admin-eval-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+                    <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-lg relative">
+                        <button id="admin-eval-modal-close" class="absolute top-3 right-3 text-neutral-400 hover:text-white text-2xl">&times;</button>
+                        <h3 id="admin-eval-modal-title" class="text-lg font-semibold mb-4"></h3>
+                        <form id="admin-eval-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <!-- Sliders will be injected here -->
+                        </form>
+                        <button id="admin-eval-update-btn" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold">Update</button>
+                        <p id="admin-eval-status" class="text-sm mt-3"></p>
+                    </div>
+                </div>
+                <script type="module">
+                import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-                <button id="uid-search-btn" class="mb-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition">
-                    Search Commits
-                </button>
+                // --- UI Elements ---
+                const peopleList = document.getElementById('admin-people-list');
+                const loadingEl = document.getElementById('admin-people-loading');
+                const modal = document.getElementById('admin-eval-modal');
+                const modalTitle = document.getElementById('admin-eval-modal-title');
+                const modalClose = document.getElementById('admin-eval-modal-close');
+                const evalForm = document.getElementById('admin-eval-form');
+                const updateBtn = document.getElementById('admin-eval-update-btn');
+                const statusEl = document.getElementById('admin-eval-status');
+                let people = [];     
+                // --- Slider fields and labels ---
+                const sliderFields = [
+                    { key: "attendance", label: "Attendance" },
+                    { key: "work_habits", label: "Work Habits" },
+                    { key: "behavior", label: "Behavior" },
+                    { key: "timeliness", label: "Timeliness" },
+                    { key: "tech_sense", label: "Tech Sense" },
+                    { key: "tech_talk", label: "Tech Talk" },
+                    { key: "tech_growth", label: "Tech Growth" },
+                    { key: "advocacy", label: "Advocacy" },
+                    { key: "communication", label: "Communication" },
+                    { key: "integrity", label: "Integrity" },
+                    { key: "organization", label: "Organization" }
+                ];
 
-                <div id="admin-summary-container" class="mb-6"></div>
-                <div id="admin-commitCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                let currentPerson = null;
+
+                // --- Fetch and render people ---
+                async function fetchPeople() {
+                    console.log("ASASASDADASDUSFIHAFIUGASIFGOY")
+                    loadingEl.textContent = "Loading users...";
+                    try {
+                        const response = await fetch(`${javaURI}/api/people`, fetchOptions);
+                        if (!response.ok) throw new Error("Failed to fetch people");
+                        const data = await response.json();
+                        people = data.map(person => ({
+                            id: person.id,
+                            name: person.name,
+                            email: person.email,
+                            uid: person.uid,
+                            sid: person.sid
+                        }));
+                        peopleList.innerHTML = '';
+                        people.forEach(person => {
+                            const card = document.createElement('div');
+                            card.className = 'cursor-pointer border border-neutral-700 bg-neutral-800 rounded-xl p-5 shadow hover:border-blue-500 transition';
+                            card.innerHTML = `
+                                <div class="font-semibold text-lg mb-1">${person.name || 'No Name'}</div>
+                                <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono">${person.uid}</span></div>
+                                <div class="text-xs text-neutral-500">ID: ${person.id}</div>
+                            `;
+                            card.addEventListener('click', () => openEvalModal(person));
+                            peopleList.appendChild(card);
+                        });
+                    } catch (e) {
+                        console.error(e);
+                        peopleList.innerHTML = '<p class="col-span-full text-red-500">Error loading users.</p>';
+                    }
+                }
+
+                // --- Modal logic ---
+                function openEvalModal(person) {
+                    currentPerson = person;
+                    modalTitle.textContent = `Evaluate: ${person.name} (UID: ${person.uid})`;
+                    evalForm.innerHTML = sliderFields.map(f => `
+                        <div>
+                            <label for="admin-slider-${f.key}" class="block text-sm text-neutral-300 mb-1">${f.label}</label>
+                            <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="4" class="w-full" />
+                            <span class="text-xs text-neutral-400">Value: <span id="admin-val-${f.key}">4</span></span>
+                        </div>
+                    `).join('');
+                    // Live update slider values
+                    sliderFields.forEach(f => {
+                        const slider = document.getElementById(`admin-slider-${f.key}`);
+                        const label = document.getElementById(`admin-val-${f.key}`);
+                        slider.addEventListener('input', () => { label.textContent = slider.value; });
+                    });
+                    statusEl.textContent = '';
+                    modal.classList.remove('hidden');
+                }
+
+                function closeEvalModal() {
+                    modal.classList.add('hidden');
+                    currentPerson = null;
+                }
+
+                modalClose.onclick = closeEvalModal;
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeEvalModal();
+                });
+
+                // --- Update handler ---
+                updateBtn.onclick = async () => {
+                    if (!currentPerson) return;
+                    updateBtn.disabled = true;
+                    statusEl.textContent = 'Updating...';
+                    // Collect slider values
+                    const body = { "user_id": currentPerson.id };
+                    sliderFields.forEach(f => {
+                        body[f.key] = Number(document.getElementById(`admin-slider-${f.key}`).value);
+                    });
+                    try {
+                        console.log("Updating with body:", JSON.stringify(body));
+                        const res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(body)
+                        });
+                        if (!res.ok) throw new Error('Failed to update');
+                        statusEl.textContent = '✅ Updated successfully!';
+                    } catch (e) {
+                        statusEl.textContent = '❌ Error updating.';
+                    }
+                    updateBtn.disabled = false;
+                };
+
+                // --- Initial load ---
+                fetchPeople();
+                </script>
             </div>
 
             <div id="tab-content-your-feedback" class="tab-content hidden px-6 py-4 text-neutral-200">
@@ -999,7 +1124,6 @@ score += gists * 0.5
     // Remove old predictGradeBtn logic and update smartPredictBtn logic:
     const smartPredictBtn = document.getElementById("smartPredictBtn");
     smartPredictBtn.onclick = async () => {
-        console.log("HI AADI")
         const userGradeEl = document.getElementById("userGrade");
         userGradeEl.textContent = "Predicting...";
         // Collect slider values
@@ -1262,7 +1386,7 @@ score += gists * 0.5
                     </select>
                 </th>
                 <th class="px-4 py-2">GitHub Issue</th>
-                <th class="px-4 py-2">
+                               <th class="px-4 py-2">
                     Status<br />
                     <select id="status-filter" class="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 mt-1 text-sm">
                     <option value="">All</option>
