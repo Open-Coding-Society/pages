@@ -155,8 +155,17 @@
     set('--ui-bg', uiBg);
     set('--ui-border', uiBorder);
     
-    // Text colors that work on panels
-    const textMuted = adjustColor(text, lightBg ? 40 : -40);
+    // Text colors that work on panels - muted text should still be readable
+    // For light backgrounds: we want a medium-dark gray that contrasts with white
+    // For dark backgrounds: we want a medium-light gray that contrasts with dark
+    let textMuted;
+    if (lightBg) {
+      // Light background: use a dark gray for muted text (good contrast on white)
+      textMuted = '#6b7280'; // Tailwind gray-500, works well on light backgrounds
+    } else {
+      // Dark background: make the light text slightly dimmer
+      textMuted = adjustColor(text, -60);
+    }
     set('--text-muted', textMuted);
 
     // Turn on the high-priority theme class on <html> so global CSS rules
@@ -250,6 +259,20 @@
         color: ${textMuted} !important;
       }
       
+      /* Gray text classes - common for descriptions */
+      html.user-theme-active .text-gray-300,
+      html.user-theme-active .text-gray-400,
+      html.user-theme-active .text-gray-500,
+      html.user-theme-active .text-gray-600 {
+        color: ${textMuted} !important;
+      }
+      
+      /* Blog post meta and descriptions - these have hardcoded colors in themes */
+      html.user-theme-active .post-meta,
+      html.user-theme-active .post-meta-description {
+        color: ${textMuted} !important;
+      }
+      
       /* Borders */
       html.user-theme-active .border-neutral-700,
       html.user-theme-active .border-neutral-600 {
@@ -274,6 +297,75 @@
         background-color: ${panel} !important;
         color: ${text} !important;
         border-color: ${uiBorder} !important;
+      }
+      
+      /* Lesson player overrides - these have hardcoded dark colors */
+      html.user-theme-active .lesson-player {
+        background-color: ${bg} !important;
+      }
+      
+      html.user-theme-active .lesson-sidebar {
+        background-color: ${panel} !important;
+        border-color: ${uiBorder} !important;
+      }
+      
+      html.user-theme-active .lesson-sidebar,
+      html.user-theme-active .sidebar-header,
+      html.user-theme-active .sprint-nav,
+      html.user-theme-active .sprint-section,
+      html.user-theme-active .lesson-item {
+        background-color: ${panel} !important;
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .lesson-main,
+      html.user-theme-active .main-content,
+      html.user-theme-active .lesson-content,
+      html.user-theme-active .content-wrapper {
+        background-color: ${bg} !important;
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .sidebar-header h2,
+      html.user-theme-active .sidebar-header p,
+      html.user-theme-active .sprint-toggle,
+      html.user-theme-active .lesson-title {
+        color: ${text} !important;
+      }
+      
+      html.user-theme-active .progress-bar-sidebar {
+        background-color: ${uiBorder} !important;
+      }
+      
+      /* Module cards in lesson player */
+      html.user-theme-active .module-card,
+      html.user-theme-active [class*="bg-neutral"],
+      html.user-theme-active [class*="bg-gray"],
+      html.user-theme-active [class*="bg-slate"],
+      html.user-theme-active [class*="bg-zinc"] {
+        background-color: ${panel} !important;
+        color: ${text} !important;
+      }
+      
+      /* All headings and paragraphs */
+      html.user-theme-active h1,
+      html.user-theme-active h2,
+      html.user-theme-active h3,
+      html.user-theme-active h4,
+      html.user-theme-active h5,
+      html.user-theme-active h6,
+      html.user-theme-active p,
+      html.user-theme-active li,
+      html.user-theme-active span,
+      html.user-theme-active div {
+        color: ${text} !important;
+      }
+      
+      /* Except for buttons and special elements */
+      html.user-theme-active button,
+      html.user-theme-active .btn,
+      html.user-theme-active a.btn {
+        color: inherit !important;
       }
     `;
   }
