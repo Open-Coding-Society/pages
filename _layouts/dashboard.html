@@ -289,7 +289,6 @@ score += gists * 0.5
 
                 // --- Fetch and render people ---
                 async function fetchPeople() {
-                    console.log("ASASASDADASDUSFIHAFIUGASIFGOY")
                     loadingEl.textContent = "Loading users...";
                     try {
                         const response = await fetch(`${javaURI}/api/people`, fetchOptions);
@@ -362,7 +361,6 @@ score += gists * 0.5
                         body[f.key] = Number(document.getElementById(`admin-slider-${f.key}`).value);
                     });
                     try {
-                        console.log("Updating with body:", JSON.stringify(body));
                         const res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
                             method: 'POST',
                             credentials: 'include',
@@ -1136,8 +1134,6 @@ score += gists * 0.5
             body[f] = Number(document.getElementById(`slider-${f}`).value);
         });
 
-        console.log("Sending smart grade prediction with body:", body);
-
         try {
             await fetch(`${javaURI}/api/grade-prediction/train`, {
                 method: 'GET',
@@ -1156,7 +1152,6 @@ score += gists * 0.5
                 body: JSON.stringify(body)
             });
             const data = await predict.json();
-            console.log("Prediction response:", data);
             userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
         } catch (error) {
             console.error("Error fetching prediction:", error);
@@ -1199,8 +1194,6 @@ score += gists * 0.5
                     body[f] = Number(document.getElementById(`slider-${f}`).value);
                 });
 
-                console.log("Sending smart grade prediction with body:", body);
-
                 try {
                     await fetch(`${javaURI}/api/grade-prediction/train`, {
                         method: 'GET',
@@ -1219,7 +1212,6 @@ score += gists * 0.5
                         body: JSON.stringify(body)
                     });
                     const data = await predict.json();
-                    console.log("Prediction response:", data);
                     userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
                 } catch (error) {
                     console.error("Error fetching prediction:", error);
