@@ -284,6 +284,7 @@ score += gists * 0.5
                 ];
 
                 let currentPerson = null;
+                let hasExistingEval = false; // Track if evaluation exists
 
                 // --- Fetch and render people ---
                 async function fetchPeople() {
@@ -318,16 +319,61 @@ score += gists * 0.5
                 }
 
                 // --- Modal logic ---
-                function openEvalModal(person) {
+                async function openEvalModal(person) {
                     currentPerson = person;
+                    hasExistingEval = false;
                     modalTitle.textContent = `Evaluate: ${person.name} (UID: ${person.uid})`;
-                    evalForm.innerHTML = sliderFields.map(f => `
-                        <div>
-                            <label for="admin-slider-${f.key}" class="block text-sm text-neutral-300 mb-1">${f.label}</label>
-                            <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="4" class="w-full" />
-                            <span class="text-xs text-neutral-400">Value: <span id="admin-val-${f.key}">4</span></span>
-                        </div>
-                    `).join('');
+
+                    // Try to fetch existing evaluation
+                    let evalData = null;
+                    try {
+                        const res = await fetch(`${javaURI}/api/admin-evaluation/get/${person.id}`, fetchOptions);
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json && typeof json === 'object' && json.evaluation) {
+                                evalData = json.evaluation;
+                                hasExistingEval = true;
+                            }
+                        }
+                    } catch (e) {
+                        evalData = null;
+                    }
+
+                    // Map API keys to slider keys
+                    const apiToSliderKey = {
+                        attendance: "attendance",
+                        workHabits: "work_habits",
+                        behavior: "behavior",
+                        timeliness: "timeliness",
+                        techSense: "tech_sense",
+                        techTalk: "tech_talk",
+                        techGrowth: "tech_growth",
+                        advocacy: "advocacy",
+                        communication: "communication",
+                        integrity: "integrity",
+                        organization: "organization"
+                    };
+
+                    evalForm.innerHTML = sliderFields.map(f => {
+                        let val = 4;
+                        if (evalData) {
+                            // Use camelCase for API, snake_case for slider
+                            const apiKey = Object.keys(apiToSliderKey).find(
+                                k => apiToSliderKey[k] === f.key
+                            );
+                            if (apiKey && typeof evalData[apiKey] !== "undefined" && evalData[apiKey] !== null) {
+                                val = evalData[apiKey];
+                            }
+                        }
+                        return `
+                            <div>
+                                <label for="admin-slider-${f.key}" class="block text-sm text-neutral-300 mb-1">${f.label}</label>
+                                <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="${val}" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="admin-val-${f.key}">${val}</span></span>
+                            </div>
+                        `;
+                    }).join('');
+
                     // Live update slider values
                     sliderFields.forEach(f => {
                         const slider = document.getElementById(`admin-slider-${f.key}`);
@@ -359,14 +405,27 @@ score += gists * 0.5
                         body[f.key] = Number(document.getElementById(`admin-slider-${f.key}`).value);
                     });
                     try {
-                        const res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
-                            method: 'POST',
-                            credentials: 'include',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(body)
-                        });
+                        let res;
+                        if (hasExistingEval) {
+                            // Use PUT to update
+                            res = await fetch(`${javaURI}/api/admin-evaluation/update/${currentPerson.id}`, {
+                                method: 'PUT',
+                                credentials: 'include',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body)
+                            });
+                        } else {
+                            // Use POST to create
+                            res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body)
+                            });
+                        }
                         if (!res.ok) throw new Error('Failed to update');
                         statusEl.textContent = '✅ Updated successfully!';
+                        hasExistingEval = true; // Now we have data
                     } catch (e) {
                         statusEl.textContent = '❌ Error updating.';
                     }
@@ -1815,116 +1874,6 @@ score += gists * 0.5
                 #profile-results-card > div { flex-direction:column !important; }
                 #profile-results-card > div > div { max-width:100% !important; padding:2rem 1rem !important; border-right:none !important;}
               }
-            </style>
-            `;
-        }
-
-        // --- Render AP Exam Predictor Card (match screenshot) ---
-        function renderAPExamCard(ap_exam) {
-            if (!ap_exam || !ap_exam.predicted_score) {
-                return `<p class="text-neutral-400">No AP Exam predictor data available for your account.</p>`;
-            }
-            const practice = ap_exam.predicted_score.practice_based || {};
-            const manual = ap_exam.predicted_score.manual_calculator || {};
-            const lastUpdated = ap_exam.last_updated || "N/A";
-
-            // Score interpretation
-            const interpretations = {
-                5: "Extremely well qualified",
-                4: "Well qualified",
-                3: "Qualified",
-                2: "Possibly qualified",
-                1: "No recommendation"
-            };
-
-            // Confidence badge color
-            function confidenceBadge(level) {
-                let color = "#334155", bg = "#334155";
-                if (level === "High") { color = "#22d3ee"; bg = "#0e7490"; }
-                else if (level === "Medium") { color = "#fbbf24"; bg = "#78350f"; }
-                else if (level === "Low") { color = "#f87171"; bg = "#7f1d1d"; }
-                return `<span style="display:inline-block;padding:0.3em 1.2em;border-radius:1.2em;font-size:1rem;font-weight:600;background:${bg};color:${color};margin-top:0.7em;">${level?.toUpperCase() || "LOW"} CONFIDENCE</span>`;
-            }
-
-            // Card style (match screenshot)
-            return `
-            <div style="background:#10131a;border-radius:18px;max-width:900px;margin:2.5rem auto 0 auto;padding:2.5rem 2rem 2.5rem 2rem;box-shadow:0 8px 32px 0 #0005;border:1.5px solid #23232a;">
-                <div style="font-size:2rem;font-weight:700;text-align:center;color:#e5e7eb;margin-bottom:1.2rem;">
-                    Your AP Exam Predictor Results
-                    <div style="width:80px;height:3px;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#06b6d4);margin:0.5rem auto 0 auto;border-radius:2px;"></div>
-                </div>
-                <div style="margin:1.5rem 0 2.5rem 0;">
-                    <div style="display:flex;align-items:center;justify-content:center;">
-                        <span style="display:inline-flex;align-items:center;gap:0.5em;background:#172032;border-radius:0.7em;padding:0.5em 1.2em;font-size:1.05rem;color:#bae6fd;">
-                            <span style="font-size:1.2em;">📅</span>
-                            Last Updated: <span style="font-weight:600;">${lastUpdated}</span>
-                        </span>
-                    </div>
-                </div>
-                <!-- Practice-Based Prediction -->
-                <div style="margin-bottom:2.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.7em;font-size:1.15rem;font-weight:600;color:#fde047;margin-bottom:1.2rem;">
-                        <span style="font-size:1.2em;">📊</span> Practice-Based Prediction
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1.2rem;">
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ 2018</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.mcq_2018 ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ 2020</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.mcq_2020 ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ 2021</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.mcq_2021 ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">PRACTICE FRQ</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.practice_frq ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 6</span></span>
-                        </div>
-                    </div>
-                    <div style="margin-top:1.5rem;">
-                        <div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);border:2px solid #4338ca;border-radius:1rem;padding:2rem 1.5rem 1.2rem 1.5rem;display:flex;flex-direction:column;align-items:flex-start;">
-                            <span style="color:#c4b5fd;font-size:1.1rem;font-weight:600;margin-bottom:0.7em;">PREDICTED AP SCORE</span>
-                            <span style="font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;">${practice.predicted_ap_score ?? "-"}</span>
-                            ${confidenceBadge(practice.confidence_level)}
-                        </div>
-                    </div>
-                </div>
-                <hr style="border:0;border-top:1.5px solid #23232a;margin:2.5rem 0;">
-                <!-- Manual Calculator Results -->
-                <div>
-                    <div style="display:flex;align-items:center;gap:0.7em;font-size:1.15rem;font-weight:600;color:#fde047;margin-bottom:1.2rem;">
-                        <span style="font-size:1.2em;">📊</span> Manual Calculator Results
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1.2rem;">
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ SCORE</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${manual.mcq_score ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">FRQ SCORE</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${manual.frq_score ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 6</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">COMPOSITE SCORE</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${manual.composite_score ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 100</span></span>
-                        </div>
-                    </div>
-                    <div style="margin-top:1.5rem;">
-                        <div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);border:2px solid #4338ca;border-radius:1rem;padding:2rem 1.5rem 1.2rem 1.5rem;display:flex;flex-direction:column;align-items:flex-start;">
-                            <span style="color:#c4b5fd;font-size:1.1rem;font-weight:600;margin-bottom:0.7em;">PREDICTED AP SCORE</span>
-                            <span style="font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;">${manual.predicted_ap_score ?? "-"}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <style>
-                @media (max-width: 900px) {
-                    #ap-exam-results-card > div { flex-direction:column !important; }
-                    #ap-exam-results-card > div > div { max-width:100% !important; padding:2rem 1rem !important; }
-                }
             </style>
             `;
         }
