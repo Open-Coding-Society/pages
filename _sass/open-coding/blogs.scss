@@ -13,16 +13,16 @@
 }
 
 .post-list li {
+  background-color: color-mix(in srgb, var(--pref-bg-color) 95%, white 5%);
+  border: 1px solid var(--pref-accent-color);
+  border-radius: 0.5em;
   margin-bottom: 1.5em;
   padding: 1em;
-  border-radius: 0.5em;
-  background: #222222;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  transition: background 0.2s;
 }
 
 .post-list li:hover {
-  background: #222222;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
 }
 
 @media only screen and (max-width: 767px) {
