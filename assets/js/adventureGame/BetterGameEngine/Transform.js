@@ -1,38 +1,20 @@
+import { Vec2 } from 'essentials/Vectors.js';
 
 export class Transform {
-    constructor(spawnX, spawnY) {
-        this.spawnX = spawnX;
-        this.spawnY = spawnY;
-        this.x = this.spawnX;
-        this.y = this.spawnY;
-        this.xv = 0;
-        this.yv = 0;
-        this.speed = 0.4;
-    }
+    constructor(spawnX, spawnY, size=50) {
+        this.spawn = new Vec2(spawnX, spawnY);
+        this.position = this.spawn;
+        this.velocity = new Vec2(0);
 
-    move(dx, dy) {
-        rad = (this.dir * Math.PI) / 180;
-        this.xv += this.speed * Math.sin(rad);
-        this.yv += this.speed * Math.cos(rad);
+        this.size = new Vec2(size);
     }
 
     distanceTo(target) {
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
-        return Math.sqrt(dx*dx + dy*dy);
+        return this.position.length(target.position.sub(this.position));
     }
 
     pointAt(target) {
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
+        const dir = target.position.sub(this.position);
         return Math.atan2(dy, dx);
-    }
-
-    updatePosition() {
-        this.xv *= 0.9;
-        this.yv *= 0.9;
-
-        this.x += this.xv;
-        this.y += this.yv;
     }
 }
