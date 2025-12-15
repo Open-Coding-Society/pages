@@ -26,7 +26,7 @@ permalink: /navigation/blogs/
 
     async function displayUserCourses() {
         const container = document.getElementById('courseLinks');
-        
+
         // Function to show all courses (default)
         function showAllCourses() {
             container.innerHTML = `

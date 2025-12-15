@@ -35,7 +35,7 @@
     },
     Light: {
       bg: '#ffffff',
-      text: '#0f172a',
+      text: '#FF80AA',
       font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
       size: 14,
       accent: '#2563eb',
@@ -49,7 +49,7 @@
     },
     Sepia: {
       bg: '#f4ecd8',
-      text: '#3b2f2f',
+      text: '#A52A2A',
       font: "Georgia, 'Times New Roman', Times, serif",
       size: 14,
       accent: '#b45309',

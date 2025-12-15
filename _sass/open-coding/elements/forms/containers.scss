@@ -22,7 +22,7 @@ $login-form-group-margin: 1.5rem !default;
 
 .login-card,
 .signup-card {
-  background: $login-container-bg;
+  background-color: var(--bg-1);
   border-radius: $login-container-border-radius;
   box-shadow: $login-container-shadow;
   padding: $login-container-padding;

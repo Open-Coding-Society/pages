@@ -4,7 +4,7 @@ layout: aesthetihawk
 active_tab: dashboard
 ---
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet" />
+<!-- Fonts loaded globally via head-custom.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
 <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
 <div class="w-full">
@@ -567,75 +567,8 @@ score += gists * 0.5
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
                 <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Column 1: Text -->
-                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-medium">Text</h3>
-                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="text">Save</button>
-                        </div>
-                        <div class="flex flex-col gap-4">
-                            <div>
-                                <label class="text-sm text-neutral-400">Font size: <span id="font-size-label">14</span>px</label>
-                                <input type="range" id="pref-font-size" min="12" max="22" value="14" class="w-full mt-1" />
-                            </div>
-
-                            <div>
-                                <label class="text-sm text-neutral-400">Font family</label>
-                                <select id="pref-font-family" class="w-full bg-neutral-700 text-white rounded px-2 py-1 mt-1">
-                                    <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial">Inter / System</option>
-                                    <option value="Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial">Roboto</option>
-                                    <option value="'Open Sans', Arial, sans-serif">Open Sans</option>
-                                    <option value="Lato, Arial, sans-serif">Lato</option>
-                                    <option value="Montserrat, Arial, sans-serif">Montserrat</option>
-                                    <option value="Georgia, 'Times New Roman', Times, serif">Georgia (Serif)</option>
-                                    <option value="'Source Code Pro', monospace">Source Code Pro</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="text-sm text-neutral-400">Text color</label>
-                                <input type="color" id="pref-text-color" value="#e6eef8" class="w-full h-8 mt-1 rounded" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Column 2: Colors -->
-                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-medium">Colors</h3>
-                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="colors">Save</button>
-                        </div>
-                        <div class="flex flex-col gap-4">
-                            <div>
-                                <label class="text-sm text-neutral-400">Background color</label>
-                                <input type="color" id="pref-bg-color" value="#0b1220" class="w-full h-8 mt-1 rounded" />
-                            </div>
-                            
-                            <div>
-                                <label class="text-sm text-neutral-400">Accent color</label>
-                                <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
-                            </div>
-                            
-                            <div>
-                                <label class="text-sm text-neutral-400">Selection highlight color</label>
-                                <input type="color" id="pref-selection-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
-                            </div>
-                            
-                            <div>
-                                <label class="text-sm text-neutral-400">Button style</label>
-                                <select id="pref-button-style" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
-                                    <option value="rounded">Rounded (Default)</option>
-                                    <option value="square">Square</option>
-                                    <option value="pill">Pill</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Language/Translation Section -->
-                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                <!-- Language/Translation Section (moved to top) -->
+                <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-medium">🌐 Language Translation</h3>
                         <div class="flex gap-2">
@@ -674,7 +607,7 @@ score += gists * 0.5
                     </div>
                 </div>
 
-                <!-- Text-to-Speech Section -->
+                <!-- Text-to-Speech Section (moved to second) -->
                 <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-medium">Text-to-Speech</h3>
@@ -709,6 +642,73 @@ score += gists * 0.5
                         <input type="text" id="tts-test-text" class="w-full bg-neutral-700 text-white rounded px-3 py-2 mt-1" value="Hello! This is a test of the text-to-speech feature." placeholder="Enter text to test..." />
                     </div>
                     <p class="text-xs text-neutral-500 mt-3">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Column 1: Text (font size, font family only) -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-medium">Text</h3>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="text">Save</button>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="text-sm text-neutral-400">Font size: <span id="font-size-label">14</span>px</label>
+                                <input type="range" id="pref-font-size" min="12" max="22" value="14" class="w-full mt-1" />
+                            </div>
+
+                            <div>
+                                <label class="text-sm text-neutral-400">Font family</label>
+                                <select id="pref-font-family" class="w-full bg-neutral-700 text-white rounded px-2 py-1 mt-1">
+                                    <option value="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial">Inter / System</option>
+                                    <option value="Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial">Roboto</option>
+                                    <option value="'Open Sans', Arial, sans-serif">Open Sans</option>
+                                    <option value="Lato, Arial, sans-serif">Lato</option>
+                                    <option value="Montserrat, Arial, sans-serif">Montserrat</option>
+                                    <option value="Georgia, 'Times New Roman', Times, serif">Georgia (Serif)</option>
+                                    <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-sm text-neutral-400">Text color</label>
+                                <input type="color" id="pref-text-color" value="#e6eef8" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Colors (background, accent, selection, button style) -->
+                    <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-medium">Colors</h3>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="colors">Save</button>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="text-sm text-neutral-400">Background color</label>
+                                <input type="color" id="pref-bg-color" value="#0b1220" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Accent color</label>
+                                <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Selection highlight color</label>
+                                <input type="color" id="pref-selection-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Button style</label>
+                                <select id="pref-button-style" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                    <option value="rounded">Rounded (Default)</option>
+                                    <option value="square">Square</option>
+                                    <option value="pill">Pill</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Actions Row -->

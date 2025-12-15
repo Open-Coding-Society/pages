@@ -1,6 +1,6 @@
 // Npc.js with DialogueSystem integration
 import Character from "./Character.js";
-import DialogueSystem from "../DialogueSystem.js";
+import DialogueSystem from "./DialogueSystem.js";
 
 class Npc extends Character {
     constructor(data = null, gameEnv = null) {
