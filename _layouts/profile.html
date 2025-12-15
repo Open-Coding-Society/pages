@@ -954,3 +954,91 @@ active_tab: profile
         }
     };
 </script>
+<!-- Barebones groups UI: appended minimal interface and fetch functions -->
+<div id="groups-ui">
+    <h3>Groups (backend)</h3>
+    <div id="groups-list">Loading groups...</div>
+
+    <h4>Your groups</h4>
+    <div id="my-groups">Loading your groups...</div>
+</div>
+
+<script>
+// Very small, unstyled helper to fetch groups from the Spring backend
+(async function() {
+    // Use localhost:8585 which is the default server port used by the Spring app in this
+    // workspace. If your backend runs on a different port/host, update `BASE` accordingly.
+    const BASE = 'http://localhost:8585';
+
+    async function fetchGroups() {
+        const out = document.getElementById('groups-list');
+        out.textContent = 'Loading groups...';
+        try {
+            const res = await fetch(`${BASE}/api/groups`, { credentials: 'include' });
+            if (!res.ok) {
+                out.textContent = `Failed to load groups (${res.status})`;
+                return;
+            }
+            const groups = await res.json();
+            if (!Array.isArray(groups) || groups.length === 0) {
+                out.textContent = 'No groups found.';
+                return;
+            }
+            out.textContent = '';
+            groups.forEach(g => {
+                const d = document.createElement('div');
+                // show minimal identifying info
+                d.textContent = `${g.id ?? ''} ${g.name ?? '(no name)'}${g.period ? ' — ' + g.period : ''}`;
+                out.appendChild(d);
+            });
+        } catch (e) {
+            console.error('Error fetching groups:', e);
+            out.textContent = 'Error loading groups.';
+        }
+    }
+
+    async function fetchMyGroups() {
+        const out = document.getElementById('my-groups');
+        out.textContent = 'Loading your groups...';
+        try {
+            const res = await fetch(`${BASE}/api/groups`, { credentials: 'include' });
+            if (!res.ok) {
+                out.textContent = `Failed to load groups (${res.status})`;
+                return;
+            }
+            const groups = await res.json();
+
+            // Try to detect current user's uid from the profile form
+            const uid = document.getElementById('uidChangeInput')?.value || '';
+            const my = (groups || []).filter(g => Array.isArray(g.members) && g.members.some(m => m.uid === uid));
+
+            out.textContent = '';
+            if (my.length === 0) {
+                out.textContent = 'You are not in any groups.';
+                return;
+            }
+
+            my.forEach(g => {
+                const d = document.createElement('div');
+                d.textContent = `${g.name ?? '(no name)'}${g.period ? ' — ' + g.period : ''}`;
+                out.appendChild(d);
+            });
+        } catch (e) {
+            console.error('Error fetching my groups:', e);
+            out.textContent = 'Error loading your groups.';
+        }
+    }
+
+    // Initial load
+    fetchGroups();
+    fetchMyGroups();
+
+    // Recompute "my groups" when uid changes
+    const uidInput = document.getElementById('uidChangeInput');
+    if (uidInput) uidInput.addEventListener('change', fetchMyGroups);
+
+    // Expose for debugging
+    window.fetchGroups = fetchGroups;
+    window.fetchMyGroups = fetchMyGroups;
+})();
+</script>
