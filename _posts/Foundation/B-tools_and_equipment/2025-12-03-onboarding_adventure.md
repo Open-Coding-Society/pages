@@ -1,5 +1,6 @@
 ---
 layout: post
+show_reading_time: false
 tailwind: True
 title: Onboarding Adventure
 assignment: true
@@ -8,10 +9,11 @@ description: >
 author: John Mortensen
 courses: {'csse': {'week': 3}, 'csp': {'week': 3}, 'csa': {'week': 1}}
 type: hacks
+canonical_id: onboarding-adventure
 permalink: /hacks
 lxdData:
   Title: "Learning Experience Designer Home"
-  Description: "Explore LxD topics and interactive games to obtain mastery in key oboarding topics... collaboration, design thinking, coding skills, etc."
+  Description: "Explore interactive games to obtain mastery in key oboarding topics... collaboration, design thinking, coding skills, etc."
   Prequisites:
     - title: "Tools Setup"
       link: "/tools"

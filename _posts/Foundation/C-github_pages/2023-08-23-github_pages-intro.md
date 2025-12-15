@@ -7,6 +7,7 @@ type: hacks
 courses: {'csse': {'week': 2}, 'csp': {'week': 2}, 'csa': {'week': 1}}
 permalink: /github/pages/
 author: John Mortensen
+canonical_id: sprints-home
 ---
 
 Welcome to your GitHub Pages mini-project journey! This series will guide you through essential skills for web programming with GitHub Pages.

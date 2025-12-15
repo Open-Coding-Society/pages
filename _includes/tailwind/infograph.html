@@ -1,3 +1,119 @@
+---
+layout: null
+---
+
+<style>
+:root {
+  --pref-bg-color: #0b1220;
+  --pref-text-color: #e6eef8;
+  --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --pref-font-size: 14px;
+  --pref-accent-color: #3b82f6;
+  --text-muted: #a0a0a0;
+
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
+}
+
+.user-theme-active,
+.user-theme-active.dark {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* Infograph container and cards use plain user color (no gradients) */
+.user-theme-active .container {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+}
+
+.user-theme-active .module-card {
+  background-color: var(--pref-bg-color) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--pref-text-color) !important;
+  padding: 1rem !important;
+  box-shadow: none !important;
+}
+
+/* Ensure identical color for every card */
+.user-theme-active .module-card:nth-child(2n) {
+  background-color: var(--pref-bg-color) !important;
+}
+
+/* Keep columns transparent */
+.user-theme-active .module-image-col,
+.user-theme-active .module-keypoints-col,
+.user-theme-active .module-desc-col {
+  background: transparent !important;
+  color: var(--pref-text-color) !important;
+}
+
+.user-theme-active .module-desc-col {
+  padding: 0.6rem !important;
+  border-radius: 0.375rem !important;
+}
+
+.user-theme-active .module-img {
+  background-color: transparent !important;
+  border-radius: 0.5rem !important;
+  object-fit: cover !important;
+}
+
+.user-theme-active .module-emoji {
+  background-color: var(--emoji-bg) !important;
+  color: #0b1220 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+}
+
+.user-theme-active .module-overlay {
+  background-color: rgba(0,0,0,0.45) !important;
+}
+
+/* Questions: plain background; inputs also plain user color */
+.user-theme-active .question-box,
+.user-theme-active .question-card,
+.user-theme-active .qa-box,
+.user-theme-active .questions {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+
+.user-theme-active .question-box input,
+.user-theme-active .question-box textarea,
+.user-theme-active .question-card input,
+.user-theme-active .question-card textarea {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  border: 1px solid rgba(0,0,0,0.18) !important;
+  padding: 0.5rem !important;
+}
+
+/* Topbar and sidebar full plain color */
+.user-theme-active .lesson-sidebar,
+.user-theme-active .lesson-topbar {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  border-color: var(--ui-border) !important;
+}
+
+/* Links/icons inherit accent */
+.user-theme-active a,
+.user-theme-active a:visited { color: var(--pref-accent-color) !important; }
+.user-theme-active svg { fill: currentColor !important; color: inherit !important; }
+
+/* Force text color to ensure readability */
+.user-theme-active p, .user-theme-active span, .user-theme-active h1, .user-theme-active h2,
+.user-theme-active h3, .user-theme-active h4, .user-theme-active h5, .user-theme-active h6 {
+  color: var(--pref-text-color) !important;
+}
+</style>
+
 <div>
   {% assign data = site.data[page.infoGraph] %}
   <div class="container">
@@ -12,7 +128,7 @@
       {% for topic in data.Topics %}
         <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md">
           <!-- Image Column -->
-          <div class="text-center relative">
+          <div class="text-center relative module-image-col">
             <a href="{{ site.baseurl }}{{ topic.link }}" class="block relative group">
               <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="rounded-lg mx-auto h-40 object-cover">
               
@@ -30,7 +146,7 @@
             </a>
           </div>
           <!-- Key Points Column -->
-          <div>
+          <div class="module-keypoints-col">
             <h3 class="text-xl font-semibold mb-2">{{ topic.title }}</h3>
             <ul class="list-disc list-inside">
               <!-- Loop through kepoints within Topic -->
@@ -40,7 +156,7 @@
             </ul>
           </div>
           <!-- Description Column -->
-          <div>
+          <div class="module-desc-col">
             <h3 class="text-xl font-semibold mb-2">{{ topic.subtitle }}</h3>
             <p class="text-sm">{{ topic.description }}</p>
           </div>

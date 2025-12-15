@@ -10,6 +10,7 @@ courses: {'csse': {'week': 2}, 'csp': {'week': 2}, 'csa': {'week': 1}}
 type: soft skills 
 categories: ['Collaboration']
 permalink: /agile/
+canonical_id: agile-home
 ---
 
 <!-- Infographic - this depends on page.infoGraph frontmatter being set -->

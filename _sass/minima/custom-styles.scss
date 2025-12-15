@@ -2,9 +2,11 @@
 @import "opencs-color-map";
 
 // Responsive logo / nav styles
-@import "minima/nav";
+@import "nav";
 
 // Then your existing imports
 @import "open-coding/main";
 @import "lessonbase";
 @import "footer";
+@import "timeline";
+@import "lesson-player";

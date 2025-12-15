@@ -4,11 +4,9 @@ layout: aesthetihawk
 active_tab: dashboard
 ---
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet" />
+<!-- Fonts loaded globally via head-custom.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
 <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
-<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/tabs.css" />
-<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/charts.css" />
 <div class="w-full">
     <div class="space-y-4 sm:space-y-6">
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
@@ -330,8 +328,85 @@ active_tab: dashboard
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
                 <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Column 1: Text -->
+                <!-- Language/Translation Section (moved to top) -->
+                <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">🌐 Language Translation</h3>
+                        <div class="flex gap-2">
+                            <button type="button" id="clear-translation-btn" class="px-3 py-1 text-sm rounded bg-orange-600 hover:bg-orange-700 text-white">Reset to English</button>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="language">Save</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-neutral-400 mb-4">Translate the entire site into your preferred language. This setting is saved and applies across all pages.</p>
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <label class="text-sm text-neutral-400">Site Language</label>
+                            <select id="pref-language" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                <option value="">Default (English - No Translation)</option>
+                                <option value="es">🇪🇸 Spanish (Español)</option>
+                                <option value="fr">🇫🇷 French (Français)</option>
+                                <option value="de">🇩🇪 German (Deutsch)</option>
+                                <option value="it">🇮🇹 Italian (Italiano)</option>
+                                <option value="pt">🇵🇹 Portuguese (Português)</option>
+                                <option value="ru">🇷🇺 Russian (Русский)</option>
+                                <option value="zh-CN">🇨🇳 Chinese Simplified (简体中文)</option>
+                                <option value="zh-TW">🇹🇼 Chinese Traditional (繁體中文)</option>
+                                <option value="ja">🇯🇵 Japanese (日本語)</option>
+                                <option value="ko">🇰🇷 Korean (한국어)</option>
+                                <option value="ar">🇸🇦 Arabic (العربية)</option>
+                                <option value="hi">🇮🇳 Hindi (हिन्दी)</option>
+                                <option value="vi">🇻🇳 Vietnamese (Tiếng Việt)</option>
+                                <option value="th">🇹🇭 Thai (ไทย)</option>
+                                <option value="nl">🇳🇱 Dutch (Nederlands)</option>
+                                <option value="pl">🇵🇱 Polish (Polski)</option>
+                                <option value="tr">🇹🇷 Turkish (Türkçe)</option>
+                                <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+                                <option value="he">🇮🇱 Hebrew (עברית)</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-neutral-500">Translation powered by Google Translate. Click "Reset to English" if translation gets stuck.</p>
+                    </div>
+                </div>
+
+                <!-- Text-to-Speech Section (moved to second) -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">Text-to-Speech</h3>
+                        <div class="flex gap-2">
+                            <button type="button" id="tts-test-btn" class="px-3 py-1 text-sm rounded bg-purple-600 hover:bg-purple-700 text-white">Test Voice</button>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="tts">Save</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-neutral-400 mb-4">Configure text-to-speech settings. Select text on any page and use the TTS button in the sidebar to hear it read aloud.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-neutral-400">Voice</label>
+                            <select id="pref-tts-voice" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                <option value="">Loading voices...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Speed: <span id="tts-rate-label">1.0</span>x</label>
+                            <input type="range" id="pref-tts-rate" min="0.5" max="2" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Pitch: <span id="tts-pitch-label">1.0</span></label>
+                            <input type="range" id="pref-tts-pitch" min="0.5" max="2" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Volume: <span id="tts-volume-label">100</span>%</label>
+                            <input type="range" id="pref-tts-volume" min="0" max="1" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="text-sm text-neutral-400">Test Text</label>
+                        <input type="text" id="tts-test-text" class="w-full bg-neutral-700 text-white rounded px-3 py-2 mt-1" value="Hello! This is a test of the text-to-speech feature." placeholder="Enter text to test..." />
+                    </div>
+                    <p class="text-xs text-neutral-500 mt-3">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Column 1: Text (font size, font family only) -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-medium">Text</h3>
@@ -363,7 +438,7 @@ active_tab: dashboard
                         </div>
                     </div>
 
-                    <!-- Column 2: Colors -->
+                    <!-- Column 2: Colors (background, accent, selection, button style) -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-medium">Colors</h3>
@@ -378,6 +453,20 @@ active_tab: dashboard
                             <div>
                                 <label class="text-sm text-neutral-400">Accent color</label>
                                 <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Selection highlight color</label>
+                                <input type="color" id="pref-selection-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Button style</label>
+                                <select id="pref-button-style" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                    <option value="rounded">Rounded (Default)</option>
+                                    <option value="square">Square</option>
+                                    <option value="pill">Pill</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -540,7 +629,15 @@ active_tab: dashboard
                             text: document.getElementById('pref-text-color').value,
                             font: document.getElementById('pref-font-family').value,
                             size: Number(document.getElementById('pref-font-size').value),
-                            accent: document.getElementById('pref-accent-color').value
+                            accent: document.getElementById('pref-accent-color').value,
+                            language: document.getElementById('pref-language').value,
+                            ttsVoice: document.getElementById('pref-tts-voice').value,
+                            ttsRate: Number(document.getElementById('pref-tts-rate').value),
+                            ttsPitch: Number(document.getElementById('pref-tts-pitch').value),
+                            ttsVolume: Number(document.getElementById('pref-tts-volume').value),
+                            // Styling options in Colors section
+                            selectionColor: document.getElementById('pref-selection-color').value,
+                            buttonStyle: document.getElementById('pref-button-style').value
                         };
                     }
 
@@ -553,6 +650,20 @@ active_tab: dashboard
                         document.getElementById('pref-font-size').value = prefs.size || d.size;
                         document.getElementById('font-size-label').textContent = prefs.size || d.size;
                         document.getElementById('pref-accent-color').value = prefs.accent || d.accent;
+                        document.getElementById('pref-language').value = prefs.language || '';
+                        
+                        // TTS settings
+                        if (prefs.ttsVoice) document.getElementById('pref-tts-voice').value = prefs.ttsVoice;
+                        document.getElementById('pref-tts-rate').value = prefs.ttsRate || 1;
+                        document.getElementById('tts-rate-label').textContent = prefs.ttsRate || 1.0;
+                        document.getElementById('pref-tts-pitch').value = prefs.ttsPitch || 1;
+                        document.getElementById('tts-pitch-label').textContent = prefs.ttsPitch || 1.0;
+                        document.getElementById('pref-tts-volume').value = prefs.ttsVolume || 1;
+                        document.getElementById('tts-volume-label').textContent = Math.round((prefs.ttsVolume || 1) * 100);
+                        
+                        // Styling settings
+                        document.getElementById('pref-selection-color').value = prefs.selectionColor || '#3b82f6';
+                        document.getElementById('pref-button-style').value = prefs.buttonStyle || 'rounded';
                     }
 
                     function showStatus(msg){
@@ -573,15 +684,123 @@ active_tab: dashboard
                         } else if (section === 'colors') {
                             current.bg = form.bg;
                             current.accent = form.accent;
+                            current.selectionColor = form.selectionColor;
+                            current.buttonStyle = form.buttonStyle;
+                        } else if (section === 'language') {
+                            const oldLang = current.language || '';
+                            const newLang = form.language;
+                            current.language = newLang;
+                            
+                            // Save first, then reload to apply language change
+                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            
+                            // Only reload if language actually changed
+                            if (oldLang !== newLang) {
+                                showStatus('Language saved! Reloading...');
+                                setTimeout(() => window.location.reload(), 500);
+                                return;
+                            }
+                        } else if (section === 'tts') {
+                            current.ttsVoice = form.ttsVoice;
+                            current.ttsRate = form.ttsRate;
+                            current.ttsPitch = form.ttsPitch;
+                            current.ttsVolume = form.ttsVolume;
                         }
                         
                         savePreferences(current);
                         showStatus('Saved ' + section);
                     }
 
+                    // Initialize TTS voices dropdown
+                    function populateTTSVoices() {
+                        const select = document.getElementById('pref-tts-voice');
+                        if (!select) return;
+                        
+                        const voices = speechSynthesis.getVoices();
+                        select.innerHTML = '';
+                        
+                        if (voices.length === 0) {
+                            select.innerHTML = '<option value="">No voices available</option>';
+                            return;
+                        }
+                        
+                        // Add default option
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.textContent = 'Default Voice';
+                        select.appendChild(defaultOpt);
+                        
+                        // Group voices by language
+                        const voicesByLang = {};
+                        voices.forEach(voice => {
+                            const lang = voice.lang.split('-')[0];
+                            if (!voicesByLang[lang]) voicesByLang[lang] = [];
+                            voicesByLang[lang].push(voice);
+                        });
+                        
+                        // Add English voices first, then others
+                        const langs = Object.keys(voicesByLang).sort((a, b) => {
+                            if (a === 'en') return -1;
+                            if (b === 'en') return 1;
+                            return a.localeCompare(b);
+                        });
+                        
+                        langs.forEach(lang => {
+                            const group = document.createElement('optgroup');
+                            group.label = lang.toUpperCase();
+                            voicesByLang[lang].forEach(voice => {
+                                const opt = document.createElement('option');
+                                opt.value = voice.name;
+                                opt.textContent = `${voice.name} (${voice.lang})`;
+                                group.appendChild(opt);
+                            });
+                            select.appendChild(group);
+                        });
+                        
+                        // Restore saved voice
+                        const saved = loadPreferences();
+                        if (saved && saved.ttsVoice) {
+                            select.value = saved.ttsVoice;
+                        }
+                    }
+                    
+                    // Test TTS function
+                    function testTTS() {
+                        if (!('speechSynthesis' in window)) {
+                            showStatus('Text-to-speech not supported');
+                            return;
+                        }
+                        
+                        // Cancel any ongoing speech
+                        speechSynthesis.cancel();
+                        
+                        const text = document.getElementById('tts-test-text').value || 'Hello, this is a test.';
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        
+                        const voiceName = document.getElementById('pref-tts-voice').value;
+                        if (voiceName) {
+                            const voices = speechSynthesis.getVoices();
+                            const voice = voices.find(v => v.name === voiceName);
+                            if (voice) utterance.voice = voice;
+                        }
+                        
+                        utterance.rate = Number(document.getElementById('pref-tts-rate').value) || 1;
+                        utterance.pitch = Number(document.getElementById('pref-tts-pitch').value) || 1;
+                        utterance.volume = Number(document.getElementById('pref-tts-volume').value) || 1;
+                        
+                        speechSynthesis.speak(utterance);
+                    }
+
                     document.addEventListener('DOMContentLoaded', function (){
                         renderPresets();
                         renderCustomThemes();
+                        
+                        // Initialize TTS voices
+                        if ('speechSynthesis' in window) {
+                            populateTTSVoices();
+                            // Chrome loads voices asynchronously
+                            speechSynthesis.onvoiceschanged = populateTTSVoices;
+                        }
 
                         const saved = loadPreferences();
                         if (saved) populateForm(saved);
@@ -590,6 +809,20 @@ active_tab: dashboard
                         document.getElementById('pref-font-size').addEventListener('input', function(e){
                             document.getElementById('font-size-label').textContent = e.target.value;
                         });
+                        
+                        // TTS slider labels
+                        document.getElementById('pref-tts-rate').addEventListener('input', function(e){
+                            document.getElementById('tts-rate-label').textContent = e.target.value;
+                        });
+                        document.getElementById('pref-tts-pitch').addEventListener('input', function(e){
+                            document.getElementById('tts-pitch-label').textContent = e.target.value;
+                        });
+                        document.getElementById('pref-tts-volume').addEventListener('input', function(e){
+                            document.getElementById('tts-volume-label').textContent = Math.round(e.target.value * 100);
+                        });
+                        
+                        // TTS test button
+                        document.getElementById('tts-test-btn').addEventListener('click', testTTS);
 
                         document.querySelectorAll('.save-section-btn').forEach(btn => {
                             btn.addEventListener('click', function() {
@@ -608,8 +841,22 @@ active_tab: dashboard
                             if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
                                 window.SitePreferences.resetPreferences();
                             }
+                            // Also clear translation
+                            clearAllTranslationCookies();
                             showStatus('Reset complete');
                             setTimeout(() => location.reload(), 100);
+                        });
+
+                        // Clear translation / Reset to English button
+                        document.getElementById('clear-translation-btn').addEventListener('click', function(){
+                            clearAllTranslationCookies();
+                            // Update preference
+                            const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                            current.language = '';
+                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            document.getElementById('pref-language').value = '';
+                            showStatus('Translation cleared! Reloading...');
+                            setTimeout(() => location.reload(), 500);
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', function(){
@@ -619,7 +866,34 @@ active_tab: dashboard
                         document.getElementById('new-theme-name').addEventListener('keypress', function(e){
                             if (e.key === 'Enter') saveThemeAs(this.value.trim());
                         });
+                        
+                        // Live preview for selection color and button style
+                        ['pref-selection-color', 'pref-button-style'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                const applyLivePreview = function() {
+                                    const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                                    const form = currentFormValues();
+                                    current.selectionColor = form.selectionColor;
+                                    current.buttonStyle = form.buttonStyle;
+                                    applyPreferences(current);
+                                };
+                                el.addEventListener('change', applyLivePreview);
+                                el.addEventListener('input', applyLivePreview);
+                            }
+                        });
                     });
+
+                    // Helper function to clear Google Translate cookies
+                    function clearAllTranslationCookies() {
+                        const domain = window.location.hostname;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+                        // Also try without domain for localhost
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                    }
 
                     window.loadPreferences = async function(){ loadPreferences(); };
                     try{ loadPreferences(); } catch(e){}

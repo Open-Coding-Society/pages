@@ -1,7 +1,10 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css">
+
 <div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
   <!-- Pearly glow effect around container -->
   <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
-  <div class="relative z-10"> <!-- Wrapper div to ensure content stays above the glow -->
+  <div class="relative z-10">
     <!-- Title and Description -->
     <div class="text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">{{ page.lxdData.Title }}</h1>
@@ -10,63 +13,1549 @@
 
     <!-- Prerequisites Section -->
     {% if page.lxdData.Prequisites %}
-    <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-2">Prerequisites</h2>
-      <ul class="flex flex-wrap gap-4 justify-center">
+    <div class="mb-4 bg-gray-800/50 rounded-xl p-6">
+      <h2 class="text-2xl font-semibold text-white mb-3">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
         {% for prereq in page.lxdData.Prequisites %}
-          <li>
-            {% if prereq.title == "Tools Setup" or prereq.title == "Agile Collaboration" %}
-            <a href="{{ prereq.link }}" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition">
-              {{ prereq.title }}
-            </a>
-            {% else %}
-            <a href="{{ prereq.link }}" class="iridescent bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition">
-              {{ prereq.title }}
-            </a>
-            {% endif %}
-          </li>
+          <a href="{{ prereq.link }}" class="bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
+            {{ prereq.title }}
+          </a>
         {% endfor %}
-      </ul>
+      </div>
     </div>
     {% endif %}
 
-    <!-- Topics Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12">
-      {% for topic in page.lxdData.Topics %}
-        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2">
-          <!-- Image with Play Overlay -->
-          <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
-            <a href="{{ topic.Game }}" class="block w-full h-full group">
-              <img src="{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-cover transition-all duration-300 group-hover:scale-110">
-              <!-- Play Button Overlay -->
-              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div class="iridescent bg-white bg-opacity-90 rounded-full p-3">
-                  <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8 5v10l8-5z"/>
-                  </svg>
+    <!-- Selection Panel -->
+    <div class="mb-8 bg-gray-800/50 rounded-xl p-6">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-white mb-2">My Onboarding Hacks</h2>
+        <p id="hacks-status" class="text-sm text-gray-300 mb-3">Loading...</p>
+        <div class="flex flex-wrap gap-2">
+          <button id="open-grading-view-btn" onclick="openGradingView()" class="bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
+            Open Grading View
+          </button>
+          <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
+            Select Hacks
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected Hacks Display -->
+      <div id="selected-hacks-container">
+        <p class="text-gray-400 text-center py-8">No hacks selected. Click "Select Hacks" to choose your onboarding tasks.</p>
+      </div>
+    </div>
+
+    <!-- Modal for Hack Selection -->
+    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: var(--pref-bg-color); padding: 20px; overflow-y: auto;">
+      <div style="position: relative; width: 100%; max-width: 70rem; margin: 0 auto; min-height: min-content;">
+        <!-- Close button -->
+        <button id="modal-close-btn" style="position: absolute; top: -35px; right: 0; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none; z-index: 1; color: white;">&times;</button>
+        
+        <!-- Scrolling checklist -->
+        <div id="hacks-checklist" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px; border: 2px solid #374151; border-radius: 8px;">
+          <!-- Checkboxes will be populated here -->
+        </div>
+        
+        <!-- Action buttons -->
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+          <button id="modal-cancel-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 500; font-size: 1rem;">
+            Cancel
+          </button>
+          <button id="modal-save-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; font-size: 1rem;">
+            Save Selection
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Topics Cards Grid (Full List) -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-white mb-6">All Available Hacks</h2>
+      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6">
+        {% for topic in page.lxdData.Topics %}
+          <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2" data-game="{{ topic.Game }}">
+            <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
+              <a href="{{ topic.Game }}" class="block w-full h-full group">
+                <img src="{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-cover transition-all duration-300 group-hover:scale-110">
+                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <div class="bg-white bg-opacity-90 rounded-full p-3">
+                    <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path d="M8 5v10l8-5z"/></svg>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="p-6">
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="text-xl font-bold text-white">{{ topic.Title }}</h3>
+                <span class="inline-block px-2 py-1 text-xs rounded-full bg-gray-700 text-gray-300" data-status-badge>Not selected</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
+              <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
+              <div class="mb-4">
+                <span class="text-sm font-semibold text-gray-200">Categories:</span>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  {% for cat in topic.Categories %}
+                    <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
+                  {% endfor %}
                 </div>
               </div>
-            </a>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-white mb-1">{{ topic.Title }}</h3>
-            <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
-            <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
-            <div class="mb-4">
-              <span class="text-sm font-semibold text-gray-200">Categories:</span>
-              <div class="flex flex-wrap gap-1 mt-1">
-                {% for cat in topic.Categories %}
-                  <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
-                {% endfor %}
+              <div class="flex gap-2">
+                <a href="{{ topic.Game }}" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-center py-2 rounded-lg font-semibold transition">Play Game</a>
+                <a href="{{ topic.Lessons }}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-center py-2 rounded-lg font-semibold transition">Lessons</a>
               </div>
             </div>
-            <div class="flex gap-2">
-              <a href="{{ topic.Game }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition">Play Game</a>
-              <a href="{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition">Lessons</a>
-            </div>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Grading View (Admin) -->
+<div id="grading-panel" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99998; background-color: var(--pref-bg-color); padding: 20px; overflow-y:auto;">
+  <div style="position: relative; width: 100%; max-width: 1100px; margin: 0 auto; min-height: min-content; padding:24px; border-radius:12px; border:1px solid #374151;">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-sm text-purple-300 uppercase tracking-wide">Grading</p>
+        <h2 class="text-2xl font-bold text-white">Grading View</h2>
+        <p class="text-gray-300 text-sm">Assignments with submissions grouped by module. Click a rubric to edit scores.</p>
+      </div>
+      <button id="close-grading-view-btn" class="text-gray-300 hover:text-white text-2xl font-bold leading-none" aria-label="Close grading view">&times;</button>
+    </div>
+
+    <!-- Assignment Selection Dropdown -->
+    <div class="mb-6">
+      <label class="block text-white font-semibold mb-2 text-sm">Select Assignment:</label>
+      <select id="assignment-selector" class="w-full md:w-96 px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:border-blue-500 focus:outline-none">
+        <option value="">Loading assignments...</option>
+      </select>
+    </div>
+
+    <div id="grading-assignments" class="space-y-4">
+      <!-- Assignments and submissions render here -->
+    </div>
+  </div>
+</div>
+
+<!-- Submission Modal -->
+<div id="submission-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background-color: var(--pref-bg-color); z-index:99999; overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; margin:40px auto; border:1px solid #374151;">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-2xl font-bold text-white">Submit Your Work</h3>
+      <button onclick="closeSubmissionModal()" style="font-size:2rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <!-- Dynamic Rubric Checklist -->
+    <div id="submission-checklist" class="mb-4">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-lg font-semibold text-white">Grading Rubric</h4>
+        <button id="view-full-rubric-btn" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm font-semibold transition">
+          View Full Rubric
+        </button>
+      </div>
+      
+      <div id="rubric-items-container" class="space-y-3 mb-4">
+        <!-- Rubric items will be dynamically loaded here -->
+      </div>
+    </div>
+
+    <!-- Submission Link -->
+    <div class="mb-4">
+      <label class="block text-white font-semibold mb-2 text-sm">Submission Link (Required):</label>
+      <input type="url" id="submission-link" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; margin-bottom:12px;" placeholder="https://example.com/your-work" />
+    </div>
+
+    <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; margin-bottom:12px;" placeholder="Write your submission here..."></textarea>
+
+    <!-- Additional Notes Section -->
+    <div class="mb-4">
+      <label class="block text-white font-semibold mb-2 text-sm">Additional Notes/Comments (Optional):</label>
+      <textarea id="submission-notes" rows="4" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151;" placeholder="Add any extra information about your work, challenges faced, or things you'd like the grader to know..."></textarea>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+      <button id="submission-btn" onclick="submitHack()" disabled style="padding:8px 20px; border-radius:8px; border:none; font-weight:600; opacity:0.5; cursor:not-allowed;">
+        Submit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Full Rubric Modal -->
+<div id="full-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background-color: var(--pref-bg-color); z-index:100000; overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-bold text-white">Complete Grading Rubric</h3>
+      <div class="flex gap-3">
+        <button id="edit-rubric-btn" onclick="toggleRubricEditMode()" style="padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer;">
+          Edit Rubric
+        </button>
+        <button onclick="closeFullRubricModal()" style="font-size:2rem; cursor:pointer; line-height:1;">&times;</button>
+      </div>
+    </div>
+
+    <!-- View Mode -->
+    <div id="rubric-view-mode">
+      <div id="full-rubric-content" class="space-y-4">
+        <!-- Full rubric will be dynamically loaded here -->
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:24px; padding-top:16px; border-top:1px solid #374151;">
+        <button onclick="closeFullRubricModal()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:500; cursor:pointer;">
+          Close
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div id="rubric-edit-mode" style="display:none;">
+      <div class="bg-gray-800 p-4 rounded-lg mb-4">
+        <label class="block text-white font-semibold mb-2">Total Points:</label>
+        <input type="number" id="edit-total-points" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" />
+      </div>
+
+      <div id="edit-categories-container" class="space-y-4 mb-4">
+        <!-- Editable categories will go here -->
+      </div>
+
+      <button onclick="addNewCategory()" style="padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
+        + Add Category
+      </button>
+
+      <div style="display:flex; justify-content:space-between; margin-top:24px; padding-top:16px; border-top:1px solid #374151;">
+        <button onclick="cancelRubricEdit()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:500; cursor:pointer;">
+          Cancel
+        </button>
+        <button onclick="saveRubricEdit()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:600; cursor:pointer;">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grading Rubric Modal (per submission) -->
+<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-sm text-purple-300 uppercase tracking-wide">Grader</p>
+        <h3 class="text-2xl font-bold text-white">Edit Rubric</h3>
+        <p id="grading-rubric-context" class="text-gray-300 text-sm"></p>
+      </div>
+      <button onclick="closeGradingRubricModal()" style="font-size:2rem; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+
+    <div class="bg-gray-800 p-4 rounded-lg mb-4">
+      <label class="block text-white font-semibold mb-2">Total Points</label>
+      <input type="number" id="grading-total-points" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600" />
+    </div>
+
+    <div id="grading-edit-categories" class="space-y-4 mb-4"></div>
+
+    <button onclick="addGradingCategory()" style="padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
+      + Add Category
+    </button>
+
+    <div style="display:flex; justify-content:space-between; padding-top:16px; border-top:1px solid #374151;">
+      <button onclick="closeGradingRubricModal()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:500; cursor:pointer;">
+        Cancel
+      </button>
+      <button onclick="saveGradingRubric()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:600; cursor:pointer;">
+        Save Rubric
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Topics data from Jekyll
+  const HACK_TOPICS = {{ page.lxdData.Topics | jsonify }};
+  
+  // Default rubric structure - this should match what graders use
+  const DEFAULT_RUBRIC = {
+    total: 0.90,
+    categories: [
+      {
+        name: "Individual Contribution",
+        weight: 0.45,
+        subcategories: [
+          { name: "Commits in GitHub", weight: 0.15 },
+          { name: "Collaboration", weight: 0.15 },
+          { name: "Description of changes", weight: 0.15 }
+        ]
+      },
+      {
+        name: "Technical Skill",
+        weight: 0.30,
+        subcategories: [
+          { name: "Good organization", weight: 0.10 },
+          { name: "Easy to use and understand", weight: 0.10 },
+          { name: "Sophisticated layout", weight: 0.10 }
+        ]
+      },
+      {
+        name: "Innovation",
+        weight: 0.15,
+        subcategories: [
+          { name: "Divergent thinking", weight: 0.05 },
+          { name: "Useful features", weight: 0.05 },
+          { name: "New contributions to code", weight: 0.05 }
+        ]
+      }
+    ]
+  };
+  
+  // User's grade data
+  let userGradeData = {
+    selected_hacks: [],
+    hacks_completed: {},
+    hacks_submissions: {},
+    hacks_notes: {}, // Store additional notes
+    hacks_links: {}, // Store submission links
+    rubric: DEFAULT_RUBRIC // Store the rubric that applies to this student
+  };
+  
+  let isAuthenticated = false;
+  let isAdmin = true; // admin requirement disabled for now
+  let gradingAssignments = [];
+  let selectedAssignmentId = null; // Track which assignment is selected in dropdown
+  let rubricTemplate = DEFAULT_RUBRIC;
+  let currentRubricContext = null;
+  let currentHackToSubmit = null;
+
+  // API base URL - adjust if needed for same-origin API (used for /api/id and /api/grade_data)
+  const API_BASE = 'https://spring.opencodingsociety.com';
+
+  // Load user's grade data from backend (with localStorage fallback)
+  async function loadGradeData() {
+    try {
+      const response = await fetch(`${API_BASE}/api/grade_data`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        isAuthenticated = true;
+        isAdmin = true; // admin requirement disabled for now
+        userGradeData = data.grade_data || { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, hacks_links: {}, rubric: DEFAULT_RUBRIC };
+        if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
+        if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
+        if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
+        if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
+        if (!userGradeData.hacks_links) userGradeData.hacks_links = {};
+        if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
+        rubricTemplate = userGradeData.rubric || DEFAULT_RUBRIC;
+        console.log('Loaded from backend:', userGradeData);
+        return true;
+      } else {
+        throw new Error('Backend not available');
+      }
+    } catch (error) {
+      console.log('Backend not available, using localStorage fallback');
+      isAuthenticated = false;
+      isAdmin = true; // admin requirement disabled for now
+      
+      const stored = localStorage.getItem('onboarding_hacks_data');
+      if (stored) {
+        try {
+          userGradeData = JSON.parse(stored);
+          if (!userGradeData.selected_hacks) userGradeData.selected_hacks = [];
+          if (!userGradeData.hacks_completed) userGradeData.hacks_completed = {};
+          if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
+          if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
+          if (!userGradeData.hacks_links) userGradeData.hacks_links = {};
+          if (!userGradeData.rubric) userGradeData.rubric = DEFAULT_RUBRIC;
+          console.log('Loaded from localStorage:', userGradeData);
+        } catch (e) {
+          console.error('Error parsing localStorage data:', e);
+          userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, hacks_links: {}, rubric: DEFAULT_RUBRIC };
+        }
+      } else {
+        userGradeData = { selected_hacks: [], hacks_completed: {}, hacks_submissions: {}, hacks_notes: {}, hacks_links: {}, rubric: DEFAULT_RUBRIC };
+      }
+      return false;
+    }
+  }
+
+  // Save user's grade data to backend (with localStorage fallback)
+  async function saveGradeData() {
+    if (isAuthenticated) {
+      try {
+        const response = await fetch(`${API_BASE}/api/grade_data`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ grade_data: userGradeData })
+        });
+
+        if (response.ok) {
+          console.log('Saved to backend');
+          return true;
+        } else {
+          throw new Error('Backend save failed');
+        }
+      } catch (error) {
+        console.log('Backend save failed, falling back to localStorage');
+        isAuthenticated = false;
+      }
+    }
+    
+    try {
+      localStorage.setItem('onboarding_hacks_data', JSON.stringify(userGradeData));
+      console.log('Saved to localStorage:', userGradeData);
+      return true;
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+      return false;
+    }
+  }
+
+  // Render dynamic rubric in submission modal
+  function renderSubmissionRubric() {
+    const container = document.getElementById('rubric-items-container');
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    
+    container.innerHTML = rubric.categories.map(category => `
+      <div class="bg-gray-800 p-3 rounded-lg">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" class="submission-checkbox mt-1 h-4 w-4 rounded border-gray-600 text-blue-600">
+          <div class="flex-1">
+            <div class="text-white font-medium">${category.name} (${category.weight.toFixed(2)})</div>
+            <ul class="text-sm text-gray-300 mt-1 space-y-1 ml-2">
+              ${category.subcategories.map(sub => `
+                <li>• ${sub.name} (${sub.weight.toFixed(2)})</li>
+              `).join('')}
+            </ul>
+          </div>
+        </label>
+      </div>
+    `).join('');
+  }
+
+  // Render full rubric modal
+  function renderFullRubric() {
+    const container = document.getElementById('full-rubric-content');
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    
+    container.innerHTML = `
+      <div class="bg-gray-800 p-4 rounded-lg mb-4">
+        <h4 class="text-xl font-bold text-white mb-2">Total Points: ${rubric.total.toFixed(2)}</h4>
+        <p class="text-gray-300 text-sm">This rubric shows how your work will be evaluated. Make sure to address all categories for full credit.</p>
+      </div>
+      
+      ${rubric.categories.map((category, idx) => `
+        <div class="bg-gray-800 p-4 rounded-lg">
+          <h4 class="text-lg font-bold text-white mb-3">${idx + 1}. ${category.name} (${category.weight.toFixed(2)} points)</h4>
+          <div class="space-y-2 ml-4">
+            ${category.subcategories.map((sub, subIdx) => `
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <span class="text-white font-medium">${String.fromCharCode(97 + subIdx)}. ${sub.name}</span>
+                </div>
+                <span class="text-blue-400 font-semibold ml-4">${sub.weight.toFixed(2)} pts</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  // Open full rubric modal
+  window.openFullRubricModal = function() {
+    renderFullRubric();
+    const modal = document.getElementById('full-rubric-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+
+  // Close full rubric modal
+  window.closeFullRubricModal = function() {
+    const modal = document.getElementById('full-rubric-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    // Reset to view mode when closing
+    document.getElementById('rubric-view-mode').style.display = 'block';
+    document.getElementById('rubric-edit-mode').style.display = 'none';
+  };
+
+  // Toggle rubric edit mode
+  window.toggleRubricEditMode = function() {
+    document.getElementById('rubric-view-mode').style.display = 'none';
+    document.getElementById('rubric-edit-mode').style.display = 'block';
+    renderRubricEditMode();
+  };
+
+  // Render rubric in edit mode
+  function renderRubricEditMode() {
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    
+    // Set total points
+    document.getElementById('edit-total-points').value = rubric.total;
+    
+    // Render categories
+    const container = document.getElementById('edit-categories-container');
+    container.innerHTML = rubric.categories.map((category, catIndex) => `
+      <div class="bg-gray-800 p-4 rounded-lg" data-category-index="${catIndex}">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="flex-1">
+            <label class="block text-white font-semibold mb-1 text-sm">Category Name:</label>
+            <input type="text" 
+                   class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 mb-2" 
+                   value="${category.name}"
+                   data-category-name="${catIndex}">
+            <label class="block text-white font-semibold mb-1 text-sm">Weight (points):</label>
+            <input type="number" 
+                   step="0.01" 
+                   class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600"
+                   value="${category.weight}"
+                   data-category-weight="${catIndex}">
+          </div>
+          <button onclick="removeCategory(${catIndex})" 
+                  style="padding:6px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">
+            Remove
+          </button>
+        </div>
+        
+        <div class="mt-3 mb-2">
+          <label class="block text-white font-semibold mb-2 text-sm">Sub-criteria (optional):</label>
+          <div class="space-y-2 mb-2" data-subcategories="${catIndex}">
+            ${category.subcategories.map((sub, subIndex) => `
+              <div class="flex items-center gap-2 bg-gray-700 p-2 rounded" data-sub-index="${subIndex}">
+                <input type="text" 
+                       placeholder="Sub-criterion name" 
+                       class="flex-1 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm"
+                       value="${sub.name}"
+                       data-sub-name="${catIndex}-${subIndex}">
+                <input type="number" 
+                       step="0.01" 
+                       placeholder="0.00"
+                       class="w-24 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm"
+                       value="${sub.weight}"
+                       data-sub-weight="${catIndex}-${subIndex}">
+                <button onclick="removeSubcategory(${catIndex}, ${subIndex})" 
+                        style="padding:4px 8px; border-radius:4px; border:none; font-size:0.75rem; cursor:pointer;">
+                  ×
+                </button>
+              </div>
+            `).join('')}
+          </div>
+          <button onclick="addSubcategory(${catIndex})" 
+                  style="padding:4px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer;">
+            + Add Sub-criterion
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Add new category
+  window.addNewCategory = function() {
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    rubric.categories.push({
+      name: "New Category",
+      weight: 0.10,
+      subcategories: []
+    });
+    renderRubricEditMode();
+  };
+
+  // Remove category
+  window.removeCategory = function(index) {
+    if (!confirm('Are you sure you want to remove this category?')) return;
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    rubric.categories.splice(index, 1);
+    renderRubricEditMode();
+  };
+
+  // Add subcategory
+  window.addSubcategory = function(categoryIndex) {
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    rubric.categories[categoryIndex].subcategories.push({
+      name: "New Sub-criterion",
+      weight: 0.05
+    });
+    renderRubricEditMode();
+  };
+
+  // Remove subcategory
+  window.removeSubcategory = function(categoryIndex, subIndex) {
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    rubric.categories[categoryIndex].subcategories.splice(subIndex, 1);
+    renderRubricEditMode();
+  };
+
+  // Cancel rubric edit
+  window.cancelRubricEdit = function() {
+    document.getElementById('rubric-view-mode').style.display = 'block';
+    document.getElementById('rubric-edit-mode').style.display = 'none';
+  };
+
+  // Save rubric edit
+  window.saveRubricEdit = async function() {
+    const rubric = userGradeData.rubric || DEFAULT_RUBRIC;
+    
+    // Update total
+    rubric.total = parseFloat(document.getElementById('edit-total-points').value) || 0.90;
+    
+    // Update categories
+    rubric.categories = [];
+    document.querySelectorAll('[data-category-index]').forEach((catEl, catIndex) => {
+      const name = catEl.querySelector(`[data-category-name="${catIndex}"]`).value;
+      const weight = parseFloat(catEl.querySelector(`[data-category-weight="${catIndex}"]`).value) || 0;
+      
+      const category = {
+        name: name,
+        weight: weight,
+        subcategories: []
+      };
+      
+      // Update subcategories
+      catEl.querySelectorAll('[data-sub-index]').forEach((subEl, subIndex) => {
+        const subName = subEl.querySelector(`[data-sub-name="${catIndex}-${subIndex}"]`)?.value;
+        const subWeight = parseFloat(subEl.querySelector(`[data-sub-weight="${catIndex}-${subIndex}"]`)?.value) || 0;
+        
+        if (subName) {
+          category.subcategories.push({
+            name: subName,
+            weight: subWeight
+          });
+        }
+      });
+      
+      rubric.categories.push(category);
+    });
+    
+    userGradeData.rubric = rubric;
+    
+    const saved = await saveGradeData();
+    if (saved) {
+      alert('Rubric saved successfully!');
+      document.getElementById('rubric-view-mode').style.display = 'block';
+      document.getElementById('rubric-edit-mode').style.display = 'none';
+      renderFullRubric();
+      renderSubmissionRubric(); // Update submission modal if open
+    } else {
+      alert('Failed to save rubric');
+    }
+  };
+
+  // Render the checklist in the modal
+  function renderChecklist() {
+    const container = document.getElementById('hacks-checklist');
+    container.innerHTML = '';
+
+    HACK_TOPICS.forEach((topic) => {
+      const isChecked = (userGradeData.selected_hacks || []).includes(topic.Game);
+      
+      const label = document.createElement('label');
+      label.className = 'flex items-start gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-750 cursor-pointer transition border border-gray-700 hover:border-blue-500';
+      
+      label.innerHTML = `
+        <input type="checkbox" 
+               data-game="${topic.Game}" 
+               ${isChecked ? 'checked' : ''} 
+               class="mt-1 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500">
+        <div class="flex-1">
+          <div class="font-semibold text-white">${topic.Title}</div>
+          <div class="text-xs text-gray-400">Level ${topic.Level} • ${topic.Genre}</div>
+        </div>
+      `;
+      
+      container.appendChild(label);
+    });
+  }
+
+  // Render selected hacks at the top
+  function renderSelectedHacks() {
+    const container = document.getElementById('selected-hacks-container');
+    const selectedGames = userGradeData.selected_hacks || [];
+
+    if (selectedGames.length === 0) {
+      container.innerHTML = '<p class="text-gray-400 text-center py-8">No hacks selected. Click "Select Hacks" to choose your onboarding tasks.</p>';
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${selectedGames.map(gamePath => {
+          const topic = HACK_TOPICS.find(t => t.Game === gamePath);
+          if (!topic) return '';
+          
+          const isCompleted = userGradeData.hacks_completed && userGradeData.hacks_completed[gamePath];
+          
+          return `
+            <div class="bg-gray-800 rounded-xl p-4 border-2 ${isCompleted ? 'border-green-500' : 'border-blue-500'}">
+              <div class="flex items-start justify-between mb-2">
+                <h3 class="text-lg font-bold text-white">${topic.Title}</h3>
+                <span class="inline-block px-2 py-1 text-xs rounded-full ${isCompleted ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'}">
+                  ${isCompleted ? '✓ Complete' : 'In Progress'}
+                </span>
+              </div>
+              <p class="text-sm text-gray-400 mb-1">Level ${topic.Level}</p>
+              <p class="text-sm text-gray-300 mb-3">${topic.Description}</p>
+              <div class="flex gap-2">
+                <a href="${topic.Game}" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-center py-2 px-3 rounded-lg text-sm font-semibold transition">
+                  Play
+                </a>
+                <a href="${topic.Lessons}" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white text-center py-2 px-3 rounded-lg text-sm font-semibold transition">
+                  Learn
+                </a>
+                <button onclick="openSubmissionModal('${gamePath}')" class="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm transition font-semibold">
+                  Submit 
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  // Update status badges on all cards
+  function updateAllCardBadges() {
+    document.querySelectorAll('[data-game]').forEach(card => {
+      const gamePath = card.getAttribute('data-game');
+      const badge = card.querySelector('[data-status-badge]');
+      
+      if (badge) {
+        const isSelected = (userGradeData.selected_hacks || []).includes(gamePath);
+        const isCompleted = userGradeData.hacks_completed && userGradeData.hacks_completed[gamePath];
+        
+        if (isCompleted) {
+          badge.textContent = '✓ Completed';
+          badge.className = 'inline-block px-2 py-1 text-xs rounded-full bg-green-600 text-white';
+        } else if (isSelected) {
+          badge.textContent = 'Selected';
+          badge.className = 'inline-block px-2 py-1 text-xs rounded-full bg-blue-600 text-white';
+        } else {
+          badge.textContent = 'Not selected';
+          badge.className = 'inline-block px-2 py-1 text-xs rounded-full bg-gray-700 text-gray-300';
+        }
+      }
+    });
+  }
+
+  // Update status message
+  function updateStatus(message, isError = false) {
+    const statusEl = document.getElementById('hacks-status');
+    statusEl.textContent = message;
+    statusEl.className = `text-sm self-center ${isError ? 'text-red-400' : 'text-gray-300'}`;
+  }
+
+  // Update the status display with counts
+  function updateStatusDisplay() {
+    const selectedCount = (userGradeData.selected_hacks || []).length;
+    const completedCount = Object.values(userGradeData.hacks_completed || {}).filter(Boolean).length;
+    updateStatus(`${selectedCount} selected • ${completedCount} completed`);
+  }
+
+  // Modal functions
+  function openModal() {
+    const modal = document.getElementById('hacks-modal');
+    if (!modal) return;
+    renderChecklist();
+    modal.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('hacks-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  async function saveSelection() {
+    const checkboxes = document.querySelectorAll('#hacks-checklist input[type="checkbox"]');
+    userGradeData.selected_hacks = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.getAttribute('data-game'));
+
+    const saved = await saveGradeData();
+    
+    if (saved) {
+      closeModal();
+      renderSelectedHacks();
+      updateAllCardBadges();
+      updateStatus('Selection saved!');
+      setTimeout(() => updateStatusDisplay(), 1500);
+    } else {
+      updateStatus('Failed to save selection', true);
+    }
+  }
+  
+  // Update submit button state based on checkboxes
+  function updateSubmitButtonState() {
+    const checkboxes = document.querySelectorAll('#submission-checklist .submission-checkbox');
+    const btn = document.getElementById('submission-btn');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    btn.disabled = !allChecked;
+    btn.style.opacity = allChecked ? '1' : '0.5';
+    btn.style.cursor = allChecked ? 'pointer' : 'not-allowed';
+  }
+
+  // Open submission modal
+  window.openSubmissionModal = async function(gamePath) {
+    currentHackToSubmit = gamePath;
+    document.getElementById('submission-link').value = userGradeData.hacks_links?.[gamePath] || '';
+    document.getElementById('submission-text').value = userGradeData.hacks_submissions?.[gamePath] || '';
+    document.getElementById('submission-notes').value = userGradeData.hacks_notes?.[gamePath] || '';
+    
+    const modal = document.getElementById('submission-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Render the rubric based on current user data
+    renderSubmissionRubric();
+
+    // Reset checkboxes
+    const checkboxes = document.querySelectorAll('#submission-checklist .submission-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+
+    updateSubmitButtonState();
+
+    // Add event listeners to checkboxes
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateSubmitButtonState);
+    });
+  };
+  
+  // Close submission modal
+  window.closeSubmissionModal = function() {
+    const modal = document.getElementById('submission-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+  
+  // Submit hack
+  window.submitHack = async function() {
+    const link = document.getElementById('submission-link').value.trim();
+    const text = document.getElementById('submission-text').value.trim();
+    const notes = document.getElementById('submission-notes').value.trim();
+    
+    if (!link) {
+      alert('Please provide a submission link.');
+      return;
+    }
+    
+    if (!text) {
+      alert('Please write something before submitting.');
+      return;
+    }
+    
+    // Use this page's permalink as the assignment key so grading view only shows submissions for this page
+    const assignmentName = currentHackToSubmit;;
+    
+    // Get user ID and class from credentials data (window.user loaded by login.js)
+    let uid = null;
+    let studentClass = 'A';
+    
+    // Always check window.user first (credentials data from console)
+    if (window.user && window.user.uid) {
+      uid = window.user.uid;
+      
+      // Handle class: it's an array, use first element if available, otherwise use school
+      if (window.user.class && Array.isArray(window.user.class) && window.user.class.length > 0) {
+        studentClass = window.user.class[0];
+      } else if (window.user.school) {
+        studentClass = window.user.school;
+      }
+      
+      console.log('Using credentials from window.user:', { 
+        uid: window.user.uid, 
+        class: window.user.class, 
+        school: window.user.school,
+        selectedClass: studentClass 
+      });
+    } else {
+      // Fallback: try to fetch if window.user doesn't exist yet
+      try {
+        const userResp = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+        if (userResp.ok) {
+          const userData = await userResp.json();
+          if (userData && userData.uid) {
+            window.user = userData; // Store for future use
+            uid = userData.uid;
+            
+            // Handle class array
+            if (userData.class && Array.isArray(userData.class) && userData.class.length > 0) {
+              studentClass = userData.class[0];
+            } else if (userData.school) {
+              studentClass = userData.school;
+            }
+            
+            console.log('Fetched user data:', userData);
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching user:', e);
+      }
+    }
+    
+    // Require authentication - if no UID found, show error
+    if (!uid) {
+      alert('You must be logged in to submit. Please log in and try again.');
+      return;
+    }
+    
+    // Prepare grade data for API
+    const gradeData = {
+      uid: uid,
+      assignment: assignmentName,
+      score: 0, // Start with 0 until graded
+      course: studentClass, // Backend uses 'course' not 'class'
+      submission: link
+    };
+    
+    // Send POST request to grades API to create a new grade
+    try {
+      console.log('Submitting grade data:', gradeData);
+      const response = await fetch(`${API_BASE}/api/grades`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(gradeData)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API response error:', response.status, errorText);
+        throw new Error(`API error: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Grade submitted successfully:', result);
+    } catch (error) {
+      console.error('Error submitting grade to API:', error);
+      const errorMsg = error.message || 'Unknown error';
+      
+      // Check if it's a network/CORS error
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        alert(`Warning: Could not connect to grading API at ${API_BASE}. Your submission was saved locally.`);
+      } else {
+        alert(`Warning: Could not submit to grading API (${errorMsg}). Your submission was saved locally.`);
+      }
+    }
+    
+    // Store locally
+    if (!userGradeData.hacks_submissions) userGradeData.hacks_submissions = {};
+    if (!userGradeData.hacks_notes) userGradeData.hacks_notes = {};
+    if (!userGradeData.hacks_links) userGradeData.hacks_links = {};
+    
+    userGradeData.hacks_links[currentHackToSubmit] = link;
+    userGradeData.hacks_submissions[currentHackToSubmit] = text;
+    userGradeData.hacks_notes[currentHackToSubmit] = notes;
+    
+    // Mark as completed
+    userGradeData.hacks_completed[currentHackToSubmit] = true;
+    await saveGradeData();
+    
+    renderSelectedHacks();
+    updateAllCardBadges();
+    closeSubmissionModal();
+    updateStatus('Submission saved!');
+    setTimeout(updateStatusDisplay, 1500);
+  };
+
+  // -------------------------------
+  // Admin grading view helpers
+  // -------------------------------
+  async function loadGradingAssignments() {
+    try {
+      // Fetch all grades/submissions from the backend
+      const resp = await fetch(`${API_BASE}/api/grades`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+      
+      const grades = await resp.json();
+      console.log('Fetched grades from backend:', grades);
+      
+      // Handle both array and single object responses
+      const gradesArray = Array.isArray(grades) ? grades : (grades.data || [grades]);
+      
+      if (!gradesArray.length) {
+        gradingAssignments = [];
+        populateAssignmentDropdown();
+        console.log('No submissions found');
+        return;
+      }
+      
+      // Group grades by assignment key
+      const assignmentsMap = new Map();
+      
+      gradesArray.forEach(grade => {
+          const assignmentKey = grade.assignment || 'Unknown Assignment';
+
+          // Try to match the assignment key to a hack by its Game path
+          const matchingTopic = HACK_TOPICS.find(t => t.Game === assignmentKey);
+
+          // Prefer the hack title if we find it, otherwise fall back to the raw key
+          const friendlyTitle = matchingTopic ? matchingTopic.Title : assignmentKey;
+
+          if (!assignmentsMap.has(assignmentKey)) {
+            const dateStr = grade.submitted_at 
+              ? new Date(grade.submitted_at).toISOString().split('T')[0] 
+              : new Date().toISOString().split('T')[0];
+
+            assignmentsMap.set(assignmentKey, {
+              id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              key: assignmentKey,
+              title: friendlyTitle,  // <-- NOW shows "Snake Game", "Calculator", etc.
+              date: dateStr,
+              submissions: []
+            });
+          }
+
+        
+        const assignment = assignmentsMap.get(assignmentKey);
+        assignment.submissions.push({
+          id: grade.id?.toString() || `${grade.uid}-${Date.now()}`,
+          student: grade.uid || 'Unknown Student',
+          submitted_at: grade.submitted_at || new Date().toISOString(),
+          text: grade.submission || 'No submission link provided',
+          submission_link: grade.submission || '',
+          score: grade.score || 0,
+          course: grade.course || '',
+          rubric: grade.rubric || JSON.parse(JSON.stringify(rubricTemplate)),
+          status: (grade.score !== null && grade.score !== undefined && grade.score > 0) ? 'graded' : 'pending'
+        });
+      });
+      
+      // Convert map to array
+      gradingAssignments = Array.from(assignmentsMap.values());
+      
+      // Sort assignments by date (newest first)
+      gradingAssignments.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      console.log('All assignments loaded:', gradingAssignments);
+      
+      // Populate dropdown and select first assignment by default
+      populateAssignmentDropdown();
+      if (gradingAssignments.length > 0) {
+        selectedAssignmentId = gradingAssignments[0].id;
+        document.getElementById('assignment-selector').value = selectedAssignmentId;
+      }
+      
+    } catch (err) {
+      console.error('Error loading grading assignments:', err);
+      gradingAssignments = [];
+      populateAssignmentDropdown();
+    }
+  }
+  
+  // Populate the assignment dropdown
+  function populateAssignmentDropdown() {
+    const selector = document.getElementById('assignment-selector');
+    if (!selector) return;
+    
+    selector.innerHTML = '';
+    
+    if (gradingAssignments.length === 0) {
+      selector.innerHTML = '<option value="">No assignments available</option>';
+      return;
+    }
+    
+    gradingAssignments.forEach(assignment => {
+      const option = document.createElement('option');
+      option.value = assignment.id;
+      option.textContent = `${assignment.title} (${assignment.submissions.length} submissions)`;
+      selector.appendChild(option);
+    });
+  }
+
+  function renderGradingAssignments() {
+    const container = document.getElementById('grading-assignments');
+    if (!container) return;
+
+    if (!gradingAssignments.length) {
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">No submissions available yet.</div>';
+      return;
+    }
+
+    // If no assignment is selected, show message
+    if (!selectedAssignmentId) {
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">Please select an assignment from the dropdown above.</div>';
+      return;
+    }
+
+    // Find the selected assignment
+    const selectedAssignment = gradingAssignments.find(a => a.id === selectedAssignmentId);
+    
+    if (!selectedAssignment) {
+      container.innerHTML = '<div class="bg-gray-800 p-4 rounded-lg text-gray-200">Selected assignment not found.</div>';
+      return;
+    }
+
+    // Render only the selected assignment
+    container.innerHTML = `
+      <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wide">${selectedAssignment.date}</p>
+            <h3 class="text-xl font-bold text-white">${selectedAssignment.title}</h3>
+          </div>
+          <span class="text-sm text-gray-300">${selectedAssignment.submissions.length} submissions</span>
+        </div>
+        <div class="space-y-3">
+          ${selectedAssignment.submissions.map(sub => `
+            <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <h4 class="text-lg font-semibold text-white">${sub.student}</h4>
+                  <p class="text-xs text-gray-400">${new Date(sub.submitted_at).toLocaleString()}</p>
+                </div>
+                <span class="inline-block px-2 py-1 text-xs rounded-full ${sub.status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}">
+                  ${sub.status === 'pending' ? 'Pending' : 'Graded'}
+                </span>
+              </div>
+              ${sub.submission_link ? `
+                <div class="mb-3">
+                  <p class="text-gray-300 text-sm mb-1">Submission Link:</p>
+                  <a href="${sub.submission_link}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 text-sm break-all">
+                    ${sub.submission_link}
+                  </a>
+                </div>
+              ` : ''}
+              ${sub.score > 0 ? `<p class="text-gray-300 text-sm mb-3">Score: ${sub.score}</p>` : ''}
+              <div class="flex items-center gap-3">
+                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                  Edit Rubric
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function openGradingView() {
+    const panel = document.getElementById('grading-panel');
+    panel.style.display = 'flex';
+    panel.style.visibility = 'visible';
+    panel.style.opacity = '1';
+    renderGradingAssignments();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGradingView() {
+    const panel = document.getElementById('grading-panel');
+    panel.style.display = 'none';
+    panel.style.visibility = 'hidden';
+    panel.style.opacity = '0';
+    document.body.style.overflow = '';
+  }
+
+  function findSubmission(assignmentId, submissionId) {
+    const assignment = gradingAssignments.find(a => a.id === assignmentId);
+    if (!assignment) return null;
+    const submission = assignment.submissions.find(s => s.id === submissionId);
+    if (!submission) return null;
+    return { assignment, submission };
+  }
+
+  function openGradingRubricModal(assignmentId, submissionId) {
+    const context = findSubmission(assignmentId, submissionId);
+    if (!context) return;
+    currentRubricContext = { assignmentId, submissionId };
+    const rubric = context.submission.rubric || rubricTemplate;
+    document.getElementById('grading-total-points').value = rubric.total;
+    document.getElementById('grading-rubric-context').textContent = `${context.submission.student} • ${context.assignment.title}`;
+    renderGradingEdit(rubric);
+    const modal = document.getElementById('grading-rubric-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGradingRubricModal() {
+    const modal = document.getElementById('grading-rubric-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    currentRubricContext = null;
+  }
+
+  function renderGradingEdit(rubric) {
+    const container = document.getElementById('grading-edit-categories');
+    container.innerHTML = rubric.categories.map((cat, idx) => {
+      // Calculate subcategory total for this category
+      const subTotal = cat.subcategories.reduce((sum, sub) => sum + (parseFloat(sub.weight) || 0), 0);
+      const catWeight = parseFloat(cat.weight) || 0;
+      const subTotalMatch = Math.abs(subTotal - catWeight) < 0.01; // Allow small floating point differences
+      
+      return `
+      <div class="bg-gray-800 p-4 rounded-lg" data-gcat="${idx}">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="flex-1">
+            <label class="block text-white font-semibold mb-1 text-sm">Category</label>
+            <input type="text" class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 mb-2 category-name-input" value="${cat.name}" data-gcat-name="${idx}">
+            <div class="flex items-center gap-2 mb-2">
+              <label class="block text-white font-semibold text-sm">Weight:</label>
+              <input type="number" step="0.01" class="w-32 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 category-weight-input" value="${cat.weight}" data-gcat-weight="${idx}">
+              <span class="text-xs text-gray-400">Sub-total: <span class="category-subtotal" data-cat-subtotal="${idx}">${subTotal.toFixed(2)}</span></span>
+              ${!subTotalMatch ? '<span class="text-xs text-red-400 ml-2">⚠ Mismatch</span>' : '<span class="text-xs text-green-400 ml-2">✓</span>'}
+            </div>
+          </div>
+          <button onclick="removeGradingCategory(${idx})" style="padding:6px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">Remove</button>
+        </div>
+        <div class="space-y-2" data-gsubcontainer="${idx}">
+          ${cat.subcategories.map((sub, sidx) => `
+            <div class="flex items-center gap-2 bg-gray-700 p-2 rounded" data-gsub="${idx}-${sidx}">
+              <input type="text" class="flex-1 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm sub-name-input" value="${sub.name}" data-gsub-name="${idx}-${sidx}">
+              <input type="number" step="0.01" class="w-24 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm sub-weight-input" value="${sub.weight}" data-gsub-weight="${idx}-${sidx}">
+              <button onclick="removeGradingSub(${idx},${sidx})" style="padding:4px 8px; border-radius:4px; border:none; font-size:0.75rem; cursor:pointer;">×</button>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="addGradingSub(${idx})" style="padding:4px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; margin-top:8px;">+ Add Sub-criterion</button>
+      </div>
+    `;
+    }).join('');
+    
+    // Add event listeners for real-time calculation
+    updateGradingCalculations();
+    attachGradingCalculationListeners();
+  }
+  
+  let isUpdatingCalculations = false;
+  
+  function updateGradingCalculations() {
+    if (isUpdatingCalculations) return; // Prevent infinite loops
+    isUpdatingCalculations = true;
+    
+    try {
+      // First, update category weights based on subcategory sums
+      document.querySelectorAll('[data-gcat]').forEach(catEl => {
+        const catIdx = parseInt(catEl.getAttribute('data-gcat'));
+        const subInputs = catEl.querySelectorAll('[data-gsub-weight]');
+        const subTotal = Array.from(subInputs).reduce((sum, input) => {
+          return sum + (parseFloat(input.value) || 0);
+        }, 0);
+        
+        // Automatically update category weight to match subcategory total
+        const catWeightInput = catEl.querySelector(`[data-gcat-weight="${catIdx}"]`);
+        if (catWeightInput) {
+          const currentValue = parseFloat(catWeightInput.value) || 0;
+          const newValue = subTotal.toFixed(2);
+          if (Math.abs(currentValue - subTotal) >= 0.01) {
+            catWeightInput.value = newValue;
+          }
+        }
+        
+        // Update display
+        const subtotalEl = catEl.querySelector(`[data-cat-subtotal="${catIdx}"]`);
+        if (subtotalEl) {
+          subtotalEl.textContent = subTotal.toFixed(2);
+          
+          // Remove old indicator and add new one (always green now since we auto-update)
+          const matchIndicator = subtotalEl.parentElement.querySelector('.text-red-400, .text-green-400');
+          if (matchIndicator) {
+            matchIndicator.remove();
+          }
+          const indicator = document.createElement('span');
+          indicator.className = 'text-xs text-green-400 ml-2';
+          indicator.textContent = '✓';
+          subtotalEl.parentElement.appendChild(indicator);
+        }
+      });
+      
+      // Then, update total points based on sum of all category weights
+      const categoryWeights = Array.from(document.querySelectorAll('[data-gcat-weight]')).reduce((sum, input) => {
+        return sum + (parseFloat(input.value) || 0);
+      }, 0);
+      
+      const totalPointsInput = document.getElementById('grading-total-points');
+      if (totalPointsInput) {
+        const currentTotal = parseFloat(totalPointsInput.value) || 0;
+        const newTotal = categoryWeights.toFixed(2);
+        if (Math.abs(currentTotal - categoryWeights) >= 0.01) {
+          totalPointsInput.value = newTotal;
+        }
+      }
+      
+      // Show total calculation (now always matching since we auto-update)
+      let totalDisplay = document.getElementById('grading-total-display');
+      if (!totalDisplay && totalPointsInput) {
+        totalDisplay = document.createElement('div');
+        totalDisplay.id = 'grading-total-display';
+        totalDisplay.className = 'text-sm text-gray-300 mt-2';
+        if (totalPointsInput.parentElement) {
+          totalPointsInput.parentElement.appendChild(totalDisplay);
+        }
+      }
+      if (totalDisplay) {
+        totalDisplay.innerHTML = `Category weights sum: <span class="text-green-400 font-semibold">${categoryWeights.toFixed(2)}</span> ✓`;
+      }
+    } finally {
+      isUpdatingCalculations = false;
+    }
+  }
+  
+  function attachGradingCalculationListeners() {
+    // Use event delegation on the modal container to handle dynamically added inputs
+    const modal = document.getElementById('grading-rubric-modal');
+    if (!modal) return;
+    
+    // Listen to all input changes within the modal (event delegation prevents duplicate listeners)
+    modal.addEventListener('input', (e) => {
+      if (e.target.matches('.sub-weight-input, .category-weight-input')) {
+        updateGradingCalculations();
+      }
+    });
+    modal.addEventListener('change', (e) => {
+      if (e.target.matches('.sub-weight-input, .category-weight-input')) {
+        updateGradingCalculations();
+      }
+    });
+  }
+
+  function addGradingCategory() {
+    const rubric = getCurrentRubric();
+    rubric.categories.push({ name: 'New Category', weight: 0, subcategories: [] });
+    renderGradingEdit(rubric);
+  }
+
+  function removeGradingCategory(idx) {
+    const rubric = getCurrentRubric();
+    rubric.categories.splice(idx, 1);
+    renderGradingEdit(rubric);
+  }
+
+  function addGradingSub(catIdx) {
+    const rubric = getCurrentRubric();
+    rubric.categories[catIdx].subcategories.push({ name: 'New Sub-criterion', weight: 0 });
+    renderGradingEdit(rubric);
+  }
+
+  function removeGradingSub(catIdx, subIdx) {
+    const rubric = getCurrentRubric();
+    rubric.categories[catIdx].subcategories.splice(subIdx, 1);
+    renderGradingEdit(rubric);
+  }
+
+  function getCurrentRubric() {
+    if (!currentRubricContext) return JSON.parse(JSON.stringify(rubricTemplate));
+    const ctx = findSubmission(currentRubricContext.assignmentId, currentRubricContext.submissionId);
+    if (!ctx) return JSON.parse(JSON.stringify(rubricTemplate));
+    if (!ctx.submission.rubric) ctx.submission.rubric = JSON.parse(JSON.stringify(rubricTemplate));
+    return ctx.submission.rubric;
+  }
+
+  function saveGradingRubric() {
+    if (!currentRubricContext) return;
+    const ctx = findSubmission(currentRubricContext.assignmentId, currentRubricContext.submissionId);
+    if (!ctx) return;
+    
+    // Validate totals before saving
+    const validationErrors = [];
+    
+    // Check each category: subcategories should sum to category weight
+    document.querySelectorAll('[data-gcat]').forEach((catEl, catIdx) => {
+      const catWeight = parseFloat(catEl.querySelector(`[data-gcat-weight="${catIdx}"]`)?.value) || 0;
+      const subInputs = catEl.querySelectorAll('[data-gsub-weight]');
+      const subTotal = Array.from(subInputs).reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
+      
+      if (Math.abs(subTotal - catWeight) >= 0.01) {
+        const catName = catEl.querySelector(`[data-gcat-name="${catIdx}"]`)?.value || `Category ${catIdx + 1}`;
+        validationErrors.push(`${catName}: Subcategories sum (${subTotal.toFixed(2)}) doesn't match category weight (${catWeight.toFixed(2)})`);
+      }
+    });
+    
+    // Check total: all category weights should sum to total points
+    const totalPoints = parseFloat(document.getElementById('grading-total-points').value) || 0;
+    const categoryWeights = Array.from(document.querySelectorAll('[data-gcat-weight]')).reduce((sum, input) => {
+      return sum + (parseFloat(input.value) || 0);
+    }, 0);
+    
+    if (Math.abs(categoryWeights - totalPoints) >= 0.01) {
+      validationErrors.push(`Total points (${totalPoints.toFixed(2)}) doesn't match sum of category weights (${categoryWeights.toFixed(2)})`);
+    }
+    
+    // Show errors if any
+    if (validationErrors.length > 0) {
+      alert('Please fix the following errors before saving:\n\n' + validationErrors.join('\n'));
+      return;
+    }
+    
+    // Save if validation passes
+    const rubric = getCurrentRubric();
+    rubric.total = totalPoints;
+    rubric.categories = [];
+    document.querySelectorAll('[data-gcat]').forEach((catEl, catIdx) => {
+      const name = catEl.querySelector(`[data-gcat-name="${catIdx}"]`)?.value || 'Category';
+      const weight = parseFloat(catEl.querySelector(`[data-gcat-weight="${catIdx}"]`)?.value) || 0;
+      const category = { name, weight, subcategories: [] };
+      catEl.querySelectorAll('[data-gsub]').forEach(subEl => {
+        const [cidx, sidx] = subEl.getAttribute('data-gsub').split('-').map(Number);
+        const subName = subEl.querySelector(`[data-gsub-name="${cidx}-${sidx}"]`)?.value || 'Sub-criterion';
+        const subWeight = parseFloat(subEl.querySelector(`[data-gsub-weight="${cidx}-${sidx}"]`)?.value) || 0;
+        category.subcategories.push({ name: subName, weight: subWeight });
+      });
+      rubric.categories.push(category);
+    });
+    ctx.submission.rubric = rubric;
+    ctx.submission.score = totalPoints; // Update local score
+    ctx.submission.status = 'graded';
+    
+    // Send PUT request to backend to update the grade
+    const gradeId = ctx.submission.id;
+    if (gradeId) {
+      const gradeData = {
+        uid: ctx.submission.student,
+        assignment: ctx.assignment.key || ctx.assignment.id, // Use the assignment key from context
+        score: totalPoints,
+        course: ctx.submission.course || '',
+        submission: ctx.submission.submission_link || ctx.submission.text
+      };
+      
+      fetch(`${API_BASE}/api/grades/${gradeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(gradeData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => {
+            throw new Error(`API error: ${response.status} - ${text}`);
+          });
+        }
+        return response.json();
+      })
+      .then(result => {
+        console.log('Grade updated successfully:', result);
+        // Update local submission with backend response if needed
+        if (result.score !== undefined) {
+          ctx.submission.score = result.score;
+        }
+      })
+      .catch(error => {
+        console.error('Error updating grade to API:', error);
+        const errorMsg = error.message || 'Unknown error';
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          alert('Warning: Could not connect to grading API. The rubric was saved locally but may not be synced with the backend.');
+        } else {
+          alert(`Warning: Could not update grade in API (${errorMsg}). The rubric was saved locally but may not be synced with the backend.`);
+        }
+      });
+    } else {
+      console.warn('No grade ID found for submission, skipping API update');
+    }
+    
+    closeGradingRubricModal();
+    renderGradingAssignments();
+  }
+
+  // Load and log credentials data
+  async function loadCredentials() {
+    try {
+      const response = await fetch(`${API_BASE}/api/id`, { credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Credentials data:', data);
+        window.user = data; // Store in window for global access
+        return data;
+      } else {
+        console.warn('Could not fetch credentials, status:', response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching credentials:', error);
+      return null;
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadCredentials(); // Load and log credentials first
+    await loadGradeData();
+    await loadGradingAssignments();
+    renderSelectedHacks();
+    updateAllCardBadges();
+    updateStatusDisplay();
+
+    const gradingBtn = document.getElementById('open-grading-view-btn');
+
+    // Event listeners
+    const selectBtn = document.getElementById('select-hacks-btn');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalSaveBtn = document.getElementById('modal-save-btn');
+    const viewRubricBtn = document.getElementById('view-full-rubric-btn');
+    const closeGradingBtn = document.getElementById('close-grading-view-btn');
+
+    if (selectBtn) {
+      selectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal();
+      });
+    }
+
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+    }
+
+    if (modalCancelBtn) {
+      modalCancelBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+    }
+
+    if (modalSaveBtn) {
+      modalSaveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        saveSelection();
+      });
+    }
+
+    if (viewRubricBtn) {
+      viewRubricBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openFullRubricModal();
+      });
+    }
+
+    if (gradingBtn) {
+      gradingBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openGradingView();
+      });
+    }
+
+    if (closeGradingBtn) {
+      closeGradingBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeGradingView();
+      });
+    }
+
+    // Assignment selector dropdown event listener
+    const assignmentSelector = document.getElementById('assignment-selector');
+    if (assignmentSelector) {
+      assignmentSelector.addEventListener('change', (e) => {
+        selectedAssignmentId = e.target.value || null;
+        renderGradingAssignments();
+      });
+    }
+  });
+</script>

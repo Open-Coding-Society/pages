@@ -365,7 +365,7 @@ show_reading_time: false
     // Function to handle Python login
     window.pythonLogin = function () {
         const options = {
-            URL: `${pythonURI}/api/authenticate`,
+            URL: `${pythonURI}/authenticate`,
             callback: pythonDatabase,
             message: "message",
             method: "POST",
@@ -473,20 +473,12 @@ show_reading_time: false
 };
     // Function to fetch and display Python data
     function pythonDatabase() {
-        const URL = `${pythonURI}/api/id`;
-        fetch(URL, fetchOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Flask server response: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                window.location.href = '{{site.baseurl}}/profile';
-            })
-            .catch(error => {
-                document.getElementById("message").textContent = `Error: ${error.message}`;
-            });
+        // Skip the /api/id fetch due to CORS restrictions with credentials mode.
+        // The user is already authenticated (token in cookie), so just redirect to profile.
+        console.log("Authentication successful, redirecting to profile...");
+        setTimeout(() => {
+            window.location.href = '{{site.baseurl}}/profile';
+        }, 1000);
     }  
     window.signup = function () {
         const signupButton = document.querySelector(".signup-card button");

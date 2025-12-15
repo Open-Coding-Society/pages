@@ -6,7 +6,7 @@ import Collectible from './GameEngine/Collectible.js';
 import Quiz from './Quiz.js';
 import Game from '../GameEngine/Game.js';
 import Enemy from './GameEngine/Enemy.js';
-import DialogueSystem from './DialogueSystem.js';
+import DialogueSystem from './GameEngine/GameControl.js';
 
 class GameLevelEnd {
   constructor(gameEnv) {
