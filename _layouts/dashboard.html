@@ -1176,21 +1176,133 @@ score += gists * 0.5
     const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
     const issuesUrl = `${pythonURI}/api/analytics/github/user/issues`;
 
+    let springUserId = null;
+    let hasExistingStudentEval = false;
+
+    async function getUserIdSpring() {
+        if (springUserId) return springUserId;
+        try {
+            // 1. Get UID from Python
+            const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+            if (!pyRes.ok) throw new Error("Failed to fetch Python ID");
+            const pyData = await pyRes.json();
+            const uid = pyData.uid;
+
+            // 2. Get People from Spring
+            const javaRes = await fetch(`${javaURI}/api/people`, fetchOptions);
+            if (!javaRes.ok) throw new Error("Failed to fetch People");
+            const people = await javaRes.json();
+
+            // 3. Match UID
+            const person = people.find(p => p.uid === uid);
+            if (!person) throw new Error("User not found in Spring");
+            
+            springUserId = person.id;
+            return springUserId;
+        } catch (e) {
+            console.error("Error getting Spring User ID:", e);
+            return null;
+        }
+    }
+
+    async function loadStudentEvaluation() {
+        const id = await getUserIdSpring();
+        if (!id) return;
+
+        try {
+            const res = await fetch(`${javaURI}/api/student-evaluation/get/${id}`, fetchOptions);
+            if (res.ok) {
+                const json = await res.json();
+                const data = json.evaluation || json; 
+                if (data) {
+                    hasExistingStudentEval = true;
+                    
+                    const apiToSliderKey = {
+                        attendance: "attendance",
+                        workHabits: "work_habits",
+                        behavior: "behavior",
+                        timeliness: "timeliness",
+                        techSense: "tech_sense",
+                        techTalk: "tech_talk",
+                        techGrowth: "tech_growth",
+                        advocacy: "advocacy",
+                        communication: "communication",
+                        integrity: "integrity",
+                        organization: "organization"
+                    };
+
+                    Object.keys(apiToSliderKey).forEach(apiKey => {
+                        const sliderKey = apiToSliderKey[apiKey];
+                        let val = 4;
+                        if (typeof data[apiKey] !== "undefined") val = data[apiKey];
+                        else if (typeof data[sliderKey] !== "undefined") val = data[sliderKey];
+
+                        const slider = document.getElementById(`slider-${sliderKey}`);
+                        const label = document.getElementById(`val-${sliderKey}`);
+                        if (slider) {
+                            slider.value = val;
+                            if (label) label.textContent = val;
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Error loading student evaluation:", e);
+        }
+    }
+
     // Remove old predictGradeBtn logic and update smartPredictBtn logic:
     const smartPredictBtn = document.getElementById("smartPredictBtn");
     smartPredictBtn.onclick = async () => {
         const userGradeEl = document.getElementById("userGrade");
-        userGradeEl.textContent = "Predicting...";
+        userGradeEl.textContent = "Processing...";
+        
+        const id = await getUserIdSpring();
+        if (!id) {
+            userGradeEl.textContent = "Error: Could not identify user.";
+            return;
+        }
+
         // Collect slider values
         const fields = [
             "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
             "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
         ];
-        const body = {};
+        const body = { "user_id": id };
         fields.forEach(f => {
             body[f] = Number(document.getElementById(`slider-${f}`).value);
         });
 
+        // 1. Save Evaluation (POST or PUT)
+        try {
+            let res;
+            if (hasExistingStudentEval) {
+                res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+            } else {
+                res = await fetch(`${javaURI}/api/student-evaluation/post`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+            }
+            
+            if (res.ok) {
+                hasExistingStudentEval = true;
+                userGradeEl.textContent = "Evaluation saved. Predicting...";
+            } else {
+                console.error("Failed to save evaluation");
+            }
+        } catch (e) {
+            console.error("Error saving evaluation:", e);
+        }
+
+        // 2. Run Prediction
         try {
             await fetch(`${javaURI}/api/grade-prediction/train`, {
                 method: 'GET',
@@ -1200,7 +1312,6 @@ score += gists * 0.5
         } catch (error) {
             console.error("Error with training:", error);
         }
-
         try {
             const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
                 method: 'POST',
@@ -1209,10 +1320,10 @@ score += gists * 0.5
                 body: JSON.stringify(body)
             });
             const data = await predict.json();
-            userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
+            userGradeEl.textContent = `Saved & Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
         } catch (error) {
             console.error("Error fetching prediction:", error);
-            userGradeEl.textContent = "Error predicting grade.";
+            userGradeEl.textContent = "Saved, but error predicting grade.";
         }
     };
 
@@ -1231,52 +1342,7 @@ score += gists * 0.5
     });
 
     // Attach smartPredictBtn handler ONCE, using correct userGrade element
-    document.addEventListener('DOMContentLoaded', function () {
-        const smartPredictBtn = document.getElementById("smartPredictBtn");
-        if (smartPredictBtn) {
-            smartPredictBtn.onclick = async () => {
-                const userGradeEl = document.getElementById("userGrade");
-                if (!userGradeEl) {
-                    console.error('userGrade element not found');
-                    return;
-                }
-                userGradeEl.textContent = "Predicting...";
-                // Collect slider values
-                const fields = [
-                    "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
-                    "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
-                ];
-                const body = {};
-                fields.forEach(f => {
-                    body[f] = Number(document.getElementById(`slider-${f}`).value);
-                });
-
-                try {
-                    await fetch(`${javaURI}/api/grade-prediction/train`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-                } catch (error) {
-                    console.error("Error with training:", error);
-                }
-
-                try {
-                    const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
-                    });
-                    const data = await predict.json();
-                    userGradeEl.textContent = `Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
-                } catch (error) {
-                    console.error("Error fetching prediction:", error);
-                    userGradeEl.textContent = "Error predicting grade.";
-                }
-            };
-        }
-    });
+    // (Handled above, duplicate block removed)
 
     async function fetchData() {
         try {
@@ -1357,14 +1423,15 @@ score += gists * 0.5
             });
 
             // Grade prediction buttons and output are moved to new tab, so disable them here
-            const predictGradeBtn = document.getElementById("predictGradeBtn");
+            const predictTechGradeBtn = document.getElementById("predictTechGradeBtn");
             
-
-            predictGradeBtn.onclick = () => {
-                const grade = calculateGradeFromCommits(commitsCount);
-                userGradeEl.textContent = `Grade based on commits: ${grade}`;
-            };
-
+            if (predictTechGradeBtn) {
+                predictTechGradeBtn.onclick = () => {
+                    const grade = calculateGradeFromCommits(commitsCount);
+                    const techResult = document.getElementById("techGradeResult");
+                    if (techResult) techResult.textContent = `Grade based on commits: ${grade}`;
+                };
+            }
 
             // Info links to show modal details
             setupInfoModal("commits-info", commitsData);
@@ -1537,41 +1604,44 @@ score += gists * 0.5
             container.appendChild(card);
         });
     }
-        document.getElementById("uid-search-btn").addEventListener("click", async () => {
-        const uid = document.getElementById("uid-input").value.trim();
-        const errorEl = document.getElementById("uid-error");
-        const summaryContainer = document.getElementById("admin-summary-container");
-        const commitContainer = document.getElementById("admin-commitCardsContainer");
+    
+    const uidSearchBtn = document.getElementById("uid-search-btn");
+    if (uidSearchBtn) {
+        uidSearchBtn.addEventListener("click", async () => {
+            const uid = document.getElementById("uid-input").value.trim();
+            const errorEl = document.getElementById("uid-error");
+            const summaryContainer = document.getElementById("admin-summary-container");
+            const commitContainer = document.getElementById("admin-commitCardsContainer");
 
-        errorEl.textContent = "";
-        summaryContainer.innerHTML = "";
-        commitContainer.innerHTML = "";
+            errorEl.textContent = "";
+            summaryContainer.innerHTML = "";
+            commitContainer.innerHTML = "";
 
-        if (!uid) {
-        errorEl.textContent = "Please enter a UID.";
-        return;
-        }
+            if (!uid) {
+                errorEl.textContent = "Please enter a UID.";
+                return;
+            }
 
-        try {
-        const response = await fetch(`${pythonURI}/api/analytics/commits/${encodeURIComponent(uid)}`, fetchOptions);
+            try {
+                const response = await fetch(`${pythonURI}/api/analytics/commits/${encodeURIComponent(uid)}`, fetchOptions);
 
-        if (!response.ok) {
-            const err = await response.json();
-            errorEl.textContent = err.message || "Failed to fetch user commit data.";
-            return;
-        }
+                if (!response.ok) {
+                    const err = await response.json();
+                    errorEl.textContent = err.message || "Failed to fetch user commit data.";
+                    return;
+                }
 
-        const data = await response.json();
+                const data = await response.json();
 
-        const commitData = data.commits?.details_of_commits || data.details_of_commits || [];
-        const commitCount = data.commits?.total_commit_contributions || data.total_commit_contributions || 0;
-        const totalAdditions = data.commits?.total_lines_added || data.total_lines_added || 0;
-        const totalDeletions = data.commits?.total_lines_deleted || data.total_lines_deleted || 0;
+                const commitData = data.commits?.details_of_commits || data.details_of_commits || [];
+                const commitCount = data.commits?.total_commit_contributions || data.total_commit_contributions || 0;
+                const totalAdditions = data.commits?.total_lines_added || data.total_lines_added || 0;
+                const totalDeletions = data.commits?.total_lines_deleted || data.total_lines_deleted || 0;
 
-        const summaryCard = document.createElement("div");
-        summaryCard.className = "summary-card bg-slate-800 text-white p-5 rounded-lg shadow max-w-xs text-center mx-auto";
+                const summaryCard = document.createElement("div");
+                summaryCard.className = "summary-card bg-slate-800 text-white p-5 rounded-lg shadow max-w-xs text-center mx-auto";
 
-        summaryCard.innerHTML = `
+                summaryCard.innerHTML = `
             <img src="https://github.com/identicons/${uid}.png" alt="Avatar" class="mx-auto rounded-full w-20 h-20 mb-3">
             <p><strong>UID:</strong> ${uid}</p>
             <p><strong>Total Commits:</strong> ${commitCount}</p>
@@ -1579,15 +1649,16 @@ score += gists * 0.5
             <p><strong>Total Deletions:</strong> -${totalDeletions}</p>
         `;
 
-        summaryContainer.appendChild(summaryCard);
+                summaryContainer.appendChild(summaryCard);
 
-        renderCommitCards(commitData, uid, commitContainer);
+                renderCommitCards(commitData, uid, commitContainer);
 
-        } catch (e) {
-        errorEl.textContent = "Unexpected error.";
-        console.error(e);
-        }
-    });
+            } catch (e) {
+                errorEl.textContent = "Unexpected error.";
+                console.error(e);
+            }
+        });
+    }
 
     // Modal code
     const dataModal = document.getElementById("dataModal");
@@ -1673,6 +1744,7 @@ score += gists * 0.5
         if (activeTab) setUnderline(activeTab);
 
         await fetchData();
+        await loadStudentEvaluation(); // Load saved evaluation
 
         // load and apply saved preferences (if any)
         try {
@@ -1681,247 +1753,6 @@ score += gists * 0.5
             console.error('Error loading preferences on window.onload', e);
         }
     };
-</script>
-
-<!-- JavaScript for tab switching -->
-<script type="module">
-    import { setupTabSwitcher } from '{{ site.baseurl }}/assets/js/aesthetihawk/dashboard/tabSwitcher.js';
-
-    // call the function with your tab ids and initial tab
-    document.addEventListener('DOMContentLoaded', function () {
-        setupTabSwitcher(
-            ['github', 'grade', 'admin-search', 'help', 'preferences', 'grade-analytics'],
-            'github'
-            );
-    });
-</script>
-
-<script type="module">
-    import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const gradeTab = document.getElementById('tab-grade-analytics');
-        const gradeContent = document.getElementById('grade-analytics-container');
-        let loaded = false;
-
-        // Feedback and badge color logic
-        function getGradeFeedback(percent) {
-            let badgeColor = 'bg-danger';
-            let feedback = 'Immediate intervention is required to pass this course.';
-            if (percent >= 90) {
-                badgeColor = 'bg-success';
-                feedback = 'Excellent work! Keep up the great performance.';
-            } else if (percent >= 80) {
-                badgeColor = 'bg-info';
-                feedback = 'Good work! Continue focusing on improvement.';
-            } else if (percent >= 70) {
-                badgeColor = 'bg-warning text-dark';
-                feedback = 'Satisfactory work. Consider seeking additional support.';
-            } else if (percent >= 60) {
-                badgeColor = 'bg-danger';
-                feedback = 'You need to significantly improve to pass this course.';
-            }
-            return { badgeColor, feedback };
-        }
-
-        function renderGradeData(data) {
-            if (!data || Object.keys(data).length === 0) {
-                return `<p class="text-neutral-400">No grade analytics available for your account.</p>`;
-            }
-            if (Array.isArray(data)) {
-                data = data[0] || {};
-            }
-
-            // Feature order (match profile)
-            const features = [
-                "Attendance", "Work Habits", "Behavior", "Timeliness", "Tech Sense",
-                "Tech Talk", "Tech Growth", "Advocacy", "Communication and Collaboration",
-                "Integrity", "Organization"
-            ];
-
-            // Calculate percent and letter grade
-            let totalScore = 0;
-            let maxScore = features.length * 5;
-            features.forEach(skill => {
-                totalScore += Number(data[skill]) || 0;
-            });
-            const avgRatingValue = (totalScore / features.length).toFixed(1);
-            const percent = Math.round((totalScore / maxScore) * 100);
-            let grade = data.grade || data.predicted_grade || '-';
-            if (grade === '-' && typeof percent === 'number') {
-                if (percent >= 90) grade = 'A';
-                else if (percent >= 80) grade = 'B';
-                else if (percent >= 70) grade = 'C';
-                else if (percent >= 60) grade = 'D';
-                else grade = 'F';
-            }
-            const { badgeColor, feedback } = getGradeFeedback(percent);
-
-            // Table rows
-            let tableRows = '';
-            features.forEach(skill => {
-                const rating = Number(data[skill]) || 0;
-                const ratio = (rating / 5).toFixed(1);
-                tableRows += `
-                  <tr>
-                    <td style="text-align:left;padding:0.5em 1em;">${skill}</td>
-                    <td style="text-align:center;padding:0.5em 1em;">${rating}</td>
-                    <td style="text-align:center;padding:0.5em 1em;">${ratio}</td>
-                  </tr>
-                `;
-            });
-            // Add average row
-            tableRows += `
-              <tr class="fw-bold table-active">
-                <td style="color:#ffc107;text-align:left;padding:0.5em 1em;">Average</td>
-                <td style="color:#ffc107;text-align:center;padding:0.5em 1em;">${avgRatingValue}</td>
-                <td style="color:#ffc107;text-align:center;padding:0.5em 1em;">${(avgRatingValue / 5).toFixed(1)}</td>
-              </tr>
-            `;
-
-            // Card style (match screenshot)
-            return `
-            <div id="profile-results-card" style="
-                background:#181b23;
-                color:#fff;
-                border-radius:2rem;
-                border:1px solid #23232a;
-                box-shadow:0 8px 32px 0 #0005;
-                margin:2rem auto 0 auto;
-                max-width:1200px;
-                padding:0;
-                ">
-              <div style="display:flex;flex-wrap:wrap;">
-                <!-- Left: Grade only -->
-                <div style="
-                    flex:1 1 320px;
-                    min-width:320px;
-                    max-width:400px;
-                    padding:3rem 1.5rem 3rem 2.5rem;
-                    display:flex;
-                    flex-direction:column;
-                    align-items:center;
-                    justify-content:center;
-                    border-right:1.5px solid #23232a;
-                    ">
-                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:2.2rem;text-align:left;width:100%;">Predicted Grade</div>
-                  <div style="margin-bottom:1.5rem;width:100%;">
-                    <span style="font-size:1.1rem;">Letter Grade:</span>
-                    <div style="display:inline-block;vertical-align:middle;margin-left:1.2rem;">
-                      <span style="
-                        display:inline-block;
-                        background:#06b6d4;
-                        color:#fff;
-                        font-size:3rem;
-                        font-weight:700;
-                        border-radius:0.3em;
-                        padding:0.2em 1.2em 0.2em 1.2em;
-                        box-shadow:0 2px 8px #06b6d455;
-                        letter-spacing:2px;
-                        ">${grade}</span>
-                    </div>
-                  </div>
-                  <div style="margin-top:2.5rem;font-size:1.1rem;color:#fff;text-align:center;min-height:2.5em;width:100%;">
-                    ${feedback}
-                  </div>
-                </div>
-                <!-- Right: Skills Table -->
-                <div style="
-                    flex:2 1 500px;
-                    min-width:340px;
-                    padding:3rem 2.5rem 3rem 2.5rem;
-                    ">
-                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:1.2rem;">Skills Summary</div>
-                  <div style="color:#ffc107;font-size:1.15rem;font-weight:600;margin-bottom:1.2rem;">
-                    Overall Rating: <span style="color:#fff;">${avgRatingValue}</span> out of 5.0
-                  </div>
-                  <div style="overflow-x:auto;">
-                    <table style="
-                        width:100%;
-                        border-collapse:separate;
-                        border-spacing:0;
-                        background:transparent;
-                        font-size:1.1rem;
-                        ">
-                      <thead>
-                        <tr style="background:transparent;">
-                          <th style="text-align:left;padding:0.5em 1em;font-weight:700;">Skill</th>
-                          <th style="text-align:center;padding:0.5em 1em;font-weight:700;">Rating</th>
-                          <th style="text-align:center;padding:0.5em 1em;font-weight:700;">Ratio</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${tableRows}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <style>
-              #profile-results-card {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                margin-bottom: 2.5rem;
-              }
-              #profile-results-card th, #profile-results-card td {
-                border: none;
-                background: transparent;
-              }
-              #profile-results-card tr.table-active {
-                background: #23232a !important;
-              }
-              @media (max-width: 900px) {
-                #profile-results-card > div { flex-direction:column !important; }
-                #profile-results-card > div > div { max-width:100% !important; padding:2rem 1rem !important; border-right:none !important;}
-              }
-            </style>
-            `;
-        }
-
-        // --- Fetch and render both cards ---
-        async function fetchGradeAnalytics() {
-            try {
-                // Grade analytics
-                const gradeRes = await fetch(`${pythonURI}/api/grade/predict`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                let gradeHtml = '';
-                if (gradeRes.ok) {
-                    const gradeData = await gradeRes.json();
-                    gradeHtml = renderGradeData(gradeData);
-                } else {
-                    gradeHtml = `<p class="text-red-400">Failed to load grade analytics.</p>`;
-                }
-
-                // AP Exam analytics
-                const apExamRes = await fetch(`${pythonURI}/api/apexam`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                let apExamHtml = '';
-                if (apExamRes.ok) {
-                    const apExamData = await apExamRes.json();
-                    apExamHtml = renderAPExamCard(apExamData.ap_exam);
-                } else {
-                    apExamHtml = `<p class="text-red-400">Failed to load AP Exam predictor data.</p>`;
-                }
-
-                gradeContent.innerHTML = gradeHtml + apExamHtml;
-            } catch (err) {
-                gradeContent.innerHTML = `<p class="text-red-400">Error loading analytics.</p>`;
-            }
-        }
-
-        gradeTab.addEventListener('click', function () {
-            if (!loaded) {
-                fetchGradeAnalytics();
-                loaded = true;
-            }
-        });
-    });
 </script>
 
 
