@@ -322,9 +322,9 @@ score += gists * 0.5
                 async function openEvalModal(person) {
                     currentPerson = person;
                     hasExistingEval = false;
-                    modalTitle.textContent = `Evaluate: ${person.name} (UID: ${person.uid})`;
+                    modalTitle.innerHTML = `Evaluate: ${person.name} <span class="text-sm text-neutral-400 font-normal">(UID: ${person.uid})</span>`;
 
-                    // Try to fetch existing evaluation
+                    // Try to fetch existing admin evaluation
                     let evalData = null;
                     try {
                         const res = await fetch(`${javaURI}/api/admin-evaluation/get/${person.id}`, fetchOptions);
@@ -337,6 +337,24 @@ score += gists * 0.5
                         }
                     } catch (e) {
                         evalData = null;
+                    }
+
+                    // Try to fetch student self-evaluation
+                    let studentEvalData = null;
+                    try {
+                        const res = await fetch(`${javaURI}/api/student-evaluation/get/${person.id}`, fetchOptions);
+                        if (res.ok) {
+                            const json = await res.json();
+                            studentEvalData = json.evaluation || json;
+                        }
+                    } catch (e) {
+                        console.error("Error fetching student eval", e);
+                    }
+
+                    if (!studentEvalData) {
+                        modalTitle.innerHTML += `<br><span class="text-xs text-yellow-500 font-normal">Student has not self-evaluated yet.</span>`;
+                    } else {
+                        modalTitle.innerHTML += `<br><span class="text-xs text-green-400 font-normal">Student self-evaluation loaded.</span>`;
                     }
 
                     // Map API keys to slider keys
@@ -355,6 +373,7 @@ score += gists * 0.5
                     };
 
                     evalForm.innerHTML = sliderFields.map(f => {
+                        // Admin Value
                         let val = 4;
                         if (evalData) {
                             // Use camelCase for API, snake_case for slider
@@ -365,11 +384,31 @@ score += gists * 0.5
                                 val = evalData[apiKey];
                             }
                         }
+
+                        // Student Value
+                        let studentVal = "N/A";
+                        if (studentEvalData) {
+                            const apiKey = Object.keys(apiToSliderKey).find(
+                                k => apiToSliderKey[k] === f.key
+                            );
+                            // Check camelCase then snake_case
+                            if (apiKey && typeof studentEvalData[apiKey] !== "undefined" && studentEvalData[apiKey] !== null) {
+                                studentVal = studentEvalData[apiKey];
+                            } else if (typeof studentEvalData[f.key] !== "undefined" && studentEvalData[f.key] !== null) {
+                                studentVal = studentEvalData[f.key];
+                            }
+                        }
+
                         return `
-                            <div>
-                                <label for="admin-slider-${f.key}" class="block text-sm text-neutral-300 mb-1">${f.label}</label>
-                                <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="${val}" class="w-full" />
-                                <span class="text-xs text-neutral-400">Value: <span id="admin-val-${f.key}">${val}</span></span>
+                            <div class="bg-neutral-800/50 p-3 rounded border border-neutral-700">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label for="admin-slider-${f.key}" class="text-sm text-neutral-300 font-medium">${f.label}</label>
+                                    <span class="text-xs text-neutral-400">Student: <span class="${studentVal !== 'N/A' ? 'text-blue-300 font-bold' : 'text-neutral-500'}">${studentVal}</span></span>
+                                </div>
+                                <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="${val}" class="w-full accent-blue-600" />
+                                <div class="text-right mt-1">
+                                    <span class="text-xs text-neutral-400">Admin: <span id="admin-val-${f.key}" class="font-bold text-white">${val}</span></span>
+                                </div>
                             </div>
                         `;
                     }).join('');
