@@ -912,7 +912,7 @@ export function deleteData(options)  {
 
     }
 export async function logoutUser() {
-        const URL = pythonURI + '/api/authenticate'; // Adjusted endpoint for logout
+        const URL = pythonURI + '/authenticate'; // Adjusted endpoint for logout
         
          const options = {
                 ...fetchOptions,

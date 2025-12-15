@@ -2,6 +2,7 @@
 import GamEnvBackground from './GameEngine/GameEnvBackground.js';
 import Player from './GameEngine/Player.js';
 import Npc from './GameEngine/Npc.js';
+import Coin from './GameEngine/Coin.js';
 import GameControl from './GameEngine/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
@@ -95,12 +96,13 @@ class GameLevelBasic {
         }
     };
 
-    // List of objects defnitions for this level
-    this.classes = [
-      { class: GamEnvBackground, data: image_data_desert },
-      { class: Player, data: sprite_data_chillguy },
-      { class: Npc, data: sprite_data_r2d2 },
-    ];
+        // List of objects defnitions for this level
+        this.classes = [
+            { class: GamEnvBackground, data: image_data_desert },
+            { class: Player, data: sprite_data_chillguy },
+            { class: Npc, data: sprite_data_r2d2 },
+            { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/2) }, size: 20, points: 5 } },
+        ];
   }
 
 }

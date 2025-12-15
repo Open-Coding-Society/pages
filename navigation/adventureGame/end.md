@@ -20,7 +20,7 @@ permalink: /gamify/end
 
     // Web Server Environment data
     const environment = {
-        path:"{{site.baseurl}}",
+        path: "{{site.baseurl}}",
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,
