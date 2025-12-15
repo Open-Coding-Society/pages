@@ -1,9 +1,11 @@
 import { Vec2, Vec3 } from '../essentials/Vectors.js';
 import { Transform } from '../Transform.js';
-import { ballCollide } from '../../GameEngine/Collision.js';
+import { ballCollide } from '../../adventureGame/GameEngine/Collision.js';
 import { camera } from '../Camera.js';
 
-class RigidBody {
+export const deltaTime = 0.1;
+
+export class RigidBody {
     constructor(object, mass, fixed=false) {
         this.rb = object;
         this.mass = mass;
@@ -90,8 +92,9 @@ class RigidBody {
         }
     }
 
-    Positioning(x, y, z) {
-        const rotZ = (z - camera.position.x);
+    Update() {
+        const time = new Vec2(deltaTime);
+        this.position = this.position.add(this.velocity.mult(time));
     }
 
 };
