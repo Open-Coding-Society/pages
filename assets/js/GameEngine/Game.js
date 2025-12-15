@@ -33,7 +33,7 @@ class GameCore {
         });
 
     // Try to dynamically load the Leaderboard
-    import('../mansionGame/ui/Leaderboard.js')  // Adjust path as needed
+    import('./Leaderboard.js')  // Adjust path as needed
         .then(mod => {
             try { 
                 new mod.default(this.gameControl, { 
