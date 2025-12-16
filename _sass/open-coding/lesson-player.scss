@@ -188,14 +188,13 @@ body:has(.lesson-player) {
 /* Top Bar */
 .lesson-topbar {
   border-bottom: 1px solid $bg-3;
-  padding: 16px 24px;
+  padding: 8px 24px;  /* Changed from 16px 24px */
 }
-
 .topbar-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 6px;  /* Changed from 12px */
 }
 
 .back-btn {
@@ -601,7 +600,7 @@ body:has(.lesson-player) {
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 8px 16px;  /* Changed from 10px 20px */
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -854,9 +853,8 @@ body:has(.lesson-player) {
   /* Bottom Navigation */
   .lesson-bottom {
     border-top: 1px solid $bg-3;
-    padding: 16px 64px;  // Reduced from 24px
+    padding: 8px 64px;  /* Changed from 24px 64px - now even smaller */
   }
-
   .topbar-actions {
     flex-direction: column;
     align-items: flex-start;
