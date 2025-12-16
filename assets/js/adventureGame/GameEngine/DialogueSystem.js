@@ -94,6 +94,55 @@ class DialogueSystem {
   }
 
   createDialogueBox() {
+    // Create style element for animations if not already created
+    if (!document.getElementById('dialogue-animations-' + this.id)) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'dialogue-animations-' + this.id;
+      styleSheet.textContent = `
+        @keyframes glow-pulse-${this.id} {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), inset 0 0 20px rgba(0, 255, 255, 0.2);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.9), inset 0 0 30px rgba(0, 255, 255, 0.3);
+          }
+        }
+        
+        @keyframes text-glow-${this.id} {
+          0%, 100% {
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(74, 134, 232, 0.3);
+          }
+          50% {
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(74, 134, 232, 0.6);
+          }
+        }
+        
+        @keyframes char-pop-${this.id} {
+          0% {
+            opacity: 0;
+            transform: scale(0.5) translateY(-10px);
+          }
+          50% {
+            transform: scale(1.1) translateY(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        
+        .dialogue-text-animated-${this.id} {
+          animation: text-glow-${this.id} 2s ease-in-out infinite;
+        }
+        
+        .dialogue-char-${this.id} {
+          display: inline-block;
+          animation: char-pop-${this.id} 0.3s ease-out;
+        }
+      `;
+      document.head.appendChild(styleSheet);
+    }
+    
     // Create the main dialogue container with unique ID
     this.dialogueBox = document.createElement("div");
     this.dialogueBox.id = "custom-dialogue-box-" + this.id;
@@ -114,7 +163,7 @@ class DialogueSystem {
       border: "2px solid #4a86e8",
       borderRadius: "12px",
       zIndex: "9999",
-      boxShadow: "0 0 20px rgba(0, 255, 255, 0.7)",
+      animation: `glow-pulse-${this.id} 2s ease-in-out infinite`,
       display: "none"
     });
 
@@ -199,19 +248,33 @@ class DialogueSystem {
     });
   }
 
-  // Typewriter effect helper
+  // Typewriter effect helper with character animations
   typewriteText(element, text, speed = this.typewriterSpeed) {
-    element.textContent = ""; // Clear the element
+    element.innerHTML = ""; // Clear the element
     let charIndex = 0;
-    
+  
     const typeNextChar = () => {
       if (charIndex < text.length) {
-        element.textContent += text.charAt(charIndex);
+        const char = text.charAt(charIndex);
+      
+        // If it's a space, just add it directly
+        if (char === ' ') {
+          element.appendChild(document.createTextNode(' '));
+        } else {
+          const charSpan = document.createElement('span');
+          charSpan.className = `dialogue-char-${this.id}`;
+          charSpan.textContent = char;
+          element.appendChild(charSpan);
+        }
+      
         charIndex++;
         this.typewriterTimeoutId = setTimeout(typeNextChar, speed);
+      } else {
+        // Add glow animation to the complete text
+        element.classList.add(`dialogue-text-animated-${this.id}`);
       }
     };
-    
+  
     typeNextChar();
   }
 
@@ -242,9 +305,11 @@ class DialogueSystem {
     
     // Apply typewriter effect or set text directly
     if (this.enableTypewriter) {
+      this.dialogueText.classList.remove(`dialogue-text-animated-${this.id}`);
       this.typewriteText(this.dialogueText, message, this.typewriterSpeed);
     } else {
       this.dialogueText.textContent = message;
+      this.dialogueText.classList.add(`dialogue-text-animated-${this.id}`);
     }
     
     // Show the dialogue box
