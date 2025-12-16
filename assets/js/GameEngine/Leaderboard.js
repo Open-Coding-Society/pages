@@ -1,10 +1,11 @@
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
-class Leaderboard {
+export default class Leaderboard {
     constructor(gameControl = null, options = {}) {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
-        this.isOpen = true; // ✅ TRACK STATE
+        this.isOpen = true;
+        console.log('[Leaderboard] Initializing with javaURI:', javaURI);
         this.injectStyles();
         this.init();
     }
@@ -16,16 +17,18 @@ class Leaderboard {
         style.id = 'leaderboard-styles';
         style.textContent = `
         .leaderboard-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
             width: 350px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,.35);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont;
-            z-index: 999999;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            z-index: 999999 !important;
             overflow: hidden;
+            display: block !important;
+            visibility: visible !important;
         }
 
         .leaderboard-header {
@@ -36,6 +39,7 @@ class Leaderboard {
             color: white;
             font-size: 20px;
             font-weight: 700;
+            background: rgba(255,255,255,0.1);
         }
 
         .toggle-btn {
@@ -48,6 +52,12 @@ class Leaderboard {
             font-size: 22px;
             cursor: pointer;
             line-height: 1;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255,255,255,.3);
+            transform: scale(1.1);
         }
 
         .leaderboard-content {
@@ -58,7 +68,11 @@ class Leaderboard {
         }
 
         .leaderboard-content.hidden {
-            display: none;
+            display: none !important;
+        }
+
+        .leaderboard-list {
+            padding: 16px;
         }
 
         .leaderboard-table {
@@ -66,48 +80,115 @@ class Leaderboard {
             border-collapse: collapse;
         }
 
-        th, td {
-            padding: 10px;
-            font-size: 14px;
+        .leaderboard-table thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        .leaderboard-table th {
+            padding: 12px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6c757d;
             text-align: left;
         }
 
-        th {
-            background: #f1f3f5;
-            font-weight: 700;
+        .leaderboard-table td {
+            padding: 12px 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f3f5;
         }
 
-        .rank { font-weight: 800; }
-        .score { font-weight: 800; color: #667eea; }
+        .leaderboard-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rank { 
+            font-weight: 800;
+            color: #495057;
+            font-size: 16px;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .game-name {
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .score { 
+            font-weight: 800; 
+            color: #667eea;
+            font-size: 16px;
+        }
 
         .loading, .error, .empty {
-            padding: 30px;
+            padding: 40px 20px;
             text-align: center;
             color: #6c757d;
+            font-size: 14px;
         }
 
-        .error { color: #dc3545; }
+        .error { 
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        /* Scrollbar */
+        .leaderboard-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .leaderboard-content::-webkit-scrollbar-track {
+            background: #f1f3f5;
+        }
+
+        .leaderboard-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
         `;
         document.head.appendChild(style);
+        console.log('[Leaderboard] Styles injected');
     }
 
     init() {
+        console.log('[Leaderboard] Init called, readyState:', document.readyState);
+        
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.mount());
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('[Leaderboard] DOMContentLoaded fired, mounting...');
+                this.mount();
+            });
         } else {
+            console.log('[Leaderboard] DOM already ready, mounting immediately...');
             this.mount();
         }
 
-        this.refreshInterval = setInterval(() => this.fetchLeaderboard(), 30000);
+        this.refreshInterval = setInterval(() => {
+            console.log('[Leaderboard] Auto-refresh triggered');
+            this.fetchLeaderboard();
+        }, 30000);
     }
 
     mount() {
+        console.log('[Leaderboard] Mount called');
+        
         const existing = document.getElementById('leaderboard-container');
-        if (existing) existing.remove();
+        if (existing) {
+            console.log('[Leaderboard] Removing existing container');
+            existing.remove();
+        }
 
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
         container.className = 'leaderboard-widget';
+        container.style.cssText = 'position: fixed !important; bottom: 20px !important; right: 20px !important; z-index: 999999 !important; display: block !important;';
 
         container.innerHTML = `
             <div class="leaderboard-header">
@@ -115,17 +196,21 @@ class Leaderboard {
                 <button id="toggle-leaderboard" class="toggle-btn">−</button>
             </div>
             <div class="leaderboard-content" id="leaderboard-content">
-                <div id="leaderboard-list">
+                <div class="leaderboard-list" id="leaderboard-list">
                     <p class="loading">Loading leaderboard…</p>
                 </div>
             </div>
         `;
 
         document.body.appendChild(container);
+        console.log('[Leaderboard] Container appended to body');
+        console.log('[Leaderboard] Container in DOM?', document.getElementById('leaderboard-container') !== null);
 
-        document
-            .getElementById('toggle-leaderboard')
-            .addEventListener('click', () => this.toggle());
+        const toggleBtn = document.getElementById('toggle-leaderboard');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggle());
+            console.log('[Leaderboard] Toggle button listener attached');
+        }
 
         this.fetchLeaderboard();
     }
@@ -136,25 +221,47 @@ class Leaderboard {
         if (!content || !btn) return;
 
         this.isOpen = !this.isOpen;
-
         content.classList.toggle('hidden', !this.isOpen);
         btn.textContent = this.isOpen ? '−' : '+';
+        console.log('[Leaderboard] Toggled, isOpen:', this.isOpen);
     }
 
     async fetchLeaderboard() {
+        console.log('[Leaderboard] fetchLeaderboard called');
         const list = document.getElementById('leaderboard-list');
-        if (!list) return;
+        if (!list) {
+            console.warn('[Leaderboard] List element not found');
+            return;
+        }
 
         list.innerHTML = '<p class="loading">Loading…</p>';
 
         try {
-            const res = await fetch(`${javaURI}/api/leaderboard`, fetchOptions);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const url = `${javaURI}/api/leaderboard`;
+            console.log('[Leaderboard] Fetching from:', url);
+            
+            // No authentication required - public leaderboard endpoint
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            console.log('[Leaderboard] fetchOptions:', options);
+            
+            const res = await fetch(url, options);
+            console.log('[Leaderboard] Response status:', res.status);
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            
             const data = await res.json();
+            console.log('[Leaderboard] Data received:', data);
             this.displayLeaderboard(data);
         } catch (err) {
             console.error('[Leaderboard] Fetch error:', err);
-            list.innerHTML = '<p class="error">Failed to load leaderboard</p>';
+            list.innerHTML = `<p class="error">Failed to load leaderboard<br/><small>${err.message}</small></p>`;
         }
     }
 
@@ -171,8 +278,8 @@ class Leaderboard {
         <table class="leaderboard-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>User</th>
+                    <th>Rank</th>
+                    <th>Player</th>
                     <th>Game</th>
                     <th>Score</th>
                 </tr>
@@ -180,19 +287,21 @@ class Leaderboard {
             <tbody>
         `;
 
-        data.forEach((e, i) => {
+        data.forEach((entry, index) => {
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
             html += `
             <tr>
-                <td class="rank">${i + 1}</td>
-                <td>${this.escape(e.user)}</td>
-                <td>${this.escape(e.gameName)}</td>
-                <td class="score">${Number(e.score).toLocaleString()}</td>
+                <td class="rank">${medal || (index + 1)}</td>
+                <td class="username">${this.escape(entry.user)}</td>
+                <td class="game-name">${this.escape(entry.gameName)}</td>
+                <td class="score">${Number(entry.score).toLocaleString()}</td>
             </tr>
             `;
         });
 
         html += '</tbody></table>';
         list.innerHTML = html;
+        console.log('[Leaderboard] Displayed', data.length, 'entries');
     }
 
     escape(str = '') {
@@ -200,11 +309,14 @@ class Leaderboard {
             ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])
         );
     }
+
+    destroy() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        const container = document.getElementById('leaderboard-container');
+        if (container) {
+            container.remove();
+        }
+    }
 }
-
-/* 🔥 AUTO-BOOT 🔥 */
-window.addEventListener('DOMContentLoaded', () => {
-    new Leaderboard();
-});
-
-export default Leaderboard;

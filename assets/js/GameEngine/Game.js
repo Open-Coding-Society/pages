@@ -36,18 +36,18 @@ class GameCore {
         });
 
     // Try to dynamically load the Leaderboard
-    import('./Leaderboard.js')  // Adjust path as needed
-        .then(mod => {
-            try { 
-                new mod.default(this.gameControl, { 
-                    apiBaseUrl: 'http://localhost:8585/api/leaderboard'  // Adjust as needed
-                }); 
-            }
-            catch (e) { console.warn('Leaderboard init failed:', e); }
-        })
-        .catch(() => {
-            // no-op: Leaderboard is optional
-        });
+import('./Leaderboard.js')
+    .then(mod => {
+        try { 
+            new mod.default(this.gameControl, { 
+                gameName: 'AdventureGame'  // Change to your game name
+            }); 
+        }
+        catch (e) { console.warn('Leaderboard init failed:', e); }
+    })
+    .catch(() => {
+        // no-op: Leaderboard is optional
+    });
 }
 
     static main(environment, GameControlClass) {
