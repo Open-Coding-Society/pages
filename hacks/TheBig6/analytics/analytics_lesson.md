@@ -53,7 +53,7 @@ date: 2025-12-02
   <div class="header">
     <h1>Analytics — All-in-One</h1>
     <p>Interactive lesson covering the admin dashboard, certificates, and mastery questions.</p>
-    <a href="../" class="button">Back</a>
+    <a href="../" class="button back-btn">Back</a>
   </div>
 
   <div class="progress-bar" id="progressBar"></div>
@@ -247,4 +247,24 @@ document.addEventListener('DOMContentLoaded', () => {
   restore();
   mainAnalytics();
 });
+</script>
+
+<script>
+// Back button handler: prefer history.back() when possible, fall back to parent path
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('a.back-btn').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // respect modifier clicks
+        e.preventDefault();
+        try{
+          if (document.referrer && new URL(document.referrer).origin === location.origin){ history.back(); return; }
+        }catch(err){}
+        var p = location.pathname.replace(/\/$/,'').split('/');
+        if (p.length>1){ p.pop(); window.location.href = p.join('/') + '/'; }
+        else { window.location.href = '/'; }
+      });
+    });
+  });
+})();
 </script>
