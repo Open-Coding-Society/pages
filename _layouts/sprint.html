@@ -1345,6 +1345,234 @@ layout: post
   }
 }
 
+.overview-section {
+  background: #111111;
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.overview-header:hover {
+  background: #151515;
+}
+
+.overview-title-group h2 {
+  color: #f8fafc;
+  font-size: 1.75rem;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.overview-title-group h2 i {
+  color: #60a5fa;
+}
+
+.overview-subtitle {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.overview-toggle-btn {
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: #60a5fa;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-toggle-btn:hover {
+  background: #1a1a1a;
+  border-color: #60a5fa;
+}
+
+.overview-toggle-icon {
+  transition: transform 0.2s;
+  display: inline-flex;
+  font-size: 16px;
+}
+
+.overview-section.collapsed .overview-toggle-icon {
+  transform: rotate(0deg);
+}
+
+.overview-section:not(.collapsed) .overview-toggle-icon {
+  transform: rotate(90deg);
+}
+
+.overview-content {
+  max-height: 2000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.overview-section.collapsed .overview-content {
+  max-height: 0;
+  opacity: 0;
+}
+
+.overview-content .skills-achievements-section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0 28px 28px 28px;
+  margin: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .overview-header {
+    padding: 20px;
+  }
+  
+  .overview-title-group h2 {
+    font-size: 1.5rem;
+  }
+  
+  .overview-content .skills-achievements-section {
+    padding: 0 20px 20px 20px;
+  }
+}
+
+/* Quick Help Section Styles */
+.quick-help-resources {
+  background: #111111;
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.quick-help-header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.quick-help-header-wrapper:hover {
+  background: #151515;
+}
+
+.quick-help-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-help-header i {
+  color: #60a5fa;
+  font-size: 1.5rem;
+}
+
+.quick-help-header h2 {
+  color: #f8fafc;
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.quick-help-description {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  margin: 0;
+  padding: 0 28px 20px 28px;
+}
+
+.quick-help-toggle-btn {
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: #60a5fa;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-help-toggle-btn:hover {
+  background: #1a1a1a;
+  border-color: #60a5fa;
+}
+
+.quick-help-toggle-icon {
+  transition: transform 0.2s;
+  display: inline-flex;
+  font-size: 16px;
+}
+
+.quick-help-resources.collapsed .quick-help-toggle-icon {
+  transform: rotate(0deg);
+}
+
+.quick-help-resources:not(.collapsed) .quick-help-toggle-icon {
+  transform: rotate(90deg);
+}
+
+.quick-help-content {
+  max-height: 3000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+  padding: 0 28px 28px 28px;
+}
+
+.quick-help-resources.collapsed .quick-help-content {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.quick-help-resources.collapsed .quick-help-description {
+  display: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .quick-help-header-wrapper {
+    padding: 20px;
+  }
+  
+  .quick-help-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .quick-help-content {
+    padding: 0 20px 20px 20px;
+  }
+  
+  .quick-help-description {
+    padding: 0 20px 20px 20px;
+  }
+}
+
 </style>
 
 <div class="timeline-header">
@@ -1363,66 +1591,83 @@ layout: post
       Incomplete Only
     </button>
     <a href="{{ site.baseurl }}/leaderboard?course={{ page.course }}" class="filter-btn leaderboard-link">
-      <i class="fas fa-trophy"></i> View Leaderboard
+      <i class="fas fa-trophy"></i> View Analytics
     </a>
   </div>
 </div>
 
-<div class="skills-achievements-section">
-  <h2>Professional Skills Achievements</h2>
-  <p class="section-subtitle">Complete quests to unlock LinkedIn-ready certificates</p>
-  
-  <div class="achievements-grid">
-    <div class="achievement-card active-quests">
-      <div class="achievement-header">
-        <div class="achievement-number" id="active-quests-count">0</div>
-        <div class="achievement-icon">
-          <i class="fas fa-fire"></i>
-        </div>
-      </div>
-      <p class="achievement-label">Active Quests</p>
-    </div>
-    
-    <div class="achievement-card certificates">
-      <div class="achievement-header">
-        <div class="achievement-number" id="certificates-earned-count">0</div>
-        <div class="achievement-icon">
-          <i class="fas fa-award"></i>
-        </div>
-      </div>
-      <p class="achievement-label">Certificates Earned</p>
-    </div>
-    
-    <div class="achievement-card tasks">
-      <div class="achievement-header">
-        <div class="achievement-number" id="tasks-completed-count">0</div>
-        <div class="achievement-icon">
-          <i class="fas fa-check-circle"></i>
-        </div>
-      </div>
-      <p class="achievement-label">Tasks Completed</p>
-    </div>
-  </div>
-  
-  <div class="course-filter-buttons">
-    <button class="course-filter-btn active" data-course-filter="all">
-      <i class="fas fa-th"></i> All Quests
-    </button>
-    <button class="course-filter-btn" data-course-filter="csa">
-      <i class="fas fa-shield-alt"></i> CSA
-    </button>
-    <button class="course-filter-btn" data-course-filter="csp">
-      <i class="fas fa-clock"></i> CSP
-    </button>
-    <button class="course-filter-btn" data-course-filter="csse">
-      <i class="fas fa-puzzle-piece"></i> CSSE
-    </button>
-  </div>
+<!-- Course Filter Buttons - OUTSIDE the dropdown -->
+<div class="course-filter-buttons" style="margin-bottom: 24px;">
+  <button class="course-filter-btn active" data-course-filter="all">
+    <i class="fas fa-th"></i> All Quests
+  </button>
+  <button class="course-filter-btn" data-course-filter="csa">
+    <i class="fas fa-shield-alt"></i> CSA
+  </button>
+  <button class="course-filter-btn" data-course-filter="csp">
+    <i class="fas fa-clock"></i> CSP
+  </button>
+  <button class="course-filter-btn" data-course-filter="csse">
+    <i class="fas fa-puzzle-piece"></i> CSSE
+  </button>
 </div>
 
-{% if page.certificates %}
-  {% include certificate_overview.html certificates=page.certificates %}
-{% endif %}
+<!-- Collapsible Overview Section -->
+<div class="overview-section collapsed" id="overview-section">
+  <div class="overview-header">
+    <div class="overview-title-group">
+      <h2><i class="fas fa-chart-line"></i> Overview</h2>
+      <p class="overview-subtitle">Your progress and achievements at a glance</p>
+    </div>
+    <button class="overview-toggle-btn" type="button" aria-expanded="false">
+      <span class="overview-toggle-icon">▸</span>
+    </button>
+  </div>
+  
+  <div class="overview-content">
+    <div class="skills-achievements-section">
+      <h2>Professional Skills Achievements</h2>
+      <p class="section-subtitle">Complete quests to unlock LinkedIn-ready certificates</p>
+      
+      <div class="achievements-grid">
+        <div class="achievement-card active-quests">
+          <div class="achievement-header">
+            <div class="achievement-number" id="active-quests-count">0</div>
+            <div class="achievement-icon">
+              <i class="fas fa-fire"></i>
+            </div>
+          </div>
+          <p class="achievement-label">Active Quests</p>
+        </div>
+        
+        <div class="achievement-card certificates">
+          <div class="achievement-header">
+            <div class="achievement-number" id="certificates-earned-count">0</div>
+            <div class="achievement-icon">
+              <i class="fas fa-award"></i>
+            </div>
+          </div>
+          <p class="achievement-label">Certificates Earned</p>
+        </div>
+        
+        <div class="achievement-card tasks">
+          <div class="achievement-header">
+            <div class="achievement-number" id="tasks-completed-count">0</div>
+            <div class="achievement-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+          <p class="achievement-label">Tasks Completed</p>
+        </div>
+      </div>
+    </div>
+
+    {% if page.certificates %}
+      {% include certificate_overview.html certificates=page.certificates %}
+    {% endif %}
+  </div>
+</div>
+  
 
 <div class="timeline-container">
   {% for unit in units %}
@@ -1576,163 +1821,173 @@ layout: post
 </div>
 
 
-<div class="quick-help-resources">
-  <div class="quick-help-header">
-    <i class="fas fa-book"></i>
-    <h2>Quick Help & Resources</h2>
+<!-- Collapsible Quick Help & Resources Section -->
+<div class="quick-help-resources collapsed" id="quick-help-section">
+  <div class="quick-help-header-wrapper">
+    <div>
+      <div class="quick-help-header">
+        <i class="fas fa-book"></i>
+        <h2>Quick Help & Resources</h2>
+      </div>
+    </div>
+    <button class="quick-help-toggle-btn" type="button" aria-expanded="false">
+      <span class="quick-help-toggle-icon">▸</span>
+    </button>
   </div>
   
   <p class="quick-help-description">Supplemental guides to help when you're stuck or need clarification</p>
   
-  <div class="search-box">
-    <i class="fas fa-search"></i>
-    <input type="text" placeholder="Search guides..." id="resource-search">
-  </div>
-  
-  <div class="resources-grid" id="resources-grid">
-    <!-- Resource 1: Live Review -->
-    <a href="https://pages.opencodingsociety.com/agile/live_reviews" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon green">
-          <i class="fas fa-users"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Live Review (Pair/Trio/Group)</h3>
-          <p class="resource-description">Guidelines for preparing and conducting live reviews during sprints. Explains checkpoint and final review types, showcase requirements, expectations for collaboration and accountability, and tips for professional presentations.</p>
-          <div class="resource-meta">
-            <span class="resource-tag collaboration">collaboration</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
-          </div>
-        </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
+  <div class="quick-help-content">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search guides..." id="resource-search">
+    </div>
     
-    <!-- Resource 2: Cookie Clicker -->
-    <a href="https://pages.opencodingsociety.com/toolkit/documentation/cookie" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon blue">
-          <i class="fas fa-code"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Cookie Clicker Developer Documentation</h3>
-          <p class="resource-description">Step-by-step guide to building a cookie-clicker game using Thymeleaf, Bootstrap, custom CSS and JavaScript. Covers HTML structure, CSS styling, physics-based animation and logic for clicks, counters and upgrades.</p>
-          <div class="resource-meta">
-            <span class="resource-tag code-example">code-example</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+    <div class="resources-grid" id="resources-grid">
+      <!-- Resource 1: Live Review -->
+      <a href="https://pages.opencodingsociety.com/agile/live_reviews" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon green">
+            <i class="fas fa-users"></i>
           </div>
-        </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
-    
-    <!-- Resource 3: Person Viewer -->
-    <a href="https://pages.opencodingsociety.com/toolkit/documentation/person" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon red">
-          <i class="fas fa-bug"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Person Viewer Developer Documentation</h3>
-          <p class="resource-description">Documentation for a person viewer page using Thymeleaf, Bootstrap and DataTables. Describes how to set up the HTML, enable sorting/searching, check for GitHub profile images and update links dynamically.</p>
-          <div class="resource-meta">
-            <span class="resource-tag debugging">debugging</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+          <div class="resource-info">
+            <h3 class="resource-title">Live Review (Pair/Trio/Group)</h3>
+            <p class="resource-description">Guidelines for preparing and conducting live reviews during sprints. Explains checkpoint and final review types, showcase requirements, expectations for collaboration and accountability, and tips for professional presentations.</p>
+            <div class="resource-meta">
+              <span class="resource-tag collaboration">collaboration</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
           </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
         </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
-    
-    <!-- Resource 4: Flask, Postman, and Backend UIs -->
-    <a href="https://pages.opencodingsociety.com/flask-overview" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon orange">
-          <i class="fas fa-cog"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Flask, Postman, and Backend UIs</h3>
-          <p class="resource-description">Overview of backend fundamentals with a live demo. Introduces Flask routes, Postman for API testing and simple backend UIs. Provides tips for teaching backend logic, key takeaways for students and a starter project with cloning and setup instructions.</p>
-          <div class="resource-meta">
-            <span class="resource-tag setup">setup</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+      </a>
+      
+      <!-- Resource 2: Cookie Clicker -->
+      <a href="https://pages.opencodingsociety.com/toolkit/documentation/cookie" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon blue">
+            <i class="fas fa-code"></i>
           </div>
-        </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
-    
-    <!-- Resource 5: Flask Project Structure -->
-    <a href="https://pages.opencodingsociety.com/python/flask/anatomy" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon orange">
-          <i class="fas fa-cog"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Flask Project Structure Explained</h3>
-          <p class="resource-description">Interactive guide to a typical Flask project layout. Explains the purpose of main.py, __init__.py, API and models folders, database initialization scripts, templates and static files. Helps learners organize their backend projects properly.</p>
-          <div class="resource-meta">
-            <span class="resource-tag setup">setup</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+          <div class="resource-info">
+            <h3 class="resource-title">Cookie Clicker Developer Documentation</h3>
+            <p class="resource-description">Step-by-step guide to building a cookie-clicker game using Thymeleaf, Bootstrap, custom CSS and JavaScript. Covers HTML structure, CSS styling, physics-based animation and logic for clicks, counters and upgrades.</p>
+            <div class="resource-meta">
+              <span class="resource-tag code-example">code-example</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
           </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
         </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
-    
-    <!-- Resource 6: Flask APIs Guide -->
-    <a href="https://pages.opencodingsociety.com/flask-api" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon purple">
-          <i class="fas fa-book"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Flask APIs Guide</h3>
-          <p class="resource-description">Introductory lesson on APIs with Flask. Defines APIs with a restaurant menu analogy, lists common use cases and shows how to add an external API route. Includes example code for a weather endpoint and guidance on registering Blueprints.</p>
-          <div class="resource-meta">
-            <span class="resource-tag concept">concept</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+      </a>
+      
+      <!-- Resource 3: Person Viewer -->
+      <a href="https://pages.opencodingsociety.com/toolkit/documentation/person" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon red">
+            <i class="fas fa-bug"></i>
           </div>
-        </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
-    
-    <!-- Resource 7: Postman Intro Guide -->
-    <a href="https://pages.opencodingsociety.com/postman-docs" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon orange">
-          <i class="fas fa-cog"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Postman Intro Guide</h3>
-          <p class="resource-description">Quick reference for using Postman to test APIs. Covers common HTTP status codes, methods, reasons to use Postman, how to write backend endpoints in VS Code and how to send requests and inspect responses in Postman.</p>
-          <div class="resource-meta">
-            <span class="resource-tag setup">setup</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+          <div class="resource-info">
+            <h3 class="resource-title">Person Viewer Developer Documentation</h3>
+            <p class="resource-description">Documentation for a person viewer page using Thymeleaf, Bootstrap and DataTables. Describes how to set up the HTML, enable sorting/searching, check for GitHub profile images and update links dynamically.</p>
+            <div class="resource-meta">
+              <span class="resource-tag debugging">debugging</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
           </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
         </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
-    
-    <!-- Resource 8: Network Stack & HTTP/TCP/IP -->
-    <a href="https://pages.opencodingsociety.com/csp%20big%20idea%204/2025/02/05/network_stack_IPYNB_2_.html" class="resource-card" target="_blank" rel="noopener">
-      <div class="resource-card-content">
-        <div class="resource-icon purple">
-          <i class="fas fa-book"></i>
-        </div>
-        <div class="resource-info">
-          <h3 class="resource-title">Network Stack & HTTP/TCP/IP</h3>
-          <p class="resource-description">Explains the full networking stack involved when a GitHub Pages frontend communicates with a backend hosted on AWS EC2. Discusses tools like Docker, Nginx and Certbot and details how HTTP requests traverse application, transport, network and physical layers.</p>
-          <div class="resource-meta">
-            <span class="resource-tag concept">concept</span>
-            <span class="resource-helps">• Helps with 2 quests</span>
+      </a>
+      
+      <!-- Resource 4: Flask, Postman, and Backend UIs -->
+      <a href="https://pages.opencodingsociety.com/flask-overview" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon orange">
+            <i class="fas fa-cog"></i>
           </div>
+          <div class="resource-info">
+            <h3 class="resource-title">Flask, Postman, and Backend UIs</h3>
+            <p class="resource-description">Overview of backend fundamentals with a live demo. Introduces Flask routes, Postman for API testing and simple backend UIs. Provides tips for teaching backend logic, key takeaways for students and a starter project with cloning and setup instructions.</p>
+            <div class="resource-meta">
+              <span class="resource-tag setup">setup</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
+          </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
         </div>
-        <i class="fas fa-external-link-alt resource-external"></i>
-      </div>
-    </a>
+      </a>
+      
+      <!-- Resource 5: Flask Project Structure -->
+      <a href="https://pages.opencodingsociety.com/python/flask/anatomy" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon orange">
+            <i class="fas fa-cog"></i>
+          </div>
+          <div class="resource-info">
+            <h3 class="resource-title">Flask Project Structure Explained</h3>
+            <p class="resource-description">Interactive guide to a typical Flask project layout. Explains the purpose of main.py, __init__.py, API and models folders, database initialization scripts, templates and static files. Helps learners organize their backend projects properly.</p>
+            <div class="resource-meta">
+              <span class="resource-tag setup">setup</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
+          </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
+        </div>
+      </a>
+      
+      <!-- Resource 6: Flask APIs Guide -->
+      <a href="https://pages.opencodingsociety.com/flask-api" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon purple">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="resource-info">
+            <h3 class="resource-title">Flask APIs Guide</h3>
+            <p class="resource-description">Introductory lesson on APIs with Flask. Defines APIs with a restaurant menu analogy, lists common use cases and shows how to add an external API route. Includes example code for a weather endpoint and guidance on registering Blueprints.</p>
+            <div class="resource-meta">
+              <span class="resource-tag concept">concept</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
+          </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
+        </div>
+      </a>
+      
+      <!-- Resource 7: Postman Intro Guide -->
+      <a href="https://pages.opencodingsociety.com/postman-docs" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon orange">
+            <i class="fas fa-cog"></i>
+          </div>
+          <div class="resource-info">
+            <h3 class="resource-title">Postman Intro Guide</h3>
+            <p class="resource-description">Quick reference for using Postman to test APIs. Covers common HTTP status codes, methods, reasons to use Postman, how to write backend endpoints in VS Code and how to send requests and inspect responses in Postman.</p>
+            <div class="resource-meta">
+              <span class="resource-tag setup">setup</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
+          </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
+        </div>
+      </a>
+      
+      <!-- Resource 8: Network Stack & HTTP/TCP/IP -->
+      <a href="https://pages.opencodingsociety.com/csp%20big%20idea%204/2025/02/05/network_stack_IPYNB_2_.html" class="resource-card" target="_blank" rel="noopener">
+        <div class="resource-card-content">
+          <div class="resource-icon purple">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="resource-info">
+            <h3 class="resource-title">Network Stack & HTTP/TCP/IP</h3>
+            <p class="resource-description">Explains the full networking stack involved when a GitHub Pages frontend communicates with a backend hosted on AWS EC2. Discusses tools like Docker, Nginx and Certbot and details how HTTP requests traverse application, transport, network and physical layers.</p>
+            <div class="resource-meta">
+              <span class="resource-tag concept">concept</span>
+              <span class="resource-helps">• Helps with 2 quests</span>
+            </div>
+          </div>
+          <i class="fas fa-external-link-alt resource-external"></i>
+        </div>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -2080,6 +2335,60 @@ layout: post
   
   let currentModalWeekNumber = null;
   let activeCertificateProfile = null;
+
+  // Setup Overview Section Toggle
+  function setupOverviewToggle() {
+    const overviewSection = document.getElementById('overview-section');
+    const toggleBtn = overviewSection?.querySelector('.overview-toggle-btn');
+    
+    if (!overviewSection || !toggleBtn) return;
+    
+    // Toggle function
+    function toggleOverview() {
+      const isCollapsed = overviewSection.classList.toggle('collapsed');
+      toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
+    }
+    
+    // Click on button
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleOverview();
+    });
+    
+    // Click on header
+    const header = overviewSection.querySelector('.overview-header');
+    header.addEventListener('click', (e) => {
+      if (e.target.closest('.overview-toggle-btn')) return;
+      toggleOverview();
+    });
+  }
+
+  // Setup Quick Help Section Toggle
+function setupQuickHelpToggle() {
+  const quickHelpSection = document.getElementById('quick-help-section');
+  const toggleBtn = quickHelpSection?.querySelector('.quick-help-toggle-btn');
+  
+  if (!quickHelpSection || !toggleBtn) return;
+  
+  // Toggle function
+  function toggleQuickHelp() {
+    const isCollapsed = quickHelpSection.classList.toggle('collapsed');
+    toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
+  }
+  
+  // Click on button
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleQuickHelp();
+  });
+  
+  // Click on header
+  const headerWrapper = quickHelpSection.querySelector('.quick-help-header-wrapper');
+  headerWrapper.addEventListener('click', (e) => {
+    if (e.target.closest('.quick-help-toggle-btn')) return;
+    toggleQuickHelp();
+  });
+}
 
   const COURSE_LABELS = {
     csp: 'Computer Science Principles',
@@ -2607,6 +2916,9 @@ layout: post
     applyFilters();
     initializeCertificateSystem();
     renderWeekSkillPreviews();
+
+    setupOverviewToggle();
+    setupQuickHelpToggle();
     
     // NEW: Initialize achievements
     updateAchievementsDisplay();
