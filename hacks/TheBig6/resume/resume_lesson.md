@@ -17,7 +17,7 @@ date: 2025-12-01
 <div class="max-w-3xl mx-auto p-4">
   <h1 class="text-2xl font-bold mb-2">Resume — All-in-One</h1>
   <p class="text-gray-600 mb-4">Short, interactive steps. Autosaves locally.</p>
-  <a href="../" class="button">Back</a>
+  <a href="../" class="button back-btn">Back</a>
   <div class="border rounded p-3 mb-4">
     <div class="flex justify-between text-sm">
       <span>Progress</span><span id="progressLabel">Step 1 / 6</span>
@@ -408,4 +408,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Boot
   restore(); renderChecklist(hardSkillsGrid, state.hardSkills); renderChecklist(softSkillsGrid, state.softSkills); renderTags(); renderExperiences(); initDragPool(); showStep(0);
 });
+</script>
+
+<script>
+// Back button handler: prefer history.back() when possible, fall back to parent path
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('a.back-btn').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+        e.preventDefault();
+        try{ if (document.referrer && new URL(document.referrer).origin === location.origin){ history.back(); return; } }catch(err){}
+        var p = location.pathname.replace(/\/$/,'').split('/');
+        if (p.length>1){ p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
+      });
+    });
+  });
+})();
 </script>
