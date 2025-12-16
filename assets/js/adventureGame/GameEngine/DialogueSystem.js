@@ -1,6 +1,7 @@
 // DialogueSystem.js - Fixed version that addresses both issues
 // 1. Unique instances for each NPC to prevent button conflicts
 // 2. Works with Eye of Ender collection
+// 3. Includes typewriter effect for dialogue text
 
 class DialogueSystem {
   constructor(options = {}) {
@@ -23,6 +24,11 @@ class DialogueSystem {
     this.enableSound = options.enableSound !== undefined ? options.enableSound : false;
     this.soundUrl = options.soundUrl || "./sounds/dialogue.mp3";
     this.sound = this.enableSound ? new Audio(this.soundUrl) : null;
+    
+    // Typewriter effect options
+    this.typewriterSpeed = options.typewriterSpeed !== undefined ? options.typewriterSpeed : 50; // ms per character
+    this.enableTypewriter = options.enableTypewriter !== undefined ? options.enableTypewriter : true;
+    this.typewriterTimeoutId = null;
     
     // Create the dialogue box
     this.createDialogueBox();
@@ -84,7 +90,8 @@ class DialogueSystem {
     this.dialogueText.id = "dialogue-text-" + this.id;
     Object.assign(this.dialogueText.style, {
       marginBottom: "15px",
-      lineHeight: "1.5"
+      lineHeight: "1.5",
+      minHeight: "40px"
     });
 
     // Create close button
@@ -136,8 +143,29 @@ class DialogueSystem {
     });
   }
 
+  // Typewriter effect helper
+  typewriteText(element, text, speed = this.typewriterSpeed) {
+    element.textContent = ""; // Clear the element
+    let charIndex = 0;
+    
+    const typeNextChar = () => {
+      if (charIndex < text.length) {
+        element.textContent += text.charAt(charIndex);
+        charIndex++;
+        this.typewriterTimeoutId = setTimeout(typeNextChar, speed);
+      }
+    };
+    
+    typeNextChar();
+  }
+
   // Show a specific dialogue message
   showDialogue(message, speaker = "", avatarSrc = null) {
+    // Clear any existing typewriter timeout
+    if (this.typewriterTimeoutId) {
+      clearTimeout(this.typewriterTimeoutId);
+    }
+    
     // Set the content (with unique element IDs)
     const speakerElement = document.getElementById("dialogue-speaker-" + this.id);
     if (speakerElement) {
@@ -156,8 +184,12 @@ class DialogueSystem {
       }
     }
     
-    // Set the dialogue text directly
-    this.dialogueText.textContent = message;
+    // Apply typewriter effect or set text directly
+    if (this.enableTypewriter) {
+      this.typewriteText(this.dialogueText, message, this.typewriterSpeed);
+    } else {
+      this.dialogueText.textContent = message;
+    }
     
     // Show the dialogue box
     this.dialogueBox.style.display = "block";
@@ -199,6 +231,11 @@ class DialogueSystem {
   // Close the dialogue box
   closeDialogue() {
     if (!this.isOpen) return;
+    
+    // Clear typewriter timeout
+    if (this.typewriterTimeoutId) {
+      clearTimeout(this.typewriterTimeoutId);
+    }
     
     // Hide the dialogue box
     this.dialogueBox.style.display = "none";

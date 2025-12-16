@@ -174,7 +174,10 @@ class GameLevelDesert {
               
               // Create a new dialogue system if needed
               if (!this.dialogueSystem) {
-                  this.dialogueSystem = new DialogueSystem();
+                this.dialogueSystem = new DialogueSystem({
+                    typewriterSpeed: 50,
+                    enableTypewriter: true
+                    });
               }
               
               // Show portal dialogue with buttons
