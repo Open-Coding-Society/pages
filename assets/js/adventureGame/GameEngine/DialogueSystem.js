@@ -2,6 +2,7 @@
 // 1. Unique instances for each NPC to prevent button conflicts
 // 2. Works with Eye of Ender collection
 // 3. Includes typewriter effect for dialogue text
+// 4. Includes voice synthesis with Australian male voice
 
 class DialogueSystem {
   constructor(options = {}) {
@@ -30,11 +31,66 @@ class DialogueSystem {
     this.enableTypewriter = options.enableTypewriter !== undefined ? options.enableTypewriter : true;
     this.typewriterTimeoutId = null;
     
+    // Voice synthesis options
+    this.enableVoice = options.enableVoice !== undefined ? options.enableVoice : true;
+    this.voiceRate = options.voiceRate !== undefined ? options.voiceRate : 1.0; // speech rate
+    this.voicePitch = options.voicePitch !== undefined ? options.voicePitch : 1.0; // pitch
+    this.voiceVolume = options.voiceVolume !== undefined ? options.voiceVolume : 1.0; // volume
+    
     // Create the dialogue box
     this.createDialogueBox();
     
     // Keep track of whether the dialogue is currently open
     this.isOpen = false;
+  }
+
+  // Voice synthesis helper
+  speakText(text) {
+    // Cancel any ongoing speech
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    if (!this.enableVoice || !window.speechSynthesis) {
+      return; // Voice synthesis not available or disabled
+    }
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Set voice properties
+    utterance.rate = this.voiceRate;
+    utterance.pitch = this.voicePitch;
+    utterance.volume = this.voiceVolume;
+    
+    // Try to set Australian male voice
+    const voices = window.speechSynthesis.getVoices();
+    
+    // First, look for Australian English voices
+    let australianVoice = voices.find(voice => 
+      voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('male')
+    );
+    
+    // If no Australian male voice found, look for any Australian voice
+    if (!australianVoice) {
+      australianVoice = voices.find(voice => voice.lang.includes('en-AU'));
+    }
+    
+    // If still no Australian voice, look for any male voice
+    if (!australianVoice) {
+      australianVoice = voices.find(voice => voice.name.toLowerCase().includes('male'));
+    }
+    
+    // If no male voice found, just pick the first voice
+    if (!australianVoice && voices.length > 0) {
+      australianVoice = voices[0];
+    }
+    
+    if (australianVoice) {
+      utterance.voice = australianVoice;
+    }
+    
+    // Speak the text
+    window.speechSynthesis.speak(utterance);
   }
 
   createDialogueBox() {
@@ -200,6 +256,9 @@ class DialogueSystem {
       this.sound.play().catch(e => console.log("Sound play error:", e));
     }
     
+    // Speak the dialogue text
+    this.speakText(message);
+    
     this.isOpen = true;
     
     // Return the dialogue box element for custom button addition
@@ -235,6 +294,11 @@ class DialogueSystem {
     // Clear typewriter timeout
     if (this.typewriterTimeoutId) {
       clearTimeout(this.typewriterTimeoutId);
+    }
+    
+    // Cancel speech synthesis
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
     
     // Hide the dialogue box

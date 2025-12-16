@@ -175,6 +175,10 @@ class GameLevelDesert {
               // Create a new dialogue system if needed
               if (!this.dialogueSystem) {
                 this.dialogueSystem = new DialogueSystem({
+                    enableVoice: true,
+                    voiceRate: 0.9,      // slightly slower
+                    voicePitch: 1.0,
+                    voiceVolume: 1.0,
                     typewriterSpeed: 50,
                     enableTypewriter: true
                     });
