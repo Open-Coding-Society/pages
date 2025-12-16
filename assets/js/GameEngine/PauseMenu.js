@@ -1,4 +1,5 @@
 // PauseMenu.js - reusable pause menu component for mansion games
+import { javaURI } from '../api/config.js';
 export default class PauseMenu {
     constructor(gameControl, options = {}) {
         this.gameControl = gameControl;
@@ -6,17 +7,15 @@ export default class PauseMenu {
         this.options = Object.assign({
             parentId: 'gameContainer',
             cssPath: '/assets/css/pause-menu.css',
-            // optional backend base URL for server persistence (e.g. http://localhost:8585)
-            // default to localhost where your Spring Boot usually runs during development
-            backendUrl: 'http://localhost:8585',
+            // optional backend base URL for server persistence
+            // default: localhost dev points at 8585 (pausemenu controller), prod uses javaURI/same-origin
+            backendUrl: null,
             // optional playerName and gameType for server-side lookups
-            // sensible defaults applied below if not provided
-            playerName: null,
-            gameType: null
+            // default to guest and generic game type
+            playerName: 'guest',
+            gameType: 'unknown'
             ,
-            // which localStorage key to read auth token from (if present)
-            // Note: score persistence no longer uses localStorage
-            authTokenKey: 'authToken'
+            // auth removed for score saves; backend should allow public score writes
         }, options);
 
     // configurable counter variable and label
@@ -42,23 +41,8 @@ export default class PauseMenu {
             if (this.gameControl) {
                 if (!this.gameControl.stats) this.gameControl.stats = { levelsCompleted: 0, points: 0 };
                 this.stats = this.gameControl.stats;
-                // apply sensible defaults for playerName and gameType if not provided
-                try {
-                    if (!this.options.playerName) {
-                        // try authenticated user from window.user (set by login.js), then localStorage, otherwise default to 'guest'
-                        try {
-                            this.options.playerName = (window.user && window.user.uid) || window.localStorage.getItem('playerName') || 'guest';
-                        } catch (e) { this.options.playerName = 'guest'; }
-                    }
-                    if (!this.options.gameType) {
-                        // derive gameType from storageKey suffix or gameControl path
-                        try {
-                            const sk = this._storageKey();
-                            const suffix = sk && sk.indexOf(':') !== -1 ? sk.split(':',2)[1] : null;
-                            this.options.gameType = suffix || (this.gameControl && (this.gameControl.game && this.gameControl.game.name)) || 'unknown';
-                        } catch (e) { this.options.gameType = 'unknown'; }
-                    }
-                } catch (e) { /* ignore */ }
+                // force guest identity for now
+                this.options.playerName = 'guest';
 
                 // Load any existing historical stats from backend (high scores, etc.)
                 try {
@@ -102,9 +86,8 @@ export default class PauseMenu {
                 this.gameControl.pauseMenuOptions.counterPerLevel = flag;
             }
         } catch (e) { /* ignore */ }
-        // refresh UI and persist
+        // refresh UI
         this._updateStatsDisplay();
-        this._saveStatsToStorage();
     }
 
     togglePerLevelMode() {
@@ -128,40 +111,33 @@ export default class PauseMenu {
 
     // Removed: _saveStatsToStorage (backend-only saving now)
 
-    // Compose the pause-menu server API base path (defaults to provided option or null)
+    // Compose the pause-menu server API base path (defaults to provided option or same-origin Java URI)
     _backendBase() {
-        return (this.options && this.options.backendUrl) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.backendUrl) || null;
-    }
-
-    // Read auth token either from options or from localStorage (key configurable)
-    _authToken() {
+        // Priority:
+        // 1. Explicit options.backendUrl
+        // 2. gameControl.pauseMenuOptions.backendUrl
+        // 3. window.javaBackendUrl (if injected)
+        // 4. Localhost dev shortcut -> http://localhost:8585
+        // 5. imported javaURI from central config
+        // 6. Same-origin base (window.location.origin)
+        const opt = (this.options && this.options.backendUrl) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.backendUrl);
+        if (opt) return opt;
         try {
-            if (this.options && this.options.authToken) return this.options.authToken;
-            const key = (this.options && this.options.authTokenKey) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.authTokenKey) || 'authToken';
-            // If you have a session token in memory, supply via options; no localStorage dependency.
-        } catch (e) {
-            /* ignore */
-        }
-        return null;
-    }
-
-    // Resolve the current user id used by the backend (defaults to window.user.uid or playerName option)
-    _currentUserId() {
-        try {
-            if (this.options && this.options.user) return this.options.user;
             if (typeof window !== 'undefined') {
-                if (window.user && window.user.uid) return window.user.uid;
-                if (window.localStorage) {
-                    const stored = window.localStorage.getItem('playerName');
-                    if (stored) return stored;
+                if (window.javaBackendUrl) return String(window.javaBackendUrl);
+                if (window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                    return 'http://localhost:8585';
                 }
             }
-            if (this.options && this.options.playerName) return this.options.playerName;
-            if (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.playerName) {
-                return this.gameControl.pauseMenuOptions.playerName;
-            }
+            if (javaURI) return String(javaURI);
+            if (typeof window !== 'undefined' && window.location && window.location.origin) return String(window.location.origin);
         } catch (e) { /* ignore */ }
         return null;
+    }
+
+    // Resolve the current user id used by the backend (forced to guest for now)
+    _currentUserId() {
+        return 'guest';
     }
 
     // Build the DTO expected by the backend controller (save/update score)
@@ -184,15 +160,14 @@ export default class PauseMenu {
     async _saveStatsToServer() {
         const base = this._backendBase();
         if (!base) return Promise.reject(new Error('No backend configured'));
+        // PauseMenu controller endpoint
         const apiBase = base.replace(/\/$/, '') + '/api/pausemenu/score';
         const dto = this._buildServerDto();
 
         try {
-            const token = this._authToken();
             const headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = 'Bearer ' + token;
 
-            // If we have an existing server id, update via PUT
+            // If we have an existing server id, update via PUT (if supported)
             const serverId = this.stats && (this.stats.serverId || this.stats._serverId || null);
             if (serverId) {
                 const url = `${apiBase}/${serverId}`;
@@ -219,7 +194,7 @@ export default class PauseMenu {
             }
 
             // Create a new server record
-            const url = `${apiBase}/save`;
+            const url = `${apiBase}`;
             console.debug('PauseMenu: POST', url, dto);
             const resp = await fetch(url, {
                 method: 'POST',
@@ -252,10 +227,9 @@ export default class PauseMenu {
         const base = this._backendBase();
         if (!base) return Promise.reject(new Error('No backend configured'));
         const apiBase = base.replace(/\/$/, '') + '/api/pausemenu/score';
-        const player = (this.options && this.options.playerName) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.playerName);
-        const gameType = (this.options && this.options.gameType) || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.gameType);
+        const player = 'guest';
 
-        // Prefer loading by known server id when available (aligns with backend getScore)
+        // Prefer loading by known server id when available (aligns with typical REST)
         const serverId = this.stats && (this.stats.serverId || this.stats._serverId || null);
         if (serverId) {
             try {
@@ -285,33 +259,25 @@ export default class PauseMenu {
             }
         }
 
-        if (!player || !gameType) return Promise.reject(new Error('playerName and gameType are required for server load'));
+        // Fallback: load leaderboard and extract player's high score if present
+        if (!player) return null;
 
         try {
-            const url = `${apiBase}/player/${encodeURIComponent(player)}/game/${encodeURIComponent(gameType)}`;
+            const url = `${apiBase}/leaderboard`;
             const resp = await fetch(url, { method: 'GET', credentials: 'include' });
             if (resp.status === 404) return null; // nothing stored for this player/game
             if (!resp.ok) throw new Error('Server GET failed: ' + resp.status);
             const body = await resp.json();
             if (Array.isArray(body) && body.length > 0) {
-                // pick most recent by id or sessionStartTime if present
-                const chosen = body[body.length - 1];
+                // find this player's entry (case-insensitive)
+                const chosen = body.find(e => ((e.username || e.user || '').toLowerCase()) === String(player).toLowerCase());
+                if (!chosen) return null;
                 // map server fields back into stats shape we use
                 this.stats = Object.assign(this.stats || {}, {
-                    levelsCompleted: chosen.getLevelsCompleted ? chosen.getLevelsCompleted : (chosen.levelReached || 0),
-                    levelReached: chosen.levelReached || 0,
-                    // Do not carry over prior run score into current run
+                    // Do not carry over prior run score into current run; only show highScore if present
                     currentScore: 0,
-                    sessionTime: chosen.sessionTime || chosen.elapsedMs || this.stats?.sessionTime || 0,
-                    highScore: chosen.highScore || 0,
-                    progressPercentage: chosen.progressPercentage || 0,
-                    gameState: chosen.gameState || null,
-                    itemsCollected: chosen.itemsCollected || 0,
-                    enemiesDefeated: chosen.enemiesDefeated || 0,
-                    totalCoins: chosen.totalCoins || 0,
-                    totalPowerUps: chosen.totalPowerUps || 0,
-                    status: 'PAUSED',
-                    serverId: chosen.id || chosen._id || null
+                    highScore: chosen.highScore || chosen.score || 0,
+                    status: 'PAUSED'
                 });
                 // mirror back to gameControl if present
                 if (this.gameControl) this.gameControl.stats = this.stats;
