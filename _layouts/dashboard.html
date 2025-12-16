@@ -4,11 +4,9 @@ layout: aesthetihawk
 active_tab: dashboard
 ---
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet" />
+<!-- Fonts loaded globally via head-custom.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
 <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
-<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/tabs.css" />
-<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/charts.css" />
 <div class="w-full">
     <div class="space-y-4 sm:space-y-6">
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
@@ -25,7 +23,7 @@ active_tab: dashboard
                 </li>
                 <li class="me-2">
                     <a href="#" id="tab-admin-search"
-                    class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">Admin Search</a>
+                    class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">Admin Evaluation</a>
                 </li>
                 <li class="me-2">
                     <a href="#" id="tab-grade-analytics"
@@ -135,68 +133,347 @@ active_tab: dashboard
 
             <!-- grade predictor tab content -->
             <div id="tab-content-grade" class="tab-content hidden px-6 py-4 text-neutral-200">
-                <h2 class="text-xl font-semibold mb-4">Grade Predictor</h2>
-                <p class="mb-4 text-neutral-400 max-w-prose">
-                    This tool estimates your GitHub-based grade using two methods:
+    <h2 class="text-xl font-semibold mb-4">Grade Predictor</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Left: Technical analytics -->
+        <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 flex flex-col">
+            <h3 class="text-lg font-semibold mb-2 text-blue-300">Technical analytics</h3>
+            <p class="mb-4 text-neutral-400 text-sm">
+                Predict your grade based on your GitHub activity (commits, PRs, issues, code changes, etc).
+            </p>
+            <div class="mb-4">
+                <p class="text-neutral-400 text-xs mb-2">
+                    <strong>How is this grade calculated?</strong><br>
+                    The technical grade uses a weighted formula based on your GitHub stats:
                 </p>
-
-                <ul class="list-disc list-inside text-neutral-300 mb-4">
-                    <li><strong>Basic Grade:</strong> Based on total commits.</li>
-                    <li><strong>Smart Grade:</strong> Includes commits, code changes, PRs, issues, followers, and more.</li>
-                </ul>
-
-                <div class="overflow-x-auto mb-4">
-                    <table class="w-full text-sm text-left text-neutral-300 border border-neutral-700">
-                        <thead class="bg-neutral-800 text-neutral-400">
-                            <tr>
-                                <th class="px-4 py-2">Metric</th>
-                                <th class="px-4 py-2">Included In</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-neutral-900">
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Commits</td><td class="px-4 py-2">Basic & Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Lines Changed</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Pull Requests</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Issues</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Repos / Gists</td><td class="px-4 py-2">Smart</td></tr>
-                            <tr class="border-t border-neutral-700"><td class="px-4 py-2">Followers / Following</td><td class="px-4 py-2">Smart</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="text-sm text-neutral-400 mb-4">
-                    <strong>Grade Scale:</strong> A (90%), B (80%), C (70%), F (55%) — based on engagement.
-                </div>
-
-                <div class="flex gap-4 mb-4">
-                    <button id="predictGradeBtn"
-                        class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">
-                        Predict Grade (Commits)
-                    </button>
-                    <button id="smartPredictBtn"
-                        class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition text-white font-semibold">
-                        Smart Predict Grade
-                    </button>
-                </div>
-                <p id="userGrade" class="text-xl font-semibold"></p>
+                <pre class="bg-neutral-900 text-neutral-200 p-3 rounded text-xs overflow-x-auto mb-2" style="font-family: 'Source Code Pro', monospace;">
+score += commits * 2
+score += additions * 0.15
+score += deletions * 0.1
+score += prs * 3
+score += issues * 1.5
+score += repos * 1.2
+score += gists * 0.5
+                </pre>
+                <p class="text-neutral-400 text-xs">
+                    This formula rewards a mix of code contributions, collaboration, and repository activity.
+                </p>
             </div>
+            <button id="predictTechGradeBtn"
+                class="mb-4 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">
+                Predict Grade
+            </button>
+            <p id="techGradeResult" class="text-xl font-semibold"></p>
+        </div>
+        <!-- Right: Evaluation matrix -->
+        <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 flex flex-col">
+            <h3 class="text-lg font-semibold mb-2 text-green-300">Evaluation matrix</h3>
+            <p class="mb-4 text-neutral-400 text-sm">
+                Adjust each slider to reflect your self-assessment or teacher's assessment for each skill (1 = lowest, 5 = highest).
+            </p>
+            <form id="smart-grade-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="slider-attendance" class="block text-sm text-neutral-300 mb-1">Attendance</label>
+                    <input type="range" id="slider-attendance" name="attendance" min="1" max="5" value="4" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-attendance">4</span></span>
+                </div>
+                <div>
+                    <label for="slider-work_habits" class="block text-sm text-neutral-300 mb-1">Work Habits</label>
+                    <input type="range" id="slider-work_habits" name="work_habits" min="1" max="5" value="5" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-work_habits">5</span></span>
+                </div>
+                <div>
+                    <label for="slider-behavior" class="block text-sm text-neutral-300 mb-1">Behavior</label>
+                    <input type="range" id="slider-behavior" name="behavior" min="1" max="5" value="4" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-behavior">4</span></span>
+                </div>
+                <div>
+                    <label for="slider-timeliness" class="block text-sm text-neutral-300 mb-1">Timeliness</label>
+                    <input type="range" id="slider-timeliness" name="timeliness" min="1" max="5" value="5" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-timeliness">5</span></span>
+                </div>
+                <div>
+                    <label for="slider-tech_sense" class="block text-sm text-neutral-300 mb-1">Tech Sense</label>
+                    <input type="range" id="slider-tech_sense" name="tech_sense" min="1" max="5" value="4" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-tech_sense">4</span></span>
+                </div>
+                <div>
+                    <label for="slider-tech_talk" class="block text-sm text-neutral-300 mb-1">Tech Talk</label>
+                    <input type="range" id="slider-tech_talk" name="tech_talk" min="1" max="5" value="4" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-tech_talk">4</span></span>
+                </div>
+                <div>
+                    <label for="slider-tech_growth" class="block text-sm text-neutral-300 mb-1">Tech Growth</label>
+                    <input type="range" id="slider-tech_growth" name="tech_growth" min="1" max="5" value="5" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-tech_growth">5</span></span>
+                </div>
+                <div>
+                    <label for="slider-advocacy" class="block text-sm text-neutral-300 mb-1">Advocacy</label>
+                    <input type="range" id="slider-advocacy" name="advocacy" min="1" max="5" value="4" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-advocacy">4</span></span>
+                </div>
+                <div>
+                    <label for="slider-communication" class="block text-sm text-neutral-300 mb-1">Communication</label>
+                    <input type="range" id="slider-communication" name="communication" min="1" max="5" value="5" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-communication">5</span></span>
+                </div>
+                <div>
+                    <label for="slider-integrity" class="block text-sm text-neutral-300 mb-1">Integrity</label>
+                    <input type="range" id="slider-integrity" name="integrity" min="1" max="5" value="5" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-integrity">5</span></span>
+                </div>
+                <div>
+                    <label for="slider-organization" class="block text-sm text-neutral-300 mb-1">Organization</label>
+                    <input type="range" id="slider-organization" name="organization" min="1" max="5" value="4" class="w-full" />
+                    <span class="text-xs text-neutral-400">Value: <span id="val-organization">4</span></span>
+                </div>
+            </form>
+            <button id="smartPredictBtn"
+                class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition text-white font-semibold">
+                Smart Predict Grade
+            </button>
+            <p id="userGrade" class="text-xl font-semibold mt-4"></p>
+        </div>
+    </div>
+</div>
 
             <!-- admin search tab content -->
             <div id="tab-content-admin-search" class="tab-content hidden px-6 py-4 text-neutral-200">
-                <h2 class="text-xl font-semibold mb-4">Admin: Search User Commits</h2>
-
-                <div class="mb-4 max-w-md">
-                    <label for="uid-input" class="block mb-2 font-medium text-neutral-300">Enter User ID (UID):</label>
-                    <input type="text" id="uid-input" class="w-full rounded px-3 py-2 bg-neutral-700 text-white border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. github username or UID" />
-                    <p id="uid-error" class="mt-1 text-red-500 text-sm min-h-[1.25rem]"></p>
+                <h2 class="text-xl font-semibold mb-4">Admin: Search & Evaluate Users</h2>
+                <div id="admin-people-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <p class="col-span-full text-neutral-400" id="admin-people-loading">Loading users...</p>
                 </div>
+                <!-- Modal for evaluation -->
+                <div id="admin-eval-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+                    <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-lg relative">
+                        <button id="admin-eval-modal-close" class="absolute top-3 right-3 text-neutral-400 hover:text-white text-2xl">&times;</button>
+                        <h3 id="admin-eval-modal-title" class="text-lg font-semibold mb-4"></h3>
+                        <form id="admin-eval-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <!-- Sliders will be injected here -->
+                        </form>
+                        <button id="admin-eval-update-btn" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold">Update</button>
+                        <p id="admin-eval-status" class="text-sm mt-3"></p>
+                    </div>
+                </div>
+                <script type="module">
+                import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-                <button id="uid-search-btn" class="mb-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold transition">
-                    Search Commits
-                </button>
+                // --- UI Elements ---
+                const peopleList = document.getElementById('admin-people-list');
+                const loadingEl = document.getElementById('admin-people-loading');
+                const modal = document.getElementById('admin-eval-modal');
+                const modalTitle = document.getElementById('admin-eval-modal-title');
+                const modalClose = document.getElementById('admin-eval-modal-close');
+                const evalForm = document.getElementById('admin-eval-form');
+                const updateBtn = document.getElementById('admin-eval-update-btn');
+                const statusEl = document.getElementById('admin-eval-status');
+                let people = [];     
+                // --- Slider fields and labels ---
+                const sliderFields = [
+                    { key: "attendance", label: "Attendance" },
+                    { key: "work_habits", label: "Work Habits" },
+                    { key: "behavior", label: "Behavior" },
+                    { key: "timeliness", label: "Timeliness" },
+                    { key: "tech_sense", label: "Tech Sense" },
+                    { key: "tech_talk", label: "Tech Talk" },
+                    { key: "tech_growth", label: "Tech Growth" },
+                    { key: "advocacy", label: "Advocacy" },
+                    { key: "communication", label: "Communication" },
+                    { key: "integrity", label: "Integrity" },
+                    { key: "organization", label: "Organization" }
+                ];
 
-                <div id="admin-summary-container" class="mb-6"></div>
-                <div id="admin-commitCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                let currentPerson = null;
+                let hasExistingEval = false; // Track if evaluation exists
+
+                // --- Fetch and render people ---
+                async function fetchPeople() {
+                    loadingEl.textContent = "Loading users...";
+                    try {
+                        const response = await fetch(`${javaURI}/api/people`, fetchOptions);
+                        if (!response.ok) throw new Error("Failed to fetch people");
+                        const data = await response.json();
+                        people = data.map(person => ({
+                            id: person.id,
+                            name: person.name,
+                            email: person.email,
+                            uid: person.uid,
+                            sid: person.sid
+                        }));
+                        peopleList.innerHTML = '';
+                        people.forEach(person => {
+                            const card = document.createElement('div');
+                            card.className = 'cursor-pointer border border-neutral-700 bg-neutral-800 rounded-xl p-5 shadow hover:border-blue-500 transition';
+                            card.innerHTML = `
+                                <div class="font-semibold text-lg mb-1">${person.name || 'No Name'}</div>
+                                <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono">${person.uid}</span></div>
+                                <div class="text-xs text-neutral-500">ID: ${person.id}</div>
+                            `;
+                            card.addEventListener('click', () => openEvalModal(person));
+                            peopleList.appendChild(card);
+                        });
+                    } catch (e) {
+                        console.error(e);
+                        peopleList.innerHTML = '<p class="col-span-full text-red-500">Error loading users.</p>';
+                    }
+                }
+
+                // --- Modal logic ---
+                async function openEvalModal(person) {
+                    currentPerson = person;
+                    hasExistingEval = false;
+                    modalTitle.innerHTML = `Evaluate: ${person.name} <span class="text-sm text-neutral-400 font-normal">(UID: ${person.uid})</span>`;
+
+                    // Try to fetch existing admin evaluation
+                    let evalData = null;
+                    try {
+                        const res = await fetch(`${javaURI}/api/admin-evaluation/get/${person.id}`, fetchOptions);
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json && typeof json === 'object' && json.evaluation) {
+                                evalData = json.evaluation;
+                                hasExistingEval = true;
+                            }
+                        }
+                    } catch (e) {
+                        evalData = null;
+                    }
+
+                    // Try to fetch student self-evaluation
+                    let studentEvalData = null;
+                    try {
+                        const res = await fetch(`${javaURI}/api/student-evaluation/get/${person.id}`, fetchOptions);
+                        if (res.ok) {
+                            const json = await res.json();
+                            studentEvalData = json.evaluation || json;
+                        }
+                    } catch (e) {
+                        console.error("Error fetching student eval", e);
+                    }
+
+                    if (!studentEvalData) {
+                        modalTitle.innerHTML += `<br><span class="text-xs text-yellow-500 font-normal">Student has not self-evaluated yet.</span>`;
+                    } else {
+                        modalTitle.innerHTML += `<br><span class="text-xs text-green-400 font-normal">Student self-evaluation loaded.</span>`;
+                    }
+
+                    // Map API keys to slider keys
+                    const apiToSliderKey = {
+                        attendance: "attendance",
+                        workHabits: "work_habits",
+                        behavior: "behavior",
+                        timeliness: "timeliness",
+                        techSense: "tech_sense",
+                        techTalk: "tech_talk",
+                        techGrowth: "tech_growth",
+                        advocacy: "advocacy",
+                        communication: "communication",
+                        integrity: "integrity",
+                        organization: "organization"
+                    };
+
+                    evalForm.innerHTML = sliderFields.map(f => {
+                        // Admin Value
+                        let val = 4;
+                        if (evalData) {
+                            // Use camelCase for API, snake_case for slider
+                            const apiKey = Object.keys(apiToSliderKey).find(
+                                k => apiToSliderKey[k] === f.key
+                            );
+                            if (apiKey && typeof evalData[apiKey] !== "undefined" && evalData[apiKey] !== null) {
+                                val = evalData[apiKey];
+                            }
+                        }
+
+                        // Student Value
+                        let studentVal = "N/A";
+                        if (studentEvalData) {
+                            const apiKey = Object.keys(apiToSliderKey).find(
+                                k => apiToSliderKey[k] === f.key
+                            );
+                            // Check camelCase then snake_case
+                            if (apiKey && typeof studentEvalData[apiKey] !== "undefined" && studentEvalData[apiKey] !== null) {
+                                studentVal = studentEvalData[apiKey];
+                            } else if (typeof studentEvalData[f.key] !== "undefined" && studentEvalData[f.key] !== null) {
+                                studentVal = studentEvalData[f.key];
+                            }
+                        }
+
+                        return `
+                            <div class="bg-neutral-800/50 p-3 rounded border border-neutral-700">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label for="admin-slider-${f.key}" class="text-sm text-neutral-300 font-medium">${f.label}</label>
+                                    <span class="text-xs text-neutral-400">Student: <span class="${studentVal !== 'N/A' ? 'text-blue-300 font-bold' : 'text-neutral-500'}">${studentVal}</span></span>
+                                </div>
+                                <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="${val}" class="w-full accent-blue-600" />
+                                <div class="text-right mt-1">
+                                    <span class="text-xs text-neutral-400">Admin: <span id="admin-val-${f.key}" class="font-bold text-white">${val}</span></span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Live update slider values
+                    sliderFields.forEach(f => {
+                        const slider = document.getElementById(`admin-slider-${f.key}`);
+                        const label = document.getElementById(`admin-val-${f.key}`);
+                        slider.addEventListener('input', () => { label.textContent = slider.value; });
+                    });
+                    statusEl.textContent = '';
+                    modal.classList.remove('hidden');
+                }
+
+                function closeEvalModal() {
+                    modal.classList.add('hidden');
+                    currentPerson = null;
+                }
+
+                modalClose.onclick = closeEvalModal;
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeEvalModal();
+                });
+
+                // --- Update handler ---
+                updateBtn.onclick = async () => {
+                    if (!currentPerson) return;
+                    updateBtn.disabled = true;
+                    statusEl.textContent = 'Updating...';
+                    // Collect slider values
+                    const body = { "user_id": currentPerson.id };
+                    sliderFields.forEach(f => {
+                        body[f.key] = Number(document.getElementById(`admin-slider-${f.key}`).value);
+                    });
+                    try {
+                        let res;
+                        if (hasExistingEval) {
+                            // Use PUT to update
+                            res = await fetch(`${javaURI}/api/admin-evaluation/update/${currentPerson.id}`, {
+                                method: 'PUT',
+                                credentials: 'include',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body)
+                            });
+                        } else {
+                            // Use POST to create
+                            res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body)
+                            });
+                        }
+                        if (!res.ok) throw new Error('Failed to update');
+                        statusEl.textContent = '✅ Updated successfully!';
+                        hasExistingEval = true; // Now we have data
+                    } catch (e) {
+                        statusEl.textContent = '❌ Error updating.';
+                    }
+                    updateBtn.disabled = false;
+                };
+
+                // --- Initial load ---
+                fetchPeople();
+                </script>
             </div>
 
             <div id="tab-content-your-feedback" class="tab-content hidden px-6 py-4 text-neutral-200">
@@ -324,14 +601,92 @@ active_tab: dashboard
         <br>
         See the full <a href="/dashboard/help/analytics" class="text-blue-400 underline hover:text-blue-200">Analytics Help page</a> for detailed docs and examples.
     </div>
-</div>
+            </div>
+
             <!-- Preferences tab content -->
             <div id="tab-content-preferences" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
                 <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Column 1: Text -->
+                <!-- Language/Translation Section (moved to top) -->
+                <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">🌐 Language Translation</h3>
+                        <div class="flex gap-2">
+                            <button type="button" id="clear-translation-btn" class="px-3 py-1 text-sm rounded bg-orange-600 hover:bg-orange-700 text-white">Reset to English</button>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="language">Save</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-neutral-400 mb-4">Translate the entire site into your preferred language. This setting is saved and applies across all pages.</p>
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <label class="text-sm text-neutral-400">Site Language</label>
+                            <select id="pref-language" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                <option value="">Default (English - No Translation)</option>
+                                <option value="es">🇪🇸 Spanish (Español)</option>
+                                <option value="fr">🇫🇷 French (Français)</option>
+                                <option value="de">🇩🇪 German (Deutsch)</option>
+                                <option value="it">🇮🇹 Italian (Italiano)</option>
+                                <option value="pt">🇵🇹 Portuguese (Português)</option>
+                                <option value="ru">🇷🇺 Russian (Русский)</option>
+                                <option value="zh-CN">🇨🇳 Chinese Simplified (简体中文)</option>
+                                <option value="zh-TW">🇹🇼 Chinese Traditional (繁體中文)</option>
+                                <option value="ja">🇯🇵 Japanese (日本語)</option>
+                                <option value="ko">🇰🇷 Korean (한국어)</option>
+                                <option value="ar">🇸🇦 Arabic (العربية)</option>
+                                <option value="hi">🇮🇳 Hindi (हिन्दी)</option>
+                                <option value="vi">🇻🇳 Vietnamese (Tiếng Việt)</option>
+                                <option value="th">🇹🇭 Thai (ไทย)</option>
+                                <option value="nl">🇳🇱 Dutch (Nederlands)</option>
+                                <option value="pl">🇵🇱 Polish (Polski)</option>
+                                <option value="tr">🇹🇷 Turkish (Türkçe)</option>
+                                <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+                                <option value="he">🇮🇱 Hebrew (עברית)</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-neutral-500">Translation powered by Google Translate. Click "Reset to English" if translation gets stuck.</p>
+                    </div>
+                </div>
+
+                <!-- Text-to-Speech Section (moved to second) -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">Text-to-Speech</h3>
+                        <div class="flex gap-2">
+                            <button type="button" id="tts-test-btn" class="px-3 py-1 text-sm rounded bg-purple-600 hover:bg-purple-700 text-white">Test Voice</button>
+                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="tts">Save</button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-neutral-400 mb-4">Configure text-to-speech settings. Select text on any page and use the TTS button in the sidebar to hear it read aloud.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-neutral-400">Voice</label>
+                            <select id="pref-tts-voice" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                <option value="">Loading voices...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Speed: <span id="tts-rate-label">1.0</span>x</label>
+                            <input type="range" id="pref-tts-rate" min="0.5" max="2" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Pitch: <span id="tts-pitch-label">1.0</span></label>
+                            <input type="range" id="pref-tts-pitch" min="0.5" max="2" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                        <div>
+                            <label class="text-sm text-neutral-400">Volume: <span id="tts-volume-label">100</span>%</label>
+                            <input type="range" id="pref-tts-volume" min="0" max="1" step="0.1" value="1" class="w-full mt-1" />
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="text-sm text-neutral-400">Test Text</label>
+                        <input type="text" id="tts-test-text" class="w-full bg-neutral-700 text-white rounded px-3 py-2 mt-1" value="Hello! This is a test of the text-to-speech feature." placeholder="Enter text to test..." />
+                    </div>
+                    <p class="text-xs text-neutral-500 mt-3">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Column 1: Text (font size, font family only) -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-medium">Text</h3>
@@ -363,7 +718,7 @@ active_tab: dashboard
                         </div>
                     </div>
 
-                    <!-- Column 2: Colors -->
+                    <!-- Column 2: Colors (background, accent, selection, button style) -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-medium">Colors</h3>
@@ -378,6 +733,20 @@ active_tab: dashboard
                             <div>
                                 <label class="text-sm text-neutral-400">Accent color</label>
                                 <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Selection highlight color</label>
+                                <input type="color" id="pref-selection-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm text-neutral-400">Button style</label>
+                                <select id="pref-button-style" class="w-full bg-neutral-700 text-white rounded px-2 py-2 mt-1">
+                                    <option value="rounded">Rounded (Default)</option>
+                                    <option value="square">Square</option>
+                                    <option value="pill">Pill</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -540,7 +909,15 @@ active_tab: dashboard
                             text: document.getElementById('pref-text-color').value,
                             font: document.getElementById('pref-font-family').value,
                             size: Number(document.getElementById('pref-font-size').value),
-                            accent: document.getElementById('pref-accent-color').value
+                            accent: document.getElementById('pref-accent-color').value,
+                            language: document.getElementById('pref-language').value,
+                            ttsVoice: document.getElementById('pref-tts-voice').value,
+                            ttsRate: Number(document.getElementById('pref-tts-rate').value),
+                            ttsPitch: Number(document.getElementById('pref-tts-pitch').value),
+                            ttsVolume: Number(document.getElementById('pref-tts-volume').value),
+                            // Styling options in Colors section
+                            selectionColor: document.getElementById('pref-selection-color').value,
+                            buttonStyle: document.getElementById('pref-button-style').value
                         };
                     }
 
@@ -553,6 +930,20 @@ active_tab: dashboard
                         document.getElementById('pref-font-size').value = prefs.size || d.size;
                         document.getElementById('font-size-label').textContent = prefs.size || d.size;
                         document.getElementById('pref-accent-color').value = prefs.accent || d.accent;
+                        document.getElementById('pref-language').value = prefs.language || '';
+                        
+                        // TTS settings
+                        if (prefs.ttsVoice) document.getElementById('pref-tts-voice').value = prefs.ttsVoice;
+                        document.getElementById('pref-tts-rate').value = prefs.ttsRate || 1;
+                        document.getElementById('tts-rate-label').textContent = prefs.ttsRate || 1.0;
+                        document.getElementById('pref-tts-pitch').value = prefs.ttsPitch || 1;
+                        document.getElementById('tts-pitch-label').textContent = prefs.ttsPitch || 1.0;
+                        document.getElementById('pref-tts-volume').value = prefs.ttsVolume || 1;
+                        document.getElementById('tts-volume-label').textContent = Math.round((prefs.ttsVolume || 1) * 100);
+                        
+                        // Styling settings
+                        document.getElementById('pref-selection-color').value = prefs.selectionColor || '#3b82f6';
+                        document.getElementById('pref-button-style').value = prefs.buttonStyle || 'rounded';
                     }
 
                     function showStatus(msg){
@@ -573,15 +964,123 @@ active_tab: dashboard
                         } else if (section === 'colors') {
                             current.bg = form.bg;
                             current.accent = form.accent;
+                            current.selectionColor = form.selectionColor;
+                            current.buttonStyle = form.buttonStyle;
+                        } else if (section === 'language') {
+                            const oldLang = current.language || '';
+                            const newLang = form.language;
+                            current.language = newLang;
+                            
+                            // Save first, then reload to apply language change
+                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            
+                            // Only reload if language actually changed
+                            if (oldLang !== newLang) {
+                                showStatus('Language saved! Reloading...');
+                                setTimeout(() => window.location.reload(), 500);
+                                return;
+                            }
+                        } else if (section === 'tts') {
+                            current.ttsVoice = form.ttsVoice;
+                            current.ttsRate = form.ttsRate;
+                            current.ttsPitch = form.ttsPitch;
+                            current.ttsVolume = form.ttsVolume;
                         }
                         
                         savePreferences(current);
                         showStatus('Saved ' + section);
                     }
 
+                    // Initialize TTS voices dropdown
+                    function populateTTSVoices() {
+                        const select = document.getElementById('pref-tts-voice');
+                        if (!select) return;
+                        
+                        const voices = speechSynthesis.getVoices();
+                        select.innerHTML = '';
+                        
+                        if (voices.length === 0) {
+                            select.innerHTML = '<option value="">No voices available</option>';
+                            return;
+                        }
+                        
+                        // Add default option
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.textContent = 'Default Voice';
+                        select.appendChild(defaultOpt);
+                        
+                        // Group voices by language
+                        const voicesByLang = {};
+                        voices.forEach(voice => {
+                            const lang = voice.lang.split('-')[0];
+                            if (!voicesByLang[lang]) voicesByLang[lang] = [];
+                            voicesByLang[lang].push(voice);
+                        });
+                        
+                        // Add English voices first, then others
+                        const langs = Object.keys(voicesByLang).sort((a, b) => {
+                            if (a === 'en') return -1;
+                            if (b === 'en') return 1;
+                            return a.localeCompare(b);
+                        });
+                        
+                        langs.forEach(lang => {
+                            const group = document.createElement('optgroup');
+                            group.label = lang.toUpperCase();
+                            voicesByLang[lang].forEach(voice => {
+                                const opt = document.createElement('option');
+                                opt.value = voice.name;
+                                opt.textContent = `${voice.name} (${voice.lang})`;
+                                group.appendChild(opt);
+                            });
+                            select.appendChild(group);
+                        });
+                        
+                        // Restore saved voice
+                        const saved = loadPreferences();
+                        if (saved && saved.ttsVoice) {
+                            select.value = saved.ttsVoice;
+                        }
+                    }
+                    
+                    // Test TTS function
+                    function testTTS() {
+                        if (!('speechSynthesis' in window)) {
+                            showStatus('Text-to-speech not supported');
+                            return;
+                        }
+                        
+                        // Cancel any ongoing speech
+                        speechSynthesis.cancel();
+                        
+                        const text = document.getElementById('tts-test-text').value || 'Hello, this is a test.';
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        
+                        const voiceName = document.getElementById('pref-tts-voice').value;
+                        if (voiceName) {
+                            const voices = speechSynthesis.getVoices();
+                            const voice = voices.find(v => v.name === voiceName);
+                            if (voice) utterance.voice = voice;
+                        }
+                        
+                        utterance.rate = Number(document.getElementById('pref-tts-rate').value) || 1;
+                        utterance.pitch = Number(document.getElementById('pref-tts-pitch').value) || 1;
+                        utterance.volume = Number(document.getElementById('pref-tts-volume').value) || 1;
+                        
+                        speechSynthesis.speak(utterance);
+                    }
+
                     document.addEventListener('DOMContentLoaded', function (){
                         renderPresets();
                         renderCustomThemes();
+                        
+                        // Initialize TTS voices
+                        if ('speechSynthesis' in window) {
+                            populateTTSVoices();
+                            // Chrome loads voices asynchronously
+                            speechSynthesis.onvoiceschanged = populateTTSVoices;
+                        }
 
                         const saved = loadPreferences();
                         if (saved) populateForm(saved);
@@ -590,6 +1089,20 @@ active_tab: dashboard
                         document.getElementById('pref-font-size').addEventListener('input', function(e){
                             document.getElementById('font-size-label').textContent = e.target.value;
                         });
+                        
+                        // TTS slider labels
+                        document.getElementById('pref-tts-rate').addEventListener('input', function(e){
+                            document.getElementById('tts-rate-label').textContent = e.target.value;
+                        });
+                        document.getElementById('pref-tts-pitch').addEventListener('input', function(e){
+                            document.getElementById('tts-pitch-label').textContent = e.target.value;
+                        });
+                        document.getElementById('pref-tts-volume').addEventListener('input', function(e){
+                            document.getElementById('tts-volume-label').textContent = Math.round(e.target.value * 100);
+                        });
+                        
+                        // TTS test button
+                        document.getElementById('tts-test-btn').addEventListener('click', testTTS);
 
                         document.querySelectorAll('.save-section-btn').forEach(btn => {
                             btn.addEventListener('click', function() {
@@ -608,8 +1121,22 @@ active_tab: dashboard
                             if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
                                 window.SitePreferences.resetPreferences();
                             }
+                            // Also clear translation
+                            clearAllTranslationCookies();
                             showStatus('Reset complete');
                             setTimeout(() => location.reload(), 100);
+                        });
+
+                        // Clear translation / Reset to English button
+                        document.getElementById('clear-translation-btn').addEventListener('click', function(){
+                            clearAllTranslationCookies();
+                            // Update preference
+                            const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                            current.language = '';
+                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            document.getElementById('pref-language').value = '';
+                            showStatus('Translation cleared! Reloading...');
+                            setTimeout(() => location.reload(), 500);
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', function(){
@@ -619,7 +1146,34 @@ active_tab: dashboard
                         document.getElementById('new-theme-name').addEventListener('keypress', function(e){
                             if (e.key === 'Enter') saveThemeAs(this.value.trim());
                         });
+                        
+                        // Live preview for selection color and button style
+                        ['pref-selection-color', 'pref-button-style'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                const applyLivePreview = function() {
+                                    const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                                    const form = currentFormValues();
+                                    current.selectionColor = form.selectionColor;
+                                    current.buttonStyle = form.buttonStyle;
+                                    applyPreferences(current);
+                                };
+                                el.addEventListener('change', applyLivePreview);
+                                el.addEventListener('input', applyLivePreview);
+                            }
+                        });
                     });
+
+                    // Helper function to clear Google Translate cookies
+                    function clearAllTranslationCookies() {
+                        const domain = window.location.hostname;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+                        // Also try without domain for localhost
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                    }
 
                     window.loadPreferences = async function(){ loadPreferences(); };
                     try{ loadPreferences(); } catch(e){}
@@ -655,13 +1209,181 @@ active_tab: dashboard
 
 <!-- Your GitHub analytics JS integrated -->
 <script type="module">
-    import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
     const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
     const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
     const commitsUrl = `${pythonURI}/api/analytics/github/user/commits`;
     const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
     const issuesUrl = `${pythonURI}/api/analytics/github/user/issues`;
+
+    let springUserId = null;
+    let hasExistingStudentEval = false;
+
+    async function getUserIdSpring() {
+        if (springUserId) return springUserId;
+        try {
+            // 1. Get UID from Python
+            const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+            if (!pyRes.ok) throw new Error("Failed to fetch Python ID");
+            const pyData = await pyRes.json();
+            const uid = pyData.uid;
+
+            // 2. Get People from Spring
+            const javaRes = await fetch(`${javaURI}/api/people`, fetchOptions);
+            if (!javaRes.ok) throw new Error("Failed to fetch People");
+            const people = await javaRes.json();
+
+            // 3. Match UID
+            const person = people.find(p => p.uid === uid);
+            if (!person) throw new Error("User not found in Spring");
+            
+            springUserId = person.id;
+            return springUserId;
+        } catch (e) {
+            console.error("Error getting Spring User ID:", e);
+            return null;
+        }
+    }
+
+    async function loadStudentEvaluation() {
+        const id = await getUserIdSpring();
+        if (!id) return;
+
+        try {
+            const res = await fetch(`${javaURI}/api/student-evaluation/get/${id}`, fetchOptions);
+            if (res.ok) {
+                const json = await res.json();
+                const data = json.evaluation || json; 
+                if (data) {
+                    hasExistingStudentEval = true;
+                    
+                    const apiToSliderKey = {
+                        attendance: "attendance",
+                        workHabits: "work_habits",
+                        behavior: "behavior",
+                        timeliness: "timeliness",
+                        techSense: "tech_sense",
+                        techTalk: "tech_talk",
+                        techGrowth: "tech_growth",
+                        advocacy: "advocacy",
+                        communication: "communication",
+                        integrity: "integrity",
+                        organization: "organization"
+                    };
+
+                    Object.keys(apiToSliderKey).forEach(apiKey => {
+                        const sliderKey = apiToSliderKey[apiKey];
+                        let val = 4;
+                        if (typeof data[apiKey] !== "undefined") val = data[apiKey];
+                        else if (typeof data[sliderKey] !== "undefined") val = data[sliderKey];
+
+                        const slider = document.getElementById(`slider-${sliderKey}`);
+                        const label = document.getElementById(`val-${sliderKey}`);
+                        if (slider) {
+                            slider.value = val;
+                            if (label) label.textContent = val;
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Error loading student evaluation:", e);
+        }
+    }
+
+    // Remove old predictGradeBtn logic and update smartPredictBtn logic:
+    const smartPredictBtn = document.getElementById("smartPredictBtn");
+    smartPredictBtn.onclick = async () => {
+        const userGradeEl = document.getElementById("userGrade");
+        userGradeEl.textContent = "Processing...";
+        
+        const id = await getUserIdSpring();
+        if (!id) {
+            userGradeEl.textContent = "Error: Could not identify user.";
+            return;
+        }
+
+        // Collect slider values
+        const fields = [
+            "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+            "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+        ];
+        const body = { "user_id": id };
+        fields.forEach(f => {
+            body[f] = Number(document.getElementById(`slider-${f}`).value);
+        });
+
+        // 1. Save Evaluation (POST or PUT)
+        try {
+            let res;
+            if (hasExistingStudentEval) {
+                res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+            } else {
+                res = await fetch(`${javaURI}/api/student-evaluation/post`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+            }
+            
+            if (res.ok) {
+                hasExistingStudentEval = true;
+                userGradeEl.textContent = "Evaluation saved. Predicting...";
+            } else {
+                console.error("Failed to save evaluation");
+            }
+        } catch (e) {
+            console.error("Error saving evaluation:", e);
+        }
+
+        // 2. Run Prediction
+        try {
+            await fetch(`${javaURI}/api/grade-prediction/train`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+        } catch (error) {
+            console.error("Error with training:", error);
+        }
+        try {
+            const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await predict.json();
+            userGradeEl.textContent = `Saved & Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
+        } catch (error) {
+            console.error("Error fetching prediction:", error);
+            userGradeEl.textContent = "Saved, but error predicting grade.";
+        }
+    };
+
+    // Update slider value labels live
+    document.addEventListener('DOMContentLoaded', function () {
+        [
+            "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+            "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+        ].forEach(f => {
+            const slider = document.getElementById(`slider-${f}`);
+            const label = document.getElementById(`val-${f}`);
+            if (slider && label) {
+                slider.addEventListener('input', () => { label.textContent = slider.value; });
+            }
+        });
+    });
+
+    // Attach smartPredictBtn handler ONCE, using correct userGrade element
+    // (Handled above, duplicate block removed)
 
     async function fetchData() {
         try {
@@ -742,30 +1464,15 @@ active_tab: dashboard
             });
 
             // Grade prediction buttons and output are moved to new tab, so disable them here
-            const predictGradeBtn = document.getElementById("predictGradeBtn");
-            const smartPredictBtn = document.getElementById("smartPredictBtn");
-            const userGradeEl = document.getElementById("userGrade");
-
-            predictGradeBtn.onclick = () => {
-                const grade = calculateGradeFromCommits(commitsCount);
-                userGradeEl.textContent = `Grade based on commits: ${grade}`;
-            };
-
-            smartPredictBtn.onclick = () => {
-                const smartData = {
-                    total_commit_contributions: commitsCount,
-                    total_lines_added: commitsData.total_lines_added || 0,
-                    total_lines_deleted: commitsData.total_lines_deleted || 0,
-                    prs: prsArray.length,
-                    issues: issuesArray.length,
-                    public_repos: userProfile.public_repos || 0,
-                    public_gists: userProfile.public_gists || 0,
-                    followers: userProfile.followers || 0,
-                    following: userProfile.following || 0,
+            const predictTechGradeBtn = document.getElementById("predictTechGradeBtn");
+            
+            if (predictTechGradeBtn) {
+                predictTechGradeBtn.onclick = () => {
+                    const grade = calculateGradeFromCommits(commitsCount);
+                    const techResult = document.getElementById("techGradeResult");
+                    if (techResult) techResult.textContent = `Grade based on commits: ${grade}`;
                 };
-                const grade = calculateSmartGrade(smartData);
-                userGradeEl.textContent = `Smart Grade: ${grade}`;
-            };
+            }
 
             // Info links to show modal details
             setupInfoModal("commits-info", commitsData);
@@ -836,7 +1543,7 @@ active_tab: dashboard
                     </select>
                 </th>
                 <th class="px-4 py-2">GitHub Issue</th>
-                <th class="px-4 py-2">
+                               <th class="px-4 py-2">
                     Status<br />
                     <select id="status-filter" class="bg-neutral-800 text-white border border-neutral-600 rounded px-2 py-1 mt-1 text-sm">
                     <option value="">All</option>
@@ -938,41 +1645,44 @@ active_tab: dashboard
             container.appendChild(card);
         });
     }
-        document.getElementById("uid-search-btn").addEventListener("click", async () => {
-        const uid = document.getElementById("uid-input").value.trim();
-        const errorEl = document.getElementById("uid-error");
-        const summaryContainer = document.getElementById("admin-summary-container");
-        const commitContainer = document.getElementById("admin-commitCardsContainer");
+    
+    const uidSearchBtn = document.getElementById("uid-search-btn");
+    if (uidSearchBtn) {
+        uidSearchBtn.addEventListener("click", async () => {
+            const uid = document.getElementById("uid-input").value.trim();
+            const errorEl = document.getElementById("uid-error");
+            const summaryContainer = document.getElementById("admin-summary-container");
+            const commitContainer = document.getElementById("admin-commitCardsContainer");
 
-        errorEl.textContent = "";
-        summaryContainer.innerHTML = "";
-        commitContainer.innerHTML = "";
+            errorEl.textContent = "";
+            summaryContainer.innerHTML = "";
+            commitContainer.innerHTML = "";
 
-        if (!uid) {
-        errorEl.textContent = "Please enter a UID.";
-        return;
-        }
+            if (!uid) {
+                errorEl.textContent = "Please enter a UID.";
+                return;
+            }
 
-        try {
-        const response = await fetch(`${pythonURI}/api/analytics/commits/${encodeURIComponent(uid)}`, fetchOptions);
+            try {
+                const response = await fetch(`${pythonURI}/api/analytics/commits/${encodeURIComponent(uid)}`, fetchOptions);
 
-        if (!response.ok) {
-            const err = await response.json();
-            errorEl.textContent = err.message || "Failed to fetch user commit data.";
-            return;
-        }
+                if (!response.ok) {
+                    const err = await response.json();
+                    errorEl.textContent = err.message || "Failed to fetch user commit data.";
+                    return;
+                }
 
-        const data = await response.json();
+                const data = await response.json();
 
-        const commitData = data.commits?.details_of_commits || data.details_of_commits || [];
-        const commitCount = data.commits?.total_commit_contributions || data.total_commit_contributions || 0;
-        const totalAdditions = data.commits?.total_lines_added || data.total_lines_added || 0;
-        const totalDeletions = data.commits?.total_lines_deleted || data.total_lines_deleted || 0;
+                const commitData = data.commits?.details_of_commits || data.details_of_commits || [];
+                const commitCount = data.commits?.total_commit_contributions || data.total_commit_contributions || 0;
+                const totalAdditions = data.commits?.total_lines_added || data.total_lines_added || 0;
+                const totalDeletions = data.commits?.total_lines_deleted || data.total_lines_deleted || 0;
 
-        const summaryCard = document.createElement("div");
-        summaryCard.className = "summary-card bg-slate-800 text-white p-5 rounded-lg shadow max-w-xs text-center mx-auto";
+                const summaryCard = document.createElement("div");
+                summaryCard.className = "summary-card bg-slate-800 text-white p-5 rounded-lg shadow max-w-xs text-center mx-auto";
 
-        summaryCard.innerHTML = `
+                summaryCard.innerHTML = `
             <img src="https://github.com/identicons/${uid}.png" alt="Avatar" class="mx-auto rounded-full w-20 h-20 mb-3">
             <p><strong>UID:</strong> ${uid}</p>
             <p><strong>Total Commits:</strong> ${commitCount}</p>
@@ -980,20 +1690,21 @@ active_tab: dashboard
             <p><strong>Total Deletions:</strong> -${totalDeletions}</p>
         `;
 
-        summaryContainer.appendChild(summaryCard);
+                summaryContainer.appendChild(summaryCard);
 
-        renderCommitCards(commitData, uid, commitContainer);
+                renderCommitCards(commitData, uid, commitContainer);
 
-        } catch (e) {
-        errorEl.textContent = "Unexpected error.";
-        console.error(e);
-        }
-    });
+            } catch (e) {
+                errorEl.textContent = "Unexpected error.";
+                console.error(e);
+            }
+        });
+    }
 
     // Modal code
     const dataModal = document.getElementById("dataModal");
     const modalData = document.getElementById("modalData");
-    const closeModal = dataModal.querySelector(".close");
+       const closeModal = dataModal.querySelector(".close");
 
     function setupInfoModal(elementId, data) {
         const el = document.getElementById(elementId);
@@ -1074,6 +1785,7 @@ active_tab: dashboard
         if (activeTab) setUnderline(activeTab);
 
         await fetchData();
+        await loadStudentEvaluation(); // Load saved evaluation
 
         // load and apply saved preferences (if any)
         try {
@@ -1082,357 +1794,6 @@ active_tab: dashboard
             console.error('Error loading preferences on window.onload', e);
         }
     };
-</script>
-
-<!-- JavaScript for tab switching -->
-<script type="module">
-    import { setupTabSwitcher } from '{{ site.baseurl }}/assets/js/aesthetihawk/dashboard/tabSwitcher.js';
-
-    // call the function with your tab ids and initial tab
-    document.addEventListener('DOMContentLoaded', function () {
-        setupTabSwitcher(
-            ['github', 'grade', 'admin-search', 'help', 'preferences', 'grade-analytics'],
-            'github'
-            );
-    });
-</script>
-
-<script type="module">
-    import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const gradeTab = document.getElementById('tab-grade-analytics');
-        const gradeContent = document.getElementById('grade-analytics-container');
-        let loaded = false;
-
-        // Feedback and badge color logic
-        function getGradeFeedback(percent) {
-            let badgeColor = 'bg-danger';
-            let feedback = 'Immediate intervention is required to pass this course.';
-            if (percent >= 90) {
-                badgeColor = 'bg-success';
-                feedback = 'Excellent work! Keep up the great performance.';
-            } else if (percent >= 80) {
-                badgeColor = 'bg-info';
-                feedback = 'Good work! Continue focusing on improvement.';
-            } else if (percent >= 70) {
-                badgeColor = 'bg-warning text-dark';
-                feedback = 'Satisfactory work. Consider seeking additional support.';
-            } else if (percent >= 60) {
-                badgeColor = 'bg-danger';
-                feedback = 'You need to significantly improve to pass this course.';
-            }
-            return { badgeColor, feedback };
-        }
-
-        function renderGradeData(data) {
-            if (!data || Object.keys(data).length === 0) {
-                return `<p class="text-neutral-400">No grade analytics available for your account.</p>`;
-            }
-            if (Array.isArray(data)) {
-                data = data[0] || {};
-            }
-
-            // Feature order (match profile)
-            const features = [
-                "Attendance", "Work Habits", "Behavior", "Timeliness", "Tech Sense",
-                "Tech Talk", "Tech Growth", "Advocacy", "Communication and Collaboration",
-                "Integrity", "Organization"
-            ];
-
-            // Calculate percent and letter grade
-            let totalScore = 0;
-            let maxScore = features.length * 5;
-            features.forEach(skill => {
-                totalScore += Number(data[skill]) || 0;
-            });
-            const avgRatingValue = (totalScore / features.length).toFixed(1);
-            const percent = Math.round((totalScore / maxScore) * 100);
-            let grade = data.grade || data.predicted_grade || '-';
-            if (grade === '-' && typeof percent === 'number') {
-                if (percent >= 90) grade = 'A';
-                else if (percent >= 80) grade = 'B';
-                else if (percent >= 70) grade = 'C';
-                else if (percent >= 60) grade = 'D';
-                else grade = 'F';
-            }
-            const { badgeColor, feedback } = getGradeFeedback(percent);
-
-            // Table rows
-            let tableRows = '';
-            features.forEach(skill => {
-                const rating = Number(data[skill]) || 0;
-                const ratio = (rating / 5).toFixed(1);
-                tableRows += `
-                  <tr>
-                    <td style="text-align:left;padding:0.5em 1em;">${skill}</td>
-                    <td style="text-align:center;padding:0.5em 1em;">${rating}</td>
-                    <td style="text-align:center;padding:0.5em 1em;">${ratio}</td>
-                  </tr>
-                `;
-            });
-            // Add average row
-            tableRows += `
-              <tr class="fw-bold table-active">
-                <td style="color:#ffc107;text-align:left;padding:0.5em 1em;">Average</td>
-                <td style="color:#ffc107;text-align:center;padding:0.5em 1em;">${avgRatingValue}</td>
-                <td style="color:#ffc107;text-align:center;padding:0.5em 1em;">${(avgRatingValue / 5).toFixed(1)}</td>
-              </tr>
-            `;
-
-            // Card style (match screenshot)
-            return `
-            <div id="profile-results-card" style="
-                background:#181b23;
-                color:#fff;
-                border-radius:2rem;
-                border:1px solid #23232a;
-                box-shadow:0 8px 32px 0 #0005;
-                margin:2rem auto 0 auto;
-                max-width:1200px;
-                padding:0;
-                ">
-              <div style="display:flex;flex-wrap:wrap;">
-                <!-- Left: Grade only -->
-                <div style="
-                    flex:1 1 320px;
-                    min-width:320px;
-                    max-width:400px;
-                    padding:3rem 1.5rem 3rem 2.5rem;
-                    display:flex;
-                    flex-direction:column;
-                    align-items:center;
-                    justify-content:center;
-                    border-right:1.5px solid #23232a;
-                    ">
-                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:2.2rem;text-align:left;width:100%;">Predicted Grade</div>
-                  <div style="margin-bottom:1.5rem;width:100%;">
-                    <span style="font-size:1.1rem;">Letter Grade:</span>
-                    <div style="display:inline-block;vertical-align:middle;margin-left:1.2rem;">
-                      <span style="
-                        display:inline-block;
-                        background:#06b6d4;
-                        color:#fff;
-                        font-size:3rem;
-                        font-weight:700;
-                        border-radius:0.3em;
-                        padding:0.2em 1.2em 0.2em 1.2em;
-                        box-shadow:0 2px 8px #06b6d455;
-                        letter-spacing:2px;
-                        ">${grade}</span>
-                    </div>
-                  </div>
-                  <div style="margin-top:2.5rem;font-size:1.1rem;color:#fff;text-align:center;min-height:2.5em;width:100%;">
-                    ${feedback}
-                  </div>
-                </div>
-                <!-- Right: Skills Table -->
-                <div style="
-                    flex:2 1 500px;
-                    min-width:340px;
-                    padding:3rem 2.5rem 3rem 2.5rem;
-                    ">
-                  <div style="font-size:1.5rem;font-weight:600;margin-bottom:1.2rem;">Skills Summary</div>
-                  <div style="color:#ffc107;font-size:1.15rem;font-weight:600;margin-bottom:1.2rem;">
-                    Overall Rating: <span style="color:#fff;">${avgRatingValue}</span> out of 5.0
-                  </div>
-                  <div style="overflow-x:auto;">
-                    <table style="
-                        width:100%;
-                        border-collapse:separate;
-                        border-spacing:0;
-                        background:transparent;
-                        font-size:1.1rem;
-                        ">
-                      <thead>
-                        <tr style="background:transparent;">
-                          <th style="text-align:left;padding:0.5em 1em;font-weight:700;">Skill</th>
-                          <th style="text-align:center;padding:0.5em 1em;font-weight:700;">Rating</th>
-                          <th style="text-align:center;padding:0.5em 1em;font-weight:700;">Ratio</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${tableRows}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <style>
-              #profile-results-card {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                margin-bottom: 2.5rem;
-              }
-              #profile-results-card th, #profile-results-card td {
-                border: none;
-                background: transparent;
-              }
-              #profile-results-card tr.table-active {
-                background: #23232a !important;
-              }
-              @media (max-width: 900px) {
-                #profile-results-card > div { flex-direction:column !important; }
-                #profile-results-card > div > div { max-width:100% !important; padding:2rem 1rem !important; border-right:none !important;}
-              }
-            </style>
-            `;
-        }
-
-        // --- Render AP Exam Predictor Card (match screenshot) ---
-        function renderAPExamCard(ap_exam) {
-            if (!ap_exam || !ap_exam.predicted_score) {
-                return `<p class="text-neutral-400">No AP Exam predictor data available for your account.</p>`;
-            }
-            const practice = ap_exam.predicted_score.practice_based || {};
-            const manual = ap_exam.predicted_score.manual_calculator || {};
-            const lastUpdated = ap_exam.last_updated || "N/A";
-
-            // Score interpretation
-            const interpretations = {
-                5: "Extremely well qualified",
-                4: "Well qualified",
-                3: "Qualified",
-                2: "Possibly qualified",
-                1: "No recommendation"
-            };
-
-            // Confidence badge color
-            function confidenceBadge(level) {
-                let color = "#334155", bg = "#334155";
-                if (level === "High") { color = "#22d3ee"; bg = "#0e7490"; }
-                else if (level === "Medium") { color = "#fbbf24"; bg = "#78350f"; }
-                else if (level === "Low") { color = "#f87171"; bg = "#7f1d1d"; }
-                return `<span style="display:inline-block;padding:0.3em 1.2em;border-radius:1.2em;font-size:1rem;font-weight:600;background:${bg};color:${color};margin-top:0.7em;">${level?.toUpperCase() || "LOW"} CONFIDENCE</span>`;
-            }
-
-            // Card style (match screenshot)
-            return `
-            <div style="background:#10131a;border-radius:18px;max-width:900px;margin:2.5rem auto 0 auto;padding:2.5rem 2rem 2.5rem 2rem;box-shadow:0 8px 32px 0 #0005;border:1.5px solid #23232a;">
-                <div style="font-size:2rem;font-weight:700;text-align:center;color:#e5e7eb;margin-bottom:1.2rem;">
-                    Your AP Exam Predictor Results
-                    <div style="width:80px;height:3px;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#06b6d4);margin:0.5rem auto 0 auto;border-radius:2px;"></div>
-                </div>
-                <div style="margin:1.5rem 0 2.5rem 0;">
-                    <div style="display:flex;align-items:center;justify-content:center;">
-                        <span style="display:inline-flex;align-items:center;gap:0.5em;background:#172032;border-radius:0.7em;padding:0.5em 1.2em;font-size:1.05rem;color:#bae6fd;">
-                            <span style="font-size:1.2em;">📅</span>
-                            Last Updated: <span style="font-weight:600;">${lastUpdated}</span>
-                        </span>
-                    </div>
-                </div>
-                <!-- Practice-Based Prediction -->
-                <div style="margin-bottom:2.5rem;">
-                    <div style="display:flex;align-items:center;gap:0.7em;font-size:1.15rem;font-weight:600;color:#fde047;margin-bottom:1.2rem;">
-                        <span style="font-size:1.2em;">📊</span> Practice-Based Prediction
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1.2rem;">
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ 2018</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.mcq_2018 ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ 2020</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.mcq_2020 ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ 2021</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.mcq_2021 ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">PRACTICE FRQ</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${practice.practice_frq ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 6</span></span>
-                        </div>
-                    </div>
-                    <div style="margin-top:1.5rem;">
-                        <div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);border:2px solid #4338ca;border-radius:1rem;padding:2rem 1.5rem 1.2rem 1.5rem;display:flex;flex-direction:column;align-items:flex-start;">
-                            <span style="color:#c4b5fd;font-size:1.1rem;font-weight:600;margin-bottom:0.7em;">PREDICTED AP SCORE</span>
-                            <span style="font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;">${practice.predicted_ap_score ?? "-"}</span>
-                            ${confidenceBadge(practice.confidence_level)}
-                        </div>
-                    </div>
-                </div>
-                <hr style="border:0;border-top:1.5px solid #23232a;margin:2.5rem 0;">
-                <!-- Manual Calculator Results -->
-                <div>
-                    <div style="display:flex;align-items:center;gap:0.7em;font-size:1.15rem;font-weight:600;color:#fde047;margin-bottom:1.2rem;">
-                        <span style="font-size:1.2em;">📊</span> Manual Calculator Results
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1.2rem;">
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">MCQ SCORE</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${manual.mcq_score ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 70</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">FRQ SCORE</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${manual.frq_score ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 6</span></span>
-                        </div>
-                        <div style="background:#181b23;border-radius:1rem;padding:1.2rem 1.2rem 1rem 1.2rem;display:flex;flex-direction:column;">
-                            <span style="color:#a1a1aa;font-size:0.98rem;margin-bottom:0.2em;">COMPOSITE SCORE</span>
-                            <span style="font-size:1.5rem;font-weight:700;color:#fff;">${manual.composite_score ?? "-"} <span style="color:#71717a;font-size:1rem;font-weight:400;">/ 100</span></span>
-                        </div>
-                    </div>
-                    <div style="margin-top:1.5rem;">
-                        <div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);border:2px solid #4338ca;border-radius:1rem;padding:2rem 1.5rem 1.2rem 1.5rem;display:flex;flex-direction:column;align-items:flex-start;">
-                            <span style="color:#c4b5fd;font-size:1.1rem;font-weight:600;margin-bottom:0.7em;">PREDICTED AP SCORE</span>
-                            <span style="font-size:2.5rem;font-weight:700;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;">${manual.predicted_ap_score ?? "-"}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <style>
-                @media (max-width: 900px) {
-                    #ap-exam-results-card > div { flex-direction:column !important; }
-                    #ap-exam-results-card > div > div { max-width:100% !important; padding:2rem 1rem !important; }
-                }
-            </style>
-            `;
-        }
-
-        // --- Fetch and render both cards ---
-        async function fetchGradeAnalytics() {
-            try {
-                // Grade analytics
-                const gradeRes = await fetch(`${pythonURI}/api/grade/predict`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                let gradeHtml = '';
-                if (gradeRes.ok) {
-                    const gradeData = await gradeRes.json();
-                    gradeHtml = renderGradeData(gradeData);
-                } else {
-                    gradeHtml = `<p class="text-red-400">Failed to load grade analytics.</p>`;
-                }
-
-                // AP Exam analytics
-                const apExamRes = await fetch(`${pythonURI}/api/apexam`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                let apExamHtml = '';
-                if (apExamRes.ok) {
-                    const apExamData = await apExamRes.json();
-                    apExamHtml = renderAPExamCard(apExamData.ap_exam);
-                } else {
-                    apExamHtml = `<p class="text-red-400">Failed to load AP Exam predictor data.</p>`;
-                }
-
-                gradeContent.innerHTML = gradeHtml + apExamHtml;
-            } catch (err) {
-                gradeContent.innerHTML = `<p class="text-red-400">Error loading analytics.</p>`;
-            }
-        }
-
-        gradeTab.addEventListener('click', function () {
-            if (!loaded) {
-                fetchGradeAnalytics();
-                loaded = true;
-            }
-        });
-    });
 </script>
 
 

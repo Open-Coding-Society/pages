@@ -11,9 +11,9 @@ layout: post
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="stylesheet" href="/assets/css/timeline.css">
+<link rel="stylesheet" href="{{ '/assets/css/_main.css' | relative_url }}">
 
-
+<div class="timeline-page"> 
 <div class="timeline-header">
   <h1>Course Timeline</h1>  
   <div class="timeline-filters">
@@ -276,7 +276,7 @@ layout: post
     </div>
   </div>
 </div>
-
+</div>
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
   {{ site.data.certificate_skills | jsonify }}

@@ -48,7 +48,8 @@ permalink: /digital-famine/
 
 <!-- Game Script -->
 <script type="module">
-import Game from "{{ site.baseurl }}/assets/js/adventureGame/GameEngine/Game.js";
+import Core from "{{ site.baseurl }}/assets/js/GameEngine/Game.js";
+import GameControl from "{{ site.baseurl }}/assets/js/adventureGame/GameEngine/GameControl.js";
 import GameLevelHomePage from "{{ site.baseurl }}/assets/js/digitalFamine/GameLevelHomePage.js";
 import { pythonURI, javaURI, fetchOptions } from "{{ site.baseurl }}/assets/js/api/config.js";
 
@@ -62,6 +63,6 @@ const environment = {
     gameLevelClasses: [GameLevelHomePage]
 };
 
-Game.main(environment);
+Core.main(environment, GameControl);
 </script>
 <!-- 6..7 -->
