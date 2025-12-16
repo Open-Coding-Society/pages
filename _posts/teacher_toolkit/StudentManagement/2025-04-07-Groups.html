@@ -221,668 +221,202 @@ comments: false
 </div>
 
 <script type="module">
-  import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-  let allGroups = [];
-  let allPeople = [];          // 👈 NEW: cache people from Person API
-  let selectedPeriods = [];    // [] means "all periods"
-  let selectedClasses = [];    // [] means "all classes"
-  let searchQuery = "";
+/* ================================
+   CONFIG
+================================ */
+import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-  // ===== People loading =====
-  async function fetchPeople() {
-    try {
-      const response = await fetch(`${javaURI}/api/people`, fetchOptions);
-      if (!response.ok) throw new Error("Failed to fetch people");
-      const data = await response.json();
+/* ================================
+   STATE
+================================ */
+let allGroups = [];
+let activePeriods = [];
+let activeClasses = [];
 
-      // Normalize the fields we care about
-      allPeople = data.map(person => ({
-        id: person.id,       // comes from Submitter superclass
-        name: person.name,
-        email: person.email,
-        uid: person.uid,
-        sid: person.sid
-        // (pfp, kasmServerNeeded, etc. exist, but we don't need them here)
-      }));
-      
-      window.allPeople = allPeople;
-    
+/* ================================
+   INIT
+================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  loadGroups();
+  document.getElementById("searchInput").addEventListener("input", renderGroups);
+});
 
-      console.table(allPeople.map(p => ({
-        id: p.id,
-        uid: p.uid,
-        name: p.name
-      })));
-
-      console.log("Loaded people:", allPeople.length);
-    } catch (error) {
-      console.error("Error loading people:", error);
-      // Optional: show some UI warning if you want
-    }
-  }
-
-
-  // ===== Data loading =====
-  async function fetchGroups() {
-    try {
-      const response = await fetch(`${javaURI}/api/groups`, fetchOptions);
-      if (!response.ok) throw new Error("Failed to fetch groups");
-      const data = await response.json();
-
-      allGroups = data.map((group) => ({
-        id: group.id,                     // ✅ use backend id
-        name: group.name,
-        period: group.period,
-        // backend doesn't have these yet -> default for now
-        class: group.course || "",
-        periodAdmin: !!group.periodAdmin,
-        members: (group.members || []).map((member) => ({
-          id: member.id,
-          uid: member.uid,
-          name: member.name,
-          email: member.email
-        }))
-      }));
-
-      console.log("Loaded groups:", allGroups.length);
-      renderGroups();
-    } catch (error) {
-      console.error("Error loading groups:", error);
-      showEmptyState("Error loading groups");
-    }
-  }
-
-
-  // ===== Rendering =====
-  function renderGroups() {
-    const container = document.getElementById("groupsContainer");
-    const emptyState = document.getElementById("emptyState");
-
-    let filteredGroups = allGroups;
-
-    // Filter by selected periods (if any)
-    if (selectedPeriods.length > 0) {
-      filteredGroups = filteredGroups.filter(group =>
-        selectedPeriods.includes(String(group.period))
-      );
-    }
-
-    // Filter by selected classes (if any)
-    if (selectedClasses.length > 0) {
-      filteredGroups = filteredGroups.filter(group =>
-        selectedClasses.includes((group.course || "").toUpperCase())
-      );
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filteredGroups = filteredGroups.filter(group => {
-        const nameMatch = group.name.toLowerCase().includes(query);
-        const memberMatch = group.members.some(member =>
-          member.name.toLowerCase().includes(query)
-        );
-        return nameMatch || memberMatch;
-      });
-    }
-
-    container.innerHTML = "";
-
-    if (filteredGroups.length === 0) {
-      container.classList.add("hidden");
-      emptyState.classList.remove("hidden");
-      return;
-    }
-
-    container.classList.remove("hidden");
-    emptyState.classList.add("hidden");
-
-    filteredGroups.forEach(group => {
-      const card = createGroupCard(group);
-      container.appendChild(card);
+/* ================================
+   API CALLS
+================================ */
+window.loadGroups = async function () {
+  try {
+    const res = await fetch(`${javaURI}/api/groups`, {
+      ...fetchOptions,
+      credentials: 'omit'
     });
-  }
-
-  function createGroupCard(group) {
-    const card = document.createElement("div");
-    card.className = "bg-neutral-700 border border-neutral-600 rounded-lg hover:border-indigo-500 transition-all duration-200";
-
-    const memberCount = group.members.length;
-    const classLabel = group.class || group.course || "Unassigned";
-
-    card.innerHTML = `
-    <div class="p-4">
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex items-center gap-4 flex-1">
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            <h3 class="text-lg font-semibold text-white truncate">${group.name}</h3>
-            <span class="inline-block px-3 py-1 text-xs font-medium bg-indigo-600 text-white rounded-full whitespace-nowrap">
-              Period ${group.period}
-            </span>
-            <span class="inline-block px-3 py-1 text-xs font-medium bg-emerald-600 text-white rounded-full whitespace-nowrap">
-              ${classLabel}
-            </span>
-            ${group.periodAdmin
-        ? `<span class="inline-block px-3 py-1 text-xs font-semibold bg-amber-500 text-black rounded-full whitespace-nowrap">
-                     Period Admin
-                   </span>`
-        : ""
-      }
-          </div>
-          <div class="text-sm text-gray-300 whitespace-nowrap">
-            <span class="font-medium">${memberCount}</span> member${memberCount !== 1 ? "s" : ""}
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <!-- Period Admin toggle button -->
-          <button
-            class="text-xs px-3 py-1 rounded-full border ${group.periodAdmin
-        ? "border-amber-400 bg-amber-500 text-black hover:bg-amber-400"
-        : "border-neutral-500 text-gray-200 hover:bg-neutral-600"
-      } transition-colors"
-            title="${group.periodAdmin ? "Unmark as Period Admin" : "Mark as Period Admin"}"
-            onclick="togglePeriodAdmin(${group.id})"
-          >
-            ${group.periodAdmin ? "Admin ✔" : "Set Admin"}
-          </button>
-
-          <button 
-            class="text-gray-300 hover:text-green-400 transition-colors p-1"
-            title="Add member"
-            onclick="addMember(${group.id})"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-          </button>
-
-          <button 
-            class="text-gray-300 hover:text-red-400 transition-colors p-1"
-            title="Remove member"
-            onclick="removeMember(${group.id})"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-            </svg>
-          </button>
-
-          <button 
-            class="ml-2 text-gray-400 hover:text-indigo-400 transition-colors p-2"
-            onclick="toggleMembers(${group.id})"
-          >
-            <svg id="chevron-${group.id}" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-      
-      <div id="members-${group.id}" class="hidden mt-4 pt-4 border-t border-neutral-600">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          ${group.members.map(member => `
-            <div class="flex items-center gap-2 text-sm bg-neutral-600 rounded-lg p-2">
-              <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
-                ${member.name.charAt(0).toUpperCase()}
-              </div>
-              <div class="text-white font-medium truncate">${member.name}</div>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-    </div>
-  `;
-
-    return card;
-  }
-
-  // ===== Member & admin management =====
-  window.toggleMembers = function (groupId) {
-    const membersList = document.getElementById(`members-${groupId}`);
-    const chevron = document.getElementById(`chevron-${groupId}`);
-    membersList.classList.toggle("hidden");
-    chevron.classList.toggle("rotate-180");
-  };
-
-  window.addMember = async function (groupId) {
-    const group = allGroups.find(g => g.id === groupId);
-    if (!group) return;
-
-    const name = prompt("Enter the student's name to add:");
-    if (!name || !name.trim()) return;
-
-    const trimmedName = name.trim();
-    const lower = trimmedName.toLowerCase();
-
-    const person = allPeople.find(
-      p => p.uid && p.uid.toLowerCase() === lower
-    );
-
-    if (!person) {
-      alert(`No user found with UID "${trimmedName}"`);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, {
-        ...fetchOptions,
-        method: 'POST'
-      });
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to add member');
-      }
-
-      const updatedGroup = await response.json();
-
-      // Update group in allGroups with the server's version
-      const index = allGroups.findIndex(g => g.id === updatedGroup.id);
-      if (index !== -1) {
-        allGroups[index] = {
-          ...allGroups[index],
-          members: (updatedGroup.members || []).map(m => ({
-            id: m.id,
-            uid: m.uid,
-            name: m.name,
-            email: m.email
-          }))
-        };
-      }
-
-      renderGroups();
-    } catch (err) {
-      console.error('Error adding member:', err);
-      alert('Error adding member. Please try again.');
-    }
-  };
-
-
-  window.removeMember = async function (groupId) {
-    const group = allGroups.find(g => g.id === groupId);
-    if (!group) return;
-
-    if (group.members.length === 0) {
-      alert("This group has no members to remove.");
-      return;
-    }
-
-    const name = prompt("Enter the name of the member to remove (case-insensitive):");
-    if (!name || !name.trim()) return;
-
-    const target = name.trim().toLowerCase();
-
-    // Find the member in the group
-    const member = group.members.find(
-      m => m.name.toLowerCase() === target
-    );
-
-    if (!member) {
-      alert("Member not found in this group.");
-      return;
-    }
-
-    // Send DELETE request to backend
-    try {
-      const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${member.id}`, {
-        ...fetchOptions,
-        method: "DELETE"
-      });
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to remove member");
-      }
-
-      // Updated group returned by backend
-      const updatedGroup = await response.json();
-
-      // Update local allGroups copy
-      const index = allGroups.findIndex(g => g.id === updatedGroup.id);
-      if (index !== -1) {
-        allGroups[index] = {
-          ...allGroups[index],
-          members: updatedGroup.members
-        };
-      }
-
-      renderGroups();
-      alert(`${member.name} was removed from the group.`);
-    } catch (err) {
-      console.error("Error removing member:", err);
-      alert("Error removing member. Please try again.");
-    }
-  };
-
-
-  // Period Admin toggle logic
-  window.togglePeriodAdmin = function (groupId) {
-    const group = allGroups.find(g => g.id === groupId);
-    if (!group) return;
-
-    const periodStr = String(group.period);
-
-    if (group.periodAdmin) {
-      // Only this group can unmark itself
-      const confirmUnmark = confirm(
-        `"${group.name}" is currently the Period Admin for Period ${group.period}.\n\nDo you want to remove this admin status?`
-      );
-      if (!confirmUnmark) return;
-
-      group.periodAdmin = false;
-      renderGroups();
-      alert(`"${group.name}" is no longer the Period Admin for Period ${group.period}.`);
-      return;
-    }
-
-    // Trying to set as Period Admin: ensure no other admin exists for this period
-    const existingAdmin = allGroups.find(
-      g => String(g.period) === periodStr && g.periodAdmin
-    );
-
-    if (existingAdmin) {
-      alert(
-        `"${existingAdmin.name}" is already the Period Admin for Period ${group.period}.\n` +
-        `They must unmark themselves as admin before another group can take over.`
-      );
-      return;
-    }
-
-    group.periodAdmin = true;
+    allGroups = await res.json();
     renderGroups();
-    alert(`"${group.name}" is now the Period Admin for Period ${group.period}.`);
+  } catch (err) {
+    console.error("Failed to load groups", err);
+  }
+}
+
+window.saveNewGroup = async function () {
+  const name = document.getElementById("newGroupName").value.trim();
+  const period = document.getElementById("newGroupPeriod").value;
+  const course = document.getElementById("newGroupClass").value;
+  const membersRaw = document.getElementById("newGroupMembers").value;
+
+  if (!name || !period || !course) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  const memberUids = membersRaw
+    .split("\n")
+    .map(m => m.trim())
+    .filter(Boolean);
+
+  const payload = {
+    name,
+    period: Number(period),
+    course,
+    memberUids
   };
 
-  // ===== Add group form =====
-  window.toggleAddGroup = function () {
-    const expanded = document.getElementById("addGroupExpanded");
-    const chevron = document.getElementById("addGroupChevron");
-    expanded.classList.toggle("hidden");
-    chevron.classList.toggle("rotate-180");
-  };
-
-  window.cancelAddGroup = function () {
-    document.getElementById("newGroupName").value = "";
-    document.getElementById("newGroupPeriod").value = "";
-    document.getElementById("newGroupClass").value = "";
-    document.getElementById("newGroupPeriodAdmin").checked = false;
-    document.getElementById("newGroupMembers").value = "";
-    toggleAddGroup();
-  };
-
-  window.saveNewGroup = async function () {
-    const name = document.getElementById("newGroupName").value.trim();
-    const period = document.getElementById("newGroupPeriod").value;
-    const className = document.getElementById("newGroupClass").value;
-    const periodAdminChecked = document.getElementById("newGroupPeriodAdmin").checked;
-    const membersText = document.getElementById("newGroupMembers").value.trim();
-
-    if (!name) {
-      alert("Please enter a group name");
-      return;
-    }
-    if (!period) {
-      alert("Please select a period");
-      return;
-    }
-    if (!className) {
-      alert("Please select a class");
-      return;
-    }
-    if (!membersText) {
-      alert("Please enter at least one member");
-      return;
-    }
-
-    // 1) Parse textarea -> array of names / identifiers
-    const requestedLines = membersText
-      .split("\n")
-      .map(n => n.trim())
-      .filter(n => n.length > 0);
-
-    if (requestedLines.length === 0) {
-      alert("Please enter at least one member");
-      return;
-    }
-
-    // 2) Match each line to a Person (by name/email/uid)
-    const memberIds = [];
-    const unresolved = [];
-
-    requestedLines.forEach(line => {
-      const lower = line.toLowerCase();
-
-    const person = allPeople.find(
-      p => p.uid && p.uid.toLowerCase() === lower
-    );
-
-      if (person) {
-        memberIds.push(person.id);
-      } else {
-        unresolved.push(line);
-      }
+  try {
+    await fetch(`${javaURI}/api/groups`, {
+      ...fetchOptions,
+      method: "POST",
+      body: JSON.stringify(payload)
     });
 
-    if (unresolved.length > 0) {
-      alert(
-        "The following entries could not be matched to any Person (by UID):\n\n" +
-        unresolved.join("\n") +
-        "\n\nMake sure they match exactly how they appear in the roster."
+    cancelAddGroup();
+    await loadGroups();
+  } catch (err) {
+    console.error("Failed to create group", err);
+  }
+}
+
+/* ================================
+   RENDERING
+================================ */
+window.renderGroups = function () {
+  const container = document.getElementById("groupsContainer");
+  const empty = document.getElementById("emptyState");
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  container.innerHTML = "";
+
+  const filtered = allGroups.filter(g => {
+    if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
+    if (activeClasses.length && !activeClasses.includes(g.course)) return false;
+
+    if (search) {
+      const memberMatch = (g.memberUids || []).some(uid =>
+        uid.toLowerCase().includes(search)
       );
-      return;
+      if (
+        !g.name.toLowerCase().includes(search) &&
+        !memberMatch
+      ) return false;
     }
-
-    // 3) Build payload that matches GroupCreateDto
-    const payload = {
-      name,
-      period,
-      course: className,
-      memberIds
-    };
-
-    console.log("Payload being sent:", payload);
-
-    try {
-      const response = await fetch(`${javaURI}/api/groups`, {
-        ...fetchOptions,
-        method: 'POST',
-        headers: {
-          ...(fetchOptions.headers || {}),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to add group');
-      }
-
-      const savedGroup = await response.json();
-
-      // 4) Push returned group into allGroups in the same shape as fetchGroups()
-      allGroups.push({
-        id: savedGroup.id,
-        name: savedGroup.name,
-        period: savedGroup.period,
-        class: className,              // still front-end only for now
-        periodAdmin: !!periodAdminChecked,
-        members: (savedGroup.members || []).map(m => ({
-          id: m.id,
-          uid: m.uid,
-          name: m.name,
-          email: m.email
-        }))
-      });
-
-      renderGroups();
-      cancelAddGroup();
-      alert(`Group "${name}" created successfully!`);
-    } catch (error) {
-      console.error('Error adding group:', error);
-      alert('Error adding group. Please try again.');
-    }
-  };
-
-
-
-  // ===== Filter helpers =====
-  function updateFilterLabels() {
-    const periodLabel = document.getElementById("periodFilterLabel");
-    const classLabel = document.getElementById("classFilterLabel");
-
-    if (selectedPeriods.length === 0) {
-      periodLabel.textContent = "All Periods";
-    } else if (selectedPeriods.length === 1) {
-      periodLabel.textContent = `Period ${selectedPeriods[0]}`;
-    } else {
-      periodLabel.textContent = `${selectedPeriods.length} Periods`;
-    }
-
-    if (selectedClasses.length === 0) {
-      classLabel.textContent = "All Classes";
-    } else if (selectedClasses.length === 1) {
-      classLabel.textContent = selectedClasses[0];
-    } else {
-      classLabel.textContent = `${selectedClasses.length} Classes`;
-    }
-  }
-
-  // Dropdown toggling
-  window.toggleDropdown = function (type) {
-    const periodDropdown = document.getElementById("periodDropdown");
-    const classDropdown = document.getElementById("classDropdown");
-
-    if (type === "period") {
-      periodDropdown.classList.toggle("hidden");
-      classDropdown.classList.add("hidden");
-    } else {
-      classDropdown.classList.toggle("hidden");
-      periodDropdown.classList.add("hidden");
-    }
-  };
-
-  // Period filters
-  window.onPeriodAllChange = function (checkbox) {
-    const periodCheckboxes = document.querySelectorAll(".period-checkbox");
-    if (checkbox.checked) {
-      selectedPeriods = [];
-      periodCheckboxes.forEach(cb => cb.checked = false);
-    } else {
-      if (selectedPeriods.length === 0) {
-        checkbox.checked = true;
-      }
-    }
-    updateFilterLabels();
-    renderGroups();
-  };
-
-  window.onPeriodCheckboxChange = function (checkbox) {
-    const value = checkbox.value;
-    const allCheckbox = document.getElementById("periodAllCheckbox");
-
-    if (checkbox.checked) {
-      if (!selectedPeriods.includes(value)) {
-        selectedPeriods.push(value);
-      }
-      allCheckbox.checked = false;
-    } else {
-      selectedPeriods = selectedPeriods.filter(v => v !== value);
-      if (selectedPeriods.length === 0) {
-        allCheckbox.checked = true;
-      }
-    }
-
-    updateFilterLabels();
-    renderGroups();
-  };
-
-  // Class filters
-  window.onClassAllChange = function (checkbox) {
-    const classCheckboxes = document.querySelectorAll(".class-checkbox");
-    if (checkbox.checked) {
-      selectedClasses = [];
-      classCheckboxes.forEach(cb => cb.checked = false);
-    } else {
-      if (selectedClasses.length === 0) {
-        checkbox.checked = true;
-      }
-    }
-    updateFilterLabels();
-    renderGroups();
-  };
-
-  window.onClassCheckboxChange = function (checkbox) {
-    const value = checkbox.value.toUpperCase();
-    const allCheckbox = document.getElementById("classAllCheckbox");
-
-    if (checkbox.checked) {
-      if (!selectedClasses.includes(value)) {
-        selectedClasses.push(value);
-      }
-      allCheckbox.checked = false;
-    } else {
-      selectedClasses = selectedClasses.filter(v => v !== value);
-      if (selectedClasses.length === 0) {
-        allCheckbox.checked = true;
-      }
-    }
-
-    updateFilterLabels();
-    renderGroups();
-  };
-
-  window.clearAllFilters = function () {
-    selectedPeriods = [];
-    selectedClasses = [];
-
-    const periodAll = document.getElementById("periodAllCheckbox");
-    const classAll = document.getElementById("classAllCheckbox");
-    periodAll.checked = true;
-    classAll.checked = true;
-
-    document.querySelectorAll(".period-checkbox").forEach(cb => cb.checked = false);
-    document.querySelectorAll(".class-checkbox").forEach(cb => cb.checked = false);
-
-    updateFilterLabels();
-    renderGroups();
-  };
-
-  // Close dropdowns when clicking outside
-  document.addEventListener("click", (event) => {
-    const periodWrapper = document.getElementById("periodFilterWrapper");
-    const classWrapper = document.getElementById("classFilterWrapper");
-    const periodDropdown = document.getElementById("periodDropdown");
-    const classDropdown = document.getElementById("classDropdown");
-
-    if (!periodWrapper.contains(event.target)) {
-      periodDropdown.classList.add("hidden");
-    }
-    if (!classWrapper.contains(event.target)) {
-      classDropdown.classList.add("hidden");
-    }
+    return true;
   });
 
-  // ===== Misc helpers =====
-  function showEmptyState(message) {
-    const container = document.getElementById("groupsContainer");
-    const emptyState = document.getElementById("emptyState");
-    container.classList.add("hidden");
-    emptyState.classList.remove("hidden");
-    emptyState.querySelector("p").textContent = message;
+  if (!filtered.length) {
+    empty.classList.remove("hidden");
+    return;
   }
 
-  // Search input handler
-  document.getElementById("searchInput").addEventListener("input", (e) => {
-    searchQuery = e.target.value;
-    renderGroups();
+  empty.classList.add("hidden");
+
+  filtered.forEach(group => {
+    const el = document.createElement("div");
+    el.course = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
+
+    el.innerHTML = `
+      <div class="flex justify-between items-center">
+        <div>
+          <h4 class="text-lg font-semibold text-white">${group.name}</h4>
+          <p class="text-sm text-gray-400">
+            Period ${group.period} · ${group.course}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-3 flex flex-wrap gap-2">
+        ${(group.memberUids || []).map(uid => `
+          <span class="px-2 py-1 bg-neutral-600 text-sm text-gray-200 rounded">
+            ${uid}
+          </span>
+        `).join("")}
+      </div>
+    `;
+
+    container.appendChild(el);
   });
+}
 
-  // Initialize on page load
-  (async function init() {
-    await fetchPeople();     // 👈 load people first
-    await fetchGroups();     // groups now can show real members from backend
-    updateFilterLabels();
-  })();
+/* ================================
+   ADD GROUP TOGGLE
+================================ */
+window.toggleAddGroup = function () {
+  document.getElementById("addGroupExpanded").classList.toggle("hidden");
+  document.getElementById("addGroupChevron").classList.toggle("rotate-180");
+}
 
+window.cancelAddGroup = function () {
+  document.getElementById("addGroupExpanded").classList.add("hidden");
+  document.getElementById("newGroupName").value = "";
+  document.getElementById("newGroupPeriod").value = "";
+  document.getElementById("newGroupClass").value = "";
+  document.getElementById("newGroupMembers").value = "";
+}
+
+/* ================================
+   FILTERS
+================================ */
+window.toggleDropdown = function (type) {
+  document.getElementById(type + "Dropdown").classList.toggle("hidden");
+}
+
+window.clearAllFilters = function () {
+  activePeriods = [];
+  activeClasses = [];
+  document.querySelectorAll(".period-checkbox,.class-checkbox").forEach(cb => cb.checked = false);
+  document.getElementById("periodAllCheckbox").checked = true;
+  document.getElementById("classAllCheckbox").checked = true;
+  document.getElementById("periodFilterLabel").textContent = "All Periods";
+  document.getElementById("classFilterLabel").textContent = "All Classes";
+  renderGroups();
+}
+
+window.onPeriodCheckboxChange = function (cb) {
+  activePeriods = [...document.querySelectorAll(".period-checkbox:checked")].map(c => c.value);
+  document.getElementById("periodAllCheckbox").checked = !activePeriods.length;
+  document.getElementById("periodFilterLabel").textContent =
+    activePeriods.length ? `Periods: ${activePeriods.join(", ")}` : "All Periods";
+  renderGroups();
+}
+
+window.onClassCheckboxChange = function (cb) {
+  activeClasses = [...document.querySelectorAll(".class-checkbox:checked")].map(c => c.value);
+  document.getElementById("classAllCheckbox").checked = !activeClasses.length;
+  document.getElementById("classFilterLabel").textContent =
+    activeClasses.length ? `Classes: ${activeClasses.join(", ")}` : "All Classes";
+  renderGroups();
+}
+
+window.onPeriodAllChange = function (cb) {
+  if (cb.checked) {
+    document.querySelectorAll(".period-checkbox").forEach(c => c.checked = false);
+    activePeriods = [];
+    renderGroups();
+  }
+}
+
+window.onClassAllChange = function (cb) {
+  if (cb.checked) {
+    document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
+    activeClasses = [];
+    renderGroups();
+  }
+}
 </script>
