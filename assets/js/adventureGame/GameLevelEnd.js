@@ -894,8 +894,11 @@ class GameLevelEnd {
       return;
     }
     
-    // Endpoint for updating balance
-    const endpoint = `${Game.javaURI}/rpg_answer/updateBalance/${personId}/${amount}`;
+    // Extract game name from the URL (e.g., 'adventureGame', 'mansionGame')
+    const gameName = Game.gameName || this._extractGameName();
+    
+    // Endpoint for updating balance with game name
+    const endpoint = `${Game.javaURI}/rpg_answer/updateBalance/${personId}/${amount}/${gameName}`;
     
     // Send request to update balance
     fetch(endpoint, Game.fetchOptions)
@@ -911,6 +914,14 @@ class GameLevelEnd {
       .catch(error => {
         console.error("Error updating balance on server:", error);
       });
+  }
+
+  // Helper to extract game name from URL
+  _extractGameName() {
+    if (typeof window === 'undefined') return 'unknown';
+    const pathname = window.location.pathname;
+    const match = pathname.match(/(\w+Game)/);
+    return match ? match[1] : 'unknown';
   }
   
   // Show floating points animation

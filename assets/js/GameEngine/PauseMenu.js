@@ -140,18 +140,33 @@ export default class PauseMenu {
         return 'guest';
     }
 
+    // Extract game name from the URL or game instance
+    _extractGameName() {
+        // Try to get from gameControl.game first (if available)
+        if (this.gameControl && this.gameControl.game && this.gameControl.game.gameName) {
+            return this.gameControl.game.gameName;
+        }
+        // Fallback: extract from URL
+        if (typeof window === 'undefined') return 'unknown';
+        const pathname = window.location.pathname;
+        const match = pathname.match(/(\w+Game)/);
+        return match ? match[1] : 'unknown';
+    }
+
     // Build the DTO expected by the backend controller (save/update score)
     _buildServerDto() {
         const uid = this._currentUserId();
         const levels = this.stats && this.stats[this.counterVar || 'levelsCompleted'] ? Number(this.stats[this.counterVar || 'levelsCompleted']) : 0;
         const sessionTime = this.stats && (this.stats.sessionTime || this.stats.elapsedMs || this.stats.timePlayed || 0);
+        const gameName = this._extractGameName();
         const dto = {
             user: uid,
             score: this.stats && this.stats[this.scoreVar] ? Number(this.stats[this.scoreVar]) : 0,
             levelsCompleted: levels,
             sessionTime: Number(sessionTime) || 0,
             totalPowerUps: (this.stats && Number(this.stats.totalPowerUps)) || 0,
-            status: (this.stats && this.stats.status) || 'PAUSED'
+            status: (this.stats && this.stats.status) || 'PAUSED',
+            gameName: gameName
         };
         return dto;
     }
