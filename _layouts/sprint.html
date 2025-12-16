@@ -489,7 +489,7 @@ layout: post
     return Array.from(document.querySelectorAll('.week-card')).find(card => extractWeekNumber(card) === weekNumber);
   }
 
-  function collectSkillsFromWeekCard(weekCard) {
+  function collectGoalsFromWeekCard(weekCard) {
     const titles = Array.from(weekCard.querySelectorAll('.item-title')).map(el => el.textContent.trim()).filter(Boolean);
     const uniqueTitles = [...new Set(titles)];
     if (uniqueTitles.length > 0) {
@@ -507,20 +507,20 @@ layout: post
       const headerParts = weekHeader.split(':');
       theme = headerParts.length > 1 ? headerParts[1].trim() : weekHeader;
     }
-    const skills = (overrides?.skills && overrides.skills.length > 0) ? overrides.skills : collectSkillsFromWeekCard(weekCard);
-    if (skills.length === 0) {
-      skills.push(theme);
+    const goals = (overrides?.goals && overrides.goals.length > 0) ? overrides.goals : collectGoalsFromWeekCard(weekCard);
+    if (goals.length === 0) {
+      goals.push(theme);
     }
     return {
       weekNumber,
       theme,
       displayName: overrides?.certificate || `Week ${weekNumber}: ${theme}`,
       courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
-      skills
+      goals
     };
   }
 
-  function renderWeekSkillPreviews() {
+  function renderWeekGoalPreviews() {
     document.querySelectorAll('.week-card').forEach(card => {
       const preview = card.querySelector('[data-week-skills]');
       if (!preview) return;
@@ -528,17 +528,31 @@ layout: post
       const profile = buildCertificateProfile(card, weekNumber);
       if (!profile) return;
       preview.innerHTML = '';
-      profile.skills.slice(0, 6).forEach(skill => {
-        const chip = document.createElement('span');
-        chip.className = 'skill-chip';
-        chip.textContent = skill;
-        preview.appendChild(chip);
+      preview.className = 'week-goals-container';
+      
+      // Add label
+      const label = document.createElement('span');
+      label.className = 'goals-label';
+      label.textContent = 'Learning Goals';
+      preview.appendChild(label);
+      
+      // Add goals list
+      const goalsList = document.createElement('div');
+      goalsList.className = 'goals-list';
+      
+      profile.goals.slice(0, 4).forEach(goal => {
+        const item = document.createElement('span');
+        item.className = 'goal-item';
+        item.textContent = goal;
+        goalsList.appendChild(item);
       });
+      
+      preview.appendChild(goalsList);
+      
       const weekTitle = card.querySelector('[data-week-title]');
       if (weekTitle) {
         weekTitle.textContent = `Week ${weekNumber}: ${profile.theme}`;
       }
-
     });
   }
 
@@ -569,14 +583,14 @@ layout: post
       return [];
     }
 
-    const certificates = (profile.skills || []).map(skillName => {
+    const certificates = (profile.goals || []).map(goalName => {
       return {
         weekNumber: profile.weekNumber,
         theme: profile.theme,
         courseName: profile.courseName,
-        skill: skillName,
-        displayName: `${profile.theme} – ${skillName}`,
-        slug: `${CURRENT_COURSE}-${profile.weekNumber}-${skillName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        goal: goalName,
+        displayName: `${profile.theme} – ${goalName}`,
+        slug: `${CURRENT_COURSE}-${profile.weekNumber}-${goalName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
       };
     });
 
@@ -701,16 +715,16 @@ layout: post
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('certificate-date').textContent = now.toLocaleDateString('en-US', options);
 
-    // Set skills
-    const skillFocus = profile.skill || profile.theme;
-    document.getElementById('certificate-skill-focus').textContent = skillFocus;
+    // Set goals
+    const goalFocus = profile.goal || profile.theme;
+    document.getElementById('certificate-skill-focus').textContent = goalFocus;
 
-    const skillsContainer = document.getElementById('skills-container');
-    skillsContainer.innerHTML = '';
-    const skillTag = document.createElement('span');
-    skillTag.className = 'skill-tag';
-    skillTag.textContent = skillFocus;
-    skillsContainer.appendChild(skillTag);
+    const goalsContainer = document.getElementById('skills-container');
+    goalsContainer.innerHTML = '';
+    const goalTag = document.createElement('span');
+    goalTag.className = 'skill-tag';
+    goalTag.textContent = goalFocus;
+    goalsContainer.appendChild(goalTag);
 
     // Close list modal and open certificate modal
     document.getElementById('certificate-list-modal').style.display = 'none';
@@ -755,7 +769,7 @@ layout: post
     const courseName = profile?.courseName || document.getElementById('certificate-course-name')?.textContent.trim() || 'Open Coding Society';
     const studentName = document.getElementById('certificate-student-name')?.textContent.trim() || 'Learner';
     const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';
-    const skillFocus = profile?.skill || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
+    const goalFocus = profile?.goal || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
 
     let issueMonth = '';
     let issueYear = '';
@@ -774,7 +788,7 @@ layout: post
       organizationName: 'Open Coding Society',
       issueYear,
       issueMonth,
-      description: `Awarded to ${studentName} for demonstrating ${skillFocus} during ${courseName}.`,
+      description: `Awarded to ${studentName} for demonstrating ${goalFocus} during ${courseName}`,
       credentialUrl: window.location.href
     });
 
@@ -933,7 +947,7 @@ layout: post
     initializeCompletion();
     applyFilters();
     initializeCertificateSystem();
-    renderWeekSkillPreviews();
+    renderWeekGoalPreviews();
     initMobileEnhancements();
   });
 

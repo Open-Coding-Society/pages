@@ -4,13 +4,13 @@
   }
 
   .timeline-header h1 {
-    color: $white1;
+    color: $text;
     font-size: 2.5rem;
     margin-bottom: 8px;
   }
 
   .timeline-header-description {
-    color: $gray1;
+    color: $text-muted;
     margin-bottom: 24px;
   }
 
@@ -23,22 +23,22 @@
   .filter-btn {
     padding: 8px 16px;
     background: transparent;
-    border: 1px solid $gray3;
+    border: 1px solid $bg-3;
     border-radius: 6px;
-    color: $white3;
+    color: $text;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 14px;
   }
 
   .filter-btn:hover {
-    background: $gray5;
+    background: $bg-2;
   }
 
   .filter-btn.active {
-    background: $gray5;
-    border-color: $blue1;
-    color: $blue1;
+    background: $bg-2;
+    border-color: $accent;
+    color: $accent;
   }
 
   .timeline-container {
@@ -46,7 +46,7 @@
   }
 
   .sprint-card {
-    border: 1px solid $gray4;
+    border: 1px solid $bg-3;
     border-radius: 16px;
     padding: 28px;
     margin-bottom: 24px;
@@ -67,11 +67,11 @@
   .sprint-title {
     margin: 0;
     font-size: 1.75rem;
-    color: $white1;
+    color: $text;
   }
 
   .sprint-meta {
-    color: $gray1;
+    color: $text-muted;
     font-size: 0.95rem;
   }
 
@@ -102,7 +102,7 @@
   }
 
   .sprint-card.collapsed .sprint-title {
-    color: $white3;
+    color: $text;
   }
 
   .week-card {
@@ -113,7 +113,7 @@
   }
 
   .week-card:hover {
-    border-color: var(--border-hover-color, $gray3);
+    border-color: var(--border-hover-color, $bg-3);
   }
 
   .week-content-wrapper {
@@ -145,11 +145,11 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    border: 2px solid $gray3;
+    border: 2px solid $bg-3;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $blue1;
+    color: $accent;
     font-weight: 600;
     font-size: 14px;
   }
@@ -157,7 +157,7 @@
   .week-connector {
     width: 1px;
     height: 32px;
-    background: $gray4;
+    background: $bg-3;
     margin-top: 8px;
   }
 
@@ -174,34 +174,24 @@
   }
 
   .week-title-group h3 {
-    color: $white1;
+    color: $text;
     font-size: 1.25rem;
     margin: 0 0 4px 0;
   }
 
-
-
-  .week-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
   .completion-badge {
     background: transparent;
-    border: 1px solid $gray3;
-    color: $white2;
+    border: 1px solid $bg-3;
+    color: $text-muted;
     padding: 4px 12px;
     border-radius: 4px;
     font-size: 13px;
   }
 
   .progression-btn {
-    background: $gray5;
-    border: 1px solid $gray3;
-    color: $blue1;
+    background: $bg-2;
+    border: 1px solid $bg-3;
+    color: $accent;
     padding: 6px 14px;
     border-radius: 4px;
     font-size: 13px;
@@ -211,16 +201,16 @@
 
   .progression-btn:hover,
   .progression-btn:focus-visible {
-    border-color: $blue1;
-    color: $lightBlue1;
-    background: $gray5;
+    border-color: $accent;
+    color: $accent-700;
+    background: $bg-2;
     outline: none;
   }
 
   .progress-bar-container {
     width: 100%;
     height: 8px;
-    background: $gray5;
+    background: $bg-2;
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 16px;
@@ -228,7 +218,7 @@
 
   .progress-bar-fill {
     height: 100%;
-    background: $blue1;
+    background: $accent;
     transition: width 0.3s ease;
     width: 0%;
   }
@@ -242,13 +232,13 @@
 
   .item-card {
     padding: 12px;
-    border: 1px solid $gray3;
+    border: 1px solid $bg-3;
     border-radius: 8px;
     transition: background 0.2s;
   }
 
   .item-card:hover {
-    background: rgba($white1, 0.05);
+    background: rgba($text, 0.05);
   }
 
   .item-content {
@@ -289,11 +279,11 @@
   }
 
   .status-icon.completed {
-    color: $blue1;
+    color: $accent;
   }
 
   .status-icon.incomplete {
-    color: $gray3;
+    color: $bg-3;
   }
 
   .type-icon {
@@ -303,7 +293,7 @@
   }
 
   .type-icon.lesson {
-    color: $blue1;
+    color: $accent;
   }
 
   .type-icon.assignment {
@@ -311,13 +301,62 @@
   }
 
   .item-title {
-    color: $white3;
+    color: $text;
     flex: 1;
     font-size: 14px;
   }
 
   .item-card.completed .item-title {
-    color: $gray1;
+    color: $text-muted;
+  }
+
+  .week-goals-container {
+    margin-top: 12px;
+    margin-bottom: 24px;
+    padding-top: 12px;
+    border-top: 1px solid $bg-3;
+  }
+
+  .goals-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .goals-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .goal-item {
+    position: relative;
+    padding-left: 16px;
+    font-size: 0.85rem;
+    color: $text;
+    line-height: 1.4;
+  }
+
+  .goal-item::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: $accent;
+    font-weight: bold;
+    opacity: 0.7;
+  }
+
+  .goal-item:hover {
+    color: $text;
+  }
+
+  .goal-item:hover::before {
+    opacity: 1;
   }
 
   .assignment-due {
@@ -337,16 +376,16 @@
   .load-more-btn {
     padding: 10px 24px;
     background: transparent;
-    border: 1px solid $gray3;
-    color: $blue1;
+    border: 1px solid $bg-3;
+    color: $accent;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .load-more-btn:hover {
-    background: $gray5;
-    color: $lightBlue1;
+    background: $bg-2;
+    color: $accent-700;
   }
 
   @media (max-width: 768px) {
@@ -498,13 +537,13 @@
     right: 16px;
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, $blue1 0%, $blueShadow1 100%);
+    background: linear-gradient(135deg, $accent 0%, $accent-700 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 16px;
-    box-shadow: 0 2px 8px rgba($blue1, 0.3);
+    box-shadow: 0 2px 8px rgba($accent, 0.3);
     z-index: 1;
   }
 
@@ -513,8 +552,8 @@
   }
 
   .week-card.clickable:hover {
-    border-color: $blue1;
-    box-shadow: 0 0 12px rgba($blue1, 0.2);
+    border-color: $accent;
+    box-shadow: 0 0 12px rgba($accent, 0.2);
   }
 
   /* Progression Modal */
@@ -534,8 +573,8 @@
   #progression-modal > div {
     max-width: 600px;
     margin: 40px auto;
-    background: $gray6;
-    border: 1px solid $gray3;
+    background: $bg-1;
+    border: 1px solid $bg-3;
     border-radius: 12px;
     padding: 32px;
   }
@@ -546,24 +585,24 @@
     right: 20px;
     background: transparent;
     border: none;
-    color: $gray1;
+    color: $text-muted;
     font-size: 24px;
     cursor: pointer;
   }
 
   #progression-modal h2 {
-    color: $white1;
+    color: $text;
     margin-bottom: 8px;
   }
 
   #progression-modal .week-theme {
-    color: $blue1;
+    color: $accent;
     margin-bottom: 24px;
   }
 
   #modal-progress-fill {
     height: 100%;
-    background: $blue1;
+    background: $accent;
     width: 0%;
     transition: width 0.3s;
   }
@@ -573,8 +612,8 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: $gray5;
-    border: 1px solid $gray3;
+    background: $bg-2;
+    border: 1px solid $bg-3;
     border-radius: 8px;
     margin-bottom: 8px;
   }
@@ -583,24 +622,24 @@
     width: 20px;
     height: 20px;
     cursor: pointer;
-    accent-color: $blue1;
+    accent-color: $accent;
   }
 
   .progression-task label {
-    color: $white3;
+    color: $text;
     flex: 1;
     cursor: pointer;
   }
 
   .task-number {
-    color: $gray2;
+    color: $text-muted;
     font-size: 14px;
   }
 
   #view-certificate-btn {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, $blue1 0%, $blueShadow1 100%);
+    background: linear-gradient(135deg, $accent 0%, $accent-700 100%);
     border: none;
     border-radius: 8px;
     color: white;
@@ -843,8 +882,8 @@
   #certificate-list-modal > div {
     max-width: 600px;
     margin: 40px auto;
-    background: $gray6;
-    border: 1px solid $gray3;
+    background: $bg-1;
+    border: 1px solid $bg-3;
     border-radius: 12px;
     padding: 32px;
   }
@@ -855,20 +894,20 @@
     right: 20px;
     background: transparent;
     border: none;
-    color: $gray1;
+    color: $text-muted;
     font-size: 24px;
     cursor: pointer;
   }
 
   #certificate-list-modal h2 {
-    color: $white1;
+    color: $text;
     margin-bottom: 24px;
   }
 
   #certificate-list button {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, $blue1 0%, $blueShadow1 100%);
+    background: linear-gradient(135deg, $accent 0%, $accent-700 100%);
     border: none;
     border-radius: 8px;
     color: white;
