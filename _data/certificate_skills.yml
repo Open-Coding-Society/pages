@@ -1,92 +1,93 @@
 #
-# Optional overrides for certificate themes/skills per course/week.
+# Optional overrides for certificate themes/goals per course/week.
 # Keys should match `page.course` values (e.g., csp, csa, csse).
-# Each week entry may define `theme` (display title) and `skills` (array of tags).
+# Each week entry may define `theme` (display title) and `goals` (array of tags).
 csp:
   0:
     theme: "Onboarding Challenge"
-    skills:
+    goals:
       - "Linux + VSCode Setup"
       - "GitHub Pages Launch"
       - "Learning Experience Design"
   1:
     theme: "Tools & Equipment"
-    skills:
+    goals:
       - "Hardware & Workspace Setup"
       - "Command Line Navigation"
       - "Developer Mindset"
   2:
     theme: "Agile Methodologies"
-    skills:
+    goals:
       - "Scrum + Standups"
       - "Planning Boards"
       - "GitHub Pages LxD Series"
   3:
     theme: "Onboarding Adventure"
-    skills:
+    goals:
       - "Sprint Planning"
       - "Team Collaboration"
       - "Portfolio Storytelling"
   4:
     theme: "Python / Flask Foundations"
-    skills:
+    goals:
       - "Framework for Sprints"
       - "REST APIs"
       - "Pair Programming Labs"
 csa:
   0:
     theme: "Onboarding & Java Readiness"
-    skills:
+    goals:
       - "Environment Setup"
       - "Scrum Habits"
       - "Student Teaching Prep"
   1:
     theme: "Framework for Sprints"
-    skills:
+    goals:
       - "Agile Methodologies"
       - "Tools & Equipment"
       - "Onboarding Adventure"
   2:
     theme: "Developer Toolchain"
-    skills:
+    goals:
       - "Python/Flask Backend Infograph"
       - "Portfolio Foundations"
   3:
     theme: "Java / Spring Kickoff"
-    skills:
+    goals:
       - "Transition to Full Stack"
       - "Sprint 2 Planning"
   4:
     theme: "Spring Web Development"
-    skills:
+    goals:
       - "Anatomy of a Spring Boot Project"
       - "REST Controllers"
       - "JWT Auth Concepts"
 csse:
   0:
     theme: "Onboarding Challenge"
-    skills:
+    goals:
       - "Team Workflows"
       - "Portfolio Setup"
   1:
     theme: "Framework for Sprints"
-    skills:
+    goals:
       - "Tools & Equipment"
       - "Agile Methodology Intro"
       - "Onboarding Adventure"
   2:
     theme: "Python & Flask Backend"
-    skills:
+    goals:
       - "Backend Infographics"
       - "Data APIs"
   3:
-    theme: "Java / Spring Web Development"
-    skills:
-      - "Transition to Full Stack"
-      - "REST API Strategy"
+    theme: "Onboarding Adventure"
+    goals:
+      - "Sprint Planning"
+      - "Team Collaboration"
+      - "Portfolio Storytelling"
   4:
     theme: "JavaScript Student Teaching"
-    skills:
+    goals:
       - "Framework for Sprints"
       - "Classroom Facilitation"
       - "Lesson Planning"
