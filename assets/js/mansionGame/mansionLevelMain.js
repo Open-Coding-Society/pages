@@ -1,8 +1,8 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './GameEngine/GameEnvBackground.js';
-import Player from './GameEngine/Player.js';
-import Npc from './GameEngine/Npc.js';
-// import GameControl from './GameEngine/GameControl.js';
+import GamEnvBackground from '../BetterGameEngine/MansionEngine/GameEnvBackground.js';
+import Player from '../BetterGameEngine/MansionEngine/Player.js';
+import Npc from '../BetterGameEngine/MansionEngine/Npc.js';
+// import GameControl from '../BetterGameEngine/MansionEngine/GameControl.js';
 import GameLevel1 from './mansionLevel1.js';
 import GameLevel2 from './mansionLevel2.js';
 import GameLevel3 from './mansionLevel3.js';
