@@ -73,8 +73,8 @@ csse:
     theme: "Essential Tools Setup"
     goals:
       - "Linux + VSCode Setup"
-      - "GitHub Repository"
-      - "GitHub Pages Launch"
+      - "GitHub Repos"
+      - "GitHub Pages"
   2:
     theme: "Agile Development" 
     goals:
