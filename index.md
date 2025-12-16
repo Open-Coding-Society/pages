@@ -549,8 +549,24 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
     <option value="">Select Inquiry Type</option>
     <option value="Bug">Bug</option>
     <option value="Feature Request">Feature Request</option>
+    <option value="Hacks">Hacks</option>
     <option value="Inquiry">Inquiry</option>
     <option value="Other">Other</option>
+  </select>
+  <select id="feedback-hack-category">
+    <option value="">Select Hack Category (Optional)</option>
+    <option value="snake">Snake Game</option>
+    <option value="calculator">Calculator</option>
+    <option value="rock-paper-scissors">Rock Paper Scissors</option>
+    <option value="connect4">Connect 4</option>
+    <option value="cookie-clicker">Cookie Clicker</option>
+    <option value="breakout">Breakout</option>
+    <option value="background">Animated Background</option>
+    <option value="pong">Pong</option>
+    <option value="blackjack">Blackjack</option>
+    <option value="memory">Memory Game</option>
+    <option value="wordgame">Word Game</option>
+    <option value="other">Other Hack</option>
   </select>
   <input type="text" id="feedback-title" placeholder="Title" required />
   <textarea id="feedback-body" rows="4" placeholder="Your suggestion..." required></textarea>
@@ -585,15 +601,29 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
     const title = document.getElementById("feedback-title").value.trim();
     const body = document.getElementById("feedback-body").value.trim();
     const type = document.getElementById("feedback-type").value;
+    const hackCategory = document.getElementById("feedback-hack-category").value;
 
-    if (!title || !body) {
-      alert("Please fill in both fields.");
+    if (!title || !body || !type) {
+      alert("Please fill in all required fields.");
       return;
     }
 
     const githubUsername = window.user?.uid || "Anonymous"; // fallback if not logged in
     
-    console.log("Payload:", { title, body, type, uid: githubUsername });
+    // Build payload with optional hack category
+    const payload = { 
+      title, 
+      body, 
+      type, 
+      uid: githubUsername 
+    };
+    
+    // Only include hack_category if it's selected
+    if (hackCategory) {
+      payload.hack_category = hackCategory;
+    }
+    
+    console.log("Payload:", payload);
     
     try {
       const res = await fetch(`${pythonURI}/api/feedback/`, {
@@ -601,7 +631,7 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ title, body, type, uid: githubUsername })
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
@@ -609,6 +639,8 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
         errorMsg.style.display = "none";
         document.getElementById("feedback-title").value = "";
         document.getElementById("feedback-body").value = "";
+        document.getElementById("feedback-type").value = "";
+        document.getElementById("feedback-hack-category").value = "";
       } else {
         throw new Error();
       }
