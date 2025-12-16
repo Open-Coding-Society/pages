@@ -1,7 +1,7 @@
 ---
 layout: post
 tailwind: True
-title: GitHub Pages LxD Series
+title: GitHub Pages Series
 description: An interactive series for learning Frontend programming, GitHub Pages, and Jupyter Notebooks through hands-on mini-projects.
 type: hacks 
 courses: {'csse': {'week': 2}, 'csp': {'week': 2}, 'csa': {'week': 1}}
@@ -23,7 +23,10 @@ graph TD
 </div>
 
 ---
+
 ## Table - How to Use This Series
+
+Follow the menus, also observe all the menu styles.  They all do navigation in a different way.
 
 <table style="width:100%; text-align:center; border-collapse:collapse;">
   <tr>
