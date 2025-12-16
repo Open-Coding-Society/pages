@@ -365,7 +365,7 @@ show_reading_time: false
     // Function to handle Python login
     window.pythonLogin = function () {
         const options = {
-            URL: `${pythonURI}/authenticate`,
+            URL: `${pythonURI}/api/authenticate`,
             callback: pythonDatabase,
             message: "message",
             method: "POST",
