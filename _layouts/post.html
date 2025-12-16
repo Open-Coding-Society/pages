@@ -683,7 +683,7 @@ Check if this is a course lesson and determine which course context to use
         ...submissionData
       };
 
-      const res = await fetch(`${pythonURI}/api/assignment/`, { // Using /api/assignment directly, check if trailing slash is needed. User prompt said /api/assignment
+      const res = await fetch(`${javaURI}/api/grades`, { 
         ...fetchOptions,
         method: "POST",
         headers: {

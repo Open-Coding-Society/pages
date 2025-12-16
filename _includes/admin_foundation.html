@@ -438,7 +438,7 @@
 
     async function getGrades() {
       try {
-        const res = await fetch(`${pythonURI}/api/assignment/`, {
+        const res = await fetch(`${javaURI}/api/grades`, {
           ...fetchOptions,
           method: "GET",
           headers: {
@@ -722,7 +722,7 @@
             if (score !== null) {
               try {
                 // Note: Trailing slash used based on previous fix experience
-                const res = await fetch(`${pythonURI}/api/assignment/`, {
+                const res = await fetch(`${javaURI}/api/grades`, {
                   ...fetchOptions,
                   method: "PUT",
                   headers: {
