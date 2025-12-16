@@ -80,10 +80,11 @@ csse:
       - "Backend Infographics"
       - "Data APIs"
   3:
-    theme: "Java / Spring Web Development"
+    theme: "Onboarding Adventure"
     goals:
-      - "Transition to Full Stack"
-      - "REST API Strategy"
+      - "Sprint Planning"
+      - "Team Collaboration"
+      - "Portfolio Storytelling"
   4:
     theme: "JavaScript Student Teaching"
     goals:
