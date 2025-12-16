@@ -15,6 +15,9 @@ class Game {
         this.gname = null;
         this.username = null;
 
+        // Preserve original level set so we can return to start (plains/zombie) after final levels
+        this.initialLevelClasses = environment.gameLevelClasses;
+
         this.initUser();
         const gameLevelClasses = environment.gameLevelClasses;
         this.gameControl = new GameControl(this, gameLevelClasses);
@@ -70,6 +73,15 @@ class Game {
         });
         this.multiplayer.init();
         console.log('[Game] Multiplayer initialized');
+    }
+
+    // Return to the first level sequence when all levels are done or skip is used on the final level
+    returnHome() {
+        if (!this.gameControl || !this.initialLevelClasses || !this.initialLevelClasses.length) return;
+        this.gameControl.levelClasses = this.initialLevelClasses;
+        this.gameControl.currentLevelIndex = 0;
+        this.gameControl.isPaused = false;
+        this.gameControl.transitionToLevel();
     }
 }
 

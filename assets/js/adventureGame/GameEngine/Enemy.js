@@ -74,7 +74,12 @@ class Enemy extends Character {
     handleCollisionEvent() {
         console.log("Player collided with the Enemy. Player is dead.");
         this.playerDestroyed = true; // Mark the player as "dead"
-        this.gameEnv.gameControl.currentLevel.restart = true; 
+        // End the level cleanly instead of setting a restart flag that can freeze input
+        if (this.gameEnv && this.gameEnv.gameControl && typeof this.gameEnv.gameControl.endLevel === 'function') {
+            this.gameEnv.gameControl.endLevel();
+        } else if (this.gameEnv && this.gameEnv.gameControl) {
+            this.gameEnv.gameControl.currentLevel.continue = false;
+        }
     }
 
     /**

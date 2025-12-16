@@ -257,6 +257,10 @@ class GameControl {
         if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
 
         if (event.key === 'l' || event.key === 'L') {
+            // If on the last level and no return handler exists, ignore; otherwise allow skip to trigger level-end flow
+            if (this.currentLevelIndex >= this.levelClasses.length - 1 && !(this.game && typeof this.game.returnHome === 'function')) {
+                return;
+            }
             // Call the public API to end/skip the level
             try {
                 this.endLevel();

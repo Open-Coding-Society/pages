@@ -200,7 +200,6 @@ class GameControl {
                 this.stats[cv] = this[cv];
             }
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) { /* ignore */ }
 
         // Alert the user that the level has ended
@@ -219,7 +218,20 @@ class GameControl {
         if (this.gameOver) {
             this.gameOver();
         } else {
+            // Move to next level; if no level exists, fall back to original set
             this.currentLevelIndex++;
+
+            // Guard against empty level arrays when a single-level side area is skipped
+            if (this.currentLevelIndex >= this.levelClasses.length) {
+                if (this._originalLevelClasses && this._originalLevelClasses.length) {
+                    this.levelClasses = this._originalLevelClasses;
+                    this.currentLevelIndex = 0;
+                } else {
+                    console.warn('No further levels available; stopping transition');
+                    return;
+                }
+            }
+
             this.transitionToLevel();
         }
     }
@@ -344,7 +356,6 @@ class GameControl {
             this[statName] = (this[statName] || 0) + Number(amount || 0);
             if (this.stats) this.stats[statName] = this[statName];
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('incrementStat error', e);
         }
@@ -356,7 +367,6 @@ class GameControl {
             if (!this.stats) this.stats = { points: this.points };
             this.stats.points = this.points;
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('addPoints error', e);
         }
