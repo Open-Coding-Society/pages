@@ -23,10 +23,10 @@ class GameControl {
     // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
     // Games can override these values if they want to count a different stat name/label.
     this.pauseMenuOptions = {
-        counterVar: 'levelsCompleted',
-        counterLabel: 'Levels completed'
+        counterVar: 'coinsCollected',
+        counterLabel: 'Coins collected'
     };
-    // Whether to show per-level counts. We want a single cumulative counter for levels completed.
+    // Whether to show per-level counts. We want a single cumulative counter for coins collected.
     this.pauseMenuOptions.counterPerLevel = false;
     // use a unique storage key so stats are per-game
     this.pauseMenuOptions.storageKey = 'pauseMenuStats:adventure';
@@ -310,6 +310,21 @@ class GameControl {
             if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('addPoints error', e);
+        }
+    }
+
+    /**
+     * Increment coin collection counter for adventure game pause menu
+     */
+    collectCoin(amount = 1) {
+        try {
+            this.coinsCollected = (this.coinsCollected || 0) + Number(amount || 0);
+            if (!this.stats) this.stats = {};
+            this.stats.coinsCollected = this.coinsCollected;
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('collectCoin error', e);
         }
     }
 
