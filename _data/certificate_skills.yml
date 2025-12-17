@@ -10,17 +10,17 @@ csp:
       - "GitHub Pages Launch"
       - "Learning Experience Design"
   1:
-    theme: "Tools & Equipment"
+    theme: "Essential Tools Setup"
     goals:
       - "Hardware & Workspace Setup"
-      - "Command Line Navigation"
       - "Developer Mindset"
+      - "VSCode, Linux, GitHub"
   2:
     theme: "Agile Methodologies"
     goals:
       - "Scrum + Standups"
-      - "Planning Boards"
-      - "GitHub Pages LxD Series"
+      - "Kanban Boards"
+      - "Retrospectives"
   3:
     theme: "Onboarding Adventure"
     goals:
@@ -64,30 +64,32 @@ csa:
       - "JWT Auth Concepts"
 csse:
   0:
-    theme: "Onboarding Challenge"
+    theme: "Onboarding Foundations"
     goals:
-      - "Team Workflows"
-      - "Portfolio Setup"
-  1:
-    theme: "Framework for Sprints"
-    goals:
-      - "Tools & Equipment"
-      - "Agile Methodology Intro"
-      - "Onboarding Adventure"
-  2:
-    theme: "Python & Flask Backend"
-    goals:
-      - "Backend Infographics"
-      - "Data APIs"
-  3:
-    theme: "Onboarding Adventure"
-    goals:
-      - "Sprint Planning"
+      - "Tool Mastery"
+      - "Project-Based Learning"
       - "Team Collaboration"
-      - "Portfolio Storytelling"
+  1:
+    theme: "Essential Tools Setup"
+    goals:
+      - "Hardware & Workspace Setup"
+      - "Developer Mindset"
+      - "VSCode, Linux, GitHub"
+  2:
+    theme: "Agile Development" 
+    goals:
+      - "Scrum + Standups"
+      - "Kanban Boards"
+      - "Retrospectives"
+  3:
+    theme: "Summative Coding Challenge"
+    goals:
+      - "JavaScript OOP"
+      - "Gamified Coding Tasks"
+      - "Upperclassmen Mentorship"
   4:
     theme: "JavaScript Student Teaching"
     goals:
-      - "Framework for Sprints"
-      - "Classroom Facilitation"
-      - "Lesson Planning"
+      - "Lesson Design"
+      - "Classroom Teaching"
+      - "Feedback and Grading"
