@@ -846,6 +846,8 @@ body:has(.lesson-player) {
   .lesson-main {
     flex: none;
     width: 100%;
+    height: auto; /* ADD THIS */
+    min-height: 100vh; /* ADD THIS */
   }
 
   .floating-menu-btn {
@@ -868,6 +870,12 @@ body:has(.lesson-player) {
 
   .lesson-content {
     padding: 16px;
+    overflow-y: visible; /* ADD THIS - was auto, causing issues */
+    height: auto; /* ADD THIS */
+  }
+
+  .lesson-content-inner {
+    max-width: 100%; /* ADD THIS */
   }
 
   .lesson-header h1 {
@@ -879,9 +887,14 @@ body:has(.lesson-player) {
     align-items: flex-start;
     gap: 8px;
   }
+  
+  .lesson-body {
+    width: 100%; /* ADD THIS */
+  }
 
   .lesson-bottom {
     padding: 8px 16px;
+    position: relative; /* ADD THIS */
   }
 
   .lesson-bottom-inner {
