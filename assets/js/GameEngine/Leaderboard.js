@@ -5,9 +5,22 @@ export default class Leaderboard {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
         this.isOpen = true;
+        this.mounted = false;
+        
+        // Validate javaURI exists
+        if (!javaURI) {
+            console.error('[Leaderboard] javaURI is not defined - cannot initialize leaderboard');
+            return;
+        }
+        
         console.log('[Leaderboard] Initializing with javaURI:', javaURI);
-        this.injectStyles();
-        this.init();
+        
+        try {
+            this.injectStyles();
+            this.init();
+        } catch (error) {
+            console.error('[Leaderboard] Initialization error:', error);
+        }
     }
 
     injectStyles() {
@@ -101,7 +114,12 @@ export default class Leaderboard {
             border-bottom: 1px solid #f1f3f5;
         }
 
-        .leaderboard-table tr:hover {
+        .leaderboard-table tbody tr {
+            background: white;
+            transition: background-color 0.2s ease;
+        }
+
+        .leaderboard-table tbody tr:hover {
             background: #f8f9fa;
         }
 
@@ -179,6 +197,12 @@ export default class Leaderboard {
     mount() {
         console.log('[Leaderboard] Mount called');
         
+        // Don't mount if already mounted
+        if (this.mounted) {
+            console.log('[Leaderboard] Already mounted, skipping');
+            return;
+        }
+        
         const existing = document.getElementById('leaderboard-container');
         if (existing) {
             console.log('[Leaderboard] Removing existing container');
@@ -203,6 +227,7 @@ export default class Leaderboard {
         `;
 
         document.body.appendChild(container);
+        this.mounted = true;
         console.log('[Leaderboard] Container appended to body');
         console.log('[Leaderboard] Container in DOM?', document.getElementById('leaderboard-container') !== null);
 
@@ -237,23 +262,53 @@ export default class Leaderboard {
         list.innerHTML = '<p class="loading">Loading…</p>';
 
         try {
-            const url = `${javaURI}/api/leaderboard`;
+            // Determine backend URL with same priority as PauseMenu
+            let backendBase = null;
+            
+            // Priority 1: Check for window.javaBackendUrl
+            if (typeof window !== 'undefined' && window.javaBackendUrl) {
+                backendBase = String(window.javaBackendUrl);
+            }
+            // Priority 2: localhost development shortcut
+            else if (typeof window !== 'undefined' && window.location && 
+                     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                backendBase = 'http://localhost:8585';
+            }
+            // Priority 3: Use imported javaURI from config
+            else if (javaURI) {
+                backendBase = String(javaURI);
+            }
+            // Priority 4: Same-origin fallback
+            else if (typeof window !== 'undefined' && window.location && window.location.origin) {
+                backendBase = String(window.location.origin);
+            }
+            
+            if (!backendBase) {
+                throw new Error('No backend URL configured');
+            }
+            
+            const url = `${backendBase.replace(/\/$/, '')}/api/leaderboard`;
             console.log('[Leaderboard] Fetching from:', url);
             
-            // No authentication required - public leaderboard endpoint
+            // Fetch without credentials for public access
             const options = {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                mode: 'cors',
+                credentials: 'omit'
             };
-            console.log('[Leaderboard] fetchOptions:', options);
+            
+            console.log('[Leaderboard] Fetch options:', options);
             
             const res = await fetch(url, options);
             console.log('[Leaderboard] Response status:', res.status);
             
             if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
+                const errorText = await res.text().catch(() => '');
+                throw new Error(`HTTP ${res.status}${errorText ? ': ' + errorText : ''}`);
             }
             
             const data = await res.json();
@@ -261,7 +316,23 @@ export default class Leaderboard {
             this.displayLeaderboard(data);
         } catch (err) {
             console.error('[Leaderboard] Fetch error:', err);
-            list.innerHTML = `<p class="error">Failed to load leaderboard<br/><small>${err.message}</small></p>`;
+            
+            // More user-friendly error messages
+            let errorMsg = 'Failed to load leaderboard';
+            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || 
+                err.message.includes('ERR_CONNECTION_REFUSED')) {
+                errorMsg = 'Cannot connect to server - is it running on port 8585?';
+            } else if (err.message.includes('CORS')) {
+                errorMsg = 'Connection error - check server CORS settings';
+            } else if (err.message.includes('404')) {
+                errorMsg = 'Leaderboard endpoint not found';
+            } else if (err.message.includes('500')) {
+                errorMsg = 'Server error - please try again later';
+            } else if (err.message.includes('No backend URL')) {
+                errorMsg = 'Backend URL not configured';
+            }
+            
+            list.innerHTML = `<p class="error">${errorMsg}<br/><small>${err.message}</small></p>`;
         }
     }
 
@@ -289,12 +360,18 @@ export default class Leaderboard {
 
         data.forEach((entry, index) => {
             const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+            
+            // Handle both camelCase and snake_case field names from backend
+            const user = entry.user || entry.username || 'Unknown';
+            const gameName = entry.gameName || entry.game_name || entry.game || 'Unknown';
+            const score = entry.score || 0;
+            
             html += `
             <tr>
                 <td class="rank">${medal || (index + 1)}</td>
-                <td class="username">${this.escape(entry.user)}</td>
-                <td class="game-name">${this.escape(entry.gameName)}</td>
-                <td class="score">${Number(entry.score).toLocaleString()}</td>
+                <td class="username">${this.escape(user)}</td>
+                <td class="game-name">${this.escape(gameName)}</td>
+                <td class="score">${Number(score).toLocaleString()}</td>
             </tr>
             `;
         });
