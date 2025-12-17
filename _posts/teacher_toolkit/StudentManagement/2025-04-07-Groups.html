@@ -175,14 +175,6 @@ comments: false
             </select>
           </div>
 
-          <!-- New: Period Admin toggle -->
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="newGroupPeriodAdmin" class="accent-indigo-500 w-4 h-4" />
-            <label for="newGroupPeriodAdmin" class="text-sm text-gray-200">
-              Mark as <span class="font-semibold">Period Admin</span> for this period
-            </label>
-          </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-200 mb-2">Members (one per line, enter UIDs)</label>
             <textarea id="newGroupMembers" rows="4" placeholder="Enter member names, one per line"
@@ -311,6 +303,39 @@ async function addPersonToGroup(groupId, personId) {
   }
 }
 
+window.addMemberToGroup = async function (groupId, uid) {
+  const personId = await getPersonIdFromUID(uid);
+
+  const res = await fetch(
+    `${javaURI}/api/groups/${groupId}/members/${personId}`,
+    {
+      ...fetchOptions,
+      method: "POST"
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to add member");
+  }
+
+  await loadGroups(); // refresh UI
+}
+
+window.removeMemberFromGroup = async function (groupId, personId) {
+  const res = await fetch(
+    `${javaURI}/api/groups/${groupId}/members/${personId}`,
+    {
+      ...fetchOptions,
+      method: "DELETE"
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to remove member");
+  }
+
+  await loadGroups(); // refresh UI
+}
 
 
 /* ================================
@@ -420,24 +445,71 @@ window.renderGroups = function () {
     el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
 
     el.innerHTML = `
-      <div class="flex justify-between items-center">
+      <!-- Header -->
+      <div class="flex justify-between items-start">
         <div>
           <h4 class="text-lg font-semibold text-white">${group.name}</h4>
           <p class="text-sm text-gray-400">
             Period ${group.period} · ${group.course}
           </p>
         </div>
+
+        <!-- Trash (future delete group) -->
+        <button
+          class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
+          title="Delete group (coming soon)">
+          🗑️
+        </button>
       </div>
 
+      <!-- Members row -->
       <div class="mt-3 flex flex-wrap gap-2">
         ${(group.members || []).map(m => `
-          <span class="px-2 py-1 bg-neutral-600 text-sm text-gray-200 rounded">
-            ${m.name ?? m.id}
+          <span class="px-3 py-1 bg-neutral-600 text-sm text-gray-200 rounded-full">
+            ${m.name}
           </span>
         `).join("")}
       </div>
-    `;
 
+      <!-- Add / Remove by UID -->
+      <div class="mt-4 flex items-center gap-2">
+        <input
+          type="text"
+          placeholder="Enter UID"
+          class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          id="member-uid-${group.id}"
+        />
+
+        <!-- Add -->
+        <button
+          class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold"
+          title="Add member"
+          onclick="
+            (() => {
+              const uid = document.getElementById('member-uid-${group.id}').value;
+              if (uid) addMemberToGroup(${group.id}, uid.trim());
+            })()
+          ">
+          +
+        </button>
+
+        <!-- Remove -->
+        <button
+          class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-500 text-white text-lg font-bold"
+          title="Remove member"
+          onclick="
+            (() => {
+              const uid = document.getElementById('member-uid-${group.id}').value;
+              if (!uid) return;
+              getPersonIdFromUID(uid.trim())
+                .then(pid => removeMemberFromGroup(${group.id}, pid))
+                .catch(err => alert(err.message));
+            })()
+          ">
+          −
+        </button>
+      </div>
+    `;
     container.appendChild(el);
   });
 }
