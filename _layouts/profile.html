@@ -116,7 +116,6 @@ active_tab: profile
         </div>
     </div>
 
-
 <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
     <h2 class="text-xl font-semibold mb-6">Group Information</h2>
 
@@ -152,7 +151,6 @@ active_tab: profile
     import { pythonURI, javaURI } from '{{site.baseurl}}/assets/js/api/config.js';
 
     document.addEventListener("DOMContentLoaded", async () => {
-        const groupContainer = document.getElementById('groupContainer');
         const uidInput = document.getElementById('uidChangeInput');
         const springGroupInfo = document.getElementById('springGroupInfo');
         const groupSearchInput = document.getElementById('groupSearchInput');
@@ -170,7 +168,6 @@ active_tab: profile
         const currentUid = uidInput.value;
 
         if (!currentUid) {
-            groupContainer.innerHTML = `<p class="text-gray-400 col-span-2">Unable to verify user identity for class data.</p>`;
             springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
             return;
         }
@@ -188,28 +185,9 @@ active_tab: profile
             const users = await response.json();
             const currentUser = Array.isArray(users) ? users.find(user => user.uid === currentUid) : users;
 
-            if (currentUser && currentUser.sections && currentUser.sections.length > 0) {
-                // Map sections to the grid layout matching the form style
-                groupContainer.innerHTML = currentUser.sections.map(section => `
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Class Name</label>
-                        <input type="text" readonly
-                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
-                            value="${section.name}">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Details</label>
-                        <input type="text" readonly
-                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
-                            value="${section.abbreviation} (${section.year})">
-                    </div>
-                `).join('');
-            } else {
-                groupContainer.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No active groups or sections found.</p>`;
-            }
+
         } catch (error) {
             console.error("Error loading group info:", error);
-            groupContainer.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
         }
 
         try {
