@@ -290,25 +290,21 @@ export default class Leaderboard {
             const url = `${backendBase.replace(/\/$/, '')}/api/leaderboard`;
             console.log('[Leaderboard] Fetching from:', url);
             
-            // Fetch without credentials for public access
-            const options = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                mode: 'cors',
-                credentials: 'omit'
+            // Use fetchOptions from config with GET method
+            const requestOptions = {
+                ...fetchOptions, // Copy all properties from fetchOptions
+                method: 'GET'    // Override to use GET method
             };
             
-            console.log('[Leaderboard] Fetch options:', options);
+            console.log('[Leaderboard] Fetch options:', requestOptions);
             
-            const res = await fetch(url, options);
+            const res = await fetch(url, requestOptions);
             console.log('[Leaderboard] Response status:', res.status);
             
             if (!res.ok) {
-                const errorText = await res.text().catch(() => '');
-                throw new Error(`HTTP ${res.status}${errorText ? ': ' + errorText : ''}`);
+                const errorMsg = 'Error: ' + res.status;
+                console.log(errorMsg);
+                throw new Error(`HTTP ${res.status}`);
             }
             
             const data = await res.json();
@@ -323,7 +319,7 @@ export default class Leaderboard {
                 err.message.includes('ERR_CONNECTION_REFUSED')) {
                 errorMsg = 'Cannot connect to server - is it running on port 8585?';
             } else if (err.message.includes('CORS')) {
-                errorMsg = 'Connection error - check server CORS settings';
+                errorMsg = 'Possible CORS or Service Down error';
             } else if (err.message.includes('404')) {
                 errorMsg = 'Leaderboard endpoint not found';
             } else if (err.message.includes('500')) {

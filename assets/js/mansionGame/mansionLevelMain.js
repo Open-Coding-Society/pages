@@ -10,6 +10,19 @@ import GameLevel4 from './mansionLevel4.js';
 import GameLevel5 from './mansionLevel5.js';
 import GameLevel6 from './mansionLevel6.js';
 
+import('./Leaderboard.js')
+    .then(mod => {
+        try { 
+            new mod.default(this.gameControl, { 
+                gameName: 'MansionGame'  // Change to your game name
+            }); 
+        }
+        catch (e) { console.warn('Leaderboard init failed:', e); }
+    })
+    .catch(() => {
+        // no-op: Leaderboard is optional
+    });
+
 class MansionLevelMain {
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
