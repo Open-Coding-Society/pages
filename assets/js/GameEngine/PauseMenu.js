@@ -1,5 +1,5 @@
 // PauseMenu.js - reusable pause menu component for mansion games
-import { javaURI } from '../api/config.js';
+import { javaURI, fetchOptions } from '../api/config.js';
 export default class PauseMenu {
     constructor(gameControl, options = {}) {
         this.gameControl = gameControl;
@@ -135,6 +135,23 @@ export default class PauseMenu {
         return null;
     }
 
+    // Get fetch options with proper headers and CORS settings
+    _getFetchOptions(method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            mode: 'cors',
+            credentials: 'omit'
+        };
+        if (body) {
+            options.body = JSON.stringify(body);
+        }
+        return options;
+    }
+
     // Resolve the current user id used by the backend (forced to guest for now)
     _currentUserId() {
         return 'guest';
@@ -187,19 +204,13 @@ export default class PauseMenu {
         const dto = this._buildServerDto();
 
         try {
-            const headers = { 'Content-Type': 'application/json' };
-
             // If we have an existing server id, update via PUT (if supported)
             const serverId = this.stats && (this.stats.serverId || this.stats._serverId || null);
             if (serverId) {
                 const url = `${apiBase}/${serverId}`;
                 console.debug('PauseMenu: PUT', url, dto);
-                const resp = await fetch(url, {
-                    method: 'PUT',
-                    headers,
-                    credentials: 'include',
-                    body: JSON.stringify(dto)
-                });
+                const options = this._getFetchOptions('PUT', dto);
+                const resp = await fetch(url, options);
                 const text = await resp.text();
                 let body;
                 try { body = text ? JSON.parse(text) : null; } catch(e) { body = text; }
@@ -218,12 +229,8 @@ export default class PauseMenu {
             // Create a new server record
             const url = `${apiBase}`;
             console.debug('PauseMenu: POST', url, dto);
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers,
-                credentials: 'include',
-                body: JSON.stringify(dto)
-            });
+            const options = this._getFetchOptions('POST', dto);
+            const resp = await fetch(url, options);
             const text = await resp.text();
             let body;
             try { body = text ? JSON.parse(text) : null; } catch(e) { body = text; }
@@ -256,7 +263,8 @@ export default class PauseMenu {
         if (serverId) {
             try {
                 const url = `${apiBase}/${serverId}`;
-                const resp = await fetch(url, { method: 'GET', credentials: 'include' });
+                const options = this._getFetchOptions('GET');
+                const resp = await fetch(url, options);
                 if (resp.status === 404) return null; // no stats yet
                 if (!resp.ok) throw new Error('Server GET failed: ' + resp.status);
                 const body = await resp.json();
@@ -301,7 +309,8 @@ export default class PauseMenu {
 
         try {
             const url = `${apiBase}/leaderboard`;
-            const resp = await fetch(url, { method: 'GET', credentials: 'include' });
+            const options = this._getFetchOptions('GET');
+            const resp = await fetch(url, options);
             if (resp.status === 404) return null; // nothing stored for this player/game
             if (!resp.ok) throw new Error('Server GET failed: ' + resp.status);
             const body = await resp.json();
