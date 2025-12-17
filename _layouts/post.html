@@ -80,8 +80,7 @@ Check if this is a course lesson and determine which course context to use
           {% for week in (sprint.start..sprint.end) %}
           {% for post in posts %}
           {% if post.courses[current_course] %}
-          {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
-          {% unless post.path contains "_IPYNB_2_.md" %}
+          {% comment %}Include all files with courses frontmatter (including converted notebook markdown files){% endcomment %}
           {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
           {% assign course_count = 0 %}
           {% for course in post.courses %}
@@ -97,7 +96,6 @@ Check if this is a course lesson and determine which course context to use
           </a>
           {% endif %}
           {% endif %}
-          {% endunless %}
           {% endif %}
           {% endfor %}
           {% endfor %}
