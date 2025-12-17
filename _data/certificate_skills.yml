@@ -93,3 +93,9 @@ csse:
       - "Lesson Design"
       - "Classroom Teaching"
       - "Feedback and Grading"
+  5:
+    theme: "Draft Learning Experience" 
+    goals:
+      - "Pick Techincal Topic"
+      - "Learner Empathy"
+      - "Design a Lesson Plan"
