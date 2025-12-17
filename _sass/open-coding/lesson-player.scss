@@ -29,24 +29,24 @@ body:has(.lesson-player) {
 /* LEFT SIDEBAR */
 .lesson-sidebar {
   width: 500px;
-  border-right: 1px solid $gray4;
+  border-right: 1px solid $bg-3;
   overflow-y: auto;
   flex-shrink: 0;
 }
 
 .sidebar-header {
   padding: 32px 24px;
-  border-bottom: 1px solid $gray4;
+  border-bottom: 1px solid $bg-3;
 }
 
 .sidebar-header h2 {
-  color: $white1;
+  color: $text;
   font-size: 1.25rem;
   margin: 0 0 8px 0;
 }
 
 .sidebar-header p {
-  color: $gray1;
+  color: $text-muted;
   margin: 0 0 16px 0;
   font-size: 14px;
 }
@@ -58,7 +58,7 @@ body:has(.lesson-player) {
 .progress-label {
   display: flex;
   justify-content: space-between;
-  color: $white2;
+  color: $text-muted;
   font-size: 14px;
   margin-bottom: 8px;
 }
@@ -72,7 +72,7 @@ body:has(.lesson-player) {
 
 .progress-bar-sidebar-fill {
   height: 100%;
-  background: $blue1;
+  background: $accent;
   transition: width 0.3s ease;
 }
 
@@ -100,13 +100,13 @@ body:has(.lesson-player) {
 }
 
 .sprint-toggle:hover {
-  background: rgba($blue1, 0.08);
+  background: rgba($accent, 0.08);
 }
 
 .sprint-chevron {
   width: 16px;
   height: 16px;
-  color: $gray1;
+  color: $text-muted;
   flex-shrink: 0;
 }
 
@@ -115,13 +115,13 @@ body:has(.lesson-player) {
 }
 
 .sprint-title {
-  color: $white3;
+  color: $text;
   font-size: 14px;
   margin-bottom: 2px;
 }
 
 .sprint-weeks {
-  color: $blue1;
+  color: $accent;
   font-size: 12px;
 }
 
@@ -146,15 +146,15 @@ body:has(.lesson-player) {
 }
 
 .lesson-item:hover {
-  background: rgba($blue1, 0.06);
+  background: rgba($accent, 0.06);
 }
 
 .lesson-item.active {
-  background: rgba($blue1, 0.1);
+  background: rgba($accent, 0.1);
 }
 
 .lesson-item.active .lesson-title {
-  color: $white1;
+  color: $text;
 }
 
 .lesson-status-icon {
@@ -164,15 +164,15 @@ body:has(.lesson-player) {
 }
 
 .lesson-status-icon.completed {
-  color: $blue1;
+  color: $accent;
 }
 
 .lesson-status-icon.incomplete {
-  color: $gray3;
+  color: $bg-3;
 }
 
 .lesson-title {
-  color: $white2;
+  color: $text-muted;
   font-size: 14px;
   flex: 1;
 }
@@ -187,15 +187,14 @@ body:has(.lesson-player) {
 
 /* Top Bar */
 .lesson-topbar {
-  border-bottom: 1px solid $gray4;
-  padding: 16px 24px;
+  border-bottom: 1px solid $bg-3;
+  padding: 8px 24px;  /* Changed from 16px 24px */
 }
-
 .topbar-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 6px;  /* Changed from 12px */
 }
 
 .back-btn {
@@ -205,7 +204,7 @@ body:has(.lesson-player) {
   padding: 8px 12px;
   background: transparent;
   border: none;
-  color: $blue1;
+  color: $accent;
   cursor: pointer;
   border-radius: 6px;
   transition: all 0.2s;
@@ -213,19 +212,19 @@ body:has(.lesson-player) {
 }
 
 .back-btn:hover {
-  background: rgba($blue1, 0.08);
+  background: rgba($accent, 0.08);
 }
 
 .breadcrumbs {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: $gray1;
+  color: $text-muted;
   font-size: 14px;
 }
 
 .breadcrumbs .current {
-  color: $white3;
+  color: $text;
 }
 
 .topbar-progress {
@@ -237,7 +236,7 @@ body:has(.lesson-player) {
 
 .topbar-progress-fill {
   height: 100%;
-  background: $blue1;
+  background: $accent;
   width: 15%;
   transition: width 0.3s ease;
 }
@@ -255,7 +254,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-header h1 {
-  color: $white1;
+  color: $text;
   font-size: 2rem;
   margin: 0 0 12px 0;
 }
@@ -264,30 +263,30 @@ body:has(.lesson-player) {
   display: flex;
   align-items: center;
   gap: 16px;
-  color: $white1;
+  color: $text;
   font-size: 14px;
   margin-bottom: 32px;
 }
 
 .lesson-body {
-  color: $white2;
+  color: $text-muted;
   line-height: 1.7;
 }
 
 .lesson-body h2 {
-  color: $white1;
+  color: $text;
   font-size: 1.5rem;
   margin: 32px 0 16px 0;
 }
 
 .lesson-body h3 {
-  color: $white1;
+  color: $text;
   font-size: 1.25rem;
   margin: 24px 0 12px 0;
 }
 
 .lesson-body h4 {
-  color: $white3;
+  color: $text;
   font-size: 1.1rem;
   margin: 20px 0 10px 0;
 }
@@ -306,7 +305,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-body a {
-  color: $blue1;
+  color: $accent;
   text-decoration: none;
 }
 
@@ -319,11 +318,11 @@ body:has(.lesson-player) {
   border-radius: 4px;
   font-family: monospace;
   font-size: 0.9em;
-  color: $white3;
+  color: $text;
 }
 
 .lesson-body pre {
-  border: 1px solid $gray3;
+  border: 1px solid $bg-3;
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
@@ -336,10 +335,10 @@ body:has(.lesson-player) {
 }
 
 .lesson-body blockquote {
-  border-left: 4px solid $blue1;
+  border-left: 4px solid $accent;
   padding-left: 16px;
   margin-left: 0;
-  color: $gray1;
+  color: $text-muted;
 }
 
 .lesson-body img {
@@ -356,25 +355,25 @@ body:has(.lesson-player) {
 
 .lesson-body table th,
 .lesson-body table td {
-  border: 1px solid $gray3;
+  border: 1px solid $bg-3;
   padding: 8px 12px;
   text-align: left;
 }
 
 .lesson-body table th {
-  color: $white1;
+  color: $text;
 }
 
 /* Assignment Submission Widget */
 .assignment-submission {
   margin-top: 48px;
   padding: 24px;
-  border: 1px solid $gray3;
+  border: 1px solid $bg-3;
   border-radius: 12px;
 }
 
 .assignment-submission h3 {
-  color: $white1;
+  color: $text;
   font-size: 1.25rem;
   margin: 0 0 16px 0;
   display: flex;
@@ -383,7 +382,7 @@ body:has(.lesson-player) {
 }
 
 .assignment-submission-icon {
-  color: $blue1;
+  color: $accent;
 }
 
 .submission-options {
@@ -395,22 +394,22 @@ body:has(.lesson-player) {
 .submission-tab {
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid $gray3;
+  border: 1px solid $bg-3;
   border-radius: 6px;
-  color: $white2;
+  color: $text-muted;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .submission-tab:hover {
-  background: $gray6;
-  color: $white1;
+  background: $bg-1;
+  color: $text;
 }
 
 .submission-tab.active {
-  background: $blue1;
-  color: $background;
-  border-color: $blue1;
+  background: $accent;
+  color: $bg-0;
+  border-color: $accent;
 }
 
 .submission-form {
@@ -427,7 +426,7 @@ body:has(.lesson-player) {
 
 .form-group label {
   display: block;
-  color: $white3;
+  color: $text;
   font-size: 14px;
   margin-bottom: 8px;
 }
@@ -437,9 +436,9 @@ body:has(.lesson-player) {
 .form-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid $gray3;
+  border: 1px solid $bg-3;
   border-radius: 6px;
-  color: $white1;
+  color: $text;
   font-size: 14px;
   font-family: inherit;
 }
@@ -447,7 +446,7 @@ body:has(.lesson-player) {
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: $blue1;
+  border-color: $accent;
 }
 
 .form-group textarea {
@@ -456,7 +455,7 @@ body:has(.lesson-player) {
 }
 
 .file-upload-area {
-  border: 2px dashed $gray3;
+  border: 2px dashed $bg-3;
   border-radius: 8px;
   padding: 32px;
   text-align: center;
@@ -465,28 +464,28 @@ body:has(.lesson-player) {
 }
 
 .file-upload-area:hover {
-  border-color: $blue1;
-  background: $gray6;
+  border-color: $accent;
+  background: $bg-1;
 }
 
 .file-upload-area.dragover {
-  border-color: $blue1;
-  background: $gray6;
+  border-color: $accent;
+  background: $bg-1;
 }
 
 .file-upload-icon {
   font-size: 48px;
-  color: $blue1;
+  color: $accent;
   margin-bottom: 12px;
 }
 
 .file-upload-text {
-  color: $white2;
+  color: $text-muted;
   margin-bottom: 8px;
 }
 
 .file-upload-hint {
-  color: $gray2;
+  color: $text-muted;
   font-size: 12px;
 }
 
@@ -499,7 +498,7 @@ body:has(.lesson-player) {
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: $gray6;
+  background: $bg-1;
   border-radius: 6px;
   margin-bottom: 8px;
 }
@@ -511,19 +510,19 @@ body:has(.lesson-player) {
 }
 
 .file-name {
-  color: $white3;
+  color: $text;
   font-size: 14px;
 }
 
 .file-size {
-  color: $gray1;
+  color: $text-muted;
   font-size: 12px;
 }
 
 .remove-file {
   background: transparent;
   border: none;
-  color: $gray1;
+  color: $text-muted;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
@@ -537,8 +536,8 @@ body:has(.lesson-player) {
 
 .submit-btn {
   padding: 12px 24px;
-  background: $blue1;
-  color: $background;
+  background: $accent;
+  color: $bg-0;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -551,12 +550,12 @@ body:has(.lesson-player) {
 }
 
 .submit-btn:hover {
-  background: $lightBlue1;
+  background: $accent-700;
 }
 
 .submit-btn:disabled {
-  background: $gray3;
-  color: $gray2;
+  background: $bg-3;
+  color: $text-muted;
   cursor: not-allowed;
 }
 
@@ -569,9 +568,9 @@ body:has(.lesson-player) {
 
 .submission-status.success {
   display: block;
-  background: rgba($blue1, 0.1);
-  border: 1px solid $blue1;
-  color: $blue1;
+  background: rgba($accent, 0.1);
+  border: 1px solid $accent;
+  color: $accent;
 }
 
 .submission-status.error {
@@ -583,7 +582,7 @@ body:has(.lesson-player) {
 
 /* Bottom Navigation */
 .lesson-bottom {
-  border-top: 1px solid $gray4;
+  border-top: 1px solid $bg-3;
   padding: 24px 64px;
 }
 
@@ -601,7 +600,7 @@ body:has(.lesson-player) {
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 8px 16px;  /* Changed from 10px 20px */
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -615,22 +614,22 @@ body:has(.lesson-player) {
 
 .btn-outline {
   background: transparent;
-  border: 1px solid $gray3;
-  color: $white3;
+  border: 1px solid $bg-3;
+  color: $text;
 }
 
 .btn-outline:hover {
-  background: rgba($blue1, 0.08);
-  color: var(--pref-text-color, $white1);
+  background: rgba($accent, 0.08);
+  color: var(--pref-text-color, $text);
 }
 
 .btn-primary {
-  background: $blue1;
-  color: $background;
+  background: $accent;
+  color: $bg-0;
 }
 
 .btn-primary:hover {
-  background: $lightBlue1;
+  background: $accent-700;
 }
 
 @media (max-width: 768px) {
@@ -656,10 +655,10 @@ body:has(.lesson-player) {
     right: 20px;
     width: 56px;
     height: 56px;
-    background: $blue1;
+    background: $accent;
     border: none;
     border-radius: 50%;
-    color: $white1;
+    color: $text;
     font-size: 20px;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -671,7 +670,7 @@ body:has(.lesson-player) {
   }
 
   .floating-menu-btn:hover {
-    background: $blueShadow1;
+    background: $accent-700;
     transform: scale(1.1);
   }
 
@@ -688,7 +687,7 @@ body:has(.lesson-player) {
     max-width: 800px;
     height: 80vh;
     background-color: var(--pref-bg-color);
-    border: 1px solid $gray4;
+    border: 1px solid $bg-3;
     border-radius: 16px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     z-index: 2000;
@@ -721,11 +720,11 @@ body:has(.lesson-player) {
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
-    border-bottom: 1px solid $gray4;
+    border-bottom: 1px solid $bg-3;
   }
 
   .timeline-modal-header h3 {
-    color: $white1;
+    color: $text;
     margin: 0;
     font-size: 1.5rem;
   }
@@ -733,7 +732,7 @@ body:has(.lesson-player) {
   .timeline-close-btn {
     background: transparent;
     border: none;
-    color: $gray1;
+    color: $text-muted;
     font-size: 24px;
     cursor: pointer;
     width: 40px;
@@ -746,8 +745,8 @@ body:has(.lesson-player) {
   }
 
   .timeline-close-btn:hover {
-    background: rgba($blue1, 0.08);
-    color: var(--pref-text-color, $white1);
+    background: rgba($accent, 0.08);
+    color: var(--pref-text-color, $text);
   }
 
   .timeline-modal-content {
@@ -758,7 +757,7 @@ body:has(.lesson-player) {
 
   /* Sprint cards in modal - matching timeline view */
   .modal-sprint-card {
-    border: 1px solid $gray4;
+    border: 1px solid $bg-3;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 16px;
@@ -775,15 +774,15 @@ body:has(.lesson-player) {
   }
 
   .modal-sprint-title {
-    color: $white1;
+    color: $text;
     font-size: 1.2rem;
     margin: 0;
   }
 
   .modal-sprint-toggle {
     background: transparent;
-    border: 1px solid $gray3;
-    color: $blue1;
+    border: 1px solid $bg-3;
+    color: $accent;
     padding: 4px 8px;
     border-radius: 4px;
     cursor: pointer;
@@ -792,7 +791,7 @@ body:has(.lesson-player) {
   }
 
   .modal-sprint-toggle:hover {
-    background: rgba($blue1, 0.08);
+    background: rgba($accent, 0.08);
   }
 
   .modal-lessons {
@@ -808,22 +807,22 @@ body:has(.lesson-player) {
     align-items: center;
     gap: 12px;
     padding: 12px;
-    border: 1px solid $gray4;
+    border: 1px solid $bg-3;
     border-radius: 8px;
     text-decoration: none;
-    color: $white3;
+    color: $text;
     transition: all 0.2s;
     margin-bottom: 8px;
   }
 
   .modal-lesson-item:hover {
-    background: rgba($blue1, 0.08);
-    border-color: $blue1;
+    background: rgba($accent, 0.08);
+    border-color: $accent;
   }
 
   .modal-lesson-item.active {
-    border-color: $blue1;
-    color: $blue1;
+    border-color: $accent;
+    color: $accent;
   }
 
   .modal-lesson-status {
@@ -833,11 +832,11 @@ body:has(.lesson-player) {
   }
 
   .modal-lesson-status.completed {
-    color: $blue1;
+    color: $accent;
   }
 
   .modal-lesson-status.incomplete {
-    color: $gray3;
+    color: $bg-3;
   }
 
   .modal-lesson-title {
@@ -845,10 +844,17 @@ body:has(.lesson-player) {
     font-size: 14px;
   }
 
+  /* Top Bar */
   .lesson-topbar {
-    padding: 12px 16px;
+    border-bottom: 1px solid $bg-3;
+    padding: 12px 24px;  // Reduced from 16px
   }
 
+  /* Bottom Navigation */
+  .lesson-bottom {
+    border-top: 1px solid $bg-3;
+    padding: 8px 64px;  /* Changed from 24px 64px - now even smaller */
+  }
   .topbar-actions {
     flex-direction: column;
     align-items: flex-start;
@@ -871,10 +877,6 @@ body:has(.lesson-player) {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-  }
-
-  .lesson-bottom {
-    padding: 16px;
   }
 
   .lesson-bottom-inner {
