@@ -156,7 +156,13 @@ export default class PauseMenu {
     // Build the DTO expected by the backend controller (save/update score)
     _buildServerDto() {
         const uid = this._currentUserId();
-        const levels = this.stats && this.stats[this.counterVar || 'levelsCompleted'] ? Number(this.stats[this.counterVar || 'levelsCompleted']) : 0;
+        // Resolve the counter variable name with fallbacks: stats, options, gameControl, default
+        const varName = (this.stats && this.stats.variableName)
+            || this.counterVar
+            || (this.gameControl && this.gameControl.pauseMenuOptions && this.gameControl.pauseMenuOptions.counterVar)
+            || 'levelsCompleted';
+
+        const levels = this.stats && this.stats[varName] ? Number(this.stats[varName]) : 0;
         const sessionTime = this.stats && (this.stats.sessionTime || this.stats.elapsedMs || this.stats.timePlayed || 0);
         const gameName = this._extractGameName();
         const dto = {
@@ -167,7 +173,7 @@ export default class PauseMenu {
             totalPowerUps: (this.stats && Number(this.stats.totalPowerUps)) || 0,
             status: (this.stats && this.stats.status) || 'PAUSED',
             gameName: gameName,
-            variableName: this.counterVar || 'levelsCompleted'
+            variableName: varName
         };
         return dto;
     }
@@ -259,7 +265,15 @@ export default class PauseMenu {
                     // Use the variableName from the server if available, otherwise use counterVar
                     const varName = chosen.variableName || this.counterVar || 'levelsCompleted';
                     const counterValue = Number(chosen.levelsCompleted || chosen.levelReached || 0);
-                    
+
+                    // Persist the server’s variable name locally so subsequent saves use it
+                    this.counterVar = varName;
+                    this.options.counterVar = varName;
+                    // Keep scoreVar aligned if it was defaulted to counterVar
+                    if (!this.options.scoreVar || this.options.scoreVar === this.scoreVar) {
+                        this.scoreVar = varName;
+                    }
+
                     this.stats = Object.assign(this.stats || {}, {
                         levelsCompleted: counterValue,
                         levelReached: counterValue,
@@ -267,7 +281,8 @@ export default class PauseMenu {
                         sessionTime: chosen.sessionTime || chosen.elapsedMs || 0,
                         totalPowerUps: chosen.totalPowerUps || 0,
                         status: chosen.status || 'PAUSED',
-                        serverId: chosen.id || chosen._id || serverId
+                        serverId: chosen.id || chosen._id || serverId,
+                        variableName: varName
                     });
                     // Set the specific counter variable based on what was saved
                     this.stats[varName] = counterValue;
