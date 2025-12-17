@@ -166,7 +166,8 @@ export default class PauseMenu {
             sessionTime: Number(sessionTime) || 0,
             totalPowerUps: (this.stats && Number(this.stats.totalPowerUps)) || 0,
             status: (this.stats && this.stats.status) || 'PAUSED',
-            gameName: gameName
+            gameName: gameName,
+            variableName: this.counterVar || 'levelsCompleted'
         };
         return dto;
     }
@@ -255,15 +256,21 @@ export default class PauseMenu {
                 const body = await resp.json();
                 if (body) {
                     const chosen = body;
+                    // Use the variableName from the server if available, otherwise use counterVar
+                    const varName = chosen.variableName || this.counterVar || 'levelsCompleted';
+                    const counterValue = Number(chosen.levelsCompleted || chosen.levelReached || 0);
+                    
                     this.stats = Object.assign(this.stats || {}, {
-                        levelsCompleted: Number(chosen.levelsCompleted || chosen.levelReached || 0),
-                        levelReached: chosen.levelReached || chosen.levelsCompleted || 0,
+                        levelsCompleted: counterValue,
+                        levelReached: counterValue,
                         currentScore: chosen.score || chosen.currentScore || 0,
                         sessionTime: chosen.sessionTime || chosen.elapsedMs || 0,
                         totalPowerUps: chosen.totalPowerUps || 0,
                         status: chosen.status || 'PAUSED',
                         serverId: chosen.id || chosen._id || serverId
                     });
+                    // Set the specific counter variable based on what was saved
+                    this.stats[varName] = counterValue;
                     if (this.gameControl) this.gameControl.stats = this.stats;
                     this._updateStatsDisplay();
                     return this.stats;
