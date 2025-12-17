@@ -290,10 +290,11 @@ export default class Leaderboard {
             const url = `${backendBase.replace(/\/$/, '')}/api/leaderboard`;
             console.log('[Leaderboard] Fetching from:', url);
             
-            // Use fetchOptions from config with GET method
+            // Use fetchOptions from config with GET method, but override credentials
             const requestOptions = {
-                ...fetchOptions, // Copy all properties from fetchOptions
-                method: 'GET'    // Override to use GET method
+                ...fetchOptions,    // Copy all properties from fetchOptions
+                method: 'GET',      // Override to use GET method
+                credentials: 'omit' // Override credentials to omit for public leaderboard
             };
             
             console.log('[Leaderboard] Fetch options:', requestOptions);
