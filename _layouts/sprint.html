@@ -115,7 +115,6 @@ layout: post
                       </button>
                     </div>
                   </div>
-
                   <div class="progress-bar-container">
                     {% if totalItems > 0 %}
                       {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
@@ -124,6 +123,9 @@ layout: post
                     {% endif %}
                     <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
                   </div>
+
+                  <!-- MOVED: Learning Goals now appear BEFORE items -->
+                  <div class="week-skills-row" data-week-skills></div>
 
                   <div class="items-grid">
                     {% for entry in entries %}
@@ -168,8 +170,6 @@ layout: post
                       <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
                     </div>
                   {% endif %}
-
-                  <div class="week-skills-row" data-week-skills></div>
                 </div>
               </div>
             </div>
