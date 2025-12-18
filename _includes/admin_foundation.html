@@ -116,14 +116,21 @@
 
   .admin-panel-content {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    /* Prevent double scrollbars */
     padding: 20px;
+    display: flex;
+    /* Enable flex layout for children */
+    flex-direction: column;
   }
 
   /* Responsive Table Container */
   #admin-container {
-    overflow-x: auto;
+    overflow: auto;
+    /* Handle both X and Y scrolling */
     width: 100%;
+    flex: 1;
+    /* Fill available height */
     display: block;
     -webkit-overflow-scrolling: touch;
     /* Smooth scrolling on iOS */
@@ -449,7 +456,7 @@
 
     async function getGrades() {
       try {
-        const res = await fetch(`${pythonURI}/api/assignment/`, {
+        const res = await fetch(`${javaURI}/api/grades`, {
           ...fetchOptions,
           method: "GET",
           headers: {
@@ -733,7 +740,7 @@
             if (score !== null) {
               try {
                 // Note: Trailing slash used based on previous fix experience
-                const res = await fetch(`${pythonURI}/api/assignment/`, {
+                const res = await fetch(`${javaURI}/api/grades`, {
                   ...fetchOptions,
                   method: "PUT",
                   headers: {
