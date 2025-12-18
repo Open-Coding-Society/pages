@@ -67,7 +67,7 @@
   .sprint-title {
     margin: 0;
     font-size: 1.75rem;
-    color: $text;
+    color: var(--pref-accent-color) !important;
   }
 
   .sprint-meta {
@@ -102,7 +102,7 @@
   }
 
   .sprint-card.collapsed .sprint-title {
-    color: $text;
+    color: var(--pref-accent-color) !important;
   }
 
   .week-card {
@@ -174,7 +174,7 @@
   }
 
   .week-title-group h3 {
-    color: $text;
+    color: var(--pref-accent-color) !important; 
     font-size: 1.25rem;
     margin: 0 0 4px 0;
   }
@@ -415,6 +415,7 @@
 
     .sprint-title {
       font-size: 1.5rem;
+      color: var(--pref-accent-color) !important;
     }
 
     .sprint-controls {
