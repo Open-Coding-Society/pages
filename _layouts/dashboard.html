@@ -1824,3 +1824,263 @@ score += gists * 0.5
         }
     };
 </script>
+
+<script type="module">
+  import { javaURI, fetchOptions } from '../../assets/js/api/config.js';
+  (function () {
+
+    // UI elements
+    const toggleBtn = document.getElementById('ask-ai-toggle');
+    const dropdown = document.getElementById('ask-ai-dropdown');
+    const sendBtn = document.getElementById('ask-ai-send');
+    const clearBtn = document.getElementById('ask-ai-clear');
+    const promptEl = document.getElementById('ask-ai-prompt');
+    const statusEl = document.getElementById('ask-ai-status');
+    const responseEl = document.getElementById('ask-ai-response');
+    const applyBtn = document.getElementById('ask-ai-apply');
+    const openLink = document.getElementById('ask-ai-open');
+
+    if (!toggleBtn || !dropdown) return;
+
+    function showStatus(msg, isError) {
+      statusEl.textContent = msg;
+      statusEl.style.color = isError ? '#f87171' : '';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      dropdown.classList.toggle('hidden');
+    });
+
+    clearBtn.addEventListener('click', () => {
+      promptEl.value = '';
+      responseEl.textContent = '';
+      openLink.classList.add('hidden');
+      showStatus('');
+    });
+
+    // Try to capture the current preference form values (read DOM inputs directly)
+    function readCurrentPrefs() {
+      try {
+        return {
+          bg: document.getElementById('pref-bg-color')?.value,
+          text: document.getElementById('pref-text-color')?.value,
+          accent: document.getElementById('pref-accent-color')?.value,
+          selectionColor: document.getElementById('pref-selection-color')?.value,
+          font: document.getElementById('pref-font-family')?.value,
+          size: Number(document.getElementById('pref-font-size')?.value || 14),
+          buttonStyle: document.getElementById('pref-button-style')?.value
+        };
+      } catch (e) {
+        return {};
+      }
+    }
+
+    // Map possible names to the font <select> values used in the form
+    const FONT_MAP = {
+      'inter': "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+      'roboto': "Roboto, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial",
+      'open sans': "'Open Sans', Arial, sans-serif",
+      'lato': "Lato, Arial, sans-serif",
+      'montserrat': "Montserrat, Arial, sans-serif",
+      'georgia': "Georgia, 'Times New Roman', Times, serif",
+      'source code pro': "'Source Code Pro', monospace",
+      'sourcecodepro': "'Source Code Pro', monospace"
+    };
+
+    function tryParseResponsePayload(data) {
+      // Data may be JSON like { background: "#...", button: "#...", text: "#...", font: "Roboto" }
+      // Or it may be { response: "..." } or plain text.
+      const parsed = { raw: data };
+
+      if (!data) return parsed;
+
+      // If data is an object with fields, copy known fields.
+      if (typeof data === 'object') {
+        parsed.bg = data.background || data.bg || data.backgroundColor || data.background_color;
+        parsed.button = data.button || data.buttonColor || data.button_color;
+        parsed.selectionColor = data.selection || data.selectionColor || data.selection_color || data.selectionColorHex;
+        parsed.text = data.text || data.textColor || data.text_color;
+        parsed.font = data.font || data.fontFamily || data.font_family;
+        parsed.accent = data.accent || data.accentColor || data.accent_color;
+        return parsed;
+      }
+
+      // If it's a string, try to find hex color values and font names.
+      if (typeof data === 'string') {
+        const s = data;
+        const hexes = [...s.matchAll(/#([0-9a-f]{3,6})/ig)].map(m => '#' + m[1]);
+        if (hexes.length) {
+          parsed.bg = hexes[0];
+          if (hexes[1]) parsed.button = hexes[1];
+          if (hexes[2]) parsed.text = hexes[2];
+          if (hexes[3]) parsed.accent = hexes[3];
+        }
+        // look for font keywords
+        Object.keys(FONT_MAP).forEach(k => {
+          if (s.toLowerCase().includes(k)) parsed.font = FONT_MAP[k];
+        });
+        return parsed;
+      }
+
+      return parsed;
+    }
+
+    async function sendPromptToBackend(promptText) {
+
+      try {
+        showStatus('Sending to AI...', false);
+        sendBtn.disabled = true;
+
+        const res = await fetch(`${javaURI}/api/upai`, {
+          method: 'POST',
+          mode: 'cors',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: promptText
+          })
+        });
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => '');
+          showStatus('Server error: ' + (res.status + ' ' + txt), true);
+          responseEl.textContent = txt || `Status: ${res.status}`;
+          openLink.classList.add('hidden');
+          return null;
+        }
+
+        // Try JSON first, then text
+        let json;
+        try { json = await res.json(); } catch (e) { json = null; }
+        let payload = json;
+        if (json && json.response) {
+          payload = json.response;
+        }
+        if (!payload) {
+          payload = await res.text();
+        }
+
+        showStatus('Response received', false);
+        return payload;
+
+      } catch (err) {
+        showStatus('Network error: ' + (err.message || err), true);
+        return null;
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+        sendBtn.addEventListener('click', async () => {
+      const promptText = promptEl.value && promptEl.value.trim();
+      if (!promptText) { showStatus('Please write a description first', true); return; }
+
+      responseEl.textContent = '';
+      openLink.classList.add('hidden');
+
+      const payload = await sendPromptToBackend(promptText);
+      if (!payload) return;
+            // Normalize the response so frontend can apply values consistently.
+            // Use tryParseResponsePayload to extract common tokens from text or object
+            const parsedRaw = (typeof payload === 'object') ? tryParseResponsePayload(payload) : tryParseResponsePayload(String(payload));
+
+            const normalized = {
+                background: (payload && (payload.background || payload.bg || payload.backgroundColor || payload.background_color)) || parsedRaw.bg || parsedRaw.background,
+                button: (payload && (payload.button || payload.buttonColor || payload.button_color)) || parsedRaw.button,
+                selectionColor: (payload && (payload.selectionColor || payload.selection || payload.selection_color)) || parsedRaw.selectionColor || parsedRaw.selection,
+                textColor: (payload && (payload.textColor || payload.text || payload.text_color)) || parsedRaw.text,
+                fontFamily: (payload && (payload.fontFamily || payload.font || payload.font_family)) || parsedRaw.font,
+                suggestions: (payload && (payload.suggestions || payload.response)) || (typeof payload === 'string' ? payload : parsedRaw.raw)
+            };
+
+            // Display the human-friendly suggestion (if present) instead of raw JSON
+            responseEl.textContent = normalized.suggestions || JSON.stringify(payload, null, 2);
+
+            // Keep the normalized object on the element for Apply to read
+            try { responseEl.dataset.parsed = JSON.stringify(normalized); } catch (e) { /* ignore */ }
+
+            // Provide a quick link to view response in a new tab (use a data: URI)
+            const safeText = encodeURIComponent(responseEl.textContent);
+            openLink.href = `data:text/plain;charset=utf-8,${safeText}`;
+            openLink.classList.remove('hidden');
+
+            showStatus('AI suggestions ready — review below. Use "Apply to Form" to copy values', false);
+    });
+
+    applyBtn.addEventListener('click', () => {
+            const raw = responseEl.textContent;
+            if (!raw && !responseEl.dataset.parsed) { showStatus('No AI response to apply', true); return; }
+
+            let parsed = null;
+            if (responseEl.dataset.parsed) {
+                try { parsed = JSON.parse(responseEl.dataset.parsed); } catch (e) { parsed = null; }
+            }
+
+            if (!parsed) {
+                // Fallbacks: try JSON in the box, then try to parse free text
+                try { parsed = JSON.parse(raw); } catch (e) { parsed = tryParseResponsePayload(raw); }
+            }
+
+            if (!parsed) { showStatus('Could not parse AI response', true); return; }
+
+            // Set form fields if found (normalized keys: background, button, selectionColor, textColor, fontFamily)
+            try {
+                if (parsed.background) {
+                    const el = document.getElementById('pref-bg-color');
+                    if (el) el.value = parsed.background;
+                }
+                if (parsed.textColor) {
+                    const el = document.getElementById('pref-text-color');
+                    if (el) el.value = parsed.textColor;
+                }
+                const accent = parsed.button || parsed.accent || parsed.buttonColor;
+        if (accent) {
+          const el = document.getElementById('pref-accent-color');
+          if (el) el.value = accent;
+        }
+                const selection = parsed.selectionColor || parsed.selection || parsed.selection_color;
+        if (selection) {
+          const el = document.getElementById('pref-selection-color');
+          if (el) el.value = selection;
+        }
+                // Handle fontFamily mapping
+                const fontVal = (parsed.fontFamily || parsed.font || '').toString().toLowerCase();
+                if (fontVal) {
+                    let mapped = null;
+                    Object.keys(FONT_MAP).forEach(k => {
+                        if (fontVal.includes(k)) mapped = FONT_MAP[k];
+                    });
+                    const fontSelect = document.getElementById('pref-font-family');
+                    if (fontSelect) {
+                        if (mapped) {
+                            fontSelect.value = mapped;
+                        } else {
+                            for (const opt of fontSelect.options) {
+                                if ((opt.value || '').toLowerCase().includes(fontVal)) {
+                                    fontSelect.value = opt.value;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+        showStatus('Values applied to the form. Click "Save All" to persist.', false);
+
+        // Optionally trigger the Save All button so user doesn't need to click twice
+        const saveBtn = document.getElementById('save-preferences');
+        if (saveBtn) {
+          // give tiny delay so UI updates are visible
+          setTimeout(() => {
+            saveBtn.click();
+            showStatus('Preferences saved (via Save All)', false);
+          }, 300);
+        }
+
+      } catch (e) {
+        showStatus('Error applying values: ' + (e.message || e), true);
+      }
+    });
+
+  })();
+</script>
