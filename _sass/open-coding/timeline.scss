@@ -667,16 +667,16 @@
   #certificate-modal .action-bar {
     position: sticky;
     top: 0;
-    background: rgba(255,255,255,0.95);
+    background: var(--panel);
     padding: 16px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--ui-border);
     z-index: 10;
   }
 
   #certificate-modal .action-btn {
     padding: 10px 20px;
-    background: #0077b5;
+    background: var(--pref-accent-color);
     color: white;
     border: none;
     border-radius: 6px;
@@ -685,20 +685,20 @@
   }
 
   #certificate-modal .secondary-btn {
-    background: white;
-    color: #333;
-    border: 1px solid #ccc;
+    background: var(--bg-2);
+    color: var(--text);
+    border: 1px solid var(--ui-border);
   }
 
   #certificate-content {
     max-width: 1000px;
     margin: 40px auto;
-    background: #fdfaf1;
+    background: var(--bg-1);
     padding: 90px 80px;
-    border: 3px solid #d4a574;
+    border: 3px solid var(--pref-accent-color);
     position: relative;
     font-family: 'Crimson Text', serif;
-    color: #1f2937;
+    color: var(--text);
   }
 
   #certificate-content::before {
@@ -708,7 +708,7 @@
     left: 18px;
     right: 18px;
     bottom: 18px;
-    border: 1px solid rgba(212, 165, 116, 0.7);
+    border: 1px solid var(--ui-border);
     pointer-events: none;
   }
 
@@ -726,12 +726,12 @@
     width: 110px;
     height: 110px;
     border-radius: 50%;
-    background: #111827;
+    background: var(--bg-3);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 24px;
-    border: 3px solid #d4a574;
+    border: 3px solid var(--pref-accent-color);
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   }
 
@@ -745,14 +745,14 @@
     font-size: 14px;
     letter-spacing: 0.35em;
     text-transform: uppercase;
-    color: #505766;
+    color: var(--text-muted);
     font-family: 'Libre Baskerville', serif;
     margin-bottom: 12px;
   }
 
   #certificate-content .certify-text {
     font-size: 30px;
-    color: #1f2937;
+    color: var(--text);
     font-family: 'Libre Baskerville', serif;
     margin-bottom: 8px;
   }
@@ -761,12 +761,12 @@
     text-transform: uppercase;
     letter-spacing: 0.25em;
     font-size: 13px;
-    color: #9ca3af;
+    color: var(--text-muted);
   }
 
   #certificate-student-name {
     font-size: 62px;
-    color: #111827;
+    color: var(--text-strong);
     font-family: 'Libre Baskerville', serif;
     font-weight: 700;
     border: none;
@@ -780,13 +780,13 @@
 
   #certificate-student-name:empty::before {
     content: 'Your Name';
-    color: #d1d5db;
+    color: var(--text-muted);
   }
 
   #certificate-content .achievement-text {
     text-align: center;
     font-size: 22px;
-    color: #374151;
+    color: var(--text);
     max-width: 720px;
     margin: 0 auto 48px;
     line-height: 1.7;
@@ -800,11 +800,11 @@
   .skill-focus-pill span {
     display: inline-block;
     padding: 6px 20px;
-    border: 1px solid #d4a574;
+    border: 1px solid var(--pref-accent-color);
     border-radius: 999px;
     font-size: 16px;
-    color: #92400e;
-    background: rgba(212, 165, 116, 0.18);
+    color: var(--pref-accent-color);
+    background: var(--bg-2);
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
@@ -812,7 +812,7 @@
   #certificate-date {
     text-align: center;
     font-size: 18px;
-    color: #6b7280;
+    color: var(--text-muted);
     font-style: italic;
     margin-bottom: 40px;
   }
@@ -838,13 +838,13 @@
   #certificate-content .signature-name {
     font-size: 30px;
     font-style: italic;
-    color: #1f2937;
+    color: var(--text);
     font-family: 'Libre Baskerville', serif;
     margin-bottom: 8px;
   }
 
   #certificate-content .signature-line {
-    border-top: 2px solid #9ca3af;
+    border-top: 2px solid var(--ui-border);
     padding-top: 8px;
     margin-bottom: 12px;
   }
@@ -852,12 +852,12 @@
   #certificate-content .signature-title {
     font-family: 'Libre Baskerville', serif;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text);
     margin: 0;
   }
 
   #certificate-content .signature-subtitle {
-    color: #4b5563;
+    color: var(--text-muted);
     margin: 2px 0 0 0;
   }
 
@@ -921,12 +921,12 @@
   #certificate-skills {
     margin-top: 48px;
     padding-top: 32px;
-    border-top: 1px solid #d1d5db;
+    border-top: 1px solid var(--ui-border);
   }
 
   .skills-heading {
     text-align: center;
-    color: #0b0d17 !important;
+    color: var(--text-strong) !important;
     font-family: 'Libre Baskerville', serif;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -942,13 +942,13 @@
 
   .skill-tag {
     padding: 6px 16px;
-    border: 1px solid #d4a574;
+    border: 1px solid var(--pref-accent-color);
     border-radius: 20px;
-    color: #1f2937;
+    color: var(--text);
     font-family: 'Crimson Text', serif;
     font-size: 14px;
     margin: 4px;
-    background: rgba(212, 165, 116, 0.1);
+    background: var(--bg-2);
   }
 
   @media (max-width: 768px) {
