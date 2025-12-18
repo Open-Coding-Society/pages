@@ -9,3 +9,5 @@ export class Camera {
         
     }
 }
+
+export const camera = new Camera(0, 0);
