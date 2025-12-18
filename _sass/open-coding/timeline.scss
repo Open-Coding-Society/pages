@@ -23,7 +23,7 @@
   .filter-btn {
     padding: 8px 16px;
     background: transparent;
-    border: 1px solid $bg-3;
+    border: 1px solid var(--accent);
     border-radius: 6px;
     color: $text;
     cursor: pointer;
@@ -46,7 +46,7 @@
   }
 
   .sprint-card {
-    border: 1px solid $bg-3;
+    border: 1px solid var(--accent);
     border-radius: 16px;
     padding: 28px;
     margin-bottom: 24px;
