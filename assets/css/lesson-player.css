@@ -116,7 +116,7 @@ body:has(.lesson-player) {
 }
 
 .sprint-title {
-  color: #e0e0e0;
+  color: var(--pref-accent-color);
   font-size: 14px;
   margin-bottom: 2px;
 }
