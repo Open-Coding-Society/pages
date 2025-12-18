@@ -782,6 +782,35 @@ score += gists * 0.5
                     </div>
                 </div>
 
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700" id="ask-ai-panel">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">Ask AI: Generate a Theme</h3>
+                        <div class="flex gap-2">
+                        <button id="ask-ai-toggle" type="button" class="px-3 py-1 text-sm rounded bg-indigo-600 hover:bg-indigo-700 text-white">Ask AI</button>
+                        </div>
+                    </div>
+
+                    <div id="ask-ai-dropdown" class="hidden mt-3">
+                        <label class="text-sm text-neutral-400 block">Describe the style you want (e.g. "modern, playful, cool blues")</label>
+                        <textarea id="ask-ai-prompt" class="w-full mt-2 bg-neutral-700 text-white rounded px-3 py-2" rows="4"
+                        placeholder="Describe colors, tones, fonts, mood, and any words like 'modern', 'playful', 'professional', etc."></textarea>
+
+                        <div class="flex gap-2 mt-3">
+                        <button id="ask-ai-send" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white">Get Suggestions</button>
+                        <button id="ask-ai-clear" class="px-4 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white">Clear</button>
+                        </div>
+
+                        <div id="ask-ai-status" class="text-sm text-neutral-400 mt-2"></div>
+
+                        <div id="ask-ai-response" class="mt-4 p-3 bg-neutral-900 border border-neutral-700 rounded text-sm text-neutral-200 whitespace-pre-wrap"></div>
+
+                        <div class="mt-3 flex gap-2 items-center">
+                        <button id="ask-ai-apply" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Apply to Form</button>
+                        <a id="ask-ai-open" href="#" target="_blank" class="text-sm text-blue-400 underline hidden ml-2">Open full response</a>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Preferences UI: the styling logic itself now lives in global
                      assets (assets/css/user-preferences.css and
                      assets/js/user-preferences.js). This script only manages
@@ -1795,5 +1824,3 @@ score += gists * 0.5
         }
     };
 </script>
-
-
