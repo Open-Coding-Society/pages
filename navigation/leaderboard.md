@@ -514,7 +514,7 @@ permalink: /leaderboard
   <!-- Page Header -->
   <div class="page-header">
     <h1>Your Analytics</h1>
-    <p>Track your progress and monitor your learning</p>
+    <p>Track your progress and see how you rank among your peers</p>
   </div>
 
   <!-- Stats Overview -->
@@ -615,9 +615,7 @@ permalink: /leaderboard
   </div>
 </div>
 
-<script type="module">
-  import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-
+<script>
   // Get course from URL parameters or use default
   const urlParams = new URLSearchParams(window.location.search);
   const CURRENT_COURSE = urlParams.get('course') || 'csp';
@@ -626,52 +624,10 @@ permalink: /leaderboard
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
   const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
 
-  // Get username from authenticated user
-  function getLoggedInUsername() {
-    try {
-      // First, try to get from window.user (set by dashboard or fetchCurrentUser)
-      if (window.user && window.user.uid) {
-        return window.user.uid;
-      }
-      
-      // Fallback: check localStorage for synced username
-      return localStorage.getItem('student-username') || null;
-    } catch (e) {
-      console.error('Error getting logged in username:', e);
-      return null;
-    }
-  }
-
-  // Fetch current user from backend
-  async function fetchCurrentUser() {
-    try {
-      const response = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      
-      if (response.ok) {
-        const userData = await response.json();
-        // Store in window for easy access
-        window.user = userData;
-        const username = userData.uid || userData.username;
-        
-        // Sync to localStorage for compatibility
-        if (username) {
-          localStorage.setItem('student-username', username);
-        }
-        
-        return username;
-      }
-      return null;
-    } catch (error) {
-      console.error('Error fetching current user:', error);
-      return null;
-    }
-  }
-
   // Initialize user stats structure
   function initializeUserStats() {
-    const loggedInUser = getLoggedInUsername();
     const defaultStats = {
-      username: loggedInUser || null,
+      username: localStorage.getItem('student-username') || 'Anonymous',
       totalCompleted: 0,
       totalItems: 0,
       currentStreak: 0,
@@ -684,14 +640,7 @@ permalink: /leaderboard
     };
     try {
       const stored = localStorage.getItem(USER_STATS_KEY);
-      const stats = stored ? { ...defaultStats, ...JSON.parse(stored) } : defaultStats;
-      
-      // Update username if it changed
-      if (loggedInUser && stats.username !== loggedInUser) {
-        stats.username = loggedInUser;
-      }
-      
-      return stats;
+      return stored ? { ...defaultStats, ...JSON.parse(stored) } : defaultStats;
     } catch (e) {
       return defaultStats;
     }
@@ -724,17 +673,12 @@ permalink: /leaderboard
     tbody.innerHTML = '';
 
     if (leaderboard.length === 0) {
-      const loggedInUser = getLoggedInUsername();
-      const message = loggedInUser 
-        ? 'No leaderboard data yet. Complete lessons to appear on the leaderboard.'
-        : 'Please log in to see the leaderboard.';
-      
       tbody.innerHTML = `
         <tr>
           <td colspan="6">
             <div class="empty-state">
               <i class="fas fa-users"></i>
-              <p>${message}</p>
+              <p>No leaderboard data yet. Complete lessons to appear on the leaderboard.</p>
             </div>
           </td>
         </tr>
@@ -1017,29 +961,7 @@ permalink: /leaderboard
   }
 
   // Initialize page
-  document.addEventListener('DOMContentLoaded', async function() {
-    // Fetch current user first
-    const loggedInUser = await fetchCurrentUser();
-    
-    if (!loggedInUser) {
-      // Not logged in - show message
-      document.querySelector('.leaderboard-page').innerHTML = `
-        <div class="back-nav">
-          <a href="javascript:history.back()" class="back-link">
-            <i class="fas fa-arrow-left"></i> Back to Course
-          </a>
-        </div>
-        <div style="text-align: center; padding: 80px 20px; color: #e0e0e0;">
-          <i class="fas fa-lock" style="font-size: 48px; color: #60a5fa; margin-bottom: 20px;"></i>
-          <h2 style="color: #ffffff; margin-bottom: 12px;">Please Log In</h2>
-          <p style="color: #9ca3af; margin-bottom: 24px;">You need to be logged in to view your analytics and leaderboard.</p>
-          <a href="/login" style="display: inline-block; padding: 12px 24px; background: #60a5fa; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Go to Login</a>
-        </div>
-      `;
-      return;
-    }
-    
-    // User is logged in, proceed normally
+  document.addEventListener('DOMContentLoaded', function() {
     refreshLeaderboardDisplay();
     initializeCharts();
 
