@@ -101,10 +101,6 @@
     display: none;
   }
 
-  .sprint-card.collapsed .sprint-title {
-    color: var(--pref-accent-color) !important;
-  }
-
   .week-card {
     border-radius: 12px;
     margin-bottom: 16px;
@@ -174,7 +170,7 @@
   }
 
   .week-title-group h3 {
-    color: var(--pref-accent-color) !important; 
+    color: var(--pref-accent-color) !important;
     font-size: 1.25rem;
     margin: 0 0 4px 0;
   }
@@ -415,7 +411,6 @@
 
     .sprint-title {
       font-size: 1.5rem;
-      color: var(--pref-accent-color) !important;
     }
 
     .sprint-controls {
