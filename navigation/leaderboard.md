@@ -287,7 +287,6 @@ permalink: /leaderboard
   .badges-cell {
     display: flex;
     gap: 6px;
-    flex-wrap: wrap;
   }
 
   .badge {
@@ -419,6 +418,52 @@ permalink: /leaderboard
   .empty-state p {
     margin: 0;
     font-size: 14px;
+  }
+
+  /* Certificates Section */
+  .certificates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .certificate-item {
+    background: #0f0f0f;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .certificate-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(168, 85, 247, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a855f7;
+    font-size: 16px;
+  }
+
+  .certificate-info {
+    flex: 1;
+  }
+
+  .certificate-name {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .certificate-date {
+    color: #6b7280;
+    font-size: 11px;
   }
 
   @media (max-width: 1024px) {
@@ -563,7 +608,7 @@ permalink: /leaderboard
         <canvas id="weekly-progress-chart" height="200"></canvas>
       </div>
       <div class="analytics-card">
-        <h3><i class="fas fa-list-check"></i> Recent Activity</h3>
+        <h3><i class="fas fa-list-check"></i> Progress</h3>
         <div id="quest-timeline"></div>
       </div>
     </div>
@@ -579,7 +624,7 @@ permalink: /leaderboard
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
   const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
 
-  // Initialize user stats structure (matches sprint.html)
+  // Initialize user stats structure
   function initializeUserStats() {
     const defaultStats = {
       username: localStorage.getItem('student-username') || 'Anonymous',
@@ -601,14 +646,16 @@ permalink: /leaderboard
     }
   }
 
-  // Get earned certificates count (matches sprint.html logic)
+  // Get earned certificates count
   function getEarnedCertificatesCount(user) {
+    // Check both user stats and dedicated certificates storage
     const userCerts = user.earnedCertificates || [];
     let storedCerts = [];
     try {
       storedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
     } catch(e) {}
     
+    // Also count completed weeks as certificates
     const completedWeeks = Object.values(user.weeklyProgress || {})
       .filter(w => w.completed === w.total && w.total > 0).length;
     
@@ -631,7 +678,7 @@ permalink: /leaderboard
           <td colspan="6">
             <div class="empty-state">
               <i class="fas fa-users"></i>
-              <p>No leaderboard data yet. Complete lessons on the course timeline to appear here.</p>
+              <p>No leaderboard data yet. Complete lessons to appear on the leaderboard.</p>
             </div>
           </td>
         </tr>
@@ -719,11 +766,10 @@ permalink: /leaderboard
     document.getElementById('completion-detail').textContent = user.totalCompleted + ' of ' + user.totalItems + ' items';
     document.getElementById('user-certificates').textContent = certificatesCount;
 
+    // Show rank position context
     const rankChange = document.getElementById('rank-change');
     if (rank > 0 && leaderboard.length > 1) {
       rankChange.textContent = 'of ' + leaderboard.length + ' students';
-    } else if (rank === 0) {
-      rankChange.textContent = 'Complete lessons to rank';
     }
   }
 
@@ -771,6 +817,7 @@ permalink: /leaderboard
       return data.total > 0 ? (data.completed / data.total) * 100 : 0;
     });
 
+    // Show placeholder if no data
     if (weeks.length === 0) {
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#6b7280';
@@ -850,10 +897,12 @@ permalink: /leaderboard
 
     const stats = initializeUserStats();
     const weeklyProgress = stats.weeklyProgress || {};
+    const completionData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 
+    // Build timeline from various sources
     const timeline = [];
     
-    // Add completed weeks with certificates
+    // Add completed weeks
     Object.entries(weeklyProgress).forEach(([weekNum, data]) => {
       if (data.completedDate) {
         timeline.push({
@@ -865,7 +914,7 @@ permalink: /leaderboard
       }
     });
 
-    // Add last activity
+    // Add recent completions (from today's activity)
     if (stats.lastActivityDate) {
       timeline.push({
         type: 'activity',
@@ -882,7 +931,7 @@ permalink: /leaderboard
       container.innerHTML = `
         <div class="empty-state">
           <i class="fas fa-clock"></i>
-          <p>No activity yet. Start completing lessons on the course timeline!</p>
+          <p>No activity yet. Start completing lessons!</p>
         </div>
       `;
       return;
@@ -913,34 +962,8 @@ permalink: /leaderboard
 
   // Initialize page
   document.addEventListener('DOMContentLoaded', function() {
-    // Sync logged-in user first (matches sprint.html)
-    async function syncLoggedInUser() {
-      try {
-        const { pythonURI, fetchOptions } = await import('{{site.baseurl}}/assets/js/api/config.js');
-        const response = await fetch(`${pythonURI}/api/id`, fetchOptions);
-        
-        if (response.ok) {
-          const userData = await response.json();
-          const username = userData.uid || userData.username;
-          
-          if (username) {
-            localStorage.setItem('student-username', username);
-            const stats = initializeUserStats();
-            stats.username = username;
-            try {
-              localStorage.setItem(USER_STATS_KEY, JSON.stringify(stats));
-            } catch(e) {}
-          }
-        }
-      } catch (error) {
-        console.log('Using cached username');
-      }
-    }
-    
-    syncLoggedInUser().then(() => {
-      refreshLeaderboardDisplay();
-      initializeCharts();
-    });
+    refreshLeaderboardDisplay();
+    initializeCharts();
 
     // Sort dropdown handler
     const sortSelect = document.getElementById('leaderboard-sort');
@@ -956,6 +979,7 @@ permalink: /leaderboard
         const sortBy = this.dataset.sort;
         sortLeaderboard(sortBy);
         
+        // Update dropdown to match
         if (sortSelect) sortSelect.value = sortBy;
       });
     });

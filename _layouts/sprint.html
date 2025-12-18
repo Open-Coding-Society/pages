@@ -2909,67 +2909,50 @@ function setupQuickHelpToggle() {
     });
   }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', async function() {
-  // Import config
-  const { pythonURI, fetchOptions } = await import('{{site.baseurl}}/assets/js/api/config.js');
-  
-  // Sync logged-in user
-  async function syncLoggedInUser() {
+  // Initialize when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeProgressBars();
+    initializeCompletion();
+    applyFilters();
+    initializeCertificateSystem();
+    renderWeekSkillPreviews();
+
+    setupOverviewToggle();
+    setupQuickHelpToggle();
+    
+    // NEW: Initialize achievements
+    updateAchievementsDisplay();
+    setupAnalyticsButton();
+    setupCourseFilters();
+    
+    // NEW: Refresh analytics button when modal opens
+    document.querySelectorAll('.progression-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setTimeout(setupAnalyticsButton, 100);
+      });
+    });
+    
+    // Prompt for username if not set (still needed for tracking)
+    if (!localStorage.getItem('student-username')) {
+      const username = prompt('Enter your name for the leaderboard:');
+      if (username) {
+        localStorage.setItem('student-username', username);
+        const stats = initializeUserStats();
+        stats.username = username;
+        saveUserStats(stats);
+      }
+    }
+  });
+
+  // Lightweight mobile detection redirect to /mobile/ (only for small screens)
+  (function(){
     try {
-      const response = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      
-      if (response.ok) {
-        const userData = await response.json();
-        const username = userData.uid || userData.username;
-        
-        if (username) {
-          localStorage.setItem('student-username', username);
-          const stats = initializeUserStats();
-          stats.username = username;
-          saveUserStats(stats);
+      if (window.matchMedia('(max-width: 640px)').matches && !window.location.pathname.startsWith('/mobile')) {
+        // Avoid interfering with user-agent previews and bots
+        if (!navigator.userAgent.includes('Slackbot') && !navigator.userAgent.includes('Twitterbot')) {
+          window.location.replace('/mobile/');
         }
       }
-    } catch (error) {
-      console.error('Error syncing logged in user:', error);
-    }
-  }
-  
-  // Sync user on page load
-  await syncLoggedInUser();
-  
-  // Now continue with rest of initialization
-  initializeProgressBars();
-  initializeCompletion();
-  applyFilters();
-  initializeCertificateSystem();
-  renderWeekSkillPreviews();
-
-  setupOverviewToggle();
-  setupQuickHelpToggle();
-  
-  // NEW: Initialize achievements
-  updateAchievementsDisplay();
-  setupAnalyticsButton();
-  setupCourseFilters();
-  
-  // NEW: Refresh analytics button when modal opens
-  document.querySelectorAll('.progression-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      setTimeout(setupAnalyticsButton, 100);
-    });
-  });
-});
-
-// Lightweight mobile detection redirect to /mobile/ (only for small screens)
-(function(){
-  try {
-    if (window.matchMedia('(max-width: 640px)').matches && !window.location.pathname.startsWith('/mobile')) {
-      // Avoid interfering with user-agent previews and bots
-      if (!navigator.userAgent.includes('Slackbot') && !navigator.userAgent.includes('Twitterbot')) {
-        window.location.replace('/mobile/');
-      }
-    }
-  } catch(e){}
-})();
+    } catch(e){}
+  })();
 </script>
