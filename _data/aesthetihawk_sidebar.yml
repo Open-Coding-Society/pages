@@ -18,12 +18,6 @@
       icon: |
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
-    - id: hallpass
-      title: Hallpass
-      url: /hallpass_queue
-      icon: |
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M18.5 12A2.5 2.5 0 0 1 21 9.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2.5a2.5 2.5 0 0 1 0 5V17a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-2.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
 - section: Toolkit
   items:
     - id: groups
@@ -38,18 +32,7 @@
       icon: |
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 6h8m-8 6h8m-8 6h8M4 16a2 2 0 1 1 3.321 1.5L4 20h5M4 5l2-1v6m-2 0h4" />
-    - id: submissions
-      title: Assignment Submissions
-      url: /student/submissions
-      icon: |
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M19 10V4a1 1 0 0 0-1-1H9.914a1 1 0 0 0-.707.293L5.293 7.207A1 1 0 0 0 5 7.914V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2M10 3v4a1 1 0 0 1-1 1H5m5 6h9m0 0-2-2m2 2-2 2"/>
-    - id: teamteach
-      title: Team Teach Signup
-      url: /student/TeamTeachToolkit/signup
-      icon: |
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+
     - id: grades
       title: View Grades
       url: /student/view-grades
