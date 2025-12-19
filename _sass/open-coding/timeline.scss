@@ -41,6 +41,40 @@
     color: $accent;
   }
 
+  .sprint-filters {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sprint-filter-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid $bg-3;
+    border-radius: 4px;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 11px;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .sprint-filter-btn:hover {
+    background: $bg-2;
+  }
+
+  .sprint-filter-btn.active {
+    background: $bg-2;
+    border-color: $accent;
+    color: $accent;
+  }
+
+  .sprint-filter-btn i {
+    font-size: 10px;
+    margin-right: 4px;
+  }
+  
   .timeline-container {
     margin-top: 32px;
   }
@@ -307,10 +341,10 @@
   }
 
   .week-goals-container {
-    margin-top: 12px;
-    margin-bottom: 24px;
-    padding-top: 12px;
-    border-top: 1px solid $bg-3;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid $bg-3;
   }
 
   .goals-label {
