@@ -1,8 +1,6 @@
 // DialogueSystem.js - Fixed version that addresses both issues
 // 1. Unique instances for each NPC to prevent button conflicts
 // 2. Works with Eye of Ender collection
-// 3. Includes typewriter effect for dialogue text
-// 4. Includes voice synthesis with Australian male voice
 
 class DialogueSystem {
   constructor(options = {}) {
@@ -26,17 +24,6 @@ class DialogueSystem {
     this.soundUrl = options.soundUrl || "./sounds/dialogue.mp3";
     this.sound = this.enableSound ? new Audio(this.soundUrl) : null;
     
-    // Typewriter effect options
-    this.typewriterSpeed = options.typewriterSpeed !== undefined ? options.typewriterSpeed : 50; // ms per character
-    this.enableTypewriter = options.enableTypewriter !== undefined ? options.enableTypewriter : true;
-    this.typewriterTimeoutId = null;
-    
-    // Voice synthesis options
-    this.enableVoice = options.enableVoice !== undefined ? options.enableVoice : true;
-    this.voiceRate = options.voiceRate !== undefined ? options.voiceRate : 1.0; // speech rate
-    this.voicePitch = options.voicePitch !== undefined ? options.voicePitch : 1.0; // pitch
-    this.voiceVolume = options.voiceVolume !== undefined ? options.voiceVolume : 1.0; // volume
-    
     // Create the dialogue box
     this.createDialogueBox();
     
@@ -44,105 +31,7 @@ class DialogueSystem {
     this.isOpen = false;
   }
 
-  // Voice synthesis helper
-  speakText(text) {
-    // Cancel any ongoing speech
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-    
-    if (!this.enableVoice || !window.speechSynthesis) {
-      return; // Voice synthesis not available or disabled
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Set voice properties
-    utterance.rate = this.voiceRate;
-    utterance.pitch = this.voicePitch;
-    utterance.volume = this.voiceVolume;
-    
-    // Try to set Australian male voice
-    const voices = window.speechSynthesis.getVoices();
-    
-    // First, look for Australian English voices
-    let australianVoice = voices.find(voice => 
-      voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('male')
-    );
-    
-    // If no Australian male voice found, look for any Australian voice
-    if (!australianVoice) {
-      australianVoice = voices.find(voice => voice.lang.includes('en-AU'));
-    }
-    
-    // If still no Australian voice, look for any male voice
-    if (!australianVoice) {
-      australianVoice = voices.find(voice => voice.name.toLowerCase().includes('male'));
-    }
-    
-    // If no male voice found, just pick the first voice
-    if (!australianVoice && voices.length > 0) {
-      australianVoice = voices[0];
-    }
-    
-    if (australianVoice) {
-      utterance.voice = australianVoice;
-    }
-    
-    // Speak the text
-    window.speechSynthesis.speak(utterance);
-  }
-
   createDialogueBox() {
-    // Create style element for animations if not already created
-    if (!document.getElementById('dialogue-animations-' + this.id)) {
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'dialogue-animations-' + this.id;
-      styleSheet.textContent = `
-        @keyframes glow-pulse-${this.id} {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), inset 0 0 20px rgba(0, 255, 255, 0.2);
-          }
-          50% {
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.9), inset 0 0 30px rgba(0, 255, 255, 0.3);
-          }
-        }
-        
-        @keyframes text-glow-${this.id} {
-          0%, 100% {
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(74, 134, 232, 0.3);
-          }
-          50% {
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(74, 134, 232, 0.6);
-          }
-        }
-        
-        @keyframes char-pop-${this.id} {
-          0% {
-            opacity: 0;
-            transform: scale(0.5) translateY(-10px);
-          }
-          50% {
-            transform: scale(1.1) translateY(0);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-        
-        .dialogue-text-animated-${this.id} {
-          animation: text-glow-${this.id} 2s ease-in-out infinite;
-        }
-        
-        .dialogue-char-${this.id} {
-          display: inline-block;
-          animation: char-pop-${this.id} 0.3s ease-out;
-        }
-      `;
-      document.head.appendChild(styleSheet);
-    }
-    
     // Create the main dialogue container with unique ID
     this.dialogueBox = document.createElement("div");
     this.dialogueBox.id = "custom-dialogue-box-" + this.id;
@@ -163,7 +52,7 @@ class DialogueSystem {
       border: "2px solid #4a86e8",
       borderRadius: "12px",
       zIndex: "9999",
-      animation: `glow-pulse-${this.id} 2s ease-in-out infinite`,
+      boxShadow: "0 0 20px rgba(0, 255, 255, 0.7)",
       display: "none"
     });
 
@@ -195,8 +84,7 @@ class DialogueSystem {
     this.dialogueText.id = "dialogue-text-" + this.id;
     Object.assign(this.dialogueText.style, {
       marginBottom: "15px",
-      lineHeight: "1.5",
-      minHeight: "40px"
+      lineHeight: "1.5"
     });
 
     // Create close button
@@ -248,43 +136,8 @@ class DialogueSystem {
     });
   }
 
-  // Typewriter effect helper with character animations
-  typewriteText(element, text, speed = this.typewriterSpeed) {
-    element.innerHTML = ""; // Clear the element
-    let charIndex = 0;
-  
-    const typeNextChar = () => {
-      if (charIndex < text.length) {
-        const char = text.charAt(charIndex);
-      
-        // If it's a space, just add it directly
-        if (char === ' ') {
-          element.appendChild(document.createTextNode(' '));
-        } else {
-          const charSpan = document.createElement('span');
-          charSpan.className = `dialogue-char-${this.id}`;
-          charSpan.textContent = char;
-          element.appendChild(charSpan);
-        }
-      
-        charIndex++;
-        this.typewriterTimeoutId = setTimeout(typeNextChar, speed);
-      } else {
-        // Add glow animation to the complete text
-        element.classList.add(`dialogue-text-animated-${this.id}`);
-      }
-    };
-  
-    typeNextChar();
-  }
-
   // Show a specific dialogue message
   showDialogue(message, speaker = "", avatarSrc = null) {
-    // Clear any existing typewriter timeout
-    if (this.typewriterTimeoutId) {
-      clearTimeout(this.typewriterTimeoutId);
-    }
-    
     // Set the content (with unique element IDs)
     const speakerElement = document.getElementById("dialogue-speaker-" + this.id);
     if (speakerElement) {
@@ -303,14 +156,8 @@ class DialogueSystem {
       }
     }
     
-    // Apply typewriter effect or set text directly
-    if (this.enableTypewriter) {
-      this.dialogueText.classList.remove(`dialogue-text-animated-${this.id}`);
-      this.typewriteText(this.dialogueText, message, this.typewriterSpeed);
-    } else {
-      this.dialogueText.textContent = message;
-      this.dialogueText.classList.add(`dialogue-text-animated-${this.id}`);
-    }
+    // Set the dialogue text directly
+    this.dialogueText.textContent = message;
     
     // Show the dialogue box
     this.dialogueBox.style.display = "block";
@@ -320,9 +167,6 @@ class DialogueSystem {
       this.sound.currentTime = 0;
       this.sound.play().catch(e => console.log("Sound play error:", e));
     }
-    
-    // Speak the dialogue text
-    this.speakText(message);
     
     this.isOpen = true;
     
@@ -355,16 +199,6 @@ class DialogueSystem {
   // Close the dialogue box
   closeDialogue() {
     if (!this.isOpen) return;
-    
-    // Clear typewriter timeout
-    if (this.typewriterTimeoutId) {
-      clearTimeout(this.typewriterTimeoutId);
-    }
-    
-    // Cancel speech synthesis
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
     
     // Hide the dialogue box
     this.dialogueBox.style.display = "none";
