@@ -12,9 +12,20 @@ active_tab: dashboard
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
             <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
                 <li class="me-2">
+                    <a href="#" id="tab-preferences"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500" aria-current="page">
+                        Preferences
+                    </a>
+                </li> 
+                <li class="me-2">
+                    <a href="#" id="tab-wait"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
+                        >Queue</a>
+                </li>               
+                <li class="me-2">
                     <a href="#" id="tab-github"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500"
-                        aria-current="page">GitHub Analytics</a>
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
+                        >GitHub Analytics</a>
                 </li>
                 <li class="me-2">
                     <a href="#" id="tab-grade"
@@ -42,12 +53,6 @@ active_tab: dashboard
                        ⓘ Help 
                     </a>
                 </li>
-                <li class="me-2">
-                    <a href="#" id="tab-preferences"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
-                        Preferences
-                    </a>
-                </li>
             </ul>
             <!-- sliding underline indicator -->
             <div id="tab-underline"
@@ -57,8 +62,20 @@ active_tab: dashboard
 
         <!-- tab content container -->
         <div id="tab-content-container" class="relative min-h-[400px]">
+            <!-- Queue tab content -->
+            <div id="tab-content-wait" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <!-- Quick action buttons -->
+                <div class="mt-6 flex flex-col items-center justify-center min-h-[220px] text-center">
+                    <p class="text-sm text-neutral-400 mb-3">Sign Up and Queue's</p>
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <a id="btn-hallpass" href="/hallpass_queue/" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium">Hallpass</a>
+                        <a id="btn-team-teach" href="/student/TeamTeachToolkit/signup" class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-medium">Team Teach Sign Up</a>
+                        <a id="btn-assign-submit" href="student/submissions/" class="px-4 py-2 rounded bg-yellow-600 hover:bg-yellow-700 text-neutral-900 font-medium">Submit Assignment</a>
+                    </div>
+                </div>
+            </div>
             <!-- github analytics tab content -->
-            <div id="tab-content-github" class="tab-content block">
+            <div id="tab-content-github" class="tab-content hidden px-6 py-4 text-neutral-200">
                 <!-- Grid -->
                 <div
                     class="grid sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-4 lg:grid-rows-2 gap-4 sm:gap-6 text-neutral-200">
@@ -604,7 +621,7 @@ score += gists * 0.5
             </div>
 
             <!-- Preferences tab content -->
-            <div id="tab-content-preferences" class="tab-content hidden px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
+            <div id="tab-content-preferences" class="tab-content block px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
                 <h2 class="text-xl font-semibold mb-2">Preferences</h2>
                 <p class="text-neutral-400 mb-6">Customize how the site looks. Changes apply across the site and are saved locally.</p>
 
