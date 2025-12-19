@@ -17,21 +17,22 @@ class GameControl {
         this.currentLevel = null;
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
-        this.isPaused = false;
+    this.isPaused = false;
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
     // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
     // Games can override these values if they want to count a different stat name/label.
     this.pauseMenuOptions = {
-        counterVar: 'coinsCollected',
-        counterLabel: 'Coins collected'
+        counterVar: 'levelsCompleted',
+        counterLabel: 'Levels completed',
+        // Use a cumulative levels-completed counter instead of per-level counts
+        counterPerLevel: false
     };
-    // Whether to show per-level counts. We want a single cumulative counter for coins collected.
-    this.pauseMenuOptions.counterPerLevel = false;
     // use a unique storage key so stats are per-game
-    this.pauseMenuOptions.storageKey = 'pauseMenuStats:adventure';
+    this.pauseMenuOptions.storageKey = 'pauseMenuStats:mansion';
     this.skipKeyListener = this.handleSkipKey.bind(this);
-        this.exitKeyListener = this.handleExitKey.bind(this);
+    this.exitKeyListener = this.handleExitKey.bind(this);
+    this.pauseKeyListener = this.handlePauseKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
         
@@ -44,7 +45,10 @@ class GameControl {
     
     start() {
         this.addExitKeyListener();
+        // Add listener for opening the pause menu (toggle with 'p') and skip key (L)
+        document.addEventListener('keydown', this.pauseKeyListener);
         this.addSkipKeyListener();
+        // PauseMenu is initialized by the shared Game core (optional dynamic import).
         this.transitionToLevel();
     }
 
@@ -124,6 +128,18 @@ class GameControl {
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
+        // If there's an existing level instance, destroy it before creating the next one.
+        // This ensures canvases and game objects from the previous level are removed
+        // and prevents leftover player canvases that can't be controlled.
+        if (this.currentLevel && typeof this.currentLevel.destroy === 'function') {
+            try {
+                this.currentLevel.destroy();
+            } catch (e) {
+                console.error('Error destroying previous level:', e);
+            }
+            this.currentLevel = null;
+        }
+
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
@@ -170,44 +186,53 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
-        // NOTE: For adventure game, the pause menu counter (coinsCollected) is NOT incremented here.
-        // It is ONLY incremented by coin collection via the collectCoin() method.
-        // Level completion or skipping should not affect the coin counter.
+        // Increment configured per-game counter (PauseMenu displays this variable)
+        try {
+            const cv = (this.pauseMenuOptions && this.pauseMenuOptions.counterVar) || 'levelsCompleted';
+            const perLevel = (this.pauseMenuOptions && this.pauseMenuOptions.counterPerLevel) || false;
+            if (!this.stats) this.stats = {};
+            if (perLevel) {
+                if (!this.stats.levels) this.stats.levels = {};
+                const levelKey = (typeof this.currentLevelIndex !== 'undefined') ? String(this.currentLevelIndex) : ((this.currentLevel && this.currentLevel.id) || '0');
+                this.stats.levels[levelKey] = (this.stats.levels[levelKey] || 0) + 1;
+            } else {
+                this[cv] = (this[cv] || 0) + 1;
+                this.stats[cv] = this[cv];
+            }
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+        } catch (e) { /* ignore */ }
+
+        // Alert the user that the level has ended
+        if (this.currentLevelIndex < this.levelClasses.length - 1) {
+            alert("Level ended.");
+        } else {
+            alert("All levels completed.");
+        }
         
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
-
-        // Destroy current level safely
-        try {
-            if (this.currentLevel && typeof this.currentLevel.destroy === 'function') {
-                this.currentLevel.destroy();
-            }
-        } catch (e) {
-            console.error('Error destroying current level:', e);
-        }
-
-        // If there are more levels, advance. Otherwise finish gracefully.
-        if (this.currentLevelIndex < this.levelClasses.length - 1) {
-            // Inform user and go to next level
-            try { alert("Level ended."); } catch (e) { /* ignore */ }
-            if (this.gameOver) {
-                this.gameOver();
-            } else {
-                this.currentLevelIndex++;
-                this.transitionToLevel();
-            }
+        
+        this.currentLevel.destroy();
+        
+        // Call the gameOver callback if it exists
+        if (this.gameOver) {
+            this.gameOver();
         } else {
-            // Final level completed: prefer game.returnHome() if available,
-            // otherwise call gameOver callback or show a completion message.
-            if (this.game && typeof this.game.returnHome === 'function') {
-                this.game.returnHome();
-            } else if (this.gameOver) {
-                this.gameOver();
-            } else {
-                try { alert("All levels completed."); } catch (e) { /* ignore */ }
+            // Move to next level; if no level exists, fall back to original set
+            this.currentLevelIndex++;
+
+            // Guard against empty level arrays when a single-level side area is skipped
+            if (this.currentLevelIndex >= this.levelClasses.length) {
+                if (this._originalLevelClasses && this._originalLevelClasses.length) {
+                    this.levelClasses = this._originalLevelClasses;
+                    this.currentLevelIndex = 0;
+                } else {
+                    console.warn('No further levels available; stopping transition');
+                    return;
+                }
             }
-            // Ensure no dangling currentLevel reference
-            this.currentLevel = null;
+
+            this.transitionToLevel();
         }
     }
 
@@ -231,6 +256,26 @@ class GameControl {
                 } catch (e) {
                     console.warn('Error toggling pause menu:', e);
                 }
+            } else {
+                // fallback: end the level when no pause menu is present
+                this.currentLevel.continue = false;
+            }
+        }
+    }
+
+    /**
+     * Handle pause-key to toggle pause menu (default: 'p')
+     */
+    handlePauseKey(event) {
+        // Don't interfere with typing in inputs
+        const tag = event.target && event.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
+
+        if (event.key === 'p' || event.key === 'P') {
+            if (this.isPaused) {
+                this.hidePauseMenu();
+            } else {
+                this.showPauseMenu();
             }
         }
     }
@@ -244,10 +289,6 @@ class GameControl {
         if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
 
         if (event.key === 'l' || event.key === 'L') {
-            // If on the last level and no return handler exists, ignore; otherwise allow skip to trigger level-end flow
-            if (this.currentLevelIndex >= this.levelClasses.length - 1 && !(this.game && typeof this.game.returnHome === 'function')) {
-                return;
-            }
             // Call the public API to end/skip the level
             try {
                 this.endLevel();
@@ -265,6 +306,39 @@ class GameControl {
         document.removeEventListener('keydown', this.skipKeyListener);
     }
 
+    showPauseMenu() {
+        // Pause the game loop and show the UI
+        this.pause();
+        if (this.pauseMenu && typeof this.pauseMenu.show === 'function') {
+            this.pauseMenu.show();
+        }
+    }
+
+    hidePauseMenu() {
+        if (this.pauseMenu && typeof this.pauseMenu.hide === 'function') {
+            this.pauseMenu.hide();
+        }
+        this.resume();
+    }
+
+    /**
+     * Restart the current level by destroying and transitioning to it again
+     */
+    restartLevel() {
+        if (this.currentLevel) {
+            try {
+                this.currentLevel.destroy();
+            } catch (e) {
+                console.error('Error destroying level during restart:', e);
+            }
+        }
+        // ensure interaction handlers cleaned
+        this.cleanupInteractionHandlers();
+        // Recreate the same level
+        this.currentLevel = null;
+        this.transitionToLevel();
+    }
+    
     /**
      * End the current level (public API)
      */
@@ -282,7 +356,6 @@ class GameControl {
             this[statName] = (this[statName] || 0) + Number(amount || 0);
             if (this.stats) this.stats[statName] = this[statName];
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('incrementStat error', e);
         }
@@ -294,44 +367,8 @@ class GameControl {
             if (!this.stats) this.stats = { points: this.points };
             this.stats.points = this.points;
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('addPoints error', e);
-        }
-    }
-
-    /**
-     * Increment coin collection counter for adventure game pause menu
-     */
-    collectCoin(amount = 1) {
-        try {
-            this.coinsCollected = (this.coinsCollected || 0) + Number(amount || 0);
-            if (!this.stats) this.stats = {};
-            this.stats.coinsCollected = this.coinsCollected;
-            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
-        } catch (e) {
-            console.warn('collectCoin error', e);
-        }
-    }
-
-    /**
-     * Called by an attached PauseMenu to show the menu (pauses the game)
-     */
-    showPauseMenu() {
-        if (this.pauseMenu && typeof this.pauseMenu.show === 'function') {
-            this.pause();
-            this.pauseMenu.show();
-        }
-    }
-
-    /**
-     * Called by an attached PauseMenu to hide the menu (resumes the game)
-     */
-    hidePauseMenu() {
-        if (this.pauseMenu && typeof this.pauseMenu.hide === 'function') {
-            this.pauseMenu.hide();
-            this.resume();
         }
     }
     

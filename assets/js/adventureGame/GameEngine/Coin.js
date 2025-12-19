@@ -88,8 +88,12 @@ export default class CoinObject extends GameObject {
             // If close enough, destroy this coin and create a new one at random position
             if (dist < 50) {
                 this.score += 1;
+                // Update the game control's coin counter
+                if (this.gameEnv && this.gameEnv.gameControl && typeof this.gameEnv.gameControl.collectCoin === 'function') {
+                    this.gameEnv.gameControl.collectCoin(1);
+                }
                 this.createNewCoinAtRandomPosition();
-                console.log("Score:", this.score);
+                console.log("Coin collected! Score:", this.score);
                 this.destroy();
             }
         }

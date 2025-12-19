@@ -31,24 +31,24 @@ class Enemy extends Character {
      */
     stayWithinCanvas() {
         // Bottom of the canvas
-        if (this.position.y + this.height > this.gameEnv.innerHeight) {
-            this.position.y = this.gameEnv.innerHeight - this.height;
-            this.velocity.y = 0;
+        if (this.transform.y + this.height > this.gameEnv.innerHeight) {
+            this.transform.y = this.gameEnv.innerHeight - this.height;
+            this.transform.yv = 0;
         }
         // Top of the canvas
-        if (this.position.y < 0) {
-            this.position.y = 0;
-            this.velocity.y = 0;
+        if (this.transform.y < 0) {
+            this.transform.y = 0;
+            this.transform.yv = 0;
         }
         // Right of the canvas
-        if (this.position.x + this.width > this.gameEnv.innerWidth) {
-            this.position.x = this.gameEnv.innerWidth - this.width;
-            this.velocity.x = 0;
+        if (this.transform.x + this.width > this.gameEnv.innerWidth) {
+            this.transform.x = this.gameEnv.innerWidth - this.width;
+            this.transform.xv = 0;
         }
         // Left of the canvas
-        if (this.position.x < 0) {
-            this.position.x = 0;
-            this.velocity.x = 0;
+        if (this.transform.x < 0) {
+            this.transform.x = 0;
+            this.transform.xv = 0;
         }
     }
 
@@ -74,7 +74,12 @@ class Enemy extends Character {
     handleCollisionEvent() {
         console.log("Player collided with the Enemy. Player is dead.");
         this.playerDestroyed = true; // Mark the player as "dead"
-        this.gameEnv.gameControl.currentLevel.restart = true; 
+        // End the level cleanly instead of setting a restart flag that can freeze input
+        if (this.gameEnv && this.gameEnv.gameControl && typeof this.gameEnv.gameControl.endLevel === 'function') {
+            this.gameEnv.gameControl.endLevel();
+        } else if (this.gameEnv && this.gameEnv.gameControl) {
+            this.gameEnv.gameControl.currentLevel.continue = false;
+        }
     }
 
     /**

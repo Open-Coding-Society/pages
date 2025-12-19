@@ -1,5 +1,5 @@
-import GameObject from '../GameEngine/GameObject.js';
-import Player from '../GameEngine/Player.js';
+import GameObject from '../../BetterGameEngine/MansionEngine/GameObject.js';
+import Player from '../../BetterGameEngine/MansionEngine/Player.js';
 
 class TriggerZone extends GameObject {
     constructor(data, gameEnv) {

@@ -1,6 +1,6 @@
-import GameEnvBackground  from "./GameEngine/GameEnvBackground.js";
-import Player from "./GameEngine/Player.js";
-import Npc from './GameEngine/Npc.js';
+import GameEnvBackground  from "../BetterGameEngine/MansionEngine/GameEnvBackground.js";
+import Player from "../BetterGameEngine/MansionEngine/Player.js";
+import Npc from '../BetterGameEngine/MansionEngine/Npc.js';
 import MansionLevel6_BattleRoom from './mansionLevel6_BattleRoom.js';
 
 class MansionLevel6 {

@@ -13,8 +13,11 @@ class GameCore {
     this.id = null;
     this.gname = null;
 
+    // Snapshot the starting level list so we can reliably reset after the final level
+    this.initialLevelClasses = [...(environment.gameLevelClasses || [])];
+
     this.initUser();
-    const gameLevelClasses = environment.gameLevelClasses;
+    const gameLevelClasses = [...this.initialLevelClasses];
     // create GameControl using the engine-provided class
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
@@ -33,18 +36,18 @@ class GameCore {
         });
 
     // Try to dynamically load the Leaderboard
-    import('./Leaderboard.js')  // Adjust path as needed
-        .then(mod => {
-            try { 
-                new mod.default(this.gameControl, { 
-                    apiBaseUrl: 'http://localhost:8585/api/gamer'  // Adjust as needed
-                }); 
-            }
-            catch (e) { console.warn('Leaderboard init failed:', e); }
-        })
-        .catch(() => {
-            // no-op: Leaderboard is optional
-        });
+import('./Leaderboard.js')
+    .then(mod => {
+        try { 
+            new mod.default(this.gameControl, { 
+                gameName: 'AdventureGame'  // Change to your game name
+            }); 
+        }
+        catch (e) { console.warn('Leaderboard init failed:', e); }
+    })
+    .catch(() => {
+        // no-op: Leaderboard is optional
+    });
 }
 
     static main(environment, GameControlClass) {
@@ -52,18 +55,22 @@ class GameCore {
     }
 
     returnHome() {
-        if (this.gameControl && !this.gameControl.currentLevelIndex == 0) {
-            try {
+        if (!this.gameControl || !this.initialLevelClasses.length) return;
+
+        try {
+            if (this.gameControl.currentLevel && typeof this.gameControl.currentLevel.destroy === 'function') {
                 this.gameControl.currentLevel.destroy();
-                this.gameControl.cleanupInteractionHandlers();
-            } catch (error) {
-                console.error("Error during cleanup when returning home:", error);
             }
-            this.gameControl.currentLevelIndex = 0;
-            this.gameControl.transitionToLevel();
-        } else {
-            console.warn("Failed to load home level");
+            this.gameControl.cleanupInteractionHandlers();
+        } catch (error) {
+            console.error("Error during cleanup when returning home:", error);
         }
+
+        // Restore the original level order and restart from the first one
+        this.gameControl.levelClasses = [...this.initialLevelClasses];
+        this.gameControl.currentLevelIndex = 0;
+        this.gameControl.isPaused = false;
+        this.gameControl.transitionToLevel();
     }
 
     loadNextLevel() {

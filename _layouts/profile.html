@@ -116,123 +116,244 @@ active_tab: profile
         </div>
     </div>
 
-    <!-- Group Management Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-        <h2 class="text-xl font-semibold mb-6">Group Management</h2>
+<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
 
-        <!-- Create New Group Section -->
-        <div class="bg-neutral-900 rounded-lg p-6 mb-8 border border-neutral-700">
-            <h3 class="text-lg font-semibold mb-6 text-gray-300">Create New Group</h3>
-
-            <!-- Class Period -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Class Period</label>
-                <select class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option class="text-gray-500">Select class period</option>
-                    <option class="text-gray-300">Period 1</option>
-                    <option class="text-gray-300">Period 2</option>
-                    <option class="text-gray-300">Period 3</option>
-                    <option class="text-gray-300">Period 4</option>
-                    <option class="text-gray-300">Period 5</option>
-                </select>
-            </div>
-
-            <!-- Group Name -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Group Name</label>
-                <input type="text" placeholder="e.g., Curators" class="w-full px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-
-            <!-- Group Members -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-300 mb-2">Group Members</label>
-                <div class="flex gap-2">
-                    <input type="text" placeholder="Enter member name" class="flex-1 px-4 py-3 rounded-lg border border-neutral-600 bg-neutral-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button type="button" class="px-6 py-3 bg-neutral-800 border border-neutral-600 text-gray-300 font-medium rounded-lg hover:bg-neutral-700 transition-colors">
-                        Add
-                    </button>
-                </div>
-            </div>
-
-            <!-- Create Group Button -->
-            <button type="button" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
-                Create Group
-            </button>
-        </div>
-
-        <!-- Existing Groups Section -->
-        <div>
-            <h3 class="text-lg font-semibold mb-6 text-gray-300">Existing Groups</h3>
-
-            <!-- Period Tabs -->
-            <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-neutral-700">
-                <button class="px-6 py-2 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
-                    All
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 1
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 2
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 3
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 4
-                </button>
-                <button class="px-6 py-2 rounded-full bg-neutral-700 text-gray-300 font-medium hover:bg-neutral-600 transition-colors">
-                    Period 5
-                </button>
-            </div>
-
-            <!-- Groups Table -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-neutral-700">
-                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Group Name</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Class Period</th>
-                            <th class="text-left py-3 px-4 font-semibold text-gray-300">Members</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Curators</td>
-                            <td class="py-4 px-4 text-gray-400">Period 1</td>
-                            <td class="py-4 px-4 text-gray-400">2</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Researchers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 1</td>
-                            <td class="py-4 px-4 text-gray-400">3</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Designers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 2</td>
-                            <td class="py-4 px-4 text-gray-400">2</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Developers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 3</td>
-                            <td class="py-4 px-4 text-gray-400">3</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Analysts</td>
-                            <td class="py-4 px-4 text-gray-400">Period 4</td>
-                            <td class="py-4 px-4 text-gray-400">1</td>
-                        </tr>
-                        <tr class="border-b border-neutral-700 hover:bg-neutral-900">
-                            <td class="py-4 px-4 text-gray-400">Writers</td>
-                            <td class="py-4 px-4 text-gray-400">Period 5</td>
-                            <td class="py-4 px-4 text-gray-400">2</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
+            Loading group information...
         </div>
     </div>
-</form>
+</div>
+
+<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+            <h2 class="text-xl font-semibold">Join a Group</h2>
+        </div>
+        <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+        <div>
+            <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
+                Groups</label>
+            <input id="groupSearchInput" type="text" placeholder="Start typing a group name or period"
+                class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                autocomplete="off">
+        </div>
+        <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { pythonURI, javaURI } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const uidInput = document.getElementById('uidChangeInput');
+        const springGroupInfo = document.getElementById('springGroupInfo');
+        const groupSearchInput = document.getElementById('groupSearchInput');
+        const groupResultsList = document.getElementById('groupResultsList');
+        const joinGroupStatus = document.getElementById('joinGroupStatus');
+        let availableGroups = [];
+
+        // Wait briefly for the main profile script (setUserData) to populate the UID
+        let attempts = 0;
+        while (!uidInput.value && attempts < 20) {
+            await new Promise(r => setTimeout(r, 100));
+            attempts++;
+        }
+
+        const currentUid = uidInput.value;
+
+        if (!currentUid) {
+            springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+            return;
+        }
+
+        try {
+            // Fetch all users to find the current one
+            const response = await fetch(`${pythonURI}/api/user`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch user data');
+
+            const users = await response.json();
+            const currentUser = Array.isArray(users) ? users.find(user => user.uid === currentUid) : users;
+
+
+        } catch (error) {
+            console.error("Error loading group info:", error);
+        }
+
+        try {
+            const groupResp = await fetch(`${javaURI}/api/groups`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+
+            if (groupResp.status === 401) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
+                groupSearchInput.disabled = true;
+                return;
+            }
+            if (!groupResp.ok) throw new Error('Failed to fetch group data');
+
+            const groups = await groupResp.json();
+            availableGroups = Array.isArray(groups) ? groups : [];
+
+            const userGroups = availableGroups.filter(group =>
+                Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
+            );
+
+            if (userGroups.length > 0) {
+                springGroupInfo.innerHTML = userGroups.map(group => `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Group Name</label>
+                        <input type="text" readonly
+                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
+                            value="${group.name}">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Period</label>
+                        <input type="text" readonly
+                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
+                            value="${group.period}">
+                    </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Members & GitHub IDs</label>
+                        <div class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300">
+                            ${group.members.map(member => `${member.name} (${member.uid})`).join(', ')}
+                        </div>
+                    </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${group.members.find(m => m.uid === currentUid).id})">
+                            Leave Group
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
+            }
+
+            const renderGroupResults = (filter = '') => {
+                const normalized = filter.toLowerCase().trim();
+                
+                if (!normalized) {
+                    groupResultsList.classList.add('hidden');
+                    return;
+                }
+
+                const filtered = availableGroups.filter(group => {
+                    const nameMatch = group.name?.toLowerCase().includes(normalized);
+                    const periodMatch = group.period?.toString().toLowerCase().includes(normalized);
+                    return nameMatch || periodMatch;
+                });
+
+                if (filtered.length === 0) {
+                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
+                    groupResultsList.classList.remove('hidden');
+                    return;
+                }
+
+                groupResultsList.innerHTML = filtered.map(group => {
+                    const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
+                    const isAlreadyMember = userGroups.some(ug => ug.id === group.id);
+                    const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
+                    return `
+                        <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
+                            onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
+                            <div class="font-medium">${label}</div>
+                            ${isAlreadyMember ? '<div class="text-xs text-gray-500 mt-1">Already a member</div>' : ''}
+                        </div>
+                    `;
+                }).join('');
+                groupResultsList.classList.remove('hidden');
+            };
+
+            groupSearchInput?.addEventListener('input', (event) => {
+                renderGroupResults(event.target.value);
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', (event) => {
+                if (!event.target.closest('#groupSearchInput') && !event.target.closest('#groupResultsList')) {
+                    groupResultsList.classList.add('hidden');
+                }
+            });
+
+            window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
+                if (isAlreadyMember) {
+                    joinGroupStatus.textContent = 'You are already a member of this group.';
+                    return;
+                }
+
+                groupSearchInput.disabled = true;
+                joinGroupStatus.textContent = 'Joining group...';
+                groupResultsList.classList.add('hidden');
+
+                try {
+                    // Step 1: get current user uid
+                    const userResponse = await fetch(`${pythonURI}/api/user`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+                    if (!userResponse.ok) throw new Error('Failed to fetch user info');
+                    const userPayload = await userResponse.json();
+                    const userUid = userPayload?.uid || currentUid;
+
+                    if (!userUid) {
+                        throw new Error('Unable to resolve user uid');
+                    }
+
+                    // Step 2: map uid to numeric id from people
+                    const peopleResp = await fetch(`${javaURI}/api/people`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+                    if (!peopleResp.ok) throw new Error('Failed to fetch people data');
+                    const people = await peopleResp.json();
+                    const matchingPerson = Array.isArray(people) ? people.find(person => person.uid === userUid) : null;
+
+                    if (!matchingPerson?.id) {
+                        throw new Error('Could not match user to an id');
+                    }
+
+                    // Step 3: join the selected group
+                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${matchingPerson.id}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+
+                    if (!joinResp.ok) {
+                        const body = await joinResp.text();
+                        throw new Error(body || 'Failed to join group');
+                    }
+
+                    joinGroupStatus.textContent = 'Refreshing...';
+                    // Refresh current groups to reflect new membership
+                    window.location.reload();
+                } catch (joinError) {
+                    console.error('Join group error:', joinError);
+                    joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
+                    groupSearchInput.disabled = false;
+                }
+            };
+        } catch (error) {
+            console.error("Error loading spring group info:", error);
+            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
+            groupSearchInput.disabled = true;
+        }
+    });
+</script>
 
 <div class="flex justify-between items-center mb-8">
     <button id="saveChangesBtn" disabled
@@ -295,7 +416,7 @@ active_tab: profile
         const changePfpBox = document.getElementById('change-pfp');
         console.log("Change pfp button clicked");
         if (changePfpBox) {
-            changePfpBox.style.visibility = 'visible'; // Make the modal visible
+            changePfpBox.style.visibility = 'visible';
         } else {
             console.error('Change PFP modal not found in the DOM.');
         }
@@ -659,6 +780,59 @@ active_tab: profile
         }
     }
 
+    // Fetch grade prediction from academic grade predictor API
+    async function fetchGradePrediction() {
+        const uidInput = document.getElementById("uidChangeInput");
+        const uid = uidInput.value.trim();
+
+        if (!uid) {
+            console.error('User ID is required to fetch grade prediction');
+            alert('Please ensure your User ID is set before fetching grade prediction.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Grade Prediction Data:', data);
+            
+            // Process and display the grade prediction data
+            if (data && data.prediction) {
+                displayGradePrediction(data);
+            } else {
+                console.warn('No prediction data available');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error fetching grade prediction:', error.message);
+            alert(`Error fetching grade prediction: ${error.message}`);
+            return null;
+        }
+    }
+
+    // Display grade prediction results
+    function displayGradePrediction(data) {
+        console.log('Displaying grade prediction:', data);
+        
+        // You can add UI elements here to display the prediction
+        // For now, just log to console
+        if (data.prediction) {
+            console.log(`Predicted Grade: ${data.prediction.grade}`);
+            console.log(`Confidence: ${data.prediction.confidence || 'N/A'}`);
+            console.log(`Prediction Details:`, data.prediction);
+        }
+    }
+
     // save all changes in one go
     async function saveChanges() {
         // get references to inputs
@@ -872,4 +1046,31 @@ active_tab: profile
     window.updateClassInAPI = updateClassInAPI;
     window.saveChanges = saveChanges;
     window.checkForChanges = checkForChanges;
+    window.fetchGradePrediction = fetchGradePrediction;
+    window.displayGradePrediction = displayGradePrediction;
+
+    // Leave group function
+    window.leaveGroup = async function(groupId, personId) {
+        if (!confirm('Are you sure you want to leave this group?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to leave group: ${response.statusText}`);
+            }
+
+            // alert('Successfully left the group.');
+            window.location.reload();
+        } catch (error) {
+            console.error('Error leaving group:', error);
+            alert(`Error leaving group: ${error.message}`);
+        }
+    };
 </script>

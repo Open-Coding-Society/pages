@@ -8,7 +8,7 @@ permalink: /gamify/mansion2
 <script type="module">
     // Adnventure Game assets locations
     import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameEngine/GameControl.js";
+    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/GameControl.js";
     import GameLevel1 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Web Server Environment data
