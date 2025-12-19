@@ -11,7 +11,7 @@ layout: post
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="stylesheet" href="{{ '/assets/css/_main.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/timeline.scss' | relative_url }}">
 
 <div class="timeline-page"> 
 <div class="timeline-header">
@@ -44,18 +44,18 @@ layout: post
           <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="false">
             <span class="sprint-toggle-icon">▾</span> View Weeks
           </button>
-            <div class="timeline-filters">
-          <button class="filter-btn active" data-filter="all">
-            <i class="fas fa-filter"></i> All Items
+        <div class="sprint-filters">
+          <button class="sprint-filter-btn active" data-filter="all" data-sprint="{{ unitKey }}">
+            <i class="fas fa-filter"></i> All
           </button>
-          <button class="filter-btn" data-filter="lessons">
-            Lessons Only
+          <button class="sprint-filter-btn" data-filter="lessons" data-sprint="{{ unitKey }}">
+            Lessons
           </button>
-          <button class="filter-btn" data-filter="assignments">
-            Assignments Only
+          <button class="sprint-filter-btn" data-filter="assignments" data-sprint="{{ unitKey }}">
+            Assignments
           </button>
-          <button class="filter-btn" data-filter="incomplete">
-            Incomplete Only
+          <button class="sprint-filter-btn" data-filter="incomplete" data-sprint="{{ unitKey }}">
+            Incomplete
           </button>
         </div>
         </div>
@@ -418,41 +418,50 @@ layout: post
     updateProgressBars();
   }
   
-  // Filter functionality
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  
-  function applyFilters() {
-    const itemCards = document.querySelectorAll('.item-card');
-    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+  // Filter functionality - per sprint
+  function applySprintFilters(sprintKey, filterType) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) return;
+    
+    const itemCards = sprintCard.querySelectorAll('.item-card');
     
     itemCards.forEach(card => {
       const type = card.dataset.type;
       const isCompleted = card.classList.contains('completed');
       
-      if (activeFilter === 'all') {
+      if (filterType === 'all') {
         card.style.display = 'block';
-      } else if (activeFilter === 'lessons' && type === 'lesson') {
+      } else if (filterType === 'lessons' && type === 'lesson') {
         card.style.display = 'block';
-      } else if (activeFilter === 'assignments' && type === 'assignment') {
+      } else if (filterType === 'assignments' && type === 'assignment') {
         card.style.display = 'block';
-      } else if (activeFilter === 'incomplete' && !isCompleted) {
+      } else if (filterType === 'incomplete' && !isCompleted) {
         card.style.display = 'block';
       } else {
         card.style.display = 'none';
       }
     });
   }
-  
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Update active state
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Apply filters
-      applyFilters();
+
+  // Initialize sprint filters
+  function initializeSprintFilters() {
+    document.querySelectorAll('.sprint-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent sprint toggle
+        
+        const sprintKey = btn.dataset.sprint;
+        const filterType = btn.dataset.filter;
+        
+        // Update active state for this sprint's filters only
+        const sprintCard = btn.closest('.sprint-card');
+        sprintCard.querySelectorAll('.sprint-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Apply filter
+        applySprintFilters(sprintKey, filterType);
+      });
     });
-  });
+  }
   
   // Initialize progress bars from data attributes
   function initializeProgressBars() {
@@ -939,11 +948,10 @@ layout: post
     }, 100);
   });
 
-  // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
     initializeCompletion();
-    applyFilters();
+    initializeSprintFilters();
     initializeCertificateSystem();
     renderWeekGoalPreviews();
     initMobileEnhancements();
