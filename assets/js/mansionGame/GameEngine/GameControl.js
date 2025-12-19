@@ -18,6 +18,7 @@ class GameControl {
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
     this.isPaused = false;
+    this.levelSkipped = false; // Track if current level was skipped
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
     // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
@@ -187,6 +188,7 @@ class GameControl {
      */
     handleLevelEnd() {
         // Increment configured per-game counter (PauseMenu displays this variable)
+        // For mansion game, count both completed and skipped levels
         try {
             const cv = (this.pauseMenuOptions && this.pauseMenuOptions.counterVar) || 'levelsCompleted';
             const perLevel = (this.pauseMenuOptions && this.pauseMenuOptions.counterPerLevel) || false;
@@ -201,6 +203,12 @@ class GameControl {
             }
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
             if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) { /* ignore */ }
+
+        // Reset the skip flag for next level
+        this.levelSkipped = false;
+            }
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
         } catch (e) { /* ignore */ }
 
         // Alert the user that the level has ended
@@ -219,7 +227,20 @@ class GameControl {
         if (this.gameOver) {
             this.gameOver();
         } else {
+            // Move to next level; if no level exists, fall back to original set
             this.currentLevelIndex++;
+
+            // Guard against empty level arrays when a single-level side area is skipped
+            if (this.currentLevelIndex >= this.levelClasses.length) {
+                if (this._originalLevelClasses && this._originalLevelClasses.length) {
+                    this.levelClasses = this._originalLevelClasses;
+                    this.currentLevelIndex = 0;
+                } else {
+                    console.warn('No further levels available; stopping transition');
+                    return;
+                }
+            }
+
             this.transitionToLevel();
         }
     }
@@ -279,6 +300,7 @@ class GameControl {
         if (event.key === 'l' || event.key === 'L') {
             // Call the public API to end/skip the level
             try {
+                this.levelSkipped = true; // Mark this level as skipped
                 this.endLevel();
             } catch (e) {
                 console.warn('Error skipping level via L key:', e);
@@ -344,7 +366,6 @@ class GameControl {
             this[statName] = (this[statName] || 0) + Number(amount || 0);
             if (this.stats) this.stats[statName] = this[statName];
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('incrementStat error', e);
         }
@@ -356,7 +377,6 @@ class GameControl {
             if (!this.stats) this.stats = { points: this.points };
             this.stats.points = this.points;
             if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
-            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
         } catch (e) {
             console.warn('addPoints error', e);
         }

@@ -435,15 +435,15 @@ function openCheatsMenu(gameInstance) {
             
             // For mansion game, we need to dynamically import and load the level
             const levelMap = {
-                "mansionLevelMain": () => import('../mansionLevelMain.js'),
-                "mansionLevel1_Pantry": () => import('../mansionLevel1_Pantry.js'),
-                "mansionLevel1": () => import('../mansionLevel1.js'),
-                "mansionLevel2": () => import('../mansionLevel2.js'),
-                "mansionLevel3": () => import('../mansionLevel3.js'),
-                "mansionLevel4": () => import('../mansionLevel4.js'),
-                "mansionLevel5": () => import('../mansionLevel5.js'),
-                "mansionLevel6_BattleRoom": () => import('../mansionLevel6_BattleRoom.js'),
-                "mansionLevel6": () => import('../mansionLevel6.js')
+                "mansionLevelMain": () => import('../../mansionGame/mansionLevelMain.js'),
+                "mansionLevel1_Pantry": () => import('../../mansionGame/mansionLevel1_Pantry.js'),
+                "mansionLevel1": () => import('../../mansionGame/mansionLevel1.js'),
+                "mansionLevel2": () => import('../../mansionGame/mansionLevel2.js'),
+                "mansionLevel3": () => import('../../mansionGame/mansionLevel3.js'),
+                "mansionLevel4": () => import('../../mansionGame/mansionLevel4.js'),
+                "mansionLevel5": () => import('../../mansionGame/mansionLevel5.js'),
+                "mansionLevel6_BattleRoom": () => import('../../mansionGame/mansionLevel6_BattleRoom.js'),
+                "mansionLevel6": () => import('../../mansionGame/mansionLevel6.js')
             };
             
             if (levelMap[level.id]) {

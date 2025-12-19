@@ -14,6 +14,10 @@ class Game {
         this.id = null;
         this.gname = null;
         this.username = null;
+        this.gameName = this._extractGameName();
+
+        // Preserve original level set so we can return to start (plains/zombie) after final levels
+        this.initialLevelClasses = environment.gameLevelClasses;
 
         this.initUser();
         const gameLevelClasses = environment.gameLevelClasses;
@@ -70,6 +74,24 @@ class Game {
         });
         this.multiplayer.init();
         console.log('[Game] Multiplayer initialized');
+    }
+
+    // Return to the first level sequence when all levels are done or skip is used on the final level
+    returnHome() {
+        if (!this.gameControl || !this.initialLevelClasses || !this.initialLevelClasses.length) return;
+        this.gameControl.levelClasses = this.initialLevelClasses;
+        this.gameControl.currentLevelIndex = 0;
+        this.gameControl.isPaused = false;
+        this.gameControl.transitionToLevel();
+    }
+
+    // Extract game name from the current URL pathname
+    _extractGameName() {
+        if (typeof window === 'undefined') return 'unknown';
+        const pathname = window.location.pathname;
+        // Extract game name from URL like /gamify/adventureGame or /gamify/mansionGame
+        const match = pathname.match(/\/(\w+Game)/);
+        return match ? match[1] : 'unknown';
     }
 }
 

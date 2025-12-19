@@ -6,8 +6,17 @@ import GameObject from './GameObject.js';
 export class GameEnvBackground extends GameObject {
     constructor(data = null, gameEnv = null) {
         super(gameEnv);
+        this.imageLoaded = false;
         if (data.src) {
             this.image = new Image();
+            this.image.onload = () => {
+                this.imageLoaded = true;
+                // draw once on load in case the first frame cleared to black
+                this.draw();
+            };
+            this.image.onerror = () => {
+                console.error('Error loading background image:', data.src);
+            };
             this.image.src = data.src;
         } else {
             this.image = null;
@@ -25,7 +34,7 @@ export class GameEnvBackground extends GameObject {
         const width = this.gameEnv.innerWidth;
         const height = this.gameEnv.innerHeight;
 
-        if (this.image) {
+        if (this.image && this.imageLoaded) {
             // Draw the background image scaled to the canvas size
             ctx.drawImage(this.image, 0, 0, width, height);
         } else {
