@@ -161,14 +161,18 @@ body:has(.lesson-player) {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
-.lesson-status-icon.completed {
-  color: $accent;
-}
-
+/* Incomplete state - completely hidden, no space */
 .lesson-status-icon.incomplete {
-  color: $bg-3;
+  display: none;
+}
+
+/* Completed state - visible blue checkmark */
+.lesson-status-icon.completed {
+  display: block;
+  color: $accent;
 }
 
 .lesson-title {
@@ -815,21 +819,39 @@ body:has(.lesson-player) {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-}
-
-.modal-lesson-status.completed {
-  color: $accent;
+  transition: all 0.2s ease;
 }
 
 .modal-lesson-status.incomplete {
-  color: $bg-3;
+  display: none;
+}
+
+.modal-lesson-status.completed {
+  display: block;
+  color: $accent;
 }
 
 .modal-lesson-title {
   flex: 1;
   font-size: 14px;
 }
-
+@keyframes checkmarkAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.lesson-status-icon.completed,
+.modal-lesson-status.completed {
+  animation: checkmarkAppear 0.3s ease;
+}
 /* Mobile Styles */
 @media (max-width: 768px) {
   .lesson-player {
