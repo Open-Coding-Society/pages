@@ -1,4 +1,4 @@
-import GameEnvBackground from "./GameEngine/GameEnvBackground.js";
+import GameEnvBackground from "../BetterGameEngine/MansionEngine/GameEnvBackground.js";
 import FightingPlayer from "./CustomGameClasses/FightingPlayer.js";
 import Boss from './CustomGameClasses/Boss.js';
 import showDeathScreen from './CustomGameClasses/DeathScreen.js';
