@@ -287,6 +287,7 @@ permalink: /leaderboard
   .badges-cell {
     display: flex;
     gap: 6px;
+    flex-wrap: wrap;
   }
 
   .badge {
@@ -418,52 +419,6 @@ permalink: /leaderboard
   .empty-state p {
     margin: 0;
     font-size: 14px;
-  }
-
-  /* Certificates Section */
-  .certificates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .certificate-item {
-    background: #0f0f0f;
-    border: 1px solid #1f1f1f;
-    border-radius: 8px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .certificate-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: rgba(168, 85, 247, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #a855f7;
-    font-size: 16px;
-  }
-
-  .certificate-info {
-    flex: 1;
-  }
-
-  .certificate-name {
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-
-  .certificate-date {
-    color: #6b7280;
-    font-size: 11px;
   }
 
   @media (max-width: 1024px) {
@@ -608,7 +563,7 @@ permalink: /leaderboard
         <canvas id="weekly-progress-chart" height="200"></canvas>
       </div>
       <div class="analytics-card">
-        <h3><i class="fas fa-list-check"></i> Progress</h3>
+        <h3><i class="fas fa-award"></i> Certificates Earned</h3>
         <div id="quest-timeline"></div>
       </div>
     </div>
@@ -646,26 +601,130 @@ permalink: /leaderboard
     }
   }
 
+  // NEW: Sync user stats with current completion data and build weekly progress
+  function syncUserStatsFromCompletion() {
+    const stats = initializeUserStats();
+    const completionData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    
+    // Get total items from stored count (set by timeline page)
+    const totalItems = parseInt(localStorage.getItem(`${CURRENT_COURSE}-total-items`) || '0');
+    
+    // Recalculate totals from completion data
+    const allCompletedItems = Object.values(completionData).filter(Boolean).length;
+    stats.totalCompleted = allCompletedItems;
+    stats.totalItems = totalItems;
+    
+    // NEW: Build weekly progress from completion data
+    // This simulates having week data by analyzing completed items
+    if (allCompletedItems > 0) {
+      // Create sample weekly progress based on total completion
+      // In a real scenario, items would have week associations
+      const estimatedWeeks = Math.ceil(totalItems / 10); // Assume ~10 items per week
+      const completedPerWeek = Math.floor(allCompletedItems / estimatedWeeks);
+      
+      for (let week = 1; week <= estimatedWeeks; week++) {
+        const weekTotal = 10; // Assume 10 items per week
+        const weekCompleted = week < estimatedWeeks ? completedPerWeek : (allCompletedItems % estimatedWeeks || completedPerWeek);
+        
+        stats.weeklyProgress[week] = {
+          total: weekTotal,
+          completed: Math.min(weekCompleted, weekTotal),
+          completedDate: weekCompleted === weekTotal ? new Date().toISOString() : null
+        };
+      }
+    }
+    
+    // Recalculate XP
+    calculateXP(stats);
+    
+    // Save updated stats
+    saveUserStats(stats);
+    
+    return stats;
+  }
+
+  // Save user stats to localStorage
+  function saveUserStats(stats) {
+    try {
+      localStorage.setItem(USER_STATS_KEY, JSON.stringify(stats));
+      
+      // Also update leaderboard
+      updateLeaderboard(stats);
+    } catch (e) {
+      console.error('Error saving user stats:', e);
+    }
+  }
+
+  // Update leaderboard with current user's stats
+  function updateLeaderboard(userStats) {
+    let leaderboard = [];
+    try {
+      leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+    } catch(e) {
+      leaderboard = [];
+    }
+    
+    // Find and update or add current user
+    const userIndex = leaderboard.findIndex(u => u.username === userStats.username);
+    if (userIndex >= 0) {
+      leaderboard[userIndex] = userStats;
+    } else {
+      leaderboard.push(userStats);
+    }
+    
+    // Sort by XP (default)
+    leaderboard.sort((a, b) => b.xp - a.xp);
+    
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+  }
+
+  // Calculate XP based on completion
+  function calculateXP(stats) {
+    // Base XP: 10 per completed item
+    let xp = stats.totalCompleted * 10;
+    
+    // Bonus: 50 XP per completed week
+    const completedWeeks = Object.values(stats.weeklyProgress || {})
+      .filter(w => w.completed === w.total && w.total > 0).length;
+    xp += completedWeeks * 50;
+    
+    // Bonus: Streak multiplier
+    if (stats.currentStreak >= 7) xp += 100;
+    if (stats.currentStreak >= 14) xp += 200;
+    if (stats.currentStreak >= 30) xp += 500;
+    
+    // Bonus: Certificate XP
+    const certs = getEarnedCertificatesCount(stats);
+    xp += certs * 100;
+    
+    stats.xp = xp;
+  }
+
   // Get earned certificates count
   function getEarnedCertificatesCount(user) {
-    // Check both user stats and dedicated certificates storage
-    const userCerts = user.earnedCertificates || [];
     let storedCerts = [];
     try {
       storedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
     } catch(e) {}
     
-    // Also count completed weeks as certificates
-    const completedWeeks = Object.values(user.weeklyProgress || {})
-      .filter(w => w.completed === w.total && w.total > 0).length;
+    return storedCerts.length;
+  }
+
+  // Get earned certificates with details
+  function getEarnedCertificatesWithDetails() {
+    let storedCerts = [];
+    try {
+      storedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
+    } catch(e) {}
     
-    return Math.max(userCerts.length, storedCerts.length, completedWeeks);
+    // Sort by earned date (most recent first)
+    return storedCerts.sort((a, b) => new Date(b.earnedDate) - new Date(a.earnedDate));
   }
 
   // Refresh leaderboard display
   function refreshLeaderboardDisplay() {
     const leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
-    const currentUser = initializeUserStats();
+    const currentUser = syncUserStatsFromCompletion();
     const tbody = document.getElementById('leaderboard-body');
 
     if (!tbody) return;
@@ -800,7 +859,7 @@ permalink: /leaderboard
   // Initialize charts
   function initializeCharts() {
     createWeeklyProgressChart();
-    createActivityTimeline();
+    createCertificatesTimeline();
   }
 
   // Create weekly progress chart
@@ -830,7 +889,7 @@ permalink: /leaderboard
     new Chart(canvas, {
       type: 'line',
       data: {
-        labels: weeks.map(w => 'W' + w),
+        labels: weeks.map(w => 'Week ' + w),
         datasets: [{
           label: 'Completion',
           data: completionRates,
@@ -842,7 +901,8 @@ permalink: /leaderboard
           pointBackgroundColor: '#60a5fa',
           pointBorderColor: '#0a0a0a',
           pointBorderWidth: 2,
-          pointRadius: 4
+          pointRadius: 4,
+          pointHoverRadius: 6
         }]
       },
       options: {
@@ -890,62 +950,37 @@ permalink: /leaderboard
     });
   }
 
-  // Create activity timeline
-  function createActivityTimeline() {
+  // Create certificates timeline
+  function createCertificatesTimeline() {
     const container = document.getElementById('quest-timeline');
     if (!container) return;
 
-    const stats = initializeUserStats();
-    const weeklyProgress = stats.weeklyProgress || {};
-    const completionData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const certificates = getEarnedCertificatesWithDetails();
 
-    // Build timeline from various sources
-    const timeline = [];
-    
-    // Add completed weeks
-    Object.entries(weeklyProgress).forEach(([weekNum, data]) => {
-      if (data.completedDate) {
-        timeline.push({
-          type: 'certificate',
-          title: 'Week ' + weekNum + ' Certificate Earned',
-          date: new Date(data.completedDate),
-          icon: 'certificate'
-        });
-      }
-    });
-
-    // Add recent completions (from today's activity)
-    if (stats.lastActivityDate) {
-      timeline.push({
-        type: 'activity',
-        title: 'Last activity recorded',
-        date: new Date(stats.lastActivityDate),
-        icon: 'activity'
-      });
-    }
-
-    // Sort by date (most recent first)
-    timeline.sort((a, b) => b.date - a.date);
-
-    if (timeline.length === 0) {
+    if (certificates.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <i class="fas fa-clock"></i>
-          <p>No activity yet. Start completing lessons!</p>
+          <i class="fas fa-award"></i>
+          <p>No certificates earned yet. Complete weeks to earn certificates!</p>
         </div>
       `;
       return;
     }
 
-    container.innerHTML = timeline.slice(0, 8).map(item => `
-      <div class="timeline-item">
-        <div class="timeline-dot ${item.icon}"></div>
-        <div class="timeline-content">
-          <div class="timeline-title">${item.title}</div>
-          <div class="timeline-meta">${formatDate(item.date)}</div>
+    container.innerHTML = certificates.map(cert => {
+      // Use skill name if available, otherwise use theme
+      const displayName = cert.skill || cert.theme || 'Certificate Earned';
+      
+      return `
+        <div class="timeline-item">
+          <div class="timeline-dot certificate"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">${displayName}</div>
+            <div class="timeline-meta">${formatDate(new Date(cert.earnedDate))}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // Format date for display
@@ -962,6 +997,9 @@ permalink: /leaderboard
 
   // Initialize page
   document.addEventListener('DOMContentLoaded', function() {
+    // SYNC STATS FIRST before displaying anything
+    syncUserStatsFromCompletion();
+    
     refreshLeaderboardDisplay();
     initializeCharts();
 

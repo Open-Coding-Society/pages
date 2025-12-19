@@ -1991,57 +1991,29 @@ layout: post
   </div>
 </div>
 
-<!-- ============================= -->
-<!--   PROGRESSION MODAL (DARK)   -->
-<!-- ============================= -->
+<!-- PROGRESSION MODAL -->
 <div id="progression-modal">
-  <div id="progression-modal">
-    <div>
-      <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
-      <h2>Week <span id="modal-week-number"></span> Progress</h2>
-      <p class="week-theme" id="modal-week-theme"></p>
-  
-      <div class="progress-bar-container" style="margin-bottom: 16px;">
-        <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
-      </div>
-  
-      <div id="task-list"></div>
-  
-      <div id="certificate-status" style="margin-top: 24px;"></div>
-      
-      <div class="modal-action-buttons">
-        <button id="modal-analytics-btn" class="modal-analytics-btn">
-          <i class="fas fa-chart-line"></i>
-          My Analytics
-        </button>
-      </div>
-      
+  <div>
+    <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
+    <h2>Week <span id="modal-week-number"></span> Progress</h2>
+    <p class="week-theme" id="modal-week-theme"></p>
+
+    <div class="progress-bar-container" style="margin-bottom: 16px;">
+      <div id="modal-progress-fill"></div>
+    </div>
+
+    <div id="task-list"></div>
+
+    <div id="certificate-status" style="margin-top: 24px;"></div>
+    
+    <div class="modal-action-buttons">
+      <button id="modal-analytics-btn" class="modal-analytics-btn">
+        <i class="fas fa-chart-line"></i>
+        My Analytics
+      </button>
     </div>
   </div>
-<div id="progression-modal">
-  <div id="progression-modal">
-    <div>
-      <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
-      <h2>Week <span id="modal-week-number"></span> Progress</h2>
-      <p class="week-theme" id="modal-week-theme"></p>
-  
-      <div class="progress-bar-container" style="margin-bottom: 16px;">
-        <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
-      </div>
-  
-      <div id="task-list"></div>
-  
-      <div id="certificate-status" style="margin-top: 24px;"></div>
-      
-      <div class="modal-action-buttons">
-        <button id="modal-analytics-btn" class="modal-analytics-btn">
-          <i class="fas fa-chart-line"></i>
-          My Analytics
-        </button>
-      </div>
-      
-    </div>
-  </div>
+</div>
 
 <!-- ============================= -->
 <!--   CERTIFICATE LIST MODAL      -->
@@ -2667,16 +2639,8 @@ function setupQuickHelpToggle() {
     if (!exists) {
       earnedCerts.push(certRecord);
       localStorage.setItem(CERTIFICATES_KEY, JSON.stringify(earnedCerts));
-
-      // Update user stats with certificate count
-      const stats = initializeUserStats();
-      if (!stats.earnedCertificates) stats.earnedCertificates = [];
-      if (!stats.earnedCertificates.includes(certRecord.id)) {
-        stats.earnedCertificates.push(certRecord.id);
-        // Bonus XP for earning certificate
-        stats.xp += 100;
-        saveUserStats(stats);
-      }
+      
+      updateAchievementsDisplay();
     }
   }
 
