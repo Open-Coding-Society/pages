@@ -79,7 +79,7 @@ class Character extends GameObject {
         
         // Check if sprite data is provided
         if (data && data.src) {
-            // Load the sprite sheet
+            // Load the sprite sheet 
             this.spriteSheet = new Image();
 
             // mark when the sprite image has finished loading
