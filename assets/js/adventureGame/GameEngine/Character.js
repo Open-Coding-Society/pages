@@ -65,7 +65,7 @@ class Character extends GameObject {
         this.canvas.style = "image-rendering: pixelated;";
 
         // Set initial object properties
-        this.transform = new Transform(data.INIT_POSITION.x, data.INIT_POSITION.y); // Position Data
+        this.transform = new Transform(data?.INIT_POSITION?.x ?? 0, data?.INIT_POSITION?.y ?? 0); // Position Data
         this.frame = 0;
         
         // Initialize the object's properties 
