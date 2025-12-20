@@ -145,8 +145,6 @@ class Player extends Character {
 
         this.transform.x += this.transform.xv * this.time;
         this.transform.y += this.transform.yv * this.time;
-
-        console.log(this.transform);
     }
         
     /**
