@@ -40,7 +40,10 @@ layout: post
           {% endif %}
         </div>
         <div class="sprint-controls">
-          <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="false">
+          <button class="progression-btn" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}">
+            Progress & Certificates
+          </button>
+          <button class="sprint-toggle-btn" type="button" aria-expanded="false">
             <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
           </button>
         </div>
@@ -94,9 +97,6 @@ layout: post
                       <div class="completion-badge">
                         {{ completedItems }}/{{ totalItems }} Complete
                       </div>
-                      <button class="progression-btn" type="button">
-                        Progress & Certificates
-                      </button>
                     </div>
                   </div>
                   <div class="progress-bar-container">
@@ -172,8 +172,8 @@ layout: post
   <button id="close-progression-modal" class="close-btn">&times;</button>
 
   <div>
-    <h2>Week <span id="modal-week-number"></span> Progress</h2>
-    <p class="week-theme" id="modal-week-theme"></p>
+    <h2><span id="modal-sprint-title"></span> Progress</h2>
+    <p class="week-theme" id="modal-sprint-subtitle"></p>
 
     <div class="progress-bar-container" style="margin-bottom: 16px;">
       <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
@@ -192,7 +192,7 @@ layout: post
   <button id="close-certificate-list-modal" class="close-btn">&times;</button>
 
   <div>
-    <h2>Week <span id="list-modal-week-number"></span> Certificates</h2>
+    <h2><span id="list-modal-sprint-title"></span> Certificates</h2>
     <div id="certificate-list"></div>
   </div>
 </div>
@@ -588,55 +588,78 @@ layout: post
     return certificates;
   }
 
-  // Open progression modal
-  function openProgressionModal(weekCard) {
-    const weekNumber = extractWeekNumber(weekCard);
-    console.log('Opening progression modal for week:', weekNumber);
-    if (!weekNumber) {
-      console.log('No week number found, returning');
+  // Open progression modal for entire sprint
+  function openProgressionModal(sprintKey, startWeek, endWeek) {
+    console.log('Opening progression modal for sprint:', sprintKey, 'weeks', startWeek, '-', endWeek);
+    
+    currentModalWeekNumber = null; // Not using this for sprint-level
+    
+    // Get sprint card and title
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.log('Sprint card not found');
       return;
     }
+    
+    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
+    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
+    
+    // Set sprint title and subtitle
+    document.getElementById('modal-sprint-title').textContent = sprintTitle;
+    document.getElementById('modal-sprint-subtitle').textContent = `${sprintKey} (Weeks ${startWeek}-${endWeek})`;
 
-    currentModalWeekNumber = weekNumber;
-    console.log('Set currentModalWeekNumber to:', currentModalWeekNumber);
-
-    // Set week number and theme
-    document.getElementById('modal-week-number').textContent = weekNumber;
-    const weekTitle = weekCard.querySelector('h3').textContent.split(':')[1]?.trim() || '';
-    document.getElementById('modal-week-theme').textContent = weekTitle;
-
-    // Populate task list
+    // Populate task list with all weeks in sprint
     const taskList = document.getElementById('task-list');
     taskList.innerHTML = '';
+    
+    let globalTaskIndex = 0;
+    
+    // Iterate through all weeks in the sprint
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (!weekCard) continue;
+      
+      // Add week header in task list
+      const weekHeader = document.createElement('div');
+      weekHeader.className = 'progression-week-header';
+      const weekTitle = weekCard.querySelector('[data-week-title]')?.textContent || `Week ${weekNum}`;
+      weekHeader.textContent = weekTitle;
+      taskList.appendChild(weekHeader);
+      
+      // Add tasks for this week
+      const itemCards = weekCard.querySelectorAll('.item-card');
+      itemCards.forEach((card) => {
+        const title = card.querySelector('.item-title').textContent;
+        const isCompleted = card.classList.contains('completed');
+        const taskDiv = document.createElement('div');
+        taskDiv.className = 'progression-task';
+        taskDiv.innerHTML = `
+          <input type="checkbox" id="task-${globalTaskIndex}" ${isCompleted ? 'checked' : ''}>
+          <label for="task-${globalTaskIndex}">${title}</label>
+          <span class="task-number">#${globalTaskIndex + 1}</span>
+        `;
 
-    const itemCards = weekCard.querySelectorAll('.item-card');
-    itemCards.forEach((card, index) => {
-      const title = card.querySelector('.item-title').textContent;
-      const isCompleted = card.classList.contains('completed');
-      const taskDiv = document.createElement('div');
-      taskDiv.className = 'progression-task';
-      taskDiv.innerHTML = `
-        <input type="checkbox" id="task-${index}" ${isCompleted ? 'checked' : ''}>
-        <label for="task-${index}">${title}</label>
-        <span class="task-number">#${index + 1}</span>
-      `;
+        // Add change listener
+        const checkbox = taskDiv.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+          const toggleBtn = card.querySelector('.completion-toggle');
+          if (toggleBtn) {
+            toggleCompletion(toggleBtn);
+            updateModalProgress();
+            updateCertificateStatusForSprint(sprintKey, startWeek, endWeek);
+          }
+        });
 
-      // Add change listener
-      const checkbox = taskDiv.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener('change', function() {
-        const toggleBtn = card.querySelector('.completion-toggle');
-        if (toggleBtn) {
-          toggleCompletion(toggleBtn);
-          updateModalProgress();
-          updateCertificateStatus();
-        }
+        taskList.appendChild(taskDiv);
+        globalTaskIndex++;
       });
-
-      taskList.appendChild(taskDiv);
-    });
+    }
 
     updateModalProgress();
-    updateCertificateStatus();
+    updateCertificateStatusForSprint(sprintKey, startWeek, endWeek);
 
     // Show modal
     document.getElementById('progression-modal').style.display = 'block';
@@ -662,7 +685,7 @@ layout: post
 
     if (availableCertificates.length > 0) {
       certificateStatus.innerHTML = `
-        <button id="view-certificate-btn">🎓 View Your Certificate</button>
+        <button id="view-certificate-btn">View Your Certificate</button>
       `;
     } else {
       certificateStatus.innerHTML = `
@@ -670,10 +693,114 @@ layout: post
       `;
     }
   }
+  
+  // Update certificate status for entire sprint
+  function updateCertificateStatusForSprint(sprintKey, startWeek, endWeek) {
+    const certificateStatus = document.getElementById('certificate-status');
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    
+    if (!sprintCard) {
+      certificateStatus.innerHTML = '<p style="color: #666; text-align: center;">Sprint not found</p>';
+      return;
+    }
+    
+    // Check if ALL tasks in the sprint are complete
+    let totalTasks = 0;
+    let completedTasks = 0;
+    
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (weekCard) {
+        const itemCards = weekCard.querySelectorAll('.item-card');
+        totalTasks += itemCards.length;
+        itemCards.forEach(card => {
+          if (card.classList.contains('completed')) {
+            completedTasks++;
+          }
+        });
+      }
+    }
+    
+    const isSprintComplete = totalTasks > 0 && completedTasks === totalTasks;
+    
+    if (isSprintComplete) {
+      certificateStatus.innerHTML = `
+        <button id="view-certificate-btn" data-sprint="${sprintKey}" data-start="${startWeek}" data-end="${endWeek}">🎓 View Your Certificate</button>
+      `;
+    } else {
+      const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      certificateStatus.innerHTML = `
+        <p style="color: #666; text-align: center;">Complete all tasks to unlock certificate (${completedTasks}/${totalTasks} - ${progress}%)</p>
+      `;
+    }
+  }
 
-  // Open certificate list modal
-  function openCertificateListModal(weekNumber) {
-    document.getElementById('list-modal-week-number').textContent = weekNumber;
+  // Open certificate for sprint (directly show the certificate, no list needed)
+  function openCertificateListModal(sprintKey, startWeek, endWeek) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.error('Sprint card not found');
+      return;
+    }
+    
+    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
+    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
+    
+    // Check if sprint is complete
+    let totalTasks = 0;
+    let completedTasks = 0;
+    const allGoals = [];
+    
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (weekCard) {
+        const itemCards = weekCard.querySelectorAll('.item-card');
+        totalTasks += itemCards.length;
+        itemCards.forEach(card => {
+          if (card.classList.contains('completed')) {
+            completedTasks++;
+          }
+          // Collect unique task titles as goals
+          const taskTitle = card.querySelector('.item-title')?.textContent.trim();
+          if (taskTitle && !allGoals.includes(taskTitle)) {
+            allGoals.push(taskTitle);
+          }
+        });
+      }
+    }
+    
+    const isSprintComplete = totalTasks > 0 && completedTasks === totalTasks;
+    
+    if (!isSprintComplete) {
+      alert('Please complete all tasks in this sprint to unlock the certificate.');
+      return;
+    }
+    
+    // Create sprint-level certificate profile
+    const certificateProfile = {
+      sprintKey: sprintKey,
+      theme: sprintTitle,
+      displayName: sprintTitle,
+      courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
+      goal: sprintTitle,
+      goals: allGoals.slice(0, 6), // Limit to first 6 goals for display
+      weekRange: `Weeks ${startWeek}-${endWeek}`,
+      description: sprintDescription
+    };
+    
+    // Open certificate modal directly
+    openCertificateModal(certificateProfile);
+  }
+  
+  // Legacy function for week-level (keep for backward compatibility)
+  function openCertificateListModalForWeek(weekNumber) {
+    document.getElementById('list-modal-sprint-title').textContent = `Week ${weekNumber}`;
     const certificateList = document.getElementById('certificate-list');
     certificateList.innerHTML = '';
 
@@ -706,16 +833,21 @@ layout: post
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('certificate-date').textContent = now.toLocaleDateString('en-US', options);
 
-    // Set goals
+    // Set goals - for sprint certificates, use the sprint title as main focus
     const goalFocus = profile.goal || profile.theme;
     document.getElementById('certificate-skill-focus').textContent = goalFocus;
 
+    // Add all goals/tasks as skill tags
     const goalsContainer = document.getElementById('skills-container');
     goalsContainer.innerHTML = '';
-    const goalTag = document.createElement('span');
-    goalTag.className = 'skill-tag';
-    goalTag.textContent = goalFocus;
-    goalsContainer.appendChild(goalTag);
+    
+    const goals = profile.goals || [goalFocus];
+    goals.forEach(goal => {
+      const goalTag = document.createElement('span');
+      goalTag.className = 'skill-tag';
+      goalTag.textContent = goal;
+      goalsContainer.appendChild(goalTag);
+    });
 
     // Close list modal and open certificate modal
     document.getElementById('certificate-list-modal').style.display = 'none';
@@ -789,33 +921,21 @@ layout: post
 
   // Initialize certificate system
   function initializeCertificateSystem() {
+    // Sprint-level progression buttons
+    document.querySelectorAll('.sprint-controls .progression-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const startWeek = parseInt(btn.dataset.start);
+        const endWeek = parseInt(btn.dataset.end);
+        openProgressionModal(sprintKey, startWeek, endWeek);
+      });
+    });
+    
     console.log('Initializing certificate system');
 
     const weekCards = document.querySelectorAll('.week-card');
     console.log('Found', weekCards.length, 'week cards');
-
-    const progressButtons = document.querySelectorAll('.week-card .progression-btn');
-    progressButtons.forEach(button => {
-      button.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const weekCard = button.closest('.week-card');
-        if (weekCard) {
-          openProgressionModal(weekCard);
-        }
-      });
-    });
-
-    weekCards.forEach(card => {
-      card.classList.add('clickable');
-      card.addEventListener('click', (event) => {
-        if (event.target.closest('a') || event.target.closest('.completion-toggle') || event.target.closest('.progression-btn')) {
-          return;
-        }
-        event.preventDefault();
-        openProgressionModal(card);
-      });
-    });
 
     function toggleSprint(card, control) {
       const isCollapsed = card.classList.toggle('collapsed');
@@ -853,11 +973,20 @@ layout: post
     document.getElementById('print-certificate-btn').addEventListener('click', printCertificate);
     document.getElementById('linkedin-share-btn').addEventListener('click', shareOnLinkedIn);
 
-    // View certificate button
+    // View certificate button (handles sprint-level data)
     document.addEventListener('click', function(e) {
       if (e.target.id === 'view-certificate-btn') {
         closeProgressionModal();
-        openCertificateListModal(currentModalWeekNumber);
+        const sprintKey = e.target.dataset.sprint;
+        const startWeek = parseInt(e.target.dataset.start);
+        const endWeek = parseInt(e.target.dataset.end);
+        
+        if (sprintKey && startWeek && endWeek) {
+          openCertificateListModal(sprintKey, startWeek, endWeek);
+        } else if (currentModalWeekNumber) {
+          // Fallback to old week-level behavior if needed
+          openCertificateListModalForWeek(currentModalWeekNumber);
+        }
       }
     });
   }
