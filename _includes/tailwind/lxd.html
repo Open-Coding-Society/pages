@@ -47,25 +47,25 @@
     </div>
 
     <!-- Modal for Hack Selection -->
-    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: var(--pref-bg-color); padding: 40px 20px 20px 20px; overflow-y: auto;">
-      <div style="position: relative; width: 100%; max-width: 70rem; margin: 0 auto;">
-        <!-- Close button -->
-        <button id="modal-close-btn" style="position: absolute; top: -35px; right: 16px; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none; z-index: 1; color: white;">&times;</button>
-        
-        <!-- Scrolling checklist -->
+    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: var(--pref-bg-color); padding: 60px 20px 60px 20px; ;">
+      <!-- Close button -->
+      <button id="modal-close-btn" style="position: absolute; top: 16px; right: 20px; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none; z-index: 1; color: white;">&times;</button>
+      
+      <!-- Scrolling checklist (centered inner container) -->
+      <div style="width: 100%; max-width: 70rem; margin: 0 auto;">
         <div id="hacks-checklist" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px; border: 2px solid #374151; border-radius: 8px;">
           <!-- Checkboxes will be populated here -->
         </div>
-        
-        <!-- Action buttons -->
-        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
-          <button id="modal-cancel-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 500; font-size: 1rem;">
-            Cancel
-          </button>
-          <button id="modal-save-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; font-size: 1rem;">
-            Save Selection
-          </button>
-        </div>
+      </div>
+      
+      <!-- Action buttons -->
+      <div style="width: 100%; max-width: 70rem; margin: 16px auto 0 auto; display: flex; justify-content: flex-end; gap: 12px;">
+        <button id="modal-cancel-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 500; font-size: 1rem;">
+          Cancel
+        </button>
+        <button id="modal-save-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; font-size: 1rem;">
+          Save Selection
+        </button>
       </div>
     </div>
 
