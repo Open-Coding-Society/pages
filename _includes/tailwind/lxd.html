@@ -1126,16 +1126,15 @@
               </div>
               ${sub.submission_link ? `
                 <div class="mb-3">
-                  <p class="text-gray-300 text-sm mb-1">Submission Link:</p>
                   <a href="${sub.submission_link}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 text-sm break-all">
                     ${sub.submission_link}
                   </a>
                 </div>
               ` : ''}
-              ${sub.score > 0 ? `<p class="text-gray-300 text-sm mb-3">Score: ${sub.score}</p>` : ''}
-              <div class="flex items-center gap-3">
+              <div class="flex items-center justify-between gap-3">
+                ${sub.score > 0 ? `<p class="text-gray-300 text-sm">Score: ${sub.score}</p>` : '<span></span>'}
                 <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
-                  Edit Rubric
+                  Rubric
                 </button>
               </div>
             </div>
