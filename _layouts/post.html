@@ -19,6 +19,39 @@ Check if this is a course lesson and determine which course context to use
 {% elsif page.courses.csse %}
 {% assign current_course = 'csse' %}
 {% assign current_week = page.courses.csse.week | plus: 0 %}
+{% elsif page.courses.cwgu %}
+{% assign current_course = 'cwgu' %}
+{% assign current_week = page.courses.cwgu.week | plus: 0 %}
+{% endif %}
+
+{% if current_course != null and current_week != null %}
+{% assign is_course_lesson = true %}
+{% endif %}
+
+{% if is_course_lesson %}
+{% comment %}
+=== TWO-PANE LESSON PLAYER FOR CSP COURSES ===
+{% endcomment %}
+
+{% assign posts = null | compact %}
+{% assign posts = posts | concat: site.posts | concat: site.pages %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ '/assets/css/_main.css' | relative_url }}">
+
+<div class="lesson-player">
+  <!-- LEFT SIDEBAR -->
+  <div class="lesson-sidebar">
+    <div class="sidebar-header">
+      {% if current_course == 'csp' %}
+      <h2>Computer Science Principles</h2>
+      {% elsif current_course == 'csa' %}
+      <h2>Computer Science A</h2>
+      {% elsif current_course == 'csse' %}
+      <h2>Computer Science & Software Engineering</h2>
+      {% endif %}
+      <p>Del Norte High School</p>
+
 {% endif %}
 
 {% if current_course != null and current_week != null %}
@@ -111,7 +144,7 @@ Check if this is a course lesson and determine which course context to use
     <!-- Top Bar -->
     <div class="lesson-topbar">
       <div class="topbar-actions">
-        <a href="{{ site.baseurl }}/navigation/section/{{ current_course }}" class="back-btn">
+        <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" class="back-btn">
           <i class="fas fa-arrow-left"></i>
           Back to Timeline View
         </a>
