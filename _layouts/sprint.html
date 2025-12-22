@@ -728,7 +728,7 @@ layout: post
     
     if (isSprintComplete) {
       certificateStatus.innerHTML = `
-        <button id="view-certificate-btn" data-sprint="${sprintKey}" data-start="${startWeek}" data-end="${endWeek}">🎓 View Your Certificate</button>
+        <button id="view-certificate-btn" data-sprint="${sprintKey}" data-start="${startWeek}" data-end="${endWeek}">View Your Certificate</button>
       `;
     } else {
       const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
