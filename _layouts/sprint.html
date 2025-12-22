@@ -976,16 +976,25 @@ layout: post
     // View certificate button (handles sprint-level data)
     document.addEventListener('click', function(e) {
       if (e.target.id === 'view-certificate-btn') {
+        console.log('Certificate button clicked!');
+        console.log('Sprint key:', e.target.dataset.sprint);
+        console.log('Start week:', e.target.dataset.start);
+        console.log('End week:', e.target.dataset.end);
+        
         closeProgressionModal();
         const sprintKey = e.target.dataset.sprint;
         const startWeek = parseInt(e.target.dataset.start);
         const endWeek = parseInt(e.target.dataset.end);
         
-        if (sprintKey && startWeek && endWeek) {
+        if (sprintKey && !isNaN(startWeek) && !isNaN(endWeek)) {
+          console.log('Calling openCertificateListModal with:', sprintKey, startWeek, endWeek);
           openCertificateListModal(sprintKey, startWeek, endWeek);
         } else if (currentModalWeekNumber) {
           // Fallback to old week-level behavior if needed
+          console.log('Falling back to week-level with week:', currentModalWeekNumber);
           openCertificateListModalForWeek(currentModalWeekNumber);
+        } else {
+          console.error('No sprint data or week number available');
         }
       }
     });
