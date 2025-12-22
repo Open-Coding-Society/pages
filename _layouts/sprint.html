@@ -40,30 +40,14 @@ layout: post
           {% endif %}
         </div>
         <div class="sprint-controls">
-          <div class="completion-badge">{{ start }} - {{ end }} Weeks</div>
           <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="false">
-            <span class="sprint-toggle-icon">▾</span> View Weeks
+            <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
           </button>
-        <div class="sprint-filters">
-          <button class="sprint-filter-btn active" data-filter="all" data-sprint="{{ unitKey }}">
-            <i class="fas fa-filter"></i> All
-          </button>
-          <button class="sprint-filter-btn" data-filter="lessons" data-sprint="{{ unitKey }}">
-            Lessons
-          </button>
-          <button class="sprint-filter-btn" data-filter="assignments" data-sprint="{{ unitKey }}">
-            Assignments
-          </button>
-          <button class="sprint-filter-btn" data-filter="incomplete" data-sprint="{{ unitKey }}">
-            Incomplete
-          </button>
-        </div>
         </div>
       </div>
 
       <div class="sprint-weeks">
         <div class="sprint-body">
-          <h3 style="margin:0 0 12px 0; font-weight:700; color:#cbd5f5;">{{ unitKey }} — {{ unitData.title }}</h3>
 
           {% for index in (start..end) %}
             {% assign entries = null | compact %}
@@ -277,7 +261,7 @@ layout: post
 </div>
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
-  {{ site.data.certificate_skills | jsonify }}
+  {{ site.data.cs_skills | jsonify }}
 </script>
 
 <script>
