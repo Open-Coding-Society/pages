@@ -73,20 +73,20 @@ csse:
     theme: "Essential Tools Setup"
     goals:
       - "Hardware & Workspace Setup"
-      - "Developer Mindset"
       - "VSCode, Linux, GitHub"
+      - "GitHub Pages Launch"
   2:
     theme: "Agile Development" 
     goals:
       - "Scrum + Standups"
-      - "Kanban Boards"
-      - "Retrospectives"
+      - "Kanban Boards + Burndown"
+      - "Team Repository Management"
   3:
     theme: "Summative Coding Challenge"
     goals:
-      - "JavaScript OOP"
       - "Gamified Coding Tasks"
-      - "Upperclassmen Mentorship"
+      - "JavaScript OOP"
+      - "Retrospective Reflection"
   4:
     theme: "JavaScript Foundations and LxD"
     goals:
@@ -99,3 +99,29 @@ csse:
       - "Pick Techincal Topic"
       - "Learner Empathy"
       - "Design a Lesson Plan"
+cwgu:
+  0:
+    theme: "Onboarding Foundations"
+    goals:
+      - "Tool Mastery"
+      - "Project-Based Learning"
+      - "Team Collaboration"
+  1:
+    theme: "Essential Tools Setup"
+    goals:
+      - "Hardware & Workspace Setup"
+      - "VSCode, Linux, GitHub"
+      - "GitHub Pages Launch"
+  2:
+    theme: "Agile Development" 
+    goals:
+      - "Scrum + Standups"
+      - "Kanban Boards + Burndown"
+      - "Team Repository Management"
+  3:
+    theme: "Summative Coding Challenge"
+    goals:
+      - "Gamified Coding Tasks"
+      - "JavaScript OOP"
+      - "Retrospective Reflection"
+  

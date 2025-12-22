@@ -4,7 +4,7 @@ Sprint1:
   start: 0
   end: 3
 Sprint2:
-  title: JavaScript Student Teaching
+  title: JavaScript Foundations & Student Teaching
   description: A key focus of this course is to make Web Games using JavaScript. Understanding fundamentals like control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices are essentiial. Students will be teaching lessons on these topics to their peers.  Each student will be responsible for a portion of the lesson, a popcorn hack, and homework.  Students will be graded on their teaching, the popcorn hack, and the homework they assign.  Students will also be graded on their participation in learning from their peers.
   start: 4
   end: 7
