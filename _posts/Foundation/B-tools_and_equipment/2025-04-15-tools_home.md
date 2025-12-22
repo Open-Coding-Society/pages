@@ -2,7 +2,6 @@
 toc: False 
 layout: post
 tailwind: True 
-microblog: True
 infoGraph: tools_infograph
 questions: tools_questions
 title: Tools and Equipment
