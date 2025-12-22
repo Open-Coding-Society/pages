@@ -112,7 +112,6 @@ title: My Title</code></pre>
 
 <ul>
   <li><code>index.md</code> is the file that contains markdown for a submenu</li>
-  <li><code>_includes/nav/home.html</code> contains code for submenu, it is included in every page in this dialog</li>
   <li><code>{{site.baseurl}}</code> refers to baseurl defined in <code>_config.yml</code>, this is the location of all files in the Website. Note, this changes as you run on localhost and deployed; make sure you remember to use this for locations of files in site.</li>
 </ul>
 
