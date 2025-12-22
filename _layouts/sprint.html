@@ -261,7 +261,7 @@ layout: post
 </div>
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
-  {{ site.data.cs_skills | jsonify }}
+  {{ course | jsonify }}
 </script>
 
 <script>
@@ -491,7 +491,9 @@ layout: post
   }
 
   function buildCertificateProfile(weekCard, weekNumber) {
-    const overrides = COURSE_SKILL_LIBRARY?.[CURRENT_COURSE]?.[weekNumber] || null;
+    // Get sprint key from week card to access the correct sprint's week data
+    const sprintKey = weekCard.dataset.sprint;
+    const overrides = COURSE_SKILL_LIBRARY?.[sprintKey]?.[weekNumber] || null;
     let theme = overrides?.theme || overrides?.title || overrides?.certificate || '';
     const weekHeader = weekCard.querySelector('.week-title-group h3')?.textContent.trim() || `Week ${weekNumber}`;
     if (!theme) {

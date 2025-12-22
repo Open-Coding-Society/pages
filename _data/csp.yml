@@ -36,11 +36,41 @@ Sprint1:
   shared: "Onboarding"
   start: 0
   end: 3
+  0:
+    theme: "Onboarding Foundations"
+    goals:
+      - "Tool Mastery"
+      - "Project-Based Learning"
+      - "Team Collaboration"
+  1:
+    theme: "Essential Tools Setup"
+    goals:
+      - "Hardware & Workspace Setup"
+      - "VSCode, Linux, GitHub"
+      - "GitHub Pages Launch"
+  2:
+    theme: "Agile Development" 
+    goals:
+      - "Scrum + Standups"
+      - "Kanban Boards + Burndown"
+      - "Team Repository Management"
+  3:
+    theme: "Summative Coding Challenge"
+    goals:
+      - "Gamified Coding Tasks"
+      - "Python Basics"
+      - "Retrospective Reflection"
 Sprint2:
   title: Python / Flask Web Development 
   description: During these weeks, students will learn fundamentals of programming and blog their learnings.  There will be several student-led lectures (student teaching) that provide foundational concepts and help students learn programming and key principles required by the College Board.
   start: 4
   end: 7
+  4:
+    theme: "Python / Flask Foundations"
+    goals:
+      - "Framework for Sprints"
+      - "REST APIs"
+      - "Pair Programming Labs"
 Sprint3:
   title: Creating a Web Application for N@tM
   description: The team Website should include rewl-world interests but also requires the use of a JavaScript frontend, a Python Flask backend, and deployed on AWS. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website, Frontend, and Backend. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
