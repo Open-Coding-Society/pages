@@ -2,8 +2,8 @@
 layout: post
 show_reading_time: false
 tailwind: True
-title: Onboarding Adventure
 assignment: true
+title: Onboarding Adventure
 description: >
   A guided sequence of hands-on and learning tasks to help you master the frameworks that power our course.
 author: John Mortensen

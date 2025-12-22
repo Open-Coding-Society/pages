@@ -1,9 +1,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css">
 
-<div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
-  <!-- Pearly glow effect around container -->
-  <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
+<div class="container mx-auto px-4 py-4 bg-gray-600/50 backdrop-blur-sm rounded-xl relative">
   <div class="relative z-10">
     <!-- Title and Description -->
     <div class="text-center mb-12">
@@ -26,23 +24,23 @@
     {% endif %}
 
     <!-- Selection Panel -->
-    <div class="mb-8 bg-gray-800/50 rounded-xl p-6">
-      <div class="mb-4">
-        <h2 class="text-2xl font-semibold text-white mb-2">My Onboarding Hacks</h2>
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold text-white mb-4">Pick your Hacks</h2>
+      <div class="bg-gray-800/50 rounded-xl p-6">
         <p id="hacks-status" class="text-sm text-gray-300 mb-3">Loading...</p>
-        <div class="flex flex-wrap gap-2">
-          <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
-            Select Hacks
-          </button>
-          <button id="open-grading-view-btn" onclick="openGradingView()" class="bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
-            Open Grading View
-          </button>
-        </div>
+      <div class="flex flex-wrap gap-2">
+        <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
+          Select Hacks
+        </button>
+        <button id="open-grading-view-btn" onclick="openGradingView()" class="bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
+          Open Grading View
+        </button>
       </div>
 
       <!-- Selected Hacks Display -->
       <div id="selected-hacks-container">
         <p class="text-gray-400 text-center py-8">No hacks selected. Click "Select Hacks" to choose your onboarding tasks.</p>
+      </div>
       </div>
     </div>
 
@@ -71,7 +69,7 @@
 
     <!-- All Topics Cards Grid (Full List) -->
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-6">All Available Hacks</h2>
+      <h2 class="text-2xl font-semibold text-white mb-4">All Available Hacks</h2>
       <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6">
         {% for topic in page.lxdData.Topics %}
           <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2" data-game="{{ topic.Game }}">
