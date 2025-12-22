@@ -14,11 +14,6 @@ permalink: /hacks
 lxdData:
   Title: "Learning Experience Designer Home"
   Description: "Explore interactive games to obtain mastery in key oboarding topics... collaboration, design thinking, coding skills, etc."
-  Prequisites:
-    - title: "Tools Setup"
-      link: "/tools"
-    - title: "Agile Collaboration"
-      link: "/agile"
   Topics:
     - Title: "Animated Background"
       Genre: "Coding"
