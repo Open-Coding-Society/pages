@@ -645,6 +645,7 @@
     position: relative;
     width: 100%;
     max-width: 600px;
+    top: 60px;
     margin: 0 auto;
     background: $bg-1;
     border: 1px solid $bg-3;
@@ -1159,13 +1160,14 @@
   }
 
   #help-modal > div {
-    max-width: 1000px;
-    margin: 40px auto;
+    max-width: 600px;
+    margin: 0px auto;
     background: var(--bg-1);
-    padding: 32px;
+    border: 1px solid $bg-3;
     border-radius: 12px;
+    padding: 32px;
     position: relative;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   }
 
   #help-modal .close-btn {
