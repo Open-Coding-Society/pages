@@ -5,6 +5,8 @@
 // These mixins provide consistent styling for overlay modals,
 // content containers, and close buttons across the application.
 
+@import "buttons";
+
 /// Creates a full-screen modal overlay with dark background
 /// @example scss - Basic usage
 ///   #my-modal {
@@ -59,31 +61,19 @@
 ///     @include modal-close-btn;
 ///   }
 @mixin modal-close-btn {
-  position: absolute;
-  right: 28px;
-  background: $bg-2;
-  border: 1px solid $bg-3;
-  color: $text;
-  font-size: 28px;
-  cursor: pointer;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  line-height: 1;
-  z-index: 10;
+  @include text-button;
   
-  &:hover {
-    background: $bg-3;
-    color: $accent;
-  }
+  // Close button specific positioning and sizing
+  position: absolute;
+  z-index: 10;
+  line-height: 1;
+  font-size: 28px;
+  top: 28px;
+  right: 28px;
   
   @media (max-width: 768px) {
-    width: 44px;
-    height: 44px;
     font-size: 20px;
-    right: 12px;
     top: 12px;
+    right: 12px;
   }
 }
