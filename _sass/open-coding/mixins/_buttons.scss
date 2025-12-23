@@ -1,0 +1,92 @@
+/**
+ * Button Mixins
+ * Reusable button patterns for consistent styling across the application
+ */
+
+/**
+ * Text Button
+ * Standard rectangular button with text content
+ *
+ * @example
+ *   .my-text-button {
+ *     @include text-button;
+ *   }
+ */
+@mixin text-button {
+  background: var(--pref-bg-color);
+  border: 1px solid var(--pref-accent-color);
+  color: var(--pref-accent-color);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: var(--pref-font-size);
+  font-family: var(--pref-font-family);
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-accent-color);
+    outline: none;
+    transform: scale(1.02);
+  }
+}
+
+/**
+ * Icon Button
+ * Square button designed for icon-only content
+ *
+ * @param {Number} $size - Button size (default: 38px)
+ * @param {Number} $spacing - Margin left spacing (default: 8px)
+ *
+ * @example
+ *   .my-icon-button {
+ *     @include icon-button;
+ *   }
+ *
+ *   .my-large-icon-button {
+ *     @include icon-button(48px, 12px);
+ *   }
+ */
+@mixin icon-button($size: 38px, $spacing: 8px) {
+  @include text-button;
+  width: $size;
+  height: $size;
+  padding: 8px;
+  margin-left: $spacing;
+}
+
+/**
+ * Toggle Button
+ * Button with icon that can rotate or change state
+ *
+ * @example
+ *   .my-toggle {
+ *     @include toggle-button;
+ *   }
+ */
+@mixin toggle-button {
+  background: var(--pref-bg-color);
+  border: 1px solid var(--pref-accent-color);
+  color: var(--pref-text-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: var(--pref-font-size);
+  font-family: var(--pref-font-family);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--pref-accent-color);
+    outline: none;
+  }
+}
