@@ -236,13 +236,13 @@
 </div>
 
 <!-- Grading Rubric Modal (per submission) -->
-<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; background-color: rgba(0,0,0,0.8); overflow-y:auto;">
-  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto; background-color: var(--pref-bg-color);">
+<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; background-color: rgba(0,0,0,0.7); overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #d1d5db; max-height: 85vh; overflow-y: auto; background-color: white; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <p class="text-sm text-purple-300 uppercase tracking-wide">Grader</p>
-        <h3 class="text-2xl font-bold text-white">Edit Rubric</h3>
-        <p id="grading-rubric-context" class="text-gray-300 text-sm"></p>
+        <p class="text-sm text-purple-600 uppercase tracking-wide">Grader</p>
+        <h3 class="text-2xl font-bold text-gray-900">Edit Rubric</h3>
+        <p id="grading-rubric-context" class="text-gray-600 text-sm"></p>
       </div>
       <button onclick="closeGradingRubricModal()" style="font-size:2rem; cursor:pointer; line-height:1;">&times;</button>
     </div>
@@ -1120,7 +1120,7 @@
                   <h4 class="text-lg font-semibold text-white">${sub.student}</h4>
                   <p class="text-xs text-gray-400">${new Date(sub.submitted_at).toLocaleString()}</p>
                 </div>
-                <span class="inline-block px-2 py-1 text-xs rounded-full ${sub.status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-green-800 text-white'}">
+                <span class="inline-block px-2 py-1 text-xs rounded-full ${sub.status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}">
                   ${sub.status === 'pending' ? 'Pending' : 'Graded'}
                 </span>
               </div>
@@ -1133,7 +1133,7 @@
               ` : ''}
               <div class="flex items-center justify-between gap-3">
                 ${sub.score > 0 ? `<p class="text-gray-300 text-sm">Score: ${sub.score}</p>` : '<span></span>'}
-                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">
                   Rubric
                 </button>
               </div>
