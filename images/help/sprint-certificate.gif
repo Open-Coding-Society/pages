@@ -1,0 +1,48 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#0b1220"/>
+  
+  <!-- Border -->
+  <rect x="10" y="10" width="780" height="580" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="400" y="60" font-family="Arial" font-size="32" fill="#e6eef8" text-anchor="middle" font-weight="bold">
+    Certificate & Progress Demo
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="400" y="100" font-family="Arial" font-size="18" fill="#94a3b8" text-anchor="middle">
+    Track your progress and earn certificates
+  </text>
+  
+  <!-- Certificate icon representation -->
+  <circle cx="400" cy="200" r="50" fill="none" stroke="#3b82f6" stroke-width="3"/>
+  <text x="400" y="215" font-family="FontAwesome" font-size="48" fill="#3b82f6" text-anchor="middle">
+    🏆
+  </text>
+  
+  <!-- Features list -->
+  <text x="150" y="300" font-family="Arial" font-size="20" fill="#e6eef8">
+    ✓ Real-time progress tracking
+  </text>
+  <text x="150" y="340" font-family="Arial" font-size="20" fill="#e6eef8">
+    ✓ Task completion checklist
+  </text>
+  <text x="150" y="380" font-family="Arial" font-size="20" fill="#e6eef8">
+    ✓ Certificate generation at 100%
+  </text>
+  <text x="150" y="420" font-family="Arial" font-size="20" fill="#e6eef8">
+    ✓ Download & share on LinkedIn
+  </text>
+  
+  <!-- Progress bar example -->
+  <rect x="150" y="460" width="500" height="30" fill="#1f2338" rx="4"/>
+  <rect x="150" y="460" width="300" height="30" fill="#3b82f6" rx="4"/>
+  <text x="400" y="482" font-family="Arial" font-size="16" fill="#e6eef8" text-anchor="middle" font-weight="bold">
+    60% Complete
+  </text>
+  
+  <!-- Footer note -->
+  <text x="400" y="560" font-family="Arial" font-size="14" fill="#94a3b8" text-anchor="middle" font-style="italic">
+    (This is a placeholder - replace with actual GIF recording)
+  </text>
+</svg>

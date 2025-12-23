@@ -1,0 +1,47 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#0b1220"/>
+  
+  <!-- Border -->
+  <rect x="10" y="10" width="780" height="580" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="400" y="60" font-family="Arial" font-size="32" fill="#e6eef8" text-anchor="middle" font-weight="bold">
+    Help Modal Demo
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="400" y="100" font-family="Arial" font-size="18" fill="#94a3b8" text-anchor="middle">
+    Access navigation guides and documentation
+  </text>
+  
+  <!-- Help icon representation -->
+  <circle cx="400" cy="200" r="50" fill="none" stroke="#3b82f6" stroke-width="3"/>
+  <text x="400" y="225" font-family="Arial" font-size="64" fill="#3b82f6" text-anchor="middle" font-weight="bold">
+    ?
+  </text>
+  
+  <!-- Content representation -->
+  <rect x="150" y="280" width="500" height="200" fill="#1f2338" stroke="#3b82f6" stroke-width="1" rx="8"/>
+  
+  <text x="400" y="310" font-family="Arial" font-size="20" fill="#3b82f6" text-anchor="middle" font-weight="bold">
+    Help Topics
+  </text>
+  
+  <text x="180" y="350" font-family="Arial" font-size="16" fill="#e6eef8">
+    • How to navigate sprints
+  </text>
+  <text x="180" y="380" font-family="Arial" font-size="16" fill="#e6eef8">
+    • Completing tasks
+  </text>
+  <text x="180" y="410" font-family="Arial" font-size="16" fill="#e6eef8">
+    • Earning certificates
+  </text>
+  <text x="180" y="440" font-family="Arial" font-size="16" fill="#e6eef8">
+    • Tips & tricks
+  </text>
+  
+  <!-- Footer note -->
+  <text x="400" y="560" font-family="Arial" font-size="14" fill="#94a3b8" text-anchor="middle" font-style="italic">
+    (This is a placeholder - replace with actual GIF recording)
+  </text>
+</svg>

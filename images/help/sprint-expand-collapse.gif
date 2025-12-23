@@ -1,0 +1,53 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#0b1220"/>
+  
+  <!-- Border -->
+  <rect x="10" y="10" width="780" height="580" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="400" y="60" font-family="Arial" font-size="32" fill="#e6eef8" text-anchor="middle" font-weight="bold">
+    Expand/Collapse Demo
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="400" y="100" font-family="Arial" font-size="18" fill="#94a3b8" text-anchor="middle">
+    Click the ▾ button to expand/collapse sprint weeks
+  </text>
+  
+  <!-- Button representation -->
+  <rect x="250" y="150" width="300" height="50" fill="#0b1220" stroke="#3b82f6" stroke-width="2" rx="6"/>
+  <text x="400" y="182" font-family="Arial" font-size="20" fill="#3b82f6" text-anchor="middle">
+    ▾ 0 - 3 Weeks
+  </text>
+  
+  <!-- Step 1 -->
+  <text x="400" y="250" font-family="Arial" font-size="24" fill="#3b82f6" text-anchor="middle">
+    Step 1: Click to Expand
+  </text>
+  <text x="400" y="280" font-family="Arial" font-size="16" fill="#e6eef8" text-anchor="middle">
+    Shows all weeks in the sprint
+  </text>
+  
+  <!-- Arrow -->
+  <path d="M 400 300 L 400 340" stroke="#3b82f6" stroke-width="3" fill="none"/>
+  <path d="M 390 330 L 400 340 L 410 330" stroke="#3b82f6" stroke-width="3" fill="none"/>
+  
+  <!-- Step 2 -->
+  <text x="400" y="380" font-family="Arial" font-size="24" fill="#3b82f6" text-anchor="middle">
+    Step 2: Click Again to Collapse
+  </text>
+  <text x="400" y="410" font-family="Arial" font-size="16" fill="#e6eef8" text-anchor="middle">
+    Hides all weeks to save space
+  </text>
+  
+  <!-- Icon indicator -->
+  <circle cx="400" cy="480" r="40" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  <text x="400" y="495" font-family="Arial" font-size="36" fill="#3b82f6" text-anchor="middle">
+    ▾
+  </text>
+  
+  <!-- Footer note -->
+  <text x="400" y="560" font-family="Arial" font-size="14" fill="#94a3b8" text-anchor="middle" font-style="italic">
+    (This is a placeholder - replace with actual GIF recording)
+  </text>
+</svg>

@@ -1,6 +1,66 @@
 @import "mixins/modals";
 @import "mixins/buttons";
 
+// Demo popup styles
+.demo-popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  padding: 20px;
+  overflow: auto;
+}
+
+.demo-popup.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-popup-content {
+  max-width: 90%;
+  max-height: 90%;
+  position: relative;
+}
+
+.demo-popup-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.demo-popup-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: var(--pref-bg-color);
+  border: 1px solid var(--pref-accent-color);
+  color: var(--pref-accent-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.demo-popup-close:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.clickable-demo {
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.clickable-demo:hover {
+  transform: scale(1.05);
+}
+
 .timeline-page {
   .timeline-header {
     margin-bottom: 32px;
