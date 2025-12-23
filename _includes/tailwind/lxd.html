@@ -1120,7 +1120,7 @@
                   <h4 class="text-lg font-semibold text-white">${sub.student}</h4>
                   <p class="text-xs text-gray-400">${new Date(sub.submitted_at).toLocaleString()}</p>
                 </div>
-                <span class="inline-block px-2 py-1 text-xs rounded-full ${sub.status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}">
+                <span class="inline-block px-2 py-1 text-xs rounded-full ${sub.status === 'pending' ? 'bg-yellow-600 text-white' : 'bg-green-800 text-white'}">
                   ${sub.status === 'pending' ? 'Pending' : 'Graded'}
                 </span>
               </div>
