@@ -4,7 +4,7 @@ Sprint1:
   start: 0
   end: 3
   0:
-    theme: "Onboarding Foundations"
+    theme: "Onboarding Objectives"
     goals:
       - "Tool Mastery"
       - "Project-Based Learning"
