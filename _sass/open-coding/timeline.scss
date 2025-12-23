@@ -587,14 +587,8 @@
     }
 
     .progression-task {
-      padding: 8px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .task-number {
-      order: -1;
+      padding: 10px;
+      gap: 10px;
     }
   }
 
@@ -643,9 +637,8 @@
     padding-top: 80px;
     
     @media (max-width: 768px) {
-      padding-top: 70px;
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
+      padding: 0;
+      padding-top: 60px;
     }
   }
 
@@ -661,8 +654,12 @@
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     
     @media (max-width: 768px) {
-      padding: 20px;
+      padding: 20px 12px;
       margin: 0;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      min-height: calc(100vh - 60px);
     }
   }
 
@@ -691,6 +688,8 @@
       width: 44px;
       height: 44px;
       font-size: 20px;
+      right: 12px;
+      top: 12px;
     }
   }
 
