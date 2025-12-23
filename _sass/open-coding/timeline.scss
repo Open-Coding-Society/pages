@@ -218,23 +218,36 @@
     font-size: 13px;
   }
 
-  .progression-btn {
-    background: $bg-2;
-    border: 1px solid $bg-3;
-    color: $accent;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 13px;
+  .sprint-btn {
+    background: var(--pref-bg-color);
+    border: 1px solid var(--pref-accent-color);
+    color: var(--pref-accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: var(--pref-font-size);
+    font-family: var(--pref-font-family);
     cursor: pointer;
     transition: all 0.2s;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .progression-btn:hover,
-  .progression-btn:focus-visible {
-    border-color: $accent;
-    color: $accent-700;
-    background: $bg-2;
+  .sprint-btn:hover,
+  .sprint-btn:focus-visible {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-accent-color);
     outline: none;
+    transform: scale(1.02);
+  }
+
+  .sprint-btn.certificate,
+  .sprint-btn.help {
+    width: 38px;
+    padding: 8px;
+    margin-left: 8px;
   }
 
   .progress-bar-container {
