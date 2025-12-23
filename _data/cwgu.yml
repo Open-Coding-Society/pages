@@ -1,6 +1,7 @@
 # WGU meta data
 Sprint1:
   shared: "Onboarding"
+  help: "/navigation/sprint1-help"  # Add help for this sprint
   start: 0
   end: 3
   0:

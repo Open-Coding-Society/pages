@@ -1096,4 +1096,166 @@
       gap: 16px;
     }
   }
+
+  /* ============================= */
+  /*       HELP MODAL STYLES       */
+  /* ============================= */
+
+  #help-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  #help-modal > div {
+    max-width: 900px;
+    margin: 40px auto;
+    background: var(--bg-1);
+    padding: 32px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  #help-modal .close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    font-size: 32px;
+    color: var(--text);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+
+  #help-modal .close-btn:hover {
+    background: var(--bg-2);
+  }
+
+  #help-modal h2 {
+    color: var(--text);
+    font-size: 28px;
+    margin-bottom: 24px;
+    padding-right: 40px;
+  }
+
+  .help-content {
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .help-content h1,
+  .help-content h2,
+  .help-content h3 {
+    color: var(--pref-accent-color);
+    margin-top: 24px;
+    margin-bottom: 12px;
+  }
+
+  .help-content h1 {
+    font-size: 24px;
+  }
+
+  .help-content h2 {
+    font-size: 20px;
+  }
+
+  .help-content h3 {
+    font-size: 18px;
+  }
+
+  .help-content p {
+    margin-bottom: 16px;
+  }
+
+  .help-content ul,
+  .help-content ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+
+  .help-content li {
+    margin-bottom: 8px;
+  }
+
+  .help-content code {
+    background: var(--bg-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+  }
+
+  .help-content pre {
+    background: var(--bg-2);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+
+  .help-content pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  .help-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 16px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .help-content a {
+    color: var(--pref-accent-color);
+    text-decoration: none;
+  }
+
+  .help-content a:hover {
+    text-decoration: underline;
+  }
+
+  .help-content blockquote {
+    border-left: 4px solid var(--pref-accent-color);
+    padding-left: 16px;
+    margin: 16px 0;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    #help-modal {
+      padding: 0;
+    }
+
+    #help-modal > div {
+      margin: 0;
+      border-radius: 0;
+      min-height: 100vh;
+    }
+
+    #help-modal .close-btn {
+      top: 8px;
+      right: 8px;
+    }
+
+    #help-modal h2 {
+      font-size: 24px;
+    }
+  }
 }

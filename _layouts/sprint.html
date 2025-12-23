@@ -25,6 +25,7 @@ layout: post
     {% assign courseUnit = course[unitKey] %}
     {% assign start = unitData.start %}
     {% assign end = unitData.end %}
+    {% assign helpUrl = unitData.help %}
 
     {% if courseUnit.shared %}
       {% assign unitData = shared[courseUnit.shared] %}
@@ -46,7 +47,11 @@ layout: post
           <button class="progression-btn" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" style="margin-left: 12px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.875rem;" title="Progress & Certificates">
               <i class="fas fa-certificate"></i>
           </button>
-          </p>
+          {% if helpUrl %}
+          <button class="help-btn" type="button" data-sprint="{{ unitKey }}" data-help-url="{{ helpUrl }}" style="margin-left: 12px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.875rem;" title="Help & Navigation Guide">
+              <i class="fas fa-question-circle"></i>
+          </button>
+          {% endif %}
         </div>
       </div>
 
@@ -259,6 +264,20 @@ layout: post
     </div>
   </div>
 </div>
+
+<!-- ============================= -->
+<!--       HELP MODAL              -->
+<!-- ============================= -->
+<div id="help-modal">
+  <div>
+    <button id="close-help-modal" class="close-btn">&times;</button>
+    
+    <h2><span id="help-modal-sprint-title"></span> Navigation Guide</h2>
+    
+    <div id="help-content" class="help-content">
+      <!-- Markdown content will be loaded here -->
+    </div>
+  </div>
 </div>
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
@@ -801,6 +820,69 @@ layout: post
     openCertificateModal(certificateProfile);
   }
   
+  // ===========================
+  // HELP MODAL FUNCTIONALITY
+  // ===========================
+  
+  // Open help modal
+  function openHelpModal(sprintKey, helpUrl) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.error('Sprint card not found');
+      return;
+    }
+    
+    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
+    document.getElementById('help-modal-sprint-title').textContent = sprintTitle;
+    
+    // Load markdown content
+    loadHelpContent(helpUrl);
+    
+    // Show modal
+    document.getElementById('help-modal').style.display = 'block';
+  }
+  
+  // Close help modal
+  function closeHelpModal() {
+    document.getElementById('help-modal').style.display = 'none';
+  }
+  
+  // Load help content from Jekyll-rendered page
+  async function loadHelpContent(helpUrl) {
+    const contentDiv = document.getElementById('help-content');
+    contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Loading...</p>';
+    
+    try {
+      const response = await fetch(helpUrl);
+      if (!response.ok) {
+        throw new Error('Failed to load help content');
+      }
+      
+      const html = await response.text();
+      
+      // Parse the HTML to extract just the content
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Try to find the main content - adjust selector based on your layout
+      // Common selectors: article, .post-content, .content, main
+      let content = doc.querySelector('article') || 
+                    doc.querySelector('.post-content') || 
+                    doc.querySelector('.content') ||
+                    doc.querySelector('main');
+      
+      if (content) {
+        contentDiv.innerHTML = content.innerHTML;
+      } else {
+        // Fallback: use body content if no specific container found
+        contentDiv.innerHTML = doc.body.innerHTML;
+      }
+    } catch (error) {
+      console.error('Error loading help content:', error);
+      contentDiv.innerHTML = '<p style="color: #e53e3e;">Failed to load help content. Please try again later.</p>';
+    }
+  }
+  
   // Legacy function for week-level (keep for backward compatibility)
   function openCertificateListModalForWeek(weekNumber) {
     document.getElementById('list-modal-sprint-title').textContent = `Week ${weekNumber}`;
@@ -1080,6 +1162,38 @@ layout: post
     initializeCertificateSystem();
     renderWeekGoalPreviews();
     initMobileEnhancements();
+    initializeHelpButtons();
   });
+  
+  // Initialize help button event listeners
+  function initializeHelpButtons() {
+    // Help button click handlers
+    document.querySelectorAll('.help-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const helpUrl = btn.dataset.helpUrl;
+        openHelpModal(sprintKey, helpUrl);
+      });
+    });
+    
+    // Close help modal
+    const closeHelpBtn = document.getElementById('close-help-modal');
+    if (closeHelpBtn) {
+      closeHelpBtn.addEventListener('click', closeHelpModal);
+    }
+    
+    // Close on outside click
+    const helpModal = document.getElementById('help-modal');
+    if (helpModal) {
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+          closeHelpModal();
+        }
+      });
+    }
+  }
 
 </script>
+</div>
+<!-- End .timeline-page -->
