@@ -272,9 +272,7 @@ layout: post
   <div>
     <button id="close-help-modal" class="close-btn">&times;</button>
     
-    <h2><span id="help-modal-sprint-title"></span> Help</h2>
-    
-    <div id="help-content" class="help-content">
+    <div id="help-content" >
       <!-- Markdown content will be loaded here -->
     </div>
   </div>
@@ -831,9 +829,6 @@ layout: post
       console.error('Sprint card not found');
       return;
     }
-    
-    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
-    document.getElementById('help-modal-sprint-title').textContent = sprintTitle;
     
     // Load markdown content
     loadHelpContent(helpUrl);
