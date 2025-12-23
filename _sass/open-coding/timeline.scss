@@ -1,8 +1,8 @@
 @import "mixins/modals";
 @import "mixins/buttons";
 
-// Demo popup styles
-.demo-popup {
+// Video demo popup styles
+.video-demo {
   display: none;
   position: fixed;
   top: 0;
@@ -15,26 +15,26 @@
   overflow: auto;
 }
 
-.demo-popup.active {
+.video-demo.active {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.demo-popup-content {
+.video-demo-content {
   max-width: 90%;
   max-height: 90%;
   position: relative;
 }
 
-.demo-popup-content img {
+.video-demo-content img {
   width: 100%;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
-.demo-popup-close {
+.video-demo-close {
   position: absolute;
   top: -40px;
   right: 0;
@@ -47,17 +47,17 @@
   font-size: 18px;
 }
 
-.demo-popup-close:hover {
+.video-demo-close:hover {
   background: rgba(59, 130, 246, 0.1);
 }
 
-.clickable-demo {
+.clickable-video {
   cursor: pointer;
   display: inline-block;
   transition: transform 0.2s;
 }
 
-.clickable-demo:hover {
+.clickable-video:hover {
   transform: scale(1.05);
 }
 
