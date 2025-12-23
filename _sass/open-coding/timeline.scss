@@ -126,6 +126,8 @@
     font-family: var(--pref-font-family);
     cursor: pointer;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
   }
 
   .sprint-toggle-btn:hover,
