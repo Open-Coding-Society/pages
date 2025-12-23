@@ -619,11 +619,10 @@
   }
 
   /* ============================= */
-  /*    UNIFIED SPRINT MODALS      */
+  /*    SPRINT MODAL MIXINS        */
   /* ============================= */
   
-  /* Base sprint modal overlay */
-  .sprint-modal {
+  @mixin sprint-modal-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -640,8 +639,7 @@
     }
   }
 
-  /* Base sprint modal content */
-  .sprint-modal > div {
+  @mixin sprint-modal-content {
     position: relative;
     width: 100%;
     max-width: 600px;
@@ -662,8 +660,7 @@
     }
   }
 
-  /* Base sprint modal close button */
-  .sprint-modal .close-btn {
+  @mixin sprint-modal-close-btn {
     position: absolute;
     right: 28px;
     background: $bg-2;
@@ -693,20 +690,31 @@
     }
   }
 
-  /* Base sprint modal heading */
-  .sprint-modal h2 {
+  /* ============================= */
+  /*     PROGRESSION MODAL         */
+  /* ============================= */
+
+  #progression-modal {
+    @include sprint-modal-overlay;
+  }
+
+  #progression-modal > div {
+    @include sprint-modal-content;
+    top: 60px;
+  }
+
+  #progression-modal .close-btn {
+    @include sprint-modal-close-btn;
+  }
+
+  #progression-modal h2 {
     color: $text;
     margin-bottom: 8px;
-    padding-right: 50px; // Space for close button
+    padding-right: 50px;
     
     @media (max-width: 768px) {
       font-size: 1.5rem;
     }
-  }
-
-  /* Progression modal specific - narrow width */
-  #progression-modal > div {
-    top: 60px;
   }
 
   #progression-modal .week-theme {
@@ -824,18 +832,14 @@
     transform: scale(1.02);
   }
 
-  /* Certificate Modal */
+  /* ============================= */
+  /*      CERTIFICATE MODAL        */
+  /* ============================= */
+
   #certificate-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 2000;
-    padding: 20px;
-    overflow-y: auto;
+    @include sprint-modal-overlay;
+    background: rgba(0,0,0,0.9); // Darker than default
+    z-index: 2000; // Higher than other modals
   }
 
   #certificate-modal .action-bar {
@@ -1126,10 +1130,6 @@
   }
 
   @media (max-width: 768px) {
-    #certificate-modal {
-      padding: 0;
-    }
-
     #certificate-content {
       margin: 0;
       padding: 40px 20px;
@@ -1145,6 +1145,32 @@
     #certificate-content .signature-section {
       flex-direction: column;
       gap: 16px;
+    }
+  }
+
+  /* ============================= */
+  /*         HELP MODAL            */
+  /* ============================= */
+
+  #help-modal {
+    @include sprint-modal-overlay;
+  }
+
+  #help-modal > div {
+    @include sprint-modal-content;
+  }
+
+  #help-modal .close-btn {
+    @include sprint-modal-close-btn;
+  }
+
+  #help-modal h2 {
+    color: $text;
+    margin-bottom: 8px;
+    padding-right: 50px;
+    
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
     }
   }
 
