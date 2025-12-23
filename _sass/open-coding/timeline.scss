@@ -618,34 +618,33 @@
     box-shadow: 0 0 12px rgba($accent, 0.2);
   }
 
-  /* Progression Modal */
-  #progression-modal {
+  /* ============================= */
+  /*    UNIFIED SPRINT MODALS      */
+  /* ============================= */
+  
+  /* Base sprint modal overlay */
+  .sprint-modal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0, 0, 0, 0.85);
     z-index: 1000;
     overflow-y: auto;
     padding: 1rem;
-    
-    /* Flexbox centering like microblog */
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 80px;
     
     @media (max-width: 768px) {
       padding: 60px 0 0 0;
     }
   }
 
-  #progression-modal > div {
+  /* Base sprint modal content */
+  .sprint-modal > div {
     position: relative;
     width: 100%;
     max-width: 600px;
-    top: 60px;
     margin: 0 auto;
     background: $bg-1;
     border: 1px solid $bg-3;
@@ -663,7 +662,8 @@
     }
   }
 
-  #progression-modal .close-btn {
+  /* Base sprint modal close button */
+  .sprint-modal .close-btn {
     position: absolute;
     right: 28px;
     background: $bg-2;
@@ -693,7 +693,8 @@
     }
   }
 
-  #progression-modal h2 {
+  /* Base sprint modal heading */
+  .sprint-modal h2 {
     color: $text;
     margin-bottom: 8px;
     padding-right: 50px; // Space for close button
@@ -701,6 +702,11 @@
     @media (max-width: 768px) {
       font-size: 1.5rem;
     }
+  }
+
+  /* Progression modal specific - narrow width */
+  #progression-modal > div {
+    top: 60px;
   }
 
   #progression-modal .week-theme {
@@ -1143,61 +1149,8 @@
   }
 
   /* ============================= */
-  /*       HELP MODAL STYLES       */
+  /*    HELP MODAL CONTENT         */
   /* ============================= */
-
-  #help-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 1000;
-    overflow-y: auto;
-    padding: 1rem;
-  }
-
-  #help-modal > div {
-    max-width: 600px;
-    margin: 0px auto;
-    background: var(--bg-1);
-    border: 1px solid $bg-3;
-    border-radius: 12px;
-    padding: 32px;
-    position: relative;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  #help-modal .close-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: transparent;
-    border: none;
-    font-size: 32px;
-    color: var(--text);
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background 0.2s;
-  }
-
-  #help-modal .close-btn:hover {
-    background: var(--bg-2);
-  }
-
-  #help-modal h2 {
-    color: var(--text);
-    font-size: 28px;
-    margin-bottom: 24px;
-    padding-right: 40px;
-  }
 
   .help-content {
     color: var(--text);
@@ -1285,26 +1238,16 @@
   }
 
   @media (max-width: 768px) {
-    #help-modal {
-      padding: 0;
+    .help-content h1 {
+      font-size: 20px;
     }
 
-    #help-modal > div {
-      margin: 60px 0 0 0;
-      border-radius: 0;
-      min-height: calc(100vh - 60px);
-      padding: 24px 16px;
+    .help-content h2 {
+      font-size: 18px;
     }
 
-    #help-modal .close-btn {
-      top: 12px;
-      right: 12px;
-      z-index: 10;
-    }
-
-    #help-modal h2 {
-      font-size: 24px;
-      padding-top: 8px;
+    .help-content h3 {
+      font-size: 16px;
     }
   }
 }
