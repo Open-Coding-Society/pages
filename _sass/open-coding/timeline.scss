@@ -1,54 +1,28 @@
 @import "mixins/modals";
 @import "mixins/buttons";
 
-// Video demo popup styles
-.video-demo {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 9999;
-  padding: 20px;
-  overflow: auto;
+/* ============================= */
+/*       VIDEO DEMO MODAL        */
+/* ============================= */
+
+#video-demo {
+  @include modal-overlay;
 }
 
-.video-demo.active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#video-demo > div {
+  @include modal-content;
+  top: 60px;
 }
 
-.video-demo-content {
-  max-width: 90%;
-  max-height: 90%;
-  position: relative;
+#video-demo .close-btn {
+  @include modal-close-btn;
 }
 
-.video-demo-content img {
+#video-demo img {
   width: 100%;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-.video-demo-close {
-  position: absolute;
-  top: -40px;
-  right: 0;
-  background: var(--pref-bg-color);
-  border: 1px solid var(--pref-accent-color);
-  color: var(--pref-accent-color);
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.video-demo-close:hover {
-  background: rgba(59, 130, 246, 0.1);
 }
 
 .clickable-video {

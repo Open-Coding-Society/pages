@@ -15,13 +15,13 @@ window.showDemoGif = function(gifSrc, title) {
   
   img.src = gifSrc;
   titleEl.textContent = title;
-  popup.classList.add('active');
+  popup.style.display = 'block';
 }
 
 window.closeDemoGif = function() {
   const popup = document.getElementById('video-demo');
   if (!popup) return;
-  popup.classList.remove('active');
+  popup.style.display = 'none';
 }
 
 // Close on escape key
@@ -33,9 +33,9 @@ document.addEventListener('keydown', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
   if (!document.getElementById('video-demo')) {
     const popupHTML = `
-      <div id="video-demo" class="video-demo" onclick="closeDemoGif()">
-        <div class="video-demo-content" onclick="event.stopPropagation()">
-          <button class="video-demo-close" onclick="closeDemoGif()">X</button>
+      <div id="video-demo" onclick="closeDemoGif()">
+        <div onclick="event.stopPropagation()">
+          <button class="close-btn" onclick="closeDemoGif()">×</button>
           <h3 id="video-title" style="color: var(--pref-accent-color); margin-bottom: 16px;"></h3>
           <img id="video-gif" src="" alt="Demo Animation">
         </div>
