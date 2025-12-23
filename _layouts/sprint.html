@@ -33,19 +33,19 @@ layout: post
     <div class="sprint-card collapsed" data-sprint="{{ unitKey }}">
       <div class="sprint-header">
         <div>
-          <p class="sprint-meta">{{ unitKey }}</p>
           <h2 class="sprint-title">{{ unitData.title }}</h2>
           {% if unitData.description %}
             <p class="sprint-meta">{{ unitData.description }}</p>
           {% endif %}
         </div>
         <div class="sprint-controls">
-          <button class="progression-btn" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}">
-            Progress & Certificates
-          </button>
           <button class="sprint-toggle-btn" type="button" aria-expanded="false">
             <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
           </button>
+          <button class="progression-btn" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" style="margin-left: 12px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.875rem;" title="Progress & Certificates">
+              <i class="fas fa-certificate"></i>
+          </button>
+          </p>
         </div>
       </div>
 
