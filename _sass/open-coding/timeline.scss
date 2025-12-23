@@ -1,3 +1,5 @@
+@import "mixins/modals";
+
 .timeline-page {
   .timeline-header {
     margin-bottom: 32px;
@@ -619,92 +621,20 @@
   }
 
   /* ============================= */
-  /*    SPRINT MODAL MIXINS        */
-  /* ============================= */
-  
-  @mixin sprint-modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 1000;
-    overflow-y: auto;
-    padding: 1rem;
-    
-    @media (max-width: 768px) {
-      padding: 60px 0 0 0;
-    }
-  }
-
-  @mixin sprint-modal-content {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    background: $bg-1;
-    border: 1px solid $bg-3;
-    border-radius: 12px;
-    padding: 32px;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    
-    @media (max-width: 768px) {
-      padding: 20px 0;
-      margin: 0;
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-      min-height: calc(100vh - 60px);
-    }
-  }
-
-  @mixin sprint-modal-close-btn {
-    position: absolute;
-    right: 28px;
-    background: $bg-2;
-    border: 1px solid $bg-3;
-    color: $text;
-    font-size: 28px;
-    cursor: pointer;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    line-height: 1;
-    z-index: 10;
-    
-    &:hover {
-      background: $bg-3;
-      color: $accent;
-    }
-    
-    @media (max-width: 768px) {
-      width: 44px;
-      height: 44px;
-      font-size: 20px;
-      right: 12px;
-      top: 12px;
-    }
-  }
-
-  /* ============================= */
   /*     PROGRESSION MODAL         */
   /* ============================= */
 
   #progression-modal {
-    @include sprint-modal-overlay;
+    @include modal-overlay;
   }
 
   #progression-modal > div {
-    @include sprint-modal-content;
+    @include modal-content;
     top: 60px;
   }
 
   #progression-modal .close-btn {
-    @include sprint-modal-close-btn;
+    @include modal-close-btn;
   }
 
   #progression-modal h2 {
@@ -837,7 +767,7 @@
   /* ============================= */
 
   #certificate-modal {
-    @include sprint-modal-overlay;
+    @include modal-overlay;
     background: rgba(0,0,0,0.9); // Darker than default
     z-index: 2000; // Higher than other modals
   }
@@ -1153,15 +1083,15 @@
   /* ============================= */
 
   #help-modal {
-    @include sprint-modal-overlay;
+    @include modal-overlay;
   }
 
   #help-modal > div {
-    @include sprint-modal-content;
+    @include modal-content;
   }
 
   #help-modal .close-btn {
-    @include sprint-modal-close-btn;
+    @include modal-close-btn;
   }
 
   #help-modal h2 {
