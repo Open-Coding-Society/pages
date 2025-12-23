@@ -116,13 +116,36 @@
     align-items: center;
   }
 
+  .sprint-toggle-btn {
+    background: var(--pref-bg-color);
+    border: 1px solid var(--pref-accent-color);
+    color: var(--pref-text-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: var(--pref-font-size);
+    font-family: var(--pref-font-family);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .sprint-toggle-btn:hover,
+  .sprint-toggle-btn:focus-visible {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--pref-accent-color);
+    outline: none;
+  }
+
   .sprint-card.collapsed .sprint-toggle-icon {
     transform: rotate(0deg);
   }
 
   .sprint-toggle-icon {
-    transition: transform 0.2s;
+    transition: transform 0.3s;
     display: inline-flex;
+    color: var(--pref-accent-color);
+    font-size: 2em;
+    font-weight: bold;
+    margin-right: 4px;
   }
 
   .sprint-weeks {
