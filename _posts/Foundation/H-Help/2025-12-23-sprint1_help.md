@@ -13,7 +13,27 @@ author: John Mortensen
 
 ---
 
-## 1. Expand/Collapse Button
+## 1. Login
+
+<div style="margin-bottom: 16px;">
+  <span class="clickable-video" onclick="showDemoGif('{{site.baseurl}}/images/help/login.gif', 'Login Demo')" title="Click to see demo">
+    <button class="sprint-btn login" type="button" title="Login">
+      <i class="fas fa-user"></i>
+    </button>
+  </span>
+</div>
+
+**Purpose**: Sign in to access personalized features and track your progress  
+**How to Use**: Click to open the login modal  
+**Features**:
+- Save your progress across sessions
+- Track completed tasks and achievements
+- Access personalized learning paths
+- Sync data across devices
+
+---
+
+## 2. Expand/Collapse Button
 
 <div style="margin-bottom: 16px;">
   <span class="clickable-video" onclick="showDemoGif('{{site.baseurl}}/images/help/sprint-expand-collapse.gif', 'Expand/Collapse Button Demo')" title="Click to see demo">
@@ -32,10 +52,10 @@ author: John Mortensen
 
 ---
 
-## 2. Certificate Button
+## 3. Certificate Button
 
 <div style="margin-bottom: 16px;">
-  <span class="clickable-video" onclick="showDemoGif('{{site.baseurl}}/images/help/sample.gif', 'Certificate & Progress Demo')" title="Click to see demo">
+  <span class="clickable-video" onclick="showDemoGif('{{site.baseurl}}/images/help/sprint-certificate.gif', 'Certificate & Progress Demo')" title="Click to see demo">
     <button class="sprint-btn certificate" type="button" title="Progress & Certificates">
       <i class="fas fa-certificate"></i>
     </button>
@@ -52,21 +72,3 @@ author: John Mortensen
 - Download as PNG or share on LinkedIn
 
 ---
-
-## 3. Help Button
-
-<div style="margin-bottom: 16px;">
-  <span class="clickable-video" onclick="showDemoGif('{{site.baseurl}}/images/help/sprint-help.gif', 'Help Modal Demo')" title="Click to see demo">
-    <button class="sprint-btn help" type="button" title="Help & Navigation Guide">
-      <i class="fas fa-question"></i>
-    </button>
-  </span>
-</div>
-
-**Purpose**: Access this navigation guide and documentation  
-**How to Use**: Click to open a modal with help content  
-**Contents**: Instructions, tips, and visual guides for using the sprint interface
-
----
-
-### Week Navigation Items

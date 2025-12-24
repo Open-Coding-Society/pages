@@ -45,14 +45,14 @@ layout: post
           <button class="sprint-toggle-btn" type="button" aria-expanded="false">
             <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
           </button>
-          <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" onclick="openProgressionModal('{{ unitKey }}', {{ start }}, {{ end }})" title="Progress & Certificates">
-              <i class="fas fa-certificate"></i>
-          </button>
           {% if helpUrl %}
           <button class="sprint-btn help" type="button" data-sprint="{{ unitKey }}" data-help-url="{{ helpUrl }}" onclick="openHelpModal('{{ unitKey }}', '{{ helpUrl }}')" title="Help & Navigation Guide">
               <i class="fas fa-question"></i>
           </button>
           {% endif %}
+          <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" onclick="openProgressionModal('{{ unitKey }}', {{ start }}, {{ end }})" title="Progress & Certificates">
+              <i class="fas fa-certificate"></i>
+          </button>
         </div>
       </div>
 
