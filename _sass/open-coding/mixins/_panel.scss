@@ -49,7 +49,7 @@
 }
 
 /**
- * Content Panel
+ * Output Panel
  * Panel optimized for code/content display with scrolling
  *
  * @param {Number} $min-height - Minimum height (default: 100px)
@@ -57,11 +57,11 @@
  *
  * @example
  *   .output-content {
- *     @include content-panel;
+ *     @include output-panel;
  *   }
  *
  *   .tall-content {
- *     @include content-panel(200px, 500px);
+ *     @include output-panel(200px, 500px);
  *   }
  */
 @mixin output-panel($min-height: 100px, $max-height: 300px) {
@@ -91,5 +91,37 @@
     &:hover {
       background: var(--panel-mid);
     }
+  }
+}
+
+/**
+ * Control Panel
+ * Horizontal bar for controls, buttons, and selects
+ *
+ * @param {String} $padding - Inner padding (default: 0.75rem 1rem)
+ * @param {String} $gap - Gap between items (default: 1rem)
+ * @param {String} $border-radius - Border radius (default: 10px 10px 0 0)
+ *
+ * @example
+ *   .control-bar {
+ *     @include control-panel;
+ *   }
+ *
+ *   .toolbar {
+ *     @include control-panel(0.5rem, 0.5rem, 8px);
+ *   }
+ */
+@mixin control-panel($padding: 0.75rem 1rem, $gap: 1rem, $border-radius: 10px 10px 0 0) {
+  display: flex;
+  align-items: center;
+  gap: $gap;
+  background: var(--pref-bg-color);
+  padding: $padding;
+  border-radius: $border-radius;
+  border: 1px solid var(--ui-border);
+
+  span {
+    color: var(--pref-text-color);
+    font-size: 0.9rem;
   }
 }
