@@ -64,29 +64,6 @@
   .clearBtn,
   .copyOutputIcon {
     @include icon-button(38px, 0);
-    margin-left: 0.5rem;
-    background: var(--ui-bg);
-    border: 1px solid var(--ui-border);
-    color: var(--pref-text-color);
-    font-size: 1rem;
-
-    &:hover {
-      background: var(--panel-mid);
-      border-color: var(--pref-accent-color);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-  }
-
-  .runBtn {
-    background: var(--pref-accent-color);
-    border-color: var(--pref-accent-color);
-    color: #fff;
-
-    &:hover {
-      opacity: 0.9;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
   }
 
   // Editor container
