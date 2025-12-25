@@ -13,6 +13,7 @@
  *   }
  */
 @mixin text-button {
+  height: 38px;
   background: var(--pref-bg-color);
   border: 1px solid var(--pref-accent-color);
   color: var(--pref-accent-color);
@@ -22,7 +23,6 @@
   font-family: var(--pref-font-family);
   cursor: pointer;
   transition: all 0.2s;
-  height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -94,4 +94,50 @@
     border-color: var(--pref-accent-color);
     outline: none;
   }
+}
+
+/**
+ * Select Control
+ * Standardized dropdown/select styling
+ *
+ * @param {Number} $min-width - Minimum width (default: 150px)
+ *
+ * @example
+ *   .languageSelect {
+ *     @include select-control;
+ *   }
+ *
+ *   .customSelect {
+ *     @include select-control(200px);
+ *   }
+ */
+@mixin select-control($size: 38px) {
+  height: $size;
+  min-width: $size;
+  background: var(--pref-bg-color);
+  border: 1px solid var(--pref-accent-color);
+  color: var(--pref-text-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: var(--pref-font-size);
+  font-family: var(--pref-font-family);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-accent-color);
+    outline: none;
+    transform: scale(1.02);
+  }
+
+  @media (max-width: 768px) {
+    width: 44px;
+    height: 44px;
+  } 
 }

@@ -8,19 +8,19 @@
   <div class="editor-container">
     <div class="control-bar">
       <button class="runBtn" title="Run">▶</button>
-      <select class="language">
+      <button class="copyBtn" title="Copy Code">⎘</button>
+      <button class="clearBtn" title="Clear Code">⎚</button>
+      <select class="languageSelect">
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="javascript">JavaScript</option>
       </select>
-      <select class="fontSize">
+      <select class="fontSizeSelect">
         <option value="14">14px</option>
         <option value="16">16px</option>
         <option value="18">18px</option>
         <option value="20">20px</option>
       </select>
-      <button class="copyBtn" title="Copy Code">⎘</button>
-      <button class="clearBtn" title="Clear Code">⎚</button>
     </div>
     <textarea class="editor-textarea"></textarea>
     <div class="control-bar">
@@ -73,8 +73,8 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
 
   editor.setValue(initialCode || "print('Hello, world!')");
 
-  const langSelect = container.querySelector('.language');
-  const fontSizeSelect = container.querySelector('.fontSize');
+  const langSelect = container.querySelector('.languageSelect');
+  const fontSizeSelect = container.querySelector('.fontSizeSelect');
   const outputDiv = container.querySelector('.output-content');
   const lineCountSpan = container.querySelector('.lineCount');
   const charCountSpan = container.querySelector('.charCount');

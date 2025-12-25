@@ -31,31 +31,16 @@
       border: none;
     }
 
-    select {
-      color: var(--pref-text-color);
-      border-radius: 4px;
-      padding: 0.25rem 0.5rem;
-      min-width: 150px;
-      background: var(--ui-bg);
-      border: 1px solid var(--ui-border);
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        border-color: var(--pref-accent-color);
-        background: var(--panel-mid);
-      }
-
-      &:focus {
-        outline: none;
-        border-color: var(--pref-accent-color);
-      }
-    }
-
     span {
       color: var(--pref-text-color);
       font-size: 0.9rem;
     }
+  }
+
+  // Select controls
+  .languageSelect,
+  .fontSizeSelect {
+    @include select-control();
   }
 
   // Action buttons (using mixins)
