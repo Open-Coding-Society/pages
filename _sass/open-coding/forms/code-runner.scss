@@ -4,15 +4,31 @@
  */
 
 @import "../mixins/buttons";
+@import "../mixins/panel";
 
 .code-runner-container {
   margin-bottom: 2rem;
 
-  // CodeMirror editor styling
+  // Code challenge box styling
+  .challenge-box {
+    @include info-panel;
+  }
+
+  // Code editor styling
   .CodeMirror {
+    // @include input-panel;
+    background: var(--panel);
+    color: var(--pref-text-color);
+
     font-size: 14px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   }
+
+  // Code output box styling
+  .output-content {
+    @include output-panel;
+  }
+
 
   // Control bar (top and bottom bars)
   .control-bar {
@@ -76,64 +92,6 @@
     background-color: var(--panel);
   }
 
-  .output-content {
-    padding: 16px;
-    white-space: pre-wrap;
-    min-height: 100px;
-    max-height: 300px;
-    overflow-y: auto;
-    background-color: var(--pref-bg-color);
-    color: var(--pref-text-color);
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: var(--pref-bg-color);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--ui-border);
-      border-radius: 4px;
-
-      &:hover {
-        background: var(--panel-mid);
-      }
-    }
-  }
-
-  // Challenge box
-  .challenge-box {
-    background: var(--panel);
-    border: 2px solid var(--pref-accent-color);
-    color: var(--pref-text-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-
-    h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--pref-accent-color);
-    }
-
-    p {
-      margin: 0;
-      font-size: 1rem;
-      opacity: 0.95;
-      line-height: 1.5;
-      color: var(--pref-text-color);
-    }
-  }
 
   // Mobile responsiveness
   @media (max-width: 768px) {

@@ -1,0 +1,95 @@
+/**
+ * Panel Mixins
+ * Reusable panel patterns for consistent content containers
+ */
+
+/**
+ * Base Panel
+ * Standard panel with border and background
+ *
+ * @param {Number} $padding - Inner padding (default: 1.5rem)
+ * @param {Number} $border-width - Border width (default: 2px)
+ * @param {Number} $margin-bottom - Bottom margin (default: 1rem)
+ *
+ * @example
+ *   .my-panel {
+ *     @include panel;
+ *   }
+ *
+ *   .compact-panel {
+ *     @include panel(1rem, 1px, 0.5rem);
+ *   }
+ */
+@mixin info-panel($padding: 1.5rem, $border-width: 2px, $margin-bottom: 1rem) {
+  background: var(--panel);
+  border: $border-width solid var(--pref-accent-color);
+  color: var(--pref-text-color);
+  padding: $padding;
+  border-radius: 8px;
+  margin-bottom: $margin-bottom;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--pref-accent-color);
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.95;
+    line-height: 1.5;
+    color: var(--pref-text-color);
+  }
+}
+
+/**
+ * Content Panel
+ * Panel optimized for code/content display with scrolling
+ *
+ * @param {Number} $min-height - Minimum height (default: 100px)
+ * @param {Number} $max-height - Maximum height (default: 300px)
+ *
+ * @example
+ *   .output-content {
+ *     @include content-panel;
+ *   }
+ *
+ *   .tall-content {
+ *     @include content-panel(200px, 500px);
+ *   }
+ */
+@mixin output-panel($min-height: 100px, $max-height: 300px) {
+  background: var(--panel);
+  color: var(--pref-text-color);
+  padding: 16px;
+  white-space: pre-wrap;
+  min-height: $min-height;
+  max-height: $max-height;
+  overflow-y: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--pref-bg-color);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--ui-border);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--panel-mid);
+    }
+  }
+}
