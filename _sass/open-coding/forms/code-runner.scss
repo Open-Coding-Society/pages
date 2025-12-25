@@ -24,12 +24,14 @@
   .CodeMirror {
     // @include input-panel;
     background: var(--panel);
+    border: 1px solid var(--ui-border);
     font-size: 14px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   }
 
   .CodeMirror-gutters {
     background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
   }
 
   // Output section
@@ -40,6 +42,7 @@
   // Code output box styling
   .output-content {
     @include output-panel;
+    border: 1px solid var(--ui-border);
   }
 
   // Control bar (top and bottom bars)
