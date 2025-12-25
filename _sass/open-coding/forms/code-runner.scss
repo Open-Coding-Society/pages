@@ -62,17 +62,4 @@
   .runBtn {
     @include emphasized-button;
   }
-
-  // Mobile responsiveness
-  @media (max-width: 768px) {
-    .control-bar {
-      flex-wrap: wrap;
-      gap: 0.5rem;
-
-      select {
-        min-width: 120px;
-      }
-    }
-
-  }
 }

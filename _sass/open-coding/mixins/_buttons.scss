@@ -79,6 +79,10 @@
   height: $size;
   padding: 8px;
   margin-left: $spacing;
+
+  @media (max-width: 768px) {
+    margin-left: 0.25rem;
+  }
 }
 
 /**
@@ -139,6 +143,8 @@
   border-radius: 4px;
 
   @media (max-width: 768px) {
-    min-width: 120px;
+    min-width: auto;
+    max-width: 90px;
+    font-size: 0.85rem;
   }
 }
