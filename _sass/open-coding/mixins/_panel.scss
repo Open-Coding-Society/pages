@@ -95,6 +95,23 @@
 }
 
 /**
+ * Input Panel
+ * Panel for code editors with syntax highlighting (CodeMirror)
+ *
+ * @example
+ *   .CodeMirror {
+ *     @include input-panel;
+ *   }
+ */
+@mixin input-panel {
+  background: var(--panel);
+  color: var(--pref-text-color);
+  border: 1px solid var(--ui-border);
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+}
+
+/**
  * Control Panel
  * Horizontal bar for controls, buttons, and selects
  *

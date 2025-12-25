@@ -22,11 +22,7 @@
 
   // Code editor styling
   .CodeMirror {
-    // @include input-panel;
-    background: var(--panel);
-    border: 1px solid var(--ui-border);
-    font-size: 14px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    @include input-panel;
   }
 
   .CodeMirror-gutters {
@@ -42,7 +38,6 @@
   // Code output box styling
   .output-content {
     @include output-panel;
-    border: 1px solid var(--ui-border);
   }
 
   // Control panel (top and bottom bars)
@@ -65,10 +60,7 @@
 
   // Emphasized run button
   .runBtn {
-    @include icon-button(38px, 0);
-    background: var(--pref-accent-color);
-    border-color: var(--pref-accent-color);
-    color: var(--pref-bg-color);
+    @include emphasized-button;
   }
 
   // Mobile responsiveness

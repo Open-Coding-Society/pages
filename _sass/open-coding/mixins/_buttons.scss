@@ -82,6 +82,25 @@
 }
 
 /**
+ * Emphasized Button
+ * Button with inverted colors for primary actions
+ *
+ * @param {Number} $size - Button size (default: 38px)
+ * @param {Number} $spacing - Margin left spacing (default: 8px)
+ *
+ * @example
+ *   .runBtn {
+ *     @include emphasized-button;
+ *   }
+ */
+@mixin emphasized-button($size: 38px, $spacing: 8px) {
+  @include icon-button($size, $spacing);
+  background: var(--pref-accent-color);
+  border-color: var(--pref-accent-color);
+  color: var(--pref-bg-color);
+}
+
+/**
  * Toggle Button
  * Button with icon that can rotate or change state
  *
