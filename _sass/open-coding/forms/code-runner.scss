@@ -5,9 +5,10 @@
 
 @import "../mixins/buttons";
 @import "../mixins/panel";
+@import "../mixins/container";
 
 .code-runner-container {
-  margin-bottom: 2rem;
+  @include main-container;
 
   // Code challenge box styling
   .challenge-box {
@@ -16,11 +17,7 @@
 
   // Editor container
   .editor-container {
-    border: 1px solid var(--ui-border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    @include sub-container;
   }
 
   // Code editor styling
@@ -37,11 +34,7 @@
 
   // Output section
   .output-container {
-    border: 1px solid var(--ui-border);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    background-color: var(--panel);
+    @include sub-container;
   }
 
   // Code output box styling
