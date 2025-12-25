@@ -62,7 +62,7 @@
   .runBtn,
   .copyBtn,
   .clearBtn,
-  .copyOutputIcon {
+  .copyOutputBtn {
     @include icon-button(38px, 0);
   }
 
@@ -154,12 +154,5 @@
       }
     }
 
-    .runBtn,
-    .copyBtn,
-    .clearBtn,
-    .copyOutputIcon {
-      width: 44px;
-      height: 44px;
-    }
   }
 }

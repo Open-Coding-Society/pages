@@ -32,7 +32,7 @@
   <div class="output-section">
     <div class="control-bar">
       <span>Output</span>
-      <button class="copyOutputIcon" title="Copy Output">⎘</button>
+      <button class="copyOutputBtn" title="Copy Output">⎘</button>
     </div>
     <div class="output-content">Click "Run Code" to see output here...</div>
   </div>
@@ -128,7 +128,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     navigator.clipboard.writeText(code).then(() => {
       const btn = container.querySelector('.copyBtn');
       const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
+      btn.textContent = '✔';
       setTimeout(() => {
         btn.textContent = originalText;
       }, 2000);
@@ -136,9 +136,9 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   };
 
   // Copy output icon
-  container.querySelector('.copyOutputIcon').onclick = () => {
+  container.querySelector('.copyOutputBtn').onclick = () => {
     const output = outputDiv.textContent;
-    const icon = container.querySelector('.copyOutputIcon');
+    const icon = container.querySelector('.copyOutputBtn');
     const original = icon.textContent;
     navigator.clipboard.writeText(output).then(() => {
       icon.textContent = '✔';
