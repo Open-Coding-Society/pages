@@ -1,0 +1,185 @@
+/**
+ * Code Runner Styles
+ * Interactive code editor with execution capabilities
+ */
+
+@import "../mixins/buttons";
+
+.code-runner-container {
+  margin-bottom: 2rem;
+
+  // CodeMirror editor styling
+  .CodeMirror {
+    font-size: 14px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  }
+
+  // Control bar (top and bottom bars)
+  .control-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--pref-bg-color, #0b1220);
+    padding: 0.75rem 1rem;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.06));
+
+    &:last-child {
+      border-radius: 0 0 10px 10px;
+      background: transparent;
+      padding: 0.5rem 0;
+      border: none;
+    }
+
+    select {
+      color: var(--pref-text-color, #e6eef8);
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      min-width: 150px;
+      background: var(--ui-bg, rgba(0,0,0,0.06));
+      border: 1px solid var(--ui-border, rgba(255, 255, 255, 0.06));
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: var(--pref-accent-color, #3b82f6);
+        background: var(--panel-mid, rgba(0,0,0,0.12));
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--pref-accent-color, #3b82f6);
+      }
+    }
+
+    span {
+      color: var(--pref-text-color, #e6eef8);
+      font-size: 0.9rem;
+    }
+  }
+
+  // Action buttons (using mixins)
+  .runBtn,
+  .copyBtn,
+  .clearBtn,
+  .copyOutputIcon {
+    @include icon-button(38px, 0);
+    margin-left: 0.5rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 1rem;
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: var(--pref-accent-color, #3b82f6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  }
+
+  .runBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+
+    &:hover {
+      background: linear-gradient(135deg, #7c8ef0 0%, #8a5ab8 100%);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+  }
+
+  // Editor container
+  .editor-container {
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  // Output section
+  .output-section {
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background-color: #2e2e2e;
+    border: 1px solid #444;
+  }
+
+  .output-content {
+    padding: 16px;
+    white-space: pre-wrap;
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #1e1e1e;
+    color: #e5e5ea;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+
+      &:hover {
+        background: #555;
+      }
+    }
+  }
+
+  // Challenge box
+  .challenge-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+      line-height: 1.5;
+    }
+  }
+
+  // Mobile responsiveness
+  @media (max-width: 768px) {
+    .control-bar {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      select {
+        min-width: 120px;
+      }
+    }
+
+    .runBtn,
+    .copyBtn,
+    .clearBtn,
+    .copyOutputIcon {
+      width: 44px;
+      height: 44px;
+    }
+  }
+}
