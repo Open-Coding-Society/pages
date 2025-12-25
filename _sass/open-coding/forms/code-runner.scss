@@ -55,7 +55,7 @@
     @include icon-button(38px, 0);
     background: var(--pref-accent-color);
     border-color: var(--pref-accent-color);
-    color: #fff;
+    color: var(--pref-bg-color);
 
     &:hover {
       opacity: 0.9;
