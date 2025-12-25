@@ -4,6 +4,31 @@
  */
 
 /**
+ * Base Control
+ * Common color and interaction styles for all controls
+ * @private - Use specific mixins instead
+ */
+@mixin base-control {
+  background: var(--pref-bg-color);
+  border: 1px solid var(--ui-border);
+  color: var(--pref-text-color);
+  font-family: var(--pref-font-family);
+  font-size: var(--pref-font-size);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--pref-accent-color);
+  }
+}
+
+/**
  * Text Button
  * Standard rectangular button with text content
  *
@@ -13,26 +38,15 @@
  *   }
  */
 @mixin text-button {
+  @include base-control;
   height: 38px;
-  background: var(--pref-bg-color);
-  border: 1px solid var(--pref-accent-color);
-  color: var(--pref-accent-color);
   padding: 8px 12px;
   border-radius: 6px;
-  font-size: var(--pref-font-size);
-  font-family: var(--pref-font-family);
-  cursor: pointer;
-  transition: all 0.2s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  &:hover,
-  &:focus-visible {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: var(--pref-accent-color);
-    color: var(--pref-accent-color);
-    outline: none;
+  &:hover {
     transform: scale(1.02);
   }
 
@@ -76,24 +90,11 @@
  *   }
  */
 @mixin toggle-button {
-  background: var(--pref-bg-color);
-  border: 1px solid var(--pref-accent-color);
-  color: var(--pref-text-color);
+  @include base-control;
   padding: 8px 16px;
   border-radius: 6px;
-  font-size: var(--pref-font-size);
-  font-family: var(--pref-font-family);
-  cursor: pointer;
-  transition: all 0.2s;
   display: inline-flex;
   align-items: center;
-
-  &:hover,
-  &:focus-visible {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: var(--pref-accent-color);
-    outline: none;
-  }
 }
 
 /**
@@ -111,33 +112,13 @@
  *     @include select-control(200px);
  *   }
  */
-@mixin select-control($size: 38px) {
-  height: $size;
-  min-width: $size;
-  background: var(--pref-bg-color);
-  border: 1px solid var(--pref-accent-color);
-  color: var(--pref-text-color);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: var(--pref-font-size);
-  font-family: var(--pref-font-family);
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover,
-  &:focus-visible {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: var(--pref-accent-color);
-    color: var(--pref-accent-color);
-    outline: none;
-    transform: scale(1.02);
-  }
+@mixin select-control($min-width: 150px) {
+  @include base-control;
+  min-width: $min-width;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 
   @media (max-width: 768px) {
-    width: 44px;
-    height: 44px;
-  } 
+    min-width: 120px;
+  }
 }

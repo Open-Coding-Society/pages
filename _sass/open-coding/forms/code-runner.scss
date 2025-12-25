@@ -44,11 +44,23 @@
   }
 
   // Action buttons (using mixins)
-  .runBtn,
   .copyBtn,
   .clearBtn,
   .copyOutputBtn {
     @include icon-button(38px, 0);
+  }
+
+  // Emphasized run button
+  .runBtn {
+    @include icon-button(38px, 0);
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: #fff;
+
+    &:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
   }
 
   // Editor container
