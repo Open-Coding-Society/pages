@@ -47,7 +47,8 @@
   justify-content: center;
 
   &:hover {
-    transform: scale(1.02);
+    opacity: 0.9;
+    transform: scale(1.05);
   }
 
   @media (max-width: 768px) {

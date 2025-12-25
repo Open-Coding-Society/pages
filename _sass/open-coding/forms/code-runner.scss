@@ -56,11 +56,6 @@
     background: var(--pref-accent-color);
     border-color: var(--pref-accent-color);
     color: var(--pref-bg-color);
-
-    &:hover {
-      opacity: 0.9;
-      transform: scale(1.05);
-    }
   }
 
   // Editor container
