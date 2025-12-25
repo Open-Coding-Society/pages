@@ -1,19 +1,10 @@
 ---
 layout: post
-title: Code Runner - Teacher Example
-description: Example showing how teachers can use multiple code runners on one page for interactive lessons.
-permalink: /code-runner-example
+coderunner: true
+title: Code Runner Lessons 
+description: Example showing how student teachers can use multiple code runners on one page for interactive lessons.
+permalink: /code/lesson
 ---
-
-<!-- CodeMirror CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css">
-
-<!-- CodeMirror JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
 
 ## Python Lesson: Fix the Syntax Error
 
@@ -26,7 +17,7 @@ Fix the syntax error in the print statement. The parenthesis is not closed!
 print('Hello World'
 {% endcapture %}
 
-{% include code-runner.html 
+{% include code-runner.html
    runner_id="exercise1"
    language="python"
    challenge=challenge1
@@ -47,12 +38,13 @@ def calculate_area(length, width):
     area = ???
     return area
 
-# Test your function
+## Test your function
+
 print(calculate_area(5, 3))
 print(calculate_area(10, 2))
 {% endcapture %}
 
-{% include code-runner.html 
+{% include code-runner.html
    runner_id="exercise2"
    language="python"
    challenge=challenge2
@@ -76,7 +68,7 @@ public class Main {
 }
 {% endcapture %}
 
-{% include code-runner.html 
+{% include code-runner.html
    runner_id="exercise3"
    language="java"
    challenge=challenge3
@@ -98,7 +90,7 @@ for (let i = ???; i <= ???; i++) {
 }
 {% endcapture %}
 
-{% include code-runner.html 
+{% include code-runner.html
    runner_id="exercise4"
    language="javascript"
    challenge=challenge4
@@ -137,7 +129,7 @@ print('Hello World'
 %}{% endraw %}
 ```
 
-### Parameters:
+### Parameters
 
 - **runner_id** (required): Unique ID for each code runner on the page
 - **language** (optional): "python", "java", or "javascript" (default: "python")
@@ -145,7 +137,7 @@ print('Hello World'
 - **code** (required): The initial code to load in the editor
 - **height** (optional): Height of the editor (default: "300px")
 
-### Tips:
+### Tips
 
 - Each runner on a page needs a unique `runner_id`
 - Students can edit and run the code directly
