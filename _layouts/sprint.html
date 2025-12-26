@@ -10,7 +10,6 @@ layout: post
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ '/assets/css/certificate_overview.css' | relative_url }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="{{ '/assets/css/timeline.scss' | relative_url }}">
 <script src="{{ '/assets/js/help-video.js' | relative_url }}"></script>
@@ -19,7 +18,6 @@ layout: post
 <div class="timeline-header">
   <h1>Course Timeline</h1>  
 </div>
-
 
 <div class="timeline-container">
   {% for unit in units %}
@@ -185,19 +183,12 @@ layout: post
     <p class="week-theme" id="modal-sprint-subtitle"></p>
 
     <div class="progress-bar-container" style="margin-bottom: 16px;">
-      <div id="modal-progress-fill"></div>
+      <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
     </div>
 
     <div id="task-list"></div>
 
     <div id="certificate-status" style="margin-top: 24px;"></div>
-    
-    <div class="modal-action-buttons">
-      <button id="modal-analytics-btn" class="modal-analytics-btn">
-        <i class="fas fa-chart-line"></i>
-        My Analytics
-      </button>
-    </div>
   </div>
 </div>
 
@@ -205,6 +196,8 @@ layout: post
 <!--   CERTIFICATE LIST MODAL      -->
 <!-- ============================= -->
 <div id="certificate-list-modal">
+  <button id="close-certificate-list-modal" class="close-btn">&times;</button>
+
   <div>
     <h2><span id="list-modal-sprint-title"></span> Certificates</h2>
     <div id="certificate-list"></div>
@@ -215,9 +208,6 @@ layout: post
 <!--     CERTIFICATE MODAL         -->
 <!-- ============================= -->
 <div id="certificate-modal">
-  <!-- Top-right X to close the modal quickly -->
-  <button id="close-certificate-modal-x" class="close-btn" aria-label="Close certificate modal">&times;</button>
-
   <div class="action-bar">
     <button id="download-certificate-btn" class="action-btn">Download PNG</button>
     <button id="print-certificate-btn" class="action-btn secondary-btn">Print</button>
@@ -298,11 +288,6 @@ layout: post
   const CURRENT_COURSE = '{{ page.course }}';
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
 
-
-
-
-
-
   // Load the skill library from the JSON script tag so the JS file itself contains no raw Liquid tokens
   let COURSE_SKILL_LIBRARY = {};
   try {
@@ -335,8 +320,7 @@ layout: post
     }
   }
   
-  // Toggle completion status (enhanced with stats tracking)
-  // Toggle completion status (enhanced with stats tracking)
+  // Toggle completion status
   function toggleCompletion(button) {
     try {
       const itemCard = button.closest('.item-card');
@@ -356,27 +340,11 @@ layout: post
       // Update UI
       updateItemUI(itemCard, !isCompleted);
       updateProgressBars();
-     
-     const stats = initializeUserStats();
-     const weekCard = button.closest('.week-card');
-     const weekNum = extractWeekNumber(weekCard);
-    
-     // Recalculate totals
-     const allItems = document.querySelectorAll('.item-card');
-     stats.totalItems = allItems.length;
-     stats.totalCompleted = Array.from(allItems).filter(c => c.classList.contains('completed')).length;
-    
-     updateStreaks(stats);
-     updateWeeklyProgress(stats, weekNum);
-     calculateXP(stats);
-     saveUserStats(stats);
-    
-     refreshLeaderboardDisplay();
-     initializeCharts();
-     
-     // NEW: Update achievements display
-     updateAchievementsDisplay();
-
+      
+      // Trigger cross-view sync by dispatching a custom event
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId, completed: !isCompleted }
+      }));
     } catch (error) {
       console.error('Error in toggleCompletion:', error);
     }
@@ -509,60 +477,6 @@ layout: post
   
   let currentModalWeekNumber = null;
   let activeCertificateProfile = null;
-
-  // Setup Overview Section Toggle
-  function setupOverviewToggle() {
-    const overviewSection = document.getElementById('overview-section');
-    const toggleBtn = overviewSection?.querySelector('.overview-toggle-btn');
-    
-    if (!overviewSection || !toggleBtn) return;
-    
-    // Toggle function
-    function toggleOverview() {
-      const isCollapsed = overviewSection.classList.toggle('collapsed');
-      toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
-    }
-    
-    // Click on button
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleOverview();
-    });
-    
-    // Click on header
-    const header = overviewSection.querySelector('.overview-header');
-    header.addEventListener('click', (e) => {
-      if (e.target.closest('.overview-toggle-btn')) return;
-      toggleOverview();
-    });
-  }
-
-  // Setup Quick Help Section Toggle
-function setupQuickHelpToggle() {
-  const quickHelpSection = document.getElementById('quick-help-section');
-  const toggleBtn = quickHelpSection?.querySelector('.quick-help-toggle-btn');
-  
-  if (!quickHelpSection || !toggleBtn) return;
-  
-  // Toggle function
-  function toggleQuickHelp() {
-    const isCollapsed = quickHelpSection.classList.toggle('collapsed');
-    toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
-  }
-  
-  // Click on button
-  toggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleQuickHelp();
-  });
-  
-  // Click on header
-  const headerWrapper = quickHelpSection.querySelector('.quick-help-header-wrapper');
-  headerWrapper.addEventListener('click', (e) => {
-    if (e.target.closest('.quick-help-toggle-btn')) return;
-    toggleQuickHelp();
-  });
-}
 
   const COURSE_LABELS = {
     csp: 'Computer Science Principles',
@@ -1021,36 +935,6 @@ function setupQuickHelpToggle() {
     document.getElementById('certificate-modal').style.display = 'block';
   }
 
-  // Track earned certificates for leaderboard
-  function trackEarnedCertificate(profile) {
-    const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
-    let earnedCerts = [];
-    
-    try {
-      earnedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
-    } catch(e) {
-      earnedCerts = [];
-    }
-
-    // Create certificate record
-    const certRecord = {
-      id: profile.slug || `week-${profile.weekNumber}-${profile.skill}`,
-      weekNumber: profile.weekNumber,
-      theme: profile.theme,
-      skill: profile.skill,
-      earnedDate: new Date().toISOString()
-    };
-
-    // Check if already earned
-    const exists = earnedCerts.some(c => c.id === certRecord.id);
-    if (!exists) {
-      earnedCerts.push(certRecord);
-      localStorage.setItem(CERTIFICATES_KEY, JSON.stringify(earnedCerts));
-      
-      updateAchievementsDisplay();
-    }
-  }
-
   // Close certificate modal
   function closeCertificateModal() {
     document.getElementById('certificate-modal').style.display = 'none';
@@ -1116,14 +1000,6 @@ function setupQuickHelpToggle() {
     window.open(linkedInUrl, '_blank', 'noopener');
   }
 
-
-
-
-
-
-
-
-
   // Initialize certificate system
   function initializeCertificateSystem() {
     // Sprint-level progression buttons
@@ -1172,20 +1048,6 @@ function setupQuickHelpToggle() {
     document.getElementById('close-progression-modal').addEventListener('click', closeProgressionModal);
     document.getElementById('close-certificate-list-modal').addEventListener('click', closeCertificateListModal);
     document.getElementById('close-certificate-modal').addEventListener('click', closeCertificateModal);
-    // Defensive binding for the newly added top-right X on the certificate modal
-    if (document.getElementById('close-certificate-modal-x')) {
-      document.getElementById('close-certificate-modal-x').addEventListener('click', closeCertificateModal);
-    }
-
-    // Allow closing modals with Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' || e.key === 'Esc') {
-        // Only attempt to close if modals are currently open
-        try { if (document.getElementById('progression-modal').style.display === 'block') closeProgressionModal(); } catch (err) {}
-        try { if (document.getElementById('certificate-list-modal').style.display === 'block') closeCertificateListModal(); } catch (err) {}
-        try { if (document.getElementById('certificate-modal').style.display === 'block') closeCertificateModal(); } catch (err) {}
-      }
-    });
 
     // Certificate actions
     document.getElementById('download-certificate-btn').addEventListener('click', downloadCertificate);
