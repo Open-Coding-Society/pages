@@ -1,23 +1,19 @@
 ---
 layout: post
+show_reading_time: false
 tailwind: True
-title: Onboarding Adventure
 assignment: true
+title: JavaScript OOP Coder 
 description: >
-  A guided sequence of hands-on and learning tasks to help you master the frameworks that power our course.
+  A guided sequence of hands-on and learning tasks to help you build foundation in JavaScript and the frameworks that power our course.
 author: John Mortensen
-courses: {'csse': {'week': 1}, 'csp': {'week': 1}, 'csa': {'week': 1}}
+courses: {'csse': {'week': 3}, 'csp': {'week': 3}, 'csa': {'week': 1}, 'cwgu': {'week': 3}}
 type: hacks
 canonical_id: onboarding-adventure
 permalink: /hacks
 lxdData:
   Title: "Learning Experience Designer Home"
-  Description: "Explore LxD topics and interactive games to obtain mastery in key oboarding topics... collaboration, design thinking, coding skills, etc."
-  Prequisites:
-    - title: "Tools Setup"
-      link: "/tools"
-    - title: "Agile Collaboration"
-      link: "/agile"
+  Description: "Explore interactive games to obtain mastery in key oboarding topics... collaboration, design thinking, coding skills, etc."
   Topics:
     - Title: "Animated Background"
       Genre: "Coding"
@@ -50,7 +46,7 @@ lxdData:
       Genre: "Coding"
       Level: "1"
       Description: "Learn more about console, elements and OOP as you play with Rock Paper Scissors."
-      Categories: ["Console", "OOP", "Game Coding", "Elements", "Innovation"]
+      Categories: ["OOP", "Inspect", "Console", "Elements", "Function Calls"]
       Game: "/rock-paper-scissor"
       Lessons: "/rock_paper_scissors/lessons"
       Image: "/images/rps/rock-paper-scissors.jpg"
@@ -59,7 +55,7 @@ lxdData:
       Genre: "Coding"
       Level: "2"
       Description: "Learn how to use Jupyter notebooks to develop Python projects. "
-      Categories: ["Python", "Jupyter", "Game Coding"]
+      Categories: ["Python", "Jupyter", "Conditionals", "XXOOX"]
       Game: "/games/tictactoe/howtorun"
       Lessons: "/games/tictactoe/lesson"
       Image: "/images/tictactoe/tictactoe.png"
@@ -68,7 +64,7 @@ lxdData:
       Genre: "Coding"
       Level: "2"
       Description: "Learn the basics of JS and object oriented programming as you dive deep into the world of game coding. "
-      Categories: ["JavaScript", "OOP", "Game Coding", "Cookies"]
+      Categories: ["OOP", "Game World", "Canvas", "Cookies"]
       Game: "/cookie-clicker-game"
       Lessons: "/cookie-lessons"
       Image: "/images/cookie.jpg"
@@ -154,14 +150,5 @@ lxdData:
       Lessons: "/blackjack/lesson"
       Image: "/images/blackjack.png"
       Alt: "Blackjack Image"
-    - Title: "API Basics"
-      Genre: "Coding"
-      Level: "4"
-      Description: "Learn the basics of APIs, Async, Error Handling, and best practices."
-      Categories: ["JavaScript", "API"]
-      Game: "/music-api" ## Change to API example with /api-basics/game
-      Lessons: "/api-basics/lessons"
-      Image: "/images/basic-api/api-image.jpg"
-      Alt: "API Image"
 ---
 {%- include tailwind/lxd.html -%}
