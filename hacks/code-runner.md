@@ -1,6 +1,6 @@
 ---
 layout: post
-coderunner: true
+codemirror: true
 title: Code Runner Examples
 description: A lesson showing how lesson can built using multiple code runners on a page.  This modular approach allows you to create consistent lessons while learning SASS best practices. Use this as a template to build topic-specific lessons (e.g., Java Arrays, Python Functions).
 permalink: /code
