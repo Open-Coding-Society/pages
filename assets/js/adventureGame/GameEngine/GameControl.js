@@ -189,7 +189,7 @@ class GameControl {
         // If there are more levels, advance. Otherwise finish gracefully.
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             // Inform user and go to next level
-            try { alert("Level ended."); } catch (e) { /* ignore */ }
+            //try { alert("Level ended."); } catch (e) { /* ignore */ }
             if (this.gameOver) {
                 this.gameOver();
             } else {

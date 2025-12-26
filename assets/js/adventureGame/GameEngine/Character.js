@@ -61,9 +61,7 @@ class Character extends GameObject {
         this.canvas.height = data.pixels?.height || PIXELS.height;
         this.hitbox = data?.hitbox || {};
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-        // Use container from gameEnv if available, fallback to DOM query
-        const container = this.gameEnv.container || document.getElementById("gameContainer");
-        container.appendChild(this.canvas);
+        this.gameEnv.container.appendChild(this.canvas);
         this.canvas.style = "image-rendering: pixelated;";
 
         // Set initial object properties
