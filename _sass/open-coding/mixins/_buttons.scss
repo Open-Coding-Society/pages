@@ -102,6 +102,13 @@
   background: var(--pref-accent-color);
   border-color: var(--pref-accent-color);
   color: var(--pref-bg-color);
+
+  &:hover {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
 }
 
 /**
