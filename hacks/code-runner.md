@@ -98,7 +98,7 @@ for (let i = ???; i <= ???; i++) {
 
 ## Code Runner Reference
 
-Code runner requires defining and passing liquid variables for **challenge** and **code** to the include file `code-runner.html`.  The liquid defintions and code inclusion create code execution panels.
+Code runner requires defining and passing liquid variables for **challenge** and **code** to the include file `code-runner.html`. Study the source of this markdown file to see how the liquid variables are defined for each example above.
 
 ### Parameters
 
