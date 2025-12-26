@@ -1,0 +1,52 @@
+/**
+ * UI Runner Styles
+ * Interactive UI code executor with visual output
+ */
+
+@import "runner-base";
+@import "../mixins/panel"; // For $panel-* variables
+
+.ui-runner-container {
+  @include runner-base;
+
+  // UI output area - visual output container
+  .ui-output {
+    // Layout & Dimensions
+    min-height: 400px;
+    max-height: 600px;
+    overflow: auto;
+    position: relative;
+    
+    // Spacing
+    padding: 0;
+    
+    // Colors & Styling
+    background: $panel-bg;
+    color: $panel-text;
+    
+    // Allow canvas/game elements to fill
+    canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+  }
+
+  // Additional buttons specific to UI runner
+  .stopBtn,
+  .resetBtn {
+    @include icon-button(38px, 0);
+  }
+
+  // Stop button - red emphasis for immediate attention
+  .stopBtn {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: $panel-bg;
+
+    &:hover {
+      background: #dc2626;
+      opacity: 0.85;
+    }
+  }
+}

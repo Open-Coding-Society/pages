@@ -3,36 +3,15 @@
  * Interactive code editor with execution capabilities
  */
 
-@import "../mixins/buttons";
-@import "../mixins/panel";
-@import "../mixins/container";
+@import "runner-base";
 
 .code-runner-container {
-  @include main-container;
+  @include runner-base;
 
-  // Code challenge box styling
-  .challenge-box {
-    @include info-panel;
-  }
-
-  // Editor container
-  .editor-container {
-    @include sub-container;
-  }
-
-  // Code editor styling
-  .CodeMirror {
-    @include input-panel;
-  }
-
-  .CodeMirror-gutters {
-    background: var(--pref-bg-color);
-    border: 1px solid var(--ui-border);
-  }
-
-  // Output section
-  .output-container {
-    @include sub-container;
+  // Select controls specific to code runner
+  .languageSelect,
+  .fontSizeSelect {
+    @include select-control();
   }
 
   // Code output box styling
@@ -40,26 +19,8 @@
     @include output-panel;
   }
 
-  // Control panel (top and bottom bars)
-  .control-panel {
-    @include control-panel;
-  }
-
-  // Select controls
-  .languageSelect,
-  .fontSizeSelect {
-    @include select-control();
-  }
-
-  // Action buttons (using mixins)
-  .copyBtn,
-  .clearBtn,
+  // Copy output button
   .copyOutputBtn {
     @include icon-button(38px, 0);
-  }
-
-  // Emphasized run button
-  .runBtn {
-    @include emphasized-button;
   }
 }
