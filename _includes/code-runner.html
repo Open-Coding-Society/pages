@@ -49,7 +49,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (!container) return;
   
   const initialLang = "{{ include.language }}";
-  const initialCode = `{{ include.code }}`;
+  const initialCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.height }}";
   
   // Set CodeMirror height dynamically
