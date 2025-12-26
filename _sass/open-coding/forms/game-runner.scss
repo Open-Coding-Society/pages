@@ -1,0 +1,108 @@
+/**
+ * Game Runner Styles
+ * Interactive game development environment with GameEngine integration
+ */
+
+@import "runner-base";
+@import "../mixins/panel";
+
+.game-runner-container {
+  @include runner-base;
+
+  // Game output area - contained canvas for educational use
+  .game-output {
+    // Layout & Dimensions
+    min-height: 400px;
+    max-height: 600px;
+    overflow: auto;
+    position: relative;
+    
+    // Spacing
+    padding: 0;
+    
+    // Colors & Styling
+    background: $panel-bg;
+    color: $panel-text;
+    
+    // Game container styling
+    .gameContainer {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      canvas {
+        display: block;
+        max-width: 100%;
+        max-height: 580px;
+        border: 2px solid var(--pref-accent-color);
+        background: #000;
+      }
+    }
+  }
+
+  // Level selector dropdown
+  .levelSelect {
+    @include select-control();
+    min-width: 120px;
+  }
+
+  // Game-specific buttons
+  .pauseBtn,
+  .stopBtn,
+  .resetBtn {
+    @include icon-button(38px, 0);
+  }
+
+  // Pause button - yellow emphasis for attention
+  .pauseBtn {
+    background: #eab308;
+    border-color: #eab308;
+    color: $panel-bg;
+
+    &:hover {
+      background: #eab308;
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      background: var(--pref-bg-color);
+      border-color: var(--ui-border);
+      color: var(--pref-text-color);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Stop button - red emphasis
+  .stopBtn {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: $panel-bg;
+
+    &:hover {
+      background: #dc2626;
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      background: var(--pref-bg-color);
+      border-color: var(--ui-border);
+      color: var(--pref-text-color);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Game status indicator
+  .game-status {
+    font-weight: 500;
+    
+    .status-text {
+      color: var(--pref-accent-color);
+      font-weight: 600;
+    }
+  }
+}
