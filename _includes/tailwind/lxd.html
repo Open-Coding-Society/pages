@@ -13,32 +13,30 @@
 
     <!-- Prerequisites Section -->
     {% if page.lxdData.Prequisites %}
-    <div class="mb-8">
-      <h2 class="text-2xl font-semibold text-white mb-2">Prerequisites</h2>
-      <ul class="flex flex-wrap gap-4 justify-center">
+    <div class="mb-4 bg-gray-800/50 rounded-xl p-6">
+      <h2 class="text-2xl font-semibold text-white mb-3">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
         {% for prereq in page.lxdData.Prequisites %}
-          <li>
-            <a href="{{ prereq.link }}" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition">
-              {{ prereq.title }}
-            </a>
-          </li>
+          <a href="{{ prereq.link }}" class="bg-blue-700 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
+            {{ prereq.title }}
+          </a>
         {% endfor %}
-      </ul>
+      </div>
     </div>
     {% endif %}
 
     <!-- Selection Panel -->
     <div class="mb-8 bg-gray-800/50 rounded-xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-semibold text-white">My Onboarding Hacks</h2>
-        <div class="flex gap-3">
-          <button id="open-grading-view-btn" onclick="openGradingView()" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition font-semibold">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-white mb-2">My Onboarding Hacks</h2>
+        <p id="hacks-status" class="text-sm text-gray-300 mb-3">Loading...</p>
+        <div class="flex flex-wrap gap-2">
+          <button id="open-grading-view-btn" onclick="openGradingView()" class="bg-purple-700 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
             Open Grading View
           </button>
-          <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition font-semibold">
+          <button id="select-hacks-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg transition font-semibold text-sm">
             Select Hacks
           </button>
-          <p id="hacks-status" class="text-sm text-gray-300 self-center">Loading...</p>
         </div>
       </div>
 
@@ -49,26 +47,25 @@
     </div>
 
     <!-- Modal for Hack Selection -->
-    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: rgba(0,0,0,0.8); overflow-y: auto;">
-      <div style="position: relative; background-color: #1a1a1a; padding: 24px; border-radius: 12px; max-width: 56rem; width: 90%; max-height: 85vh; overflow-y: auto; border: 1px solid #374151; z-index: 100000; margin: 40px auto;">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-2xl font-bold text-white" style="color: white;">Choose Your Onboarding Hacks</h3>
-          <button id="modal-close-btn" class="text-gray-400 hover:text-white text-3xl font-bold leading-none" style="color: #9ca3af; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none;">&times;</button>
-        </div>
-        <p class="text-gray-300 mb-6" style="color: #d1d5db; margin-bottom: 1.5rem;">Select the hacks you want to work on. They'll appear at the top of the page for easy access.</p>
-        
-        <div id="hacks-checklist" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; max-height: 400px; overflow-y: auto; padding: 8px; margin-bottom: 1.5rem;">
+    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: var(--pref-bg-color); padding: 60px 20px 60px 20px; ;">
+      <!-- Close button -->
+      <button id="modal-close-btn" style="position: absolute; top: 16px; right: 20px; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none; z-index: 1; color: white;">&times;</button>
+      
+      <!-- Scrolling checklist (centered inner container) -->
+      <div style="width: 100%; max-width: 70rem; margin: 0 auto;">
+        <div id="hacks-checklist" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px; border: 2px solid #374151; border-radius: 8px;">
           <!-- Checkboxes will be populated here -->
         </div>
-        
-        <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 16px; border-top: 1px solid #374151;">
-          <button id="modal-cancel-btn" style="padding: 8px 20px; border-radius: 8px; background-color: #374151; color: white; cursor: pointer; border: none; font-weight: 500;">
-            Cancel
-          </button>
-          <button id="modal-save-btn" style="padding: 8px 20px; border-radius: 8px; background-color: #16a34a; color: white; cursor: pointer; border: none; font-weight: 600;">
-            Save Selection
-          </button>
-        </div>
+      </div>
+      
+      <!-- Action buttons -->
+      <div style="width: 100%; max-width: 70rem; margin: 16px auto 0 auto; display: flex; justify-content: flex-end; gap: 12px;">
+        <button id="modal-cancel-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 500; font-size: 1rem;">
+          Cancel
+        </button>
+        <button id="modal-save-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; font-size: 1rem;">
+          Save Selection
+        </button>
       </div>
     </div>
 
@@ -116,8 +113,8 @@
 </div>
 
 <!-- Grading View (Admin) -->
-<div id="grading-panel" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99998; background-color: rgba(0,0,0,0.8); overflow-y:auto;">
-  <div style="position: relative; background-color: #111827; padding:24px; border-radius:12px; max-width:1100px; width:90%; margin:40px auto; border:1px solid #374151;">
+<div id="grading-panel" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99998; background-color: var(--pref-bg-color); padding: 20px; overflow-y:auto;">
+  <div style="position: relative; width: 100%; max-width: 1100px; margin: 60px auto 0 auto; min-height: min-content; padding:24px; border-radius:12px; border:1px solid #374151;">
     <div class="flex items-start justify-between mb-4">
       <div>
         <p class="text-sm text-purple-300 uppercase tracking-wide">Grading</p>
@@ -142,11 +139,11 @@
 </div>
 
 <!-- Submission Modal -->
-<div id="submission-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background-color: rgba(0,0,0,0.8); overflow-y:auto;">
-  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; margin:40px auto; border:1px solid #374151;">
+<div id="submission-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background-color: var(--pref-bg-color); z-index:99999; overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; margin:40px auto; border:1px solid #374151;">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-2xl font-bold text-white">Submit Your Work</h3>
-      <button onclick="closeSubmissionModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer;">&times;</button>
+      <button onclick="closeSubmissionModal()" style="font-size:2rem; cursor:pointer;">&times;</button>
     </div>
 
     <!-- Dynamic Rubric Checklist -->
@@ -166,19 +163,19 @@
     <!-- Submission Link -->
     <div class="mb-4">
       <label class="block text-white font-semibold mb-2 text-sm">Submission Link (Required):</label>
-      <input type="url" id="submission-link" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white; margin-bottom:12px;" placeholder="https://example.com/your-work" />
+      <input type="url" id="submission-link" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; margin-bottom:12px;" placeholder="https://example.com/your-work" />
     </div>
 
-    <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white; margin-bottom:12px;" placeholder="Write your submission here..."></textarea>
+    <textarea id="submission-text" rows="8" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; margin-bottom:12px;" placeholder="Write your submission here..."></textarea>
 
     <!-- Additional Notes Section -->
     <div class="mb-4">
       <label class="block text-white font-semibold mb-2 text-sm">Additional Notes/Comments (Optional):</label>
-      <textarea id="submission-notes" rows="4" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151; background:#111; color:white;" placeholder="Add any extra information about your work, challenges faced, or things you'd like the grader to know..."></textarea>
+      <textarea id="submission-notes" rows="4" style="width:100%; padding:12px; border-radius:8px; border:1px solid #374151;" placeholder="Add any extra information about your work, challenges faced, or things you'd like the grader to know..."></textarea>
     </div>
 
     <div style="display:flex; justify-content:flex-end; margin-top:16px;">
-      <button id="submission-btn" onclick="submitHack()" disabled style="padding:8px 20px; border-radius:8px; background-color:#16a34a; color:white; border:none; font-weight:600; opacity:0.5; cursor:not-allowed;">
+      <button id="submission-btn" onclick="submitHack()" disabled style="padding:8px 20px; border-radius:8px; border:none; font-weight:600; opacity:0.5; cursor:not-allowed;">
         Submit
       </button>
     </div>
@@ -186,15 +183,15 @@
 </div>
 
 <!-- Full Rubric Modal -->
-<div id="full-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100000; background-color: rgba(0,0,0,0.85); overflow-y:auto;">
-  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+<div id="full-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; background-color: var(--pref-bg-color); z-index:100000; overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
     <div class="flex items-center justify-between mb-6">
       <h3 class="text-2xl font-bold text-white">Complete Grading Rubric</h3>
       <div class="flex gap-3">
-        <button id="edit-rubric-btn" onclick="toggleRubricEditMode()" style="padding:8px 16px; border-radius:8px; background-color:#3b82f6; color:white; border:none; font-weight:600; cursor:pointer;">
+        <button id="edit-rubric-btn" onclick="toggleRubricEditMode()" style="padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer;">
           Edit Rubric
         </button>
-        <button onclick="closeFullRubricModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer; line-height:1;">&times;</button>
+        <button onclick="closeFullRubricModal()" style="font-size:2rem; cursor:pointer; line-height:1;">&times;</button>
       </div>
     </div>
 
@@ -205,7 +202,7 @@
       </div>
 
       <div style="display:flex; justify-content:flex-end; margin-top:24px; padding-top:16px; border-top:1px solid #374151;">
-        <button onclick="closeFullRubricModal()" style="padding:8px 20px; border-radius:8px; background-color:#374151; color:white; border:none; font-weight:500; cursor:pointer;">
+        <button onclick="closeFullRubricModal()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:500; cursor:pointer;">
           Close
         </button>
       </div>
@@ -222,15 +219,15 @@
         <!-- Editable categories will go here -->
       </div>
 
-      <button onclick="addNewCategory()" style="padding:8px 16px; border-radius:8px; background-color:#10b981; color:white; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
+      <button onclick="addNewCategory()" style="padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
         + Add Category
       </button>
 
       <div style="display:flex; justify-content:space-between; margin-top:24px; padding-top:16px; border-top:1px solid #374151;">
-        <button onclick="cancelRubricEdit()" style="padding:8px 20px; border-radius:8px; background-color:#374151; color:white; border:none; font-weight:500; cursor:pointer;">
+        <button onclick="cancelRubricEdit()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:500; cursor:pointer;">
           Cancel
         </button>
-        <button onclick="saveRubricEdit()" style="padding:8px 20px; border-radius:8px; background-color:#10b981; color:white; border:none; font-weight:600; cursor:pointer;">
+        <button onclick="saveRubricEdit()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:600; cursor:pointer;">
           Save Changes
         </button>
       </div>
@@ -239,15 +236,15 @@
 </div>
 
 <!-- Grading Rubric Modal (per submission) -->
-<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; background-color: rgba(0,0,0,0.85); overflow-y:auto;">
-  <div style="position: relative; background-color: #1a1a1a; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; background-color: rgba(0,0,0,0.7); overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #d1d5db; max-height: 85vh; overflow-y: auto; background-color: white; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <p class="text-sm text-purple-300 uppercase tracking-wide">Grader</p>
-        <h3 class="text-2xl font-bold text-white">Edit Rubric</h3>
-        <p id="grading-rubric-context" class="text-gray-300 text-sm"></p>
+        <p class="text-sm text-purple-600 uppercase tracking-wide">Grader</p>
+        <h3 class="text-2xl font-bold text-gray-900">Edit Rubric</h3>
+        <p id="grading-rubric-context" class="text-gray-600 text-sm"></p>
       </div>
-      <button onclick="closeGradingRubricModal()" style="font-size:2rem; background:none; border:none; color:#9ca3af; cursor:pointer; line-height:1;">&times;</button>
+      <button onclick="closeGradingRubricModal()" style="font-size:2rem; cursor:pointer; line-height:1;">&times;</button>
     </div>
 
     <div class="bg-gray-800 p-4 rounded-lg mb-4">
@@ -257,15 +254,15 @@
 
     <div id="grading-edit-categories" class="space-y-4 mb-4"></div>
 
-    <button onclick="addGradingCategory()" style="padding:8px 16px; border-radius:8px; background-color:#10b981; color:white; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
+    <button onclick="addGradingCategory()" style="padding:8px 16px; border-radius:8px; border:none; font-weight:600; cursor:pointer; margin-bottom:16px;">
       + Add Category
     </button>
 
     <div style="display:flex; justify-content:space-between; padding-top:16px; border-top:1px solid #374151;">
-      <button onclick="closeGradingRubricModal()" style="padding:8px 20px; border-radius:8px; background-color:#374151; color:white; border:none; font-weight:500; cursor:pointer;">
+      <button onclick="closeGradingRubricModal()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:500; cursor:pointer;">
         Cancel
       </button>
-      <button onclick="saveGradingRubric()" style="padding:8px 20px; border-radius:8px; background-color:#10b981; color:white; border:none; font-weight:600; cursor:pointer;">
+      <button onclick="saveGradingRubric()" style="padding:8px 20px; border-radius:8px; border:none; font-weight:600; cursor:pointer;">
         Save Rubric
       </button>
     </div>
@@ -523,7 +520,7 @@
                    data-category-weight="${catIndex}">
           </div>
           <button onclick="removeCategory(${catIndex})" 
-                  style="padding:6px 12px; border-radius:6px; background-color:#ef4444; color:white; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">
+                  style="padding:6px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">
             Remove
           </button>
         </div>
@@ -545,14 +542,14 @@
                        value="${sub.weight}"
                        data-sub-weight="${catIndex}-${subIndex}">
                 <button onclick="removeSubcategory(${catIndex}, ${subIndex})" 
-                        style="padding:4px 8px; border-radius:4px; background-color:#ef4444; color:white; border:none; font-size:0.75rem; cursor:pointer;">
+                        style="padding:4px 8px; border-radius:4px; border:none; font-size:0.75rem; cursor:pointer;">
                   ×
                 </button>
               </div>
             `).join('')}
           </div>
           <button onclick="addSubcategory(${catIndex})" 
-                  style="padding:4px 12px; border-radius:6px; background-color:#6366f1; color:white; border:none; font-size:0.875rem; cursor:pointer;">
+                  style="padding:4px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer;">
             + Add Sub-criterion
           </button>
         </div>
@@ -766,20 +763,14 @@
     const modal = document.getElementById('hacks-modal');
     if (!modal) return;
     renderChecklist();
-    modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
+    modal.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.body.style.overflow = 'hidden';
   }
 
   function closeModal() {
     const modal = document.getElementById('hacks-modal');
     if (modal) {
       modal.style.display = 'none';
-      modal.style.visibility = 'hidden';
-      modal.style.opacity = '0';
-      document.body.style.overflow = '';
     }
   }
 
@@ -863,7 +854,7 @@
     }
     
     // Use this page's permalink as the assignment key so grading view only shows submissions for this page
-    const assignmentName = '{{ page.permalink | escape }}';
+    const assignmentName = currentHackToSubmit;;
     
     // Get user ID and class from credentials data (window.user loaded by login.js)
     let uid = null;
@@ -1009,22 +1000,28 @@
       const assignmentsMap = new Map();
       
       gradesArray.forEach(grade => {
-        const assignmentKey = grade.assignment || 'Unknown Assignment';
-        
-        if (!assignmentsMap.has(assignmentKey)) {
-          // Choose a date to show (use first submission or today)
-          const dateStr = grade.submitted_at 
-            ? new Date(grade.submitted_at).toISOString().split('T')[0] 
-            : new Date().toISOString().split('T')[0];
-          
-          assignmentsMap.set(assignmentKey, {
-            id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            key: assignmentKey,
-            title: assignmentKey, // You can enhance this to fetch titles if available
-            date: dateStr,
-            submissions: []
-          });
-        }
+          const assignmentKey = grade.assignment || 'Unknown Assignment';
+
+          // Try to match the assignment key to a hack by its Game path
+          const matchingTopic = HACK_TOPICS.find(t => t.Game === assignmentKey);
+
+          // Prefer the hack title if we find it, otherwise fall back to the raw key
+          const friendlyTitle = matchingTopic ? matchingTopic.Title : assignmentKey;
+
+          if (!assignmentsMap.has(assignmentKey)) {
+            const dateStr = grade.submitted_at 
+              ? new Date(grade.submitted_at).toISOString().split('T')[0] 
+              : new Date().toISOString().split('T')[0];
+
+            assignmentsMap.set(assignmentKey, {
+              id: assignmentKey.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              key: assignmentKey,
+              title: friendlyTitle,  // <-- NOW shows "Snake Game", "Calculator", etc.
+              date: dateStr,
+              submissions: []
+            });
+          }
+
         
         const assignment = assignmentsMap.get(assignmentKey);
         assignment.submissions.push({
@@ -1129,16 +1126,15 @@
               </div>
               ${sub.submission_link ? `
                 <div class="mb-3">
-                  <p class="text-gray-300 text-sm mb-1">Submission Link:</p>
                   <a href="${sub.submission_link}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 text-sm break-all">
                     ${sub.submission_link}
                   </a>
                 </div>
               ` : ''}
-              ${sub.score > 0 ? `<p class="text-gray-300 text-sm mb-3">Score: ${sub.score}</p>` : ''}
-              <div class="flex items-center gap-3">
-                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
-                  Edit Rubric
+              <div class="flex items-center justify-between gap-3">
+                ${sub.score > 0 ? `<p class="text-gray-300 text-sm">Score: ${sub.score}</p>` : '<span></span>'}
+                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                  Rubric
                 </button>
               </div>
             </div>
@@ -1214,18 +1210,18 @@
               ${!subTotalMatch ? '<span class="text-xs text-red-400 ml-2">⚠ Mismatch</span>' : '<span class="text-xs text-green-400 ml-2">✓</span>'}
             </div>
           </div>
-          <button onclick="removeGradingCategory(${idx})" style="padding:6px 12px; border-radius:6px; background-color:#ef4444; color:white; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">Remove</button>
+          <button onclick="removeGradingCategory(${idx})" style="padding:6px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; height:fit-content;">Remove</button>
         </div>
         <div class="space-y-2" data-gsubcontainer="${idx}">
           ${cat.subcategories.map((sub, sidx) => `
             <div class="flex items-center gap-2 bg-gray-700 p-2 rounded" data-gsub="${idx}-${sidx}">
               <input type="text" class="flex-1 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm sub-name-input" value="${sub.name}" data-gsub-name="${idx}-${sidx}">
               <input type="number" step="0.01" class="w-24 px-2 py-1 rounded bg-gray-600 text-white border border-gray-500 text-sm sub-weight-input" value="${sub.weight}" data-gsub-weight="${idx}-${sidx}">
-              <button onclick="removeGradingSub(${idx},${sidx})" style="padding:4px 8px; border-radius:4px; background-color:#ef4444; color:white; border:none; font-size:0.75rem; cursor:pointer;">×</button>
+              <button onclick="removeGradingSub(${idx},${sidx})" style="padding:4px 8px; border-radius:4px; border:none; font-size:0.75rem; cursor:pointer;">×</button>
             </div>
           `).join('')}
         </div>
-        <button onclick="addGradingSub(${idx})" style="padding:4px 12px; border-radius:6px; background-color:#6366f1; color:white; border:none; font-size:0.875rem; cursor:pointer; margin-top:8px;">+ Add Sub-criterion</button>
+        <button onclick="addGradingSub(${idx})" style="padding:4px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; margin-top:8px;">+ Add Sub-criterion</button>
       </div>
     `;
     }).join('');

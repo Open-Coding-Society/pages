@@ -12,7 +12,7 @@
       {% for topic in data.Topics %}
         <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md">
           <!-- Image Column -->
-          <div class="text-center relative">
+          <div class="text-center relative module-image-col">
             <a href="{{ site.baseurl }}{{ topic.link }}" class="block relative group">
               <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="rounded-lg mx-auto h-40 object-cover">
               
@@ -30,7 +30,7 @@
             </a>
           </div>
           <!-- Key Points Column -->
-          <div>
+          <div class="module-keypoints-col">
             <h3 class="text-xl font-semibold mb-2">{{ topic.title }}</h3>
             <ul class="list-disc list-inside">
               <!-- Loop through kepoints within Topic -->
@@ -40,7 +40,7 @@
             </ul>
           </div>
           <!-- Description Column -->
-          <div>
+          <div class="module-desc-col">
             <h3 class="text-xl font-semibold mb-2">{{ topic.subtitle }}</h3>
             <p class="text-sm">{{ topic.description }}</p>
           </div>

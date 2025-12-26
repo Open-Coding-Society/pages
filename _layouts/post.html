@@ -19,6 +19,9 @@ Check if this is a course lesson and determine which course context to use
 {% elsif page.courses.csse %}
 {% assign current_course = 'csse' %}
 {% assign current_week = page.courses.csse.week | plus: 0 %}
+{% elsif page.courses.cwgu %}
+{% assign current_course = 'cwgu' %}
+{% assign current_week = page.courses.cwgu.week | plus: 0 %}
 {% endif %}
 
 {% if current_course != null and current_week != null %}
@@ -34,7 +37,6 @@ Check if this is a course lesson and determine which course context to use
 {% assign posts = posts | concat: site.posts | concat: site.pages %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="/assets/css/lesson-player.css">
 
 <div class="lesson-player">
   <!-- LEFT SIDEBAR -->
@@ -46,8 +48,9 @@ Check if this is a course lesson and determine which course context to use
       <h2>Computer Science A</h2>
       {% elsif current_course == 'csse' %}
       <h2>Computer Science & Software Engineering</h2>
+      {% elsif current_course == 'cwgu' %}
+      <h2>WGU Applied Computer Science</h2>
       {% endif %}
-      <p>Del Norte High School</p>
 
       <div class="course-progress-section">
         <div class="progress-label">
@@ -80,8 +83,7 @@ Check if this is a course lesson and determine which course context to use
           {% for week in (sprint.start..sprint.end) %}
           {% for post in posts %}
           {% if post.courses[current_course] %}
-          {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
-          {% unless post.path contains "_IPYNB_2_.md" %}
+          {% comment %}Include all files with courses frontmatter (including converted notebook markdown files){% endcomment %}
           {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
           {% assign course_count = 0 %}
           {% for course in post.courses %}
@@ -97,7 +99,6 @@ Check if this is a course lesson and determine which course context to use
           </a>
           {% endif %}
           {% endif %}
-          {% endunless %}
           {% endif %}
           {% endfor %}
           {% endfor %}
@@ -113,7 +114,7 @@ Check if this is a course lesson and determine which course context to use
     <!-- Top Bar -->
     <div class="lesson-topbar">
       <div class="topbar-actions">
-        <a href="{{ site.baseurl }}/navigation/section/{{ current_course }}" class="back-btn">
+        <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" class="back-btn">
           <i class="fas fa-arrow-left"></i>
           Back to Timeline View
         </a>
@@ -136,9 +137,9 @@ Check if this is a course lesson and determine which course context to use
         <div class="lesson-header">
           <h1>{{ page.title | escape }}</h1>
           <div class="lesson-meta">
+            {%- if page.show_reading_time != false -%}
             <span><i class="fas fa-clock"></i> {% include reading_time.html %}</span>
-            <span>•</span>
-            <span>Week {{ current_week }}</span>
+            {%- endif -%}
             {% if page.assignment %}
             <span>•</span>
             <span><i class="fas fa-file-alt"></i> Assignment</span>
@@ -683,7 +684,7 @@ Check if this is a course lesson and determine which course context to use
         ...submissionData
       };
 
-      const res = await fetch(`${pythonURI}/api/assignment/`, { // Using /api/assignment directly, check if trailing slash is needed. User prompt said /api/assignment
+      const res = await fetch(`${javaURI}/api/grades`, { 
         ...fetchOptions,
         method: "POST",
         headers: {

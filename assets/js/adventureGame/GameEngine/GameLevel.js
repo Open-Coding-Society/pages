@@ -5,7 +5,7 @@ class GameLevel {
 
   constructor(gameControl) {
     this.gameEnv = new GameEnv()
-    this.gameEnv.game = gameControl.game
+    this.gameEnv.game = gameControl.game.environment  // Pass environment, not Game instance
     this.gameEnv.path = gameControl.path
     this.gameEnv.gameContainer = gameControl.gameContainer
     this.gameEnv.gameCanvas = gameControl.gameCanvas

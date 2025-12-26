@@ -146,12 +146,40 @@ Sprint1:
   shared: "Onboarding"
   start: 0
   end: 2
+  0:
+    theme: "Onboarding & Java Readiness"
+    goals:
+      - "Environment Setup"
+      - "Scrum Habits"
+      - "Student Teaching Prep"
+  1:
+    theme: "Framework for Sprints"
+    goals:
+      - "Agile Methodologies"
+      - "Tools & Equipment"
+      - "Onboarding Adventure"
+  2:
+    theme: "Developer Toolchain"
+    goals:
+      - "Python/Flask Backend Infograph"
+      - "Portfolio Foundations"
 Sprint2:
   title: Java / Spring Web Development
   description: Students will master the Fundamentals of Java Programming using the Spring Framework. In this Sprint, students will become familiar with Java types, booleans, iteration, recursion, using, and writing objects. Student teaching labs will introduce AP-required aspects of Java while learning the Spring Framework. This will teach key Java concepts while using a JWT login system, a Rest Controller, Plain Old Java Objects (POJOs), Object Relational Model (ORM), and Java Persistence API (JPA).
   illustration: *college_board_fundamentals
   start: 3
   end: 7
+  3:
+    theme: "Java / Spring Kickoff"
+    goals:
+      - "Transition to Full Stack"
+      - "Sprint 2 Planning"
+  4:
+    theme: "Spring Web Development"
+    goals:
+      - "Anatomy of a Spring Boot Project"
+      - "REST Controllers"
+      - "JWT Auth Concepts"
 Sprint3:
   title: Team Project for N@tM
   description: In this Sprint, students will continue to become familiar with Java development as they immerse themselves in  Web Development using the Spring Framework. Coding will focus on RESTful APIs, receiving requests, working with data using SQLite, and responding to requests.  Students will pick a Full Stack Web Development project, and work in teams to build it out, including all layers, and how to use ThymeLeaf to create an Admin UI.  The goal is to have the project working and deployed on AWS by the end of this Sprint.

@@ -1,0 +1,1100 @@
+@import "mixins/modals";
+@import "mixins/buttons";
+
+/* ============================= */
+/*       VIDEO DEMO MODAL        */
+/* ============================= */
+
+#video-demo {
+  @include modal-overlay;
+}
+
+#video-demo > div {
+  @include modal-content;
+  top: 60px;
+}
+
+#video-demo .close-btn {
+  @include modal-close-btn;
+}
+
+#video-demo img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+#video-demo .desktop-only {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.clickable-video {
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.clickable-video:hover {
+  transform: scale(1.05);
+}
+
+.timeline-page {
+  .timeline-header {
+    margin-bottom: 32px;
+  }
+
+  .timeline-header h1 {
+    color: $text;
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+
+  .timeline-header-description {
+    color: $text-muted;
+    margin-bottom: 24px;
+  }
+
+  .timeline-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: $text;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+
+  .filter-btn:hover {
+    background: $bg-2;
+  }
+
+  .filter-btn.active {
+    background: $bg-2;
+    border-color: $accent;
+    color: $accent;
+  }
+
+  .sprint-filters {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .sprint-filter-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid $bg-3;
+    border-radius: 4px;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 11px;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  .sprint-filter-btn:hover {
+    background: $bg-2;
+  }
+
+  .sprint-filter-btn.active {
+    background: $bg-2;
+    border-color: $accent;
+    color: $accent;
+  }
+
+  .sprint-filter-btn i {
+    font-size: 10px;
+    margin-right: 4px;
+  }
+  
+  .timeline-container {
+    margin-top: 32px;
+  }
+
+  .sprint-card {
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  }
+
+  .sprint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #1f2338;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+
+  .sprint-title {
+    margin: 0;
+    font-size: 1.75rem;
+    color: var(--pref-accent-color) !important;
+  }
+
+  .sprint-meta {
+    color: $text-muted;
+    font-size: 0.95rem;
+  }
+
+  .sprint-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .sprint-toggle-btn {
+    @include toggle-button;
+  }
+
+  .sprint-card.collapsed .sprint-toggle-icon {
+    transform: rotate(0deg);
+  }
+
+  .sprint-toggle-icon {
+    transition: transform 0.3s;
+    display: inline-flex;
+    color: var(--pref-accent-color);
+    font-size: 2em;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+
+  .sprint-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sprint-card.collapsed .sprint-weeks {
+    display: none;
+  }
+
+  .week-card {
+    border-radius: 12px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+    overflow: hidden;
+  }
+
+  .week-card:hover {
+    border-color: var(--border-hover-color, $bg-3);
+  }
+
+  .week-content-wrapper {
+    display: flex;
+    gap: 24px;
+  }
+
+  .week-main-content {
+    flex: 1;
+  }
+
+  .week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .week-indicator {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .week-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid $bg-3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $accent;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .week-connector {
+    width: 1px;
+    height: 32px;
+    background: $bg-3;
+    margin-top: 8px;
+  }
+
+  .week-card:last-child .week-connector {
+    display: none;
+  }
+
+  .week-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .week-title-group h3 {
+    color: var(--pref-accent-color) !important;
+    font-size: 1.25rem;
+    margin: 0 0 4px 0;
+  }
+
+  .completion-badge {
+    background: transparent;
+    border: 1px solid $bg-3;
+    color: $text-muted;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .sprint-btn {
+    background: var(--pref-bg-color);
+    border: 1px solid var(--pref-accent-color);
+    color: var(--pref-accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: var(--pref-font-size);
+    font-family: var(--pref-font-family);
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sprint-btn:hover,
+  .sprint-btn:focus-visible {
+    @include text-button;
+  }
+
+  .sprint-btn.certificate,
+  .sprint-btn.help {
+    @include icon-button
+  }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .item-card {
+    padding: 12px;
+    border: 1px solid $bg-3;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+
+  .item-card:hover {
+    background: rgba($text, 0.05);
+  }
+
+  .item-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .completion-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .item-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .status-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+
+  .status-icon.completed {
+    color: $accent;
+  }
+
+  .status-icon.incomplete {
+    color: $bg-3;
+  }
+
+  .type-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+
+  .type-icon.lesson {
+    color: $accent;
+  }
+
+  .type-icon.assignment {
+    color: #f59e0b;
+  }
+
+  .item-title {
+    color: $text;
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .item-card.completed .item-title {
+    color: $text-muted;
+  }
+
+  .week-goals-container {
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid $bg-3;
+  }
+
+  .goals-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .goals-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .goal-item {
+    position: relative;
+    padding-left: 16px;
+    font-size: 0.85rem;
+    color: $text;
+    line-height: 1.4;
+  }
+
+  .goal-item::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: $accent;
+    font-weight: bold;
+    opacity: 0.7;
+  }
+
+  .goal-item:hover {
+    color: $text;
+  }
+
+  .goal-item:hover::before {
+    opacity: 1;
+  }
+
+  .assignment-due {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f59e0b;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .load-more {
+    text-align: center;
+    margin-top: 24px;
+  }
+
+  .load-more-btn {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid $bg-3;
+    color: $accent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .load-more-btn:hover {
+    background: $bg-2;
+    color: $accent-700;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-header h1 {
+      font-size: 2rem;
+    }
+
+    .timeline-filters {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .sprint-card {
+      padding: 16px;
+    }
+
+    .sprint-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .sprint-title {
+      font-size: 1.5rem;
+    }
+
+    .sprint-controls {
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .week-content-wrapper {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .week-indicator {
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .week-circle {
+      width: 40px;
+      height: 40px;
+      font-size: 12px;
+    }
+
+    .week-connector {
+      display: none;
+    }
+
+    .week-main-content {
+      width: 100%;
+    }
+
+    .week-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .week-title-group h3 {
+      font-size: 1.1rem;
+    }
+
+    .week-actions {
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .items-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .item-card {
+      padding: 10px;
+    }
+
+    .item-content {
+      gap: 8px;
+    }
+
+    .item-title {
+      font-size: 13px;
+    }
+
+    .progression-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .completion-badge {
+      font-size: 12px;
+      padding: 3px 8px;
+    }
+
+    /* Modal responsiveness */
+    #progression-modal > div,
+    #certificate-list-modal > div {
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    #certificate-content {
+      padding: 40px 20px;
+    }
+
+    #certificate-student-name {
+      font-size: 36px;
+    }
+
+    #certificate-content .achievement-text {
+      font-size: 18px;
+    }
+
+    .certificate-modal .action-bar {
+      padding: 12px;
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      margin: 0 4px;
+    }
+
+    .progression-task {
+      padding: 10px;
+      gap: 10px;
+    }
+  }
+
+  /* Certificate System Styles */
+  .certificate-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, $accent 0%, $accent-700 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba($accent, 0.3);
+    z-index: 1;
+  }
+
+  .week-card.clickable {
+    cursor: pointer;
+  }
+
+  .week-card.clickable:hover {
+    border-color: $accent;
+    box-shadow: 0 0 12px rgba($accent, 0.2);
+  }
+
+  /* ============================= */
+  /*     PROGRESSION MODAL         */
+  /* ============================= */
+
+  #progression-modal {
+    @include modal-overlay;
+  }
+
+  #progression-modal > div {
+    @include modal-content;
+    top: 60px;
+  }
+
+  #progression-modal .close-btn {
+    @include modal-close-btn;
+  }
+
+  #progression-modal h2 {
+    color: $text;
+    margin-bottom: 8px;
+    padding-right: 50px;
+    
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  #progression-modal .week-theme {
+    color: $accent;
+    margin-bottom: 24px;
+    padding-right: 50px; // Space for close button
+    
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+  }
+  
+  #task-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    
+    @media (max-width: 768px) {
+      max-height: 50vh;
+    }
+  }
+
+  #modal-progress-fill {
+    height: 100%;
+    background: $accent;
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .progression-task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: $bg-2;
+    border: 1px solid $bg-3;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    
+    @media (max-width: 768px) {
+      padding: 10px;
+      gap: 10px;
+    }
+  }
+  
+  .progression-week-header {
+    color: $text;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $bg-3;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
+  }
+
+  .progression-task input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: $accent;
+    flex-shrink: 0;
+    
+    @media (max-width: 768px) {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .progression-task label {
+    color: $text;
+    flex: 1;
+    cursor: pointer;
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
+  }
+
+  .task-number {
+    color: $text-muted;
+    font-size: 14px;
+    flex-shrink: 0;
+    
+    @media (max-width: 768px) {
+      font-size: 12px;
+    }
+  }
+
+  #view-certificate-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, $accent 0%, $accent-700 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 24px;
+  }
+
+  #view-certificate-btn:hover {
+    transform: scale(1.02);
+  }
+
+  /* ============================= */
+  /*      CERTIFICATE MODAL        */
+  /* ============================= */
+
+  #certificate-modal {
+    @include modal-overlay;
+    background: rgba(0,0,0,0.9); // Darker than default
+    z-index: 2000; // Higher than other modals
+  }
+
+  #certificate-modal .action-bar {
+    position: sticky;
+    top: 60px;
+    background: var(--panel);
+    padding: 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--ui-border);
+    z-index: 10;
+  }
+
+  #certificate-modal .action-btn {
+    padding: 10px 20px;
+    background: var(--pref-accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    margin: 0 8px;
+    cursor: pointer;
+  }
+
+  #certificate-modal .secondary-btn {
+    background: var(--bg-2);
+    color: var(--text);
+    border: 1px solid var(--ui-border);
+  }
+
+  #certificate-content {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: var(--bg-1);
+    padding: 90px 80px;
+    border: 3px solid var(--pref-accent-color);
+    position: relative;
+    font-family: 'Crimson Text', serif;
+    color: var(--text);
+  }
+
+  #certificate-content::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    border: 1px solid var(--ui-border);
+    pointer-events: none;
+  }
+
+  #certificate-content > div {
+    position: relative;
+    z-index: 1;
+  }
+
+  .certificate-heading {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .certificate-emblem {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--bg-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    border: 3px solid var(--pref-accent-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  #certificate-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+  }
+
+  #certificate-content .header-text {
+    font-size: 14px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: 'Libre Baskerville', serif;
+    margin-bottom: 12px;
+  }
+
+  #certificate-content .certify-text {
+    font-size: 30px;
+    color: var(--text);
+    font-family: 'Libre Baskerville', serif;
+    margin-bottom: 8px;
+  }
+
+  .certificate-subtitle {
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  #certificate-student-name {
+    font-size: 62px;
+    color: var(--text-strong);
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700;
+    border: none;
+    outline: none;
+    display: block;
+    cursor: text;
+    text-align: center;
+    margin: 32px auto 40px;
+    width: 100%;
+  }
+
+  #certificate-student-name:empty::before {
+    content: 'Your Name';
+    color: var(--text-muted);
+  }
+
+  #certificate-content .achievement-text {
+    text-align: center;
+    font-size: 22px;
+    color: var(--text);
+    max-width: 720px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+  }
+
+  .skill-focus-pill {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .skill-focus-pill span {
+    display: inline-block;
+    padding: 6px 20px;
+    border: 1px solid var(--pref-accent-color);
+    border-radius: 999px;
+    font-size: 16px;
+    color: var(--pref-accent-color);
+    background: var(--bg-2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  #certificate-date {
+    text-align: center;
+    font-size: 18px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 40px;
+  }
+
+  .certificate-divider {
+    width: 60%;
+    height: 1px;
+    background: transparent;
+    margin: 0 auto 48px;
+  }
+
+  #certificate-content .signature-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  #certificate-content .signature {
+    text-align: center;
+    max-width: 320px;
+  }
+
+  #certificate-content .signature-name {
+    font-size: 30px;
+    font-style: italic;
+    color: var(--text);
+    font-family: 'Libre Baskerville', serif;
+    margin-bottom: 8px;
+  }
+
+  #certificate-content .signature-line {
+    border-top: 2px solid var(--ui-border);
+    padding-top: 8px;
+    margin-bottom: 12px;
+  }
+
+  #certificate-content .signature-title {
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+
+  #certificate-content .signature-subtitle {
+    color: var(--text-muted);
+    margin: 2px 0 0 0;
+  }
+
+  /* Certificate List Modal */
+  #certificate-list-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 1500;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  #certificate-list-modal > div {
+    max-width: 600px;
+    margin: 40px auto;
+    background: $bg-1;
+    border: 1px solid $bg-3;
+    border-radius: 12px;
+    padding: 32px;
+  }
+
+  #certificate-list-modal .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: $text-muted;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  #certificate-list-modal h2 {
+    color: $text;
+    margin-bottom: 24px;
+  }
+
+  #certificate-list button {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, $accent 0%, $accent-700 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-bottom: 12px;
+  }
+
+  #certificate-list button:hover {
+    transform: scale(1.02);
+  }
+
+  #certificate-skills {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--ui-border);
+  }
+
+  .skills-heading {
+    text-align: center;
+    color: var(--text-strong) !important;
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  #skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .skill-tag {
+    padding: 6px 16px;
+    border: 1px solid var(--pref-accent-color);
+    border-radius: 20px;
+    color: var(--text);
+    font-family: 'Crimson Text', serif;
+    font-size: 14px;
+    margin: 4px;
+    background: var(--bg-2);
+  }
+
+  @media (max-width: 768px) {
+    #certificate-content {
+      margin: 0;
+      padding: 40px 20px;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+
+    #certificate-student-name {
+      font-size: 36px;
+    }
+
+    #certificate-content .signature-section {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  /* ============================= */
+  /*         HELP MODAL            */
+  /* ============================= */
+
+  #help-modal {
+    @include modal-overlay;
+  }
+
+  #help-modal > div {
+    @include modal-content;
+    top: 60px;
+  }
+
+  #help-modal .close-btn {
+    @include modal-close-btn;
+  }
+  
+}

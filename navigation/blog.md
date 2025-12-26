@@ -14,9 +14,9 @@ permalink: /navigation/blogs/
 <div id="courseLinks" style="text-align:center;">
     <table style="width:100%; text-align:center;">
         <tr>
-            <td><a href="{{site.baseurl}}/navigation/section/csse">CSSE</a></td>
-            <td><a href="{{site.baseurl}}/navigation/section/csp">APCSP</a></td>
-            <td><a href="{{site.baseurl}}/navigation/section/csa">APCSA</a></td>
+            <td><a href="{{site.baseurl}}/navigation/courses/csse">CSSE</a></td>
+            <td><a href="{{site.baseurl}}/navigation/courses/csp">APCSP</a></td>
+            <td><a href="{{site.baseurl}}/navigation/courses/csa">APCSA</a></td>
         </tr>
     </table>
 </div>
@@ -26,15 +26,15 @@ permalink: /navigation/blogs/
 
     async function displayUserCourses() {
         const container = document.getElementById('courseLinks');
-        
+
         // Function to show all courses (default)
         function showAllCourses() {
             container.innerHTML = `
                 <table style="width:100%; text-align:center;">
                     <tr>
-                        <td><a href="{{site.baseurl}}/navigation/section/csse">CSSE</a></td>
-                        <td><a href="{{site.baseurl}}/navigation/section/csp">APCSP</a></td>
-                        <td><a href="{{site.baseurl}}/navigation/section/csa">APCSA</a></td>
+                        <td><a href="{{site.baseurl}}/navigation/courses/csse">CSSE</a></td>
+                        <td><a href="{{site.baseurl}}/navigation/courses/csp">APCSP</a></td>
+                        <td><a href="{{site.baseurl}}/navigation/courses/csa">APCSA</a></td>
                     </tr>
                 </table>
             `;
@@ -64,9 +64,9 @@ permalink: /navigation/blogs/
 
             // User is logged in and has classes - show only their courses
             const courseMap = {
-                'CSSE': { name: 'CSSE', url: '{{site.baseurl}}/navigation/section/csse' },
-                'CSP': { name: 'APCSP', url: '{{site.baseurl}}/navigation/section/csp' },
-                'CSA': { name: 'APCSA', url: '{{site.baseurl}}/navigation/section/csa' }
+                'CSSE': { name: 'CSSE', url: '{{site.baseurl}}/navigation/courses/csse' },
+                'CSP': { name: 'APCSP', url: '{{site.baseurl}}/navigation/courses/csp' },
+                'CSA': { name: 'APCSA', url: '{{site.baseurl}}/navigation/courses/csa' }
             };
 
             let tableHTML = '<table style="width:100%; text-align:center;"><tr>';

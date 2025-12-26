@@ -1,5 +1,8 @@
 <!-- Small Inbox Button (appears to the left of the microblog FAB) -->
-<button id="inbox-toggle-btn" class="inbox-fab" aria-label="Open Inbox">📥</button>
+<button id="inbox-toggle-btn" class="inbox-fab" aria-label="Open Inbox">
+  📥
+  <div id="inbox-badge" class="inbox-badge hidden" title="Unread announcements">!</div>
+</button>
 
 <!-- Compact Inbox Panel (opened by the small inbox FAB) -->
 <aside id="inbox-panel" class="microblog-panel inbox-panel--compact" tabindex="-1" aria-label="Inbox panel">
@@ -10,12 +13,12 @@
   <div class="microblog-panel-content">
     <div class="inbox-tabs" style="display:flex; gap:0.5rem; padding:0.5rem;">
       <button id="tab-announcements" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Announcements</button>
-      <button id="tab-notifications" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Notifications</button>
     </div>
 
     <div id="announcements-content">
       <div id="inbox-app" class="inbox-app">
-      <form id="inbox-form" class="microblog-form" aria-label="Inbox announcement form">
+      <!-- Admin-only form - hidden by default, shown via JS for admins -->
+      <form id="inbox-form" class="microblog-form" aria-label="Inbox announcement form" style="display:none;">
         <div class="microblog-form-group">
           <label class="microblog-form-label" for="inbox-title">Title <span class="required">*</span></label>
           <input id="inbox-title" name="title" type="text" required class="microblog-input" style="width:100%;" />
@@ -35,21 +38,51 @@
         </div>
       </form>
 
-      <hr style="border-color: rgba(255,255,255,0.08); margin:0.75rem 0;" />
+      <hr id="inbox-form-divider" style="border-color: rgba(255,255,255,0.08); margin:0.75rem 0; display:none;" />
 
       <div id="inbox-messages" class="inbox-messages">
         <em style="color:var(--white); padding:0.5rem; display:block;">No announcements yet.</em>
       </div>
       </div>
 
-    <div id="notifications-content" style="display:none; padding:0.5rem; color:var(--white);">
-      <em>(work in progress)</em>
-    </div>
-
   </div>
 </aside>
 
 <script type="module">
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+// Store admin status globally for use in message rendering
+window.inboxUserIsAdmin = false;
+
+// Check if user is Admin and show inbox form
+async function checkInboxAdminAccess() {
+  try {
+    const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+    if (!res.ok) return;
+    
+    const user = await res.json();
+    const isAdmin = user.role === "Admin";
+    window.inboxUserIsAdmin = isAdmin;
+    
+    if (isAdmin) {
+      const inboxForm = document.getElementById('inbox-form');
+      const inboxDivider = document.getElementById('inbox-form-divider');
+      
+      if (inboxForm) inboxForm.style.display = 'block';
+      if (inboxDivider) inboxDivider.style.display = 'block';
+      
+      // Show admin controls on existing messages
+      document.querySelectorAll('.inbox-admin-controls').forEach(ctrl => {
+        ctrl.style.display = 'flex';
+      });
+    }
+  } catch (err) {
+    console.error("Error checking inbox admin access:", err);
+  }
+}
+
+// Run admin check on load
+checkInboxAdminAccess();
 
 // Inbox toggle (small FAB)
 const inboxToggle = document.getElementById('inbox-toggle-btn');
@@ -79,39 +112,9 @@ document.addEventListener('click', (e) => {
   if (inboxToggle && e.target === inboxToggle) return;
   closeInboxPanel();
 });
-
 </script>
 
 <script>
-// Tab switching logic for Inbox
-(function(){
-  const tabAnnouncements = document.getElementById('tab-announcements');
-  const tabNotifications = document.getElementById('tab-notifications');
-  const annContent = document.getElementById('announcements-content');
-  const notContent = document.getElementById('notifications-content');
-
-  function setActiveTab(tab){
-    if (tab === 'notifications'){
-      tabNotifications.style.background = 'rgba(255,255,255,0.06)';
-      tabAnnouncements.style.background = 'transparent';
-      annContent.style.display = 'none';
-      notContent.style.display = 'block';
-    } else {
-      tabAnnouncements.style.background = 'rgba(255,255,255,0.06)';
-      tabNotifications.style.background = 'transparent';
-      annContent.style.display = 'block';
-      notContent.style.display = 'none';
-    }
-  }
-
-  if (tabAnnouncements && tabNotifications){
-    tabAnnouncements.addEventListener('click', () => { setActiveTab('announcements'); openInboxPanel(); });
-    tabNotifications.addEventListener('click', () => { setActiveTab('notifications'); openInboxPanel(); });
-    // default active
-    setActiveTab('announcements');
-  }
-})();
-
 // Inbox form behavior (no persistence)
 ;(function(){
   const form = document.getElementById('inbox-form');
@@ -119,6 +122,20 @@ document.addEventListener('click', (e) => {
   const addLinkBtn = document.getElementById('add-link-btn');
   const messagesEl = document.getElementById('inbox-messages');
   const clearBtn = document.getElementById('inbox-clear-btn');
+  const badge = document.getElementById('inbox-badge');
+
+  // Update badge visibility based on unread messages
+  function updateBadge() {
+    const unreadMessages = messagesEl.querySelectorAll('.inbox-message.unread');
+    const unreadCount = unreadMessages.length;
+    
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount > 9 ? '!' : unreadCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
 
   function createLinkRow(url='', label=''){
     const row = document.createElement('div');
@@ -175,12 +192,13 @@ document.addEventListener('click', (e) => {
     }).filter(l => l.url);
 
     // Build announcement object
-    const ann = { id: 'ann-' + Date.now() + '-' + Math.floor(Math.random()*1000), title, content, links };
+    const ann = { id: 'ann-' + Date.now() + '-' + Math.floor(Math.random()*1000), title, content, links, unread: true };
 
     function buildMessageElement(announcement){
       const el = document.createElement('div');
-      el.className = 'inbox-message';
+      el.className = 'inbox-message' + (announcement.unread ? ' unread' : '');
       el.dataset.annId = announcement.id;
+      el.dataset.unread = announcement.unread ? 'true' : 'false';
       el.style.padding = '0.75rem';
       el.style.border = '1px solid rgba(255,255,255,0.06)';
       el.style.borderRadius = '6px';
@@ -197,8 +215,10 @@ document.addEventListener('click', (e) => {
       h.textContent = announcement.title;
 
       const controls = document.createElement('div');
-      controls.style.display = 'flex';
+      controls.className = 'inbox-admin-controls';
+      controls.style.display = 'none'; // Hidden by default, shown for admins
       controls.style.gap = '0.5rem';
+      controls.style.alignItems = 'center';
 
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
@@ -223,20 +243,38 @@ document.addEventListener('click', (e) => {
       delBtn.className = 'microblog-btn-cancel';
       delBtn.textContent = 'Delete';
       delBtn.onclick = () => {
-        if (confirm('Delete this announcement?')) el.remove();
+        if (confirm('Delete this announcement?')) {
+          el.remove();
+          updateBadge();
+        }
       };
 
-      // Mark-as-read button (visual only)
-      const markBtn = document.createElement('button');
-      markBtn.type = 'button';
-      markBtn.className = 'inbox-mark-read';
-      markBtn.title = 'Mark as read';
-      markBtn.textContent = '✓';
+      const markDoneBtn = document.createElement('button');
+      markDoneBtn.type = 'button';
+      markDoneBtn.className = 'microblog-btn-done';
+      markDoneBtn.title = 'Mark as read';
+      markDoneBtn.setAttribute('aria-label', 'Mark as read');
+      markDoneBtn.innerHTML = '&#10003;';
+      markDoneBtn.onclick = () => {
+        // Mark as read: remove unread class and update dataset
+        const wasUnread = el.dataset.unread === 'true';
+        el.classList.remove('unread');
+        el.dataset.unread = 'false';
+        // visual toggle for done state
+        el.classList.toggle('inbox-done');
+        markDoneBtn.classList.toggle('done');
+        // Update badge if there are no more unread messages
+        if (wasUnread) updateBadge();
+      };
 
       controls.appendChild(editBtn);
       controls.appendChild(delBtn);
-      // place a small checkmark to the right
-      controls.appendChild(markBtn);
+      controls.appendChild(markDoneBtn);
+      
+      // Show controls if user is admin
+      if (window.inboxUserIsAdmin) {
+        controls.style.display = 'flex';
+      }
 
       header.appendChild(h);
       header.appendChild(controls);
@@ -290,6 +328,8 @@ document.addEventListener('click', (e) => {
         // Prepend to ensure newest announcements appear first
         if (messagesEl.prepend) messagesEl.prepend(msgEl); else messagesEl.insertBefore(msgEl, messagesEl.firstChild);
       }
+      // Update badge with new unread count
+      updateBadge();
     }
 
     // reset form

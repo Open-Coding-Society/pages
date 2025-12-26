@@ -12,1588 +12,12 @@ layout: post
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ '/assets/css/certificate_overview.css' | relative_url }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{{ '/assets/css/timeline.scss' | relative_url }}">
+<script src="{{ '/assets/js/help-video.js' | relative_url }}"></script>
 
-<style>
-  body {
-    background: #0a0a0a;
-  }
-
-  .timeline-header {
-    margin-bottom: 32px;
-  }
-
-  .timeline-header h1 {
-    color: #ffffff;
-    font-size: 2.5rem;
-    margin-bottom: 8px;
-  }
-
-  .timeline-header-description {
-    color: #999999;
-    margin-bottom: 24px;
-  }
-
-  .timeline-filters {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    padding: 8px 16px;
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    border-radius: 6px;
-    color: #e0e0e0;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 14px;
-  }
-
-  .filter-btn:hover {
-    background: #1a1a1a;
-  }
-
-  .filter-btn.active {
-    background: #1a1a1a;
-    border-color: #60a5fa;
-    color: #60a5fa;
-  }
-
-  .timeline-container {
-    margin-top: 32px;
-  }
-
-  .sprint-card {
-    background: #111111;
-    border: 1px solid #1f1f1f;
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 24px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-  }
-
-  .sprint-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid #1f2338;
-    padding-bottom: 20px;
-    margin-bottom: 24px;
-  }
-
-  .sprint-title {
-    margin: 0;
-    font-size: 1.75rem;
-    color: #f8fafc;
-  }
-
-  .sprint-meta {
-    color: #9ca3af;
-    font-size: 0.95rem;
-  }
-
-  .sprint-controls {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .sprint-card.collapsed .sprint-toggle-icon {
-    transform: rotate(0deg);
-  }
-
-  .sprint-toggle-icon {
-    transition: transform 0.2s;
-    display: inline-flex;
-  }
-
-  .sprint-weeks {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .sprint-card.collapsed .sprint-weeks {
-    display: none;
-  }
-
-  .sprint-card.collapsed .sprint-title {
-    color: #cbd5f5;
-  }
-
-  .week-card {
-    background: #0f0f0f;
-    border: 1px solid #222222;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    transition: all 0.2s;
-    overflow: hidden;
-  }
-
-  .week-card:hover {
-    border-color: #2a2a2a;
-  }
-
-  .week-content-wrapper {
-    display: flex;
-    gap: 24px;
-  }
-
-  .week-main-content {
-    flex: 1;
-  }
-
-  .week-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .week-indicator {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .week-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: #1a1a1a;
-    border: 2px solid #2a2a2a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #60a5fa;
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .week-connector {
-    width: 1px;
-    height: 32px;
-    background: #222222;
-    margin-top: 8px;
-  }
-
-  .week-card:last-child .week-connector {
-    display: none;
-  }
-
-  .week-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .week-title-group h3 {
-    color: #ffffff;
-    font-size: 1.25rem;
-    margin: 0 0 4px 0;
-  }
-
-  .week-sprint {
-    color: #60a5fa;
-    font-size: 14px;
-  }
-
-  .week-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .completion-badge {
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    color: #cccccc;
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-size: 13px;
-  }
-
-  .progression-btn {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    color: #60a5fa;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .progression-btn:hover,
-  .progression-btn:focus-visible {
-    border-color: #60a5fa;
-    color: #93c5fd;
-    background: #151515;
-    outline: none;
-  }
-
-  .progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background: #1a1a1a;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: #60a5fa;
-    transition: width 0.3s ease;
-    width: 0%;
-  }
-
-  .items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .item-card {
-    padding: 12px;
-    background: #151515;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    transition: background 0.2s;
-  }
-
-  .item-card:hover {
-    background: #1a1a1a;
-  }
-
-  .item-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-  }
-
-  .completion-toggle {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-  }
-
-  .item-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .status-icon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    font-size: 16px;
-  }
-
-  .status-icon.completed {
-    color: #60a5fa;
-  }
-
-  .status-icon.incomplete {
-    color: #444444;
-  }
-
-  .type-icon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-  }
-
-  .type-icon.lesson {
-    color: #60a5fa;
-  }
-
-  .type-icon.assignment {
-    color: #f59e0b;
-  }
-
-  .item-title {
-    color: #e0e0e0;
-    flex: 1;
-    font-size: 14px;
-  }
-
-  .item-card.completed .item-title {
-    color: #999999;
-  }
-
-  .assignment-due {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #f59e0b;
-    font-size: 14px;
-    margin-top: 8px;
-  }
-
-  .load-more {
-    text-align: center;
-    margin-top: 24px;
-  }
-
-  .load-more-btn {
-    padding: 10px 24px;
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    color: #60a5fa;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .load-more-btn:hover {
-    background: #1a1a1a;
-    color: #93c5fd;
-  }
-
-  @media (max-width: 768px) {
-    .items-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .week-content-wrapper {
-      gap: 16px;
-    }
-
-    .week-circle {
-      width: 48px;
-      height: 48px;
-      font-size: 12px;
-    }
-
-    .week-actions {
-      justify-content: flex-start;
-    }
-  }
-
-  /* Certificate System Styles */
-  .certificate-badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
-    z-index: 1;
-  }
-
-  .week-card.clickable {
-    cursor: pointer;
-  }
-
-  .week-card.clickable:hover {
-    border-color: #60a5fa;
-    box-shadow: 0 0 12px rgba(96, 165, 250, 0.2);
-  }
-
-  /* Progression Modal */
-  #progression-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85);
-    z-index: 1000;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  #progression-modal > div {
-    max-width: 600px;
-    margin: 40px auto;
-    background: #0f0f0f;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    padding: 32px;
-  }
-
-  #progression-modal .close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: none;
-    color: #999;
-    font-size: 24px;
-    cursor: pointer;
-  }
-
-  #progression-modal h2 {
-    color: #ffffff;
-    margin-bottom: 8px;
-  }
-
-  #progression-modal .week-theme {
-    color: #60a5fa;
-    margin-bottom: 24px;
-  }
-
-  #modal-progress-fill {
-    height: 100%;
-    background: #60a5fa;
-    width: 0%;
-    transition: width 0.3s;
-  }
-
-  .progression-task {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: #151515;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    margin-bottom: 8px;
-  }
-
-  .progression-task input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    accent-color: #60a5fa;
-  }
-
-  .progression-task label {
-    color: #e0e0e0;
-    flex: 1;
-    cursor: pointer;
-  }
-
-  .task-number {
-    color: #666;
-    font-size: 14px;
-  }
-
-  #view-certificate-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s;
-    margin-top: 24px;
-  }
-
-  #view-certificate-btn:hover {
-    transform: scale(1.02);
-  }
-
-  /* Certificate Modal */
-  #certificate-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 2000;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  #certificate-modal .action-bar {
-    position: sticky;
-    top: 0;
-    background: rgba(255,255,255,0.95);
-    padding: 16px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-    z-index: 10;
-  }
-
-  #certificate-modal .action-btn {
-    padding: 10px 20px;
-    background: #0077b5;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    margin: 0 8px;
-    cursor: pointer;
-  }
-
-  #certificate-modal .secondary-btn {
-    background: white;
-    color: #333;
-    border: 1px solid #ccc;
-  }
-
-  #certificate-content {
-    max-width: 1000px;
-    margin: 40px auto;
-    background: #fdfaf1;
-    padding: 90px 80px;
-    border: 3px solid #d4a574;
-    position: relative;
-    font-family: 'Crimson Text', serif;
-    color: #1f2937;
-  }
-
-  #certificate-content::before {
-    content: '';
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    right: 18px;
-    bottom: 18px;
-    border: 1px solid rgba(212, 165, 116, 0.7);
-    pointer-events: none;
-  }
-
-  #certificate-content > div {
-    position: relative;
-    z-index: 1;
-  }
-
-  .certificate-heading {
-    text-align: center;
-    margin-bottom: 40px;
-  }
-
-  .certificate-emblem {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background: #111827;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 24px;
-    border: 3px solid #d4a574;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  }
-
-  #certificate-logo {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-  }
-
-  #certificate-content .header-text {
-    font-size: 14px;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: #505766;
-    font-family: 'Libre Baskerville', serif;
-    margin-bottom: 12px;
-  }
-
-  #certificate-content .certify-text {
-    font-size: 30px;
-    color: #1f2937;
-    font-family: 'Libre Baskerville', serif;
-    margin-bottom: 8px;
-  }
-
-  .certificate-subtitle {
-    text-transform: uppercase;
-    letter-spacing: 0.25em;
-    font-size: 13px;
-    color: #9ca3af;
-  }
-
-  #certificate-student-name {
-    font-size: 62px;
-    color: #111827;
-    font-family: 'Libre Baskerville', serif;
-    font-weight: 700;
-    border: none;
-    outline: none;
-    display: block;
-    cursor: text;
-    text-align: center;
-    margin: 32px auto 40px;
-    width: 100%;
-  }
-
-  #certificate-student-name:empty::before {
-    content: 'Your Name';
-    color: #d1d5db;
-  }
-
-  #certificate-content .achievement-text {
-    text-align: center;
-    font-size: 22px;
-    color: #374151;
-    max-width: 720px;
-    margin: 0 auto 48px;
-    line-height: 1.7;
-  }
-
-  .skill-focus-pill {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-
-  .skill-focus-pill span {
-    display: inline-block;
-    padding: 6px 20px;
-    border: 1px solid #d4a574;
-    border-radius: 999px;
-    font-size: 16px;
-    color: #92400e;
-    background: rgba(212, 165, 116, 0.18);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  #certificate-date {
-    text-align: center;
-    font-size: 18px;
-    color: #6b7280;
-    font-style: italic;
-    margin-bottom: 40px;
-  }
-
-  .certificate-divider {
-    width: 60%;
-    height: 1px;
-    background: transparent;
-    margin: 0 auto 48px;
-  }
-
-  #certificate-content .signature-section {
-    display: flex;
-    justify-content: center;
-    margin-top: 32px;
-  }
-
-  #certificate-content .signature {
-    text-align: center;
-    max-width: 320px;
-  }
-
-  #certificate-content .signature-name {
-    font-size: 30px;
-    font-style: italic;
-    color: #1f2937;
-    font-family: 'Libre Baskerville', serif;
-    margin-bottom: 8px;
-  }
-
-  #certificate-content .signature-line {
-    border-top: 2px solid #9ca3af;
-    padding-top: 8px;
-    margin-bottom: 12px;
-  }
-
-  #certificate-content .signature-title {
-    font-family: 'Libre Baskerville', serif;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-  }
-
-  #certificate-content .signature-subtitle {
-    color: #4b5563;
-    margin: 2px 0 0 0;
-  }
-
-  /* Certificate List Modal */
-  #certificate-list-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 1500;
-    padding: 20px;
-    overflow-y: auto;
-  }
-
-  #certificate-list-modal > div {
-    max-width: 600px;
-    margin: 40px auto;
-    background: #0f0f0f;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    padding: 32px;
-  }
-
-  #certificate-list-modal .close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: none;
-    color: #999;
-    font-size: 24px;
-    cursor: pointer;
-  }
-
-  #certificate-list-modal h2 {
-    color: #ffffff;
-    margin-bottom: 24px;
-  }
-
-  #certificate-list button {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s;
-    margin-bottom: 12px;
-  }
-
-  #certificate-list button:hover {
-    transform: scale(1.02);
-  }
-
-  #certificate-skills {
-    margin-top: 48px;
-    padding-top: 32px;
-    border-top: 1px solid #d1d5db;
-  }
-
-  .skills-heading {
-    text-align: center;
-    color: #0b0d17 !important;
-    font-family: 'Libre Baskerville', serif;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    margin-bottom: 16px;
-  }
-
-  #skills-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .skill-tag {
-    padding: 6px 16px;
-    border: 1px solid #d4a574;
-    border-radius: 20px;
-    color: #1f2937;
-    font-family: 'Crimson Text', serif;
-    font-size: 14px;
-    margin: 4px;
-    background: rgba(212, 165, 116, 0.1);
-  }
-
-  @media (max-width: 768px) {
-    #certificate-content {
-      padding: 40px 20px;
-    }
-
-    #certificate-student-name {
-      font-size: 36px;
-    }
-
-    #certificate-content .signature-section {
-      flex-direction: column;
-      gap: 16px;
-    }
-  }
-
-  .leaderboard-container {
- background: #111111;
- border: 1px solid #1f1f1f;
- border-radius: 16px;
- padding: 32px;
- margin-bottom: 24px;
-}
-
-
-.leaderboard-header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 24px;
- flex-wrap: wrap;
- gap: 16px;
-}
-
-
-.leaderboard-header h2 {
- color: #ffffff;
- margin: 0;
-}
-
-
-.leaderboard-controls {
- display: flex;
- gap: 12px;
-}
-
-
-.leaderboard-stats-overview {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 16px;
- margin-bottom: 32px;
-}
-
-
-.stat-card {
- background: #0f0f0f;
- border: 1px solid #2a2a2a;
- border-radius: 12px;
- padding: 20px;
- display: flex;
- align-items: center;
- gap: 16px;
- transition: all 0.2s;
-}
-
-
-.stat-card:hover {
- border-color: #60a5fa;
- transform: translateY(-2px);
-}
-
-
-.stat-icon {
- font-size: 32px;
- flex-shrink: 0;
-}
-
-
-.stat-content {
- flex: 1;
-}
-
-
-.stat-label {
- color: #999999;
- font-size: 13px;
- margin-bottom: 4px;
-}
-
-
-.stat-value {
- color: #ffffff;
- font-size: 24px;
- font-weight: 600;
-}
-
-
-.leaderboard-table-container {
- overflow-x: auto;
- border-radius: 8px;
- border: 1px solid #2a2a2a;
-}
-
-
-.leaderboard-table {
- width: 100%;
- border-collapse: collapse;
-}
-
-
-.leaderboard-table thead {
- background: #0f0f0f;
-}
-
-
-.leaderboard-table th {
- padding: 16px;
- text-align: left;
- color: #60a5fa;
- font-weight: 600;
- border-bottom: 2px solid #2a2a2a;
-}
-
-
-.leaderboard-table th.sortable {
- cursor: pointer;
- user-select: none;
-}
-
-
-.leaderboard-table th.sortable:hover {
- color: #93c5fd;
-}
-
-
-.leaderboard-table tbody tr {
- border-bottom: 1px solid #1f1f1f;
- transition: background 0.2s;
-}
-
-
-.leaderboard-table tbody tr:hover {
- background: #0f0f0f;
-}
-
-
-.leaderboard-table tbody tr.current-user {
- background: rgba(96, 165, 250, 0.1);
- border-left: 3px solid #60a5fa;
-}
-
-
-.leaderboard-table td {
- padding: 16px;
- color: #e0e0e0;
-}
-
-
-.rank-cell {
- font-weight: 700;
- font-size: 18px;
-}
-
-
-.rank-cell.top-3 {
- color: #fbbf24;
-}
-
-
-.student-cell {
- display: flex;
- align-items: center;
- gap: 12px;
-}
-
-
-.student-avatar {
- width: 36px;
- height: 36px;
- border-radius: 50%;
- background: linear-gradient(135deg, #60a5fa, #3b82f6);
- display: flex;
- align-items: center;
- justify-content: center;
- color: white;
- font-weight: 600;
-}
-
-
-.badges-cell {
- display: flex;
- gap: 4px;
-}
-
-
-.badge-icon {
- font-size: 20px;
- opacity: 0.8;
- transition: opacity 0.2s;
-}
-
-
-.badge-icon:hover {
- opacity: 1;
- transform: scale(1.2);
-}
-
-
-/* Analytics Dashboard */
-.analytics-dashboard {
- background: #111111;
- border: 1px solid #1f1f1f;
- border-radius: 16px;
- padding: 32px;
-}
-
-
-.analytics-dashboard h2 {
- color: #ffffff;
- margin-bottom: 24px;
-}
-
-
-.charts-grid {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
- gap: 24px;
-}
-
-
-.chart-card {
- background: #0f0f0f;
- border: 1px solid #2a2a2a;
- border-radius: 12px;
- padding: 24px;
-}
-
-
-.chart-card h3 {
- color: #ffffff;
- margin: 0 0 20px 0;
- font-size: 16px;
-}
-
-
-#quest-timeline {
- max-height: 300px;
- overflow-y: auto;
-}
-
-
-.timeline-item {
- display: flex;
- gap: 16px;
- margin-bottom: 16px;
- padding-bottom: 16px;
- border-bottom: 1px solid #1f1f1f;
-}
-
-
-.timeline-item:last-child {
- border-bottom: none;
-}
-
-
-.timeline-marker {
- width: 12px;
- height: 12px;
- border-radius: 50%;
- background: #60a5fa;
- margin-top: 4px;
- flex-shrink: 0;
-}
-
-
-.timeline-content {
- flex: 1;
-}
-
-
-.timeline-title {
- color: #e0e0e0;
- font-weight: 600;
- margin-bottom: 4px;
-}
-
-
-.timeline-date {
- color: #999999;
- font-size: 13px;
-}
-
-
-#activity-heatmap {
- display: grid;
- grid-template-columns: repeat(7, 1fr);
- gap: 4px;
- max-width: 400px;
-}
-
-
-.heatmap-cell {
- aspect-ratio: 1;
- border-radius: 2px;
- background: #1a1a1a;
- transition: all 0.2s;
- cursor: pointer;
-}
-
-
-.heatmap-cell.level-0 { background: #1a1a1a; }
-.heatmap-cell.level-1 { background: #0e4429; }
-.heatmap-cell.level-2 { background: #006d32; }
-.heatmap-cell.level-3 { background: #26a641; }
-.heatmap-cell.level-4 { background: #39d353; }
-
-
-.heatmap-cell:hover {
- transform: scale(1.1);
- box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
-}
-
-
-@media (max-width: 768px) {
- .charts-grid {
-   grid-template-columns: 1fr;
- }
-  .leaderboard-stats-overview {
-   grid-template-columns: repeat(2, 1fr);
- }
-}
-
-.skills-achievements-section {
-  background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-  border: 1px solid #2a2a2a;
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-}
-
-.skills-achievements-section h2 {
-  color: #ffffff;
-  font-size: 1.75rem;
-  margin: 0 0 8px 0;
-}
-
-.skills-achievements-section .section-subtitle {
-  color: #999999;
-  font-size: 0.95rem;
-  margin: 0 0 24px 0;
-}
-
-.achievements-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.achievement-card {
-  background: #0f0f0f;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.achievement-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.achievement-card:hover {
-  border-color: #3a3a3a;
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.achievement-card:hover::before {
-  opacity: 1;
-}
-
-.achievement-card.active-quests::before {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-}
-
-.achievement-card.certificates::before {
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-}
-
-.achievement-card.tasks::before {
-  background: linear-gradient(90deg, #10b981, #059669);
-}
-
-.achievement-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.achievement-number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
-}
-
-.achievement-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.achievement-card.active-quests .achievement-icon {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.achievement-card.certificates .achievement-icon {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
-}
-
-.achievement-card.tasks .achievement-icon {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-}
-
-.achievement-label {
-  color: #999999;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.course-filter-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.course-filter-btn {
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  color: #e0e0e0;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.course-filter-btn:hover {
-  background: #1a1a1a;
-  border-color: #3a3a3a;
-}
-
-.course-filter-btn.active {
-  background: #1a1a1a;
-  border-color: #60a5fa;
-  color: #60a5fa;
-}
-
-/* Modal Analytics Button */
-.modal-action-buttons {
-  border-top: 1px solid #2a2a2a;
-  padding-top: 20px;
-  margin-top: 20px;
-}
-
-.modal-analytics-btn {
-  width: 100%;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.modal-analytics-btn:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
-}
-
-/* Mobile Responsive Overrides */
-@media (max-width: 768px) {
-  .achievements-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .achievement-number {
-    font-size: 2rem;
-  }
-  
-  .skills-achievements-section {
-    padding: 24px 20px;
-  }
-}
-
-.overview-section {
-  background: #111111;
-  border: 1px solid #1f1f1f;
-  border-radius: 16px;
-  margin-bottom: 24px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.overview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 28px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.2s;
-}
-
-.overview-header:hover {
-  background: #151515;
-}
-
-.overview-title-group h2 {
-  color: #f8fafc;
-  font-size: 1.75rem;
-  margin: 0 0 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.overview-title-group h2 i {
-  color: #60a5fa;
-}
-
-.overview-subtitle {
-  color: #9ca3af;
-  font-size: 0.95rem;
-  margin: 0;
-}
-
-.overview-toggle-btn {
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  color: #60a5fa;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.overview-toggle-btn:hover {
-  background: #1a1a1a;
-  border-color: #60a5fa;
-}
-
-.overview-toggle-icon {
-  transition: transform 0.2s;
-  display: inline-flex;
-  font-size: 16px;
-}
-
-.overview-section.collapsed .overview-toggle-icon {
-  transform: rotate(0deg);
-}
-
-.overview-section:not(.collapsed) .overview-toggle-icon {
-  transform: rotate(90deg);
-}
-
-.overview-content {
-  max-height: 2000px;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-  opacity: 1;
-}
-
-.overview-section.collapsed .overview-content {
-  max-height: 0;
-  opacity: 0;
-}
-
-.overview-content .skills-achievements-section {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0 28px 28px 28px;
-  margin: 0;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .overview-header {
-    padding: 20px;
-  }
-  
-  .overview-title-group h2 {
-    font-size: 1.5rem;
-  }
-  
-  .overview-content .skills-achievements-section {
-    padding: 0 20px 20px 20px;
-  }
-}
-
-/* Quick Help Section Styles */
-.quick-help-resources {
-  background: #111111;
-  border: 1px solid #1f1f1f;
-  border-radius: 16px;
-  margin-bottom: 24px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.quick-help-header-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 28px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.2s;
-}
-
-.quick-help-header-wrapper:hover {
-  background: #151515;
-}
-
-.quick-help-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.quick-help-header i {
-  color: #60a5fa;
-  font-size: 1.5rem;
-}
-
-.quick-help-header h2 {
-  color: #f8fafc;
-  font-size: 1.75rem;
-  margin: 0;
-}
-
-.quick-help-description {
-  color: #9ca3af;
-  font-size: 0.95rem;
-  margin: 0;
-  padding: 0 28px 20px 28px;
-}
-
-.quick-help-toggle-btn {
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  color: #60a5fa;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.quick-help-toggle-btn:hover {
-  background: #1a1a1a;
-  border-color: #60a5fa;
-}
-
-.quick-help-toggle-icon {
-  transition: transform 0.2s;
-  display: inline-flex;
-  font-size: 16px;
-}
-
-.quick-help-resources.collapsed .quick-help-toggle-icon {
-  transform: rotate(0deg);
-}
-
-.quick-help-resources:not(.collapsed) .quick-help-toggle-icon {
-  transform: rotate(90deg);
-}
-
-.quick-help-content {
-  max-height: 3000px;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-  opacity: 1;
-  padding: 0 28px 28px 28px;
-}
-
-.quick-help-resources.collapsed .quick-help-content {
-  max-height: 0;
-  opacity: 0;
-  padding: 0;
-}
-
-.quick-help-resources.collapsed .quick-help-description {
-  display: none;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .quick-help-header-wrapper {
-    padding: 20px;
-  }
-  
-  .quick-help-header h2 {
-    font-size: 1.5rem;
-  }
-  
-  .quick-help-content {
-    padding: 0 20px 20px 20px;
-  }
-  
-  .quick-help-description {
-    padding: 0 20px 20px 20px;
-  }
-}
-
-</style>
-
+<div class="timeline-page"> 
 <div class="timeline-header">
   <h1>Course Timeline</h1>  
-  <div class="timeline-filters">
-    <button class="filter-btn active" data-filter="all">
-      <i class="fas fa-filter"></i> All Items
-    </button>
-    <button class="filter-btn" data-filter="lessons">
-      Lessons Only
-    </button>
-    <button class="filter-btn" data-filter="assignments">
-      Assignments Only
-    </button>
-    <button class="filter-btn" data-filter="incomplete">
-      Incomplete Only
-    </button>
-    <a href="{{ site.baseurl }}/leaderboard?course={{ page.course }}" class="filter-btn leaderboard-link">
-      <i class="fas fa-trophy"></i> View Analytics
-    </a>
-  </div>
 </div>
 
 <!-- Course Filter Buttons - OUTSIDE the dropdown -->
@@ -1676,6 +100,7 @@ layout: post
     {% assign courseUnit = course[unitKey] %}
     {% assign start = unitData.start %}
     {% assign end = unitData.end %}
+    {% assign helpUrl = unitData.help %}
 
     {% if courseUnit.shared %}
       {% assign unitData = shared[courseUnit.shared] %}
@@ -1691,16 +116,22 @@ layout: post
           {% endif %}
         </div>
         <div class="sprint-controls">
-          <div class="completion-badge">{{ start }} - {{ end }} Weeks</div>
-          <button class="progression-btn sprint-toggle-btn" type="button" aria-expanded="false">
-            <span class="sprint-toggle-icon">▾</span> View Weeks
+          <button class="sprint-toggle-btn" type="button" aria-expanded="false">
+            <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
+          </button>
+          {% if helpUrl %}
+          <button class="sprint-btn help" type="button" data-sprint="{{ unitKey }}" data-help-url="{{ helpUrl }}" onclick="openHelpModal('{{ unitKey }}', '{{ helpUrl }}')" title="Help & Navigation Guide">
+              <i class="fas fa-question"></i>
+          </button>
+          {% endif %}
+          <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" onclick="openProgressionModal('{{ unitKey }}', {{ start }}, {{ end }})" title="Progress & Certificates">
+              <i class="fas fa-certificate"></i>
           </button>
         </div>
       </div>
 
       <div class="sprint-weeks">
         <div class="sprint-body">
-          <h3 style="margin:0 0 12px 0; font-weight:700; color:#cbd5f5;">{{ unitKey }} — {{ unitData.title }}</h3>
 
           {% for index in (start..end) %}
             {% assign entries = null | compact %}
@@ -1708,27 +139,25 @@ layout: post
 
             {% for post in posts %}
               {% if post.courses[page.course] %}
-                {% comment %}Skip Jekyll auto-generated notebook markdown files (prefer original .ipynb files){% endcomment %}
-                {% unless post.path contains "_IPYNB_2_.md" %}
-                  {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
-                  {% assign course_count = 0 %}
-                  {% for course in post.courses %}
-                    {% assign course_count = course_count | plus: 1 %}
-                  {% endfor %}
-                  {% if course_count == 1 %}
-                  {% assign week = post.courses[page.course].week | plus: 0 %}
-                  {% if week == index %}
-                    {% if post.assignment == true %}
-                      {% assign itemType = "assignment" %}
-                    {% else %}
-                      {% assign itemType = "lesson" %}
-                    {% endif %}
-                    {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
-                    {% assign entries = entries | push: entry %}
-                    {% assign totalItems = totalItems | plus: 1 %}
+                {% comment %}Include all files with courses frontmatter (including converted notebook markdown files){% endcomment %}
+                {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
+                {% assign course_count = 0 %}
+                {% for course in post.courses %}
+                  {% assign course_count = course_count | plus: 1 %}
+                {% endfor %}
+                {% if course_count == 1 %}
+                {% assign week = post.courses[page.course].week | plus: 0 %}
+                {% if week == index %}
+                  {% if post.assignment == true %}
+                    {% assign itemType = "assignment" %}
+                  {% else %}
+                    {% assign itemType = "lesson" %}
                   {% endif %}
-                  {% endif %}
-                {% endunless %}
+                  {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
+                  {% assign entries = entries | push: entry %}
+                  {% assign totalItems = totalItems | plus: 1 %}
+                {% endif %}
+                {% endif %}
               {% endif %}
             {% endfor %}
 
@@ -1749,12 +178,8 @@ layout: post
                       <div class="completion-badge">
                         {{ completedItems }}/{{ totalItems }} Complete
                       </div>
-                      <button class="progression-btn" type="button">
-                        Progress & Certificates
-                      </button>
                     </div>
                   </div>
-
                   <div class="progress-bar-container">
                     {% if totalItems > 0 %}
                       {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
@@ -1763,6 +188,9 @@ layout: post
                     {% endif %}
                     <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
                   </div>
+
+                  <!-- MOVED: Learning Goals now appear BEFORE items -->
+                  <div class="week-skills-row" data-week-skills></div>
 
                   <div class="items-grid">
                     {% for entry in entries %}
@@ -1807,8 +235,6 @@ layout: post
                       <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
                     </div>
                   {% endif %}
-
-                  <div class="week-skills-row" data-week-skills></div>
                 </div>
               </div>
             </div>
@@ -1820,183 +246,15 @@ layout: post
   {% endfor %}
 </div>
 
-
-<!-- Collapsible Quick Help & Resources Section -->
-<div class="quick-help-resources collapsed" id="quick-help-section">
-  <div class="quick-help-header-wrapper">
-    <div>
-      <div class="quick-help-header">
-        <i class="fas fa-book"></i>
-        <h2>Quick Help & Resources</h2>
-      </div>
-    </div>
-    <button class="quick-help-toggle-btn" type="button" aria-expanded="false">
-      <span class="quick-help-toggle-icon">▸</span>
-    </button>
-  </div>
-  
-  <p class="quick-help-description">Supplemental guides to help when you're stuck or need clarification</p>
-  
-  <div class="quick-help-content">
-    <div class="search-box">
-      <i class="fas fa-search"></i>
-      <input type="text" placeholder="Search guides..." id="resource-search">
-    </div>
-    
-    <div class="resources-grid" id="resources-grid">
-      <!-- Resource 1: Live Review -->
-      <a href="https://pages.opencodingsociety.com/agile/live_reviews" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon green">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Live Review (Pair/Trio/Group)</h3>
-            <p class="resource-description">Guidelines for preparing and conducting live reviews during sprints. Explains checkpoint and final review types, showcase requirements, expectations for collaboration and accountability, and tips for professional presentations.</p>
-            <div class="resource-meta">
-              <span class="resource-tag collaboration">collaboration</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 2: Cookie Clicker -->
-      <a href="https://pages.opencodingsociety.com/toolkit/documentation/cookie" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon blue">
-            <i class="fas fa-code"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Cookie Clicker Developer Documentation</h3>
-            <p class="resource-description">Step-by-step guide to building a cookie-clicker game using Thymeleaf, Bootstrap, custom CSS and JavaScript. Covers HTML structure, CSS styling, physics-based animation and logic for clicks, counters and upgrades.</p>
-            <div class="resource-meta">
-              <span class="resource-tag code-example">code-example</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 3: Person Viewer -->
-      <a href="https://pages.opencodingsociety.com/toolkit/documentation/person" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon red">
-            <i class="fas fa-bug"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Person Viewer Developer Documentation</h3>
-            <p class="resource-description">Documentation for a person viewer page using Thymeleaf, Bootstrap and DataTables. Describes how to set up the HTML, enable sorting/searching, check for GitHub profile images and update links dynamically.</p>
-            <div class="resource-meta">
-              <span class="resource-tag debugging">debugging</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 4: Flask, Postman, and Backend UIs -->
-      <a href="https://pages.opencodingsociety.com/flask-overview" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon orange">
-            <i class="fas fa-cog"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Flask, Postman, and Backend UIs</h3>
-            <p class="resource-description">Overview of backend fundamentals with a live demo. Introduces Flask routes, Postman for API testing and simple backend UIs. Provides tips for teaching backend logic, key takeaways for students and a starter project with cloning and setup instructions.</p>
-            <div class="resource-meta">
-              <span class="resource-tag setup">setup</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 5: Flask Project Structure -->
-      <a href="https://pages.opencodingsociety.com/python/flask/anatomy" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon orange">
-            <i class="fas fa-cog"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Flask Project Structure Explained</h3>
-            <p class="resource-description">Interactive guide to a typical Flask project layout. Explains the purpose of main.py, __init__.py, API and models folders, database initialization scripts, templates and static files. Helps learners organize their backend projects properly.</p>
-            <div class="resource-meta">
-              <span class="resource-tag setup">setup</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 6: Flask APIs Guide -->
-      <a href="https://pages.opencodingsociety.com/flask-api" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon purple">
-            <i class="fas fa-book"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Flask APIs Guide</h3>
-            <p class="resource-description">Introductory lesson on APIs with Flask. Defines APIs with a restaurant menu analogy, lists common use cases and shows how to add an external API route. Includes example code for a weather endpoint and guidance on registering Blueprints.</p>
-            <div class="resource-meta">
-              <span class="resource-tag concept">concept</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 7: Postman Intro Guide -->
-      <a href="https://pages.opencodingsociety.com/postman-docs" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon orange">
-            <i class="fas fa-cog"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Postman Intro Guide</h3>
-            <p class="resource-description">Quick reference for using Postman to test APIs. Covers common HTTP status codes, methods, reasons to use Postman, how to write backend endpoints in VS Code and how to send requests and inspect responses in Postman.</p>
-            <div class="resource-meta">
-              <span class="resource-tag setup">setup</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-      
-      <!-- Resource 8: Network Stack & HTTP/TCP/IP -->
-      <a href="https://pages.opencodingsociety.com/csp%20big%20idea%204/2025/02/05/network_stack_IPYNB_2_.html" class="resource-card" target="_blank" rel="noopener">
-        <div class="resource-card-content">
-          <div class="resource-icon purple">
-            <i class="fas fa-book"></i>
-          </div>
-          <div class="resource-info">
-            <h3 class="resource-title">Network Stack & HTTP/TCP/IP</h3>
-            <p class="resource-description">Explains the full networking stack involved when a GitHub Pages frontend communicates with a backend hosted on AWS EC2. Discusses tools like Docker, Nginx and Certbot and details how HTTP requests traverse application, transport, network and physical layers.</p>
-            <div class="resource-meta">
-              <span class="resource-tag concept">concept</span>
-              <span class="resource-helps">• Helps with 2 quests</span>
-            </div>
-          </div>
-          <i class="fas fa-external-link-alt resource-external"></i>
-        </div>
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- PROGRESSION MODAL -->
+<!-- ============================= -->
+<!--   PROGRESSION MODAL (DARK)   -->
+<!-- ============================= -->
 <div id="progression-modal">
   <div>
-    <button id="close-progression-modal" class="close-btn" aria-label="Close week progress modal">&times;</button>
-    <h2>Week <span id="modal-week-number"></span> Progress</h2>
-    <p class="week-theme" id="modal-week-theme"></p>
+    <button id="close-progression-modal" class="close-btn">&times;</button>
+    
+    <h2><span id="modal-sprint-title"></span> Progress</h2>
+    <p class="week-theme" id="modal-sprint-subtitle"></p>
 
     <div class="progress-bar-container" style="margin-bottom: 16px;">
       <div id="modal-progress-fill"></div>
@@ -2020,8 +278,7 @@ layout: post
 <!-- ============================= -->
 <div id="certificate-list-modal">
   <div>
-    <button id="close-certificate-list-modal" class="close-btn" aria-label="Close certificate list modal">&times;</button>
-    <h2>Week <span id="list-modal-week-number"></span> Certificates</h2>
+    <h2><span id="list-modal-sprint-title"></span> Certificates</h2>
     <div id="certificate-list"></div>
   </div>
 </div>
@@ -2091,13 +348,21 @@ layout: post
   </div>
 </div>
 
-
-
-
-
+<!-- ============================= -->
+<!--       HELP MODAL              -->
+<!-- ============================= -->
+<div id="help-modal">
+  <div>
+    <button id="close-help-modal" class="close-btn">&times;</button>
+    
+    <div id="help-content" >
+      <!-- Markdown content will be loaded here -->
+    </div>
+  </div>
+</div>
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
-  {{ site.data.certificate_skills | jsonify }}
+  {{ course | jsonify }}
 </script>
 
 <script>
@@ -2260,41 +525,50 @@ layout: post
     updateProgressBars();
   }
   
-  // Filter functionality
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  
-  function applyFilters() {
-    const itemCards = document.querySelectorAll('.item-card');
-    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+  // Filter functionality - per sprint
+  function applySprintFilters(sprintKey, filterType) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) return;
+    
+    const itemCards = sprintCard.querySelectorAll('.item-card');
     
     itemCards.forEach(card => {
       const type = card.dataset.type;
       const isCompleted = card.classList.contains('completed');
       
-      if (activeFilter === 'all') {
+      if (filterType === 'all') {
         card.style.display = 'block';
-      } else if (activeFilter === 'lessons' && type === 'lesson') {
+      } else if (filterType === 'lessons' && type === 'lesson') {
         card.style.display = 'block';
-      } else if (activeFilter === 'assignments' && type === 'assignment') {
+      } else if (filterType === 'assignments' && type === 'assignment') {
         card.style.display = 'block';
-      } else if (activeFilter === 'incomplete' && !isCompleted) {
+      } else if (filterType === 'incomplete' && !isCompleted) {
         card.style.display = 'block';
       } else {
         card.style.display = 'none';
       }
     });
   }
-  
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Update active state
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Apply filters
-      applyFilters();
+
+  // Initialize sprint filters
+  function initializeSprintFilters() {
+    document.querySelectorAll('.sprint-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent sprint toggle
+        
+        const sprintKey = btn.dataset.sprint;
+        const filterType = btn.dataset.filter;
+        
+        // Update active state for this sprint's filters only
+        const sprintCard = btn.closest('.sprint-card');
+        sprintCard.querySelectorAll('.sprint-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Apply filter
+        applySprintFilters(sprintKey, filterType);
+      });
     });
-  });
+  }
   
   // Initialize progress bars from data attributes
   function initializeProgressBars() {
@@ -2383,7 +657,7 @@ function setupQuickHelpToggle() {
     return Array.from(document.querySelectorAll('.week-card')).find(card => extractWeekNumber(card) === weekNumber);
   }
 
-  function collectSkillsFromWeekCard(weekCard) {
+  function collectGoalsFromWeekCard(weekCard) {
     const titles = Array.from(weekCard.querySelectorAll('.item-title')).map(el => el.textContent.trim()).filter(Boolean);
     const uniqueTitles = [...new Set(titles)];
     if (uniqueTitles.length > 0) {
@@ -2394,27 +668,29 @@ function setupQuickHelpToggle() {
   }
 
   function buildCertificateProfile(weekCard, weekNumber) {
-    const overrides = COURSE_SKILL_LIBRARY?.[CURRENT_COURSE]?.[weekNumber] || null;
+    // Get sprint key from week card to access the correct sprint's week data
+    const sprintKey = weekCard.dataset.sprint;
+    const overrides = COURSE_SKILL_LIBRARY?.[sprintKey]?.[weekNumber] || null;
     let theme = overrides?.theme || overrides?.title || overrides?.certificate || '';
     const weekHeader = weekCard.querySelector('.week-title-group h3')?.textContent.trim() || `Week ${weekNumber}`;
     if (!theme) {
       const headerParts = weekHeader.split(':');
       theme = headerParts.length > 1 ? headerParts[1].trim() : weekHeader;
     }
-    const skills = (overrides?.skills && overrides.skills.length > 0) ? overrides.skills : collectSkillsFromWeekCard(weekCard);
-    if (skills.length === 0) {
-      skills.push(theme);
+    const goals = (overrides?.goals && overrides.goals.length > 0) ? overrides.goals : collectGoalsFromWeekCard(weekCard);
+    if (goals.length === 0) {
+      goals.push(theme);
     }
     return {
       weekNumber,
       theme,
       displayName: overrides?.certificate || `Week ${weekNumber}: ${theme}`,
       courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
-      skills
+      goals
     };
   }
 
-  function renderWeekSkillPreviews() {
+  function renderWeekGoalPreviews() {
     document.querySelectorAll('.week-card').forEach(card => {
       const preview = card.querySelector('[data-week-skills]');
       if (!preview) return;
@@ -2422,17 +698,31 @@ function setupQuickHelpToggle() {
       const profile = buildCertificateProfile(card, weekNumber);
       if (!profile) return;
       preview.innerHTML = '';
-      profile.skills.slice(0, 6).forEach(skill => {
-        const chip = document.createElement('span');
-        chip.className = 'skill-chip';
-        chip.textContent = skill;
-        preview.appendChild(chip);
+      preview.className = 'week-goals-container';
+      
+      // Add label
+      const label = document.createElement('span');
+      label.className = 'goals-label';
+      label.textContent = 'Learning Goals';
+      preview.appendChild(label);
+      
+      // Add goals list
+      const goalsList = document.createElement('div');
+      goalsList.className = 'goals-list';
+      
+      profile.goals.slice(0, 4).forEach(goal => {
+        const item = document.createElement('span');
+        item.className = 'goal-item';
+        item.textContent = goal;
+        goalsList.appendChild(item);
       });
+      
+      preview.appendChild(goalsList);
+      
       const weekTitle = card.querySelector('[data-week-title]');
       if (weekTitle) {
         weekTitle.textContent = `Week ${weekNumber}: ${profile.theme}`;
       }
-
     });
   }
 
@@ -2463,69 +753,92 @@ function setupQuickHelpToggle() {
       return [];
     }
 
-    const certificates = (profile.skills || []).map(skillName => {
+    const certificates = (profile.goals || []).map(goalName => {
       return {
         weekNumber: profile.weekNumber,
         theme: profile.theme,
         courseName: profile.courseName,
-        skill: skillName,
-        displayName: `${profile.theme} – ${skillName}`,
-        slug: `${CURRENT_COURSE}-${profile.weekNumber}-${skillName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+        goal: goalName,
+        displayName: `${profile.theme} – ${goalName}`,
+        slug: `${CURRENT_COURSE}-${profile.weekNumber}-${goalName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
       };
     });
 
     return certificates;
   }
 
-  // Open progression modal
-  function openProgressionModal(weekCard) {
-    const weekNumber = extractWeekNumber(weekCard);
-    console.log('Opening progression modal for week:', weekNumber);
-    if (!weekNumber) {
-      console.log('No week number found, returning');
+  // Open progression modal for entire sprint
+  function openProgressionModal(sprintKey, startWeek, endWeek) {
+    console.log('Opening progression modal for sprint:', sprintKey, 'weeks', startWeek, '-', endWeek);
+    
+    currentModalWeekNumber = null; // Not using this for sprint-level
+    
+    // Get sprint card and title
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.log('Sprint card not found');
       return;
     }
+    
+    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
+    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
+    
+    // Set sprint title and subtitle
+    document.getElementById('modal-sprint-title').textContent = sprintTitle;
+    document.getElementById('modal-sprint-subtitle').textContent = `${sprintKey} (Weeks ${startWeek}-${endWeek})`;
 
-    currentModalWeekNumber = weekNumber;
-    console.log('Set currentModalWeekNumber to:', currentModalWeekNumber);
-
-    // Set week number and theme
-    document.getElementById('modal-week-number').textContent = weekNumber;
-    const weekTitle = weekCard.querySelector('h3').textContent.split(':')[1]?.trim() || '';
-    document.getElementById('modal-week-theme').textContent = weekTitle;
-
-    // Populate task list
+    // Populate task list with all weeks in sprint
     const taskList = document.getElementById('task-list');
     taskList.innerHTML = '';
+    
+    let globalTaskIndex = 0;
+    
+    // Iterate through all weeks in the sprint
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (!weekCard) continue;
+      
+      // Add week header in task list
+      const weekHeader = document.createElement('div');
+      weekHeader.className = 'progression-week-header';
+      const weekTitle = weekCard.querySelector('[data-week-title]')?.textContent || `Week ${weekNum}`;
+      weekHeader.textContent = weekTitle;
+      taskList.appendChild(weekHeader);
+      
+      // Add tasks for this week
+      const itemCards = weekCard.querySelectorAll('.item-card');
+      itemCards.forEach((card) => {
+        const title = card.querySelector('.item-title').textContent;
+        const isCompleted = card.classList.contains('completed');
+        const taskDiv = document.createElement('div');
+        taskDiv.className = 'progression-task';
+        taskDiv.innerHTML = `
+          <input type="checkbox" id="task-${globalTaskIndex}" ${isCompleted ? 'checked' : ''}>
+          <label for="task-${globalTaskIndex}">${title}</label>
+          <span class="task-number">#${globalTaskIndex + 1}</span>
+        `;
 
-    const itemCards = weekCard.querySelectorAll('.item-card');
-    itemCards.forEach((card, index) => {
-      const title = card.querySelector('.item-title').textContent;
-      const isCompleted = card.classList.contains('completed');
-      const taskDiv = document.createElement('div');
-      taskDiv.className = 'progression-task';
-      taskDiv.innerHTML = `
-        <input type="checkbox" id="task-${index}" ${isCompleted ? 'checked' : ''}>
-        <label for="task-${index}">${title}</label>
-        <span class="task-number">#${index + 1}</span>
-      `;
+        // Add change listener
+        const checkbox = taskDiv.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+          const toggleBtn = card.querySelector('.completion-toggle');
+          if (toggleBtn) {
+            toggleCompletion(toggleBtn);
+            updateModalProgress();
+            updateCertificateStatusForSprint(sprintKey, startWeek, endWeek);
+          }
+        });
 
-      // Add change listener
-      const checkbox = taskDiv.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener('change', function() {
-        const toggleBtn = card.querySelector('.completion-toggle');
-        if (toggleBtn) {
-          toggleCompletion(toggleBtn);
-          updateModalProgress();
-          updateCertificateStatus();
-        }
+        taskList.appendChild(taskDiv);
+        globalTaskIndex++;
       });
-
-      taskList.appendChild(taskDiv);
-    });
+    }
 
     updateModalProgress();
-    updateCertificateStatus();
+    updateCertificateStatusForSprint(sprintKey, startWeek, endWeek);
 
     // Show modal
     document.getElementById('progression-modal').style.display = 'block';
@@ -2551,7 +864,7 @@ function setupQuickHelpToggle() {
 
     if (availableCertificates.length > 0) {
       certificateStatus.innerHTML = `
-        <button id="view-certificate-btn">🎓 View Your Certificate</button>
+        <button id="view-certificate-btn">View Your Certificate</button>
       `;
     } else {
       certificateStatus.innerHTML = `
@@ -2559,10 +872,174 @@ function setupQuickHelpToggle() {
       `;
     }
   }
+  
+  // Update certificate status for entire sprint
+  function updateCertificateStatusForSprint(sprintKey, startWeek, endWeek) {
+    const certificateStatus = document.getElementById('certificate-status');
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    
+    if (!sprintCard) {
+      certificateStatus.innerHTML = '<p style="color: #666; text-align: center;">Sprint not found</p>';
+      return;
+    }
+    
+    // Check if ALL tasks in the sprint are complete
+    let totalTasks = 0;
+    let completedTasks = 0;
+    
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (weekCard) {
+        const itemCards = weekCard.querySelectorAll('.item-card');
+        totalTasks += itemCards.length;
+        itemCards.forEach(card => {
+          if (card.classList.contains('completed')) {
+            completedTasks++;
+          }
+        });
+      }
+    }
+    
+    const isSprintComplete = totalTasks > 0 && completedTasks === totalTasks;
+    
+    if (isSprintComplete) {
+      certificateStatus.innerHTML = `
+        <button id="view-certificate-btn" data-sprint="${sprintKey}" data-start="${startWeek}" data-end="${endWeek}">View Your Certificate</button>
+      `;
+    } else {
+      const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      certificateStatus.innerHTML = `
+        <p style="color: #666; text-align: center;">Complete all tasks to unlock certificate (${completedTasks}/${totalTasks} - ${progress}%)</p>
+      `;
+    }
+  }
 
-  // Open certificate list modal
-  function openCertificateListModal(weekNumber) {
-    document.getElementById('list-modal-week-number').textContent = weekNumber;
+  // Open certificate for sprint (directly show the certificate, no list needed)
+  function openCertificateListModal(sprintKey, startWeek, endWeek) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.error('Sprint card not found');
+      return;
+    }
+    
+    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
+    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
+    
+    // Check if sprint is complete
+    let totalTasks = 0;
+    let completedTasks = 0;
+    const allGoals = [];
+    
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (weekCard) {
+        const itemCards = weekCard.querySelectorAll('.item-card');
+        totalTasks += itemCards.length;
+        itemCards.forEach(card => {
+          if (card.classList.contains('completed')) {
+            completedTasks++;
+          }
+          // Collect unique task titles as goals
+          const taskTitle = card.querySelector('.item-title')?.textContent.trim();
+          if (taskTitle && !allGoals.includes(taskTitle)) {
+            allGoals.push(taskTitle);
+          }
+        });
+      }
+    }
+    
+    const isSprintComplete = totalTasks > 0 && completedTasks === totalTasks;
+    
+    if (!isSprintComplete) {
+      alert('Please complete all tasks in this sprint to unlock the certificate.');
+      return;
+    }
+    
+    // Create sprint-level certificate profile
+    const certificateProfile = {
+      sprintKey: sprintKey,
+      theme: sprintTitle,
+      displayName: sprintTitle,
+      courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
+      goal: sprintTitle,
+      goals: allGoals.slice(0, 6), // Limit to first 6 goals for display
+      weekRange: `Weeks ${startWeek}-${endWeek}`,
+      description: sprintDescription
+    };
+    
+    // Open certificate modal directly
+    openCertificateModal(certificateProfile);
+  }
+  
+  // ===========================
+  // HELP MODAL FUNCTIONALITY
+  // ===========================
+  
+  // Open help modal
+  function openHelpModal(sprintKey, helpUrl) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.error('Sprint card not found');
+      return;
+    }
+    
+    // Load markdown content
+    loadHelpContent(helpUrl);
+    
+    // Show modal
+    document.getElementById('help-modal').style.display = 'block';
+  }
+  
+  // Close help modal
+  function closeHelpModal() {
+    document.getElementById('help-modal').style.display = 'none';
+  }
+  
+  // Load help content from Jekyll-rendered page
+  async function loadHelpContent(helpUrl) {
+    const contentDiv = document.getElementById('help-content');
+    contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Loading...</p>';
+    
+    try {
+      const response = await fetch(helpUrl);
+      if (!response.ok) {
+        throw new Error('Failed to load help content');
+      }
+      
+      const html = await response.text();
+      
+      // Parse the HTML to extract just the content
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Try to find the main content - adjust selector based on your layout
+      // Common selectors: article, .post-content, .content, main
+      let content = doc.querySelector('article') || 
+                    doc.querySelector('.post-content') || 
+                    doc.querySelector('.content') ||
+                    doc.querySelector('main');
+      
+      if (content) {
+        contentDiv.innerHTML = content.innerHTML;
+      } else {
+        // Fallback: use body content if no specific container found
+        contentDiv.innerHTML = doc.body.innerHTML;
+      }
+    } catch (error) {
+      console.error('Error loading help content:', error);
+      contentDiv.innerHTML = '<p style="color: #e53e3e;">Failed to load help content. Please try again later.</p>';
+    }
+  }
+  
+  // Legacy function for week-level (keep for backward compatibility)
+  function openCertificateListModalForWeek(weekNumber) {
+    document.getElementById('list-modal-sprint-title').textContent = `Week ${weekNumber}`;
     const certificateList = document.getElementById('certificate-list');
     certificateList.innerHTML = '';
 
@@ -2595,19 +1072,21 @@ function setupQuickHelpToggle() {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('certificate-date').textContent = now.toLocaleDateString('en-US', options);
 
-    // Set skills
-    const skillFocus = profile.skill || profile.theme;
-    document.getElementById('certificate-skill-focus').textContent = skillFocus;
+    // Set goals - for sprint certificates, use the sprint title as main focus
+    const goalFocus = profile.goal || profile.theme;
+    document.getElementById('certificate-skill-focus').textContent = goalFocus;
 
-    const skillsContainer = document.getElementById('skills-container');
-    skillsContainer.innerHTML = '';
-    const skillTag = document.createElement('span');
-    skillTag.className = 'skill-tag';
-    skillTag.textContent = skillFocus;
-    skillsContainer.appendChild(skillTag);
-
-    // Track earned certificate
-    trackEarnedCertificate(profile);
+    // Add all goals/tasks as skill tags
+    const goalsContainer = document.getElementById('skills-container');
+    goalsContainer.innerHTML = '';
+    
+    const goals = profile.goals || [goalFocus];
+    goals.forEach(goal => {
+      const goalTag = document.createElement('span');
+      goalTag.className = 'skill-tag';
+      goalTag.textContent = goal;
+      goalsContainer.appendChild(goalTag);
+    });
 
     // Close list modal and open certificate modal
     document.getElementById('certificate-list-modal').style.display = 'none';
@@ -2681,8 +1160,8 @@ function setupQuickHelpToggle() {
     const certificateName = profile?.displayName || profile?.theme || document.getElementById('certificate-week-theme')?.textContent.trim() || 'Course Module Completion';
     const courseName = profile?.courseName || document.getElementById('certificate-course-name')?.textContent.trim() || 'Open Coding Society';
     const studentName = document.getElementById('certificate-student-name')?.textContent.trim() || 'Learner';
-    const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';  
-    const skillFocus = profile?.skill || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
+    const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';
+    const goalFocus = profile?.goal || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
 
     let issueMonth = '';
     let issueYear = '';
@@ -2701,7 +1180,7 @@ function setupQuickHelpToggle() {
       organizationName: 'Open Coding Society',
       issueYear,
       issueMonth,
-      description: `Awarded to ${studentName} for demonstrating ${skillFocus} during ${courseName}.`,
+      description: `Awarded to ${studentName} for demonstrating ${goalFocus} during ${courseName}`,
       credentialUrl: window.location.href
     });
 
@@ -2719,33 +1198,21 @@ function setupQuickHelpToggle() {
 
   // Initialize certificate system
   function initializeCertificateSystem() {
+    // Sprint-level progression buttons
+    document.querySelectorAll('.sprint-controls .progression-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const startWeek = parseInt(btn.dataset.start);
+        const endWeek = parseInt(btn.dataset.end);
+        openProgressionModal(sprintKey, startWeek, endWeek);
+      });
+    });
+    
     console.log('Initializing certificate system');
 
     const weekCards = document.querySelectorAll('.week-card');
     console.log('Found', weekCards.length, 'week cards');
-
-    const progressButtons = document.querySelectorAll('.week-card .progression-btn');
-    progressButtons.forEach(button => {
-      button.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const weekCard = button.closest('.week-card');
-        if (weekCard) {
-          openProgressionModal(weekCard);
-        }
-      });
-    });
-
-    weekCards.forEach(card => {
-      card.classList.add('clickable');
-      card.addEventListener('click', (event) => {
-        if (event.target.closest('a') || event.target.closest('.completion-toggle') || event.target.closest('.progression-btn')) {
-          return;
-        }
-        event.preventDefault();
-        openProgressionModal(card);
-      });
-    });
 
     function toggleSprint(card, control) {
       const isCollapsed = card.classList.toggle('collapsed');
@@ -2797,126 +1264,142 @@ function setupQuickHelpToggle() {
     document.getElementById('print-certificate-btn').addEventListener('click', printCertificate);
     document.getElementById('linkedin-share-btn').addEventListener('click', shareOnLinkedIn);
 
-    // View certificate button
+    // View certificate button (handles sprint-level data)
     document.addEventListener('click', function(e) {
       if (e.target.id === 'view-certificate-btn') {
+        console.log('Certificate button clicked!');
+        console.log('Sprint key:', e.target.dataset.sprint);
+        console.log('Start week:', e.target.dataset.start);
+        console.log('End week:', e.target.dataset.end);
+        
         closeProgressionModal();
-        openCertificateListModal(currentModalWeekNumber);
+        const sprintKey = e.target.dataset.sprint;
+        const startWeek = parseInt(e.target.dataset.start);
+        const endWeek = parseInt(e.target.dataset.end);
+        
+        if (sprintKey && !isNaN(startWeek) && !isNaN(endWeek)) {
+          console.log('Calling openCertificateListModal with:', sprintKey, startWeek, endWeek);
+          openCertificateListModal(sprintKey, startWeek, endWeek);
+        } else if (currentModalWeekNumber) {
+          // Fallback to old week-level behavior if needed
+          console.log('Falling back to week-level with week:', currentModalWeekNumber);
+          openCertificateListModalForWeek(currentModalWeekNumber);
+        } else {
+          console.error('No sprint data or week number available');
+        }
       }
     });
   }
 
-  // ============================================
-  // NEW: PROFESSIONAL SKILLS ACHIEVEMENTS TRACKING
-  // ============================================
+  // Cross-view synchronization - sync when switching between timeline and two-pane views
+  window.addEventListener('focus', function() {
+    updateAllCompletionStates();
+  });
+  
+  // Sync when page becomes visible (handles tab switching)
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      updateAllCompletionStates();
+    }
+  });
+  
+  // Listen for storage changes from other tabs/windows (cross-tab sync)
+  window.addEventListener('storage', function(e) {
+    if (e.key === STORAGE_KEY) {
+      updateAllCompletionStates();
+    }
+  });
+  
+  // Listen for completion changes from other views (same-window sync)
+  window.addEventListener('completionChanged', function(e) {
+    updateAllCompletionStates();
+  });
 
-  function updateAchievementsDisplay() {
+  // Update all completion states from localStorage
+  function updateAllCompletionStates() {
     const completionData = loadCompletionData();
+    const itemCards = document.querySelectorAll('.item-card');
     
-    // Count active quests (weeks that are started but not complete)
-    let activeQuests = 0;
-    document.querySelectorAll('.week-card').forEach(weekCard => {
-      const items = weekCard.querySelectorAll('.item-card');
-      const completed = Array.from(items).filter(item => 
-        completionData[item.dataset.itemId]
-      ).length;
+    itemCards.forEach(card => {
+      const itemId = card.dataset.itemId;
+      const isCompleted = completionData[itemId] || false;
+      updateItemUI(card, isCompleted);
+    });
+    
+    updateProgressBars();
+  }
+
+  // Mobile-specific enhancements
+  function initMobileEnhancements() {
+    if (window.innerWidth <= 768) {
+      // Auto-collapse all sprints on mobile for better navigation
+      document.querySelectorAll('.sprint-card:not(.collapsed)').forEach(card => {
+        card.classList.add('collapsed');
+      });
       
-      // Active = has some completion but not all
-      if (completed > 0 && completed < items.length) {
-        activeQuests++;
-      }
-    });
-    
-    // Count certificates earned
-    const CERTIFICATES_KEY = `${CURRENT_COURSE}-earned-certificates`;
-    let earnedCerts = [];
-    try {
-      earnedCerts = JSON.parse(localStorage.getItem(CERTIFICATES_KEY) || '[]');
-    } catch(e) {
-      earnedCerts = [];
-    }
-    
-    // Count total tasks completed
-    const totalCompleted = Object.values(completionData).filter(Boolean).length;
-    
-    // Update display
-    const activeEl = document.getElementById('active-quests-count');
-    const certsEl = document.getElementById('certificates-earned-count');
-    const tasksEl = document.getElementById('tasks-completed-count');
-    
-    if (activeEl) activeEl.textContent = activeQuests;
-    if (certsEl) certsEl.textContent = earnedCerts.length;
-    if (tasksEl) tasksEl.textContent = totalCompleted;
-  }
-
-  // Setup Analytics Button
-  function setupAnalyticsButton() {
-    const analyticsBtn = document.getElementById('modal-analytics-btn');
-    if (analyticsBtn) {
-      analyticsBtn.addEventListener('click', () => {
-        closeProgressionModal();
-        window.location.href = `${window.location.origin}/leaderboard?course=${CURRENT_COURSE}`;
+      // Add touch-friendly interactions for modals
+      document.querySelectorAll('.progression-btn').forEach(btn => {
+        btn.style.minHeight = '44px'; // iOS recommended touch target size
+      });
+      
+      // Improve modal close buttons for mobile
+      document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.style.minWidth = '44px';
+        btn.style.minHeight = '44px';
+        btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
       });
     }
   }
 
-  // Setup Course Filters
-  function setupCourseFilters() {
-    const filterButtons = document.querySelectorAll('.course-filter-btn');
-    filterButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const courseFilter = btn.dataset.courseFilter;
-        console.log('Filter selected:', courseFilter);
-      });
-    });
-  }
+  // Handle orientation changes
+  window.addEventListener('orientationchange', function() {
+    setTimeout(function() {
+      updateProgressBars();
+      initMobileEnhancements();
+    }, 100);
+  });
 
-  // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
     initializeCompletion();
-    applyFilters();
+    initializeSprintFilters();
     initializeCertificateSystem();
-    renderWeekSkillPreviews();
-
-    setupOverviewToggle();
-    setupQuickHelpToggle();
-    
-    // NEW: Initialize achievements
-    updateAchievementsDisplay();
-    setupAnalyticsButton();
-    setupCourseFilters();
-    
-    // NEW: Refresh analytics button when modal opens
-    document.querySelectorAll('.progression-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        setTimeout(setupAnalyticsButton, 100);
+    renderWeekGoalPreviews();
+    initMobileEnhancements();
+    initializeHelpButtons();
+  });
+  
+  // Initialize help button event listeners
+  function initializeHelpButtons() {
+    // Help button click handlers
+    document.querySelectorAll('.help-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const helpUrl = btn.dataset.helpUrl;
+        openHelpModal(sprintKey, helpUrl);
       });
     });
     
-    // Prompt for username if not set (still needed for tracking)
-    if (!localStorage.getItem('student-username')) {
-      const username = prompt('Enter your name for the leaderboard:');
-      if (username) {
-        localStorage.setItem('student-username', username);
-        const stats = initializeUserStats();
-        stats.username = username;
-        saveUserStats(stats);
-      }
+    // Close help modal
+    const closeHelpBtn = document.getElementById('close-help-modal');
+    if (closeHelpBtn) {
+      closeHelpBtn.addEventListener('click', closeHelpModal);
     }
-  });
-
-  // Lightweight mobile detection redirect to /mobile/ (only for small screens)
-  (function(){
-    try {
-      if (window.matchMedia('(max-width: 640px)').matches && !window.location.pathname.startsWith('/mobile')) {
-        // Avoid interfering with user-agent previews and bots
-        if (!navigator.userAgent.includes('Slackbot') && !navigator.userAgent.includes('Twitterbot')) {
-          window.location.replace('/mobile/');
+    
+    // Close on outside click
+    const helpModal = document.getElementById('help-modal');
+    if (helpModal) {
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+          closeHelpModal();
         }
-      }
-    } catch(e){}
-  })();
+      });
+    }
+  }
+
 </script>
+</div>
+<!-- End .timeline-page -->

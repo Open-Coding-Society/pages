@@ -1,3 +1,5 @@
+/* ---------- User theme: plain color (no gradients) ---------- */
+
 :root {
   --pref-bg-color: #0b1220;
   --pref-text-color: #e6eef8;
@@ -5,54 +7,27 @@
   --pref-font-size: 14px;
   --pref-accent-color: #3b82f6;
   --text-muted: #a0a0a0;
+
+  /* Derived UI variables */
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
 }
 
+/* Scope the user theme */
+.user-theme-active,
+.user-theme-active.dark {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* Make main containers use plain user color (no gradients) */
 .user-theme-active {
-  &, &.dark {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-    font-family: var(--pref-font-family) !important;
-    font-size: var(--pref-font-size) !important;
-  }
-
-  body, body.dark, body.min-h-screen, body.bg-neutral-800 {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-    font-family: var(--pref-font-family) !important;
-    font-size: var(--pref-font-size) !important;
-  }
-
-  & .min-h-screen, & .min-h-screen.bg-neutral-900,
-  & .ml-64.p-8, & .ml-64.p-8.bg-neutral-900 {
-    color: var(--pref-text-color) !important;
-    background-color: var(--pref-bg-color) !important;
-  }
-
-  // Use text color consistently, not var(--text) which may not be set
-  * {
-    color: inherit;
-  }
-  
-  // Explicit text color for main content
-  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6 {
-    color: var(--pref-text-color) !important;
-  }
-
-  // Muted text for secondary content  
-  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
-  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500 {
-    color: var(--text-muted) !important;
-  }
-
-  .opencs_root,
-  .opencs_root *,
-  .opencs_root .post-header,
-  .opencs_root .post-content {
-    color: var(--pref-text-color) !important;
-    font-family: var(--pref-font-family) !important;
-    font-size: var(--pref-font-size) !important;
-  }
-
+  .container,
   .page-content,
   .wrapper,
   main,
@@ -62,81 +37,134 @@
   .opencs_root {
     background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
   }
 
-  // Links with accent color
-  a:not(.tab-btn):not([class*="bg-"]):not(.accent-preset) {
-    color: var(--pref-accent-color) !important;
-    text-decoration: none !important;
-    
-    &:hover {
-      opacity: 0.8 !important;
-    }
+  /* Full sidebar and topbar use the plain user color */
+  .lesson-sidebar,
+  .lesson-topbar,
+  aside,
+  .sidebar,
+  #sidebar,
+  .site-sidebar,
+  .sidebar-container,
+  .side-panel {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
   }
 
-  input:focus, select:focus, textarea:focus, button:focus {
-    outline: 2px solid var(--pref-accent-color) !important;
-    outline-offset: 2px !important;
+  /* Infograph module cards: same plain color for every card */
+  .module-card {
+    background-color: var(--pref-bg-color) !important;
+    border: 1px solid var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+    padding: 1rem !important;
+    box-shadow: none !important;
   }
 
-  // Panels and cards
+  /* Ensure no alternating rule overrides the plain color */
+  .module-card:nth-child(2n) {
+    background-color: var(--pref-bg-color) !important;
+  }
+
+  /* Columns transparent so card color remains visible */
+  .module-image-col,
+  .module-keypoints-col,
+  .module-desc-col {
+    background: transparent !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  .module-desc-col {
+    padding: 0.6rem !important;
+    border-radius: 0.375rem !important;
+  }
+
+  .module-img {
+    background-color: transparent !important;
+    border-radius: 0.5rem !important;
+    object-fit: cover !important;
+  }
+
+  .module-emoji {
+    background-color: var(--emoji-bg) !important;
+    color: #0b1220 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+  }
+
+  .module-overlay {
+    background-color: rgba(0,0,0,0.45) !important;
+  }
+
+  /* Questions: background plain; inputs also plain user color */
+  .questions,
+  .question-box,
+  .question-card,
+  .qa-box,
+  .qa-section {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+  }
+
+  .question-box input,
+  .question-box textarea,
+  .question-card input,
+  .question-card textarea,
+  input.question-input,
+  textarea.question-input {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid rgba(0,0,0,0.18) !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Generic cards/panels use plain user color */
   .card,
   .panel,
   .box,
-  .bg-neutral-800,
-  .bg-neutral-900,
-  .bg-slate-800,
-  .bg-slate-900,
-  .bg-gray-900,
-  .bg-gray-950,
-  .bg-zinc-900,
-  .bg-slate-950,
+  .post,
+  .microblog-post,
   [class*="rounded-xl"],
   [class*="rounded-lg"] {
-    background-color: var(--panel) !important;
+    background-color: var(--pref-bg-color) !important;
     border-color: var(--ui-border) !important;
     color: var(--pref-text-color) !important;
   }
-  
-  [class*="rounded-full"] {
-    border-radius: 9999px !important;
+
+  /* Links/icons */
+  a, a:visited, a:hover,
+  .module-card a,
+  .module-card svg,
+  header a,
+  .site-header a,
+  aside a,
+  .sidebar a {
+    color: var(--pref-accent-color) !important;
+    fill: currentColor !important;
   }
 
-  .border-neutral-700,
-  .border-neutral-800,
-  .border-gray-800,
-  .border-gray-900,
-  .border-zinc-800 {
-    border-color: var(--ui-border) !important;
-  }
-
-  img, video, svg, iframe {
-    background-color: transparent !important;
-  }
-  
-  // SVG icons should inherit text color
-  svg {
-    color: inherit !important;
-    fill: currentColor;
-  }
-
-  input, select, textarea {
-    background-color: var(--ui-bg) !important;
+  /* Force text color for readability */
+  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
     color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
-    
-    &::placeholder {
-      color: var(--text-muted) !important;
-    }
   }
 
-  button {
+  /* Muted secondary text */
+  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
+  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500,
+  .post-meta, .post-meta-description {
+    color: var(--text-muted) !important;
+  }
+
+  /* Inputs/buttons default */
+  input, select, textarea, button {
     background-color: var(--ui-bg) !important;
     color: var(--pref-text-color) !important;
     border: 1px solid var(--ui-border) !important;
   }
-  
-  // Primary/accent buttons with proper contrast
+
+  /* Buttons using accent color remain as before */
   button.bg-blue-600, button.bg-blue-700,
   button.bg-green-600, button.bg-green-700,
   .btn-primary,
@@ -147,63 +175,40 @@
     border-color: var(--pref-accent-color) !important;
     color: #fff !important;
   }
+
+  /* Lesson player specific overrides */
+  .lesson-player,
+  .lesson-main,
+  .main-content,
+  .content-wrapper,
+  .lesson-content {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+  }
   
-  // Red/danger buttons
-  button.bg-red-600, button.bg-red-700,
-  #restore-styles {
-    background-color: #dc2626 !important;
-    border-color: #dc2626 !important;
-    color: #fff !important;
-  }
-
-  // Accent color preset buttons keep their colors
-  .accent-preset {
-    border: 2px solid transparent !important;
-    
-    &:hover {
-      border-color: var(--pref-text-color) !important;
-    }
-  }
-
-  aside,
-  .sidebar,
-  #sidebar,
-  .site-sidebar,
-  .sidebar-container {
-    background-color: var(--panel-mid) !important;
+  .lesson-sidebar,
+  .sidebar-header,
+  .sprint-nav,
+  .sprint-section,
+  .lesson-item {
+    background-color: var(--panel) !important;
     color: var(--pref-text-color) !important;
     border-color: var(--ui-border) !important;
   }
-
-  .tab-btn {
-    color: var(--text-muted) !important;
-    
-    &.active, &[aria-current="page"] {
-      color: var(--pref-accent-color) !important;
-      border-color: var(--pref-accent-color) !important;
-    }
+  
+  .sidebar-header h2,
+  .sidebar-header p,
+  .sprint-toggle,
+  .lesson-title,
+  .progress-label {
+    color: var(--pref-text-color) !important;
   }
   
-  #tab-underline {
-    background-color: var(--pref-accent-color) !important;
-  }
-  
-  ::selection {
-    background-color: var(--pref-accent-color) !important;
-    color: #fff !important;
-  }
-
-  // Color input styling
-  input[type="color"] {
-    padding: 0 !important;
-    border: 1px solid var(--ui-border) !important;
-    background-color: transparent !important;
-    cursor: pointer;
-  }
-
-  // Range input styling
-  input[type="range"] {
-    background-color: transparent !important;
-    border: none !important;
+  /* Tailwind background class overrides */
+  [class*="bg-neutral-"],
+  [class*="bg-gray-"],
+  [class*="bg-slate-"],
+  [class*="bg-zinc-"] {
+    background-color: var(--pref-bg-color) !important;
   }
 }

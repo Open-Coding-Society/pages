@@ -1,0 +1,187 @@
+/**
+ * Panel Mixins
+ * Reusable panel patterns for consistent content containers
+ */
+
+// Panel color variables (using CSS custom properties)
+$panel-bg: var(--panel);
+$panel-text: var(--pref-text-color);
+$panel-border: var(--ui-border);
+$panel-accent: var(--pref-accent-color);
+$panel-bg-primary: var(--pref-bg-color);
+$panel-bg-hover: var(--panel-mid);
+
+// Common font stacks
+$mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+/**
+ * Base Panel
+ * Standard panel with border and background
+ *
+ * @param {Number} $padding - Inner padding (default: 1.5rem)
+ * @param {Number} $border-width - Border width (default: 2px)
+ * @param {Number} $margin-bottom - Bottom margin (default: 1rem)
+ *
+ * @example
+ *   .my-panel {
+ *     @include panel;
+ *   }
+ *
+ *   .compact-panel {
+ *     @include panel(1rem, 1px, 0.5rem);
+ *   }
+ */
+@mixin info-panel($padding: 1.5rem, $border-width: 2px, $margin-bottom: 1rem) {
+  // Layout & Spacing
+  padding: $padding;
+  margin-bottom: $margin-bottom;
+  border-radius: 8px;
+  
+  // Colors & Styling
+  background: $panel-bg;
+  border: $border-width solid $panel-accent;
+  color: $panel-text;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+  h3 {
+    // Layout & Spacing
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem 0;
+    
+    // Typography
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $panel-accent;
+  }
+
+  p {
+    // Layout & Spacing
+    margin: 0;
+    line-height: 1.5;
+    
+    // Typography
+    font-size: 1rem;
+    color: $panel-text;
+    opacity: 0.95;
+  }
+}
+
+/**
+ * Output Panel
+ * Panel optimized for code/content display with scrolling
+ *
+ * @param {Number} $min-height - Minimum height (default: 100px)
+ * @param {Number} $max-height - Maximum height (default: 300px)
+ *
+ * @example
+ *   .output-content {
+ *     @include output-panel;
+ *   }
+ *
+ *   .tall-content {
+ *     @include output-panel(200px, 500px);
+ *   }
+ */
+@mixin output-panel($min-height: 100px, $max-height: 300px) {
+  // Layout & Dimensions
+  min-height: $min-height;
+  max-height: $max-height;
+  overflow-y: auto;
+  
+  // Spacing
+  padding: 16px;
+  
+  // Colors & Styling
+  background: $panel-bg;
+  color: $panel-text;
+  
+  // Typography
+  white-space: pre-wrap;
+  font-family: $mono-font;
+  font-size: 0.9rem;
+  line-height: 1.5;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $panel-bg-primary;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $panel-border;
+    border-radius: 4px;
+
+    &:hover {
+      background: $panel-bg-hover;
+    }
+  }
+}
+
+/**
+ * Input Panel
+ * Panel for code editors with syntax highlighting (CodeMirror)
+ *
+ * @example
+ *   .CodeMirror {
+ *     @include input-panel;
+ *   }
+ */
+@mixin input-panel {
+  // Colors & Styling
+  background: $panel-bg;
+  border: 1px solid $panel-border;
+  color: $panel-text;
+  
+  // Typography
+  font-family: $mono-font;
+  font-size: 14px;
+}
+
+/**
+ * Control Panel
+ * Horizontal bar for controls, buttons, and selects
+ *
+ * @param {String} $padding - Inner padding (default: 0.75rem 1rem)
+ * @param {String} $gap - Gap between items (default: 1rem)
+ * @param {String} $border-radius - Border radius (default: 10px 10px 0 0)
+ *
+ * @example
+ *   .control-bar {
+ *     @include control-panel;
+ *   }
+ *
+ *   .toolbar {
+ *     @include control-panel(0.5rem, 0.5rem, 8px);
+ *   }
+ */
+@mixin control-panel($padding: 0.75rem 1rem, $gap: 1rem, $border-radius: 10px 10px 0 0) {
+  // Layout
+  display: flex;
+  align-items: center;
+  gap: $gap;
+  
+  // Spacing
+  padding: $padding;
+  border-radius: $border-radius;
+  
+  // Colors & Styling
+  background: $panel-bg-primary;
+  border: 1px solid $panel-border;
+
+  span {
+    // Typography
+    font-size: 0.9rem;
+    color: $panel-text;
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+}

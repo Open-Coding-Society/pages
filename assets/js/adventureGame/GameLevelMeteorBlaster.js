@@ -12,7 +12,7 @@ class GameLevelMeteorBlaster {
     let path = gameEnv.path
 
     console.log("Game path:", path)  // Debug log
-    checkGameImages(path)
+    // this.checkGameImages(path)
 
     this.score = 0
     this.lives = 3
@@ -388,19 +388,20 @@ class GameLevelMeteorBlaster {
       ...this.laserData,
       id: `Laser-${Math.random().toString(36).substring(2, 9)}`,
       INIT_POSITION: {
-        x: player.position.x + player.width / 2 - 10,
-        y: player.position.y - 20,
+        x: player.transform.x + player.width / 2 - 10,
+        y: player.transform.y - 20,
       },
     }
 
     const laser = new Character(laserData, this.gameEnv)
 
-    laser.velocity = { x: 0, y: -10 }
+    laser.transform.xv = 0
+    laser.transform.yv = -10;
 
     laser.update = function () {
-      this.position.y += this.velocity.y
+      this.transform.y += this.transform.yv
 
-      if (this.position.y < -this.height) {
+      if (this.transform.y < -this.height) {
         const index = this.gameEnv.gameObjects.indexOf(this)
         if (index !== -1) {
           this.gameEnv.gameObjects.splice(index, 1)
@@ -758,10 +759,10 @@ class GameLevelMeteorBlaster {
 
   isColliding(obj1, obj2) {
     return (
-      obj1.position.x < obj2.position.x + obj2.width &&
-      obj1.position.x + obj1.width > obj2.position.x &&
-      obj1.position.y < obj2.position.y + obj2.height &&
-      obj1.position.y + obj1.height > obj2.position.y
+      obj1.transform.x < obj2.transform.x + obj2.width &&
+      obj1.transform.x + obj1.width > obj2.transform.x &&
+      obj1.transform.y < obj2.transform.y + obj2.height &&
+      obj1.transform.y + obj1.height > obj2.transform.y
     )
   }
 
@@ -797,7 +798,7 @@ class GameLevelMeteorBlaster {
 
   checkGameOver() {
     for (let i = 0; i < this.meteors.length; i++) {
-      if (this.meteors[i].position.y > this.gameEnv.innerHeight && !this.meteors[i].isHit) {
+      if (this.meteors[i].transform.y > this.gameEnv.innerHeight && !this.meteors[i].isHit) {
         // Meteor reached bottom - no life lost, just remove it
         this.removeMeteor(i)
       }
@@ -854,7 +855,7 @@ class GameLevelMeteorBlaster {
 
     for (let i = this.lasers.length - 1; i >= 0; i--) {
       const laserIndex = this.gameEnv.gameObjects.indexOf(this.lasers[i])
-      if (laserIndex === -1 || this.lasers[i].position.y < -this.lasers[i].height) {
+      if (laserIndex === -1 || this.lasers[i].transform.y < -this.lasers[i].height) {
         this.removeLaser(i)
         continue
       }
