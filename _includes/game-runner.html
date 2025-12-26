@@ -132,20 +132,21 @@
       gameInstance = null;
     }
     
-    // Restore original IDs and clear canvas
-    const canvas = document.getElementById('gameCanvas') || document.getElementById('game-canvas-{{ include.runner_id }}');
-    const container = document.getElementById('gameContainer') || document.getElementById('game-container-{{ include.runner_id }}');
+    // Clear canvas
+    const canvas = document.getElementById('game-canvas-{{ include.runner_id }}');
+    const container = document.getElementById('game-container-{{ include.runner_id }}');
     
     if (canvas) {
-      canvas.id = 'game-canvas-{{ include.runner_id }}';
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
     
+    // Remove character canvases
     if (container) {
-      container.id = 'game-container-{{ include.runner_id }}';
+      const canvases = container.querySelectorAll('canvas:not(#game-canvas-{{ include.runner_id }})');
+      canvases.forEach(c => c.remove());
     }
     
     updateStatus('Stopped');
@@ -240,22 +241,19 @@
         }
 
         // Initialize canvas dimensions before game starts
-        gameCanvas.width = gameCanvas.parentElement.clientWidth || 800;
-        gameCanvas.height = 580;
-        
-        // GameEngine expects specific IDs: 'gameCanvas' and 'gameContainer'
-        // Temporarily set the IDs for this runner's elements
-        const originalCanvasId = gameCanvas.id;
-        const originalContainerId = gameContainer.id;
-        gameCanvas.id = 'gameCanvas';
-        gameContainer.id = 'gameContainer';
+        const containerWidth = gameContainer.parentElement.clientWidth || 800;
+        const containerHeight = 580;
+        gameCanvas.width = containerWidth;
+        gameCanvas.height = containerHeight;
 
-        // Create environment object
+        // Create environment object with explicit dimensions and references
         const environment = {
           path: path,
           gameContainer: gameContainer,
           gameCanvas: gameCanvas,
-          gameLevelClasses: gameLevelClasses
+          gameLevelClasses: gameLevelClasses,
+          innerWidth: containerWidth,   // Override window.innerWidth
+          innerHeight: containerHeight  // Override window.innerHeight
         };
 
         // Populate level selector
