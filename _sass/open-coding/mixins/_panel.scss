@@ -3,6 +3,17 @@
  * Reusable panel patterns for consistent content containers
  */
 
+// Panel color variables (using CSS custom properties)
+$panel-bg: var(--panel);
+$panel-text: var(--pref-text-color);
+$panel-border: var(--ui-border);
+$panel-accent: var(--pref-accent-color);
+$panel-bg-primary: var(--pref-bg-color);
+$panel-bg-hover: var(--panel-mid);
+
+// Common font stacks
+$mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
 /**
  * Base Panel
  * Standard panel with border and background
@@ -21,30 +32,39 @@
  *   }
  */
 @mixin info-panel($padding: 1.5rem, $border-width: 2px, $margin-bottom: 1rem) {
-  background: var(--panel);
-  border: $border-width solid var(--pref-accent-color);
-  color: var(--pref-text-color);
+  // Layout & Spacing
   padding: $padding;
-  border-radius: 8px;
   margin-bottom: $margin-bottom;
+  border-radius: 8px;
+  
+  // Colors & Styling
+  background: $panel-bg;
+  border: $border-width solid $panel-accent;
+  color: $panel-text;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 
   h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-    font-weight: 600;
+    // Layout & Spacing
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--pref-accent-color);
+    margin: 0 0 0.5rem 0;
+    
+    // Typography
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $panel-accent;
   }
 
   p {
+    // Layout & Spacing
     margin: 0;
-    font-size: 1rem;
-    opacity: 0.95;
     line-height: 1.5;
-    color: var(--pref-text-color);
+    
+    // Typography
+    font-size: 1rem;
+    color: $panel-text;
+    opacity: 0.95;
   }
 }
 
@@ -65,14 +85,21 @@
  *   }
  */
 @mixin output-panel($min-height: 100px, $max-height: 300px) {
-  background: var(--panel);
-  color: var(--pref-text-color);
-  padding: 16px;
-  white-space: pre-wrap;
+  // Layout & Dimensions
   min-height: $min-height;
   max-height: $max-height;
   overflow-y: auto;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  
+  // Spacing
+  padding: 16px;
+  
+  // Colors & Styling
+  background: $panel-bg;
+  color: $panel-text;
+  
+  // Typography
+  white-space: pre-wrap;
+  font-family: $mono-font;
   font-size: 0.9rem;
   line-height: 1.5;
 
@@ -81,15 +108,15 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--pref-bg-color);
+    background: $panel-bg-primary;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--ui-border);
+    background: $panel-border;
     border-radius: 4px;
 
     &:hover {
-      background: var(--panel-mid);
+      background: $panel-bg-hover;
     }
   }
 }
@@ -104,10 +131,13 @@
  *   }
  */
 @mixin input-panel {
-  background: var(--panel);
-  color: var(--pref-text-color);
-  border: 1px solid var(--ui-border);
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  // Colors & Styling
+  background: $panel-bg;
+  border: 1px solid $panel-border;
+  color: $panel-text;
+  
+  // Typography
+  font-family: $mono-font;
   font-size: 14px;
 }
 
@@ -129,19 +159,26 @@
  *   }
  */
 @mixin control-panel($padding: 0.75rem 1rem, $gap: 1rem, $border-radius: 10px 10px 0 0) {
+  // Layout
   display: flex;
   align-items: center;
   gap: $gap;
-  background: var(--pref-bg-color);
+  
+  // Spacing
   padding: $padding;
   border-radius: $border-radius;
-  border: 1px solid var(--ui-border);
+  
+  // Colors & Styling
+  background: $panel-bg-primary;
+  border: 1px solid $panel-border;
 
   span {
-    color: var(--pref-text-color);
+    // Typography
     font-size: 0.9rem;
+    color: $panel-text;
   }
 
+  // Responsive
   @media (max-width: 768px) {
     flex-wrap: wrap;
     gap: 0.25rem;
