@@ -2,70 +2,8 @@
 layout: post
 codemirror: true
 title: Code Runner Examples
-description: A lesson showing how lesson can built using multiple code runners on a page.  This modular approach allows you to create consistent lessons while learning SASS best practices. Use this as a template to build topic-specific lessons (e.g., Java Arrays, Python Functions).
+description: Build a lesson using multiple code runners on a page.  This modular approach allows you to create interactive lessons, more code -- less words.
 permalink: /code
----
-
-## Define Code Runner in a Lesson
-
-Code runner requires defining **challenge** and **code** variables, then passing them to the include with a unique **runner_id**.
-
-```liquid
-{% raw %}{% capture challenge1 %}
-Fix the syntax error. Run the code to get a hint!
-{% endcapture %}
-
-{% capture code1 %}
-print('Hello World'
-{% endcapture %}
-
-{% include code-runner.html 
-   runner_id="exercise1"
-   language="python"
-   challenge=challenge1
-   code=code1
-   height="300px"
-%}{% endraw %}
-```
-
-### Parameters
-
-- **runner_id** (required): Unique ID for each runner on the page (e.g., "exercise1", "exercise2")
-- **language** (optional): "python", "java", or "javascript" (defaults to "python")
-- **challenge**: Variable containing the challenge/instruction text
-- **code**: Variable containing the starter code
-- **height** (optional): Editor height (defaults to "300px")
-
-### Code Runner Architecture
-
-#### HTML Component
-
-- File: `_includes/code-runner.html`
-- Reusable component with parameters for customization
-- Uses CodeMirror for syntax highlighting
-
-#### SCSS Styling
-
-- Main file: `_sass/open-coding/forms/code-runner.scss`
-- Uses mixins for consistent styling across lessons:
-  - `@mixin control-panel` - Top/bottom toolbars with buttons
-  - `@mixin sub-container` - Groups editor/output sections
-  - `@mixin info-panel` - Challenge box styling
-  - `@mixin output-panel` - Code output display
-  - `@mixin icon-button` - Consistent button styling
-  - `@mixin select-control` - Dropdown menus
-
-#### Color Variables
-
-- File: `_sass/open-coding/user-preferences.scss`
-- Uses colors that correspond to user preferences
-
-- `--pref-bg-color` - Background color
-- `--pref-text-color` - Text color
-- `--pref-accent-color` - Accent/emphasis color
-- `--ui-border` - Border color
-- `--panel` - Panel background
-
 ---
 
 ## Python Lesson: Fix the Syntax Error
@@ -98,9 +36,7 @@ def calculate_area(length, width):
     # Replace ??? with the correct formula
     area = ???
     return area
-
-## Test your function
-
+''' Test calculate area function '''
 print(calculate_area(5, 3))
 print(calculate_area(10, 2))
 {% endcapture %}
@@ -157,3 +93,49 @@ for (let i = ???; i <= ???; i++) {
    challenge=challenge4
    code=code4
 %}
+
+---
+
+## Code Runner Reference
+
+Code runner requires defining and passing liquid variables for **challenge** and **code** to the include file `code-runner.html`. Study the source of this markdown file to see how the liquid variables are defined for each example above.
+
+### Parameters
+
+- **runner_id** (required): Unique ID for each runner on the page (e.g., "exercise1", "exercise2")
+- **language** (optional): "python", "java", or "javascript" (defaults to "python")
+- **challenge**: Variable containing the challenge/instruction text
+- **code**: Variable containing the starter code
+- **height** (optional): Editor height (defaults to "300px")
+
+### Code Runner Architecture
+
+#### HTML Component
+
+- File: `_includes/code-runner.html`
+- Reusable component with parameters for customization
+- Uses CodeMirror for syntax highlighting
+
+#### SCSS Styling
+
+- Main file: `_sass/open-coding/forms/code-runner.scss`
+- Uses mixins for consistent styling across lessons:
+  - `@mixin control-panel` - Top/bottom toolbars with buttons
+  - `@mixin sub-container` - Groups editor/output sections
+  - `@mixin info-panel` - Challenge box styling
+  - `@mixin output-panel` - Code output display
+  - `@mixin icon-button` - Consistent button styling
+  - `@mixin select-control` - Dropdown menus
+
+#### Color Variables
+
+- File: `_sass/open-coding/user-preferences.scss`
+- Uses colors that correspond to user preferences
+
+- `--pref-bg-color` - Background color
+- `--pref-text-color` - Text color
+- `--pref-accent-color` - Accent/emphasis color
+- `--ui-border` - Border color
+- `--panel` - Panel background
+
+---
