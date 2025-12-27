@@ -216,8 +216,9 @@ def inject_code_runners(markdown, notebook):
                     result.append('   language="' + runner_data['language'] + '"')
                     result.append('   challenge=challenge' + str(code_cell_count - 1))
                     result.append('   code=code' + str(code_cell_count - 1))
-                    result.append('%}')
-                
+                    result.append('%}')                
+                    result.append('')
+                result.append('---')                
                 code_block_content = []
         elif in_code_block:
             code_block_content.append(line)
