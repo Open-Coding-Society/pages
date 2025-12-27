@@ -1,0 +1,280 @@
+.certificate-overview {
+  margin: 32px 0 24px;
+  color: #f4f6fb;
+}
+
+.certificate-overview .certificate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.certificate-overview .certificate-card {
+  background: linear-gradient(180deg, #161616 0%, #0f0f0f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+  padding: 20px;
+  text-decoration: none;
+  display: block;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.certificate-overview .certificate-card-button {
+  width: 100%;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.certificate-overview .certificate-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 20px 60px rgba(96, 165, 250, 0.25);
+}
+
+.certificate-overview .certificate-card.is-locked {
+  opacity: 0.85;
+}
+
+.certificate-overview .certificate-card.is-complete {
+  border-color: rgba(74, 222, 128, 0.45);
+  box-shadow: 0 20px 65px rgba(74, 222, 128, 0.25);
+}
+
+.certificate-overview .certificate-card-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.certificate-overview .certificate-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 25% 25%, rgba(96, 165, 250, 0.25), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.certificate-overview .certificate-card.is-complete .certificate-icon {
+  background: radial-gradient(circle at 25% 25%, rgba(74, 222, 128, 0.35), rgba(15, 23, 42, 0.9));
+}
+
+.certificate-overview .certificate-info {
+  flex: 1;
+}
+
+.certificate-overview .certificate-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.certificate-overview .certificate-status {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+  margin: 0;
+}
+
+.certificate-overview .certificate-percent {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.certificate-overview .certificate-title {
+  margin: 6px 0 4px 0;
+  font-size: 1.15rem;
+  color: #f8fafc;
+}
+
+.certificate-overview .certificate-progress-copy {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+  color: rgba(226, 232, 240, 0.65);
+}
+
+.certificate-overview .certificate-progress-copy .divider {
+  color: rgba(226, 232, 240, 0.35);
+  margin: 0 4px;
+}
+
+.certificate-overview .certificate-progress {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.certificate-overview .progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #60a5fa 0%, #34d399 100%);
+  width: 0;
+  transition: width 0.4s ease;
+}
+
+.certificate-overview .certificate-card.is-locked .progress-bar {
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.65), rgba(71, 85, 105, 0.9));
+}
+
+.certificate-overview .certificate-progress-meta {
+  margin: 8px 0 0 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(148, 163, 184, 0.75);
+}
+
+.certificate-summary-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+}
+
+.certificate-summary-overlay[hidden] {
+  display: none;
+}
+
+.certificate-summary-modal {
+  background: #0f0f0f;
+  border: 1px solid #1f1f1f;
+  border-radius: 20px;
+  width: min(500px, 100%);
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+}
+
+.certificate-summary-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.certificate-summary-status {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  color: #a5b4fc;
+  margin: 0 0 8px 0;
+}
+
+.certificate-summary-title {
+  margin: 0 0 16px 0;
+  color: #f8fafc;
+  font-size: 1.5rem;
+}
+
+.certificate-summary-text {
+  color: rgba(226, 232, 240, 0.75);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.certificate-summary-progress .progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.certificate-summary-progress .progress-track .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #60a5fa, #34d399);
+  width: 0;
+}
+
+.certificate-summary-progress .progress-label {
+  font-size: 0.85rem;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.certificate-summary-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.certificate-summary-actions .summary-link {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.certificate-summary-actions .summary-close-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid #374151;
+  background: transparent;
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+@media (max-width: 960px) {
+  .certificate-overview {
+    margin-top: 24px;
+  }
+
+  .certificate-overview .certificate-card-body {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .certificate-overview .certificate-card {
+    padding: 18px;
+  }
+
+  .certificate-overview .certificate-card-body {
+    flex-direction: row;
+  }
+
+  .certificate-overview .certificate-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .certificate-summary-modal {
+    padding: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .certificate-overview .certificate-card,
+  .certificate-overview .progress-bar {
+    transition: none;
+  }
+}
