@@ -19,6 +19,13 @@ notebook_directory = "_notebooks"
 destination_directory = "_posts"
 mermaid_output_directory = "assets/mermaid"
 
+# Comment patterns for different languages
+CODE_RUNNER_PATTERNS = {
+    'javascript': r'^//\s*CODE_RUNNER:\s*(.+)$',
+    'python': r'^#\s*CODE_RUNNER:\s*(.+)$',
+    'java': r'^//\s*CODE_RUNNER:\s*(.+)$',
+}
+
 
 def error_cleanup(notebook_file):
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
@@ -64,16 +71,187 @@ def fix_js_code_blocks(markdown):
     return markdown
 
 
+def extract_code_runner_metadata(cell_source, language):
+    """Extract CODE_RUNNER challenge from cell comments"""
+    if language not in CODE_RUNNER_PATTERNS:
+        return None
+    
+    pattern = CODE_RUNNER_PATTERNS[language]
+    lines = cell_source.split('\n')
+    
+    for line in lines:
+        match = re.match(pattern, line.strip(), re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    
+    return None
+
+
+def clean_code_for_runner(cell_source, language):
+    """Remove %%js, %%python magic commands and CODE_RUNNER comments from code"""
+    lines = cell_source.split('\n')
+    cleaned_lines = []
+    
+    # Pattern for CODE_RUNNER comments
+    if language in CODE_RUNNER_PATTERNS:
+        pattern = CODE_RUNNER_PATTERNS[language]
+    else:
+        pattern = None
+    
+    for line in lines:
+        # Skip magic commands
+        if line.strip().startswith('%%'):
+            continue
+        # Skip CODE_RUNNER comment lines
+        if pattern and re.match(pattern, line.strip(), re.IGNORECASE):
+            continue
+        cleaned_lines.append(line)
+    
+    return '\n'.join(cleaned_lines).strip()
+
+
+def generate_runner_id(permalink, index):
+    """Generate runner_id from permalink"""
+    # Convert /javascript/json/lesson to javascript-json-lesson-0
+    clean_permalink = permalink.strip('/').replace('/', '-')
+    return f"{clean_permalink}-{index}"
+
+
+def detect_cell_language(cell):
+    """Detect the programming language of a code cell"""
+    source = cell.get('source', '')
+    
+    # Check for magic commands
+    if source.strip().startswith('%%js'):
+        return 'javascript'
+    elif source.strip().startswith('%%python'):
+        return 'python'
+    
+    # Use cell metadata or default to python
+    return cell.get('metadata', {}).get('language', 'python')
+
+
+def process_code_runner_cells(notebook, permalink):
+    """Process notebook cells and add code-runner metadata"""
+    runner_index = 0
+    processed_cells = []
+    
+    for cell in notebook.cells:
+        if cell.cell_type == 'code':
+            language = detect_cell_language(cell)
+            challenge = extract_code_runner_metadata(cell.source, language)
+            
+            if challenge:
+                # Store metadata for later use
+                cell['metadata']['code_runner'] = {
+                    'challenge': challenge,
+                    'language': language,
+                    'runner_id': generate_runner_id(permalink, runner_index),
+                    'code': clean_code_for_runner(cell.source, language)
+                }
+                runner_index += 1
+                
+                # Clear outputs for cells with code-runner (outputs are redundant)
+                cell['outputs'] = []
+                cell['execution_count'] = None
+        
+        processed_cells.append(cell)
+    
+    notebook.cells = processed_cells
+    return notebook
+
+
+def inject_code_runners(markdown, notebook):
+    """Inject code-runner includes after code blocks with metadata"""
+    lines = markdown.split('\n')
+    result = []
+    in_code_block = False
+    code_block_content = []
+    cell_index = 0
+    code_cell_count = 0
+    
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        
+        # Detect code block start
+        if line.startswith('```'):
+            if not in_code_block:
+                in_code_block = True
+                code_block_content = [line]
+            else:
+                # End of code block
+                in_code_block = False
+                code_block_content.append(line)
+                
+                # Check if this corresponds to a code cell with runner metadata
+                code_cell = None
+                current_code_cell = 0
+                for cell in notebook.cells:
+                    if cell.cell_type == 'code':
+                        if current_code_cell == code_cell_count:
+                            code_cell = cell
+                            break
+                        current_code_cell += 1
+                
+                code_cell_count += 1
+                
+                # Add the code block
+                result.extend(code_block_content)
+                
+                # Add code-runner if metadata exists
+                if code_cell and 'code_runner' in code_cell.get('metadata', {}):
+                    runner_data = code_cell['metadata']['code_runner']
+                    result.append('')
+                    result.append('{% capture challenge' + str(code_cell_count - 1) + ' %}')
+                    result.append(runner_data['challenge'])
+                    result.append('{% endcapture %}')
+                    result.append('')
+                    result.append('{% capture code' + str(code_cell_count - 1) + ' %}')
+                    result.append(runner_data['code'])
+                    result.append('{% endcapture %}')
+                    result.append('')
+                    result.append('{% include code-runner.html')
+                    result.append('   runner_id="' + runner_data['runner_id'] + '"')
+                    result.append('   language="' + runner_data['language'] + '"')
+                    result.append('   challenge=challenge' + str(code_cell_count - 1))
+                    result.append('   code=code' + str(code_cell_count - 1))
+                    result.append('%}')                
+                    result.append('')
+                result.append('---')                
+                code_block_content = []
+        elif in_code_block:
+            code_block_content.append(line)
+        else:
+            result.append(line)
+        
+        i += 1
+    
+    return '\n'.join(result)
+
+
 # Function to convert the notebook to Markdown with front matter
 def convert_notebook_to_markdown_with_front_matter(notebook_file):
     with open(notebook_file, "r", encoding="utf-8") as file:
         notebook = nbformat.read(file, as_version=nbformat.NO_CONVERT)
         front_matter = extract_front_matter(notebook_file, notebook.cells[0])
+        
+        # Get permalink for runner_id generation
+        permalink = front_matter.get('permalink', '')
+        
         notebook.cells.pop(0)
+        
+        # Process code runner cells before conversion
+        notebook = process_code_runner_cells(notebook, permalink)
+        
         process_mermaid_cells(notebook)
         exporter = MarkdownExporter()
         markdown, _ = exporter.from_notebook_node(notebook)
         markdown = fix_js_code_blocks(markdown) # Fix JS code blocks
+        
+        # Inject code-runner includes
+        markdown = inject_code_runners(markdown, notebook)
+        
         front_matter_content = (
             "---\n"
             + "\n".join(f"{key}: {value}" for key, value in front_matter.items())
