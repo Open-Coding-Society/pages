@@ -353,4 +353,14 @@ def process_mermaid_cells(notebook):
 
 
 if __name__ == "__main__":
-    convert_notebooks()
+    # Check if a specific file was passed as an argument
+    if len(sys.argv) > 1:
+        notebook_file = sys.argv[1]
+        if os.path.exists(notebook_file):
+            print(f"Converting single notebook: {notebook_file}")
+            convert_single_notebook(notebook_file)
+        else:
+            print(f"Error: File not found: {notebook_file}")
+            sys.exit(1)
+    else:
+        convert_notebooks()

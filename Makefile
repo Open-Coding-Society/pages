@@ -17,7 +17,11 @@ default: serve-current
 		if (/^[[:blank:]]*$$/) { regenerate=0 } \
 		else { \
 			print; \
-			if ($$0 ~ /_notebooks\/.*\.ipynb/ || $$0 ~ /_docx\/.*\.docx/) { \
+			if ($$0 ~ /_notebooks\/.*\.ipynb/) { \
+				match($$0, /_notebooks\/[^[:space:]]+\.ipynb/); \
+				notebookFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-single NOTEBOOK_FILE=\"" notebookFile "\" &") \
+			} else if ($$0 ~ /_docx\/.*\.docx/) { \
 				system("make convert &") \
 			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
 				match($$0, /_docx\/.*\/_config\.yml/); \
@@ -168,6 +172,15 @@ convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
 	@python3 -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+
+# Single notebook conversion (faster for development)
+convert-single:
+	@if [ -z "$(NOTEBOOK_FILE)" ]; then \
+		echo "Error: NOTEBOOK_FILE variable not set"; \
+		exit 1; \
+	fi
+	@echo "Converting: $(NOTEBOOK_FILE)"
+	@python3 scripts/convert_notebooks.py "$(NOTEBOOK_FILE)"
 
 # DOCX conversion
 convert-docx:
