@@ -3,6 +3,7 @@ layout: post
 codemirror: true
 title: Game Runner Examples
 description: Learn game development using the GameEngine framework in a contained educational environment. Build game levels, add characters, and create interactive experiences with live code editing and debugging controls.
+courses: { csse: {week: 7} } 
 permalink: /code/game
 ---
 
@@ -19,7 +20,6 @@ Create a basic game level with a player character. Use the GameEngine to set up 
 // Import GameEngine modules
 import GameControl from '{{site.baseurl}}/assets/js/adventureGame/GameEngine/GameControl.js';
 import GameLevelBasic from '{{site.baseurl}}/assets/js/adventureGame/GameLevelBasic.js';
-
 // Export for game runner
 export { GameControl };
 export const gameLevelClasses = [GameLevelBasic];
@@ -104,7 +104,6 @@ Run the basic desert adventure game. Use WASD or arrow keys to move Chill Guy ar
 // Import GameEngine modules
 import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
-
 // Export for game runner
 export { GameControl };
 export const gameLevelClasses = [GameLevelBasic];
@@ -130,7 +129,6 @@ Create a multi-level game! Start in the desert, then switch to the water level u
 import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 import GameLevelBasicWater from '/assets/js/adventureGame/GameLevelBasicWater.js';
-
 // Export multiple levels
 export { GameControl };
 export const gameLevelClasses = [GameLevelBasic, GameLevelBasicWater];
