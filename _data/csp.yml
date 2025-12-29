@@ -73,18 +73,18 @@ Sprint2:
       - "Pair Programming Labs"
 Sprint3:
   title: Creating a Web Application for N@tM
-  description: The team Website should include rewl-world interests but also requires the use of a JavaScript frontend, a Python Flask backend, and deployed on AWS. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website, Frontend, and Backend. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
+  description: The team Website should include rewl-world interests but also requires the use of a JavaScript frontend including use of Local Storage for persistent data. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website with a learning purpose. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
   illustration: *web_dev_layers
   start: 8
   end: 12
 Sprint4:
-  title: Warm-up Create Performance Task, Data Abstraction, Computer Systems, Networks, Impact of Computing
-  description: Trimester 2 will begin with advancement of Social Media Project, CPT learning and ideation. Great projects contain frontend style and backend data. Ideation for your CPT project should contain frontend using SASS; JavaScript interacting with user events; and a database with personal data structures. Student Teaching during this period will be preparing for College Board MCQ, topics will be assigned.
+  title: Create Performance Task 
+  description: Trimester 2 will begin with advancement of the Web Project.  Using CPT learning requirements, personal interests for ideation, and PBL advancemnts with Python/Flask students will make a Full Stack Project. Great projects contain frontend style and backend persistent data, database. Ideation for your CPT project should contain frontend styling; JavaScript interacting with user requests; and a database with personal data structures.
   start: 13
   end: 16
 Sprint5:
   title: Create Performance Task (CPT) final design and development
-  description: Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.
+  description: Data Abstraction, Computer Systems, Networks, Impact of Computing. Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.  Backend project will be deployed on AWS.  Students should be able to talk about data structures, data abstraction, and how their system works from frontend to backend including networks and systems. To aid in talking, their will be student-led lectures (student teaching) that provide foundational concepts and help students learn key principles required by the College Board.
   start: 17
   end: 21
 Sprint6:
