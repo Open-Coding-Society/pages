@@ -77,21 +77,123 @@ Sprint3:
   illustration: *web_dev_layers
   start: 8
   end: 12
+  8:
+    theme: "Frontend Development Foundations"
+    goals:
+      - "JavaScript Fundamentals"
+      - "DOM Manipulation & Events"
+      - "User Interface Design"
+  9:
+    theme: "Interactive Features & Data"
+    goals:
+      - "Local Storage & Persistence"
+      - "Fetch API & Async JavaScript"
+      - "Form Handling & Validation"
+  10:
+    theme: "Team Integration & Testing"
+    goals:
+      - "Feature Integration"
+      - "User Experience (UX) Refinement"
+      - "Cross-Browser Testing"
+  11:
+    theme: "Project Polish & Presentation Prep"
+    goals:
+      - "Code Review & Debugging"
+      - "Documentation & README"
+      - "N@tM Presentation Practice"
+  12:
+    theme: "Night at the Museum (N@tM)"
+    goals:
+      - "Live Project Demonstration"
+      - "Peer & Community Feedback"
+      - "Sprint Retrospective"
 Sprint4:
   title: Create Performance Task 
   description: Trimester 2 will begin with advancement of the Web Project.  Using CPT learning requirements, personal interests for ideation, and PBL advancemnts with Python/Flask students will make a Full Stack Project. Great projects contain frontend style and backend persistent data, database. Ideation for your CPT project should contain frontend styling; JavaScript interacting with user requests; and a database with personal data structures.
   start: 13
   end: 16
+  13:
+    theme: "Flask Introduction & Security"
+    goals:
+      - "JWT Authentication, Login, Cookies"
+      - "Simple RESTful APIs with Flask"
+      - "Data Access & Security"
+  14:
+    theme: "Backend API Development"
+    goals:
+      - "Postman, Debugging, Errors & Testing"
+      - "Frontend Consuming Backend APIs"
+      - "CPT Ideation with Full Stack"
+  15:
+    theme: "Full Stack Achievment"
+    goals:
+      - "Python/Flask CORS Handling"
+      - "REST API Design Principles"
+      - "Frontend-Backend Integration"
+  16:
+    theme: "Database & Data Models"
+    goals:
+      - "SQLite/Database Model Creation"
+      - "CRUD Operations & Endpoints"
+      - "Full Stack Localhost Pipeline"
 Sprint5:
   title: Create Performance Task (CPT) final design and development
   description: Data Abstraction, Computer Systems, Networks, Impact of Computing. Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.  Backend project will be deployed on AWS.  Students should be able to talk about data structures, data abstraction, and how their system works from frontend to backend including networks and systems. To aid in talking, their will be student-led lectures (student teaching) that provide foundational concepts and help students learn key principles required by the College Board.
   start: 17
   end: 21
+  17:
+    theme: "Teacher Feedback Integration"
+    goals:
+      - "Feature Refinement"
+      - "Kanband Review & Improvement Plans"
+      - "Start Issue Burndown"
+  18:
+    theme: "Deployment & AWS Infrastructure"
+    goals:
+      - "AWS EC2 Setup & Configuration"
+      - "Full Stack Deployment Pipeline"
+      - "Database Backup and Restore"
+  19:
+    theme: "Full Stack Realization & Teaching"
+    goals:
+      - "Student Teaching: Big Ideas"
+      - "System Architecture Understanding"
+      - "Database Review & Optimization"
+  20:
+    theme: "College Board Big Ideas Integration"
+    goals:
+      - "Algorithmic Thinking & Analysis"
+      - "Impact of Computing Discussion"
+      - "Networks & Internet Concepts"
+  21:
+    theme: "CPT Project Completion"
+    goals:
+      - "Comprehensive Testing Plans"
+      - "Final Feature Refinement"
+      - "Documentation & Video Making"
 Sprint6:
-  title: N@tM and Create Performance Task (CPT) video and presentations. MCQ Exam Practice.
-  description: Trimester 2 concludes with students presenting their CPT project at N@tM. Each person within "Student Teams" will have their own specialty within the student project that satisfies all their Create Performance Task requirements. Students should be able to talk about design, coding, iteration, and present features of their portion of the system.
+  title: N@tM and Create Performance Task (CPT) video and presentations. 
+  description: Trimester 2 concludes with students presenting their CPT project at N@tM. Each person within "Student Teams" will have their own specialty within the student project that satisfies all their Create Performance Task requirements. Students should be able to talk about design, coding, iteration, and present features of their portion of the system. There will be an MCQ Exam Practice during finals week.
   start: 22
   end: 24
+  22:
+    theme: "CPT Video & Documentation"
+    goals:
+      - "Create CPT Video Recording"
+      - "Written Response Preparation"
+      - "Code Commenting & Portfolio"
+  23:
+    theme: "Professional Presentation Prep"
+    goals:
+      - "N@tM Booth Setup Planning"
+      - "Presentation Script & Practice"
+      - "External Feedback Collection"
+  24:
+    theme: "N@tM Showcase & Reflection"
+    goals:
+      - "Live Project Demonstration"
+      - "Community & Industry Feedback"
+      - "CPT Submission & Finals Prep"
 Sprint7: 
   title: Data Structures and Data Science
   description: This is the beginning of a college course following the outline of CS113 Data Structures from Mira Costa CC. Topics, using Python, include searching, sorting, hashing, algorithms, analysis, object-oriented design, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
