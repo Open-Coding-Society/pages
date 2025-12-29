@@ -108,7 +108,7 @@ Sprint3:
       - "Peer & Community Feedback"
       - "Sprint Retrospective"
 Sprint4:
-  title: Create Performance Task 
+  title: Create Performance Task (CPT) Full Stack
   description: Trimester 2 will begin with advancement of the Web Project.  Using CPT learning requirements, personal interests for ideation, and PBL advancements with Python/Flask students will make a Full Stack Project. Great projects contain frontend style and backend persistent data, database. Ideation for your CPT project should contain frontend styling; JavaScript interacting with user requests; and a database with personal data structures.
   start: 13
   end: 16
@@ -137,7 +137,7 @@ Sprint4:
       - "CRUD Operations & Endpoints"
       - "Full Stack Localhost Pipeline"
 Sprint5:
-  title: Create Performance Task (CPT) final design and development
+  title: CPT final Design and Development
   description: Data Abstraction, Computer Systems, Networks, Impact of Computing. Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.  Backend project will be deployed on AWS.  Students should be able to talk about data structures, data abstraction, and how their system works from frontend to backend including networks and systems. To aid in talking, there will be student-led lectures (student teaching) that provide foundational concepts and help students learn key principles required by the College Board.
   start: 17
   end: 21
@@ -172,7 +172,7 @@ Sprint5:
       - "Final Feature Refinement"
       - "Documentation & Video Making"
 Sprint6:
-  title: N@tM and Create Performance Task (CPT) video and presentations. 
+  title: N@tM Presentations and AP Exam Prep
   description: Trimester 2 concludes with students presenting their CPT project at N@tM. Each person within "Student Teams" will have their own specialty within the student project that satisfies all their Create Performance Task requirements. Students should be able to talk about design, coding, iteration, and present features of their portion of the system. There will be an MCQ Exam Practice during finals week.
   start: 22
   end: 24
