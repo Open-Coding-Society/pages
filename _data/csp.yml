@@ -76,7 +76,7 @@ Sprint2:
     goals:
       - "Student Teaching Sessions"
       - "Data Types: Strings, Numbers, Booleans"
-      - "Control Structures: Conditionals, Loops"
+      - "Control Structures: Selection, Iteration"
   6:
     theme: "Functions and Data Structures"
     goals:
