@@ -61,16 +61,34 @@ Sprint1:
       - "Python Basics"
       - "Retrospective Reflection"
 Sprint2:
-  title: Python / Flask Web Development 
+  title: JavaScript and Python Foundations 
   description: During these weeks, students will learn fundamentals of programming and blog their learnings.  There will be several student-led lectures (student teaching) that provide foundational concepts and help students learn programming and key principles required by the College Board.
   start: 4
   end: 7
   4:
-    theme: "Python / Flask Foundations"
+    theme: "Lesson Planning and Creation"
     goals:
-      - "Framework for Sprints"
-      - "REST APIs"
-      - "Pair Programming Labs"
+      - "Python and JavaScript Basics"
+      - "APCSP Big Ideaa 3 Topics"
+      - "Using Code Runner and Jupyter Notebooks"
+  5:
+    theme: "Programming Basics"
+    goals:
+      - "Student Teaching Sessions"
+      - "Data Types: Strings, Numbers, Booleans"
+      - "Control Structures: Conditionals, Loops"
+  6:
+    theme: "Functions and Data Structures"
+    goals:
+      - "Defining and Calling Functions"
+      - "Lists/Arrays and Dictionaries/Objects"
+      - "Problem-Solving with Functions"
+  7:
+    theme: "APCSP Topics"
+    goals:
+      - "Algorithms and Efficiency"
+      - "Randomization and Simulation"
+      - "Unsoolvable Problems"
 Sprint3:
   title: Creating a Web Application for N@tM
   description: The team Website should include real-world interests but also requires the use of a JavaScript frontend including use of Local Storage for persistent data. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website with a learning purpose. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 

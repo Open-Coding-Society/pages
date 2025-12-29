@@ -1,8 +1,9 @@
 ---
 layout: post
-title: JavaScript and Python Student Teaching 
-description: Creative Development, Flask, and learning new Programming Languages.
+categories: [Objectives]
 type: objectives 
+title: Student Teaching Objectives 
+description: Creative Development, Flask, and learning new Programming Languages.
 courses: {'csp': {'week': 4}}
 comments: True
 ---
