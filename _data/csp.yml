@@ -40,8 +40,8 @@ Sprint1:
     theme: "Onboarding Objectives"
     goals:
       - "Tool Mastery"
-      - "Project-Based Learning"
       - "Team Collaboration"
+      - "Project-Based Learning"
   1:
     theme: "Essential Tools Setup"
     goals:
@@ -58,7 +58,8 @@ Sprint1:
     theme: "Summative Coding Challenge"
     goals:
       - "Gamified Coding Tasks"
-      - "Python Basics"
+      - "JavaScript"
+      - "Python"
       - "Retrospective Reflection"
 Sprint2:
   title: JavaScript and Python Foundations 
