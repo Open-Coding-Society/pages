@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Python/Flask Backend Legacy Materials 
+title: Intro to Flask 
 description: Flask is a micro web framework for Python based on Werkzeug, Jinja 2 and good intentions.
 author: Isabel Marilla
 permalink: /flask-intro
