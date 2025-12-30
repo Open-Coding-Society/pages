@@ -1,10 +1,11 @@
 ---
 layout: post
-title: Plagiarism Usability Test Plan
-description: Google Form Design Plans for TDD
-author: John Mortensen
-permalink: /plagiarism/useability
 breadcrumb: True
+courses: {'csp': {'week': 10}}
+title: Plagiarism Usability Test Plan (Sample)
+description: Google Form Design Plans for TDD
+permalink: /plagiarism/useability
+author: John Mortensen
 ---
 
 
