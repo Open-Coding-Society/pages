@@ -21,7 +21,8 @@ Sprint1:
     goals:
       - "Scrum + Standups"
       - "Kanban Boards + Burndown"
-      - "Team Repository Management"
+      - "Repository Management"
+      - "Coding"
   3:
     theme: "Summative Coding Challenge"
     goals:
