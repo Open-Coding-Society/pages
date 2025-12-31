@@ -1,11 +1,12 @@
 <!-- Feedback Button + Modal -->
 <style>
+
   #feedback-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #2563eb;
-    color: white;
+    background-color: var(--pref-accent-color, #2563eb);
+    color: var(--pref-text-color, white);
     border: none;
     border-radius: 9999px;
     padding: 12px 20px;
@@ -18,7 +19,7 @@
   }
 
   #feedback-btn:hover {
-    background-color: #1e40af;
+    background-color: var(--pref-accent-color-hover, #1e40af);
   }
 
   #feedback-modal {
@@ -26,26 +27,26 @@
     position: fixed;
     bottom: 80px;
     right: 20px;
-    background: #1f2937;
-    color: white;
+    background: var(--pref-bg-color, #1f2937);
+    color: var(--pref-text-color, white);
     border-radius: 16px;
     padding: 20px;
     width: 320px;
     max-width: 90vw;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    border: 1px solid #4b5563;
+    border: 1px solid var(--ui-border, #4b5563);
     z-index: 1000;
     animation: slideIn 0.2s ease-out;
     box-sizing: border-box;
   }
 
   #feedback-modal h4 {
-    color: white;
+    color: var(--pref-text-color, white);
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 12px;
     text-align: center;
-    border-bottom: 1px solid #4b5563;
+    border-bottom: 1px solid var(--ui-border, #4b5563);
     padding-bottom: 8px;
   }
 
@@ -55,27 +56,27 @@
     margin-bottom: 12px;
     padding: 10px;
     font-size: 14px;
-    color: white;
-    background: #374151;
+    color: var(--pref-text-color, white);
+    background: var(--ui-bg, #374151);
     border-radius: 8px;
-    border: 1px solid #6b7280;
+    border: 1px solid var(--ui-border, #6b7280);
     box-sizing: border-box;
   }
 
   #feedback-modal textarea::placeholder,
   #feedback-modal input::placeholder {
-    color: #9ca3af;
+    color: var(--text-muted, #9ca3af);
   }
 
   #feedback-modal textarea:focus,
   #feedback-modal input:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--pref-accent-color, #3b82f6);
   }
 
   #feedback-modal button {
-    background-color: #3b82f6;
-    color: white;
+    background-color: var(--pref-accent-color, #3b82f6);
+    color: var(--pref-text-color, white);
     border: none;
     border-radius: 8px;
     padding: 10px;
@@ -85,7 +86,7 @@
   }
 
   #feedback-modal button:hover {
-    background-color: #2563eb;
+    background-color: var(--pref-accent-color-hover, #2563eb);
   }
 
   #feedback-modal-close {
@@ -94,12 +95,12 @@
     right: 12px;
     font-size: 16px;
     font-weight: bold;
-    color: #9ca3af;
+    color: var(--text-muted, #9ca3af);
     cursor: pointer;
   }
 
   #feedback-modal-close:hover {
-    color: white;
+    color: var(--pref-text-color, white);
   }
 
   #feedback-success,
@@ -110,11 +111,11 @@
   }
 
   #feedback-success {
-    color: #10b981;
+    color: var(--success-green, #10b981);
   }
 
   #feedback-error {
-    color: #ef4444;
+    color: var(--warn, #ef4444);
   }
 
   @keyframes slideIn {
@@ -133,27 +134,27 @@
     margin-bottom: 12px;
     padding: 10px;
     font-size: 14px;
-    color: white;
-    background: #374151;
+    color: var(--pref-text-color, white);
+    background: var(--ui-bg, #374151);
     border-radius: 8px;
-    border: 1px solid #6b7280;
+    border: 1px solid var(--ui-border, #6b7280);
     box-sizing: border-box;
     appearance: none;
   }
 
   #feedback-modal select:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--pref-accent-color, #3b82f6);
   }
 
   #feedback-modal select option {
-    background-color: #1f2937;
-    color: white;
+    background-color: var(--pref-bg-color, #1f2937);
+    color: var(--pref-text-color, white);
   }
 </style>
 
 <!-- Feedback Button & Modal -->
-<button id="feedback-btn">Tell us how we can improve!</button>
+<button id="feedback-btn">Issue ⁇</button>
 
 <div id="feedback-modal">
   <div id="feedback-modal-close">✕</div>
@@ -169,7 +170,7 @@
   <!-- Hidden hack category field - auto-populated based on current page -->
   <input type="hidden" id="feedback-hack-category" />
   <input type="text" id="feedback-title" placeholder="Title" required />
-  <textarea id="feedback-body" rows="4" placeholder="Your suggestion..." required></textarea>
+  <textarea id="feedback-body" rows="4" placeholder="Your request..." required></textarea>
   <button id="feedback-submit">Submit</button>
   <div id="feedback-success" style="display:none;">✅ Thanks for your feedback!</div>
   <div id="feedback-error" style="display:none;">⚠️ Something went wrong.</div>
