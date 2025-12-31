@@ -27,7 +27,6 @@ const living_in_the_world = [
 
 // Create grid container
 const container = document.createElement('div');
-container.id = 'grid_container';
 container.style.display = 'grid';
 container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
 container.style.gap = '10px';
