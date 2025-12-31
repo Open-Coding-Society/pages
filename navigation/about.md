@@ -9,10 +9,10 @@ description: My name is John, often referred to as "Mr M(ort)" in my CompSci cla
 Here are some places I have lived.
 
 <!-- SECTION 1: Flag are made with JavaScript using Wikipedia images -->
-<div id="container"></div>
+<div id="grid_container"></div>
 
 <script>
-var outputElement = document.getElementById("container");
+var outputElement = document.getElementById("grid_container");
 
 // Clear the output
 outputElement.innerHTML = '';
@@ -27,6 +27,7 @@ const living_in_the_world = [
 
 // Create grid container
 const container = document.createElement('div');
+container.id = 'grid_container';
 container.style.display = 'grid';
 container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
 container.style.gap = '10px';
@@ -56,6 +57,7 @@ for (const location of living_in_the_world) {
   greeting.textContent = location.greeting;
   greeting.style.margin = '5px 0';
   greeting.style.fontStyle = 'italic';
+  greeting.style.opacity = '0.7';
   
   // Add all elements to grid item
   gridItem.appendChild(img);
