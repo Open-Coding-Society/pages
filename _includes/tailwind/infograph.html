@@ -10,7 +10,7 @@
     <!-- Rows Section -->
     <div id="rows" class="grid gap-4 p-6">
       {% for topic in data.Topics %}
-        <div class="grid grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center p-4 rounded-lg shadow-md">
           <!-- Image Column -->
           <div class="text-center relative module-image-col">
             <a href="{{ site.baseurl }}{{ topic.link }}" class="block relative group">

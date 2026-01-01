@@ -40,8 +40,8 @@ Sprint1:
     theme: "Onboarding Objectives"
     goals:
       - "Tool Mastery"
-      - "Project-Based Learning"
       - "Team Collaboration"
+      - "Project-Based Learning"
   1:
     theme: "Essential Tools Setup"
     goals:
@@ -53,45 +53,167 @@ Sprint1:
     goals:
       - "Scrum + Standups"
       - "Kanban Boards + Burndown"
-      - "Team Repository Management"
+      - "Repository Management"
+      - "Coding"
   3:
     theme: "Summative Coding Challenge"
     goals:
       - "Gamified Coding Tasks"
-      - "Python Basics"
+      - "JavaScript"
+      - "Python"
       - "Retrospective Reflection"
 Sprint2:
-  title: Python / Flask Web Development 
+  title: JavaScript and Python Foundations 
   description: During these weeks, students will learn fundamentals of programming and blog their learnings.  There will be several student-led lectures (student teaching) that provide foundational concepts and help students learn programming and key principles required by the College Board.
   start: 4
   end: 7
   4:
-    theme: "Python / Flask Foundations"
+    theme: "Lesson Planning and Creation"
     goals:
-      - "Framework for Sprints"
-      - "REST APIs"
-      - "Pair Programming Labs"
+      - "Python and JavaScript Basics"
+      - "APCSP Big Ideaa 3 Topics"
+      - "Using Code Runner and Jupyter Notebooks"
+  5:
+    theme: "Programming Basics"
+    goals:
+      - "Student Teaching Sessions"
+      - "Data Types: Strings, Numbers, Booleans"
+      - "Control Structures: Selection, Iteration"
+  6:
+    theme: "Functions and Data Structures"
+    goals:
+      - "Defining and Calling Functions"
+      - "Lists/Arrays and Dictionaries/Objects"
+      - "Problem-Solving with Functions"
+  7:
+    theme: "APCSP Topics"
+    goals:
+      - "Algorithms and Efficiency"
+      - "Randomization and Simulation"
+      - "Unsolvable Problems"
 Sprint3:
   title: Creating a Web Application for N@tM
-  description: The team Website should include rewl-world interests but also requires the use of a JavaScript frontend, a Python Flask backend, and deployed on AWS. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website, Frontend, and Backend. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
+  description: The team Website should include real-world interests but also requires the use of a JavaScript frontend including use of Local Storage for persistent data. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website with a learning purpose. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
   illustration: *web_dev_layers
   start: 8
   end: 12
+  8:
+    theme: "Frontend Development Foundations"
+    goals:
+      - "JavaScript Fundamentals"
+      - "DOM Manipulation & Events"
+      - "User Interface Design"
+  9:
+    theme: "Interactive Features & Data"
+    goals:
+      - "Local Storage & Persistence"
+      - "Fetch API & Async JavaScript"
+      - "Form Handling & Validation"
+  10:
+    theme: "Team Integration & Testing"
+    goals:
+      - "Feature Integration"
+      - "User Experience (UX) Refinement"
+      - "Cross-Browser Testing"
+  11:
+    theme: "Project Polish & Presentation Prep"
+    goals:
+      - "Code Review & Debugging"
+      - "Documentation & README"
+      - "N@tM Presentation Practice"
+  12:
+    theme: "Night at the Museum (N@tM)"
+    goals:
+      - "Live Project Demonstration"
+      - "Peer & Community Feedback"
+      - "Sprint Retrospective"
 Sprint4:
-  title: Warm-up Create Performance Task, Data Abstraction, Computer Systems, Networks, Impact of Computing
-  description: Trimester 2 will begin with advancement of Social Media Project, CPT learning and ideation. Great projects contain frontend style and backend data. Ideation for your CPT project should contain frontend using SASS; JavaScript interacting with user events; and a database with personal data structures. Student Teaching during this period will be preparing for College Board MCQ, topics will be assigned.
+  title: Create Performance Task (CPT) Full Stack
+  description: Trimester 2 will begin with advancement of the Web Project.  Using CPT learning requirements, personal interests for ideation, and PBL advancements with Python/Flask students will make a Full Stack Project. Great projects contain frontend style and backend persistent data, database. Ideation for your CPT project should contain frontend styling; JavaScript interacting with user requests; and a database with personal data structures.
   start: 13
   end: 16
+  13:
+    theme: "Flask Introduction & Security"
+    goals:
+      - "JWT Authentication, Login, Cookies"
+      - "Simple RESTful APIs with Flask"
+      - "Data Access & Security"
+  14:
+    theme: "Backend API Development"
+    goals:
+      - "Postman, Debugging, Errors & Testing"
+      - "Frontend Consuming Backend APIs"
+      - "CPT Ideation with Full Stack"
+  15:
+    theme: "Full Stack Achievement"
+    goals:
+      - "Python/Flask CORS Handling"
+      - "REST API Design Principles"
+      - "Frontend-Backend Integration"
+  16:
+    theme: "Database & Data Models"
+    goals:
+      - "SQLite/Database Model Creation"
+      - "CRUD Operations & Endpoints"
+      - "Full Stack Localhost Pipeline"
 Sprint5:
-  title: Create Performance Task (CPT) final design and development
-  description: Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.
+  title: CPT final Design and Development
+  description: Data Abstraction, Computer Systems, Networks, Impact of Computing. Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.  Backend project will be deployed on AWS.  Students should be able to talk about data structures, data abstraction, and how their system works from frontend to backend including networks and systems. To aid in talking, there will be student-led lectures (student teaching) that provide foundational concepts and help students learn key principles required by the College Board.
   start: 17
   end: 21
+  17:
+    theme: "Teacher Feedback Integration"
+    goals:
+      - "Feature Refinement"
+      - "Kanban Review & Improvement Plans"
+      - "Start Issue Burndown"
+  18:
+    theme: "Deployment & AWS Infrastructure"
+    goals:
+      - "AWS EC2 Setup & Configuration"
+      - "Full Stack Deployment Pipeline"
+      - "Database Backup and Restore"
+  19:
+    theme: "Full Stack Realization & Teaching"
+    goals:
+      - "Student Teaching: Big Ideas"
+      - "System Architecture Understanding"
+      - "Database Review & Optimization"
+  20:
+    theme: "College Board Big Ideas Integration"
+    goals:
+      - "Algorithmic Thinking & Analysis"
+      - "Impact of Computing Discussion"
+      - "Networks & Internet Concepts"
+  21:
+    theme: "CPT Project Completion"
+    goals:
+      - "Comprehensive Testing Plans"
+      - "Final Feature Refinement"
+      - "Documentation & Video Making"
 Sprint6:
-  title: N@tM and Create Performance Task (CPT) video and presentations. MCQ Exam Practice.
-  description: Trimester 2 concludes with students presenting their CPT project at N@tM. Each person within "Student Teams" will have their own specialty within the student project that satisfies all their Create Performance Task requirements. Students should be able to talk about design, coding, iteration, and present features of their portion of the system.
+  title: N@tM Presentations and AP Exam Prep
+  description: Trimester 2 concludes with students presenting their CPT project at N@tM. Each person within "Student Teams" will have their own specialty within the student project that satisfies all their Create Performance Task requirements. Students should be able to talk about design, coding, iteration, and present features of their portion of the system. There will be an MCQ Exam Practice during finals week.
   start: 22
   end: 24
+  22:
+    theme: "CPT Video & Documentation"
+    goals:
+      - "Create CPT Video Recording"
+      - "Written Response Preparation"
+      - "Code Commenting & Portfolio"
+  23:
+    theme: "Professional Presentation Prep"
+    goals:
+      - "N@tM Booth Setup Planning"
+      - "Presentation Script & Practice"
+      - "External Feedback Collection"
+  24:
+    theme: "N@tM Showcase & Reflection"
+    goals:
+      - "Live Project Demonstration"
+      - "Community & Industry Feedback"
+      - "CPT Submission & Finals Prep"
 Sprint7: 
   title: Data Structures and Data Science
   description: This is the beginning of a college course following the outline of CS113 Data Structures from Mira Costa CC. Topics, using Python, include searching, sorting, hashing, algorithms, analysis, object-oriented design, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.

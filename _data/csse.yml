@@ -21,12 +21,13 @@ Sprint1:
     goals:
       - "Scrum + Standups"
       - "Kanban Boards + Burndown"
-      - "Team Repository Management"
+      - "Repository Management"
+      - "Coding"
   3:
     theme: "Summative Coding Challenge"
     goals:
       - "Gamified Coding Tasks"
-      - "JavaScript OOP"
+      - "JavaScript"
       - "Retrospective Reflection"
 Sprint2:
   title: JavaScript Foundations & Student Teaching
@@ -36,15 +37,29 @@ Sprint2:
   4:
     theme: "JavaScript Foundations and LxD"
     goals:
-      - "Lesson Design"
+      - "LxD Principles"
       - "Classroom Teaching"
       - "Feedback and Grading"
   5:
     theme: "Draft Learning Experience" 
     goals:
+      - "JavaScript Fundamentals"
       - "Pick Technical Topic"
       - "Learner Empathy"
       - "Design a Lesson Plan"
+  6: 
+    theme: "Deliver and Receive Learning Experiences"
+    goals:
+      - "Be a Learner"
+      - "Teach a Lesson"
+      - "Provide Quality Feedback"
+  7:
+    theme: "Game Development Basics"
+    goals:
+      - "Build Game Elements"
+      - "Player and NPCs"
+      - "Sprites and Animation"
+      - "Backgrounds"
 Sprint3:
   title: Creating a game for N@tM
   description: Part of the process of becoming technically proficient is going beyond fundamentals by taking on a project challenge while coding. A challenge with some vision, questions, AI research, and more allow amazing things to be accomplished. Our goal is to participate in N@tM with the other CS classes and other classes from the Electives Department.  We should have a blog, progress in a game, and a series of lesson hacks to show off.

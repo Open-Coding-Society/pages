@@ -63,11 +63,12 @@ def ensure_directory_exists(path):
 
 def fix_js_code_blocks(markdown):
     # This regex finds ```python blocks starting with %%js and replaces with ```javascript
+    # but keeps the %%js line for developers to see
     pattern = re.compile(r"```python\n%%js\n", re.MULTILINE)
-    markdown = pattern.sub("```javascript\n", markdown)
+    markdown = pattern.sub("```javascript\n%%js\n", markdown)
     # Optionally, handle blocks with no newline after %%js
     pattern2 = re.compile(r"```python\r?\n%%js\r?\n", re.MULTILINE)
-    markdown = pattern2.sub("```javascript\n", markdown)
+    markdown = pattern2.sub("```javascript\n%%js\n", markdown)
     return markdown
 
 
@@ -352,4 +353,14 @@ def process_mermaid_cells(notebook):
 
 
 if __name__ == "__main__":
-    convert_notebooks()
+    # Check if a specific file was passed as an argument
+    if len(sys.argv) > 1:
+        notebook_file = sys.argv[1]
+        if os.path.exists(notebook_file):
+            print(f"Converting single notebook: {notebook_file}")
+            convert_single_notebook(notebook_file)
+        else:
+            print(f"Error: File not found: {notebook_file}")
+            sys.exit(1)
+    else:
+        convert_notebooks()

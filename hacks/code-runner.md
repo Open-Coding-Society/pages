@@ -3,7 +3,6 @@ layout: post
 codemirror: true
 title: Code Runner Examples
 description: Build a lesson using multiple code runners on a page.  This modular approach allows you to create interactive lessons, more code -- less words.
-courses: { csse: {week: 4} } 
 permalink: /code
 ---
 

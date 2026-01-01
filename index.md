@@ -1,11 +1,11 @@
 ---
 layout: post 
+feedback: true
+hide: true
 title: Open Coding Society
 description: An Open Pathway to Computer Science
 sprite: /images/mario_animation.png
 permalink: /
-microblog: true
-hide: true
 ---
 
 <!-- Liquid:  statements-->

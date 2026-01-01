@@ -51,7 +51,7 @@
   // Set UI output height
   if (outputHeight) {
     const style = document.createElement('style');
-    style.textContent = `#ui-output-{{ include.runner_id }} { height: ${outputHeight}; }`;
+    style.textContent = `#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`;
     document.head.appendChild(style);
   }
   
