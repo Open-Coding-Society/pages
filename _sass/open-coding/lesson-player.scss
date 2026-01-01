@@ -327,7 +327,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-body pre {
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
@@ -340,7 +340,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-body blockquote {
-  border-left: 4px solid $accent;
+  border-left: 4px solid var(--pref-accent-color);
   padding-left: 16px;
   margin-left: 0;
   color: $text-muted;
@@ -360,7 +360,7 @@ body:has(.lesson-player) {
 
 .lesson-body table th,
 .lesson-body table td {
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   padding: 8px 12px;
   text-align: left;
 }
@@ -369,11 +369,15 @@ body:has(.lesson-player) {
   color: $text;
 }
 
+.lesson-body table tr:nth-child(even) {
+  background: var(--bg-2);
+}
+
 /* Assignment Submission Widget */
 .assignment-submission {
   margin-top: 48px;
   padding: 24px;
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   border-radius: 12px;
 }
 
@@ -587,7 +591,7 @@ body:has(.lesson-player) {
 
 /* Bottom Navigation */
 .lesson-bottom {
-  border-top: 1px solid $bg-3;
+  border-top: 1px solid var(--pref-accent-color);
   padding: 12px 64px;
 }
 
@@ -619,7 +623,7 @@ body:has(.lesson-player) {
 
 .btn-outline {
   background: transparent;
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   color: $text;
 }
 
@@ -747,7 +751,7 @@ body:has(.lesson-player) {
 
 /* Sprint cards in modal */
 .modal-sprint-card {
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
@@ -760,7 +764,7 @@ body:has(.lesson-player) {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #1f2338;
+  border-bottom: 1px solid var(--pref-accent-color);
 }
 
 .modal-sprint-title {
@@ -771,8 +775,7 @@ body:has(.lesson-player) {
 
 .modal-sprint-toggle {
   background: transparent;
-  border: 1px solid $bg-3;
-  color: $accent;
+  border: 1px solid var(--pref-accent-color);
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -781,7 +784,7 @@ body:has(.lesson-player) {
 }
 
 .modal-sprint-toggle:hover {
-  background: rgba($accent, 0.08);
+  background: var(--bg-2);
 }
 
 .modal-lessons {
@@ -806,13 +809,12 @@ body:has(.lesson-player) {
 }
 
 .modal-lesson-item:hover {
-  background: rgba($accent, 0.08);
-  border-color: $accent;
+  background: var(--bg-2);
+  border-color: var(--pref-accent-color);
 }
 
 .modal-lesson-item.active {
-  border-color: $accent;
-  color: $accent;
+  border-color: var(--pref-accent-color);
 }
 
 .modal-lesson-status {
