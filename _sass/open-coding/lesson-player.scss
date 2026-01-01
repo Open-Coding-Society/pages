@@ -1,4 +1,4 @@
-/* Keep site header and navigation visible - removed hiding styles */
+@import "./mixins/buttons";
 
 /* Apply minimal body styles when lesson player is active */
 body:has(.lesson-player) {
@@ -203,21 +203,10 @@ body:has(.lesson-player) {
 }
 
 .back-btn {
+  @include text-button;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: transparent;
   border: none;
-  color: $accent;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
-.back-btn:hover {
-  background: rgba($accent, 0.08);
 }
 
 .breadcrumbs {
