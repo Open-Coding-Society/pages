@@ -365,10 +365,7 @@ body:has(.lesson-player) {
   text-align: left;
 }
 
-.lesson-body table th {
-  color: $text;
-}
-
+.lesson-body table th, 
 .lesson-body table tr:nth-child(even) {
   background: var(--bg-2);
 }
