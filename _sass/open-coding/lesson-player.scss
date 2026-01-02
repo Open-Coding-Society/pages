@@ -530,22 +530,9 @@ body:has(.lesson-player) {
 }
 
 .submit-btn {
-  padding: 12px 24px;
-  background: $accent;
-  color: $bg-0;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  @include emphasized-button;
+  
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.submit-btn:hover {
-  background: $accent-700;
 }
 
 .submit-btn:disabled {
@@ -629,33 +616,17 @@ body:has(.lesson-player) {
 
 /* Floating Menu Button (Mobile) */
 .floating-menu-btn {
+  @include icon-button(20px, 0);
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 56px;
   height: 56px;
-  background: $accent;
-  border: none;
+  background: var(--pref-accent-color); 
   border-radius: 50%;
-  color: $text;
-  font-size: 20px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   z-index: 1000;
-  transition: all 0.3s ease;
-  display: none;
-  align-items: center;
-  justify-content: center;
 }
 
-.floating-menu-btn:hover {
-  background: $accent-700;
-  transform: scale(1.1);
-}
-
-.floating-menu-btn:active {
-  transform: scale(0.95);
-}
 
 /* Timeline Modal - applies to all screen sizes */
 .timeline-modal {
