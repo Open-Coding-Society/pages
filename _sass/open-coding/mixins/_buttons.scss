@@ -52,7 +52,6 @@
   }
 
   @media (max-width: 768px) {
-    width: 44px;
     height: 44px;
   }
 }
@@ -82,6 +81,7 @@
 
   @media (max-width: 768px) {
     margin-left: 0.25rem;
+    width: 44px;
   }
 }
 
@@ -94,10 +94,10 @@
  *
  * @example
  *   .runBtn {
- *     @include emphasized-button;
+ *     @include emphasized-icon-button;
  *   }
  */
-@mixin emphasized-button($size: 38px, $spacing: 8px) {
+@mixin emphasized-icon-button($size: 38px, $spacing: 8px) {
   @include icon-button($size, $spacing);
   background: var(--pref-accent-color);
   border-color: var(--pref-accent-color);

@@ -62,7 +62,7 @@ ctx.fillRect(100, 100, 200, 200);
   - `@mixin control-panel` - Top/bottom toolbars with buttons
   - `@mixin sub-container` - Groups editor/output sections
   - `@mixin info-panel` - Challenge box styling
-  - `@mixin emphasized-button` - Run button with accent color
+  - `@mixin emphasized-icon-button` - Run button with accent color
   - `@mixin icon-button` - Stop/Reset/Copy/Clear buttons
 
 #### Output Element

@@ -530,7 +530,7 @@ body:has(.lesson-player) {
 }
 
 .submit-btn {
-  @include emphasized-button;
+  @include emphasized-icon-button;
   font-size: 14px;
 }
 
@@ -581,10 +581,9 @@ body:has(.lesson-player) {
 }
 
 .btn {
-  @include base-button;
+  @include text-button;
   font-size: 14px;
   display: flex;
-  gap: 8px;
 
   @media (max-width: 768px) {
     flex: 1;
@@ -603,6 +602,7 @@ body:has(.lesson-player) {
 }
 
 .btn-primary {
+
   background: $accent;
   color: $bg-0;
 }
@@ -678,7 +678,7 @@ body:has(.lesson-player) {
 }
 
 .timeline-close-btn {
-  @include emphasized-button;
+  @include emphasized-icon-button;
   font-size: 24px;
 }
 
