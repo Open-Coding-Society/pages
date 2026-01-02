@@ -681,24 +681,10 @@ body:has(.lesson-player) {
 }
 
 .timeline-close-btn {
-  background: transparent;
-  border: none;
-  color: $text-muted;
+  @include emphasized-button;
   font-size: 24px;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
 }
 
-.timeline-close-btn:hover {
-  background: rgba($accent, 0.08);
-  color: var(--pref-text-color, $text);
-}
 
 .timeline-modal-content {
   flex: 1;
