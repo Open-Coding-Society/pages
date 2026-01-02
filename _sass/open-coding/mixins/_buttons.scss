@@ -8,7 +8,7 @@
  * Common color and interaction styles for all controls
  * @private - Use specific mixins instead
  */
-@mixin base-control {
+@mixin base-button {
   background: var(--pref-bg-color);
   border: 1px solid var(--ui-border);
   color: var(--pref-text-color);
@@ -38,7 +38,7 @@
  *   }
  */
 @mixin text-button {
-  @include base-control;
+  @include base-button;
   height: 38px;
   padding: 8px 12px;
   border-radius: 6px;
@@ -121,7 +121,7 @@
  *   }
  */
 @mixin toggle-button {
-  @include base-control;
+  @include base-button;
   padding: 8px 16px;
   border-radius: 6px;
   display: inline-flex;
@@ -144,7 +144,7 @@
  *   }
  */
 @mixin select-control($min-width: 150px) {
-  @include base-control;
+  @include base-button;
   min-width: $min-width;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;

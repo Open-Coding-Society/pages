@@ -531,7 +531,6 @@ body:has(.lesson-player) {
 
 .submit-btn {
   @include emphasized-button;
-  
   font-size: 14px;
 }
 
@@ -582,16 +581,14 @@ body:has(.lesson-player) {
 }
 
 .btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
+  @include base-button;
   font-size: 14px;
-  border: none;
   display: flex;
-  align-items: center;
   gap: 8px;
-  text-decoration: none;
+
+  @media (max-width: 768px) {
+    flex: 1;
+  }
 }
 
 .btn-outline {
@@ -684,7 +681,6 @@ body:has(.lesson-player) {
   @include emphasized-button;
   font-size: 24px;
 }
-
 
 .timeline-modal-content {
   flex: 1;
@@ -873,11 +869,6 @@ body:has(.lesson-player) {
   .bottom-actions {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .btn {
-    flex: 1;
-    justify-content: center;
   }
 
   .assignment-submission {
