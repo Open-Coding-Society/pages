@@ -232,7 +232,7 @@ Sprint6:
     goals:  
       - "Project Kanban"
       - "Database Models (draw.io)"
-      - "Frontend UI/UX (wires)"
+      - "Frontend UI/UX (html/css)"
       - "API Basics (postman)"
   22:
     theme: "Functional Checkpoint"
