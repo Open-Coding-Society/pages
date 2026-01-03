@@ -1,8 +1,8 @@
 ---
 layout: post
-courses: { csse: {week: 7}, csa: {'week': 17 } }
+courses: { csse: {week: 4}, csp: {week: 17}, csa: {week: 17 } }
 codemirror: true
-title: Code Runner Examples
+title: Code Runner - Examples
 description: Build a lesson using multiple code runners on a page.  This modular approach allows you to create interactive lessons, more code -- less words.
 permalink: /code
 ---
