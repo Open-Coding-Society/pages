@@ -192,23 +192,46 @@ Sprint4:
   start: 13
   end: 16
 Sprint5:
-  title: Creative Development Ideas and Concepts
-  description: This will be the most creative portion of the year for CSA students. The objective of these weeks is to explore, create ideas, and code concepts that have the growth potential to enable a two-trimester project. Consider frontend design, draw.io database modeling, API plans, JWT designs, big data solutions, and future usefulness. The ideas and code that are most liked by Teachers and Students will be continued and used for N@tM projects. Students should be able to talk about design, do fe/be coding, add data and data structure, add database features, and perform weekly live reviews.
+  title: AP required Java FRQ Topics and buildout of Open Coding Society tracking system
+  description: Students will master the Java Programming requirements for College Board through Teaching and OCS system design. In this Sprint, students will teach key AP FRQ topics to their peers while building out the Open Coding Society platform. The required topics include Arrays, ArrayLists, 2D Arrays, Methods & Control Structures, Searching, and Sorting. Teaching will include tracking success of each student on the OCS platform and providing feedback. Each student will complete hacks on to the OCS platform that demonstrates their understanding of each topic. 
   start: 17
   end: 19
+  17:
+    theme: "Prep and OCS Requirements"
+    goals:
+      - "Pick Topic"
+      - "Lesson Standards"
+      - "HW and Grading Standards"
+  18:
+    theme: "Prototype Teaching"
+    goals:
+      - "1 Teaching Session"
+      - "1 Grading Session"
+      - "Revise OCS Features"
+  19:
+    theme: "Teaching the Right Way"
+    goals:
+      - "Teach 4 Topics"
+      - "Analyze Student Data"
 Sprint6:
-  title: Passion Project v1.0 and N@tM Demo
-  description: Each person within "Student Teams" will have their own specialty within their student project that shows Full Stack competency, with a specific focus on Java as backend. Intentions for this period are to have the freedom of a creative project, driven by your individual Issues and team Scrum Board.
+  title: Passion Project Prototype and N@tM Feedback
+  description: This will be the most creative portion of the year for CSA students. The objective of these weeks is to explore, create ideas, and code concepts that have the growth potential to enable a two-trimester project. Consider frontend design, draw.io database modeling, API plans, JWT designs, big data solutions, and future usefulness. Students should be able to talk about design, do fe/be coding, add data and data structure, add database features, and perform weekly live reviews.
   start: 20
   end: 24
+  20:
+    theme: "Passion Project Ideation"
+    goals:
+      - "Finish FRQ/Sorting Teaching"
+      - "Project Ideation"
+      - "Research Technologies"
 Sprint7: 
-  title: Data Structures
+  title: Data Structures and Passion Project v1.0
   description: A focus on Data Structures that relate to the AP exam. A key requirement is to make your own Algorithmic sorting video. The theme is to produce work that can help you pass the AP Exam and improve your Passion Project. Each student must cover key concepts from the Four AP FRQ types, contain a key Data Structure, and utilize Sorting.
   illustration: *data_structures
   start: 25
   end: 29
 Sprint8:
-  title: AP Weeks
+  title: AP Weeks, Study Sessions
   description: Students will lead several study sessions (20-minute test, followed by review) the week before the exam. In any break in study, students will transition activities back to their final project.
   illustration: *frq_types
   start: 30
