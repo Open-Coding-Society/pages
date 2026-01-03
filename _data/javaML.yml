@@ -54,6 +54,7 @@ Topics:
       Apply what you've learned in Tablesaw, Weka, and Smile to analyze wine quality data and build machine learning models! 
 
   - title: "Titanic Survival"
+    image: "/javaml/titanic.jpeg"
     link: "/javaml/intro/titanic"
     alt: "titanic"
     subtitle: "Titanic Survival Analysis"
