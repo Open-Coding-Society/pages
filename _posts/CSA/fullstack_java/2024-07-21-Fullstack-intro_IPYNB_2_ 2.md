@@ -3,9 +3,8 @@ layout: post
 title: Fullstack Development (Student Thinking)
 description: A reminder and guide to full stack development, aka learn how to do everyone job
 type: coding 
-courses: {'csa': {'week': 5}}
+courses: {'csa': {'week': 3}}
 permalink: /fullstack/java/intro
-menu: nav/fullstack_java.html
 toc: True
 comments: True
 author: Finn Carpenter
@@ -67,5 +66,7 @@ Start with an idea;  I am going to be creating a announcement API!
 > My overcoming thoughts
 
 - Use this simple outline to start a GitHub issue
-- Start referencing the full-stack materials with your idea
-- Go through the process POJO, JPA, API, Postman, FUll-Stack, JS Fetch, CRUD, etc
+- Start referencing the full-stack materials for Java/Spring with your idea in mind
+- Learn the process Sprint: POJO, JPA, API
+- Build Postman checks, build endpoint queries for methods: GET, POST, PUT, DELETE
+- JavaScript frontend is basically the same as Python/Flask:  Desing Forms and format JSON response
