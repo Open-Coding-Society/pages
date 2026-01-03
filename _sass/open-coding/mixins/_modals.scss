@@ -61,7 +61,7 @@
 ///     @include modal-close-btn;
 ///   }
 @mixin modal-close-btn {
-  @include text-button;
+  @include icon-button;
   
   // Close button specific positioning and sizing
   position: absolute;

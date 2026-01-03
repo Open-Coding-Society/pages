@@ -42,7 +42,7 @@
 
   // Emphasized run button
   .runBtn {
-    @include emphasized-button;
+    @include emphasized-icon-button;
   }
 
   // Common icon buttons

@@ -2,13 +2,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const style = getComputedStyle(document.documentElement);
+        const theme = style.getPropertyValue('--theme').trim() || "dark";
         const panel = style.getPropertyValue('--panel-mid').trim() || "#0b1220";
         const text = style.getPropertyValue('--pref-text-color').trim() || "#e6eef8";
         const accent = style.getPropertyValue('--pref-accent-color').trim() || "#3b82f6";
         const fontFamily = style.getPropertyValue('--pref-font-family').trim() || "Arial, sans-serif";
         mermaid.initialize({ 
             startOnLoad: false,
-            theme: 'base',
+            theme: theme,
             securityLevel: 'loose',
             themeVariables: {
                 background: panel,
