@@ -193,7 +193,7 @@ Sprint4:
   end: 16
 Sprint5:
   title: AP required Java FRQ Topics and buildout of Open Coding Society tracking system
-  description: Students will master the Java Programming requirements for College Board through Teaching and OCS system design. In this Sprint, students will teach key AP FRQ topics to their peers while building out the Open Coding Society platform. The required topics include Arrays, ArrayLists, 2D Arrays, Methods & Control Structures, Searching, and Sorting. Teaching will include tracking success of each student on the OCS platform and providing feedback. Each student will complete hacks on to the OCS platform that demonstrates their understanding of each topic. 
+  description: Students will master the Java Programming requirements for College Board through Teaching. In this Sprint, students will teach key APCSA opics to their peers while building maximizing capabilities of the Open Coding Society platform. The required topics include Methods & Control Structures, Arrays, ArrayLists, Clasess, 2D Arrays, Searching, and Sorting. Teaching will include tracking progress of each student on the OCS platform and providing feedback. Each student will complete hacks and demonstrates their mastery of each topic. 
   start: 17
   end: 19
   17:
