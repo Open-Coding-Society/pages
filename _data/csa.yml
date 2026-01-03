@@ -227,6 +227,33 @@ Sprint6:
       - "Project Ideation"
       - "Research Technologies"
       - "Checkpoint Ideation"
+  21:
+    theme: "Design Checkpoint"
+    goals:  
+      - "Project Kanban"
+      - "Database Models (draw.io)"
+      - "Frontend UI/UX (wires)"
+      - "API Basics (postman)"
+  22:
+    theme: "Functional Checkpoint"
+    goals:  
+      - "Issue Burndown"
+      - "Backend Admin UI"
+      - "Frontend Interactivity"
+      - "API Testing (postman)"
+  23: 
+    theme: "Final Prototype Push"
+    goals:    
+      - "Final Features"
+      - "Testing/Debugging"
+      - "Project Presentation"
+      - "N@tM Feedback"
+  24: 
+    theme: "N@tM Retrospective"
+    goals:    
+      - "Peer Review"
+      - "Instructor Feedback"
+      - "Next Steps Planning"
 Sprint7: 
   title: Data Structures and Passion Project v1.0
   description: A focus on Data Structures that relate to the AP exam. A key requirement is to make your own Algorithmic sorting video. The theme is to produce work that can help you pass the AP Exam and improve your Passion Project. Each student must cover key concepts from the Four AP FRQ types, contain a key Data Structure, and utilize Sorting.
