@@ -192,38 +192,41 @@ Sprint4:
   start: 13
   end: 16
 Sprint5:
-  title: AP required Java FRQ Topics and buildout of Open Coding Society tracking system
-  description: Students will master the Java Programming requirements for College Board through Teaching. In this Sprint, students will teach key APCSA opics to their peers while building maximizing capabilities of the Open Coding Society platform. The required topics include Methods & Control Structures, Arrays, ArrayLists, Clasess, 2D Arrays, Searching, and Sorting. Teaching will include tracking progress of each student on the OCS platform and providing feedback. Each student will complete hacks and demonstrates their mastery of each topic. 
+  title: AP Java FRQ Topics & OCS Platform Enhancement
+  description: In this Sprint, students will master AP CSA Java requirements by teaching a selected topic to their peers and building or improving features on the Open Coding Society (OCS) platform. Required topics include Methods & Control Structures, Arrays, ArrayLists, Classes, 2D Arrays, Searching, and Sorting. Each student will deliver a lesson on their chosen topic, complete coding hacks from other groups' topics, and contribute to OCS features for student tracking and feedback. Teaching and platform work are integrated, with all students demonstrating mastery through both instruction and hands-on development.
   start: 17
   end: 19
   17:
     theme: "Prep and OCS Requirements"
     goals:
-      - "Pick Topic"
-      - "Lesson Standards"
-      - "HW and Grading Standards"
+      - "Pick Teaching Topics"
+      - "Define Lesson, HW Standards"
+      - "Develop OCS Features"
   18:
     theme: "Prototype Teaching"
     goals:
-      - "1 Teaching Session"
-      - "1 Grading Session"
+      - "Present 1-Topic (prototype)"
+      - "Grading/Feedback 1-Topic"
+      - "Provide OCS Feedback"
       - "Revise OCS Features"
   19:
     theme: "Teaching the Right Way"
     goals:
-      - "Teach 4 Topics"
+      - "Present 4-Topics (final)"
+      - "Record Student Data"
       - "Analyze Student Data"
 Sprint6:
-  title: Passion Project Prototype and N@tM Feedback
-  description: This will be the most creative portion of the year for CSA students. The objective of these weeks is to explore, create ideas, and code concepts that have the growth potential to enable a two-trimester project. Consider frontend design, draw.io database modeling, API plans, JWT designs, big data solutions, and future usefulness. Students should be able to talk about design, do fe/be coding, add data and data structure, add database features, and perform weekly live reviews.
+  title: Passion Project or OCS Enhancement & N@tM Feedback
+  description: In this Sprint, students may choose to continue enhancing the OCS platform or propose and prototype a new project based on their interests and skills. The focus is on creativity, design, and technical growth—whether through OCS development or a new passion project. Students should document their design process, make technical decisions, and present their work for peer and instructor feedback. Consider frontend design, database modeling, API plans, JWT designs, big data solutions, and future usefulness. Weekly live reviews and feedback will support project evolution.
   start: 20
   end: 24
   20:
     theme: "Passion Project Ideation"
     goals:
-      - "Finish FRQ/Sorting Teaching"
+      - "Present 3-Topics (final)"
       - "Project Ideation"
       - "Research Technologies"
+      - "Checkpoint Ideation"
 Sprint7: 
   title: Data Structures and Passion Project v1.0
   description: A focus on Data Structures that relate to the AP exam. A key requirement is to make your own Algorithmic sorting video. The theme is to produce work that can help you pass the AP Exam and improve your Passion Project. Each student must cover key concepts from the Four AP FRQ types, contain a key Data Structure, and utilize Sorting.
