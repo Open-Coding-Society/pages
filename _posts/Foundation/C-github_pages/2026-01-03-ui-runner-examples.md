@@ -1,6 +1,6 @@
 ---
 layout: post
-courses: {'csa': {'week': 21}}
+courses: { csse: {week: 8}, csp: {week: 17}, csa: {week: 21 } }
 codemirror: true
 title: UI Runner Examples
 description: A lesson showing how to create visual JavaScript lessons using the UI Runner. Perfect for teaching game development, canvas graphics, DOM manipulation, and interactive visualizations. Use this as a template to build visual coding lessons with the GameEngine.
