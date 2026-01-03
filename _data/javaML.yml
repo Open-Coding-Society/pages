@@ -13,6 +13,7 @@ Topics:
       - "Managing collections with arrays and ArrayLists"
     description: |
       Learn Java fundamentals through data manipulation. Tablesaw makes it easy to apply loops, classes, and arrays in real-world datasets—bridging AP CSA topics with practical data science.
+
   - title: "Weka"
     image: "/javaml/weka.jpeg"
     link: "/javaml/intro/weka"
@@ -51,3 +52,15 @@ Topics:
       - "Make predictions on wine quality"
     description: |
       Apply what you've learned in Tablesaw, Weka, and Smile to analyze wine quality data and build machine learning models! 
+
+  - title: "Titanic Survival"
+    link: "/javaml/intro/titanic"
+    alt: "titanic"
+    subtitle: "Titanic Survival Analysis"
+    keyPoints:
+      - "Load and explore Titanic passenger datasets"
+      - "Create visualizations to understand survival patterns"
+      - "Build and compare machine learning models"
+      - "Make predictions on Titanic survival"
+    description: |
+      Apply what you've learned in Tablesaw, Weka, and Smile to analyze Titanic passenger data and build machine learning models! 
