@@ -9,6 +9,7 @@
     "axe/language": "off",
     "axe/forms": "off",
     "apple-touch-icons": "off",
-    "disown-opener": "off"
+    "disown-opener": "off",
+    "no-inline-styles": "off"
   }
 }
