@@ -1,0 +1,119 @@
+/**
+ * Game Runner Styles
+ * Interactive game development environment with GameEngine integration
+ */
+
+@import "runner-base";
+@import "../mixins/panel";
+
+.game-runner-container {
+  @include runner-base;
+
+  // Game output area - contained canvas for educational use
+  .game-output {
+    // Layout & Dimensions
+    min-height: 400px;
+    max-height: 600px;
+    overflow: hidden;
+    position: relative;
+    
+    // Spacing
+    padding: 0;
+    
+    // Colors & Styling
+    background: #000; // Black background for game
+    color: $panel-text;
+    
+    // Game container styling
+    .gameContainer {
+      width: 100%;
+      height: 580px;
+      position: relative;
+      overflow: hidden;
+      
+      // Only style the main canvas, not character canvases
+      > canvas#gameCanvas {
+        display: block;
+        width: 100% !important;
+        height: 580px !important;
+        border: none;
+        background: transparent;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      
+      // Reset styles for all game-generated canvases
+      canvas {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+    }
+  }
+
+  // Level selector dropdown
+  .levelSelect {
+    @include select-control();
+    min-width: 120px;
+  }
+
+  // Game-specific buttons
+  .pauseBtn,
+  .stopBtn,
+  .resetBtn {
+    @include icon-button(38px, 0);
+  }
+
+  // Pause button - yellow emphasis for attention
+  .pauseBtn {
+    background: #eab308;
+    border-color: #eab308;
+    color: $panel-bg;
+
+    &:hover {
+      background: #eab308;
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      background: var(--pref-bg-color);
+      border-color: var(--ui-border);
+      color: var(--pref-text-color);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Stop button - red emphasis
+  .stopBtn {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: $panel-bg;
+
+    &:hover {
+      background: #dc2626;
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      background: var(--pref-bg-color);
+      border-color: var(--ui-border);
+      color: var(--pref-text-color);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Game status indicator
+  .game-status {
+    font-weight: 500;
+    
+    .status-text {
+      color: var(--pref-accent-color);
+      font-weight: 600;
+    }
+  }
+}

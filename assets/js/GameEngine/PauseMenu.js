@@ -348,7 +348,10 @@ export default class PauseMenu {
     }
 
     _createDom() {
-        const parent = document.getElementById(this.options.parentId) || document.body;
+        // Use gameContainer from gameControl if available, fallback to ID lookup
+        const parent = (this.gameControl && this.gameControl.gameContainer) 
+            || document.getElementById(this.options.parentId) 
+            || document.body;
 
         // Main overlay container
         const overlay = document.createElement('div');

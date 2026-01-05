@@ -1,0 +1,53 @@
+/**
+ * Runner Base Styles
+ * Shared styles for code-runner and ui-runner
+ */
+
+@import "../mixins/buttons";
+@import "../mixins/panel";
+@import "../mixins/container";
+
+@mixin runner-base {
+  @include main-container;
+
+  // Code challenge box styling
+  .challenge-box {
+    @include info-panel;
+  }
+
+  // Editor container
+  .editor-container {
+    @include sub-container;
+  }
+
+  // Code editor styling
+  .CodeMirror {
+    @include input-panel;
+  }
+
+  .CodeMirror-gutters {
+    background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
+  }
+
+  // Output section
+  .output-container {
+    @include sub-container;
+  }
+
+  // Control panel (top and bottom bars)
+  .control-panel {
+    @include control-panel;
+  }
+
+  // Emphasized run button
+  .runBtn {
+    @include emphasized-icon-button;
+  }
+
+  // Common icon buttons
+  .copyBtn,
+  .clearBtn {
+    @include icon-button(38px, 0);
+  }
+}

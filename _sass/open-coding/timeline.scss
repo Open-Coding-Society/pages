@@ -1,3 +1,46 @@
+@import "mixins/modals";
+@import "mixins/buttons";
+
+/* ============================= */
+/*       VIDEO DEMO MODAL        */
+/* ============================= */
+
+#video-demo {
+  @include modal-overlay;
+}
+
+#video-demo > div {
+  @include modal-content;
+  top: 60px;
+}
+
+#video-demo .close-btn {
+  @include modal-close-btn;
+}
+
+#video-demo img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+#video-demo .desktop-only {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.clickable-video {
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.clickable-video:hover {
+  transform: scale(1.05);
+}
+
 .timeline-page {
   .timeline-header {
     margin-bottom: 32px;
@@ -116,13 +159,21 @@
     align-items: center;
   }
 
+  .sprint-toggle-btn {
+    @include toggle-button;
+  }
+
   .sprint-card.collapsed .sprint-toggle-icon {
     transform: rotate(0deg);
   }
 
   .sprint-toggle-icon {
-    transition: transform 0.2s;
+    transition: transform 0.3s;
     display: inline-flex;
+    color: var(--pref-accent-color);
+    font-size: 2em;
+    font-weight: bold;
+    margin-right: 4px;
   }
 
   .sprint-weeks {
@@ -218,39 +269,30 @@
     font-size: 13px;
   }
 
-  .progression-btn {
-    background: $bg-2;
-    border: 1px solid $bg-3;
-    color: $accent;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 13px;
+  .sprint-btn {
+    background: var(--pref-bg-color);
+    border: 1px solid var(--pref-accent-color);
+    color: var(--pref-accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: var(--pref-font-size);
+    font-family: var(--pref-font-family);
     cursor: pointer;
     transition: all 0.2s;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .progression-btn:hover,
-  .progression-btn:focus-visible {
-    border-color: $accent;
-    color: $accent-700;
-    background: $bg-2;
-    outline: none;
+  .sprint-btn:hover,
+  .sprint-btn:focus-visible {
+    @include text-button;
   }
 
-  .progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background: $bg-2;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-
-  .progress-bar-fill {
-    height: 100%;
-    background: $accent;
-    transition: width 0.3s ease;
-    width: 0%;
+  .sprint-btn.certificate,
+  .sprint-btn.help {
+    @include icon-button
   }
 
   .items-grid {
@@ -549,14 +591,8 @@
     }
 
     .progression-task {
-      padding: 8px;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .task-number {
-      order: -1;
+      padding: 10px;
+      gap: 10px;
     }
   }
 
@@ -586,48 +622,52 @@
     box-shadow: 0 0 12px rgba($accent, 0.2);
   }
 
-  /* Progression Modal */
+  /* ============================= */
+  /*     PROGRESSION MODAL         */
+  /* ============================= */
+
   #progression-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85);
-    z-index: 1000;
-    padding: 20px;
-    overflow-y: auto;
+    @include modal-overlay;
   }
 
   #progression-modal > div {
-    max-width: 600px;
-    margin: 40px auto;
-    background: $bg-1;
-    border: 1px solid $bg-3;
-    border-radius: 12px;
-    padding: 32px;
+    @include modal-content;
+    top: 60px;
   }
 
   #progression-modal .close-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: none;
-    color: $text-muted;
-    font-size: 24px;
-    cursor: pointer;
+    @include modal-close-btn;
   }
 
   #progression-modal h2 {
     color: $text;
     margin-bottom: 8px;
+    padding-right: 50px;
+    
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
   }
 
   #progression-modal .week-theme {
     color: $accent;
     margin-bottom: 24px;
+    padding-right: 50px; // Space for close button
+    
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+  }
+  
+  #task-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    
+    @media (max-width: 768px) {
+      max-height: 50vh;
+    }
   }
 
   #modal-progress-fill {
@@ -646,6 +686,31 @@
     border: 1px solid $bg-3;
     border-radius: 8px;
     margin-bottom: 8px;
+    
+    @media (max-width: 768px) {
+      padding: 10px;
+      gap: 10px;
+    }
+  }
+  
+  .progression-week-header {
+    color: $text;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $bg-3;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
   }
 
   .progression-task input[type="checkbox"] {
@@ -653,17 +718,32 @@
     height: 20px;
     cursor: pointer;
     accent-color: $accent;
+    flex-shrink: 0;
+    
+    @media (max-width: 768px) {
+      width: 22px;
+      height: 22px;
+    }
   }
 
   .progression-task label {
     color: $text;
     flex: 1;
     cursor: pointer;
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
   }
 
   .task-number {
     color: $text-muted;
     font-size: 14px;
+    flex-shrink: 0;
+    
+    @media (max-width: 768px) {
+      font-size: 12px;
+    }
   }
 
   #view-certificate-btn {
@@ -684,23 +764,19 @@
     transform: scale(1.02);
   }
 
-  /* Certificate Modal */
+  /* ============================= */
+  /*      CERTIFICATE MODAL        */
+  /* ============================= */
+
   #certificate-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 2000;
-    padding: 20px;
-    overflow-y: auto;
+    @include modal-overlay;
+    background: rgba(0,0,0,0.9); // Darker than default
+    z-index: 2000; // Higher than other modals
   }
 
   #certificate-modal .action-bar {
     position: sticky;
-    top: 0;
+    top: 60px;
     background: var(--panel);
     padding: 16px;
     text-align: center;
@@ -987,7 +1063,11 @@
 
   @media (max-width: 768px) {
     #certificate-content {
+      margin: 0;
       padding: 40px 20px;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
     }
 
     #certificate-student-name {
@@ -999,4 +1079,22 @@
       gap: 16px;
     }
   }
+
+  /* ============================= */
+  /*         HELP MODAL            */
+  /* ============================= */
+
+  #help-modal {
+    @include modal-overlay;
+  }
+
+  #help-modal > div {
+    @include modal-content;
+    top: 60px;
+  }
+
+  #help-modal .close-btn {
+    @include modal-close-btn;
+  }
+  
 }

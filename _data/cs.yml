@@ -41,7 +41,7 @@ introduction_tools: &introduction_tools |
     +-----------------+
 
 Onboarding: 
-  title: Onboarding and SDLC 
+  title: SDLC & Dev Tools
   description: By the end of this onboarding sprint, students will be able to operate effectively within a modern software development environment and articulate how their work fits into the Software Development Life Cycle (SDLC). Students will set up and use core development tools (Linux, VSCode, GitHub), collaborate using industry-standard workflows, and iteratively build and document a personal portfolio site. Through hands-on practice with Markdown, HTML, CSS, and JavaScript in a Jekyll-based workflow, students will develop sustainable development habits—embracing iteration, version control, documentation, pair programming, and responsible AI usage—while prioritizing breadth of SDLC understanding over depth of implementation.
   illustration: *introduction_tools
   mermaid_figure: |

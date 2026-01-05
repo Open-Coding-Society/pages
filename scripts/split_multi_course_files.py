@@ -183,7 +183,7 @@ def find_and_split_multi_course_files():
         for file_pattern in ['*.md', '*.ipynb']:
             for file_path in directory.rglob(file_pattern):
                 # Skip already split files
-                if re.search(r'_(csp|csa|csse)\.(md|ipynb)$', str(file_path)):
+                if re.search(r'_(csp|csa|csse|cwgu)\.(md|ipynb)$', str(file_path)):
                     continue
                     
                 try:
@@ -229,7 +229,7 @@ def clean_split_files():
     for directory in directories:
         for file_pattern in ['*.md', '*.ipynb']:
             for file_path in directory.rglob(file_pattern):
-                if (re.search(r'_(csp|csa|csse)\.(md|ipynb)$', str(file_path)) or 
+                if (re.search(r'_(csp|csa|csse|cwgu)\.(md|ipynb)$', str(file_path)) or 
                     re.search(r'_content\.md$', str(file_path))):
                     file_path.unlink()
                     removed_files.append(str(file_path))

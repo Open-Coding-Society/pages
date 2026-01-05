@@ -1,4 +1,4 @@
-/* Keep site header and navigation visible - removed hiding styles */
+@import "./mixins/buttons";
 
 /* Apply minimal body styles when lesson player is active */
 body:has(.lesson-player) {
@@ -203,21 +203,10 @@ body:has(.lesson-player) {
 }
 
 .back-btn {
+  @include text-button;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: transparent;
   border: none;
-  color: $accent;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
-.back-btn:hover {
-  background: rgba($accent, 0.08);
 }
 
 .breadcrumbs {
@@ -327,7 +316,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-body pre {
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
@@ -340,7 +329,7 @@ body:has(.lesson-player) {
 }
 
 .lesson-body blockquote {
-  border-left: 4px solid $accent;
+  border-left: 4px solid var(--pref-accent-color);
   padding-left: 16px;
   margin-left: 0;
   color: $text-muted;
@@ -360,20 +349,21 @@ body:has(.lesson-player) {
 
 .lesson-body table th,
 .lesson-body table td {
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   padding: 8px 12px;
   text-align: left;
 }
 
-.lesson-body table th {
-  color: $text;
+.lesson-body table th, 
+.lesson-body table tr:nth-child(even) {
+  background: var(--bg-2);
 }
 
 /* Assignment Submission Widget */
 .assignment-submission {
   margin-top: 48px;
   padding: 24px;
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   border-radius: 12px;
 }
 
@@ -540,22 +530,8 @@ body:has(.lesson-player) {
 }
 
 .submit-btn {
-  padding: 12px 24px;
-  background: $accent;
-  color: $bg-0;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  @include emphasized-icon-button;
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.submit-btn:hover {
-  background: $accent-700;
 }
 
 .submit-btn:disabled {
@@ -587,7 +563,7 @@ body:has(.lesson-player) {
 
 /* Bottom Navigation */
 .lesson-bottom {
-  border-top: 1px solid $bg-3;
+  border-top: 1px solid var(--pref-accent-color);
   padding: 12px 64px;
 }
 
@@ -605,21 +581,18 @@ body:has(.lesson-player) {
 }
 
 .btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
+  @include text-button;
   font-size: 14px;
-  border: none;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
+
+  @media (max-width: 768px) {
+    flex: 1;
+  }
 }
 
 .btn-outline {
   background: transparent;
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   color: $text;
 }
 
@@ -629,6 +602,7 @@ body:has(.lesson-player) {
 }
 
 .btn-primary {
+
   background: $accent;
   color: $bg-0;
 }
@@ -639,33 +613,17 @@ body:has(.lesson-player) {
 
 /* Floating Menu Button (Mobile) */
 .floating-menu-btn {
+  @include icon-button(20px, 0);
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 56px;
   height: 56px;
-  background: $accent;
-  border: none;
+  background: var(--pref-accent-color); 
   border-radius: 50%;
-  color: $text;
-  font-size: 20px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   z-index: 1000;
-  transition: all 0.3s ease;
-  display: none;
-  align-items: center;
-  justify-content: center;
 }
 
-.floating-menu-btn:hover {
-  background: $accent-700;
-  transform: scale(1.1);
-}
-
-.floating-menu-btn:active {
-  transform: scale(0.95);
-}
 
 /* Timeline Modal - applies to all screen sizes */
 .timeline-modal {
@@ -720,23 +678,8 @@ body:has(.lesson-player) {
 }
 
 .timeline-close-btn {
-  background: transparent;
-  border: none;
-  color: $text-muted;
+  @include emphasized-icon-button;
   font-size: 24px;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-
-.timeline-close-btn:hover {
-  background: rgba($accent, 0.08);
-  color: var(--pref-text-color, $text);
 }
 
 .timeline-modal-content {
@@ -747,7 +690,7 @@ body:has(.lesson-player) {
 
 /* Sprint cards in modal */
 .modal-sprint-card {
-  border: 1px solid $bg-3;
+  border: 1px solid var(--pref-accent-color);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 16px;
@@ -760,7 +703,7 @@ body:has(.lesson-player) {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #1f2338;
+  border-bottom: 1px solid var(--pref-accent-color);
 }
 
 .modal-sprint-title {
@@ -771,8 +714,7 @@ body:has(.lesson-player) {
 
 .modal-sprint-toggle {
   background: transparent;
-  border: 1px solid $bg-3;
-  color: $accent;
+  border: 1px solid var(--pref-accent-color);
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -781,7 +723,7 @@ body:has(.lesson-player) {
 }
 
 .modal-sprint-toggle:hover {
-  background: rgba($accent, 0.08);
+  background: var(--bg-2);
 }
 
 .modal-lessons {
@@ -806,13 +748,12 @@ body:has(.lesson-player) {
 }
 
 .modal-lesson-item:hover {
-  background: rgba($accent, 0.08);
-  border-color: $accent;
+  background: var(--bg-2);
+  border-color: var(--pref-accent-color);
 }
 
 .modal-lesson-item.active {
-  border-color: $accent;
-  color: $accent;
+  border-color: var(--pref-accent-color);
 }
 
 .modal-lesson-status {
@@ -928,11 +869,6 @@ body:has(.lesson-player) {
   .bottom-actions {
     width: 100%;
     justify-content: space-between;
-  }
-
-  .btn {
-    flex: 1;
-    justify-content: center;
   }
 
   .assignment-submission {

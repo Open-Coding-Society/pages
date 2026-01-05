@@ -1,16 +1,24 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const style = getComputedStyle(document.documentElement);
+        const theme = style.getPropertyValue('--theme').trim() || "dark";
+        const panel = style.getPropertyValue('--panel-mid').trim() || "#0b1220";
+        const text = style.getPropertyValue('--pref-text-color').trim() || "#e6eef8";
+        const accent = style.getPropertyValue('--pref-accent-color').trim() || "#3b82f6";
+        const fontFamily = style.getPropertyValue('--pref-font-family').trim() || "Arial, sans-serif";
         mermaid.initialize({ 
             startOnLoad: false,
-            theme: 'dark',
+            theme: theme,
             securityLevel: 'loose',
             themeVariables: {
-                primaryColor: '#1a3a4a',
-                primaryTextColor: '#ffffff',
-                primaryBorderColor: '#2d4a3d',
-                lineColor: '#ffffff',
-                arrowheadColor: '#ffffff'
+                background: panel,
+                primaryColor: panel,
+                primaryTextColor: text,
+                primaryBorderColor: accent,
+                lineColor: text,
+                arrowheadColor: text,
+                fontFamily: fontFamily
             }
         });
         

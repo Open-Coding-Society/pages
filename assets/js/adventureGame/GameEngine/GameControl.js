@@ -189,7 +189,7 @@ class GameControl {
         // If there are more levels, advance. Otherwise finish gracefully.
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             // Inform user and go to next level
-            try { alert("Level ended."); } catch (e) { /* ignore */ }
+            //try { alert("Level ended."); } catch (e) { /* ignore */ }
             if (this.gameOver) {
                 this.gameOver();
             } else {
@@ -347,8 +347,7 @@ class GameControl {
 
     // Helper method to save the current canvas id and image data in the game container
     saveCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
-        const canvasElements = gameContainer.querySelectorAll('canvas');
+        const canvasElements = this.gameContainer.querySelectorAll('canvas');
         this.savedCanvasState = Array.from(canvasElements).map(canvas => {
             return {
                 id: canvas.id,
@@ -359,8 +358,7 @@ class GameControl {
 
     // Helper method to hide the current canvas state in the game container
     hideCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
-        const canvasElements = gameContainer.querySelectorAll('canvas');
+        const canvasElements = this.gameContainer.querySelectorAll('canvas');
         canvasElements.forEach(canvas => {
             if (canvas.id !== 'gameCanvas') {
                 canvas.style.display = 'none';
@@ -370,7 +368,6 @@ class GameControl {
 
     // Helper method to restore the hidden canvas item to be visible
     showCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
         this.savedCanvasState.forEach(hidden_canvas => {
             const canvas = document.getElementById(hidden_canvas.id);
             if (canvas) {

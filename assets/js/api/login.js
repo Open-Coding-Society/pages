@@ -140,9 +140,9 @@ async function updateNavigation(isLoggedIn) {
         console.log("User classes:", classes);
 
         const courseMap = {
-            'CSSE': { name: 'CSSE', url: `${baseurl}/navigation/section/csse` },
-            'CSP': { name: 'APCSP', url: `${baseurl}/navigation/section/csp` },
-            'CSA': { name: 'APCSA', url: `${baseurl}/navigation/section/csa` }
+            'CSSE': { name: 'CSSE', url: `${baseurl}/navigation/courses/csse` },
+            'CSP': { name: 'APCSP', url: `${baseurl}/navigation/courses/csp` },
+            'CSA': { name: 'APCSA', url: `${baseurl}/navigation/courses/csa` }
         };
 
         // Filter to valid courses only

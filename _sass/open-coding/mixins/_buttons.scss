@@ -1,0 +1,157 @@
+/**
+ * Button Mixins
+ * Reusable button patterns for consistent styling across the application
+ */
+
+/**
+ * Base Control
+ * Common color and interaction styles for all controls
+ * @private - Use specific mixins instead
+ */
+@mixin base-button {
+  background: var(--pref-bg-color);
+  border: 1px solid var(--ui-border);
+  color: var(--pref-text-color);
+  font-family: var(--pref-font-family);
+  font-size: var(--pref-font-size);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--pref-accent-color);
+  }
+}
+
+/**
+ * Text Button
+ * Standard rectangular button with text content
+ *
+ * @example
+ *   .my-text-button {
+ *     @include text-button;
+ *   }
+ */
+@mixin text-button {
+  @include base-button;
+  height: 38px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    height: 44px;
+  }
+}
+
+/**
+ * Icon Button
+ * Square button designed for icon-only content
+ *
+ * @param {Number} $size - Button size (default: 38px)
+ * @param {Number} $spacing - Margin left spacing (default: 8px)
+ *
+ * @example
+ *   .my-icon-button {
+ *     @include icon-button;
+ *   }
+ *
+ *   .my-large-icon-button {
+ *     @include icon-button(48px, 12px);
+ *   }
+ */
+@mixin icon-button($size: 38px, $spacing: 8px) {
+  @include text-button;
+  width: $size;
+  height: $size;
+  padding: 8px;
+  margin-left: $spacing;
+
+  @media (max-width: 768px) {
+    margin-left: 0.25rem;
+    width: 44px;
+  }
+}
+
+/**
+ * Emphasized Button
+ * Button with inverted colors for primary actions
+ *
+ * @param {Number} $size - Button size (default: 38px)
+ * @param {Number} $spacing - Margin left spacing (default: 8px)
+ *
+ * @example
+ *   .runBtn {
+ *     @include emphasized-icon-button;
+ *   }
+ */
+@mixin emphasized-icon-button($size: 38px, $spacing: 8px) {
+  @include icon-button($size, $spacing);
+  background: var(--pref-accent-color);
+  border-color: var(--pref-accent-color);
+  color: var(--pref-bg-color);
+
+  &:hover {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+/**
+ * Toggle Button
+ * Button with icon that can rotate or change state
+ *
+ * @example
+ *   .my-toggle {
+ *     @include toggle-button;
+ *   }
+ */
+@mixin toggle-button {
+  @include base-button;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/**
+ * Select Control
+ * Standardized dropdown/select styling
+ *
+ * @param {Number} $min-width - Minimum width (default: 150px)
+ *
+ * @example
+ *   .languageSelect {
+ *     @include select-control;
+ *   }
+ *
+ *   .customSelect {
+ *     @include select-control(200px);
+ *   }
+ */
+@mixin select-control($min-width: 150px) {
+  @include base-button;
+  min-width: $min-width;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    min-width: auto;
+    max-width: 90px;
+    font-size: 0.85rem;
+  }
+}
