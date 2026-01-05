@@ -89,7 +89,7 @@ def extract_code_runner_metadata(cell_source, language):
 
 
 def clean_code_for_runner(cell_source, language):
-    """Remove %%js, %%python magic commands and CODE_RUNNER comments from code"""
+    """Remove magic commands, CODE_RUNNER comments, and language-specific artifacts from code"""
     lines = cell_source.split('\n')
     cleaned_lines = []
     
@@ -99,16 +99,31 @@ def clean_code_for_runner(cell_source, language):
     else:
         pattern = None
     
-    for line in lines:
-        # Skip magic commands
+    # Find index of last non-whitespace line for Java .main(null) removal
+    last_content_index = -1
+    if language == 'java':
+        for i in range(len(lines) - 1, -1, -1):
+            if lines[i].strip():
+                last_content_index = i
+                break
+    
+    for i, line in enumerate(lines):
+        # Skip %%js magic command (JavaScript first line)
+        if language == 'javascript' and i == 0 and line.strip().startswith('%%js'):
+            continue
+        # Skip any other magic commands
         if line.strip().startswith('%%'):
             continue
         # Skip CODE_RUNNER comment lines
         if pattern and re.match(pattern, line.strip(), re.IGNORECASE):
             continue
+        # Skip Java .main(null) call (last non-whitespace line)
+        if language == 'java' and i == last_content_index:
+            if re.match(r'^\w+\.main\s*\(\s*null\s*\)\s*;?\s*$', line.strip()):
+                continue
         cleaned_lines.append(line)
     
-    return '\n'.join(cleaned_lines).strip()
+    return '\n'.join(cleaned_lines).rstrip()
 
 
 def generate_runner_id(permalink, index):
@@ -121,15 +136,24 @@ def generate_runner_id(permalink, index):
 def detect_cell_language(cell):
     """Detect the programming language of a code cell"""
     source = cell.get('source', '')
+    lines = source.split('\n')
     
-    # Check for magic commands
-    if source.strip().startswith('%%js'):
+    # JavaScript: first line is %%js magic command
+    if lines and lines[0].strip().startswith('%%js'):
         return 'javascript'
-    elif source.strip().startswith('%%python'):
-        return 'python'
     
-    # Use cell metadata or default to python
-    return cell.get('metadata', {}).get('language', 'python')
+    # Java: last non-whitespace line matches ClassName.main(null);
+    # Find last non-empty line
+    last_line = ''
+    for line in reversed(lines):
+        if line.strip():
+            last_line = line.strip()
+            break
+    if re.match(r'^\w+\.main\s*\(\s*null\s*\)\s*;?\s*$', last_line):
+        return 'java'
+    
+    # Default to python
+    return 'python'
 
 
 def process_code_runner_cells(notebook, permalink):

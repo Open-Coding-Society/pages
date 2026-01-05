@@ -174,9 +174,9 @@ Sprint5:
       - "Full Stack Deployment Pipeline"
       - "Database Backup and Restore"
   19:
-    theme: "Full Stack Realization & Teaching"
+    theme: "Full Stack Realization"
     goals:
-      - "Student Teaching: Big Ideas"
+      - "Student Teaching Plan: Big Ideas"
       - "System Architecture Understanding"
       - "Database Review & Optimization"
   20:
