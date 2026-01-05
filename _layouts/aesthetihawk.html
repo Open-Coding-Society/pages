@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
     <title>{{ page.title }}</title>
@@ -7,18 +7,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- User preferences CSS (must come after Tailwind to override) and JS -->
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
 </head>
 
 
-<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 bg-neutral-800 text-neutral-100 transition-colors">
+<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors user-theme-root">
     <!-- navbar -->
     {%- include aesthetihawk/header.html -%}
 
-    <div
-        class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased text-neutral-50 mt-[53px] bg-neutral-900">
+    <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
 
         <!-- Sidebar -->
-        <div class="fixed left-0 top-[53px] w-64 h-full bg-neutral-800 border-r  border-neutral-700 flex flex-col">
+        <div class="fixed left-0 top-[53px] w-64 h-full border-r flex flex-col lesson-sidebar">
 
             <!-- welcome section 
             <div class="p-6 flex flex-col items-center bg-neutral-800">
@@ -34,7 +36,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="ml-64 p-8 bg-neutral-900">
+        <div class="ml-64 p-8 lesson-main">
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-2xl font-bold">{{page.title}}</h1>
             </div>

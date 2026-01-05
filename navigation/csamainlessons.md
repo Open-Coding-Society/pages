@@ -1,25 +1,24 @@
 ---
 layout: post 
-title: CSA Lessons Homepage
+courses: {'csa':  {'week': 5}}
+title: CSA MCQ Lessons
 search_exclude: true
-permalink: /navigation/csa-lessons/
-courses: {'csa':  {'week': 6}}
+permalink: /csa/mcq
 type: lesson
 ---
 
-
-# CSA Unit Navbars Test
-
-Below are the navigation bars for all CSA units. You can click the links to test navigation:
-
 ## Unit 1
-{% include nav/CSA_Nunits/csaunit1.html %}
+
+{% include nav/csa_units/csaunit1.html %}
 
 ## Unit 2
-{% include nav/CSA_Nunits/csaunit2.html %}
+
+{% include nav/csa_units/csaunit2.html %}
 
 ## Unit 3
-{% include nav/CSA_Nunits/csaunit3.html %}
+
+{% include nav/csa_units/csaunit3.html %}
 
 ## Unit 4
-{% include nav/CSA_Nunits/csaunit4.html %}
+
+{% include nav/csa_units/csaunit4.html %}

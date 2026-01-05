@@ -17,7 +17,11 @@ default: serve-current
 		if (/^[[:blank:]]*$$/) { regenerate=0 } \
 		else { \
 			print; \
-			if ($$0 ~ /_notebooks\/.*\.ipynb/ || $$0 ~ /_docx\/.*\.docx/) { \
+			if ($$0 ~ /_notebooks\/.*\.ipynb/) { \
+				match($$0, /_notebooks\/[^[:space:]]+\.ipynb/); \
+				notebookFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-single NOTEBOOK_FILE=\"" notebookFile "\" &") \
+			} else if ($$0 ~ /_docx\/.*\.docx/) { \
 				system("make convert &") \
 			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
 				match($$0, /_docx\/.*\/_config\.yml/); \
@@ -108,7 +112,7 @@ serve-yat: use-yat clean
 	@make serve-current
 
 # General serve target (uses whatever is in _config.yml/Gemfile)
-serve-current: stop convert
+serve-current: stop convert split-courses
 	@echo "Starting server with current config/Gemfile..."
 	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) >> $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
@@ -145,7 +149,7 @@ build-cayman: use-cayman build-current
 build-so-simple: use-so-simple build-current
 build-yat: use-yat build-current
 
-build-current: clean
+build-current: clean convert split-courses
 	@bundle install
 	@bundle exec jekyll clean
 	@bundle exec jekyll build
@@ -154,11 +158,29 @@ build-current: clean
 serve: serve-current
 build: build-current
 
+# Multi-course file splitting
+split-courses:
+	@echo " ------ Splitting multi-course files... -------"
+	@python3 scripts/split_multi_course_files.py
+
+clean-courses:
+	@echo "🧹 Cleaning course-specific files..."
+	@python3 scripts/split_multi_course_files.py clean
+
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
 	@python3 -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+
+# Single notebook conversion (faster for development)
+convert-single:
+	@if [ -z "$(NOTEBOOK_FILE)" ]; then \
+		echo "Error: NOTEBOOK_FILE variable not set"; \
+		exit 1; \
+	fi
+	@echo "Converting: $(NOTEBOOK_FILE)"
+	@python3 scripts/convert_notebooks.py "$(NOTEBOOK_FILE)"
 
 # DOCX conversion
 convert-docx:
@@ -213,6 +235,8 @@ clean: stop
 	@find _posts -type f -name '*_GithubIssue_.md' -exec rm {} +
 	@echo "Cleaning converted DOCX files..."
 	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
+	@echo "Cleaning course-specific files..."
+	@make clean-courses
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -279,12 +303,14 @@ help:
 	@echo "Conversion Commands:"
 	@echo "  make convert        - Convert notebooks and DOCX files"
 	@echo "  make convert-docx   - Convert DOCX files only"
+	@echo "  make split-courses  - Split multi-course files automatically"
 	@echo "  make docx-only      - Convert DOCX and prepare for preview"
 	@echo "  make preview-docx   - Clean, convert DOCX, and serve"
 	@echo ""
 	@echo "Cleanup Commands:"
 	@echo "  make clean          - Remove all generated files"
 	@echo "  make clean-docx     - Remove DOCX-generated files only"
+	@echo "  make clean-courses  - Remove course-specific split files only"
 	@echo ""
 	@echo "Diagnostic Commands:"
 	@echo "  make convert-check  - Check notebooks for conversion warnings"

@@ -1,7 +1,7 @@
 ---
 layout: post
-title: BI 3 | ALGORITHMS AND PROGRAMMING | Fundamentals 
-description: An introduction to College Board's Big Idea 3, part one.  This is a collection of Python lessons to help students understand the fundamental algorithm and programming elementes required by College Board's AP Computer Science Principles curriculum.
+title: BI 3 Review
+description: This was an introduction to College Board's Big Idea 3.  This is a revolving collection of Python and JavaScript lessons to help students understand the fundamental algorithm and programming elementes required by College Board's AP Computer Science Principles curriculum.
 toc: False
 comments: False
 permalink: /csp/big-idea/fundamentals
@@ -19,9 +19,7 @@ Welcome to the exciting world of Computer Science!
 
 College Board Big Idea 3 is divided into two parts.
 
-#### Part 1 - Fundamentals (This unit)
-
-In this unit, you will cover the foundational concepts of programming, including:
+In this unit, you covered the foundational concepts of programming, including:
 
 - 3.1 Variables
 - 3.2 Data Abstraction
@@ -35,7 +33,7 @@ In this unit, you will cover the foundational concepts of programming, including
 
 #### Part 2 - Core Concepts (Next unit)
 
-In the next unit, you will delve into more complex topics, such as:
+In the next unit, you delved into more complex topics, such as:
 
 - 3.9 Developing Algorithms
 - 3.11 Search
@@ -57,20 +55,20 @@ Additionally, coding improves your logical thinking skills. The concepts covered
 
 ## Getting Started
 
-To start your journey into algorithms and programming, follow these steps:
+To conclude your journey into algorithms and programming, review these steps:
 
-1. **Familiarize Yourself with Basic Terms**: Look up the terms listed below and others that are unknown as you work through coding exercises.
-2. **Engage in Hands-On Practice**: Use Jupyter code cells to work through the coding exercises provided in the hacks. Create a Python cell and insert it at any point in the exercise. Don’t hesitate to experiment and explore beyond the curriculum.
+1. **Familiarize Yourself with Basic Terms**: Look up the terms listed below and others that are unknown as you review your coding progress.
+2. **Engage in Hands-On Practice**: You should have used Jupyter code cells and Code Runner to work through the coding exercises provided in the hacks. Create a code cell and insert it at any point in the exercise. Don’t hesitate to experiment and explore beyond the curriculum.
 3. **Consistent Practice**: The key to mastering programming is consistent practice, problem-solving, asking questions, and conducting research.
 
 ### Basic Terms
 
 - **Algorithm**: A step-by-step procedure for solving a problem or performing a task.
 - **Pseudocode**: A way to describe algorithms using a mixture of natural language and programming language elements.
-- **College Board Pseudocode**: A language used on the AP exam. It does not run or compile, but it is used to express knowledge of programming fundamentals.
+- **College Board Pseudocode**: A language used on the AP exam. It does not run or compile, but it is used to express knowledge of programming fundamentals through MCQs.
 - **Debugging**: The process of finding and fixing errors in a program.
 - **Debugger**: A tool used to debug code. It allows developers to step through lines of code and examine variables.
-- **Control Structures**: Constructs that control the flow of execution in a program (e.g., loops, conditionals).
+- **Control Structures**: Constructs that control the flow of execution in a program (e.g., sequence (order of code), selection (if statements), iteration (loops)).
 
 ### Resource
 

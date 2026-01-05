@@ -16,6 +16,12 @@ export class Transform {
         this.yv += this.speed * Math.cos(rad);
     }
 
+    distanceTo(target) {
+        const dx = target.x - this.x;
+        const dy = target.y - this.y;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+
     updatePosition() {
 
         this.xv *= 0.9;

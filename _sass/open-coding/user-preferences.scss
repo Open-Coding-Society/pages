@@ -1,0 +1,212 @@
+/* ---------- User theme: plain color (no gradients) ---------- */
+
+:root {
+  --pref-bg-color: #0b1220;
+  --pref-text-color: #e6eef8;
+  --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --pref-font-size: 14px;
+  --pref-accent-color: #3b82f6;
+  --text-muted: #a0a0a0;
+
+  /* Derived UI variables */
+  --panel: var(--pref-bg-color);
+  --panel-mid: rgba(0,0,0,0.12);
+  --ui-bg: rgba(0,0,0,0.06);
+  --ui-border: rgba(255,255,255,0.06);
+  --emoji-bg: rgba(255,255,255,0.9);
+}
+
+/* Scope the user theme */
+.user-theme-active,
+.user-theme-active.dark {
+  background-color: var(--pref-bg-color) !important;
+  color: var(--pref-text-color) !important;
+  font-family: var(--pref-font-family) !important;
+  font-size: var(--pref-font-size) !important;
+}
+
+/* Make main containers use plain user color (no gradients) */
+.user-theme-active {
+  .container,
+  .page-content,
+  .wrapper,
+  main,
+  article,
+  .post,
+  .content,
+  .opencs_root {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  /* Full sidebar and topbar use the plain user color */
+  .lesson-sidebar,
+  .lesson-topbar,
+  aside,
+  .sidebar,
+  #sidebar,
+  .site-sidebar,
+  .sidebar-container,
+  .side-panel {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+
+  /* Infograph module cards: same plain color for every card */
+  .module-card {
+    background-color: var(--pref-bg-color) !important;
+    border: 1px solid var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+    padding: 1rem !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure no alternating rule overrides the plain color */
+  .module-card:nth-child(2n) {
+    background-color: var(--pref-bg-color) !important;
+  }
+
+  /* Columns transparent so card color remains visible */
+  .module-image-col,
+  .module-keypoints-col,
+  .module-desc-col {
+    background: transparent !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  .module-desc-col {
+    padding: 0.6rem !important;
+    border-radius: 0.375rem !important;
+  }
+
+  .module-img {
+    background-color: transparent !important;
+    border-radius: 0.5rem !important;
+    object-fit: cover !important;
+  }
+
+  .module-emoji {
+    background-color: var(--emoji-bg) !important;
+    color: #0b1220 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
+  }
+
+  .module-overlay {
+    background-color: rgba(0,0,0,0.45) !important;
+  }
+
+  /* Questions: background plain; inputs also plain user color */
+  .questions,
+  .question-box,
+  .question-card,
+  .qa-box,
+  .qa-section {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid var(--ui-border) !important;
+  }
+
+  .question-box input,
+  .question-box textarea,
+  .question-card input,
+  .question-card textarea,
+  input.question-input,
+  textarea.question-input {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+    border: 1px solid rgba(0,0,0,0.18) !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Generic cards/panels use plain user color */
+  .card,
+  .panel,
+  .box,
+  .post,
+  .microblog-post,
+  [class*="rounded-xl"],
+  [class*="rounded-lg"] {
+    background-color: var(--pref-bg-color) !important;
+    border-color: var(--ui-border) !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Links/icons */
+  a, a:visited, a:hover,
+  .module-card a,
+  .module-card svg,
+  header a,
+  .site-header a,
+  aside a,
+  .sidebar a {
+    color: var(--pref-accent-color) !important;
+    fill: currentColor !important;
+  }
+
+  /* Force text color for readability */
+  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
+    color: var(--pref-text-color) !important;
+  }
+
+  /* Muted secondary text */
+  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
+  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500,
+  .post-meta, .post-meta-description {
+    color: var(--text-muted) !important;
+  }
+
+  /* Inputs/buttons default */
+  input, select, textarea, button {
+    background-color: var(--panel);
+    border: 1px solid var(--pref-accent-color);
+  }
+
+  /* Invert color to look preferred */
+  button.bg-blue-600, button.bg-blue-700,
+  button.bg-green-600, button.bg-green-700,
+  .btn-primary,
+  .save-section-btn,
+  #save-preferences,
+  #save-theme-btn {
+    background-color: color-mix(in srgb, var(--pref-accent-color) 65%, white 35%);
+    border: 1px solid var(--pref-accent-color);
+  }
+
+  /* Lesson player specific overrides */
+  .lesson-player,
+  .lesson-main,
+  .main-content,
+  .content-wrapper,
+  .lesson-content {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+  }
+  
+  .lesson-sidebar,
+  .sidebar-header,
+  .sprint-nav,
+  .sprint-section,
+  .lesson-item {
+    background-color: var(--panel) !important;
+    color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+  }
+  
+  .sidebar-header h2,
+  .sidebar-header p,
+  .sprint-toggle,
+  .lesson-title,
+  .progress-label {
+    color: var(--pref-text-color) !important;
+  }
+  
+  /* Tailwind background class overrides */
+  [class*="bg-neutral-"],
+  [class*="bg-gray-"],
+  [class*="bg-slate-"],
+  [class*="bg-zinc-"] {
+    background-color: var(--pref-bg-color) !important;
+  }
+}

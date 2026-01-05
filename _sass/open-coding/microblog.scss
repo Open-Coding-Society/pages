@@ -1,16 +1,17 @@
-
 /* Microblog form group and label */
 .microblog-form-group {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
+
 .microblog-form-label {
   font-size: 1rem;
   font-weight: 500;
   color: #f1f5f9;
   margin-bottom: 0.25rem;
 }
+
 .microblog-form-label .required {
   color: #ef4444;
 }
@@ -19,9 +20,10 @@
 /* Modal overlay background: dark semi-transparent */
 #microblog-modal,
 #reply-modal {
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 1200;
 }
+
 #microblog-modal,
 #reply-modal {
   position: fixed;
@@ -30,19 +32,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   transition: opacity 0.2s;
 }
+
 #microblog-modal.hidden,
 #reply-modal.hidden {
   display: none;
 }
+
 /* Modal Panel: matches microblog panel pattern */
 .microblog-modal-panel {
   background: var(--green-bg);
   color: var(--white);
   border-radius: 0.5rem;
-  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 32rem;
   margin: 0 0.5rem;
@@ -59,6 +63,7 @@
   background: none;
   color: inherit;
 }
+
 .microblog-modal-close {
   background: none;
   border: none;
@@ -68,25 +73,30 @@
   transition: color 0.2s;
   margin-right: 0.5rem;
 }
+
 .microblog-modal-close:hover {
   color: #fff;
 }
+
 .microblog-modal-title {
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 0;
 }
+
 .microblog-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+
 .microblog-form label {
   font-size: 1rem;
   font-weight: 500;
   color: #f1f5f9;
   margin-bottom: 0.25rem;
 }
+
 .microblog-form input[type="text"] {
   width: 100%;
   border: 1px solid #cbd5e1;
@@ -97,6 +107,15 @@
   background: #fff;
   margin-top: 0.25rem;
 }
+
+/* Inbox-specific text inputs for title and link labels */
+.inbox-panel--compact .microblog-form input[type="text"],
+.inbox-panel--compact .microblog-form input[type="url"] {
+  background: #1f2937;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
 .microblog-form textarea {
   display: block;
   width: 100%;
@@ -113,11 +132,13 @@
   resize: vertical;
   box-sizing: border-box;
 }
+
 .microblog-form .microblog-form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
 }
+
 .microblog-btn {
   background: #1e40af;
   color: #fff;
@@ -129,47 +150,235 @@
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .microblog-btn:hover {
   background: #2563eb;
 }
+
 .microblog-btn-cancel {
   background: #64748b;
 }
+
 .microblog-btn-cancel:hover {
   background: #475569;
 }
+
+/* Override button styles inside inbox forms for Remove and Clear buttons */
+.inbox-panel--compact .microblog-form .microblog-btn-cancel {
+  background: #2563eb;
+  border: none;
+  border-radius: 0.375rem;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.inbox-panel--compact .microblog-form .microblog-btn-cancel:hover {
+  background: #1e40af;
+}
+
+.inbox-panel--compact .microblog-form .microblog-btn {
+  background: #2563eb;
+  border-radius: 0.375rem;
+  color: #fff;
+}
+
+.inbox-panel--compact .microblog-form .microblog-btn:hover {
+  background: #1e40af;
+}
+
 /* Floating Action Button */
-.microblog-fab {
+
+/* Container that holds the microblog FAB and the inbox FAB so they sit adjacent */
+.micro-actions-wrapper {
   position: fixed;
   top: 5rem;
   right: 2rem;
   z-index: 1050;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  --fab-size: 56px; /* default diameter for circular FABs */
+}
+
+/* Floating Action Button */
+.microblog-fab {
   background: #2563eb;
   color: #fff;
   border: none;
   border-radius: 999px;
-  padding: 1rem 1.5rem;
-  font-size: 1.2rem;
+  padding: 0 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--fab-size, 56px);
+  min-width: calc(var(--fab-size, 56px) + 40px);
 }
-.microblog-fab:hover {
-  background: #1e40af;
+
+.microblog-fab:hover { background: #1e40af; }
+
+@media (max-width: 600px) {
+  .micro-actions-wrapper { top: 1rem; right: 1rem; }
+  .microblog-fab { font-size: 1.2rem; min-width: 56px; height: var(--fab-size,56px); }
+}
+
+/* Small Inbox FAB - sits to the left of the main microblog FAB */
+.inbox-fab {
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: var(--fab-size, 56px);
+  height: var(--fab-size, 56px);
+  padding: 0;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+  position: relative;
+}
+.inbox-fab:hover { background: #059669; transform: translateY(-1px); }
+
+/* Notification badge on inbox FAB */
+.inbox-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 2px solid var(--green-bg);
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.inbox-badge.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @media (max-width: 600px) {
-  .microblog-fab {
-    right: 1rem;
-    top: 1rem;
-    padding: 1.2rem 2.2rem;
-    font-size: 1.5rem;
-    min-width: 56px;
-    min-height: 56px;
-    border-radius: 50%;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-  }
+  .inbox-fab { width: var(--fab-size,56px); height: var(--fab-size,56px); font-size:1.35rem; }
+}
+
+/* Compact inbox panel - small, anchored near the inbox FAB */
+.inbox-panel--compact {
+  right: calc(2rem + 0px); /* sits near the micro-actions wrapper */
+  top: calc(5rem + 3px);
+  width: 420px;
+  max-width: 92vw;
+  height: auto;
+  min-height: 8rem;
+  max-height: calc(100vh - 6rem);
+  overflow: auto;
+  transform: translateX(8px) translateY(-8px) translateZ(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  border-radius: 0.5rem;
+}
+.inbox-panel--compact.open {
+  transform: translateX(0) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .inbox-panel--compact { right: 4.4rem; top: 4.2rem; }
+}
+
+/* Inbox-specific input sizing to make title smaller and same width as content */
+.inbox-panel--compact .microblog-input {
+  font-size: 0.95rem;
+  padding: 0.35rem 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+.inbox-panel--compact .microblog-textarea {
+  width: 100%;
+  min-height: 120px;
+  box-sizing: border-box;
+}
+
+/* Make inbox inputs dark gray by default and ensure text is readable */
+.inbox-panel--compact .microblog-input,
+.inbox-panel--compact .microblog-textarea {
+  background: #1f2937; /* dark gray */
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Admin control buttons in inbox: make all buttons blue with rounded corners.
+   Provide a square, rounded 'done' button sized to match the height of other buttons. */
+.inbox-panel--compact .inbox-admin-controls .microblog-btn,
+.inbox-panel--compact .inbox-admin-controls .microblog-btn-cancel,
+.inbox-panel--compact .inbox-admin-controls .microblog-btn-done {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.4rem 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px; /* uniform height for controls */
+}
+
+.inbox-panel--compact .inbox-admin-controls .microblog-btn:hover,
+.inbox-panel--compact .inbox-admin-controls .microblog-btn-cancel:hover,
+.inbox-panel--compact .inbox-admin-controls .microblog-btn-done:hover {
+  background: #1e40af;
+}
+
+/* Square done button matching the controls' height */
+.inbox-panel--compact .inbox-admin-controls .microblog-btn-done {
+  width: 36px;
+  padding: 0;
+  border-radius: 8px; /* slightly rounded square */
+}
+
+/* Ensure generic microblog buttons used elsewhere inside inbox also follow blue styling */
+.inbox-panel--compact .microblog-btn {
+  background: #2563eb;
+  color: #fff;
+  border-radius: 0.375rem;
+}
+.inbox-panel--compact .microblog-btn-cancel {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Messages container: newest first visually (we prepend via JS too) */
+.inbox-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Simple visual for tabs inside inbox */
+.inbox-tabs .inbox-tab {
+  color: var(--white);
+  border: 1px solid transparent;
+}
+.inbox-tabs .inbox-tab:hover {
+  background: rgba(255,255,255,0.04);
 }
 
 /* Side Panel */
@@ -181,18 +390,21 @@
   right: 0;
   width: 400px;
   max-width: 90vw;
-  height: calc(100vh - 5rem - 3rem); /* leave 3rem for footer */
+  height: calc(100vh - 5rem - 3rem);
+  /* leave 3rem for footer */
   margin-bottom: 3rem;
-  box-shadow: -2px 0 12px rgba(0,0,0,0.12);
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.12);
   z-index: 1100;
   transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
   display: flex;
   flex-direction: column;
 }
+
 .microblog-panel.open {
   transform: translateX(0);
 }
+
 .microblog-panel-header,
 .microblog-modal-header {
   display: flex;
@@ -201,6 +413,7 @@
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
 }
+
 .microblog-panel-title,
 .microblog-modal-title {
   margin: 0;
@@ -212,6 +425,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .microblog-close-btn {
   background: none;
   border: none;
@@ -221,27 +435,48 @@
   padding: 0 0.5rem;
   line-height: 1;
 }
+
 .microblog-panel-content {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
 }
-@media (max-width: 600px) {
+
+@media (max-width: 768px) {
   .microblog-panel {
-    width: 100vw;
-    max-width: 100vw;
-    top: 1rem;
-    height: calc(100vh - 1rem);
+    width: 95vw;
+    max-width: 95vw;
+    height: 85vh;
+    border-radius: 12px;
+
+    /* Centered Modal Style */
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    right: auto;
+    /* Reset right positioning */
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.28s cubic-bezier(.4, 0, .2, 1),
+      opacity 0.2s ease, visibility 0.2s ease;
   }
+
+  .microblog-panel.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+
   .microblog-fab {
-    right: 1rem;
-    top: 1rem;
-    padding: 1.2rem 2.2rem;
-    font-size: 1.5rem;
-    min-width: 56px;
-    min-height: 56px;
-    border-radius: 50%;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    right: 2rem;
+    top: 5rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem;
+    min-width: auto;
+    min-height: auto;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -265,6 +500,7 @@
   transition: background 0.2s;
   margin-left: auto;
 }
+
 .guest-signup-toggle-btn:hover {
   background: #059669;
 }
@@ -297,6 +533,23 @@
   color: #222;
   background: #fff;
   box-sizing: border-box;
+}
+
+/* Unread indicator for messages in the inbox */
+.inbox-message.unread {
+  border-left: 3px solid #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.inbox-message.unread::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
 }
 
 .guest-submit-btn {

@@ -2,11 +2,10 @@
 layout: post 
 title: Student Toolkit - Selection Sort Simulation
 description: Selection Sort animation to help visualize the sorting algorithm; meant to pair with student_toolkit sorting part 1 team teach lesson
-author: Anusha Khobare, Eshaan Kumar, Matthew Wang
-hide: true
 permalink: /toolkit-sorting-selection-simulation
-menu: nav/CSA_Units/ds_team_teaches/toolkit-selection-insertion.html
+author: Anusha Khobare, Eshaan Kumar, Matthew Wang
 ---
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">

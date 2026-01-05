@@ -1,0 +1,341 @@
+<!-- Small Inbox Button (appears to the left of the microblog FAB) -->
+<button id="inbox-toggle-btn" class="inbox-fab" aria-label="Open Inbox">
+  📥
+  <div id="inbox-badge" class="inbox-badge hidden" title="Unread announcements">!</div>
+</button>
+
+<!-- Compact Inbox Panel (opened by the small inbox FAB) -->
+<aside id="inbox-panel" class="microblog-panel inbox-panel--compact" tabindex="-1" aria-label="Inbox panel">
+  <div class="microblog-panel-header">
+    <button id="inbox-close-btn" class="microblog-close-btn" aria-label="Close Inbox">&times;</button>
+    <h2 class="microblog-panel-title">Inbox</h2>
+  </div>
+  <div class="microblog-panel-content">
+    <div class="inbox-tabs" style="display:flex; gap:0.5rem; padding:0.5rem;">
+      <button id="tab-announcements" class="inbox-tab" style="padding:0.35rem 0.6rem; background:transparent; border-radius:6px;">Announcements</button>
+    </div>
+
+    <div id="announcements-content">
+      <div id="inbox-app" class="inbox-app">
+      <!-- Admin-only form - hidden by default, shown via JS for admins -->
+      <form id="inbox-form" class="microblog-form" aria-label="Inbox announcement form" style="display:none;">
+        <div class="microblog-form-group">
+          <label class="microblog-form-label" for="inbox-title">Title <span class="required">*</span></label>
+          <input id="inbox-title" name="title" type="text" required class="microblog-input" style="width:100%;" />
+        </div>
+        <div class="microblog-form-group">
+          <label class="microblog-form-label" for="inbox-content">Content <span class="required">*</span></label>
+          <textarea id="inbox-content" name="content" required class="microblog-textarea"></textarea>
+        </div>
+        <div class="microblog-form-group" id="links-area">
+          <label class="microblog-form-label">Links (optional)</label>
+          <div id="inbox-links-container"></div>
+          <p style="margin-top:0.5rem;"><button id="add-link-btn" type="button" class="microblog-btn">Add link</button></p>
+        </div>
+        <div class="microblog-form-actions">
+          <button type="submit" class="microblog-btn">Post to Inbox</button>
+          <button type="button" id="inbox-clear-btn" class="microblog-btn-cancel">Clear</button>
+        </div>
+      </form>
+
+      <hr id="inbox-form-divider" style="border-color: rgba(255,255,255,0.08); margin:0.75rem 0; display:none;" />
+
+      <div id="inbox-messages" class="inbox-messages">
+        <em style="color:var(--white); padding:0.5rem; display:block;">No announcements yet.</em>
+      </div>
+      </div>
+
+  </div>
+</aside>
+
+<script type="module">
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+// Store admin status globally for use in message rendering
+window.inboxUserIsAdmin = false;
+
+// Check if user is Admin and show inbox form
+async function checkInboxAdminAccess() {
+  try {
+    const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+    if (!res.ok) return;
+    
+    const user = await res.json();
+    const isAdmin = user.role === "Admin";
+    window.inboxUserIsAdmin = isAdmin;
+    
+    if (isAdmin) {
+      const inboxForm = document.getElementById('inbox-form');
+      const inboxDivider = document.getElementById('inbox-form-divider');
+      
+      if (inboxForm) inboxForm.style.display = 'block';
+      if (inboxDivider) inboxDivider.style.display = 'block';
+      
+      // Show admin controls on existing messages
+      document.querySelectorAll('.inbox-admin-controls').forEach(ctrl => {
+        ctrl.style.display = 'flex';
+      });
+    }
+  } catch (err) {
+    console.error("Error checking inbox admin access:", err);
+  }
+}
+
+// Run admin check on load
+checkInboxAdminAccess();
+
+// Inbox toggle (small FAB)
+const inboxToggle = document.getElementById('inbox-toggle-btn');
+const inboxPanel = document.getElementById('inbox-panel');
+const inboxCloseBtn = document.getElementById('inbox-close-btn');
+
+function openInboxPanel() {
+  inboxPanel.classList.add('open');
+}
+function closeInboxPanel() {
+  inboxPanel.classList.remove('open');
+}
+if (inboxToggle) {
+  inboxToggle.onclick = function(e) {
+    e.stopPropagation();
+    // toggle the compact inbox panel
+    if (inboxPanel.classList.contains('open')) closeInboxPanel(); else openInboxPanel();
+  };
+}
+if (inboxCloseBtn) inboxCloseBtn.onclick = closeInboxPanel;
+
+// Close inbox when clicking outside the panel
+document.addEventListener('click', (e) => {
+  if (!inboxPanel) return;
+  if (!inboxPanel.classList.contains('open')) return;
+  if (e.target === inboxPanel || inboxPanel.contains(e.target)) return;
+  if (inboxToggle && e.target === inboxToggle) return;
+  closeInboxPanel();
+});
+</script>
+
+<script>
+// Inbox form behavior (no persistence)
+;(function(){
+  const form = document.getElementById('inbox-form');
+  const linksContainer = document.getElementById('inbox-links-container');
+  const addLinkBtn = document.getElementById('add-link-btn');
+  const messagesEl = document.getElementById('inbox-messages');
+  const clearBtn = document.getElementById('inbox-clear-btn');
+  const badge = document.getElementById('inbox-badge');
+
+  // Update badge visibility based on unread messages
+  function updateBadge() {
+    const unreadMessages = messagesEl.querySelectorAll('.inbox-message.unread');
+    const unreadCount = unreadMessages.length;
+    
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount > 9 ? '!' : unreadCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  function createLinkRow(url='', label=''){
+    const row = document.createElement('div');
+    row.className = 'inbox-link-row';
+    row.style.display = 'flex';
+    row.style.gap = '0.5rem';
+    row.style.marginTop = '0.25rem';
+
+    const urlInput = document.createElement('input');
+    urlInput.type = 'url';
+    urlInput.placeholder = 'https://example.com';
+    urlInput.value = url;
+    urlInput.style.flex = '1';
+    urlInput.className = 'microblog-input';
+
+    const labelInput = document.createElement('input');
+    labelInput.type = 'text';
+    labelInput.placeholder = 'Link label (optional)';
+    labelInput.value = label;
+    labelInput.style.width = '10rem';
+    labelInput.className = 'microblog-input';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'microblog-btn-cancel';
+    removeBtn.textContent = 'Remove';
+    removeBtn.onclick = () => row.remove();
+
+    row.appendChild(urlInput);
+    row.appendChild(labelInput);
+    row.appendChild(removeBtn);
+    return row;
+  }
+
+  addLinkBtn && addLinkBtn.addEventListener('click', () => {
+    linksContainer.appendChild(createLinkRow());
+  });
+
+  clearBtn && clearBtn.addEventListener('click', () => {
+    form.reset();
+    linksContainer.innerHTML = '';
+  });
+
+  form && form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('inbox-title').value.trim();
+    const content = document.getElementById('inbox-content').value.trim();
+    if (!title || !content) return alert('Please provide title and content.');
+
+    const linkRows = Array.from(linksContainer.querySelectorAll('.inbox-link-row'));
+    const links = linkRows.map(r => {
+      const inputs = r.getElementsByTagName('input');
+      return { url: inputs[0].value.trim(), label: inputs[1].value.trim() };
+    }).filter(l => l.url);
+
+    // Build announcement object
+    const ann = { id: 'ann-' + Date.now() + '-' + Math.floor(Math.random()*1000), title, content, links, unread: true };
+
+    function buildMessageElement(announcement){
+      const el = document.createElement('div');
+      el.className = 'inbox-message' + (announcement.unread ? ' unread' : '');
+      el.dataset.annId = announcement.id;
+      el.dataset.unread = announcement.unread ? 'true' : 'false';
+      el.style.padding = '0.75rem';
+      el.style.border = '1px solid rgba(255,255,255,0.06)';
+      el.style.borderRadius = '6px';
+      el.style.marginBottom = '0.5rem';
+
+      const header = document.createElement('div');
+      header.style.display = 'flex';
+      header.style.justifyContent = 'space-between';
+      header.style.alignItems = 'center';
+
+      const h = document.createElement('div');
+      h.style.fontWeight = '700';
+      h.style.marginBottom = '0.25rem';
+      h.textContent = announcement.title;
+
+      const controls = document.createElement('div');
+      controls.className = 'inbox-admin-controls';
+      controls.style.display = 'none'; // Hidden by default, shown for admins
+      controls.style.gap = '0.5rem';
+      controls.style.alignItems = 'center';
+
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'microblog-btn';
+      editBtn.textContent = 'Edit';
+      editBtn.onclick = () => {
+        // populate form for editing
+        document.getElementById('inbox-title').value = announcement.title;
+        document.getElementById('inbox-content').value = announcement.content;
+        linksContainer.innerHTML = '';
+        (announcement.links || []).forEach(l => linksContainer.appendChild(createLinkRow(l.url, l.label)));
+        form.dataset.editingId = announcement.id;
+        // change submit label
+        const submitBtn = form.querySelector('button[type=submit]');
+        if (submitBtn) submitBtn.textContent = 'Save changes';
+        // open panel
+        openInboxPanel();
+      };
+
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'microblog-btn-cancel';
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => {
+        if (confirm('Delete this announcement?')) {
+          el.remove();
+          updateBadge();
+        }
+      };
+
+      const markDoneBtn = document.createElement('button');
+      markDoneBtn.type = 'button';
+      markDoneBtn.className = 'microblog-btn-done';
+      markDoneBtn.title = 'Mark as read';
+      markDoneBtn.setAttribute('aria-label', 'Mark as read');
+      markDoneBtn.innerHTML = '&#10003;';
+      markDoneBtn.onclick = () => {
+        // Mark as read: remove unread class and update dataset
+        const wasUnread = el.dataset.unread === 'true';
+        el.classList.remove('unread');
+        el.dataset.unread = 'false';
+        // visual toggle for done state
+        el.classList.toggle('inbox-done');
+        markDoneBtn.classList.toggle('done');
+        // Update badge if there are no more unread messages
+        if (wasUnread) updateBadge();
+      };
+
+      controls.appendChild(editBtn);
+      controls.appendChild(delBtn);
+      controls.appendChild(markDoneBtn);
+      
+      // Show controls if user is admin
+      if (window.inboxUserIsAdmin) {
+        controls.style.display = 'flex';
+      }
+
+      header.appendChild(h);
+      header.appendChild(controls);
+
+      const c = document.createElement('div');
+      c.style.marginBottom = '0.5rem';
+      c.innerHTML = announcement.content.replace(/\n/g, '<br>');
+
+      el.appendChild(header);
+      el.appendChild(c);
+
+      if ((announcement.links || []).length > 0) {
+        const ul = document.createElement('ul');
+        ul.style.margin = '0';
+        ul.style.paddingLeft = '1rem';
+        (announcement.links || []).forEach(l => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = l.url;
+          a.textContent = l.label || l.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.style.color = 'var(--white)';
+          a.style.textDecoration = 'underline';
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+        el.appendChild(ul);
+      }
+
+      return el;
+    }
+
+    // If editing existing announcement, update it
+    const editingId = form.dataset.editingId;
+    if (editingId) {
+      const existing = messagesEl.querySelector(`[data-ann-id="${editingId}"]`);
+      if (existing) {
+        const newEl = buildMessageElement(ann);
+        existing.replaceWith(newEl);
+      }
+      delete form.dataset.editingId;
+      const submitBtn = form.querySelector('button[type=submit]');
+      if (submitBtn) submitBtn.textContent = 'Post to Inbox';
+    } else {
+      // Prepend new message
+      const msgEl = buildMessageElement(ann);
+      if (messagesEl) {
+        const placeholder = messagesEl.querySelector('em');
+        if (placeholder) placeholder.remove();
+        // Prepend to ensure newest announcements appear first
+        if (messagesEl.prepend) messagesEl.prepend(msgEl); else messagesEl.insertBefore(msgEl, messagesEl.firstChild);
+      }
+      // Update badge with new unread count
+      updateBadge();
+    }
+
+    // reset form
+    form.reset();
+    linksContainer.innerHTML = '';
+  });
+
+})();
+</script>

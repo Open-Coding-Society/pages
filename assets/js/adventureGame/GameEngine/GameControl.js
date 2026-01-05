@@ -20,6 +20,16 @@ class GameControl {
         this.isPaused = false;
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
+    // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
+    // Games can override these values if they want to count a different stat name/label.
+    this.pauseMenuOptions = {
+        counterVar: 'coinsCollected',
+        counterLabel: 'Coins collected'
+    };
+    // Whether to show per-level counts. We want a single cumulative counter for coins collected.
+    this.pauseMenuOptions.counterPerLevel = false;
+    // use a unique storage key so stats are per-game
+    this.pauseMenuOptions.storageKey = 'pauseMenuStats:adventure';
     this.skipKeyListener = this.handleSkipKey.bind(this);
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
@@ -160,6 +170,10 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
+        // NOTE: For adventure game, the pause menu counter (coinsCollected) is NOT incremented here.
+        // It is ONLY incremented by coin collection via the collectCoin() method.
+        // Level completion or skipping should not affect the coin counter.
+        
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
@@ -175,7 +189,7 @@ class GameControl {
         // If there are more levels, advance. Otherwise finish gracefully.
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             // Inform user and go to next level
-            try { alert("Level ended."); } catch (e) { /* ignore */ }
+            //try { alert("Level ended."); } catch (e) { /* ignore */ }
             if (this.gameOver) {
                 this.gameOver();
             } else {
@@ -230,6 +244,10 @@ class GameControl {
         if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
 
         if (event.key === 'l' || event.key === 'L') {
+            // If on the last level and no return handler exists, ignore; otherwise allow skip to trigger level-end flow
+            if (this.currentLevelIndex >= this.levelClasses.length - 1 && !(this.game && typeof this.game.returnHome === 'function')) {
+                return;
+            }
             // Call the public API to end/skip the level
             try {
                 this.endLevel();
@@ -253,6 +271,47 @@ class GameControl {
     endLevel() {
         if (this.currentLevel) {
             this.currentLevel.continue = false;
+        }
+    }
+
+    /**
+     * Increment an arbitrary stat on this GameControl (keeps PauseMenu in sync if present)
+     */
+    incrementStat(statName, amount = 1) {
+        try {
+            this[statName] = (this[statName] || 0) + Number(amount || 0);
+            if (this.stats) this.stats[statName] = this[statName];
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('incrementStat error', e);
+        }
+    }
+
+    addPoints(amount = 0) {
+        try {
+            this.points = (this.points || 0) + Number(amount || 0);
+            if (!this.stats) this.stats = { points: this.points };
+            this.stats.points = this.points;
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('addPoints error', e);
+        }
+    }
+
+    /**
+     * Increment coin collection counter for adventure game pause menu
+     */
+    collectCoin(amount = 1) {
+        try {
+            this.coinsCollected = (this.coinsCollected || 0) + Number(amount || 0);
+            if (!this.stats) this.stats = {};
+            this.stats.coinsCollected = this.coinsCollected;
+            if (this.pauseMenu && typeof this.pauseMenu._updateStatsDisplay === 'function') this.pauseMenu._updateStatsDisplay();
+            if (this.pauseMenu && typeof this.pauseMenu._saveStatsToStorage === 'function') this.pauseMenu._saveStatsToStorage();
+        } catch (e) {
+            console.warn('collectCoin error', e);
         }
     }
 
@@ -288,8 +347,7 @@ class GameControl {
 
     // Helper method to save the current canvas id and image data in the game container
     saveCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
-        const canvasElements = gameContainer.querySelectorAll('canvas');
+        const canvasElements = this.gameContainer.querySelectorAll('canvas');
         this.savedCanvasState = Array.from(canvasElements).map(canvas => {
             return {
                 id: canvas.id,
@@ -300,8 +358,7 @@ class GameControl {
 
     // Helper method to hide the current canvas state in the game container
     hideCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
-        const canvasElements = gameContainer.querySelectorAll('canvas');
+        const canvasElements = this.gameContainer.querySelectorAll('canvas');
         canvasElements.forEach(canvas => {
             if (canvas.id !== 'gameCanvas') {
                 canvas.style.display = 'none';
@@ -311,7 +368,6 @@ class GameControl {
 
     // Helper method to restore the hidden canvas item to be visible
     showCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
         this.savedCanvasState.forEach(hidden_canvas => {
             const canvas = document.getElementById(hidden_canvas.id);
             if (canvas) {

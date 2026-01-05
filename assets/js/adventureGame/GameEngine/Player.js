@@ -1,6 +1,7 @@
 import Character from './Character.js';
 import TouchControls from './TouchControls.js';
 
+
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
 const STEP_FACTOR = 100; // 1/nth, or N steps up and across the canvas
@@ -28,7 +29,7 @@ class Player extends Character {
         this.pressedKeys = {}; // active keys array
         this.bindMovementKeyListners();
         this.gravity = data.GRAVITY || false;
-        this.acceleration = 0.001;
+        this.acceleration = 1;
         this.time = 0;
         this.moved = false;
         // Initialize touch controls for mobile devices
@@ -67,7 +68,6 @@ class Player extends Character {
             delete this.pressedKeys[keyCode];
         }
         // adjust the velocity and direction based on the remaining keys
-        this.updateVelocity();
         this.updateDirection();
     }
 
@@ -76,20 +76,17 @@ class Player extends Character {
      */
 
     updateVelocity() {
-        this.velocity.x = 0;
-        this.velocity.y = 0;
-
         this.moved = false;
 
         if (this.pressedKeys[this.keypress.right] || this.pressedKeys[this.keypress.left]) {
             this.moved = true;
 
             if (this.pressedKeys[this.keypress.right]) {
-                this.velocity.x += this.xVelocity;
+                this.transform.xv += 0.6 * this.time;
             }
 
             else if (this.pressedKeys[this.keypress.left]) {
-                this.velocity.x -= this.xVelocity;
+                this.transform.xv -= 0.6 * this.time;
             }
         }
 
@@ -97,13 +94,16 @@ class Player extends Character {
             this.moved = true;
 
             if (this.pressedKeys[this.keypress.up]) {
-                this.velocity.y -= this.yVelocity;
+                this.transform.yv -= 0.6 * this.time;
             }
 
             else if (this.pressedKeys[this.keypress.down]) {
-                this.velocity.y += this.yVelocity;
+                this.transform.yv += 0.6 * this.time;
             }
         }
+
+        this.transform.xv *= 0.7;
+        this.transform.yv *= 0.7;
     }
 
     updateDirection() {       
@@ -131,17 +131,21 @@ class Player extends Character {
     }
 
     update() {
+        this.updateVelocity();
         super.update();
         if(!this.moved){
             if (this.gravity) {
                     this.time += 1;
-                    this.velocity.y += 0.5 + this.acceleration * this.time;
+                    this.transform.yv -= this.acceleration * -this.time;
                 }
             }
         else{
-            this.time = 0;
+            this.time = 1;
         }
-        }
+
+        this.transform.x += this.transform.xv * this.time;
+        this.transform.y += this.transform.yv * this.time;
+    }
         
     /**
      * Overrides the reaction to the collision to handle

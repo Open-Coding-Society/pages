@@ -8,9 +8,15 @@
         {%- include themes/minima/header.html -%}
 
         {% if page.microblog %}
-          {% include microblog_foundation.html %}
+          <div class="micro-actions-wrapper">
+            {% include microblog_foundation.html %}
+            {% include inbox_foundation.html %}
+          </div>
         {% endif %}
 
+        {% if page.feedback  %}
+          {% include feedback_foundation.html %}
+        {% endif %}
 
         {% if page.admin %}
           {% include admin_foundation.html %}
