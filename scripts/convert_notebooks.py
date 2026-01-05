@@ -122,14 +122,27 @@ def detect_cell_language(cell):
     """Detect the programming language of a code cell"""
     source = cell.get('source', '')
     
+    # Check cell metadata first (for Java and other kernels)
+    cell_language = cell.get('metadata', {}).get('language', '').lower()
+    if cell_language in ['java', 'javascript', 'python']:
+        return cell_language
+    
     # Check for magic commands
     if source.strip().startswith('%%js'):
         return 'javascript'
     elif source.strip().startswith('%%python'):
         return 'python'
     
-    # Use cell metadata or default to python
-    return cell.get('metadata', {}).get('language', 'python')
+    # Check for Java-style CODE_RUNNER comment (// CODE_RUNNER:)
+    first_line = source.strip().split('\n')[0] if source.strip() else ''
+    if first_line.startswith('// CODE_RUNNER:'):
+        # Could be Java or JavaScript, check for Java patterns
+        if 'public class' in source or 'public static void main' in source:
+            return 'java'
+        return 'javascript'
+    
+    # Default to python
+    return 'python'
 
 
 def process_code_runner_cells(notebook, permalink):
