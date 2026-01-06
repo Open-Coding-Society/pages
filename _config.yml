@@ -23,6 +23,13 @@ github_repo: "reQUESTers"
 baseurl: "/reQUESTers" 
 future: true
 
+# Exclude from Jekyll watch - these are processed by our conversion scripts
+# This prevents double-regeneration when saving notebooks/docx files
+exclude:
+  - _notebooks
+  - _docx
+  - venv
+
 
 # Build settings
 # --------------
