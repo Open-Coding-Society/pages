@@ -264,6 +264,65 @@ refresh:
 	@make clean
 	@make
 
+# Development mode: clean start with incremental builds and single-file conversion
+# Skips full notebook conversion for ~20 second startup, converts individual files on save
+dev: stop clean
+	@echo "Starting development server (fast mode)..."
+	@echo "  - Skipping full notebook conversion"
+	@echo "  - Incremental builds enabled"
+	@echo "  - Will convert individual files on save"
+	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental >> $(LOG_FILE) 2>&1 & \
+		PID=$$!; \
+		echo "Server PID: $$PID"
+	@until [ -f $(LOG_FILE) ]; do sleep 1; done
+	@for ((COUNTER = 0; ; COUNTER++)); do \
+		if grep -q "Server address:" $(LOG_FILE); then \
+			echo "Server started in $$COUNTER seconds"; \
+			grep "Server address:" $(LOG_FILE); \
+			break; \
+		fi; \
+		if [ $$COUNTER -eq 300 ]; then \
+			echo "Server timed out after $$COUNTER seconds."; \
+			exit 1; \
+		fi; \
+		sleep 1; \
+	done
+	@echo ""
+	@echo "Development mode active - watching for file changes..."
+	@echo "  - Notebooks will be converted individually on save"
+	@echo "  - DOCX files will be converted on save"
+	@echo ""
+	@(tail -f $(LOG_FILE) | awk '/Server address:/ { serverReady=1 } \
+	serverReady && /^ *Regenerating:/ { regenerate=1 } \
+	regenerate { \
+		if (/^[[:blank:]]*$$/) { regenerate=0 } \
+		else { \
+			print; \
+			if ($$0 ~ /_notebooks\/.*\.ipynb/) { \
+				match($$0, /_notebooks\/[^[:space:]]+\.ipynb/); \
+				notebookFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-single NOTEBOOK_FILE=\"" notebookFile "\" &") \
+			} else if ($$0 ~ /_docx\/.*\.docx/) { \
+				match($$0, /_docx\/[^[:space:]]+\.docx/); \
+				docxFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-docx-single DOCX_FILE=\"" docxFile "\" &") \
+			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
+				match($$0, /_docx\/.*\/_config\.yml/); \
+				configFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-docx-config CONFIG_FILE=\"" configFile "\" &") \
+			} \
+		} \
+	}') 2>/dev/null &
+
+# Single DOCX file conversion (for dev mode)
+convert-docx-single:
+	@if [ -z "$(DOCX_FILE)" ]; then \
+		echo "Error: DOCX_FILE variable not set"; \
+		exit 1; \
+	fi
+	@echo "Converting: $(DOCX_FILE)"
+	@python3 scripts/convert_docx.py --single "$(DOCX_FILE)" 2>/dev/null || python3 scripts/convert_docx.py
+
 docx-only: convert-docx
 	@echo "DOCX conversion complete - ready for preview"
 
@@ -294,11 +353,13 @@ help:
 	@echo "  make update-colors-preview - Update colors and start server"
 	@echo ""
 	@echo "Server Commands:"
-	@echo "  make serve          - Serve with current config"
-	@echo "  make build          - Build with current config"
-	@echo "  make stop           - Stop server and logging"
-	@echo "  make reload         - Stop and restart server"
-	@echo "  make refresh        - Stop, clean, and restart server"
+	@echo "  make              - Full conversion, serve, and watch for file changes (auto-convert on save)"
+	@echo "  make dev          - Fast dev mode: clean start, no conversion, file watching, only convert files on save (quick)"
+	@echo "  make serve        - Convert and serve (no auto-convert watching)"
+	@echo "  make build        - Convert and build _site/ for deployment (no server)"
+	@echo "  make stop         - Stop server and logging"
+	@echo "  make reload       - Stop and restart server"
+	@echo "  make refresh      - Stop, clean, and restart server"
 	@echo ""
 	@echo "Conversion Commands:"
 	@echo "  make convert        - Convert notebooks and DOCX files"
