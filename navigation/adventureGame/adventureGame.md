@@ -12,7 +12,7 @@ permalink: /gamify/adventureGame
 <script type="module">
 
     // Adventure Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
+    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/GameEngine/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/adventureGame/GameEngine/GameControl.js";
     import GameLevelWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWater.js";
     import GameLevelDesert from "{{site.baseurl}}/assets/js/adventureGame/GameLevelDesert.js";
