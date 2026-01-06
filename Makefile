@@ -10,6 +10,8 @@ DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
 
 default: serve-current
+	@touch /tmp/.notebook_watch_marker
+	@make watch-notebooks &
 	@make watch-files
 
 # File watcher - monitors log for file changes and triggers conversion
@@ -222,7 +224,10 @@ stop:
 	@@lsof -ti :$(PORT) | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping logging process..."
 	@@ps aux | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
-	@rm -f $(LOG_FILE)
+	@echo "Stopping notebook watcher..."
+	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker
 
 reload:
 	@make stop
@@ -236,13 +241,27 @@ refresh:
 # Development mode: clean start with incremental builds and single-file conversion
 # Skips full notebook conversion for ~20 second startup, converts individual files on save
 dev: stop clean start-server-fast
+	@make watch-notebooks &
 	@make watch-files
+
+# Watch notebooks directory for changes (since Jekyll excludes _notebooks)
+watch-notebooks:
+	@echo "Watching _notebooks for changes..."
+	@while true; do \
+		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker 2>/dev/null | while read notebook; do \
+			echo "Notebook changed: $$notebook"; \
+			make convert-single NOTEBOOK_FILE="$$notebook"; \
+		done; \
+		touch /tmp/.notebook_watch_marker; \
+		sleep 2; \
+	done
 
 # Start server without conversion (for dev mode)
 start-server-fast:
 	@echo "Starting development server (fast mode)..."
 	@echo "  - Skipping full notebook conversion"
 	@echo "  - Incremental builds enabled"
+	@touch /tmp/.notebook_watch_marker
 	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental >> $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
 		echo "Server PID: $$PID"
