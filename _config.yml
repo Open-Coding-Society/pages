@@ -29,10 +29,6 @@ exclude:
   - _notebooks
   - _docx
   - venv
-  - node_modules
-  - Makefile
-  - requirements.txt
-  - scripts
 
 
 # Build settings
