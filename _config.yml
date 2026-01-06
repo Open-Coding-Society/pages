@@ -29,6 +29,8 @@ exclude:
   - _notebooks
   - _docx
   - venv
+  - vendor
+  - Makefile
 
 
 # Build settings
