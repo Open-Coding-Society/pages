@@ -17,27 +17,35 @@ default: serve-current
 # File watcher - monitors log for file changes and triggers conversion
 watch-files:
 	@echo "Watching for file changes (auto-convert on save)..."
-	@(tail -f $(LOG_FILE) | awk '/Server address:/ { serverReady=1 } \
-	serverReady && /^ *Regenerating:/ { regenerate=1 } \
-	regenerate { \
-		if (/^[[:blank:]]*$$/) { regenerate=0 } \
-		else { \
-			print; \
-			if ($$0 ~ /_notebooks\/.*\.ipynb/) { \
-				match($$0, /_notebooks\/[^[:space:]]+\.ipynb/); \
-				notebookFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-single NOTEBOOK_FILE=\"" notebookFile "\" &") \
-			} else if ($$0 ~ /_docx\/.*\.docx/) { \
-				match($$0, /_docx\/[^[:space:]]+\.docx/); \
-				docxFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-docx-single DOCX_FILE=\"" docxFile "\" &") \
-			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
-				match($$0, /_docx\/.*\/_config\.yml/); \
-				configFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-docx-config CONFIG_FILE=\"" configFile "\" &") \
-			} \
-		} \
-	}') 2>/dev/null &
+	@(tail -f $(LOG_FILE) | while read line; do \
+		if echo "$$line" | grep -q "Regenerating:"; then \
+			echo "$$line"; \
+			echo $$(date +%s) > /tmp/.jekyll_regenerating; \
+		elif echo "$$line" | grep -q "\.\.\.done in"; then \
+			rm -f /tmp/.jekyll_regenerating; \
+			echo "  ✓ $$line"; \
+		elif echo "$$line" | grep -q "_notebooks/.*\.ipynb"; then \
+			echo "$$line"; \
+			notebook=$$(echo "$$line" | grep -o '_notebooks/[^[:space:]]*\.ipynb'); \
+			make convert-single NOTEBOOK_FILE="$$notebook" & \
+		elif echo "$$line" | grep -q "_docx/.*\.docx"; then \
+			echo "$$line"; \
+			docx=$$(echo "$$line" | grep -o '_docx/[^[:space:]]*\.docx'); \
+			make convert-docx-single DOCX_FILE="$$docx" & \
+		fi; \
+	done) 2>/dev/null & \
+	sleep 2; \
+	while true; do \
+		if [ -f /tmp/.jekyll_regenerating ]; then \
+			START=$$(cat /tmp/.jekyll_regenerating); \
+			NOW=$$(date +%s); \
+			ELAPSED=$$((NOW - START)); \
+			if [ $$((ELAPSED % 10)) -eq 0 ] && [ $$ELAPSED -gt 0 ]; then \
+				echo "  Still regenerating... ($$ELAPSED seconds elapsed)"; \
+			fi; \
+		fi; \
+		sleep 1; \
+	done
 
 use-minima:
 	@echo "Switching to Minima theme..."
@@ -227,7 +235,7 @@ stop:
 	@echo "Stopping notebook watcher..."
 	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker
+	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.jekyll_regenerating
 
 reload:
 	@make stop
