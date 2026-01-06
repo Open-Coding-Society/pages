@@ -10,7 +10,11 @@ DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
 
 default: serve-current
-	@echo "Terminal logging starting, watching server for regeneration..."
+	@make watch-files
+
+# File watcher - monitors log for file changes and triggers conversion
+watch-files:
+	@echo "Watching for file changes (auto-convert on save)..."
 	@(tail -f $(LOG_FILE) | awk '/Server address:/ { serverReady=1 } \
 	serverReady && /^ *Regenerating:/ { regenerate=1 } \
 	regenerate { \
@@ -22,7 +26,9 @@ default: serve-current
 				notebookFile = substr($$0, RSTART, RLENGTH); \
 				system("make convert-single NOTEBOOK_FILE=\"" notebookFile "\" &") \
 			} else if ($$0 ~ /_docx\/.*\.docx/) { \
-				system("make convert &") \
+				match($$0, /_docx\/[^[:space:]]+\.docx/); \
+				docxFile = substr($$0, RSTART, RLENGTH); \
+				system("make convert-docx-single DOCX_FILE=\"" docxFile "\" &") \
 			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
 				match($$0, /_docx\/.*\/_config\.yml/); \
 				configFile = substr($$0, RSTART, RLENGTH); \
@@ -30,20 +36,6 @@ default: serve-current
 			} \
 		} \
 	}') 2>/dev/null &
-	@for ((COUNTER = 0; ; COUNTER++)); do \
-		if grep -q "Server address:" $(LOG_FILE); then \
-			echo "Server started in $$COUNTER seconds"; \
-			break; \
-		fi; \
-		if [ $$COUNTER -eq 300 ]; then \
-			echo "Server timed out after $$COUNTER seconds."; \
-			echo "Review errors from $(LOG_FILE)."; \
-			cat $(LOG_FILE); \
-			exit 1; \
-		fi; \
-		sleep 1; \
-	done
-	@sed '$$d' $(LOG_FILE)
 
 use-minima:
 	@echo "Switching to Minima theme..."
@@ -117,30 +109,7 @@ serve-current: stop convert split-courses
 	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) >> $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
 		echo "Server PID: $$PID"
-	@until [ -f $(LOG_FILE) ]; do sleep 1; done
-	@for ((COUNTER = 0; ; COUNTER++)); do \
-		if grep -q "Server address:" $(LOG_FILE); then \
-			echo "Server started in $$COUNTER seconds"; \
-			grep "Server address:" $(LOG_FILE); \
-			break; \
-		fi; \
-		if [ $$COUNTER -eq 300 ]; then \
-			echo "Server timed out after $$COUNTER seconds."; \
-			echo "Review errors from $(LOG_FILE)."; \
-			grep -v "Server running... press ctrl-c to stop." $(LOG_FILE); \
-			exit 1; \
-		fi; \
-		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b" $(LOG_FILE); then \
-			echo "Fatal error detected during startup!"; \
-			echo "Review errors from $(LOG_FILE):"; \
-			grep -v "Server running... press ctrl-c to stop." $(LOG_FILE); \
-			exit 1; \
-		fi; \
-		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
-			echo "Still starting... ($$COUNTER seconds elapsed)"; \
-		fi; \
-		sleep 1; \
-	done
+	@make wait-for-server
 
 # Build with selected theme
 build-minima: use-minima build-current
@@ -266,14 +235,21 @@ refresh:
 
 # Development mode: clean start with incremental builds and single-file conversion
 # Skips full notebook conversion for ~20 second startup, converts individual files on save
-dev: stop clean
+dev: stop clean start-server-fast
+	@make watch-files
+
+# Start server without conversion (for dev mode)
+start-server-fast:
 	@echo "Starting development server (fast mode)..."
 	@echo "  - Skipping full notebook conversion"
 	@echo "  - Incremental builds enabled"
-	@echo "  - Will convert individual files on save"
 	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental >> $(LOG_FILE) 2>&1 & \
 		PID=$$!; \
 		echo "Server PID: $$PID"
+	@make wait-for-server
+
+# Common server wait logic
+wait-for-server:
 	@until [ -f $(LOG_FILE) ]; do sleep 1; done
 	@for ((COUNTER = 0; ; COUNTER++)); do \
 		if grep -q "Server address:" $(LOG_FILE); then \
@@ -283,36 +259,20 @@ dev: stop clean
 		fi; \
 		if [ $$COUNTER -eq 300 ]; then \
 			echo "Server timed out after $$COUNTER seconds."; \
+			echo "Review errors from $(LOG_FILE)."; \
+			cat $(LOG_FILE); \
 			exit 1; \
+		fi; \
+		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b" $(LOG_FILE); then \
+			echo "Fatal error detected during startup!"; \
+			cat $(LOG_FILE); \
+			exit 1; \
+		fi; \
+		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+			echo "Still starting... ($$COUNTER seconds elapsed)"; \
 		fi; \
 		sleep 1; \
 	done
-	@echo ""
-	@echo "Development mode active - watching for file changes..."
-	@echo "  - Notebooks will be converted individually on save"
-	@echo "  - DOCX files will be converted on save"
-	@echo ""
-	@(tail -f $(LOG_FILE) | awk '/Server address:/ { serverReady=1 } \
-	serverReady && /^ *Regenerating:/ { regenerate=1 } \
-	regenerate { \
-		if (/^[[:blank:]]*$$/) { regenerate=0 } \
-		else { \
-			print; \
-			if ($$0 ~ /_notebooks\/.*\.ipynb/) { \
-				match($$0, /_notebooks\/[^[:space:]]+\.ipynb/); \
-				notebookFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-single NOTEBOOK_FILE=\"" notebookFile "\" &") \
-			} else if ($$0 ~ /_docx\/.*\.docx/) { \
-				match($$0, /_docx\/[^[:space:]]+\.docx/); \
-				docxFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-docx-single DOCX_FILE=\"" docxFile "\" &") \
-			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
-				match($$0, /_docx\/.*\/_config\.yml/); \
-				configFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-docx-config CONFIG_FILE=\"" configFile "\" &") \
-			} \
-		} \
-	}') 2>/dev/null &
 
 # Single DOCX file conversion (for dev mode)
 convert-docx-single:
