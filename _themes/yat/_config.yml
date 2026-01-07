@@ -152,9 +152,9 @@ yat:
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
 header_pages:
-    - navigation/section/csse.md
-    - navigation/section/csp.md
-    - navigation/section/csa.md 
+    - navigation/courses/csse.md
+    - navigation/courses/csp.md
+    - navigation/courses/csa.md 
     - navigation/blog.md
     - navigation/search.md
 

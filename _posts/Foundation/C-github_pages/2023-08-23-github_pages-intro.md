@@ -1,16 +1,21 @@
 ---
 layout: post
-tailwind: True
-title: GitHub Pages LxD Series
-description: An interactive series for learning Frontend programming, GitHub Pages, and Jupyter Notebooks through hands-on mini-projects.
-type: hacks 
 courses: {'csse': {'week': 2}, 'csp': {'week': 2}, 'csa': {'week': 1}}
+canonical_id: sprints-home
+tailwind: True
+title: GitHub Pages (index.md)
+description: An interactive series for learning Frontend programming, GitHub Pages, and Jupyter Notebooks through hands-on editing.  Link and then read for your understanding.
 permalink: /github/pages/
 author: John Mortensen
-canonical_id: sprints-home
 ---
 
-Welcome to your GitHub Pages mini-project journey! This series will guide you through essential skills for web programming with GitHub Pages.
+## GitHub Pages Task
+
+Welcome to your GitHub Pages mini-project journey! This article will guide you through essential skills for starting with web programming with GitHub Pages and updating your home page (index.md).
+
+The articles listed are relevant and will be part of future learnings.  But for now, just focus on adding links to these in your preferred style on your home page.
+
+The joy is in the task and seeing information come alive.
 
 <div class="mermaid" style="padding:1rem; border-radius:0.5rem;">
 graph TD
@@ -23,7 +28,12 @@ graph TD
 </div>
 
 ---
-## Table - How to Use This Series
+
+## Home Page Edits
+
+Review the following menus, observe all the menu styles.  They all do navigation to other pages in a different way.  Pick one or more styles and update your home page with some updates.
+
+### HTML Orientation 1
 
 <table style="width:100%; text-align:center; border-collapse:collapse;">
   <tr>
@@ -45,6 +55,8 @@ graph TD
 </table>
 
 ---
+
+### HTML Orientation 2
 
 <table style="width:100%; text-align:center; border-collapse:collapse;">
   <tr>
@@ -79,10 +91,9 @@ graph TD
 
 ---
 
-## Markdown - How to Use This Series
+### Markdown Orientation 1
 
 - **Start at the top** and follow the arrows to progress through each topic.
-- Complete each activity to build your skills and prepare for your own LxD experience.
 
 - [Jupyter Notebooks & Jokes]({{site.baseurl}}/github/pages/jokes)
   - Learn JavaScript in Jupyter Notebooks with a fun twist—random programming and accounting jokes!
@@ -97,6 +108,8 @@ graph TD
 
 ---
 
+### Markdown Orientation 2
+
 - [Jupyter Notebooks & Jokes]({{site.baseurl}}/github/pages/jokes): Fun with JavaScript and Jupyter Notebooks
 - [Anatomy]({{site.baseurl}}/github/pages/anatomy): Explore the structure of a GitHub Pages site
 - [Theme]({{site.baseurl}}/github/pages/theme): Learn about theme templates and layout of SASS files for advanced styling
@@ -106,7 +119,7 @@ graph TD
 
 ---
 
-## Tailwind - How to Use This Series
+### [Tailwind](https://tailwindcss.com/plus/ui-blocks/application-ui/page-examples/home-screens)
 
 <div class="flex flex-wrap gap-6 justify-center my-8">
   <!-- Notebooks & Jokes Card -->
@@ -145,7 +158,8 @@ graph TD
 
 ## Hack
 
-> Ready to begin? Start building a LxD layout and articles on your personal Home Page (index.md).
+> Ready to begin? Start building a layout and articles on your personal Home Page (index.md).  Organizing and linking becomes part of your Learning Experience Design (LxD).
 
-1. Pick a style to navigate to these items on you Home Page
-2. Move all the documents into you personal repository and get all the links working.
+1. Pick a style to navigate to these items on your Home Page
+2. Move all of these documents into your personal repository and get all the links working.
+3. Read the articles and make a summary paragraph on the index.md page, so you can recognize why you made links to these topics in the future.

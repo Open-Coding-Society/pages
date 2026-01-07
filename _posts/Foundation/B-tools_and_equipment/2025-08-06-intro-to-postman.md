@@ -1,28 +1,14 @@
 ---
-toc: True
 layout: post
-data: flask
-title: Postman Intro Guide
+courses: {'csa': {'week': 21}}
+toc: true
+title: Postman Guide
 description: Quick Guide to Write & Test APIs with Postman
-categories: ['Python Flask']
-permalink: /postman-docs
-menu: nav/flask.html
+permalink: /postman
 author: Anusha Khobare
-breadcrumb: True 
 ---
 
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Postman Intro Guide - Full Interactive</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 2rem;
-    line-height: 1.6;
-    color: #222;
-  }
   /* Infographic styles */
   .postman-intro-visualizer {
     max-width: 900px;
@@ -39,8 +25,7 @@ breadcrumb: True
     flex-wrap: wrap;
   }
   .postman-phase {
-    background: #f1f8ff;
-    border: 2px solid #007bff;
+    border: 2px solid;
     border-radius: 10px;
     padding: 1rem 1.5rem;
     width: 220px;
@@ -49,11 +34,10 @@ breadcrumb: True
     user-select: none;
   }
   .postman-phase:hover {
-    background: #d9eaff;
+    background: var(--panel);
   }
   .phase-arrow {
     font-size: 2.5rem;
-    color: #007bff;
     user-select: none;
     align-self: center;
     padding: 0 0.5rem;
@@ -67,7 +51,7 @@ breadcrumb: True
     max-width: 900px;
     margin: 3rem auto;
     padding-top: 2rem;
-    border-top: 2px solid #007bff;
+    border-top: 2px solid;
   }
   section.lesson-section h2 {
     color: #007bff;
@@ -78,29 +62,11 @@ breadcrumb: True
   }
   section.lesson-section img {
     max-width: 100%;
-    border: 1px solid #ccc;
+    border: 1px solid;
     margin: 1rem 0;
     border-radius: 6px;
   }
-  /* Table styling */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0 2rem 0;
-  }
-  th, td {
-    border: 1px solid #aaa;
-    padding: 0.6rem 1rem;
-    text-align: left;
-    vertical-align: top;
-  }
-  th {
-    background-color: #007bff;
-    color: white;
-  }
 </style>
-</head>
-<body>
 
 <!-- Interactive Infographic -->
 <div class="postman-intro-visualizer">
@@ -334,6 +300,3 @@ breadcrumb: True
     document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
   }
 </script>
-
-</body>
-</html>

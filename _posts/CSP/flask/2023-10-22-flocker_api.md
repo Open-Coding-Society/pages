@@ -1,11 +1,10 @@
 ---
 layout: post
-title: Flocker Start APIs
-description: Defing the APIs for the Flocker project
+courses: {'csp': {'week': 11}}
+title: Planning Workspaces and APIs (Flocker) 
+description: A project will have frontend and backend, port assignments, and require testing.  This shows some progress that you will need to get to Full Stack.
 permalink: /flask-flocker-api
 toc: True
-type: ccc
-courses: {'csp': {'week': 10}}
 ---
 
 ## Clone flocker_frontend `https://github.com/open-coding-society/flocker_frontend.git`

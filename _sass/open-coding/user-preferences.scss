@@ -159,21 +159,19 @@
 
   /* Inputs/buttons default */
   input, select, textarea, button {
-    background-color: var(--ui-bg) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
+    background-color: var(--panel);
+    border: 1px solid var(--pref-accent-color);
   }
 
-  /* Buttons using accent color remain as before */
+  /* Invert color to look preferred */
   button.bg-blue-600, button.bg-blue-700,
   button.bg-green-600, button.bg-green-700,
   .btn-primary,
   .save-section-btn,
   #save-preferences,
   #save-theme-btn {
-    background-color: var(--pref-accent-color) !important;
-    border-color: var(--pref-accent-color) !important;
-    color: #fff !important;
+    background-color: color-mix(in srgb, var(--pref-accent-color) 65%, white 35%);
+    border: 1px solid var(--pref-accent-color);
   }
 
   /* Lesson player specific overrides */

@@ -1,0 +1,31 @@
+# WGU meta data
+Sprint1:
+  shared: "Onboarding"
+  help: "/navigation/sprint1-help"  # Add help for this sprint
+  start: 0
+  end: 3
+  0:
+    theme: "Onboarding Objectives"
+    goals:
+      - "Tool Mastery"
+      - "Project-Based Learning"
+      - "Team Collaboration"
+  1:
+    theme: "Essential Tools Setup"
+    goals:
+      - "Hardware & Workspace Setup"
+      - "VSCode, Linux, GitHub"
+      - "GitHub Pages Launch"
+  2:
+    theme: "Agile Development" 
+    goals:
+      - "Scrum + Standups"
+      - "Kanban Boards + Burndown"
+      - "Repository Management"
+      - "Coding"
+  3:
+    theme: "Summative Coding Challenge"
+    goals:
+      - "Gamified Coding Tasks"
+      - "JavaScript OOP"
+      - "Retrospective Reflection"

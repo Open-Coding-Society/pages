@@ -1,0 +1,182 @@
+<!-- Reusable UI Runner Component -->
+<div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  <div class="challenge-box">
+    <h3>Challenge</h3>
+    <p>{{ include.challenge }}</p>
+  </div>
+
+  <div class="editor-container">
+    <div class="control-panel">
+      <button class="runBtn" title="Run">▶</button>
+      <button class="stopBtn" title="Stop">■</button>
+      <button class="copyBtn" title="Copy Code">⎘</button>
+      <button class="saveBtn" title="Save Code">💾</button>
+      <button class="clearStorageBtn" title="Clear Storage">🗑</button>
+    </div>
+    <textarea class="editor-textarea"></textarea>
+    <div class="control-panel">
+      <span class="lineCount">Lines: 1</span>
+      <span class="charCount">Characters: 0</span>
+    </div>
+  </div>
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span>UI Output</span>
+      <button class="resetBtn" title="Reset">↻</button>
+    </div>
+    <div class="ui-output" id="ui-output-{{ include.runner_id }}"></div>
+  </div>
+</div>
+
+<script type="module">
+(function() {
+  const container = document.getElementById('ui-runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const defaultCode = `{{ include.code }}`.trim();
+  const editorHeight = "{{ include.height }}";
+  const outputHeight = "{{ include.output_height }}";
+  const storageKey = container.dataset.storageKey;
+  
+  // Load code from localStorage or use default
+  const savedCode = localStorage.getItem(storageKey);
+  const initialCode = savedCode !== null ? savedCode : defaultCode;
+  
+  // Set CodeMirror height dynamically
+  if (editorHeight) {
+    const style = document.createElement('style');
+    style.textContent = `#ui-runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
+    document.head.appendChild(style);
+  } else {
+    const style = document.createElement('style');
+    style.textContent = `#ui-runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
+    document.head.appendChild(style);
+  }
+
+  // Set UI output height
+  if (outputHeight) {
+    const style = document.createElement('style');
+    style.textContent = `#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`;
+    document.head.appendChild(style);
+  }
+  
+  const editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
+    lineNumbers: true,
+    mode: "javascript",
+    theme: "darcula",
+    indentUnit: 2,
+    tabSize: 2
+  });
+
+  editor.setValue(initialCode || "// Write your JavaScript code here");
+
+  const fontSizeSelect = container.querySelector('.fontSizeSelect');
+  const uiOutput = container.querySelector('.ui-output');
+  const lineCountSpan = container.querySelector('.lineCount');
+  const charCountSpan = container.querySelector('.charCount');
+
+  let currentExecution = null;
+
+  // Update stats
+  function updateStats() {
+    const code = editor.getValue();
+    const lines = code.split('\n').length;
+    const chars = code.length;
+    lineCountSpan.textContent = `Lines: ${lines}`;
+    charCountSpan.textContent = `Characters: ${chars}`;
+  }
+  editor.on('change', updateStats);
+  updateStats();
+
+  // Clear storage button - removes localStorage and resets to default code
+  container.querySelector('.clearStorageBtn').onclick = () => {
+    localStorage.removeItem(storageKey);
+    editor.setValue(defaultCode || "// Write your JavaScript code here");
+    stopExecution();
+    const btn = container.querySelector('.clearStorageBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  };
+
+  // Save code button - saves to localStorage
+  container.querySelector('.saveBtn').onclick = () => {
+    const code = editor.getValue();
+    localStorage.setItem(storageKey, code);
+    const btn = container.querySelector('.saveBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  };
+
+  // Copy code button
+  container.querySelector('.copyBtn').onclick = () => {
+    const code = editor.getValue();
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = container.querySelector('.copyBtn');
+      const originalText = btn.textContent;
+      btn.textContent = '✔';
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 2000);
+    });
+  };
+
+  // Stop execution
+  function stopExecution() {
+    uiOutput.innerHTML = '';
+    if (currentExecution && currentExecution.stop) {
+      currentExecution.stop();
+    }
+    currentExecution = null;
+  }
+
+  // Reset button
+  container.querySelector('.resetBtn').onclick = () => {
+    stopExecution();
+  };
+
+  // Stop button
+  container.querySelector('.stopBtn').onclick = () => {
+    stopExecution();
+  };
+
+  // Run button logic
+  function runCode() {
+    const code = editor.getValue();
+    
+    // Clear previous output
+    stopExecution();
+    
+    try {
+      // Create a sandboxed execution context
+      const outputElement = uiOutput;
+      
+      // Create function with access to output element
+      const userFunction = new Function('outputElement', `
+        'use strict';
+        ${code}
+      `);
+      
+      // Execute user code
+      currentExecution = userFunction(outputElement);
+      
+    } catch (err) {
+      uiOutput.innerHTML = `<div style="color: red; padding: 1rem;">Error: ${err.message}</div>`;
+    }
+  }
+
+  container.querySelector('.runBtn').onclick = runCode;
+
+  // Keyboard shortcut
+  editor.setOption("extraKeys", {
+    "Ctrl-Enter": runCode,
+    "Cmd-Enter": runCode
+  });
+})();
+</script>

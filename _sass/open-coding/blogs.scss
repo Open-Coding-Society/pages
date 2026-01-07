@@ -13,8 +13,8 @@
 }
 
 .post-list li {
-  background-color: color-mix(in srgb, var(--pref-bg-color) 95%, white 5%);
-  border: 1px solid var(--pref-accent-color);
+  background-color: var(--bg-1); 
+  border: 1px solid var(--accent);
   border-radius: 0.5em;
   margin-bottom: 1.5em;
   padding: 1em;

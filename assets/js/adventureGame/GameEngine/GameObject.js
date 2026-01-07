@@ -205,29 +205,29 @@ class GameObject {
 
             if (touchPoints.top) {
                 this.state.movement.down = false;
-                if (this.velocity.y > 0) {
-                    this.velocity.y = 0;
+                if (this.transform.yv > 0) {
+                    this.transform.yv = 0;
                 }
             }
 
             if (touchPoints.bottom) {
                 this.state.movement.up = false;
-                if (this.velocity.y < 0) {
-                    this.velocity.y = 0;
+                if (this.transform.yv < 0) {
+                    this.transform.yv = 0;
                 }
             }
 
             if (touchPoints.right) {
                 this.state.movement.left = false;
-                if (this.velocity.x < 0) {
-                    this.velocity.x = 0;
+                if (this.transform.xv < 0) {
+                    this.transform.xv = 0;
                 }
             }
 
             if (touchPoints.left) {
                 this.state.movement.right = false;
-                if (this.velocity.x > 0) {
-                    this.velocity.x = 0;
+                if (this.transform.xv > 0) {
+                    this.transform.xv = 0;
                 }
             }
         }

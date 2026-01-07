@@ -47,25 +47,25 @@
     </div>
 
     <!-- Modal for Hack Selection -->
-    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: var(--pref-bg-color); padding: 20px; overflow-y: auto;">
-      <div style="position: relative; width: 100%; max-width: 70rem; margin: 0 auto; min-height: min-content;">
-        <!-- Close button -->
-        <button id="modal-close-btn" style="position: absolute; top: -35px; right: 0; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none; z-index: 1; color: white;">&times;</button>
-        
-        <!-- Scrolling checklist -->
+    <div id="hacks-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background-color: var(--pref-bg-color); padding: 60px 20px 60px 20px; ;">
+      <!-- Close button -->
+      <button id="modal-close-btn" style="position: absolute; top: 16px; right: 20px; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: none; z-index: 1; color: white;">&times;</button>
+      
+      <!-- Scrolling checklist (centered inner container) -->
+      <div style="width: 100%; max-width: 70rem; margin: 0 auto;">
         <div id="hacks-checklist" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 16px; border: 2px solid #374151; border-radius: 8px;">
           <!-- Checkboxes will be populated here -->
         </div>
-        
-        <!-- Action buttons -->
-        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
-          <button id="modal-cancel-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 500; font-size: 1rem;">
-            Cancel
-          </button>
-          <button id="modal-save-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; font-size: 1rem;">
-            Save Selection
-          </button>
-        </div>
+      </div>
+      
+      <!-- Action buttons -->
+      <div style="width: 100%; max-width: 70rem; margin: 16px auto 0 auto; display: flex; justify-content: flex-end; gap: 12px;">
+        <button id="modal-cancel-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 500; font-size: 1rem;">
+          Cancel
+        </button>
+        <button id="modal-save-btn" style="padding: 10px 24px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; font-size: 1rem;">
+          Save Selection
+        </button>
       </div>
     </div>
 
@@ -114,7 +114,7 @@
 
 <!-- Grading View (Admin) -->
 <div id="grading-panel" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:99998; background-color: var(--pref-bg-color); padding: 20px; overflow-y:auto;">
-  <div style="position: relative; width: 100%; max-width: 1100px; margin: 0 auto; min-height: min-content; padding:24px; border-radius:12px; border:1px solid #374151;">
+  <div style="position: relative; width: 100%; max-width: 1100px; margin: 60px auto 0 auto; min-height: min-content; padding:24px; border-radius:12px; border:1px solid #374151;">
     <div class="flex items-start justify-between mb-4">
       <div>
         <p class="text-sm text-purple-300 uppercase tracking-wide">Grading</p>
@@ -236,13 +236,13 @@
 </div>
 
 <!-- Grading Rubric Modal (per submission) -->
-<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; overflow-y:auto;">
-  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #374151; max-height: 85vh; overflow-y: auto;">
+<div id="grading-rubric-modal" style="display:none; position: fixed; top:0; left:0; right:0; bottom:0; z-index:100001; background-color: rgba(0,0,0,0.7); overflow-y:auto;">
+  <div style="position: relative; padding:24px; border-radius:12px; max-width:900px; width:90%; margin:40px auto; border:1px solid #d1d5db; max-height: 85vh; overflow-y: auto; background-color: white; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <p class="text-sm text-purple-300 uppercase tracking-wide">Grader</p>
-        <h3 class="text-2xl font-bold text-white">Edit Rubric</h3>
-        <p id="grading-rubric-context" class="text-gray-300 text-sm"></p>
+        <p class="text-sm text-purple-600 uppercase tracking-wide">Grader</p>
+        <h3 class="text-2xl font-bold text-gray-900">Edit Rubric</h3>
+        <p id="grading-rubric-context" class="text-gray-600 text-sm"></p>
       </div>
       <button onclick="closeGradingRubricModal()" style="font-size:2rem; cursor:pointer; line-height:1;">&times;</button>
     </div>
@@ -1126,16 +1126,15 @@
               </div>
               ${sub.submission_link ? `
                 <div class="mb-3">
-                  <p class="text-gray-300 text-sm mb-1">Submission Link:</p>
                   <a href="${sub.submission_link}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 text-sm break-all">
                     ${sub.submission_link}
                   </a>
                 </div>
               ` : ''}
-              ${sub.score > 0 ? `<p class="text-gray-300 text-sm mb-3">Score: ${sub.score}</p>` : ''}
-              <div class="flex items-center gap-3">
-                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold">
-                  Edit Rubric
+              <div class="flex items-center justify-between gap-3">
+                ${sub.score > 0 ? `<p class="text-gray-300 text-sm">Score: ${sub.score}</p>` : '<span></span>'}
+                <button onclick="openGradingRubricModal('${selectedAssignment.id}','${sub.id}')" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                  Rubric
                 </button>
               </div>
             </div>

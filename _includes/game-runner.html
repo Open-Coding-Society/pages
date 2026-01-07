@@ -1,0 +1,345 @@
+<!-- Reusable Game Runner Component -->
+<div class="game-runner-container" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  <div class="challenge-box">
+    <h3>Challenge</h3>
+    <p>{{ include.challenge }}</p>
+  </div>
+
+  <div class="editor-container">
+    <div class="control-panel">
+      <button class="runBtn" title="Start Game">▶ Start</button>
+      <button class="pauseBtn" title="Pause Game">⏸ Pause</button>
+      <button class="stopBtn" title="Stop Game">■ Stop</button>
+      <button class="resetBtn" title="Reset Game">↻ Reset</button>
+      <select class="levelSelect" title="Select Level">
+        <option value="">Select Level...</option>
+      </select>
+    </div>
+    <textarea class="editor-textarea"></textarea>
+    <div class="control-panel">
+      <span class="lineCount">Lines: 1</span>
+      <span class="charCount">Characters: 0</span>
+      <button class="copyBtn" title="Copy Code">📋 Copy</button>
+      <button class="saveBtn" title="Save Code">💾 Save</button>
+      <button class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span class="game-status">Game Status: <span class="status-text">Not Started</span></span>
+    </div>
+    <div class="game-output" id="game-output-{{ include.runner_id }}">
+      <div id="game-container-{{ include.runner_id }}" class="gameContainer">
+        <canvas id="game-canvas-{{ include.runner_id }}"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+(function() {
+  const container = document.getElementById('game-runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const defaultCode = `{{ include.code }}`.trim();
+  const editorHeight = "{{ include.height }}";
+  const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
+  const storageKey = container.dataset.storageKey;
+  
+  // Load code from localStorage or use default
+  const savedCode = localStorage.getItem(storageKey);
+  const initialCode = savedCode !== null ? savedCode : defaultCode;
+  
+  // Set CodeMirror height dynamically
+  const style = document.createElement('style');
+  if (editorHeight && editorHeight !== "") {
+    style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
+  } else {
+    style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
+  }
+  document.head.appendChild(style);
+
+  // Initialize CodeMirror
+  const editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
+    mode: 'javascript',
+    theme: 'darcula',
+    lineNumbers: true,
+    value: initialCode
+  });
+  editor.setValue(initialCode);
+
+  // Get UI elements
+  const runBtn = container.querySelector('.runBtn');
+  const pauseBtn = container.querySelector('.pauseBtn');
+  const stopBtn = container.querySelector('.stopBtn');
+  const resetBtn = container.querySelector('.resetBtn');
+  const levelSelect = container.querySelector('.levelSelect');
+  const gameOutput = container.querySelector('.game-output');
+  const statusText = container.querySelector('.status-text');
+  const lineCountSpan = container.querySelector('.lineCount');
+  const charCountSpan = container.querySelector('.charCount');
+
+  // Game state
+  let gameControl = null;
+  let gameInstance = null;
+  let currentLevelIndex = 0;
+
+  // Disable game controls initially
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
+
+  // Update stats
+  function updateStats() {
+    const code = editor.getValue();
+    const lines = code.split('\n').length;
+    const chars = code.length;
+    lineCountSpan.textContent = `Lines: ${lines}`;
+    charCountSpan.textContent = `Characters: ${chars}`;
+  }
+  editor.on('change', updateStats);
+  updateStats();
+
+  // Update status
+  function updateStatus(status) {
+    statusText.textContent = status;
+  }
+
+  // Clear storage button - removes localStorage and resets to default code
+  container.querySelector('.clearStorageBtn').onclick = () => {
+    localStorage.removeItem(storageKey);
+    editor.setValue(defaultCode);
+    stopGame();
+    const btn = container.querySelector('.clearStorageBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✔ Cleared';
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+    }, 2000);
+  };
+
+  // Save code button - saves to localStorage
+  container.querySelector('.saveBtn').onclick = () => {
+    const code = editor.getValue();
+    localStorage.setItem(storageKey, code);
+    const btn = container.querySelector('.saveBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✔ Saved';
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+    }, 2000);
+  };
+
+  // Copy code button
+  container.querySelector('.copyBtn').onclick = () => {
+    const code = editor.getValue();
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = container.querySelector('.copyBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '✔ Copied';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+      }, 2000);
+    });
+  };
+
+  // Stop game
+  function stopGame() {
+    if (gameControl) {
+      try {
+        if (gameControl.destroy) {
+          gameControl.destroy();
+        }
+      } catch (e) {
+        console.warn('Error destroying game:', e);
+      }
+      gameControl = null;
+      gameInstance = null;
+    }
+    
+    // Clear canvas
+    const canvas = document.getElementById('game-canvas-{{ include.runner_id }}');
+    const container = document.getElementById('game-container-{{ include.runner_id }}');
+    
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    
+    // Remove character canvases
+    if (container) {
+      const canvases = container.querySelectorAll('canvas:not(#game-canvas-{{ include.runner_id }})');
+      canvases.forEach(c => c.remove());
+    }
+    
+    updateStatus('Stopped');
+    runBtn.disabled = false;
+    pauseBtn.disabled = true;
+    stopBtn.disabled = true;
+    levelSelect.disabled = false;
+  }
+
+  // Pause game
+  function pauseGame() {
+    if (gameControl && gameControl.pause) {
+      gameControl.pause();
+      updateStatus('Paused');
+      pauseBtn.innerHTML = '▶ Resume';
+      pauseBtn.onclick = resumeGame;
+    }
+  }
+
+  // Resume game
+  function resumeGame() {
+    if (gameControl && gameControl.resume) {
+      gameControl.resume();
+      updateStatus('Running');
+      pauseBtn.innerHTML = '⏸ Pause';
+      pauseBtn.onclick = pauseGame;
+    }
+  }
+
+  // Reset game (resets to current session code, not storage)
+  function resetGame() {
+    stopGame();
+    editor.setValue(defaultCode);
+    updateStatus('Reset');
+  }
+
+  // Run game
+  async function runGame() {
+    try {
+      stopGame(); // Stop any existing game
+      
+      let code = editor.getValue();
+      if (!code.trim()) {
+        updateStatus('Error: No code to run');
+        return;
+      }
+
+      updateStatus('Loading...');
+      runBtn.disabled = true;
+      pauseBtn.disabled = false;
+      stopBtn.disabled = false;
+      levelSelect.disabled = true;
+
+      // Get canvas and container
+      const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
+      const gameCanvas = document.getElementById('game-canvas-{{ include.runner_id }}');
+      
+      // Setup game environment
+      const path = '{{ site.baseurl }}';
+      const baseUrl = window.location.origin + path;
+      
+      // Replace relative import paths with absolute URLs
+      // Match import statements and convert paths starting with / or relative paths to absolute URLs
+      code = code.replace(/from\s+['"](\/?[^'"]+)['"]/g, (match, importPath) => {
+        // If path starts with / or is relative, make it absolute
+        if (importPath.startsWith('/')) {
+          return `from '${baseUrl}${importPath}'`;
+        } else if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
+          return `from '${baseUrl}/${importPath}'`;
+        }
+        return match; // Already absolute
+      });
+      
+      // Import core Game engine
+      const GameModule = await import(baseUrl + '/assets/js/GameEngine/Game.js');
+      const Game = GameModule.default;
+      
+      // Create a blob URL to execute user code as a module
+      const blob = new Blob([code], { type: 'application/javascript' });
+      const blobUrl = URL.createObjectURL(blob);
+      
+      try {
+        // Import the user's code as a module
+        const userModule = await import(blobUrl);
+        
+        // Get exports from user code
+        const GameControl = userModule.GameControl;
+        const gameLevelClasses = userModule.gameLevelClasses;
+        
+        if (!GameControl || !gameLevelClasses) {
+          throw new Error('Code must export GameControl and gameLevelClasses');
+        }
+
+        // Initialize canvas dimensions before game starts
+        const containerWidth = gameContainer.parentElement.clientWidth || 800;
+        const containerHeight = 580;
+        gameCanvas.width = containerWidth;
+        gameCanvas.height = containerHeight;
+
+        // Create environment object with explicit dimensions and references
+        const environment = {
+          path: path,
+          gameContainer: gameContainer,
+          gameCanvas: gameCanvas,
+          gameLevelClasses: gameLevelClasses,
+          innerWidth: containerWidth,   // Override window.innerWidth
+          innerHeight: containerHeight  // Override window.innerHeight
+        };
+
+        // Populate level selector
+        if (levelSelect.options.length <= 1) {
+          gameLevelClasses.forEach((levelClass, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = levelClass.name || `Level ${index + 1}`;
+            levelSelect.appendChild(option);
+          });
+          if (gameLevelClasses.length > 0) {
+            levelSelect.value = "0";
+          }
+        }
+
+        // Start the game
+        gameInstance = Game.main(environment, GameControl);
+        gameControl = gameInstance; // Store reference for pause/stop
+        
+        updateStatus('Running');
+        pauseBtn.innerHTML = '⏸ Pause';
+        pauseBtn.onclick = pauseGame;
+        
+      } finally {
+        // Clean up blob URL
+        URL.revokeObjectURL(blobUrl);
+      }
+
+    } catch (error) {
+      updateStatus('Error: ' + error.message);
+      console.error('Game error:', error);
+      runBtn.disabled = false;
+      pauseBtn.disabled = true;
+      stopBtn.disabled = true;
+      levelSelect.disabled = false;
+    }
+  }
+
+  // Event listeners
+  runBtn.onclick = runGame;
+  pauseBtn.onclick = pauseGame;
+  stopBtn.onclick = stopGame;
+  resetBtn.onclick = resetGame;
+
+  // Level selector
+  levelSelect.addEventListener('change', () => {
+    if (gameControl && levelSelect.value !== "") {
+      const levelIndex = parseInt(levelSelect.value);
+      if (gameControl.transitionToLevel) {
+        gameControl.currentLevelIndex = levelIndex;
+        gameControl.transitionToLevel();
+        updateStatus('Switched to ' + levelSelect.options[levelSelect.selectedIndex].text);
+      }
+    }
+  });
+
+  // Keyboard shortcuts
+  editor.setOption("extraKeys", {
+    "Ctrl-Enter": runGame,
+    "Cmd-Enter": runGame
+  });
+
+})();
+</script>

@@ -14,6 +14,9 @@
           </div>
         {% endif %}
 
+        {% if page.feedback  %}
+          {% include feedback_foundation.html %}
+        {% endif %}
 
         {% if page.admin %}
           {% include admin_foundation.html %}

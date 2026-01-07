@@ -1,0 +1,225 @@
+<!-- Reusable Code Runner Component -->
+<div class="code-runner-container" id="runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  <div class="challenge-box">
+    <h3>Challenge</h3>
+    <p>{{ include.challenge }}</p>
+  </div>
+
+  <div class="editor-container">
+    <div class="control-panel">
+      <button class="runBtn" title="Run">▶</button>
+      <button class="copyBtn" title="Copy Code">⎘</button>
+      <button class="saveBtn" title="Save Code">💾</button>
+      <button class="clearStorageBtn" title="Clear Storage">🗑</button>
+      <select class="languageSelect">
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+      </select>
+      <select class="fontSizeSelect">
+        <option value="14">14px</option>
+        <option value="16">16px</option>
+        <option value="18">18px</option>
+        <option value="20">20px</option>
+      </select>
+    </div>
+    <textarea class="editor-textarea"></textarea>
+    <div class="control-panel">
+      <span class="lineCount">Lines: 1</span>
+      <span class="charCount">Characters: 0</span>
+    </div>
+  </div>
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span>Output</span>
+      <button class="copyOutputBtn" title="Copy Output">⎘</button>
+    </div>
+    <div class="output-content">Click "Run" in code control panel to see output ...</div>
+    <div class="control-panel">
+      <span class="execTime"></span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+(function() {
+  const container = document.getElementById('runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const initialLang = "{{ include.language }}";
+  const defaultCode = `{{ include.code }}`.trim();
+  const editorHeight = "{{ include.height }}";
+  const storageKey = container.dataset.storageKey;
+  
+  // Load code from localStorage or use default
+  const savedCode = localStorage.getItem(storageKey);
+  const initialCode = savedCode !== null ? savedCode : defaultCode;
+  
+  // Set CodeMirror height dynamically
+  if (editorHeight) {
+    const style = document.createElement('style');
+    style.textContent = `#runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
+    document.head.appendChild(style);
+  } else {
+    const style = document.createElement('style');
+    style.textContent = `#runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
+    document.head.appendChild(style);
+  }
+  
+  const editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
+    lineNumbers: true,
+    mode: initialLang === "java" ? "text/x-java" : (initialLang || "python"),
+    theme: "darcula",
+    indentUnit: 4,
+    tabSize: 4
+  });
+
+  editor.setValue(initialCode || "print('Hello, world!')");
+
+  const langSelect = container.querySelector('.languageSelect');
+  const fontSizeSelect = container.querySelector('.fontSizeSelect');
+  const outputDiv = container.querySelector('.output-content');
+  const lineCountSpan = container.querySelector('.lineCount');
+  const charCountSpan = container.querySelector('.charCount');
+  const execTimeSpan = container.querySelector('.execTime');
+
+  // Set initial language selection
+  if (initialLang) {
+    langSelect.value = initialLang;
+  }
+
+  // Update stats
+  function updateStats() {
+    const code = editor.getValue();
+    const lines = code.split('\n').length;
+    const chars = code.length;
+    lineCountSpan.textContent = `Lines: ${lines}`;
+    charCountSpan.textContent = `Characters: ${chars}`;
+  }
+  editor.on('change', updateStats);
+  updateStats();
+
+  // Font size changer
+  fontSizeSelect.addEventListener("change", () => {
+    const size = fontSizeSelect.value;
+    container.querySelector('.CodeMirror').style.fontSize = size + 'px';
+    editor.refresh();
+  });
+
+  // Language switcher
+  langSelect.addEventListener("change", () => {
+    const lang = langSelect.value;
+    if (lang === "python") {
+      editor.setOption("mode", "python");
+    } else if (lang === "java") {
+      editor.setOption("mode", "text/x-java");
+    } else if (lang === "javascript") {
+      editor.setOption("mode", "javascript");
+    }
+  });
+
+  // Clear storage button - removes localStorage and resets to default code
+  container.querySelector('.clearStorageBtn').onclick = () => {
+    localStorage.removeItem(storageKey);
+    editor.setValue(defaultCode || "print('Hello, world!')");
+    outputDiv.textContent = 'Storage cleared. Code reset to default.';
+    execTimeSpan.textContent = '';
+    const btn = container.querySelector('.clearStorageBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  };
+
+  // Save code button - saves to localStorage
+  container.querySelector('.saveBtn').onclick = () => {
+    const code = editor.getValue();
+    localStorage.setItem(storageKey, code);
+    const btn = container.querySelector('.saveBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  };
+
+  // Copy code button
+  container.querySelector('.copyBtn').onclick = () => {
+    const code = editor.getValue();
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = container.querySelector('.copyBtn');
+      const originalText = btn.textContent;
+      btn.textContent = '✔';
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 2000);
+    });
+  };
+
+  // Copy output icon
+  container.querySelector('.copyOutputBtn').onclick = () => {
+    const output = outputDiv.textContent;
+    const icon = container.querySelector('.copyOutputBtn');
+    const original = icon.textContent;
+    navigator.clipboard.writeText(output).then(() => {
+      icon.textContent = '✔';
+      setTimeout(() => {
+        icon.textContent = original;
+      }, 1200);
+    });
+  };
+
+  // Run button logic
+  function runCode() {
+    const code = editor.getValue();
+    const lang = langSelect.value;
+    outputDiv.textContent = "⏳ Running...";
+    execTimeSpan.textContent = '';
+
+    /*
+    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    if (lang === "javascript" && !isLocalhost) {
+      outputDiv.textContent = "⚠️ JavaScript execution is only available on localhost.";
+      execTimeSpan.textContent = '';
+      return;
+    }
+    */
+
+    const startTime = Date.now();
+
+    let runURL;
+    if (lang === "python") runURL = `${pythonURI}/run/python`;
+    else if (lang === "java") runURL = `${javaURI}/run/java`;
+    else if (lang === "javascript") runURL = `${pythonURI}/run/javascript`;
+
+    const body = JSON.stringify({ code });
+    const options = { ...fetchOptions, method: "POST", body };
+
+    fetch(runURL, options)
+      .then(res => res.json())
+      .then(result => {
+        const endTime = Date.now();
+        const execTime = endTime - startTime;
+        const output = result.output || "[no output]";
+        outputDiv.textContent = output;
+        execTimeSpan.textContent = `⏱Execution time: ${execTime}ms`;
+      })
+      .catch(err => {
+        outputDiv.textContent = "Error: " + err.message;
+        execTimeSpan.textContent = '';
+      });
+  }
+
+  container.querySelector('.runBtn').onclick = runCode;
+
+  // Keyboard shortcut
+  editor.setOption("extraKeys", {
+    "Ctrl-Enter": runCode,
+    "Cmd-Enter": runCode
+  });
+})();
+</script>

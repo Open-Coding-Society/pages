@@ -1,13 +1,65 @@
 # CSSE course meta data
 Sprint1:
   shared: "Onboarding"
+  help: "/navigation/sprint1-help"  # Add help for this sprint
   start: 0
   end: 3
+  0:
+    theme: "Onboarding Objectives"
+    goals:
+      - "Tool Mastery"
+      - "Project-Based Learning"
+      - "Team Collaboration"
+  1:
+    theme: "Essential Tools Setup"
+    goals:
+      - "Hardware & Workspace Setup"
+      - "VSCode, Linux, GitHub"
+      - "GitHub Pages Launch"
+  2:
+    theme: "Agile Development" 
+    goals:
+      - "Scrum + Standups"
+      - "Kanban Boards + Burndown"
+      - "Repository Management"
+      - "Coding"
+  3:
+    theme: "Summative Coding Challenge"
+    goals:
+      - "Gamified Coding Tasks"
+      - "JavaScript"
+      - "Retrospective Reflection"
 Sprint2:
-  title: JavaScript Student Teaching
+  title: JavaScript Foundations & Student Teaching
   description: A key focus of this course is to make Web Games using JavaScript. Understanding fundamentals like control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices are essentiial. Students will be teaching lessons on these topics to their peers.  Each student will be responsible for a portion of the lesson, a popcorn hack, and homework.  Students will be graded on their teaching, the popcorn hack, and the homework they assign.  Students will also be graded on their participation in learning from their peers.
   start: 4
   end: 7
+  4:
+    theme: "JavaScript Foundations and LxD"
+    goals:
+      - "LxD Principles"
+      - "Classroom Teaching"
+      - "Feedback and Grading"
+  5:
+    theme: "Draft Learning Experience" 
+    goals:
+      - "JavaScript Fundamentals"
+      - "Pick Technical Topic"
+      - "Learner Empathy"
+      - "Design a Lesson Plan"
+  6: 
+    theme: "Deliver and Receive Learning Experiences"
+    goals:
+      - "Be a Learner"
+      - "Teach a Lesson"
+      - "Provide Quality Feedback"
+  7:
+    theme: "Game Development Basics"
+    goals:
+      - "Build Game Elements"
+      - "Player and NPCs"
+      - "Sprites and Animation"
+      - "Backgrounds"
 Sprint3:
   title: Creating a game for N@tM
   description: Part of the process of becoming technically proficient is going beyond fundamentals by taking on a project challenge while coding. A challenge with some vision, questions, AI research, and more allow amazing things to be accomplished. Our goal is to participate in N@tM with the other CS classes and other classes from the Electives Department.  We should have a blog, progress in a game, and a series of lesson hacks to show off.

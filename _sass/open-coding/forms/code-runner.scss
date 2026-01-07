@@ -1,0 +1,26 @@
+/**
+ * Code Runner Styles
+ * Interactive code editor with execution capabilities
+ */
+
+@import "runner-base";
+
+.code-runner-container {
+  @include runner-base;
+
+  // Select controls specific to code runner
+  .languageSelect,
+  .fontSizeSelect {
+    @include select-control();
+  }
+
+  // Code output box styling
+  .output-content {
+    @include output-panel;
+  }
+
+  // Copy output button
+  .copyOutputBtn {
+    @include icon-button(38px, 0);
+  }
+}
