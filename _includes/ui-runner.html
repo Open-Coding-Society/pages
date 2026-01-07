@@ -1,5 +1,5 @@
 <!-- Reusable UI Runner Component -->
-<div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}">
+<div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   <div class="challenge-box">
     <h3>Challenge</h3>
     <p>{{ include.challenge }}</p>
@@ -10,7 +10,8 @@
       <button class="runBtn" title="Run">▶</button>
       <button class="stopBtn" title="Stop">■</button>
       <button class="copyBtn" title="Copy Code">⎘</button>
-      <button class="clearBtn" title="Clear Code">⎚</button>
+      <button class="saveBtn" title="Save Code">💾</button>
+      <button class="clearStorageBtn" title="Clear Storage">🗑</button>
     </div>
     <textarea class="editor-textarea"></textarea>
     <div class="control-panel">
@@ -33,9 +34,14 @@
   const container = document.getElementById('ui-runner-{{ include.runner_id }}');
   if (!container) return;
   
-  const initialCode = `{{ include.code }}`.trim();
+  const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.height }}";
   const outputHeight = "{{ include.output_height }}";
+  const storageKey = container.dataset.storageKey;
+  
+  // Load code from localStorage or use default
+  const savedCode = localStorage.getItem(storageKey);
+  const initialCode = savedCode !== null ? savedCode : defaultCode;
   
   // Set CodeMirror height dynamically
   if (editorHeight) {
@@ -83,10 +89,29 @@
   editor.on('change', updateStats);
   updateStats();
 
-  // Clear button
-  container.querySelector('.clearBtn').onclick = () => {
-    editor.setValue("");
+  // Clear storage button - removes localStorage and resets to default code
+  container.querySelector('.clearStorageBtn').onclick = () => {
+    localStorage.removeItem(storageKey);
+    editor.setValue(defaultCode || "// Write your JavaScript code here");
     stopExecution();
+    const btn = container.querySelector('.clearStorageBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  };
+
+  // Save code button - saves to localStorage
+  container.querySelector('.saveBtn').onclick = () => {
+    const code = editor.getValue();
+    localStorage.setItem(storageKey, code);
+    const btn = container.querySelector('.saveBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
   };
 
   // Copy code button
