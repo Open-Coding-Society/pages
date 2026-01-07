@@ -155,12 +155,14 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     outputDiv.textContent = "⏳ Running...";
     execTimeSpan.textContent = '';
 
+    /*
     const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
     if (lang === "javascript" && !isLocalhost) {
       outputDiv.textContent = "⚠️ JavaScript execution is only available on localhost.";
       execTimeSpan.textContent = '';
       return;
     }
+    */
 
     const startTime = Date.now();
 
