@@ -1,5 +1,5 @@
 <!-- Reusable Game Runner Component -->
-<div class="game-runner-container" id="game-runner-{{ include.runner_id }}">
+<div class="game-runner-container" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   <div class="challenge-box">
     <h3>Challenge</h3>
     <p>{{ include.challenge }}</p>
@@ -20,7 +20,8 @@
       <span class="lineCount">Lines: 1</span>
       <span class="charCount">Characters: 0</span>
       <button class="copyBtn" title="Copy Code">📋 Copy</button>
-      <button class="clearBtn" title="Clear Code">🗑️ Clear</button>
+      <button class="saveBtn" title="Save Code">💾 Save</button>
+      <button class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
     </div>
   </div>
 
@@ -41,9 +42,14 @@
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
   if (!container) return;
   
-  const initialCode = `{{ include.code }}`.trim();
+  const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.height }}";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
+  const storageKey = container.dataset.storageKey;
+  
+  // Load code from localStorage or use default
+  const savedCode = localStorage.getItem(storageKey);
+  const initialCode = savedCode !== null ? savedCode : defaultCode;
   
   // Set CodeMirror height dynamically
   const style = document.createElement('style');
@@ -99,10 +105,29 @@
     statusText.textContent = status;
   }
 
-  // Clear button
-  container.querySelector('.clearBtn').onclick = () => {
-    editor.setValue("");
+  // Clear storage button - removes localStorage and resets to default code
+  container.querySelector('.clearStorageBtn').onclick = () => {
+    localStorage.removeItem(storageKey);
+    editor.setValue(defaultCode);
     stopGame();
+    const btn = container.querySelector('.clearStorageBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✔ Cleared';
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+    }, 2000);
+  };
+
+  // Save code button - saves to localStorage
+  container.querySelector('.saveBtn').onclick = () => {
+    const code = editor.getValue();
+    localStorage.setItem(storageKey, code);
+    const btn = container.querySelector('.saveBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✔ Saved';
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+    }, 2000);
   };
 
   // Copy code button
@@ -176,10 +201,10 @@
     }
   }
 
-  // Reset game
+  // Reset game (resets to current session code, not storage)
   function resetGame() {
     stopGame();
-    editor.setValue(initialCode);
+    editor.setValue(defaultCode);
     updateStatus('Reset');
   }
 
