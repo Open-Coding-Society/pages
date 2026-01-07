@@ -1,5 +1,5 @@
 <!-- Reusable Code Runner Component -->
-<div class="code-runner-container" id="runner-{{ include.runner_id }}">
+<div class="code-runner-container" id="runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   <div class="challenge-box">
     <h3>Challenge</h3>
     <p>{{ include.challenge }}</p>
@@ -9,7 +9,8 @@
     <div class="control-panel">
       <button class="runBtn" title="Run">▶</button>
       <button class="copyBtn" title="Copy Code">⎘</button>
-      <button class="clearBtn" title="Clear Code">⎚</button>
+      <button class="saveBtn" title="Save Code">💾</button>
+      <button class="clearStorageBtn" title="Clear Storage">🗑</button>
       <select class="languageSelect">
         <option value="python">Python</option>
         <option value="java">Java</option>
@@ -49,8 +50,13 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (!container) return;
   
   const initialLang = "{{ include.language }}";
-  const initialCode = `{{ include.code }}`.trim();
+  const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.height }}";
+  const storageKey = container.dataset.storageKey;
+  
+  // Load code from localStorage or use default
+  const savedCode = localStorage.getItem(storageKey);
+  const initialCode = savedCode !== null ? savedCode : defaultCode;
   
   // Set CodeMirror height dynamically
   if (editorHeight) {
@@ -115,11 +121,30 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     }
   });
 
-  // Clear button
-  container.querySelector('.clearBtn').onclick = () => {
-    editor.setValue("");
-    outputDiv.textContent = 'Click "Run Code" to see output here...';
+  // Clear storage button - removes localStorage and resets to default code
+  container.querySelector('.clearStorageBtn').onclick = () => {
+    localStorage.removeItem(storageKey);
+    editor.setValue(defaultCode || "print('Hello, world!')");
+    outputDiv.textContent = 'Storage cleared. Code reset to default.';
     execTimeSpan.textContent = '';
+    const btn = container.querySelector('.clearStorageBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  };
+
+  // Save code button - saves to localStorage
+  container.querySelector('.saveBtn').onclick = () => {
+    const code = editor.getValue();
+    localStorage.setItem(storageKey, code);
+    const btn = container.querySelector('.saveBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '✔';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
   };
 
   // Copy code button
@@ -155,12 +180,14 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     outputDiv.textContent = "⏳ Running...";
     execTimeSpan.textContent = '';
 
+    /*
     const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
     if (lang === "javascript" && !isLocalhost) {
       outputDiv.textContent = "⚠️ JavaScript execution is only available on localhost.";
       execTimeSpan.textContent = '';
       return;
     }
+    */
 
     const startTime = Date.now();
 
