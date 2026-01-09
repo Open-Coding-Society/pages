@@ -26,6 +26,10 @@ future: true
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
 exclude:
+# Jekyll defaults
+  - vendor
+# Custom excludes
+  - Makefile
   - _notebooks
   - _docx
   - venv
