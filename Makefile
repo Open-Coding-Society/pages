@@ -8,11 +8,13 @@ SHELL = /bin/bash -c
 NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
-
 default: serve-current
 	@touch /tmp/.notebook_watch_marker
 	@make watch-notebooks &
-	@make watch-files
+	@make watch-files &
+	@echo "Server running in background on http://localhost:$(PORT)"
+	@echo "  View logs: tail -f $(LOG_FILE)"
+	@echo "  Stop: make stop"
 
 # File watcher - monitors log for file changes and triggers conversion
 watch-files:
@@ -114,12 +116,7 @@ serve-yat: use-yat clean
 	@make serve-current
 
 # General serve target (uses whatever is in _config.yml/Gemfile)
-serve-current: stop convert split-courses
-	@echo "Starting server with current config/Gemfile..."
-	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) >> $(LOG_FILE) 2>&1 & \
-		PID=$$!; \
-		echo "Server PID: $$PID"
-	@make wait-for-server
+serve-current: stop convert split-courses jekyll-serve
 
 # Build with selected theme
 build-minima: use-minima build-current
@@ -246,33 +243,41 @@ refresh:
 	@make clean
 	@make
 
-# Development mode: clean start with incremental builds and single-file conversion
-# Skips full notebook conversion for ~20 second startup, converts individual files on save
-dev: stop clean start-server-fast
+# Development mode: clean start, no conversion, converts files on save
+# Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
+dev: stop clean jekyll-serve
 	@make watch-notebooks &
-	@make watch-files
+	@make watch-files &
+	@echo "Dev server running in background on http://localhost:$(PORT)"
+	@echo "  View logs: tail -f $(LOG_FILE)"
+	@echo "  Stop: make stop"
 
 # Watch notebooks directory for changes (since Jekyll excludes _notebooks)
+# Converts immediately (async), Jekyll serve handles regeneration batching
 watch-notebooks:
 	@echo "Watching _notebooks for changes..."
 	@while true; do \
 		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker 2>/dev/null | while read notebook; do \
 			echo "Notebook changed: $$notebook"; \
-			make convert-single NOTEBOOK_FILE="$$notebook"; \
+			make convert-single NOTEBOOK_FILE="$$notebook" & \
 		done; \
 		touch /tmp/.notebook_watch_marker; \
 		sleep 2; \
 	done
 
-# Start server without conversion (for dev mode)
-start-server-fast:
-	@echo "Starting development server (fast mode)..."
-	@echo "  - Skipping full notebook conversion"
-	@echo "  - Incremental builds enabled"
+# Bundle install (only runs if Gemfile changed)
+bundle-install:
+	@if [ ! -f .bundle/install_marker ] || [ Gemfile -nt .bundle/install_marker ]; then \
+		echo "Installing bundle..."; \
+		bundle install; \
+		mkdir -p .bundle && touch .bundle/install_marker; \
+	fi
+
+# Start Jekyll server (incremental for development, production is GitHub Actions)
+jekyll-serve: bundle-install
 	@touch /tmp/.notebook_watch_marker
-	@bundle install > $(LOG_FILE) 2>&1 && bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental >> $(LOG_FILE) 2>&1 & \
-		PID=$$!; \
-		echo "Server PID: $$PID"
+	@bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental > $(LOG_FILE) 2>&1 & \
+		echo "Server PID: $$!"
 	@make wait-for-server
 
 # Common server wait logic
