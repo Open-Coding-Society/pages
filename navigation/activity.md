@@ -178,7 +178,7 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
       hoverDesc: "Bake delicious cookies and deliver them to neighbors. Learn baking skills while spreading joy!"
     },
     {
-      image: "{{site.baseurl}}/images/activity/missionaries.jped",
+      image: "{{site.baseurl}}/images/activity/missionaries.jpeg",
       title: "Feed Missionaries",
       shortDesc: "Go Ye Into the World",
       hoverDesc: "Prepare and share a meal with local missionaries. Learn about service and hearing their stories!"
