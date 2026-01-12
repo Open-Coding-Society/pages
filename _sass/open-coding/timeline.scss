@@ -1096,5 +1096,180 @@
   #help-modal .close-btn {
     @include modal-close-btn;
   }
+
+  /* ============================= */
+  /*     SPRINT DATE CONTROLS      */
+  /* ============================= */
+
+  .sprint-date-control {
+    position: relative;
+    display: inline-block;
+  }
+
+  .sprint-btn.date-toggle {
+    @include toggle-button;
+    padding: 8px 12px;
+    font-size: 14px;
+    
+    &:hover {
+      background: $bg-2;
+    }
+    
+    i {
+      color: var(--pref-accent-color);
+    }
+  }
+
+  .sprint-date-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    min-width: 280px;
+    background: $bg-1;
+    border: 1px solid $bg-3;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    margin-top: 8px;
+    
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .date-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $bg-3;
+    
+    span {
+      font-weight: 600;
+      color: $text;
+      font-size: 14px;
+    }
+  }
+
+  .date-dropdown-close {
+    background: none;
+    border: none;
+    color: $text-muted;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    
+    &:hover {
+      color: $text;
+    }
+  }
+
+  .date-input-group {
+    margin-bottom: 12px;
+    
+    label {
+      display: block;
+      font-size: 12px;
+      color: $text-muted;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    
+    input[type="date"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: $bg-2;
+      border: 1px solid $bg-3;
+      border-radius: 8px;
+      color: $text;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      
+      &:focus {
+        border-color: var(--pref-accent-color);
+      }
+      
+      &::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+      }
+    }
+  }
+
+  .date-actions {
+    margin-top: 16px;
+  }
+
+  .save-sprint-dates-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--pref-accent-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 0.9;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .sprint-date-status {
+    margin-top: 12px;
+    font-size: 12px;
+    text-align: center;
+    min-height: 18px;
+    
+    &.success {
+      color: #10b981;
+    }
+    
+    &.error {
+      color: #ef4444;
+    }
+    
+    &.loading {
+      color: $text-muted;
+    }
+  }
+
+  .sprint-dates-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: $text-muted;
+    padding: 6px 10px;
+    background: $bg-2;
+    border-radius: 6px;
+    
+    i {
+      color: var(--pref-accent-color);
+    }
+    
+    .date-range {
+      color: $text;
+    }
+  }
   
 }
