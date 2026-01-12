@@ -974,19 +974,47 @@ score += gists * 0.5
                         }
                     }
 
-                    // Load preferences - tries backend first, falls back to localStorage
+                    // Check if user is logged in by calling an auth endpoint
+                    async function checkLoginStatus() {
+                        try {
+                            // Try to get user info - if this succeeds, user is logged in
+                            const res = await fetch(`${javaURI}/api/person/get`, {
+                                method: 'GET',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include'
+                            });
+                            
+                            if (res.ok) {
+                                isLoggedIn = true;
+                                return true;
+                            } else {
+                                isLoggedIn = false;
+                                return false;
+                            }
+                        } catch (e) {
+                            console.log('Login check failed, assuming guest user');
+                            isLoggedIn = false;
+                            return false;
+                        }
+                    }
+
+                    // Load preferences - checks login first, then tries backend, falls back to localStorage
                     async function loadPreferences() {
                         try {
-                            // Try backend first
-                            const backendPrefs = await fetchPreferencesFromBackend();
+                            // First check if user is logged in
+                            const loggedIn = await checkLoginStatus();
                             
-                            if (isLoggedIn && backendPrefs) {
-                                cachedPrefs = backendPrefs;
-                                applyPreferences(backendPrefs);
-                                return backendPrefs;
+                            // Only try backend if logged in
+                            if (loggedIn) {
+                                const backendPrefs = await fetchPreferencesFromBackend();
+                                if (backendPrefs) {
+                                    cachedPrefs = backendPrefs;
+                                    applyPreferences(backendPrefs);
+                                    return backendPrefs;
+                                }
                             }
                             
-                            // Fallback to localStorage for guests
+                            // Fallback to localStorage for guests or if backend fails
                             const raw = localStorage.getItem(localStorageKey);
                             if (raw) {
                                 const prefs = JSON.parse(raw);
@@ -1411,11 +1439,18 @@ score += gists * 0.5
 
                     // Expose loadPreferences globally for other scripts
                     window.loadPreferences = loadPreferences;
+                    window.checkLoginStatus = checkLoginStatus;
                     
-                    // Initial load attempt (will be called again on DOMContentLoaded)
+                    // Initial load from localStorage only (no backend call yet)
+                    // Full loadPreferences() with backend check will be called on window.onload after login is confirmed
                     try { 
-                        loadPreferences().catch(e => console.error('Initial load error', e)); 
-                    } catch(e) { console.error('Initial load error', e); }
+                        const raw = localStorage.getItem(localStorageKey);
+                        if (raw) {
+                            const prefs = JSON.parse(raw);
+                            cachedPrefs = prefs;
+                            applyPreferences(prefs);
+                        }
+                    } catch(e) { console.error('Initial localStorage load error', e); }
                 })();
                 </script>
 
