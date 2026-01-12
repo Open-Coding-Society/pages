@@ -170,7 +170,7 @@ We will vote by season. Hover over each activity to learn more!
   // Winter Activities (December - February)
   const winterActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Bird_house_11.jpg/640px-Bird_house_11.jpg",
+      image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Bird+House",
       title: "Build Bird Houses",
       shortDesc: "Wood Craft",
       hoverDesc: "Learn basic woodworking skills by building homes for our feathered friends. Perfect indoor winter activity!"
@@ -182,19 +182,19 @@ We will vote by season. Hover over each activity to learn more!
       hoverDesc: "Learn the ancient game of chess! Develop critical thinking, patience, and strategic planning skills."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Chocolate_Chip_Cookies_-_kimberlykv.jpg/640px-Chocolate_Chip_Cookies_-_kimberlykv.jpg",
+      image: "https://placehold.co/400x300/D2691E/FFFFFF?text=Baking+Cookies",
       title: "Baking & Delivery",
       shortDesc: "Love Your Neighbor",
       hoverDesc: "Bake delicious cookies and deliver them to neighbors. Learn baking skills while spreading joy!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Ai-generated-8436457_1280.jpg/640px-Ai-generated-8436457_1280.jpg",
+      image: "https://placehold.co/400x300/FF6347/FFFFFF?text=Share+a+Meal",
       title: "Feed Missionaries",
       shortDesc: "Go Into the World",
       hoverDesc: "Prepare and share a meal with local missionaries. Learn about service and hearing their stories!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/3D_printer_Replicating_Rapid-prototyper.jpg/640px-3D_printer_Replicating_Rapid-prototyper.jpg",
+      image: "https://placehold.co/400x300/4169E1/FFFFFF?text=3D+Printing",
       title: "3D Printing",
       shortDesc: "Makerspace Fun",
       hoverDesc: "Design and create your own 3D printed objects. Introduction to modern manufacturing technology!"
@@ -204,37 +204,37 @@ We will vote by season. Hover over each activity to learn more!
   // Spring Activities (March - May)
   const springActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Decorated_easter_eggs_2010.jpg/640px-Decorated_easter_eggs_2010.jpg",
+      image: "https://placehold.co/400x300/FFB6C1/000000?text=Easter+Eggs",
       title: "Easter Activities",
       shortDesc: "Atonement Study",
       hoverDesc: "Breakfast study about the Atonement followed by a fun Easter egg hunt in the spring sunshine!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Watercolor_Paint.JPG/640px-Watercolor_Paint.JPG",
+      image: "https://placehold.co/400x300/FF69B4/FFFFFF?text=Drawing",
       title: "Learning to Draw",
       shortDesc: "Artistic Skills",
       hoverDesc: "Discover your artistic side! Learn basic drawing techniques and create your own masterpieces."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Backpackers_in_the_Bob_Marshall_Wilderness_of_Montana.jpg/640px-Backpackers_in_the_Bob_Marshall_Wilderness_of_Montana.jpg",
+      image: "https://placehold.co/400x300/228B22/FFFFFF?text=Backpacking",
       title: "Backpacking Prep",
       shortDesc: "Outdoor Skills",
       hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Raking_leaves.jpg/640px-Raking_leaves.jpg",
+      image: "https://placehold.co/400x300/32CD32/000000?text=Yard+Cleanup",
       title: "Yard Cleanup",
       shortDesc: "Bless Your Fellow Man",
       hoverDesc: "Help someone in the community with spring yard cleanup. Service project with lunch included!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Water_Rocket.JPG/640px-Water_Rocket.JPG",
+      image: "https://placehold.co/400x300/FF4500/FFFFFF?text=Rockets",
       title: "Air Rockets",
       shortDesc: "Science & Launch",
       hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Knot_tying.jpg/640px-Knot_tying.jpg",
+      image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Knots+and+Ropes",
       title: "Knots & Ropes",
       shortDesc: "Practical Skills",
       hoverDesc: "Master essential knot-tying skills for camping, sailing, and everyday use. Very handy knowledge!"
@@ -244,37 +244,37 @@ We will vote by season. Hover over each activity to learn more!
   // Summer Activities (June - August)
   const summerActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Campfire.jpg/640px-Campfire.jpg",
+      image: "https://placehold.co/400x300/FF8C00/000000?text=Campfire",
       title: "Camping & Fire",
       shortDesc: "Outdoor Adventure",
       hoverDesc: "Learn campfire safety, setup camp, and enjoy the great outdoors under the stars!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Cooking_over_campfire.jpg/640px-Cooking_over_campfire.jpg",
+      image: "https://placehold.co/400x300/DC143C/FFFFFF?text=Camp+Cooking",
       title: "Camping Cooking",
       shortDesc: "Outdoor Chef",
       hoverDesc: "Cook delicious meals in nature! Learn camping cooking techniques and outdoor food safety."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Swimming_pool_1.jpg/640px-Swimming_pool_1.jpg",
+      image: "https://placehold.co/400x300/00CED1/000000?text=Pool+Party",
       title: "Pool Party",
       shortDesc: "Water Fun",
       hoverDesc: "Beat the summer heat with swimming, pool games, and water safety lessons!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Scuba_diving_in_Mal%C3%A9_Atoll.jpg/640px-Scuba_diving_in_Mal%C3%A9_Atoll.jpg",
+      image: "https://placehold.co/400x300/1E90FF/FFFFFF?text=Scuba+Diving",
       title: "Scuba Basics",
       shortDesc: "Underwater World",
       hoverDesc: "Introduction to scuba diving! Learn basic equipment, safety, and breathing techniques."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Mountainbiking.jpg/640px-Mountainbiking.jpg",
+      image: "https://placehold.co/400x300/2E8B57/FFFFFF?text=Biking",
       title: "Gravel Biking",
       shortDesc: "Bike Adventure",
       hoverDesc: "Explore trails on two wheels! Learn bike safety and enjoy outdoor cycling adventures."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/PlayStation_3_controller_Sixaxis.png/640px-PlayStation_3_controller_Sixaxis.png",
+      image: "https://placehold.co/400x300/9370DB/FFFFFF?text=Game+Making",
       title: "Video Game Making",
       shortDesc: "Plan of Happiness",
       hoverDesc: "Create your own video game with a positive message! Learn basic game design and coding."
@@ -284,37 +284,37 @@ We will vote by season. Hover over each activity to learn more!
   // Fall Activities (September - November)
   const fallActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Innova_Champion_Discs_Aviar_Putt_%26_Approach_1.jpg/640px-Innova_Champion_Discs_Aviar_Putt_%26_Approach_1.jpg",
+      image: "https://placehold.co/400x300/FFD700/000000?text=Frisbee+Golf",
       title: "Frisbee Golf",
       shortDesc: "Modified Sport",
       hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Dodgeball.jpg/640px-Dodgeball.jpg",
+      image: "https://placehold.co/400x300/FF6347/FFFFFF?text=Dodgeball",
       title: "Modified Dodgeball",
       shortDesc: "Team Sport",
       hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Four_Square_Setup.jpg/640px-Four_Square_Setup.jpg",
+      image: "https://placehold.co/400x300/FF8C00/000000?text=Four+Square",
       title: "Four Square",
       shortDesc: "Classic Game",
       hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Artist_Palette_and_Brushes.jpg/640px-Artist_Palette_and_Brushes.jpg",
+      image: "https://placehold.co/400x300/BA55D3/FFFFFF?text=Painting",
       title: "Learning to Paint",
       shortDesc: "Artistic Expression",
       hoverDesc: "Explore painting with different mediums. Express yourself through color and creativity!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Salt_Lake_LDS_Conference_Center.jpg/640px-Salt_Lake_LDS_Conference_Center.jpg",
+      image: "https://placehold.co/400x300/4682B4/FFFFFF?text=Conference",
       title: "Conference Notes",
       shortDesc: "Learn of Prophets",
       hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Catapult_model.jpg/640px-Catapult_model.jpg",
+      image: "https://placehold.co/400x300/CD853F/000000?text=Catapults",
       title: "Popsicle Catapults",
       shortDesc: "Engineering Fun",
       hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering."
