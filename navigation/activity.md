@@ -194,37 +194,37 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
   // Spring Activities (March - May)
   const springActivities = [
     {
-      image: "https://placehold.co/400x300/2F4F4F/FFFFFF?text=Compass+Navigation",
+      image: "https://upload.wikimedia.org/wikipedia/commons/9/99/Kompas_Sofia.JPG",
       title: "Compass Navigation",
       shortDesc: "Find Your Way",
       hoverDesc: "Learn to use a compass and map! Discover navigation skills for hiking and outdoor adventures."
     },
     {
-      image: "https://placehold.co/400x300/FFB6C1/000000?text=Easter+Eggs",
+      image: "https://i.pinimg.com/736x/00/9e/8d/009e8d29e58f7f92385055dafcdd35e9.jpg",
       title: "Easter Activities",
       shortDesc: "Atonement Study",
       hoverDesc: "Breakfast study about the Atonement followed by a fun Easter egg hunt in the spring sunshine!"
     },
     {
-      image: "https://placehold.co/400x300/FF69B4/FFFFFF?text=Drawing",
+      image: "https://upload.wikimedia.org/wikipedia/commons/9/99/Leonardo_da_Vinci_-_Study_of_hands_-_WGA12812.jpg",
       title: "Learning to Draw",
       shortDesc: "Artistic Skills",
       hoverDesc: "Discover your artistic side! Learn basic drawing techniques and create your own masterpieces."
     },
     {
-      image: "https://placehold.co/400x300/228B22/FFFFFF?text=Backpacking",
+      image: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Backpacking_supplies_%28pack%2C_tent%2C_sleeping_pad%2C_and_bear_box%29_at_Panhandle_Gap.jpg",
       title: "Backpacking Prep",
       shortDesc: "Outdoor Skills",
       hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!"
     },
     {
-      image: "https://placehold.co/400x300/32CD32/000000?text=Yard+Cleanup",
+      image: "https://upload.wikimedia.org/wikipedia/commons/6/61/Overgrown_yard_-_geograph.org.uk_-_964505.jpg",
       title: "Yard Cleanup",
       shortDesc: "Bless Your Fellow Man",
       hoverDesc: "Help someone in the community with spring yard cleanup. Service project with lunch included!"
     },
     {
-      image: "https://placehold.co/400x300/FF4500/FFFFFF?text=Rockets",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
       title: "Air Rockets",
       shortDesc: "Science & Launch",
       hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics."
