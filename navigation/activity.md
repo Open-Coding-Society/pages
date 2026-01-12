@@ -170,31 +170,31 @@ We will vote by season. Hover over each activity to learn more!
   // Winter Activities (December - February)
   const winterActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Emberiza_citrinella_-_Corn_Bunting%2C_Adana_2016.jpg/800px-Emberiza_citrinella_-_Corn_Bunting%2C_Adana_2016.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Bird_house_11.jpg/640px-Bird_house_11.jpg",
       title: "Build Bird Houses",
       shortDesc: "Wood Craft",
       hoverDesc: "Learn basic woodworking skills by building homes for our feathered friends. Perfect indoor winter activity!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Chess_pieces_0l.jpg/800px-Chess_pieces_0l.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/ChessSet.jpg/640px-ChessSet.jpg",
       title: "Chess Basics",
       shortDesc: "Strategy & Thinking",
       hoverDesc: "Learn the ancient game of chess! Develop critical thinking, patience, and strategic planning skills."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Chocolate_Chip_Cookies_-_kimberlykv.jpg/800px-Chocolate_Chip_Cookies_-_kimberlykv.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Chocolate_Chip_Cookies_-_kimberlykv.jpg/640px-Chocolate_Chip_Cookies_-_kimberlykv.jpg",
       title: "Baking & Delivery",
       shortDesc: "Love Your Neighbor",
       hoverDesc: "Bake delicious cookies and deliver them to neighbors. Learn baking skills while spreading joy!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Missionaries_2.jpg/800px-Missionaries_2.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Ai-generated-8436457_1280.jpg/640px-Ai-generated-8436457_1280.jpg",
       title: "Feed Missionaries",
       shortDesc: "Go Into the World",
       hoverDesc: "Prepare and share a meal with local missionaries. Learn about service and hearing their stories!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/3D_Printer.jpg/800px-3D_Printer.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/3D_printer_Replicating_Rapid-prototyper.jpg/640px-3D_printer_Replicating_Rapid-prototyper.jpg",
       title: "3D Printing",
       shortDesc: "Makerspace Fun",
       hoverDesc: "Design and create your own 3D printed objects. Introduction to modern manufacturing technology!"
@@ -204,37 +204,37 @@ We will vote by season. Hover over each activity to learn more!
   // Spring Activities (March - May)
   const springActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Easter_egg_on_grass_%28Unsplash%29.jpg/800px-Easter_egg_on_grass_%28Unsplash%29.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Decorated_easter_eggs_2010.jpg/640px-Decorated_easter_eggs_2010.jpg",
       title: "Easter Activities",
       shortDesc: "Atonement Study",
       hoverDesc: "Breakfast study about the Atonement followed by a fun Easter egg hunt in the spring sunshine!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Colored_pencils_in_a_cup.jpg/800px-Colored_pencils_in_a_cup.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Watercolor_Paint.JPG/640px-Watercolor_Paint.JPG",
       title: "Learning to Draw",
       shortDesc: "Artistic Skills",
       hoverDesc: "Discover your artistic side! Learn basic drawing techniques and create your own masterpieces."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Estes_Park_Aerial_Tramway_02.jpg/800px-Estes_Park_Aerial_Tramway_02.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Backpackers_in_the_Bob_Marshall_Wilderness_of_Montana.jpg/640px-Backpackers_in_the_Bob_Marshall_Wilderness_of_Montana.jpg",
       title: "Backpacking Prep",
       shortDesc: "Outdoor Skills",
       hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Yard_work.jpg/800px-Yard_work.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Raking_leaves.jpg/640px-Raking_leaves.jpg",
       title: "Yard Cleanup",
       shortDesc: "Bless Your Fellow Man",
       hoverDesc: "Help someone in the community with spring yard cleanup. Service project with lunch included!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Estes_water_rocket.jpg/800px-Estes_water_rocket.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Water_Rocket.JPG/640px-Water_Rocket.JPG",
       title: "Air Rockets",
       shortDesc: "Science & Launch",
       hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Knots.jpg/800px-Knots.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Knot_tying.jpg/640px-Knot_tying.jpg",
       title: "Knots & Ropes",
       shortDesc: "Practical Skills",
       hoverDesc: "Master essential knot-tying skills for camping, sailing, and everyday use. Very handy knowledge!"
@@ -244,37 +244,37 @@ We will vote by season. Hover over each activity to learn more!
   // Summer Activities (June - August)
   const summerActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Campfire_4213.jpg/800px-Campfire_4213.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Campfire.jpg/640px-Campfire.jpg",
       title: "Camping & Fire",
       shortDesc: "Outdoor Adventure",
       hoverDesc: "Learn campfire safety, setup camp, and enjoy the great outdoors under the stars!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Cooking_outdoors.jpg/800px-Cooking_outdoors.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Cooking_over_campfire.jpg/640px-Cooking_over_campfire.jpg",
       title: "Camping Cooking",
       shortDesc: "Outdoor Chef",
       hoverDesc: "Cook delicious meals in nature! Learn camping cooking techniques and outdoor food safety."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Swimming_Pool_in_Atacama_Desert.jpg/800px-Swimming_Pool_in_Atacama_Desert.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Swimming_pool_1.jpg/640px-Swimming_pool_1.jpg",
       title: "Pool Party",
       shortDesc: "Water Fun",
       hoverDesc: "Beat the summer heat with swimming, pool games, and water safety lessons!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Scuba_diver_in_Red_Sea.jpg/800px-Scuba_diver_in_Red_Sea.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Scuba_diving_in_Mal%C3%A9_Atoll.jpg/640px-Scuba_diving_in_Mal%C3%A9_Atoll.jpg",
       title: "Scuba Basics",
       shortDesc: "Underwater World",
       hoverDesc: "Introduction to scuba diving! Learn basic equipment, safety, and breathing techniques."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Mountain_biking.jpg/800px-Mountain_biking.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Mountainbiking.jpg/640px-Mountainbiking.jpg",
       title: "Gravel Biking",
       shortDesc: "Bike Adventure",
       hoverDesc: "Explore trails on two wheels! Learn bike safety and enjoy outdoor cycling adventures."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Video_game_controller_Flickr_steeljam.jpg/800px-Video_game_controller_Flickr_steeljam.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/PlayStation_3_controller_Sixaxis.png/640px-PlayStation_3_controller_Sixaxis.png",
       title: "Video Game Making",
       shortDesc: "Plan of Happiness",
       hoverDesc: "Create your own video game with a positive message! Learn basic game design and coding."
@@ -284,37 +284,37 @@ We will vote by season. Hover over each activity to learn more!
   // Fall Activities (September - November)
   const fallActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Frisbee_in_flight.jpg/800px-Frisbee_in_flight.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Innova_Champion_Discs_Aviar_Putt_%26_Approach_1.jpg/640px-Innova_Champion_Discs_Aviar_Putt_%26_Approach_1.jpg",
       title: "Frisbee Golf",
       shortDesc: "Modified Sport",
       hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Dodgeball_game.jpg/800px-Dodgeball_game.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Dodgeball.jpg/640px-Dodgeball.jpg",
       title: "Modified Dodgeball",
       shortDesc: "Team Sport",
       hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Four_square.jpg/800px-Four_square.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Four_Square_Setup.jpg/640px-Four_Square_Setup.jpg",
       title: "Four Square",
       shortDesc: "Classic Game",
       hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Painting-artist.jpg/800px-Painting-artist.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Artist_Palette_and_Brushes.jpg/640px-Artist_Palette_and_Brushes.jpg",
       title: "Learning to Paint",
       shortDesc: "Artistic Expression",
       hoverDesc: "Explore painting with different mediums. Express yourself through color and creativity!"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Salt_Lake_LDS_Conference_Center.jpg/800px-Salt_Lake_LDS_Conference_Center.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Salt_Lake_LDS_Conference_Center.jpg/640px-Salt_Lake_LDS_Conference_Center.jpg",
       title: "Conference Notes",
       shortDesc: "Learn of Prophets",
       hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together."
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Catapult_-_Mangonnel.jpg/800px-Catapult_-_Mangonnel.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Catapult_model.jpg/640px-Catapult_model.jpg",
       title: "Popsicle Catapults",
       shortDesc: "Engineering Fun",
       hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering."
