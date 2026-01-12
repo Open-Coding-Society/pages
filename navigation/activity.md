@@ -5,47 +5,25 @@ title: Activitity Days Ideas
 description: Here are some activities day options
 ---
 
-## Nature/Physical Goals
-
-Modified Frisbee Golf
-Modified Dodge Ball
-Four Square
-Camping and Fire
-Camping and Cooking
-Backpacking and Hiking
-Pool Party
-Scuba Basics
-Gravel Biking
-
-## Talent Building
-
-Chess Playing Basics
-Learning to Draw
-Learning to Paint
-Wood Craft (Bird House)
-Wood Milling
-
-## Intellectual Goals
-
-Basic Automotive
-Navigation Basis
-Knots and Ropes
-3D Printing Makerspace
-Video Game Making - Plan of Happiness
-Air Rockets Launching
-Popsicle Stick (Catapults)
-
-## Follow Jesus and Social
-
-Love your Neighbor - Baking Cookies and Delivery
-Go ye into the World - Meet snd feed the Missionaries
-Bless your fellow man - Lunch and Yard cleanup
-Easter Atonement - Breakfast Study and Egg Hunt
-Learn of the Prophets - Conference Lunch and Notes
-
 ## Let's Schedule
 
-We will vote by season. Hover over each activity to learn more!
+Here is a brief
+
+### Nature/Physical Goals
+
+Modified Frisbee Golf → Modified Dodge Ball → Four Square → Camping and Fire → Camping and Cooking → Backpacking and Hiking → Pool Party → Scuba Basics → Gravel Biking
+
+### Talent Building
+
+Chess Playing → Learning to Draw → Learning to Paint → Wood Craft → Wood Milling
+
+### Intellectual Goals
+
+Knots and Ropes → Basic Automotive → Navigation Basics → 3D Printing Makerspace → Video Game Making → Air Rockets → Catapults
+
+### Follow Jesus and Social
+
+Love your Neighbor → Go ye into the World  → Bless your fellow man → Easter Atonement → Learn of the Prophets
 
 ### Winter ❄️
 <!-- SECTION 1: Winter options -->
@@ -170,6 +148,12 @@ We will vote by season. Hover over each activity to learn more!
   // Winter Activities (December - February)
   const winterActivities = [
     {
+      image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Knots+and+Ropes",
+      title: "Knots & Ropes",
+      shortDesc: "Practical Skills",
+      hoverDesc: "Master essential knot-tying skills for camping, sailing, and everyday use. Very handy knowledge!"
+    },
+    {
       image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Bird+House",
       title: "Build Bird Houses",
       shortDesc: "Wood Craft",
@@ -190,7 +174,7 @@ We will vote by season. Hover over each activity to learn more!
     {
       image: "https://placehold.co/400x300/FF6347/FFFFFF?text=Share+a+Meal",
       title: "Feed Missionaries",
-      shortDesc: "Go Into the World",
+      shortDesc: "Go Ye Into the World",
       hoverDesc: "Prepare and share a meal with local missionaries. Learn about service and hearing their stories!"
     },
     {
@@ -232,12 +216,6 @@ We will vote by season. Hover over each activity to learn more!
       title: "Air Rockets",
       shortDesc: "Science & Launch",
       hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics."
-    },
-    {
-      image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Knots+and+Ropes",
-      title: "Knots & Ropes",
-      shortDesc: "Practical Skills",
-      hoverDesc: "Master essential knot-tying skills for camping, sailing, and everyday use. Very handy knowledge!"
     }
   ];
   
@@ -247,13 +225,13 @@ We will vote by season. Hover over each activity to learn more!
       image: "https://placehold.co/400x300/FF8C00/000000?text=Campfire",
       title: "Camping & Fire",
       shortDesc: "Outdoor Adventure",
-      hoverDesc: "Learn campfire safety, setup camp, and enjoy the great outdoors under the stars!"
+      hoverDesc: "Learn campfire safety, setup camp, and how to enjoy the great outdoors under the stars!"
     },
     {
       image: "https://placehold.co/400x300/DC143C/FFFFFF?text=Camp+Cooking",
       title: "Camping Cooking",
       shortDesc: "Outdoor Chef",
-      hoverDesc: "Cook delicious meals in nature! Learn camping cooking techniques and outdoor food safety."
+      hoverDesc: "Learn to cook delicious meals in nature! Learn camping cooking techniques and outdoor food safety."
     },
     {
       image: "https://placehold.co/400x300/00CED1/000000?text=Pool+Party",
