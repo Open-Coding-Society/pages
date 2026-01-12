@@ -19,7 +19,7 @@ Chess Playing → Learning to Draw → Learning to Paint → Wood Craft → Wood
 
 ### Intellectual Goals
 
-Knots and Ropes → Basic Automotive → Navigation Basics → 3D Printing Makerspace → Video Game Making → Air Rockets → Catapults
+Knots and Ropes → Basic Automotive → Compass Navigation → 3D Printing Makerspace → Video Game Making → Air Rockets → Catapults
 
 ### Follow Jesus and Social
 
@@ -154,6 +154,12 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
       hoverDesc: "Master essential knot-tying skills for camping, sailing, and everyday use. Very handy knowledge!"
     },
     {
+      image: "https://placehold.co/400x300/696969/FFFFFF?text=Basic+Automotive",
+      title: "Basic Automotive",
+      shortDesc: "Car Basics",
+      hoverDesc: "Learn fundamental automotive skills: checking oil, changing tires, and understanding how cars work!"
+    },
+    {
       image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Bird+House",
       title: "Build Bird Houses",
       shortDesc: "Wood Craft",
@@ -187,6 +193,12 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
   
   // Spring Activities (March - May)
   const springActivities = [
+    {
+      image: "https://placehold.co/400x300/2F4F4F/FFFFFF?text=Compass+Navigation",
+      title: "Compass Navigation",
+      shortDesc: "Find Your Way",
+      hoverDesc: "Learn to use a compass and map! Discover navigation skills for hiking and outdoor adventures."
+    },
     {
       image: "https://placehold.co/400x300/FFB6C1/000000?text=Easter+Eggs",
       title: "Easter Activities",
