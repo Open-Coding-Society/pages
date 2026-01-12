@@ -148,19 +148,19 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
   // Winter Activities (December - February)
   const winterActivities = [
     {
-      image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Knots+and+Ropes",
+      image: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Nf_knots.png",
       title: "Knots & Ropes",
       shortDesc: "Practical Skills",
       hoverDesc: "Master essential knot-tying skills for camping, sailing, and everyday use. Very handy knowledge!"
     },
     {
-      image: "https://placehold.co/400x300/696969/FFFFFF?text=Basic+Automotive",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Fotograf%C3%ADa_de_taller.jpg/2560px-Fotograf%C3%ADa_de_taller.jpg",
       title: "Basic Automotive",
       shortDesc: "Car Basics",
       hoverDesc: "Learn fundamental automotive skills: checking oil, changing tires, and understanding how cars work!"
     },
     {
-      image: "https://placehold.co/400x300/8B4513/FFFFFF?text=Bird+House",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Nestbox_metal_protection.jpg/1280px-Nestbox_metal_protection.jpg",
       title: "Build Bird Houses",
       shortDesc: "Wood Craft",
       hoverDesc: "Learn basic woodworking skills by building homes for our feathered friends. Perfect indoor winter activity!"
@@ -172,19 +172,19 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
       hoverDesc: "Learn the ancient game of chess! Develop critical thinking, patience, and strategic planning skills."
     },
     {
-      image: "https://placehold.co/400x300/D2691E/FFFFFF?text=Baking+Cookies",
+      image: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Chocolate_Chip_Cookies_-_kimberlykv.jpg",
       title: "Baking & Delivery",
       shortDesc: "Love Your Neighbor",
       hoverDesc: "Bake delicious cookies and deliver them to neighbors. Learn baking skills while spreading joy!"
     },
     {
-      image: "https://placehold.co/400x300/FF6347/FFFFFF?text=Share+a+Meal",
+      image: "{{site.baseurl}}/images/activity/missionaries.jped",
       title: "Feed Missionaries",
       shortDesc: "Go Ye Into the World",
       hoverDesc: "Prepare and share a meal with local missionaries. Learn about service and hearing their stories!"
     },
     {
-      image: "https://placehold.co/400x300/4169E1/FFFFFF?text=3D+Printing",
+      image: "https://upload.wikimedia.org/wikipedia/commons/1/1e/3D_printer.png",
       title: "3D Printing",
       shortDesc: "Makerspace Fun",
       hoverDesc: "Design and create your own 3D printed objects. Introduction to modern manufacturing technology!"
