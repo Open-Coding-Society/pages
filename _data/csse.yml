@@ -48,23 +48,31 @@ Sprint2:
       - "Learner Empathy"
       - "Design a Lesson Plan"
   6: 
-    theme: "Deliver and Receive Learning Experiences"
+    theme: "Deliver Learning Experiences"
     goals:
-      - "Be a Learner"
+      - "Develop Lesson Plan"
       - "Teach a Lesson"
-      - "Provide Quality Feedback"
+      - "Homework Delivery"
+      - "Prepare for Grading"
   7:
-    theme: "Game Development Basics"
+    theme: "Receive Learning and Reflect"
     goals:
-      - "Build Game Elements"
-      - "Player and NPCs"
-      - "Sprites and Animation"
-      - "Backgrounds"
+      - "Reflect on Teaching"
+      - "Be a Learner"
+      - "Provide Learner Feedback"
+      - "Complete Homework"
 Sprint3:
   title: Creating a game for N@tM
   description: Part of the process of becoming technically proficient is going beyond fundamentals by taking on a project challenge while coding. A challenge with some vision, questions, AI research, and more allow amazing things to be accomplished. Our goal is to participate in N@tM with the other CS classes and other classes from the Electives Department.  We should have a blog, progress in a game, and a series of lesson hacks to show off.
   start: 8
   end: 12
+  8:
+    theme: "Game Development Basics"
+    goals:
+      - "Build Game Elements"
+      - "Backgrounds"
+      - "Sprites and Animation"
+      - "Player and NPCs"
 Sprint4:
   title: Planning, Tinkering, and OOP
   description: Students, in trios, will work on Game and study OOP. There will be a lot of code, some Tech Talks, and some Teaching assignments provided to learn the code.

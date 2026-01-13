@@ -3,7 +3,7 @@ toc: True
 courses: { csse: {week: 7} }
 layout: post
 title: Likert Review (Group)
-description: A response is sound and pedagogically appropriate for peer-led instruction. It balances reflection, metacognition, and instructional quality without overburdening peer-teachers immediately after delivery. 
+description: A structured evaluation form for peer-led lessons that balances reflection, metacognition, and instructional quality without overburdening peer-teachers immediately after delivery.
 permalink: /likert
 ---
 
@@ -21,7 +21,7 @@ The purpose of this evaluation is to improve future instruction by identifying s
 
 ## Peer Lesson Evaluation (Group of 6)
 
-The microblog comment allows for immediate feedback and reply from leeson team to request clarity.  Additinally, these tracking elements are captured in microblog automatically.
+The microblog comment allows for immediate feedback and reply from lesson team to request clarity. Additionally, these tracking elements are captured in microblog automatically.
 
 - **Lesson Topic:**  
 - **Teaching Group:**  
@@ -46,7 +46,7 @@ Complete this evaluation immediately after the lesson as a **single group respon
 
 ---
 
-### Addtional Prompt (Optional)
+### Additional Prompt (Optional)
 
 - What should this group **keep doing** in future lessons?
 - What is **one improvement** that would most increase learning value?
