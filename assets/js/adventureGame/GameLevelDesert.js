@@ -90,9 +90,10 @@ class GameLevelDesert {
         },
         interact: function() {
             // Show random dialogue message
-            if (this.dialogueSystem) {
-                this.showRandomDialogue();
+            if (!this.dialogueSystem) {
+                this.dialogueSystem = new DialogueSystem();
             }
+            this.showRandomDialogue();
         }
     };
 
@@ -132,9 +133,10 @@ class GameLevelDesert {
           },
           interact: function() {
               // Show random dialogue message
-              if (this.dialogueSystem) {
-                  this.showRandomDialogue();
+              if (!this.dialogueSystem) {
+                  this.dialogueSystem = new DialogueSystem();
               }
+              this.showRandomDialogue();
           }
       };
     
@@ -445,6 +447,10 @@ class GameLevelDesert {
               }
               
               // Show a dialogue with buttons immediately
+              if (!this.dialogueSystem) {
+                  this.dialogueSystem = new DialogueSystem();
+              }
+              
               if (this.dialogueSystem) {
                   // Get a random dialogue message if available
                   let message = "I need help analyzing some stocks. Want to check out the market with me?";
@@ -561,6 +567,10 @@ class GameLevelDesert {
             }
             
             // Show a dialogue with buttons immediately
+            if (!this.dialogueSystem) {
+                this.dialogueSystem = new DialogueSystem();
+            }
+            
             if (this.dialogueSystem) {
                 // Get a random dialogue message if available
                 let message = "Feeling lucky? The casino awaits with games of chance and fortune!";
