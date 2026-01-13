@@ -824,13 +824,13 @@ score += gists * 0.5
                     </div>
                 </div>
 
-                <!-- Preferences UI: the styling logic itself now lives in global
-                     assets (assets/css/user-preferences.css and
-                     assets/js/user-preferences.js). This script only manages
-                     localStorage and calls the shared SitePreferences helper
-                     so the same theme is applied across every page. -->
+                <!-- Preferences UI: Now fetches/saves preferences from Spring backend API.
+                     Falls back to localStorage for guests (not logged in).
+                     Uses config.js for API endpoints. -->
 
-                <script>
+                <script type="module">
+                import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
                 (function () {
                     const PRESETS = window.SitePreferences?.PRESETS || {
                         'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#3b82f6' },
@@ -842,8 +842,56 @@ score += gists * 0.5
                     };
 
                     const MAX_CUSTOM = 10;
-                    const storageKey = 'sitePreferences';
-                    const themesKey = 'siteThemes';
+                    const localStorageKey = 'sitePreferences'; // Fallback for guests
+                    const localThemesKey = 'siteThemes'; // Fallback for guests
+                    
+                    // Track if user is logged in and if preferences exist in backend
+                    let isLoggedIn = false;
+                    let backendPrefsExist = false;
+                    let cachedPrefs = null;
+
+                    // Convert frontend prefs format to backend format
+                    function toBackendFormat(prefs) {
+                        return {
+                            backgroundColor: prefs.bg,
+                            textColor: prefs.text,
+                            fontFamily: prefs.font,
+                            fontSize: prefs.size,
+                            accentColor: prefs.accent,
+                            selectionColor: prefs.selectionColor || '#3b82f6',
+                            buttonStyle: prefs.buttonStyle || 'rounded',
+                            language: prefs.language || '',
+                            ttsVoice: prefs.ttsVoice || '',
+                            ttsRate: prefs.ttsRate || 1.0,
+                            ttsPitch: prefs.ttsPitch || 1.0,
+                            ttsVolume: prefs.ttsVolume || 1.0,
+                            customThemes: JSON.stringify(prefs.customThemes || {})
+                        };
+                    }
+
+                    // Convert backend format to frontend prefs format
+                    function toFrontendFormat(backendPrefs) {
+                        let customThemes = {};
+                        try {
+                            customThemes = backendPrefs.customThemes ? JSON.parse(backendPrefs.customThemes) : {};
+                        } catch (e) { customThemes = {}; }
+                        
+                        return {
+                            bg: backendPrefs.backgroundColor,
+                            text: backendPrefs.textColor,
+                            font: backendPrefs.fontFamily,
+                            size: backendPrefs.fontSize,
+                            accent: backendPrefs.accentColor,
+                            selectionColor: backendPrefs.selectionColor,
+                            buttonStyle: backendPrefs.buttonStyle,
+                            language: backendPrefs.language,
+                            ttsVoice: backendPrefs.ttsVoice,
+                            ttsRate: backendPrefs.ttsRate,
+                            ttsPitch: backendPrefs.ttsPitch,
+                            ttsVolume: backendPrefs.ttsVolume,
+                            customThemes: customThemes
+                        };
+                    }
 
                     function applyPreferences(prefs) {
                         if (window.SitePreferences && typeof window.SitePreferences.applyPreferences === 'function') {
@@ -851,33 +899,191 @@ score += gists * 0.5
                         }
                     }
 
-                    function loadPreferences() {
+                    // Fetch preferences from backend API
+                    async function fetchPreferencesFromBackend() {
                         try {
-                            const raw = localStorage.getItem(storageKey);
-                            if (!raw) return null;
-                            const prefs = JSON.parse(raw);
-                            applyPreferences(prefs);
-                            return prefs;
-                        } catch (e) { console.error('loadPreferences error', e); return null; }
+                            const res = await fetch(`${javaURI}/api/user/preferences`, {
+                                ...fetchOptions,
+                                method: 'GET'
+                            });
+                            
+                            if (res.status === 401) {
+                                // Not logged in
+                                isLoggedIn = false;
+                                return null;
+                            }
+                            
+                            if (res.ok) {
+                                isLoggedIn = true;
+                                const data = await res.json();
+                                if (data && data.id) {
+                                    backendPrefsExist = true;
+                                    return toFrontendFormat(data);
+                                } else {
+                                    // Backend returned defaults (no saved prefs yet)
+                                    backendPrefsExist = false;
+                                    return data ? toFrontendFormat(data) : null;
+                                }
+                            }
+                            return null;
+                        } catch (e) {
+                            console.error('fetchPreferencesFromBackend error', e);
+                            isLoggedIn = false;
+                            return null;
+                        }
                     }
 
-                    function savePreferences(prefs){
+                    // Save preferences to backend API
+                    async function savePreferencesToBackend(prefs) {
                         try {
-                            localStorage.setItem(storageKey, JSON.stringify(prefs));
+                            const backendData = toBackendFormat(prefs);
+                            const method = backendPrefsExist ? 'PUT' : 'POST';
+                            
+                            const res = await fetch(`${javaURI}/api/user/preferences`, {
+                                ...fetchOptions,
+                                method: method,
+                                body: JSON.stringify(backendData)
+                            });
+                            
+                            if (res.ok) {
+                                backendPrefsExist = true;
+                                return true;
+                            }
+                            return false;
+                        } catch (e) {
+                            console.error('savePreferencesToBackend error', e);
+                            return false;
+                        }
+                    }
+
+                    // Delete preferences from backend
+                    async function deletePreferencesFromBackend() {
+                        try {
+                            const res = await fetch(`${javaURI}/api/user/preferences`, {
+                                ...fetchOptions,
+                                method: 'DELETE'
+                            });
+                            if (res.ok) {
+                                backendPrefsExist = false;
+                                return true;
+                            }
+                            return false;
+                        } catch (e) {
+                            console.error('deletePreferencesFromBackend error', e);
+                            return false;
+                        }
+                    }
+
+                    // Check if user is logged in by calling an auth endpoint
+                    async function checkLoginStatus() {
+                        try {
+                            // Try to get user info - if this succeeds, user is logged in
+                            const res = await fetch(`${javaURI}/api/person/get`, {
+                                method: 'GET',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include'
+                            });
+                            
+                            if (res.ok) {
+                                isLoggedIn = true;
+                                return true;
+                            } else {
+                                isLoggedIn = false;
+                                return false;
+                            }
+                        } catch (e) {
+                            console.log('Login check failed, assuming guest user');
+                            isLoggedIn = false;
+                            return false;
+                        }
+                    }
+
+                    // Load preferences - checks login first, then tries backend, falls back to localStorage
+                    async function loadPreferences() {
+                        try {
+                            // First check if user is logged in
+                            const loggedIn = await checkLoginStatus();
+                            
+                            // Only try backend if logged in
+                            if (loggedIn) {
+                                const backendPrefs = await fetchPreferencesFromBackend();
+                                if (backendPrefs) {
+                                    cachedPrefs = backendPrefs;
+                                    applyPreferences(backendPrefs);
+                                    return backendPrefs;
+                                }
+                            }
+                            
+                            // Fallback to localStorage for guests or if backend fails
+                            const raw = localStorage.getItem(localStorageKey);
+                            if (raw) {
+                                const prefs = JSON.parse(raw);
+                                cachedPrefs = prefs;
+                                applyPreferences(prefs);
+                                return prefs;
+                            }
+                            
+                            return null;
+                        } catch (e) { 
+                            console.error('loadPreferences error', e); 
+                            return null; 
+                        }
+                    }
+
+                    // Save preferences - saves to backend if logged in, otherwise localStorage
+                    async function savePreferences(prefs) {
+                        try {
+                            cachedPrefs = prefs;
                             applyPreferences(prefs);
                             populateForm(prefs);
-                        } catch (e) { console.error('savePreferences error', e); }
+                            
+                            if (isLoggedIn) {
+                                const success = await savePreferencesToBackend(prefs);
+                                if (!success) {
+                                    // Fallback to localStorage if backend save fails
+                                    localStorage.setItem(localStorageKey, JSON.stringify(prefs));
+                                    showStatus('Saved locally (backend unavailable)');
+                                    return;
+                                }
+                            } else {
+                                // Guest user - save to localStorage
+                                localStorage.setItem(localStorageKey, JSON.stringify(prefs));
+                            }
+                        } catch (e) { 
+                            console.error('savePreferences error', e); 
+                            // Fallback to localStorage on any error
+                            localStorage.setItem(localStorageKey, JSON.stringify(prefs));
+                        }
                     }
 
-                    function loadThemes(){
+                    // Load custom themes
+                    function loadThemes() {
+                        if (cachedPrefs && cachedPrefs.customThemes) {
+                            return cachedPrefs.customThemes;
+                        }
                         try {
-                            const raw = localStorage.getItem(themesKey);
+                            const raw = localStorage.getItem(localThemesKey);
                             return raw ? JSON.parse(raw) : {};
-                        } catch (e) { console.error('loadThemes error', e); return {}; }
+                        } catch (e) { 
+                            console.error('loadThemes error', e); 
+                            return {}; 
+                        }
                     }
 
-                    function saveThemes(obj){
-                        try { localStorage.setItem(themesKey, JSON.stringify(obj)); } catch(e){console.error('saveThemes error', e);}    
+                    // Save custom themes - embedded in preferences
+                    async function saveThemes(themesObj) {
+                        try {
+                            const current = cachedPrefs || await loadPreferences() || { ...PRESETS['Midnight'] };
+                            current.customThemes = themesObj;
+                            await savePreferences(current);
+                            
+                            // Also save to localStorage as backup
+                            localStorage.setItem(localThemesKey, JSON.stringify(themesObj));
+                        } catch(e) {
+                            console.error('saveThemes error', e);
+                            // Fallback to localStorage
+                            localStorage.setItem(localThemesKey, JSON.stringify(themesObj));
+                        }    
                     }
 
                     function renderPresets(){
@@ -889,8 +1095,8 @@ score += gists * 0.5
                             const btn = document.createElement('button');
                             btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm flex items-center gap-2';
                             btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${p.accent}"></span> ${name}`;
-                            btn.addEventListener('click', () => {
-                                savePreferences({ ...p });
+                            btn.addEventListener('click', async () => {
+                                await savePreferences({ ...p, customThemes: loadThemes() });
                                 showStatus('Applied: ' + name);
                             });
                             container.appendChild(btn);
@@ -914,33 +1120,36 @@ score += gists * 0.5
                             const btn = document.createElement('button');
                             btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm text-left flex items-center gap-2';
                             btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${theme.accent || '#3b82f6'}"></span> ${name}`;
-                            btn.addEventListener('click', () => { savePreferences(theme); showStatus('Applied: ' + name); });
+                            btn.addEventListener('click', async () => { 
+                                await savePreferences({ ...theme, customThemes: loadThemes() }); 
+                                showStatus('Applied: ' + name); 
+                            });
                             const del = document.createElement('button');
                             del.className = 'px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs';
                             del.textContent = 'X';
                             del.title = 'Delete';
-                            del.addEventListener('click', () => { deleteTheme(name); });
+                            del.addEventListener('click', async () => { await deleteTheme(name); });
                             wrap.appendChild(btn);
                             wrap.appendChild(del);
                             container.appendChild(wrap);
                         });
                     }
 
-                    function saveThemeAs(name){
+                    async function saveThemeAs(name){
                         if (!name) { showStatus('Enter a theme name'); return; }
                         const themes = loadThemes();
                         if (Object.keys(themes).length >= MAX_CUSTOM && !themes[name]) { showStatus('Max themes reached'); return; }
                         themes[name] = currentFormValues();
-                        saveThemes(themes);
+                        await saveThemes(themes);
                         renderCustomThemes();
                         showStatus('Saved: ' + name);
                         document.getElementById('new-theme-name').value = '';
                     }
 
-                    function deleteTheme(name){
+                    async function deleteTheme(name){
                         const themes = loadThemes();
                         if (themes[name]) delete themes[name];
-                        saveThemes(themes);
+                        await saveThemes(themes);
                         renderCustomThemes();
                         showStatus('Deleted: ' + name);
                     }
@@ -957,9 +1166,9 @@ score += gists * 0.5
                             ttsRate: Number(document.getElementById('pref-tts-rate').value),
                             ttsPitch: Number(document.getElementById('pref-tts-pitch').value),
                             ttsVolume: Number(document.getElementById('pref-tts-volume').value),
-                            // Styling options in Colors section
                             selectionColor: document.getElementById('pref-selection-color').value,
-                            buttonStyle: document.getElementById('pref-button-style').value
+                            buttonStyle: document.getElementById('pref-button-style').value,
+                            customThemes: loadThemes()
                         };
                     }
 
@@ -995,8 +1204,8 @@ score += gists * 0.5
                         setTimeout(()=> el.textContent = '', 2500);
                     }
 
-                    function saveSectionPrefs(section){
-                        const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                    async function saveSectionPrefs(section){
+                        const current = cachedPrefs || await loadPreferences() || { ...PRESETS['Midnight'] };
                         const form = currentFormValues();
                         
                         if (section === 'text') {
@@ -1014,7 +1223,7 @@ score += gists * 0.5
                             current.language = newLang;
                             
                             // Save first, then reload to apply language change
-                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            await savePreferences(current);
                             
                             // Only reload if language actually changed
                             if (oldLang !== newLang) {
@@ -1029,12 +1238,13 @@ score += gists * 0.5
                             current.ttsVolume = form.ttsVolume;
                         }
                         
-                        savePreferences(current);
+                        current.customThemes = loadThemes();
+                        await savePreferences(current);
                         showStatus('Saved ' + section);
                     }
 
                     // Initialize TTS voices dropdown
-                    function populateTTSVoices() {
+                    async function populateTTSVoices() {
                         const select = document.getElementById('pref-tts-voice');
                         if (!select) return;
                         
@@ -1080,9 +1290,8 @@ score += gists * 0.5
                         });
                         
                         // Restore saved voice
-                        const saved = loadPreferences();
-                        if (saved && saved.ttsVoice) {
-                            select.value = saved.ttsVoice;
+                        if (cachedPrefs && cachedPrefs.ttsVoice) {
+                            select.value = cachedPrefs.ttsVoice;
                         }
                     }
                     
@@ -1113,20 +1322,37 @@ score += gists * 0.5
                         speechSynthesis.speak(utterance);
                     }
 
-                    document.addEventListener('DOMContentLoaded', function (){
+                    // Helper function to clear Google Translate cookies
+                    function clearAllTranslationCookies() {
+                        const domain = window.location.hostname;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                    }
+
+                    // Initialize on DOM ready
+                    document.addEventListener('DOMContentLoaded', async function (){
+                        // Load preferences from backend (or localStorage fallback)
+                        const saved = await loadPreferences();
+                        
                         renderPresets();
                         renderCustomThemes();
                         
                         // Initialize TTS voices
                         if ('speechSynthesis' in window) {
                             populateTTSVoices();
-                            // Chrome loads voices asynchronously
                             speechSynthesis.onvoiceschanged = populateTTSVoices;
                         }
 
-                        const saved = loadPreferences();
                         if (saved) populateForm(saved);
                         else populateForm(PRESETS['Midnight']);
+                        
+                        // Show login status hint
+                        if (isLoggedIn) {
+                            showStatus('Preferences synced from your account');
+                        }
 
                         document.getElementById('pref-font-size').addEventListener('input', function(e){
                             document.getElementById('font-size-label').textContent = e.target.value;
@@ -1147,46 +1373,51 @@ score += gists * 0.5
                         document.getElementById('tts-test-btn').addEventListener('click', testTTS);
 
                         document.querySelectorAll('.save-section-btn').forEach(btn => {
-                            btn.addEventListener('click', function() {
-                                saveSectionPrefs(this.dataset.section);
+                            btn.addEventListener('click', async function() {
+                                await saveSectionPrefs(this.dataset.section);
                             });
                         });
 
-                        document.getElementById('save-preferences').addEventListener('click', function(){
-                            savePreferences(currentFormValues());
-                            showStatus('All preferences saved');
+                        document.getElementById('save-preferences').addEventListener('click', async function(){
+                            await savePreferences(currentFormValues());
+                            showStatus(isLoggedIn ? 'Preferences saved to your account' : 'Preferences saved locally');
                         });
 
-                        document.getElementById('restore-styles').addEventListener('click', function(){
-                            localStorage.removeItem(storageKey);
-                            localStorage.removeItem(themesKey);
+                        document.getElementById('restore-styles').addEventListener('click', async function(){
+                            // Delete from backend if logged in
+                            if (isLoggedIn) {
+                                await deletePreferencesFromBackend();
+                            }
+                            // Clear localStorage
+                            localStorage.removeItem(localStorageKey);
+                            localStorage.removeItem(localThemesKey);
+                            cachedPrefs = null;
+                            
                             if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
                                 window.SitePreferences.resetPreferences();
                             }
-                            // Also clear translation
                             clearAllTranslationCookies();
                             showStatus('Reset complete');
                             setTimeout(() => location.reload(), 100);
                         });
 
                         // Clear translation / Reset to English button
-                        document.getElementById('clear-translation-btn').addEventListener('click', function(){
+                        document.getElementById('clear-translation-btn').addEventListener('click', async function(){
                             clearAllTranslationCookies();
-                            // Update preference
-                            const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                            const current = cachedPrefs || await loadPreferences() || { ...PRESETS['Midnight'] };
                             current.language = '';
-                            localStorage.setItem(storageKey, JSON.stringify(current));
+                            await savePreferences(current);
                             document.getElementById('pref-language').value = '';
                             showStatus('Translation cleared! Reloading...');
                             setTimeout(() => location.reload(), 500);
                         });
 
-                        document.getElementById('save-theme-btn').addEventListener('click', function(){
-                            saveThemeAs(document.getElementById('new-theme-name').value.trim());
+                        document.getElementById('save-theme-btn').addEventListener('click', async function(){
+                            await saveThemeAs(document.getElementById('new-theme-name').value.trim());
                         });
                         
-                        document.getElementById('new-theme-name').addEventListener('keypress', function(e){
-                            if (e.key === 'Enter') saveThemeAs(this.value.trim());
+                        document.getElementById('new-theme-name').addEventListener('keypress', async function(e){
+                            if (e.key === 'Enter') await saveThemeAs(this.value.trim());
                         });
                         
                         // Live preview for selection color and button style
@@ -1194,7 +1425,7 @@ score += gists * 0.5
                             const el = document.getElementById(id);
                             if (el) {
                                 const applyLivePreview = function() {
-                                    const current = loadPreferences() || { ...PRESETS['Midnight'] };
+                                    const current = cachedPrefs || { ...PRESETS['Midnight'] };
                                     const form = currentFormValues();
                                     current.selectionColor = form.selectionColor;
                                     current.buttonStyle = form.buttonStyle;
@@ -1206,19 +1437,20 @@ score += gists * 0.5
                         });
                     });
 
-                    // Helper function to clear Google Translate cookies
-                    function clearAllTranslationCookies() {
-                        const domain = window.location.hostname;
-                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
-                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
-                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
-                        // Also try without domain for localhost
-                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-                    }
-
-                    window.loadPreferences = async function(){ loadPreferences(); };
-                    try{ loadPreferences(); } catch(e){}
+                    // Expose loadPreferences globally for other scripts
+                    window.loadPreferences = loadPreferences;
+                    window.checkLoginStatus = checkLoginStatus;
+                    
+                    // Initial load from localStorage only (no backend call yet)
+                    // Full loadPreferences() with backend check will be called on window.onload after login is confirmed
+                    try { 
+                        const raw = localStorage.getItem(localStorageKey);
+                        if (raw) {
+                            const prefs = JSON.parse(raw);
+                            cachedPrefs = prefs;
+                            applyPreferences(prefs);
+                        }
+                    } catch(e) { console.error('Initial localStorage load error', e); }
                 })();
                 </script>
 

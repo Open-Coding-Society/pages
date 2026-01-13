@@ -95,7 +95,7 @@ active_tab: profile
                     ID (7 digits)</label>
                 <input type="text" id="sidChangeInput" name="studentId"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="" maxlength="7" pattern="\d{7}" onchange="checkForChanges()" autocomplete="off">
+                    value="" onchange="checkForChanges()" autocomplete="off">
             </div>
         </div>
     </div>
@@ -148,54 +148,40 @@ active_tab: profile
 </div>
 
 <script type="module">
-    import { pythonURI, javaURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     document.addEventListener("DOMContentLoaded", async () => {
-        const uidInput = document.getElementById('uidChangeInput');
         const springGroupInfo = document.getElementById('springGroupInfo');
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
         let availableGroups = [];
+        let currentUid = null;
 
-        // Wait briefly for the main profile script (setUserData) to populate the UID
-        let attempts = 0;
-        while (!uidInput.value && attempts < 20) {
-            await new Promise(r => setTimeout(r, 100));
-            attempts++;
-        }
+        try {
+            // Fetch current user ID directly
+            const response = await fetch(`${pythonURI}/api/id`, fetchOptions);
 
-        const currentUid = uidInput.value;
+            if (!response.ok) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                return;
+            }
 
-        if (!currentUid) {
-            springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+            const userData = await response.json();
+            currentUid = userData.uid;
+
+            if (!currentUid) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                return;
+            }
+        } catch (error) {
+            console.error("Error loading user info:", error);
+            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading user information.</p>`;
             return;
         }
 
         try {
-            // Fetch all users to find the current one
-            const response = await fetch(`${pythonURI}/api/user`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch user data');
-
-            const users = await response.json();
-            const currentUser = Array.isArray(users) ? users.find(user => user.uid === currentUid) : users;
-
-
-        } catch (error) {
-            console.error("Error loading group info:", error);
-        }
-
-        try {
-            const groupResp = await fetch(`${javaURI}/api/groups`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
+            const groupResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
 
             if (groupResp.status === 401) {
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
@@ -386,8 +372,7 @@ active_tab: profile
 </script>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
     // external functions
@@ -521,8 +506,7 @@ active_tab: profile
 </script>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Store original form values
     let originalValues = {};
     let formChanged = false;
