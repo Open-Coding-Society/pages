@@ -148,7 +148,7 @@ active_tab: profile
 </div>
 
 <script type="module">
-    import { pythonURI, javaURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     document.addEventListener("DOMContentLoaded", async () => {
         const springGroupInfo = document.getElementById('springGroupInfo');
@@ -372,8 +372,7 @@ active_tab: profile
 </script>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
     // external functions
@@ -507,8 +506,7 @@ active_tab: profile
 </script>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Store original form values
     let originalValues = {};
     let formChanged = false;
