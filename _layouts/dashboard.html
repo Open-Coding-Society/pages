@@ -1504,13 +1504,12 @@ score += gists * 0.5
             const uid = pyData.uid;
 
             // 2. Get People from Spring
-            const javaRes = await fetch(`${javaURI}/api/people`, fetchOptions);
-            if (!javaRes.ok) throw new Error("Failed to fetch People");
-            const people = await javaRes.json();
+            const javaRes = await fetch(`${javaURI}/api/person/uid/${uid}`, fetchOptions);
+            if (!javaRes.ok) throw new Error("Failed to fetch user from Spring");
+            const person = await javaRes.json();
 
             // 3. Match UID
-            const person = people.find(p => p.uid === uid);
-            if (!person) throw new Error("User not found in Spring");
+            if (!person || person.uid !== uid) throw new Error("User not found in Spring");
             
             springUserId = person.id;
             return springUserId;
