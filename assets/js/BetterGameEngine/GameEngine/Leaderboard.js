@@ -4,6 +4,7 @@ export default class Leaderboard {
     constructor(gameControl = null, options = {}) {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
+        this.parentId = options.parentId || null; // NEW: Accept parentId option
         this.isOpen = true;
         this.mounted = false;
         
@@ -14,6 +15,7 @@ export default class Leaderboard {
         }
         
         console.log('[Leaderboard] Initializing with javaURI:', javaURI);
+        console.log('[Leaderboard] Parent ID:', this.parentId); // NEW: Log parent
         
         try {
             this.injectStyles();
@@ -30,7 +32,7 @@ export default class Leaderboard {
         style.id = 'leaderboard-styles';
         style.textContent = `
         .leaderboard-widget {
-            position: fixed !important;
+            position: absolute !important;
             bottom: 20px !important;
             right: 20px !important;
             width: 350px;
@@ -42,6 +44,11 @@ export default class Leaderboard {
             overflow: hidden;
             display: block !important;
             visibility: visible !important;
+        }
+
+        /* Fixed positioning for when NOT in a game container */
+        .leaderboard-widget.fixed-position {
+            position: fixed !important;
         }
 
         .leaderboard-header {
@@ -212,7 +219,36 @@ export default class Leaderboard {
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
         container.className = 'leaderboard-widget';
-        container.style.cssText = 'position: fixed !important; bottom: 20px !important; right: 20px !important; z-index: 999999 !important; display: block !important;';
+        
+        // NEW: Determine parent element
+        let parentElement = document.body;
+        let useFixedPosition = true;
+        
+        if (this.parentId) {
+            const parent = document.getElementById(this.parentId);
+            if (parent) {
+                parentElement = parent;
+                useFixedPosition = false;
+                console.log('[Leaderboard] Mounting to parent:', this.parentId);
+                
+                // Ensure parent has position relative for absolute positioning to work
+                const parentStyle = window.getComputedStyle(parent);
+                if (parentStyle.position === 'static') {
+                    parent.style.position = 'relative';
+                    console.log('[Leaderboard] Set parent position to relative');
+                }
+            } else {
+                console.warn('[Leaderboard] Parent element not found:', this.parentId);
+            }
+        }
+        
+        // Apply appropriate positioning class
+        if (useFixedPosition) {
+            container.classList.add('fixed-position');
+            container.style.cssText = 'position: fixed !important; bottom: 20px !important; right: 20px !important; z-index: 999999 !important; display: block !important;';
+        } else {
+            container.style.cssText = 'position: absolute !important; bottom: 20px !important; right: 20px !important; z-index: 999999 !important; display: block !important;';
+        }
 
         container.innerHTML = `
             <div class="leaderboard-header">
@@ -226,9 +262,9 @@ export default class Leaderboard {
             </div>
         `;
 
-        document.body.appendChild(container);
+        parentElement.appendChild(container);
         this.mounted = true;
-        console.log('[Leaderboard] Container appended to body');
+        console.log('[Leaderboard] Container appended to:', parentElement.id || 'body');
         console.log('[Leaderboard] Container in DOM?', document.getElementById('leaderboard-container') !== null);
 
         const toggleBtn = document.getElementById('toggle-leaderboard');
