@@ -32,7 +32,7 @@ layout: post
       {% assign unitData = shared[courseUnit.shared] %}
     {% endif %}
 
-    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}">
+    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
       <div class="sprint-header">
         <div>
           <p class="sprint-meta">{{ unitKey }}</p>
@@ -42,6 +42,32 @@ layout: post
           {% endif %}
         </div>
         <div class="sprint-controls">
+          <!-- Sprint Date Assignment -->
+          <div class="sprint-date-control">
+            <button class="sprint-btn date-toggle" type="button" data-sprint="{{ unitKey }}" title="Set Sprint Dates">
+              <i class="fas fa-calendar-alt"></i>
+            </button>
+            <div class="sprint-date-dropdown hidden" data-sprint="{{ unitKey }}">
+              <div class="date-dropdown-header">
+                <span>Sprint Dates</span>
+                <button class="date-dropdown-close" type="button">&times;</button>
+              </div>
+              <div class="date-input-group">
+                <label>Start Date:</label>
+                <input type="date" class="sprint-start-date" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
+              </div>
+              <div class="date-input-group">
+                <label>End Date:</label>
+                <input type="date" class="sprint-end-date" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
+              </div>
+              <div class="date-actions">
+                <button class="save-sprint-dates-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                  <i class="fas fa-save"></i> Save & Add to Calendar
+                </button>
+              </div>
+              <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
+            </div>
+          </div>
           <button class="sprint-toggle-btn" type="button" aria-expanded="false">
             <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
           </button>
@@ -88,7 +114,17 @@ layout: post
             {% endfor %}
 
           {% if entries.size > 0 %}
-            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}">
+            {% assign assignmentTitles = "" %}
+            {% for entry in entries %}
+              {% assign parts = entry | split: "||" %}
+              {% if parts[2] == "assignment" %}
+                {% if assignmentTitles != "" %}
+                  {% assign assignmentTitles = assignmentTitles | append: ";;;" %}
+                {% endif %}
+                {% assign assignmentTitles = assignmentTitles | append: parts[0] %}
+              {% endif %}
+            {% endfor %}
+            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}" data-assignments="{{ assignmentTitles | escape }}">
               <div class="week-content-wrapper">
                 <div class="week-indicator">
                   <div class="week-circle">W{{ index }}</div>
@@ -1159,6 +1195,7 @@ layout: post
     renderWeekGoalPreviews();
     initMobileEnhancements();
     initializeHelpButtons();
+    initializeSprintDates();
   });
   
   // Initialize help button event listeners
@@ -1187,6 +1224,473 @@ layout: post
           closeHelpModal();
         }
       });
+    }
+  }
+
+  // ============================= 
+  //   SPRINT DATE MANAGEMENT     
+  // ============================= 
+  
+  const SPRINT_DATES_STORAGE_KEY = 'sprintDates';
+  let cachedSprintDates = null;
+  
+  // Load sprint dates from localStorage (fallback)
+  function loadSprintDates() {
+    try {
+      const stored = localStorage.getItem(SPRINT_DATES_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error('Error loading sprint dates:', e);
+      return {};
+    }
+  }
+  
+  // Load sprint dates from backend API
+  async function loadSprintDatesFromBackend(course) {
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      const response = await fetch(`${javaURI}/api/sprint-dates/${course}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Convert array to keyed object for easy lookup
+        const sprintDates = {};
+        data.forEach(sd => {
+          const key = `${sd.course}_${sd.sprintKey}`;
+          sprintDates[key] = {
+            startDate: sd.startDate,
+            endDate: sd.endDate,
+            course: sd.course,
+            sprintKey: sd.sprintKey,
+            startWeek: sd.startWeek,
+            endWeek: sd.endWeek
+          };
+        });
+        return sprintDates;
+      }
+      return null;
+    } catch (error) {
+      console.log('Backend API not available for loading sprint dates:', error.message);
+      return null;
+    }
+  }
+  
+  // Save sprint dates to localStorage
+  function saveSprintDatesToStorage(dates) {
+    try {
+      localStorage.setItem(SPRINT_DATES_STORAGE_KEY, JSON.stringify(dates));
+    } catch (e) {
+      console.error('Error saving sprint dates:', e);
+    }
+  }
+  
+  // Format date for display
+  function formatDateDisplay(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  
+  // Initialize sprint date controls
+  async function initializeSprintDates() {
+    // Get course from page (e.g., "csa", "csp", "csse")
+    const courseInput = document.querySelector('.sprint-start-date[data-course]');
+    const course = courseInput ? courseInput.dataset.course : null;
+    
+    // Try to load from backend first, fallback to localStorage
+    let sprintDates = {};
+    if (course) {
+      const backendDates = await loadSprintDatesFromBackend(course);
+      if (backendDates) {
+        sprintDates = backendDates;
+        // Also cache to localStorage for offline access
+        const existingDates = loadSprintDates();
+        Object.assign(existingDates, backendDates);
+        saveSprintDatesToStorage(existingDates);
+      } else {
+        sprintDates = loadSprintDates();
+      }
+    } else {
+      sprintDates = loadSprintDates();
+    }
+    
+    // Toggle dropdown visibility
+    document.querySelectorAll('.sprint-btn.date-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const dropdown = document.querySelector(`.sprint-date-dropdown[data-sprint="${sprintKey}"]`);
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.sprint-date-dropdown').forEach(d => {
+          if (d !== dropdown) d.classList.add('hidden');
+        });
+        
+        dropdown.classList.toggle('hidden');
+      });
+    });
+    
+    // Close dropdown buttons
+    document.querySelectorAll('.date-dropdown-close').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btn.closest('.sprint-date-dropdown').classList.add('hidden');
+      });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.sprint-date-control')) {
+        document.querySelectorAll('.sprint-date-dropdown').forEach(d => {
+          d.classList.add('hidden');
+        });
+      }
+    });
+    
+    // Load saved dates into inputs
+    document.querySelectorAll('.sprint-start-date').forEach(input => {
+      const sprintKey = input.dataset.sprint;
+      const course = input.dataset.course;
+      const key = `${course}_${sprintKey}`;
+      
+      if (sprintDates[key] && sprintDates[key].startDate) {
+        input.value = sprintDates[key].startDate;
+      }
+    });
+    
+    document.querySelectorAll('.sprint-end-date').forEach(input => {
+      const sprintKey = input.dataset.sprint;
+      const course = input.dataset.course;
+      const key = `${course}_${sprintKey}`;
+      
+      if (sprintDates[key] && sprintDates[key].endDate) {
+        input.value = sprintDates[key].endDate;
+      }
+    });
+    
+    // Save button handlers
+    document.querySelectorAll('.save-sprint-dates-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const course = btn.dataset.course;
+        
+        await saveSprintDates(sprintKey, course, btn);
+      });
+    });
+  }
+  
+  // Save sprint dates and add to calendar
+  async function saveSprintDates(sprintKey, course, btn) {
+    const startInput = document.querySelector(`.sprint-start-date[data-sprint="${sprintKey}"]`);
+    const endInput = document.querySelector(`.sprint-end-date[data-sprint="${sprintKey}"]`);
+    const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
+    
+    const startDate = startInput.value;
+    const endDate = endInput.value;
+    const startWeek = parseInt(btn.dataset.startWeek);
+    const endWeek = parseInt(btn.dataset.endWeek);
+    
+    // Validation
+    if (!startDate || !endDate) {
+      showDateStatus(statusEl, 'Please select both start and end dates', 'error');
+      return;
+    }
+    
+    if (new Date(startDate) > new Date(endDate)) {
+      showDateStatus(statusEl, 'Start date must be before end date', 'error');
+      return;
+    }
+    
+    btn.disabled = true;
+    showDateStatus(statusEl, 'Saving & adding events...', 'loading');
+    
+    try {
+      // Get sprint title for calendar event
+      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+      const sprintTitle = sprintCard ? sprintCard.querySelector('.sprint-title')?.textContent?.trim() : sprintKey;
+      
+      // Collect week assignments from the page
+      const weekAssignments = collectWeekAssignments(sprintKey);
+      
+      // Try to save to backend first (backend handles calendar sync)
+      const backendSuccess = await saveSprintDatesToBackend({
+        course,
+        sprintKey,
+        sprintTitle,
+        startDate,
+        endDate,
+        startWeek,
+        endWeek,
+        weekAssignments
+      });
+      
+      if (backendSuccess) {
+        // Backend saved and created calendar events
+        showDateStatus(statusEl, '✓ All events added to calendar!', 'success');
+      } else {
+        // Fallback: Save to localStorage and call calendar API directly
+        console.log('Backend unavailable, using localStorage fallback');
+        
+        const sprintDates = loadSprintDates();
+        const key = `${course}_${sprintKey}`;
+        sprintDates[key] = {
+          startDate,
+          endDate,
+          course,
+          sprintKey,
+          startWeek,
+          endWeek
+        };
+        saveSprintDatesToStorage(sprintDates);
+        
+        // Add events directly to calendar API
+        const calendarSuccess = await addAllSprintEventsToCalendar(
+          sprintKey, course, sprintTitle, startDate, endDate, startWeek, endWeek
+        );
+        
+        if (calendarSuccess) {
+          showDateStatus(statusEl, '✓ Events added to calendar!', 'success');
+        } else {
+          showDateStatus(statusEl, '✓ Saved locally (calendar sync failed)', 'success');
+        }
+      }
+      
+      // Update any date display elements
+      updateSprintDateDisplay(sprintKey, startDate, endDate);
+      
+    } catch (error) {
+      console.error('Error saving sprint dates:', error);
+      showDateStatus(statusEl, 'Error saving dates', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  
+  // Collect week assignments from the page DOM
+  function collectWeekAssignments(sprintKey) {
+    const weekAssignments = {};
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    
+    if (sprintCard) {
+      const weekCards = sprintCard.querySelectorAll('.week-card');
+      weekCards.forEach(weekCard => {
+        const weekNum = weekCard.dataset.week;
+        const assignments = weekCard.dataset.assignments || '';
+        
+        if (assignments) {
+          weekAssignments[weekNum] = assignments.split(';;;').filter(a => a.trim());
+        } else {
+          weekAssignments[weekNum] = [];
+        }
+      });
+    }
+    
+    return weekAssignments;
+  }
+  
+  // Save sprint dates to backend API
+  async function saveSprintDatesToBackend(data) {
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      console.log('Attempting to save sprint dates to backend:', javaURI);
+      console.log('Request data:', JSON.stringify(data, null, 2));
+      
+      // Try to POST to backend (backend handles all calendar event creation)
+      const response = await fetch(`${javaURI}/api/sprint-dates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+      
+      console.log('Backend response status:', response.status);
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Backend success response:', result);
+        console.log(`Backend created ${result.eventsCreated || 'N/A'} calendar events`);
+        return true;
+      } else if (response.status === 409) {
+        // Sprint date exists, try PUT to update
+        console.log('Sprint exists, trying PUT to update...');
+        const updateResponse = await fetch(`${javaURI}/api/sprint-dates/${data.course}/${data.sprintKey}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(data)
+        });
+        
+        console.log('PUT response status:', updateResponse.status);
+        
+        if (updateResponse.ok) {
+          const result = await updateResponse.json();
+          console.log('Backend update success:', result);
+          console.log(`Backend updated sprint, created ${result.eventsCreated || 'N/A'} calendar events`);
+          return true;
+        } else {
+          const errorText = await updateResponse.text();
+          console.error('PUT failed:', errorText);
+        }
+      } else {
+        // Log the error response
+        const errorText = await response.text();
+        console.error('Backend POST failed:', response.status, errorText);
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Backend API error:', error);
+      return false;
+    }
+  }
+  
+  // Calculate the date for a specific week within the sprint date range
+  function calculateWeekDate(sprintStartDate, sprintEndDate, weekNumber, startWeekNumber, endWeekNumber) {
+    const start = new Date(sprintStartDate);
+    const end = new Date(sprintEndDate);
+    const totalWeeks = endWeekNumber - startWeekNumber + 1;
+    const weekIndex = weekNumber - startWeekNumber;
+    
+    // Calculate total days in sprint
+    const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    
+    // Calculate days per week
+    const daysPerWeek = totalDays / totalWeeks;
+    
+    // Calculate the start date for this week
+    const weekStartDate = new Date(start);
+    weekStartDate.setDate(weekStartDate.getDate() + Math.round(weekIndex * daysPerWeek));
+    
+    // Calculate the end date for this week (start of next week - 1 day, or sprint end)
+    const weekEndDate = new Date(start);
+    weekEndDate.setDate(weekEndDate.getDate() + Math.round((weekIndex + 1) * daysPerWeek) - 1);
+    
+    // Make sure we don't exceed the sprint end date
+    if (weekEndDate > end) {
+      weekEndDate.setTime(end.getTime());
+    }
+    
+    return {
+      start: weekStartDate.toISOString().split('T')[0],
+      end: weekEndDate.toISOString().split('T')[0]
+    };
+  }
+  
+  // Add all sprint events to calendar (sprint start/end + weeks + assignments)
+  async function addAllSprintEventsToCalendar(sprintKey, course, sprintTitle, startDate, endDate, startWeek, endWeek) {
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      const courseName = course.toUpperCase();
+      const events = [];
+      
+      // 1. Sprint Start Event
+      events.push({
+        title: `🚀 ${sprintKey} Start: ${sprintTitle}`,
+        description: `${courseName} ${sprintKey} begins.\nSprint: ${sprintTitle}\nWeeks ${startWeek}-${endWeek}`,
+        date: startDate,
+        period: courseName
+      });
+      
+      // 2. Sprint End Event
+      events.push({
+        title: `🏁 ${sprintKey} End: ${sprintTitle}`,
+        description: `${courseName} ${sprintKey} ends.\nSprint: ${sprintTitle}`,
+        date: endDate,
+        period: courseName
+      });
+      
+      // 3. Get all weeks in this sprint and add week events + assignment due dates
+      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+      if (sprintCard) {
+        const weekCards = sprintCard.querySelectorAll('.week-card');
+        
+        weekCards.forEach(weekCard => {
+          const weekNum = parseInt(weekCard.dataset.week);
+          const assignments = weekCard.dataset.assignments || '';
+          
+          // Calculate the date for this week
+          const weekDates = calculateWeekDate(startDate, endDate, weekNum, startWeek, endWeek);
+          
+          // Add week start event
+          events.push({
+            title: `📅 Week ${weekNum} - ${courseName}`,
+            description: `${courseName} ${sprintKey} - Week ${weekNum}\nSprint: ${sprintTitle}`,
+            date: weekDates.start,
+            period: courseName
+          });
+          
+          // Add assignment due dates (assignments are due at end of their week)
+          if (assignments) {
+            const assignmentList = assignments.split(';;;').filter(a => a.trim());
+            assignmentList.forEach(assignmentTitle => {
+              events.push({
+                title: `📝 Due: ${assignmentTitle}`,
+                description: `${courseName} Assignment Due\nWeek ${weekNum} - ${sprintKey}\n${assignmentTitle}`,
+                date: weekDates.end,
+                period: courseName
+              });
+            });
+          }
+        });
+      }
+      
+      // Send all events to calendar API
+      console.log(`Adding ${events.length} events to calendar for ${sprintKey}`);
+      
+      const results = await Promise.all(
+        events.map(event => 
+          fetch(`${javaURI}/api/calendar/add_event`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(event)
+          }).then(res => res.ok).catch(() => false)
+        )
+      );
+      
+      const successCount = results.filter(r => r).length;
+      console.log(`Successfully added ${successCount}/${events.length} events`);
+      
+      return successCount > 0;
+    } catch (error) {
+      console.error('Error adding sprint events to calendar:', error);
+      return false;
+    }
+  }
+  
+  // Show status message
+  function showDateStatus(el, message, type) {
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'sprint-date-status ' + type;
+    
+    if (type === 'success' || type === 'error') {
+      setTimeout(() => {
+        el.textContent = '';
+        el.className = 'sprint-date-status';
+      }, 4000);
+    }
+  }
+  
+  // Update date display (if you want to show dates in the UI)
+  function updateSprintDateDisplay(sprintKey, startDate, endDate) {
+    const displayEl = document.querySelector(`.sprint-dates-display[data-sprint="${sprintKey}"]`);
+    if (displayEl) {
+      const rangeEl = displayEl.querySelector('.date-range');
+      if (rangeEl) {
+        rangeEl.textContent = `${formatDateDisplay(startDate)} - ${formatDateDisplay(endDate)}`;
+      }
     }
   }
 

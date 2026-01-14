@@ -221,13 +221,20 @@ def inject_code_runners(markdown, notebook):
                 
                 code_cell_count += 1
                 
-                # Add the code block
-                result.extend(code_block_content)
-                
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['code_runner']
+                    
+                    # Wrap code block in collapsible details (collapsed by default)
+                    result.append('<details>')
+                    result.append('<summary>View Source Code</summary>')
                     result.append('')
+                    result.extend(code_block_content)
+                    result.append('')
+                    result.append('</details>')
+                    result.append('')
+                    
+                    # Add liquid captures and code-runner include
                     result.append('{% capture challenge' + str(code_cell_count - 1) + ' %}')
                     result.append(runner_data['challenge'])
                     result.append('{% endcapture %}')
@@ -243,6 +250,10 @@ def inject_code_runners(markdown, notebook):
                     result.append('   code=code' + str(code_cell_count - 1))
                     result.append('%}')                
                     result.append('')
+                else:
+                    # Regular code block without code-runner
+                    result.extend(code_block_content)
+                
                 result.append('---')                
                 code_block_content = []
         elif in_code_block:
