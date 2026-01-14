@@ -383,3 +383,13 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
 - Data Structures 1,2 receives Articulated College Credit to Mira Costa CC for "CS 113: Basic Data Structures and Algorithms". Mira Costa CC requires and provides free registration to receive UC college credit.
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
+
+
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+    <a href="{{site.baseurl}}/lessons" style="text-decoration: none;">
+        <div style="background-color: #00FF00; color: black; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+            Lesson
+        </div>
+    </a>
+
