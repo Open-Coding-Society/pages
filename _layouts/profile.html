@@ -155,22 +155,34 @@ active_tab: profile
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
-        let availableGroups = [];
+        
+        // Cache for current user data - fetched once, reused throughout
+        let currentPersonId = null;
         let currentUid = null;
+        let userGroupIds = new Set(); // Track user's group IDs for quick lookup
+        let searchDebounceTimer = null;
 
+        // Fetch current user's person data from Java backend (includes numeric id)
+        // This replaces the need to fetch all people later
         try {
-            // Fetch current user ID directly
-            const response = await fetch(`${pythonURI}/api/id`, fetchOptions);
-
-            if (!response.ok) {
+            const personResp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            
+            if (personResp.status === 401) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
+                groupSearchInput.disabled = true;
+                return;
+            }
+            
+            if (!personResp.ok) {
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
                 return;
             }
 
-            const userData = await response.json();
-            currentUid = userData.uid;
+            const personData = await personResp.json();
+            currentPersonId = personData.id;
+            currentUid = personData.uid;
 
-            if (!currentUid) {
+            if (!currentPersonId || !currentUid) {
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
                 return;
             }
@@ -180,22 +192,22 @@ active_tab: profile
             return;
         }
 
+        // Fetch all groups (still needed for search, but we filter efficiently)
         try {
             const groupResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
 
-            if (groupResp.status === 401) {
-                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
-                groupSearchInput.disabled = true;
-                return;
-            }
             if (!groupResp.ok) throw new Error('Failed to fetch group data');
 
             const groups = await groupResp.json();
-            availableGroups = Array.isArray(groups) ? groups : [];
+            const availableGroups = Array.isArray(groups) ? groups : [];
 
+            // Filter user's groups efficiently using the cached uid
             const userGroups = availableGroups.filter(group =>
                 Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
             );
+            
+            // Build a Set of user's group IDs for O(1) lookup during search
+            userGroups.forEach(group => userGroupIds.add(group.id));
 
             if (userGroups.length > 0) {
                 springGroupInfo.innerHTML = userGroups.map(group => `
@@ -218,7 +230,7 @@ active_tab: profile
                         </div>
                     </div>
                     <div class="col-span-1 md:col-span-2">
-                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${group.members.find(m => m.uid === currentUid).id})">
+                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${currentPersonId})">
                             Leave Group
                         </button>
                     </div>
@@ -227,6 +239,7 @@ active_tab: profile
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
             }
 
+            // Debounced search to reduce re-renders
             const renderGroupResults = (filter = '') => {
                 const normalized = filter.toLowerCase().trim();
                 
@@ -249,7 +262,7 @@ active_tab: profile
 
                 groupResultsList.innerHTML = filtered.map(group => {
                     const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
-                    const isAlreadyMember = userGroups.some(ug => ug.id === group.id);
+                    const isAlreadyMember = userGroupIds.has(group.id);
                     const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
                     return `
                         <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
@@ -262,8 +275,12 @@ active_tab: profile
                 groupResultsList.classList.remove('hidden');
             };
 
+            // Debounced input handler to reduce unnecessary re-renders
             groupSearchInput?.addEventListener('input', (event) => {
-                renderGroupResults(event.target.value);
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(() => {
+                    renderGroupResults(event.target.value);
+                }, 150);
             });
 
             // Close results when clicking outside
@@ -273,6 +290,7 @@ active_tab: profile
                 }
             });
 
+            // Optimized join function - uses cached personId instead of fetching all people
             window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
                 if (isAlreadyMember) {
                     joinGroupStatus.textContent = 'You are already a member of this group.';
@@ -284,36 +302,13 @@ active_tab: profile
                 groupResultsList.classList.add('hidden');
 
                 try {
-                    // Step 1: get current user uid
-                    const userResponse = await fetch(`${pythonURI}/api/user`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-                    if (!userResponse.ok) throw new Error('Failed to fetch user info');
-                    const userPayload = await userResponse.json();
-                    const userUid = userPayload?.uid || currentUid;
-
-                    if (!userUid) {
-                        throw new Error('Unable to resolve user uid');
+                    // Use the cached person ID - no need to fetch all people
+                    if (!currentPersonId) {
+                        throw new Error('User ID not available. Please refresh the page.');
                     }
 
-                    // Step 2: map uid to numeric id from people
-                    const peopleResp = await fetch(`${javaURI}/api/people`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-                    if (!peopleResp.ok) throw new Error('Failed to fetch people data');
-                    const people = await peopleResp.json();
-                    const matchingPerson = Array.isArray(people) ? people.find(person => person.uid === userUid) : null;
-
-                    if (!matchingPerson?.id) {
-                        throw new Error('Could not match user to an id');
-                    }
-
-                    // Step 3: join the selected group
-                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${matchingPerson.id}`, {
+                    // Join the selected group using cached person ID
+                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${currentPersonId}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include'
