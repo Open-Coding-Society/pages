@@ -234,37 +234,37 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
   // Summer Activities (June - August)
   const summerActivities = [
     {
-      image: "https://placehold.co/400x300/FF8C00/000000?text=Campfire",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
       title: "Camping & Fire",
       shortDesc: "Outdoor Adventure",
       hoverDesc: "Learn campfire safety, setup camp, and how to enjoy the great outdoors under the stars!"
     },
     {
-      image: "https://placehold.co/400x300/DC143C/FFFFFF?text=Camp+Cooking",
+      image: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Coleman_stove.jpg",
       title: "Camping Cooking",
       shortDesc: "Outdoor Chef",
       hoverDesc: "Learn to cook delicious meals in nature! Learn camping cooking techniques and outdoor food safety."
     },
     {
-      image: "https://placehold.co/400x300/00CED1/000000?text=Pool+Party",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Napa_Pool_Party.jpg/2560px-Napa_Pool_Party.jpg",
       title: "Pool Party",
       shortDesc: "Water Fun",
       hoverDesc: "Beat the summer heat with swimming, pool games, and water safety lessons!"
     },
     {
-      image: "https://placehold.co/400x300/1E90FF/FFFFFF?text=Scuba+Diving",
+      image: "https://upload.wikimedia.org/wikipedia/commons/e/ed/Scouts_Scuba_in_Pool.jpg",
       title: "Scuba Basics",
       shortDesc: "Underwater World",
       hoverDesc: "Introduction to scuba diving! Learn basic equipment, safety, and breathing techniques."
     },
     {
-      image: "https://placehold.co/400x300/2E8B57/FFFFFF?text=Biking",
+      image: "https://upload.wikimedia.org/wikipedia/commons/8/8c/Look_765_Gravel_Bicycle.jpg",
       title: "Gravel Biking",
       shortDesc: "Bike Adventure",
       hoverDesc: "Explore trails on two wheels! Learn bike safety and enjoy outdoor cycling adventures."
     },
     {
-      image: "https://placehold.co/400x300/9370DB/FFFFFF?text=Game+Making",
+      image: "{{site.baseurl}}/images/activity/planofhappygame.png",
       title: "Video Game Making",
       shortDesc: "Plan of Happiness",
       hoverDesc: "Create your own video game with a positive message! Learn basic game design and coding."
@@ -274,37 +274,37 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
   // Fall Activities (September - November)
   const fallActivities = [
     {
-      image: "https://placehold.co/400x300/FFD700/000000?text=Frisbee+Golf",
+      image: "{{site.baseurl}}/images/activity/frisbeegolf.png",
       title: "Frisbee Golf",
       shortDesc: "Modified Sport",
       hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun."
     },
     {
-      image: "https://placehold.co/400x300/FF6347/FFFFFF?text=Dodgeball",
+      image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cloth_dodgeball.jpg",
       title: "Modified Dodgeball",
       shortDesc: "Team Sport",
       hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!"
     },
     {
-      image: "https://placehold.co/400x300/FF8C00/000000?text=Four+Square",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Utopia_Playground_td_%282020-12-14%29_100.jpg/2560px-Utopia_Playground_td_%282020-12-14%29_100.jpg",
       title: "Four Square",
       shortDesc: "Classic Game",
       hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking."
     },
     {
-      image: "https://placehold.co/400x300/BA55D3/FFFFFF?text=Painting",
+      image: "{{site.baseurl}}/images/activity/learningtopaint.png",
       title: "Learning to Paint",
       shortDesc: "Artistic Expression",
       hoverDesc: "Explore painting with different mediums. Express yourself through color and creativity!"
     },
     {
-      image: "https://placehold.co/400x300/4682B4/FFFFFF?text=Conference",
+      image: "https://www.churchofjesuschrist.org/imgs/li6h2f1zh38l26ueaiy8epfjmrpqc8oywz2uy7cf/full/!1280%2C1024/0/default",
       title: "Conference Notes",
       shortDesc: "Learn of Prophets",
       hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together."
     },
     {
-      image: "https://placehold.co/400x300/CD853F/000000?text=Catapults",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Catapult_made_with_craft_sticks.jpg/1920px-Catapult_made_with_craft_sticks.jpg?20161025110105",
       title: "Popsicle Catapults",
       shortDesc: "Engineering Fun",
       hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering."
