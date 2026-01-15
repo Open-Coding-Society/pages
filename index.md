@@ -174,27 +174,45 @@ permalink: /
 </script>
 
 <!-- ================= PAGE CONTENT ================= -->
-
 ## About
 
 Empower yourself to solve real-world problems, unlock creativity, and open doors to every field—because coding is the language of innovation.
 
-> Move Mario to explore the page 👾
+> Invest in your technical skills through Project-based learning.
 
-<div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+<div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px; flex-wrap: wrap;">
 
-  <img src="{{site.baseurl}}/images/logo-framed.png" style="width:180px;">
-  <img src="{{site.baseurl}}/images/course-brag/qr.png" style="width:180px;">
+  <!-- Logo -->
+  <div style="text-align: center;">
+    <img src="{{site.baseurl}}/images/logo-framed.png" alt="Logo" style="width: 180px; max-width: 100%;">
+  </div>
 
-</div>
-## Courses
+  <!-- QR Code -->
+  <div style="text-align: center;">
+    <img src="{{site.baseurl}}/images/course-brag/qr.png" alt="QR Code" style="width: 180px; max-width: 100%;">
+  </div>
 
-Explore each pathway by *moving forward*.
-
-![csse]({{site.baseurl}}/images/course-brag/csse.png)
-![csp]({{site.baseurl}}/images/course-brag/csp24.png)
-![csa]({{site.baseurl}}/images/course-brag/csa24.png)
-
+  <!-- Socials -->
+  <div style="min-width: 220px;">
+    <ul style="list-style: none; padding: 0; font-size: 1.1em;">
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="mailto:open.coding.society@gmail.com">open.coding.society@gmail.com</a>
+      </li>
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="https://linkedin.com/company/open-coding-society" target="_blank">LinkedIn</a>
+      </li>
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="https://x.com/Open_Coding" target="_blank">@Open_Coding</a>
+      </li>
+      <li>
+        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+        <a href="https://www.youtube.com/@OpenCodingSociety" target="_blank">@OpenCodingSociety</a>
+      </li>
+    </ul>
+  </div>
 </div>
 
 ## Project-based learning
