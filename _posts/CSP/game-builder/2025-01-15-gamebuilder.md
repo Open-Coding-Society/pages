@@ -1,12 +1,12 @@
 ---
-layout: gamebuilder
+layout: post
 title: Game Asset Creator
 description: Helping programmers understand how to creater a game
-permalink: /rpg/gamebuilder
-comments: false
+permalink: /rpg/story
+comments: True
 ---
 <style>
-/*  theme */
+/* --- Theme: Deep Space Nebula --- */
 :root {
     --space-bg: #0b0d17;
     --glass-bg: rgba(15, 20, 35, 0.85);
@@ -27,7 +27,7 @@ body {
 
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
 
-/* main layout */
+/* --- Main Layout --- */
 .creator-layout {
     display: flex;
     gap: 20px;
@@ -77,7 +77,7 @@ select, input {
     color: #fff; padding: 8px; border-radius: 4px; font-size: 0.85em; margin-bottom: 10px;
 }
 
-/* control buttons */
+/* --- Control Buttons --- */
 .button-footer { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); }
 .btn {
     padding: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;
@@ -87,7 +87,7 @@ select, input {
 .btn-run { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,243,255,0.3); }
 .btn-danger { background: #ff4d4f; color: #fff; border: 1px solid #ff4d4f; }
 
-/* code editor and highlights */
+/* --- Code Editor & Surgical Highlights --- */
 .code-panel { flex: 1; position: relative; }
 .editor-container { 
     position: relative; 
@@ -101,7 +101,7 @@ select, input {
     padding: 20px; box-sizing: border-box;
     font-family: 'Fira Code', 'Courier New', monospace; 
     font-size: 13px; 
-    line-height: 20px; 
+    line-height: 20px; /* Crucial: Must match JS offset */
     color: #d4d4d4; 
     background: transparent; 
     border: none; 
@@ -117,7 +117,7 @@ select, input {
     left: 0; 
     width: 100%; 
     height: 100%;
-    padding: 20px; 
+    padding: 20px; /* Must match textarea padding */
     box-sizing: border-box; 
     pointer-events: none; 
     z-index: 1;
@@ -128,9 +128,10 @@ select, input {
     border-left: 4px solid #ffd700;
     left: 10px; 
     width: calc(100% - 20px);
-    display: block !important; 
+    display: block !important; /* Ensure visibility */
 }
 
+/* Persistent box after typing completes (bordered, minimal fill) */
 .highlight-persistent-block {
     position: absolute;
     background: rgba(255, 215, 0, 0.12);
@@ -140,6 +141,7 @@ select, input {
     width: calc(100% - 20px);
 }
 
+/* Typing state highlight (more vivid while animating) */
 .typing-highlight {
     position: absolute;
     background: rgba(255, 235, 59, 0.25);
@@ -151,8 +153,206 @@ select, input {
 .game-frame { flex: 1; background: #000; }
 iframe { width: 100%; height: 100%; border: none; }
 
+/* RPG Navigation Sidebar Styles */
+        .rpg-nav-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: linear-gradient(145deg, rgba(20, 20, 40, 0.98), rgba(10, 10, 20, 0.98));
+            backdrop-filter: blur(10px);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+            transform: translateX(-280px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            border-right: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .rpg-nav-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .nav-toggle {
+            position: absolute;
+            right: -50px;
+            top: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, rgba(20, 20, 40, 0.98), rgba(10, 10, 20, 0.98));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+            color: #ffd700;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .nav-dashboard {
+            padding: 30px 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .nav-title {
+            color: #ffd700;
+            font-size: 1.5em;
+            font-family: 'Cinzel', 'Georgia', serif;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .nav-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin-bottom: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            color: #c0c0c0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover:not(.locked) {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #ffd700;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .nav-link.visited .nav-check {
+            display: inline;
+        }
+
+        .nav-link.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .nav-link.locked .nav-lock {
+            display: inline;
+        }
+
+        .nav-link:not(.locked) .nav-lock {
+            display: none;
+        }
+
+        .nav-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 50%;
+            color: #ffd700;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .nav-check {
+            color: #4cc9f0;
+            font-size: 1.2em;
+            display: none;
+            margin-left: 8px;
+        }
+
+        .nav-lock {
+            color: #ff6b6b;
+            font-size: 1em;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .rpg-nav-sidebar {
+                width: 240px;
+                transform: translateX(-240px);
+            }
+        }
 </style>
 
+<!-- RPG Navigation Sidebar -->
+<div id="rpg-nav-sidebar" class="rpg-nav-sidebar">
+  <button id="nav-toggle" class="nav-toggle">☰</button>
+  <div class="nav-dashboard">
+    <h3 class="nav-title">🎮 RPG Creator</h3>
+    <div class="nav-divider"></div>
+    <nav class="nav-links">
+      <a href="/rpg/login" class="nav-link" data-page="1">
+        <span class="nav-number">1</span>
+        <span class="nav-text">Login</span>
+      </a>
+      <a href="/rpg/dashboard" class="nav-link" data-page="2">
+        <span class="nav-number">2</span>
+        <span class="nav-text">Dashboard</span>
+        <span class="nav-check">✓</span>
+      </a>
+      <a href="/rpg/story" class="nav-link active" data-page="3">
+        <span class="nav-number">3</span>
+        <span class="nav-text">Story & Narrative</span>
+        <span class="nav-check">✓</span>
+      </a>
+      <a href="/rpg/game-creator" class="nav-link" data-page="4">
+        <span class="nav-number">4</span>
+        <span class="nav-text">Game creator</span>
+        <span class="nav-check">✓</span>
+      </a>
+      <a href="/rpg/keybindings" class="nav-link" data-page="5">
+        <span class="nav-number">5</span>
+        <span class="nav-text">Controls</span>
+        <span class="nav-check">✓</span>
+      </a>
+      <a href="/rpg/systems" class="nav-link" data-page="6">
+        <span class="nav-number">6</span>
+        <span class="nav-text">Game Systems</span>
+        <span class="nav-check">✓</span>
+      </a>
+      <a href="/rpg/review" class="nav-link" data-page="6" id="review-link">
+        <span class="nav-number">6</span>
+        <span class="nav-text">Review</span>
+        <span class="nav-lock">✓</span>
+        <span class="nav-check">✓</span>
+      </a>
+    </nav>
+  </div>
+  
+</div>
 
 <div class="creator-layout">
     <div class="col-tools">
@@ -404,26 +604,32 @@ document.addEventListener('DOMContentLoaded', () => {
         notice: document.getElementById('freestyle-notice')
     };
 
-    // npcs 
+    // Toggle NPC fields on 'Add NPC' click (open/close)
     ui.npcs.forEach(slot => {
         if (slot.addBtn && slot.fieldsContainer) {
             slot.addBtn.addEventListener('click', () => {
                 const isVisible = slot.fieldsContainer.style.display !== 'none';
+                // Toggle dropdown visibility
                 slot.fieldsContainer.style.display = isVisible ? 'none' : '';
+                // Allow editing when open
                 if (!isVisible) slot.locked = false;
+                // Update button label with caret and name
                 const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add NPC';
                 const caret = isVisible ? ' ▸' : ' ▾';
                 slot.addBtn.textContent = labelBase + caret;
+                // Added style if slot was confirmed
                 if (slot.locked && slot.displayName) slot.addBtn.classList.add('btn-confirm');
                 else slot.addBtn.classList.remove('btn-confirm');
                 updateStepUI();
                 syncFromControlsIfFreestyle();
             });
         }
+        // Ensure delete starts hidden until NPC is created
         if (slot.deleteBtn) slot.deleteBtn.style.display = 'none';
-        // delete
+        // Delete action
         if (slot.deleteBtn) {
             slot.deleteBtn.addEventListener('click', () => {
+                // Clear values and hide panel
                 if (slot.nId) slot.nId.value = '';
                 if (slot.nMsg) slot.nMsg.value = '';
                 if (slot.nSprite) slot.nSprite.value = '';
@@ -446,32 +652,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // walls
+    // Dynamic Collision Walls: create on demand via single Add Wall button
     let wallCounter = 0;
 
     function hookWallSlotListeners(slot) {
         if (slot.wId) slot.wId.addEventListener('input', syncFromControlsIfFreestyle);
+        // Toggle dropdown open/close
         if (slot.addBtn && slot.fieldsContainer) {
             slot.addBtn.addEventListener('click', () => {
                 const isVisible = slot.fieldsContainer.style.display !== 'none';
+                // Toggle visibility
                 slot.fieldsContainer.style.display = isVisible ? 'none' : '';
+                // Allow editing when open
                 if (!isVisible) slot.locked = false;
+                // Update button label with caret and name
                 const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add Wall';
                 const caret = isVisible ? ' ▸' : ' ▾';
                 slot.addBtn.textContent = labelBase + caret;
+                // Added style if slot was confirmed
                 if (slot.locked && slot.displayName) slot.addBtn.classList.add('btn-confirm');
                 else slot.addBtn.classList.remove('btn-confirm');
                 updateStepUI();
                 syncFromControlsIfFreestyle();
             });
         }
+        // Ensure delete starts hidden until wall is created/confirmed
         if (slot.deleteBtn) slot.deleteBtn.style.display = 'none';
         const getWallInstance = (id) => {
             const win = ui.iframe?.contentWindow;
             const reg = win && win.__adventureGameRegistry && win.__adventureGameRegistry.walls;
             return reg ? reg[id] : null;
         };
-        // x position 
+        // X position slider: update wall's position.x only
         if (slot.wX) slot.wX.addEventListener('input', () => {
             const wall = ui.walls.find(w => w.index === slot.index);
             if (wall) {
@@ -482,7 +694,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ui.editor.value = generateStepCode('player');
             }
         });
-        // y position 
+        // Y position slider: update wall's position.y only
         if (slot.wY) slot.wY.addEventListener('input', () => {
             const wall = ui.walls.find(w => w.index === slot.index);
             if (wall) {
@@ -493,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ui.editor.value = generateStepCode('player');
             }
         });
-        // width 
+        // Width slider: adjust wall dimensions
         if (slot.wW) slot.wW.addEventListener('input', () => {
             const wall = ui.walls.find(w => w.index === slot.index);
             if (wall) {
@@ -506,7 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ui.editor.value = generateStepCode('player');
             }
         });
-        // height
+        // Height slider: adjust wall dimensions
         if (slot.wH) slot.wH.addEventListener('input', () => {
             const wall = ui.walls.find(w => w.index === slot.index);
             if (wall) {
@@ -521,6 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (slot.deleteBtn) {
             slot.deleteBtn.addEventListener('click', () => {
+                // Remove from DOM and UI list
                 if (slot.root) slot.root.remove();
                 ui.walls = ui.walls.filter(w => w.index !== slot.index);
                 syncFromControlsIfFreestyle();
@@ -534,6 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const root = document.createElement('div');
         root.className = 'wall-slot';
         root.id = `wall-slot-${idx}`;
+        // Header with dropdown toggle
         const header = document.createElement('div');
         header.className = 'wall-header';
         header.style.cssText = 'display:flex; align-items:center; gap:8px;';
@@ -541,6 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="btn" id="wall${idx}-toggle">Add Wall ▸</button>
         `;
 
+        // Fields panel (collapsed by default)
         const fields = document.createElement('div');
         fields.className = 'wall-fields';
         fields.style.cssText = 'margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);';
@@ -592,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const LINE_HEIGHT = 20;
     const state = { persistent: null, typing: null, userEdited: false, programmaticEdit: false };
     const steps = ['background','player','npc','freestyle'];
-    let stepIndex = 0; 
+    let stepIndex = 0; // start at 'background'
     const indicator = document.getElementById('progress-indicator');
 
     function setIndicator() {
@@ -606,6 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateStepUI() {
         const current = steps[stepIndex];
         const mv = document.getElementById('movement-keys');
+        // Default: disable all inputs/buttons
         [ui.bg, ui.pSprite, ui.pX, mv].forEach(el => { if (el) el.disabled = true; });
         ui.npcs.forEach(slot => {
             if (slot.addBtn) slot.addBtn.disabled = true;
@@ -628,6 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 [slot.wId, slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
             });
         } else if (current === 'npc') {
+            // Enable add buttons and manage NPC fields based on locked state
             ui.npcs.forEach(slot => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
                 if (slot.deleteBtn) {
@@ -635,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     slot.deleteBtn.style.display = slot.locked ? '' : 'none';
                 }
                 if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
+                    // Fields are editable when dropdown is open
                     unlockField(slot.nId);
                     unlockField(slot.nMsg);
                     unlockField(slot.nSprite);
@@ -661,11 +879,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
         }
+        // Show or hide freestyle unlocked notice
         if (ui.notice) {
             ui.notice.style.display = (current === 'freestyle') ? '' : 'none';
         }
     }
 
+        // Baseline skeleton: include all imports to minimize diff across steps
         function generateBaselineCode() {
                 return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
 import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
@@ -796,6 +1016,7 @@ export const gameLevelClasses = [CustomLevel];`;
                 }
 
                 if (currentStep === 'npc') {
+                    // Include all locked (previously confirmed) slots and any currently visible slots
                     const includedSlots = ui.npcs.filter(s => s.locked || (s.fieldsContainer && s.fieldsContainer.style.display !== 'none'));
                     if (includedSlots.length === 0) return null;
 
@@ -878,9 +1099,11 @@ export const gameLevelClasses = [CustomLevel];`;
                         return header() + defs + footer(classes);
                 }
 
+                // Freestyle: keep last generated, allow edits; return current editor code
                 return ui.editor.value;
         }
 
+    // Compute diff range (line-based)
     function computeChangeRange(oldCode, newCode) {
         const oldLines = oldCode.split('\n');
         const newLines = newCode.split('\n');
@@ -897,6 +1120,7 @@ export const gameLevelClasses = [CustomLevel];`;
 
     function renderOverlay() {
         clearOverlay();
+        // Keep highlight aligned with scrolled content
         ui.hLayer.style.transform = `translateY(${-ui.editor.scrollTop}px)`;
         const addBox = (cls, start, count) => {
             if (!count || count < 1) return;
@@ -910,13 +1134,15 @@ export const gameLevelClasses = [CustomLevel];`;
         if (state.persistent) addBox('highlight-persistent-block', state.persistent.startLine, state.persistent.lineCount);
     }
 
+    // Sync overlay with editor scroll
     ui.editor.addEventListener('scroll', renderOverlay);
+    // Track manual edits in freestyle to avoid auto-overwriting code
     ui.editor.addEventListener('input', () => { if (!state.programmaticEdit) state.userEdited = true; });
 
     function syncFromControlsIfFreestyle() {
         const current = steps[stepIndex];
         if (current !== 'freestyle') return;
-        if (state.userEdited) return; 
+        if (state.userEdited) return; // don't overwrite user's manual edits
         const hasNPCs = ui.npcs.some(s => s.locked || (s.fieldsContainer && s.fieldsContainer.style.display !== 'none'));
         const hasPlayer = !!ui.pSprite.value;
         const hasBackground = !!ui.bg.value;
@@ -941,7 +1167,7 @@ export const gameLevelClasses = [CustomLevel];`;
         state.persistent = null;
         state.typing = { startLine, lineCount: Math.max(1, lineCount) };
         renderOverlay();
-        const speed = 6; 
+        const speed = 6; // chars per frame (faster)
         function step() {
             for (let i = 0; i < speed && typed.length < targetBlock.length; i++) typed += targetBlock[typed.length];
             const partial = typed.split('\n');
@@ -964,6 +1190,7 @@ export const gameLevelClasses = [CustomLevel];`;
         requestAnimationFrame(step);
     }
 
+    // Auto-sync controls in freestyle when changed
     const mvEl = document.getElementById('movement-keys');
     if (ui.bg) ui.bg.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pSprite) ui.pSprite.addEventListener('change', syncFromControlsIfFreestyle);
@@ -995,12 +1222,15 @@ export const gameLevelClasses = [CustomLevel];`;
             return;
         }
         animateTypingDiff(oldCode, newCode, () => {
+            // Lock fields for completed step and (optionally) advance
             if (current === 'background') { lockField(ui.bg); }
             if (current === 'player') { lockField(ui.pSprite); lockField(ui.pX); lockField(document.getElementById('movement-keys')); }
             if (current === 'npc') {
                 ui.npcs.forEach(slot => {
                     if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
+                        // Mark as locked so updateStepUI keeps fields disabled until edited
                         slot.locked = true;
+                        // Update Add NPC button to show user-named NPC and highlight
                         const name = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC');
                         slot.displayName = name;
                         if (slot.addBtn) {
@@ -1014,6 +1244,7 @@ export const gameLevelClasses = [CustomLevel];`;
                         }
                     }
                 });
+                // Lock any visible walls
                 ui.walls.forEach(slot => {
                     if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
                         slot.locked = true;
@@ -1030,6 +1261,7 @@ export const gameLevelClasses = [CustomLevel];`;
                         }
                     }
                 });
+                // Move to freestyle after first NPC is added so users can edit anything
                 stepIndex = steps.indexOf('freestyle');
             } else {
                 stepIndex = Math.min(stepIndex + 1, steps.length - 1);
@@ -1053,7 +1285,9 @@ export const gameLevelClasses = [CustomLevel];`;
 
     document.getElementById('btn-run').addEventListener('click', runInEmbed);
 
+    // No forced defaults: keep all selects blank on initial load
 
+    // Initial: show baseline skeleton and set step gating
     ui.editor.value = generateBaselineCode();
     setIndicator();
     updateStepUI();
@@ -1062,9 +1296,11 @@ export const gameLevelClasses = [CustomLevel];`;
 </script>
 
 <script>
+// Prevent arrow keys and space from scrolling the page during gameplay
 window.addEventListener('keydown', function(e) {
-    const keys = [32, 37, 38, 39, 40]; 
+    const keys = [32, 37, 38, 39, 40]; // space, left, up, right, down
     if (keys.includes(e.keyCode)) {
+        // Only prevent if focus is not in an input/textarea
         if (!(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
             e.preventDefault();
         }
@@ -1072,3 +1308,10 @@ window.addEventListener('keydown', function(e) {
 }, { passive: false });
 </script>
 
+<script>
+    const navToggle = document.getElementById('nav-toggle');
+    const sidebar = document.getElementById('rpg-nav-sidebar');
+    if (navToggle && sidebar) {
+        navToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    }
+</script>
