@@ -94,14 +94,27 @@ function closeCustomAlert() {
         } catch (_) {}
     }
 
-    // Lazy-load AdventureGame to avoid early import errors and allow cache busting
-    let AdventureGame = null;
-    async function loadAdventureGame() {
-        if (AdventureGame) return AdventureGame;
-        const url = `${origin}${path || ''}/assets/js/adventureGame/GameEngine/Game.js?v=${Date.now()}`;
-        const mod = await import(url);
-        AdventureGame = mod?.default ?? mod;
-        return AdventureGame;
+    // Lazy-load engine (Adventure first, then BetterGameEngine fallback)
+    let EngineModule = null;
+    let engineType = null; // 'adventure' | 'better'
+    async function loadEngine() {
+        if (EngineModule) return EngineModule;
+        // Try AdventureGame engine
+        try {
+            const url = `${origin}${path || ''}/assets/js/adventureGame/GameEngine/Game.js?v=${Date.now()}`;
+            const mod = await import(url);
+            EngineModule = mod?.default ?? mod;
+            engineType = 'adventure';
+            return EngineModule;
+        } catch (e1) {
+            console.warn('Adventure engine load failed, trying BetterGameEngine:', e1);
+            // Fallback: BetterGameEngine
+            const url2 = `${origin}${path || ''}/assets/js/BetterGameEngine/GameEngine/Game.js?v=${Date.now()}`;
+            const mod2 = await import(url2);
+            EngineModule = mod2?.default ?? mod2;
+            engineType = 'better';
+            return EngineModule;
+        }
     }
 
     // Respect autostart query parameter (default: true)
@@ -248,8 +261,8 @@ function closeCustomAlert() {
                 .replace(fromRelRe, (m, p1, p2, p3) => `${p1}${basePrefix}/${p2}${p3}`)
                 .replace(dynImpRelRe, (m, p1, p2, p3) => `${p1}${basePrefix}/${p2}${p3}`);
 
-            // Ensure AdventureGame is loaded before running
-            const AG = await loadAdventureGame();
+            // Ensure engine is loaded before running
+            const Engine = await loadEngine();
 
             // Create module blob and import
             const blob = new Blob([code], { type: 'application/javascript' });
@@ -275,17 +288,31 @@ function closeCustomAlert() {
 
             let started = false;
             // Preferred: Use Adventure Game engine entrypoint with provided levels
-            if (levelClasses.length > 0 && AG && typeof AG.main === 'function') {
+            if (levelClasses.length > 0 && Engine && typeof Engine.main === 'function') {
                 try {
-                    liveAdventure = AG.main({
-                        path: env.path,
-                        gameContainer: env.gameContainer,
-                        gameCanvas: env.gameCanvas,
-                        pythonURI: env.pythonURI,
-                        javaURI: env.javaURI,
-                        fetchOptions: env.fetchOptions,
-                        gameLevelClasses: levelClasses
-                    });
+                    if (engineType === 'better') {
+                        // BetterGameEngine expects (environment, GameControlClass)
+                        const GameControlClass = mod.GameControl; // from user module
+                        if (!GameControlClass) throw new Error('GameControl export required for BetterGameEngine');
+                        // Prepare explicit dimensions similar to game-runner
+                        const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
+                        const containerHeight = Math.min(580, window.innerHeight);
+                        env.innerWidth = containerWidth;
+                        env.innerHeight = containerHeight;
+                        env.gameLevelClasses = levelClasses;
+                        liveAdventure = Engine.main(env, GameControlClass);
+                    } else {
+                        // Adventure engine expects environment with level classes
+                        liveAdventure = Engine.main({
+                            path: env.path,
+                            gameContainer: env.gameContainer,
+                            gameCanvas: env.gameCanvas,
+                            pythonURI: env.pythonURI,
+                            javaURI: env.javaURI,
+                            fetchOptions: env.fetchOptions,
+                            gameLevelClasses: levelClasses
+                        });
+                    }
                     started = true;
                 } catch (e) {
                     console.warn('Adventure Game main failed, trying fallbacks:', e);
