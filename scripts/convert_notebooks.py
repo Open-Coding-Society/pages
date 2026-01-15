@@ -123,7 +123,14 @@ def clean_code_for_runner(cell_source, language):
                 continue
         cleaned_lines.append(line)
     
-    return '\n'.join(cleaned_lines).rstrip()
+    # Join lines and strip trailing whitespace
+    result = '\n'.join(cleaned_lines).rstrip()
+    
+    # Remove leading empty lines
+    while result.startswith('\n'):
+        result = result[1:]
+    
+    return result
 
 
 def generate_runner_id(permalink, index):
