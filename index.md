@@ -8,37 +8,45 @@ sprite: /images/mario_animation.png
 permalink: /
 ---
 
-<!-- Liquid:  statements-->
+<!-- ================= LIQUID SETUP ================= -->
 
-<!--- Concatenation of site URL to frontmatter sprite  --->
 {% assign sprite_file = site.baseurl | append: page.sprite %}
-<!--- Has is a list variable containing mario metadata for sprite --->
-{% assign hash = site.data.mario_metadata %}  
-<!--- Size width/height of Sprit images --->
+{% assign hash = site.data.mario_metadata %}
 {% assign pixels = 256 %}
 
-<!--- HTML for page contains <p> tag named "Mario" and class properties for a "sprite"  -->
+<!-- ================= GAME ELEMENTS ================= -->
 
 <p id="mario" class="sprite"></p>
-  
-<!--- Embedded Cascading Style Sheet (CSS) rules, 
-        define how HTML elements look 
---->
-<style>
+<canvas id="fog"></canvas>
 
-  /*CSS style rules for the id and class of the sprite...
-  */
+<!-- ================= STYLES ================= -->
+
+<style>
+  body {
+    background-color: black;
+  }
+
   .sprite {
     height: {{pixels}}px;
     width: {{pixels}}px;
     background-image: url('{{sprite_file}}');
     background-repeat: no-repeat;
+    position: absolute;
+    z-index: 10;
   }
 
-  /*background position of sprite element
-  */
   #mario {
-    background-position: calc({{animations[0].col}} * {{pixels}} * -1px) calc({{animations[0].row}} * {{pixels}}* -1px);
+    background-position: 0 0;
+  }
+
+  #fog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 999;
   }
 
   .social-icon {
@@ -46,249 +54,147 @@ permalink: /
   }
 </style>
 
-<!--- Embedded executable code--->
+<!-- ================= GAME SCRIPT ================= -->
+
 <script>
-  ////////// convert YML hash to javascript key:value objects /////////
+  //////////////////// METADATA ////////////////////
 
-  var mario_metadata = {}; //key, value object
-  {% for key in hash %}  
-  
-  var key = "{{key | first}}"  //key
-  var values = {} //values object
-  values["row"] = {{key.row}}
-  values["col"] = {{key.col}}
-  values["frames"] = {{key.frames}}
-  mario_metadata[key] = values; //key with values added
-
+  var mario_metadata = {};
+  {% for key in hash %}
+  mario_metadata["{{key | first}}"] = {
+    row: {{key.row}},
+    col: {{key.col}},
+    frames: {{key.frames}}
+  };
   {% endfor %}
 
-  ////////// game object for player /////////
+  //////////////////// FOG OF WAR ////////////////////
+
+  const fogCanvas = document.getElementById("fog");
+  const fogCtx = fogCanvas.getContext("2d");
+
+  function resizeFog() {
+    fogCanvas.width = window.innerWidth;
+    fogCanvas.height = window.innerHeight;
+    fogCtx.fillStyle = "rgba(0,0,0,0.95)";
+    fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+  }
+
+  function reveal(x, y, radius = 140) {
+    fogCtx.globalCompositeOperation = "destination-out";
+    const gradient = fogCtx.createRadialGradient(x, y, radius * 0.3, x, y, radius);
+    gradient.addColorStop(0, "rgba(0,0,0,1)");
+    gradient.addColorStop(1, "rgba(0,0,0,0)");
+    fogCtx.fillStyle = gradient;
+    fogCtx.beginPath();
+    fogCtx.arc(x, y, radius, 0, Math.PI * 2);
+    fogCtx.fill();
+    fogCtx.globalCompositeOperation = "source-over";
+  }
+
+  window.addEventListener("resize", resizeFog);
+
+  //////////////////// MARIO CLASS ////////////////////
 
   class Mario {
-    constructor(meta_data) {
-      this.tID = null;  //capture setInterval() task ID
-      this.positionX = 0;  // current position of sprite in X direction
-      this.currentSpeed = 0;
-      this.marioElement = document.getElementById("mario"); //HTML element of sprite
-      this.pixels = {{pixels}}; //pixel offset of images in the sprite, set by liquid constant
-      this.interval = 100; //animation time interval
-      this.obj = meta_data;
-      this.marioElement.style.position = "absolute";
+    constructor(meta) {
+      this.meta = meta;
+      this.el = document.getElementById("mario");
+      this.pixels = {{pixels}};
+      this.positionX = 0;
+      this.speed = 0;
+      this.frame = 0;
+      this.interval = 100;
+      this.timer = null;
     }
 
-    animate(obj, speed) {
-      let frame = 0;
-      const row = obj.row * this.pixels;
-      this.currentSpeed = speed;
+    animate(state, speed) {
+      this.stop();
+      this.speed = speed;
+      const row = state.row * this.pixels;
 
-      this.tID = setInterval(() => {
-        const col = (frame + obj.col) * this.pixels;
-        this.marioElement.style.backgroundPosition = `-${col}px -${row}px`;
-        this.marioElement.style.left = `${this.positionX}px`;
+      this.timer = setInterval(() => {
+        const col = (this.frame + state.col) * this.pixels;
+        this.el.style.backgroundPosition = `-${col}px -${row}px`;
+        this.el.style.left = `${this.positionX}px`;
 
         this.positionX += speed;
-        frame = (frame + 1) % obj.frames;
+        this.frame = (this.frame + 1) % state.frames;
 
-        const viewportWidth = window.innerWidth;
-        if (this.positionX > viewportWidth - this.pixels) {
-          document.documentElement.scrollLeft = this.positionX - viewportWidth + this.pixels;
+        const rect = this.el.getBoundingClientRect();
+        reveal(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+        if (this.positionX > window.innerWidth - this.pixels) {
+          document.documentElement.scrollLeft =
+            this.positionX - window.innerWidth + this.pixels;
         }
       }, this.interval);
     }
 
-    startWalking() {
-      this.stopAnimate();
-      this.animate(this.obj["Walk"], 3);
+    stop() {
+      clearInterval(this.timer);
     }
 
-    startWalkingL() {
-      this.stopAnimate();
-      this.animate(this.obj["WalkL"], -3);
-    }
-
-    startRunning() {
-      this.stopAnimate();
-      this.animate(this.obj["Run1"], 6);
-    }
-
-    startRunningL() {
-      this.stopAnimate();
-      this.animate(this.obj["Run1L"], -6);
-    }
-
-    startPuffing() {
-      this.stopAnimate();
-      this.animate(this.obj["Puff"], 0);
-    }
-
-    startPuffingL() {
-      this.stopAnimate();
-      this.animate(this.obj["PuffL"], 0);
-    }
-
-    startCheering() {
-      this.stopAnimate();
-      this.animate(this.obj["Cheer"], 0);
-    }
-
-    startCheeringL() {
-      this.stopAnimate();
-      this.animate(this.obj["CheerL"], 0);
-    }
-
-    startFlipping() {
-      this.stopAnimate();
-      this.animate(this.obj["Flip"], 0);
-    }
-
-    startFlippingL() {
-      this.stopAnimate();
-      this.animate(this.obj["FlipL"], 0);
-    }
-
-    startResting() {
-      this.stopAnimate();
-      this.animate(this.obj["Rest"], 0);
-    }
-
-    startRestingL() {
-      this.stopAnimate();
-      this.animate(this.obj["RestL"], 0);
-    }
-
-    stopAnimate() {
-      clearInterval(this.tID);
+    start(name, speed) {
+      this.animate(this.meta[name], speed);
     }
   }
 
   const mario = new Mario(mario_metadata);
 
-  ////////// event control /////////
+  //////////////////// CONTROLS ////////////////////
 
-// Add event listener for keydown event
-  window.addEventListener("keydown", (event) => {
-      const activeElement = document.activeElement;
-      const isTyping = activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA";
-      if (isTyping) return; // ✅ Skip game controls while typing in forms
+  window.addEventListener("keydown", e => {
+    if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
 
-      if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
-          event.preventDefault();
-          if (event.repeat) {
-              mario.startCheering();
-          } else {
-              if (mario.currentSpeed === 0) {
-                  mario.startWalking();
-              } else if (mario.currentSpeed === 3) {
-                  mario.startRunning();
-              }
-          }
-      } else if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
-          event.preventDefault();
-          if (event.repeat) {
-              mario.startCheeringL();
-          } else {
-              if (mario.currentSpeed === 0) {
-                  mario.startWalkingL();
-              } else if (mario.currentSpeed === 3) {
-                  mario.startRunningL();
-              }
-          }
-      } else if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
-          event.preventDefault();
-          mario.startFlipping();
-      } else if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
-          event.preventDefault();
-          mario.startResting();
-      }
-  });
-  
-  // Add event listener for touchstart events
-  window.addEventListener("touchstart", (event) => {
-      event.preventDefault(); // prevent default browser action
-      const touchX = event.touches[0].clientX;
-      const screenWidth = window.innerWidth;
-      const centerThreshold = screenWidth * 0.1; // 10% of the screen width on either side of the center
-
-      if (touchX > screenWidth / 2 + centerThreshold) {
-          // move right
-          if (mario.currentSpeed === 0) {
-              mario.startWalking();
-          } else if (mario.currentSpeed === 3) {
-              mario.startRunning();
-          }
-      } else if (touchX < screenWidth / 2 - centerThreshold) {
-          // move left
-          if (mario.currentSpeed === 0) {
-              mario.startWalkingL();
-          } else if (mario.currentSpeed === 3) {
-              mario.startRunningL();
-          }
-      } else {
-          // touch near the center, make Mario puff
-          mario.startPuffing();
-      }
+    if (e.key === "ArrowRight" || e.key === "d") {
+      mario.start("Walk", 3);
+    }
+    if (e.key === "ArrowLeft" || e.key === "a") {
+      mario.start("WalkL", -3);
+    }
+    if (e.key === "ArrowUp" || e.key === "w") {
+      mario.start("Flip", 0);
+    }
+    if (e.key === "ArrowDown" || e.key === "s") {
+      mario.start("Rest", 0);
+    }
   });
 
-  //stop animation on window blur
-  window.addEventListener("blur", () => {
-    mario.stopAnimate();
-  });
+  window.addEventListener("blur", () => mario.stop());
 
-  //start animation on window focus
-  window.addEventListener("focus", () => {
-     mario.startFlipping();
-  });
+  //////////////////// INIT ////////////////////
 
-  //start animation on page load or page refresh
   document.addEventListener("DOMContentLoaded", () => {
-    // adjust sprite size for high pixel density devices
-    const scale = window.devicePixelRatio;
-    const sprite = document.querySelector(".sprite");
-    sprite.style.transform = `scale(${0.2 * scale})`;
-    mario.startResting();
+    resizeFog();
+    const scale = window.devicePixelRatio || 1;
+    mario.el.style.transform = `scale(${0.2 * scale})`;
+    mario.start("Rest", 0);
   });
-
 </script>
+
+<!-- ================= PAGE CONTENT ================= -->
 
 ## About
 
 Empower yourself to solve real-world problems, unlock creativity, and open doors to every field—because coding is the language of innovation.
 
-> Invest in your technical skills through Project-based learning.
+> Move Mario to explore the page 👾
 
-<div style="display: flex; align-items: flex-start; justify-content: center; gap: 40px; flex-wrap: wrap;">
+<div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
 
-  <!-- Logo -->
-  <div style="text-align: center;">
-    <img src="{{site.baseurl}}/images/logo-framed.png" alt="Logo" style="width: 180px; max-width: 100%;">
-  </div>
+  <img src="{{site.baseurl}}/images/logo-framed.png" style="width:180px;">
+  <img src="{{site.baseurl}}/images/course-brag/qr.png" style="width:180px;">
 
-  <!-- QR Code -->
-  <div style="text-align: center;">
-    <img src="{{site.baseurl}}/images/course-brag/qr.png" alt="QR Code" style="width: 180px; max-width: 100%;">
-  </div>
+</div>
+## Courses
 
-  <!-- Socials -->
-  <div style="min-width: 220px;">
-    <ul style="list-style: none; padding: 0; font-size: 1.1em;">
-      <li>
-        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width: 20px; vertical-align: middle; margin-right: 8px;">
-        <a href="mailto:open.coding.society@gmail.com">open.coding.society@gmail.com</a>
-      </li>
-      <li>
-        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" style="width: 20px; vertical-align: middle; margin-right: 8px;">
-        <a href="https://linkedin.com/company/open-coding-society" target="_blank">LinkedIn</a>
-      </li>
-      <li>
-        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" style="width: 20px; vertical-align: middle; margin-right: 8px;">
-        <a href="https://x.com/Open_Coding" target="_blank">@Open_Coding</a>
-      </li>
-      <li>
-        <img class="social-icon" src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube" style="width: 20px; vertical-align: middle; margin-right: 8px;">
-        <a href="https://www.youtube.com/@OpenCodingSociety" target="_blank">@OpenCodingSociety</a>
-      </li>
-    </ul>
-  </div>
+Explore each pathway by *moving forward*.
+
+![csse]({{site.baseurl}}/images/course-brag/csse.png)
+![csp]({{site.baseurl}}/images/course-brag/csp24.png)
+![csa]({{site.baseurl}}/images/course-brag/csa24.png)
+
 </div>
 
 ## Project-based learning
