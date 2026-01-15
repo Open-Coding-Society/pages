@@ -65,15 +65,11 @@ layout: post
               <div class="sync-options">
                 <label class="sync-option">
                   <input type="checkbox" class="sync-reading-materials" data-sprint="{{ unitKey }}" checked>
-                  <span><i class="fas fa-book"></i> Reading Materials (Monday)</span>
+                  <span><i class="fas fa-book"></i> Formative (Monday) - Readings, Lessons</span>
                 </label>
                 <label class="sync-option">
                   <input type="checkbox" class="sync-assessments" data-sprint="{{ unitKey }}" checked>
-                  <span><i class="fas fa-clipboard-check"></i> Assessments (Friday)</span>
-                </label>
-                <label class="sync-option">
-                  <input type="checkbox" class="sync-checkpoints" data-sprint="{{ unitKey }}" checked>
-                  <span><i class="fas fa-flag-checkered"></i> Checkpoints (Next Tuesday)</span>
+                  <span><i class="fas fa-clipboard-check"></i> Summative (Friday) - Assessments</span>
                 </label>
               </div>
               <div class="date-actions">
@@ -1445,10 +1441,9 @@ layout: post
     const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
     const btn = document.querySelector(`.sync-sprint-calendar-btn[data-sprint="${sprintKey}"]`);
     
-    // Get sync options
-    const syncReadings = document.querySelector(`.sync-reading-materials[data-sprint="${sprintKey}"]`)?.checked ?? true;
-    const syncAssessments = document.querySelector(`.sync-assessments[data-sprint="${sprintKey}"]`)?.checked ?? true;
-    const syncCheckpoints = document.querySelector(`.sync-checkpoints[data-sprint="${sprintKey}"]`)?.checked ?? true;
+    // Get sync options (Checkpoints are added manually by instructor, not synced here)
+    const syncFormative = document.querySelector(`.sync-reading-materials[data-sprint="${sprintKey}"]`)?.checked ?? true;
+    const syncSummative = document.querySelector(`.sync-assessments[data-sprint="${sprintKey}"]`)?.checked ?? true;
     
     btn.disabled = true;
     showDateStatus(statusEl, 'Syncing to calendar...', 'loading');
@@ -1494,77 +1489,78 @@ layout: post
         
         const readingDate = getReadingDate(weekNum);
         const assessmentDate = getAssessmentDate(weekNum);
-        const checkpointDate = getCheckpointDate(weekNum);
         
         const weekData = SCHOOL_CALENDAR.weeks[weekNum];
         const isHolidayWeek = weekData?.holidays?.length > 0;
         const holidayNote = isHolidayWeek ? ` (${weekData.holidays.join(', ')} week)` : '';
         
-        // MONDAY (or Tuesday if holiday): Reading Materials / Week Title
-        if (syncReadings && readingDate) {
+        // MONDAY (or Tuesday if holiday): FORMATIVE - All reading materials/lessons for the week
+        if (syncFormative && readingDate) {
           // Get all lesson titles and URLs for this week
           const lessonList = lessons.split(';;;').filter(l => l.trim());
           
-          if (lessonList.length > 0) {
-            // Create combined notes with all reading materials
-            const lessonNotes = lessonList.map(l => {
+          // Remove duplicates (same title)
+          const uniqueLessons = [];
+          const seenTitles = new Set();
+          for (const l of lessonList) {
+            const [title] = l.split('|||');
+            if (!seenTitles.has(title)) {
+              seenTitles.add(title);
+              uniqueLessons.push(l);
+            }
+          }
+          
+          if (uniqueLessons.length > 0) {
+            // Create ONE formative event with all lessons listed
+            const lessonItems = uniqueLessons.map(l => {
               const [title, url] = l.split('|||');
-              return `• ${title}${url ? '\n  Link: {{baseurl}}' + url : ''}`;
+              const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
+              return `• ${title}${fullUrl ? '\n  ' + fullUrl : ''}`;
             }).join('\n\n');
             
             events.push({
-              title: `📚 Week ${weekNum} Reading - ${courseName}`,
-              description: `${courseName} ${sprintKey} - Week ${weekNum}${holidayNote}\n\nReading Materials:\n${lessonNotes.replace(/\{\{baseurl\}\}/g, window.location.origin + '{{ site.baseurl }}')}`,
-              date: readingDate,
-              period: courseName
-            });
-          } else {
-            // No specific lessons, just add week start
-            events.push({
-              title: `📅 Week ${weekNum} - ${courseName}`,
-              description: `${courseName} ${sprintKey} - Week ${weekNum}${holidayNote}\nSprint: ${sprintTitle}`,
+              title: `📚 Week ${weekNum} Formative - ${courseName}`,
+              description: `${courseName} ${sprintKey} - Week ${weekNum}${holidayNote}\n\nReading Materials:\n\n${lessonItems}`,
               date: readingDate,
               period: courseName
             });
           }
         }
         
-        // FRIDAY: Assessments (Formative/Summative/Final)
-        if (syncAssessments && assessmentDate && assignments) {
+        // FRIDAY: SUMMATIVE - All assessments for the week
+        // Note: Checkpoints are manually added by instructors through the calendar UI
+        if (syncSummative && assessmentDate && assignments) {
           const assignmentList = assignments.split(';;;').filter(a => a.trim());
           
-          // Create individual events for each assessment with direct link
-          for (const assignment of assignmentList) {
-            const [title, url] = assignment.split('|||');
-            const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
+          // Remove duplicates (same title)
+          const uniqueAssignments = [];
+          const seenTitles = new Set();
+          for (const a of assignmentList) {
+            const [title] = a.split('|||');
+            if (!seenTitles.has(title)) {
+              seenTitles.add(title);
+              uniqueAssignments.push(a);
+            }
+          }
+          
+          if (uniqueAssignments.length > 0) {
+            // Create ONE summative event with all assignments listed
+            const assignmentItems = uniqueAssignments.map(a => {
+              const [title, url] = a.split('|||');
+              const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
+              return `• ${title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+            }).join('\n\n');
             
             events.push({
-              title: `📝 Due: ${title}`,
-              description: `${courseName} Assessment Due\nWeek ${weekNum} - ${sprintKey}\n\n${title}${fullUrl ? '\n\nDirect Link: ' + fullUrl : ''}`,
+              title: `📝 Week ${weekNum} Summative - ${courseName}`,
+              description: `${courseName} ${sprintKey} - Week ${weekNum}\n\nAssessments Due:\n\n${assignmentItems}`,
               date: assessmentDate,
               period: courseName
             });
           }
         }
         
-        // NEXT TUESDAY: Checkpoints (only if this week had assessments)
-        if (syncCheckpoints && checkpointDate && assignments) {
-          const assignmentList = assignments.split(';;;').filter(a => a.trim());
-          
-          if (assignmentList.length > 0) {
-            const checkpointItems = assignmentList.map(a => {
-              const [title] = a.split('|||');
-              return `• ${title}`;
-            }).join('\n');
-            
-            events.push({
-              title: `🔍 Week ${weekNum} Checkpoint - ${courseName}`,
-              description: `${courseName} ${sprintKey} - Week ${weekNum} Checkpoint\n\nReview/Grade for:\n${checkpointItems}`,
-              date: checkpointDate,
-              period: courseName
-            });
-          }
-        }
+        // Checkpoints are added manually by instructor via calendar UI, not auto-synced
       }
       
       // Send all events to calendar API
