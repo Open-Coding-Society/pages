@@ -138,9 +138,15 @@ active_tab: profile
         <div>
             <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
                 Groups</label>
-            <input id="groupSearchInput" type="text" placeholder="Start typing a group name or period"
-                class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                autocomplete="off">
+            <div class="flex gap-2">
+                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    autocomplete="off">
+                <button id="groupSearchBtn" type="button"
+                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                    Search
+                </button>
+            </div>
         </div>
         <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
         </div>
@@ -160,7 +166,6 @@ active_tab: profile
         let currentPersonId = null;
         let currentUid = null;
         let userGroupIds = new Set(); // Track user's group IDs for quick lookup
-        let searchDebounceTimer = null;
 
         // Fetch current user's person data from Java backend (includes numeric id)
         // This replaces the need to fetch all people later
@@ -192,17 +197,17 @@ active_tab: profile
             return;
         }
 
-        // Fetch all groups (still needed for search, but we filter efficiently)
+        // Fetch user's groups to display current membership
         try {
             const groupResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
 
             if (!groupResp.ok) throw new Error('Failed to fetch group data');
 
             const groups = await groupResp.json();
-            const availableGroups = Array.isArray(groups) ? groups : [];
+            const allGroups = Array.isArray(groups) ? groups : [];
 
             // Filter user's groups efficiently using the cached uid
-            const userGroups = availableGroups.filter(group =>
+            const userGroups = allGroups.filter(group =>
                 Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
             );
             
@@ -239,55 +244,54 @@ active_tab: profile
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
             }
 
-            // Debounced search to reduce re-renders
-            const renderGroupResults = (filter = '') => {
-                const normalized = filter.toLowerCase().trim();
+            // Debounced search using server-side API for performance
+            const searchGroups = async (query) => {
+                const normalized = query.trim();
                 
                 if (!normalized) {
                     groupResultsList.classList.add('hidden');
                     return;
                 }
 
-                const filtered = availableGroups.filter(group => {
-                    const nameMatch = group.name?.toLowerCase().includes(normalized);
-                    const periodMatch = group.period?.toString().toLowerCase().includes(normalized);
-                    return nameMatch || periodMatch;
-                });
+                try {
+                    const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
+                    if (!searchResp.ok) throw new Error('Search failed');
+                    
+                    const filtered = await searchResp.json();
 
-                if (filtered.length === 0) {
-                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
+                    if (filtered.length === 0) {
+                        groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
+                        groupResultsList.classList.remove('hidden');
+                        return;
+                    }
+
+                    groupResultsList.innerHTML = filtered.map(group => {
+                        const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
+                        const isAlreadyMember = userGroupIds.has(group.id);
+                        const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
+                        const membersText = group.members?.length > 0 
+                            ? group.members.map(m => m.name).join(', ')
+                            : 'No members';
+                        return `
+                            <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
+                                onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
+                                <div class="font-medium">${label}</div>
+                                <div class="text-xs text-gray-500 mt-1">${membersText}</div>
+                                ${isAlreadyMember ? '<div class="text-xs text-gray-400 mt-1">Already a member</div>' : ''}
+                            </div>
+                        `;
+                    }).join('');
                     groupResultsList.classList.remove('hidden');
-                    return;
+                } catch (error) {
+                    console.error('Search error:', error);
+                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-red-400 text-sm">Search failed</div>`;
+                    groupResultsList.classList.remove('hidden');
                 }
-
-                groupResultsList.innerHTML = filtered.map(group => {
-                    const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
-                    const isAlreadyMember = userGroupIds.has(group.id);
-                    const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                    return `
-                        <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
-                            onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
-                            <div class="font-medium">${label}</div>
-                            ${isAlreadyMember ? '<div class="text-xs text-gray-500 mt-1">Already a member</div>' : ''}
-                        </div>
-                    `;
-                }).join('');
-                groupResultsList.classList.remove('hidden');
             };
 
-            // Debounced input handler to reduce unnecessary re-renders
-            groupSearchInput?.addEventListener('input', (event) => {
-                clearTimeout(searchDebounceTimer);
-                searchDebounceTimer = setTimeout(() => {
-                    renderGroupResults(event.target.value);
-                }, 150);
-            });
-
-            // Close results when clicking outside
-            document.addEventListener('click', (event) => {
-                if (!event.target.closest('#groupSearchInput') && !event.target.closest('#groupResultsList')) {
-                    groupResultsList.classList.add('hidden');
-                }
+            // Search button click handler
+            document.getElementById('groupSearchBtn')?.addEventListener('click', () => {
+                searchGroups(groupSearchInput.value);
             });
 
             // Optimized join function - uses cached personId instead of fetching all people
