@@ -194,6 +194,7 @@ def inject_code_runners(markdown, notebook):
     code_block_content = []
     cell_index = 0
     code_cell_count = 0
+    code_runner_count = 0
     
     i = 0
     while i < len(lines):
@@ -226,15 +227,15 @@ def inject_code_runners(markdown, notebook):
                     runner_data = code_cell['metadata']['code_runner']
                     result.append('')
                     # Add liquid captures and code-runner include
-                    result.append('{% capture challenge' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
                     result.append(runner_data['challenge'])
                     result.append('{% endcapture %}')
                     result.append('')
-                    result.append('{% capture code' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture code' + str(code_runner_count) + ' %}')
                     result.append(runner_data['code'])
                     result.append('{% endcapture %}')
                     result.append('')
-                    result.append('{% capture source' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture source' + str(code_runner_count) + ' %}')
                     # Add the source code block content (already formatted markdown)
                     result.extend(code_block_content)
                     result.append('{% endcapture %}')
@@ -242,12 +243,13 @@ def inject_code_runners(markdown, notebook):
                     result.append('{% include code-runner.html')
                     result.append('   runner_id="' + runner_data['runner_id'] + '"')
                     result.append('   language="' + runner_data['language'] + '"')
-                    result.append('   challenge=challenge' + str(code_cell_count - 1))
-                    result.append('   code=code' + str(code_cell_count - 1))
-                    result.append('   source=source' + str(code_cell_count - 1))
-                    result.append('   challenge_number=' + str(code_cell_count))
+                    result.append('   challenge=challenge' + str(code_runner_count))
+                    result.append('   code=code' + str(code_runner_count))
+                    result.append('   source=source' + str(code_runner_count))
+                    result.append('   challenge_number=' + str(code_runner_count + 1))
                     result.append('%}')                
                     result.append('')
+                    code_runner_count += 1
                 else:
                     # Regular code block without code-runner
                     result.extend(code_block_content)
