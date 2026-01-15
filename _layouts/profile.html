@@ -152,6 +152,7 @@ active_tab: profile
         </div>
     </div>
 </div>
+</form>
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -198,19 +199,30 @@ active_tab: profile
         }
 
         // Fetch user's groups to display current membership
+        // Use server-side filtering by person ID instead of fetching all groups
         try {
-            const groupResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
+            const groupResp = await fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
 
-            if (!groupResp.ok) throw new Error('Failed to fetch group data');
+            let userGroups = [];
 
-            const groups = await groupResp.json();
-            const allGroups = Array.isArray(groups) ? groups : [];
+            if (groupResp.ok) {
+                const groups = await groupResp.json();
+                userGroups = Array.isArray(groups) ? groups : [];
+            } else if (groupResp.status === 404) {
+                // Fallback to fetching all groups (this is less efficient then sending a GET for just a specific user)
+                console.warn('Person groups endpoint not available, using fallback!!');
+                const fallbackResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
+                if (fallbackResp.ok) {
+                    const allGroups = await fallbackResp.json();
+                    userGroups = (Array.isArray(allGroups) ? allGroups : []).filter(group =>
+                        Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
+                    );
+                }
+            } else {
+                throw new Error('Failed to fetch group data');
+                console.warn('Both methods of obtaining groups failed!!');
+            }
 
-            // Filter user's groups efficiently using the cached uid
-            const userGroups = allGroups.filter(group =>
-                Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
-            );
-            
             // Build a Set of user's group IDs for O(1) lookup during search
             userGroups.forEach(group => userGroupIds.add(group.id));
 
