@@ -25,6 +25,11 @@ active_tab: dashboard
                 </li>
             --> 
                 <li class="me-2">
+                    <a href="#" id="tab-ocs-analytics"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
+                        >OCS Analytics</a>
+                </li>
+                <li class="me-2">
                     <a href="#" id="tab-github"
                         class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
                         >GitHub Analytics</a>
@@ -146,6 +151,16 @@ active_tab: dashboard
 
                 <!-- Commit Cards Container -->
                 <div id="commitCardsContainer" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- OCS Analytics tab content -->
+            <div id="tab-content-ocs-analytics" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <div class="flex items-center justify-center min-h-[400px]">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p class="text-neutral-300">Loading OCS analytics...</p>
+                    </div>
+                </div>
             </div>
 
             <!-- grade predictor tab content -->
@@ -1484,6 +1499,7 @@ score += gists * 0.5
 <!-- Your GitHub analytics JS integrated -->
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
 
     const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
     const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
@@ -1493,6 +1509,11 @@ score += gists * 0.5
 
     let springUserId = null;
     let hasExistingStudentEval = false;
+    
+    // Initialize OCS Analytics Dashboard
+    initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions).catch(e => {
+        console.warn('OCS Analytics dashboard failed to initialize:', e);
+    });
 
     async function getUserIdSpring() {
         if (springUserId) return springUserId;
@@ -2027,6 +2048,13 @@ score += gists * 0.5
 
             if (targetId === "tab-content-your-feedback") {
                 await loadUserFeedback();  // 👈 load feedback when user clicks the tab
+            }
+
+            if (targetId === "tab-content-ocs-analytics") {
+                // Load OCS Analytics dashboard
+                if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
+                    await window.OCSAnalytics.loadAnalyticsSummary();
+                }
             }
         });
     });
