@@ -224,16 +224,7 @@ def inject_code_runners(markdown, notebook):
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['code_runner']
-                    
-                    # Wrap code block in collapsible details (collapsed by default)
-                    result.append('<details markdown="1">')
-                    result.append('<summary>View Source Code</summary>')
                     result.append('')
-                    result.extend(code_block_content)
-                    result.append('')
-                    result.append('</details>')
-                    result.append('')
-                    
                     # Add liquid captures and code-runner include
                     result.append('{% capture challenge' + str(code_cell_count - 1) + ' %}')
                     result.append(runner_data['challenge'])
@@ -243,11 +234,18 @@ def inject_code_runners(markdown, notebook):
                     result.append(runner_data['code'])
                     result.append('{% endcapture %}')
                     result.append('')
+                    result.append('{% capture source' + str(code_cell_count - 1) + ' %}')
+                    # Add the source code block content (already formatted markdown)
+                    result.extend(code_block_content)
+                    result.append('{% endcapture %}')
+                    result.append('')
                     result.append('{% include code-runner.html')
                     result.append('   runner_id="' + runner_data['runner_id'] + '"')
                     result.append('   language="' + runner_data['language'] + '"')
                     result.append('   challenge=challenge' + str(code_cell_count - 1))
                     result.append('   code=code' + str(code_cell_count - 1))
+                    result.append('   source=source' + str(code_cell_count - 1))
+                    result.append('   challenge_number=' + str(code_cell_count))
                     result.append('%}')                
                     result.append('')
                 else:
