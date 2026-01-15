@@ -31,6 +31,9 @@ html, body { height: 100%; }
     display: none; /* shown when engine is stopped */
 }
 
+/* Hide BetterGameEngine leaderboard when running inside Game Builder iframe */
+.embedded .leaderboard-widget { display: none !important; visibility: hidden !important; }
+
 .custom-alert {
     display: none;
     position: fixed;
@@ -94,25 +97,25 @@ function closeCustomAlert() {
         } catch (_) {}
     }
 
-    // Lazy-load engine (Adventure first, then BetterGameEngine fallback)
+    // Lazy-load engine (Prefer BetterGameEngine, fallback to Adventure)
     let EngineModule = null;
     let engineType = null; // 'adventure' | 'better'
     async function loadEngine() {
         if (EngineModule) return EngineModule;
-        // Try AdventureGame engine
+        // Try BetterGameEngine first (matches working game-runner component)
         try {
-            const url = `${origin}${path || ''}/assets/js/adventureGame/GameEngine/Game.js?v=${Date.now()}`;
-            const mod = await import(url);
-            EngineModule = mod?.default ?? mod;
-            engineType = 'adventure';
-            return EngineModule;
-        } catch (e1) {
-            console.warn('Adventure engine load failed, trying BetterGameEngine:', e1);
-            // Fallback: BetterGameEngine
             const url2 = `${origin}${path || ''}/assets/js/BetterGameEngine/GameEngine/Game.js?v=${Date.now()}`;
             const mod2 = await import(url2);
             EngineModule = mod2?.default ?? mod2;
             engineType = 'better';
+            return EngineModule;
+        } catch (e1) {
+            console.warn('BetterGameEngine load failed, trying Adventure engine:', e1);
+            // Fallback: AdventureGame engine
+            const url = `${origin}${path || ''}/assets/js/adventureGame/GameEngine/Game.js?v=${Date.now()}`;
+            const mod = await import(url);
+            EngineModule = mod?.default ?? mod;
+            engineType = 'adventure';
             return EngineModule;
         }
     }
