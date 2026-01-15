@@ -36,18 +36,31 @@ class GameCore {
         });
 
     // Try to dynamically load the Leaderboard
-import('./Leaderboard.js')
-    .then(mod => {
-        try { 
-            new mod.default(this.gameControl, { 
-                gameName: 'AdventureGame'  // Change to your game name
-            }); 
-        }
-        catch (e) { console.warn('Leaderboard init failed:', e); }
-    })
-    .catch(() => {
-        // no-op: Leaderboard is optional
-    });
+    import('./Leaderboard.js')
+        .then(mod => {
+            try {
+                // Get the actual container element from gameContainer
+                let parentId = 'gameContainer'; // default
+                
+                // If gameContainer is a string ID, use it directly
+                if (typeof this.gameContainer === 'string') {
+                    parentId = this.gameContainer;
+                }
+                // If gameContainer is an HTMLElement, get its ID
+                else if (this.gameContainer instanceof HTMLElement) {
+                    parentId = this.gameContainer.id || 'gameContainer';
+                }
+                
+                new mod.default(this.gameControl, { 
+                    gameName: 'AdventureGame',  // Change to your game name
+                    parentId: parentId          // Use the dynamic container ID
+                }); 
+            }
+            catch (e) { console.warn('Leaderboard init failed:', e); }
+        })
+        .catch(() => {
+            // no-op: Leaderboard is optional
+        });
 }
 
     static main(environment, GameControlClass) {
