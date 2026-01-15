@@ -209,7 +209,7 @@ active_tab: profile
                 const groups = await groupResp.json();
                 userGroups = Array.isArray(groups) ? groups : [];
             } else if (groupResp.status === 404) {
-                // Fallback to fetching all groups (this is less efficient then sending a GET for just a specific user)
+                // Fallback to fetching all groups (this is less efficient than sending a GET for just a specific user)
                 console.warn('Person groups endpoint not available, using fallback!!');
                 const fallbackResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
                 if (fallbackResp.ok) {
