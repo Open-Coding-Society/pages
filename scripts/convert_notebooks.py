@@ -226,7 +226,7 @@ def inject_code_runners(markdown, notebook):
                     runner_data = code_cell['metadata']['code_runner']
                     
                     # Wrap code block in collapsible details (collapsed by default)
-                    result.append('<details>')
+                    result.append('<details markdown="1">')
                     result.append('<summary>View Source Code</summary>')
                     result.append('')
                     result.extend(code_block_content)
