@@ -2,7 +2,7 @@
 layout: post
 title: Game Asset Creator
 description: Helping programmers understand how to creater a game
-permalink: /rpg/story
+permalink: /rpg/gamebuilder
 comments: True
 ---
 <style>
