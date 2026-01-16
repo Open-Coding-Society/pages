@@ -176,6 +176,8 @@ iframe { width: 100%; height: 100%; border: none; }
                 
                 <div class="asset-group">
                     <div class="group-title">PLAYER</div>
+                    <label>Name</label>
+                    <input type="text" id="player-name" value="" placeholder="Player name">
                     <label>Sprite</label>
                     <select id="player-select">
                         <option value="" selected disabled>Select sprite…</option>
@@ -184,6 +186,8 @@ iframe { width: 100%; height: 100%; border: none; }
                     </select>
                     <label>X Position</label>
                     <input type="range" id="player-x" min="0" max="800" value="100">
+                    <label>Y Position</label>
+                    <input type="range" id="player-y" min="0" max="600" value="300">
                     <label>Movement Keys</label>
                     <select id="movement-keys">
                         <option value="" selected disabled>Select keys…</option>
@@ -327,12 +331,10 @@ iframe { width: 100%; height: 100%; border: none; }
             <div class="button-footer">
                 <button id="btn-confirm" class="btn btn-confirm">Confirm Step</button>
                 <button id="btn-run" class="btn btn-run">Run Game</button>
-                <div id="progress-indicator" style="font-size: 0.8em; color: var(--text-muted);">Step: background → player → npc → freestyle</div>
+                <div id="progress-indicator" style="font-size: 0.8em; color: var(--text-muted);">Step: background → player → freestyle</div>
                 <ol class="steps-numbered" style="margin: 8px 0 0 18px; color: var(--text-muted); font-size: 0.85em;">
                     <li>Step 1: Background</li>
                     <li>Step 2: Player</li>
-                    <li>Step 3: Add NPC</li>
-                    <li>Step 4: Walls</li>
                 </ol>
                 <div id="freestyle-notice" style="display:none; margin-top: 4px; padding: 6px; border: 1px solid var(--neon-blue); border-radius: 6px; color: var(--neon-blue); background: rgba(0,243,255,0.08); font-size: 0.85em; line-height: 1.2;">
                     freestyle unlocked !<br>
@@ -379,6 +381,8 @@ document.addEventListener('DOMContentLoaded', () => {
         bg: document.getElementById('bg-select'),
         pSprite: document.getElementById('player-select'),
         pX: document.getElementById('player-x'),
+        pY: document.getElementById('player-y'),
+        pName: document.getElementById('player-name'),
         npcs: [1,2,3,4,5].map(i => ({
             addBtn: document.getElementById(`add-npc-${i}`),
             fieldsContainer: document.getElementById(`npc-fields-${i}`),
@@ -411,15 +415,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isVisible = slot.fieldsContainer.style.display !== 'none';
                 // Toggle dropdown visibility
                 slot.fieldsContainer.style.display = isVisible ? 'none' : '';
-                // Allow editing when open
-                if (!isVisible) slot.locked = false;
+                // When closing the dropdown, commit NPC and keep it present
+                if (isVisible) {
+                    // We are closing; lock the NPC and update header state
+                    const name = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC');
+                    slot.locked = true;
+                    slot.displayName = name;
+                    slot.addBtn.classList.add('btn-confirm');
+                    // Show delete when locked
+                    if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
+                }
                 // Update button label with caret and name
                 const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add NPC';
                 const caret = isVisible ? ' ▸' : ' ▾';
                 slot.addBtn.textContent = labelBase + caret;
-                // Added style if slot was confirmed
-                if (slot.locked && slot.displayName) slot.addBtn.classList.add('btn-confirm');
-                else slot.addBtn.classList.remove('btn-confirm');
                 updateStepUI();
                 syncFromControlsIfFreestyle();
             });
@@ -540,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const LINE_HEIGHT = 20;
     const state = { persistent: null, typing: null, userEdited: false, programmaticEdit: false };
-    const steps = ['background','player','npc','walls','freestyle'];
+    const steps = ['background','player','freestyle'];
     let stepIndex = 0; // start at 'background'
     const indicator = document.getElementById('progress-indicator');
 
@@ -556,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const current = steps[stepIndex];
         const mv = document.getElementById('movement-keys');
         // Default: disable all inputs/buttons
-        [ui.bg, ui.pSprite, ui.pX, mv].forEach(el => { if (el) el.disabled = true; });
+        [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = true; });
         ui.npcs.forEach(slot => {
             if (slot.addBtn) slot.addBtn.disabled = true;
             [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY, slot.deleteBtn].forEach(el => { if (el) el.disabled = true; });
@@ -573,6 +582,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (current === 'player') {
             unlockField(ui.pSprite);
             unlockField(ui.pX);
+            unlockField(ui.pY);
+            unlockField(ui.pName);
             unlockField(mv);
             
         } else if (current === 'npc') {
@@ -608,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else if (current === 'freestyle') {
             ui.editor.readOnly = false;
-            [ui.bg, ui.pSprite, ui.pX, mv].forEach(el => { if (el) el.disabled = false; });
+            [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = false; });
             ui.npcs.forEach(slot => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
                 [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY].forEach(el => { if (el) el.disabled = false; });
@@ -707,6 +718,7 @@ export const gameLevelClasses = [CustomLevel];`;
 
                 if (currentStep === 'player') {
                         if (!ui.bg.value || !ui.pSprite.value) return null;
+                        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
                         const defs = `
         const bgData = {
             name: 'custom_bg',
@@ -714,12 +726,12 @@ export const gameLevelClasses = [CustomLevel];`;
             pixels: { height: ${bg.h}, width: ${bg.w} }
         };
         const playerData = {
-            id: 'Hero',
+            id: '${name}',
             src: path + "${p.src}",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
-            INIT_POSITION: { x: ${ui.pX.value}, y: height - Math.floor(height/5) },
+            INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} },
             pixels: { height: ${p.h}, width: ${p.w} },
             orientation: { rows: ${p.rows}, columns: ${p.cols} },
             down: { row: 0, start: 0, columns: 3 },
@@ -745,6 +757,7 @@ export const gameLevelClasses = [CustomLevel];`;
                     const includedSlots = ui.npcs.filter(s => s.locked || (s.fieldsContainer && s.fieldsContainer.style.display !== 'none'));
                     if (includedSlots.length === 0) return null;
 
+                        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
                         const defsStart = `
         const bgData = {
             name: 'custom_bg',
@@ -752,12 +765,12 @@ export const gameLevelClasses = [CustomLevel];`;
             pixels: { height: ${bg.h}, width: ${bg.w} }
         };
         const playerData = {
-            id: 'Hero',
+            id: '${name}',
             src: path + "${p.src}",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
-            INIT_POSITION: { x: ${ui.pX.value}, y: height - Math.floor(height/5) },
+            INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} },
             pixels: { height: ${p.h}, width: ${p.w} },
             orientation: { rows: ${p.rows}, columns: ${p.cols} },
             down: { row: 0, start: 0, columns: 3 },
@@ -808,6 +821,7 @@ export const gameLevelClasses = [CustomLevel];`;
 
                 if (currentStep === 'walls') {
                     if (!ui.bg.value || !ui.pSprite.value) return null;
+                    const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
                     const defsStart = `
         const bgData = {
             name: 'custom_bg',
@@ -815,12 +829,12 @@ export const gameLevelClasses = [CustomLevel];`;
             pixels: { height: ${bg.h}, width: ${bg.w} }
         };
         const playerData = {
-            id: 'Hero',
+            id: '${name}',
             src: path + "${p.src}",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
-            INIT_POSITION: { x: ${ui.pX.value}, y: height - Math.floor(height/5) },
+            INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} },
             pixels: { height: ${p.h}, width: ${p.w} },
             orientation: { rows: ${p.rows}, columns: ${p.cols} },
             down: { row: 0, start: 0, columns: 3 },
@@ -987,9 +1001,21 @@ export const gameLevelClasses = [CustomLevel];`;
     if (ui.bg) ui.bg.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pSprite) ui.pSprite.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pX) ui.pX.addEventListener('input', syncFromControlsIfFreestyle);
+    if (ui.pY) ui.pY.addEventListener('input', syncFromControlsIfFreestyle);
+    if (ui.pName) ui.pName.addEventListener('input', syncFromControlsIfFreestyle);
     if (mvEl) mvEl.addEventListener('change', syncFromControlsIfFreestyle);
     ui.npcs.forEach(slot => {
         if (slot.nId) slot.nId.addEventListener('input', syncFromControlsIfFreestyle);
+        // Reflect name changes in the dropdown header when editing
+        if (slot.nId) slot.nId.addEventListener('input', () => {
+            const name = slot.nId.value.trim();
+            if (name.length) {
+                slot.displayName = name;
+                const isVisible = slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none';
+                const caret = isVisible ? ' ▾' : ' ▸';
+                slot.addBtn.textContent = (slot.locked ? name : 'Add NPC') + caret;
+            }
+        });
         if (slot.nMsg) slot.nMsg.addEventListener('input', syncFromControlsIfFreestyle);
         if (slot.nSprite) slot.nSprite.addEventListener('change', syncFromControlsIfFreestyle);
         if (slot.nX) slot.nX.addEventListener('input', syncFromControlsIfFreestyle);
@@ -1010,7 +1036,7 @@ export const gameLevelClasses = [CustomLevel];`;
         animateTypingDiff(oldCode, newCode, () => {
             // Lock fields for completed step and (optionally) advance
             if (current === 'background') { lockField(ui.bg); }
-            if (current === 'player') { lockField(ui.pSprite); lockField(ui.pX); lockField(document.getElementById('movement-keys')); }
+            if (current === 'player') { lockField(ui.pSprite); lockField(ui.pX); lockField(ui.pY); lockField(ui.pName); lockField(document.getElementById('movement-keys')); }
             if (current === 'npc') {
                 ui.npcs.forEach(slot => {
                     if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
@@ -1031,8 +1057,8 @@ export const gameLevelClasses = [CustomLevel];`;
                     }
                 });
                 
-                // Advance to walls step next
-                stepIndex = steps.indexOf('walls');
+                // After NPC confirmation, go to freestyle
+                stepIndex = steps.indexOf('freestyle');
             } else {
                 if (current === 'walls') {
                     ui.walls.forEach(w => {
