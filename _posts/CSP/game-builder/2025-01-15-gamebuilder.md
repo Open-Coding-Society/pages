@@ -309,13 +309,7 @@ iframe { width: 100%; height: 100%; border: none; }
                         </div>
                     </div>
                 </div>
-                <div class="asset-group">
-                    <div class="group-title">COLLISION WALLS</div>
-                    <div style="margin-bottom:10px;">
-                        <button class="btn" id="add-wall">Add Wall</button>
-                    </div>
-                    <div id="wall-list" style="display:flex; flex-direction:column; gap:10px;"></div>
-                </div>
+                
             </div>
             <div class="button-footer">
                 <button id="btn-confirm" class="btn btn-confirm">Confirm Step</button>
@@ -384,22 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             index: i,
             displayName: ''
         })),
-        walls: [1,2,3].map(i => ({
-            addBtn: document.getElementById(`add-wall-${i}`),
-            fieldsContainer: document.getElementById(`wall-fields-${i}`),
-            wId: document.getElementById(`wall${i}-id`),
-            wX: document.getElementById(`wall${i}-x`),
-            wY: document.getElementById(`wall${i}-y`),
-            wW: document.getElementById(`wall${i}-w`),
-            wH: document.getElementById(`wall${i}-h`),
-            deleteBtn: document.getElementById(`wall${i}-delete`),
-            locked: false,
-            index: i,
-            displayName: ''
-        })),
-        addWallBtn: document.getElementById('add-wall'),
-        wallList: document.getElementById('wall-list'),
-        walls: [],
+        
         editor: document.getElementById('code-editor'),
         hLayer: document.getElementById('highlight-layer'),
         iframe: document.getElementById('game-iframe'),
@@ -454,157 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Dynamic Collision Walls: create on demand via single Add Wall button
-    let wallCounter = 0;
-
-    function hookWallSlotListeners(slot) {
-        if (slot.wId) slot.wId.addEventListener('input', syncFromControlsIfFreestyle);
-        // Toggle dropdown open/close
-        if (slot.addBtn && slot.fieldsContainer) {
-            slot.addBtn.addEventListener('click', () => {
-                const isVisible = slot.fieldsContainer.style.display !== 'none';
-                // Toggle visibility
-                slot.fieldsContainer.style.display = isVisible ? 'none' : '';
-                // Allow editing when open
-                if (!isVisible) slot.locked = false;
-                // Update button label with caret and name
-                const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add Wall';
-                const caret = isVisible ? ' ▸' : ' ▾';
-                slot.addBtn.textContent = labelBase + caret;
-                // Added style if slot was confirmed
-                if (slot.locked && slot.displayName) slot.addBtn.classList.add('btn-confirm');
-                else slot.addBtn.classList.remove('btn-confirm');
-                updateStepUI();
-                syncFromControlsIfFreestyle();
-            });
-        }
-        // Ensure delete starts hidden until wall is created/confirmed
-        if (slot.deleteBtn) slot.deleteBtn.style.display = 'none';
-        const getWallInstance = (id) => {
-            const win = ui.iframe?.contentWindow;
-            const reg = win && win.__adventureGameRegistry && win.__adventureGameRegistry.walls;
-            return reg ? reg[id] : null;
-        };
-        // X position slider: update wall's position.x only
-        if (slot.wX) slot.wX.addEventListener('input', () => {
-            const wall = ui.walls.find(w => w.index === slot.index);
-            if (wall) {
-                wall.wX.value = slot.wX.value;
-                const gameWall = getWallInstance(wall.wId.value);
-                if (gameWall) gameWall.position.x = parseInt(slot.wX.value, 10);
-                syncFromControlsIfFreestyle();
-                ui.editor.value = generateStepCode('player');
-            }
-        });
-        // Y position slider: update wall's position.y only
-        if (slot.wY) slot.wY.addEventListener('input', () => {
-            const wall = ui.walls.find(w => w.index === slot.index);
-            if (wall) {
-                wall.wY.value = slot.wY.value;
-                const gameWall = getWallInstance(wall.wId.value);
-                if (gameWall) gameWall.position.y = parseInt(slot.wY.value, 10);
-                syncFromControlsIfFreestyle();
-                ui.editor.value = generateStepCode('player');
-            }
-        });
-        // Width slider: adjust wall dimensions
-        if (slot.wW) slot.wW.addEventListener('input', () => {
-            const wall = ui.walls.find(w => w.index === slot.index);
-            if (wall) {
-                wall.wW.value = slot.wW.value;
-                const gameWall = getWallInstance(wall.wId.value);
-                if (gameWall && typeof gameWall.setDimensions === 'function') {
-                    gameWall.setDimensions(parseInt(slot.wW.value, 10), parseInt(slot.wH.value, 10));
-                }
-                syncFromControlsIfFreestyle();
-                ui.editor.value = generateStepCode('player');
-            }
-        });
-        // Height slider: adjust wall dimensions
-        if (slot.wH) slot.wH.addEventListener('input', () => {
-            const wall = ui.walls.find(w => w.index === slot.index);
-            if (wall) {
-                wall.wH.value = slot.wH.value;
-                const gameWall = getWallInstance(wall.wId.value);
-                if (gameWall && typeof gameWall.setDimensions === 'function') {
-                    gameWall.setDimensions(parseInt(slot.wW.value, 10), parseInt(slot.wH.value, 10));
-                }
-                syncFromControlsIfFreestyle();
-                ui.editor.value = generateStepCode('player');
-            }
-        });
-        if (slot.deleteBtn) {
-            slot.deleteBtn.addEventListener('click', () => {
-                // Remove from DOM and UI list
-                if (slot.root) slot.root.remove();
-                ui.walls = ui.walls.filter(w => w.index !== slot.index);
-                syncFromControlsIfFreestyle();
-            });
-        }
-    }
-
-    function createWallSlot() {
-        wallCounter += 1;
-        const idx = wallCounter;
-        const root = document.createElement('div');
-        root.className = 'wall-slot';
-        root.id = `wall-slot-${idx}`;
-        // Header with dropdown toggle
-        const header = document.createElement('div');
-        header.className = 'wall-header';
-        header.style.cssText = 'display:flex; align-items:center; gap:8px;';
-        header.innerHTML = `
-            <button class="btn" id="wall${idx}-toggle">Add Wall ▸</button>
-        `;
-
-        // Fields panel (collapsed by default)
-        const fields = document.createElement('div');
-        fields.className = 'wall-fields';
-        fields.style.cssText = 'margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);';
-        fields.style.display = 'none';
-        fields.innerHTML = `
-            <label>ID</label>
-            <input type="text" id="wall${idx}-id" value="Wall${idx}" placeholder="Wall id">
-            <label>X</label>
-            <input type="range" id="wall${idx}-x" min="0" max="800" value="100">
-            <label>Y</label>
-            <input type="range" id="wall${idx}-y" min="0" max="600" value="100">
-            <label>Width</label>
-            <input type="range" id="wall${idx}-w" min="10" max="800" value="200">
-            <label>Height</label>
-            <input type="range" id="wall${idx}-h" min="10" max="600" value="20">
-            <div class="wall-actions" style="margin-top:8px; display:flex; gap:8px;">
-                <button class="btn btn-danger" id="wall${idx}-delete">Delete</button>
-            </div>
-        `;
-
-        root.appendChild(header);
-        root.appendChild(fields);
-        ui.wallList.appendChild(root);
-
-        const slot = {
-            root,
-            fieldsContainer: fields,
-            addBtn: header.querySelector(`#wall${idx}-toggle`),
-            wId: fields.querySelector(`#wall${idx}-id`),
-            wX: fields.querySelector(`#wall${idx}-x`),
-            wY: fields.querySelector(`#wall${idx}-y`),
-            wW: fields.querySelector(`#wall${idx}-w`),
-            wH: fields.querySelector(`#wall${idx}-h`),
-            deleteBtn: fields.querySelector(`#wall${idx}-delete`),
-            locked: true,
-            index: idx,
-            displayName: `Wall${idx}`
-        };
-        ui.walls.push(slot);
-        hookWallSlotListeners(slot);
-        updateStepUI();
-        syncFromControlsIfFreestyle();
-    }
-
-    if (ui.addWallBtn) {
-        ui.addWallBtn.addEventListener('click', createWallSlot);
-    }
+    // Walls feature removed
 
     const LINE_HEIGHT = 20;
     const state = { persistent: null, typing: null, userEdited: false, programmaticEdit: false };
@@ -629,22 +458,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (slot.addBtn) slot.addBtn.disabled = true;
             [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY, slot.deleteBtn].forEach(el => { if (el) el.disabled = true; });
         });
-        ui.walls.forEach(slot => {
-            [slot.wId, slot.wX, slot.wY, slot.wW, slot.wH, slot.deleteBtn].forEach(el => { if (el) el.disabled = true; });
-        });
+        
         if (current === 'background') {
             unlockField(ui.bg);
         } else if (current === 'player') {
             unlockField(ui.pSprite);
             unlockField(ui.pX);
             unlockField(mv);
-            ui.walls.forEach(slot => {
-                if (slot.deleteBtn) {
-                    slot.deleteBtn.disabled = false;
-                    slot.deleteBtn.style.display = '';
-                }
-                [slot.wId, slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
-            });
+            
         } else if (current === 'npc') {
             // Enable add buttons and manage NPC fields based on locked state
             ui.npcs.forEach(slot => {
@@ -662,13 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     unlockField(slot.nY);
                 }
             });
-            ui.walls.forEach(slot => {
-                if (slot.deleteBtn) {
-                    slot.deleteBtn.disabled = false;
-                    slot.deleteBtn.style.display = '';
-                }
-                [slot.wId, slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
-            });
+            
         } else if (current === 'freestyle') {
             ui.editor.readOnly = false;
             [ui.bg, ui.pSprite, ui.pX, mv].forEach(el => { if (el) el.disabled = false; });
@@ -676,10 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
                 [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY].forEach(el => { if (el) el.disabled = false; });
             });
-            ui.walls.forEach(slot => {
-                [slot.wId, slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => { if (el) el.disabled = false; });
-                if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
-            });
+            
         }
         // Show or hide freestyle unlocked notice
         if (ui.notice) {
@@ -728,7 +540,7 @@ export const gameLevelClasses = [CustomLevel];`;
 import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
 import Player from '/assets/js/adventureGame/GameEngine/Player.js';
 import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-        import Wall from '/assets/js/adventureGame/GameEngine/Wall.js';
+        
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -791,30 +603,11 @@ export const gameLevelClasses = [CustomLevel];`;
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
             keypress: ${keypress}
         };`;
-                        const wallDefs = [];
                         const classes = [
             "      { class: GameEnvBackground, data: bgData }",
             "      { class: Player, data: playerData }"
                         ];
-                        ui.walls.forEach(slot => {
-                            const name = (slot.wId && slot.wId.value ? slot.wId.value.trim() : `Wall${slot.index}`).replace(/'/g, "\\'");
-                            const x = parseInt(slot.wX?.value || '100', 10);
-                            const y = parseInt(slot.wY?.value || '100', 10);
-                            const w = parseInt(slot.wW?.value || '200', 10);
-                            const h = parseInt(slot.wH?.value || '20', 10);
-                            wallDefs.push(`
-        const wallData${slot.index} = {
-            id: '${name}',
-            INIT_POSITION: { x: ${x}, y: ${y} },
-            pixels: { width: ${w}, height: ${h} },
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            zIndex: 9,
-            fillStyle: 'rgba(255, 215, 0, 0.35)'
-        };`);
-                            classes.push(`      { class: Wall, data: wallData${slot.index} }`);
-                        });
-                        const defsWithWalls = defs + (wallDefs.length ? ('\n' + wallDefs.join('\n')) : '');
-                        return header() + defsWithWalls + footer(classes);
+                        return header() + defs + footer(classes);
                 }
 
                 if (currentStep === 'npc') {
@@ -849,28 +642,10 @@ export const gameLevelClasses = [CustomLevel];`;
             keypress: ${keypress}
         };`;
                         const npcDefs = [];
-                        const wallDefs = [];
                         const classes = [
             "      { class: GameEnvBackground, data: bgData }",
             "      { class: Player, data: playerData }"
                         ];
-                        ui.walls.forEach(slot => {
-                            const name = (slot.wId && slot.wId.value ? slot.wId.value.trim() : `Wall${slot.index}`).replace(/'/g, "\\'");
-                            const x = parseInt(slot.wX?.value || '100', 10);
-                            const y = parseInt(slot.wY?.value || '100', 10);
-                            const w = parseInt(slot.wW?.value || '200', 10);
-                            const h = parseInt(slot.wH?.value || '20', 10);
-                            wallDefs.push(`
-        const wallData${slot.index} = {
-            id: '${name}',
-            INIT_POSITION: { x: ${x}, y: ${y} },
-            pixels: { width: ${w}, height: ${h} },
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            zIndex: 9,
-            fillStyle: 'rgba(255, 215, 0, 0.35)'
-        };`);
-                            classes.push(`      { class: Wall, data: wallData${slot.index} }`);
-                        });
                         includedSlots.forEach((slot) => {
                             const index = slot.index;
                             const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
@@ -897,7 +672,7 @@ export const gameLevelClasses = [CustomLevel];`;
         };`);
                             classes.push(`      { class: Npc, data: npcData${index} }`);
                         });
-                        const defs = defsStart + (wallDefs.length ? ('\n' + wallDefs.join('\n')) : '') + npcDefs.join('\n');
+                        const defs = defsStart + npcDefs.join('\n');
                         return header() + defs + footer(classes);
                 }
 
@@ -1005,13 +780,7 @@ export const gameLevelClasses = [CustomLevel];`;
         if (slot.nX) slot.nX.addEventListener('input', syncFromControlsIfFreestyle);
         if (slot.nY) slot.nY.addEventListener('input', syncFromControlsIfFreestyle);
     });
-    ui.walls.forEach(slot => {
-        if (slot.wId) slot.wId.addEventListener('input', syncFromControlsIfFreestyle);
-        if (slot.wX) slot.wX.addEventListener('input', syncFromControlsIfFreestyle);
-        if (slot.wY) slot.wY.addEventListener('input', syncFromControlsIfFreestyle);
-        if (slot.wW) slot.wW.addEventListener('input', syncFromControlsIfFreestyle);
-        if (slot.wH) slot.wH.addEventListener('input', syncFromControlsIfFreestyle);
-    });
+    
 
     document.getElementById('btn-confirm').addEventListener('click', () => {
         const oldCode = ui.editor.value;
@@ -1046,23 +815,7 @@ export const gameLevelClasses = [CustomLevel];`;
                         }
                     }
                 });
-                // Lock any visible walls
-                ui.walls.forEach(slot => {
-                    if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
-                        slot.locked = true;
-                        const name = (slot.wId && slot.wId.value ? slot.wId.value.trim() : 'Wall');
-                        slot.displayName = name;
-                        if (slot.addBtn) {
-                            const open = slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none';
-                            slot.addBtn.textContent = name + (open ? ' ▾' : ' ▸');
-                            slot.addBtn.classList.add('btn-confirm');
-                        }
-                        if (slot.deleteBtn) {
-                            slot.deleteBtn.disabled = false;
-                            slot.deleteBtn.style.display = '';
-                        }
-                    }
-                });
+                
                 // Move to freestyle after first NPC is added so users can edit anything
                 stepIndex = steps.indexOf('freestyle');
             } else {
