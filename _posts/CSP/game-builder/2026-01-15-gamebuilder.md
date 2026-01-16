@@ -317,7 +317,9 @@ iframe { width: 100%; height: 100%; border: none; }
                     <button class="btn" id="add-wall">Add Wall</button>
                     <div id="walls-container" style="margin-top:8px;"></div>
                     <div style="margin-top:6px; font-size:0.8em; color: var(--text-muted);">
-                        Walls are invisible in the game. They briefly show when a slot is opened for editing.
+                        Walls are invisible in the game. <br>
+                        They briefly show when a slot is <br>
+                        opened for editing.
                     </div>
                 </div>
                 
