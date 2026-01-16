@@ -120,6 +120,20 @@ function closeCustomAlert() {
         }
     }
 
+    // Explicit loader for Adventure engine for runtime fallback from Better
+    async function loadAdventureEngine() {
+        try {
+            const url = `${origin}${path || ''}/assets/js/adventureGame/GameEngine/Game.js?v=${Date.now()}`;
+            const mod = await import(url);
+            EngineModule = mod?.default ?? mod;
+            engineType = 'adventure';
+            return EngineModule;
+        } catch (e) {
+            console.error('Failed to load Adventure engine fallback:', e);
+            throw e;
+        }
+    }
+
     // Respect autostart query parameter (default: true)
     const params = new URLSearchParams(window.location.search);
     const autostartParam = (params.get('autostart') || '').toLowerCase();
@@ -287,7 +301,12 @@ function closeCustomAlert() {
                 fetchOptions: {}
             };
 
-            const levelClasses = Array.isArray(mod.gameLevelClasses) ? mod.gameLevelClasses : [];
+            // Accept both named and default exports for gameLevelClasses
+            const levelClasses = Array.isArray(mod.gameLevelClasses)
+                ? mod.gameLevelClasses
+                : Array.isArray(mod?.default?.gameLevelClasses)
+                ? mod.default.gameLevelClasses
+                : [];
 
             let started = false;
             // Preferred: Use Adventure Game engine entrypoint with provided levels
@@ -295,7 +314,8 @@ function closeCustomAlert() {
                 try {
                     if (engineType === 'better') {
                         // BetterGameEngine expects (environment, GameControlClass)
-                        const GameControlClass = mod.GameControl; // from user module
+                        // Accept both named and default exports
+                        const GameControlClass = mod.GameControl || mod?.default?.GameControl; // from user module
                         if (!GameControlClass) throw new Error('GameControl export required for BetterGameEngine');
                         // Prepare explicit dimensions similar to game-runner
                         const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
@@ -306,6 +326,8 @@ function closeCustomAlert() {
                         liveAdventure = Engine.main(env, GameControlClass);
                     } else {
                         // Adventure engine expects environment with level classes
+                        const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
+                        const containerHeight = Math.min(580, window.innerHeight);
                         liveAdventure = Engine.main({
                             path: env.path,
                             gameContainer: env.gameContainer,
@@ -313,12 +335,33 @@ function closeCustomAlert() {
                             pythonURI: env.pythonURI,
                             javaURI: env.javaURI,
                             fetchOptions: env.fetchOptions,
+                            innerWidth: containerWidth,
+                            innerHeight: containerHeight,
                             gameLevelClasses: levelClasses
                         });
                     }
                     started = true;
                 } catch (e) {
-                    console.warn('Adventure Game main failed, trying fallbacks:', e);
+                    console.warn('Engine start failed, attempting Adventure fallback:', e);
+                    try {
+                        const Engine2 = await loadAdventureEngine();
+                        const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
+                        const containerHeight = Math.min(580, window.innerHeight);
+                        liveAdventure = Engine2.main({
+                            path: env.path,
+                            gameContainer: env.gameContainer,
+                            gameCanvas: env.gameCanvas,
+                            pythonURI: env.pythonURI,
+                            javaURI: env.javaURI,
+                            fetchOptions: env.fetchOptions,
+                            innerWidth: containerWidth,
+                            innerHeight: containerHeight,
+                            gameLevelClasses: levelClasses
+                        });
+                        started = true;
+                    } catch (ef) {
+                        console.error('Adventure fallback failed:', ef);
+                    }
                 }
             }
 

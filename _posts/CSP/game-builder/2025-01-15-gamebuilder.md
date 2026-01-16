@@ -357,8 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const assets = {
         bg: {
             desert: { src: "/images/gamify/desert.png", h: 580, w: 1038 },
-            alien: { src: "/images/gamify/alien_planet.jpg", h: 600, w: 1000 },
-            clouds: { src: "/images/gamify/clouds.jpg", h: 720, w: 1280 }
+            alien: { src: "/images/gamebuilder/alien_planet.jpg", h: 600, w: 1000 },
+            clouds: { src: "/images/gamebuilder/clouds.jpg", h: 720, w: 1280 }
         },
         sprites: {
             tux: { src: "/images/gamify/tux.png", h:256, w:352, rows:8, cols:11 },
@@ -1074,9 +1074,15 @@ export const gameLevelClasses = [CustomLevel];`;
         });
     });
 
+    function safeCodeToRun() {
+        const code = ui.editor.value || '';
+        const hasLevels = /export\s+const\s+gameLevelClasses/.test(code);
+        return hasLevels ? code : generateBaselineCode();
+    }
+
     function runInEmbed() {
         renderOverlay();
-        const code = ui.editor.value;
+        const code = safeCodeToRun();
         ui.iframe.src = ui.iframe.src;
         ui.iframe.onload = () => {
             setTimeout(() => {
