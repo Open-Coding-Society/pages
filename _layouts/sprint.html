@@ -76,6 +76,9 @@ layout: post
                 <button class="sync-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
                   <i class="fas fa-sync"></i> Sync to Calendar
                 </button>
+                <button class="delete-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                  <i class="fas fa-trash-alt"></i> Remove from Calendar
+                </button>
               </div>
               <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
             </div>
@@ -1309,71 +1312,23 @@ layout: post
     return week && !week.skipWeek;
   }
   
-  // Get info about skipped breaks between two logical weeks
-  // Returns array of break info objects for display purposes
-  function getSkippedBreaksInRange(startLogicalWeek, endLogicalWeek) {
-    const breaks = [];
-    const seenCalendarWeeks = new Set();
-    
-    // Check all calendar weeks that might be in this range
-    for (let logicalW = startLogicalWeek; logicalW <= endLogicalWeek; logicalW++) {
-      const calendarW = mapToCalendarWeek(logicalW);
-      
-      // Look for any skipped weeks between consecutive logical weeks
-      if (logicalW > startLogicalWeek) {
-        const prevCalendarW = mapToCalendarWeek(logicalW - 1);
-        // If there's a gap between calendar weeks, there are skipped weeks
-        for (let checkW = prevCalendarW + 1; checkW < calendarW; checkW++) {
-          if (!seenCalendarWeeks.has(checkW)) {
-            const week = SCHOOL_CALENDAR.weeks[checkW];
-            if (week && week.skipWeek) {
-              seenCalendarWeeks.add(checkW);
-              breaks.push({
-                calendarWeek: checkW,
-                holidays: week.holidays || ['Break'],
-                notes: week.notes || ''
-              });
-            }
-          }
-        }
-      }
-    }
-    
-    return breaks;
-  }
-  
   const SPRINT_DATES_STORAGE_KEY = 'sprintDates';
   
-  // Map a logical week number to the actual calendar week, skipping break weeks
-  // For example, if week 14 is Thanksgiving break, logical week 14 maps to calendar week 15
-  function mapToCalendarWeek(logicalWeek) {
-    let calendarWeek = 0;  // Start from calendar week 0
-    let logicalCount = 0;  // Count of school weeks encountered
-    const maxWeeks = 50;   // Safety limit
-    
-    while (calendarWeek < maxWeeks) {
-      const week = SCHOOL_CALENDAR.weeks[calendarWeek];
-      if (!week) break;
-      
-      // If this is a valid school week (not a skip week), count it
-      if (!week.skipWeek) {
-        if (logicalCount === logicalWeek) {
-          return calendarWeek;
-        }
-        logicalCount++;
-      }
-      calendarWeek++;
-    }
-    
-    // Fallback: return the logical week if mapping fails
-    return logicalWeek;
+  // Get calendar week data directly - sprint weeks ARE calendar weeks
+  // The skip_week property is used to show warnings, not to remap weeks
+  function getCalendarWeek(weekNum) {
+    return SCHOOL_CALENDAR.weeks[weekNum] || null;
+  }
+  
+  // Check if a calendar week is a break/skip week
+  function isSkipWeek(weekNum) {
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    return week && week.skipWeek === true;
   }
   
   // Get the appropriate date for reading materials (Monday or Tuesday if holiday)
-  // Uses calendar week mapping to skip break weeks
   function getReadingDate(weekNum) {
-    const calendarWeek = mapToCalendarWeek(weekNum);
-    const week = SCHOOL_CALENDAR.weeks[calendarWeek];
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
     if (!week) return null;
     
     // Skip weeks should not return dates (they're breaks)
@@ -1387,10 +1342,8 @@ layout: post
   }
   
   // Get the Friday date for assessments
-  // Uses calendar week mapping to skip break weeks
   function getAssessmentDate(weekNum) {
-    const calendarWeek = mapToCalendarWeek(weekNum);
-    const week = SCHOOL_CALENDAR.weeks[calendarWeek];
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
     if (!week) return null;
     
     // Skip weeks should not return dates (they're breaks)
@@ -1402,12 +1355,12 @@ layout: post
   // Get the Tuesday of the NEXT valid school week for checkpoints
   function getCheckpointDate(weekNum) {
     // Find next valid school week after the given week
-    let nextCalendarWeek = mapToCalendarWeek(weekNum) + 1;
+    let nextWeekNum = weekNum + 1;
     const maxWeeks = 50;
     
     // Skip any break weeks to find the next valid school week
-    while (nextCalendarWeek < maxWeeks) {
-      const week = SCHOOL_CALENDAR.weeks[nextCalendarWeek];
+    while (nextWeekNum < maxWeeks) {
+      const week = SCHOOL_CALENDAR.weeks[nextWeekNum];
       if (!week) return null;
       if (!week.skipWeek) {
         // Calculate Tuesday from Monday (add 1 day)
@@ -1415,7 +1368,7 @@ layout: post
         monday.setDate(monday.getDate() + 1);
         return monday.toISOString().split('T')[0];
       }
-      nextCalendarWeek++;
+      nextWeekNum++;
     }
     return null;
   }
@@ -1434,13 +1387,10 @@ layout: post
   }
   
   // Get the date range for a sprint based on week numbers
-  // Maps logical weeks to calendar weeks, skipping break weeks
+  // Sprint weeks directly correspond to calendar weeks
   function getSprintDateRange(startWeek, endWeek) {
-    const startCalendarWeek = mapToCalendarWeek(startWeek);
-    const endCalendarWeek = mapToCalendarWeek(endWeek);
-    
-    const startWeekData = SCHOOL_CALENDAR.weeks[startCalendarWeek];
-    const endWeekData = SCHOOL_CALENDAR.weeks[endCalendarWeek];
+    const startWeekData = SCHOOL_CALENDAR.weeks[startWeek];
+    const endWeekData = SCHOOL_CALENDAR.weeks[endWeek];
     
     if (!startWeekData || !endWeekData) {
       return { start: null, end: null };
@@ -1472,23 +1422,29 @@ layout: post
         </div>
       `;
       
-      // Show skipped breaks within this sprint range
-      const skippedBreaks = getSkippedBreaksInRange(startWeek, endWeek);
-      if (skippedBreaks.length > 0) {
+      // Show any break weeks that fall within this sprint range
+      const breakWeeks = [];
+      for (let w = startWeek; w <= endWeek; w++) {
+        const week = SCHOOL_CALENDAR.weeks[w];
+        if (week && week.skipWeek && week.holidays) {
+          breakWeeks.push({ week: w, holidays: week.holidays });
+        }
+      }
+      
+      if (breakWeeks.length > 0) {
         html += '<div class="holiday-warnings">';
-        skippedBreaks.forEach(b => {
-          html += `<div class="holiday-notice break"><i class="fas fa-umbrella-beach"></i> ${b.holidays.join(', ')} (skipped)</div>`;
+        breakWeeks.forEach(b => {
+          html += `<div class="holiday-notice break"><i class="fas fa-umbrella-beach"></i> Week ${b.week}: ${b.holidays.join(', ')} (no school)</div>`;
         });
         html += '</div>';
       }
       
       // Show holiday warnings (non-skip weeks with holidays - materials on Tuesday)
       const holidays = [];
-      for (let logicalW = startWeek; logicalW <= endWeek; logicalW++) {
-        const calendarW = mapToCalendarWeek(logicalW);
-        const week = SCHOOL_CALENDAR.weeks[calendarW];
+      for (let w = startWeek; w <= endWeek; w++) {
+        const week = SCHOOL_CALENDAR.weeks[w];
         if (week && week.holidays && !week.skipWeek) {
-          holidays.push({ week: logicalW, calendarWeek: calendarW, holidays: week.holidays });
+          holidays.push({ week: w, holidays: week.holidays });
         }
       }
       
@@ -1559,6 +1515,19 @@ layout: post
         const endWeek = parseInt(btn.dataset.endWeek);
         
         await syncSprintToCalendar(sprintKey, course, startWeek, endWeek);
+      });
+    });
+    
+    // Delete button handlers
+    document.querySelectorAll('.delete-sprint-calendar-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const course = btn.dataset.course;
+        const startWeek = parseInt(btn.dataset.startWeek);
+        const endWeek = parseInt(btn.dataset.endWeek);
+        
+        await deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek);
       });
     });
   }
@@ -1681,7 +1650,11 @@ layout: post
         
         if (bulkResponse.ok) {
           const result = await bulkResponse.json();
-          successCount = result.added || events.length;
+          // API returns { created: X, updated: Y, failed: Z }
+          successCount = (result.created || 0) + (result.updated || 0);
+          if (result.failed > 0) {
+            console.warn(`${result.failed} events failed to sync`);
+          }
         } else if (bulkResponse.status === 404) {
           // Bulk endpoint not available, fall back to parallel individual requests
           console.log('Bulk endpoint not available, using individual requests');
@@ -1716,6 +1689,96 @@ layout: post
     } catch (error) {
       console.error('Error syncing sprint to calendar:', error);
       showDateStatus(statusEl, 'Error syncing to calendar', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  
+  // Main function to delete sprint events from calendar
+  async function deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek) {
+    const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
+    const btn = document.querySelector(`.delete-sprint-calendar-btn[data-sprint="${sprintKey}"]`);
+    
+    // Confirm before deleting
+    const courseName = course.toUpperCase();
+    const confirmMessage = `Are you sure you want to remove all ${courseName} events for ${sprintKey} (Weeks ${startWeek}-${endWeek}) from your calendar?`;
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+    
+    btn.disabled = true;
+    showDateStatus(statusEl, 'Removing events from calendar...', 'loading');
+    
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      // Get sprint info
+      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+      
+      // Build list of event titles to delete (matching what was synced)
+      const eventTitlesToDelete = [];
+      const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
+      
+      for (const weekCard of weekCards) {
+        const weekNum = parseInt(weekCard.dataset.week);
+        
+        // Formative event title pattern
+        eventTitlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
+        
+        // Summative event title pattern
+        eventTitlesToDelete.push(`📝 Week ${weekNum} Summative - ${courseName}`);
+      }
+      
+      console.log(`Deleting ${eventTitlesToDelete.length} potential events for ${sprintKey}`);
+      console.log('Event titles to delete:', eventTitlesToDelete);
+      
+      let deletedCount = 0;
+      
+      // Try bulk delete endpoint first
+      try {
+        const bulkResponse = await fetch(`${javaURI}/api/calendar/delete_events`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ titles: eventTitlesToDelete })
+        });
+        
+        if (bulkResponse.ok) {
+          const result = await bulkResponse.json();
+          deletedCount = result.deleted || 0;
+        } else if (bulkResponse.status === 404) {
+          // Bulk endpoint not available, fall back to individual deletes
+          console.log('Bulk delete endpoint not available, using individual requests');
+          const results = await Promise.all(
+            eventTitlesToDelete.map(title => 
+              fetch(`${javaURI}/api/calendar/delete_event`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ title: title })
+              }).then(res => res.ok ? 1 : 0).catch(() => 0)
+            )
+          );
+          deletedCount = results.reduce((a, b) => a + b, 0);
+        } else {
+          console.error('Failed to delete events:', bulkResponse.status);
+        }
+      } catch (err) {
+        console.error('Error deleting events:', err);
+      }
+      
+      console.log(`Successfully deleted ${deletedCount} events`);
+      
+      if (deletedCount > 0) {
+        showDateStatus(statusEl, `✓ Removed ${deletedCount} events from calendar!`, 'success');
+      } else {
+        showDateStatus(statusEl, '⚠ No events found to remove', 'warning');
+      }
+      
+    } catch (error) {
+      console.error('Error deleting sprint from calendar:', error);
+      showDateStatus(statusEl, 'Error removing from calendar', 'error');
     } finally {
       btn.disabled = false;
     }
