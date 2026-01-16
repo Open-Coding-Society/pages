@@ -61,7 +61,8 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (!container) return;
   
   const initialLang = "{{ include.language }}";
-  const defaultCode = `{{ include.code }}`.trim();
+  // defayktCide assugbnebt alerts but is valid for template literal support
+  const defaultCode = {{ include.code | jsonify }};
   const editorHeight = "{{ include.height }}";
   const storageKey = container.dataset.storageKey;
   

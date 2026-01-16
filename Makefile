@@ -1,6 +1,7 @@
 HOST ?= localhost
 PORT ?= 4500
 LOG_FILE = /tmp/jekyll$(PORT).log
+PYTHON := venv/bin/python3
 
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
@@ -56,7 +57,7 @@ use-minima:
 	@cp _themes/minima/opencs.html _layouts/opencs.html
 	@cp _themes/minima/page.html _layouts/page.html
 	@cp _themes/minima/post.html _layouts/post.html
-	@python3 scripts/update_color_map.py minima || echo "⚠ Color map update failed, continuing..."
+	@$(PYTHON) scripts/update_color_map.py minima || echo "⚠ Color map update failed, continuing..."
 	@echo "✓ Minima theme activated"
 
 use-cayman:
@@ -66,7 +67,7 @@ use-cayman:
 	@cp _themes/cayman/opencs.html _layouts/opencs.html
 	@cp _themes/cayman/page.html _layouts/page.html
 	@cp _themes/cayman/post.html _layouts/post.html
-	@python3 scripts/update_color_map.py cayman || echo "⚠ Color map update failed, continuing..."
+	@$(PYTHON) scripts/update_color_map.py cayman || echo "⚠ Color map update failed, continuing..."
 	@echo "✓ Cayman theme activated"
 
 use-hydejack:
@@ -76,7 +77,7 @@ use-hydejack:
 	@cp _themes/hydejack/opencs.html _layouts/opencs.html
 	@cp _themes/hydejack/page.html _layouts/page.html
 	@cp _themes/hydejack/post.html _layouts/post.html
-	@python3 scripts/update_color_map.py hydejack || echo "⚠ Color map update failed, continuing..."
+	@$(PYTHON) scripts/update_color_map.py hydejack || echo "⚠ Color map update failed, continuing..."
 	@echo "✓ Hydejack theme activated"
 
 use-so-simple:
@@ -147,7 +148,7 @@ clean-courses:
 convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
-	@python3 -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
 
 # Single notebook conversion (faster for development)
 convert-single:
@@ -156,12 +157,12 @@ convert-single:
 		exit 1; \
 	fi
 	@echo "Converting: $(NOTEBOOK_FILE)"
-	@python3 scripts/convert_notebooks.py "$(NOTEBOOK_FILE)"
+	@$(PYTHON) scripts/convert_notebooks.py "$(NOTEBOOK_FILE)"
 
 # DOCX conversion
 convert-docx:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
-		python3 scripts/convert_docx.py; \
+		$(PYTHON) scripts/convert_docx.py; \
 	else \
 		echo "No DOCX files found in _docx directory"; \
 	fi
@@ -171,9 +172,9 @@ convert-docx-config:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
 		if [ -n "$(CONFIG_FILE)" ]; then \
 			echo "🔧 Config file changed: $(CONFIG_FILE)"; \
-			python3 scripts/convert_docx.py --config-changed "$(CONFIG_FILE)"; \
+			$(PYTHON) scripts/convert_docx.py --config-changed "$(CONFIG_FILE)"; \
 		else \
-			python3 scripts/convert_docx.py; \
+			$(PYTHON) scripts/convert_docx.py; \
 		fi; \
 	else \
 		echo "No DOCX files found in _docx directory"; \
@@ -192,7 +193,7 @@ clean-docx:
 # Color mapping
 update-colors:
 	@echo "Updating local color map..."
-	@python3 scripts/update_color_map.py
+	@$(PYTHON) scripts/update_color_map.py
 	@echo "Color map updated successfully"
 	@echo "Generated files:"
 	@echo "   - _sass/root-color-map.scss"
@@ -313,7 +314,7 @@ convert-docx-single:
 		exit 1; \
 	fi
 	@echo "Converting: $(DOCX_FILE)"
-	@python3 scripts/convert_docx.py --single "$(DOCX_FILE)" 2>/dev/null || python3 scripts/convert_docx.py
+	@$(PYTHON) scripts/convert_docx.py --single "$(DOCX_FILE)" 2>/dev/null || $(PYTHON) scripts/convert_docx.py
 
 docx-only: convert-docx
 	@echo "DOCX conversion complete - ready for preview"
@@ -373,9 +374,9 @@ help:
 convert-check:
 	@echo "Running conversion diagnostics..."
 	@echo "Checking for notebook conversion warnings or errors..."
-	@python3 scripts/check_conversion_warnings.py
+	@$(PYTHON) scripts/check_conversion_warnings.py
 
 convert-fix:
 	@echo "Running conversion fixes..."
 	@echo "️Fixing notebooks with known warnings or errors..."
-	@python3 scripts/check_conversion_warnings.py --fix
+	@$(PYTHON) scripts/check_conversion_warnings.py --fix
