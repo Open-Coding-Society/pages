@@ -342,6 +342,30 @@ layout: post
   {{ course | jsonify }}
 </script>
 
+<!-- Embed school calendar as application/json to avoid Liquid template lint errors -->
+{% assign calendar = site.data.school_calendar %}
+<script id="school-calendar-json" type="application/json">
+{
+  "schoolYear": {{ calendar.school_year | jsonify }},
+  "firstDay": {{ calendar.first_day | jsonify }},
+  "lastDay": {{ calendar.last_day | jsonify }},
+  "weeks": {
+    {% for week in calendar.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "tuesday": {{ week[1].tuesday | default: nil | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
+</script>
+
 <script>
   // Completion tracking (course-specific)
   const CURRENT_COURSE = '{{ page.course }}';
@@ -1254,34 +1278,106 @@ layout: post
   //   SCHOOL CALENDAR SYSTEM     
   // ============================= 
   
-  // School Calendar data (from _data/school_calendar.yml)
-  // This is embedded at build time from Jekyll
-  const SCHOOL_CALENDAR = {
-    {% assign calendar = site.data.school_calendar %}
-    schoolYear: "{{ calendar.school_year }}",
-    firstDay: "{{ calendar.first_day }}",
-    lastDay: "{{ calendar.last_day }}",
-    weeks: {
-      {% for week in calendar.weeks %}
-      {{ week[0] }}: {
-        monday: "{{ week[1].monday }}",
-        friday: "{{ week[1].friday }}",
-        {% if week[1].tuesday %}tuesday: "{{ week[1].tuesday }}",{% endif %}
-        {% if week[1].holidays %}holidays: {{ week[1].holidays | jsonify }},{% endif %}
-        {% if week[1].holiday_adjustment %}holidayAdjustment: "{{ week[1].holiday_adjustment }}",{% endif %}
-        {% if week[1].theme %}theme: "{{ week[1].theme }}",{% endif %}
-        {% if week[1].notes %}notes: "{{ week[1].notes }}"{% endif %}
-      }{% unless forloop.last %},{% endunless %}
-      {% endfor %}
+  // School Calendar data is loaded from JSON script tag to avoid Liquid template lint errors
+  let SCHOOL_CALENDAR = {};
+  try {
+    const calendarEl = document.getElementById('school-calendar-json');
+    if (calendarEl && calendarEl.textContent) {
+      SCHOOL_CALENDAR = JSON.parse(calendarEl.textContent);
     }
-  };
+  } catch (e) {
+    console.warn('Unable to parse SCHOOL_CALENDAR, falling back to empty object', e);
+    SCHOOL_CALENDAR = { weeks: {} };
+  }
+  
+  // Helper function to find the next valid school week (skipping break weeks)
+  function getNextValidSchoolWeek(startWeekNum) {
+    let weekNum = startWeekNum;
+    const maxWeeks = 50; // Safety limit
+    while (weekNum < maxWeeks) {
+      const week = SCHOOL_CALENDAR.weeks[weekNum];
+      if (!week) return null;
+      if (!week.skipWeek) return weekNum;
+      weekNum++;
+    }
+    return null;
+  }
+  
+  // Helper function to check if a week is a school day (not a skip week)
+  function isSchoolWeek(weekNum) {
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    return week && !week.skipWeek;
+  }
+  
+  // Get info about skipped breaks between two logical weeks
+  // Returns array of break info objects for display purposes
+  function getSkippedBreaksInRange(startLogicalWeek, endLogicalWeek) {
+    const breaks = [];
+    const seenCalendarWeeks = new Set();
+    
+    // Check all calendar weeks that might be in this range
+    for (let logicalW = startLogicalWeek; logicalW <= endLogicalWeek; logicalW++) {
+      const calendarW = mapToCalendarWeek(logicalW);
+      
+      // Look for any skipped weeks between consecutive logical weeks
+      if (logicalW > startLogicalWeek) {
+        const prevCalendarW = mapToCalendarWeek(logicalW - 1);
+        // If there's a gap between calendar weeks, there are skipped weeks
+        for (let checkW = prevCalendarW + 1; checkW < calendarW; checkW++) {
+          if (!seenCalendarWeeks.has(checkW)) {
+            const week = SCHOOL_CALENDAR.weeks[checkW];
+            if (week && week.skipWeek) {
+              seenCalendarWeeks.add(checkW);
+              breaks.push({
+                calendarWeek: checkW,
+                holidays: week.holidays || ['Break'],
+                notes: week.notes || ''
+              });
+            }
+          }
+        }
+      }
+    }
+    
+    return breaks;
+  }
   
   const SPRINT_DATES_STORAGE_KEY = 'sprintDates';
   
+  // Map a logical week number to the actual calendar week, skipping break weeks
+  // For example, if week 14 is Thanksgiving break, logical week 14 maps to calendar week 15
+  function mapToCalendarWeek(logicalWeek) {
+    let calendarWeek = 0;  // Start from calendar week 0
+    let logicalCount = 0;  // Count of school weeks encountered
+    const maxWeeks = 50;   // Safety limit
+    
+    while (calendarWeek < maxWeeks) {
+      const week = SCHOOL_CALENDAR.weeks[calendarWeek];
+      if (!week) break;
+      
+      // If this is a valid school week (not a skip week), count it
+      if (!week.skipWeek) {
+        if (logicalCount === logicalWeek) {
+          return calendarWeek;
+        }
+        logicalCount++;
+      }
+      calendarWeek++;
+    }
+    
+    // Fallback: return the logical week if mapping fails
+    return logicalWeek;
+  }
+  
   // Get the appropriate date for reading materials (Monday or Tuesday if holiday)
+  // Uses calendar week mapping to skip break weeks
   function getReadingDate(weekNum) {
-    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    const calendarWeek = mapToCalendarWeek(weekNum);
+    const week = SCHOOL_CALENDAR.weeks[calendarWeek];
     if (!week) return null;
+    
+    // Skip weeks should not return dates (they're breaks)
+    if (week.skipWeek) return null;
     
     // If Monday is a holiday, use Tuesday
     if (week.holidayAdjustment === 'tuesday' && week.tuesday) {
@@ -1291,21 +1387,37 @@ layout: post
   }
   
   // Get the Friday date for assessments
+  // Uses calendar week mapping to skip break weeks
   function getAssessmentDate(weekNum) {
-    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    const calendarWeek = mapToCalendarWeek(weekNum);
+    const week = SCHOOL_CALENDAR.weeks[calendarWeek];
     if (!week) return null;
+    
+    // Skip weeks should not return dates (they're breaks)
+    if (week.skipWeek) return null;
+    
     return week.friday;
   }
   
-  // Get the Tuesday of the NEXT week for checkpoints
+  // Get the Tuesday of the NEXT valid school week for checkpoints
   function getCheckpointDate(weekNum) {
-    const nextWeek = SCHOOL_CALENDAR.weeks[weekNum + 1];
-    if (!nextWeek) return null;
+    // Find next valid school week after the given week
+    let nextCalendarWeek = mapToCalendarWeek(weekNum) + 1;
+    const maxWeeks = 50;
     
-    // Calculate Tuesday from Monday (add 1 day)
-    const monday = new Date(nextWeek.monday);
-    monday.setDate(monday.getDate() + 1);
-    return monday.toISOString().split('T')[0];
+    // Skip any break weeks to find the next valid school week
+    while (nextCalendarWeek < maxWeeks) {
+      const week = SCHOOL_CALENDAR.weeks[nextCalendarWeek];
+      if (!week) return null;
+      if (!week.skipWeek) {
+        // Calculate Tuesday from Monday (add 1 day)
+        const monday = new Date(week.monday);
+        monday.setDate(monday.getDate() + 1);
+        return monday.toISOString().split('T')[0];
+      }
+      nextCalendarWeek++;
+    }
+    return null;
   }
   
   // Format date for display
@@ -1322,9 +1434,13 @@ layout: post
   }
   
   // Get the date range for a sprint based on week numbers
+  // Maps logical weeks to calendar weeks, skipping break weeks
   function getSprintDateRange(startWeek, endWeek) {
-    const startWeekData = SCHOOL_CALENDAR.weeks[startWeek];
-    const endWeekData = SCHOOL_CALENDAR.weeks[endWeek];
+    const startCalendarWeek = mapToCalendarWeek(startWeek);
+    const endCalendarWeek = mapToCalendarWeek(endWeek);
+    
+    const startWeekData = SCHOOL_CALENDAR.weeks[startCalendarWeek];
+    const endWeekData = SCHOOL_CALENDAR.weeks[endCalendarWeek];
     
     if (!startWeekData || !endWeekData) {
       return { start: null, end: null };
@@ -1356,12 +1472,23 @@ layout: post
         </div>
       `;
       
-      // Show holiday warnings for weeks in this sprint
+      // Show skipped breaks within this sprint range
+      const skippedBreaks = getSkippedBreaksInRange(startWeek, endWeek);
+      if (skippedBreaks.length > 0) {
+        html += '<div class="holiday-warnings">';
+        skippedBreaks.forEach(b => {
+          html += `<div class="holiday-notice break"><i class="fas fa-umbrella-beach"></i> ${b.holidays.join(', ')} (skipped)</div>`;
+        });
+        html += '</div>';
+      }
+      
+      // Show holiday warnings (non-skip weeks with holidays - materials on Tuesday)
       const holidays = [];
-      for (let w = startWeek; w <= endWeek; w++) {
-        const week = SCHOOL_CALENDAR.weeks[w];
-        if (week && week.holidays) {
-          holidays.push({ week: w, holidays: week.holidays });
+      for (let logicalW = startWeek; logicalW <= endWeek; logicalW++) {
+        const calendarW = mapToCalendarWeek(logicalW);
+        const week = SCHOOL_CALENDAR.weeks[calendarW];
+        if (week && week.holidays && !week.skipWeek) {
+          holidays.push({ week: logicalW, calendarWeek: calendarW, holidays: week.holidays });
         }
       }
       
