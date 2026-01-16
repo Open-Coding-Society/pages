@@ -72,6 +72,31 @@ layout: post
                   <span><i class="fas fa-clipboard-check"></i> Summative (Friday) - Assessments</span>
                 </label>
               </div>
+              <div class="priority-selector">
+                <label class="priority-label">Priority Level:</label>
+                <div class="priority-options" data-sprint="{{ unitKey }}">
+                  <label class="priority-option priority-p0">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P0" class="priority-radio">
+                    <span class="priority-badge p0">P0</span>
+                    <span class="priority-desc">Critical</span>
+                  </label>
+                  <label class="priority-option priority-p1">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P1" class="priority-radio">
+                    <span class="priority-badge p1">P1</span>
+                    <span class="priority-desc">High</span>
+                  </label>
+                  <label class="priority-option priority-p2">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P2" class="priority-radio" checked>
+                    <span class="priority-badge p2">P2</span>
+                    <span class="priority-desc">Medium</span>
+                  </label>
+                  <label class="priority-option priority-p3">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P3" class="priority-radio">
+                    <span class="priority-badge p3">P3</span>
+                    <span class="priority-desc">Low</span>
+                  </label>
+                </div>
+              </div>
               <div class="date-actions">
                 <button class="sync-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
                   <i class="fas fa-sync"></i> Sync to Calendar
@@ -1444,6 +1469,10 @@ layout: post
     // Get sync options (Checkpoints are added manually by instructor, not synced here)
     const syncFormative = document.querySelector(`.sync-reading-materials[data-sprint="${sprintKey}"]`)?.checked ?? true;
     const syncSummative = document.querySelector(`.sync-assessments[data-sprint="${sprintKey}"]`)?.checked ?? true;
+
+    // Get selected priority level (default to P2 if none selected)
+    const priorityRadio = document.querySelector(`input[name="priority-${sprintKey}"]:checked`);
+    const priority = priorityRadio?.value || 'P2';
     
     btn.disabled = true;
     showDateStatus(statusEl, 'Syncing to calendar...', 'loading');
@@ -1497,7 +1526,8 @@ layout: post
               title: `📚 Week ${weekNum} Formative - ${courseName}`,
               description: `Reading Materials:\n\n${lessonItems}`,
               date: readingDate,
-              period: courseName
+              period: courseName,
+              priority: priority
             });
           }
         }
@@ -1530,7 +1560,8 @@ layout: post
               title: `📝 Week ${weekNum} Summative - ${courseName}`,
               description: `Assessments Due:\n\n${assignmentItems}`,
               date: assessmentDate,
-              period: courseName
+              period: courseName,
+              priority: priority
             });
           }
         }
