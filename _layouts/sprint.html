@@ -1454,32 +1454,11 @@ layout: post
       
       // Get sprint info
       const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
-      const sprintTitle = sprintCard?.querySelector('.sprint-title')?.textContent?.trim() || sprintKey;
       const courseName = course.toUpperCase();
       
       const events = [];
-      const dateRange = getSprintDateRange(startWeek, endWeek);
       
-      // Sprint start/end events
-      if (dateRange.start) {
-        events.push({
-          title: `🚀 ${sprintKey} Start: ${sprintTitle}`,
-          description: `${courseName} ${sprintKey} begins.\nSprint: ${sprintTitle}\nWeeks ${startWeek}-${endWeek}`,
-          date: dateRange.start,
-          period: courseName
-        });
-      }
-      
-      if (dateRange.end) {
-        events.push({
-          title: `🏁 ${sprintKey} End: ${sprintTitle}`,
-          description: `${courseName} ${sprintKey} ends.\nSprint: ${sprintTitle}`,
-          date: dateRange.end,
-          period: courseName
-        });
-      }
-      
-      // Process each week in the sprint
+      // Process each week in the sprint (no sprint start/end events - only calendar items)
       const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
       
       for (const weekCard of weekCards) {
@@ -1489,10 +1468,6 @@ layout: post
         
         const readingDate = getReadingDate(weekNum);
         const assessmentDate = getAssessmentDate(weekNum);
-        
-        const weekData = SCHOOL_CALENDAR.weeks[weekNum];
-        const isHolidayWeek = weekData?.holidays?.length > 0;
-        const holidayNote = isHolidayWeek ? ` (${weekData.holidays.join(', ')} week)` : '';
         
         // MONDAY (or Tuesday if holiday): FORMATIVE - All reading materials/lessons for the week
         if (syncFormative && readingDate) {
@@ -1520,7 +1495,7 @@ layout: post
             
             events.push({
               title: `📚 Week ${weekNum} Formative - ${courseName}`,
-              description: `${courseName} ${sprintKey} - Week ${weekNum}${holidayNote}\n\nReading Materials:\n\n${lessonItems}`,
+              description: `Reading Materials:\n\n${lessonItems}`,
               date: readingDate,
               period: courseName
             });
@@ -1553,7 +1528,7 @@ layout: post
             
             events.push({
               title: `📝 Week ${weekNum} Summative - ${courseName}`,
-              description: `${courseName} ${sprintKey} - Week ${weekNum}\n\nAssessments Due:\n\n${assignmentItems}`,
+              description: `Assessments Due:\n\n${assignmentItems}`,
               date: assessmentDate,
               period: courseName
             });
@@ -1563,29 +1538,44 @@ layout: post
         // Checkpoints are added manually by instructor via calendar UI, not auto-synced
       }
       
-      // Send all events to calendar API
+      // Send all events to calendar API in a single bulk request
       console.log(`Adding ${events.length} events to calendar for ${sprintKey}`);
       console.log('Events:', events);
       
-      const results = await Promise.all(
-        events.map(event => 
-          fetch(`${javaURI}/api/calendar/add_event`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(event)
-          }).then(res => {
-            if (res.ok) return true;
-            console.error(`Failed to add event: ${event.title}`, res.status);
-            return false;
-          }).catch(err => {
-            console.error(`Error adding event: ${event.title}`, err);
-            return false;
-          })
-        )
-      );
+      // Try bulk endpoint first, fall back to individual requests if not available
+      let successCount = 0;
+      try {
+        const bulkResponse = await fetch(`${javaURI}/api/calendar/add_events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ events: events })
+        });
+        
+        if (bulkResponse.ok) {
+          const result = await bulkResponse.json();
+          successCount = result.added || events.length;
+        } else if (bulkResponse.status === 404) {
+          // Bulk endpoint not available, fall back to parallel individual requests
+          console.log('Bulk endpoint not available, using individual requests');
+          const results = await Promise.all(
+            events.map(event => 
+              fetch(`${javaURI}/api/calendar/add_event`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(event)
+              }).then(res => res.ok).catch(() => false)
+            )
+          );
+          successCount = results.filter(r => r).length;
+        } else {
+          console.error('Failed to add events:', bulkResponse.status);
+        }
+      } catch (err) {
+        console.error('Error adding events:', err);
+      }
       
-      const successCount = results.filter(r => r).length;
       console.log(`Successfully added ${successCount}/${events.length} events`);
       
       if (successCount === events.length) {
