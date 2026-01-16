@@ -5,6 +5,30 @@
 
 export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions) {
     
+    // Get current user's Spring ID
+    async function getUserIdSpring() {
+        try {
+            // 1. Get UID from Python
+            const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+            if (!pyRes.ok) throw new Error("Failed to fetch Python ID");
+            const pyData = await pyRes.json();
+            const uid = pyData.uid;
+
+            // 2. Get Person from Spring
+            const javaRes = await fetch(`${javaURI}/api/person/uid/${uid}`, fetchOptions);
+            if (!javaRes.ok) throw new Error("Failed to fetch user from Spring");
+            const person = await javaRes.json();
+
+            // 3. Verify UID match
+            if (!person || person.uid !== uid) throw new Error("User not found in Spring");
+            
+            return person;
+        } catch (e) {
+            console.error("Error getting Spring user:", e);
+            return null;
+        }
+    }
+    
     /**
      * Load and display OCS analytics data
      */
@@ -23,11 +47,28 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                 </div>
             `;
             
+            // Get current user
+            const person = await getUserIdSpring();
+            if (!person) {
+                throw new Error("Not logged in. Please log in to view analytics.");
+            }
+            
             // Fetch analytics summary
-            const res = await fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions);
-            if (!res.ok) throw new Error('Failed to fetch analytics');
+            const url = `${javaURI}/api/ocs-analytics/user/summary`;
+            console.log('Fetching OCS analytics from:', url);
+            console.log('Fetch options:', fetchOptions);
+            
+            const res = await fetch(url, fetchOptions);
+            console.log('Response status:', res.status, res.statusText);
+            
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error('Error response:', errText);
+                throw new Error(`Failed to fetch analytics: ${res.status} ${res.statusText}`);
+            }
             
             const summary = await res.json();
+            console.log('Analytics summary:', summary);
             
             // Render analytics summary
             renderAnalyticsSummary(container, summary);
@@ -35,8 +76,13 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
         } catch (error) {
             console.error('Error loading OCS analytics:', error);
             container.innerHTML = `
-                <div class="text-center py-8">
-                    <p class="text-red-400">Error loading analytics. Please try again later.</p>
+                <div class="text-center py-8 space-y-4">
+                    <p class="text-red-400">Error loading analytics.</p>
+                    <p class="text-sm text-neutral-400">${error.message}</p>
+                    <p class="text-xs text-neutral-500">Check the browser console (F12) for more details.</p>
+                    <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+                        Retry
+                    </button>
                 </div>
             `;
         }
