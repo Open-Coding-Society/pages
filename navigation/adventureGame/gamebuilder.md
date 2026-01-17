@@ -13,9 +13,7 @@ permalink: /rpg/gamebuilder
     text-align: center;
     font-size: 2em;
     font-weight: bold;
-    color: var(--neon-blue);
     letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(0,243,255,0.5);
 }
 
 /* --- Main Layout --- */
@@ -31,21 +29,19 @@ permalink: /rpg/gamebuilder
 .col-tools { flex: 1; display: flex; gap: 15px; min-width: 0; }
 
 .glass-panel {
-    background: var(--glass-bg);
+    background: rgba(0,0,0,0.3);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
 }
 
 .panel-header {
     padding: 16px;
     background: rgba(0,0,0,0.3);
-    border-bottom: 1px solid var(--glass-border);
-    color: var(--neon-blue);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.9em;
@@ -60,23 +56,32 @@ permalink: /rpg/gamebuilder
     padding: 14px;
     margin-bottom: 15px;
 }
-.group-title { font-size: 0.8em; color: var(--neon-purple); font-weight: bold; margin-bottom: 12px; }
+.group-title { font-size: 0.8em; font-weight: bold; margin-bottom: 12px; }
 
-label { display: block; font-size: 0.7em; color: var(--text-muted); margin-bottom: 5px; }
+label { display: block; font-size: 0.7em; margin-bottom: 5px; }
 select, input {
-    width: 100%; background: #000; border: 1px solid #333;
-    color: #fff; padding: 8px; border-radius: 4px; font-size: 0.85em; margin-bottom: 10px;
+    width: 100%; 
+    padding: 8px; 
+    border-radius: 4px; 
+    font-size: 0.85em; 
+    margin-bottom: 10px;
 }
 
 /* --- Control Buttons --- */
 .button-footer { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); }
 .btn {
-    padding: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;
-    transition: all 0.2s; text-transform: uppercase; font-size: 0.85em;
+    padding: 12px; 
+    border-radius: 6px; 
+    border: none; 
+    font-weight: bold; 
+    cursor: pointer;
+    transition: all 0.2s; 
+    text-transform: uppercase; 
+    font-size: 0.85em;
 }
-.btn-confirm { background: #333; color: var(--neon-blue); border: 1px solid var(--neon-blue); }
-.btn-run { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,243,255,0.3); }
-.btn-danger { background: #ff4d4f; color: #fff; border: 1px solid #ff4d4f; }
+.btn-confirm { }
+.btn-run { }
+.btn-danger { }
 
 /* --- Code Editor & Surgical Highlights --- */
 .code-panel { flex: 1; position: relative; }
@@ -85,16 +90,18 @@ select, input {
     flex: 1; 
     width: 100%; 
     overflow: hidden; 
-    background: #0c0f16; 
 }
 .code-layer {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    padding: 20px; box-sizing: border-box;
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    padding: 20px; 
+    box-sizing: border-box;
     font-family: 'Fira Code', 'Courier New', monospace; 
     font-size: 13px; 
     line-height: 20px; /* Crucial: Must match JS offset */
-    color: #d4d4d4; 
-    background: transparent; 
     border: none; 
     resize: none; 
     outline: none;
@@ -141,10 +148,9 @@ select, input {
     width: calc(100% - 20px);
 }
 
-.game-frame { flex: 1; background: #000; }
+.game-frame { flex: 1; }
 iframe { width: 100%; height: 100%; border: none; }
-/* Sidebar component removed */
-.wall-slot { margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
+.wall-slot { margin-top:8px; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
 .wall-fields label { display:block; }
 
 </style>
