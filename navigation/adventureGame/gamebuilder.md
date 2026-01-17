@@ -420,18 +420,13 @@ iframe { width: 100%; height: 100%; border: none; }
                     <div class="group-title">WALLS</div>
                     <button class="btn" id="add-wall">Add Wall</button>
                     <div id="walls-container" style="margin-top:8px;"></div>
-                    <div style="margin-top:6px; font-size:0.8em; color: var(--text-muted);">
-                        Walls are invisible in the game. <br>
-                        They briefly show when a slot is <br>
-                        opened for editing.
-                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-code">
         <div class="glass-panel code-panel">
-            <div class="panel-header">Level Logic (JS)</div>
+            <div class="panel-header">Code View (JS)</div>
             <div class="editor-container" id="editor-container">
                 <div id="highlight-layer" class="highlight-layer"></div>
                 <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
@@ -440,7 +435,7 @@ iframe { width: 100%; height: 100%; border: none; }
     </div>
     <div class="col-game">
         <div class="glass-panel" style="flex:1;">
-            <div class="panel-header">Game Preview</div>
+            <div class="panel-header">Game View</div>
             <div class="game-frame">
                 <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
             </div>
