@@ -60,23 +60,23 @@ permalink: /rpg/gamebuilder
 
 label { display: block; font-size: 0.7em; margin-bottom: 5px; }
 select, input {
-    width: 100%; 
-    padding: 8px; 
-    border-radius: 4px; 
-    font-size: 0.85em; 
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
     margin-bottom: 10px;
 }
 
 /* --- Control Buttons --- */
 .button-footer { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); }
 .btn {
-    padding: 12px; 
-    border-radius: 6px; 
-    border: none; 
-    font-weight: bold; 
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s; 
-    text-transform: uppercase; 
+    transition: all 0.2s;
+    text-transform: uppercase;
     font-size: 0.85em;
 }
 .btn-confirm { }
@@ -85,46 +85,46 @@ select, input {
 
 /* --- Code Editor & Surgical Highlights --- */
 .code-panel { flex: 1; position: relative; }
-.editor-container { 
-    position: relative; 
-    flex: 1; 
-    width: 100%; 
-    overflow: hidden; 
+.editor-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
 }
 .code-layer {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
-    padding: 20px; 
+    padding: 20px;
     box-sizing: border-box;
-    font-family: 'Fira Code', 'Courier New', monospace; 
-    font-size: 13px; 
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 13px;
     line-height: 20px; /* Crucial: Must match JS offset */
-    border: none; 
-    resize: none; 
+    border: none;
+    resize: none;
     outline: none;
-    z-index: 2; 
-    white-space: pre; 
+    z-index: 2;
+    white-space: pre;
     overflow: auto;
 }
 .highlight-layer {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
     padding: 20px; /* Must match textarea padding */
-    box-sizing: border-box; 
-    pointer-events: none; 
+    box-sizing: border-box;
+    pointer-events: none;
     z-index: 1;
 }
 .highlight-box {
-    position: absolute; 
-    background: rgba(255, 215, 0, 0.25);
-    border-left: 4px solid #ffd700;
-    left: 10px; 
+    position: absolute;
+    background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
+    border-left: 4px solid var(--pref-accent-color);
+    left: 10px;
     width: calc(100% - 20px);
     display: block !important; /* Ensure visibility */
 }
@@ -132,8 +132,8 @@ select, input {
 /* Persistent box after typing completes (bordered, minimal fill) */
 .highlight-persistent-block {
     position: absolute;
-    background: rgba(255, 215, 0, 0.12);
-    border: 2px solid #ffd700;
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+    border: 2px solid var(--pref-accent-color);
     border-left-width: 4px;
     left: 10px;
     width: calc(100% - 20px);
@@ -142,8 +142,8 @@ select, input {
 /* Typing state highlight (more vivid while animating) */
 .typing-highlight {
     position: absolute;
-    background: rgba(255, 235, 59, 0.25);
-    border-left: 4px solid #ffeb3b;
+    background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
+    border-left: 4px solid var(--pref-accent-color);
     left: 10px;
     width: calc(100% - 20px);
 }
@@ -172,7 +172,6 @@ iframe { width: 100%; height: 100%; border: none; }
                         <option value="clouds">Sky Kingdom</option>
                     </select>
                 </div>
-                
                 <div class="asset-group">
                     <div class="group-title">PLAYER</div>
                     <label>Name</label>
@@ -314,7 +313,6 @@ iframe { width: 100%; height: 100%; border: none; }
                         </div>
                     </div>
                 </div>
-                
                 <div class="asset-group">
                     <div class="group-title">WALLS</div>
                     <button class="btn" id="add-wall">Add Wall</button>
@@ -325,7 +323,6 @@ iframe { width: 100%; height: 100%; border: none; }
                         opened for editing.
                     </div>
                 </div>
-                
             </div>
             <div class="button-footer">
                 <button id="btn-confirm" class="btn btn-confirm">Confirm Step</button>
@@ -341,7 +338,6 @@ iframe { width: 100%; height: 100%; border: none; }
                 </div>
             </div>
         </div>
-
         <div class="glass-panel code-panel">
             <div class="panel-header">Level Logic (JS)</div>
             <div class="editor-container" id="editor-container">
@@ -350,7 +346,6 @@ iframe { width: 100%; height: 100%; border: none; }
             </div>
         </div>
     </div>
-
     <div class="col-game">
         <div class="glass-panel" style="flex:1;">
             <div class="panel-header">Game Preview</div>
@@ -395,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             index: i,
             displayName: ''
         })),
-        
+
         // Walls UI (dynamic slots)
         addWallBtn: document.getElementById('add-wall'),
         wallsContainer: document.getElementById('walls-container'),
@@ -575,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (slot.addBtn) slot.addBtn.disabled = true;
             fields.forEach(el => { if (el) el.disabled = true; });
         });
-        
+
         if (current === 'background') {
             unlockField(ui.bg);
         } else if (current === 'player') {
@@ -584,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
             unlockField(ui.pY);
             unlockField(ui.pName);
             unlockField(mv);
-            
+
         } else if (current === 'npc') {
             // Enable add buttons and manage NPC fields based on locked state
             ui.npcs.forEach(slot => {
@@ -602,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     unlockField(slot.nY);
                 }
             });
-            
+
         } else if (current === 'walls') {
             if (ui.addWallBtn) ui.addWallBtn.disabled = false;
             ui.walls.forEach(slot => {
@@ -629,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 [slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
-            
+
         }
         // Show or hide freestyle unlocked notice
         if (ui.notice) {
@@ -680,7 +675,6 @@ import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackgr
 import Player from '/assets/js/adventureGame/GameEngine/Player.js';
 import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
 import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
-        
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -1020,7 +1014,6 @@ export const gameLevelClasses = [CustomLevel];`;
         if (slot.nX) slot.nX.addEventListener('input', syncFromControlsIfFreestyle);
         if (slot.nY) slot.nY.addEventListener('input', syncFromControlsIfFreestyle);
     });
-    
 
     document.getElementById('btn-confirm').addEventListener('click', () => {
         const oldCode = ui.editor.value;
@@ -1055,7 +1048,7 @@ export const gameLevelClasses = [CustomLevel];`;
                         }
                     }
                 });
-                
+
                 // After NPC confirmation, go to freestyle
                 stepIndex = steps.indexOf('freestyle');
             } else {
