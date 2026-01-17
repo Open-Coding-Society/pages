@@ -153,6 +153,54 @@ iframe { width: 100%; height: 100%; border: none; }
 .wall-slot { margin-top:8px; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
 .wall-fields label { display:block; }
 
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+    .creator-layout {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .col-tools {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .col-game {
+        flex: none;
+        width: 100%;
+        min-height: 500px;
+    }
+    
+    .glass-panel.code-panel {
+        min-height: 400px;
+    }
+    
+    .gamebuilder-title {
+        font-size: 1.5em;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .creator-layout {
+        padding: 5px;
+        gap: 5px;
+    }
+    
+    .col-tools {
+        gap: 5px;
+    }
+    
+    .panel-header {
+        padding: 12px;
+        font-size: 0.8em;
+    }
+    
+    .gamebuilder-title {
+        font-size: 1.2em;
+    }
+}
+
 </style>
 
 <div class="gamebuilder-title">{{page.title}}</div>
