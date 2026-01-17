@@ -1,13 +1,22 @@
 ---
 layout: opencs 
-title: Game Asset Creator
+title: GameBuilder
 description: Helping programmers understand how to create a game
 permalink: /rpg/gamebuilder
 ---
 
 <style>
-
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
+
+/* --- Main Title --- */
+.gamebuilder-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--neon-blue);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0,243,255,0.5);
+}
 
 /* --- Main Layout --- */
 .creator-layout {
@@ -137,8 +146,10 @@ iframe { width: 100%; height: 100%; border: none; }
 /* Sidebar component removed */
 .wall-slot { margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
 .wall-fields label { display:block; }
+
 </style>
 
+<div class="gamebuilder-title">{{page.title}}</div>
 
 <div class="creator-layout">
     <div class="col-tools">
