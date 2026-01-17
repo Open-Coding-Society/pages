@@ -38,9 +38,10 @@ class Barrier extends GameObject {
         if (this.visible) {
             // Show a subtle edit overlay when selected/edited in builder
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = 'rgba(255, 215, 0, 0.12)';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.strokeStyle = '#ffd700';
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--pref-accent-color').trim() || '#ffd700';
+            
+            // Draw border only (no fill for subtle visibility)
+            this.ctx.strokeStyle = accentColor;
             this.ctx.lineWidth = 2;
             this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
             this.canvas.style.opacity = '1';
