@@ -1,37 +1,19 @@
 ---
-layout: post
+layout: opencs 
 title: Game Asset Creator
 description: Helping programmers understand how to create a game
 permalink: /rpg/gamebuilder
 ---
 
 <style>
-/* --- Theme: Deep Space Nebula --- */
-:root {
-    --space-bg: #0b0d17;
-    --glass-bg: rgba(15, 20, 35, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --neon-blue: #00f3ff;
-    --neon-purple: #bc13fe;
-    --text-main: #e0e6ed;
-    --text-muted: #94a3b8;
-}
-
-body {
-    background: radial-gradient(circle at 50% 50%, #1f253a 0%, #000000 100%);
-    background-attachment: fixed;
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-}
 
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
 
 /* --- Main Layout --- */
 .creator-layout {
     display: flex;
-    gap: 20px;
-    padding: 20px;
+    gap: 10px;
+    padding: 10px;
     height: 92vh;
     box-sizing: border-box;
 }
