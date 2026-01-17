@@ -102,7 +102,29 @@ permalink: /rpg/gamebuilder
     padding: 14px;
     margin-bottom: 15px;
 }
-.group-title { font-size: 0.8em; font-weight: bold; margin-bottom: 12px; }
+.group-title { 
+    font-size: 0.8em; 
+    font-weight: bold; 
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.add-item-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+}
 
 label { display: block; font-size: 0.7em; margin-bottom: 5px; }
 select, input {
@@ -297,14 +319,18 @@ iframe { width: 100%; height: 100%; border: none; }
                     </select>
                 </div>
                 <div class="asset-group">
-                    <div class="group-title">NPC</div>
-                    <button class="btn" id="add-npc">Add NPC</button>
-                    <div id="npcs-container" style="margin-top:8px;"></div>
+                    <div class="group-title">
+                        <span>NPC</span>
+                        <button class="add-item-btn" id="add-npc">+</button>
+                    </div>
+                    <div id="npcs-container"></div>
                 </div>
                 <div class="asset-group">
-                    <div class="group-title">WALLS</div>
-                    <button class="btn" id="add-wall">Add Wall</button>
-                    <div id="walls-container" style="margin-top:8px;"></div>
+                    <div class="group-title">
+                        <span>WALLS</span>
+                        <button class="add-item-btn" id="add-wall">+</button>
+                    </div>
+                    <div id="walls-container"></div>
                 </div>
             </div>
         </div>
