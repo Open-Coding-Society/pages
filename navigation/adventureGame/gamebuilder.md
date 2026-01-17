@@ -25,8 +25,9 @@ permalink: /rpg/gamebuilder
     box-sizing: border-box;
 }
 
-.col-game { flex: 0 0 45%; display: flex; flex-direction: column; gap: 15px; }
-.col-tools { flex: 1; display: flex; gap: 15px; min-width: 0; }
+.col-asset { flex: 0 0 20%; display: flex; flex-direction: column; }
+.col-code { flex: 0 0 20%; display: flex; flex-direction: column; min-width: 0; }
+.col-game { flex: 0 0 60%; display: flex; flex-direction: column; }
 
 .glass-panel {
     background: rgba(0,0,0,0.3);
@@ -46,6 +47,51 @@ permalink: /rpg/gamebuilder
     text-transform: uppercase;
     font-size: 0.9em;
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.panel-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.icon-btn:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.step-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-right: 4px;
 }
 
 .scroll-form { flex: 1; overflow-y: auto; padding: 15px; }
@@ -68,7 +114,6 @@ select, input {
 }
 
 /* --- Control Buttons --- */
-.button-footer { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); }
 .btn {
     padding: 12px;
     border-radius: 6px;
@@ -82,6 +127,23 @@ select, input {
 .btn-confirm { }
 .btn-run { }
 .btn-danger { }
+
+.help-panel {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 16px;
+    background: rgba(0,0,0,0.95);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px;
+    max-width: 300px;
+    z-index: 100;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.help-panel.active { display: block; }
 
 /* --- Code Editor & Surgical Highlights --- */
 .code-panel { flex: 1; position: relative; }
@@ -154,47 +216,25 @@ iframe { width: 100%; height: 100%; border: none; }
 .wall-fields label { display:block; }
 
 /* --- Responsive Design --- */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
+    .creator-layout {
+        flex-wrap: wrap;
+    }
+    
+    .col-asset { flex: 0 0 100%; order: 1; max-height: 400px; }
+    .col-code { flex: 0 0 48%; order: 2; }
+    .col-game { flex: 0 0 48%; order: 3; }
+}
+
+@media (max-width: 768px) {
     .creator-layout {
         flex-direction: column;
         height: auto;
     }
     
-    .col-tools {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .col-game {
-        flex: none;
-        width: 100%;
-        min-height: 500px;
-    }
-    
-    .glass-panel.code-panel {
-        min-height: 400px;
-    }
-    
-    .gamebuilder-title {
-        font-size: 1.5em;
-        padding: 5px 10px;
-    }
-}
-
-@media (max-width: 768px) {
-    .creator-layout {
-        padding: 5px;
-        gap: 5px;
-    }
-    
-    .col-tools {
-        gap: 5px;
-    }
-    
-    .panel-header {
-        padding: 12px;
-        font-size: 0.8em;
-    }
+    .col-asset { flex: none; max-height: 300px; }
+    .col-code { flex: none; min-height: 300px; }
+    .col-game { flex: none; min-height: 400px; margin-bottom: 180px; }
     
     .gamebuilder-title {
         font-size: 1.2em;
@@ -206,9 +246,24 @@ iframe { width: 100%; height: 100%; border: none; }
 <div class="gamebuilder-title">{{page.title}}</div>
 
 <div class="creator-layout">
-    <div class="col-tools">
-        <div class="glass-panel creator-panel">
-            <div class="panel-header">Asset Configurations</div>
+    <div class="col-asset">
+        <div class="glass-panel creator-panel" style="position: relative;">
+            <div class="panel-header">
+                <span>Assets</span>
+                <div class="panel-controls">
+                    <span class="step-indicator" id="step-indicator-mini">Step 1/2</span>
+                    <button id="btn-confirm" class="icon-btn" data-tooltip="Confirm Step">✓</button>
+                    <button id="btn-run" class="icon-btn" data-tooltip="Run Game">▶</button>
+                    <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
+                </div>
+            </div>
+            <div class="help-panel" id="help-panel">
+                <strong>Steps:</strong><br>
+                1. Background - Select environment<br>
+                2. Player - Configure character<br>
+                3. Freestyle - Add NPCs & walls<br><br>
+                <strong>Tips:</strong> Walls are invisible in-game. They show briefly when editing.
+            </div>
             <div class="scroll-form">
                 <div class="asset-group">
                     <div class="group-title">ENVIRONMENT</div>
@@ -372,20 +427,9 @@ iframe { width: 100%; height: 100%; border: none; }
                     </div>
                 </div>
             </div>
-            <div class="button-footer">
-                <button id="btn-confirm" class="btn btn-confirm">Confirm Step</button>
-                <button id="btn-run" class="btn btn-run">Run Game</button>
-                <div id="progress-indicator" style="font-size: 0.8em; color: var(--text-muted);">Step: background → player → freestyle</div>
-                <ol class="steps-numbered" style="margin: 8px 0 0 18px; color: var(--text-muted); font-size: 0.85em;">
-                    <li>Step 1: Background</li>
-                    <li>Step 2: Player</li>
-                </ol>
-                <div id="freestyle-notice" style="display:none; margin-top: 4px; padding: 6px; border: 1px solid var(--neon-blue); border-radius: 6px; color: var(--neon-blue); background: rgba(0,243,255,0.08); font-size: 0.85em; line-height: 1.2;">
-                    freestyle unlocked !<br>
-                    you can edit whatever you want
-                </div>
-            </div>
         </div>
+    </div>
+    <div class="col-code">
         <div class="glass-panel code-panel">
             <div class="panel-header">Level Logic (JS)</div>
             <div class="editor-container" id="editor-container">
@@ -446,8 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         editor: document.getElementById('code-editor'),
         hLayer: document.getElementById('highlight-layer'),
-        iframe: document.getElementById('game-iframe'),
-        notice: document.getElementById('freestyle-notice')
+        iframe: document.getElementById('game-iframe')
     };
 
     // Toggle NPC fields on 'Add NPC' click (open/close)
@@ -593,11 +636,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = { persistent: null, typing: null, userEdited: false, programmaticEdit: false };
     const steps = ['background','player','freestyle'];
     let stepIndex = 0; // start at 'background'
-    const indicator = document.getElementById('progress-indicator');
+    const stepIndicatorMini = document.getElementById('step-indicator-mini');
+    const helpBtn = document.getElementById('btn-help');
+    const helpPanel = document.getElementById('help-panel');
+
+    // Help button toggle
+    if (helpBtn && helpPanel) {
+        helpBtn.addEventListener('click', () => {
+            helpPanel.classList.toggle('active');
+        });
+        // Close help when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!helpBtn.contains(e.target) && !helpPanel.contains(e.target)) {
+                helpPanel.classList.remove('active');
+            }
+        });
+    }
 
     function setIndicator() {
         const current = steps[stepIndex];
-        indicator.textContent = `Step: ${current}`;
+        if (stepIndicatorMini) {
+            if (stepIndex < 2) {
+                stepIndicatorMini.textContent = `Step ${stepIndex + 1}/2`;
+            } else {
+                stepIndicatorMini.textContent = 'Freestyle';
+            }
+        }
     }
 
     function lockField(el) { if (el) { el.disabled = true; el.classList.add('locked'); } }
@@ -673,10 +737,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
 
-        }
-        // Show or hide freestyle unlocked notice
-        if (ui.notice) {
-            ui.notice.style.display = (current === 'freestyle') ? '' : 'none';
         }
     }
 
