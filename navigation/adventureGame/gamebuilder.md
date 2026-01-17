@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         slot.container.className = 'wall-slot';
         const headerBtn = document.createElement('button');
         headerBtn.className = 'btn';
-        headerBtn.textContent = 'NPC ▸';
+        headerBtn.textContent = `NPC ${index} ▸`;
         const fields = document.createElement('div');
         fields.className = 'wall-fields';
         fields.style.display = 'none';
@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const wasOpen = fields.style.display !== 'none';
             fields.style.display = wasOpen ? 'none' : '';
             slot.fieldsOpen = !wasOpen;
-            const labelBase = slot.displayName && slot.locked ? slot.displayName : 'NPC';
+            const labelBase = slot.displayName && slot.locked ? slot.displayName : `NPC ${index}`;
             headerBtn.textContent = labelBase + (wasOpen ? ' ▸' : ' ▾');
             if (slot.locked && slot.displayName) headerBtn.classList.add('btn-confirm'); else headerBtn.classList.remove('btn-confirm');
             updateStepUI();
@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Auto-open newly added slot for easy editing
             if (slot.fieldsContainer) slot.fieldsContainer.style.display = '';
             slot.fieldsOpen = true;
-            slot.addBtn.textContent = 'NPC ▾';
+            slot.addBtn.textContent = `NPC ${ui.npcs.length} ▾`;
             updateStepUI();
             syncFromControlsIfFreestyle();
         });
@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         slot.container.className = 'wall-slot';
         const headerBtn = document.createElement('button');
         headerBtn.className = 'btn';
-        headerBtn.textContent = 'Wall ▸';
+        headerBtn.textContent = `Wall ${index} ▸`;
         const fields = document.createElement('div');
         fields.className = 'wall-fields';
         fields.style.display = 'none';
@@ -533,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const wasOpen = fields.style.display !== 'none';
             fields.style.display = wasOpen ? 'none' : '';
             slot.fieldsOpen = !wasOpen;
-            const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Wall';
+            const labelBase = slot.displayName && slot.locked ? slot.displayName : `Wall ${index}`;
             headerBtn.textContent = labelBase + (wasOpen ? ' ▸' : ' ▾');
             if (slot.locked && slot.displayName) headerBtn.classList.add('btn-confirm'); else headerBtn.classList.remove('btn-confirm');
             updateStepUI();
@@ -566,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Auto-open newly added slot for easy editing
             if (slot.fieldsContainer) slot.fieldsContainer.style.display = '';
             slot.fieldsOpen = true;
-            slot.addBtn.textContent = 'Wall ▾';
+            slot.addBtn.textContent = `Wall ${ui.walls.length} ▾`;
             updateStepUI();
             syncFromControlsIfFreestyle();
         });
