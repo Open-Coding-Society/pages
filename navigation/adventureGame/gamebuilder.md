@@ -261,7 +261,7 @@ iframe { width: 100%; height: 100%; border: none; }
                 <strong>Steps:</strong><br>
                 1. Background - Select environment<br>
                 2. Player - Configure character<br>
-                3. Freestyle - Add NPCs & walls<br><br>
+                3. Freestyle - Add NPCs, Walls, etc<br><br>
                 <strong>Tips:</strong> Walls are invisible in-game. They show briefly when editing.
             </div>
             <div class="scroll-form">
@@ -298,123 +298,8 @@ iframe { width: 100%; height: 100%; border: none; }
                 </div>
                 <div class="asset-group">
                     <div class="group-title">NPC</div>
-                    <div class="npc-slots">
-                        <div class="npc-slot" id="npc-slot-1">
-                            <button class="btn" id="add-npc-1">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-1" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc1-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc1-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc1-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc1-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc1-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc1-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-2">
-                            <button class="btn" id="add-npc-2">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-2" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc2-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc2-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc2-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc2-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc2-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc2-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-3">
-                            <button class="btn" id="add-npc-3">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-3" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc3-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc3-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc3-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc3-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc3-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc3-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-4">
-                            <button class="btn" id="add-npc-4">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-4" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc4-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc4-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc4-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc4-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc4-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc4-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-5">
-                            <button class="btn" id="add-npc-5">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-5" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc5-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc5-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc5-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc5-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc5-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc5-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <button class="btn" id="add-npc">Add NPC</button>
+                    <div id="npcs-container" style="margin-top:8px;"></div>
                 </div>
                 <div class="asset-group">
                     <div class="group-title">WALLS</div>
@@ -464,19 +349,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pX: document.getElementById('player-x'),
         pY: document.getElementById('player-y'),
         pName: document.getElementById('player-name'),
-        npcs: [1,2,3,4,5].map(i => ({
-            addBtn: document.getElementById(`add-npc-${i}`),
-            fieldsContainer: document.getElementById(`npc-fields-${i}`),
-            nId: document.getElementById(`npc${i}-id`),
-            nMsg: document.getElementById(`npc${i}-msg`),
-            nSprite: document.getElementById(`npc${i}-sprite`),
-            nX: document.getElementById(`npc${i}-x`),
-            nY: document.getElementById(`npc${i}-y`),
-            deleteBtn: document.getElementById(`npc${i}-delete`),
-            locked: false,
-            index: i,
-            displayName: ''
-        })),
+        
+        // NPCs UI (dynamic slots)
+        addNpcBtn: document.getElementById('add-npc'),
+        npcsContainer: document.getElementById('npcs-container'),
+        npcs: [],
 
         // Walls UI (dynamic slots)
         addWallBtn: document.getElementById('add-wall'),
@@ -488,58 +365,100 @@ document.addEventListener('DOMContentLoaded', () => {
         iframe: document.getElementById('game-iframe')
     };
 
-    // Toggle NPC fields on 'Add NPC' click (open/close)
-    ui.npcs.forEach(slot => {
-        if (slot.addBtn && slot.fieldsContainer) {
-            slot.addBtn.addEventListener('click', () => {
-                const isVisible = slot.fieldsContainer.style.display !== 'none';
-                // Toggle dropdown visibility
-                slot.fieldsContainer.style.display = isVisible ? 'none' : '';
-                // When closing the dropdown, commit NPC and keep it present
-                if (isVisible) {
-                    // We are closing; lock the NPC and update header state
-                    const name = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC');
-                    slot.locked = true;
-                    slot.displayName = name;
-                    slot.addBtn.classList.add('btn-confirm');
-                    // Show delete when locked
-                    if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
-                }
-                // Update button label with caret and name
-                const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add NPC';
-                const caret = isVisible ? ' ▸' : ' ▾';
-                slot.addBtn.textContent = labelBase + caret;
-                updateStepUI();
-                syncFromControlsIfFreestyle();
-            });
-        }
-        // Ensure delete starts hidden until NPC is created
-        if (slot.deleteBtn) slot.deleteBtn.style.display = 'none';
-        // Delete action
-        if (slot.deleteBtn) {
-            slot.deleteBtn.addEventListener('click', () => {
-                // Clear values and hide panel
-                if (slot.nId) slot.nId.value = '';
-                if (slot.nMsg) slot.nMsg.value = '';
-                if (slot.nSprite) slot.nSprite.value = '';
-                if (slot.nX) slot.nX.value = 500;
-                if (slot.nY) slot.nY.value = 300;
-                slot.locked = false;
-                slot.displayName = '';
-                if (slot.fieldsContainer) slot.fieldsContainer.style.display = 'none';
-                if (slot.addBtn) {
-                    slot.addBtn.textContent = 'Add NPC ▸';
-                    slot.addBtn.classList.remove('btn-confirm');
-                }
-                if (slot.deleteBtn) {
-                    slot.deleteBtn.disabled = true;
-                    slot.deleteBtn.style.display = 'none';
-                }
-                updateStepUI();
-                syncFromControlsIfFreestyle();
-            });
-        }
-    });
+    // Dynamic NPCs feature
+    function makeNpcSlot(index) {
+        const slot = {
+            index,
+            locked: false,
+            displayName: '',
+            container: document.createElement('div'),
+            fieldsOpen: false
+        };
+        slot.container.className = 'wall-slot';
+        const headerBtn = document.createElement('button');
+        headerBtn.className = 'btn';
+        headerBtn.textContent = 'NPC ▸';
+        const fields = document.createElement('div');
+        fields.className = 'wall-fields';
+        fields.style.display = 'none';
+        fields.innerHTML = `
+            <label>ID</label>
+            <input type="text" placeholder="NPC id" class="npc-id">
+            <label>Message</label>
+            <input type="text" placeholder="Message when interacted with" class="npc-msg">
+            <label>Sprite</label>
+            <select class="npc-sprite">
+                <option value="" selected disabled>Select sprite…</option>
+                <option value="chillguy">Chill Guy</option>
+                <option value="tux">Tux (penguin)</option>
+                <option value="r2d2">R2D2</option>
+            </select>
+            <label>Position X</label>
+            <input type="range" min="0" max="800" value="500" class="npc-x">
+            <label>Position Y</label>
+            <input type="range" min="0" max="600" value="300" class="npc-y">
+            <div style="margin-top:8px; display:flex; gap:8px;">
+                <button class="btn btn-sm btn-danger npc-delete">Delete</button>
+            </div>
+        `;
+        slot.container.appendChild(headerBtn);
+        slot.container.appendChild(fields);
+        ui.npcsContainer.appendChild(slot.container);
+
+        // Bind DOM refs
+        slot.addBtn = headerBtn;
+        slot.fieldsContainer = fields;
+        slot.nId = fields.querySelector('.npc-id');
+        slot.nMsg = fields.querySelector('.npc-msg');
+        slot.nSprite = fields.querySelector('.npc-sprite');
+        slot.nX = fields.querySelector('.npc-x');
+        slot.nY = fields.querySelector('.npc-y');
+        slot.deleteBtn = fields.querySelector('.npc-delete');
+
+        // Toggle open/close
+        headerBtn.addEventListener('click', () => {
+            const wasOpen = fields.style.display !== 'none';
+            fields.style.display = wasOpen ? 'none' : '';
+            slot.fieldsOpen = !wasOpen;
+            const labelBase = slot.displayName && slot.locked ? slot.displayName : 'NPC';
+            headerBtn.textContent = labelBase + (wasOpen ? ' ▸' : ' ▾');
+            if (slot.locked && slot.displayName) headerBtn.classList.add('btn-confirm'); else headerBtn.classList.remove('btn-confirm');
+            updateStepUI();
+            syncFromControlsIfFreestyle();
+        });
+
+        // Delete
+        slot.deleteBtn.addEventListener('click', () => {
+            slot.container.remove();
+            ui.npcs = ui.npcs.filter(n => n !== slot);
+            updateStepUI();
+            syncFromControlsIfFreestyle();
+        });
+
+        // Change listeners for freestyle sync
+        ['input','change'].forEach(evt => {
+            slot.nId.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nMsg.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nSprite.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nX.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nY.addEventListener(evt, syncFromControlsIfFreestyle);
+        });
+
+        ui.npcs.push(slot);
+        return slot;
+    }
+
+    if (ui.addNpcBtn) {
+        ui.addNpcBtn.addEventListener('click', () => {
+            const slot = makeNpcSlot(ui.npcs.length + 1);
+            // Auto-open newly added slot for easy editing
+            if (slot.fieldsContainer) slot.fieldsContainer.style.display = '';
+            slot.fieldsOpen = true;
+            slot.addBtn.textContent = 'NPC ▾';
+            updateStepUI();
+            syncFromControlsIfFreestyle();
+        });
+    }
 
     // Dynamic Walls feature
     function makeWallSlot(index) {
@@ -553,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
         slot.container.className = 'wall-slot';
         const headerBtn = document.createElement('button');
         headerBtn.className = 'btn';
-        headerBtn.textContent = 'Add Wall ▸';
+        headerBtn.textContent = 'Wall ▸';
         const fields = document.createElement('div');
         fields.className = 'wall-fields';
         fields.style.display = 'none';
@@ -588,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const wasOpen = fields.style.display !== 'none';
             fields.style.display = wasOpen ? 'none' : '';
             slot.fieldsOpen = !wasOpen;
-            const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add Wall';
+            const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Wall';
             headerBtn.textContent = labelBase + (wasOpen ? ' ▸' : ' ▾');
             if (slot.locked && slot.displayName) headerBtn.classList.add('btn-confirm'); else headerBtn.classList.remove('btn-confirm');
             updateStepUI();
@@ -621,7 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Auto-open newly added slot for easy editing
             if (slot.fieldsContainer) slot.fieldsContainer.style.display = '';
             slot.fieldsOpen = true;
-            slot.addBtn.textContent = 'Add Wall ▾';
+            slot.addBtn.textContent = 'Wall ▾';
             updateStepUI();
             syncFromControlsIfFreestyle();
         });
@@ -689,19 +608,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else if (current === 'npc') {
             // Enable add buttons and manage NPC fields based on locked state
+            if (ui.addNpcBtn) ui.addNpcBtn.disabled = false;
             ui.npcs.forEach(slot => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
-                if (slot.deleteBtn) {
-                    slot.deleteBtn.disabled = !slot.locked;
-                    slot.deleteBtn.style.display = slot.locked ? '' : 'none';
-                }
+                // Editable only when open
                 if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
-                    // Fields are editable when dropdown is open
-                    unlockField(slot.nId);
-                    unlockField(slot.nMsg);
-                    unlockField(slot.nSprite);
-                    unlockField(slot.nX);
-                    unlockField(slot.nY);
+                    [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY].forEach(el => unlockField(el));
+                    if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
+                } else {
+                    if (slot.deleteBtn) { slot.deleteBtn.disabled = !slot.locked; slot.deleteBtn.style.display = slot.locked ? '' : 'none'; }
                 }
             });
 
@@ -721,9 +636,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (current === 'freestyle') {
             ui.editor.readOnly = false;
             [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = false; });
+            if (ui.addNpcBtn) ui.addNpcBtn.disabled = false;
             ui.npcs.forEach(slot => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
                 [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY].forEach(el => { if (el) el.disabled = false; });
+                if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
             if (ui.addWallBtn) ui.addWallBtn.disabled = false;
             ui.walls.forEach(slot => {
@@ -1109,7 +1026,7 @@ export const gameLevelClasses = [CustomLevel];`;
                 slot.displayName = name;
                 const isVisible = slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none';
                 const caret = isVisible ? ' ▾' : ' ▸';
-                slot.addBtn.textContent = (slot.locked ? name : 'Add NPC') + caret;
+                slot.addBtn.textContent = (slot.locked ? name : 'NPC') + caret;
             }
         });
         if (slot.nMsg) slot.nMsg.addEventListener('input', syncFromControlsIfFreestyle);
@@ -1137,7 +1054,7 @@ export const gameLevelClasses = [CustomLevel];`;
                     if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
                         // Mark as locked so updateStepUI keeps fields disabled until edited
                         slot.locked = true;
-                        // Update Add NPC button to show user-named NPC and highlight
+                        // Update NPC button to show user-named NPC and highlight
                         const name = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC');
                         slot.displayName = name;
                         if (slot.addBtn) {
