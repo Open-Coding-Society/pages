@@ -26,7 +26,7 @@ permalink: /rpg/gamebuilder
 }
 
 .col-asset { 
-    flex: 0 0 25%; 
+    flex: 0 0 20%; 
     display: flex; 
     flex-direction: column; 
 }
@@ -37,6 +37,27 @@ permalink: /rpg/gamebuilder
     flex-direction: column; 
     min-width: 0;
     position: relative;
+}
+
+.col-main.view-code .panel-game { display: none; }
+.col-main.view-game .panel-code { display: none; }
+
+.col-main.view-code .panel-code,
+.col-main.view-game .panel-game {
+    flex: 1;
+}
+
+/* Split view: side-by-side layout */
+.col-main.view-split .main-content {
+    flex-direction: row;
+}
+
+.col-main.view-split .panel-game {
+    flex: 0 0 55%;
+}
+
+.col-main.view-split .panel-code {
+    flex: 1;
 }
 
 .view-controls {
@@ -72,28 +93,6 @@ permalink: /rpg/gamebuilder
     flex-direction: column;
     gap: 10px;
     min-height: 0;
-}
-
-/* View modes */
-.col-main.view-code .panel-game { display: none; }
-.col-main.view-game .panel-code { display: none; }
-
-.col-main.view-code .panel-code,
-.col-main.view-game .panel-game {
-    flex: 1;
-}
-
-/* Split view: side-by-side layout */
-.col-main.view-split .main-content {
-    flex-direction: row;
-}
-
-.col-main.view-split .panel-game { 
-    flex: 0 0 45%; 
-}
-
-.col-main.view-split .panel-code { 
-    flex: 1;
 }
 
 .glass-panel {
