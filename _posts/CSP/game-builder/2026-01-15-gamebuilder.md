@@ -1,10 +1,10 @@
 ---
 layout: post
 title: Game Asset Creator
-description: Helping programmers understand how to creater a game
+description: Helping programmers understand how to create a game
 permalink: /rpg/gamebuilder
-comments: True
 ---
+
 <style>
 /* --- Theme: Deep Space Nebula --- */
 :root {
