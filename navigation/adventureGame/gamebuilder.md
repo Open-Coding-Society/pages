@@ -25,9 +25,76 @@ permalink: /rpg/gamebuilder
     box-sizing: border-box;
 }
 
-.col-asset { flex: 0 0 20%; display: flex; flex-direction: column; }
-.col-code { flex: 0 0 20%; display: flex; flex-direction: column; min-width: 0; }
-.col-game { flex: 0 0 60%; display: flex; flex-direction: column; }
+.col-asset { 
+    flex: 0 0 25%; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.col-main { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    min-width: 0;
+    position: relative;
+}
+
+.view-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.view-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    background: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.view-btn.active {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--pref-accent-color);
+}
+
+.view-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+}
+
+/* View modes */
+.col-main.view-code .panel-game { display: none; }
+.col-main.view-game .panel-code { display: none; }
+
+.col-main.view-code .panel-code,
+.col-main.view-game .panel-game {
+    flex: 1;
+}
+
+/* Split view: side-by-side layout */
+.col-main.view-split .main-content {
+    flex-direction: row;
+}
+
+.col-main.view-split .panel-game { 
+    flex: 0 0 45%; 
+}
+
+.col-main.view-split .panel-code { 
+    flex: 1;
+}
 
 .glass-panel {
     background: rgba(0,0,0,0.3);
@@ -238,25 +305,50 @@ iframe { width: 100%; height: 100%; border: none; }
 .wall-fields label { display:block; }
 
 /* --- Responsive Design --- */
-@media (max-width: 1200px) {
-    .creator-layout {
-        flex-wrap: wrap;
-    }
-    
-    .col-asset { flex: 0 0 100%; order: 1; max-height: 400px; }
-    .col-code { flex: 0 0 48%; order: 2; }
-    .col-game { flex: 0 0 48%; order: 3; }
-}
-
 @media (max-width: 768px) {
     .creator-layout {
         flex-direction: column;
         height: auto;
     }
     
-    .col-asset { flex: none; max-height: 300px; }
-    .col-code { flex: none; min-height: 300px; }
-    .col-game { flex: none; min-height: 400px; margin-bottom: 180px; }
+    .col-asset { 
+        flex: none; 
+        max-height: 300px; 
+    }
+    
+    .col-main {
+        flex: none;
+        min-height: 600px;
+    }
+    
+    /* Force split view on mobile */
+    .col-main.view-code,
+    .col-main.view-game {
+        /* Override: show both panels */
+    }
+    
+    .col-main.view-code .panel-game,
+    .col-main.view-game .panel-code {
+        display: flex !important;
+    }
+    
+    /* Always use vertical stacking on mobile */
+    .col-main .main-content {
+        flex-direction: column !important;
+    }
+    
+    .col-main .panel-game { 
+        flex: 0 0 45% !important;
+    }
+    
+    .col-main .panel-code { 
+        flex: 1 !important;
+    }
+    
+    /* Hide view toggle buttons on mobile */
+    .view-controls {
+        display: none;
+    }
     
     .gamebuilder-title {
         font-size: 1.2em;
@@ -335,20 +427,25 @@ iframe { width: 100%; height: 100%; border: none; }
             </div>
         </div>
     </div>
-    <div class="col-code">
-        <div class="glass-panel code-panel">
-            <div class="panel-header">Code View (JS)</div>
-            <div class="editor-container" id="editor-container">
-                <div id="highlight-layer" class="highlight-layer"></div>
-                <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
-            </div>
+    <div class="col-main view-split">
+        <div class="view-controls">
+            <button class="view-btn" data-view="code">Code</button>
+            <button class="view-btn" data-view="game">Game</button>
+            <button class="view-btn active" data-view="split">Split</button>
         </div>
-    </div>
-    <div class="col-game">
-        <div class="glass-panel" style="flex:1;">
-            <div class="panel-header">Game View</div>
-            <div class="game-frame">
-                <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
+        <div class="main-content">
+            <div class="glass-panel panel-game">
+                <div class="panel-header">Game View</div>
+                <div class="game-frame">
+                    <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
+                </div>
+            </div>
+            <div class="glass-panel code-panel panel-code">
+                <div class="panel-header">Code View (JS)</div>
+                <div class="editor-container" id="editor-container">
+                    <div id="highlight-layer" class="highlight-layer"></div>
+                    <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
+                </div>
             </div>
         </div>
     </div>
@@ -388,8 +485,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         editor: document.getElementById('code-editor'),
         hLayer: document.getElementById('highlight-layer'),
-        iframe: document.getElementById('game-iframe')
+        iframe: document.getElementById('game-iframe'),
+        
+        // View controls
+        colMain: document.querySelector('.col-main'),
+        viewBtns: document.querySelectorAll('.view-btn')
     };
+
+    // View toggle functionality
+    ui.viewBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.view;
+            ui.colMain.className = `col-main view-${view}`;
+            ui.viewBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
 
     // Dynamic NPCs feature
     function makeNpcSlot(index) {
