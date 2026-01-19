@@ -19,8 +19,8 @@ title: Open Coding
 description: "Class of 2026"
 owner_name: Samaghna Deshatty
 github_username: CaptainSam12
-github_repo: "Pages_Team_Repo3.0" 
-baseurl: "/Pages_Team_Repo3.0" 
+github_repo: "Pages-Team-Repo3.0" 
+baseurl: "/Pages-Team-Repo3.0" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
