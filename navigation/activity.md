@@ -75,19 +75,16 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
   .activity-item .title {
     font-weight: bold;
     margin: 8px 0;
-    color: #333;
     font-size: 1em;
   }
   
   .activity-item .short-desc {
     font-size: 0.85em;
-    color: #666;
     margin: 5px 0;
   }
   
   .activity-item .date {
     font-size: 0.8em;
-    color: #888;
     font-style: italic;
     margin: 3px 0;
   }
