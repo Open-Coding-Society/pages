@@ -72,6 +72,18 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
     margin-bottom: 10px;
   }
   
+  .activity-item .dual-images {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .activity-item .dual-images img {
+    width: calc(50% - 2.5px);
+    height: 120px;
+    margin-bottom: 0;
+  }
+  
   .activity-item .title {
     font-weight: bold;
     margin: 8px 0;
@@ -122,9 +134,28 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
       const item = document.createElement('div');
       item.className = 'activity-item';
 
-      const img = document.createElement('img');
-      img.src = activity.image;
-      img.alt = activity.title;
+      // Handle single or dual images
+      if (activity.image2) {
+        const dualContainer = document.createElement('div');
+        dualContainer.className = 'dual-images';
+        
+        const img1 = document.createElement('img');
+        img1.src = activity.image;
+        img1.alt = activity.title;
+        
+        const img2 = document.createElement('img');
+        img2.src = activity.image2;
+        img2.alt = activity.title;
+        
+        dualContainer.appendChild(img1);
+        dualContainer.appendChild(img2);
+        item.appendChild(dualContainer);
+      } else {
+        const img = document.createElement('img');
+        img.src = activity.image;
+        img.alt = activity.title;
+        item.appendChild(img);
+      }
 
       const title = document.createElement('div');
       title.className = 'title';
@@ -144,7 +175,7 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
       hoverDesc.className = 'hover-desc';
       hoverDesc.textContent = activity.hoverDesc;
 
-      item.appendChild(img);
+      //item.appendChild(img);
       item.appendChild(title);
       item.appendChild(shortDesc);
       if (activity.date) {
@@ -169,23 +200,18 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/ChessSet.jpg/640px-ChessSet.jpg",
-      title: "Chess Basics",
+      image2: "https://www.tasteofhome.com/wp-content/uploads/2024/03/Dirt-Dessert_FT24_36973_ST_0405_1-1.jpg?fit=700%2C1024",
+      title: "Chess and Dirt Cake",
       shortDesc: "Strategy & Thinking",
-      hoverDesc: "Learn the ancient game of chess! Develop critical thinking, patience, and strategic planning skills.",
+      hoverDesc: "Learn the ancient game of chess! Develop critical thinking, patience, and strategic planning skills. Dirt Cake recipe: https://www.tasteofhome.com/recipes/dirt-dessert/",
       date: "Jan 27 - Church"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/1/1e/3D_printer.png",
-      title: "3D Printing",
+      image2: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Chocolate_Chip_Cookies_-_kimberlykv.jpg",
+      title: "3D Printing and Baking",
       shortDesc: "Makerspace Fun",
-      hoverDesc: "Design and create your own 3D printed objects. Introduction to modern manufacturing technology!",
-      date: "Feb 10 - Spring Meadow Lane"
-    },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/b/b9/Chocolate_Chip_Cookies_-_kimberlykv.jpg",
-      title: "Baking & Delivery",
-      shortDesc: "Love Your Neighbor",
-      hoverDesc: "Bake delicious cookies and deliver them to neighbors. Learn baking skills while spreading joy!",
+      hoverDesc: "Design and create your own 3D printed objects. Introduction to modern manufacturing technology! Bake delicious cookies and deliver them to neighbors. Learn baking skills while spreading joy!",
       date: "Feb 10 - Spring Meadow Lane"
     },
     {
@@ -244,16 +270,10 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
-      title: "Camping & Fire",
+      image2: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Coleman_stove.jpg",
+      title: "Camping & Outdoors Activities",
       shortDesc: "Outdoor Adventure",
-      hoverDesc: "Learn campfire safety, setup camp, and how to enjoy the great outdoors under the stars!",
-      date: "Saturday May 23 - Julian"
-    },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Coleman_stove.jpg",
-      title: "Camping Cooking",
-      shortDesc: "Outdoor Chef",
-      hoverDesc: "Learn to cook delicious meals in nature! Learn camping cooking techniques and outdoor food safety.",
+      hoverDesc: "Setup camp, learn campfire safety, how to cook delicious meals in nature, hiking, milling, offroad, and how to enjoy the great outdoors under the stars!",
       date: "Saturday May 23 - Julian"
     },
     {
