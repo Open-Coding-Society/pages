@@ -1,45 +1,9 @@
 ---
 layout: post 
 show_reading_time: false
-title: Activitity Days Ideas 
-description: Here are some activities day options
+title: Activitity Days Schedule
+description: Here are the activities. Hover over image for more details
 ---
-
-## Let's Schedule
-
-Here is a brief
-
-### Nature/Physical Goals
-
-Modified Frisbee Golf → Modified Dodge Ball → Four Square → Camping and Fire → Camping and Cooking → Backpacking and Hiking → Pool Party → Scuba Basics → Gravel Biking
-
-### Talent Building
-
-Chess Playing → Learning to Draw → Learning to Paint → Wood Craft → Wood Milling
-
-### Intellectual Goals
-
-Knots and Ropes → Basic Automotive → Compass Navigation → 3D Printing Makerspace → Video Game Making → Air Rockets → Catapults
-
-### Follow Jesus and Social
-
-Love your Neighbor → Go ye into the World  → Bless your fellow man → Easter Atonement → Learn of the Prophets
-
-### Winter ❄️
-<!-- SECTION 1: Winter options -->
-<div id="winter_container"></div>
-
-### Spring 🌸
-<!-- SECTION 2: Spring options -->
-<div id="spring_container"></div>
-
-### Summer ☀️
-<!-- SECTION 3: Summer Options -->
-<div id="summer_container"></div>
-
-### Fall 🍂
-<!-- SECTION 4: Fall Options -->
-<div id="fall_container"></div>
 
 <style>
   .activity-grid {
@@ -119,6 +83,22 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
     transform: translateY(0);
   }
 </style>
+
+## Winter ❄️
+<!-- SECTION 1: Winter options -->
+<div id="winter_container"></div>
+
+## Spring 🌸
+<!-- SECTION 2: Spring options -->
+<div id="spring_container"></div>
+
+## Summer ☀️
+<!-- SECTION 3: Summer Options -->
+<div id="summer_container"></div>
+
+## Fall 🍂
+<!-- SECTION 4: Fall Options -->
+<div id="fall_container"></div>
 
 <script>
 {
@@ -219,7 +199,7 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
       title: "Basic Automotive",
       shortDesc: "Car Basics",
       hoverDesc: "Learn fundamental automotive skills: checking oil, changing tires, and understanding how cars work!",
-      date: "Feb 24 - TBD"
+      date: "Feb 24 - Church"
     },
     {
       image: "{{site.baseurl}}/images/activity/missionaries.jpeg",
@@ -367,3 +347,19 @@ Love your Neighbor → Go ye into the World  → Bless your fellow man → Easte
 </script>
 
 ---
+
+## Activity Day Compass
+
+The four areas of personal development are Spiritual, Social, Physical, and Intellectual.  Everything we do has social and physical elements.  Activity is in the title.  Christ centered is themed into all our events.
+
+### Physical Playbook
+
+Modified Frisbee Golf → Modified Dodge Ball → Four Square → Camping and Fire → Camping and Cooking → Backpacking and Hiking → Pool Party → Scuba Basics → Gravel Biking
+
+### Intellectual Focus
+
+Chess Playing → Learning to Draw → Learning to Paint → Wood Craft → Wood Milling → Knots and Ropes → Basic Automotive → Compass Navigation → 3D Printing Makerspace → Video Game Making → Air Rockets → Catapults
+
+### Spititual Connections using the examples of Jesus
+
+Love your Neighbor → Go ye into the World  → Bless your fellow man → Easter Atonement → Learn of the Prophets
