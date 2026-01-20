@@ -1619,7 +1619,7 @@ layout: post
             }).join('\n\n');
             
             events.push({
-              title: `📚 Week ${weekNum} Formative - ${courseName}`,
+              title: `[${priority}] 📚 Week ${weekNum} Formative - ${courseName}`,
               description: `Reading Materials:\n\n${lessonItems}`,
               date: readingDate,
               period: courseName,
@@ -1653,7 +1653,7 @@ layout: post
             }).join('\n\n');
             
             events.push({
-              title: `📝 Week ${weekNum} Summative - ${courseName}`,
+              title: `[${priority}] 📝 Week ${weekNum} Summative - ${courseName}`,
               description: `Assessments Due:\n\n${assignmentItems}`,
               date: assessmentDate,
               period: courseName,
@@ -1753,8 +1753,13 @@ layout: post
       
       for (const weekCard of weekCards) {
         const weekNum = parseInt(weekCard.dataset.week);
-        
-        // Formative event title pattern
+
+        // Formative event title patterns (with all priority levels)
+        ['P0', 'P1', 'P2', 'P3'].forEach(p => {
+          eventTitlesToDelete.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
+          eventTitlesToDelete.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
+        });
+        // Also include old format without priority for backwards compatibility
         eventTitlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
         
         // Summative event title pattern
