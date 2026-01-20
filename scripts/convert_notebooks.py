@@ -186,8 +186,21 @@ def process_code_runner_cells(notebook, permalink):
     return notebook
 
 
-def inject_code_runners(markdown, notebook):
-    """Inject code-runner includes after code blocks with metadata"""
+def inject_code_runners(markdown, notebook, front_matter=None):
+    """Inject code-runner includes after code blocks with metadata
+    
+    If front_matter contains 'challenge_submit: true', also injects:
+    - challenge-submit-button.html after each code-runner
+    - lesson-submit-button.html at the end of the document
+    """
+    if front_matter is None:
+        front_matter = {}
+    
+    challenge_submit_enabled = front_matter.get('challenge_submit', False)
+    permalink = front_matter.get('permalink', '')
+    # Generate lesson_key from permalink (e.g., "/csa/frqs/2019/3" -> "csa-frqs-2019-3")
+    lesson_key = permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
+    
     lines = markdown.split('\n')
     result = []
     in_code_block = False
@@ -250,6 +263,13 @@ def inject_code_runners(markdown, notebook):
                     result.append('   code=code' + str(code_cell_count - 1))
                     result.append('%}')                
                     result.append('')
+                    
+                    # If challenge_submit is enabled, add individual submit button
+                    if challenge_submit_enabled:
+                        result.append('{% include challenge-submit-button.html')
+                        result.append('   runner_id="' + runner_data['runner_id'] + '"')
+                        result.append('%}')
+                        result.append('')
                 else:
                     # Regular code block without code-runner
                     result.extend(code_block_content)
@@ -262,6 +282,14 @@ def inject_code_runners(markdown, notebook):
             result.append(line)
         
         i += 1
+    
+    # If challenge_submit is enabled, add lesson submit button at the end
+    if challenge_submit_enabled:
+        result.append('')
+        result.append('{% include lesson-submit-button.html')
+        result.append('   lesson_key="' + lesson_key + '"')
+        result.append('%}')
+        result.append('')
     
     return '\n'.join(result)
 
@@ -285,8 +313,8 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         markdown, _ = exporter.from_notebook_node(notebook)
         markdown = fix_js_code_blocks(markdown) # Fix JS code blocks
         
-        # Inject code-runner includes
-        markdown = inject_code_runners(markdown, notebook)
+        # Inject code-runner includes (and submit buttons if challenge_submit is enabled)
+        markdown = inject_code_runners(markdown, notebook, front_matter)
         
         front_matter_content = (
             "---\n"
