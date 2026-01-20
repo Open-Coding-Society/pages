@@ -202,6 +202,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     */
 
     const startTime = Date.now();
+    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
     let runURL;
     if (lang === "python") runURL = `${pythonURI}/run/python`;
@@ -217,12 +218,42 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
         const endTime = Date.now();
         const execTime = endTime - startTime;
         const output = result.output || "[no output]";
+        
+        // Check if backend returned a Node.js error - throw to trigger catch block
+        if (lang === "javascript" && isLocalhost && output.includes("No such file or directory: 'node'")) {
+          throw new Error('Node.js not available on backend');
+        }
+        
         outputDiv.textContent = output;
         execTimeSpan.textContent = `⏱Execution time: ${execTime}ms`;
       })
       .catch(err => {
-        outputDiv.textContent = "Error: " + err.message;
-        execTimeSpan.textContent = '';
+        // Fallback to local eval for JavaScript on localhost (handles both network and backend errors)
+        if (lang === "javascript" && isLocalhost) {
+          try {
+            const logs = [];
+            const originalLog = console.log;
+            console.log = function(...args) {
+              logs.push(args.map(arg => String(arg)).join(' '));
+              originalLog.apply(console, args);
+            };
+
+            eval(code);
+
+            console.log = originalLog;
+
+            const localEndTime = Date.now();
+            const localExecTime = localEndTime - startTime;
+            outputDiv.textContent = logs.length > 0 ? logs.join('\n') : "[no output]";
+            execTimeSpan.textContent = `⏱Execution time: ${localExecTime}ms (local fallback)`;
+          } catch (evalErr) {
+            outputDiv.textContent = "Error: " + evalErr.message;
+            execTimeSpan.textContent = '';
+          }
+        } else {
+          outputDiv.textContent = "Error: " + err.message;
+          execTimeSpan.textContent = '';
+        }
       });
   }
 

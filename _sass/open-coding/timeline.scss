@@ -1303,6 +1303,9 @@
 
   .date-actions {
     margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .sync-sprint-calendar-btn {
@@ -1323,6 +1326,41 @@
     
     &:hover {
       opacity: 0.9;
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .delete-sprint-calendar-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: #dc2626;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s, transform 0.1s;
+    
+    &:hover {
+      opacity: 0.9;
+      background: #b91c1c;
     }
     
     &:active {
