@@ -1,64 +1,163 @@
 ---
-layout: post
-title: Game Asset Creator
+layout: opencs 
+title: GameBuilder
 description: Helping programmers understand how to create a game
 permalink: /rpg/gamebuilder
 ---
 
 <style>
-/* --- Theme: Deep Space Nebula --- */
-:root {
-    --space-bg: #0b0d17;
-    --glass-bg: rgba(15, 20, 35, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --neon-blue: #00f3ff;
-    --neon-purple: #bc13fe;
-    --text-main: #e0e6ed;
-    --text-muted: #94a3b8;
-}
-
-body {
-    background: radial-gradient(circle at 50% 50%, #1f253a 0%, #000000 100%);
-    background-attachment: fixed;
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-}
-
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
+
+/* --- Main Title --- */
+.gamebuilder-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
 
 /* --- Main Layout --- */
 .creator-layout {
     display: flex;
-    gap: 20px;
-    padding: 20px;
+    gap: 10px;
+    padding: 10px;
     height: 92vh;
     box-sizing: border-box;
 }
 
-.col-game { flex: 0 0 45%; display: flex; flex-direction: column; gap: 15px; }
-.col-tools { flex: 1; display: flex; gap: 15px; min-width: 0; }
+.col-asset { 
+    flex: 0 0 20%; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.col-main { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    min-width: 0;
+    position: relative;
+}
+
+.col-main.view-code .panel-game { display: none; }
+.col-main.view-game .panel-code { display: none; }
+
+.col-main.view-code .panel-code,
+.col-main.view-game .panel-game {
+    flex: 1;
+}
+
+/* Split view: side-by-side layout */
+.col-main.view-split .main-content {
+    flex-direction: row;
+}
+
+.col-main.view-split .panel-game {
+    flex: 0 0 55%;
+}
+
+.col-main.view-split .panel-code {
+    flex: 1;
+}
+
+.view-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.view-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    background: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.view-btn.active {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--pref-accent-color);
+}
+
+.view-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+}
 
 .glass-panel {
-    background: var(--glass-bg);
+    background: rgba(0,0,0,0.3);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
 }
 
 .panel-header {
     padding: 16px;
     background: rgba(0,0,0,0.3);
-    border-bottom: 1px solid var(--glass-border);
-    color: var(--neon-blue);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.9em;
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.panel-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.icon-btn:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.step-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-right: 4px;
 }
 
 .scroll-form { flex: 1; overflow-y: auto; padding: 15px; }
@@ -69,64 +168,113 @@ body {
     padding: 14px;
     margin-bottom: 15px;
 }
-.group-title { font-size: 0.8em; color: var(--neon-purple); font-weight: bold; margin-bottom: 12px; }
+.group-title { 
+    font-size: 0.8em; 
+    font-weight: bold; 
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-label { display: block; font-size: 0.7em; color: var(--text-muted); margin-bottom: 5px; }
+.add-item-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+}
+
+label { display: block; font-size: 0.7em; margin-bottom: 5px; }
 select, input {
-    width: 100%; background: #000; border: 1px solid #333;
-    color: #fff; padding: 8px; border-radius: 4px; font-size: 0.85em; margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin-bottom: 10px;
 }
 
 /* --- Control Buttons --- */
-.button-footer { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); }
 .btn {
-    padding: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;
-    transition: all 0.2s; text-transform: uppercase; font-size: 0.85em;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    font-size: 0.85em;
 }
-.btn-confirm { background: #333; color: var(--neon-blue); border: 1px solid var(--neon-blue); }
-.btn-run { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,243,255,0.3); }
-.btn-danger { background: #ff4d4f; color: #fff; border: 1px solid #ff4d4f; }
+.btn-confirm { }
+.btn-run { }
+.btn-danger { }
+
+.help-panel {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 16px;
+    background: rgba(0,0,0,0.95);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px;
+    max-width: 300px;
+    z-index: 100;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.help-panel.active { display: block; }
 
 /* --- Code Editor & Surgical Highlights --- */
 .code-panel { flex: 1; position: relative; }
-.editor-container { 
-    position: relative; 
-    flex: 1; 
-    width: 100%; 
-    overflow: hidden; 
-    background: #0c0f16; 
+.editor-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
 }
 .code-layer {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    padding: 20px; box-sizing: border-box;
-    font-family: 'Fira Code', 'Courier New', monospace; 
-    font-size: 13px; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 13px;
     line-height: 20px; /* Crucial: Must match JS offset */
-    color: #d4d4d4; 
-    background: transparent; 
-    border: none; 
-    resize: none; 
+    border: none;
+    resize: none;
     outline: none;
-    z-index: 2; 
-    white-space: pre; 
+    z-index: 2;
+    white-space: pre;
     overflow: auto;
 }
 .highlight-layer {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
     padding: 20px; /* Must match textarea padding */
-    box-sizing: border-box; 
-    pointer-events: none; 
+    box-sizing: border-box;
+    pointer-events: none;
     z-index: 1;
 }
 .highlight-box {
-    position: absolute; 
-    background: rgba(255, 215, 0, 0.25);
-    border-left: 4px solid #ffd700;
-    left: 10px; 
+    position: absolute;
+    background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
+    border-left: 4px solid var(--pref-accent-color);
+    left: 10px;
     width: calc(100% - 20px);
     display: block !important; /* Ensure visibility */
 }
@@ -134,8 +282,8 @@ select, input {
 /* Persistent box after typing completes (bordered, minimal fill) */
 .highlight-persistent-block {
     position: absolute;
-    background: rgba(255, 215, 0, 0.12);
-    border: 2px solid #ffd700;
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+    border: 2px solid var(--pref-accent-color);
     border-left-width: 4px;
     left: 10px;
     width: calc(100% - 20px);
@@ -144,24 +292,91 @@ select, input {
 /* Typing state highlight (more vivid while animating) */
 .typing-highlight {
     position: absolute;
-    background: rgba(255, 235, 59, 0.25);
-    border-left: 4px solid #ffeb3b;
+    background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
+    border-left: 4px solid var(--pref-accent-color);
     left: 10px;
     width: calc(100% - 20px);
 }
 
-.game-frame { flex: 1; background: #000; }
+.game-frame { flex: 1; }
 iframe { width: 100%; height: 100%; border: none; }
-/* Sidebar component removed */
-.wall-slot { margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
+.wall-slot { margin-top:8px; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
 .wall-fields label { display:block; }
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .creator-layout {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .col-asset { 
+        flex: none; 
+        max-height: 300px; 
+    }
+    
+    .col-main {
+        flex: none;
+        min-height: 600px;
+    }
+    
+    /* Force split view on mobile */
+    .col-main.view-code,
+    .col-main.view-game {
+        /* Override: show both panels */
+    }
+    
+    .col-main.view-code .panel-game,
+    .col-main.view-game .panel-code {
+        display: flex !important;
+    }
+    
+    /* Always use vertical stacking on mobile */
+    .col-main .main-content {
+        flex-direction: column !important;
+    }
+    
+    .col-main .panel-game { 
+        flex: 0 0 45% !important;
+    }
+    
+    .col-main .panel-code { 
+        flex: 1 !important;
+    }
+    
+    /* Hide view toggle buttons on mobile */
+    .view-controls {
+        display: none;
+    }
+    
+    .gamebuilder-title {
+        font-size: 1.2em;
+    }
+}
+
 </style>
 
+<div class="gamebuilder-title">{{page.title}}</div>
 
 <div class="creator-layout">
-    <div class="col-tools">
-        <div class="glass-panel creator-panel">
-            <div class="panel-header">Asset Configurations</div>
+    <div class="col-asset">
+        <div class="glass-panel creator-panel" style="position: relative;">
+            <div class="panel-header">
+                <span>Assets</span>
+                <div class="panel-controls">
+                    <span class="step-indicator" id="step-indicator-mini">Step 1/2</span>
+                    <button id="btn-confirm" class="icon-btn" data-tooltip="Confirm Step">✓</button>
+                    <button id="btn-run" class="icon-btn" data-tooltip="Run Game">▶</button>
+                    <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
+                </div>
+            </div>
+            <div class="help-panel" id="help-panel">
+                <strong>Steps:</strong><br>
+                1. Background - Select environment<br>
+                2. Player - Configure character<br>
+                3. Freestyle - Add NPCs, Walls, etc<br><br>
+                <strong>Tips:</strong> Walls are invisible in-game. They show briefly when editing.
+            </div>
             <div class="scroll-form">
                 <div class="asset-group">
                     <div class="group-title">ENVIRONMENT</div>
@@ -173,7 +388,6 @@ iframe { width: 100%; height: 100%; border: none; }
                         <option value="clouds">Sky Kingdom</option>
                     </select>
                 </div>
-                
                 <div class="asset-group">
                     <div class="group-title">PLAYER</div>
                     <label>Name</label>
@@ -196,167 +410,41 @@ iframe { width: 100%; height: 100%; border: none; }
                     </select>
                 </div>
                 <div class="asset-group">
-                    <div class="group-title">NPC</div>
-                    <div class="npc-slots">
-                        <div class="npc-slot" id="npc-slot-1">
-                            <button class="btn" id="add-npc-1">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-1" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc1-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc1-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc1-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc1-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc1-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc1-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-2">
-                            <button class="btn" id="add-npc-2">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-2" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc2-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc2-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc2-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc2-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc2-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc2-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-3">
-                            <button class="btn" id="add-npc-3">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-3" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc3-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc3-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc3-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc3-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc3-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc3-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-4">
-                            <button class="btn" id="add-npc-4">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-4" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc4-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc4-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc4-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc4-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc4-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc4-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="npc-slot" id="npc-slot-5">
-                            <button class="btn" id="add-npc-5">Add NPC</button>
-                            <div class="npc-fields" id="npc-fields-5" style="display:none; margin-top:8px; border: 1px solid #444; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08);">
-                                <label>ID</label>
-                                <input type="text" id="npc5-id" value="" placeholder="NPC id">
-                                <label>Message</label>
-                                <input type="text" id="npc5-msg" value="" placeholder="Message when interacted with">
-                                <label>Sprite</label>
-                                <select id="npc5-sprite">
-                                    <option value="" selected disabled>Select sprite…</option>
-                                    <option value="chillguy">Chill Guy</option>
-                                    <option value="tux">Tux (penguin)</option>
-                                    <option value="r2d2">R2D2</option>
-                                </select>
-                                <label>Position X</label>
-                                <input type="range" id="npc5-x" min="0" max="800" value="500">
-                                <label>Position Y</label>
-                                <input type="range" id="npc5-y" min="0" max="600" value="300">
-                                <div class="npc-actions" style="margin-top:8px; display:flex; gap:8px;">
-                                    <button class="btn btn-sm btn-danger" id="npc5-delete">Delete</button>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="group-title">
+                        <span>NPC</span>
+                        <button class="add-item-btn" id="add-npc">+</button>
                     </div>
+                    <div id="npcs-container"></div>
                 </div>
-                
                 <div class="asset-group">
-                    <div class="group-title">WALLS</div>
-                    <button class="btn" id="add-wall">Add Wall</button>
-                    <div id="walls-container" style="margin-top:8px;"></div>
-                    <div style="margin-top:6px; font-size:0.8em; color: var(--text-muted);">
-                        Walls are invisible in the game. <br>
-                        They briefly show when a slot is <br>
-                        opened for editing.
+                    <div class="group-title">
+                        <span>WALLS</span>
+                        <button class="add-item-btn" id="add-wall">+</button>
                     </div>
+                    <div id="walls-container"></div>
                 </div>
-                
-            </div>
-            <div class="button-footer">
-                <button id="btn-confirm" class="btn btn-confirm">Confirm Step</button>
-                <button id="btn-run" class="btn btn-run">Run Game</button>
-                <div id="progress-indicator" style="font-size: 0.8em; color: var(--text-muted);">Step: background → player → freestyle</div>
-                <ol class="steps-numbered" style="margin: 8px 0 0 18px; color: var(--text-muted); font-size: 0.85em;">
-                    <li>Step 1: Background</li>
-                    <li>Step 2: Player</li>
-                </ol>
-                <div id="freestyle-notice" style="display:none; margin-top: 4px; padding: 6px; border: 1px solid var(--neon-blue); border-radius: 6px; color: var(--neon-blue); background: rgba(0,243,255,0.08); font-size: 0.85em; line-height: 1.2;">
-                    freestyle unlocked !<br>
-                    you can edit whatever you want
-                </div>
-            </div>
-        </div>
-
-        <div class="glass-panel code-panel">
-            <div class="panel-header">Level Logic (JS)</div>
-            <div class="editor-container" id="editor-container">
-                <div id="highlight-layer" class="highlight-layer"></div>
-                <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
             </div>
         </div>
     </div>
-
-    <div class="col-game">
-        <div class="glass-panel" style="flex:1;">
-            <div class="panel-header">Game Preview</div>
-            <div class="game-frame">
-                <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
+    <div class="col-main view-split">
+        <div class="view-controls">
+            <button class="view-btn" data-view="code">Code</button>
+            <button class="view-btn" data-view="game">Game</button>
+            <button class="view-btn active" data-view="split">Split</button>
+        </div>
+        <div class="main-content">
+            <div class="glass-panel panel-game">
+                <div class="panel-header">Game View</div>
+                <div class="game-frame">
+                    <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
+                </div>
+            </div>
+            <div class="glass-panel code-panel panel-code">
+                <div class="panel-header">Code View (JS)</div>
+                <div class="editor-container" id="editor-container">
+                    <div id="highlight-layer" class="highlight-layer"></div>
+                    <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
+                </div>
             </div>
         </div>
     </div>
@@ -383,20 +471,12 @@ document.addEventListener('DOMContentLoaded', () => {
         pX: document.getElementById('player-x'),
         pY: document.getElementById('player-y'),
         pName: document.getElementById('player-name'),
-        npcs: [1,2,3,4,5].map(i => ({
-            addBtn: document.getElementById(`add-npc-${i}`),
-            fieldsContainer: document.getElementById(`npc-fields-${i}`),
-            nId: document.getElementById(`npc${i}-id`),
-            nMsg: document.getElementById(`npc${i}-msg`),
-            nSprite: document.getElementById(`npc${i}-sprite`),
-            nX: document.getElementById(`npc${i}-x`),
-            nY: document.getElementById(`npc${i}-y`),
-            deleteBtn: document.getElementById(`npc${i}-delete`),
-            locked: false,
-            index: i,
-            displayName: ''
-        })),
         
+        // NPCs UI (dynamic slots)
+        addNpcBtn: document.getElementById('add-npc'),
+        npcsContainer: document.getElementById('npcs-container'),
+        npcs: [],
+
         // Walls UI (dynamic slots)
         addWallBtn: document.getElementById('add-wall'),
         wallsContainer: document.getElementById('walls-container'),
@@ -405,61 +485,116 @@ document.addEventListener('DOMContentLoaded', () => {
         editor: document.getElementById('code-editor'),
         hLayer: document.getElementById('highlight-layer'),
         iframe: document.getElementById('game-iframe'),
-        notice: document.getElementById('freestyle-notice')
+        
+        // View controls
+        colMain: document.querySelector('.col-main'),
+        viewBtns: document.querySelectorAll('.view-btn')
     };
 
-    // Toggle NPC fields on 'Add NPC' click (open/close)
-    ui.npcs.forEach(slot => {
-        if (slot.addBtn && slot.fieldsContainer) {
-            slot.addBtn.addEventListener('click', () => {
-                const isVisible = slot.fieldsContainer.style.display !== 'none';
-                // Toggle dropdown visibility
-                slot.fieldsContainer.style.display = isVisible ? 'none' : '';
-                // When closing the dropdown, commit NPC and keep it present
-                if (isVisible) {
-                    // We are closing; lock the NPC and update header state
-                    const name = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC');
-                    slot.locked = true;
-                    slot.displayName = name;
-                    slot.addBtn.classList.add('btn-confirm');
-                    // Show delete when locked
-                    if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
-                }
-                // Update button label with caret and name
-                const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add NPC';
-                const caret = isVisible ? ' ▸' : ' ▾';
-                slot.addBtn.textContent = labelBase + caret;
-                updateStepUI();
-                syncFromControlsIfFreestyle();
-            });
-        }
-        // Ensure delete starts hidden until NPC is created
-        if (slot.deleteBtn) slot.deleteBtn.style.display = 'none';
-        // Delete action
-        if (slot.deleteBtn) {
-            slot.deleteBtn.addEventListener('click', () => {
-                // Clear values and hide panel
-                if (slot.nId) slot.nId.value = '';
-                if (slot.nMsg) slot.nMsg.value = '';
-                if (slot.nSprite) slot.nSprite.value = '';
-                if (slot.nX) slot.nX.value = 500;
-                if (slot.nY) slot.nY.value = 300;
-                slot.locked = false;
-                slot.displayName = '';
-                if (slot.fieldsContainer) slot.fieldsContainer.style.display = 'none';
-                if (slot.addBtn) {
-                    slot.addBtn.textContent = 'Add NPC ▸';
-                    slot.addBtn.classList.remove('btn-confirm');
-                }
-                if (slot.deleteBtn) {
-                    slot.deleteBtn.disabled = true;
-                    slot.deleteBtn.style.display = 'none';
-                }
-                updateStepUI();
-                syncFromControlsIfFreestyle();
-            });
-        }
+    // View toggle functionality
+    ui.viewBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.view;
+            ui.colMain.className = `col-main view-${view}`;
+            ui.viewBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
     });
+
+    // Dynamic NPCs feature
+    function makeNpcSlot(index) {
+        const slot = {
+            index,
+            locked: false,
+            displayName: '',
+            container: document.createElement('div'),
+            fieldsOpen: false
+        };
+        slot.container.className = 'wall-slot';
+        const headerBtn = document.createElement('button');
+        headerBtn.className = 'btn';
+        headerBtn.textContent = `NPC ${index} ▸`;
+        const fields = document.createElement('div');
+        fields.className = 'wall-fields';
+        fields.style.display = 'none';
+        fields.innerHTML = `
+            <label>ID</label>
+            <input type="text" placeholder="NPC id" class="npc-id">
+            <label>Message</label>
+            <input type="text" placeholder="Message when interacted with" class="npc-msg">
+            <label>Sprite</label>
+            <select class="npc-sprite">
+                <option value="" selected disabled>Select sprite…</option>
+                <option value="chillguy">Chill Guy</option>
+                <option value="tux">Tux (penguin)</option>
+                <option value="r2d2">R2D2</option>
+            </select>
+            <label>Position X</label>
+            <input type="range" min="0" max="800" value="500" class="npc-x">
+            <label>Position Y</label>
+            <input type="range" min="0" max="600" value="300" class="npc-y">
+            <div style="margin-top:8px; display:flex; gap:8px;">
+                <button class="btn btn-sm btn-danger npc-delete">Delete</button>
+            </div>
+        `;
+        slot.container.appendChild(headerBtn);
+        slot.container.appendChild(fields);
+        ui.npcsContainer.appendChild(slot.container);
+
+        // Bind DOM refs
+        slot.addBtn = headerBtn;
+        slot.fieldsContainer = fields;
+        slot.nId = fields.querySelector('.npc-id');
+        slot.nMsg = fields.querySelector('.npc-msg');
+        slot.nSprite = fields.querySelector('.npc-sprite');
+        slot.nX = fields.querySelector('.npc-x');
+        slot.nY = fields.querySelector('.npc-y');
+        slot.deleteBtn = fields.querySelector('.npc-delete');
+
+        // Toggle open/close
+        headerBtn.addEventListener('click', () => {
+            const wasOpen = fields.style.display !== 'none';
+            fields.style.display = wasOpen ? 'none' : '';
+            slot.fieldsOpen = !wasOpen;
+            const labelBase = slot.displayName && slot.locked ? slot.displayName : `NPC ${index}`;
+            headerBtn.textContent = labelBase + (wasOpen ? ' ▸' : ' ▾');
+            if (slot.locked && slot.displayName) headerBtn.classList.add('btn-confirm'); else headerBtn.classList.remove('btn-confirm');
+            updateStepUI();
+            syncFromControlsIfFreestyle();
+        });
+
+        // Delete
+        slot.deleteBtn.addEventListener('click', () => {
+            slot.container.remove();
+            ui.npcs = ui.npcs.filter(n => n !== slot);
+            updateStepUI();
+            syncFromControlsIfFreestyle();
+        });
+
+        // Change listeners for freestyle sync
+        ['input','change'].forEach(evt => {
+            slot.nId.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nMsg.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nSprite.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nX.addEventListener(evt, syncFromControlsIfFreestyle);
+            slot.nY.addEventListener(evt, syncFromControlsIfFreestyle);
+        });
+
+        ui.npcs.push(slot);
+        return slot;
+    }
+
+    if (ui.addNpcBtn) {
+        ui.addNpcBtn.addEventListener('click', () => {
+            const slot = makeNpcSlot(ui.npcs.length + 1);
+            // Auto-open newly added slot for easy editing
+            if (slot.fieldsContainer) slot.fieldsContainer.style.display = '';
+            slot.fieldsOpen = true;
+            slot.addBtn.textContent = `NPC ${ui.npcs.length} ▾`;
+            updateStepUI();
+            syncFromControlsIfFreestyle();
+        });
+    }
 
     // Dynamic Walls feature
     function makeWallSlot(index) {
@@ -473,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
         slot.container.className = 'wall-slot';
         const headerBtn = document.createElement('button');
         headerBtn.className = 'btn';
-        headerBtn.textContent = 'Add Wall ▸';
+        headerBtn.textContent = `Wall ${index} ▸`;
         const fields = document.createElement('div');
         fields.className = 'wall-fields';
         fields.style.display = 'none';
@@ -508,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const wasOpen = fields.style.display !== 'none';
             fields.style.display = wasOpen ? 'none' : '';
             slot.fieldsOpen = !wasOpen;
-            const labelBase = slot.displayName && slot.locked ? slot.displayName : 'Add Wall';
+            const labelBase = slot.displayName && slot.locked ? slot.displayName : `Wall ${index}`;
             headerBtn.textContent = labelBase + (wasOpen ? ' ▸' : ' ▾');
             if (slot.locked && slot.displayName) headerBtn.classList.add('btn-confirm'); else headerBtn.classList.remove('btn-confirm');
             updateStepUI();
@@ -541,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Auto-open newly added slot for easy editing
             if (slot.fieldsContainer) slot.fieldsContainer.style.display = '';
             slot.fieldsOpen = true;
-            slot.addBtn.textContent = 'Add Wall ▾';
+            slot.addBtn.textContent = `Wall ${ui.walls.length} ▾`;
             updateStepUI();
             syncFromControlsIfFreestyle();
         });
@@ -551,11 +686,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = { persistent: null, typing: null, userEdited: false, programmaticEdit: false };
     const steps = ['background','player','freestyle'];
     let stepIndex = 0; // start at 'background'
-    const indicator = document.getElementById('progress-indicator');
+    const stepIndicatorMini = document.getElementById('step-indicator-mini');
+    const helpBtn = document.getElementById('btn-help');
+    const helpPanel = document.getElementById('help-panel');
+
+    // Help button toggle
+    if (helpBtn && helpPanel) {
+        helpBtn.addEventListener('click', () => {
+            helpPanel.classList.toggle('active');
+        });
+        // Close help when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!helpBtn.contains(e.target) && !helpPanel.contains(e.target)) {
+                helpPanel.classList.remove('active');
+            }
+        });
+    }
 
     function setIndicator() {
         const current = steps[stepIndex];
-        indicator.textContent = `Step: ${current}`;
+        if (stepIndicatorMini) {
+            if (stepIndex < 2) {
+                stepIndicatorMini.textContent = `Step ${stepIndex + 1}/2`;
+            } else {
+                stepIndicatorMini.textContent = 'Freestyle';
+            }
+        }
     }
 
     function lockField(el) { if (el) { el.disabled = true; el.classList.add('locked'); } }
@@ -576,7 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (slot.addBtn) slot.addBtn.disabled = true;
             fields.forEach(el => { if (el) el.disabled = true; });
         });
-        
+
         if (current === 'background') {
             unlockField(ui.bg);
         } else if (current === 'player') {
@@ -585,25 +741,21 @@ document.addEventListener('DOMContentLoaded', () => {
             unlockField(ui.pY);
             unlockField(ui.pName);
             unlockField(mv);
-            
+
         } else if (current === 'npc') {
             // Enable add buttons and manage NPC fields based on locked state
+            if (ui.addNpcBtn) ui.addNpcBtn.disabled = false;
             ui.npcs.forEach(slot => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
-                if (slot.deleteBtn) {
-                    slot.deleteBtn.disabled = !slot.locked;
-                    slot.deleteBtn.style.display = slot.locked ? '' : 'none';
-                }
+                // Editable only when open
                 if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
-                    // Fields are editable when dropdown is open
-                    unlockField(slot.nId);
-                    unlockField(slot.nMsg);
-                    unlockField(slot.nSprite);
-                    unlockField(slot.nX);
-                    unlockField(slot.nY);
+                    [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY].forEach(el => unlockField(el));
+                    if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
+                } else {
+                    if (slot.deleteBtn) { slot.deleteBtn.disabled = !slot.locked; slot.deleteBtn.style.display = slot.locked ? '' : 'none'; }
                 }
             });
-            
+
         } else if (current === 'walls') {
             if (ui.addWallBtn) ui.addWallBtn.disabled = false;
             ui.walls.forEach(slot => {
@@ -620,9 +772,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (current === 'freestyle') {
             ui.editor.readOnly = false;
             [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = false; });
+            if (ui.addNpcBtn) ui.addNpcBtn.disabled = false;
             ui.npcs.forEach(slot => {
                 if (slot.addBtn) slot.addBtn.disabled = false;
                 [slot.nId, slot.nMsg, slot.nSprite, slot.nX, slot.nY].forEach(el => { if (el) el.disabled = false; });
+                if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
             if (ui.addWallBtn) ui.addWallBtn.disabled = false;
             ui.walls.forEach(slot => {
@@ -630,11 +784,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 [slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
-            
-        }
-        // Show or hide freestyle unlocked notice
-        if (ui.notice) {
-            ui.notice.style.display = (current === 'freestyle') ? '' : 'none';
+
         }
     }
 
@@ -681,7 +831,6 @@ import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackgr
 import Player from '/assets/js/adventureGame/GameEngine/Player.js';
 import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
 import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
-        
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -1013,7 +1162,7 @@ export const gameLevelClasses = [CustomLevel];`;
                 slot.displayName = name;
                 const isVisible = slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none';
                 const caret = isVisible ? ' ▾' : ' ▸';
-                slot.addBtn.textContent = (slot.locked ? name : 'Add NPC') + caret;
+                slot.addBtn.textContent = (slot.locked ? name : 'NPC') + caret;
             }
         });
         if (slot.nMsg) slot.nMsg.addEventListener('input', syncFromControlsIfFreestyle);
@@ -1021,7 +1170,6 @@ export const gameLevelClasses = [CustomLevel];`;
         if (slot.nX) slot.nX.addEventListener('input', syncFromControlsIfFreestyle);
         if (slot.nY) slot.nY.addEventListener('input', syncFromControlsIfFreestyle);
     });
-    
 
     document.getElementById('btn-confirm').addEventListener('click', () => {
         const oldCode = ui.editor.value;
@@ -1042,7 +1190,7 @@ export const gameLevelClasses = [CustomLevel];`;
                     if (slot.fieldsContainer && slot.fieldsContainer.style.display !== 'none') {
                         // Mark as locked so updateStepUI keeps fields disabled until edited
                         slot.locked = true;
-                        // Update Add NPC button to show user-named NPC and highlight
+                        // Update NPC button to show user-named NPC and highlight
                         const name = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC');
                         slot.displayName = name;
                         if (slot.addBtn) {
@@ -1056,7 +1204,7 @@ export const gameLevelClasses = [CustomLevel];`;
                         }
                     }
                 });
-                
+
                 // After NPC confirmation, go to freestyle
                 stepIndex = steps.indexOf('freestyle');
             } else {
