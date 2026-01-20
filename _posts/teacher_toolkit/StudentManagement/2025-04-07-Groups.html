@@ -10,7 +10,7 @@ comments: false
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
     <!-- Page Title -->
-    <h2 class="text-2xl font-semibold text-white mb-6">Group Management</h2>
+    <h2 class="text-2xl font-semibold text-white mb-6">Groups Management</h2>
 
     <!-- Unified Filter Bar -->
     <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4 mb-6">
@@ -173,12 +173,6 @@ comments: false
               <option value="CSP">CSP</option>
               <option value="CSA">CSA</option>
             </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-200 mb-2">Members (one per line, enter UIDs)</label>
-            <textarea id="newGroupMembers" rows="4" placeholder="Enter member names, one per line"
-              class="w-full px-4 py-2 bg-neutral-600 text-white placeholder-gray-400 border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
           </div>
 
           <div class="flex gap-3 justify-end">
@@ -381,17 +375,13 @@ window.saveNewGroup = async function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
-  const rawUIDs = document.getElementById("newGroupMembers").value;
 
   if (!name || !period || !course) {
     alert("Please fill all required fields.");
     return;
   }
 
-  const uids = parseUIDs(rawUIDs);
-
   try {
-    // 1️⃣ Create group (NO MEMBERS)
     const groupRes = await fetch(`${javaURI}/api/groups`, {
       ...fetchOptions,
       method: "POST",
@@ -403,21 +393,6 @@ window.saveNewGroup = async function () {
     });
 
     if (!groupRes.ok) throw new Error("Group creation failed");
-
-    const group = await groupRes.json();
-    const groupId = group.id;
-
-    // 2️⃣ Resolve & add each UID
-    for (const uid of uids) {
-      // Flask validation
-      const validatedUID = await validateUIDWithFlask(uid);
-
-      // Java UID → person.id
-      const personId = await getPersonIdFromUID(validatedUID);
-
-      // Add to group
-      await addPersonToGroup(groupId, personId);
-    }
 
     cancelAddGroup();
     await loadGroups();
@@ -490,16 +465,16 @@ window.renderGroups = function () {
       <div class="mt-3 flex flex-wrap gap-2">
         ${(group.members || []).map(m => `
           <span class="px-3 py-1 bg-neutral-600 text-sm text-gray-200 rounded-full">
-            ${m.name}
+            ${m.name} (${m.uid})
           </span>
         `).join("")}
       </div>
 
-      <!-- Add / Remove by UID -->
+      <!-- Add / Remove by GitHub ID -->
       <div class="mt-4 flex items-center gap-2">
         <input
           type="text"
-          placeholder="Enter UID"
+          placeholder="Enter GitHub ID"
           class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           id="member-uid-${group.id}"
         />
@@ -551,7 +526,6 @@ window.cancelAddGroup = function () {
   document.getElementById("newGroupName").value = "";
   document.getElementById("newGroupPeriod").value = "";
   document.getElementById("newGroupClass").value = "";
-  document.getElementById("newGroupMembers").value = "";
 }
 
 /* ================================

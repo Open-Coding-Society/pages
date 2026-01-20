@@ -1096,5 +1096,333 @@
   #help-modal .close-btn {
     @include modal-close-btn;
   }
+
+  /* ============================= */
+  /*     SPRINT CALENDAR SYNC      */
+  /* ============================= */
+
+  .sprint-date-control {
+    position: relative;
+    display: inline-block;
+  }
+
+  .sprint-btn.date-toggle {
+    @include toggle-button;
+    padding: 8px 12px;
+    font-size: 14px;
+    
+    &:hover {
+      background: $bg-2;
+    }
+    
+    i {
+      color: var(--pref-accent-color);
+    }
+  }
+
+  .sprint-date-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    min-width: 320px;
+    background: $bg-1;
+    border: 1px solid $bg-3;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    margin-top: 8px;
+    
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .date-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $bg-3;
+    
+    span {
+      font-weight: 600;
+      color: $text;
+      font-size: 14px;
+    }
+  }
+
+  .date-dropdown-close {
+    background: none;
+    border: none;
+    color: $text-muted;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    
+    &:hover {
+      color: $text;
+    }
+  }
+
+  .calendar-sync-info {
+    margin-bottom: 16px;
+  }
+
+  .sprint-week-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: $bg-2;
+    border-radius: 8px;
+    font-size: 13px;
+    color: $text-muted;
+    margin-bottom: 12px;
+    
+    i {
+      color: var(--pref-accent-color);
+    }
+    
+    strong {
+      color: $text;
+    }
+  }
+
+  .sprint-date-preview {
+    padding: 12px;
+    background: rgba(var(--pref-accent-rgb), 0.1);
+    border: 1px solid rgba(var(--pref-accent-rgb), 0.2);
+    border-radius: 8px;
+    
+    .date-preview-loading {
+      color: $text-muted;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    .date-range-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 13px;
+      
+      .date-label {
+        color: $text-muted;
+        font-weight: 500;
+      }
+      
+      .date-value {
+        color: $text;
+        font-weight: 600;
+      }
+    }
+    
+    .date-error {
+      color: #ef4444;
+      font-size: 12px;
+      text-align: center;
+    }
+  }
+
+  .holiday-warnings {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(var(--pref-accent-rgb), 0.3);
+  }
+
+  .holiday-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 6px;
+    font-size: 11px;
+    color: #f59e0b;
+    margin-top: 6px;
+    
+    i {
+      flex-shrink: 0;
+    }
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .sync-options {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: $bg-2;
+    border-radius: 8px;
+  }
+
+  .sync-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: $text;
+    border-bottom: 1px solid $bg-3;
+    
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    &:first-child {
+      padding-top: 0;
+    }
+    
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--pref-accent-color);
+      cursor: pointer;
+    }
+    
+    span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      i {
+        width: 16px;
+        text-align: center;
+        color: var(--pref-accent-color);
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .date-actions {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sync-sprint-calendar-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--pref-accent-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s, transform 0.1s;
+    
+    &:hover {
+      opacity: 0.9;
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .delete-sprint-calendar-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: #dc2626;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s, transform 0.1s;
+    
+    &:hover {
+      opacity: 0.9;
+      background: #b91c1c;
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .sprint-date-status {
+    margin-top: 12px;
+    font-size: 12px;
+    text-align: center;
+    min-height: 18px;
+    padding: 6px;
+    border-radius: 6px;
+    
+    &.success {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    &.error {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    &.warning {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+    
+    &.loading {
+      color: $text-muted;
+      background: $bg-2;
+    }
+  }
+
+  .sprint-dates-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: $text-muted;
+    padding: 6px 10px;
+    background: $bg-2;
+    border-radius: 6px;
+    
+    i {
+      color: var(--pref-accent-color);
+    }
+    
+    .date-range {
+      color: $text;
+    }
+  }
   
 }

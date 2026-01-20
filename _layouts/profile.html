@@ -95,7 +95,7 @@ active_tab: profile
                     ID (7 digits)</label>
                 <input type="text" id="sidChangeInput" name="studentId"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="" maxlength="7" pattern="\d{7}" onchange="checkForChanges()" autocomplete="off">
+                    value="" onchange="checkForChanges()" autocomplete="off">
             </div>
         </div>
     </div>
@@ -138,78 +138,93 @@ active_tab: profile
         <div>
             <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
                 Groups</label>
-            <input id="groupSearchInput" type="text" placeholder="Start typing a group name or period"
-                class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                autocomplete="off">
+            <div class="flex gap-2">
+                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    autocomplete="off">
+                <button id="groupSearchBtn" type="button"
+                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                    Search
+                </button>
+            </div>
         </div>
         <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
         </div>
     </div>
 </div>
+</form>
 
 <script type="module">
-    import { pythonURI, javaURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     document.addEventListener("DOMContentLoaded", async () => {
-        const uidInput = document.getElementById('uidChangeInput');
         const springGroupInfo = document.getElementById('springGroupInfo');
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
-        let availableGroups = [];
+        
+        // Cache for current user data - fetched once, reused throughout
+        let currentPersonId = null;
+        let currentUid = null;
+        let userGroupIds = new Set(); // Track user's group IDs for quick lookup
 
-        // Wait briefly for the main profile script (setUserData) to populate the UID
-        let attempts = 0;
-        while (!uidInput.value && attempts < 20) {
-            await new Promise(r => setTimeout(r, 100));
-            attempts++;
-        }
-
-        const currentUid = uidInput.value;
-
-        if (!currentUid) {
-            springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
-            return;
-        }
-
+        // Fetch current user's person data from Java backend (includes numeric id)
+        // This replaces the need to fetch all people later
         try {
-            // Fetch all users to find the current one
-            const response = await fetch(`${pythonURI}/api/user`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch user data');
-
-            const users = await response.json();
-            const currentUser = Array.isArray(users) ? users.find(user => user.uid === currentUid) : users;
-
-
-        } catch (error) {
-            console.error("Error loading group info:", error);
-        }
-
-        try {
-            const groupResp = await fetch(`${javaURI}/api/groups`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-
-            if (groupResp.status === 401) {
+            const personResp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            
+            if (personResp.status === 401) {
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
                 groupSearchInput.disabled = true;
                 return;
             }
-            if (!groupResp.ok) throw new Error('Failed to fetch group data');
+            
+            if (!personResp.ok) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                return;
+            }
 
-            const groups = await groupResp.json();
-            availableGroups = Array.isArray(groups) ? groups : [];
+            const personData = await personResp.json();
+            currentPersonId = personData.id;
+            currentUid = personData.uid;
 
-            const userGroups = availableGroups.filter(group =>
-                Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
-            );
+            if (!currentPersonId || !currentUid) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                return;
+            }
+        } catch (error) {
+            console.error("Error loading user info:", error);
+            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading user information.</p>`;
+            return;
+        }
+
+        // Fetch user's groups to display current membership
+        // Use server-side filtering by person ID instead of fetching all groups
+        try {
+            const groupResp = await fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
+
+            let userGroups = [];
+
+            if (groupResp.ok) {
+                const groups = await groupResp.json();
+                userGroups = Array.isArray(groups) ? groups : [];
+            } else if (groupResp.status === 404) {
+                // Fallback to fetching all groups (this is less efficient than sending a GET for just a specific user)
+                console.warn('Person groups endpoint not available, using fallback!!');
+                const fallbackResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
+                if (fallbackResp.ok) {
+                    const allGroups = await fallbackResp.json();
+                    userGroups = (Array.isArray(allGroups) ? allGroups : []).filter(group =>
+                        Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
+                    );
+                }
+            } else {
+                throw new Error('Failed to fetch group data');
+                console.warn('Both methods of obtaining groups failed!!');
+            }
+
+            // Build a Set of user's group IDs for O(1) lookup during search
+            userGroups.forEach(group => userGroupIds.add(group.id));
 
             if (userGroups.length > 0) {
                 springGroupInfo.innerHTML = userGroups.map(group => `
@@ -232,7 +247,7 @@ active_tab: profile
                         </div>
                     </div>
                     <div class="col-span-1 md:col-span-2">
-                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${group.members.find(m => m.uid === currentUid).id})">
+                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${currentPersonId})">
                             Leave Group
                         </button>
                     </div>
@@ -241,52 +256,57 @@ active_tab: profile
                 springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
             }
 
-            const renderGroupResults = (filter = '') => {
-                const normalized = filter.toLowerCase().trim();
+            // Debounced search using server-side API for performance
+            const searchGroups = async (query) => {
+                const normalized = query.trim();
                 
                 if (!normalized) {
                     groupResultsList.classList.add('hidden');
                     return;
                 }
 
-                const filtered = availableGroups.filter(group => {
-                    const nameMatch = group.name?.toLowerCase().includes(normalized);
-                    const periodMatch = group.period?.toString().toLowerCase().includes(normalized);
-                    return nameMatch || periodMatch;
-                });
+                try {
+                    const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
+                    if (!searchResp.ok) throw new Error('Search failed');
+                    
+                    const filtered = await searchResp.json();
 
-                if (filtered.length === 0) {
-                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
+                    if (filtered.length === 0) {
+                        groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
+                        groupResultsList.classList.remove('hidden');
+                        return;
+                    }
+
+                    groupResultsList.innerHTML = filtered.map(group => {
+                        const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
+                        const isAlreadyMember = userGroupIds.has(group.id);
+                        const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
+                        const membersText = group.members?.length > 0 
+                            ? group.members.map(m => m.name).join(', ')
+                            : 'No members';
+                        return `
+                            <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
+                                onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
+                                <div class="font-medium">${label}</div>
+                                <div class="text-xs text-gray-500 mt-1">${membersText}</div>
+                                ${isAlreadyMember ? '<div class="text-xs text-gray-400 mt-1">Already a member</div>' : ''}
+                            </div>
+                        `;
+                    }).join('');
                     groupResultsList.classList.remove('hidden');
-                    return;
+                } catch (error) {
+                    console.error('Search error:', error);
+                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-red-400 text-sm">Search failed</div>`;
+                    groupResultsList.classList.remove('hidden');
                 }
-
-                groupResultsList.innerHTML = filtered.map(group => {
-                    const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
-                    const isAlreadyMember = userGroups.some(ug => ug.id === group.id);
-                    const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                    return `
-                        <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
-                            onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
-                            <div class="font-medium">${label}</div>
-                            ${isAlreadyMember ? '<div class="text-xs text-gray-500 mt-1">Already a member</div>' : ''}
-                        </div>
-                    `;
-                }).join('');
-                groupResultsList.classList.remove('hidden');
             };
 
-            groupSearchInput?.addEventListener('input', (event) => {
-                renderGroupResults(event.target.value);
+            // Search button click handler
+            document.getElementById('groupSearchBtn')?.addEventListener('click', () => {
+                searchGroups(groupSearchInput.value);
             });
 
-            // Close results when clicking outside
-            document.addEventListener('click', (event) => {
-                if (!event.target.closest('#groupSearchInput') && !event.target.closest('#groupResultsList')) {
-                    groupResultsList.classList.add('hidden');
-                }
-            });
-
+            // Optimized join function - uses cached personId instead of fetching all people
             window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
                 if (isAlreadyMember) {
                     joinGroupStatus.textContent = 'You are already a member of this group.';
@@ -298,36 +318,13 @@ active_tab: profile
                 groupResultsList.classList.add('hidden');
 
                 try {
-                    // Step 1: get current user uid
-                    const userResponse = await fetch(`${pythonURI}/api/user`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-                    if (!userResponse.ok) throw new Error('Failed to fetch user info');
-                    const userPayload = await userResponse.json();
-                    const userUid = userPayload?.uid || currentUid;
-
-                    if (!userUid) {
-                        throw new Error('Unable to resolve user uid');
+                    // Use the cached person ID - no need to fetch all people
+                    if (!currentPersonId) {
+                        throw new Error('User ID not available. Please refresh the page.');
                     }
 
-                    // Step 2: map uid to numeric id from people
-                    const peopleResp = await fetch(`${javaURI}/api/people`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-                    if (!peopleResp.ok) throw new Error('Failed to fetch people data');
-                    const people = await peopleResp.json();
-                    const matchingPerson = Array.isArray(people) ? people.find(person => person.uid === userUid) : null;
-
-                    if (!matchingPerson?.id) {
-                        throw new Error('Could not match user to an id');
-                    }
-
-                    // Step 3: join the selected group
-                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${matchingPerson.id}`, {
+                    // Join the selected group using cached person ID
+                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${currentPersonId}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         credentials: 'include'
@@ -386,8 +383,7 @@ active_tab: profile
 </script>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
     // external functions
@@ -521,8 +517,7 @@ active_tab: profile
 </script>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Store original form values
     let originalValues = {};
     let formChanged = false;

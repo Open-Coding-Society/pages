@@ -123,7 +123,14 @@ def clean_code_for_runner(cell_source, language):
                 continue
         cleaned_lines.append(line)
     
-    return '\n'.join(cleaned_lines).rstrip()
+    # Join lines and strip trailing whitespace
+    result = '\n'.join(cleaned_lines).rstrip()
+    
+    # Remove leading empty lines
+    while result.startswith('\n'):
+        result = result[1:]
+    
+    return result
 
 
 def generate_runner_id(permalink, index):
@@ -207,6 +214,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     code_block_content = []
     cell_index = 0
     code_cell_count = 0
+    code_runner_count = 0
     
     i = 0
     while i < len(lines):
@@ -237,23 +245,19 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['code_runner']
-                    
-                    # Wrap code block in collapsible details (collapsed by default)
-                    result.append('<details>')
-                    result.append('<summary>View Source Code</summary>')
                     result.append('')
-                    result.extend(code_block_content)
-                    result.append('')
-                    result.append('</details>')
-                    result.append('')
-                    
                     # Add liquid captures and code-runner include
-                    result.append('{% capture challenge' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
                     result.append(runner_data['challenge'])
                     result.append('{% endcapture %}')
                     result.append('')
-                    result.append('{% capture code' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture code' + str(code_runner_count) + ' %}')
                     result.append(runner_data['code'])
+                    result.append('{% endcapture %}')
+                    result.append('')
+                    result.append('{% capture source' + str(code_runner_count) + ' %}')
+                    # Add the source code block content (already formatted markdown)
+                    result.extend(code_block_content)
                     result.append('{% endcapture %}')
                     result.append('')
                     result.append('{% include code-runner.html')
@@ -263,13 +267,6 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     result.append('   code=code' + str(code_cell_count - 1))
                     result.append('%}')                
                     result.append('')
-                    
-                    # If challenge_submit is enabled, add individual submit button
-                    if challenge_submit_enabled:
-                        result.append('{% include challenge-submit-button.html')
-                        result.append('   runner_id="' + runner_data['runner_id'] + '"')
-                        result.append('%}')
-                        result.append('')
                 else:
                     # Regular code block without code-runner
                     result.extend(code_block_content)

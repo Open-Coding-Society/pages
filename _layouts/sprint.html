@@ -32,7 +32,7 @@ layout: post
       {% assign unitData = shared[courseUnit.shared] %}
     {% endif %}
 
-    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}">
+    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
       <div class="sprint-header">
         <div>
           <p class="sprint-meta">{{ unitKey }}</p>
@@ -42,6 +42,47 @@ layout: post
           {% endif %}
         </div>
         <div class="sprint-controls">
+          <!-- Sprint Calendar Sync -->
+          <div class="sprint-date-control">
+            <button class="sprint-btn date-toggle" type="button" data-sprint="{{ unitKey }}" title="Sync Sprint to Calendar">
+              <i class="fas fa-calendar-alt"></i>
+            </button>
+            <div class="sprint-date-dropdown hidden" data-sprint="{{ unitKey }}">
+              <div class="date-dropdown-header">
+                <span>Sync to Calendar</span>
+                <button class="date-dropdown-close" type="button">&times;</button>
+              </div>
+              <div class="calendar-sync-info">
+                <div class="sprint-week-range">
+                  <i class="fas fa-info-circle"></i>
+                  <span>This sprint covers <strong>Weeks {{ start }}-{{ end }}</strong></span>
+                </div>
+                <div class="sprint-date-preview" data-sprint="{{ unitKey }}">
+                  <!-- Will be populated by JS with actual dates from school calendar -->
+                  <div class="date-preview-loading">Loading calendar dates...</div>
+                </div>
+              </div>
+              <div class="sync-options">
+                <label class="sync-option">
+                  <input type="checkbox" class="sync-reading-materials" data-sprint="{{ unitKey }}" checked>
+                  <span><i class="fas fa-book"></i> Formative (Monday) - Readings, Lessons</span>
+                </label>
+                <label class="sync-option">
+                  <input type="checkbox" class="sync-assessments" data-sprint="{{ unitKey }}" checked>
+                  <span><i class="fas fa-clipboard-check"></i> Summative (Friday) - Assessments</span>
+                </label>
+              </div>
+              <div class="date-actions">
+                <button class="sync-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                  <i class="fas fa-sync"></i> Sync to Calendar
+                </button>
+                <button class="delete-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                  <i class="fas fa-trash-alt"></i> Remove from Calendar
+                </button>
+              </div>
+              <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
+            </div>
+          </div>
           <button class="sprint-toggle-btn" type="button" aria-expanded="false">
             <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
           </button>
@@ -88,7 +129,28 @@ layout: post
             {% endfor %}
 
           {% if entries.size > 0 %}
-            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}">
+            {% assign assignmentTitles = "" %}
+            {% assign lessonTitles = "" %}
+            {% assign allEntries = "" %}
+            {% for entry in entries %}
+              {% assign parts = entry | split: "||" %}
+              {% if parts[2] == "assignment" %}
+                {% if assignmentTitles != "" %}
+                  {% assign assignmentTitles = assignmentTitles | append: ";;;" %}
+                {% endif %}
+                {% assign assignmentTitles = assignmentTitles | append: parts[0] | append: "|||" | append: parts[1] %}
+              {% else %}
+                {% if lessonTitles != "" %}
+                  {% assign lessonTitles = lessonTitles | append: ";;;" %}
+                {% endif %}
+                {% assign lessonTitles = lessonTitles | append: parts[0] | append: "|||" | append: parts[1] %}
+              {% endif %}
+              {% if allEntries != "" %}
+                {% assign allEntries = allEntries | append: ";;;" %}
+              {% endif %}
+              {% assign allEntries = allEntries | append: entry %}
+            {% endfor %}
+            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}" data-assignments="{{ assignmentTitles | escape }}" data-lessons="{{ lessonTitles | escape }}" data-entries="{{ allEntries | escape }}">
               <div class="week-content-wrapper">
                 <div class="week-indicator">
                   <div class="week-circle">W{{ index }}</div>
@@ -281,6 +343,30 @@ layout: post
 <!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
 <script id="course-skill-lib-json" type="application/json">
   {{ course | jsonify }}
+</script>
+
+<!-- Embed school calendar as application/json to avoid Liquid template lint errors -->
+{% assign calendar = site.data.school_calendar %}
+<script id="school-calendar-json" type="application/json">
+{
+  "schoolYear": {{ calendar.school_year | jsonify }},
+  "firstDay": {{ calendar.first_day | jsonify }},
+  "lastDay": {{ calendar.last_day | jsonify }},
+  "weeks": {
+    {% for week in calendar.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "tuesday": {{ week[1].tuesday | default: nil | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
 </script>
 
 <script>
@@ -1159,6 +1245,7 @@ layout: post
     renderWeekGoalPreviews();
     initMobileEnhancements();
     initializeHelpButtons();
+    initializeSprintDates();
   });
   
   // Initialize help button event listeners
@@ -1187,6 +1274,527 @@ layout: post
           closeHelpModal();
         }
       });
+    }
+  }
+
+  // ============================= 
+  //   SCHOOL CALENDAR SYSTEM     
+  // ============================= 
+  
+  // School Calendar data is loaded from JSON script tag to avoid Liquid template lint errors
+  let SCHOOL_CALENDAR = {};
+  try {
+    const calendarEl = document.getElementById('school-calendar-json');
+    if (calendarEl && calendarEl.textContent) {
+      SCHOOL_CALENDAR = JSON.parse(calendarEl.textContent);
+    }
+  } catch (e) {
+    console.warn('Unable to parse SCHOOL_CALENDAR, falling back to empty object', e);
+    SCHOOL_CALENDAR = { weeks: {} };
+  }
+  
+  // Helper function to find the next valid school week (skipping break weeks)
+  function getNextValidSchoolWeek(startWeekNum) {
+    let weekNum = startWeekNum;
+    const maxWeeks = 50; // Safety limit
+    while (weekNum < maxWeeks) {
+      const week = SCHOOL_CALENDAR.weeks[weekNum];
+      if (!week) return null;
+      if (!week.skipWeek) return weekNum;
+      weekNum++;
+    }
+    return null;
+  }
+  
+  // Helper function to check if a week is a school day (not a skip week)
+  function isSchoolWeek(weekNum) {
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    return week && !week.skipWeek;
+  }
+  
+  const SPRINT_DATES_STORAGE_KEY = 'sprintDates';
+  
+  // Get calendar week data directly - sprint weeks ARE calendar weeks
+  // The skip_week property is used to show warnings, not to remap weeks
+  function getCalendarWeek(weekNum) {
+    return SCHOOL_CALENDAR.weeks[weekNum] || null;
+  }
+  
+  // Check if a calendar week is a break/skip week
+  function isSkipWeek(weekNum) {
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    return week && week.skipWeek === true;
+  }
+  
+  // Get the appropriate date for reading materials (Monday or Tuesday if holiday)
+  function getReadingDate(weekNum) {
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    if (!week) return null;
+    
+    // Skip weeks should not return dates (they're breaks)
+    if (week.skipWeek) return null;
+    
+    // If Monday is a holiday, use Tuesday
+    if (week.holidayAdjustment === 'tuesday' && week.tuesday) {
+      return week.tuesday;
+    }
+    return week.monday;
+  }
+  
+  // Get the Friday date for assessments
+  function getAssessmentDate(weekNum) {
+    const week = SCHOOL_CALENDAR.weeks[weekNum];
+    if (!week) return null;
+    
+    // Skip weeks should not return dates (they're breaks)
+    if (week.skipWeek) return null;
+    
+    return week.friday;
+  }
+  
+  // Get the Tuesday of the NEXT valid school week for checkpoints
+  function getCheckpointDate(weekNum) {
+    // Find next valid school week after the given week
+    let nextWeekNum = weekNum + 1;
+    const maxWeeks = 50;
+    
+    // Skip any break weeks to find the next valid school week
+    while (nextWeekNum < maxWeeks) {
+      const week = SCHOOL_CALENDAR.weeks[nextWeekNum];
+      if (!week) return null;
+      if (!week.skipWeek) {
+        // Calculate Tuesday from Monday (add 1 day)
+        const monday = new Date(week.monday);
+        monday.setDate(monday.getDate() + 1);
+        return monday.toISOString().split('T')[0];
+      }
+      nextWeekNum++;
+    }
+    return null;
+  }
+  
+  // Format date for display
+  function formatDateDisplay(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  
+  function formatDateShort(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+  
+  // Get the date range for a sprint based on week numbers
+  // Sprint weeks directly correspond to calendar weeks
+  function getSprintDateRange(startWeek, endWeek) {
+    const startWeekData = SCHOOL_CALENDAR.weeks[startWeek];
+    const endWeekData = SCHOOL_CALENDAR.weeks[endWeek];
+    
+    if (!startWeekData || !endWeekData) {
+      return { start: null, end: null };
+    }
+    
+    return {
+      start: startWeekData.monday,
+      end: endWeekData.friday
+    };
+  }
+  
+  // Populate the sprint date preview with actual calendar dates
+  function populateSprintDatePreview(sprintKey, startWeek, endWeek) {
+    const previewEl = document.querySelector(`.sprint-date-preview[data-sprint="${sprintKey}"]`);
+    if (!previewEl) return;
+    
+    const dateRange = getSprintDateRange(startWeek, endWeek);
+    
+    let html = '';
+    if (dateRange.start && dateRange.end) {
+      html = `
+        <div class="date-range-display">
+          <span class="date-label">Start:</span> 
+          <span class="date-value">${formatDateDisplay(dateRange.start)}</span>
+        </div>
+        <div class="date-range-display">
+          <span class="date-label">End:</span> 
+          <span class="date-value">${formatDateDisplay(dateRange.end)}</span>
+        </div>
+      `;
+      
+      // Show any break weeks that fall within this sprint range
+      const breakWeeks = [];
+      for (let w = startWeek; w <= endWeek; w++) {
+        const week = SCHOOL_CALENDAR.weeks[w];
+        if (week && week.skipWeek && week.holidays) {
+          breakWeeks.push({ week: w, holidays: week.holidays });
+        }
+      }
+      
+      if (breakWeeks.length > 0) {
+        html += '<div class="holiday-warnings">';
+        breakWeeks.forEach(b => {
+          html += `<div class="holiday-notice break"><i class="fas fa-umbrella-beach"></i> Week ${b.week}: ${b.holidays.join(', ')} (no school)</div>`;
+        });
+        html += '</div>';
+      }
+      
+      // Show holiday warnings (non-skip weeks with holidays - materials on Tuesday)
+      const holidays = [];
+      for (let w = startWeek; w <= endWeek; w++) {
+        const week = SCHOOL_CALENDAR.weeks[w];
+        if (week && week.holidays && !week.skipWeek) {
+          holidays.push({ week: w, holidays: week.holidays });
+        }
+      }
+      
+      if (holidays.length > 0) {
+        html += '<div class="holiday-warnings">';
+        holidays.forEach(h => {
+          html += `<div class="holiday-notice"><i class="fas fa-exclamation-triangle"></i> Week ${h.week}: ${h.holidays.join(', ')} - Materials on Tuesday</div>`;
+        });
+        html += '</div>';
+      }
+    } else {
+      html = '<div class="date-error">Calendar dates not available for these weeks</div>';
+    }
+    
+    previewEl.innerHTML = html;
+  }
+  
+  // Initialize sprint calendar controls
+  async function initializeSprintDates() {
+    // Populate all sprint date previews
+    document.querySelectorAll('.sync-sprint-calendar-btn').forEach(btn => {
+      const sprintKey = btn.dataset.sprint;
+      const startWeek = parseInt(btn.dataset.startWeek);
+      const endWeek = parseInt(btn.dataset.endWeek);
+      populateSprintDatePreview(sprintKey, startWeek, endWeek);
+    });
+    
+    // Toggle dropdown visibility
+    document.querySelectorAll('.sprint-btn.date-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const dropdown = document.querySelector(`.sprint-date-dropdown[data-sprint="${sprintKey}"]`);
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.sprint-date-dropdown').forEach(d => {
+          if (d !== dropdown) d.classList.add('hidden');
+        });
+        
+        dropdown.classList.toggle('hidden');
+      });
+    });
+    
+    // Close dropdown buttons
+    document.querySelectorAll('.date-dropdown-close').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btn.closest('.sprint-date-dropdown').classList.add('hidden');
+      });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.sprint-date-control')) {
+        document.querySelectorAll('.sprint-date-dropdown').forEach(d => {
+          d.classList.add('hidden');
+        });
+      }
+    });
+    
+    // Sync button handlers
+    document.querySelectorAll('.sync-sprint-calendar-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const course = btn.dataset.course;
+        const startWeek = parseInt(btn.dataset.startWeek);
+        const endWeek = parseInt(btn.dataset.endWeek);
+        
+        await syncSprintToCalendar(sprintKey, course, startWeek, endWeek);
+      });
+    });
+    
+    // Delete button handlers
+    document.querySelectorAll('.delete-sprint-calendar-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const course = btn.dataset.course;
+        const startWeek = parseInt(btn.dataset.startWeek);
+        const endWeek = parseInt(btn.dataset.endWeek);
+        
+        await deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek);
+      });
+    });
+  }
+  
+  // Main function to sync sprint to calendar
+  async function syncSprintToCalendar(sprintKey, course, startWeek, endWeek) {
+    const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
+    const btn = document.querySelector(`.sync-sprint-calendar-btn[data-sprint="${sprintKey}"]`);
+    
+    // Get sync options (Checkpoints are added manually by instructor, not synced here)
+    const syncFormative = document.querySelector(`.sync-reading-materials[data-sprint="${sprintKey}"]`)?.checked ?? true;
+    const syncSummative = document.querySelector(`.sync-assessments[data-sprint="${sprintKey}"]`)?.checked ?? true;
+    
+    btn.disabled = true;
+    showDateStatus(statusEl, 'Syncing to calendar...', 'loading');
+    
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      // Get sprint info
+      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+      const courseName = course.toUpperCase();
+      
+      const events = [];
+      
+      // Process each week in the sprint (no sprint start/end events - only calendar items)
+      const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
+      
+      for (const weekCard of weekCards) {
+        const weekNum = parseInt(weekCard.dataset.week);
+        const lessons = weekCard.dataset.lessons || '';
+        const assignments = weekCard.dataset.assignments || '';
+        
+        const readingDate = getReadingDate(weekNum);
+        const assessmentDate = getAssessmentDate(weekNum);
+        
+        // MONDAY (or Tuesday if holiday): FORMATIVE - All reading materials/lessons for the week
+        if (syncFormative && readingDate) {
+          // Get all lesson titles and URLs for this week
+          const lessonList = lessons.split(';;;').filter(l => l.trim());
+          
+          // Remove duplicates (same title)
+          const uniqueLessons = [];
+          const seenTitles = new Set();
+          for (const l of lessonList) {
+            const [title] = l.split('|||');
+            if (!seenTitles.has(title)) {
+              seenTitles.add(title);
+              uniqueLessons.push(l);
+            }
+          }
+          
+          if (uniqueLessons.length > 0) {
+            // Create ONE formative event with all lessons listed
+            const lessonItems = uniqueLessons.map(l => {
+              const [title, url] = l.split('|||');
+              const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
+              return `• ${title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+            }).join('\n\n');
+            
+            events.push({
+              title: `📚 Week ${weekNum} Formative - ${courseName}`,
+              description: `Reading Materials:\n\n${lessonItems}`,
+              date: readingDate,
+              period: courseName
+            });
+          }
+        }
+        
+        // FRIDAY: SUMMATIVE - All assessments for the week
+        // Note: Checkpoints are manually added by instructors through the calendar UI
+        if (syncSummative && assessmentDate && assignments) {
+          const assignmentList = assignments.split(';;;').filter(a => a.trim());
+          
+          // Remove duplicates (same title)
+          const uniqueAssignments = [];
+          const seenTitles = new Set();
+          for (const a of assignmentList) {
+            const [title] = a.split('|||');
+            if (!seenTitles.has(title)) {
+              seenTitles.add(title);
+              uniqueAssignments.push(a);
+            }
+          }
+          
+          if (uniqueAssignments.length > 0) {
+            // Create ONE summative event with all assignments listed
+            const assignmentItems = uniqueAssignments.map(a => {
+              const [title, url] = a.split('|||');
+              const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
+              return `• ${title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+            }).join('\n\n');
+            
+            events.push({
+              title: `📝 Week ${weekNum} Summative - ${courseName}`,
+              description: `Assessments Due:\n\n${assignmentItems}`,
+              date: assessmentDate,
+              period: courseName
+            });
+          }
+        }
+        
+        // Checkpoints are added manually by instructor via calendar UI, not auto-synced
+      }
+      
+      // Send all events to calendar API in a single bulk request
+      console.log(`Adding ${events.length} events to calendar for ${sprintKey}`);
+      console.log('Events:', events);
+      
+      // Try bulk endpoint first, fall back to individual requests if not available
+      let successCount = 0;
+      try {
+        const bulkResponse = await fetch(`${javaURI}/api/calendar/add_events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ events: events })
+        });
+        
+        if (bulkResponse.ok) {
+          const result = await bulkResponse.json();
+          // API returns { created: X, updated: Y, failed: Z }
+          successCount = (result.created || 0) + (result.updated || 0);
+          if (result.failed > 0) {
+            console.warn(`${result.failed} events failed to sync`);
+          }
+        } else if (bulkResponse.status === 404) {
+          // Bulk endpoint not available, fall back to parallel individual requests
+          console.log('Bulk endpoint not available, using individual requests');
+          const results = await Promise.all(
+            events.map(event => 
+              fetch(`${javaURI}/api/calendar/add_event`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(event)
+              }).then(res => res.ok).catch(() => false)
+            )
+          );
+          successCount = results.filter(r => r).length;
+        } else {
+          console.error('Failed to add events:', bulkResponse.status);
+        }
+      } catch (err) {
+        console.error('Error adding events:', err);
+      }
+      
+      console.log(`Successfully added ${successCount}/${events.length} events`);
+      
+      if (successCount === events.length) {
+        showDateStatus(statusEl, `✓ Added ${successCount} events to calendar!`, 'success');
+      } else if (successCount > 0) {
+        showDateStatus(statusEl, `⚠ Added ${successCount}/${events.length} events`, 'warning');
+      } else {
+        showDateStatus(statusEl, '✗ Failed to add events. Are you logged in?', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error syncing sprint to calendar:', error);
+      showDateStatus(statusEl, 'Error syncing to calendar', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  
+  // Main function to delete sprint events from calendar
+  async function deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek) {
+    const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
+    const btn = document.querySelector(`.delete-sprint-calendar-btn[data-sprint="${sprintKey}"]`);
+    
+    // Confirm before deleting
+    const courseName = course.toUpperCase();
+    const confirmMessage = `Are you sure you want to remove all ${courseName} events for ${sprintKey} (Weeks ${startWeek}-${endWeek}) from your calendar?`;
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+    
+    btn.disabled = true;
+    showDateStatus(statusEl, 'Removing events from calendar...', 'loading');
+    
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      // Get sprint info
+      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+      
+      // Build list of event titles to delete (matching what was synced)
+      const eventTitlesToDelete = [];
+      const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
+      
+      for (const weekCard of weekCards) {
+        const weekNum = parseInt(weekCard.dataset.week);
+        
+        // Formative event title pattern
+        eventTitlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
+        
+        // Summative event title pattern
+        eventTitlesToDelete.push(`📝 Week ${weekNum} Summative - ${courseName}`);
+      }
+      
+      console.log(`Deleting ${eventTitlesToDelete.length} potential events for ${sprintKey}`);
+      console.log('Event titles to delete:', eventTitlesToDelete);
+      
+      let deletedCount = 0;
+      
+      // Try bulk delete endpoint first
+      try {
+        const bulkResponse = await fetch(`${javaURI}/api/calendar/delete_events`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ titles: eventTitlesToDelete })
+        });
+        
+        if (bulkResponse.ok) {
+          const result = await bulkResponse.json();
+          deletedCount = result.deleted || 0;
+        } else if (bulkResponse.status === 404) {
+          // Bulk endpoint not available, fall back to individual deletes
+          console.log('Bulk delete endpoint not available, using individual requests');
+          const results = await Promise.all(
+            eventTitlesToDelete.map(title => 
+              fetch(`${javaURI}/api/calendar/delete_event`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ title: title })
+              }).then(res => res.ok ? 1 : 0).catch(() => 0)
+            )
+          );
+          deletedCount = results.reduce((a, b) => a + b, 0);
+        } else {
+          console.error('Failed to delete events:', bulkResponse.status);
+        }
+      } catch (err) {
+        console.error('Error deleting events:', err);
+      }
+      
+      console.log(`Successfully deleted ${deletedCount} events`);
+      
+      if (deletedCount > 0) {
+        showDateStatus(statusEl, `✓ Removed ${deletedCount} events from calendar!`, 'success');
+      } else {
+        showDateStatus(statusEl, '⚠ No events found to remove', 'warning');
+      }
+      
+    } catch (error) {
+      console.error('Error deleting sprint from calendar:', error);
+      showDateStatus(statusEl, 'Error removing from calendar', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  
+  // Show status message
+  function showDateStatus(el, message, type) {
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'sprint-date-status ' + type;
+    
+    if (type === 'success' || type === 'error' || type === 'warning') {
+      setTimeout(() => {
+        el.textContent = '';
+        el.className = 'sprint-date-status';
+      }, 5000);
     }
   }
 
