@@ -809,6 +809,26 @@
     position: relative;
     font-family: 'Crimson Text', serif;
     color: var(--text);
+    transition: all 0.3s ease;
+
+    &.excellence-theme {
+      border-color: #ffd700; // Gold
+      box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+      background: linear-gradient(135deg, var(--bg-1) 0%, #fffdf0 100%);
+
+      &::before {
+        border-color: #ffd700;
+      }
+
+      .certificate-emblem {
+        border-color: #ffd700;
+        background: #fffdf0;
+      }
+
+      .certify-text {
+        color: #b8860b; // Dark Gold
+      }
+    }
   }
 
   #certificate-content::before {
