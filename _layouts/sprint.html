@@ -1968,6 +1968,43 @@ layout: post
       }, 5000);
     }
   }
+  
+  // Show toast notification (visible overlay message)
+  function showToastNotification(message, type) {
+    // Remove existing toast if present
+    const existingToast = document.querySelector('.calendar-toast-notification');
+    if (existingToast) {
+      existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `calendar-toast-notification ${type}`;
+    toast.innerHTML = `
+      <span class="toast-message">${message}</span>
+      <button class="toast-close">&times;</button>
+    `;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Close button handler
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    });
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, 5000);
+  }
 
   // ========================================
   // SELECTIVE SYNC/REMOVE MODAL SYSTEM
@@ -2519,6 +2556,16 @@ layout: post
       // Close modal and show status
       closeSelectiveSyncModal();
       
+      // Show toast notification for visibility
+      if (successCount === events.length) {
+        showToastNotification(`✓ Synced ${successCount} events to calendar!`, 'success');
+      } else if (successCount > 0) {
+        showToastNotification(`⚠ Synced ${successCount}/${events.length} events`, 'warning');
+      } else {
+        showToastNotification('✗ Failed to sync events. Are you logged in?', 'error');
+      }
+      
+      // Also update the dropdown status (visible when dropdown is opened)
       const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
       if (successCount === events.length) {
         showDateStatus(statusEl, `✓ Synced ${successCount} events to calendar!`, 'success');
@@ -2612,6 +2659,14 @@ layout: post
       // Close modal and show status
       closeSelectiveRemoveModal();
       
+      // Show toast notification for visibility
+      if (deletedCount > 0) {
+        showToastNotification(`✓ Removed ${deletedCount} events from calendar!`, 'success');
+      } else {
+        showToastNotification('⚠ No events found to remove', 'warning');
+      }
+      
+      // Also update the dropdown status (visible when dropdown is opened)
       const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
       if (deletedCount > 0) {
         showDateStatus(statusEl, `✓ Removed ${deletedCount} events from calendar!`, 'success');
@@ -2637,6 +2692,14 @@ layout: post
   function closeSelectiveRemoveModal() {
     document.getElementById('selective-remove-modal').style.display = 'none';
     currentRemoveModalData = null;
+    
+    // Reopen the basic dropdown menu
+    if (returnToDropdown && sprintKey) {
+      const dropdown = document.querySelector(`.sprint-date-dropdown[data-sprint="${sprintKey}"]`);
+      if (dropdown) {
+        dropdown.classList.remove('hidden');
+      }
+    }
   }
   
   // Initialize modal event handlers
