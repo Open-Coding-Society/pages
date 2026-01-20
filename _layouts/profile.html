@@ -434,86 +434,104 @@ active_tab: profile
         }
     });
     document.getElementById("formPersonaGroupsBtn")
-    ?.addEventListener("click", async () => {
-
-        const course = document.getElementById("personaCourse").value.trim();
-        const period = document.getElementById("personaPeriod").value.trim();
-        const groupSize = parseInt(
-            document.getElementById("personaGroupSize").value
-        );
-
-        const resultsBox = document.getElementById("personaGroupResults");
-
-        if (!course || !period || !groupSize) {
-            resultsBox.innerHTML =
-            `<p class="text-red-400">All fields are required.</p>`;
-            return;
-        }
-
-        resultsBox.innerHTML =
-        `<p class="text-gray-400">Forming persona-based groups…</p>`;
-
-        try {
-            // Fetch eligible users for this course/period
-            const usersResp = await fetch(
-                `${javaURI}/api/person/course/${course}/period/${period}`,
-                fetchOptions
+        ?.addEventListener("click", async () => {
+            const course = document.getElementById("personaCourse").value.trim();
+            const period = document.getElementById("personaPeriod").value.trim();
+            const groupSize = parseInt(
+                document.getElementById("personaGroupSize").value
             );
 
-            if (!usersResp.ok) throw new Error("Failed to load users");
+            const resultsBox = document.getElementById("personaGroupResults");
 
-            const users = await usersResp.json();
-            const userUids = users.map(u => u.uid);
+            if (!course || !period || !groupSize) {
+                resultsBox.innerHTML =
+                    `<p class="text-red-400">All fields are required.</p>`;
+                return;
+            }
 
-            const resp = await fetch(
-                `${javaURI}/api/groups/form-with-personas`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        userUids,
-                        groupSize,
-                        period,
-                        course
-                    })
-                }
-            );
-
-            if (!resp.ok) throw new Error("Persona grouping failed");
-
-            const data = await resp.json();
-            renderPersonaResults(data, resultsBox);
-
-        } catch (err) {
-            console.error(err);
             resultsBox.innerHTML =
-            `<p class="text-red-400">Error forming groups.</p>`;
-        }
-    });
-    function renderPersonaResults(data, container) {
-        container.innerHTML = `
-            <div class="text-sm text-gray-400">
-                Average Team Score: <b>${data.average_score.toFixed(2)}</b>
-            </div>
-            ${data.groups.map(group => `
-                <div class="p-4 border border-neutral-700 rounded-lg">
-                    <div class="font-semibold">
-                        ${group.name}
-                    </div>
-                    <div class="text-xs text-gray-400 mb-2">
-                        Persona Score Embedded in Name
-                    </div>
-                    <ul class="list-disc ml-5 text-sm">
-                        ${group.members.map(m =>
-                            `<li>${m.name} (${m.uid})</li>`
-                        ).join("")}
-                    </ul>
-                </div>
-            `).join("")}
-        `;
-    }
+                `<p class="text-gray-400">Forming persona-based groups…</p>`;
 
+            try {
+                // STEP 1: Fetch eligible users for this course/period from Spring
+                const usersResp = await fetch(
+                    `${javaURI}/api/person/course/${course}/period/${period}`,
+                    fetchOptions
+                );
+
+                if (!usersResp.ok) throw new Error("Failed to load users");
+
+                const users = await usersResp.json();
+                const userUids = users.map(u => u.uid);
+
+                // STEP 2: Call Flask DIRECTLY to get optimal groupings
+                const flaskResp = await fetch(
+                    `${pythonURI}/api/persona/form-groups`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                            user_uids: userUids,  // Flask expects snake_case
+                            group_size: groupSize
+                        })
+                    }
+                );
+
+                if (!flaskResp.ok) throw new Error("Flask persona grouping failed");
+
+                const flaskData = await flaskResp.json();
+                
+                // STEP 3: Transform Flask data for Spring (map UIDs to Person IDs)
+                const uidToPersonId = {};
+                users.forEach(u => {
+                    uidToPersonId[u.uid] = u.id;
+                });
+
+                // Build Spring-compatible payload
+                const springGroups = flaskData.groups.map((group, i) => ({
+                    name: `Group ${i + 1} (Persona Score: ${group.team_score.toFixed(1)})`,
+                    period: period,
+                    course: course,
+                    memberIds: group.user_uids.map(uid => uidToPersonId[uid]).filter(Boolean)
+                }));
+
+                // STEP 4: Send to Spring to create groups in database
+                const springResp = await fetch(
+                    `${javaURI}/api/groups/bulk`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                            groups: springGroups
+                        })
+                    }
+                );
+
+                if (!springResp.ok) throw new Error("Failed to create groups in database");
+
+                const springData = await springResp.json();
+
+                // STEP 5: Display results
+                renderPersonaResults({
+                    groups: springData.created,
+                    average_score: flaskData.average_score
+                }, resultsBox);
+
+                // Show success message
+                resultsBox.insertAdjacentHTML('afterbegin', `
+                    <div class="p-3 bg-green-500/20 border border-green-500 rounded-lg mb-4">
+                        <p class="text-green-400">✓ Successfully created ${springData.created.length} groups!</p>
+                    </div>
+                `);
+
+            } catch (err) {
+                console.error(err);
+                resultsBox.innerHTML =
+                    `<p class="text-red-400">Error: ${err.message}</p>`;
+            }
+        });
 </script>
 
 <div class="flex justify-between items-center mb-8">
