@@ -240,123 +240,124 @@ window.parseUIDs = function (raw) {
     .filter(Boolean);
 }
 
-window.validateUIDWithFlask = async function (uid) {
-  const res = await fetch(`${pythonURI}/api/user`, {
+window.validateUIDWithFlask = function (uid) {
+  return fetch(`${pythonURI}/api/user`, {
     credentials: "include"
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch users from Flask");
-  }
-
-  const users = await res.json();
-
-  const match = users.find(u => u.uid === uid);
-
-  if (!match) {
-    throw new Error(`UID not found in Flask: ${uid}`);
-  }
-
-  return match.uid; // validated
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch users from Flask");
+      }
+      return res.json();
+    })
+    .then(users => {
+      const match = users.find(u => u.uid === uid);
+      if (!match) {
+        throw new Error(`UID not found in Flask: ${uid}`);
+      }
+      return match.uid; // validated
+    });
 }
 
 
 
-window.getPersonIdFromUID = async function (uid) {
-  const res = await fetch(`${javaURI}/api/people`, {
+window.getPersonIdFromUID = function (uid) {
+  return fetch(`${javaURI}/api/people`, {
     ...fetchOptions,
     credentials: "include"
-  });
-
-  if (!res.ok) {
-    console.error("Java /api/people status:", res.status);
-    throw new Error("Failed to fetch people from Java");
-  }
-
-  const people = await res.json();
-
-  const match = people.find(p => p.uid === uid);
-
-  if (!match) {
-    throw new Error(`UID found in Flask but missing in Java: ${uid}`);
-  }
-
-  return match.id; // INTEGER (e.g. 52)
+  })
+    .then(res => {
+      if (!res.ok) {
+        console.error("Java /api/people status:", res.status);
+        throw new Error("Failed to fetch people from Java");
+      }
+      return res.json();
+    })
+    .then(people => {
+      const match = people.find(p => p.uid === uid);
+      if (!match) {
+        throw new Error(`UID found in Flask but missing in Java: ${uid}`);
+      }
+      return match.id; // INTEGER (e.g. 52)
+    });
 };
 
 
-async function addPersonToGroup(groupId, personId) {
-  const res = await fetch(
+function addPersonToGroup(groupId, personId) {
+  return fetch(
     `${javaURI}/api/groups/${groupId}/members/${personId}`,
     {
       ...fetchOptions,
       method: "POST"
     }
-  );
-
-  console.log("ADD MEMBER STATUS:", res.status);
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("ADD MEMBER ERROR:", text);
-    throw new Error("Failed to add member");
-  }
+  )
+    .then(res => {
+      console.log("ADD MEMBER STATUS:", res.status);
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("ADD MEMBER ERROR:", text);
+          throw new Error("Failed to add member");
+        });
+      }
+    });
 }
 
-window.addMemberToGroup = async function (groupId, uid) {
-  const personId = await getPersonIdFromUID(uid);
-
-  const res = await fetch(
-    `${javaURI}/api/groups/${groupId}/members/${personId}`,
-    {
-      ...fetchOptions,
-      method: "POST"
-    }
-  );
-
-  if (!res.ok) {
-    throw new Error("Failed to add member");
-  }
-
-  await loadGroups(); // refresh UI
+window.addMemberToGroup = function (groupId, uid) {
+  return getPersonIdFromUID(uid)
+    .then(personId => {
+      return fetch(
+        `${javaURI}/api/groups/${groupId}/members/${personId}`,
+        {
+          ...fetchOptions,
+          method: "POST"
+        }
+      );
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to add member");
+      }
+      return loadGroups(); // refresh UI
+    });
 }
 
-window.removeMemberFromGroup = async function (groupId, personId) {
-  const res = await fetch(
+window.removeMemberFromGroup = function (groupId, personId) {
+  return fetch(
     `${javaURI}/api/groups/${groupId}/members/${personId}`,
     {
       ...fetchOptions,
       method: "DELETE"
     }
-  );
-
-  if (!res.ok) {
-    throw new Error("Failed to remove member");
-  }
-
-  await loadGroups(); // refresh UI
+  )
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to remove member");
+      }
+      return loadGroups(); // refresh UI
+    });
 }
 
-window.deleteGroup = async function (groupId) {
+window.deleteGroup = function (groupId) {
   const confirmed = confirm(
     "Are you sure you want to delete this group?\n\nThis action cannot be undone."
   );
 
   if (!confirmed) return;
 
-  const res = await fetch(`${javaURI}/api/groups/${groupId}`, {
+  return fetch(`${javaURI}/api/groups/${groupId}`, {
     ...fetchOptions,
     method: "DELETE"
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("DELETE GROUP ERROR:", text);
-    alert("Failed to delete group");
-    return;
-  }
-
-  await loadGroups(); // refresh UI
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("DELETE GROUP ERROR:", text);
+          alert("Failed to delete group");
+          throw new Error("Failed to delete group");
+        });
+      }
+      return loadGroups(); // refresh UI
+    });
 };
 
 
@@ -364,20 +365,22 @@ window.deleteGroup = async function (groupId) {
 /* ================================
    API CALLS
 ================================ */
-window.loadGroups = async function () {
-  try {
-    const res = await fetch(`${javaURI}/api/groups`, {
-      ...fetchOptions,
-      // credentials: 'omit'
+window.loadGroups = function () {
+  return fetch(`${javaURI}/api/groups`, {
+    ...fetchOptions,
+    // credentials: 'omit'
+  })
+    .then(res => res.json())
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => {
+      console.error("Failed to load groups", err);
     });
-    allGroups = await res.json();
-    renderGroups();
-  } catch (err) {
-    console.error("Failed to load groups", err);
-  }
 }
 
-window.saveNewGroup = async function () {
+window.saveNewGroup = function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
@@ -390,9 +393,19 @@ window.saveNewGroup = async function () {
 
   const uids = parseUIDs(rawUIDs);
 
-  try {
-    // 1️⃣ Create group (NO MEMBERS)
-    const groupRes = await fetch(`${javaURI}/api/groups`, {
+  // 1️⃣ Fetch Flask users, Java people, and create group in parallel
+  return Promise.all([
+    fetch(`${pythonURI}/api/user`, { credentials: "include" })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch users from Flask");
+        return res.json();
+      }),
+    fetch(`${javaURI}/api/people`, { ...fetchOptions, credentials: "include" })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch people from Java");
+        return res.json();
+      }),
+    fetch(`${javaURI}/api/groups`, {
       ...fetchOptions,
       method: "POST",
       body: JSON.stringify({
@@ -400,32 +413,39 @@ window.saveNewGroup = async function () {
         period: Number(period),
         course
       })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Group creation failed");
+        return res.json();
+      })
+  ])
+    .then(([flaskUsers, javaPeople, group]) => {
+      const groupId = group.id;
+
+      // 2️⃣ Validate all UIDs and resolve person IDs from cached data
+      const personIds = uids.map(uid => {
+        const flaskMatch = flaskUsers.find(u => u.uid === uid);
+        if (!flaskMatch) throw new Error(`UID not found in Flask: ${uid}`);
+
+        const javaMatch = javaPeople.find(p => p.uid === uid);
+        if (!javaMatch) throw new Error(`UID found in Flask but missing in Java: ${uid}`);
+
+        return javaMatch.id;
+      });
+
+      // 3️⃣ Add all members sequentially
+      return personIds.reduce((promiseChain, personId) => {
+        return promiseChain.then(() => addPersonToGroup(groupId, personId));
+      }, Promise.resolve());
+    })
+    .then(() => {
+      cancelAddGroup();
+      return loadGroups();
+    })
+    .catch(err => {
+      console.error(err);
+      alert(err.message);
     });
-
-    if (!groupRes.ok) throw new Error("Group creation failed");
-
-    const group = await groupRes.json();
-    const groupId = group.id;
-
-    // 2️⃣ Resolve & add each UID
-    for (const uid of uids) {
-      // Flask validation
-      const validatedUID = await validateUIDWithFlask(uid);
-
-      // Java UID → person.id
-      const personId = await getPersonIdFromUID(validatedUID);
-
-      // Add to group
-      await addPersonToGroup(groupId, personId);
-    }
-
-    cancelAddGroup();
-    await loadGroups();
-
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
 };
 
 
