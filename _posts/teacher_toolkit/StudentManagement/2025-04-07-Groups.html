@@ -9,12 +9,10 @@ comments: false
 
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 shadow-2xl flex flex-col items-center gap-4">
-        <div class="loading-spinner"></div>
-        <p id="loadingText" class="text-gray-200 text-sm">Loading...</p>
-      </div>
+    <!-- Loading Indicator -->
+    <div id="loadingOverlay" class="hidden fixed top-4 right-4 z-50 bg-neutral-800 border border-neutral-600 rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg">
+      <div class="loading-spinner"></div>
+      <span id="loadingText" class="text-gray-300 text-sm">Loading...</span>
     </div>
 
     <!-- Page Title -->
@@ -126,8 +124,15 @@ comments: false
     <!-- Groups Display Area -->
     <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
       <!-- Search bar -->
-      <input type="text" id="searchInput" placeholder="Search by Group Name or Member Name"
-        class="w-full mb-6 px-4 py-3 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <div class="flex gap-2 mb-6">
+        <input type="text" id="searchInput" placeholder="Search by Group Name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          onkeydown="if(event.key==='Enter') searchGroups()" />
+        <button onclick="searchGroups()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium">
+          Search
+        </button>
+      </div>
 
       <!-- Add Group Section -->
       <div id="addGroupSection" class="mb-6 bg-neutral-700 border-2 border-dashed border-neutral-600 rounded-lg p-6">
@@ -216,16 +221,14 @@ comments: false
 
 <style>
   .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #4b5563;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #4b5563;
     border-top-color: #6366f1;
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s linear infinite;
   }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <script type="module">
@@ -264,8 +267,30 @@ function hideLoading() {
 ================================ */
 document.addEventListener("DOMContentLoaded", () => {
   initializeData();
-  document.getElementById("searchInput").addEventListener("input", renderGroups);
 });
+
+// Search groups using API
+window.searchGroups = async function () {
+  const searchTerm = document.getElementById("searchInput").value.trim();
+  
+  showLoading("Searching...");
+  try {
+    let url = `${javaURI}/api/groups`;
+    if (searchTerm) {
+      url = `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`;
+    }
+    
+    const res = await fetch(url, fetchOptions);
+    if (!res.ok) throw new Error("Search failed");
+    
+    allGroups = await res.json();
+    renderGroups();
+  } catch (err) {
+    console.error("Search failed", err);
+  } finally {
+    hideLoading();
+  }
+}
 
 // Load groups and people in parallel on page load (only 2 API calls total)
 async function initializeData() {
@@ -490,24 +515,13 @@ window.saveNewGroup = async function () {
 window.renderGroups = function () {
   const container = document.getElementById("groupsContainer");
   const empty = document.getElementById("emptyState");
-  const search = document.getElementById("searchInput").value.toLowerCase();
 
   container.innerHTML = "";
 
+  // Only filter by period/class (search is handled by API)
   const filtered = allGroups.filter(g => {
     if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
     if (activeClasses.length && !activeClasses.includes(g.course)) return false;
-
-    if (search) {
-      // Search in group name
-      const nameMatch = g.name.toLowerCase().includes(search);
-      // Search in member names and UIDs
-      const memberMatch = (g.members || []).some(m =>
-        m.name?.toLowerCase().includes(search) || 
-        m.uid?.toLowerCase().includes(search)
-      );
-      if (!nameMatch && !memberMatch) return false;
-    }
     return true;
   });
 
@@ -626,7 +640,8 @@ window.clearAllFilters = function () {
   document.getElementById("classAllCheckbox").checked = true;
   document.getElementById("periodFilterLabel").textContent = "All Periods";
   document.getElementById("classFilterLabel").textContent = "All Classes";
-  renderGroups();
+  document.getElementById("searchInput").value = "";
+  searchGroups();  // Reload all groups
 }
 
 window.onPeriodCheckboxChange = function (cb) {
