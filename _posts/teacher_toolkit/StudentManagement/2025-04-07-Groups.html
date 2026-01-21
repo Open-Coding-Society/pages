@@ -9,6 +9,14 @@ comments: false
 
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 shadow-2xl flex flex-col items-center gap-4">
+        <div class="loading-spinner"></div>
+        <p id="loadingText" class="text-gray-200 text-sm">Loading...</p>
+      </div>
+    </div>
+
     <!-- Page Title -->
     <h2 class="text-2xl font-semibold text-white mb-6">Groups Management</h2>
 
@@ -206,6 +214,20 @@ comments: false
   </div>
 </div>
 
+<style>
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #4b5563;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
 <script type="module">
 /* ================================
    CONFIG
@@ -219,6 +241,23 @@ let allGroups = [];
 let peopleCache = [];  // Cache people to avoid repeated API calls
 let activePeriods = [];
 let activeClasses = [];
+let loadingCount = 0;  // Track concurrent loading operations
+
+/* ================================
+   LOADING HELPERS
+================================ */
+function showLoading(message = "Loading...") {
+  loadingCount++;
+  document.getElementById("loadingText").textContent = message;
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
+
+function hideLoading() {
+  loadingCount = Math.max(0, loadingCount - 1);
+  if (loadingCount === 0) {
+    document.getElementById("loadingOverlay").classList.add("hidden");
+  }
+}
 
 /* ================================
    INIT
@@ -230,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Load groups and people in parallel on page load (only 2 API calls total)
 async function initializeData() {
+  showLoading("Loading groups...");
   try {
     const [groupsRes, peopleRes] = await Promise.all([
       fetch(`${javaURI}/api/groups`, fetchOptions),
@@ -245,6 +285,8 @@ async function initializeData() {
     renderGroups();
   } catch (err) {
     console.error("Failed to initialize data", err);
+  } finally {
+    hideLoading();
   }
 }
 
@@ -272,6 +314,7 @@ window.getPersonById = function (personId) {
 
 // Add member to group - updates local state instead of refetching
 window.addMemberToGroup = async function (groupId, uid) {
+  showLoading("Adding member...");
   try {
     const personId = getPersonIdFromUID(uid);
     const person = getPersonById(personId);
@@ -301,11 +344,14 @@ window.addMemberToGroup = async function (groupId, uid) {
     document.getElementById(`member-uid-${groupId}`).value = '';
   } catch (err) {
     alert(err.message);
+  } finally {
+    hideLoading();
   }
 }
 
 // Remove member from group - updates local state instead of refetching
 window.removeMemberFromGroup = async function (groupId, personId) {
+  showLoading("Removing member...");
   try {
     const res = await fetch(
       `${javaURI}/api/groups/${groupId}/members/${personId}`,
@@ -326,6 +372,8 @@ window.removeMemberFromGroup = async function (groupId, personId) {
     document.getElementById(`member-uid-${groupId}`).value = '';
   } catch (err) {
     alert(err.message);
+  } finally {
+    hideLoading();
   }
 }
 
@@ -337,6 +385,7 @@ window.deleteGroup = async function (groupId) {
 
   if (!confirmed) return;
 
+  showLoading("Deleting group...");
   try {
     const res = await fetch(`${javaURI}/api/groups/${groupId}`, {
       ...fetchOptions,
@@ -355,6 +404,8 @@ window.deleteGroup = async function (groupId) {
     renderGroups();
   } catch (err) {
     console.error(err);
+  } finally {
+    hideLoading();
   }
 };
 
@@ -397,6 +448,7 @@ window.saveNewGroup = async function () {
     return;
   }
 
+  showLoading("Creating group...");
   try {
     const res = await fetch(`${javaURI}/api/groups`, {
       ...fetchOptions,
@@ -425,6 +477,8 @@ window.saveNewGroup = async function () {
   } catch (err) {
     console.error(err);
     alert(err.message);
+  } finally {
+    hideLoading();
   }
 };
 
