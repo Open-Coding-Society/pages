@@ -23,6 +23,7 @@
     'tr': { name: 'Turkish', code: 'tr' },
     'uk': { name: 'Ukrainian', code: 'uk' },
     'he': { name: 'Hebrew', code: 'he' },
+    'fa': { name: 'Persian (Farsi)', code: 'fa' },
   };
 
   const PRESETS = {

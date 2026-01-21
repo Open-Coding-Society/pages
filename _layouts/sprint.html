@@ -11,7 +11,6 @@ layout: post
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="stylesheet" href="{{ '/assets/css/timeline.scss' | relative_url }}">
 <script src="{{ '/assets/js/help-video.js' | relative_url }}"></script>
 
 <div class="timeline-page"> 
@@ -72,12 +71,43 @@ layout: post
                   <span><i class="fas fa-clipboard-check"></i> Summative (Friday) - Assessments</span>
                 </label>
               </div>
+              <div class="priority-selector">
+                <label class="priority-label">Priority Level:</label>
+                <div class="priority-options" data-sprint="{{ unitKey }}">
+                  <label class="priority-option priority-p0">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P0" class="priority-radio">
+                    <span class="priority-badge p0">P0</span>
+                    <span class="priority-desc">Critical</span>
+                  </label>
+                  <label class="priority-option priority-p1">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P1" class="priority-radio">
+                    <span class="priority-badge p1">P1</span>
+                    <span class="priority-desc">High</span>
+                  </label>
+                  <label class="priority-option priority-p2">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P2" class="priority-radio" checked>
+                    <span class="priority-badge p2">P2</span>
+                    <span class="priority-desc">Medium</span>
+                  </label>
+                  <label class="priority-option priority-p3">
+                    <input type="radio" name="priority-{{ unitKey }}" value="P3" class="priority-radio">
+                    <span class="priority-badge p3">P3</span>
+                    <span class="priority-desc">Low</span>
+                  </label>
+                </div>
+              </div>
               <div class="date-actions">
                 <button class="sync-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
                   <i class="fas fa-sync"></i> Sync to Calendar
                 </button>
+                <button class="advanced-sync-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                  <i class="fas fa-sliders-h"></i> Advanced Sync
+                </button>
                 <button class="delete-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
                   <i class="fas fa-trash-alt"></i> Remove from Calendar
+                </button>
+                <button class="advanced-remove-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                  <i class="fas fa-list-check"></i> Advanced Remove
                 </button>
               </div>
               <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
@@ -338,6 +368,106 @@ layout: post
     
     <div id="help-content" >
       <!-- Markdown content will be loaded here -->
+    </div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   SELECTIVE SYNC MODAL        -->
+<!-- ============================= -->
+<div id="selective-sync-modal" class="calendar-action-modal">
+  <div class="calendar-action-modal-content">
+    <div class="calendar-action-modal-header">
+      <h2><i class="fas fa-calendar-plus"></i> Sync to Calendar</h2>
+      <button id="close-selective-sync-modal" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="calendar-action-modal-body">
+      <!-- Sprint Info -->
+      <div class="sync-modal-sprint-info">
+        <span class="sync-modal-sprint-name" id="sync-modal-sprint-name"></span>
+        <span class="sync-modal-date-range" id="sync-modal-date-range"></span>
+      </div>
+      
+      <!-- Warnings Section -->
+      <div id="sync-warnings-container" class="sync-warnings-container hidden"></div>
+      
+      <!-- Quick Actions -->
+      <div class="sync-quick-actions">
+        <button type="button" class="quick-action-btn" id="sync-select-all"><i class="fas fa-check-double"></i> Select All</button>
+        <button type="button" class="quick-action-btn" id="sync-deselect-all"><i class="fas fa-square"></i> Deselect All</button>
+        <button type="button" class="quick-action-btn" id="sync-select-formative"><i class="fas fa-book"></i> Formative Only</button>
+        <button type="button" class="quick-action-btn" id="sync-select-summative"><i class="fas fa-clipboard-check"></i> Summative Only</button>
+      </div>
+      
+      <!-- Priority Selector -->
+      <div class="sync-modal-priority">
+        <label class="priority-label">Priority Level:</label>
+        <div class="priority-options-inline">
+          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P0"><span class="priority-badge p0">P0</span></label>
+          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P1"><span class="priority-badge p1">P1</span></label>
+          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P2" checked><span class="priority-badge p2">P2</span></label>
+          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P3"><span class="priority-badge p3">P3</span></label>
+        </div>
+      </div>
+      
+      <!-- Week Selection List -->
+      <div class="sync-week-list" id="sync-week-list">
+        <!-- Dynamically populated -->
+      </div>
+      
+      <!-- Summary -->
+      <div class="sync-summary" id="sync-summary">
+        <span class="sync-summary-count"><span id="sync-selected-count">0</span> items selected</span>
+      </div>
+    </div>
+    
+    <div class="calendar-action-modal-footer">
+      <button type="button" class="modal-btn secondary" id="cancel-selective-sync">Cancel</button>
+      <button type="button" class="modal-btn primary" id="confirm-selective-sync"><i class="fas fa-sync"></i> Sync Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   SELECTIVE REMOVE MODAL      -->
+<!-- ============================= -->
+<div id="selective-remove-modal" class="calendar-action-modal">
+  <div class="calendar-action-modal-content remove-modal">
+    <div class="calendar-action-modal-header">
+      <h2><i class="fas fa-calendar-minus"></i> Remove from Calendar</h2>
+      <button id="close-selective-remove-modal" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="calendar-action-modal-body">
+      <!-- Sprint Info -->
+      <div class="sync-modal-sprint-info">
+        <span class="sync-modal-sprint-name" id="remove-modal-sprint-name"></span>
+        <span class="sync-modal-date-range" id="remove-modal-date-range"></span>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="sync-quick-actions">
+        <button type="button" class="quick-action-btn" id="remove-select-all"><i class="fas fa-check-double"></i> Select All</button>
+        <button type="button" class="quick-action-btn" id="remove-deselect-all"><i class="fas fa-square"></i> Deselect All</button>
+        <button type="button" class="quick-action-btn" id="remove-select-formative"><i class="fas fa-book"></i> Formative Only</button>
+        <button type="button" class="quick-action-btn" id="remove-select-summative"><i class="fas fa-clipboard-check"></i> Summative Only</button>
+      </div>
+      
+      <!-- Week Selection List -->
+      <div class="sync-week-list" id="remove-week-list">
+        <!-- Dynamically populated -->
+      </div>
+      
+      <!-- Summary -->
+      <div class="sync-summary remove-summary" id="remove-summary">
+        <span class="sync-summary-count"><span id="remove-selected-count">0</span> items selected for removal</span>
+      </div>
+    </div>
+    
+    <div class="calendar-action-modal-footer">
+      <button type="button" class="modal-btn secondary" id="cancel-selective-remove">Cancel</button>
+      <button type="button" class="modal-btn danger" id="confirm-selective-remove"><i class="fas fa-trash-alt"></i> Remove Selected</button>
     </div>
   </div>
 </div>
@@ -1626,7 +1756,7 @@ layout: post
       }
     });
     
-    // Sync button handlers
+    // Sync button handlers - direct sync (original functionality)
     document.querySelectorAll('.sync-sprint-calendar-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -1639,7 +1769,20 @@ layout: post
       });
     });
     
-    // Delete button handlers
+    // Advanced sync button handlers - open selective sync modal
+    document.querySelectorAll('.advanced-sync-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const course = btn.dataset.course;
+        const startWeek = parseInt(btn.dataset.startWeek);
+        const endWeek = parseInt(btn.dataset.endWeek);
+        
+        openSelectiveSyncModal(sprintKey, course, startWeek, endWeek);
+      });
+    });
+    
+    // Delete button handlers - direct delete (original functionality)
     document.querySelectorAll('.delete-sprint-calendar-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -1651,6 +1794,22 @@ layout: post
         await deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek);
       });
     });
+    
+    // Advanced remove button handlers - open selective remove modal
+    document.querySelectorAll('.advanced-remove-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sprintKey = btn.dataset.sprint;
+        const course = btn.dataset.course;
+        const startWeek = parseInt(btn.dataset.startWeek);
+        const endWeek = parseInt(btn.dataset.endWeek);
+        
+        openSelectiveRemoveModal(sprintKey, course, startWeek, endWeek);
+      });
+    });
+    
+    // Initialize selective sync/remove modal handlers
+    initializeSelectiveSyncModals();
   }
   
   // Main function to sync sprint to calendar
@@ -1661,6 +1820,10 @@ layout: post
     // Get sync options (Checkpoints are added manually by instructor, not synced here)
     const syncFormative = document.querySelector(`.sync-reading-materials[data-sprint="${sprintKey}"]`)?.checked ?? true;
     const syncSummative = document.querySelector(`.sync-assessments[data-sprint="${sprintKey}"]`)?.checked ?? true;
+
+    // Get selected priority level (default to P2 if none selected)
+    const priorityRadio = document.querySelector(`input[name="priority-${sprintKey}"]:checked`);
+    const priority = priorityRadio?.value || 'P2';
     
     btn.disabled = true;
     showDateStatus(statusEl, 'Syncing to calendar...', 'loading');
@@ -1711,10 +1874,11 @@ layout: post
             }).join('\n\n');
             
             events.push({
-              title: `📚 Week ${weekNum} Formative - ${courseName}`,
+              title: `[${priority}] 📚 Week ${weekNum} Formative - ${courseName}`,
               description: `Reading Materials:\n\n${lessonItems}`,
               date: readingDate,
-              period: courseName
+              period: courseName,
+              priority: priority
             });
           }
         }
@@ -1744,15 +1908,23 @@ layout: post
             }).join('\n\n');
             
             events.push({
-              title: `📝 Week ${weekNum} Summative - ${courseName}`,
+              title: `[${priority}] 📝 Week ${weekNum} Summative - ${courseName}`,
               description: `Assessments Due:\n\n${assignmentItems}`,
               date: assessmentDate,
-              period: courseName
+              period: courseName,
+              priority: priority
             });
           }
         }
         
         // Checkpoints are added manually by instructor via calendar UI, not auto-synced
+      }
+      
+      // Check if we have any events to sync
+      if (events.length === 0) {
+        showDateStatus(statusEl, 'No events to sync for this sprint', 'warning');
+        btn.disabled = false;
+        return;
       }
       
       // Send all events to calendar API in a single bulk request
@@ -1843,8 +2015,13 @@ layout: post
       
       for (const weekCard of weekCards) {
         const weekNum = parseInt(weekCard.dataset.week);
-        
-        // Formative event title pattern
+
+        // Formative event title patterns (with all priority levels)
+        ['P0', 'P1', 'P2', 'P3'].forEach(p => {
+          eventTitlesToDelete.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
+          eventTitlesToDelete.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
+        });
+        // Also include old format without priority for backwards compatibility
         eventTitlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
         
         // Summative event title pattern
@@ -1917,6 +2094,839 @@ layout: post
         el.className = 'sprint-date-status';
       }, 5000);
     }
+  }
+  
+  // Show toast notification (visible overlay message)
+  function showToastNotification(message, type) {
+    // Remove existing toast if present
+    const existingToast = document.querySelector('.calendar-toast-notification');
+    if (existingToast) {
+      existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `calendar-toast-notification ${type}`;
+    toast.innerHTML = `
+      <span class="toast-message">${message}</span>
+      <button class="toast-close">&times;</button>
+    `;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Close button handler
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    });
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, 5000);
+  }
+
+  // ========================================
+  // SELECTIVE SYNC/REMOVE MODAL SYSTEM
+  // ========================================
+  
+  let currentSyncModalData = null;
+  let currentRemoveModalData = null;
+  
+  // Parse week items from week card data attributes
+  function parseWeekItems(weekCard) {
+    const weekNum = parseInt(weekCard.dataset.week);
+    const lessons = weekCard.dataset.lessons || '';
+    const assignments = weekCard.dataset.assignments || '';
+    
+    const items = [];
+    
+    // Parse lessons (formative)
+    if (lessons) {
+      const lessonList = lessons.split(';;;').filter(l => l.trim());
+      const seenTitles = new Set();
+      lessonList.forEach(l => {
+        const [title, url] = l.split('|||');
+        if (!seenTitles.has(title)) {
+          seenTitles.add(title);
+          items.push({
+            id: `w${weekNum}-formative-${title.replace(/\s+/g, '-').toLowerCase()}`,
+            title: title,
+            url: url,
+            type: 'formative',
+            weekNum: weekNum,
+            day: 'Monday'
+          });
+        }
+      });
+    }
+    
+    // Parse assignments (summative)
+    if (assignments) {
+      const assignmentList = assignments.split(';;;').filter(a => a.trim());
+      const seenTitles = new Set();
+      assignmentList.forEach(a => {
+        const [title, url] = a.split('|||');
+        if (!seenTitles.has(title)) {
+          seenTitles.add(title);
+          items.push({
+            id: `w${weekNum}-summative-${title.replace(/\s+/g, '-').toLowerCase()}`,
+            title: title,
+            url: url,
+            type: 'summative',
+            weekNum: weekNum,
+            day: 'Friday'
+          });
+        }
+      });
+    }
+    
+    return items;
+  }
+  
+  // Build week selection HTML for modal
+  function buildWeekSelectionHTML(sprintKey, course, startWeek, endWeek, modalType) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
+    const courseName = course.toUpperCase();
+    
+    let html = '';
+    
+    for (const weekCard of weekCards) {
+      const weekNum = parseInt(weekCard.dataset.week);
+      const items = parseWeekItems(weekCard);
+      
+      if (items.length === 0) continue;
+      
+      const formativeItems = items.filter(i => i.type === 'formative');
+      const summativeItems = items.filter(i => i.type === 'summative');
+      
+      const readingDate = getReadingDate(weekNum);
+      const assessmentDate = getAssessmentDate(weekNum);
+      
+      // Check for warnings
+      const calendarWeek = SCHOOL_CALENDAR.weeks[weekNum];
+      const isSkip = calendarWeek?.skipWeek;
+      const hasHoliday = calendarWeek?.holidays && !isSkip;
+      const isPastDate = readingDate && new Date(readingDate) < new Date();
+      
+      html += `
+        <div class="sync-week-group" data-week="${weekNum}">
+          <div class="sync-week-header">
+            <label class="sync-week-checkbox">
+              <input type="checkbox" class="week-select-all" data-week="${weekNum}" checked>
+              <span class="week-label">
+                <strong>Week ${weekNum}</strong>
+                <span class="week-date-range">${readingDate ? formatDateShort(readingDate) : ''} - ${assessmentDate ? formatDateShort(assessmentDate) : ''}</span>
+              </span>
+            </label>
+            <button type="button" class="week-expand-btn" data-week="${weekNum}">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
+          
+          ${isSkip ? `<div class="sync-item-warning skip"><i class="fas fa-umbrella-beach"></i> Break week - ${calendarWeek.holidays?.join(', ') || 'No school'}</div>` : ''}
+          ${hasHoliday ? `<div class="sync-item-warning holiday"><i class="fas fa-exclamation-triangle"></i> Holiday: ${calendarWeek.holidays?.join(', ')} - Materials on Tuesday</div>` : ''}
+          ${isPastDate ? `<div class="sync-item-warning past"><i class="fas fa-clock"></i> This week's dates have already passed</div>` : ''}
+          
+          <div class="sync-week-items" data-week="${weekNum}">
+            ${formativeItems.length > 0 ? `
+              <div class="sync-item-category">
+                <div class="sync-category-header">
+                  <label class="sync-category-checkbox">
+                    <input type="checkbox" class="category-select-all" data-week="${weekNum}" data-type="formative" checked>
+                    <i class="fas fa-book"></i> Formative (${readingDate ? formatDateShort(readingDate) : 'Monday'})
+                  </label>
+                </div>
+                <div class="sync-item-list">
+                  ${formativeItems.map(item => `
+                    <label class="sync-item-checkbox">
+                      <input type="checkbox" class="item-checkbox" data-week="${weekNum}" data-type="formative" data-id="${item.id}" data-title="${item.title}" data-url="${item.url || ''}" checked>
+                      <span class="item-title">${item.title}</span>
+                      ${item.url ? `<a href="{{ site.baseurl }}${item.url}" target="_blank" class="item-link-icon" onclick="event.stopPropagation()"><i class="fas fa-external-link-alt"></i></a>` : ''}
+                    </label>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+            
+            ${summativeItems.length > 0 ? `
+              <div class="sync-item-category">
+                <div class="sync-category-header">
+                  <label class="sync-category-checkbox">
+                    <input type="checkbox" class="category-select-all" data-week="${weekNum}" data-type="summative" checked>
+                    <i class="fas fa-clipboard-check"></i> Summative (${assessmentDate ? formatDateShort(assessmentDate) : 'Friday'})
+                  </label>
+                </div>
+                <div class="sync-item-list">
+                  ${summativeItems.map(item => `
+                    <label class="sync-item-checkbox">
+                      <input type="checkbox" class="item-checkbox" data-week="${weekNum}" data-type="summative" data-id="${item.id}" data-title="${item.title}" data-url="${item.url || ''}" checked>
+                      <span class="item-title">${item.title}</span>
+                      ${item.url ? `<a href="{{ site.baseurl }}${item.url}" target="_blank" class="item-link-icon" onclick="event.stopPropagation()"><i class="fas fa-external-link-alt"></i></a>` : ''}
+                    </label>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+    
+    return html || '<p class="no-items-message">No items found for this sprint.</p>';
+  }
+  
+  // Open selective sync modal
+  function openSelectiveSyncModal(sprintKey, course, startWeek, endWeek) {
+    currentSyncModalData = { sprintKey, course, startWeek, endWeek };
+    
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    const sprintTitle = sprintCard?.querySelector('.sprint-title')?.textContent || sprintKey;
+    const courseName = course.toUpperCase();
+    
+    // Set header info
+    document.getElementById('sync-modal-sprint-name').textContent = `${sprintTitle} - ${courseName}`;
+    const dateRange = getSprintDateRange(startWeek, endWeek);
+    document.getElementById('sync-modal-date-range').textContent = 
+      dateRange.start && dateRange.end 
+        ? `${formatDateDisplay(dateRange.start)} - ${formatDateDisplay(dateRange.end)}`
+        : `Weeks ${startWeek}-${endWeek}`;
+    
+    // Build week selection list
+    document.getElementById('sync-week-list').innerHTML = buildWeekSelectionHTML(sprintKey, course, startWeek, endWeek, 'sync');
+    
+    // Check for existing events and show warnings
+    checkForExistingEvents(sprintKey, course, startWeek, endWeek);
+    
+    // Initialize checkbox handlers for this modal
+    initializeSyncModalCheckboxes('sync');
+    
+    // Update count
+    updateSelectedCount('sync');
+    
+    // Close the dropdown
+    document.querySelectorAll('.sprint-date-dropdown').forEach(d => d.classList.add('hidden'));
+    
+    // Show modal
+    document.getElementById('selective-sync-modal').style.display = 'flex';
+  }
+  
+  // Open selective remove modal
+  function openSelectiveRemoveModal(sprintKey, course, startWeek, endWeek) {
+    currentRemoveModalData = { sprintKey, course, startWeek, endWeek };
+    
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    const sprintTitle = sprintCard?.querySelector('.sprint-title')?.textContent || sprintKey;
+    const courseName = course.toUpperCase();
+    
+    // Set header info
+    document.getElementById('remove-modal-sprint-name').textContent = `${sprintTitle} - ${courseName}`;
+    const dateRange = getSprintDateRange(startWeek, endWeek);
+    document.getElementById('remove-modal-date-range').textContent = 
+      dateRange.start && dateRange.end 
+        ? `${formatDateDisplay(dateRange.start)} - ${formatDateDisplay(dateRange.end)}`
+        : `Weeks ${startWeek}-${endWeek}`;
+    
+    // Build week selection list
+    document.getElementById('remove-week-list').innerHTML = buildWeekSelectionHTML(sprintKey, course, startWeek, endWeek, 'remove');
+    
+    // Initialize checkbox handlers for this modal
+    initializeSyncModalCheckboxes('remove');
+    
+    // Update count
+    updateSelectedCount('remove');
+    
+    // Close the dropdown
+    document.querySelectorAll('.sprint-date-dropdown').forEach(d => d.classList.add('hidden'));
+    
+    // Show modal
+    document.getElementById('selective-remove-modal').style.display = 'flex';
+  }
+  
+  // Check for existing events on the calendar
+  async function checkForExistingEvents(sprintKey, course, startWeek, endWeek) {
+    const warningsContainer = document.getElementById('sync-warnings-container');
+    warningsContainer.innerHTML = '<div class="checking-events"><i class="fas fa-spinner fa-spin"></i> Checking for existing events...</div>';
+    warningsContainer.classList.remove('hidden');
+    
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      const courseName = course.toUpperCase();
+      
+      // Build list of event titles we're about to sync
+      const eventTitlesToCheck = [];
+      const priorities = ['P0', 'P1', 'P2', 'P3'];
+      
+      for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+        priorities.forEach(p => {
+          eventTitlesToCheck.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
+          eventTitlesToCheck.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
+        });
+        // Also check old format
+        eventTitlesToCheck.push(`📚 Week ${weekNum} Formative - ${courseName}`);
+        eventTitlesToCheck.push(`📝 Week ${weekNum} Summative - ${courseName}`);
+      }
+      
+      // Check if any of these events exist
+      const response = await fetch(`${javaURI}/api/calendar/check_events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ titles: eventTitlesToCheck })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        const existingEvents = result.existing || [];
+        
+        if (existingEvents.length > 0) {
+          // Group by week
+          const eventsByWeek = {};
+          existingEvents.forEach(title => {
+            const match = title.match(/Week (\d+)/);
+            if (match) {
+              const weekNum = match[1];
+              if (!eventsByWeek[weekNum]) eventsByWeek[weekNum] = [];
+              eventsByWeek[weekNum].push(title);
+            }
+          });
+          
+          let warningHtml = `
+            <div class="sync-warning duplicate">
+              <div class="warning-header">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Existing Events Detected</strong>
+              </div>
+              <p>The following events already exist on your calendar and will be updated:</p>
+              <ul class="existing-events-list">
+          `;
+          
+          Object.keys(eventsByWeek).sort((a, b) => a - b).forEach(weekNum => {
+            const events = eventsByWeek[weekNum];
+            warningHtml += `<li><strong>Week ${weekNum}:</strong> ${events.length} event(s)</li>`;
+          });
+          
+          warningHtml += `
+              </ul>
+              <div class="warning-actions">
+                <label class="warning-option">
+                  <input type="radio" name="duplicate-action" value="update" checked>
+                  <span>Update existing events</span>
+                </label>
+                <label class="warning-option">
+                  <input type="radio" name="duplicate-action" value="skip">
+                  <span>Skip existing events</span>
+                </label>
+              </div>
+            </div>
+          `;
+          
+          warningsContainer.innerHTML = warningHtml;
+        } else {
+          warningsContainer.innerHTML = '';
+          warningsContainer.classList.add('hidden');
+        }
+      } else if (response.status === 404) {
+        // Endpoint not available, hide warnings
+        warningsContainer.innerHTML = '';
+        warningsContainer.classList.add('hidden');
+      } else {
+        warningsContainer.innerHTML = '';
+        warningsContainer.classList.add('hidden');
+      }
+    } catch (error) {
+      console.log('Could not check for existing events:', error);
+      warningsContainer.innerHTML = '';
+      warningsContainer.classList.add('hidden');
+    }
+  }
+  
+  // Initialize checkbox event handlers within modal
+  function initializeSyncModalCheckboxes(modalType) {
+    const listId = modalType === 'sync' ? 'sync-week-list' : 'remove-week-list';
+    const listEl = document.getElementById(listId);
+    
+    // Week expand/collapse
+    listEl.querySelectorAll('.week-expand-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const weekNum = btn.dataset.week;
+        const itemsContainer = listEl.querySelector(`.sync-week-items[data-week="${weekNum}"]`);
+        const icon = btn.querySelector('i');
+        
+        if (itemsContainer.classList.contains('collapsed')) {
+          itemsContainer.classList.remove('collapsed');
+          icon.classList.remove('fa-chevron-right');
+          icon.classList.add('fa-chevron-down');
+        } else {
+          itemsContainer.classList.add('collapsed');
+          icon.classList.remove('fa-chevron-down');
+          icon.classList.add('fa-chevron-right');
+        }
+      });
+    });
+    
+    // Week select all checkbox
+    listEl.querySelectorAll('.week-select-all').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const weekNum = checkbox.dataset.week;
+        const isChecked = checkbox.checked;
+        
+        // Update all items in this week
+        listEl.querySelectorAll(`.item-checkbox[data-week="${weekNum}"]`).forEach(cb => {
+          cb.checked = isChecked;
+        });
+        
+        // Update category checkboxes
+        listEl.querySelectorAll(`.category-select-all[data-week="${weekNum}"]`).forEach(cb => {
+          cb.checked = isChecked;
+        });
+        
+        updateSelectedCount(modalType);
+      });
+    });
+    
+    // Category select all checkbox
+    listEl.querySelectorAll('.category-select-all').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const weekNum = checkbox.dataset.week;
+        const type = checkbox.dataset.type;
+        const isChecked = checkbox.checked;
+        
+        // Update all items in this category
+        listEl.querySelectorAll(`.item-checkbox[data-week="${weekNum}"][data-type="${type}"]`).forEach(cb => {
+          cb.checked = isChecked;
+        });
+        
+        // Update week checkbox
+        updateWeekCheckboxState(listEl, weekNum);
+        updateSelectedCount(modalType);
+      });
+    });
+    
+    // Individual item checkbox
+    listEl.querySelectorAll('.item-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        const weekNum = checkbox.dataset.week;
+        const type = checkbox.dataset.type;
+        
+        // Update category checkbox
+        updateCategoryCheckboxState(listEl, weekNum, type);
+        
+        // Update week checkbox
+        updateWeekCheckboxState(listEl, weekNum);
+        
+        updateSelectedCount(modalType);
+      });
+    });
+  }
+  
+  // Update category checkbox state based on items
+  function updateCategoryCheckboxState(listEl, weekNum, type) {
+    const categoryCheckbox = listEl.querySelector(`.category-select-all[data-week="${weekNum}"][data-type="${type}"]`);
+    if (!categoryCheckbox) return;
+    
+    const items = listEl.querySelectorAll(`.item-checkbox[data-week="${weekNum}"][data-type="${type}"]`);
+    const checkedItems = listEl.querySelectorAll(`.item-checkbox[data-week="${weekNum}"][data-type="${type}"]:checked`);
+    
+    categoryCheckbox.checked = checkedItems.length === items.length;
+    categoryCheckbox.indeterminate = checkedItems.length > 0 && checkedItems.length < items.length;
+  }
+  
+  // Update week checkbox state based on all items
+  function updateWeekCheckboxState(listEl, weekNum) {
+    const weekCheckbox = listEl.querySelector(`.week-select-all[data-week="${weekNum}"]`);
+    if (!weekCheckbox) return;
+    
+    const items = listEl.querySelectorAll(`.item-checkbox[data-week="${weekNum}"]`);
+    const checkedItems = listEl.querySelectorAll(`.item-checkbox[data-week="${weekNum}"]:checked`);
+    
+    weekCheckbox.checked = checkedItems.length === items.length;
+    weekCheckbox.indeterminate = checkedItems.length > 0 && checkedItems.length < items.length;
+  }
+  
+  // Update selected count display
+  function updateSelectedCount(modalType) {
+    const listId = modalType === 'sync' ? 'sync-week-list' : 'remove-week-list';
+    const countId = modalType === 'sync' ? 'sync-selected-count' : 'remove-selected-count';
+    
+    const listEl = document.getElementById(listId);
+    const checkedItems = listEl.querySelectorAll('.item-checkbox:checked');
+    
+    document.getElementById(countId).textContent = checkedItems.length;
+  }
+  
+  // Get selected items from modal
+  function getSelectedItems(modalType) {
+    const listId = modalType === 'sync' ? 'sync-week-list' : 'remove-week-list';
+    const listEl = document.getElementById(listId);
+    
+    const selectedItems = [];
+    const itemsByWeek = {};
+    
+    listEl.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+      const weekNum = parseInt(checkbox.dataset.week);
+      const type = checkbox.dataset.type;
+      const title = checkbox.dataset.title;
+      const url = checkbox.dataset.url;
+      
+      if (!itemsByWeek[weekNum]) {
+        itemsByWeek[weekNum] = { formative: [], summative: [] };
+      }
+      
+      itemsByWeek[weekNum][type].push({ title, url });
+    });
+    
+    return itemsByWeek;
+  }
+  
+  // Execute selective sync
+  async function executeSelectiveSync() {
+    if (!currentSyncModalData) return;
+    
+    const { sprintKey, course, startWeek, endWeek } = currentSyncModalData;
+    const selectedItems = getSelectedItems('sync');
+    const priority = document.querySelector('input[name="sync-modal-priority"]:checked')?.value || 'P2';
+    const duplicateAction = document.querySelector('input[name="duplicate-action"]:checked')?.value || 'update';
+    
+    const courseName = course.toUpperCase();
+    const confirmBtn = document.getElementById('confirm-selective-sync');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+    
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      const events = [];
+      
+      Object.keys(selectedItems).forEach(weekNum => {
+        const weekData = selectedItems[weekNum];
+        const readingDate = getReadingDate(parseInt(weekNum));
+        const assessmentDate = getAssessmentDate(parseInt(weekNum));
+        
+        // Build formative event if any items selected
+        if (weekData.formative.length > 0 && readingDate) {
+          const lessonItems = weekData.formative.map(item => {
+            const fullUrl = item.url ? window.location.origin + '{{ site.baseurl }}' + item.url : '';
+            return `• ${item.title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+          }).join('\n\n');
+          
+          events.push({
+            title: `[${priority}] 📚 Week ${weekNum} Formative - ${courseName}`,
+            description: `Reading Materials:\n\n${lessonItems}`,
+            date: readingDate,
+            period: courseName,
+            priority: priority
+          });
+        }
+        
+        // Build summative event if any items selected
+        if (weekData.summative.length > 0 && assessmentDate) {
+          const assignmentItems = weekData.summative.map(item => {
+            const fullUrl = item.url ? window.location.origin + '{{ site.baseurl }}' + item.url : '';
+            return `• ${item.title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+          }).join('\n\n');
+          
+          events.push({
+            title: `[${priority}] 📝 Week ${weekNum} Summative - ${courseName}`,
+            description: `Assessments Due:\n\n${assignmentItems}`,
+            date: assessmentDate,
+            period: courseName,
+            priority: priority
+          });
+        }
+      });
+      
+      if (events.length === 0) {
+        alert('No items selected to sync.');
+        return;
+      }
+      
+      console.log(`Syncing ${events.length} events to calendar`);
+      
+      let successCount = 0;
+      
+      const bulkResponse = await fetch(`${javaURI}/api/calendar/add_events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ events: events, duplicateAction: duplicateAction })
+      });
+      
+      if (bulkResponse.ok) {
+        const result = await bulkResponse.json();
+        successCount = (result.created || 0) + (result.updated || 0);
+      } else if (bulkResponse.status === 404) {
+        const results = await Promise.all(
+          events.map(event => 
+            fetch(`${javaURI}/api/calendar/add_event`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify(event)
+            }).then(res => res.ok).catch(() => false)
+          )
+        );
+        successCount = results.filter(r => r).length;
+      }
+      
+      // Close modal and show status
+      closeSelectiveSyncModal();
+      
+      // Show toast notification for visibility
+      if (successCount === events.length) {
+        showToastNotification(`✓ Synced ${successCount} events to calendar!`, 'success');
+      } else if (successCount > 0) {
+        showToastNotification(`⚠ Synced ${successCount}/${events.length} events`, 'warning');
+      } else {
+        showToastNotification('✗ Failed to sync events. Are you logged in?', 'error');
+      }
+      
+      // Also update the dropdown status (visible when dropdown is opened)
+      const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
+      if (successCount === events.length) {
+        showDateStatus(statusEl, `✓ Synced ${successCount} events to calendar!`, 'success');
+      } else if (successCount > 0) {
+        showDateStatus(statusEl, `⚠ Synced ${successCount}/${events.length} events`, 'warning');
+      } else {
+        showDateStatus(statusEl, '✗ Failed to sync events. Are you logged in?', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Error syncing:', error);
+      alert('Error syncing to calendar. Please try again.');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '<i class="fas fa-sync"></i> Sync Selected';
+    }
+  }
+  
+  // Execute selective remove
+  async function executeSelectiveRemove() {
+    if (!currentRemoveModalData) return;
+    
+    const { sprintKey, course, startWeek, endWeek } = currentRemoveModalData;
+    const selectedItems = getSelectedItems('remove');
+    const courseName = course.toUpperCase();
+    
+    const confirmBtn = document.getElementById('confirm-selective-remove');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+    
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      const titlesToDelete = [];
+      const priorities = ['P0', 'P1', 'P2', 'P3'];
+      
+      Object.keys(selectedItems).forEach(weekNum => {
+        const weekData = selectedItems[weekNum];
+        
+        // Add formative event titles if any items selected
+        if (weekData.formative.length > 0) {
+          priorities.forEach(p => {
+            titlesToDelete.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
+          });
+          titlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
+        }
+        
+        // Add summative event titles if any items selected
+        if (weekData.summative.length > 0) {
+          priorities.forEach(p => {
+            titlesToDelete.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
+          });
+          titlesToDelete.push(`📝 Week ${weekNum} Summative - ${courseName}`);
+        }
+      });
+      
+      if (titlesToDelete.length === 0) {
+        alert('No items selected to remove.');
+        return;
+      }
+      
+      console.log(`Removing ${titlesToDelete.length} potential events from calendar`);
+      
+      let deletedCount = 0;
+      
+      const bulkResponse = await fetch(`${javaURI}/api/calendar/delete_events`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ titles: titlesToDelete })
+      });
+      
+      if (bulkResponse.ok) {
+        const result = await bulkResponse.json();
+        deletedCount = result.deleted || 0;
+      } else if (bulkResponse.status === 404) {
+        const results = await Promise.all(
+          titlesToDelete.map(title => 
+            fetch(`${javaURI}/api/calendar/delete_event`, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ title: title })
+            }).then(res => res.ok ? 1 : 0).catch(() => 0)
+          )
+        );
+        deletedCount = results.reduce((a, b) => a + b, 0);
+      }
+      
+      // Close modal and show status
+      closeSelectiveRemoveModal();
+      
+      // Show toast notification for visibility
+      if (deletedCount > 0) {
+        showToastNotification(`✓ Removed ${deletedCount} events from calendar!`, 'success');
+      } else {
+        showToastNotification('⚠ No events found to remove', 'warning');
+      }
+      
+      // Also update the dropdown status (visible when dropdown is opened)
+      const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
+      if (deletedCount > 0) {
+        showDateStatus(statusEl, `✓ Removed ${deletedCount} events from calendar!`, 'success');
+      } else {
+        showDateStatus(statusEl, '⚠ No events found to remove', 'warning');
+      }
+      
+    } catch (error) {
+      console.error('Error removing:', error);
+      alert('Error removing from calendar. Please try again.');
+    } finally {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove Selected';
+    }
+  }
+  
+  // Close modals
+  function closeSelectiveSyncModal() {
+    document.getElementById('selective-sync-modal').style.display = 'none';
+    currentSyncModalData = null;
+  }
+  
+  function closeSelectiveRemoveModal() {
+    document.getElementById('selective-remove-modal').style.display = 'none';
+    currentRemoveModalData = null;
+    
+    // Reopen the basic dropdown menu
+    if (returnToDropdown && sprintKey) {
+      const dropdown = document.querySelector(`.sprint-date-dropdown[data-sprint="${sprintKey}"]`);
+      if (dropdown) {
+        dropdown.classList.remove('hidden');
+      }
+    }
+  }
+  
+  // Initialize modal event handlers
+  function initializeSelectiveSyncModals() {
+    // Close buttons
+    document.getElementById('close-selective-sync-modal')?.addEventListener('click', closeSelectiveSyncModal);
+    document.getElementById('cancel-selective-sync')?.addEventListener('click', closeSelectiveSyncModal);
+    document.getElementById('close-selective-remove-modal')?.addEventListener('click', closeSelectiveRemoveModal);
+    document.getElementById('cancel-selective-remove')?.addEventListener('click', closeSelectiveRemoveModal);
+    
+    // Confirm buttons
+    document.getElementById('confirm-selective-sync')?.addEventListener('click', executeSelectiveSync);
+    document.getElementById('confirm-selective-remove')?.addEventListener('click', executeSelectiveRemove);
+    
+    // Quick action buttons - Sync modal
+    document.getElementById('sync-select-all')?.addEventListener('click', () => {
+      document.querySelectorAll('#sync-week-list .item-checkbox').forEach(cb => cb.checked = true);
+      document.querySelectorAll('#sync-week-list .category-select-all').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      document.querySelectorAll('#sync-week-list .week-select-all').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      updateSelectedCount('sync');
+    });
+    
+    document.getElementById('sync-deselect-all')?.addEventListener('click', () => {
+      document.querySelectorAll('#sync-week-list .item-checkbox').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#sync-week-list .category-select-all').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      document.querySelectorAll('#sync-week-list .week-select-all').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      updateSelectedCount('sync');
+    });
+    
+    document.getElementById('sync-select-formative')?.addEventListener('click', () => {
+      document.querySelectorAll('#sync-week-list .item-checkbox[data-type="formative"]').forEach(cb => cb.checked = true);
+      document.querySelectorAll('#sync-week-list .item-checkbox[data-type="summative"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#sync-week-list .category-select-all[data-type="formative"]').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      document.querySelectorAll('#sync-week-list .category-select-all[data-type="summative"]').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      document.querySelectorAll('#sync-week-list .week-select-all').forEach(cb => {
+        const weekNum = cb.dataset.week;
+        updateWeekCheckboxState(document.getElementById('sync-week-list'), weekNum);
+      });
+      updateSelectedCount('sync');
+    });
+    
+    document.getElementById('sync-select-summative')?.addEventListener('click', () => {
+      document.querySelectorAll('#sync-week-list .item-checkbox[data-type="summative"]').forEach(cb => cb.checked = true);
+      document.querySelectorAll('#sync-week-list .item-checkbox[data-type="formative"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#sync-week-list .category-select-all[data-type="summative"]').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      document.querySelectorAll('#sync-week-list .category-select-all[data-type="formative"]').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      document.querySelectorAll('#sync-week-list .week-select-all').forEach(cb => {
+        const weekNum = cb.dataset.week;
+        updateWeekCheckboxState(document.getElementById('sync-week-list'), weekNum);
+      });
+      updateSelectedCount('sync');
+    });
+    
+    // Quick action buttons - Remove modal
+    document.getElementById('remove-select-all')?.addEventListener('click', () => {
+      document.querySelectorAll('#remove-week-list .item-checkbox').forEach(cb => cb.checked = true);
+      document.querySelectorAll('#remove-week-list .category-select-all').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      document.querySelectorAll('#remove-week-list .week-select-all').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      updateSelectedCount('remove');
+    });
+    
+    document.getElementById('remove-deselect-all')?.addEventListener('click', () => {
+      document.querySelectorAll('#remove-week-list .item-checkbox').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#remove-week-list .category-select-all').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      document.querySelectorAll('#remove-week-list .week-select-all').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      updateSelectedCount('remove');
+    });
+    
+    document.getElementById('remove-select-formative')?.addEventListener('click', () => {
+      document.querySelectorAll('#remove-week-list .item-checkbox[data-type="formative"]').forEach(cb => cb.checked = true);
+      document.querySelectorAll('#remove-week-list .item-checkbox[data-type="summative"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#remove-week-list .category-select-all[data-type="formative"]').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      document.querySelectorAll('#remove-week-list .category-select-all[data-type="summative"]').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      document.querySelectorAll('#remove-week-list .week-select-all').forEach(cb => {
+        const weekNum = cb.dataset.week;
+        updateWeekCheckboxState(document.getElementById('remove-week-list'), weekNum);
+      });
+      updateSelectedCount('remove');
+    });
+    
+    document.getElementById('remove-select-summative')?.addEventListener('click', () => {
+      document.querySelectorAll('#remove-week-list .item-checkbox[data-type="summative"]').forEach(cb => cb.checked = true);
+      document.querySelectorAll('#remove-week-list .item-checkbox[data-type="formative"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#remove-week-list .category-select-all[data-type="summative"]').forEach(cb => { cb.checked = true; cb.indeterminate = false; });
+      document.querySelectorAll('#remove-week-list .category-select-all[data-type="formative"]').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+      document.querySelectorAll('#remove-week-list .week-select-all').forEach(cb => {
+        const weekNum = cb.dataset.week;
+        updateWeekCheckboxState(document.getElementById('remove-week-list'), weekNum);
+      });
+      updateSelectedCount('remove');
+    });
+    
+    // Close on outside click
+    document.getElementById('selective-sync-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'selective-sync-modal') closeSelectiveSyncModal();
+    });
+    
+    document.getElementById('selective-remove-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'selective-remove-modal') closeSelectiveRemoveModal();
+    });
   }
 
 </script>

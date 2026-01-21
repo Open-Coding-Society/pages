@@ -4,7 +4,8 @@ courses: { csse: {week: 8}, csp: {week: 17}, csa: {week: 20 } }
 codemirror: true
 title: Game Runner Examples
 description: Learn game development using the GameEngine framework in a contained educational environment. Build game levels, add characters, and create interactive experiences with live code editing and debugging controls.
-permalink: /code/game
+permalink: /rpg/game
+
 ---
 
 ## Define Game Runner in a Lesson
