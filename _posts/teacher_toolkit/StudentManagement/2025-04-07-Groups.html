@@ -175,13 +175,6 @@ comments: false
             </select>
           </div>
 
-          <!-- Members (optional) -->
-          <div>
-            <label class="block text-sm font-medium text-gray-200 mb-2">Members (UIDs, one per line)</label>
-            <textarea id="newGroupMembers" placeholder="Enter UIDs, one per line (optional)"
-              class="w-full px-4 py-2 bg-neutral-600 text-white placeholder-gray-400 border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 h-24 resize-none"></textarea>
-          </div>
-
           <div class="flex gap-3 justify-end">
             <button onclick="cancelAddGroup()"
               class="px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-white rounded-lg transition-colors">
@@ -393,12 +386,11 @@ window.refreshPeopleCache = async function () {
   }
 }
 
-// Create new group - uses memberIds in POST body (single API call)
+// Create new group (single API call)
 window.saveNewGroup = async function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
-  const rawUIDs = document.getElementById("newGroupMembers").value;
 
   if (!name || !period || !course) {
     alert("Please fill all required fields.");
@@ -406,24 +398,13 @@ window.saveNewGroup = async function () {
   }
 
   try {
-    const uids = parseUIDs(rawUIDs);
-    
-    // Resolve UIDs to person IDs using cached data (no API calls)
-    const memberIds = uids.map(uid => {
-      const match = peopleCache.find(p => p.uid === uid);
-      if (!match) throw new Error(`UID not found: ${uid}`);
-      return match.id;
-    });
-
-    // Single API call to create group with members
     const res = await fetch(`${javaURI}/api/groups`, {
       ...fetchOptions,
       method: "POST",
       body: JSON.stringify({
         name,
         period: String(period),
-        course,
-        memberIds: memberIds.length > 0 ? memberIds : undefined
+        course
       })
     });
 
@@ -434,12 +415,7 @@ window.saveNewGroup = async function () {
     }
 
     const newGroup = await res.json();
-    
-    // Add members array to the new group for local state
-    newGroup.members = memberIds.map(id => {
-      const person = peopleCache.find(p => p.id === id);
-      return { id, name: person?.name || 'Unknown', uid: person?.uid };
-    });
+    newGroup.members = [];
     
     // Update local state instead of refetching
     allGroups.push(newGroup);
@@ -579,7 +555,6 @@ window.cancelAddGroup = function () {
   document.getElementById("newGroupName").value = "";
   document.getElementById("newGroupPeriod").value = "";
   document.getElementById("newGroupClass").value = "";
-  document.getElementById("newGroupMembers").value = "";
 }
 
 /* ================================
