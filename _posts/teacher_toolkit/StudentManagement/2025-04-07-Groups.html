@@ -558,19 +558,24 @@ window.renderGroups = function () {
       <!-- Members row -->
       <div class="mt-3 flex flex-wrap gap-2">
         ${(group.members || []).map(m => `
-          <span class="px-3 py-1 bg-neutral-600 text-sm text-gray-200 rounded-full">
-            ${m.name}
+          <span 
+            class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
+            onclick="removeMemberFromGroup(${group.id}, ${m.id})"
+            title="Click to remove">
+            <span class="group-hover:hidden">${m.name}</span>
+            <span class="hidden group-hover:inline">Remove</span>
           </span>
         `).join("")}
       </div>
 
-      <!-- Add / Remove by UID -->
+      <!-- Add member by UID -->
       <div class="mt-4 flex items-center gap-2">
         <input
           type="text"
           placeholder="Enter UID"
           class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           id="member-uid-${group.id}"
+          onkeydown="if(event.key==='Enter') { const uid = this.value; if(uid) addMemberToGroup(${group.id}, uid.trim()); }"
         />
 
         <!-- Add -->
@@ -584,25 +589,6 @@ window.renderGroups = function () {
             })()
           ">
           +
-        </button>
-
-        <!-- Remove -->
-        <button
-          class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-500 text-white text-lg font-bold"
-          title="Remove member"
-          onclick="
-            (() => {
-              const uid = document.getElementById('member-uid-${group.id}').value;
-              if (!uid) return;
-              try {
-                const pid = getPersonIdFromUID(uid.trim());
-                removeMemberFromGroup(${group.id}, pid);
-              } catch (err) {
-                alert(err.message);
-              }
-            })()
-          ">
-          −
         </button>
       </div>
     `;
