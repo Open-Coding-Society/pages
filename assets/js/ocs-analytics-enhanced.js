@@ -14,10 +14,11 @@
         eventTrackingEnabled: true,
         trackCodeRunner: true,
         trackLessonCompletion: true,
-        eventBatchInterval: 15000, // Send event batches every 15 seconds
-        pythonURI: window.pythonURI || 'http://localhost:5000',
-        javaURI: window.javaURI || 'http://localhost:8585'  // Spring backend
+        eventBatchInterval: 15000  // Send event batches every 15 seconds
     };
+    
+    // Use pythonURI and javaURI from global scope (defined in config.js)
+    // They're available as window.pythonURI and window.javaURI
 
     // Enhanced analytics state - extends the main tracker
     let enhancedAnalyticsState = {
@@ -262,7 +263,7 @@
         };
         
         try {
-            const response = await fetch(`${ENHANCED_CONFIG.javaURI}/api/ocs-analytics/events/batch`, {
+            const response = await fetch(`${window.javaURI}/api/ocs-analytics/events/batch`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -289,7 +290,7 @@
      */
     async function sendLessonCompletion(lessonId, questName, moduleName) {
         try {
-            const response = await fetch(`${ENHANCED_CONFIG.javaURI}/api/ocs-analytics/lesson-complete`, {
+            const response = await fetch(`${window.javaURI}/api/ocs-analytics/lesson-complete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -361,7 +362,7 @@
      */
     async function fetchUserUID() {
         try {
-            const response = await fetch(`${ENHANCED_CONFIG.pythonURI}/api/id`, {
+            const response = await fetch(`${window.pythonURI}/api/id`, {
                 credentials: 'include'
             });
             
