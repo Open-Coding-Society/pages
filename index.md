@@ -151,22 +151,22 @@ window.addEventListener("keydown", e => {
   switch (e.key.toLowerCase()) {
     case "d":
     case "arrowright":
-      mario.start("Walk", 3, 0);
+      mario.start("Walk", 5, 0);
       break;
 
     case "a":
     case "arrowleft":
-      mario.start("WalkL", -3, 0);
+      mario.start("WalkL", -5, 0);
       break;
 
     case "w":
     case "arrowup":
-      mario.start("Walk", 0, -3);
+      mario.start("Walk", 0, -5);
       break;
 
     case "s":
     case "arrowdown":
-      mario.start("Walk", 0, 3);
+      mario.start("Walk", 0, 5);
       break;
   }
 });
