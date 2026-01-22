@@ -336,6 +336,132 @@ window.getPersonById = function (personId) {
   return peopleCache.find(p => p.id === personId);
 };
 
+// Track selected user for each group
+let selectedUserForGroup = {};
+
+// Search for users by name or GitHub ID
+window.searchPeopleForGroup = async function (groupId) {
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  const query = searchInput.value.trim();
+  
+  if (!query) {
+    alert("Please enter a search term");
+    return;
+  }
+  
+  showLoading("Searching users...");
+  try {
+    const res = await fetch(
+      `${javaURI}/api/people/search?query=${encodeURIComponent(query)}`,
+      fetchOptions
+    );
+    
+    if (!res.ok) throw new Error("Search failed");
+    
+    const results = await res.json();
+    displaySearchResults(groupId, results);
+  } catch (err) {
+    console.error("User search failed", err);
+    alert("Failed to search users");
+  } finally {
+    hideLoading();
+  }
+}
+
+// Display search results in dropdown
+window.displaySearchResults = function (groupId, results) {
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  
+  if (!results || results.length === 0) {
+    dropdown.innerHTML = `
+      <div class="p-3 text-gray-400 text-sm text-center">No users found</div>
+    `;
+    dropdown.classList.remove("hidden");
+    return;
+  }
+  
+  dropdown.innerHTML = results.map(person => `
+    <div 
+      class="px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center justify-between text-sm"
+      onclick="selectUserForGroup(${groupId}, ${person.id}, '${person.uid}', '${person.name.replace(/'/g, "\\'")}')">
+      <div>
+        <span class="text-white font-medium">${person.name}</span>
+        <span class="text-gray-400 ml-2">@${person.uid}</span>
+      </div>
+      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+    </div>
+  `).join("");
+  
+  dropdown.classList.remove("hidden");
+}
+
+// Select a user from search results
+window.selectUserForGroup = function (groupId, personId, uid, name) {
+  selectedUserForGroup[groupId] = { id: personId, uid, name };
+  
+  // Update input to show selected user
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  searchInput.value = `${name} (@${uid})`;
+  searchInput.dataset.selectedId = personId;
+  searchInput.dataset.selectedUid = uid;
+  searchInput.dataset.selectedName = name;
+  
+  // Hide dropdown
+  document.getElementById(`search-results-${groupId}`).classList.add("hidden");
+}
+
+// Clear search selection
+window.clearSearchSelection = function (groupId) {
+  delete selectedUserForGroup[groupId];
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  searchInput.value = "";
+  delete searchInput.dataset.selectedId;
+  delete searchInput.dataset.selectedUid;
+  delete searchInput.dataset.selectedName;
+  document.getElementById(`search-results-${groupId}`).classList.add("hidden");
+}
+
+// Add selected member to group
+window.addSelectedMemberToGroup = async function (groupId) {
+  const selected = selectedUserForGroup[groupId];
+  
+  if (!selected) {
+    alert("Please search and select a user first");
+    return;
+  }
+  
+  showLoading("Adding member...");
+  try {
+    const res = await fetch(
+      `${javaURI}/api/groups/${groupId}/members/${selected.id}`,
+      { ...fetchOptions, method: "POST" }
+    );
+    
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("ADD MEMBER ERROR:", text);
+      throw new Error("Failed to add member");
+    }
+    
+    // Update local state
+    const group = allGroups.find(g => g.id === groupId);
+    if (group) {
+      if (!group.members) group.members = [];
+      if (!group.members.find(m => m.id === selected.id)) {
+        group.members.push({ id: selected.id, name: selected.name, uid: selected.uid });
+      }
+    }
+    
+    clearSearchSelection(groupId);
+    renderGroups();
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    hideLoading();
+  }
+}
 
 // Add member to group - updates local state instead of refetching
 window.addMemberToGroup = async function (groupId, uid) {
@@ -568,28 +694,42 @@ window.renderGroups = function () {
         `).join("")}
       </div>
 
-      <!-- Add member by UID -->
-      <div class="mt-4 flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Enter UID"
-          class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          id="member-uid-${group.id}"
-          onkeydown="if(event.key==='Enter') { const uid = this.value; if(uid) addMemberToGroup(${group.id}, uid.trim()); }"
-        />
+      <!-- Add member by search -->
+      <div class="mt-4 relative">
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search by name"
+            class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            id="member-search-${group.id}"
+            onkeydown="if(event.key==='Enter') searchPeopleForGroup(${group.id})"
+            oninput="if(!this.dataset.selectedId) document.getElementById('search-results-${group.id}').classList.add('hidden')"
+          />
 
-        <!-- Add -->
-        <button
-          class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold"
-          title="Add member"
-          onclick="
-            (() => {
-              const uid = document.getElementById('member-uid-${group.id}').value;
-              if (uid) addMemberToGroup(${group.id}, uid.trim());
-            })()
-          ">
-          +
-        </button>
+          <!-- Search button -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+            title="Search users"
+            onclick="searchPeopleForGroup(${group.id})">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+
+          <!-- Add selected user -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold transition-colors"
+            title="Add selected member"
+            onclick="addSelectedMemberToGroup(${group.id})">
+            +
+          </button>
+        </div>
+
+        <!-- Search results dropdown -->
+        <div 
+          id="search-results-${group.id}" 
+          class="hidden absolute left-0 right-12 mt-1 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto">
+        </div>
       </div>
     `;
     container.appendChild(el);
