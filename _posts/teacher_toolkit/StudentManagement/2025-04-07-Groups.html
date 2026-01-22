@@ -9,11 +9,7 @@ comments: false
 
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
-    <!-- Loading Indicator -->
-    <div id="loadingOverlay" class="hidden fixed top-4 right-4 z-50 bg-neutral-800 border border-neutral-600 rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg">
-      <div class="loading-spinner"></div>
-      <span id="loadingText" class="text-gray-300 text-sm">Loading...</span>
-    </div>
+    <!-- Loading overlay removed -->
 
     <!-- Page Title -->
     <h2 class="text-2xl font-semibold text-white mb-6">Groups Management</h2>
@@ -221,322 +217,368 @@ comments: false
 
 <style>
   .loading-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #4b5563;
-    border-top-color: #6366f1;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
     border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+    animation: spin 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-spinner-indigo {
+    border-color: rgba(99, 102, 241, 0.3);
+    border-top-color: #6366f1;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 </style>
 
 <script type="module">
-/* ================================
-   CONFIG
-================================ */
-import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  /* ================================
+     CONFIG
+  ================================ */
+  import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-/* ================================
-   STATE
-================================ */
-let allGroups = [];
-let peopleCache = [];  // Cache people to avoid repeated API calls
-let activePeriods = [];
-let activeClasses = [];
-let loadingCount = 0;  // Track concurrent loading operations
+  /* ================================
+     STATE
+  ================================ */
+  let allGroups = [];
+  let peopleCache = [];  // Cache people to avoid repeated API calls
+  let activePeriods = [];
+  let activeClasses = [];
+  /* ================================
+     LOADING HELPERS
+     (Transitioning to inline loaders, global helpers removed)
+  ================================ */
 
-/* ================================
-   LOADING HELPERS
-================================ */
-function showLoading(message = "Loading...") {
-  loadingCount++;
-  document.getElementById("loadingText").textContent = message;
-  document.getElementById("loadingOverlay").classList.remove("hidden");
-}
-
-function hideLoading() {
-  loadingCount = Math.max(0, loadingCount - 1);
-  if (loadingCount === 0) {
-    document.getElementById("loadingOverlay").classList.add("hidden");
-  }
-}
-
-/* ================================
-   INIT
-================================ */
-document.addEventListener("DOMContentLoaded", () => {
-  initializeData();
-});
-
-// Search groups using API
-window.searchGroups = async function () {
-  const searchTerm = document.getElementById("searchInput").value.trim();
-  
-  showLoading("Searching...");
-  try {
-    let url = `${javaURI}/api/groups`;
-    if (searchTerm) {
-      url = `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`;
-    }
-    
-    const res = await fetch(url, fetchOptions);
-    if (!res.ok) throw new Error("Search failed");
-    
-    allGroups = await res.json();
-    renderGroups();
-  } catch (err) {
-    console.error("Search failed", err);
-  } finally {
-    hideLoading();
-  }
-}
-
-// Load groups and people in parallel on page load (only 2 API calls total)
-async function initializeData() {
-  showLoading("Loading groups...");
-  try {
-    const [groupsRes, peopleRes] = await Promise.all([
-      fetch(`${javaURI}/api/groups`, fetchOptions),
-      fetch(`${javaURI}/api/people`, fetchOptions)
-    ]);
-    
-    if (!groupsRes.ok) throw new Error("Failed to load groups");
-    if (!peopleRes.ok) throw new Error("Failed to load people");
-    
-    allGroups = await groupsRes.json();
-    peopleCache = await peopleRes.json();
-    
-    renderGroups();
-  } catch (err) {
-    console.error("Failed to initialize data", err);
-  } finally {
-    hideLoading();
-  }
-}
-
-window.parseUIDs = function (raw) {
-  return raw
-    .split("\n")
-    .map(u => u.trim())
-    .filter(Boolean);
-}
-
-// Synchronous lookup from cache - no API call needed
-window.getPersonIdFromUID = function (uid) {
-  const match = peopleCache.find(p => p.uid === uid);
-  if (!match) {
-    throw new Error(`UID not found: ${uid}`);
-  }
-  return match.id;
-};
-
-// Get person object from cache by ID
-window.getPersonById = function (personId) {
-  return peopleCache.find(p => p.id === personId);
-};
-
-
-// Add member to group - updates local state instead of refetching
-window.addMemberToGroup = async function (groupId, uid) {
-  showLoading("Adding member...");
-  try {
-    const personId = getPersonIdFromUID(uid);
-    const person = getPersonById(personId);
-    
-    const res = await fetch(
-      `${javaURI}/api/groups/${groupId}/members/${personId}`,
-      { ...fetchOptions, method: "POST" }
-    );
-    
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("ADD MEMBER ERROR:", text);
-      throw new Error("Failed to add member");
-    }
-    
-    // Update local state instead of refetching all groups
-    const group = allGroups.find(g => g.id === groupId);
-    if (group) {
-      if (!group.members) group.members = [];
-      // Only add if not already present
-      if (!group.members.find(m => m.id === personId)) {
-        group.members.push({ id: personId, name: person?.name || uid, uid: uid });
-      }
-    }
-    
-    renderGroups();
-    document.getElementById(`member-uid-${groupId}`).value = '';
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
-}
-
-// Remove member from group - updates local state instead of refetching
-window.removeMemberFromGroup = async function (groupId, personId) {
-  showLoading("Removing member...");
-  try {
-    const res = await fetch(
-      `${javaURI}/api/groups/${groupId}/members/${personId}`,
-      { ...fetchOptions, method: "DELETE" }
-    );
-    
-    if (!res.ok) {
-      throw new Error("Failed to remove member");
-    }
-    
-    // Update local state instead of refetching all groups
-    const group = allGroups.find(g => g.id === groupId);
-    if (group && group.members) {
-      group.members = group.members.filter(m => m.id !== personId);
-    }
-    
-    renderGroups();
-    document.getElementById(`member-uid-${groupId}`).value = '';
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
-}
-
-// Delete group - updates local state instead of refetching
-window.deleteGroup = async function (groupId) {
-  const confirmed = confirm(
-    "Are you sure you want to delete this group?\n\nThis action cannot be undone."
-  );
-
-  if (!confirmed) return;
-
-  showLoading("Deleting group...");
-  try {
-    const res = await fetch(`${javaURI}/api/groups/${groupId}`, {
-      ...fetchOptions,
-      method: "DELETE"
-    });
-    
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("DELETE GROUP ERROR:", text);
-      alert("Failed to delete group");
-      throw new Error("Failed to delete group");
-    }
-    
-    // Update local state instead of refetching all groups
-    allGroups = allGroups.filter(g => g.id !== groupId);
-    renderGroups();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    hideLoading();
-  }
-};
-
-
-
-/* ================================
-   API CALLS
-================================ */
-// Manual refresh function - only call when absolutely needed
-window.loadGroups = async function () {
-  try {
-    const res = await fetch(`${javaURI}/api/groups`, fetchOptions);
-    if (!res.ok) throw new Error("Failed to load groups");
-    allGroups = await res.json();
-    renderGroups();
-  } catch (err) {
-    console.error("Failed to load groups", err);
-  }
-}
-
-// Refresh people cache if needed (e.g., new user registered)
-window.refreshPeopleCache = async function () {
-  try {
-    const res = await fetch(`${javaURI}/api/people`, fetchOptions);
-    if (!res.ok) throw new Error("Failed to refresh people");
-    peopleCache = await res.json();
-  } catch (err) {
-    console.error("Failed to refresh people cache", err);
-  }
-}
-
-// Create new group (single API call)
-window.saveNewGroup = async function () {
-  const name = document.getElementById("newGroupName").value.trim();
-  const period = document.getElementById("newGroupPeriod").value;
-  const course = document.getElementById("newGroupClass").value;
-
-  if (!name || !period || !course) {
-    alert("Please fill all required fields.");
-    return;
-  }
-
-  showLoading("Creating group...");
-  try {
-    const res = await fetch(`${javaURI}/api/groups`, {
-      ...fetchOptions,
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        period: String(period),
-        course
-      })
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("GROUP CREATION ERROR:", text);
-      throw new Error("Group creation failed");
-    }
-
-    const newGroup = await res.json();
-    newGroup.members = [];
-    
-    // Update local state instead of refetching
-    allGroups.push(newGroup);
-    
-    cancelAddGroup();
-    renderGroups();
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
-};
-
-
-
-/* ================================
-   RENDERING
-================================ */
-window.renderGroups = function () {
-  const container = document.getElementById("groupsContainer");
-  const empty = document.getElementById("emptyState");
-
-  container.innerHTML = "";
-
-  // Only filter by period/class (search is handled by API)
-  const filtered = allGroups.filter(g => {
-    if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
-    if (activeClasses.length && !activeClasses.includes(g.course)) return false;
-    return true;
+  /* ================================
+     INIT
+  ================================ */
+  document.addEventListener("DOMContentLoaded", () => {
+    initializeData();
   });
 
-  if (!filtered.length) {
-    empty.classList.remove("hidden");
-    return;
+  // Search groups using API
+  // Search groups using API
+  window.searchGroups = async function () {
+    const searchTerm = document.getElementById("searchInput").value.trim();
+    const container = document.getElementById("groupsContainer");
+
+    // Show inline loader
+    container.innerHTML = `
+    <div class="flex flex-col items-center justify-center py-12">
+      <div class="loading-spinner loading-spinner-indigo w-8 h-8 mb-3"></div>
+      <p class="text-gray-400">Searching groups...</p>
+    </div>
+  `;
+    document.getElementById("emptyState").classList.add("hidden");
+
+    try {
+      let url = `${javaURI}/api/groups`;
+      if (searchTerm) {
+        url = `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`;
+      }
+
+      const res = await fetch(url, fetchOptions);
+      if (!res.ok) throw new Error("Search failed");
+
+      allGroups = await res.json();
+      renderGroups();
+    } catch (err) {
+      console.error("Search failed", err);
+      container.innerHTML = `
+      <div class="text-center py-8 text-red-400">
+        <p>Failed to load groups. Please try again.</p>
+      </div>
+    `;
+    }
   }
 
-  empty.classList.add("hidden");
+  // Load groups and people in parallel on page load (only 2 API calls total)
+  // Load groups and people in parallel on page load (only 2 API calls total)
+  async function initializeData() {
+    const container = document.getElementById("groupsContainer");
 
-  filtered.forEach(group => {
-    const el = document.createElement("div");
-    el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
+    // Inline loader for initial state
+    container.innerHTML = `
+    <div class="flex flex-col items-center justify-center py-12">
+      <div class="loading-spinner loading-spinner-indigo w-8 h-8 mb-3"></div>
+      <p class="text-gray-400">Loading Groups...</p>
+    </div>
+  `;
 
-    el.innerHTML = `
+    try {
+      const [groupsRes, peopleRes] = await Promise.all([
+        fetch(`${javaURI}/api/groups`, fetchOptions),
+        fetch(`${javaURI}/api/people`, fetchOptions)
+      ]);
+
+      if (!groupsRes.ok) throw new Error("Failed to load groups");
+      if (!peopleRes.ok) throw new Error("Failed to load people");
+
+      allGroups = await groupsRes.json();
+      peopleCache = await peopleRes.json();
+
+      renderGroups();
+    } catch (err) {
+      console.error("Failed to initialize data", err);
+      container.innerHTML = `
+      <div class="text-center py-8 text-red-400">
+        <p>Failed to initialize data. Please refresh the page.</p>
+      </div>
+    `;
+    }
+  }
+
+  window.parseUIDs = function (raw) {
+    return raw
+      .split("\n")
+      .map(u => u.trim())
+      .filter(Boolean);
+  }
+
+  // Synchronous lookup from cache - no API call needed
+  window.getPersonIdFromUID = function (uid) {
+    const match = peopleCache.find(p => p.uid === uid);
+    if (!match) {
+      throw new Error(`UID not found: ${uid}`);
+    }
+    return match.id;
+  };
+
+  // Get person object from cache by ID
+  window.getPersonById = function (personId) {
+    return peopleCache.find(p => p.id === personId);
+  };
+
+
+  // Add member to group - updates local state instead of refetching
+  // Add member to group - updates local state instead of refetching
+  window.addMemberToGroup = async function (groupId, uid) {
+    const btn = document.getElementById(`add-member-btn-${groupId}`);
+    const originalContent = btn.innerHTML;
+
+    // Set loading state
+    btn.disabled = true;
+    btn.innerHTML = `<div class="loading-spinner w-5 h-5"></div>`;
+
+    try {
+      const personId = getPersonIdFromUID(uid);
+      const person = getPersonById(personId);
+
+      const res = await fetch(
+        `${javaURI}/api/groups/${groupId}/members/${personId}`,
+        { ...fetchOptions, method: "POST" }
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("ADD MEMBER ERROR:", text);
+        throw new Error("Failed to add member");
+      }
+
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group) {
+        if (!group.members) group.members = [];
+        // Only add if not already present
+        if (!group.members.find(m => m.id === personId)) {
+          group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+        }
+      }
+
+      renderGroups();
+    } catch (err) {
+      alert(err.message);
+      // Reset button since renderGroups won't run on error for this row's preservation usually, 
+      // but here we re-render on success. On error we need to reset manually if we didn't re-render.
+      btn.disabled = false;
+      btn.innerHTML = originalContent;
+    }
+  }
+
+  // Remove member from group - updates local state instead of refetching
+  // Remove member from group - updates local state instead of refetching
+  window.removeMemberFromGroup = async function (groupId, personId, element) {
+    const originalContent = element.innerHTML;
+
+    // Set loading state (spinner in chip)
+    element.style.pointerEvents = "none";
+    element.innerHTML = `<span class="flex items-center gap-1">Removing <div class="loading-spinner w-3 h-3"></div></span>`;
+
+    try {
+      const res = await fetch(
+        `${javaURI}/api/groups/${groupId}/members/${personId}`,
+        { ...fetchOptions, method: "DELETE" }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to remove member");
+      }
+
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group && group.members) {
+        group.members = group.members.filter(m => m.id !== personId);
+      }
+
+      renderGroups();
+    } catch (err) {
+      alert(err.message);
+      element.innerHTML = originalContent;
+      element.style.pointerEvents = "auto";
+    }
+  }
+
+  // Delete group - updates local state instead of refetching
+  // Delete group - updates local state instead of refetching
+  window.deleteGroup = async function (groupId, btnElement) {
+    const confirmed = confirm(
+      "Are you sure you want to delete this group?\n\nThis action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    const originalContent = btnElement.innerHTML;
+    btnElement.disabled = true;
+    btnElement.innerHTML = `<div class="loading-spinner w-5 h-5"></div>`;
+
+    try {
+      const res = await fetch(`${javaURI}/api/groups/${groupId}`, {
+        ...fetchOptions,
+        method: "DELETE"
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("DELETE GROUP ERROR:", text);
+        alert("Failed to delete group");
+        throw new Error("Failed to delete group");
+      }
+
+      // Update local state instead of refetching all groups
+      allGroups = allGroups.filter(g => g.id !== groupId);
+      renderGroups();
+    } catch (err) {
+      console.error(err);
+      btnElement.disabled = false;
+      btnElement.innerHTML = originalContent;
+    }
+  };
+
+
+
+  /* ================================
+     API CALLS
+  ================================ */
+  // Manual refresh function - only call when absolutely needed
+  window.loadGroups = async function () {
+    try {
+      const res = await fetch(`${javaURI}/api/groups`, fetchOptions);
+      if (!res.ok) throw new Error("Failed to load groups");
+      allGroups = await res.json();
+      renderGroups();
+    } catch (err) {
+      console.error("Failed to load groups", err);
+    }
+  }
+
+  // Refresh people cache if needed (e.g., new user registered)
+  window.refreshPeopleCache = async function () {
+    try {
+      const res = await fetch(`${javaURI}/api/people`, fetchOptions);
+      if (!res.ok) throw new Error("Failed to refresh people");
+      peopleCache = await res.json();
+    } catch (err) {
+      console.error("Failed to refresh people cache", err);
+    }
+  }
+
+  // Create new group (single API call)
+  // Create new group (single API call)
+  window.saveNewGroup = async function () {
+    const name = document.getElementById("newGroupName").value.trim();
+    const period = document.getElementById("newGroupPeriod").value;
+    const course = document.getElementById("newGroupClass").value;
+    const btn = document.querySelector("#addGroupExpanded button:last-child");
+
+    if (!name || !period || !course) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = `<div class="flex items-center gap-2"><div class="loading-spinner w-4 h-4"></div> Creating...</div>`;
+
+    try {
+      const res = await fetch(`${javaURI}/api/groups`, {
+        ...fetchOptions,
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          period: String(period),
+          course
+        })
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("GROUP CREATION ERROR:", text);
+        throw new Error("Group creation failed");
+      }
+
+      const newGroup = await res.json();
+      newGroup.members = [];
+
+      // Update local state instead of refetching
+      allGroups.push(newGroup);
+
+      cancelAddGroup();
+      renderGroups();
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  };
+
+
+
+  /* ================================
+     RENDERING
+  ================================ */
+  window.renderGroups = function () {
+    const container = document.getElementById("groupsContainer");
+    const empty = document.getElementById("emptyState");
+
+    container.innerHTML = "";
+
+    // Only filter by period/class (search is handled by API)
+    const filtered = allGroups.filter(g => {
+      if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
+      if (activeClasses.length && !activeClasses.includes(g.course)) return false;
+      return true;
+    });
+
+    if (!filtered.length) {
+      empty.classList.remove("hidden");
+      return;
+    }
+
+    empty.classList.add("hidden");
+
+    filtered.forEach(group => {
+      const el = document.createElement("div");
+      el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
+
+      el.innerHTML = `
       <!-- Header -->
       <div class="flex justify-between items-start">
         <div>
@@ -546,11 +588,11 @@ window.renderGroups = function () {
           </p>
         </div>
 
-        <!-- Trash (future delete group) -->
+      <!-- Trash (future delete group) -->
         <button
-          class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
+          class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Delete group"
-          onclick="deleteGroup(${group.id})">
+          onclick="deleteGroup(${group.id}, this)">
           🗑️
         </button>
       </div>
@@ -560,7 +602,7 @@ window.renderGroups = function () {
         ${(group.members || []).map(m => `
           <span 
             class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
-            onclick="removeMemberFromGroup(${group.id}, ${m.id})"
+            onclick="removeMemberFromGroup(${group.id}, ${m.id}, this)"
             title="Click to remove">
             <span class="group-hover:hidden">${m.name}</span>
             <span class="hidden group-hover:inline">Remove</span>
@@ -580,7 +622,8 @@ window.renderGroups = function () {
 
         <!-- Add -->
         <button
-          class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold"
+          id="add-member-btn-${group.id}"
+          class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           title="Add member"
           onclick="
             (() => {
@@ -592,73 +635,73 @@ window.renderGroups = function () {
         </button>
       </div>
     `;
-    container.appendChild(el);
-  });
-}
+      container.appendChild(el);
+    });
+  }
 
-/* ================================
-   ADD GROUP TOGGLE
-================================ */
-window.toggleAddGroup = function () {
-  document.getElementById("addGroupExpanded").classList.toggle("hidden");
-  document.getElementById("addGroupChevron").classList.toggle("rotate-180");
-}
+  /* ================================
+     ADD GROUP TOGGLE
+  ================================ */
+  window.toggleAddGroup = function () {
+    document.getElementById("addGroupExpanded").classList.toggle("hidden");
+    document.getElementById("addGroupChevron").classList.toggle("rotate-180");
+  }
 
-window.cancelAddGroup = function () {
-  document.getElementById("addGroupExpanded").classList.add("hidden");
-  document.getElementById("newGroupName").value = "";
-  document.getElementById("newGroupPeriod").value = "";
-  document.getElementById("newGroupClass").value = "";
-}
+  window.cancelAddGroup = function () {
+    document.getElementById("addGroupExpanded").classList.add("hidden");
+    document.getElementById("newGroupName").value = "";
+    document.getElementById("newGroupPeriod").value = "";
+    document.getElementById("newGroupClass").value = "";
+  }
 
-/* ================================
-   FILTERS
-================================ */
-window.toggleDropdown = function (type) {
-  document.getElementById(type + "Dropdown").classList.toggle("hidden");
-}
+  /* ================================
+     FILTERS
+  ================================ */
+  window.toggleDropdown = function (type) {
+    document.getElementById(type + "Dropdown").classList.toggle("hidden");
+  }
 
-window.clearAllFilters = function () {
-  activePeriods = [];
-  activeClasses = [];
-  document.querySelectorAll(".period-checkbox,.class-checkbox").forEach(cb => cb.checked = false);
-  document.getElementById("periodAllCheckbox").checked = true;
-  document.getElementById("classAllCheckbox").checked = true;
-  document.getElementById("periodFilterLabel").textContent = "All Periods";
-  document.getElementById("classFilterLabel").textContent = "All Classes";
-  document.getElementById("searchInput").value = "";
-  searchGroups();  // Reload all groups
-}
-
-window.onPeriodCheckboxChange = function (cb) {
-  activePeriods = [...document.querySelectorAll(".period-checkbox:checked")].map(c => c.value);
-  document.getElementById("periodAllCheckbox").checked = !activePeriods.length;
-  document.getElementById("periodFilterLabel").textContent =
-    activePeriods.length ? `Periods: ${activePeriods.join(", ")}` : "All Periods";
-  renderGroups();
-}
-
-window.onClassCheckboxChange = function (cb) {
-  activeClasses = [...document.querySelectorAll(".class-checkbox:checked")].map(c => c.value);
-  document.getElementById("classAllCheckbox").checked = !activeClasses.length;
-  document.getElementById("classFilterLabel").textContent =
-    activeClasses.length ? `Classes: ${activeClasses.join(", ")}` : "All Classes";
-  renderGroups();
-}
-
-window.onPeriodAllChange = function (cb) {
-  if (cb.checked) {
-    document.querySelectorAll(".period-checkbox").forEach(c => c.checked = false);
+  window.clearAllFilters = function () {
     activePeriods = [];
-    renderGroups();
-  }
-}
-
-window.onClassAllChange = function (cb) {
-  if (cb.checked) {
-    document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
     activeClasses = [];
+    document.querySelectorAll(".period-checkbox,.class-checkbox").forEach(cb => cb.checked = false);
+    document.getElementById("periodAllCheckbox").checked = true;
+    document.getElementById("classAllCheckbox").checked = true;
+    document.getElementById("periodFilterLabel").textContent = "All Periods";
+    document.getElementById("classFilterLabel").textContent = "All Classes";
+    document.getElementById("searchInput").value = "";
+    searchGroups();  // Reload all groups
+  }
+
+  window.onPeriodCheckboxChange = function (cb) {
+    activePeriods = [...document.querySelectorAll(".period-checkbox:checked")].map(c => c.value);
+    document.getElementById("periodAllCheckbox").checked = !activePeriods.length;
+    document.getElementById("periodFilterLabel").textContent =
+      activePeriods.length ? `Periods: ${activePeriods.join(", ")}` : "All Periods";
     renderGroups();
   }
-}
+
+  window.onClassCheckboxChange = function (cb) {
+    activeClasses = [...document.querySelectorAll(".class-checkbox:checked")].map(c => c.value);
+    document.getElementById("classAllCheckbox").checked = !activeClasses.length;
+    document.getElementById("classFilterLabel").textContent =
+      activeClasses.length ? `Classes: ${activeClasses.join(", ")}` : "All Classes";
+    renderGroups();
+  }
+
+  window.onPeriodAllChange = function (cb) {
+    if (cb.checked) {
+      document.querySelectorAll(".period-checkbox").forEach(c => c.checked = false);
+      activePeriods = [];
+      renderGroups();
+    }
+  }
+
+  window.onClassAllChange = function (cb) {
+    if (cb.checked) {
+      document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
+      activeClasses = [];
+      renderGroups();
+    }
+  }
 </script>
