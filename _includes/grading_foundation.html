@@ -1,0 +1,230 @@
+<!-- ===================== GRADING FEATURE ===================== -->
+
+<script>
+  // Global feature registry (safe)
+  window.PageFeatures = window.PageFeatures || {};
+
+  // ✅ FORCE ENABLE grading (no body dataset dependency)
+  window.PageFeatures.grading = true;
+</script>
+
+<!-- Button Container -->
+<div id="grading-button-container" class="grading-button-container"></div>
+
+<!-- Grading Toggle Button -->
+<button
+  id="grading-toggle-btn"
+  class="grading-btn"
+  aria-label="Open Grading"
+  hidden
+>
+  📊 Grading
+</button>
+
+<!-- Grading Panel -->
+<aside
+  id="grading-panel"
+  class="grading-panel"
+  tabindex="-1"
+  aria-label="Grading Panel"
+  hidden
+>
+  <div class="grading-panel-inner">
+    <header class="grading-header">
+      <h1>📊 Grading Dashboard</h1>
+      <button
+        id="grading-close-btn"
+        class="grading-close-btn"
+        aria-label="Close Grading"
+      >&times;</button>
+    </header>
+
+    <section id="grading-content">
+      <em>Loading submissions…</em>
+    </section>
+  </div>
+</aside>
+
+<!-- ===================== GRADING FEATURE ===================== -->
+
+<!-- ===================== GRADING FEATURE ===================== -->
+
+<!-- ===================== GRADING FEATURE ===================== -->
+
+<script>
+  // Global feature registry (safe)
+  window.PageFeatures = window.PageFeatures || {};
+  // Force enable grading
+  window.PageFeatures.grading = true;
+</script>
+
+<!-- Button Container -->
+<div id="grading-button-container" class="grading-button-container"></div>
+
+<!-- Grading Toggle Button -->
+<button
+  id="grading-toggle-btn"
+  class="grading-btn"
+  aria-label="Open Grading"
+  hidden
+>
+  📊 Grading
+</button>
+
+<!-- Grading Panel -->
+<aside
+  id="grading-panel"
+  class="grading-panel"
+  tabindex="-1"
+  aria-label="Grading Panel"
+  hidden
+>
+  <div class="grading-panel-inner">
+    <header class="grading-header">
+      <h1>📊 Grading Dashboard</h1>
+      <button
+        id="grading-close-btn"
+        class="grading-close-btn"
+        aria-label="Close Grading"
+      >&times;</button>
+    </header>
+
+    <section id="grading-content">
+      <em>Loading submissions…</em>
+    </section>
+  </div>
+</aside>
+
+<script>
+/* ===================== INIT ===================== */
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.PageFeatures.grading) return;
+
+  const container = document.getElementById("grading-button-container");
+  const toggleBtn = document.getElementById("grading-toggle-btn");
+
+  if (!container || !toggleBtn) return;
+
+  if (!container.contains(toggleBtn)) {
+    container.appendChild(toggleBtn);
+  }
+
+  toggleBtn.hidden = false;
+});
+
+/* ===================== ELEMENTS ===================== */
+const gradingToggle = document.getElementById("grading-toggle-btn");
+const gradingPanel  = document.getElementById("grading-panel");
+const gradingClose  = document.getElementById("grading-close-btn");
+
+/* ===================== OPEN / CLOSE ===================== */
+function openGradingPanel() {
+  gradingPanel.hidden = false;
+  renderGradingTable();
+}
+
+function closeGradingPanel() {
+  gradingPanel.hidden = true;
+}
+
+gradingToggle?.addEventListener("click", openGradingPanel);
+gradingClose?.addEventListener("click", closeGradingPanel);
+
+/* ESC to close */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !gradingPanel.hidden) {
+    closeGradingPanel();
+  }
+});
+
+/* ===================== CONTENT ===================== */
+const gradingData = [
+  { student: "Student A", assignment: "HW1", score: 92, status: "Graded" },
+  { student: "Student B", assignment: "HW1", score: 85, status: "Graded" },
+  { student: "Student C", assignment: "HW1", score: "—", status: "Pending" },
+];
+
+/* ===================== TABLE RENDER + EDITABLE ===================== */
+function renderGradingTable() {
+  const container = document.getElementById("grading-content");
+
+  // Create search input and table
+  container.innerHTML = `
+    <input
+      type="text"
+      id="grading-search"
+      placeholder="Search by student..."
+      style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border-radius: 8px; border: 1px solid #63b3ed; background: #000; color: #fff;"
+    />
+    <table class="grading-table" style="width:100%; border-collapse: collapse; color: #fff;">
+      <thead style="background: #111;">
+        <tr>
+          <th style="border: 1px solid #63b3ed; padding: 0.5rem;">Student</th>
+          <th style="border: 1px solid #63b3ed; padding: 0.5rem;">Assignment</th>
+          <th style="border: 1px solid #63b3ed; padding: 0.5rem;">Score</th>
+          <th style="border: 1px solid #63b3ed; padding: 0.5rem;">Status</th>
+        </tr>
+      </thead>
+      <tbody id="grading-tbody"></tbody>
+    </table>
+  `;
+
+  const tbody = document.getElementById("grading-tbody");
+
+  // Function to update rows based on filter
+  function updateTable(filter = "") {
+    const filteredData = gradingData.filter((row) =>
+      row.student.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    tbody.innerHTML = filteredData
+      .map(
+        (row, index) => `<tr>
+          <td style="border: 1px solid #63b3ed; padding: 0.5rem;">${row.student}</td>
+          <td style="border: 1px solid #63b3ed; padding: 0.5rem;">${row.assignment}</td>
+          <td style="border: 1px solid #63b3ed; padding: 0.5rem;">
+            <input type="text" value="${row.score}" 
+              style="width: 60px; background: #111; color: #fff; border: 1px solid #63b3ed; border-radius: 4px; padding: 2px;"
+              data-index="${index}" class="score-input"
+            />
+          </td>
+          <td style="border: 1px solid #63b3ed; padding: 0.5rem;">
+            <select data-index="${index}" class="status-select"
+              style="background: #111; color: #fff; border: 1px solid #63b3ed; border-radius: 4px; padding: 2px;">
+              <option value="Pending" ${row.status === "Pending" ? "selected" : ""}>Pending</option>
+              <option value="Graded" ${row.status === "Graded" ? "selected" : ""}>Graded</option>
+            </select>
+          </td>
+        </tr>`
+      )
+      .join("");
+
+    // Attach event listeners for score inputs
+    document.querySelectorAll(".score-input").forEach((input) => {
+      input.addEventListener("input", (e) => {
+        const idx = e.target.dataset.index;
+        gradingData[idx].score = e.target.value;
+      });
+    });
+
+    // Attach event listeners for status selects
+    document.querySelectorAll(".status-select").forEach((select) => {
+      select.addEventListener("change", (e) => {
+        const idx = e.target.dataset.index;
+        gradingData[idx].status = e.target.value;
+      });
+    });
+  }
+
+  // Initial table render
+  updateTable();
+
+  // Attach input listener for live search
+  const searchInput = document.getElementById("grading-search");
+  searchInput.addEventListener("input", (e) => {
+    updateTable(e.target.value);
+  });
+}
+</script>
+
+<!-- ===================== END GRADING FEATURE ===================== -->

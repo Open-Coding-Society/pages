@@ -1,0 +1,121 @@
+/* ===================== Grading Button ===================== */
+
+.grading-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.grading-btn {
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #1d8bdf;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #1e40af;
+  }
+}
+
+/* ===================== Fullscreen Grading Overlay ===================== */
+
+.grading-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 1300; /* ABOVE microblog + inbox */
+  background: rgba(0, 0, 0, 0.95); /* darker black overlay */
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  isolation: isolate; /* prevents gradient bleed */
+}
+
+/* Hidden state */
+.grading-panel[hidden] {
+  display: none;
+}
+
+/* ===================== Inner Panel ===================== */
+
+.grading-panel-inner {
+  background: #000000; /* black background */
+  color: #ffffff; /* white text */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  pointer-events: auto;
+}
+
+/* ===================== Header ===================== */
+
+.grading-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #333333; /* subtle divider in dark mode */
+  background: #000000; /* black header */
+  z-index: 1;
+
+  h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .grading-close-btn {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    line-height: 1;
+  }
+}
+
+/* ===================== Content ===================== */
+
+#grading-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  background: #000000; /* black content area */
+  color: #ffffff; /* white text */
+}
+
+/* ===================== Table Styling ===================== */
+
+#grading-content table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    border: 1px solid #63b3ed; /* light blue border */
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    color: #ffffff;
+  }
+
+  th {
+    background-color: #111111; /* dark header cells */
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) {
+    background-color: #0d0d0d; /* subtle dark stripe */
+  }
+
+  tr:nth-child(odd) {
+    background-color: #000000;
+  }
+}
