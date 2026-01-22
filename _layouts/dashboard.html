@@ -994,11 +994,7 @@ score += gists * 0.5
                     async function checkLoginStatus() {
                         try {
                             // Try to get user info - if this succeeds, user is logged in
-                            const res = await fetch(`${javaURI}/api/person/get`, {
-                                method: 'GET',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'include'
-                            });
+                            const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
                             
                             if (res.ok) {
                                 isLoggedIn = true;
@@ -1614,16 +1610,14 @@ score += gists * 0.5
             let res;
             if (hasExistingStudentEval) {
                 res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, {
+                    ...fetchOptions,
                     method: 'PUT',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
             } else {
                 res = await fetch(`${javaURI}/api/student-evaluation/post`, {
+                    ...fetchOptions,
                     method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
             }
@@ -1641,18 +1635,16 @@ score += gists * 0.5
         // 2. Run Prediction
         try {
             await fetch(`${javaURI}/api/grade-prediction/train`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
+                ...fetchOptions,
+                method: 'GET'
             });
         } catch (error) {
             console.error("Error with training:", error);
         }
         try {
             const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
+                ...fetchOptions,
                 method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
             const data = await predict.json();
