@@ -122,6 +122,10 @@ const gradingData = [
   { student: "Student A", assignment: "HW1", score: 92, status: "Graded" },
   { student: "Student B", assignment: "HW1", score: 85, status: "Graded" },
   { student: "Student C", assignment: "HW1", score: "—", status: "Pending" },
+  { student: "Student A", assignment: "HW2", score: 92, status: "Graded" },
+  { student: "Student B", assignment: "HW2", score: 85, status: "Graded" },
+  { student: "Student C", assignment: "HW2", score: "—", status: "Pending" },
+];
 ];
 
 /* ===================== RUBRIC TEMPLATE ===================== */
@@ -139,14 +143,24 @@ const rubricContent = document.getElementById("rubric-content");
 /* ===================== TABLE RENDER + EDITABLE ===================== */
 function renderGradingTable() {
   const container = document.getElementById("grading-content");
-
   container.innerHTML = `
-    <input
-      type="text"
-      id="grading-search"
-      placeholder="Search by student..."
-      style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border-radius: 8px; border: 1px solid #63b3ed; background: #000; color: #fff;"
-    />
+    <div style="display:flex; gap:.5rem; align-items:center; margin-bottom:1rem;">
+      <input
+        type="text"
+        id="grading-search"
+        placeholder="Search by student..."
+        style="flex:1; padding: 0.5rem; border-radius: 8px; border: 1px solid #63b3ed; background: #000; color: #fff;"
+      />
+
+      <select id="assignment-filter" style="background:#000; color:#fff; border:1px solid #63b3ed; border-radius:8px; padding:0.4rem;">
+        <option value="">All assignments</option>
+      </select>
+
+      <select id="status-filter" style="background:#000; color:#fff; border:1px solid #63b3ed; border-radius:8px; padding:0.4rem;">
+        <option value="">All statuses</option>
+      </select>
+    </div>
+
     <table class="grading-table" style="width:100%; border-collapse: collapse; color: #fff;">
       <thead style="background: #111;">
         <tr>
@@ -164,9 +178,17 @@ function renderGradingTable() {
   const tbody = document.getElementById("grading-tbody");
 
   function updateTable(filter = "") {
-    const filteredData = gradingData.filter((row) =>
-      row.student.toLowerCase().includes(filter.toLowerCase())
-    );
+    const assignmentSelect = document.getElementById('assignment-filter');
+    const statusSelect = document.getElementById('status-filter');
+    const assignmentFilter = assignmentSelect ? assignmentSelect.value : '';
+    const statusFilter = statusSelect ? statusSelect.value : '';
+
+    const filteredData = gradingData.filter((row) => {
+      const matchesStudent = row.student.toLowerCase().includes(filter.toLowerCase());
+      const matchesAssignment = !assignmentFilter || row.assignment === assignmentFilter;
+      const matchesStatus = !statusFilter || row.status === statusFilter;
+      return matchesStudent && matchesAssignment && matchesStatus;
+    });
 
     tbody.innerHTML = filteredData
       .map(
@@ -216,6 +238,37 @@ function renderGradingTable() {
   }
 
   updateTable();
+
+  // Populate assignment and status filters dynamically from the data
+  function populateFilters() {
+    const assignmentSet = new Set();
+    const statusSet = new Set();
+    gradingData.forEach(r => {
+      if (r.assignment !== undefined && r.assignment !== null) assignmentSet.add(r.assignment);
+      if (r.status !== undefined && r.status !== null) statusSet.add(r.status);
+    });
+
+    const assignmentSelect = document.getElementById('assignment-filter');
+    const statusSelect = document.getElementById('status-filter');
+
+    if (assignmentSelect) {
+      const opts = ['<option value="">All assignments</option>'].concat(
+        Array.from(assignmentSet).map(v => `<option value="${v}">${v}</option>`)
+      ).join('');
+      assignmentSelect.innerHTML = opts;
+      assignmentSelect.addEventListener('change', () => updateTable(document.getElementById('grading-search').value));
+    }
+
+    if (statusSelect) {
+      const opts = ['<option value="">All statuses</option>'].concat(
+        Array.from(statusSet).map(v => `<option value="${v}">${v}</option>`)
+      ).join('');
+      statusSelect.innerHTML = opts;
+      statusSelect.addEventListener('change', () => updateTable(document.getElementById('grading-search').value));
+    }
+  }
+
+  populateFilters();
 
   // Live search
   const searchInput = document.getElementById("grading-search");
