@@ -9,10 +9,10 @@ comments: false
 
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
-    <!-- Loading Indicator -->
-    <div id="loadingOverlay" class="hidden fixed top-4 right-4 z-50 bg-neutral-800 border border-neutral-600 rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg">
+    <!-- Subtle Loading Indicator - inline badge style -->
+    <div id="loadingOverlay" class="hidden fixed bottom-4 right-4 z-40 bg-neutral-800/90 backdrop-blur-sm border border-neutral-700 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-md text-xs">
       <div class="loading-spinner"></div>
-      <span id="loadingText" class="text-gray-300 text-sm">Loading...</span>
+      <span id="loadingText" class="text-gray-400">Loading...</span>
     </div>
 
     <!-- Page Title -->
@@ -221,12 +221,12 @@ comments: false
 
 <style>
   .loading-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #4b5563;
-    border-top-color: #6366f1;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #6b7280;
+    border-top-color: #818cf8;
     border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+    animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
