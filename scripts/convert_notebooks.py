@@ -263,13 +263,10 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     result.append('{% include code-runner.html')
                     result.append('   runner_id="' + runner_data['runner_id'] + '"')
                     result.append('   language="' + runner_data['language'] + '"')
-                    result.append('   challenge=challenge' + str(code_runner_count))
-                    result.append('   code=code' + str(code_runner_count))
-                    result.append('   source=source' + str(code_runner_count))
-                    result.append('   challenge_number="' + str(code_runner_count + 1) + '"')
+                    result.append('   challenge=challenge' + str(code_cell_count - 1))
+                    result.append('   code=code' + str(code_cell_count - 1))
                     result.append('%}')                
                     result.append('')
-                    code_runner_count += 1
                 else:
                     # Regular code block without code-runner
                     result.extend(code_block_content)
