@@ -152,82 +152,114 @@ active_tab: profile
         </div>
     </div>
 </div>
+
+<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
+    
+    <div id="personaSelectionContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p class="text-gray-400 text-center py-4 col-span-full">Loading personas...</p>
+    </div>
+</div>
+
+
 </form>
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    document.addEventListener("DOMContentLoaded", async () => {
+    /**
+     * API Request Chaining Implementation
+     * ==================================
+     * This script demonstrates chaining API requests where:
+     * 1. First fetch user identity from Java backend (required for all subsequent calls)
+     * 2. Then chain to fetch user's groups using the personId from step 1
+     * 
+     * Benefits:
+     * - Proper dependency management (can't fetch groups without personId)
+     * - Single cached personId reused for join/leave operations
+     * - Clear error propagation through the chain
+     */
+
+    document.addEventListener("DOMContentLoaded", () => {
         const springGroupInfo = document.getElementById('springGroupInfo');
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
         
-        // Cache for current user data - fetched once, reused throughout
+        // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
-        let userGroupIds = new Set(); // Track user's group IDs for quick lookup
+        let userGroupIds = new Set(); // Track user's group IDs for O(1) lookup
 
-        // Fetch current user's person data from Java backend (includes numeric id)
-        // This replaces the need to fetch all people later
-        try {
-            const personResp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-            
-            if (personResp.status === 401) {
-                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
-                groupSearchInput.disabled = true;
-                return;
-            }
-            
-            if (!personResp.ok) {
-                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
-                return;
-            }
-
-            const personData = await personResp.json();
-            currentPersonId = personData.id;
-            currentUid = personData.uid;
-
-            if (!currentPersonId || !currentUid) {
-                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
-                return;
-            }
-        } catch (error) {
-            console.error("Error loading user info:", error);
-            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading user information.</p>`;
-            return;
-        }
-
-        // Fetch user's groups to display current membership
-        // Use server-side filtering by person ID instead of fetching all groups
-        try {
-            const groupResp = await fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
-
-            let userGroups = [];
-
-            if (groupResp.ok) {
-                const groups = await groupResp.json();
-                userGroups = Array.isArray(groups) ? groups : [];
-            } else if (groupResp.status === 404) {
-                // Fallback to fetching all groups (this is less efficient than sending a GET for just a specific user)
-                console.warn('Person groups endpoint not available, using fallback!!');
-                const fallbackResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
-                if (fallbackResp.ok) {
-                    const allGroups = await fallbackResp.json();
-                    userGroups = (Array.isArray(allGroups) ? allGroups : []).filter(group =>
-                        Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
-                    );
+        /**
+         * CHAINED API PATTERN:
+         * Step 1: Fetch user identity -> Step 2: Use personId to fetch groups
+         * 
+         * This uses .then() chaining to demonstrate the pattern where
+         * each subsequent request depends on data from the previous one.
+         */
+        fetch(`${javaURI}/api/person/get`, fetchOptions)
+            .then(response => {
+                // Handle authentication errors
+                if (response.status === 401) {
+                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
+                    groupSearchInput.disabled = true;
+                    return null; // Stop the chain
                 }
-            } else {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch user: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(personData => {
+                if (!personData) return null; // Chain was stopped
+                
+                // Cache user identity for reuse in join/leave operations
+                currentPersonId = personData.id;
+                currentUid = personData.uid;
+
+                if (!currentPersonId || !currentUid) {
+                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                    return null;
+                }
+
+                // CHAIN: Now fetch groups using the personId we just obtained
+                // This request DEPENDS on having currentPersonId from the previous call
+                return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
+            })
+           
+            .then(groupResp => {
+                if (!groupResp) return null; // Chain was stopped
+                
+                // Handle group fetch response
+                if (groupResp.ok) {
+                    return groupResp.json();
+                } else if (groupResp.status === 404) {
+                    // Fallback: endpoint not available, try fetching all groups
+                    console.warn('Person groups endpoint not available, using fallback');
+                    return fetch(`${javaURI}/api/groups`, fetchOptions)
+                        .then(fallbackResp => {
+                            if (!fallbackResp.ok) return [];
+                            return fallbackResp.json().then(allGroups => {
+                                // Filter client-side (less efficient fallback)
+                                return (Array.isArray(allGroups) ? allGroups : []).filter(group =>
+                                    Array.isArray(group.members) && group.members.some(m => m.uid === currentUid)
+                                );
+                            });
+                        });
+                }
                 throw new Error('Failed to fetch group data');
-                console.warn('Both methods of obtaining groups failed!!');
-            }
+            })
+            .then(userGroups => {
+                if (!userGroups) return; // Chain was stopped
+                
+                const groups = Array.isArray(userGroups) ? userGroups : [];
 
-            // Build a Set of user's group IDs for O(1) lookup during search
-            userGroups.forEach(group => userGroupIds.add(group.id));
+                // Build a Set of user's group IDs for O(1) lookup during search
+                groups.forEach(group => userGroupIds.add(group.id));
 
-            if (userGroups.length > 0) {
-                springGroupInfo.innerHTML = userGroups.map(group => `
+                if (groups.length > 0) {
+                    springGroupInfo.innerHTML = groups.map(group => `
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1">Group Name</label>
                         <input type="text" readonly
@@ -251,12 +283,26 @@ active_tab: profile
                             Leave Group
                         </button>
                     </div>
-                `).join('');
-            } else {
-                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
-            }
+                    `).join('');
+                } else {
+                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
+                }
 
-            // Debounced search using server-side API for performance
+                // Set up search functionality (uses cached personId)
+                setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, currentPersonId);
+            })
+            .catch(error => {
+                console.error("Error in API chain:", error);
+                springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
+                groupSearchInput.disabled = true;
+            });
+
+        /**
+         * Set up group search and join functionality
+         * Separated into a function to keep the main chain clean
+         */
+        function setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, personId) {
+            // Search function using server-side API
             const searchGroups = async (query) => {
                 const normalized = query.trim();
                 
@@ -307,6 +353,7 @@ active_tab: profile
             });
 
             // Optimized join function - uses cached personId instead of fetching all people
+            // This demonstrates how the cached personId from the initial chain is reused
             window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
                 if (isAlreadyMember) {
                     joinGroupStatus.textContent = 'You are already a member of this group.';
@@ -317,37 +364,34 @@ active_tab: profile
                 joinGroupStatus.textContent = 'Joining group...';
                 groupResultsList.classList.add('hidden');
 
-                try {
-                    // Use the cached person ID - no need to fetch all people
-                    if (!currentPersonId) {
-                        throw new Error('User ID not available. Please refresh the page.');
-                    }
+                // Use cached personId - no additional API call needed!
+                if (!personId) {
+                    joinGroupStatus.textContent = 'User ID not available. Please refresh the page.';
+                    groupSearchInput.disabled = false;
+                    return;
+                }
 
-                    // Join the selected group using cached person ID
-                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${currentPersonId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include'
-                    });
-
+                // Join group using the cached person ID from the initial chain
+                fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                })
+                .then(joinResp => {
                     if (!joinResp.ok) {
-                        const body = await joinResp.text();
-                        throw new Error(body || 'Failed to join group');
+                        return joinResp.text().then(body => {
+                            throw new Error(body || 'Failed to join group');
+                        });
                     }
-
                     joinGroupStatus.textContent = 'Refreshing...';
-                    // Refresh current groups to reflect new membership
                     window.location.reload();
-                } catch (joinError) {
+                })
+                .catch(joinError => {
                     console.error('Join group error:', joinError);
                     joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
                     groupSearchInput.disabled = false;
-                }
+                });
             };
-        } catch (error) {
-            console.error("Error loading spring group info:", error);
-            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
-            groupSearchInput.disabled = true;
         }
     });
 </script>
@@ -381,7 +425,265 @@ active_tab: profile
         });
     });
 </script>
+<script type="module">
+    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPersonas();
+    });
+
+    async function loadPersonas() {
+        const container = document.getElementById('personaSelectionContainer');
+        
+        try {
+            // Fetch all available personas
+            const personasResp = await fetch(`${pythonURI}/api/persona`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!personasResp.ok) throw new Error('Failed to load personas');
+            const personas = await personasResp.json();
+            
+            // Get user's personas from the RIGHT endpoint
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (!userPersonasResp.ok) {
+                // If 401, user might not be authenticated or endpoint doesn't exist
+                console.log('No personas found for user or not authenticated');
+                showPersonaSelectionCards(personas);
+                return;
+            }
+            
+            const userPersonasData = await userPersonasResp.json();
+            
+            // Check if user has personas
+            if (userPersonasData.personas && userPersonasData.personas.length > 0) {
+                const userPersona = userPersonasData.personas[0];
+                const personaId = userPersona.persona_id || userPersona.id;
+                
+                // Find the full persona details
+                const selectedPersona = personas.find(p => p.id === personaId);
+                if (selectedPersona) {
+                    showSelectedPersona(selectedPersona);
+                    return;
+                }
+            }
+            
+            // If no persona selected, show all cards to choose from
+            showPersonaSelectionCards(personas);
+            
+        } catch (error) {
+            console.error('Error loading personas:', error);
+            container.innerHTML = `
+                <p class="text-red-400 text-center py-4">Error loading personas. Please try again later.</p>
+            `;
+        }
+    }
+
+    function showPersonaSelectionCards(personas) {
+        const container = document.getElementById('personaSelectionContainer');
+        
+        if (personas.length === 0) {
+            container.innerHTML = `
+                <p class="text-gray-400 text-center py-4">No personas available.</p>
+            `;
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-gray-200 mb-2">Choose Your Persona</h2>
+                <p class="text-gray-400">Select a persona that represents your personality and interests.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${personas.map(persona => {
+                    const title = persona.bio_map?.title || persona.alias || 'Unnamed Persona';
+                    const description = persona.bio_map?.description || 'No description available';
+                    const category = persona.category || persona._category || 'Uncategorized';
+                    
+                    return `
+                        <div 
+                            class="border rounded-lg p-4 cursor-pointer transition-all bg-neutral-700 border-gray-600 hover:border-indigo-400 hover:bg-neutral-600"
+                            onclick="selectPersona(${persona.id})">
+                            <h3 class="font-semibold text-gray-200 mb-2">${title}</h3>
+                            <p class="text-sm text-gray-400 mb-3 line-clamp-3">${description}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="inline-block px-2 py-1 text-xs rounded bg-neutral-600 text-gray-300">
+                                    ${category}
+                                </span>
+                                <span class="text-xs text-gray-400">
+                                    Click to select
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function showSelectedPersona(persona) {
+        const container = document.getElementById('personaSelectionContainer');
+        const title = persona.bio_map?.title || persona.alias || 'Unnamed Persona';
+        const description = persona.bio_map?.description || 'No description available';
+        const category = persona.category || persona._category || 'Uncategorized';
+        const says = persona.empathy_map?.says?.[0] || persona.bio_map?.says?.[0] || '';
+        const thinks = persona.empathy_map?.thinks?.[0] || persona.bio_map?.thinks?.[0] || '';
+        const feels = persona.empathy_map?.feels?.[0] || persona.bio_map?.feels?.[0] || '';
+        const does = persona.empathy_map?.does?.[0] || persona.bio_map?.does?.[0] || '';
+        
+        container.innerHTML = `
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-bold text-gray-200 mb-2">Your Selected Persona</h2>
+                    <p class="text-gray-400">This persona represents your personality and interests.</p>
+                </div>
+                
+                <div class="border rounded-lg p-6 bg-neutral-700 border-indigo-500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-200">${title}</h3>
+                            <span class="inline-block mt-1 px-3 py-1 text-sm rounded-full bg-indigo-900 text-indigo-200">
+                                ${category}
+                            </span>
+                        </div>
+                        <button 
+                            onclick="changePersona()"
+                            class="px-4 py-2 text-sm bg-neutral-600 hover:bg-neutral-500 text-gray-200 rounded-lg transition">
+                            Change Persona
+                        </button>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-6">${description}</p>
+                    
+                    ${says || thinks || feels || does ? `
+                        <div class="mt-6 pt-6 border-t border-gray-600">
+                            <h4 class="text-lg font-semibold text-gray-200 mb-4">Persona Insights</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${says ? `
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <h5 class="font-medium text-indigo-300 mb-2">Says</h5>
+                                        <p class="text-gray-300">"${says}"</p>
+                                    </div>
+                                ` : ''}
+                                
+                                ${thinks ? `
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <h5 class="font-medium text-indigo-300 mb-2">Thinks</h5>
+                                        <p class="text-gray-300">${thinks}</p>
+                                    </div>
+                                ` : ''}
+                                
+                                ${feels ? `
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <h5 class="font-medium text-indigo-300 mb-2">Feels</h5>
+                                        <p class="text-gray-300">${feels}</p>
+                                    </div>
+                                ` : ''}
+                                
+                                ${does ? `
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <h5 class="font-medium text-indigo-300 mb-2">Does</h5>
+                                        <p class="text-gray-300">${does}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-gray-400 text-sm">
+                        Want to join a group with similar personas? 
+                        <a href="#" class="text-indigo-400 hover:text-indigo-300">Explore groups</a>
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
+    async function selectPersona(personaId) {
+        console.log('selectPersona called with ID:', personaId);
+        
+        try {
+            // Show loading
+            const container = document.getElementById('personaSelectionContainer');
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12">
+                    <svg class="animate-spin h-12 w-12 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-gray-300">Saving your persona selection...</p>
+                </div>
+            `;
+            
+            console.log('About to make POST request...');
+            
+            // Add the new persona - backend handles replacement
+            const response = await fetch(`${pythonURI}/api/user/persona`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    persona_id: personaId,
+                    weight: 2
+                })
+            });
+            
+            console.log('POST request completed, status:', response.status);
+            
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('Response not OK:', error);
+                throw new Error(error.message || 'Failed to select persona');
+            }
+            
+            console.log('About to call loadPersonas()...');
+            
+            // Success - reload to show selected persona
+            loadPersonas();
+            
+        } catch (error) {
+            console.error('Error in selectPersona:', error);
+            console.error('Error stack:', error.stack);
+            
+            const container = document.getElementById('personaSelectionContainer');
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-900/30 mb-4">
+                        <svg class="w-6 h-6 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-red-400 mb-2">Error</h3>
+                    <p class="text-gray-400 mb-4">${error.message}</p>
+                    <button 
+                        onclick="loadPersonas()"
+                        class="px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-gray-200 rounded-lg transition">
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+    }
+    function changePersona() {
+        // Simply reload which will show selection cards again
+        loadPersonas();
+    }
+
+    // Make functions globally accessible
+    window.loadPersonas = loadPersonas;
+    window.selectPersona = selectPersona;
+    window.changePersona = changePersona;
+    window.showPersonaSelectionCards = showPersonaSelectionCards;
+    window.showSelectedPersona = showSelectedPersona;
+</script>
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
@@ -437,13 +739,9 @@ active_tab: profile
 
     window.getUserData = getUserData; // get the data
     window.setUserData = setUserData; // setting the user data to display
-    document.addEventListener("DOMContentLoaded", async () => {
-        try {
-            await window.setUserData();
-        } catch (error) {
-            console.error("Error initializing user data:", error.message);
-        }
-    });
+    // NOTE: Removed duplicate DOMContentLoaded listener that called setUserData()
+    // setUserData() is already called once at line ~427, calling it twice causes
+    // redundant API requests. This is an example of optimizing by removing duplicate calls.
 
     window.changeClass = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
