@@ -1,4 +1,12 @@
 <!-- Reusable Code Runner Component -->
+<!-- Load CodeMirror library (once per page) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/darcula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+
 <div class="code-runner-container" id="runner-{{ include.runner_id }}" data-runner-id="{{ include.runner_id }}"
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   <div class="challenge-box">
@@ -56,6 +64,13 @@
 
 <script type="module">
   import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+// Wait for CodeMirror to be available
+function initializeCodeRunner() {
+  if (typeof CodeMirror === 'undefined') {
+    setTimeout(initializeCodeRunner, 100);
+    return;
+  }
 
 (function() {
   const container = document.getElementById('runner-{{ include.runner_id }}');
@@ -234,4 +249,8 @@
       "Cmd-Enter": runCode
     });
   })();
+}
+
+// Start initialization
+initializeCodeRunner();
 </script>
