@@ -1,7 +1,7 @@
 <!-- 
   Lesson Submit Button - Submit ALL challenges from a lesson at once
   
-  Usage: {% include lesson-submit-button.html lesson_key="csa-frqs-2019-3" %}
+  Usage: include lesson-submit-button.html lesson_key="csa-frqs-2019-3"
   
   This button is placed at the bottom of notebooks when the frontmatter 
   flag 'challenge_submit: true' is set. It collects code from all 
@@ -10,7 +10,7 @@
 <div class="lesson-submit-container" id="lesson-submit-{{ include.lesson_key }}"
     data-lesson-key="{{ include.lesson_key }}">
     <div class="lesson-submit-header">
-        <h3>📦 Submit Your Work</h3>
+        <h3>Submit Your Work</h3>
         <p>Submit all your code challenges for this lesson.</p>
     </div>
 
