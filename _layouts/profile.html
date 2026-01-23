@@ -152,40 +152,6 @@ active_tab: profile
         </div>
     </div>
 </div>
-
-<!-- Persona-Based Group Formation (Admin Only) -->
-<div id="personaGroupSection"
-     class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border hidden">
-
-    <h2 class="text-xl font-semibold mb-4">Persona-Based Group Formation</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <input id="personaCourse"
-               placeholder="Course (e.g. CSP)"
-               class="px-4 py-2 rounded-lg bg-neutral-700 border border-gray-600">
-
-        <input id="personaPeriod"
-               placeholder="Period"
-               class="px-4 py-2 rounded-lg bg-neutral-700 border border-gray-600">
-
-        <input id="personaGroupSize"
-               type="number"
-               min="2"
-               placeholder="Group Size"
-               class="px-4 py-2 rounded-lg bg-neutral-700 border border-gray-600">
-
-        <button id="formPersonaGroupsBtn"
-                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
-            Form Groups
-        </button>
-    </div>
-
-    <div id="personaGroupResults"
-         class="text-gray-300 text-sm space-y-4">
-        <!-- Results injected here -->
-    </div>
-</div>
-
 </form>
 
 <script type="module">
@@ -251,22 +217,6 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
-            .then(personData => {
-                if (!personData) return null;
-
-                currentPersonId = personData.id;
-                currentUid = personData.uid;
-
-                // 👇 ADMIN CHECK
-                if (personData.role === "ADMIN" || personData.isTeacher) {
-                    document
-                    .getElementById("personaGroupSection")
-                    .classList.remove("hidden");
-                }
-
-                return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
-            })
-
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
                 
@@ -433,87 +383,6 @@ active_tab: profile
             };
         }
     });
-    document.getElementById("formPersonaGroupsBtn")
-    ?.addEventListener("click", async () => {
-
-        const course = document.getElementById("personaCourse").value.trim();
-        const period = document.getElementById("personaPeriod").value.trim();
-        const groupSize = parseInt(
-            document.getElementById("personaGroupSize").value
-        );
-
-        const resultsBox = document.getElementById("personaGroupResults");
-
-        if (!course || !period || !groupSize) {
-            resultsBox.innerHTML =
-            `<p class="text-red-400">All fields are required.</p>`;
-            return;
-        }
-
-        resultsBox.innerHTML =
-        `<p class="text-gray-400">Forming persona-based groups…</p>`;
-
-        try {
-            // Fetch eligible users for this course/period
-            const usersResp = await fetch(
-                `${javaURI}/api/person/course/${course}/period/${period}`,
-                fetchOptions
-            );
-
-            if (!usersResp.ok) throw new Error("Failed to load users");
-
-            const users = await usersResp.json();
-            const userUids = users.map(u => u.uid);
-
-            const resp = await fetch(
-                `${javaURI}/api/groups/form-with-personas`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        userUids,
-                        groupSize,
-                        period,
-                        course
-                    })
-                }
-            );
-
-            if (!resp.ok) throw new Error("Persona grouping failed");
-
-            const data = await resp.json();
-            renderPersonaResults(data, resultsBox);
-
-        } catch (err) {
-            console.error(err);
-            resultsBox.innerHTML =
-            `<p class="text-red-400">Error forming groups.</p>`;
-        }
-    });
-    function renderPersonaResults(data, container) {
-        container.innerHTML = `
-            <div class="text-sm text-gray-400">
-                Average Team Score: <b>${data.average_score.toFixed(2)}</b>
-            </div>
-            ${data.groups.map(group => `
-                <div class="p-4 border border-neutral-700 rounded-lg">
-                    <div class="font-semibold">
-                        ${group.name}
-                    </div>
-                    <div class="text-xs text-gray-400 mb-2">
-                        Persona Score Embedded in Name
-                    </div>
-                    <ul class="list-disc ml-5 text-sm">
-                        ${group.members.map(m =>
-                            `<li>${m.name} (${m.uid})</li>`
-                        ).join("")}
-                    </ul>
-                </div>
-            `).join("")}
-        `;
-    }
-
 </script>
 
 <div class="flex justify-between items-center mb-8">
