@@ -152,6 +152,7 @@ active_tab: profile
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 
 <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
     <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
@@ -162,6 +163,8 @@ active_tab: profile
 </div>
 
 
+=======
+>>>>>>> parent of 448c7aeae (add persona selection to groups)
 </form>
 
 <script type="module">
@@ -227,7 +230,10 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
+<<<<<<< HEAD
            
+=======
+>>>>>>> parent of 448c7aeae (add persona selection to groups)
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
                 
