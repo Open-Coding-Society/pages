@@ -57,6 +57,8 @@ permalink: /
 <!-- ================= GAME SCRIPT ================= -->
 
 <script>
+<button id="revealAll">Reveal Map</button>
+
   //////////////////// METADATA ////////////////////
 
   var mario_metadata = {};
@@ -183,6 +185,13 @@ window.addEventListener("keydown", e => {
     mario.el.style.transform = `scale(${0.2 * scale})`;
     mario.start("Rest", 0);
   });
+
+  function revealAll() {
+  fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+}
+
+document.getElementById("revealAll").addEventListener("click", revealAll);
+
 </script>
 
 <!-- ================= PAGE CONTENT ================= -->
