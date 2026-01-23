@@ -153,14 +153,38 @@ active_tab: profile
     </div>
 </div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
-    
-    <div id="personaSelectionContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <p class="text-gray-400 text-center py-4 col-span-full">Loading personas...</p>
+<!-- Persona-Based Group Formation (Admin Only) -->
+<div id="personaGroupSection"
+     class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border hidden">
+
+    <h2 class="text-xl font-semibold mb-4">Persona-Based Group Formation</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+        <input id="personaCourse"
+               placeholder="Course (e.g. CSP)"
+               class="px-4 py-2 rounded-lg bg-neutral-700 border border-gray-600">
+
+        <input id="personaPeriod"
+               placeholder="Period"
+               class="px-4 py-2 rounded-lg bg-neutral-700 border border-gray-600">
+
+        <input id="personaGroupSize"
+               type="number"
+               min="2"
+               placeholder="Group Size"
+               class="px-4 py-2 rounded-lg bg-neutral-700 border border-gray-600">
+
+        <button id="formPersonaGroupsBtn"
+                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
+            Form Groups
+        </button>
+    </div>
+
+    <div id="personaGroupResults"
+         class="text-gray-300 text-sm space-y-4">
+        <!-- Results injected here -->
     </div>
 </div>
-
 
 </form>
 
@@ -227,7 +251,22 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
-           
+            .then(personData => {
+                if (!personData) return null;
+
+                currentPersonId = personData.id;
+                currentUid = personData.uid;
+
+                // 👇 ADMIN CHECK
+                if (personData.role === "ADMIN" || personData.isTeacher) {
+                    document
+                    .getElementById("personaGroupSection")
+                    .classList.remove("hidden");
+                }
+
+                return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
+            })
+
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
                 
@@ -394,6 +433,105 @@ active_tab: profile
             };
         }
     });
+    document.getElementById("formPersonaGroupsBtn")
+        ?.addEventListener("click", async () => {
+            const course = document.getElementById("personaCourse").value.trim();
+            const period = document.getElementById("personaPeriod").value.trim();
+            const groupSize = parseInt(
+                document.getElementById("personaGroupSize").value
+            );
+
+            const resultsBox = document.getElementById("personaGroupResults");
+
+            if (!course || !period || !groupSize) {
+                resultsBox.innerHTML =
+                    `<p class="text-red-400">All fields are required.</p>`;
+                return;
+            }
+
+            resultsBox.innerHTML =
+                `<p class="text-gray-400">Forming persona-based groups…</p>`;
+
+            try {
+                // STEP 1: Fetch eligible users for this course/period from Spring
+                const usersResp = await fetch(
+                    `${javaURI}/api/person/course/${course}/period/${period}`,
+                    fetchOptions
+                );
+
+                if (!usersResp.ok) throw new Error("Failed to load users");
+
+                const users = await usersResp.json();
+                const userUids = users.map(u => u.uid);
+
+                // STEP 2: Call Flask DIRECTLY to get optimal groupings
+                const flaskResp = await fetch(
+                    `${pythonURI}/api/persona/form-groups`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                            user_uids: userUids,  // Flask expects snake_case
+                            group_size: groupSize
+                        })
+                    }
+                );
+
+                if (!flaskResp.ok) throw new Error("Flask persona grouping failed");
+
+                const flaskData = await flaskResp.json();
+                
+                // STEP 3: Transform Flask data for Spring (map UIDs to Person IDs)
+                const uidToPersonId = {};
+                users.forEach(u => {
+                    uidToPersonId[u.uid] = u.id;
+                });
+
+                // Build Spring-compatible payload
+                const springGroups = flaskData.groups.map((group, i) => ({
+                    name: `Group ${i + 1} (Persona Score: ${group.team_score.toFixed(1)})`,
+                    period: period,
+                    course: course,
+                    memberIds: group.user_uids.map(uid => uidToPersonId[uid]).filter(Boolean)
+                }));
+
+                // STEP 4: Send to Spring to create groups in database
+                const springResp = await fetch(
+                    `${javaURI}/api/groups/bulk`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                            groups: springGroups
+                        })
+                    }
+                );
+
+                if (!springResp.ok) throw new Error("Failed to create groups in database");
+
+                const springData = await springResp.json();
+
+                // STEP 5: Display results
+                renderPersonaResults({
+                    groups: springData.created,
+                    average_score: flaskData.average_score
+                }, resultsBox);
+
+                // Show success message
+                resultsBox.insertAdjacentHTML('afterbegin', `
+                    <div class="p-3 bg-green-500/20 border border-green-500 rounded-lg mb-4">
+                        <p class="text-green-400">✓ Successfully created ${springData.created.length} groups!</p>
+                    </div>
+                `);
+
+            } catch (err) {
+                console.error(err);
+                resultsBox.innerHTML =
+                    `<p class="text-red-400">Error: ${err.message}</p>`;
+            }
+        });
 </script>
 
 <div class="flex justify-between items-center mb-8">
@@ -424,130 +562,6 @@ active_tab: profile
             });
         });
     });
-</script>
-<script type="module">
-    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-
-    document.addEventListener("DOMContentLoaded", () => {
-        loadPersonas();
-    });
-
-    async function loadPersonas() {
-        const container = document.getElementById('personaSelectionContainer');
-        
-        try {
-            // Fetch all available personas
-            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions);
-            if (!personasResp.ok) throw new Error('Failed to load personas');
-            
-            const personas = await personasResp.json();
-            
-            // Fetch current user's persona
-            const userResp = await fetch(`${pythonURI}/api/user`, fetchOptions);
-            if (!userResp.ok) throw new Error('Failed to load user data');
-            
-            const userData = await userResp.json();
-            const userPersonaId = userData.personas && userData.personas.length > 0 
-                ? userData.personas[0].persona_id 
-                : null;
-            
-            if (personas.length === 0) {
-                container.innerHTML = `
-                    <p class="text-gray-400 text-center py-4 col-span-full">No personas available.</p>
-                `;
-                return;
-            }
-            
-            // Render persona cards
-            container.innerHTML = personas.map(persona => {
-                const isSelected = persona.id === userPersonaId;
-                const title = persona.bio_map?.title || persona.alias;
-                const description = persona.bio_map?.description || 'No description available';
-                
-                return `
-                    <div 
-                        class="border rounded-lg p-4 cursor-pointer transition-all ${
-                            isSelected 
-                                ? 'bg-indigo-900/30 border-indigo-500 ring-2 ring-indigo-500' 
-                                : 'bg-neutral-700 border-gray-600 hover:border-indigo-400 hover:bg-neutral-600'
-                        }"
-                        onclick="selectPersona(${persona.id})">
-                        <div class="flex items-start justify-between mb-2">
-                            <h3 class="font-semibold text-gray-200">${title}</h3>
-                            ${isSelected ? `
-                                <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                            ` : ''}
-                        </div>
-                        <p class="text-sm text-gray-400">${description}</p>
-                        ${persona.category ? `
-                            <span class="inline-block mt-2 px-2 py-1 text-xs rounded bg-neutral-600 text-gray-300">
-                                ${persona.category}
-                            </span>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-            
-        } catch (error) {
-            console.error('Error loading personas:', error);
-            container.innerHTML = `
-                <p class="text-red-400 text-center py-4 col-span-full">Error loading personas.</p>
-            `;
-        }
-    }
-
-    async function selectPersona(personaId) {
-        try {
-            // First, get current user's personas to see if they have one
-            const userResp = await fetch(`${pythonURI}/api/user`, fetchOptions);
-            if (!userResp.ok) throw new Error('Failed to load user data');
-            
-            const userData = await userResp.json();
-            const currentPersonas = userData.personas || [];
-            
-            // If user already has a persona, delete it first
-            if (currentPersonas.length > 0) {
-                const oldPersonaId = currentPersonas[0].persona_id;
-                
-                // Only delete if selecting a different persona
-                if (oldPersonaId === personaId) {
-                    return; // Already selected, do nothing
-                }
-                
-                await fetch(`${pythonURI}/api/user/persona/${oldPersonaId}`, {
-                    method: 'DELETE',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            }
-            
-            // Add the new persona
-            const response = await fetch(`${pythonURI}/api/user/persona`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    persona_id: personaId,
-                    weight: 100  // Default weight
-                })
-            });
-            
-            if (!response.ok) throw new Error('Failed to select persona');
-            
-            // Reload to show the new selection
-            loadPersonas();
-            
-        } catch (error) {
-            console.error('Error selecting persona:', error);
-            alert('Error selecting persona. Please try again.');
-        }
-    }
-
-    // Make functions globally accessible
-    window.loadPersonas = loadPersonas;
-    window.selectPersona = selectPersona;
 </script>
 
 <script type="module">
