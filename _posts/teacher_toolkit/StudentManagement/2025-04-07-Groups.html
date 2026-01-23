@@ -473,7 +473,6 @@ window.addMemberToGroup = function (groupId, uid) {
         }
       }
       renderGroups();
-      document.getElementById(`member-uid-${groupId}`).value = '';
     })
     .catch(err => alert(err.message))
     .finally(() => hideLoading());
@@ -492,7 +491,6 @@ window.removeMemberFromGroup = function (groupId, personId) {
         group.members = group.members.filter(m => m.id !== personId);
       }
       renderGroups();
-      document.getElementById(`member-uid-${groupId}`).value = '';
     })
     .catch(err => alert(err.message))
     .finally(() => hideLoading());
