@@ -599,16 +599,9 @@ window.saveNewGroup = async function () {
     return;
   }
 
-<<<<<<< HEAD
   showLoading("Creating group...");
   try {
     const res = await fetch(`${javaURI}/api/groups`, {
-=======
-  const uids = parseUIDs(rawUIDs);
-
-  try {
-    const groupRes = await fetch(`${javaURI}/api/groups`, {
->>>>>>> parent of 4184a5103 (Minor UX tweaks to Groups page.)
       ...fetchOptions,
       method: "POST",
       body: JSON.stringify({
@@ -618,37 +611,18 @@ window.saveNewGroup = async function () {
       })
     });
 
-    if (!groupRes.ok) throw new Error("Group creation failed");
     if (!res.ok) {
       const text = await res.text();
       console.error("GROUP CREATION ERROR:", text);
       throw new Error("Group creation failed");
     }
 
-<<<<<<< HEAD
     const newGroup = await res.json();
     newGroup.members = [];
     
     // Update local state instead of refetching
     allGroups.push(newGroup);
     
-=======
-    const group = await groupRes.json();
-    const groupId = group.id;
-
-    // 2️⃣ Resolve & add each UID
-    for (const uid of uids) {
-      // Flask validation
-      const validatedUID = await validateUIDWithFlask(uid);
-
-      // Java UID → person.id
-      const personId = await getPersonIdFromUID(validatedUID);
-
-      // Add to group
-      await addPersonToGroup(groupId, personId);
-    }
-
->>>>>>> parent of 4184a5103 (Minor UX tweaks to Groups page.)
     cancelAddGroup();
     renderGroups();
   } catch (err) {
@@ -710,23 +684,16 @@ window.renderGroups = function () {
       <!-- Members row -->
       <div class="mt-3 flex flex-wrap gap-2">
         ${(group.members || []).map(m => `
-<<<<<<< HEAD
           <span 
             class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
             onclick="removeMemberFromGroup(${group.id}, ${m.id})"
             title="Click to remove">
             <span class="group-hover:hidden">${m.name}</span>
             <span class="hidden group-hover:inline">Remove</span>
-=======
-          <span class="px-3 py-1 bg-neutral-600 text-sm text-gray-200 rounded-full">
-            ${m.name} (${m.uid})
-            ${m.name}
->>>>>>> parent of 4184a5103 (Minor UX tweaks to Groups page.)
           </span>
         `).join("")}
       </div>
 
-<<<<<<< HEAD
       <!-- Add member by search -->
       <div class="mt-4 relative">
         <div class="flex items-center gap-2">
@@ -738,17 +705,6 @@ window.renderGroups = function () {
             onkeydown="if(event.key==='Enter') searchPeopleForGroup(${group.id})"
             oninput="if(!this.dataset.selectedId) document.getElementById('search-results-${group.id}').classList.add('hidden')"
           />
-=======
-      <!-- Add / Remove by UID -->
-      <!-- Add / Remove by GitHub ID -->
-      <div class="mt-4 flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Enter GitHub ID"
-          class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          id="member-uid-${group.id}"
-        />
->>>>>>> parent of 4184a5103 (Minor UX tweaks to Groups page.)
 
           <!-- Search button -->
           <button
