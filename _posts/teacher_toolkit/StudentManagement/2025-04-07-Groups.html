@@ -235,7 +235,7 @@ comments: false
 /* ================================
    CONFIG
 ================================ */
-import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 /* ================================
    STATE
@@ -245,6 +245,7 @@ let peopleCache = [];  // Cache people to avoid repeated API calls
 let activePeriods = [];
 let activeClasses = [];
 let loadingCount = 0;  // Track concurrent loading operations
+let isAdmin = false;   // Track if current user is an admin
 
 /* ================================
    LOADING HELPERS
@@ -288,7 +289,7 @@ window.searchGroups = function () {
     .finally(() => hideLoading());
 }
 
-// Load groups and people in parallel on page load with chaining
+// Load groups, people, and admin status in parallel on page load with chaining
 function initializeData() {
   showLoading("Loading groups...");
   
@@ -296,11 +297,15 @@ function initializeData() {
     fetch(`${javaURI}/api/groups`, fetchOptions)
       .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
     fetch(`${javaURI}/api/people`, fetchOptions)
-      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people")))
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people"))),
+    fetch(`${pythonURI}/api/id`, fetchOptions)
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null)  // Don't fail if user check fails
   ])
-    .then(([groups, people]) => {
+    .then(([groups, people, user]) => {
       allGroups = groups;
       peopleCache = people;
+      isAdmin = user && user.role === "Admin";
       renderGroups();
     })
     .catch(err => console.error("Failed to initialize data", err))
@@ -630,13 +635,15 @@ window.renderGroups = function () {
           </p>
         </div>
 
-        <!-- Trash (future delete group) -->
+        <!-- Trash (admin only) -->
+        ${isAdmin ? `
         <button
           class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
-          title="Delete group"
+          title="Delete group (Admin only)"
           onclick="deleteGroup(${group.id})">
           🗑️
         </button>
+        ` : ''}
       </div>
 
       <!-- Members row -->
