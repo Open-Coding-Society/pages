@@ -47,3 +47,13 @@
 {%- endcomment -%}
 <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 <script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
+<!-- Set up javaURI globally for OCS Analytics Tracker -->
+<script>
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        window.javaURI = "http://localhost:8585";
+    } else {
+        window.javaURI = "https://spring.opencodingsociety.com";
+    }
+</script>
+<!-- OCS Analytics Tracking Script (loaded on every page) -->
+<script src="{{ site.baseurl }}/assets/js/ocs-analytics-tracker.js" defer></script>
