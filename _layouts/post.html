@@ -1514,6 +1514,11 @@ Check if this is a course lesson and determine which course context to use
   {%- include disqus_comments.html -%}
   {%- endif -%}
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+  
+  <!-- Enhanced Analytics Tracking -->
+  <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/lesson-completion.js"></script>
 </article>
 
 {% endif %}

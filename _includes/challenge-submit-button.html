@@ -1,0 +1,178 @@
+<!-- 
+  Challenge Submit Button - Submit a SINGLE challenge from a code runner
+  
+  Usage: include challenge-submit-button.html runner_id="csa-frqs-2019-3-0"
+  
+  This button is placed after each code-runner block when the frontmatter 
+  flag 'challenge_submit: true' is set.
+-->
+<div class="challenge-submit-container" id="submit-{{ include.runner_id }}" data-runner-id="{{ include.runner_id }}">
+  <button class="challenge-submit-btn" title="Submit this challenge">
+    <span class="btn-icon">📤</span>
+    <span class="btn-text">Submit Challenge</span>
+  </button>
+  <span class="submit-status"></span>
+</div>
+
+<style>
+.challenge-submit-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 20px 0;
+}
+
+.challenge-submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.challenge-submit-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.challenge-submit-btn:active {
+  transform: translateY(0);
+}
+
+.challenge-submit-btn:disabled {
+  background: #888;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.challenge-submit-btn .btn-icon {
+  font-size: 16px;
+}
+
+.submit-status {
+  font-size: 13px;
+  color: #666;
+}
+
+.submit-status.success {
+  color: #4CAF50;
+}
+
+.submit-status.error {
+  color: #f44336;
+}
+
+.submit-status.loading {
+  color: #2196F3;
+}
+</style>
+
+<script type="module">
+import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+(function() {
+  const container = document.getElementById('submit-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const runnerId = container.dataset.runnerId;
+  const submitBtn = container.querySelector('.challenge-submit-btn');
+  const statusSpan = container.querySelector('.submit-status');
+  
+  // Extract lessonKey from runnerId (e.g., "csa-frqs-2019-3-0" -> "csa-frqs-2019-3")
+  const lessonKey = runnerId.replace(/-\d+$/, '');
+  
+  /**
+   * Get code from the CodeMirror editor for this challenge
+   */
+  function getCodeFromRunner() {
+    const runnerContainer = document.getElementById('runner-' + runnerId);
+    if (!runnerContainer) {
+      console.error('Runner container not found:', runnerId);
+      return null;
+    }
+    
+    // Find the CodeMirror instance
+    const cmElement = runnerContainer.querySelector('.CodeMirror');
+    if (cmElement && cmElement.CodeMirror) {
+      return cmElement.CodeMirror.getValue();
+    }
+    
+    // Fallback: try textarea
+    const textarea = runnerContainer.querySelector('.editor-textarea');
+    if (textarea) {
+      return textarea.value;
+    }
+    
+    console.error('Could not find code editor for:', runnerId);
+    return null;
+  }
+  
+  /**
+   * Submit the challenge to the backend
+   */
+  async function submitChallenge() {
+    const code = getCodeFromRunner();
+    if (code === null) {
+      statusSpan.textContent = '❌ Could not get code';
+      statusSpan.className = 'submit-status error';
+      return;
+    }
+    
+    if (!code.trim()) {
+      statusSpan.textContent = '⚠️ No code to submit';
+      statusSpan.className = 'submit-status error';
+      return;
+    }
+    
+    // Update UI
+    submitBtn.disabled = true;
+    statusSpan.textContent = '⏳ Submitting...';
+    statusSpan.className = 'submit-status loading';
+    
+    try {
+      const response = await fetch(`${javaURI}/api/challenge-submission/submit-challenge`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({
+          lessonKey: lessonKey,
+          challengeId: runnerId,
+          code: code
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        statusSpan.textContent = '✅ Submitted!';
+        statusSpan.className = 'submit-status success';
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          statusSpan.textContent = '';
+        }, 3000);
+      } else {
+        statusSpan.textContent = '❌ ' + (result.error || 'Submission failed');
+        statusSpan.className = 'submit-status error';
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      statusSpan.textContent = '❌ Network error';
+      statusSpan.className = 'submit-status error';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+  
+  // Attach click handler
+  submitBtn.addEventListener('click', submitChallenge);
+})();
+</script>

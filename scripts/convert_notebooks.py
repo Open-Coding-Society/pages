@@ -123,7 +123,14 @@ def clean_code_for_runner(cell_source, language):
                 continue
         cleaned_lines.append(line)
     
-    return '\n'.join(cleaned_lines).rstrip()
+    # Join lines and strip trailing whitespace
+    result = '\n'.join(cleaned_lines).rstrip()
+    
+    # Remove leading empty lines
+    while result.startswith('\n'):
+        result = result[1:]
+    
+    return result
 
 
 def generate_runner_id(permalink, index):
@@ -186,14 +193,28 @@ def process_code_runner_cells(notebook, permalink):
     return notebook
 
 
-def inject_code_runners(markdown, notebook):
-    """Inject code-runner includes after code blocks with metadata"""
+def inject_code_runners(markdown, notebook, front_matter=None):
+    """Inject code-runner includes after code blocks with metadata
+    
+    If front_matter contains 'challenge_submit: true', also injects:
+    - challenge-submit-button.html after each code-runner
+    - lesson-submit-button.html at the end of the document
+    """
+    if front_matter is None:
+        front_matter = {}
+    
+    challenge_submit_enabled = front_matter.get('challenge_submit', False)
+    permalink = front_matter.get('permalink', '')
+    # Generate lesson_key from permalink (e.g., "/csa/frqs/2019/3" -> "csa-frqs-2019-3")
+    lesson_key = permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
+    
     lines = markdown.split('\n')
     result = []
     in_code_block = False
     code_block_content = []
     cell_index = 0
     code_cell_count = 0
+    code_runner_count = 0
     
     i = 0
     while i < len(lines):
@@ -224,37 +245,33 @@ def inject_code_runners(markdown, notebook):
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['code_runner']
-                    
-                    # Wrap code block in collapsible details (collapsed by default)
-                    result.append('<details>')
-                    result.append('<summary>View Source Code</summary>')
                     result.append('')
-                    result.extend(code_block_content)
-                    result.append('')
-                    result.append('</details>')
-                    result.append('')
-                    
                     # Add liquid captures and code-runner include
-                    result.append('{% capture challenge' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
                     result.append(runner_data['challenge'])
                     result.append('{% endcapture %}')
                     result.append('')
-                    result.append('{% capture code' + str(code_cell_count - 1) + ' %}')
+                    result.append('{% capture code' + str(code_runner_count) + ' %}')
                     result.append(runner_data['code'])
+                    result.append('{% endcapture %}')
+                    result.append('')
+                    result.append('{% capture source' + str(code_runner_count) + ' %}')
+                    # Add the source code block content (already formatted markdown)
+                    result.extend(code_block_content)
                     result.append('{% endcapture %}')
                     result.append('')
                     result.append('{% include code-runner.html')
                     result.append('   runner_id="' + runner_data['runner_id'] + '"')
                     result.append('   language="' + runner_data['language'] + '"')
-                    result.append('   challenge=challenge' + str(code_cell_count - 1))
-                    result.append('   code=code' + str(code_cell_count - 1))
+                    result.append('   challenge=challenge' + str(code_runner_count))
+                    result.append('   code=code' + str(code_runner_count))
+                    result.append('   source=source' + str(code_runner_count))
                     result.append('%}')                
                     result.append('')
+                    code_runner_count += 1
                 else:
                     # Regular code block without code-runner
-                    result.extend(code_block_content)
-                
-                result.append('---')                
+                    result.extend(code_block_content)                
                 code_block_content = []
         elif in_code_block:
             code_block_content.append(line)
@@ -262,6 +279,14 @@ def inject_code_runners(markdown, notebook):
             result.append(line)
         
         i += 1
+    
+    # If challenge_submit is enabled, add lesson submit button at the end
+    if challenge_submit_enabled:
+        result.append('')
+        result.append('{% include lesson-submit-button.html')
+        result.append('   lesson_key="' + lesson_key + '"')
+        result.append('%}')
+        result.append('')
     
     return '\n'.join(result)
 
@@ -285,8 +310,8 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         markdown, _ = exporter.from_notebook_node(notebook)
         markdown = fix_js_code_blocks(markdown) # Fix JS code blocks
         
-        # Inject code-runner includes
-        markdown = inject_code_runners(markdown, notebook)
+        # Inject code-runner includes (and submit buttons if challenge_submit is enabled)
+        markdown = inject_code_runners(markdown, notebook, front_matter)
         
         front_matter_content = (
             "---\n"

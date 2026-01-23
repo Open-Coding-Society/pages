@@ -2,14 +2,14 @@
 toc: True
 courses: { csse: {week: 7} }
 layout: post
-title: Likert Review (Group)
+title: Likert Review
 description: A structured evaluation form for peer-led lessons that balances reflection, metacognition, and instructional quality without overburdening peer-teachers immediately after delivery.
 permalink: /likert
 ---
 
 ## Overview
 
-The purpose of this evaluation is to improve future instruction by identifying strengths, key takeaways, and opportunities for growth.  Each category includes three structured sentences and a value rating on a scale of 1–5.
+The purpose of this evaluation is to improve future instruction by identifying strengths, key takeaways, and opportunities for growth.  Each category includes three structured sentences and a value rating on a scale of 1–5. Pick one category, try a different category each lesson.
 
 - **Presentation** - Statements evaluating the group's clarity, knowledge, engagement, and organization.
 
@@ -19,7 +19,7 @@ The purpose of this evaluation is to improve future instruction by identifying s
 
 ---
 
-## Peer Lesson Evaluation (Group of 6)
+## Lesson Evaluation
 
 The microblog comment allows for immediate feedback and reply from lesson team to request clarity. Additionally, these tracking elements are captured in microblog automatically.
 
