@@ -157,98 +157,77 @@ active_tab: profile
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    /**
-     * API Request Chaining Implementation
-     * ==================================
-     * This script demonstrates chaining API requests where:
-     * 1. First fetch user identity from Java backend (required for all subsequent calls)
-     * 2. Then chain to fetch user's groups using the personId from step 1
-     * 
-     * Benefits:
-     * - Proper dependency management (can't fetch groups without personId)
-     * - Single cached personId reused for join/leave operations
-     * - Clear error propagation through the chain
-     */
-
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         const springGroupInfo = document.getElementById('springGroupInfo');
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
         
-        // Module-level cache for current user data - fetched once, reused throughout
+        // Cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
-        let userGroupIds = new Set(); // Track user's group IDs for O(1) lookup
+        let userGroupIds = new Set(); // Track user's group IDs for quick lookup
 
-        /**
-         * CHAINED API PATTERN:
-         * Step 1: Fetch user identity -> Step 2: Use personId to fetch groups
-         * 
-         * This uses .then() chaining to demonstrate the pattern where
-         * each subsequent request depends on data from the previous one.
-         */
-        fetch(`${javaURI}/api/person/get`, fetchOptions)
-            .then(response => {
-                // Handle authentication errors
-                if (response.status === 401) {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
-                    groupSearchInput.disabled = true;
-                    return null; // Stop the chain
-                }
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch user: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(personData => {
-                if (!personData) return null; // Chain was stopped
-                
-                // Cache user identity for reuse in join/leave operations
-                currentPersonId = personData.id;
-                currentUid = personData.uid;
+        // Fetch current user's person data from Java backend (includes numeric id)
+        // This replaces the need to fetch all people later
+        try {
+            const personResp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            
+            if (personResp.status === 401) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
+                groupSearchInput.disabled = true;
+                return;
+            }
+            
+            if (!personResp.ok) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                return;
+            }
 
-                if (!currentPersonId || !currentUid) {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
-                    return null;
-                }
+            const personData = await personResp.json();
+            currentPersonId = personData.id;
+            currentUid = personData.uid;
 
-                // CHAIN: Now fetch groups using the personId we just obtained
-                // This request DEPENDS on having currentPersonId from the previous call
-                return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
-            })
-            .then(groupResp => {
-                if (!groupResp) return null; // Chain was stopped
-                
-                // Handle group fetch response
-                if (groupResp.ok) {
-                    return groupResp.json();
-                } else if (groupResp.status === 404) {
-                    // Fallback: endpoint not available, try fetching all groups
-                    console.warn('Person groups endpoint not available, using fallback');
-                    return fetch(`${javaURI}/api/groups`, fetchOptions)
-                        .then(fallbackResp => {
-                            if (!fallbackResp.ok) return [];
-                            return fallbackResp.json().then(allGroups => {
-                                // Filter client-side (less efficient fallback)
-                                return (Array.isArray(allGroups) ? allGroups : []).filter(group =>
-                                    Array.isArray(group.members) && group.members.some(m => m.uid === currentUid)
-                                );
-                            });
-                        });
+            if (!currentPersonId || !currentUid) {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
+                return;
+            }
+        } catch (error) {
+            console.error("Error loading user info:", error);
+            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading user information.</p>`;
+            return;
+        }
+
+        // Fetch user's groups to display current membership
+        // Use server-side filtering by person ID instead of fetching all groups
+        try {
+            const groupResp = await fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
+
+            let userGroups = [];
+
+            if (groupResp.ok) {
+                const groups = await groupResp.json();
+                userGroups = Array.isArray(groups) ? groups : [];
+            } else if (groupResp.status === 404) {
+                // Fallback to fetching all groups (this is less efficient than sending a GET for just a specific user)
+                console.warn('Person groups endpoint not available, using fallback!!');
+                const fallbackResp = await fetch(`${javaURI}/api/groups`, fetchOptions);
+                if (fallbackResp.ok) {
+                    const allGroups = await fallbackResp.json();
+                    userGroups = (Array.isArray(allGroups) ? allGroups : []).filter(group =>
+                        Array.isArray(group.members) && group.members.some(member => member.uid === currentUid)
+                    );
                 }
+            } else {
                 throw new Error('Failed to fetch group data');
-            })
-            .then(userGroups => {
-                if (!userGroups) return; // Chain was stopped
-                
-                const groups = Array.isArray(userGroups) ? userGroups : [];
+                console.warn('Both methods of obtaining groups failed!!');
+            }
 
-                // Build a Set of user's group IDs for O(1) lookup during search
-                groups.forEach(group => userGroupIds.add(group.id));
+            // Build a Set of user's group IDs for O(1) lookup during search
+            userGroups.forEach(group => userGroupIds.add(group.id));
 
-                if (groups.length > 0) {
-                    springGroupInfo.innerHTML = groups.map(group => `
+            if (userGroups.length > 0) {
+                springGroupInfo.innerHTML = userGroups.map(group => `
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1">Group Name</label>
                         <input type="text" readonly
@@ -272,26 +251,12 @@ active_tab: profile
                             Leave Group
                         </button>
                     </div>
-                    `).join('');
-                } else {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
-                }
+                `).join('');
+            } else {
+                springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
+            }
 
-                // Set up search functionality (uses cached personId)
-                setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, currentPersonId);
-            })
-            .catch(error => {
-                console.error("Error in API chain:", error);
-                springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
-                groupSearchInput.disabled = true;
-            });
-
-        /**
-         * Set up group search and join functionality
-         * Separated into a function to keep the main chain clean
-         */
-        function setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, personId) {
-            // Search function using server-side API
+            // Debounced search using server-side API for performance
             const searchGroups = async (query) => {
                 const normalized = query.trim();
                 
@@ -342,7 +307,6 @@ active_tab: profile
             });
 
             // Optimized join function - uses cached personId instead of fetching all people
-            // This demonstrates how the cached personId from the initial chain is reused
             window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
                 if (isAlreadyMember) {
                     joinGroupStatus.textContent = 'You are already a member of this group.';
@@ -353,34 +317,37 @@ active_tab: profile
                 joinGroupStatus.textContent = 'Joining group...';
                 groupResultsList.classList.add('hidden');
 
-                // Use cached personId - no additional API call needed!
-                if (!personId) {
-                    joinGroupStatus.textContent = 'User ID not available. Please refresh the page.';
-                    groupSearchInput.disabled = false;
-                    return;
-                }
-
-                // Join group using the cached person ID from the initial chain
-                fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                })
-                .then(joinResp => {
-                    if (!joinResp.ok) {
-                        return joinResp.text().then(body => {
-                            throw new Error(body || 'Failed to join group');
-                        });
+                try {
+                    // Use the cached person ID - no need to fetch all people
+                    if (!currentPersonId) {
+                        throw new Error('User ID not available. Please refresh the page.');
                     }
+
+                    // Join the selected group using cached person ID
+                    const joinResp = await fetch(`${javaURI}/api/groups/${groupId}/members/${currentPersonId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+
+                    if (!joinResp.ok) {
+                        const body = await joinResp.text();
+                        throw new Error(body || 'Failed to join group');
+                    }
+
                     joinGroupStatus.textContent = 'Refreshing...';
+                    // Refresh current groups to reflect new membership
                     window.location.reload();
-                })
-                .catch(joinError => {
+                } catch (joinError) {
                     console.error('Join group error:', joinError);
                     joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
                     groupSearchInput.disabled = false;
-                });
+                }
             };
+        } catch (error) {
+            console.error("Error loading spring group info:", error);
+            springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
+            groupSearchInput.disabled = true;
         }
     });
 </script>
@@ -470,9 +437,13 @@ active_tab: profile
 
     window.getUserData = getUserData; // get the data
     window.setUserData = setUserData; // setting the user data to display
-    // NOTE: Removed duplicate DOMContentLoaded listener that called setUserData()
-    // setUserData() is already called once at line ~427, calling it twice causes
-    // redundant API requests. This is an example of optimizing by removing duplicate calls.
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            await window.setUserData();
+        } catch (error) {
+            console.error("Error initializing user data:", error.message);
+        }
+    });
 
     window.changeClass = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
