@@ -269,50 +269,42 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeData();
 });
 
-// Search groups using API
-window.searchGroups = async function () {
+// Search groups using API with chaining for better performance
+window.searchGroups = function () {
   const searchTerm = document.getElementById("searchInput").value.trim();
+  const url = searchTerm 
+    ? `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`
+    : `${javaURI}/api/groups`;
   
   showLoading("Searching...");
-  try {
-    let url = `${javaURI}/api/groups`;
-    if (searchTerm) {
-      url = `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`;
-    }
-    
-    const res = await fetch(url, fetchOptions);
-    if (!res.ok) throw new Error("Search failed");
-    
-    allGroups = await res.json();
-    renderGroups();
-  } catch (err) {
-    console.error("Search failed", err);
-  } finally {
-    hideLoading();
-  }
+  
+  fetch(url, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => console.error("Search failed", err))
+    .finally(() => hideLoading());
 }
 
-// Load groups and people in parallel on page load (only 2 API calls total)
-async function initializeData() {
+// Load groups and people in parallel on page load with chaining
+function initializeData() {
   showLoading("Loading groups...");
-  try {
-    const [groupsRes, peopleRes] = await Promise.all([
-      fetch(`${javaURI}/api/groups`, fetchOptions),
-      fetch(`${javaURI}/api/people`, fetchOptions)
-    ]);
-    
-    if (!groupsRes.ok) throw new Error("Failed to load groups");
-    if (!peopleRes.ok) throw new Error("Failed to load people");
-    
-    allGroups = await groupsRes.json();
-    peopleCache = await peopleRes.json();
-    
-    renderGroups();
-  } catch (err) {
-    console.error("Failed to initialize data", err);
-  } finally {
-    hideLoading();
-  }
+  
+  Promise.all([
+    fetch(`${javaURI}/api/groups`, fetchOptions)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
+    fetch(`${javaURI}/api/people`, fetchOptions)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people")))
+  ])
+    .then(([groups, people]) => {
+      allGroups = groups;
+      peopleCache = people;
+      renderGroups();
+    })
+    .catch(err => console.error("Failed to initialize data", err))
+    .finally(() => hideLoading());
 }
 
 window.parseUIDs = function (raw) {
@@ -339,8 +331,8 @@ window.getPersonById = function (personId) {
 // Track selected user for each group
 let selectedUserForGroup = {};
 
-// Search for users by name or GitHub ID
-window.searchPeopleForGroup = async function (groupId) {
+// Search for users by name or GitHub ID with chaining
+window.searchPeopleForGroup = function (groupId) {
   const searchInput = document.getElementById(`member-search-${groupId}`);
   const query = searchInput.value.trim();
   
@@ -350,22 +342,15 @@ window.searchPeopleForGroup = async function (groupId) {
   }
   
   showLoading("Searching users...");
-  try {
-    const res = await fetch(
-      `${javaURI}/api/people/search?query=${encodeURIComponent(query)}`,
-      fetchOptions
-    );
-    
-    if (!res.ok) throw new Error("Search failed");
-    
-    const results = await res.json();
-    displaySearchResults(groupId, results);
-  } catch (err) {
-    console.error("User search failed", err);
-    alert("Failed to search users");
-  } finally {
-    hideLoading();
-  }
+  
+  fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+    .then(results => displaySearchResults(groupId, results))
+    .catch(err => {
+      console.error("User search failed", err);
+      alert("Failed to search users");
+    })
+    .finally(() => hideLoading());
 }
 
 // Display search results in dropdown
@@ -423,8 +408,8 @@ window.clearSearchSelection = function (groupId) {
   document.getElementById(`search-results-${groupId}`).classList.add("hidden");
 }
 
-// Add selected member to group
-window.addSelectedMemberToGroup = async function (groupId) {
+// Add selected member to group with chaining
+window.addSelectedMemberToGroup = function (groupId) {
   const selected = selectedUserForGroup[groupId];
   
   if (!selected) {
@@ -433,103 +418,88 @@ window.addSelectedMemberToGroup = async function (groupId) {
   }
   
   showLoading("Adding member...");
-  try {
-    const res = await fetch(
-      `${javaURI}/api/groups/${groupId}/members/${selected.id}`,
-      { ...fetchOptions, method: "POST" }
-    );
-    
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("ADD MEMBER ERROR:", text);
-      throw new Error("Failed to add member");
-    }
-    
-    // Update local state
-    const group = allGroups.find(g => g.id === groupId);
-    if (group) {
-      if (!group.members) group.members = [];
-      if (!group.members.find(m => m.id === selected.id)) {
-        group.members.push({ id: selected.id, name: selected.name, uid: selected.uid });
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${selected.id}`, { ...fetchOptions, method: "POST" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("ADD MEMBER ERROR:", text);
+          return Promise.reject(new Error("Failed to add member"));
+        });
       }
-    }
-    
-    clearSearchSelection(groupId);
-    renderGroups();
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
+      return res;
+    })
+    .then(() => {
+      // Update local state
+      const group = allGroups.find(g => g.id === groupId);
+      if (group) {
+        if (!group.members) group.members = [];
+        if (!group.members.find(m => m.id === selected.id)) {
+          group.members.push({ id: selected.id, name: selected.name, uid: selected.uid });
+        }
+      }
+      clearSearchSelection(groupId);
+      renderGroups();
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
 }
 
-// Add member to group - updates local state instead of refetching
-window.addMemberToGroup = async function (groupId, uid) {
+// Add member to group with chaining - updates local state instead of refetching
+window.addMemberToGroup = function (groupId, uid) {
   showLoading("Adding member...");
-  try {
-    const personId = getPersonIdFromUID(uid);
-    const person = getPersonById(personId);
-    
-    const res = await fetch(
-      `${javaURI}/api/groups/${groupId}/members/${personId}`,
-      { ...fetchOptions, method: "POST" }
-    );
-    
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("ADD MEMBER ERROR:", text);
-      throw new Error("Failed to add member");
-    }
-    
-    // Update local state instead of refetching all groups
-    const group = allGroups.find(g => g.id === groupId);
-    if (group) {
-      if (!group.members) group.members = [];
-      // Only add if not already present
-      if (!group.members.find(m => m.id === personId)) {
-        group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+  
+  const personId = getPersonIdFromUID(uid);
+  const person = getPersonById(personId);
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "POST" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("ADD MEMBER ERROR:", text);
+          return Promise.reject(new Error("Failed to add member"));
+        });
       }
-    }
-    
-    renderGroups();
-    document.getElementById(`member-uid-${groupId}`).value = '';
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
+      return res;
+    })
+    .then(() => {
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group) {
+        if (!group.members) group.members = [];
+        // Only add if not already present
+        if (!group.members.find(m => m.id === personId)) {
+          group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+        }
+      }
+      renderGroups();
+      document.getElementById(`member-uid-${groupId}`).value = '';
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
 }
 
-// Remove member from group - updates local state instead of refetching
-window.removeMemberFromGroup = async function (groupId, personId) {
+// Remove member from group with chaining - updates local state instead of refetching
+window.removeMemberFromGroup = function (groupId, personId) {
   showLoading("Removing member...");
-  try {
-    const res = await fetch(
-      `${javaURI}/api/groups/${groupId}/members/${personId}`,
-      { ...fetchOptions, method: "DELETE" }
-    );
-    
-    if (!res.ok) {
-      throw new Error("Failed to remove member");
-    }
-    
-    // Update local state instead of refetching all groups
-    const group = allGroups.find(g => g.id === groupId);
-    if (group && group.members) {
-      group.members = group.members.filter(m => m.id !== personId);
-    }
-    
-    renderGroups();
-    document.getElementById(`member-uid-${groupId}`).value = '';
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "DELETE" })
+    .then(res => res.ok ? res : Promise.reject(new Error("Failed to remove member")))
+    .then(() => {
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group && group.members) {
+        group.members = group.members.filter(m => m.id !== personId);
+      }
+      renderGroups();
+      document.getElementById(`member-uid-${groupId}`).value = '';
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
 }
 
-// Delete group - updates local state instead of refetching
-window.deleteGroup = async function (groupId) {
+// Delete group with chaining - updates local state instead of refetching
+window.deleteGroup = function (groupId) {
   const confirmed = confirm(
     "Are you sure you want to delete this group?\n\nThis action cannot be undone."
   );
@@ -537,27 +507,25 @@ window.deleteGroup = async function (groupId) {
   if (!confirmed) return;
 
   showLoading("Deleting group...");
-  try {
-    const res = await fetch(`${javaURI}/api/groups/${groupId}`, {
-      ...fetchOptions,
-      method: "DELETE"
-    });
-    
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("DELETE GROUP ERROR:", text);
-      alert("Failed to delete group");
-      throw new Error("Failed to delete group");
-    }
-    
-    // Update local state instead of refetching all groups
-    allGroups = allGroups.filter(g => g.id !== groupId);
-    renderGroups();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    hideLoading();
-  }
+  
+  fetch(`${javaURI}/api/groups/${groupId}`, { ...fetchOptions, method: "DELETE" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("DELETE GROUP ERROR:", text);
+          alert("Failed to delete group");
+          return Promise.reject(new Error("Failed to delete group"));
+        });
+      }
+      return res;
+    })
+    .then(() => {
+      // Update local state instead of refetching all groups
+      allGroups = allGroups.filter(g => g.id !== groupId);
+      renderGroups();
+    })
+    .catch(err => console.error(err))
+    .finally(() => hideLoading());
 };
 
 
@@ -565,31 +533,27 @@ window.deleteGroup = async function (groupId) {
 /* ================================
    API CALLS
 ================================ */
-// Manual refresh function - only call when absolutely needed
-window.loadGroups = async function () {
-  try {
-    const res = await fetch(`${javaURI}/api/groups`, fetchOptions);
-    if (!res.ok) throw new Error("Failed to load groups");
-    allGroups = await res.json();
-    renderGroups();
-  } catch (err) {
-    console.error("Failed to load groups", err);
-  }
+// Manual refresh function with chaining - only call when absolutely needed
+window.loadGroups = function () {
+  fetch(`${javaURI}/api/groups`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups")))
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => console.error("Failed to load groups", err));
 }
 
-// Refresh people cache if needed (e.g., new user registered)
-window.refreshPeopleCache = async function () {
-  try {
-    const res = await fetch(`${javaURI}/api/people`, fetchOptions);
-    if (!res.ok) throw new Error("Failed to refresh people");
-    peopleCache = await res.json();
-  } catch (err) {
-    console.error("Failed to refresh people cache", err);
-  }
+// Refresh people cache with chaining if needed (e.g., new user registered)
+window.refreshPeopleCache = function () {
+  fetch(`${javaURI}/api/people`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to refresh people")))
+    .then(data => { peopleCache = data; })
+    .catch(err => console.error("Failed to refresh people cache", err));
 }
 
-// Create new group (single API call)
-window.saveNewGroup = async function () {
+// Create new group with chaining (single API call)
+window.saveNewGroup = function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
@@ -600,37 +564,33 @@ window.saveNewGroup = async function () {
   }
 
   showLoading("Creating group...");
-  try {
-    const res = await fetch(`${javaURI}/api/groups`, {
-      ...fetchOptions,
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        period: String(period),
-        course
-      })
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("GROUP CREATION ERROR:", text);
-      throw new Error("Group creation failed");
-    }
-
-    const newGroup = await res.json();
-    newGroup.members = [];
-    
-    // Update local state instead of refetching
-    allGroups.push(newGroup);
-    
-    cancelAddGroup();
-    renderGroups();
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  } finally {
-    hideLoading();
-  }
+  
+  fetch(`${javaURI}/api/groups`, {
+    ...fetchOptions,
+    method: "POST",
+    body: JSON.stringify({ name, period: String(period), course })
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("GROUP CREATION ERROR:", text);
+          return Promise.reject(new Error("Group creation failed"));
+        });
+      }
+      return res.json();
+    })
+    .then(newGroup => {
+      newGroup.members = [];
+      // Update local state instead of refetching
+      allGroups.push(newGroup);
+      cancelAddGroup();
+      renderGroups();
+    })
+    .catch(err => {
+      console.error(err);
+      alert(err.message);
+    })
+    .finally(() => hideLoading());
 };
 
 
