@@ -9,8 +9,14 @@ comments: false
 
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
+    <!-- Subtle Loading Indicator - inline badge style -->
+    <div id="loadingOverlay" class="hidden fixed bottom-4 right-4 z-40 bg-neutral-800/90 backdrop-blur-sm border border-neutral-700 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-md text-xs">
+      <div class="loading-spinner"></div>
+      <span id="loadingText" class="text-gray-400">Loading...</span>
+    </div>
+
     <!-- Page Title -->
-    <h2 class="text-2xl font-semibold text-white mb-6">Group Management</h2>
+    <h2 class="text-2xl font-semibold text-white mb-6">Groups Management</h2>
 
     <!-- Unified Filter Bar -->
     <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4 mb-6">
@@ -118,8 +124,15 @@ comments: false
     <!-- Groups Display Area -->
     <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
       <!-- Search bar -->
-      <input type="text" id="searchInput" placeholder="Search by Group Name or Member Name"
-        class="w-full mb-6 px-4 py-3 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <div class="flex gap-2 mb-6">
+        <input type="text" id="searchInput" placeholder="Search by Group Name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          onkeydown="if(event.key==='Enter') searchGroups()" />
+        <button onclick="searchGroups()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium">
+          Search
+        </button>
+      </div>
 
       <!-- Add Group Section -->
       <div id="addGroupSection" class="mb-6 bg-neutral-700 border-2 border-dashed border-neutral-600 rounded-lg p-6">
@@ -175,12 +188,6 @@ comments: false
             </select>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-200 mb-2">Members (one per line, enter UIDs)</label>
-            <textarea id="newGroupMembers" rows="4" placeholder="Enter member names, one per line"
-              class="w-full px-4 py-2 bg-neutral-600 text-white placeholder-gray-400 border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-          </div>
-
           <div class="flex gap-3 justify-end">
             <button onclick="cancelAddGroup()"
               class="px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-white rounded-lg transition-colors">
@@ -212,26 +219,98 @@ comments: false
   </div>
 </div>
 
+<style>
+  .loading-spinner {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #6b7280;
+    border-top-color: #818cf8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
 <script type="module">
 /* ================================
    CONFIG
 ================================ */
-import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 /* ================================
    STATE
 ================================ */
 let allGroups = [];
+let peopleCache = [];  // Cache people to avoid repeated API calls
 let activePeriods = [];
 let activeClasses = [];
+let loadingCount = 0;  // Track concurrent loading operations
+let isAdmin = false;   // Track if current user is an admin
+
+/* ================================
+   LOADING HELPERS
+================================ */
+function showLoading(message = "Loading...") {
+  loadingCount++;
+  document.getElementById("loadingText").textContent = message;
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
+
+function hideLoading() {
+  loadingCount = Math.max(0, loadingCount - 1);
+  if (loadingCount === 0) {
+    document.getElementById("loadingOverlay").classList.add("hidden");
+  }
+}
 
 /* ================================
    INIT
 ================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  loadGroups();
-  document.getElementById("searchInput").addEventListener("input", renderGroups);
+  initializeData();
 });
+
+// Search groups using API with chaining for better performance
+window.searchGroups = function () {
+  const searchTerm = document.getElementById("searchInput").value.trim();
+  const url = searchTerm 
+    ? `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`
+    : `${javaURI}/api/groups`;
+  
+  showLoading("Searching...");
+  
+  fetch(url, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => console.error("Search failed", err))
+    .finally(() => hideLoading());
+}
+
+// Load groups, people, and admin status in parallel on page load with chaining
+function initializeData() {
+  showLoading("Loading groups...");
+  
+  Promise.all([
+    fetch(`${javaURI}/api/groups`, fetchOptions)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
+    fetch(`${javaURI}/api/people`, fetchOptions)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people"))),
+    fetch(`${pythonURI}/api/id`, fetchOptions)
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null)  // Don't fail if user check fails
+  ])
+    .then(([groups, people, user]) => {
+      allGroups = groups;
+      peopleCache = people;
+      isAdmin = user && user.role === "Admin";
+      renderGroups();
+    })
+    .catch(err => console.error("Failed to initialize data", err))
+    .finally(() => hideLoading());
+}
 
 window.parseUIDs = function (raw) {
   return raw
@@ -240,123 +319,216 @@ window.parseUIDs = function (raw) {
     .filter(Boolean);
 }
 
-window.validateUIDWithFlask = async function (uid) {
-  const res = await fetch(`${pythonURI}/api/user`, {
-    credentials: "include"
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch users from Flask");
-  }
-
-  const users = await res.json();
-
-  const match = users.find(u => u.uid === uid);
-
+// Synchronous lookup from cache - no API call needed
+window.getPersonIdFromUID = function (uid) {
+  const match = peopleCache.find(p => p.uid === uid);
   if (!match) {
-    throw new Error(`UID not found in Flask: ${uid}`);
+    throw new Error(`UID not found: ${uid}`);
   }
-
-  return match.uid; // validated
-}
-
-
-
-window.getPersonIdFromUID = async function (uid) {
-  const res = await fetch(`${javaURI}/api/people`, {
-    ...fetchOptions,
-    credentials: "include"
-  });
-
-  if (!res.ok) {
-    console.error("Java /api/people status:", res.status);
-    throw new Error("Failed to fetch people from Java");
-  }
-
-  const people = await res.json();
-
-  const match = people.find(p => p.uid === uid);
-
-  if (!match) {
-    throw new Error(`UID found in Flask but missing in Java: ${uid}`);
-  }
-
-  return match.id; // INTEGER (e.g. 52)
+  return match.id;
 };
 
+// Get person object from cache by ID
+window.getPersonById = function (personId) {
+  return peopleCache.find(p => p.id === personId);
+};
 
-async function addPersonToGroup(groupId, personId) {
-  const res = await fetch(
-    `${javaURI}/api/groups/${groupId}/members/${personId}`,
-    {
-      ...fetchOptions,
-      method: "POST"
-    }
-  );
+// Track selected user for each group
+let selectedUserForGroup = {};
 
-  console.log("ADD MEMBER STATUS:", res.status);
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("ADD MEMBER ERROR:", text);
-    throw new Error("Failed to add member");
+// Search for users by name or GitHub ID with chaining
+window.searchPeopleForGroup = function (groupId) {
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  const query = searchInput.value.trim();
+  
+  if (!query) {
+    alert("Please enter a search term");
+    return;
   }
+  
+  showLoading("Searching users...");
+  
+  fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+    .then(results => displaySearchResults(groupId, results))
+    .catch(err => {
+      console.error("User search failed", err);
+      alert("Failed to search users");
+    })
+    .finally(() => hideLoading());
 }
 
-window.addMemberToGroup = async function (groupId, uid) {
-  const personId = await getPersonIdFromUID(uid);
-
-  const res = await fetch(
-    `${javaURI}/api/groups/${groupId}/members/${personId}`,
-    {
-      ...fetchOptions,
-      method: "POST"
-    }
-  );
-
-  if (!res.ok) {
-    throw new Error("Failed to add member");
+// Display search results in dropdown
+window.displaySearchResults = function (groupId, results) {
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  
+  if (!results || results.length === 0) {
+    dropdown.innerHTML = `
+      <div class="p-3 text-gray-400 text-sm text-center">No users found</div>
+    `;
+    dropdown.classList.remove("hidden");
+    return;
   }
-
-  await loadGroups(); // refresh UI
+  
+  dropdown.innerHTML = results.map(person => `
+    <div 
+      class="px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center justify-between text-sm"
+      onclick="selectUserForGroup(${groupId}, ${person.id}, '${person.uid}', '${person.name.replace(/'/g, "\\'")}')">
+      <div>
+        <span class="text-white font-medium">${person.name}</span>
+        <span class="text-gray-400 ml-2">@${person.uid}</span>
+      </div>
+      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+    </div>
+  `).join("");
+  
+  dropdown.classList.remove("hidden");
 }
 
-window.removeMemberFromGroup = async function (groupId, personId) {
-  const res = await fetch(
-    `${javaURI}/api/groups/${groupId}/members/${personId}`,
-    {
-      ...fetchOptions,
-      method: "DELETE"
-    }
-  );
-
-  if (!res.ok) {
-    throw new Error("Failed to remove member");
-  }
-
-  await loadGroups(); // refresh UI
+// Select a user from search results
+window.selectUserForGroup = function (groupId, personId, uid, name) {
+  selectedUserForGroup[groupId] = { id: personId, uid, name };
+  
+  // Update input to show selected user
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  searchInput.value = `${name} (@${uid})`;
+  searchInput.dataset.selectedId = personId;
+  searchInput.dataset.selectedUid = uid;
+  searchInput.dataset.selectedName = name;
+  
+  // Hide dropdown
+  document.getElementById(`search-results-${groupId}`).classList.add("hidden");
 }
 
-window.deleteGroup = async function (groupId) {
+// Clear search selection
+window.clearSearchSelection = function (groupId) {
+  delete selectedUserForGroup[groupId];
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  searchInput.value = "";
+  delete searchInput.dataset.selectedId;
+  delete searchInput.dataset.selectedUid;
+  delete searchInput.dataset.selectedName;
+  document.getElementById(`search-results-${groupId}`).classList.add("hidden");
+}
+
+// Add selected member to group with chaining
+window.addSelectedMemberToGroup = function (groupId) {
+  const selected = selectedUserForGroup[groupId];
+  
+  if (!selected) {
+    alert("Please search and select a user first");
+    return;
+  }
+  
+  showLoading("Adding member...");
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${selected.id}`, { ...fetchOptions, method: "POST" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("ADD MEMBER ERROR:", text);
+          return Promise.reject(new Error("Failed to add member"));
+        });
+      }
+      return res;
+    })
+    .then(() => {
+      // Update local state
+      const group = allGroups.find(g => g.id === groupId);
+      if (group) {
+        if (!group.members) group.members = [];
+        if (!group.members.find(m => m.id === selected.id)) {
+          group.members.push({ id: selected.id, name: selected.name, uid: selected.uid });
+        }
+      }
+      clearSearchSelection(groupId);
+      renderGroups();
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
+}
+
+// Add member to group with chaining - updates local state instead of refetching
+window.addMemberToGroup = function (groupId, uid) {
+  showLoading("Adding member...");
+  
+  const personId = getPersonIdFromUID(uid);
+  const person = getPersonById(personId);
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "POST" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("ADD MEMBER ERROR:", text);
+          return Promise.reject(new Error("Failed to add member"));
+        });
+      }
+      return res;
+    })
+    .then(() => {
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group) {
+        if (!group.members) group.members = [];
+        // Only add if not already present
+        if (!group.members.find(m => m.id === personId)) {
+          group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+        }
+      }
+      renderGroups();
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
+}
+
+// Remove member from group with chaining - updates local state instead of refetching
+window.removeMemberFromGroup = function (groupId, personId) {
+  showLoading("Removing member...");
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "DELETE" })
+    .then(res => res.ok ? res : Promise.reject(new Error("Failed to remove member")))
+    .then(() => {
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group && group.members) {
+        group.members = group.members.filter(m => m.id !== personId);
+      }
+      renderGroups();
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
+}
+
+// Delete group with chaining - updates local state instead of refetching
+window.deleteGroup = function (groupId) {
   const confirmed = confirm(
     "Are you sure you want to delete this group?\n\nThis action cannot be undone."
   );
 
   if (!confirmed) return;
 
-  const res = await fetch(`${javaURI}/api/groups/${groupId}`, {
-    ...fetchOptions,
-    method: "DELETE"
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    console.error("DELETE GROUP ERROR:", text);
-    alert("Failed to delete group");
-    return;
-  }
-
-  await loadGroups(); // refresh UI
+  showLoading("Deleting group...");
+  
+  fetch(`${javaURI}/api/groups/${groupId}`, { ...fetchOptions, method: "DELETE" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("DELETE GROUP ERROR:", text);
+          alert("Failed to delete group");
+          return Promise.reject(new Error("Failed to delete group"));
+        });
+      }
+      return res;
+    })
+    .then(() => {
+      // Update local state instead of refetching all groups
+      allGroups = allGroups.filter(g => g.id !== groupId);
+      renderGroups();
+    })
+    .catch(err => console.error(err))
+    .finally(() => hideLoading());
 };
 
 
@@ -364,68 +536,64 @@ window.deleteGroup = async function (groupId) {
 /* ================================
    API CALLS
 ================================ */
-window.loadGroups = async function () {
-  try {
-    const res = await fetch(`${javaURI}/api/groups`, {
-      ...fetchOptions,
-      // credentials: 'omit'
-    });
-    allGroups = await res.json();
-    renderGroups();
-  } catch (err) {
-    console.error("Failed to load groups", err);
-  }
+// Manual refresh function with chaining - only call when absolutely needed
+window.loadGroups = function () {
+  fetch(`${javaURI}/api/groups`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups")))
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => console.error("Failed to load groups", err));
 }
 
-window.saveNewGroup = async function () {
+// Refresh people cache with chaining if needed (e.g., new user registered)
+window.refreshPeopleCache = function () {
+  fetch(`${javaURI}/api/people`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to refresh people")))
+    .then(data => { peopleCache = data; })
+    .catch(err => console.error("Failed to refresh people cache", err));
+}
+
+// Create new group with chaining (single API call)
+window.saveNewGroup = function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
-  const rawUIDs = document.getElementById("newGroupMembers").value;
 
   if (!name || !period || !course) {
     alert("Please fill all required fields.");
     return;
   }
 
-  const uids = parseUIDs(rawUIDs);
-
-  try {
-    // 1️⃣ Create group (NO MEMBERS)
-    const groupRes = await fetch(`${javaURI}/api/groups`, {
-      ...fetchOptions,
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        period: Number(period),
-        course
-      })
-    });
-
-    if (!groupRes.ok) throw new Error("Group creation failed");
-
-    const group = await groupRes.json();
-    const groupId = group.id;
-
-    // 2️⃣ Resolve & add each UID
-    for (const uid of uids) {
-      // Flask validation
-      const validatedUID = await validateUIDWithFlask(uid);
-
-      // Java UID → person.id
-      const personId = await getPersonIdFromUID(validatedUID);
-
-      // Add to group
-      await addPersonToGroup(groupId, personId);
-    }
-
-    cancelAddGroup();
-    await loadGroups();
-
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
+  showLoading("Creating group...");
+  
+  fetch(`${javaURI}/api/groups`, {
+    ...fetchOptions,
+    method: "POST",
+    body: JSON.stringify({ name, period: String(period), course })
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("GROUP CREATION ERROR:", text);
+          return Promise.reject(new Error("Group creation failed"));
+        });
+      }
+      return res.json();
+    })
+    .then(newGroup => {
+      newGroup.members = [];
+      // Update local state instead of refetching
+      allGroups.push(newGroup);
+      cancelAddGroup();
+      renderGroups();
+    })
+    .catch(err => {
+      console.error(err);
+      alert(err.message);
+    })
+    .finally(() => hideLoading());
 };
 
 
@@ -436,23 +604,13 @@ window.saveNewGroup = async function () {
 window.renderGroups = function () {
   const container = document.getElementById("groupsContainer");
   const empty = document.getElementById("emptyState");
-  const search = document.getElementById("searchInput").value.toLowerCase();
 
   container.innerHTML = "";
 
+  // Only filter by period/class (search is handled by API)
   const filtered = allGroups.filter(g => {
     if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
     if (activeClasses.length && !activeClasses.includes(g.course)) return false;
-
-    if (search) {
-      const memberMatch = (g.memberUids || []).some(uid =>
-        uid.toLowerCase().includes(search)
-      );
-      if (
-        !g.name.toLowerCase().includes(search) &&
-        !memberMatch
-      ) return false;
-    }
     return true;
   });
 
@@ -477,61 +635,66 @@ window.renderGroups = function () {
           </p>
         </div>
 
-        <!-- Trash (future delete group) -->
+        <!-- Trash (admin only) -->
+        ${isAdmin ? `
         <button
           class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
-          title="Delete group"
+          title="Delete group (Admin only)"
           onclick="deleteGroup(${group.id})">
           🗑️
         </button>
+        ` : ''}
       </div>
 
       <!-- Members row -->
       <div class="mt-3 flex flex-wrap gap-2">
         ${(group.members || []).map(m => `
-          <span class="px-3 py-1 bg-neutral-600 text-sm text-gray-200 rounded-full">
-            ${m.name}
+          <span 
+            class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
+            onclick="removeMemberFromGroup(${group.id}, ${m.id})"
+            title="Click to remove">
+            <span class="group-hover:hidden">${m.name}</span>
+            <span class="hidden group-hover:inline">Remove</span>
           </span>
         `).join("")}
       </div>
 
-      <!-- Add / Remove by UID -->
-      <div class="mt-4 flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Enter UID"
-          class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          id="member-uid-${group.id}"
-        />
+      <!-- Add member by search -->
+      <div class="mt-4 relative">
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search by full name"
+            class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            id="member-search-${group.id}"
+            onkeydown="if(event.key==='Enter') searchPeopleForGroup(${group.id})"
+            oninput="if(!this.dataset.selectedId) document.getElementById('search-results-${group.id}').classList.add('hidden')"
+          />
 
-        <!-- Add -->
-        <button
-          class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold"
-          title="Add member"
-          onclick="
-            (() => {
-              const uid = document.getElementById('member-uid-${group.id}').value;
-              if (uid) addMemberToGroup(${group.id}, uid.trim());
-            })()
-          ">
-          +
-        </button>
+          <!-- Search button -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+            title="Search users"
+            onclick="searchPeopleForGroup(${group.id})">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
 
-        <!-- Remove -->
-        <button
-          class="w-10 h-10 flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-500 text-white text-lg font-bold"
-          title="Remove member"
-          onclick="
-            (() => {
-              const uid = document.getElementById('member-uid-${group.id}').value;
-              if (!uid) return;
-              getPersonIdFromUID(uid.trim())
-                .then(pid => removeMemberFromGroup(${group.id}, pid))
-                .catch(err => alert(err.message));
-            })()
-          ">
-          −
-        </button>
+          <!-- Add selected user -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold transition-colors"
+            title="Add selected member"
+            onclick="addSelectedMemberToGroup(${group.id})">
+            +
+          </button>
+        </div>
+
+        <!-- Search results dropdown -->
+        <div 
+          id="search-results-${group.id}" 
+          class="hidden absolute left-0 right-12 mt-1 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto">
+        </div>
       </div>
     `;
     container.appendChild(el);
@@ -551,7 +714,6 @@ window.cancelAddGroup = function () {
   document.getElementById("newGroupName").value = "";
   document.getElementById("newGroupPeriod").value = "";
   document.getElementById("newGroupClass").value = "";
-  document.getElementById("newGroupMembers").value = "";
 }
 
 /* ================================
@@ -569,7 +731,8 @@ window.clearAllFilters = function () {
   document.getElementById("classAllCheckbox").checked = true;
   document.getElementById("periodFilterLabel").textContent = "All Periods";
   document.getElementById("classFilterLabel").textContent = "All Classes";
-  renderGroups();
+  document.getElementById("searchInput").value = "";
+  searchGroups();  // Reload all groups
 }
 
 window.onPeriodCheckboxChange = function (cb) {
