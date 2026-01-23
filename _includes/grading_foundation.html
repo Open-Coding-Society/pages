@@ -3,8 +3,7 @@
 <script>
   // Global feature registry (safe)
   window.PageFeatures = window.PageFeatures || {};
-
-  // ✅ FORCE ENABLE grading
+  // If a page sets grading=true in front matter, layout will include this file
   window.PageFeatures.grading = true;
 </script>
 
@@ -18,7 +17,7 @@
   aria-label="Open Grading"
   hidden
 >
-  📊 Grading
+  Grading
 </button>
 
 <!-- Grading Panel -->
@@ -31,7 +30,7 @@
 >
   <div class="grading-panel-inner">
     <header class="grading-header">
-      <h1>📊 Grading Dashboard</h1>
+      <h1>Grading Dashboard</h1>
       <button
         id="grading-close-btn"
         class="grading-close-btn"
@@ -40,92 +39,52 @@
     </header>
 
     <section id="grading-content">
-      <em>Loading submissions…</em>
+      <em>Loading submissions...</em>
     </section>
   </div>
 </aside>
 
-<div id="rubric-popup"
-  style="position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:9999;">
+<!-- Rubric Popup (simple) -->
+<div
+  id="rubric-popup"
+  style="position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:9999;"
+>
   <div style="background:#000; padding:1rem; border:1px solid #63b3ed; border-radius:8px; width:300px; color:white;">
     <h3 style="margin-top:0;">Rubric</h3>
-    <div id="rubric-categories">
-      <label><input type="checkbox"> Category 1</label><br>
-      <label><input type="checkbox"> Category 2</label><br>
-      <label><input type="checkbox"> Category 3</label><br>
-    </div>
-    <textarea id="rubric-comments"
+
+    <div id="rubric-categories"></div>
+
+    <textarea
+      id="rubric-comments"
       placeholder="Comments..."
-      style="width:100%; margin-top:10px; background:#111; color:white; height:60px; border:1px solid #63b3ed; border-radius:4px;"></textarea>
-    <button id="rubric-save"
-      style="width:100%; margin-top:10px; background:#111; color:#63b3ed; border:1px solid #63b3ed; padding:4px; border-radius:4px;">
+      style="width:100%; margin-top:10px; background:#111; color:white; height:60px; border:1px solid #63b3ed; border-radius:4px;"
+    ></textarea>
+
+    <button
+      id="rubric-save"
+      style="width:100%; margin-top:10px; background:#111; color:#63b3ed; border:1px solid #63b3ed; padding:6px; border-radius:4px;"
+    >
       Save
+    </button>
+
+    <button
+      id="rubric-cancel"
+      style="width:100%; margin-top:8px; background:#111; color:#fff; border:1px solid #444; padding:6px; border-radius:4px;"
+    >
+      Cancel
     </button>
   </div>
 </div>
 
-<!-- Rubric Modal -->
-<div id="rubric-modal" class="rubric-modal" hidden>
-  <div class="rubric-modal-inner" style="background:#111; color:#fff; padding:1rem; border:1px solid #63b3ed; border-radius:8px; width:400px; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:1100;">
-    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-      <h2>Rubric</h2>
-      <button id="rubric-close-btn" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">&times;</button>
-    </header>
-    <div id="rubric-content" class="rubric-content"></div>
-  </div>
-</div>
-
 <script>
-/* ===================== INIT ===================== */
-document.addEventListener("DOMContentLoaded", () => {
-  if (!window.PageFeatures.grading) return;
-
-  const container = document.getElementById("grading-button-container");
-  const toggleBtn = document.getElementById("grading-toggle-btn");
-
-  if (!container || !toggleBtn) return;
-
-  if (!container.contains(toggleBtn)) {
-    container.appendChild(toggleBtn);
-  }
-
-  toggleBtn.hidden = false;
-});
-
-/* ===================== ELEMENTS ===================== */
-const gradingToggle = document.getElementById("grading-toggle-btn");
-const gradingPanel  = document.getElementById("grading-panel");
-const gradingClose  = document.getElementById("grading-close-btn");
-
-/* ===================== OPEN / CLOSE ===================== */
-function openGradingPanel() {
-  gradingPanel.hidden = false;
-  renderGradingTable();
-}
-
-function closeGradingPanel() {
-  gradingPanel.hidden = true;
-}
-
-gradingToggle?.addEventListener("click", openGradingPanel);
-gradingClose?.addEventListener("click", closeGradingPanel);
-
-/* ESC to close grading panel */
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !gradingPanel.hidden) {
-    closeGradingPanel();
-  }
-});
-
 /* ===================== CONTENT ===================== */
 const gradingData = [
-  { student: "Student A", assignment: "HW1", score: 92, status: "Graded" },
-  { student: "Student B", assignment: "HW1", score: 85, status: "Graded" },
-  { student: "Student C", assignment: "HW1", score: "—", status: "Pending" },
-  { student: "Student A", assignment: "HW2", score: 92, status: "Graded" },
-  { student: "Student B", assignment: "HW2", score: 85, status: "Graded" },
-  { student: "Student C", assignment: "HW2", score: "—", status: "Pending" },
-];
+  { student: "Student A", assignment: "HW1", score: 92, status: "Graded", rubric: { checks: [], comments: "" } },
+  { student: "Student B", assignment: "HW1", score: 85, status: "Graded", rubric: { checks: [], comments: "" } },
+  { student: "Student C", assignment: "HW1", score: "—", status: "Pending", rubric: { checks: [], comments: "" } },
+  { student: "Student A", assignment: "HW2", score: 92, status: "Graded", rubric: { checks: [], comments: "" } },
+  { student: "Student B", assignment: "HW2", score: 85, status: "Graded", rubric: { checks: [], comments: "" } },
+  { student: "Student C", assignment: "HW2", score: "—", status: "Pending", rubric: { checks: [], comments: "" } },
 ];
 
 /* ===================== RUBRIC TEMPLATE ===================== */
@@ -136,13 +95,43 @@ const rubricTemplate = [
   "Comments included"
 ];
 
-const rubricModal = document.getElementById("rubric-modal");
-const rubricClose = document.getElementById("rubric-close-btn");
-const rubricContent = document.getElementById("rubric-content");
+/* ===================== INIT ===================== */
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.PageFeatures || !window.PageFeatures.grading) return;
 
-/* ===================== TABLE RENDER + EDITABLE ===================== */
+  const container = document.getElementById("grading-button-container");
+  const toggleBtn = document.getElementById("grading-toggle-btn");
+  const panel = document.getElementById("grading-panel");
+  const closeBtn = document.getElementById("grading-close-btn");
+
+  if (!container || !toggleBtn || !panel || !closeBtn) return;
+
+  if (!container.contains(toggleBtn)) container.appendChild(toggleBtn);
+  toggleBtn.hidden = false;
+
+  function openGradingPanel() {
+    panel.hidden = false;
+    renderGradingTable();
+  }
+
+  function closeGradingPanel() {
+    panel.hidden = true;
+  }
+
+  toggleBtn.addEventListener("click", openGradingPanel);
+  closeBtn.addEventListener("click", closeGradingPanel);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !panel.hidden) closeGradingPanel();
+    if (e.key === "Escape") closeRubricPopup();
+  });
+});
+
+/* ===================== TABLE RENDER ===================== */
 function renderGradingTable() {
   const container = document.getElementById("grading-content");
+  if (!container) return;
+
   container.innerHTML = `
     <div style="display:flex; gap:.5rem; align-items:center; margin-bottom:1rem;">
       <input
@@ -178,10 +167,10 @@ function renderGradingTable() {
   const tbody = document.getElementById("grading-tbody");
 
   function updateTable(filter = "") {
-    const assignmentSelect = document.getElementById('assignment-filter');
-    const statusSelect = document.getElementById('status-filter');
-    const assignmentFilter = assignmentSelect ? assignmentSelect.value : '';
-    const statusFilter = statusSelect ? statusSelect.value : '';
+    const assignmentSelect = document.getElementById("assignment-filter");
+    const statusSelect = document.getElementById("status-filter");
+    const assignmentFilter = assignmentSelect ? assignmentSelect.value : "";
+    const statusFilter = statusSelect ? statusSelect.value : "";
 
     const filteredData = gradingData.filter((row) => {
       const matchesStudent = row.student.toLowerCase().includes(filter.toLowerCase());
@@ -191,90 +180,136 @@ function renderGradingTable() {
     });
 
     tbody.innerHTML = filteredData
-      .map(
-        (row, index) => `<tr>
+      .map((row, idxInFiltered) => {
+        // Find real index in gradingData so edits persist
+        const realIndex = gradingData.indexOf(row);
+        return `<tr>
           <td style="border: 1px solid #63b3ed; padding: 0.5rem;">${row.student}</td>
           <td style="border: 1px solid #63b3ed; padding: 0.5rem;">${row.assignment}</td>
           <td style="border: 1px solid #63b3ed; padding: 0.5rem;">
-            <input type="text" value="${row.score}" 
-              style="width: 60px; background: #111; color: #fff; border: 1px solid #63b3ed; border-radius: 4px; padding: 2px;"
-              data-index="${index}" class="score-input"
+            <input type="text" value="${row.score}"
+              style="width: 70px; background: #111; color: #fff; border: 1px solid #63b3ed; border-radius: 4px; padding: 2px;"
+              data-index="${realIndex}" class="score-input"
             />
           </td>
           <td style="border: 1px solid #63b3ed; padding: 0.5rem;">
-            <select data-index="${index}" class="status-select"
+            <select data-index="${realIndex}" class="status-select"
               style="background: #111; color: #fff; border: 1px solid #63b3ed; border-radius: 4px; padding: 2px;">
               <option value="Pending" ${row.status === "Pending" ? "selected" : ""}>Pending</option>
               <option value="Graded" ${row.status === "Graded" ? "selected" : ""}>Graded</option>
             </select>
           </td>
-        </tr>`
-      )
+          <td style="border: 1px solid #63b3ed; padding: 0.5rem;">
+            <button class="rubric-btn" data-index="${realIndex}"
+              style="background:#111; color:#63b3ed; border:1px solid #63b3ed; border-radius:6px; padding:4px 8px; cursor:pointer;">
+              Edit
+            </button>
+          </td>
+        </tr>`;
+      })
       .join("");
 
-    // Score input listener
-    document.querySelectorAll(".score-input").forEach(input => {
-      input.addEventListener("input", e => {
+    document.querySelectorAll(".score-input").forEach((input) => {
+      input.addEventListener("input", (e) => {
         const idx = e.target.dataset.index;
         gradingData[idx].score = e.target.value;
       });
     });
 
-    // Status select listener
-    document.querySelectorAll(".status-select").forEach(select => {
-      select.addEventListener("change", e => {
+    document.querySelectorAll(".status-select").forEach((select) => {
+      select.addEventListener("change", (e) => {
         const idx = e.target.dataset.index;
         gradingData[idx].status = e.target.value;
       });
     });
 
-    // Rubric button listener
-    document.querySelectorAll(".rubric-btn").forEach(btn => {
-      btn.addEventListener("click", e => {
+    document.querySelectorAll(".rubric-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         const idx = e.target.dataset.index;
-        openRubricModal(idx);
+        openRubricPopup(Number(idx));
       });
     });
   }
 
-  updateTable();
-
-  // Populate assignment and status filters dynamically from the data
   function populateFilters() {
-    const assignmentSet = new Set();
-    const statusSet = new Set();
-    gradingData.forEach(r => {
-      if (r.assignment !== undefined && r.assignment !== null) assignmentSet.add(r.assignment);
-      if (r.status !== undefined && r.status !== null) statusSet.add(r.status);
-    });
+    const assignmentSet = new Set(gradingData.map(r => r.assignment));
+    const statusSet = new Set(gradingData.map(r => r.status));
 
-    const assignmentSelect = document.getElementById('assignment-filter');
-    const statusSelect = document.getElementById('status-filter');
+    const assignmentSelect = document.getElementById("assignment-filter");
+    const statusSelect = document.getElementById("status-filter");
 
     if (assignmentSelect) {
-      const opts = ['<option value="">All assignments</option>'].concat(
-        Array.from(assignmentSet).map(v => `<option value="${v}">${v}</option>`)
-      ).join('');
-      assignmentSelect.innerHTML = opts;
-      assignmentSelect.addEventListener('change', () => updateTable(document.getElementById('grading-search').value));
+      assignmentSelect.innerHTML =
+        `<option value="">All assignments</option>` +
+        Array.from(assignmentSet).map(v => `<option value="${v}">${v}</option>`).join("");
+      assignmentSelect.addEventListener("change", () => updateTable(document.getElementById("grading-search").value));
     }
 
     if (statusSelect) {
-      const opts = ['<option value="">All statuses</option>'].concat(
-        Array.from(statusSet).map(v => `<option value="${v}">${v}</option>`)
-      ).join('');
-      statusSelect.innerHTML = opts;
-      statusSelect.addEventListener('change', () => updateTable(document.getElementById('grading-search').value));
+      statusSelect.innerHTML =
+        `<option value="">All statuses</option>` +
+        Array.from(statusSet).map(v => `<option value="${v}">${v}</option>`).join("");
+      statusSelect.addEventListener("change", () => updateTable(document.getElementById("grading-search").value));
     }
   }
 
   populateFilters();
+  updateTable();
 
-  // Live search
   const searchInput = document.getElementById("grading-search");
-  searchInput.addEventListener("input", e => {
-    updateTable(e.target.value);
-  });
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => updateTable(e.target.value));
+  }
+}
+
+/* ===================== RUBRIC POPUP ===================== */
+let currentRubricIndex = null;
+
+function openRubricPopup(index) {
+  currentRubricIndex = index;
+
+  const popup = document.getElementById("rubric-popup");
+  const cats = document.getElementById("rubric-categories");
+  const comments = document.getElementById("rubric-comments");
+
+  if (!popup || !cats || !comments) return;
+
+  const saved = gradingData[index].rubric || { checks: [], comments: "" };
+
+  cats.innerHTML = rubricTemplate.map((label, i) => {
+    const checked = saved.checks.includes(i) ? "checked" : "";
+    return `<label><input type="checkbox" data-r="${i}" ${checked}> ${label}</label><br>`;
+  }).join("");
+
+  comments.value = saved.comments || "";
+
+  popup.style.display = "flex";
+
+  const saveBtn = document.getElementById("rubric-save");
+  const cancelBtn = document.getElementById("rubric-cancel");
+
+  if (saveBtn) {
+    saveBtn.onclick = () => {
+      const checks = Array.from(cats.querySelectorAll("input[type=checkbox]"))
+        .filter(cb => cb.checked)
+        .map(cb => Number(cb.dataset.r));
+
+      gradingData[index].rubric = {
+        checks,
+        comments: comments.value || ""
+      };
+
+      closeRubricPopup();
+    };
+  }
+
+  if (cancelBtn) cancelBtn.onclick = closeRubricPopup;
+}
+
+function closeRubricPopup() {
+  const popup = document.getElementById("rubric-popup");
+  if (popup) popup.style.display = "none";
+  currentRubricIndex = null;
 }
 </script>
 
