@@ -61,53 +61,12 @@ layout: post
                   <div class="date-preview-loading">Loading calendar dates...</div>
                 </div>
               </div>
-              <div class="sync-options">
-                <label class="sync-option">
-                  <input type="checkbox" class="sync-reading-materials" data-sprint="{{ unitKey }}" checked>
-                  <span><i class="fas fa-book"></i> Formative (Monday) - Readings, Lessons</span>
-                </label>
-                <label class="sync-option">
-                  <input type="checkbox" class="sync-assessments" data-sprint="{{ unitKey }}" checked>
-                  <span><i class="fas fa-clipboard-check"></i> Summative (Friday) - Assessments</span>
-                </label>
-              </div>
-              <div class="priority-selector">
-                <label class="priority-label">Priority Level:</label>
-                <div class="priority-options" data-sprint="{{ unitKey }}">
-                  <label class="priority-option priority-p0">
-                    <input type="radio" name="priority-{{ unitKey }}" value="P0" class="priority-radio">
-                    <span class="priority-badge p0">P0</span>
-                    <span class="priority-desc">Critical</span>
-                  </label>
-                  <label class="priority-option priority-p1">
-                    <input type="radio" name="priority-{{ unitKey }}" value="P1" class="priority-radio">
-                    <span class="priority-badge p1">P1</span>
-                    <span class="priority-desc">High</span>
-                  </label>
-                  <label class="priority-option priority-p2">
-                    <input type="radio" name="priority-{{ unitKey }}" value="P2" class="priority-radio" checked>
-                    <span class="priority-badge p2">P2</span>
-                    <span class="priority-desc">Medium</span>
-                  </label>
-                  <label class="priority-option priority-p3">
-                    <input type="radio" name="priority-{{ unitKey }}" value="P3" class="priority-radio">
-                    <span class="priority-badge p3">P3</span>
-                    <span class="priority-desc">Low</span>
-                  </label>
-                </div>
-              </div>
               <div class="date-actions">
-                <button class="sync-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
+                <button class="advanced-sync-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
                   <i class="fas fa-sync"></i> Sync to Calendar
                 </button>
-                <button class="advanced-sync-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
-                  <i class="fas fa-sliders-h"></i> Advanced Sync
-                </button>
-                <button class="delete-sprint-calendar-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
-                  <i class="fas fa-trash-alt"></i> Remove from Calendar
-                </button>
                 <button class="advanced-remove-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
-                  <i class="fas fa-list-check"></i> Advanced Remove
+                  <i class="fas fa-trash-alt"></i> Remove from Calendar
                 </button>
               </div>
               <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
@@ -221,7 +180,7 @@ layout: post
                         {% assign itemType = "lesson" %}
                       {% endif %}
 
-                      <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}">
+                      <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}" data-title="{{ parts[0] }}">
                         <div class="item-content">
                           <button class="completion-toggle">
                             <i class="fas fa-circle status-icon incomplete"></i>
@@ -234,6 +193,14 @@ layout: post
                             {% endif %}
                             <span class="item-title">{{ parts[0] }}</span>
                           </a>
+                          <div class="item-priority-selector">
+                            <select class="item-priority-dropdown" data-item-url="{{ parts[1] }}">
+                              <option value="P3">P3</option>
+                              <option value="P2" selected>P2</option>
+                              <option value="P1">P1</option>
+                              <option value="P0">P0</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
                     {% endfor %}
@@ -515,6 +482,82 @@ layout: post
     });
     
     updateProgressBars();
+  }
+
+  // ===========================
+  // ITEM PRIORITY SYSTEM
+  // ===========================
+  
+  const ITEM_PRIORITY_KEY = `item_priorities_${window.location.pathname}`;
+  
+  // Load item priorities from localStorage
+  function loadItemPriorities() {
+    try {
+      const stored = localStorage.getItem(ITEM_PRIORITY_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error('Error loading item priorities:', e);
+      return {};
+    }
+  }
+  
+  // Save item priorities to localStorage
+  function saveItemPriorities(data) {
+    try {
+      localStorage.setItem(ITEM_PRIORITY_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Error saving item priorities:', e);
+    }
+  }
+  
+  // Update dropdown styling based on priority
+  function updatePriorityDropdownStyle(dropdown) {
+    const value = dropdown.value.toLowerCase();
+    dropdown.classList.remove('priority-p0', 'priority-p1', 'priority-p2', 'priority-p3');
+    dropdown.classList.add(`priority-${value}`);
+  }
+  
+  // Get item priority (for use by calendar sync)
+  function getItemPriority(itemUrl) {
+    const priorities = loadItemPriorities();
+    return priorities[itemUrl] || 'P2';
+  }
+  
+  // Initialize item priority dropdowns
+  function initializeItemPriorities() {
+    const priorities = loadItemPriorities();
+    const dropdowns = document.querySelectorAll('.item-priority-dropdown');
+    
+    dropdowns.forEach(dropdown => {
+      const itemUrl = dropdown.dataset.itemUrl;
+      
+      // Load saved priority or default to P2
+      const savedPriority = priorities[itemUrl] || 'P2';
+      dropdown.value = savedPriority;
+      updatePriorityDropdownStyle(dropdown);
+      
+      // Add change listener
+      dropdown.addEventListener('change', function(e) {
+        e.stopPropagation();
+        const newPriority = this.value;
+        const itemUrl = this.dataset.itemUrl;
+        
+        // Save to localStorage
+        const currentPriorities = loadItemPriorities();
+        currentPriorities[itemUrl] = newPriority;
+        saveItemPriorities(currentPriorities);
+        
+        // Update styling
+        updatePriorityDropdownStyle(this);
+        
+        console.log(`Item priority updated: ${itemUrl} → ${newPriority}`);
+      });
+      
+      // Prevent click propagation so dropdown works
+      dropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    });
   }
   
   // Filter functionality - per sprint
@@ -1250,6 +1293,7 @@ layout: post
   document.addEventListener('DOMContentLoaded', function() {
     initializeProgressBars();
     initializeCompletion();
+    initializeItemPriorities();
     initializeSprintFilters();
     initializeCertificateSystem();
     renderWeekGoalPreviews();
