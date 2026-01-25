@@ -26,7 +26,17 @@
     'fa': { name: 'Persian (Farsi)', code: 'fa' },
   };
 
+  // Site Default uses the website's native CSS colors (from user-colors.scss)
+  const SITE_DEFAULT = {
+    bg: '#121212',      // From user-colors.scss $background
+    text: '#F0F0F0',    // From root-color-map.scss $text
+    font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+    size: 14,
+    accent: '#4CAFEF',  // From root-color-map.scss $accent
+  };
+
   const PRESETS = {
+    'Site Default': SITE_DEFAULT,
     Midnight: {
       bg: '#0b1220',
       text: '#e6eef8',
@@ -111,7 +121,7 @@
   }
 
   function applyPreferences(prefs) {
-    const base = PRESETS.Midnight;
+    const base = SITE_DEFAULT;
     const bg = prefs?.bg || base.bg;
     const text = prefs?.text || base.text;
     const font = prefs?.font || base.font;
@@ -437,18 +447,19 @@
 
     // Wait for Google Translate to be ready, then trigger translation
     const attemptTranslation = (attempts = 0) => {
-      if (attempts > 50) return; // Give up after 5 seconds
+      if (attempts > 100) return; // Give up after 5 seconds (100 attempts * 50ms)
       
       const select = document.querySelector('.goog-te-combo');
       if (select) {
         select.value = langCode;
         select.dispatchEvent(new Event('change'));
       } else {
-        setTimeout(() => attemptTranslation(attempts + 1), 100);
+        setTimeout(() => attemptTranslation(attempts + 1), 50); // Faster polling (50ms instead of 100ms)
       }
     };
     
-    setTimeout(() => attemptTranslation(), 500);
+    // Start attempting immediately, then poll quickly
+    attemptTranslation();
   }
 
   function clearGoogleTranslateCookies() {
@@ -602,10 +613,20 @@
 
   function init() {
     if (typeof window === 'undefined') return;
+    
+    // Check if user explicitly reset preferences - if so, don't load anything
+    const wasReset = window.localStorage.getItem('preferencesReset');
+    if (wasReset === 'true') {
+      // Don't clear the flag here - let the dashboard page handle that
+      // Just don't apply any preferences
+      return;
+    }
+    
     const prefs = loadStoredPreferences();
     if (prefs) {
       applyPreferences(prefs);
     }
+    // If no stored preferences, don't apply anything - let site's default CSS show through
   }
 
   // Expose helpers for dashboard.html to reuse
