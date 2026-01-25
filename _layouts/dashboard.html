@@ -1022,6 +1022,8 @@ score += gists * 0.5
                                 if (backendPrefs) {
                                     cachedPrefs = backendPrefs;
                                     applyPreferences(backendPrefs);
+                                    // Sync backend prefs to localStorage so other pages use the same settings
+                                    localStorage.setItem(localStorageKey, JSON.stringify(backendPrefs));
                                     return backendPrefs;
                                 }
                             }
@@ -1049,17 +1051,15 @@ score += gists * 0.5
                             applyPreferences(prefs);
                             populateForm(prefs);
                             
+                            // Always save to localStorage so other pages can use the updated preferences
+                            localStorage.setItem(localStorageKey, JSON.stringify(prefs));
+                            
                             if (isLoggedIn) {
                                 const success = await savePreferencesToBackend(prefs);
                                 if (!success) {
-                                    // Fallback to localStorage if backend save fails
-                                    localStorage.setItem(localStorageKey, JSON.stringify(prefs));
                                     showStatus('Saved locally (backend unavailable)');
                                     return;
                                 }
-                            } else {
-                                // Guest user - save to localStorage
-                                localStorage.setItem(localStorageKey, JSON.stringify(prefs));
                             }
                         } catch (e) { 
                             console.error('savePreferences error', e); 
