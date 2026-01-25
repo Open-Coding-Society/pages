@@ -1002,24 +1002,16 @@
       const titlesToDelete = [];
       const priorities = ['P0', 'P1', 'P2', 'P3'];
       
-      Object.keys(selectedItems).forEach(weekNum => {
-        const weekData = selectedItems[weekNum];
+      // Build titles to delete based on selected items - must match sync format exactly
+      selectedItems.forEach(item => {
+        const emoji = item.type === 'formative' ? '📚' : '📝';
         
-        // Add formative event titles if any items selected
-        if (weekData.formative.length > 0) {
-          priorities.forEach(p => {
-            titlesToDelete.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
-          });
-          titlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
-        }
-        
-        // Add summative event titles if any items selected
-        if (weekData.summative.length > 0) {
-          priorities.forEach(p => {
-            titlesToDelete.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
-          });
-          titlesToDelete.push(`📝 Week ${weekNum} Summative - ${courseName}`);
-        }
+        // Try all priority variations since we don't know what priority was used when syncing
+        priorities.forEach(p => {
+          titlesToDelete.push(`[${p}] ${emoji} ${item.title} - ${courseName}`);
+        });
+        // Also try without priority prefix (in case it was synced without priority)
+        titlesToDelete.push(`${emoji} ${item.title} - ${courseName}`);
       });
       
       if (titlesToDelete.length === 0) {
@@ -1027,7 +1019,7 @@
         return;
       }
       
-      console.log(`Removing ${titlesToDelete.length} potential events from calendar`);
+      console.log(`Removing ${titlesToDelete.length} potential events from calendar`, titlesToDelete);
       
       let deletedCount = 0;
       
