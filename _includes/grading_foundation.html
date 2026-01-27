@@ -3,7 +3,7 @@
 <!-- Enable on any page by adding `grading: true` to front matter -->
 
 <script>
-  // Global feature registry (safe)
+// Global feature registry (safe)
   window.PageFeatures = window.PageFeatures || {};
 
   // ✅ FORCE ENABLE grading
@@ -12,7 +12,7 @@
 
 @@ -45,55 +45,16 @@ <h1>📊 Grading Dashboard</h1>
   </div>
-</div>
+</aside>
 
 <!-- Rubric Modal -->
 <div id="rubric-modal" class="rubric-modal" hidden>
@@ -145,6 +145,7 @@ function renderGradingTable() {
         const idx = e.target.dataset.index;
         gradingData[idx].score = e.target.value;
       });
+    });
 
     // Status select listener
     document.querySelectorAll(".status-select").forEach(select => {
