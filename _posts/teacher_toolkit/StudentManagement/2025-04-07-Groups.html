@@ -246,6 +246,7 @@ let activePeriods = [];
 let activeClasses = [];
 let loadingCount = 0;  // Track concurrent loading operations
 let isAdmin = false;   // Track if current user is an admin
+let selectedUsersForGroup = {}; // Track multi-select members per group
 
 /* ================================
    LOADING HELPERS
@@ -333,8 +334,16 @@ window.getPersonById = function (personId) {
   return peopleCache.find(p => p.id === personId);
 };
 
-// Track selected user for each group
-let selectedUserForGroup = {};
+// Helpers for multi-select state per group
+function getSelectedUsers(groupId) {
+  return selectedUsersForGroup[groupId] || [];
+}
+
+function setSelectedUsers(groupId, users) {
+  selectedUsersForGroup[groupId] = users;
+  updateAddSelectedButton(groupId);
+  updateSearchResultsSelection(groupId);
+}
 
 // Search for users by name or GitHub ID with chaining
 window.searchPeopleForGroup = function (groupId) {
@@ -361,6 +370,7 @@ window.searchPeopleForGroup = function (groupId) {
 // Display search results in dropdown
 window.displaySearchResults = function (groupId, results) {
   const dropdown = document.getElementById(`search-results-${groupId}`);
+  const selected = getSelectedUsers(groupId).map(u => u.id);
   
   if (!results || results.length === 0) {
     dropdown.innerHTML = `
@@ -370,84 +380,89 @@ window.displaySearchResults = function (groupId, results) {
     return;
   }
   
-  dropdown.innerHTML = results.map(person => `
-    <div 
-      class="px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center justify-between text-sm"
-      onclick="selectUserForGroup(${groupId}, ${person.id}, '${person.uid}', '${person.name.replace(/'/g, "\\'")}')">
-      <div>
-        <span class="text-white font-medium">${person.name}</span>
-        <span class="text-gray-400 ml-2">@${person.uid}</span>
+  dropdown.innerHTML = results.map(person => {
+    const isSelected = selected.includes(person.id);
+    return `
+      <div 
+        class="px-3 py-2 ${isSelected ? "bg-neutral-600 border border-neutral-500" : "hover:bg-neutral-600"} cursor-pointer flex items-center justify-between text-sm"
+        data-person-id="${person.id}"
+        onclick="toggleUserSelectionFromResult(${groupId}, ${person.id}, '${person.uid}', '${person.name.replace(/'/g, "\\'")}')">
+        <div>
+          <span class="text-white font-medium">${person.name}</span>
+          <span class="text-gray-400 ml-2">@${person.uid}</span>
+        </div>
+        <span class="text-xs ${isSelected ? "text-green-400" : "text-gray-500"}">${isSelected ? "Selected" : "Tap to select"}</span>
       </div>
-      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-      </svg>
-    </div>
-  `).join("");
+    `;
+  }).join("");
   
   dropdown.classList.remove("hidden");
 }
 
-// Select a user from search results
-window.selectUserForGroup = function (groupId, personId, uid, name) {
-  selectedUserForGroup[groupId] = { id: personId, uid, name };
-  
-  // Update input to show selected user
-  const searchInput = document.getElementById(`member-search-${groupId}`);
-  searchInput.value = `${name} (@${uid})`;
-  searchInput.dataset.selectedId = personId;
-  searchInput.dataset.selectedUid = uid;
-  searchInput.dataset.selectedName = name;
-  
-  // Hide dropdown
-  document.getElementById(`search-results-${groupId}`).classList.add("hidden");
+// Toggle user selection from search results
+window.toggleUserSelectionFromResult = function (groupId, personId, uid, name) {
+  const current = getSelectedUsers(groupId);
+  const exists = current.find(u => u.id === personId);
+  const updated = exists
+    ? current.filter(u => u.id !== personId)
+    : [...current, { id: personId, uid, name }];
+  setSelectedUsers(groupId, updated);
 }
 
-// Clear search selection
+// Clear selected users for a group
 window.clearSearchSelection = function (groupId) {
-  delete selectedUserForGroup[groupId];
+  setSelectedUsers(groupId, []);
   const searchInput = document.getElementById(`member-search-${groupId}`);
-  searchInput.value = "";
-  delete searchInput.dataset.selectedId;
-  delete searchInput.dataset.selectedUid;
-  delete searchInput.dataset.selectedName;
-  document.getElementById(`search-results-${groupId}`).classList.add("hidden");
+  if (searchInput) searchInput.value = "";
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  if (dropdown) dropdown.classList.add("hidden");
 }
 
-// Add selected member to group with chaining
-window.addSelectedMemberToGroup = function (groupId) {
-  const selected = selectedUserForGroup[groupId];
+// Add all selected members to group with chaining
+window.addSelectedMembersToGroup = async function (groupId) {
+  const selected = getSelectedUsers(groupId);
   
-  if (!selected) {
-    alert("Please search and select a user first");
+  if (!selected.length) {
+    alert("Please select at least one user");
     return;
   }
   
-  showLoading("Adding member...");
-  
-  fetch(`${javaURI}/api/groups/${groupId}/members/${selected.id}`, { ...fetchOptions, method: "POST" })
-    .then(res => {
+  showLoading("Adding members...");
+  const successes = [];
+  const failures = [];
+
+  for (const person of selected) {
+    try {
+      const res = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, { ...fetchOptions, method: "POST" });
       if (!res.ok) {
-        return res.text().then(text => {
-          console.error("ADD MEMBER ERROR:", text);
-          return Promise.reject(new Error("Failed to add member"));
-        });
+        const text = await res.text();
+        console.error("ADD MEMBER ERROR:", text);
+        failures.push(person);
+        continue;
       }
-      return res;
-    })
-    .then(() => {
-      // Update local state
-      const group = allGroups.find(g => g.id === groupId);
-      if (group) {
-        if (!group.members) group.members = [];
-        if (!group.members.find(m => m.id === selected.id)) {
-          group.members.push({ id: selected.id, name: selected.name, uid: selected.uid });
-        }
+      successes.push(person);
+    } catch (err) {
+      console.error("ADD MEMBER ERROR:", err);
+      failures.push(person);
+    }
+  }
+
+  const group = allGroups.find(g => g.id === groupId);
+  if (group) {
+    if (!group.members) group.members = [];
+    successes.forEach(person => {
+      if (!group.members.find(m => m.id === person.id)) {
+        group.members.push({ id: person.id, name: person.name, uid: person.uid });
       }
-      clearSearchSelection(groupId);
-      renderGroups();
-    })
-    .catch(err => alert(err.message))
-    .finally(() => hideLoading());
+    });
+  }
+
+  setSelectedUsers(groupId, []);
+  renderGroups();
+  if (failures.length) {
+    alert(`Added ${successes.length} member(s). ${failures.length} failed. Check console for details.`);
+  }
+  hideLoading();
 }
 
 // Add member to group with chaining - updates local state instead of refetching
@@ -668,7 +683,7 @@ window.renderGroups = function () {
             class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             id="member-search-${group.id}"
             onkeydown="if(event.key==='Enter') searchPeopleForGroup(${group.id})"
-            oninput="if(!this.dataset.selectedId) document.getElementById('search-results-${group.id}').classList.add('hidden')"
+            oninput="if(!this.value.trim()) document.getElementById('search-results-${group.id}').classList.add('hidden')"
           />
 
           <!-- Search button -->
@@ -683,10 +698,12 @@ window.renderGroups = function () {
 
           <!-- Add selected user -->
           <button
-            class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-lg font-bold transition-colors"
-            title="Add selected member"
-            onclick="addSelectedMemberToGroup(${group.id})">
-            +
+            id="add-selected-btn-${group.id}"
+            class="px-4 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Add selected members"
+            onclick="addSelectedMembersToGroup(${group.id})"
+            disabled>
+            Add Selected
           </button>
         </div>
 
@@ -698,6 +715,29 @@ window.renderGroups = function () {
       </div>
     `;
     container.appendChild(el);
+    updateAddSelectedButton(group.id);
+  });
+}
+
+// Update add button label/state based on selection count
+function updateAddSelectedButton(groupId) {
+  const btn = document.getElementById(`add-selected-btn-${groupId}`);
+  if (!btn) return;
+  const count = getSelectedUsers(groupId).length;
+  btn.textContent = count ? `Add Selected (${count})` : "Add Selected";
+  btn.disabled = count === 0;
+}
+
+// Highlight selected rows in search dropdown after rerender
+function updateSearchResultsSelection(groupId) {
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  if (!dropdown) return;
+  const selectedIds = getSelectedUsers(groupId).map(u => u.id);
+  dropdown.querySelectorAll("[data-person-id]").forEach(item => {
+    const id = Number(item.dataset.personId);
+    const isSelected = selectedIds.includes(id);
+    item.classList.toggle("bg-neutral-600", isSelected);
+    item.classList.toggle("border", isSelected);
   });
 }
 
