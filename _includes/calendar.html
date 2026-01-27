@@ -26,15 +26,13 @@
         <button type="button" class="quick-action-btn" id="sync-select-summative"><i class="fas fa-clipboard-check"></i> Summative Only</button>
       </div>
       
-      <!-- Priority Selector -->
-      <div class="sync-modal-priority">
-        <label class="priority-label">Priority Level:</label>
-        <div class="priority-options-inline">
-          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P0"><span class="priority-badge p0">P0</span></label>
-          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P1"><span class="priority-badge p1">P1</span></label>
-          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P2" checked><span class="priority-badge p2">P2</span></label>
-          <label class="priority-option-inline"><input type="radio" name="sync-modal-priority" value="P3"><span class="priority-badge p3">P3</span></label>
-        </div>
+      <!-- Bulk Priority Setter -->
+      <div class="sync-bulk-priority">
+        <span class="bulk-priority-label">Set all priorities to:</span>
+        <button type="button" class="bulk-priority-btn p0" data-priority="P0">P0</button>
+        <button type="button" class="bulk-priority-btn p1" data-priority="P1">P1</button>
+        <button type="button" class="bulk-priority-btn p2" data-priority="P2">P2</button>
+        <button type="button" class="bulk-priority-btn p3" data-priority="P3">P3</button>
       </div>
       
       <!-- Week Selection List -->
@@ -126,7 +124,7 @@
   // ============================= 
   //   SCHOOL CALENDAR SYSTEM     
   // ============================= 
-  
+
   // School Calendar data is loaded from JSON script tag to avoid Liquid template lint errors
   let SCHOOL_CALENDAR = {};
   try {
@@ -310,8 +308,8 @@
   
   // Initialize sprint calendar controls
   async function initializeSprintDates() {
-    // Populate all sprint date previews
-    document.querySelectorAll('.sync-sprint-calendar-btn').forEach(btn => {
+    // Populate all sprint date previews (using advanced-sync-btn as reference)
+    document.querySelectorAll('.advanced-sync-btn').forEach(btn => {
       const sprintKey = btn.dataset.sprint;
       const startWeek = parseInt(btn.dataset.startWeek);
       const endWeek = parseInt(btn.dataset.endWeek);
@@ -351,20 +349,7 @@
       }
     });
     
-    // Sync button handlers - direct sync (original functionality)
-    document.querySelectorAll('.sync-sprint-calendar-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const sprintKey = btn.dataset.sprint;
-        const course = btn.dataset.course;
-        const startWeek = parseInt(btn.dataset.startWeek);
-        const endWeek = parseInt(btn.dataset.endWeek);
-        
-        await syncSprintToCalendar(sprintKey, course, startWeek, endWeek);
-      });
-    });
-    
-    // Advanced sync button handlers - open selective sync modal
+    // Sync button handlers - open selective sync modal
     document.querySelectorAll('.advanced-sync-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -377,20 +362,7 @@
       });
     });
     
-    // Delete button handlers - direct delete (original functionality)
-    document.querySelectorAll('.delete-sprint-calendar-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const sprintKey = btn.dataset.sprint;
-        const course = btn.dataset.course;
-        const startWeek = parseInt(btn.dataset.startWeek);
-        const endWeek = parseInt(btn.dataset.endWeek);
-        
-        await deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek);
-      });
-    });
-    
-    // Advanced remove button handlers - open selective remove modal
+    // Remove button handlers - open selective remove modal
     document.querySelectorAll('.advanced-remove-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
@@ -405,256 +377,6 @@
     
     // Initialize selective sync/remove modal handlers
     initializeSelectiveSyncModals();
-  }
-  
-  // Main function to sync sprint to calendar
-  async function syncSprintToCalendar(sprintKey, course, startWeek, endWeek) {
-    const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
-    const btn = document.querySelector(`.sync-sprint-calendar-btn[data-sprint="${sprintKey}"]`);
-    
-    // Get sync options (Checkpoints are added manually by instructor, not synced here)
-    const syncFormative = document.querySelector(`.sync-reading-materials[data-sprint="${sprintKey}"]`)?.checked ?? true;
-    const syncSummative = document.querySelector(`.sync-assessments[data-sprint="${sprintKey}"]`)?.checked ?? true;
-
-    // Get selected priority level (default to P2 if none selected)
-    const priorityRadio = document.querySelector(`input[name="priority-${sprintKey}"]:checked`);
-    const priority = priorityRadio?.value || 'P2';
-    
-    btn.disabled = true;
-    showDateStatus(statusEl, 'Syncing to calendar...', 'loading');
-    
-    try {
-      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
-      const javaURI = configModule.javaURI;
-      
-      // Get sprint info
-      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
-      const courseName = course.toUpperCase();
-      
-      const events = [];
-      
-      // Process each week in the sprint (no sprint start/end events - only calendar items)
-      const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
-      
-      for (const weekCard of weekCards) {
-        const weekNum = parseInt(weekCard.dataset.week);
-        const lessons = weekCard.dataset.lessons || '';
-        const assignments = weekCard.dataset.assignments || '';
-        
-        const readingDate = getReadingDate(weekNum);
-        const assessmentDate = getAssessmentDate(weekNum);
-        
-        // MONDAY (or Tuesday if holiday): FORMATIVE - All reading materials/lessons for the week
-        if (syncFormative && readingDate) {
-          // Get all lesson titles and URLs for this week
-          const lessonList = lessons.split(';;;').filter(l => l.trim());
-          
-          // Remove duplicates (same title)
-          const uniqueLessons = [];
-          const seenTitles = new Set();
-          for (const l of lessonList) {
-            const [title] = l.split('|||');
-            if (!seenTitles.has(title)) {
-              seenTitles.add(title);
-              uniqueLessons.push(l);
-            }
-          }
-          
-          if (uniqueLessons.length > 0) {
-            // Create ONE formative event with all lessons listed
-            const lessonItems = uniqueLessons.map(l => {
-              const [title, url] = l.split('|||');
-              const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
-              return `• ${title}${fullUrl ? '\n  ' + fullUrl : ''}`;
-            }).join('\n\n');
-            
-            events.push({
-              title: `[${priority}] 📚 Week ${weekNum} Formative - ${courseName}`,
-              description: `Reading Materials:\n\n${lessonItems}`,
-              date: readingDate,
-              period: courseName,
-              priority: priority
-            });
-          }
-        }
-        
-        // FRIDAY: SUMMATIVE - All assessments for the week
-        // Note: Checkpoints are manually added by instructors through the calendar UI
-        if (syncSummative && assessmentDate && assignments) {
-          const assignmentList = assignments.split(';;;').filter(a => a.trim());
-          
-          // Remove duplicates (same title)
-          const uniqueAssignments = [];
-          const seenTitles = new Set();
-          for (const a of assignmentList) {
-            const [title] = a.split('|||');
-            if (!seenTitles.has(title)) {
-              seenTitles.add(title);
-              uniqueAssignments.push(a);
-            }
-          }
-          
-          if (uniqueAssignments.length > 0) {
-            // Create ONE summative event with all assignments listed
-            const assignmentItems = uniqueAssignments.map(a => {
-              const [title, url] = a.split('|||');
-              const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
-              return `• ${title}${fullUrl ? '\n  ' + fullUrl : ''}`;
-            }).join('\n\n');
-            
-            events.push({
-              title: `[${priority}] 📝 Week ${weekNum} Summative - ${courseName}`,
-              description: `Assessments Due:\n\n${assignmentItems}`,
-              date: assessmentDate,
-              period: courseName,
-              priority: priority
-            });
-          }
-        }
-        
-        // Checkpoints are added manually by instructor via calendar UI, not auto-synced
-      }
-      
-      // Check if we have any events to sync
-      if (events.length === 0) {
-        showDateStatus(statusEl, 'No events to sync for this sprint', 'warning');
-        btn.disabled = false;
-        return;
-      }
-      
-      // Send all events to calendar API
-      console.log(`Adding ${events.length} events to calendar for ${sprintKey}`);
-      console.log('Events:', events);
-      
-      // Send individual requests in parallel
-      let successCount = 0;
-      try {
-        const results = await Promise.all(
-          events.map(event => 
-            fetch(`${javaURI}/api/calendar/add_event`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify(event)
-            }).then(res => res.ok).catch(() => false)
-          )
-        );
-        successCount = results.filter(r => r).length;
-      } catch (err) {
-        console.error('Error adding events:', err);
-      }
-      
-      console.log(`Successfully added ${successCount}/${events.length} events`);
-      
-      if (successCount === events.length) {
-        showDateStatus(statusEl, `✓ Added ${successCount} events to calendar!`, 'success');
-      } else if (successCount > 0) {
-        showDateStatus(statusEl, `⚠ Added ${successCount}/${events.length} events`, 'warning');
-      } else {
-        showDateStatus(statusEl, '✗ Failed to add events. Are you logged in?', 'error');
-      }
-      
-    } catch (error) {
-      console.error('Error syncing sprint to calendar:', error);
-      showDateStatus(statusEl, 'Error syncing to calendar', 'error');
-    } finally {
-      btn.disabled = false;
-    }
-  }
-  
-  // Main function to delete sprint events from calendar
-  async function deleteSprintFromCalendar(sprintKey, course, startWeek, endWeek) {
-    const statusEl = document.querySelector(`.sprint-date-status[data-sprint="${sprintKey}"]`);
-    const btn = document.querySelector(`.delete-sprint-calendar-btn[data-sprint="${sprintKey}"]`);
-    
-    // Confirm before deleting
-    const courseName = course.toUpperCase();
-    const confirmMessage = `Are you sure you want to remove all ${courseName} events for ${sprintKey} (Weeks ${startWeek}-${endWeek}) from your calendar?`;
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-    
-    btn.disabled = true;
-    showDateStatus(statusEl, 'Removing events from calendar...', 'loading');
-    
-    try {
-      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
-      const javaURI = configModule.javaURI;
-      
-      // Get sprint info
-      const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
-      
-      // Build list of event titles to delete (matching what was synced)
-      const eventTitlesToDelete = [];
-      const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
-      
-      for (const weekCard of weekCards) {
-        const weekNum = parseInt(weekCard.dataset.week);
-
-        // Formative event title patterns (with all priority levels)
-        ['P0', 'P1', 'P2', 'P3'].forEach(p => {
-          eventTitlesToDelete.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
-          eventTitlesToDelete.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
-        });
-        // Also include old format without priority for backwards compatibility
-        eventTitlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
-        
-        // Summative event title pattern
-        eventTitlesToDelete.push(`📝 Week ${weekNum} Summative - ${courseName}`);
-      }
-      
-      console.log(`Deleting ${eventTitlesToDelete.length} potential events for ${sprintKey}`);
-      console.log('Event titles to delete:', eventTitlesToDelete);
-      
-      let deletedCount = 0;
-      
-      // Try bulk delete endpoint first
-      try {
-        const bulkResponse = await fetch(`${javaURI}/api/calendar/delete_events`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ titles: eventTitlesToDelete })
-        });
-        
-        if (bulkResponse.ok) {
-          const result = await bulkResponse.json();
-          deletedCount = result.deleted || 0;
-        } else if (bulkResponse.status === 404) {
-          // Bulk endpoint not available, fall back to individual deletes
-          console.log('Bulk delete endpoint not available, using individual requests');
-          const results = await Promise.all(
-            eventTitlesToDelete.map(title => 
-              fetch(`${javaURI}/api/calendar/delete_event`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ title: title })
-              }).then(res => res.ok ? 1 : 0).catch(() => 0)
-            )
-          );
-          deletedCount = results.reduce((a, b) => a + b, 0);
-        } else {
-          console.error('Failed to delete events:', bulkResponse.status);
-        }
-      } catch (err) {
-        console.error('Error deleting events:', err);
-      }
-      
-      console.log(`Successfully deleted ${deletedCount} events`);
-      
-      if (deletedCount > 0) {
-        showDateStatus(statusEl, `✓ Removed ${deletedCount} events from calendar!`, 'success');
-      } else {
-        showDateStatus(statusEl, '⚠ No events found to remove', 'warning');
-      }
-      
-    } catch (error) {
-      console.error('Error deleting sprint from calendar:', error);
-      showDateStatus(statusEl, 'Error removing from calendar', 'error');
-    } finally {
-      btn.disabled = false;
-    }
   }
   
   // Show status message
@@ -772,6 +494,27 @@
     const weekCards = sprintCard?.querySelectorAll('.week-card') || [];
     const courseName = course.toUpperCase();
     
+    // Load saved item priorities from localStorage
+    const ITEM_PRIORITY_KEY = `item_priorities_${window.location.pathname}`;
+    let savedPriorities = {};
+    try {
+      const stored = localStorage.getItem(ITEM_PRIORITY_KEY);
+      savedPriorities = stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.warn('Could not load saved priorities:', e);
+    }
+    
+    // Helper to get saved priority for an item
+    const getSavedPriority = (url) => savedPriorities[url] || 'P2';
+    
+    // Helper to build priority options with saved selection
+    const buildPriorityOptions = (url) => {
+      const saved = getSavedPriority(url);
+      return ['P0', 'P1', 'P2', 'P3'].map(p => 
+        `<option value="${p}"${p === saved ? ' selected' : ''}>${p}</option>`
+      ).join('');
+    };
+    
     let html = '';
     
     for (const weekCard of weekCards) {
@@ -823,8 +566,12 @@
                 <div class="sync-item-list">
                   ${formativeItems.map(item => `
                     <label class="sync-item-checkbox">
-                      <input type="checkbox" class="item-checkbox" data-week="${weekNum}" data-type="formative" data-id="${item.id}" data-title="${item.title}" data-url="${item.url || ''}" checked>
+                      <input type="checkbox" class="item-checkbox" data-week="${weekNum}" data-type="formative" data-id="${item.id}" data-title="${item.title}" data-url="${item.url || ''}" data-default-date="${readingDate || ''}" checked>
                       <span class="item-title">${item.title}</span>
+                      <select class="item-priority-select" data-id="${item.id}" data-url="${item.url || ''}">
+                        ${buildPriorityOptions(item.url)}
+                      </select>
+                      <input type="date" class="item-date-input" data-id="${item.id}" value="${readingDate || ''}" title="Custom date (leave as-is to use default)">
                       ${item.url ? `<a href="{{ site.baseurl }}${item.url}" target="_blank" class="item-link-icon" onclick="event.stopPropagation()"><i class="fas fa-external-link-alt"></i></a>` : ''}
                     </label>
                   `).join('')}
@@ -843,8 +590,12 @@
                 <div class="sync-item-list">
                   ${summativeItems.map(item => `
                     <label class="sync-item-checkbox">
-                      <input type="checkbox" class="item-checkbox" data-week="${weekNum}" data-type="summative" data-id="${item.id}" data-title="${item.title}" data-url="${item.url || ''}" checked>
+                      <input type="checkbox" class="item-checkbox" data-week="${weekNum}" data-type="summative" data-id="${item.id}" data-title="${item.title}" data-url="${item.url || ''}" data-default-date="${assessmentDate || ''}" checked>
                       <span class="item-title">${item.title}</span>
+                      <select class="item-priority-select" data-id="${item.id}" data-url="${item.url || ''}">
+                        ${buildPriorityOptions(item.url)}
+                      </select>
+                      <input type="date" class="item-date-input" data-id="${item.id}" value="${assessmentDate || ''}" title="Custom date (leave as-is to use default)">
                       ${item.url ? `<a href="{{ site.baseurl }}${item.url}" target="_blank" class="item-link-icon" onclick="event.stopPropagation()"><i class="fas fa-external-link-alt"></i></a>` : ''}
                     </label>
                   `).join('')}
@@ -1040,6 +791,20 @@
         updateSelectedCount(modalType);
       });
     });
+    
+    // Prevent date inputs from triggering label clicks
+    listEl.querySelectorAll('.item-date-input').forEach(input => {
+      input.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    });
+    
+    // Prevent priority selects from triggering label clicks  
+    listEl.querySelectorAll('.item-priority-select').forEach(select => {
+      select.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    });
   }
   
   // Update category checkbox state based on items
@@ -1083,22 +848,34 @@
     const listEl = document.getElementById(listId);
     
     const selectedItems = [];
-    const itemsByWeek = {};
     
     listEl.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
       const weekNum = parseInt(checkbox.dataset.week);
       const type = checkbox.dataset.type;
       const title = checkbox.dataset.title;
       const url = checkbox.dataset.url;
+      const itemId = checkbox.dataset.id;
+      const defaultDate = checkbox.dataset.defaultDate;
       
-      if (!itemsByWeek[weekNum]) {
-        itemsByWeek[weekNum] = { formative: [], summative: [] };
-      }
+      // Get the individual priority for this item
+      const prioritySelect = listEl.querySelector(`.item-priority-select[data-id="${itemId}"]`);
+      const priority = prioritySelect?.value || 'P2';
       
-      itemsByWeek[weekNum][type].push({ title, url });
+      // Get the custom date (if user changed it) or use default
+      const dateInput = listEl.querySelector(`.item-date-input[data-id="${itemId}"]`);
+      const customDate = dateInput?.value || defaultDate;
+      
+      selectedItems.push({
+        weekNum,
+        type,
+        title,
+        url,
+        priority,
+        customDate
+      });
     });
     
-    return itemsByWeek;
+    return selectedItems;
   }
   
   // Execute selective sync
@@ -1107,8 +884,6 @@
     
     const { sprintKey, course, startWeek, endWeek } = currentSyncModalData;
     const selectedItems = getSelectedItems('sync');
-    const priority = document.querySelector('input[name="sync-modal-priority"]:checked')?.value || 'P2';
-    const duplicateAction = document.querySelector('input[name="duplicate-action"]:checked')?.value || 'update';
     
     const courseName = course.toUpperCase();
     const confirmBtn = document.getElementById('confirm-selective-sync');
@@ -1121,50 +896,46 @@
       
       const events = [];
       
-      Object.keys(selectedItems).forEach(weekNum => {
-        const weekData = selectedItems[weekNum];
-        const readingDate = getReadingDate(parseInt(weekNum));
-        const assessmentDate = getAssessmentDate(parseInt(weekNum));
+      // Create individual events for each item with its own priority and custom date
+      selectedItems.forEach(item => {
+        const { weekNum, type, title, url, priority, customDate } = item;
         
-        // Build formative event if any items selected
-        if (weekData.formative.length > 0 && readingDate) {
-          const lessonItems = weekData.formative.map(item => {
-            const fullUrl = item.url ? window.location.origin + '{{ site.baseurl }}' + item.url : '';
-            return `• ${item.title}${fullUrl ? '\n  ' + fullUrl : ''}`;
-          }).join('\n\n');
-          
-          events.push({
-            title: `[${priority}] 📚 Week ${weekNum} Formative - ${courseName}`,
-            description: `Reading Materials:\n\n${lessonItems}`,
-            date: readingDate,
-            period: courseName,
-            priority: priority
-          });
+        // Use custom date if provided, otherwise fall back to calculated date
+        let eventDate = customDate;
+        let emoji;
+        let typeLabel;
+        
+        if (type === 'formative') {
+          if (!eventDate) eventDate = getReadingDate(weekNum);
+          emoji = '📚';
+          typeLabel = 'Formative';
+        } else {
+          if (!eventDate) eventDate = getAssessmentDate(weekNum);
+          emoji = '📝';
+          typeLabel = 'Summative';
         }
         
-        // Build summative event if any items selected
-        if (weekData.summative.length > 0 && assessmentDate) {
-          const assignmentItems = weekData.summative.map(item => {
-            const fullUrl = item.url ? window.location.origin + '{{ site.baseurl }}' + item.url : '';
-            return `• ${item.title}${fullUrl ? '\n  ' + fullUrl : ''}`;
-          }).join('\n\n');
-          
-          events.push({
-            title: `[${priority}] 📝 Week ${weekNum} Summative - ${courseName}`,
-            description: `Assessments Due:\n\n${assignmentItems}`,
-            date: assessmentDate,
-            period: courseName,
-            priority: priority
-          });
-        }
+        if (!eventDate) return;
+        
+        const fullUrl = url ? window.location.origin + '{{ site.baseurl }}' + url : '';
+        
+        events.push({
+          title: `[${priority}] ${emoji} ${title} - ${courseName}`,
+          description: `${typeLabel} - Week ${weekNum}\n${fullUrl}`,
+          date: eventDate,
+          period: courseName,
+          priority: priority
+        });
       });
       
       if (events.length === 0) {
         alert('No items selected to sync.');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-sync"></i> Sync Selected';
         return;
       }
       
-      console.log(`Syncing ${events.length} events to calendar`);
+      console.log(`Syncing ${events.length} individual events to calendar`);
       
       let successCount = 0;
       
@@ -1231,24 +1002,16 @@
       const titlesToDelete = [];
       const priorities = ['P0', 'P1', 'P2', 'P3'];
       
-      Object.keys(selectedItems).forEach(weekNum => {
-        const weekData = selectedItems[weekNum];
+      // Build titles to delete based on selected items - must match sync format exactly
+      selectedItems.forEach(item => {
+        const emoji = item.type === 'formative' ? '📚' : '📝';
         
-        // Add formative event titles if any items selected
-        if (weekData.formative.length > 0) {
-          priorities.forEach(p => {
-            titlesToDelete.push(`[${p}] 📚 Week ${weekNum} Formative - ${courseName}`);
-          });
-          titlesToDelete.push(`📚 Week ${weekNum} Formative - ${courseName}`);
-        }
-        
-        // Add summative event titles if any items selected
-        if (weekData.summative.length > 0) {
-          priorities.forEach(p => {
-            titlesToDelete.push(`[${p}] 📝 Week ${weekNum} Summative - ${courseName}`);
-          });
-          titlesToDelete.push(`📝 Week ${weekNum} Summative - ${courseName}`);
-        }
+        // Try all priority variations since we don't know what priority was used when syncing
+        priorities.forEach(p => {
+          titlesToDelete.push(`[${p}] ${emoji} ${item.title} - ${courseName}`);
+        });
+        // Also try without priority prefix (in case it was synced without priority)
+        titlesToDelete.push(`${emoji} ${item.title} - ${courseName}`);
       });
       
       if (titlesToDelete.length === 0) {
@@ -1256,7 +1019,7 @@
         return;
       }
       
-      console.log(`Removing ${titlesToDelete.length} potential events from calendar`);
+      console.log(`Removing ${titlesToDelete.length} potential events from calendar`, titlesToDelete);
       
       let deletedCount = 0;
       
@@ -1411,6 +1174,50 @@
       });
       updateSelectedCount('remove');
     });
+    
+    // Bulk priority buttons
+    document.querySelectorAll('.set-all-priority-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const priority = btn.dataset.priority;
+        document.querySelectorAll('#sync-week-list .item-priority-select').forEach(select => {
+          select.value = priority;
+          // Also save to localStorage
+          savePriorityToStorage(select);
+        });
+      });
+    });
+    
+    // Sync modal priority changes back to localStorage
+    document.getElementById('sync-week-list')?.addEventListener('change', (e) => {
+      if (e.target.classList.contains('item-priority-select')) {
+        savePriorityToStorage(e.target);
+        // Also update the dashboard dropdown if it exists
+        const url = e.target.dataset.url;
+        const dashboardDropdown = document.querySelector(`.item-priority-dropdown[data-item-url="${url}"]`);
+        if (dashboardDropdown) {
+          dashboardDropdown.value = e.target.value;
+          // Trigger styling update
+          dashboardDropdown.classList.remove('priority-p0', 'priority-p1', 'priority-p2', 'priority-p3');
+          dashboardDropdown.classList.add(`priority-${e.target.value.toLowerCase()}`);
+        }
+      }
+    });
+    
+    // Helper to save priority to localStorage
+    function savePriorityToStorage(selectEl) {
+      const url = selectEl.dataset.url;
+      if (!url) return;
+      
+      const ITEM_PRIORITY_KEY = `item_priorities_${window.location.pathname}`;
+      try {
+        const stored = localStorage.getItem(ITEM_PRIORITY_KEY);
+        const priorities = stored ? JSON.parse(stored) : {};
+        priorities[url] = selectEl.value;
+        localStorage.setItem(ITEM_PRIORITY_KEY, JSON.stringify(priorities));
+      } catch (e) {
+        console.warn('Could not save priority:', e);
+      }
+    }
     
     // Close on outside click
     document.getElementById('selective-sync-modal')?.addEventListener('click', (e) => {
