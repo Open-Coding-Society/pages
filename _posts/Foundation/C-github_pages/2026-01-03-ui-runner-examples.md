@@ -3,9 +3,13 @@ layout: post
 courses: { csse: {week: 8}, csp: {week: 17}, csa: {week: 21 } }
 codemirror: true
 title: UI Runner Examples
-description: A lesson showing how to create visual JavaScript lessons using the UI Runner. Perfect for teaching game development, canvas graphics, DOM manipulation, and interactive visualizations. Use this as a template to build visual coding lessons with the GameEngine.
+description: An introduction showing how to create JavaScript games.  Game Builder will start the design process. lessons using the UI Runner help understatn the parts of  for game development, canvas graphics, DOM manipulation, and interactive visualizations.
 permalink: /code/ui
 ---
+
+## Begin Game Development with Game Builder
+
+A [GameBuilder]({{site.baseurl}}/rpg/gamebuilder) begins our jouney into game building.  Build a layout with some key game pieces (Background, Player, NPC, and Obstacles).
 
 ## Define UI Runner in a Lesson
 

@@ -397,7 +397,7 @@ show_reading_time: false
             if (!response.ok) {
                 throw new Error("Invalid login");
             }
-            return response.json();
+            return response.text();
         })
         .then(data => {
             console.log("Login successful!", data);

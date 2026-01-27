@@ -2,6 +2,7 @@
 layout: post 
 show_reading_time: false
 title: Activitity Days Schedule
+permalink: /sabresprings/activity
 description: Here are the activities. Hover over image for more details
 ---
 
