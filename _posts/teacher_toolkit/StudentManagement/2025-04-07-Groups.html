@@ -668,8 +668,8 @@ window.renderGroups = function () {
             class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
             onclick="removeMemberFromGroup(${group.id}, ${m.id})"
             title="Click to remove">
-            <span class="group-hover:hidden">${m.name}</span>
-            <span class="hidden group-hover:inline">Remove</span>
+            <span class="group-hover:hidden">${m.name} <span class="text-gray-400">@${m.uid}</span></span>
+            <span class="hidden group-hover:inline">Remove ${m.uid} from group</span>
           </span>
         `).join("")}
       </div>
