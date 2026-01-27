@@ -25,6 +25,11 @@ active_tab: dashboard
                 </li>
             --> 
                 <li class="me-2">
+                    <a href="#" id="tab-ocs-analytics"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
+                        >OCS Analytics</a>
+                </li>
+                <li class="me-2">
                     <a href="#" id="tab-github"
                         class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
                         >GitHub Analytics</a>
@@ -146,6 +151,16 @@ active_tab: dashboard
 
                 <!-- Commit Cards Container -->
                 <div id="commitCardsContainer" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- OCS Analytics tab content -->
+            <div id="tab-content-ocs-analytics" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <div class="flex items-center justify-center min-h-[400px]">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p class="text-neutral-300">Loading OCS analytics...</p>
+                    </div>
+                </div>
             </div>
 
             <!-- grade predictor tab content -->
@@ -625,12 +640,8 @@ score += gists * 0.5
                 <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-medium">🌐 Language Translation</h3>
-                        <div class="flex gap-2">
-                            <button type="button" id="clear-translation-btn" class="px-3 py-1 text-sm rounded bg-orange-600 hover:bg-orange-700 text-white">Reset to English</button>
-                            <button type="button" class="save-section-btn px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white" data-section="language">Save</button>
-                        </div>
                     </div>
-                    <p class="text-sm text-neutral-400 mb-4">Translate the entire site into your preferred language. This setting is saved and applies across all pages.</p>
+                    <p class="text-sm text-neutral-400 mb-4">Translate the entire site into your preferred language. Use "Save All" below to apply, or "Reset" to return to English.</p>
                     <div class="flex flex-col gap-4">
                         <div>
                             <label class="text-sm text-neutral-400">Site Language</label>
@@ -658,7 +669,7 @@ score += gists * 0.5
                                 <option value="fa">🇮🇷 Persian (فارسی)</option>
                             </select>
                         </div>
-                        <p class="text-xs text-neutral-500">Translation powered by Google Translate. Click "Reset to English" if translation gets stuck.</p>
+                        <p class="text-xs text-neutral-500">Translation powered by Google Translate.</p>
                     </div>
                 </div>
 
@@ -727,7 +738,7 @@ score += gists * 0.5
 
                             <div>
                                 <label class="text-sm text-neutral-400">Text color</label>
-                                <input type="color" id="pref-text-color" value="#e6eef8" class="w-full h-8 mt-1 rounded" />
+                                <input type="color" id="pref-text-color" value="#F0F0F0" class="w-full h-8 mt-1 rounded" />
                             </div>
                         </div>
                     </div>
@@ -741,17 +752,17 @@ score += gists * 0.5
                         <div class="flex flex-col gap-4">
                             <div>
                                 <label class="text-sm text-neutral-400">Background color</label>
-                                <input type="color" id="pref-bg-color" value="#0b1220" class="w-full h-8 mt-1 rounded" />
+                                <input type="color" id="pref-bg-color" value="#121212" class="w-full h-8 mt-1 rounded" />
                             </div>
                             
                             <div>
                                 <label class="text-sm text-neutral-400">Accent color</label>
-                                <input type="color" id="pref-accent-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                                <input type="color" id="pref-accent-color" value="#4CAFEF" class="w-full h-8 mt-1 rounded" />
                             </div>
                             
                             <div>
                                 <label class="text-sm text-neutral-400">Selection highlight color</label>
-                                <input type="color" id="pref-selection-color" value="#3b82f6" class="w-full h-8 mt-1 rounded" />
+                                <input type="color" id="pref-selection-color" value="#4CAFEF" class="w-full h-8 mt-1 rounded" />
                             </div>
                             
                             <div>
@@ -833,7 +844,17 @@ score += gists * 0.5
                 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
                 (function () {
+                    // Site Default uses the website's native CSS colors (from user-colors.scss)
+                    const SITE_DEFAULT = {
+                        bg: '#121212',      // From user-colors.scss $background
+                        text: '#F0F0F0',    // From root-color-map.scss $text
+                        font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+                        size: 14,
+                        accent: '#4CAFEF'   // From root-color-map.scss $accent
+                    };
+                    
                     const PRESETS = window.SitePreferences?.PRESETS || {
+                        'Site Default': SITE_DEFAULT,
                         'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#3b82f6' },
                         'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#2563eb' },
                         'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#10b981' },
@@ -872,24 +893,37 @@ score += gists * 0.5
 
                     // Convert backend format to frontend prefs format
                     function toFrontendFormat(backendPrefs) {
+                        // If backend prefs are empty/null, return null
+                        if (!backendPrefs) return null;
+                        
+                        // Check if this has actual values (not just default/empty object)
+                        const hasBg = backendPrefs.backgroundColor && backendPrefs.backgroundColor !== '';
+                        const hasText = backendPrefs.textColor && backendPrefs.textColor !== '';
+                        
+                        // If no actual colors are set, return null to fall back to defaults
+                        if (!hasBg && !hasText) return null;
+                        
                         let customThemes = {};
                         try {
                             customThemes = backendPrefs.customThemes ? JSON.parse(backendPrefs.customThemes) : {};
                         } catch (e) { customThemes = {}; }
                         
+                        // Use Site Default for any missing values
+                        const defaults = SITE_DEFAULT;
+                        
                         return {
-                            bg: backendPrefs.backgroundColor,
-                            text: backendPrefs.textColor,
-                            font: backendPrefs.fontFamily,
-                            size: backendPrefs.fontSize,
-                            accent: backendPrefs.accentColor,
-                            selectionColor: backendPrefs.selectionColor,
-                            buttonStyle: backendPrefs.buttonStyle,
-                            language: backendPrefs.language,
-                            ttsVoice: backendPrefs.ttsVoice,
-                            ttsRate: backendPrefs.ttsRate,
-                            ttsPitch: backendPrefs.ttsPitch,
-                            ttsVolume: backendPrefs.ttsVolume,
+                            bg: backendPrefs.backgroundColor || defaults.bg,
+                            text: backendPrefs.textColor || defaults.text,
+                            font: backendPrefs.fontFamily || defaults.font,
+                            size: backendPrefs.fontSize || defaults.size,
+                            accent: backendPrefs.accentColor || defaults.accent,
+                            selectionColor: backendPrefs.selectionColor || defaults.accent,
+                            buttonStyle: backendPrefs.buttonStyle || 'rounded',
+                            language: backendPrefs.language || '',
+                            ttsVoice: backendPrefs.ttsVoice || '',
+                            ttsRate: backendPrefs.ttsRate || 1.0,
+                            ttsPitch: backendPrefs.ttsPitch || 1.0,
+                            ttsVolume: backendPrefs.ttsVolume || 1.0,
                             customThemes: customThemes
                         };
                     }
@@ -918,12 +952,13 @@ score += gists * 0.5
                                 isLoggedIn = true;
                                 const data = await res.json();
                                 if (data && data.id) {
+                                    // User has saved preferences in backend
                                     backendPrefsExist = true;
                                     return toFrontendFormat(data);
                                 } else {
-                                    // Backend returned defaults (no saved prefs yet)
+                                    // No saved preferences in backend - return null to use defaults
                                     backendPrefsExist = false;
-                                    return data ? toFrontendFormat(data) : null;
+                                    return null;
                                 }
                             }
                             return null;
@@ -979,11 +1014,7 @@ score += gists * 0.5
                     async function checkLoginStatus() {
                         try {
                             // Try to get user info - if this succeeds, user is logged in
-                            const res = await fetch(`${javaURI}/api/person/get`, {
-                                method: 'GET',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'include'
-                            });
+                            const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
                             
                             if (res.ok) {
                                 isLoggedIn = true;
@@ -1002,6 +1033,15 @@ score += gists * 0.5
                     // Load preferences - checks login first, then tries backend, falls back to localStorage
                     async function loadPreferences() {
                         try {
+                            // Check if user explicitly reset preferences - if so, don't load anything
+                            const wasReset = localStorage.getItem('preferencesReset');
+                            if (wasReset === 'true') {
+                                // Clear the flag - it's only for one page load cycle
+                                localStorage.removeItem('preferencesReset');
+                                // Return null to use site defaults
+                                return null;
+                            }
+                            
                             // First check if user is logged in
                             const loggedIn = await checkLoginStatus();
                             
@@ -1011,6 +1051,8 @@ score += gists * 0.5
                                 if (backendPrefs) {
                                     cachedPrefs = backendPrefs;
                                     applyPreferences(backendPrefs);
+                                    // Sync backend prefs to localStorage so other pages use the same settings
+                                    localStorage.setItem(localStorageKey, JSON.stringify(backendPrefs));
                                     return backendPrefs;
                                 }
                             }
@@ -1038,17 +1080,18 @@ score += gists * 0.5
                             applyPreferences(prefs);
                             populateForm(prefs);
                             
+                            // Clear the reset flag since user is now saving new preferences
+                            localStorage.removeItem('preferencesReset');
+                            
+                            // Always save to localStorage so other pages can use the updated preferences
+                            localStorage.setItem(localStorageKey, JSON.stringify(prefs));
+                            
                             if (isLoggedIn) {
                                 const success = await savePreferencesToBackend(prefs);
                                 if (!success) {
-                                    // Fallback to localStorage if backend save fails
-                                    localStorage.setItem(localStorageKey, JSON.stringify(prefs));
                                     showStatus('Saved locally (backend unavailable)');
                                     return;
                                 }
-                            } else {
-                                // Guest user - save to localStorage
-                                localStorage.setItem(localStorageKey, JSON.stringify(prefs));
                             }
                         } catch (e) { 
                             console.error('savePreferences error', e); 
@@ -1074,7 +1117,7 @@ score += gists * 0.5
                     // Save custom themes - embedded in preferences
                     async function saveThemes(themesObj) {
                         try {
-                            const current = cachedPrefs || await loadPreferences() || { ...PRESETS['Midnight'] };
+                            const current = cachedPrefs || await loadPreferences() || { ...SITE_DEFAULT };
                             current.customThemes = themesObj;
                             await savePreferences(current);
                             
@@ -1097,8 +1140,24 @@ score += gists * 0.5
                             btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm flex items-center gap-2';
                             btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${p.accent}"></span> ${name}`;
                             btn.addEventListener('click', async () => {
-                                await savePreferences({ ...p, customThemes: loadThemes() });
-                                showStatus('Applied: ' + name);
+                                // Get current language from form (most up-to-date) or cached prefs
+                                const currentLang = document.getElementById('pref-language')?.value || cachedPrefs?.language || '';
+                                const currentTTS = {
+                                    ttsVoice: cachedPrefs?.ttsVoice || '',
+                                    ttsRate: cachedPrefs?.ttsRate || 1.0,
+                                    ttsPitch: cachedPrefs?.ttsPitch || 1.0,
+                                    ttsVolume: cachedPrefs?.ttsVolume || 1.0
+                                };
+                                await savePreferences({ 
+                                    ...p, 
+                                    language: currentLang,
+                                    ...currentTTS,
+                                    customThemes: loadThemes() 
+                                });
+                                showStatus('Applied: ' + name + ' - Reloading...');
+                                
+                                // Clean reload to ensure theme and translation apply correctly
+                                setTimeout(() => cleanReload(), 200);
                             });
                             container.appendChild(btn);
                         });
@@ -1122,8 +1181,24 @@ score += gists * 0.5
                             btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm text-left flex items-center gap-2';
                             btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${theme.accent || '#3b82f6'}"></span> ${name}`;
                             btn.addEventListener('click', async () => { 
-                                await savePreferences({ ...theme, customThemes: loadThemes() }); 
-                                showStatus('Applied: ' + name); 
+                                // Get current language from form (most up-to-date) or cached prefs
+                                const currentLang = document.getElementById('pref-language')?.value || cachedPrefs?.language || '';
+                                const currentTTS = {
+                                    ttsVoice: cachedPrefs?.ttsVoice || '',
+                                    ttsRate: cachedPrefs?.ttsRate || 1.0,
+                                    ttsPitch: cachedPrefs?.ttsPitch || 1.0,
+                                    ttsVolume: cachedPrefs?.ttsVolume || 1.0
+                                };
+                                await savePreferences({ 
+                                    ...theme, 
+                                    language: currentLang,
+                                    ...currentTTS,
+                                    customThemes: loadThemes() 
+                                }); 
+                                showStatus('Applied: ' + name + ' - Reloading...');
+                                
+                                // Clean reload to ensure theme and translation apply correctly
+                                setTimeout(() => cleanReload(), 200);
                             });
                             const del = document.createElement('button');
                             del.className = 'px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs';
@@ -1175,7 +1250,7 @@ score += gists * 0.5
 
                     function populateForm(prefs){
                         if (!prefs) return;
-                        const d = PRESETS['Midnight'];
+                        const d = SITE_DEFAULT;
                         document.getElementById('pref-bg-color').value = prefs.bg || d.bg;
                         document.getElementById('pref-text-color').value = prefs.text || d.text;
                         document.getElementById('pref-font-family').value = prefs.font || d.font;
@@ -1206,7 +1281,7 @@ score += gists * 0.5
                     }
 
                     async function saveSectionPrefs(section){
-                        const current = cachedPrefs || await loadPreferences() || { ...PRESETS['Midnight'] };
+                        const current = cachedPrefs || await loadPreferences() || { ...SITE_DEFAULT };
                         const form = currentFormValues();
                         
                         if (section === 'text') {
@@ -1218,20 +1293,6 @@ score += gists * 0.5
                             current.accent = form.accent;
                             current.selectionColor = form.selectionColor;
                             current.buttonStyle = form.buttonStyle;
-                        } else if (section === 'language') {
-                            const oldLang = current.language || '';
-                            const newLang = form.language;
-                            current.language = newLang;
-                            
-                            // Save first, then reload to apply language change
-                            await savePreferences(current);
-                            
-                            // Only reload if language actually changed
-                            if (oldLang !== newLang) {
-                                showStatus('Language saved! Reloading...');
-                                setTimeout(() => window.location.reload(), 500);
-                                return;
-                            }
                         } else if (section === 'tts') {
                             current.ttsVoice = form.ttsVoice;
                             current.ttsRate = form.ttsRate;
@@ -1326,11 +1387,34 @@ score += gists * 0.5
                     // Helper function to clear Google Translate cookies
                     function clearAllTranslationCookies() {
                         const domain = window.location.hostname;
+                        // Clear all possible googtrans cookie variations
                         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                         document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
                         document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
                         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
                         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                        // Also try to set empty value
+                        document.cookie = 'googtrans=/en/en; path=/;';
+                        document.cookie = `googtrans=/en/en; path=/; domain=${domain}`;
+                        document.cookie = `googtrans=/en/en; path=/; domain=.${domain}`;
+                        
+                        // Remove Google Translate elements if present
+                        const gtFrame = document.querySelector('.goog-te-banner-frame');
+                        if (gtFrame) gtFrame.remove();
+                        const gtMenu = document.querySelector('.goog-te-menu-frame');
+                        if (gtMenu) gtMenu.remove();
+                        
+                        // Reset body to remove Google Translate modifications
+                        document.body.style.top = '';
+                        document.body.classList.remove('translated-ltr', 'translated-rtl');
+                    }
+
+                    // Clean reload that clears translation state first
+                    function cleanReload() {
+                        // Clear translation cookies before reload for faster language switching
+                        clearAllTranslationCookies();
+                        // Use location.href assignment for a cleaner reload that respects new cookies
+                        window.location.href = window.location.href.split('#')[0];
                     }
 
                     // Initialize on DOM ready
@@ -1347,12 +1431,21 @@ score += gists * 0.5
                             speechSynthesis.onvoiceschanged = populateTTSVoices;
                         }
 
-                        if (saved) populateForm(saved);
-                        else populateForm(PRESETS['Midnight']);
+                        if (saved) {
+                            populateForm(saved);
+                        } else {
+                            // No saved preferences - populate form with Site Default values
+                            // but don't apply them (let site's natural CSS show through)
+                            populateForm(SITE_DEFAULT);
+                        }
                         
                         // Show login status hint
                         if (isLoggedIn) {
-                            showStatus('Preferences synced from your account');
+                            if (saved) {
+                                showStatus('Preferences synced from your account');
+                            } else {
+                                showStatus('No saved preferences found - using defaults');
+                            }
                         }
 
                         document.getElementById('pref-font-size').addEventListener('input', function(e){
@@ -1376,41 +1469,52 @@ score += gists * 0.5
                         document.querySelectorAll('.save-section-btn').forEach(btn => {
                             btn.addEventListener('click', async function() {
                                 await saveSectionPrefs(this.dataset.section);
+                                showStatus('Saved! Reloading...');
+                                // Clean reload to ensure styles and translation apply correctly
+                                setTimeout(() => cleanReload(), 200);
                             });
                         });
 
                         document.getElementById('save-preferences').addEventListener('click', async function(){
-                            await savePreferences(currentFormValues());
-                            showStatus(isLoggedIn ? 'Preferences saved to your account' : 'Preferences saved locally');
+                            const formValues = currentFormValues();
+                            await savePreferences(formValues);
+                            showStatus('Preferences saved! Reloading...');
+                            // Clean reload to ensure styles and translation apply correctly
+                            setTimeout(() => cleanReload(), 200);
                         });
 
                         document.getElementById('restore-styles').addEventListener('click', async function(){
                             // Delete from backend if logged in
                             if (isLoggedIn) {
-                                await deletePreferencesFromBackend();
+                                const deleted = await deletePreferencesFromBackend();
+                                if (!deleted) {
+                                    showStatus('Failed to delete from server, trying again...');
+                                    await deletePreferencesFromBackend();
+                                }
                             }
-                            // Clear localStorage
+                            
+                            // Clear localStorage and set a flag to indicate user wants site defaults
                             localStorage.removeItem(localStorageKey);
                             localStorage.removeItem(localThemesKey);
+                            localStorage.setItem('preferencesReset', 'true');
                             cachedPrefs = null;
+                            backendPrefsExist = false;
                             
+                            // Reset to site's natural CSS by removing all user theme overrides
                             if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
                                 window.SitePreferences.resetPreferences();
                             }
-                            clearAllTranslationCookies();
-                            showStatus('Reset complete');
-                            setTimeout(() => location.reload(), 100);
-                        });
-
-                        // Clear translation / Reset to English button
-                        document.getElementById('clear-translation-btn').addEventListener('click', async function(){
-                            clearAllTranslationCookies();
-                            const current = cachedPrefs || await loadPreferences() || { ...PRESETS['Midnight'] };
-                            current.language = '';
-                            await savePreferences(current);
+                            
+                            // Populate form with Site Default values
+                            populateForm(SITE_DEFAULT);
+                            
+                            // Reset language translation
                             document.getElementById('pref-language').value = '';
-                            showStatus('Translation cleared! Reloading...');
-                            setTimeout(() => location.reload(), 500);
+                            
+                            showStatus('Preferences reset! Reloading...');
+                            
+                            // Use cleanReload for faster/cleaner reset
+                            setTimeout(() => cleanReload(), 300);
                         });
 
                         document.getElementById('save-theme-btn').addEventListener('click', async function(){
@@ -1426,7 +1530,14 @@ score += gists * 0.5
                             const el = document.getElementById(id);
                             if (el) {
                                 const applyLivePreview = function() {
-                                    const current = cachedPrefs || { ...PRESETS['Midnight'] };
+                                    // Only apply live preview if we have existing preferences
+                                    // Don't create new preferences with Midnight fallback
+                                    const stored = localStorage.getItem(localStorageKey);
+                                    if (!stored && !cachedPrefs) return; // No preferences, don't apply anything
+                                    
+                                    const current = cachedPrefs || (stored ? JSON.parse(stored) : null);
+                                    if (!current) return;
+                                    
                                     const form = currentFormValues();
                                     current.selectionColor = form.selectionColor;
                                     current.buttonStyle = form.buttonStyle;
@@ -1443,15 +1554,22 @@ score += gists * 0.5
                     window.checkLoginStatus = checkLoginStatus;
                     
                     // Initial load from localStorage only (no backend call yet)
-                    // Full loadPreferences() with backend check will be called on window.onload after login is confirmed
+                    // Full loadPreferences() with backend check will be called on DOMContentLoaded
                     try { 
-                        const raw = localStorage.getItem(localStorageKey);
-                        if (raw) {
-                            const prefs = JSON.parse(raw);
-                            cachedPrefs = prefs;
-                            applyPreferences(prefs);
+                        // Check if user explicitly reset preferences
+                        const wasReset = localStorage.getItem('preferencesReset');
+                        if (wasReset !== 'true') {
+                            const raw = localStorage.getItem(localStorageKey);
+                            if (raw) {
+                                const prefs = JSON.parse(raw);
+                                cachedPrefs = prefs;
+                                applyPreferences(prefs);
+                            }
                         }
-                    } catch(e) { console.error('Initial localStorage load error', e); }
+                        // If reset flag is set or no localStorage, don't apply anything - let site defaults show
+                    } catch(e) { 
+                        console.error('Initial localStorage load error', e);
+                    }
                 })();
                 </script>
 
@@ -1485,6 +1603,7 @@ score += gists * 0.5
 <!-- Your GitHub analytics JS integrated -->
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
 
     const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
     const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
@@ -1494,6 +1613,11 @@ score += gists * 0.5
 
     let springUserId = null;
     let hasExistingStudentEval = false;
+    
+    // Initialize OCS Analytics Dashboard
+    initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions).catch(e => {
+        console.warn('OCS Analytics dashboard failed to initialize:', e);
+    });
 
     async function getUserIdSpring() {
         if (springUserId) return springUserId;
@@ -1505,13 +1629,12 @@ score += gists * 0.5
             const uid = pyData.uid;
 
             // 2. Get People from Spring
-            const javaRes = await fetch(`${javaURI}/api/people`, fetchOptions);
-            if (!javaRes.ok) throw new Error("Failed to fetch People");
-            const people = await javaRes.json();
+            const javaRes = await fetch(`${javaURI}/api/person/uid/${uid}`, fetchOptions);
+            if (!javaRes.ok) throw new Error("Failed to fetch user from Spring");
+            const person = await javaRes.json();
 
             // 3. Match UID
-            const person = people.find(p => p.uid === uid);
-            if (!person) throw new Error("User not found in Spring");
+            if (!person || person.uid !== uid) throw new Error("User not found in Spring");
             
             springUserId = person.id;
             return springUserId;
@@ -1594,16 +1717,14 @@ score += gists * 0.5
             let res;
             if (hasExistingStudentEval) {
                 res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, {
+                    ...fetchOptions,
                     method: 'PUT',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
             } else {
                 res = await fetch(`${javaURI}/api/student-evaluation/post`, {
+                    ...fetchOptions,
                     method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body)
                 });
             }
@@ -1621,18 +1742,16 @@ score += gists * 0.5
         // 2. Run Prediction
         try {
             await fetch(`${javaURI}/api/grade-prediction/train`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
+                ...fetchOptions,
+                method: 'GET'
             });
         } catch (error) {
             console.error("Error with training:", error);
         }
         try {
             const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
+                ...fetchOptions,
                 method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
             const data = await predict.json();
@@ -2029,6 +2148,13 @@ score += gists * 0.5
 
             if (targetId === "tab-content-your-feedback") {
                 await loadUserFeedback();  // 👈 load feedback when user clicks the tab
+            }
+
+            if (targetId === "tab-content-ocs-analytics") {
+                // Load OCS Analytics dashboard
+                if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
+                    await window.OCSAnalytics.loadAnalyticsSummary();
+                }
             }
         });
     });
