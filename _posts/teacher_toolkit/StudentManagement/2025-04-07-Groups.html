@@ -460,7 +460,7 @@ window.addSelectedMembersToGroup = async function (groupId) {
   setSelectedUsers(groupId, []);
   renderGroups();
   if (failures.length) {
-    alert(`Added ${successes.length} member(s). ${failures.length} failed. Check console for details.`);
+    alert(`Added ${successes.length} member(s). ${failures.length} failed. Is the user already a member of the group? Check console for details.`);
   }
   hideLoading();
 }
@@ -514,6 +514,23 @@ window.removeMemberFromGroup = function (groupId, personId) {
     })
     .catch(err => alert(err.message))
     .finally(() => hideLoading());
+}
+
+// Open group chat with placeholder functionality
+window.openGroupChat = function (groupId, groupName) {
+  const group = allGroups.find(g => g.id === groupId);
+  if (!group || !group.members || group.members.length === 0) {
+    alert(`No members in ${groupName} to chat with`);
+    return;
+  }
+  
+  // TODO: Implement chat functionality
+  // This is a placeholder for chat integration
+  console.log(`Opening chat for group: ${groupName} (ID: ${groupId})`);
+  console.log("Group members:", group.members);
+  
+  // Example placeholder action:
+  alert(`Chat feature coming soon for ${groupName}!\nMembers: ${group.members.map(m => m.name).join(", ")}`);
 }
 
 // Delete group with chaining - updates local state instead of refetching
@@ -650,15 +667,26 @@ window.renderGroups = function () {
           </p>
         </div>
 
-        <!-- Trash (admin only) -->
-        ${isAdmin ? `
-        <button
-          class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
-          title="Delete group (Admin only)"
-          onclick="deleteGroup(${group.id})">
-          🗑️
-        </button>
-        ` : ''}
+        <!-- Action buttons -->
+        <div class="flex gap-2">
+          <!-- Chat button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-green-600 text-gray-300 hover:text-white transition-colors"
+            title="Chat with group members"
+            onclick="openGroupChat(${group.id}, '${group.name.replace(/'/g, "\\'")}')" >
+            💬
+          </button>
+
+          <!-- Trash (admin only) -->
+          ${isAdmin ? `
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
+            title="Delete group (Admin only)"
+            onclick="deleteGroup(${group.id})">
+            🗑️
+          </button>
+          ` : ''}
+        </div>
       </div>
 
       <!-- Members row -->
@@ -669,7 +697,7 @@ window.renderGroups = function () {
             onclick="removeMemberFromGroup(${group.id}, ${m.id})"
             title="Click to remove">
             <span class="group-hover:hidden">${m.name} <span class="text-gray-400">@${m.uid}</span></span>
-            <span class="hidden group-hover:inline">Remove ${m.uid} from group</span>
+            <span class="hidden group-hover:inline">Remove ${m.uid}</span>
           </span>
         `).join("")}
       </div>
