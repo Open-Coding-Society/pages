@@ -1,0 +1,143 @@
+/**
+ * GameControl.js Template
+ * =======================
+ * This class manages the game loop, level transitions, and core game mechanics.
+ * 
+ * Key Responsibilities:
+ * - Initialize and manage game levels
+ * - Handle game loop (update, render cycle)
+ * - Manage level transitions and progression
+ * - Track game state (paused, running, ended)
+ * - Handle keyboard/input events
+ * 
+ * Extends or works with:
+ * - GameLevel: Individual level implementation
+ * - Player: Main character controlled by user
+ * - GameEnv: Game environment and rendering
+ */
+
+class GameControl {
+    /**
+     * Constructor - Initialize game controller with levels
+     * 
+     * @param {GameCore} game - Reference to the main game instance
+     * @param {Array} levelClasses - Array of GameLevel classes to cycle through
+     */
+    constructor(game, levelClasses = []) {
+        // TODO: Store game reference
+        // this.game = game;
+
+        // TODO: Initialize level management
+        // this.levelClasses = levelClasses;
+        // this.currentLevelIndex = 0;
+        // this.currentLevel = null;
+
+        // TODO: Initialize game state flags
+        // this.isPaused = false;
+        // this.isRunning = false;
+
+        // TODO: Optional PauseMenu configuration (passed to shared PauseMenu)
+        // this.pauseMenuOptions = {
+        //   counterVar: 'levelsCompleted',
+        //   counterLabel: 'Levels Completed'
+        // };
+    }
+
+    /**
+     * Start the game and load the first level
+     */
+    start() {
+        // TODO: Initialize game loop
+        // TODO: Load first level
+        // TODO: Set up game state and begin rendering
+    }
+
+    /**
+     * Handle level transitions
+     * - Destroy current level
+     * - Load next level
+     * - Update level index
+     * - Resume game loop
+     */
+    transitionToLevel() {
+        // TODO: Implement level transition logic
+        // if (this.currentLevel) this.currentLevel.destroy();
+        // this.currentLevel = new this.levelClasses[this.currentLevelIndex](this.game);
+        // this.currentLevel.init();
+    }
+
+    /**
+     * Main game loop - called every frame
+     * - Update game logic
+     * - Render graphics
+     * - Handle collisions
+     */
+    gameLoop() {
+        // TODO: Check if game should continue
+        // TODO: Update all game objects
+        // TODO: Check for collisions
+        // TODO: Render current frame
+        // TODO: Request next animation frame
+    }
+
+    /**
+     * Pause the game
+     * - Stop game loop
+     * - Show pause menu
+     * - Preserve game state
+     */
+    pause() {
+        // TODO: Implement pause logic
+        // this.isPaused = true;
+        // Stop animation frame loop
+    }
+
+    /**
+     * Resume the game after pause
+     */
+    resume() {
+        // TODO: Implement resume logic
+        // this.isPaused = false;
+        // Restart animation frame loop
+    }
+
+    /**
+     * Handle keyboard input for game controls
+     * - Move player
+     * - Interact with objects
+     * - Use abilities
+     * 
+     * @param {KeyboardEvent} event - The keyboard event
+     */
+    handleKeyPress(event) {
+        // TODO: Map keyboard inputs to game actions
+        // if (event.code === 'ArrowUp') { this.currentLevel.player.moveUp(); }
+    }
+
+    /**
+     * Check for and handle collisions between game objects
+     */
+    checkCollisions() {
+        // TODO: Implement collision detection
+        // TODO: Call collision handlers on colliding objects
+    }
+
+    /**
+     * Clean up game state when level ends
+     */
+    cleanupInteractionHandlers() {
+        // TODO: Remove event listeners
+        // TODO: Clean up any temporary resources
+    }
+
+    /**
+     * End the game and show results
+     */
+    endGame() {
+        // TODO: Stop game loop
+        // TODO: Calculate final score
+        // TODO: Show game over screen
+    }
+}
+
+export default GameControl;

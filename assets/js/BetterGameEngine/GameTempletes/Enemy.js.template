@@ -1,0 +1,322 @@
+/**
+ * Enemy.js Template
+ * ================
+ * This class represents an enemy or obstacle in the game.
+ * Inherit from this to create different enemy types with unique behaviors.
+ * 
+ * Key Responsibilities:
+ * - Store enemy position and state
+ * - Implement movement AI/behavior
+ * - Handle collisions with player
+ * - Manage animation and rendering
+ * - Track health/status
+ * 
+ * Enemy Types:
+ * - Patrol: Walks back and forth on a platform
+ * - Flying: Flies around and hunts player
+ * - Boss: Large enemy with more health and attacks
+ * - Stationary: Stays in one place (spikes, saw, etc.)
+ */
+
+class Enemy {
+    /**
+     * Constructor - Initialize enemy with position and behavior
+     * 
+     * @param {Object} config - Enemy configuration
+     * @param {number} config.x - Starting X position
+     * @param {number} config.y - Starting Y position
+     * @param {string} config.type - Enemy type: 'patrol', 'flying', 'stationary', etc.
+     * @param {number} config.width - Enemy width (default: 30)
+     * @param {number} config.height - Enemy height (default: 30)
+     * @param {number} config.speed - Movement speed (default: 2)
+     * @param {number} config.health - Enemy health (default: 1)
+     */
+    constructor(config = {}) {
+        // TODO: Store position
+        // this.x = config.x || 0;
+        // this.y = config.y || 0;
+
+        // TODO: Store dimensions
+        // this.width = config.width || 30;
+        // this.height = config.height || 30;
+
+        // TODO: Store enemy type
+        // this.type = config.type || 'patrol'; // 'patrol', 'flying', 'stationary', 'boss'
+
+        // TODO: Store movement properties
+        // this.speed = config.speed || 2;
+        // this.vx = this.speed; // Start moving right
+        // this.vy = 0;
+        // this.direction = 1; // 1 for right, -1 for left
+
+        // TODO: Store health
+        // this.health = config.health || 1;
+        // this.maxHealth = config.health || 1;
+
+        // TODO: Store patrol boundaries (if patrol type)
+        // this.minX = config.minX || this.x - 100;
+        // this.maxX = config.maxX || this.x + 100;
+
+        // TODO: Store behavior state
+        // this.state = 'idle'; // 'idle', 'patrolling', 'chasing', 'attacking'
+        // this.lastPlayerSeen = null;
+        // this.detectionRange = config.detectionRange || 200;
+
+        // TODO: Store animation state
+        // this.currentAnimation = 'walk';
+        // this.animationFrame = 0;
+    }
+
+    /**
+     * Update enemy each frame
+     * - Move based on behavior
+     * - Check if player is in range
+     * - Update animation
+     */
+    update() {
+        // TODO: Call appropriate update method based on type
+        // switch(this.type) {
+        //   case 'patrol':
+        //     this.updatePatrol();
+        //     break;
+        //   case 'flying':
+        //     this.updateFlying();
+        //     break;
+        //   case 'stationary':
+        //     this.updateStationary();
+        //     break;
+        // }
+
+        // TODO: Update animation
+        // this.updateAnimation();
+    }
+
+    /**
+     * Patrol type - Walk back and forth between min/max X
+     * Turn around when hitting boundaries
+     */
+    updatePatrol() {
+        // TODO: Move in current direction
+        // this.x += this.vx * this.direction;
+
+        // TODO: Check boundaries and turn around
+        // if (this.x <= this.minX || this.x >= this.maxX) {
+        //   this.direction *= -1; // Reverse direction
+        //   this.vx = Math.abs(this.vx) * this.direction;
+        // }
+
+        // TODO: Check if player is in detection range
+        // this.checkForPlayer();
+    }
+
+    /**
+     * Flying type - Fly around and hunt player if seen
+     * Can move in all directions
+     */
+    updateFlying() {
+        // TODO: Check if player is in range
+        // this.checkForPlayer();
+
+        // TODO: If player detected, chase them
+        // if (this.lastPlayerSeen && Date.now() - this.lastPlayerSeen < 3000) {
+        //   this.chasePlayer(player);
+        // } else {
+        //   // Patrol in a pattern (circle, zigzag, etc.)
+        //   this.patrolFlyingPattern();
+        // }
+
+        // TODO: Apply gravity if needed (or no gravity for flying)
+        // this.y += this.vy;
+        // this.vy += 0.3; // Light gravity
+    }
+
+    /**
+     * Stationary type - Stay in place, just spin or bounce
+     * Used for spikes, saws, hazards
+     */
+    updateStationary() {
+        // TODO: Rotate or animate in place
+        // this.rotation += 5; // Spin
+
+        // TODO: Maybe bounce up and down
+        // this.y = this.startY + Math.sin(Date.now() / 500) * 5;
+
+        // TODO: Always deal damage on contact (no health tracking needed)
+    }
+
+    /**
+     * Check if player is in detection range
+     * 
+     * @param {Player} player - The player to detect
+     */
+    checkForPlayer(player) {
+        // TODO: Calculate distance to player
+        // const dx = player.x - this.x;
+        // const dy = player.y - this.y;
+        // const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // TODO: If within detection range, remember player
+        // if (distance < this.detectionRange) {
+        //   this.lastPlayerSeen = Date.now();
+        //   return true;
+        // }
+        // return false;
+    }
+
+    /**
+     * Chase the player
+     * Move towards player position
+     * 
+     * @param {Player} player - The player to chase
+     */
+    chasePlayer(player) {
+        // TODO: Calculate direction to player
+        // const dx = player.x - this.x;
+        // const dy = player.y - this.y;
+        // const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // TODO: Normalize direction and move towards player
+        // this.vx = (dx / distance) * this.speed;
+        // this.vy = (dy / distance) * this.speed * 0.5; // Less vertical movement
+
+        // TODO: Update facing direction
+        // if (dx > 0) {
+        //   this.direction = 1;
+        // } else {
+        //   this.direction = -1;
+        // }
+    }
+
+    /**
+     * Patrol in a flying pattern (circle, sine wave, etc.)
+     */
+    patrolFlyingPattern() {
+        // TODO: Implement flying pattern
+        // const time = Date.now() / 1000;
+        // this.x = this.startX + Math.cos(time) * 50;
+        // this.y = this.startY + Math.sin(time * 0.7) * 30;
+    }
+
+    /**
+     * Take damage from player attack
+     * 
+     * @param {number} damage - Damage amount (default: 1)
+     */
+    takeDamage(damage = 1) {
+        // TODO: Reduce health
+        // this.health -= damage;
+
+        // TODO: Play damage animation
+        // this.flashDamage();
+
+        // TODO: Check if dead
+        // if (this.health <= 0) {
+        //   this.die();
+        // }
+    }
+
+    /**
+     * Flash red for damage animation
+     */
+    flashDamage() {
+        // TODO: Set damaged flag
+        // this.isDamaged = true;
+        // TODO: Set timer to turn off after 100ms
+        // setTimeout(() => { this.isDamaged = false; }, 100);
+    }
+
+    /**
+     * Enemy dies - remove from level
+     */
+    die() {
+        // TODO: Play death animation
+        // TODO: Play death sound
+        // TODO: Drop items if applicable
+        // TODO: Mark for removal from level.gameObjects array
+        // this.isDead = true;
+    }
+
+    /**
+     * Update animation based on state
+     */
+    updateAnimation() {
+        // TODO: Select animation based on state/direction
+        // if (this.state === 'chasing') {
+        //   this.currentAnimation = 'alert';
+        // } else {
+        //   this.currentAnimation = 'walk';
+        // }
+
+        // TODO: Increment frame
+        // this.animationFrame += 1;
+    }
+
+    /**
+     * Render enemy to canvas
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    render(ctx) {
+        // TODO: Option 1 - Draw as colored rectangle
+        // ctx.fillStyle = this.isDamaged ? 'red' : 'darkred';
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // TODO: Option 2 - Draw sprite
+        // const sprite = this.getAnimationSprite();
+        // ctx.save();
+        // if (this.direction === -1) {
+        //   ctx.scale(-1, 1);
+        //   ctx.translate(-this.width, 0);
+        // }
+        // ctx.drawImage(sprite, this.x, this.y, this.width, this.height);
+        // ctx.restore();
+
+        // TODO: Option 3 - Draw simple shape
+        // this.drawSimpleEnemy(ctx);
+
+        // TODO: Debug - Draw health bar
+        // this.renderHealthBar(ctx);
+    }
+
+    /**
+     * Draw a simple enemy shape
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    drawSimpleEnemy(ctx) {
+        // TODO: Draw enemy body (circle, triangle, etc.)
+        // ctx.fillStyle = 'darkred';
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // TODO: Draw eyes
+        // ctx.fillStyle = 'white';
+        // ctx.fillRect(this.x + 5, this.y + 5, 5, 5);
+        // ctx.fillRect(this.x + 20, this.y + 5, 5, 5);
+
+        // TODO: Draw pupils based on facing direction
+        // ctx.fillStyle = 'black';
+        // const pupilX = this.direction === 1 ? 3 : 1;
+        // ctx.fillRect(this.x + 5 + pupilX, this.y + 5 + 1, 3, 3);
+        // ctx.fillRect(this.x + 20 + pupilX, this.y + 5 + 1, 3, 3);
+    }
+
+    /**
+     * Render health bar above enemy
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    renderHealthBar(ctx) {
+        // TODO: Calculate health percentage
+        // const healthPercent = this.health / this.maxHealth;
+
+        // TODO: Draw health bar background
+        // ctx.fillStyle = 'black';
+        // ctx.fillRect(this.x, this.y - 10, this.width, 4);
+
+        // TODO: Draw health bar foreground
+        // ctx.fillStyle = 'green';
+        // ctx.fillRect(this.x, this.y - 10, this.width * healthPercent, 4);
+    }
+}
+
+export default Enemy;
