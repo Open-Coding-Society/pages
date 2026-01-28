@@ -1,7 +1,7 @@
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
-import PauseFeature from './pause/PauseFeature.js';
-import ScoreFeature from './pause/ScoreFeature.js';
-import LevelSkipFeature from './pause/LevelSkipFeature.js';
+import PauseFeature from './PauseFeature.js';
+import ScoreFeature from './ScoreFeature.js';
+import LevelSkipFeature from './LevelSkipFeature.js';
 
 export default class PauseMenu {
     constructor(gameControl, options = {}) {
