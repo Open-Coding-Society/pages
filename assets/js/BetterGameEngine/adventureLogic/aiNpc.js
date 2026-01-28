@@ -4,7 +4,7 @@
  * DEBUG VERSION - WITH EXTENSIVE CONSOLE LOGGING
  */
 
-import DialogueSystem from './DialogueSystem.js';
+import DialogueSystem from '../../BetterGameEngine/features/DialogueSystem.js';
 
 class AINpc {
   constructor(config) {

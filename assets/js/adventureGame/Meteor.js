@@ -1,4 +1,4 @@
-import Character from "./adventureLogic/Character.js";
+import Character from "../BetterGameEngine/adventureLogic/Character.js";
 
 class Meteor extends Character {
   constructor(data, gameEnv) {

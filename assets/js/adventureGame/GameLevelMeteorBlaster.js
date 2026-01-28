@@ -1,7 +1,7 @@
-import GameEnvBackground from "./adventureLogic/GameEnvBackground.js"
-import Player from "./adventureLogic/Player.js"
+import GameEnvBackground from "../BetterGameEngine/adventureLogic/GameEnvBackground.js"
+import Player from "../BetterGameEngine/adventureLogic/Player.js"
 import Meteor from "./Meteor.js"
-import Character from "./adventureLogic/Character.js";
+import Character from "../BetterGameEngine/adventureLogic/Character.js";
 import Quiz from "./Quiz.js"
 
 class GameLevelMeteorBlaster {

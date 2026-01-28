@@ -1,6 +1,6 @@
-import GameEnvBackground from './adventureLogic/GameEnvBackground.js';
-import Npc from './adventureLogic/Npc.js';
-import Player from './adventureLogic/Player.js';
+import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
+import Player from '../BetterGameEngine/adventureLogic/Player.js';
 import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from './DialogBox.js';
 import WaypointArrow from './WaypointArrow.js';
 import NpcProgressSystem from './NpcProgressSystem.js';
