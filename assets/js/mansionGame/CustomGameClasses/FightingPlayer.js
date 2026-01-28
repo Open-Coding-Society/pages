@@ -1,4 +1,4 @@
-import Player from '../../BetterGameEngine/MansionLogic/Player.js';
+import Player from '../MansionLogic/Player.js';
 import Projectile from './Projectile.js';
 
 class FightingPlayer extends Player {

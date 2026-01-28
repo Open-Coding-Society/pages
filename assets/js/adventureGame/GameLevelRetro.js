@@ -1,10 +1,10 @@
-import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
-import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
-import Player from '../BetterGameEngine/adventureLogic/Player.js';
-import GameControl from '../BetterGameEngine/adventureLogic/GameControl.js';
+import GameEnvBackground from './adventureLogic/GameEnvBackground.js';
+import Npc from './adventureLogic/Npc.js';
+import Player from './adventureLogic/Player.js';
+import GameControl from './adventureLogic/GameControl.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 
-import Game from './Game.js';
+import Game from '../BetterGameEngine/features/Game.js';
 import GameLevelWallstreet from './GameLevelWallstreet.js';
 class GameLevelRetro {
   /**
