@@ -254,23 +254,27 @@ export default class ScoreFeature {
                 try {
                     const resp = await this._saveStatsToServer();
                     console.log('ScoreFeature: saved to backend', resp);
+                    alert('Saved to backend!');
                     if (this.pauseMenu._saveStatusNode) {
                         this.pauseMenu._saveStatusNode.innerText = 'Score saved to backend!';
                     }
                 } catch (e) {
                     console.error('ScoreFeature: save to backend failed', e);
+                    alert('Save failed!');
                     if (this.pauseMenu._saveStatusNode) {
                         this.pauseMenu._saveStatusNode.innerText = 'Backend save failed';
                     }
                 }
             } else {
                 console.warn('ScoreFeature: no backend configured');
+                alert('No backend configured');
                 if (this.pauseMenu._saveStatusNode) {
                     this.pauseMenu._saveStatusNode.innerText = 'No backend configured';
                 }
             }
         } catch (e) {
             console.error('ScoreFeature: save failed', e);
+            alert('Save failed!');
             if (this.pauseMenu._saveStatusNode) {
                 this.pauseMenu._saveStatusNode.innerText = 'Save failed';
             }
