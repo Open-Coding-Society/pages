@@ -47,9 +47,9 @@ class GameEnv {
         this.setCanvas();
         this.setTop();
         this.setBottom();
-        // Use provided dimensions from game environment, fallback to window dimensions
-        this.innerWidth = this.game?.innerWidth || window.innerWidth;
-        this.innerHeight = (this.game?.innerHeight || window.innerHeight) - this.top - this.bottom;
+        // Use fixed dimensions for consistent game size
+        this.innerWidth = 800;
+        this.innerHeight = 600;
         this.size();
     }
 
@@ -98,9 +98,6 @@ class GameEnv {
         this.canvas.height = this.innerHeight;
         this.canvas.style.width = `${this.innerWidth}px`;
         this.canvas.style.height = `${this.innerHeight}px`;
-        this.canvas.style.position = 'absolute';
-        this.canvas.style.left = '0px';
-        this.canvas.style.top = `${this.top}px`;
     }
 
 
