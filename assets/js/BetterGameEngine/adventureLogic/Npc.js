@@ -45,14 +45,18 @@ class Npc extends Character {
 
     update() {
         this.draw();
-        // Check if player is still in collision - add null checks
-        const players = this.gameEnv.gameObjects.filter(
-            obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
-        );
         
-        // Reset interaction state if player moved away
-        if (players.length === 0 && this.isInteracting) {
-            this.isInteracting = false;
+        // Only check collision state when not paused
+        if (!this.gameEnv.gameControl || !this.gameEnv.gameControl.isPaused) {
+            // Check if player is still in collision - add null checks
+            const players = this.gameEnv.gameObjects.filter(
+                obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
+            );
+            
+            // Reset interaction state if player moved away
+            if (players.length === 0 && this.isInteracting) {
+                this.isInteracting = false;
+            }
         }
     }
 

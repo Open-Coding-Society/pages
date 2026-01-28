@@ -145,8 +145,12 @@ class Character extends GameObject {
      */
     update() {
         this.draw();
-        this.collisionChecks();
-        this.move();
+        
+        // Only update collision and movement when game is not paused
+        if (!this.gameEnv.gameControl || !this.gameEnv.gameControl.isPaused) {
+            this.collisionChecks();
+            this.move();
+        }
     }
 
 
