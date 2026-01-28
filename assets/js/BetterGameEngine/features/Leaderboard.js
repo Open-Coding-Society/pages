@@ -253,7 +253,7 @@ export default class Leaderboard {
                     <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
                     <span id="leaderboard-title">🏆 Leaderboard</span>
                     <span id="leaderboard-preview"
-                          style="font-size:18px;font-weight:700;margin-left:8px;display:none;"></span>
+                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Click "+" to choose a leaderboard!</span>
                 </div>
                 <button id="toggle-leaderboard" class="toggle-btn">+</button>
             </div>
@@ -314,9 +314,9 @@ export default class Leaderboard {
         const backBtn = document.getElementById('back-btn');
         if (backBtn) backBtn.style.display = 'none';
 
-        // Clear preview
+        // Reset preview to initial text
         const preview = document.getElementById('leaderboard-preview');
-        if (preview) preview.textContent = '';
+        if (preview) preview.textContent = 'Collapse to choose a leaderboard';
 
         // Show type selection
         this.showTypeSelection();
