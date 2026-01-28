@@ -249,8 +249,8 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
-    pythonLogin();
     javaLogin();  // Call Java login
+    pythonLogin();
 };
     // Function to handle Python login
     window.pythonLogin = function () {

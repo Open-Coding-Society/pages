@@ -359,26 +359,14 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
-        // Wrap both logins in Promises and only redirect after both finish
-        let javaPromise = new Promise((resolve) => {
-            window.javaLogin(resolve);
-        });
-        let pythonPromise = new Promise((resolve) => {
-            window.pythonLogin(resolve);
-        });
-        Promise.allSettled([javaPromise, pythonPromise]).then(() => {
-            // Only redirect after both have completed (success or fail)
-            window.location.href = '{{site.baseurl}}/profile';
-        });
-    };
+    javaLogin();  // Call Java login
+    pythonLogin();
+};
     // Function to handle Python login
-    window.pythonLogin = function (done) {
+    window.pythonLogin = function () {
         const options = {
             URL: `${pythonURI}/api/authenticate`,
-            callback: function() {
-                pythonDatabase();
-                if (done) done();
-            },
+            callback: pythonDatabase,
             message: "message",
             method: "POST",
             cache: "no-cache",
@@ -388,105 +376,101 @@ show_reading_time: false
             }
         };
         login(options);
-        // If login() is not async, call done() immediately
-        // if (done) done();
     }
     // Function to handle Java login
-    window.javaLogin = function (done) {
-        const loginURL = `${javaURI}/authenticate`;
-        const databaseURL = `${javaURI}/api/person/get`;
-        const signupURL = `${javaURI}/api/person/create`;
-        const userCredentials = JSON.stringify({
-            uid: document.getElementById("uid").value,
-            password: document.getElementById("password").value,
-        });
-        const loginOptions = {
-            ...fetchOptions,
-            method: "POST",
-            body: userCredentials,
-        };
-        console.log("Attempting Java login...");
-        fetch(loginURL, loginOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Invalid login");
-                }
-                return response.text();
-            })
-            .then(data => {
-                console.log("Login successful!", data);
-                // Do not redirect here
-                // Fetch database after login success using fetchOptions
-                return fetch(databaseURL, fetchOptions);
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Java database response:", data);
-                if (done) done();
-            })
-            .catch(error => {
-                console.error("Login failed:", error.message);
-                // If login fails, attempt account creation
-                if (error.message === "Invalid login") {
-                    const signupData = JSON.stringify({
-                        uid: document.getElementById("uid").value,
-                        sid: "0000000",
-                        email: document.getElementById("uid").value + "@gmail.com",
-                        dob: "11-01-2024", // Static date, can be modified
-                        name: document.getElementById("uid").value,
-                        password: document.getElementById("password").value,
-                        kasmServerNeeded: false,
-                    });
-                    const signupOptions = {
-                        ...fetchOptions,
-                        method: "POST",
-                        body: signupData,
-                    };
-                    fetch(signupURL, signupOptions)
-                        .then(signupResponse => {
-                            if (!signupResponse.ok) {
-                                throw new Error("Account creation failed!");
-                            }
-                            return signupResponse.json();
-                        })
-                        .then(signupResult => {
-                            console.log("Account creation successful!", signupResult);
-                            // Retry login after account creation
-                            return fetch(loginURL, loginOptions);
-                        })
-                        .then(newLoginResponse => {
-                            if (!newLoginResponse.ok) {
-                                throw new Error("Login failed after account creation");
-                            }
-                            console.log("Login successful after account creation!");
-                            // Fetch database after successful login
-                            return fetch(databaseURL, fetchOptions);
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`Spring server response: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log("Java database response:", data);
-                            if (done) done();
-                        })
-                        .catch(newLoginError => {
-                            console.error("Error after account creation:", newLoginError.message);
-                            if (done) done();
-                        });
-                } else {
-                    console.log("Logged in!");
-                    if (done) done();
-                }
-            });
+    window.javaLogin = function () {
+    const loginURL = `${javaURI}/authenticate`;
+    const databaseURL = `${javaURI}/api/person/get`;
+    const signupURL = `${javaURI}/api/person/create`;
+    const userCredentials = JSON.stringify({
+        uid: document.getElementById("uid").value,
+        password: document.getElementById("password").value,
+    });
+    const loginOptions = {
+        ...fetchOptions,
+        method: "POST",
+        body: userCredentials,
     };
+    console.log("Attempting Java login...");
+    fetch(loginURL, loginOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Invalid login");
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Login successful!", data);
+            window.location.href = '{{site.baseurl}}/profile';
+            // Fetch database after login success using fetchOptions
+            return fetch(databaseURL, fetchOptions);
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Spring server response: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Java database response:", data);
+        })
+        .catch(error => {
+            console.error("Login failed:", error.message);
+            // If login fails, attempt account creation
+            if (error.message === "Invalid login") {
+                // alert("Login for Spring failed. Creating a new Java account...");
+                const signupData = JSON.stringify({
+                    uid: document.getElementById("uid").value,
+                    sid: "0000000",
+                    email: document.getElementById("uid").value + "@gmail.com",
+                    dob: "11-01-2024", // Static date, can be modified
+                    name: document.getElementById("uid").value,
+                    password: document.getElementById("password").value,
+                    kasmServerNeeded: false,
+                });
+                const signupOptions = {
+                    ...fetchOptions,
+                    method: "POST",
+                    body: signupData,
+                };
+                fetch(signupURL, signupOptions)
+                    .then(signupResponse => {
+                        if (!signupResponse.ok) {
+                            throw new Error("Account creation failed!");
+                        }
+                        return signupResponse.json();
+                    })
+                    .then(signupResult => {
+                        console.log("Account creation successful!", signupResult);
+                        // alert("Account Creation Successful. Logging you into Flask/Spring!");
+                        // Retry login after account creation
+                        return fetch(loginURL, loginOptions);
+                    })
+                    .then(newLoginResponse => {
+                        if (!newLoginResponse.ok) {
+                            throw new Error("Login failed after account creation");
+                        }
+                        console.log("Login successful after account creation!");
+                        // Fetch database after successful login
+                        return fetch(databaseURL, fetchOptions);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Spring server response: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Java database response:", data);
+                    })
+                    .catch(newLoginError => {
+                        console.error("Error after account creation:", newLoginError.message);
+                    });
+            } else {
+                console.log("Logged in!");
+            }
+        });
+};
     // Function to fetch and display Python data
     function pythonDatabase() {
         // Skip the /api/id fetch due to CORS restrictions with credentials mode.
