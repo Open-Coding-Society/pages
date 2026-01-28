@@ -77,7 +77,8 @@ show_reading_time: false
 </div>
 
 <script type="module">
-import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video');
@@ -121,11 +122,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const imageData = canvas.toDataURL('image/png');
 
         fetch(`${pythonURI}/facial/authenticate`, {
+            ...fetchOptions,
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
             body: JSON.stringify({ image: imageData })
         })
         .then(response => response.json())

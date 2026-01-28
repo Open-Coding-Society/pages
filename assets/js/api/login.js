@@ -118,11 +118,7 @@ async function updateNavigation(isLoggedIn) {
     // Logged in: fetch user's courses
     console.log("User logged in, fetching courses...");
     try {
-        const response = await fetch(`${pythonURI}/api/user/class`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' }
-        });
+        const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions ); 
 
         if (!response.ok) {
             console.warn("Course fetch failed:", response.status);
