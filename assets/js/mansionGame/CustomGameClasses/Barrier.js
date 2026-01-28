@@ -1,5 +1,5 @@
-import GameObject from '../../BetterGameEngine/MansionEngine/GameObject.js';
-import Player from '../../BetterGameEngine/MansionEngine/Player.js';
+import GameObject from '../../BetterGameEngine/MansionLogic/GameObject.js';
+import Player from '../../BetterGameEngine/MansionLogic/Player.js';
 
 //cool comment
 class Barrier extends GameObject {
