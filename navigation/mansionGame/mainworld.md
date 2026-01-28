@@ -6,29 +6,25 @@ microblog: true
 ---
 
 <style>
-/* Center game container and canvas */
+body {
+    margin: 0;
+    padding: 0;
+}
+
 #gameContainer {
-    width: 100%;
-    max-width: 800px;
-    height: 600px;
-    margin: 20px auto;
-    position: relative;
-    background: #000;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    width: 100%;
+    padding-top: 20px;
+    position: relative;
+    background: #000;
 }
 
 #gameCanvas {
-    width: 100%;
-    height: 100%;
     display: block;
-    background: transparent;
-}
-
-/* Ensure proper stacking */
-.promptDropDown {
-    position: absolute !important;
+    max-width: 100%;
+    height: auto;
 }
 </style>
 

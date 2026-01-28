@@ -1,5 +1,5 @@
 // PauseMenu.js - reusable pause menu component for mansion games
-import { javaURI, fetchOptions } from '../api/config.js';
+import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 export default class PauseMenu {
     constructor(gameControl, options = {}) {
         this.gameControl = gameControl;
