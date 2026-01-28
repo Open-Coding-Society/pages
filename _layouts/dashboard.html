@@ -596,17 +596,15 @@ score += gists * 0.5
                         if (hasExistingEval) {
                             // Use PUT to update
                             res = await fetch(`${javaURI}/api/admin-evaluation/update/${currentPerson.id}`, {
+                                ...fetchOptions,
                                 method: 'PUT',
-                                credentials: 'include',
-                                headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(body)
                             });
                         } else {
                             // Use POST to create
                             res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
+                                ...fetchOptions,
                                 method: 'POST',
-                                credentials: 'include',
-                                headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(body)
                             });
                         }
@@ -2292,10 +2290,8 @@ score += gists * 0.5
         sendBtn.disabled = true;
 
         const res = await fetch(`${javaURI}/api/upai`, {
+          ...fetchDataOptions, 
           method: 'POST',
-          mode: 'cors',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt: promptText
           })

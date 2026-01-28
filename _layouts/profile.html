@@ -373,9 +373,8 @@ active_tab: profile
 
                 // Join group using the cached person ID from the initial chain
                 fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+                    ...fetchOptions,
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
                 })
                 .then(joinResp => {
                     if (!joinResp.ok) {
@@ -437,20 +436,12 @@ active_tab: profile
         
         try {
             // Fetch all available personas
-            const personasResp = await fetch(`${pythonURI}/api/persona`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions); 
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
             
             // Get user's personas from the RIGHT endpoint
-            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
             
             if (!userPersonasResp.ok) {
                 // If 401, user might not be authenticated or endpoint doesn't exist
@@ -681,9 +672,8 @@ active_tab: profile
             
             // Add the new persona - backend handles replacement
             const response = await fetch(`${pythonURI}/api/user/persona`, {
+                ...fetchOptions,
                 method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     persona_id: personaId,
                     weight: 2
@@ -990,12 +980,7 @@ active_tab: profile
     
     async function loadUserClasses() {
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions); 
             if (!response.ok) {
                 console.error('Failed to load classes');
                 return;
@@ -1056,9 +1041,8 @@ active_tab: profile
 
         try {
             const response = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
                 method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ class: newClass })
             });
 
@@ -1083,9 +1067,8 @@ active_tab: profile
         try {
             // Use POST with action parameter instead of DELETE
             const response = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
                 method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     action: 'remove',
                     class: classToRemove 
@@ -1110,9 +1093,8 @@ active_tab: profile
 
         try {
             const response = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
                 method: 'PUT',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ class: updatedClasses })
             });
 
@@ -1141,12 +1123,7 @@ active_tab: profile
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions); 
             if (!response.ok) {
                 throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
             }
