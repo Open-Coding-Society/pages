@@ -1,4 +1,4 @@
-import Game from "../BetterGameEngine/GameEngine/Game.js";
+import Game from "../BetterGameEngine/features/Game.js";
 class Quiz {
     constructor(game = null) {
         this.game = game;

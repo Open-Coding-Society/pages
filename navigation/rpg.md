@@ -171,7 +171,7 @@ function closeCustomAlert() {
             console.warn('Adventure engine load failed, trying BetterGameEngine:', eAdv);
             try {
                 const prefix = await ensureBasePrefix();
-                const betterUrl = `${prefix}/assets/js/BetterGameEngine/GameEngine/Game.js?v=${Date.now()}`;
+                const betterUrl = `${prefix}/assets/js/BetterGameEngine/features/Game.js?v=${Date.now()}`;
                 // Prefetch and validate Better engine too
                 try {
                     const r = await fetch(betterUrl, { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
