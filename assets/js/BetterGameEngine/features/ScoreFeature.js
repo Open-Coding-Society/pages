@@ -4,6 +4,59 @@ import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 export default class ScoreFeature {
     constructor(pauseMenu) {
         this.pauseMenu = pauseMenu;
+        this._createScoreCounter();
+    }
+
+    /**
+     * Create the score counter UI element below the buttons
+     */
+    _createScoreCounter() {
+        if (!this.pauseMenu.gameControl) return;
+        
+        const parent = (this.pauseMenu.gameControl && this.pauseMenu.gameControl.gameContainer) 
+            || document.getElementById(this.pauseMenu.options.parentId) 
+            || document.body;
+
+        const scoreCounter = document.createElement('div');
+        scoreCounter.className = 'pause-score-counter';
+        scoreCounter.style.position = 'fixed';
+        scoreCounter.style.top = '120px';
+        scoreCounter.style.left = '20px';
+        scoreCounter.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        scoreCounter.style.color = '#fff';
+        scoreCounter.style.padding = '10px 15px';
+        scoreCounter.style.borderRadius = '5px';
+        scoreCounter.style.fontSize = '16px';
+        scoreCounter.style.fontWeight = 'bold';
+        scoreCounter.style.zIndex = '9998';
+        scoreCounter.style.minWidth = '150px';
+        scoreCounter.style.textAlign = 'center';
+        
+        const scoreLabel = document.createElement('div');
+        scoreLabel.style.fontSize = '12px';
+        scoreLabel.style.color = '#aaa';
+        scoreLabel.style.marginBottom = '5px';
+        scoreLabel.innerText = 'Score';
+        
+        const scoreValue = document.createElement('div');
+        scoreValue.className = 'pause-score-value';
+        scoreValue.style.fontSize = '24px';
+        scoreValue.innerText = '0';
+        
+        scoreCounter.appendChild(scoreLabel);
+        scoreCounter.appendChild(scoreValue);
+        parent.appendChild(scoreCounter);
+        
+        this._scoreValue = scoreValue;
+    }
+
+    /**
+     * Update the score counter display
+     */
+    updateScoreDisplay(value) {
+        if (this._scoreValue) {
+            this._scoreValue.innerText = String(value);
+        }
     }
 
     /**
