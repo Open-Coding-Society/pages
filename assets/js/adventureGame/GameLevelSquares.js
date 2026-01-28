@@ -1,6 +1,6 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from './adventureLogic/GameEnvBackground.js';
-import Player from './adventureLogic/Player.js';
+import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import Player from '../BetterGameEngine/adventureLogic/Player.js';
 
 // Minimal Definition
 class GameLevelSquares {

@@ -1,4 +1,4 @@
-import Npc from "./adventureLogic/Npc.js";
+import Npc from "../BetterGameEngine/adventureLogic/Npc.js";
 
 class FinancialAdvisor extends Npc {
     constructor(data = null, gameEnv = null) {

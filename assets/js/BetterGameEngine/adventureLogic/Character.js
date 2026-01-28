@@ -1,5 +1,5 @@
 import GameObject from './GameObject.js';
-import { Transform } from './Transform.js';
+import { Transform } from '../essentials/Transform.js';
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas

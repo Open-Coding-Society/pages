@@ -1,5 +1,5 @@
 import Character from './Character.js';
-import TouchControls from './TouchControls.js';
+import TouchControls from '../features/TouchControls.js';
 
 
 // Define non-mutable constants as defaults

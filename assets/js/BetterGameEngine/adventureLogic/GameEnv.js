@@ -113,26 +113,18 @@ class GameEnv {
      * Sets the top offset based on the height of the header element.
      */
     setTop() {
-        // If constrained by game environment, no header offset needed
-        if (this.game?.innerHeight) {
-            this.top = 0;
-        } else {
-            const header = document.querySelector('header');
-            this.top = header ? header.offsetHeight : 0;
-        }
+        // Default to 0 - game container should handle its own positioning
+        const header = document.querySelector('header');
+        this.top = header ? header.offsetHeight : 0;
     }
 
     /**
      * Sets the bottom offset based on the height of the footer element.
      */
     setBottom() {
-        // If constrained by game environment, no footer offset needed
-        if (this.game?.innerHeight) {
-            this.bottom = 0;
-        } else {
-            const footer = document.querySelector('footer');
-            this.bottom = footer ? footer.offsetHeight : 0;
-        }
+        // Default to 0 - game container should handle its own positioning
+        const footer = document.querySelector('footer');
+        this.bottom = footer ? footer.offsetHeight : 0;
     }
 
     /**

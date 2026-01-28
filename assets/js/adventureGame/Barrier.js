@@ -1,4 +1,4 @@
-import GameObject from './adventureLogic/GameObject.js';
+import GameObject from '../BetterGameEngine/adventureLogic/GameObject.js';
 
 class Barrier extends GameObject {
     constructor(data = {}, gameEnv = null) {
