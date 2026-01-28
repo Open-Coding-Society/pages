@@ -2,8 +2,6 @@
 export default class PauseFeature {
     constructor(pauseMenu) {
         this.pauseMenu = pauseMenu;
-        // Properly bind the key handler so 'this' refers to the PauseFeature instance
-        this._boundKeyHandler = (e) => this._handleKeyDown(e);
     }
 
     show() {
@@ -17,7 +15,6 @@ export default class PauseFeature {
         this.pauseMenu.container.style.display = 'flex';
         this.pauseMenu.container.style.zIndex = '10000'; // Ensure overlay is on top
         this.pauseMenu.container.setAttribute('aria-hidden', 'false');
-        document.addEventListener('keydown', this._boundKeyHandler);
         const btn = this.pauseMenu.container.querySelector('button');
         if (btn) btn.focus();
         if (typeof this.pauseMenu._updateStatsDisplay === 'function') {
@@ -29,7 +26,6 @@ export default class PauseFeature {
         if (!this.pauseMenu.container) return;
         this.pauseMenu.container.style.display = 'none';
         this.pauseMenu.container.setAttribute('aria-hidden', 'true');
-        document.removeEventListener('keydown', this._boundKeyHandler);
         
         // Resume the game
         if (this.pauseMenu.gameControl && typeof this.pauseMenu.gameControl.resume === 'function') {
@@ -51,9 +47,6 @@ export default class PauseFeature {
     }
 
     _handleKeyDown(e) {
-        if (e.key === 'Escape' || e.key === 'Esc') {
-            e.preventDefault();
-            this.toggle();
-        }
+        // No-op: ESC-based pause handling has been disabled in favor of UI controls.
     }
 }

@@ -54,6 +54,8 @@ export class Background extends GameObject {
         }
         this.canvas.width = gameCanvas.width;
         this.canvas.height = gameCanvas.height;
+        this.canvas.style.width = `${gameCanvas.width}px`;
+        this.canvas.style.height = `${gameCanvas.height}px`;
         this.canvas.style.left = gameCanvas.style.left;
         this.canvas.style.top = gameCanvas.style.top;
     }

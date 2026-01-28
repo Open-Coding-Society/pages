@@ -28,7 +28,10 @@ export class Background extends GameObject {
 
             // Create the canvas element and context
             this.canvas = document.createElement("canvas");
+            this.canvas.style.display = "block";
             this.canvas.style.position = "absolute";
+            this.canvas.style.top = "0";
+            this.canvas.style.left = "0";
             this.canvas.style.zIndex = this.data.zIndex || "0";
             this.canvas.id = data.id || "background";
             this.ctx = this.canvas.getContext("2d", { willReadFrequently: true });
@@ -54,8 +57,8 @@ export class Background extends GameObject {
         }
         this.canvas.width = gameCanvas.width;
         this.canvas.height = gameCanvas.height;
-        this.canvas.style.left = gameCanvas.style.left;
-        this.canvas.style.top = gameCanvas.style.top;
+        this.canvas.style.width = `${gameCanvas.width}px`;
+        this.canvas.style.height = `${gameCanvas.height}px`;
     }
 
     /**
