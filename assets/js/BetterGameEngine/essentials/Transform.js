@@ -1,5 +1,5 @@
 // Import the Vec2 class, which handles 2D vector math (position, velocity, etc.)
-import { Vec2 } from 'essentials/Vectors.js';
+import { Vec2 } from './Vectors.js';
 
 // Define a Transform class to manage an object's position, movement, and size
 export class Transform {

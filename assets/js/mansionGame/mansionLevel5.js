@@ -1,10 +1,10 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from '../BetterGameEngine/MansionEngine/GameEnvBackground.js';
-import Player from '../BetterGameEngine/MansionEngine/Player.js';
-import Enemy from '../BetterGameEngine/MansionEngine/Enemy.js';
-import GameControl from '../BetterGameEngine/MansionEngine/GameControl.js';
-import Character from '../BetterGameEngine/MansionEngine/Character.js';
-import Npc from '../BetterGameEngine/MansionEngine/Npc.js';
+import GameEnvBackground from '../MansionEngine/GameEnvBackground.js';
+import Player from '../MansionEngine/Player.js';
+import Enemy from '../MansionEngine/Enemy.js';
+import GameControl from '../MansionEngine/GameControl.js';
+import Character from '../MansionEngine/Character.js';
+import Npc from '../MansionEngine/Npc.js';
 import GameLevel6 from './mansionLevel6.js';
 
 
