@@ -8,6 +8,11 @@ export default class PauseMenu {
         this.gameControl = gameControl;
         this.container = null;
 
+        // Register this PauseMenu with the GameControl so it can interact with ESC key handling
+        if (this.gameControl) {
+            this.gameControl.pauseMenu = this;
+        }
+
         this.options = Object.assign({
             parentId: 'gameContainer',
             cssPath: '/assets/css/pause-menu.css',
