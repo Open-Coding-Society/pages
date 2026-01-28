@@ -10,7 +10,6 @@ permalink: /digital-famine/planets
 </div>
 
 <script type="module">
-    // Adventure Game assets locations (use central core + GameControl)
     import Core from "{{site.baseurl}}/assets/js/adventureGame/adventureLogic/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/adventureGame/adventureLogic/GameControl.js";
     import GameLevelHomePage from "{{site.baseurl}}/assets/js/digitalFamine/GameLevelHomePage.js";
