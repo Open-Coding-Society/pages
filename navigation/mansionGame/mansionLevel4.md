@@ -10,8 +10,8 @@ microblog: true
 </div>
 <script type="module">
     // Mansion Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/features/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameControl.js";
     import GameLevel4 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel4.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Web Server Environment data

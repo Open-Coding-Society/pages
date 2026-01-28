@@ -5,6 +5,29 @@ permalink: /gamify/mansionGame
 microblog: true
 ---
 
+<style>
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#gameContainer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    padding-top: 20px;
+    position: relative;
+    background: #000;
+}
+
+#gameCanvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+</style>
+
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
     <canvas id='gameCanvas'></canvas>
@@ -12,8 +35,8 @@ microblog: true
 
 <script type="module">
     // Mansion Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/features/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/cheats.js";
     import GameLevelMain from "{{site.baseurl}}/assets/js/mansionGame/mansionLevelMain.js";
     import GameLevel1 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel1.js";

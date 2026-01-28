@@ -1,113 +1,35 @@
-// combined game.js files from adventure and mansion games
+import GameControl from './GameControl.js';
+import Multiplayer from './Multiplayer.js';
 
-class GameCore {
-    constructor(environment, GameControlClass) {
-    this.environment = environment;
-    this.path = environment.path;
-    this.gameContainer = environment.gameContainer;
-    this.gameCanvas = environment.gameCanvas;
-    this.pythonURI = environment.pythonURI;
-    this.javaURI = environment.javaURI;
-    this.fetchOptions = environment.fetchOptions;
-    this.uid = null;
-    this.id = null;
-    this.gname = null;
+class Game {
+    constructor(environment) {
+        this.environment = environment;
+        this.path = environment.path;
+        this.gameContainer = environment.gameContainer;
+        this.gameCanvas = environment.gameCanvas;
+        this.pythonURI = environment.pythonURI;
+        this.javaURI = environment.javaURI;
+        this.fetchOptions = environment.fetchOptions;
+        this.uid = null;
+        this.id = null;
+        this.gname = null;
+        this.username = null;
+        this.gameName = this._extractGameName();
 
-    // Snapshot the starting level list so we can reliably reset after the final level
-    this.initialLevelClasses = [...(environment.gameLevelClasses || [])];
+        // Preserve original level set so we can return to start (plains/zombie) after final levels
+        this.initialLevelClasses = environment.gameLevelClasses;
 
-    this.initUser();
-    const gameLevelClasses = [...this.initialLevelClasses];
-    // create GameControl using the engine-provided class
-    this.gameControl = new GameControlClass(this, gameLevelClasses);
-    this.gameControl.start();
-
-    // Try to dynamically load the centralized PauseMenu (prefer the shared one)
-    import('./PauseMenu.js')
-        .then(mod => {
-            try {
-                // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
-                const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
-                new mod.default(this.gameControl, pmOptions);
-            } catch (e) { console.warn('PauseMenu init failed:', e); }
-        })
-        .catch(() => {
-            // no-op: PauseMenu is optional
-        });
-
-    // Try to dynamically load the Leaderboard
-    import('./Leaderboard.js')
-        .then(mod => {
-            try {
-                // Get the actual container element from gameContainer
-                let parentId = 'gameContainer'; // default
-                
-                // If gameContainer is a string ID, use it directly
-                if (typeof this.gameContainer === 'string') {
-                    parentId = this.gameContainer;
-                }
-                // If gameContainer is an HTMLElement, get its ID
-                else if (this.gameContainer instanceof HTMLElement) {
-                    parentId = this.gameContainer.id || 'gameContainer';
-                }
-                
-                new mod.default(this.gameControl, { 
-                    gameName: 'AdventureGame',  // Change to your game name
-                    parentId: parentId          // Use the dynamic container ID
-                }); 
-            }
-            catch (e) { console.warn('Leaderboard init failed:', e); }
-        })
-        .catch(() => {
-            // no-op: Leaderboard is optional
-        });
-}
-
-    static main(environment, GameControlClass) {
-        return new GameCore(environment, GameControlClass);
+        this.initUser();
+        const gameLevelClasses = environment.gameLevelClasses;
+        this.gameControl = new GameControl(this, gameLevelClasses);
+        this.gameControl.start();
+        
+        // Initialize multiplayer after a short delay to ensure user is loaded
+        setTimeout(() => this.initMultiplayer(), 500);
     }
 
-    returnHome() {
-        if (!this.gameControl || !this.initialLevelClasses.length) return;
-
-        try {
-            if (this.gameControl.currentLevel && typeof this.gameControl.currentLevel.destroy === 'function') {
-                this.gameControl.currentLevel.destroy();
-            }
-            this.gameControl.cleanupInteractionHandlers();
-        } catch (error) {
-            console.error("Error during cleanup when returning home:", error);
-        }
-
-        // Restore the original level order and restart from the first one
-        this.gameControl.levelClasses = [...this.initialLevelClasses];
-        this.gameControl.currentLevelIndex = 0;
-        this.gameControl.isPaused = false;
-        this.gameControl.transitionToLevel();
-    }
-
-    loadNextLevel() {
-        if (this.gameControl && this.gameControl.currentLevel) {
-            this.gameControl.currentLevel.continue = false;
-            console.log("Loading next level...");
-        } else {
-            console.warn("GameControl or currentLevel not available");
-        }
-    }
-
-    loadPreviousLevel() {
-        if (this.gameControl && this.gameControl.currentLevelIndex > 0) {
-            try {
-                this.gameControl.currentLevel.destroy();
-                this.gameControl.cleanupInteractionHandlers();
-            } catch (error) {
-                console.error("Error during cleanup when returning home:", error);
-            }
-            this.gameControl.currentLevelIndex--;
-            this.gameControl.transitionToLevel();
-        } else {
-            console.warn("No previous level to load");
-        }
+    static main(environment) {
+        return new Game(environment);
     }
 
     initUser() {
@@ -123,6 +45,7 @@ class GameCore {
             .then(data => {
                 if (!data) return;
                 this.uid = data.uid;
+                this.username = data.username || `player_${this.uid}`;
 
                 const javaURL = this.javaURI + '/rpg_answer/person/' + this.uid;
                 return fetch(javaURL, this.fetchOptions);
@@ -141,8 +64,35 @@ class GameCore {
                 console.error("Error:", error);
             });
     }
+
+    initMultiplayer() {
+        // Initialize multiplayer with your Java backend
+        this.multiplayer = new Multiplayer(this, 4, {
+            apiUrl: this.javaURI,
+            useWebSocket: false,
+            useLocal: true
+        });
+        this.multiplayer.init();
+        console.log('[Game] Multiplayer initialized');
+    }
+
+    // Return to the first level sequence when all levels are done or skip is used on the final level
+    returnHome() {
+        if (!this.gameControl || !this.initialLevelClasses || !this.initialLevelClasses.length) return;
+        this.gameControl.levelClasses = this.initialLevelClasses;
+        this.gameControl.currentLevelIndex = 0;
+        this.gameControl.isPaused = false;
+        this.gameControl.transitionToLevel();
+    }
+
+    // Extract game name from the current URL pathname
+    _extractGameName() {
+        if (typeof window === 'undefined') return 'unknown';
+        const pathname = window.location.pathname;
+        // Extract game name from URL like /gamify/adventureGame or /gamify/mansionGame
+        const match = pathname.match(/\/(\w+Game)/);
+        return match ? match[1] : 'unknown';
+    }
 }
 
-export default {
-    main: (environment, GameControlClass) => GameCore.main(environment, GameControlClass)
-};
+export default Game;

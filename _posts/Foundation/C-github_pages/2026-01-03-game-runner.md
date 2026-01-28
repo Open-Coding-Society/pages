@@ -4,7 +4,8 @@ courses: { csse: {week: 8}, csp: {week: 17}, csa: {week: 20 } }
 codemirror: true
 title: Game Runner Examples
 description: Learn game development using the GameEngine framework in a contained educational environment. Build game levels, add characters, and create interactive experiences with live code editing and debugging controls.
-permalink: /code/game
+permalink: /rpg/game
+
 ---
 
 ## Define Game Runner in a Lesson
@@ -18,7 +19,7 @@ Create a basic game level with a player character. Use the GameEngine to set up 
 
 {% capture code1 %}
 // Import GameEngine modules
-import GameControl from '{{site.baseurl}}/assets/js/adventureGame/GameEngine/GameControl.js';
+import GameControl from '{{site.baseurl}}/assets/js/BetterGameEngine/GameEngine/GameControl.js';
 import GameLevelBasic from '{{site.baseurl}}/assets/js/adventureGame/GameLevelBasic.js';
 // Export for game runner
 export { GameControl };
@@ -85,7 +86,7 @@ Your game code must export two things:
 2. **gameLevelClasses**: Array of game level classes
 
 ```javascript
-import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
+import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 
 export const GameControl = GameControl;
@@ -102,7 +103,7 @@ Run the basic desert adventure game. Use WASD or arrow keys to move Chill Guy ar
 
 {% capture code1 %}
 // Import GameEngine modules
-import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
+import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 // Export for game runner
 export { GameControl };
@@ -126,7 +127,7 @@ Create a multi-level game! Start in the desert, then switch to the water level u
 
 {% capture code2 %}
 // Import GameEngine modules
-import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
+import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 import GameLevelBasicWater from '/assets/js/adventureGame/GameLevelBasicWater.js';
 // Export multiple levels
@@ -151,9 +152,9 @@ Create your own custom game level! This example shows how to define a simple lev
 
 {% capture code3 %}
 // Import core GameEngine components
-import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
+import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
+import GameEnvBackground from '/assets/js/BetterGameEngine/GameEngine/GameEnvBackground.js';
+import Player from '/assets/js/BetterGameEngine/GameEngine/Player.js';
 
 // Define custom level class
 class CustomLevel {
@@ -217,7 +218,7 @@ export const gameLevelClasses = [CustomLevel];
 
 Always import necessary GameEngine modules:
 ```javascript
-import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
+import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 ```
 

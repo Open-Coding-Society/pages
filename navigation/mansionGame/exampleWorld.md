@@ -11,8 +11,8 @@ permalink: /gamify/testWorld
 
 <script type="module">
     // Mansion Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/features/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/cheats.js";
     import GameLevelMain from "{{site.baseurl}}/assets/js/mansionGame/mansionLevelMain.js";
     import GameLevel1 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel1.js";

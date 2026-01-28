@@ -1,17 +1,17 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './GameEngine/GameEnvBackground.js';
-import Player from './GameEngine/Player.js';
-import Npc from './GameEngine/Npc.js';
-import Coin from './GameEngine/Coin.js';
+import GamEnvBackground from '../BetterGameEngine/GameEngine/GameEnvBackground.js';
+import Player from '../BetterGameEngine/GameEngine/Player.js';
+import Npc from '../BetterGameEngine/GameEngine/Npc.js';
+import Coin from '../BetterGameEngine/GameEngine/Coin.js';
 import Quiz from './Quiz.js';
-import DialogueSystem from './GameEngine/DialogueSystem.js';
-import GameControl from './GameEngine/GameControl.js';
+import DialogueSystem from '../BetterGameEngine/GameEngine/DialogueSystem.js';
+import GameControl from '../BetterGameEngine/GameEngine/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
-import AINpc from './GameEngine/aiNpc.js';
+import AINpc from '../BetterGameEngine/GameEngine/aiNpc.js';
 
 class GameLevelDesert {
   constructor(gameEnv) {
@@ -859,25 +859,24 @@ class GameLevelDesert {
         }
     };
 
-    // ===== CUSTOM AI NPCs =====
-    // Example: Create an AI NPC using the AINpc class
+    window.GEMINI_API_KEY = '';
     // ===== CUSTOM AI NPCs =====
     const historianNpc = new AINpc({
-        id: "Professor History",
+        id: "ProfessorHistory",  
         greeting: "Hello! I'm an expert in history!",
         expertise: "history",
         sprite: path + "/assets/js/adventureGame/images/character-spritesheet.png",
         spriteWidth: 559,
         spriteHeight: 263,
-        scaleFactor:2,
-        animationRate: 500,
+        scaleFactor: 0.5,
+        animationRate: 10,
         randomPosition: true,
         gameEnv: gameEnv,
 
         // Sprite sheet layout
         orientation: { rows: 4, columns: 9 },
 
-        // ✅ LOCK: use ONLY the 4th row (index 3) for every direction/state
+        // LOCK: use ONLY the 4th row (index 3) for every direction/state
         down:      { row: 3, start: 0, columns: 9 },
         up:        { row: 3, start: 0, columns: 9 },
         left:      { row: 3, start: 0, columns: 9 },

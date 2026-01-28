@@ -57,6 +57,8 @@ permalink: /
 <!-- ================= GAME SCRIPT ================= -->
 
 <script>
+<button id="revealAll">Reveal Map</button>
+
   //////////////////// METADATA ////////////////////
 
   var mario_metadata = {};
@@ -102,64 +104,76 @@ permalink: /
       this.el = document.getElementById("mario");
       this.pixels = {{pixels}};
       this.positionX = 0;
+      this.positionY = 200; // starting Y position
       this.speed = 0;
       this.frame = 0;
       this.interval = 100;
       this.timer = null;
     }
 
-    animate(state, speed) {
-      this.stop();
-      this.speed = speed;
-      const row = state.row * this.pixels;
+animate(state, dx, dy) {
+  this.stop();
+  const row = state.row * this.pixels;
 
-      this.timer = setInterval(() => {
-        const col = (this.frame + state.col) * this.pixels;
-        this.el.style.backgroundPosition = `-${col}px -${row}px`;
-        this.el.style.left = `${this.positionX}px`;
+  this.timer = setInterval(() => {
+    const col = (this.frame + state.col) * this.pixels;
+    this.el.style.backgroundPosition = `-${col}px -${row}px`;
 
-        this.positionX += speed;
-        this.frame = (this.frame + 1) % state.frames;
+    this.positionX += dx;
+    this.positionY += dy;
 
-        const rect = this.el.getBoundingClientRect();
-        reveal(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    this.el.style.left = `${this.positionX}px`;
+    this.el.style.top = `${this.positionY}px`;
 
-        if (this.positionX > window.innerWidth - this.pixels) {
-          document.documentElement.scrollLeft =
-            this.positionX - window.innerWidth + this.pixels;
-        }
-      }, this.interval);
-    }
+    this.frame = (this.frame + 1) % state.frames;
+
+    const rect = this.el.getBoundingClientRect();
+    reveal(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }, this.interval);
+}
+
 
     stop() {
       clearInterval(this.timer);
     }
 
-    start(name, speed) {
-      this.animate(this.meta[name], speed);
-    }
+start(name, dx = 0, dy = 0) {
+  this.animate(this.meta[name], dx, dy);
+}
+
   }
 
   const mario = new Mario(mario_metadata);
 
   //////////////////// CONTROLS ////////////////////
 
-  window.addEventListener("keydown", e => {
-    if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+window.addEventListener("keydown", e => {
+  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
 
-    if (e.key === "ArrowRight" || e.key === "d") {
-      mario.start("Walk", 3);
-    }
-    if (e.key === "ArrowLeft" || e.key === "a") {
-      mario.start("WalkL", -3);
-    }
-    if (e.key === "ArrowUp" || e.key === "w") {
-      mario.start("Flip", 0);
-    }
-    if (e.key === "ArrowDown" || e.key === "s") {
-      mario.start("Rest", 0);
-    }
-  });
+  switch (e.key.toLowerCase()) {
+    case "d":
+    case "arrowright":
+      mario.start("Walk", 5, 0);
+      break;
+
+    case "a":
+    case "arrowleft":
+      mario.start("WalkL", -5, 0);
+      break;
+
+    case "w":
+    case "arrowup":
+      mario.start("Walk", 0, -5);
+      break;
+
+    case "s":
+    case "arrowdown":
+      mario.start("Walk", 0, 5);
+      break;
+  }
+});
+
+
 
   window.addEventListener("blur", () => mario.stop());
 
@@ -171,6 +185,13 @@ permalink: /
     mario.el.style.transform = `scale(${0.2 * scale})`;
     mario.start("Rest", 0);
   });
+
+  function revealAll() {
+  fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+}
+
+document.getElementById("revealAll").addEventListener("click", revealAll);
+
 </script>
 
 <!-- ================= PAGE CONTENT ================= -->
