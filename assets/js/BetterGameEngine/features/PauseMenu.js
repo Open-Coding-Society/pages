@@ -81,8 +81,8 @@ export default class PauseMenu {
         const buttonBar = document.createElement('div');
         buttonBar.className = 'pause-button-bar';
         buttonBar.style.position = 'fixed';
-        buttonBar.style.bottom = '20px';
-        buttonBar.style.right = '20px';
+        buttonBar.style.top = '60px';
+        buttonBar.style.left = '20px';
         buttonBar.style.display = 'flex';
         buttonBar.style.gap = '10px';
         buttonBar.style.zIndex = '9999';

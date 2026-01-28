@@ -2,30 +2,26 @@
 export default class PauseFeature {
     constructor(pauseMenu) {
         this.pauseMenu = pauseMenu;
+        this.isPaused = false; // Track pause state
     }
 
     show() {
         if (!this.pauseMenu.container) return;
+        
+        this.isPaused = true;
         
         // Pause the game
         if (this.pauseMenu.gameControl && typeof this.pauseMenu.gameControl.pause === 'function') {
             this.pauseMenu.gameControl.pause();
         }
         
-        this.pauseMenu.container.style.display = 'flex';
-        this.pauseMenu.container.style.zIndex = '10000'; // Ensure overlay is on top
-        this.pauseMenu.container.setAttribute('aria-hidden', 'false');
-        const btn = this.pauseMenu.container.querySelector('button');
-        if (btn) btn.focus();
-        if (typeof this.pauseMenu._updateStatsDisplay === 'function') {
-            this.pauseMenu._updateStatsDisplay();
-        }
+        // Don't show the pause menu UI - just pause the game silently
     }
 
     hide() {
         if (!this.pauseMenu.container) return;
-        this.pauseMenu.container.style.display = 'none';
-        this.pauseMenu.container.setAttribute('aria-hidden', 'true');
+        
+        this.isPaused = false;
         
         // Resume the game
         if (this.pauseMenu.gameControl && typeof this.pauseMenu.gameControl.resume === 'function') {
@@ -38,8 +34,7 @@ export default class PauseFeature {
     }
 
     toggle() {
-        if (!this.pauseMenu.container) return;
-        if (this.pauseMenu.container.style.display === 'flex') {
+        if (this.isPaused) {
             this.hide();
         } else {
             this.show();
