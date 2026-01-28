@@ -317,26 +317,49 @@ class Character extends GameObject {
         this.transform.x += this.transform.xv;
         this.transform.y += this.transform.yv;
 
-        // Ensure the object stays within the canvas boundaries
-        // Bottom of the canvas
-        if (this.transform.y + this.height > this.gameEnv.innerHeight) {
-            this.transform.y = this.gameEnv.innerHeight - this.height;
-            this.transform.yv = 0;
-        }
-        // Top of the canvas
-        if (this.transform.y < 0) {
-            this.transform.y = 0;
-            this.transform.yv = 0;
-        }
-        // Right of the canvas
-        if (this.transform.x + this.width > this.gameEnv.innerWidth) {
-            this.transform.x = this.gameEnv.innerWidth - this.width;
-            this.transform.xv = 0;
-        }
-        // Left of the canvas
-        if (this.transform.x < 0) {
-            this.transform.x = 0;
-            this.transform.xv = 0;
+        // Check if the sprite data has a custom walkingArea boundary
+        if (this.spriteData && this.spriteData.walkingArea) {
+            const walkingArea = this.spriteData.walkingArea;
+            
+            // Constrain position within walking area
+            if (this.transform.x < walkingArea.xMin) {
+                this.transform.x = walkingArea.xMin;
+                this.transform.xv = 0;
+            }
+            if (this.transform.x + this.width > walkingArea.xMax) {
+                this.transform.x = walkingArea.xMax - this.width;
+                this.transform.xv = 0;
+            }
+            if (this.transform.y < walkingArea.yMin) {
+                this.transform.y = walkingArea.yMin;
+                this.transform.yv = 0;
+            }
+            if (this.transform.y + this.height > walkingArea.yMax) {
+                this.transform.y = walkingArea.yMax - this.height;
+                this.transform.yv = 0;
+            }
+        } else {
+            // Ensure the object stays within the canvas boundaries (default behavior)
+            // Bottom of the canvas
+            if (this.transform.y + this.height > this.gameEnv.innerHeight) {
+                this.transform.y = this.gameEnv.innerHeight - this.height;
+                this.transform.yv = 0;
+            }
+            // Top of the canvas
+            if (this.transform.y < 0) {
+                this.transform.y = 0;
+                this.transform.yv = 0;
+            }
+            // Right of the canvas
+            if (this.transform.x + this.width > this.gameEnv.innerWidth) {
+                this.transform.x = this.gameEnv.innerWidth - this.width;
+                this.transform.xv = 0;
+            }
+            // Left of the canvas
+            if (this.transform.x < 0) {
+                this.transform.x = 0;
+                this.transform.xv = 0;
+            }
         }
     }
     
