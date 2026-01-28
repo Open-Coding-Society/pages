@@ -47,43 +47,10 @@ class GameEnv {
         this.setCanvas();
         this.setTop();
         this.setBottom();
-        // Calculate dimensions dynamically based on game environment or container
-        this.calculateDimensions();
+        // Use fixed dimensions for consistent game size
+        this.innerWidth = 800;
+        this.innerHeight = 600;
         this.size();
-    }
-
-    /**
-     * Calculate game dimensions dynamically based on available space.
-     */
-    calculateDimensions() {
-        // If game environment provides explicit dimensions, use those
-        if (this.game?.innerWidth && this.game?.innerHeight) {
-            this.innerWidth = this.game.innerWidth;
-            this.innerHeight = this.game.innerHeight;
-            return;
-        }
-
-        // Prefer window size minus header/footer offsets (original intended behavior)
-        const winW = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 1000;
-        const winH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 600;
-        const availableH = Math.max(100, winH - (this.top || 0) - (this.bottom || 0));
-
-        // If a container exists, constrain to its size but keep header/footer offsets in mind
-        if (this.container) {
-            const rect = this.container.getBoundingClientRect();
-            // If container reports reasonable size, use its width; otherwise fall back to window
-            const contW = rect && rect.width && rect.width > 50 ? rect.width : winW;
-            const contH = rect && rect.height && rect.height > 50 ? rect.height : availableH;
-
-            // Use container height but ensure we account for header/footer if container is full-page
-            this.innerWidth = Math.floor(Math.max(320, Math.min(contW, winW)));
-            this.innerHeight = Math.floor(Math.max(200, Math.min(contH, availableH)));
-            return;
-        }
-
-        // Fallback to window-based sizes
-        this.innerWidth = Math.floor(Math.max(320, winW));
-        this.innerHeight = Math.floor(Math.max(200, availableH));
     }
 
     /**
