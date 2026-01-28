@@ -12,7 +12,7 @@ permalink: /gamify/water
 <script type="module">
     // Adnventure Game assets locations
     import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/features/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/GameEngine/GameControl.js";
+    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/adventureLogic/GameControl.js";
     import GameLevelWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWater.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 

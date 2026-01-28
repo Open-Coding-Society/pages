@@ -1,7 +1,7 @@
-import GameEnvBackground from '../BetterGameEngine/GameEngine/GameEnvBackground.js';
-import Npc from '../BetterGameEngine/GameEngine/Npc.js';
-import Player from '../BetterGameEngine/GameEngine/Player.js';
-import GameControl from '../BetterGameEngine/GameEngine/GameControl.js';
+import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
+import Player from '../BetterGameEngine/adventureLogic/Player.js';
+import GameControl from '../BetterGameEngine/adventureLogic/GameControl.js';
 
 import GameLevelRetro from './GameLevelRetro.js';
 import Game from './Game.js';

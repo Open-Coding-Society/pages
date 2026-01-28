@@ -1,12 +1,12 @@
-import GamEnvBackground from '../BetterGameEngine/GameEngine/GameEnvBackground.js';
-import BackgroundParallax from '../BetterGameEngine/GameEngine/BackgroundParallax.js';
-import Player from '../BetterGameEngine/GameEngine/Player.js';
-import Npc from '../BetterGameEngine/GameEngine/Npc.js';  // Direct import for portal creation
-import Collectible from '../BetterGameEngine/GameEngine/Collectible.js';
+import GamEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import BackgroundParallax from '../BetterGameEngine/adventureLogic/BackgroundParallax.js';
+import Player from '../BetterGameEngine/adventureLogic/Player.js';
+import Npc from '../BetterGameEngine/adventureLogic/Npc.js';  // Direct import for portal creation
+import Collectible from '../BetterGameEngine/adventureLogic/Collectible.js';
 import Quiz from './Quiz.js';
 import Game from '../BetterGameEngine/features/Game.js';
-import Enemy from '../BetterGameEngine/GameEngine/Enemy.js';
-import DialogueSystem from '../BetterGameEngine/GameEngine/DialogueSystem.js';
+import Enemy from '../BetterGameEngine/adventureLogic/Enemy.js';
+import DialogueSystem from '../BetterGameEngine/adventureLogic/DialogueSystem.js';
 
 class GameLevelEnd {
   constructor(gameEnv) {
