@@ -324,7 +324,7 @@ class GameLevelEnd {
               document.removeEventListener('keydown', handleKeyPress);
               
               // Redirect to the specified URL
-              window.location.href = '/assets/js/adventureGame/GameEngine/endplatformer.html';
+              window.location.href = '/assets/js/adventureGame/adventureLogic/endplatformer.html';
             }
           };
           
