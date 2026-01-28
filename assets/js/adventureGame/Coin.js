@@ -71,31 +71,49 @@ export default class CoinObject extends GameObject {
      * Check if player is close enough to coin and replace with new one if touched
      */
     checkPlayerProximity() {
-        // Find all players in game objects
-        const players = this.gameEnv.gameObjects.filter(obj => obj.canvas && obj.id);
+        if (!this.gameEnv || !this.gameEnv.gameObjects) return;
         
-        for (let player of players) {
-            const playerRect = player.canvas.getBoundingClientRect();
-            const playerX = playerRect.left + playerRect.width / 2;
-            const playerY = playerRect.top + playerRect.height / 2;
+        // Find player in game objects - look for player by id or class name
+        const player = this.gameEnv.gameObjects.find(obj => 
+            obj.id?.toLowerCase().includes('player') || 
+            obj.constructor.name === 'Player'
+        );
+        
+        if (!player) return;
+        
+        // Get player position from transform (adventure game uses transform for position)
+        const playerX = player.transform?.x ?? 0;
+        const playerY = player.transform?.y ?? 0;
+        
+        // Get player dimensions
+        const playerWidth = player.width || player.size || 30;
+        const playerHeight = player.height || player.size || 30;
+        
+        // Calculate centers for distance calculation
+        const playerCenterX = playerX + playerWidth / 2;
+        const playerCenterY = playerY + playerHeight / 2;
+        
+        const coinCenterX = this.x + this.size / 2;
+        const coinCenterY = this.y + this.size / 2;
+        
+        // Calculate distance between player center and coin center
+        const dx = playerCenterX - coinCenterX;
+        const dy = playerCenterY - coinCenterY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        // If close enough (within 50 pixels), collect the coin
+        if (dist < 50) {
+            this.score += 1;
+            console.log("Coin collected! Score:", this.score);
             
-            const coinCenterX = this.x + this.size / 2;
-            const coinCenterY = this.y + this.size / 2;
-            
-            // Calculate distance between player and coin
-            const dist = Math.sqrt(Math.pow(playerX - coinCenterX, 2) + Math.pow(playerY - coinCenterY, 2));
-            
-            // If close enough, destroy this coin and create a new one at random position
-            if (dist < 50) {
-                this.score += 1;
-                // Update the game control's coin counter
-                if (this.gameEnv && this.gameEnv.gameControl && typeof this.gameEnv.gameControl.collectCoin === 'function') {
-                    this.gameEnv.gameControl.collectCoin(1);
-                }
-                this.createNewCoinAtRandomPosition();
-                console.log("Coin collected! Score:", this.score);
-                this.destroy();
+            // Update the game control's coin counter
+            if (this.gameEnv && this.gameEnv.gameControl && typeof this.gameEnv.gameControl.collectCoin === 'function') {
+                this.gameEnv.gameControl.collectCoin(1);
             }
+            
+            // Remove this coin and create a new one at random position
+            this.destroy();
+            this.createNewCoinAtRandomPosition();
         }
     }
 
