@@ -306,7 +306,7 @@ permalink: /exam-predictor
 </script>
 
 <script type="module">
-  import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     const saveButton = document.getElementById('savePredictionBtn');
@@ -317,10 +317,7 @@ permalink: /exam-predictor
     // Fetch current user data
     async function fetchCurrentUser() {
       try {
-        const response = await fetch(`${pythonURI}/api/user`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+        const response = await fetch(`${pythonURI}/api/user`, fetchOptions);
         if (response.ok) {
           currentUser = await response.json();
           console.log('Fetched current user:', currentUser);
@@ -397,11 +394,8 @@ permalink: /exam-predictor
       try {
         // Send the PUT request to update the user data
         const response = await fetch(`${pythonURI}/api/user`, {
+          ...fetchOptions,
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // Ensure cookies are sent for authentication
           body: JSON.stringify({ ap_exam: apExamData }), // Send the ap_exam field
         });
 

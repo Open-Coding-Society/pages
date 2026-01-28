@@ -134,10 +134,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         fetch(`${pythonURI}/api/mood/detect`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
             body: JSON.stringify({ image: imageData })
         })
         .then(response => response.json())
