@@ -13,7 +13,7 @@ microblog: true
 <script type="module">
     // Mansion Game assets locations (use central core + GameControl)
     import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/GameControl.js";
+    import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/BetterGameEngine/MansionEngine/cheats.js";
     import GameLevel3 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel3.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
