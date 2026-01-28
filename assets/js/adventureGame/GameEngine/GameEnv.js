@@ -48,7 +48,7 @@ class GameEnv {
         this.setTop();
         this.setBottom();
         // Use fixed dimensions for consistent game size
-        this.innerWidth = 800;
+        this.innerWidth = 1000;
         this.innerHeight = 600;
         this.size();
     }
