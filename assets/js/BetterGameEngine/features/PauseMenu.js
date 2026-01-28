@@ -105,6 +105,12 @@ export default class PauseMenu {
         btnSave.innerText = 'Save Score';
         btnSave.addEventListener('click', () => this.saveScore(btnSave));
 
+        // Skip Level Button
+        const btnSkipLevel = document.createElement('button');
+        btnSkipLevel.className = 'pause-btn skip-level';
+        btnSkipLevel.innerText = 'Skip Level';
+        btnSkipLevel.addEventListener('click', () => this.skipLevel());
+
         // Save Status Message
         const saveStatus = document.createElement('div');
         saveStatus.className = 'pause-save-status';
@@ -117,6 +123,7 @@ export default class PauseMenu {
         panel.appendChild(counterWrap);
         panel.appendChild(title);
         panel.appendChild(btnSave);
+        panel.appendChild(btnSkipLevel);
         panel.appendChild(saveStatus);
         overlay.appendChild(panel);
 
