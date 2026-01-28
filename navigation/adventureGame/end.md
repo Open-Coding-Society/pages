@@ -11,7 +11,7 @@ permalink: /gamify/end
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/features/Game.js";
+    import Core from "{{site.baseurl}}/assets/js/adventureGame/adventureLogic/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/adventureGame/adventureLogic/GameControl.js";
     import GameLevelEnd from "{{site.baseurl}}/assets/js/adventureGame/GameLevelEnd.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
