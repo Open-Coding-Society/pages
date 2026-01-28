@@ -4,7 +4,7 @@ import Player from './adventureLogic/Player.js';
 import GameControl from './adventureLogic/GameControl.js';
 
 import GameLevelRetro from './GameLevelRetro.js';
-import Game from './Game.js';
+import Game from './adventureLogic/Game.js';
 import StockMoodModal from './StockMoodModal.js';
 import Market from './Market.js';
 import HelpPanel2 from './HelpPanel2.js'; // ✅ new import

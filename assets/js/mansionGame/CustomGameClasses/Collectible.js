@@ -1,6 +1,6 @@
 // Collectible.js with DialogueSystem integration
-import Character from "../../BetterGameEngine/mansionLogic/Character.js";
-import DialogueSystem from "../../BetterGameEngine/mansionLogic/DialogueSystem.js";
+import Character from "../MansionLogic/Character.js";
+import DialogueSystem from "../MansionLogic/DialogueSystem.js";
 
 class Collectible extends Character {
     constructor(data = null, gameEnv = null) {

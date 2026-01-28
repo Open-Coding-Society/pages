@@ -1,4 +1,4 @@
-import Npc from '../../BetterGameEngine/mansionLogic/Npc.js';
+import Npc from '../MansionLogic/Npc.js';
 
 class FallingBlock extends Npc {
     constructor(data = null, gameEnv = null) {
