@@ -253,7 +253,7 @@ export default class Leaderboard {
                     <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
                     <span id="leaderboard-title">🏆 Leaderboard</span>
                     <span id="leaderboard-preview"
-                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Click "+" to choose a leaderboard!</span>
+                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Click "+" choose a leaderboard!</span>
                 </div>
                 <button id="toggle-leaderboard" class="toggle-btn">+</button>
             </div>
@@ -437,11 +437,11 @@ export default class Leaderboard {
             const res = await fetch(
                 `${base.replace(/\/$/, '')}/api/leaderboard`,
                 {
-                    ...fetchOptions,
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'omit',
                     body: JSON.stringify({
                         user: name,
                         username: name,
