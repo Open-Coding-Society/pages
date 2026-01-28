@@ -1450,9 +1450,8 @@ active_tab: profile
 
         try {
             const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+                ...fetchOptions,
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
             });
 
             if (!response.ok) {

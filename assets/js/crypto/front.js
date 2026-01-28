@@ -470,7 +470,6 @@ async function fetchCurrentEnergyPlan() {
         const response = await fetch(`${javaURI}/api/mining/energy`, {
             ...fetchOptions,
             method: 'GET',
-            credentials: 'include'
         });
         
         if (!response.ok) {
@@ -1082,11 +1081,6 @@ window.confirmSell = async function (gpuId) {
     try {
         const response = await fetch(`${javaURI}/api/mining/gpu/sell/${gpuId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...fetchOptions.headers
-            },
-            credentials: 'include',
             body: JSON.stringify({ quantity: quantity })
         });
         const result = await response.json();

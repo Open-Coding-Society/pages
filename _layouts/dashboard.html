@@ -937,10 +937,7 @@ score += gists * 0.5
                     // Fetch preferences from backend API
                     async function fetchPreferencesFromBackend() {
                         try {
-                            const res = await fetch(`${javaURI}/api/user/preferences`, {
-                                ...fetchOptions,
-                                method: 'GET'
-                            });
+                            const res = await fetch(`${javaURI}/api/user/preferences`, fetchOptions ); 
                             
                             if (res.status === 401) {
                                 // Not logged in
@@ -1741,10 +1738,7 @@ score += gists * 0.5
 
         // 2. Run Prediction
         try {
-            await fetch(`${javaURI}/api/grade-prediction/train`, {
-                ...fetchOptions,
-                method: 'GET'
-            });
+            await fetch(`${javaURI}/api/grade-prediction/train`, fetchOptions ); 
         } catch (error) {
             console.error("Error with training:", error);
         }
@@ -1886,13 +1880,7 @@ score += gists * 0.5
     const container = document.getElementById("user-feedback-table-container");
 
     try {
-        const res = await fetch(`${pythonURI}/api/feedback/user/${uid}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        }
-        });
+        const res = await fetch(`${pythonURI}/api/feedback/user/${uid}`, fetchOptions ); 
 
         if (!res.ok) throw new Error("Failed to fetch feedback");
 

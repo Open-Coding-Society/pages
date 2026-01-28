@@ -70,10 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function getCredentials(baseurl) {
     const URL = pythonURI + '/api/id';
-    return fetch(URL, {
-        ...fetchOptions,
-        credentials: 'include' // Add this to include cookies
-    })
+    return fetch(URL, fetchOptions)
         .then(response => {
             if (!response.ok) {
                 console.warn("HTTP status code: " + response.status);
