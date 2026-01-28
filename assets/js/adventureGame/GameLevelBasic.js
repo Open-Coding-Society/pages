@@ -2,7 +2,7 @@
 import GamEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
 import Player from '../BetterGameEngine/adventureLogic/Player.js';
 import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
-import Coin from '../BetterGameEngine/adventureLogic/Coin.js';
+import Coin from './Coin.js';
 import GameControl from '../BetterGameEngine/adventureLogic/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 

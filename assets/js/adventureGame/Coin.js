@@ -1,5 +1,5 @@
-import { Transform } from "./Transform.js";
-import GameObject from './GameObject.js';
+import { Transform } from "../BetterGameEngine/adventureLogic/Transform.js";
+import GameObject from '../BetterGameEngine/adventureLogic/GameObject.js';
 
 // Low-level utility Coin class (kept for compatibility)
 export class Coin {
