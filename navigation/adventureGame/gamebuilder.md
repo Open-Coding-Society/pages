@@ -768,11 +768,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
         function generateBaselineCode() {
-                return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-    import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
+                return `import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
+import GameEnvBackground from '/assets/js/BetterGameEngine/GameEngine/GameEnvBackground.js';
+import Player from '/assets/js/BetterGameEngine/GameEngine/Player.js';
+import Npc from '/assets/js/BetterGameEngine/GameEngine/Npc.js';
+    import Barrier from '/assets/js/BetterGameEngine/GameEngine/Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -804,11 +804,11 @@ export const gameLevelClasses = [CustomLevel];`;
                         : '{ up: 87, left: 65, down: 83, right: 68 }';
 
                 function header() {
-                        return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
+                        return `import GameControl from '/assets/js/BetterGameEngine/GameEngine/GameControl.js';
+import GameEnvBackground from '/assets/js/BetterGameEngine/GameEngine/GameEnvBackground.js';
+import Player from '/assets/js/BetterGameEngine/GameEngine/Player.js';
+import Npc from '/assets/js/BetterGameEngine/GameEngine/Npc.js';
+import Barrier from '/assets/js/BetterGameEngine/GameEngine/Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {

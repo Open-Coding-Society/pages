@@ -1,6 +1,6 @@
-import GameEnvBackground  from "../MansionEngine/GameEnvBackground.js";
+import GameEnvBackground  from "../BetterGameEngine/MansionEngine/GameEnvBackground.js";
 import MansionLevel1 from './mansionLevel1.js';
-import Npc from '../MansionEngine/Npc.js';
+import Npc from '../BetterGameEngine/MansionEngine/Npc.js';
 
 /**
  * Cemetery Memory Game Level

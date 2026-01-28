@@ -11,8 +11,8 @@ permalink: /gamify/squares
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "{{site.baseurl}}/assets/js/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/adventureGame/GameEngine/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/features/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/GameEngine/GameControl.js";
     import GameLevelSquares from "{{site.baseurl}}/assets/js/adventureGame/GameLevelSquares.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 

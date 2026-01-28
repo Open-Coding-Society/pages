@@ -1,7 +1,7 @@
-import GameEnvBackground from '../MansionEngine/GameEnvBackground.js';
-import Player from '../MansionEngine/Player.js';
-import GameObject from '../MansionEngine/GameObject.js';
-import DialogueSystem from '../MansionEngine/DialogueSystem.js';
+import GameEnvBackground from '../BetterGameEngine/MansionEngine/GameEnvBackground.js';
+import Player from '../BetterGameEngine/MansionEngine/Player.js';
+import GameObject from '../BetterGameEngine/MansionEngine/GameObject.js';
+import DialogueSystem from '../BetterGameEngine/MansionEngine/DialogueSystem.js';
 import MansionLevel4 from './mansionLevel4.js';
 
 console.log("🎮 mansionLevel3.js loaded!");
