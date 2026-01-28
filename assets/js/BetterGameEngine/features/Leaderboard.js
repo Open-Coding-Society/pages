@@ -251,9 +251,9 @@ export default class Leaderboard {
             <div class="leaderboard-header">
                 <div>
                     <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
-                    🏆 Leaderboard
+                    <span id="leaderboard-title">🏆 Leaderboard</span>
                     <span id="leaderboard-preview"
-                          style="font-size:14px;font-weight:500;margin-left:8px;"></span>
+                          style="font-size:18px;font-weight:700;margin-left:8px;display:none;"></span>
                 </div>
                 <button id="toggle-leaderboard" class="toggle-btn">+</button>
             </div>
@@ -280,13 +280,22 @@ export default class Leaderboard {
         const content = document.getElementById('leaderboard-content');
         const btn = document.getElementById('toggle-leaderboard');
         const preview = document.getElementById('leaderboard-preview');
+        const title = document.getElementById('leaderboard-title');
 
         this.isOpen = !this.isOpen;
         content.classList.toggle('hidden', !this.isOpen);
         btn.textContent = this.isOpen ? '−' : '+';
 
-        if (preview) {
-            preview.style.display = this.isOpen ? 'none' : 'inline';
+        if (preview && title) {
+            if (this.isOpen) {
+                // When open: show title, hide preview
+                title.style.display = 'inline';
+                preview.style.display = 'none';
+            } else {
+                // When collapsed: hide title, show preview
+                title.style.display = 'none';
+                preview.style.display = 'inline';
+            }
         }
     }
 
@@ -368,32 +377,42 @@ export default class Leaderboard {
         const list = document.getElementById('leaderboard-list');
         if (!list) return;
 
-        list.innerHTML = `
-            <div class="elementary-form">
-                <div class="form-group">
-                    <label for="player-name">Player Name</label>
-                    <input type="text" id="player-name" placeholder="Enter name" />
-                </div>
-                <div class="form-group">
-                    <label for="player-score">Score</label>
-                    <input type="number" id="player-score" placeholder="Enter score" />
-                </div>
-                <button class="submit-btn" id="add-score-btn">Add Score</button>
-            </div>
-        `;
-
-        document.getElementById('add-score-btn').addEventListener('click', () => {
-            this.addElementaryScore();
-        });
-
-        // Allow Enter key to submit
-        document.getElementById('player-score').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.addElementaryScore();
-        });
-
-        // Display existing entries if any
+        // Check if we have existing entries to display
         if (this.elementaryEntries.length > 0) {
+            // Show the full leaderboard with "Add Another Score" button
             this.displayElementaryLeaderboard();
+        } else {
+            // Show the form for first entry
+            list.innerHTML = `
+                <div class="elementary-form">
+                    <div class="form-group">
+                        <label for="player-name">Player Name</label>
+                        <input type="text" id="player-name" placeholder="Enter name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="player-score">Score</label>
+                        <input type="number" id="player-score" placeholder="Enter score" />
+                    </div>
+                    <button class="submit-btn" id="add-score-btn">Add Score</button>
+                </div>
+            `;
+
+            // Bind event listeners after innerHTML is set
+            const addScoreBtn = document.getElementById('add-score-btn');
+            const scoreInput = document.getElementById('player-score');
+            
+            if (addScoreBtn) {
+                addScoreBtn.addEventListener('click', () => {
+                    this.addElementaryScore();
+                });
+            }
+
+            // Allow Enter key to submit
+            if (scoreInput) {
+                scoreInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addElementaryScore();
+                });
+            }
         }
     }
 
@@ -491,8 +510,9 @@ export default class Leaderboard {
         if (!this.elementaryEntries.length) return;
 
         const top = this.elementaryEntries[0];
-        preview.textContent =
-            ` – High Score: ${top.user}: ${Number(top.score).toLocaleString()}`;
+        if (preview) {
+            preview.textContent = `High Score: ${top.user} - ${Number(top.score).toLocaleString()}`;
+        }
 
         let html = `
             <table class="leaderboard-table">
@@ -518,18 +538,39 @@ export default class Leaderboard {
 
         html += '</tbody></table>';
         
-        // Add button to add more scores
+        // Add form to add more scores
         html += `
-            <div style="padding: 12px; border-top: 2px solid #f1f3f5;">
-                <button class="submit-btn" id="add-another-btn">Add Another Score</button>
+            <div class="elementary-form" style="border-top: 2px solid #f1f3f5; margin-top: 12px;">
+                <div class="form-group">
+                    <label for="player-name">Player Name</label>
+                    <input type="text" id="player-name" placeholder="Enter name" />
+                </div>
+                <div class="form-group">
+                    <label for="player-score">Score</label>
+                    <input type="number" id="player-score" placeholder="Enter score" />
+                </div>
+                <button class="submit-btn" id="add-score-btn">Add Score</button>
             </div>
         `;
 
         list.innerHTML = html;
 
-        document.getElementById('add-another-btn').addEventListener('click', () => {
-            this.showElementaryForm();
-        });
+        // Bind event listeners after setting innerHTML
+        const addScoreBtn = document.getElementById('add-score-btn');
+        const scoreInput = document.getElementById('player-score');
+        
+        if (addScoreBtn) {
+            addScoreBtn.addEventListener('click', () => {
+                this.addElementaryScore();
+            });
+        }
+
+        // Allow Enter key to submit
+        if (scoreInput) {
+            scoreInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.addElementaryScore();
+            });
+        }
     }
 
     async fetchLeaderboard() {
@@ -566,8 +607,9 @@ export default class Leaderboard {
         }
 
         const top = data[0];
-        preview.textContent =
-            ` – High Score: ${top.user || top.username}: ${Number(top.score).toLocaleString()}`;
+        if (preview) {
+            preview.textContent = `High Score: ${top.user || top.username} - ${Number(top.score).toLocaleString()}`;
+        }
 
         let html = `
             <table class="leaderboard-table">
