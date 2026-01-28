@@ -41,18 +41,11 @@ export default class PauseMenu {
             this.stats = this.gameControl.stats;
         }
 
-        // -------------------------
-        // GLOBAL ESC TO OPEN MENU
-        // -------------------------
-        this._globalEscHandler = (e) => {
-            if (e.key === 'Escape' || e.key === 'Esc') {
-                // Only toggle if not already focused on an input
-                const active = document.activeElement;
-                if (active && ['INPUT', 'TEXTAREA'].includes(active.tagName)) return;
-                this.pauseFeature.toggle();
-            }
-        };
-        document.addEventListener('keydown', this._globalEscHandler);
+        // Disable global ESC pause handling when possible. GameControl may have
+        // registered an exit key listener; remove it so ESC no longer toggles pause.
+        if (this.gameControl && typeof this.gameControl.removeExitKeyListener === 'function') {
+            try { this.gameControl.removeExitKeyListener(); } catch (e) { /* ignore */ }
+        }
     }
 
     // -----------------------
@@ -94,6 +87,21 @@ export default class PauseMenu {
         buttonBar.style.gap = '10px';
         buttonBar.style.zIndex = '9999';
 
+        // Pause Toggle Button (always visible)
+        const btnPause = document.createElement('button');
+        btnPause.className = 'pause-btn pause-toggle';
+        btnPause.innerText = 'Pause';
+        btnPause.addEventListener('click', () => {
+            if (this.pauseFeature && typeof this.pauseFeature.toggle === 'function') {
+                this.pauseFeature.toggle();
+                // Update label to reflect new state (pause overlay visible -> 'Resume')
+                setTimeout(() => {
+                    const paused = this.container && this.container.style.display === 'flex';
+                    btnPause.innerText = paused ? 'Resume' : 'Pause';
+                }, 0);
+            }
+        });
+
         // Save Score Button (always visible)
         const btnSave = document.createElement('button');
         btnSave.className = 'pause-btn save-score';
@@ -106,6 +114,7 @@ export default class PauseMenu {
         btnSkipLevel.innerText = 'Skip Level';
         btnSkipLevel.addEventListener('click', () => this.skipLevel());
 
+        buttonBar.appendChild(btnPause);
         buttonBar.appendChild(btnSave);
         buttonBar.appendChild(btnSkipLevel);
         parent.appendChild(buttonBar);

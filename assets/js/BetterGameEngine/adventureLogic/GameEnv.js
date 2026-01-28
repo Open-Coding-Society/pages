@@ -47,21 +47,99 @@ class GameEnv {
         this.setCanvas();
         this.setTop();
         this.setBottom();
-        // Use fixed dimensions for consistent game size
-        this.innerWidth = 1000;
-        this.innerHeight = 600;
+        // Calculate dimensions dynamically based on game environment or container
+        this.calculateDimensions();
         this.size();
+    }
+
+    /**
+     * Calculate game dimensions dynamically based on available space.
+     */
+    calculateDimensions() {
+        // If game environment provides explicit dimensions, use those
+        if (this.game?.innerWidth && this.game?.innerHeight) {
+            this.innerWidth = this.game.innerWidth;
+            this.innerHeight = this.game.innerHeight;
+            return;
+        }
+
+        // Prefer window size minus header/footer offsets (original intended behavior)
+        const winW = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 1000;
+        const winH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 600;
+        const availableH = Math.max(100, winH - (this.top || 0) - (this.bottom || 0));
+
+        // If a container exists, constrain to its size but keep header/footer offsets in mind
+        if (this.container) {
+            const rect = this.container.getBoundingClientRect();
+            // If container reports reasonable size, use its width; otherwise fall back to window
+            const contW = rect && rect.width && rect.width > 50 ? rect.width : winW;
+            const contH = rect && rect.height && rect.height > 50 ? rect.height : availableH;
+
+            // Use container height but ensure we account for header/footer if container is full-page
+            this.innerWidth = Math.floor(Math.max(320, Math.min(contW, winW)));
+            this.innerHeight = Math.floor(Math.max(200, Math.min(contH, availableH)));
+            return;
+        }
+
+        // Fallback to window-based sizes
+        this.innerWidth = Math.floor(Math.max(320, winW));
+        this.innerHeight = Math.floor(Math.max(200, availableH));
     }
 
     /**
      * Sets the canvas element and its 2D rendering context.
      */
     setCanvas() {
-        // Use provided canvas from game environment, fallback to DOM query
-        this.canvas = this.game?.gameCanvas || document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-        // Also set container reference
-        this.container = this.game?.gameContainer || document.getElementById('gameContainer');
+        // Determine container first (may be element, id string, or missing)
+        let containerCandidate = this.game?.gameContainer || document.getElementById('gameContainer') || document.body;
+        if (typeof containerCandidate === 'string') {
+            const el = document.getElementById(containerCandidate);
+            if (el) containerCandidate = el;
+            else containerCandidate = document.body;
+        }
+        this.container = containerCandidate;
+
+        // Canvas detection strategy (in order):
+        // 1) explicit this.game.gameCanvas (element or id)
+        // 2) data attribute selectors inside container ([data-game-canvas])
+        // 3) first <canvas> inside the container
+        // 4) well-known ids (#gameCanvas, #game-canvas)
+        // 5) document.querySelector('canvas')
+        // 6) create a canvas and append to container
+
+        let candidate = null;
+        const provided = this.game?.gameCanvas;
+        if (provided) {
+            if (typeof provided === 'string') candidate = document.getElementById(provided);
+            else if (provided instanceof HTMLCanvasElement) candidate = provided;
+            else if (provided instanceof Element) {
+                // If it's an element but not a canvas, try to find a canvas inside it
+                candidate = provided.querySelector && provided.querySelector('canvas');
+            }
+        }
+
+        if (!candidate && this.container && this.container.querySelector) {
+            candidate = this.container.querySelector('[data-game-canvas]') || this.container.querySelector('canvas');
+        }
+
+        if (!candidate) candidate = document.getElementById('gameCanvas') || document.getElementById('game-canvas') || document.querySelector('canvas');
+
+        if (!candidate) {
+            // Create a canvas if none found
+            candidate = document.createElement('canvas');
+            candidate.id = 'gameCanvas';
+            if (this.container && this.container.appendChild) this.container.appendChild(candidate);
+            else document.body.appendChild(candidate);
+        }
+
+        this.canvas = candidate;
+        // Safely get 2D context
+        try {
+            this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+        } catch (e) {
+            console.warn('Unable to get 2D context for canvas:', e);
+            this.ctx = null;
+        }
     }
 
     /**
