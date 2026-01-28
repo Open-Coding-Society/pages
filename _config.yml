@@ -126,3 +126,5 @@ minima:
     - navigation/blog.md
     - navigation/courses.md
     - navigation/search.md
+
+gemini_api_key: AIzaSyBWEz5qHeWx5buC4I4dZ2fllaMk3z8k_-w

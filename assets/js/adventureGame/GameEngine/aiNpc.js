@@ -1,35 +1,7 @@
 /**
  * AINpc.js - BASE CLASS (DO NOT MODIFY)
- * 
- * This file creates AI NPCs that use Google Gemini API for intelligent conversations
- * Students should NOT modify this file - just import it and use it!
- * 
- * SETUP INSTRUCTIONS:
- * 1. Go to https://ai.google.dev/
- * 2. Click "Get API Key" and create your free key
- * 3. Add this to your .env file:
- *    VITE_GEMINI_API_KEY=your_api_key_here
- * 
- * IMPORT IN YOUR GAME LEVEL:
- * import AINpc from './AINpc.js';
- * 
- * THEN USE IT LIKE THIS:
- * const myNpc = new AINpc({
- *   id: "Character Name",
- *   greeting: "Hello!",
- *   expertise: "history",
- *   sprite: path + "/images/gamify/yoursprite.png",
- *   spriteWidth: 512,
- *   spriteHeight: 384,
- *   scaleFactoR: 5,
- *   randomPosition: true,
- *   gameEnv: gameEnv,
- *   knowledgeBase: {
- *     "history": [
- *       { question: "What is Egypt?", answer: "A great civilization" }
- *     ]
- *   }
- * }).getData();
+ * Modified to integrate chat into dialogue box
+ * DEBUG VERSION - WITH EXTENSIVE CONSOLE LOGGING
  */
 
 import DialogueSystem from './DialogueSystem.js';
@@ -38,6 +10,7 @@ class AINpc {
   constructor(config) {
     this.config = config;
     this.spriteData = this.createSpriteData();
+    this.chatHistory = []; // Store chat history
   }
 
   createSpriteData() {
@@ -46,7 +19,6 @@ class AINpc {
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
 
-    // Determine spawn position
     let posX, posY;
     if (config.randomPosition) {
       posX = Math.random() * (width * 0.8) + (width * 0.1);
@@ -56,7 +28,6 @@ class AINpc {
       posY = config.posY || height / 2;
     }
 
-    // Default random dialogues
     const defaultDialogues = [
       `Ask me anything about ${config.expertise}!`,
       `I have knowledge about ${config.expertise}...`,
@@ -75,7 +46,6 @@ class AINpc {
       INIT_POSITION: { x: posX, y: posY },
       orientation: config.orientation || { rows: 3, columns: 4 },
       
-      // Animation frames
       down: config.down || { row: 0, start: 0, columns: 3 },
       downRight: config.downRight || { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
       downLeft: config.downLeft || { row: 2, start: 0, columns: 3, rotate: -Math.PI / 16 },
@@ -89,6 +59,7 @@ class AINpc {
       dialogues: config.dialogues || defaultDialogues,
       knowledgeBase: config.knowledgeBase || {},
       expertise: config.expertise,
+      chatHistory: [],
 
       reaction: function() {
         if (this.dialogueSystem) {
@@ -107,58 +78,233 @@ class AINpc {
           this.dialogueSystem = new DialogueSystem();
         }
 
-        // Get random greeting
         let message = config.greeting;
-        if (this.spriteData.dialogues && this.spriteData.dialogues.length > 0) {
-          const randomIndex = Math.floor(Math.random() * this.spriteData.dialogues.length);
-          message = this.spriteData.dialogues[randomIndex];
+        if (this.dialogues && this.dialogues.length > 0) {
+          const randomIndex = Math.floor(Math.random() * this.dialogues.length);
+          message = this.dialogues[randomIndex];
         }
 
         this.dialogueSystem.showDialogue(
           message,
           config.id,
-          this.spriteData.src
+          this.src
         );
 
-        // Create button container
+        // Create chat interface in dialogue box
         const buttonContainer = document.createElement('div');
         buttonContainer.style.display = 'flex';
-        buttonContainer.style.justifyContent = 'space-between';
-        buttonContainer.style.marginTop = '10px';
+        buttonContainer.style.flexDirection = 'column';
         buttonContainer.style.gap = '10px';
+        buttonContainer.style.marginTop = '15px';
 
-        const chatButton = document.createElement('button');
-        chatButton.textContent = "💬 Chat";
-        chatButton.style.padding = '8px 15px';
-        chatButton.style.background = '#4a86e8';
-        chatButton.style.color = 'white';
-        chatButton.style.border = 'none';
-        chatButton.style.borderRadius = '5px';
-        chatButton.style.cursor = 'pointer';
-        chatButton.style.flex = '1';
+        // Input field
+        const inputField = document.createElement('input');
+        inputField.type = 'text';
+        inputField.placeholder = `Ask about ${config.expertise}...`;
+        inputField.style.padding = '8px 12px';
+        inputField.style.borderRadius = '5px';
+        inputField.style.border = '2px solid #4a86e8';
+        inputField.style.backgroundColor = '#16213e';
+        inputField.style.color = '#fff';
+        inputField.style.fontFamily = 'Arial, sans-serif';
+        inputField.style.fontSize = '14px';
 
-        const closeButton = document.createElement('button');
-        closeButton.textContent = "Close";
-        closeButton.style.padding = '8px 15px';
-        closeButton.style.background = '#666';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '5px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.style.flex = '1';
+        // Button container for send and history
+        const buttonRow = document.createElement('div');
+        buttonRow.style.display = 'flex';
+        buttonRow.style.gap = '10px';
 
-        chatButton.onclick = () => {
-          this.openAIChat();
+        const historyBtn = document.createElement('button');
+        historyBtn.textContent = '📋 History';
+        historyBtn.style.padding = '8px 15px';
+        historyBtn.style.background = '#666';
+        historyBtn.style.color = 'white';
+        historyBtn.style.border = 'none';
+        historyBtn.style.borderRadius = '5px';
+        historyBtn.style.cursor = 'pointer';
+        historyBtn.style.flex = '1';
+        historyBtn.style.fontFamily = 'Arial, sans-serif';
+
+        // AI Response area (typewriter effect)
+        const responseArea = document.createElement('div');
+        responseArea.style.minHeight = '40px';
+        responseArea.style.padding = '10px';
+        responseArea.style.backgroundColor = '#16213e';
+        responseArea.style.borderRadius = '5px';
+        responseArea.style.borderLeft = '3px solid #4a86e8';
+        responseArea.style.color = '#4a86e8';
+        responseArea.style.fontStyle = 'italic';
+        responseArea.style.display = 'none';
+        responseArea.textContent = '';
+
+        const typewriterEffect = (text, element, speed = 30) => {
+          element.textContent = '';
+          element.style.display = 'block';
+          let index = 0;
+          
+          const type = () => {
+            if (index < text.length) {
+              element.textContent += text.charAt(index);
+              index++;
+              setTimeout(type, speed);
+            }
+          };
+          type();
         };
 
-        closeButton.onclick = () => {
-          if (this.dialogueSystem) {
-            this.dialogueSystem.closeDialogue();
+        const sendMessage = async () => {
+          const userMessage = inputField.value.trim();
+          if (userMessage === '') return;
+
+          // Store in history
+          spriteData.chatHistory.push({ role: 'user', message: userMessage });
+
+          inputField.value = '';
+          responseArea.textContent = 'Thinking...';
+          responseArea.style.display = 'block';
+
+          try {
+            // DEBUG 1: Check if API key exists
+            const apiKey = window.GEMINI_API_KEY;
+            console.log("🔍 DEBUG 1 - API Key Check:");
+            console.log("  - API Key exists:", !!apiKey);
+            console.log("  - API Key value:", apiKey ? `${apiKey.substring(0, 10)}...` : "UNDEFINED");
+            console.log("  - API Key type:", typeof apiKey);
+            console.log("  - window.GEMINI_API_KEY exists:", 'GEMINI_API_KEY' in window);
+
+            if (!apiKey) {
+              console.error("❌ FAIL: API Key is missing or undefined");
+              typewriterEffect('AI is not configured. Please add your Gemini API key!', responseArea);
+              return;
+            }
+
+            // DEBUG 2: Check message and expertise
+            console.log("🔍 DEBUG 2 - Message & Expertise:");
+            console.log("  - User message:", userMessage);
+            console.log("  - Expertise:", config.expertise);
+
+            let knowledgeContext = "";
+            const topicsArray = config.knowledgeBase[config.expertise] || [];
+            console.log("🔍 DEBUG 2b - Knowledge Base:");
+            console.log("  - Topics array length:", topicsArray.length);
+            
+            if (topicsArray.length > 0) {
+              knowledgeContext = "Here are some example topics I can help with:\n";
+              topicsArray.slice(0, 3).forEach(topic => {
+                knowledgeContext += `- ${topic.question}\n`;
+              });
+              knowledgeContext += "\n";
+            }
+
+            // DEBUG 3: Build the API URL
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            console.log("🔍 DEBUG 3 - API URL:");
+            console.log("  - Full URL:", apiUrl);
+            console.log("  - Host:", new URL(apiUrl).host);
+
+            // DEBUG 4: Build request body
+            const fullPrompt = `You are an expert in ${config.expertise}. ${knowledgeContext}Answer the following question in a friendly, educational way suitable for students. Keep your answer concise and engaging:\n\n${userMessage}`;
+            const requestBody = {
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: fullPrompt
+                    }
+                  ]
+                }
+              ],
+              generationConfig: {
+                maxOutputTokens: 300,
+                temperature: 0.7
+              }
+            };
+            console.log("🔍 DEBUG 4 - Request Body:");
+            console.log("  - Contents length:", requestBody.contents.length);
+            console.log("  - First part text length:", requestBody.contents[0].parts[0].text.length);
+            console.log("  - Full prompt:", fullPrompt);
+
+            // DEBUG 5: Make the fetch request
+            console.log("🔍 DEBUG 5 - Making Fetch Request...");
+            console.log("  - Method: POST");
+            console.log("  - URL:", apiUrl);
+            
+            const response = await fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody)
+            });
+
+            // DEBUG 6: Check response status
+            console.log("🔍 DEBUG 6 - Response Status:");
+            console.log("  - Status code:", response.status);
+            console.log("  - Status text:", response.statusText);
+            console.log("  - Is OK:", response.ok);
+            console.log("  - Headers:", {
+              contentType: response.headers.get('content-type'),
+              date: response.headers.get('date')
+            });
+
+            // DEBUG 7: Parse response
+            const data = await response.json();
+            console.log("🔍 DEBUG 7 - Response Data:");
+            console.log("  - Full response:", JSON.stringify(data, null, 2));
+            console.log("  - Has candidates:", !!data.candidates);
+            console.log("  - Has error:", !!data.error);
+            
+            if (data.error) {
+              console.error("❌ ERROR RESPONSE:");
+              console.error("  - Error code:", data.error.code);
+              console.error("  - Error message:", data.error.message);
+              console.error("  - Error status:", data.error.status);
+              console.error("  - Full error:", JSON.stringify(data.error, null, 2));
+            }
+
+            let aiResponse = "I'm thinking about that... Let me get back to you!";
+            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+              aiResponse = data.candidates[0].content.parts[0].text;
+              console.log("✅ DEBUG 8 - Successfully got AI response:", aiResponse.substring(0, 50) + "...");
+            } else {
+              console.warn("⚠️ DEBUG 8 - Unexpected response structure");
+            }
+
+            // Store in history
+            spriteData.chatHistory.push({ role: 'ai', message: aiResponse });
+
+            // Typewriter effect
+            typewriterEffect(aiResponse, responseArea);
+          } catch (error) {
+            console.error("❌ CRITICAL ERROR in sendMessage:");
+            console.error("  - Error name:", error.name);
+            console.error("  - Error message:", error.message);
+            console.error("  - Error stack:", error.stack);
+            console.error("  - Full error object:", error);
+            typewriterEffect("I'm having trouble thinking right now. Try asking again!", responseArea);
           }
         };
 
-        buttonContainer.appendChild(chatButton);
-        buttonContainer.appendChild(closeButton);
+        historyBtn.onclick = () => {
+          spriteData.showChatHistory();
+        };
+
+        buttonRow.appendChild(historyBtn);
+
+        inputField.onkeypress = (e) => {
+          e.stopPropagation();
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+          }
+        };
+        inputField.onkeydown = (e) => {
+          e.stopPropagation();
+        };
+
+        buttonContainer.appendChild(inputField);
+        buttonContainer.appendChild(buttonRow);
+        buttonContainer.appendChild(responseArea);
 
         const dialogueBox = document.getElementById('custom-dialogue-box-' + this.dialogueSystem.id);
         if (dialogueBox) {
@@ -171,208 +317,74 @@ class AINpc {
         }
       },
 
-      openAIChat: function() {
-        const chatContainer = document.createElement('div');
-        Object.assign(chatContainer.style, {
+      showChatHistory: function() {
+        const historyModal = document.createElement('div');
+        Object.assign(historyModal.style, {
           position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          width: '350px',
-          height: '500px',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           backgroundColor: '#1a1a2e',
           border: '2px solid #4a86e8',
           borderRadius: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: '10000',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          padding: '20px',
+          maxWidth: '500px',
+          maxHeight: '600px',
+          overflowY: 'auto',
+          zIndex: '10001',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
           fontFamily: 'Arial, sans-serif',
           color: '#fff'
         });
 
-        // Header
-        const header = document.createElement('div');
-        Object.assign(header.style, {
-          backgroundColor: '#4a86e8',
-          padding: '15px',
-          borderRadius: '8px 8px 0 0',
-          fontWeight: 'bold',
-          fontSize: '16px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        });
-        header.textContent = config.id;
+        const header = document.createElement('h3');
+        header.textContent = 'Chat History';
+        header.style.color = '#4a86e8';
+        header.style.marginTop = '0';
+
+        const content = document.createElement('div');
+        content.style.marginBottom = '15px';
+
+        if (spriteData.chatHistory.length === 0) {
+          content.textContent = 'No messages yet.';
+          content.style.color = '#999';
+        } else {
+          spriteData.chatHistory.forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.style.marginBottom = '10px';
+            msgDiv.style.padding = '10px';
+            msgDiv.style.borderRadius = '5px';
+
+            if (msg.role === 'user') {
+              msgDiv.style.backgroundColor = '#4a86e8';
+              msgDiv.style.textAlign = 'right';
+            } else {
+              msgDiv.style.backgroundColor = '#16213e';
+              msgDiv.style.borderLeft = '3px solid #4a86e8';
+            }
+
+            msgDiv.textContent = msg.message;
+            content.appendChild(msgDiv);
+          });
+        }
 
         const closeBtn = document.createElement('button');
-        closeBtn.textContent = '✕';
-        closeBtn.style.background = 'none';
-        closeBtn.style.border = 'none';
+        closeBtn.textContent = 'Close';
+        closeBtn.style.padding = '10px 20px';
+        closeBtn.style.backgroundColor = '#4a86e8';
         closeBtn.style.color = 'white';
-        closeBtn.style.fontSize = '20px';
+        closeBtn.style.border = 'none';
+        closeBtn.style.borderRadius = '5px';
         closeBtn.style.cursor = 'pointer';
-        closeBtn.onclick = () => chatContainer.remove();
-        header.appendChild(closeBtn);
+        closeBtn.style.width = '100%';
+        closeBtn.style.fontSize = '14px';
+        closeBtn.onclick = () => historyModal.remove();
 
-        // Messages area
-        const messagesArea = document.createElement('div');
-        Object.assign(messagesArea.style, {
-          flex: '1',
-          overflowY: 'auto',
-          padding: '15px',
-          borderBottom: '1px solid #4a86e8'
-        });
+        historyModal.appendChild(header);
+        historyModal.appendChild(content);
+        historyModal.appendChild(closeBtn);
 
-        // Input area
-        const inputArea = document.createElement('div');
-        Object.assign(inputArea.style, {
-          padding: '10px',
-          display: 'flex',
-          gap: '5px'
-        });
-
-        const input = document.createElement('input');
-        Object.assign(input.style, {
-          flex: '1',
-          padding: '8px',
-          border: '1px solid #4a86e8',
-          borderRadius: '5px',
-          backgroundColor: '#16213e',
-          color: '#fff'
-        });
-        input.placeholder = `Ask about ${config.expertise}...`;
-        input.type = 'text';
-
-        const sendBtn = document.createElement('button');
-        sendBtn.textContent = '📤';
-        Object.assign(sendBtn.style, {
-          padding: '8px 12px',
-          backgroundColor: '#4a86e8',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer'
-        });
-
-        // Add message to chat
-        const addMessage = (text, sender) => {
-          const messageDiv = document.createElement('div');
-          messageDiv.style.marginBottom = '10px';
-          messageDiv.style.padding = '8px';
-          messageDiv.style.borderRadius = '5px';
-          messageDiv.style.wordWrap = 'break-word';
-
-          if (sender === 'user') {
-            messageDiv.style.backgroundColor = '#4a86e8';
-            messageDiv.style.marginLeft = '20px';
-            messageDiv.style.textAlign = 'right';
-          } else {
-            messageDiv.style.backgroundColor = '#16213e';
-            messageDiv.style.marginRight = '20px';
-            messageDiv.style.borderLeft = '3px solid #4a86e8';
-          }
-
-          messageDiv.textContent = text;
-          messagesArea.appendChild(messageDiv);
-          messagesArea.scrollTop = messagesArea.scrollHeight;
-        };
-
-        // Send message function
-        const sendMessage = async () => {
-          const userMessage = input.value.trim();
-          if (userMessage === '') return;
-
-          addMessage(userMessage, 'user');
-          input.value = '';
-          
-          // Show loading indicator
-          addMessage("Thinking...", 'ai');
-
-          const response = await this.generateResponse(userMessage, config.knowledgeBase, config.expertise);
-          
-          // Remove the "Thinking..." message and add the real response
-          const lastMessage = messagesArea.lastChild;
-          if (lastMessage && lastMessage.textContent === "Thinking...") {
-            messagesArea.removeChild(lastMessage);
-          }
-          addMessage(response, 'ai');
-        };
-
-        sendBtn.onclick = sendMessage;
-        input.onkeypress = (e) => {
-          if (e.key === 'Enter') sendMessage();
-        };
-
-        inputArea.appendChild(input);
-        inputArea.appendChild(sendBtn);
-
-        chatContainer.appendChild(header);
-        chatContainer.appendChild(messagesArea);
-        chatContainer.appendChild(inputArea);
-
-        document.body.appendChild(chatContainer);
-
-        addMessage(`Hi! I'm ${config.id}. Ask me anything about ${config.expertise}!`, 'ai');
-      },
-
-      generateResponse: async function(userMessage, knowledgeBase, expertise) {
-        try {
-          // Get API key from environment variable
-          const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-          
-          if (!apiKey) {
-            console.error("Gemini API key not found. Please add VITE_GEMINI_API_KEY to your .env file");
-            return "AI is not configured. Please add your Gemini API key!";
-          }
-
-          // Build knowledge base context from the provided data
-          let knowledgeContext = "";
-          const topicsArray = knowledgeBase[expertise] || [];
-          if (topicsArray.length > 0) {
-            knowledgeContext = "Here are some example topics I can help with:\n";
-            topicsArray.slice(0, 3).forEach(topic => {
-              knowledgeContext += `- ${topic.question}\n`;
-            });
-            knowledgeContext += "\n";
-          }
-
-          // Call Google Gemini API
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      {
-                        text: `You are an expert in ${expertise}. ${knowledgeContext}Answer the following question in a friendly, educational way suitable for students. Keep your answer concise and engaging:\n\n${userMessage}`
-                      }
-                    ]
-                  }
-                ],
-                generationConfig: {
-                  maxOutputTokens: 300,
-                  temperature: 0.7
-                }
-              })
-            }
-          );
-
-          const data = await response.json();
-          
-          if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
-            return data.candidates[0].content.parts[0].text;
-          } else {
-            return "I'm thinking about that... Let me get back to you!";
-          }
-        } catch (error) {
-          console.error("API Error:", error);
-          return "I'm having trouble thinking right now. Try asking again!";
-        }
+        document.body.appendChild(historyModal);
       }
     };
 
