@@ -5,6 +5,7 @@ export default class ScoreFeature {
     constructor(pauseMenu) {
         this.pauseMenu = pauseMenu;
         this._createScoreCounter();
+        this._setupAutoUpdate();
     }
 
     /**
@@ -36,7 +37,7 @@ export default class ScoreFeature {
         scoreLabel.style.fontSize = '12px';
         scoreLabel.style.color = '#aaa';
         scoreLabel.style.marginBottom = '5px';
-        scoreLabel.innerText = 'Score';
+        scoreLabel.innerText = this.pauseMenu.counterLabelText || 'Score';
         
         const scoreValue = document.createElement('div');
         scoreValue.className = 'pause-score-value';
@@ -48,6 +49,30 @@ export default class ScoreFeature {
         parent.appendChild(scoreCounter);
         
         this._scoreValue = scoreValue;
+        this._scoreLabel = scoreLabel;
+    }
+
+    /**
+     * Setup automatic score updates by polling gameControl stats
+     */
+    _setupAutoUpdate() {
+        // Update score display every 100ms to keep it in sync
+        this._updateInterval = setInterval(() => {
+            this._syncScoreDisplay();
+        }, 100);
+    }
+
+    /**
+     * Sync the score display with current gameControl stats
+     */
+    _syncScoreDisplay() {
+        if (!this.pauseMenu.gameControl) return;
+        
+        const varName = this.pauseMenu.counterVar || 'levelsCompleted';
+        const stats = this.pauseMenu.gameControl.stats || this.pauseMenu.gameControl;
+        const currentValue = stats[varName] || this.pauseMenu.gameControl[varName] || 0;
+        
+        this.updateScoreDisplay(currentValue);
     }
 
     /**
@@ -55,7 +80,17 @@ export default class ScoreFeature {
      */
     updateScoreDisplay(value) {
         if (this._scoreValue) {
-            this._scoreValue.innerText = String(value);
+            this._scoreValue.innerText = String(value || 0);
+        }
+    }
+
+    /**
+     * Cleanup when ScoreFeature is destroyed
+     */
+    destroy() {
+        if (this._updateInterval) {
+            clearInterval(this._updateInterval);
+            this._updateInterval = null;
         }
     }
 
