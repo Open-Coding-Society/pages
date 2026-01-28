@@ -1,8 +1,8 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from '../BetterGameEngine/MansionEngine/GameEnvBackground.js';
-import Player from '../BetterGameEngine/MansionEngine/Player.js';
-import GameObject from '../BetterGameEngine/MansionEngine/GameObject.js';
-import DialogueSystem from '../BetterGameEngine/MansionEngine/DialogueSystem.js';
+import GameEnvBackground from '../BetterGameEngine/MansionLogic/GameEnvBackground.js';
+import Player from '../BetterGameEngine/MansionLogic/Player.js';
+import GameObject from '../BetterGameEngine/MansionLogic/GameObject.js';
+import DialogueSystem from '../BetterGameEngine/MansionLogic/DialogueSystem.js';
 
 //Import custom classes from select files
 import Barrier from './CustomGameClasses/Barrier.js';
