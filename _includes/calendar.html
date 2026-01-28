@@ -1175,15 +1175,21 @@
       updateSelectedCount('remove');
     });
     
-    // Bulk priority buttons
-    document.querySelectorAll('.set-all-priority-btn').forEach(btn => {
+    // Bulk priority buttons - set all items to the selected priority
+    document.querySelectorAll('.bulk-priority-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const priority = btn.dataset.priority;
+
+        // Update all priority dropdowns in the sync modal
         document.querySelectorAll('#sync-week-list .item-priority-select').forEach(select => {
           select.value = priority;
           // Also save to localStorage
           savePriorityToStorage(select);
         });
+
+        // Visual feedback - highlight the clicked button
+        document.querySelectorAll('.bulk-priority-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
       });
     });
     

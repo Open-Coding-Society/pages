@@ -2215,7 +2215,7 @@
     }
   }
 
-  // Bulk priority buttons
+  // Bulk priority buttons (legacy structure)
   .bulk-priority-section {
     display: flex;
     flex-direction: column;
@@ -2268,6 +2268,76 @@
         background: rgba(156, 163, 175, 0.2);
         color: #9ca3af;
         &:hover { background: rgba(156, 163, 175, 0.3); }
+      }
+    }
+  }
+
+  // Sync modal bulk priority controls
+  .sync-bulk-priority {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: $bg-2;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    .bulk-priority-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-muted;
+      margin-right: 4px;
+    }
+  }
+
+  // Bulk priority buttons (used in sync modal)
+  .bulk-priority-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.p0, &[data-priority="P0"] {
+      background: rgba(220, 38, 38, 0.15);
+      color: #dc2626;
+      border-color: rgba(220, 38, 38, 0.3);
+      &:hover, &.active {
+        background: rgba(220, 38, 38, 0.3);
+        border-color: #dc2626;
+      }
+    }
+
+    &.p1, &[data-priority="P1"] {
+      background: rgba(234, 88, 12, 0.15);
+      color: #ea580c;
+      border-color: rgba(234, 88, 12, 0.3);
+      &:hover, &.active {
+        background: rgba(234, 88, 12, 0.3);
+        border-color: #ea580c;
+      }
+    }
+
+    &.p2, &[data-priority="P2"] {
+      background: rgba(202, 138, 4, 0.15);
+      color: #ca8a04;
+      border-color: rgba(202, 138, 4, 0.3);
+      &:hover, &.active {
+        background: rgba(202, 138, 4, 0.3);
+        border-color: #ca8a04;
+      }
+    }
+
+    &.p3, &[data-priority="P3"] {
+      background: rgba(22, 163, 74, 0.15);
+      color: #16a34a;
+      border-color: rgba(22, 163, 74, 0.3);
+      &:hover, &.active {
+        background: rgba(22, 163, 74, 0.3);
+        border-color: #16a34a;
       }
     }
   }
