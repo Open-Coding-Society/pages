@@ -4,7 +4,7 @@ import Player from './adventureLogic/Player.js';
 import Npc from './adventureLogic/Npc.js';  // Direct import for portal creation
 import Collectible from './adventureLogic/Collectible.js';
 import Quiz from './Quiz.js';
-import Game from '../BetterGameEngine/features/Game.js';
+import Game from './Game.js';
 import Enemy from './adventureLogic/Enemy.js';
 import DialogueSystem from './adventureLogic/DialogueSystem.js';
 

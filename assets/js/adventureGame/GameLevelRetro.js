@@ -4,7 +4,7 @@ import Player from './adventureLogic/Player.js';
 import GameControl from './adventureLogic/GameControl.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 
-import Game from '../BetterGameEngine/features/Game.js';
+import Game from './Game.js';
 import GameLevelWallstreet from './GameLevelWallstreet.js';
 class GameLevelRetro {
   /**

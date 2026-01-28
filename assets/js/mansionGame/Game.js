@@ -1,4 +1,4 @@
-// combined game.js files from adventure and mansion games
+// Mansion Game - Game Core
 
 class GameCore {
     constructor(environment, GameControlClass) {
@@ -55,8 +55,8 @@ class GameCore {
                 }
                 
                 new mod.default(this.gameControl, { 
-                    gameName: 'AdventureGame',  // Change to your game name
-                    parentId: parentId          // Use the dynamic container ID
+                    gameName: 'MansionGame',
+                    parentId: parentId
                 }); 
             }
             catch (e) { console.warn('Leaderboard init failed:', e); }
