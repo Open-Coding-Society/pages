@@ -1,4 +1,4 @@
-import Character from '../../BetterGameEngine/MansionLogic/Character.js';
+import Character from '../MansionLogic/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from "./HealthBars.js";
 

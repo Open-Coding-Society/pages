@@ -768,11 +768,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
         function generateBaselineCode() {
-                return `import GameControl from '/assets/js/BetterGameEngine/adventureLogic/GameControl.js';
-import GameEnvBackground from '/assets/js/BetterGameEngine/adventureLogic/GameEnvBackground.js';
-import Player from '/assets/js/BetterGameEngine/adventureLogic/Player.js';
-import Npc from '/assets/js/BetterGameEngine/adventureLogic/Npc.js';
-    import Barrier from '/assets/js/adventureGame/Barrier.js';
+                return `import GameControl from './adventureLogic/GameControl.js';
+import GameEnvBackground from './adventureLogic/GameEnvBackground.js';
+import Player from './adventureLogic/Player.js';
+import Npc from './adventureLogic/Npc.js';
+    import Barrier from './Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -804,11 +804,11 @@ export const gameLevelClasses = [CustomLevel];`;
                         : '{ up: 87, left: 65, down: 83, right: 68 }';
 
                 function header() {
-                        return `import GameControl from '/assets/js/BetterGameEngine/adventureLogic/GameControl.js';
-import GameEnvBackground from '/assets/js/BetterGameEngine/adventureLogic/GameEnvBackground.js';
-import Player from '/assets/js/BetterGameEngine/adventureLogic/Player.js';
-import Npc from '/assets/js/BetterGameEngine/adventureLogic/Npc.js';
-import Barrier from '/assets/js/adventureGame/Barrier.js';
+                        return `import GameControl from './adventureLogic/GameControl.js';
+import GameEnvBackground from './adventureLogic/GameEnvBackground.js';
+import Player from './adventureLogic/Player.js';
+import Npc from './adventureLogic/Npc.js';
+import Barrier from './Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {

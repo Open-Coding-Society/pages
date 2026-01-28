@@ -1,5 +1,5 @@
 // GameControl.js with improved level transition handling
-import GameLevel from "../BetterGameEngine/MansionLogic/GameLevel.js";
+import GameLevel from "./MansionLogic/GameLevel.js";
 
 class GameControl {
     /**

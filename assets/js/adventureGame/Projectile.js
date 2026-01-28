@@ -1,4 +1,4 @@
-import Character from "../BetterGameEngine/adventureLogic/Character.js";
+import Character from "./adventureLogic/Character.js";
 import ProjectileExplosion from './ProjectileExplosion.js';
 
 function newProjectileExplosion(data, gameEnv) {

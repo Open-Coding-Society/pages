@@ -1,4 +1,4 @@
-import Character from "../BetterGameEngine/adventureLogic/Character.js";
+import Character from "./adventureLogic/Character.js";
 
 class ProjectileExplosion extends Character {
     constructor(data, gameEnv) {

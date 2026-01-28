@@ -1,5 +1,5 @@
 import Game from '../BetterGameEngine/features/Game.js';
-import GameControl from '../BetterGameEngine/adventureLogic/GameControl.js';
+import GameControl from './adventureLogic/GameControl.js';
 import Quiz from './Quiz.js';
 import Inventory from "./Inventory.js";
 import { defaultItems } from "./items.js";

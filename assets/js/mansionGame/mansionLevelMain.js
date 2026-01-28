@@ -1,7 +1,7 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from '../BetterGameEngine/MansionLogic/GameEnvBackground.js';
-import Player from '../BetterGameEngine/MansionLogic/Player.js';
-import Npc from '../BetterGameEngine/MansionLogic/Npc.js';
+import GamEnvBackground from './MansionLogic/GameEnvBackground.js';
+import Player from './MansionLogic/Player.js';
+import Npc from './MansionLogic/Npc.js';
 // import GameControl from '../MansionLogic/GameControl.js';
 import GameLevel1 from './mansionLevel1.js';
 import GameLevel2 from './mansionLevel2.js';

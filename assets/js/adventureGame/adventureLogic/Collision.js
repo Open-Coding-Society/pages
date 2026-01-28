@@ -1,5 +1,5 @@
 
-import { Transform } from "Transform.js";
+import { Transform } from "./Transform.js";
 
 class Collision {
     constructor() {
