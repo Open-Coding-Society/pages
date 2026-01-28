@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Wait for an element to exist in the DOM, retrying up to maxAttempts
+// Wait for an element to exist in the DOM, retrying up to maxAttempts (delay between attempts)
 function waitForElement(selector, maxAttempts = 20, interval = 100) {
     return new Promise((resolve, reject) => {
         let attempts = 0;
