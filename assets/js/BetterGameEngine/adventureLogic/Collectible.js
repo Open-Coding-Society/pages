@@ -34,17 +34,21 @@ class Collectible extends Character {
 
     update() {
         this.draw();
-        // Check if player is still in collision
-        const players = this.gameEnv.gameObjects.filter(
-            obj => obj.state.collisionEvents.includes(this.spriteData.id)
-        );
         
-        // Reset interaction state if player moved away
-        if (players.length === 0 && this.isInteracting) {
-            this.isInteracting = false;
-            // Close dialogue if player moves away
-            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-                this.dialogueSystem.closeDialogue();
+        // Only check collision state when not paused
+        if (!this.gameEnv.gameControl || !this.gameEnv.gameControl.isPaused) {
+            // Check if player is still in collision
+            const players = this.gameEnv.gameObjects.filter(
+                obj => obj.state.collisionEvents.includes(this.spriteData.id)
+            );
+            
+            // Reset interaction state if player moved away
+            if (players.length === 0 && this.isInteracting) {
+                this.isInteracting = false;
+                // Close dialogue if player moves away
+                if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                    this.dialogueSystem.closeDialogue();
+                }
             }
         }
     }

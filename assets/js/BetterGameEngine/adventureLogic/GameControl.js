@@ -139,13 +139,15 @@ class GameControl {
             this.handleLevelEnd();
             return;
         }
-        // If the game level is paused, stop the game loop
-        if (this.isPaused) {
-            return;
-        }
-        // Level updates
+        
+        // Always render, even when paused - this keeps characters visible
         this.currentLevel.update();
-        this.handleInLevelLogic();
+        
+        // Only update game logic when not paused
+        if (!this.isPaused) {
+            this.handleInLevelLogic();
+        }
+        
         // Recurse at frame rate speed
         requestAnimationFrame(this.gameLoop.bind(this));
     }

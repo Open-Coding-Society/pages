@@ -75,19 +75,22 @@ export class BackgroundParallax extends GameObject {
      * Update is called by GameLoop on all GameObjects 
      */
     update() {
-        // Update the position for parallax scrolling
-        this.position.x -= this.velocity; // Move left
-        this.position.y += this.velocity; // Move down (for snowfall effect)
+        // Only update position if game is not paused
+        if (!this.gameEnv.gameControl || !this.gameEnv.gameControl.isPaused) {
+            // Update the position for parallax scrolling
+            this.position.x -= this.velocity; // Move left
+            this.position.y += this.velocity; // Move down (for snowfall effect)
 
-        // Wrap the position to prevent overflow
-        if (this.position.x < -this.width) {
-            this.position.x = 0;
-        }
-        if (this.position.y > this.height) {
-            this.position.y = 0;
+            // Wrap the position to prevent overflow
+            if (this.position.x < -this.width) {
+                this.position.x = 0;
+            }
+            if (this.position.y > this.height) {
+                this.position.y = 0;
+            }
         }
 
-        // Draw the background image
+        // Always draw the background image, even when paused
         this.draw();
     }
 

@@ -17,13 +17,17 @@ class Enemy extends Character {
         if (this.spriteData && typeof this.spriteData.update === 'function') {
             this.spriteData.update.call(this);
         }
-        // Check for collision with the player
-        if (!this.playerDestroyed && this.collisionChecks()) {
-            this.handleCollisionEvent();
-        }
+        
+        // Only check collisions and move when not paused
+        if (!this.gameEnv.gameControl || !this.gameEnv.gameControl.isPaused) {
+            // Check for collision with the player
+            if (!this.playerDestroyed && this.collisionChecks()) {
+                this.handleCollisionEvent();
+            }
 
-        // Ensure the object stays within the canvas boundaries
-        this.stayWithinCanvas();
+            // Ensure the object stays within the canvas boundaries
+            this.stayWithinCanvas();
+        }
     }
 
     /**
