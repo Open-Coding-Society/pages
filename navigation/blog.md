@@ -22,7 +22,7 @@ permalink: /navigation/blogs/
 </div>
 
 <script type="module">
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     async function displayUserCourses() {
         const container = document.getElementById('courseLinks');
@@ -41,11 +41,7 @@ permalink: /navigation/blogs/
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions );
 
             // If not logged in or error, show all courses
             if (!response.ok) {

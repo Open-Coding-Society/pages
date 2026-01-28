@@ -630,13 +630,7 @@ Check if this is a course lesson and determine which course context to use
   // NOTE: This getUid function is duplicated from admin_foundation.html logic
   async function getUid() {
     try {
-      const res = await fetch(`${pythonURI}/api/id`, {
-        ...fetchOptions,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions ); 
 
       if (res.ok) {
         const data = await res.json();
