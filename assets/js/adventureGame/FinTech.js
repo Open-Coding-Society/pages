@@ -1,4 +1,4 @@
-import Game from '../BetterGameEngine/features/Game.js';
+import Game from './Game.js';
 import GameControl from './adventureLogic/GameControl.js';
 import Quiz from './Quiz.js';
 import Inventory from "./Inventory.js";
