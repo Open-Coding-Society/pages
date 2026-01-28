@@ -1,4 +1,4 @@
-import Npc from './Npc.js';
+import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
 
 class FallingBlock extends Npc {
     constructor(data = null, gameEnv = null) {

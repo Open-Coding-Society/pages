@@ -772,7 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
 import GameEnvBackground from '/assets/js/BetterGameEngine/adventureLogic/GameEnvBackground.js';
 import Player from '/assets/js/BetterGameEngine/adventureLogic/Player.js';
 import Npc from '/assets/js/BetterGameEngine/adventureLogic/Npc.js';
-    import Barrier from '/assets/js/BetterGameEngine/adventureLogic/Barrier.js';
+    import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -808,7 +808,7 @@ export const gameLevelClasses = [CustomLevel];`;
 import GameEnvBackground from '/assets/js/BetterGameEngine/adventureLogic/GameEnvBackground.js';
 import Player from '/assets/js/BetterGameEngine/adventureLogic/Player.js';
 import Npc from '/assets/js/BetterGameEngine/adventureLogic/Npc.js';
-import Barrier from '/assets/js/BetterGameEngine/adventureLogic/Barrier.js';
+import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {

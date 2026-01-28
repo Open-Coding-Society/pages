@@ -1,5 +1,5 @@
 import GameControl from './GameControl.js';
-import Multiplayer from './Multiplayer.js';
+import Multiplayer from '../../adventureGame/Multiplayer.js';
 
 class Game {
     constructor(environment) {
