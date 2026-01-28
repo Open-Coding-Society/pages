@@ -23,17 +23,20 @@ class GameCore {
     this.gameControl.start();
 
     // Try to dynamically load the centralized PauseMenu (prefer the shared one)
-    import('./PauseMenu.js')
-        .then(mod => {
-            try {
-                // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
-                const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
-                new mod.default(this.gameControl, pmOptions);
-            } catch (e) { console.warn('PauseMenu init failed:', e); }
-        })
-        .catch(() => {
-            // no-op: PauseMenu is optional
+    // Skip if disablePauseMenu is set in environment
+    if (!this.environment.disablePauseMenu) {
+        import('./PauseMenu.js')
+            .then(mod => {
+                try {
+                    // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
+                    const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
+                    new mod.default(this.gameControl, pmOptions);
+                } catch (e) { console.warn('PauseMenu init failed:', e); }
+            })
+            .catch(() => {
+                // no-op: PauseMenu is optional
         });
+    }
 
     // Try to dynamically load the Leaderboard
     import('./Leaderboard.js')
