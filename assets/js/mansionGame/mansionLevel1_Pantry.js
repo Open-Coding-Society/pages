@@ -1,7 +1,7 @@
-import GameEnvBackground  from "../BetterGameEngine/MansionEngine/GameEnvBackground.js";
-import Player from "../BetterGameEngine/MansionEngine/Player.js";
-import Npc from "../BetterGameEngine/MansionEngine/Npc.js";
-import DialogueSystem from "../BetterGameEngine/MansionEngine/DialogueSystem.js";
+import GameEnvBackground  from "../MansionEngine/GameEnvBackground.js";
+import Player from "../MansionEngine/Player.js";
+import Npc from "../MansionEngine/Npc.js";
+import DialogueSystem from "../MansionEngine/DialogueSystem.js";
 import MansionLevelMain from './mansionLevelMain.js';
 
 class MansionLevel1_Pantry {

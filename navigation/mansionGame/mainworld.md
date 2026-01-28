@@ -5,6 +5,33 @@ permalink: /gamify/mansionGame
 microblog: true
 ---
 
+<style>
+/* Center game container and canvas */
+#gameContainer {
+    width: 100%;
+    max-width: 800px;
+    height: 600px;
+    margin: 20px auto;
+    position: relative;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: transparent;
+}
+
+/* Ensure proper stacking */
+.promptDropDown {
+    position: absolute !important;
+}
+</style>
+
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
     <canvas id='gameCanvas'></canvas>
