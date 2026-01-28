@@ -4,19 +4,18 @@ export default class Leaderboard {
     constructor(gameControl = null, options = {}) {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
-        this.parentId = options.parentId || null; // NEW: Accept parentId option
-        this.isOpen = true;
+        this.parentId = options.parentId || null;
+        this.isOpen = false;
         this.mounted = false;
-        
-        // Validate javaURI exists
+        this.mode = null; // 'dynamic' or 'elementary'
+        this.showingTypeSelection = true;
+        this.elementaryEntries = []; // Store elementary entries locally
+
         if (!javaURI) {
-            console.error('[Leaderboard] javaURI is not defined - cannot initialize leaderboard');
+            console.error('[Leaderboard] javaURI is not defined');
             return;
         }
-        
-        console.log('[Leaderboard] Initializing with javaURI:', javaURI);
-        console.log('[Leaderboard] Parent ID:', this.parentId); // NEW: Log parent
-        
+
         try {
             this.injectStyles();
             this.init();
@@ -32,23 +31,27 @@ export default class Leaderboard {
         style.id = 'leaderboard-styles';
         style.textContent = `
         .leaderboard-widget {
-            position: absolute !important;
-            bottom: 20px !important;
-            right: 20px !important;
             width: 350px;
             background: linear-gradient(135deg, #667eea, #764ba2);
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,.35);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            z-index: 999999 !important;
+            z-index: 1000;
             overflow: hidden;
-            display: block !important;
-            visibility: visible !important;
         }
 
-        /* Fixed positioning for when NOT in a game container */
-        .leaderboard-widget.fixed-position {
-            position: fixed !important;
+        /* Embedded inside game canvas */
+        .leaderboard-embedded {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        /* Fallback if no parent */
+        .leaderboard-fixed {
+            position: fixed;
+            top: 20px;
+            right: 20px;
         }
 
         .leaderboard-header {
@@ -71,28 +74,16 @@ export default class Leaderboard {
             border-radius: 50%;
             font-size: 22px;
             cursor: pointer;
-            line-height: 1;
-            transition: all 0.3s ease;
-        }
-
-        .toggle-btn:hover {
-            background: rgba(255,255,255,.3);
-            transform: scale(1.1);
         }
 
         .leaderboard-content {
             background: white;
             max-height: 400px;
             overflow-y: auto;
-            display: block;
         }
 
         .leaderboard-content.hidden {
             display: none !important;
-        }
-
-        .leaderboard-list {
-            padding: 16px;
         }
 
         .leaderboard-table {
@@ -100,318 +91,510 @@ export default class Leaderboard {
             border-collapse: collapse;
         }
 
-        .leaderboard-table thead {
-            background: #f8f9fa;
-            position: sticky;
-            top: 0;
-        }
-
-        .leaderboard-table th {
-            padding: 12px 8px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: #6c757d;
-            text-align: left;
-        }
-
+        .leaderboard-table th,
         .leaderboard-table td {
             padding: 12px 8px;
             font-size: 14px;
             border-bottom: 1px solid #f1f3f5;
         }
 
-        .leaderboard-table tbody tr {
-            background: white;
-            transition: background-color 0.2s ease;
-        }
+        .rank { font-weight: 800; }
+        .username { font-weight: 600; }
+        .score { font-weight: 800; color: #667eea; }
 
-        .leaderboard-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .rank { 
-            font-weight: 800;
-            color: #495057;
-            font-size: 16px;
-        }
-        
-        .username {
-            font-weight: 600;
-            color: #212529;
-        }
-
-        .game-name {
-            color: #6c757d;
-            font-size: 12px;
-        }
-
-        .score { 
-            font-weight: 800; 
-            color: #667eea;
-            font-size: 16px;
-        }
-
-        .loading, .error, .empty {
-            padding: 40px 20px;
+        /* Type selection styles */
+        .type-selection {
+            padding: 24px;
             text-align: center;
-            color: #6c757d;
+        }
+
+        .type-selection h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .type-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .type-btn {
+            padding: 14px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Elementary form styles */
+        .elementary-form {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
             font-size: 14px;
         }
 
-        .error { 
-            color: #dc3545;
-            font-weight: 600;
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
         }
 
-        /* Scrollbar */
-        .leaderboard-content::-webkit-scrollbar {
-            width: 8px;
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
-        .leaderboard-content::-webkit-scrollbar-track {
-            background: #f1f3f5;
-        }
-
-        .leaderboard-content::-webkit-scrollbar-thumb {
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
             background: #667eea;
-            border-radius: 4px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            background: #5568d3;
+        }
+
+        .loading, .error {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,.3);
         }
         `;
         document.head.appendChild(style);
-        console.log('[Leaderboard] Styles injected');
     }
 
     init() {
-        console.log('[Leaderboard] Init called, readyState:', document.readyState);
-        
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                console.log('[Leaderboard] DOMContentLoaded fired, mounting...');
-                this.mount();
-            });
+            document.addEventListener('DOMContentLoaded', () => this.mount());
         } else {
-            console.log('[Leaderboard] DOM already ready, mounting immediately...');
             this.mount();
         }
-
-        this.refreshInterval = setInterval(() => {
-            console.log('[Leaderboard] Auto-refresh triggered');
-            this.fetchLeaderboard();
-        }, 30000);
     }
 
     mount() {
-        console.log('[Leaderboard] Mount called');
-        
-        // Don't mount if already mounted
-        if (this.mounted) {
-            console.log('[Leaderboard] Already mounted, skipping');
-            return;
-        }
-        
-        const existing = document.getElementById('leaderboard-container');
-        if (existing) {
-            console.log('[Leaderboard] Removing existing container');
-            existing.remove();
+        if (this.mounted) return;
+
+        let parent = document.body;
+        let embedded = false;
+
+        if (this.parentId) {
+            const el = document.getElementById(this.parentId);
+            if (el) {
+                parent = el;
+                embedded = true;
+
+                const style = window.getComputedStyle(parent);
+                if (style.position === 'static') {
+                    parent.style.position = 'relative';
+                }
+            }
         }
 
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
-        container.className = 'leaderboard-widget';
-        
-        // NEW: Determine parent element
-        let parentElement = document.body;
-        let useFixedPosition = true;
-        
-        if (this.parentId) {
-            const parent = document.getElementById(this.parentId);
-            if (parent) {
-                parentElement = parent;
-                useFixedPosition = false;
-                console.log('[Leaderboard] Mounting to parent:', this.parentId);
-                
-                // Ensure parent has position relative for absolute positioning to work
-                const parentStyle = window.getComputedStyle(parent);
-                if (parentStyle.position === 'static') {
-                    parent.style.position = 'relative';
-                    console.log('[Leaderboard] Set parent position to relative');
-                }
-            } else {
-                console.warn('[Leaderboard] Parent element not found:', this.parentId);
-            }
-        }
-        
-        // Apply appropriate positioning class
-        if (useFixedPosition) {
-            container.classList.add('fixed-position');
-            container.style.cssText = 'position: fixed !important; bottom: 20px !important; right: 20px !important; z-index: 999999 !important; display: block !important;';
-        } else {
-            container.style.cssText = 'position: absolute !important; bottom: 20px !important; right: 20px !important; z-index: 999999 !important; display: block !important;';
-        }
+        container.className = `leaderboard-widget ${
+            embedded ? 'leaderboard-embedded' : 'leaderboard-fixed'
+        }`;
 
         container.innerHTML = `
             <div class="leaderboard-header">
-                🏆 Leaderboard
-                <button id="toggle-leaderboard" class="toggle-btn">−</button>
-            </div>
-            <div class="leaderboard-content" id="leaderboard-content">
-                <div class="leaderboard-list" id="leaderboard-list">
-                    <p class="loading">Loading leaderboard…</p>
+                <div>
+                    <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
+                    🏆 Leaderboard
+                    <span id="leaderboard-preview"
+                          style="font-size:14px;font-weight:500;margin-left:8px;"></span>
                 </div>
+                <button id="toggle-leaderboard" class="toggle-btn">+</button>
+            </div>
+            <div class="leaderboard-content hidden" id="leaderboard-content">
+                <div id="leaderboard-list"></div>
             </div>
         `;
 
-        parentElement.appendChild(container);
+        parent.appendChild(container);
         this.mounted = true;
-        console.log('[Leaderboard] Container appended to:', parentElement.id || 'body');
-        console.log('[Leaderboard] Container in DOM?', document.getElementById('leaderboard-container') !== null);
 
-        const toggleBtn = document.getElementById('toggle-leaderboard');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => this.toggle());
-            console.log('[Leaderboard] Toggle button listener attached');
-        }
+        document
+            .getElementById('toggle-leaderboard')
+            .addEventListener('click', () => this.toggle());
 
-        this.fetchLeaderboard();
+        document
+            .getElementById('back-btn')
+            .addEventListener('click', () => this.goBack());
+
+        this.showTypeSelection();
     }
 
     toggle() {
         const content = document.getElementById('leaderboard-content');
         const btn = document.getElementById('toggle-leaderboard');
-        if (!content || !btn) return;
+        const preview = document.getElementById('leaderboard-preview');
 
         this.isOpen = !this.isOpen;
         content.classList.toggle('hidden', !this.isOpen);
         btn.textContent = this.isOpen ? '−' : '+';
-        console.log('[Leaderboard] Toggled, isOpen:', this.isOpen);
+
+        if (preview) {
+            preview.style.display = this.isOpen ? 'none' : 'inline';
+        }
     }
 
-    async fetchLeaderboard() {
-        console.log('[Leaderboard] fetchLeaderboard called');
+    goBack() {
+        // Clear any intervals
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
+
+        // Reset state
+        this.mode = null;
+        this.showingTypeSelection = true;
+
+        // Hide back button
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.style.display = 'none';
+
+        // Clear preview
+        const preview = document.getElementById('leaderboard-preview');
+        if (preview) preview.textContent = '';
+
+        // Show type selection
+        this.showTypeSelection();
+    }
+
+    showTypeSelection() {
         const list = document.getElementById('leaderboard-list');
-        if (!list) {
-            console.warn('[Leaderboard] List element not found');
+        if (!list) return;
+
+        list.innerHTML = `
+            <div class="type-selection">
+                <h3>Choose Leaderboard Type</h3>
+                <div class="type-buttons">
+                    <button class="type-btn" id="dynamic-btn">Dynamic Leaderboard</button>
+                    <button class="type-btn" id="elementary-btn">Elementary Leaderboard</button>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('dynamic-btn').addEventListener('click', () => {
+            this.mode = 'dynamic';
+            this.showingTypeSelection = false;
+            this.setupDynamicMode();
+        });
+
+        document.getElementById('elementary-btn').addEventListener('click', () => {
+            this.mode = 'elementary';
+            this.showingTypeSelection = false;
+            this.setupElementaryMode();
+        });
+    }
+
+    setupDynamicMode() {
+        const list = document.getElementById('leaderboard-list');
+        list.innerHTML = '<p class="loading">Loading dynamic leaderboard…</p>';
+        
+        // Show back button
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.style.display = 'inline-block';
+        
+        // Start auto-updating
+        this.fetchLeaderboard();
+        this.refreshInterval = setInterval(() => this.fetchLeaderboard(), 30000);
+    }
+
+    setupElementaryMode() {
+        // Show back button
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.style.display = 'inline-block';
+        
+        // Fetch existing data from backend
+        this.fetchElementaryLeaderboard().then(() => {
+            this.showElementaryForm();
+        });
+    }
+
+    showElementaryForm() {
+        const list = document.getElementById('leaderboard-list');
+        if (!list) return;
+
+        list.innerHTML = `
+            <div class="elementary-form">
+                <div class="form-group">
+                    <label for="player-name">Player Name</label>
+                    <input type="text" id="player-name" placeholder="Enter name" />
+                </div>
+                <div class="form-group">
+                    <label for="player-score">Score</label>
+                    <input type="number" id="player-score" placeholder="Enter score" />
+                </div>
+                <button class="submit-btn" id="add-score-btn">Add Score</button>
+            </div>
+        `;
+
+        document.getElementById('add-score-btn').addEventListener('click', () => {
+            this.addElementaryScore();
+        });
+
+        // Allow Enter key to submit
+        document.getElementById('player-score').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addElementaryScore();
+        });
+
+        // Display existing entries if any
+        if (this.elementaryEntries.length > 0) {
+            this.displayElementaryLeaderboard();
+        }
+    }
+
+    async addElementaryScore() {
+        const nameInput = document.getElementById('player-name');
+        const scoreInput = document.getElementById('player-score');
+
+        const name = nameInput.value.trim();
+        const score = parseInt(scoreInput.value);
+
+        if (!name || isNaN(score)) {
+            alert('Please enter both name and score');
             return;
         }
 
-        list.innerHTML = '<p class="loading">Loading…</p>';
+        try {
+            const base =
+                window.javaBackendUrl ||
+                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
+
+            // POST to backend
+            const res = await fetch(
+                `${base.replace(/\/$/, '')}/api/leaderboard`,
+                {
+                    ...fetchOptions,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: name,
+                        username: name,
+                        score: score,
+                        gameName: this.gameName,
+                        game: this.gameName
+                    })
+                }
+            );
+
+            if (!res.ok) throw new Error('Failed to save score');
+
+            // Add to local array
+            this.elementaryEntries.push({
+                user: name,
+                username: name,
+                score: score,
+                gameName: this.gameName,
+                game: this.gameName
+            });
+
+            // Sort by score descending
+            this.elementaryEntries.sort((a, b) => b.score - a.score);
+
+            // Clear inputs
+            nameInput.value = '';
+            scoreInput.value = '';
+
+            // Fetch updated leaderboard from backend
+            await this.fetchElementaryLeaderboard();
+
+        } catch (error) {
+            console.error('Error adding score:', error);
+            alert('Failed to save score. Please try again.');
+        }
+    }
+
+    async fetchElementaryLeaderboard() {
+        try {
+            const base =
+                window.javaBackendUrl ||
+                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
+
+            const res = await fetch(
+                `${base.replace(/\/$/, '')}/api/leaderboard`,
+                { ...fetchOptions, method: 'GET', credentials: 'omit' }
+            );
+
+            if (!res.ok) throw new Error(res.status);
+            const data = await res.json();
+            
+            // Update local entries with backend data
+            this.elementaryEntries = data;
+            this.displayElementaryLeaderboard();
+        } catch (error) {
+            console.error('Error fetching leaderboard:', error);
+            // Fall back to local data if fetch fails
+            this.displayElementaryLeaderboard();
+        }
+    }
+
+    displayElementaryLeaderboard() {
+        const list = document.getElementById('leaderboard-list');
+        const preview = document.getElementById('leaderboard-preview');
+
+        if (!this.elementaryEntries.length) return;
+
+        const top = this.elementaryEntries[0];
+        preview.textContent =
+            ` – High Score: ${top.user}: ${Number(top.score).toLocaleString()}`;
+
+        let html = `
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        this.elementaryEntries.forEach((e, i) => {
+            html += `
+                <tr>
+                    <td class="rank">${i + 1}</td>
+                    <td class="username">${this.escape(e.user)}</td>
+                    <td class="score">${Number(e.score).toLocaleString()}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        
+        // Add button to add more scores
+        html += `
+            <div style="padding: 12px; border-top: 2px solid #f1f3f5;">
+                <button class="submit-btn" id="add-another-btn">Add Another Score</button>
+            </div>
+        `;
+
+        list.innerHTML = html;
+
+        document.getElementById('add-another-btn').addEventListener('click', () => {
+            this.showElementaryForm();
+        });
+    }
+
+    async fetchLeaderboard() {
+        if (this.mode !== 'dynamic') return;
+
+        const list = document.getElementById('leaderboard-list');
+        if (!list) return;
 
         try {
-            // Determine backend URL with same priority as PauseMenu
-            let backendBase = null;
-            
-            // Priority 1: Check for window.javaBackendUrl
-            if (typeof window !== 'undefined' && window.javaBackendUrl) {
-                backendBase = String(window.javaBackendUrl);
-            }
-            // Priority 2: localhost development shortcut
-            else if (typeof window !== 'undefined' && window.location && 
-                     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-                backendBase = 'http://localhost:8585';
-            }
-            // Priority 3: Use imported javaURI from config
-            else if (javaURI) {
-                backendBase = String(javaURI);
-            }
-            // Priority 4: Same-origin fallback
-            else if (typeof window !== 'undefined' && window.location && window.location.origin) {
-                backendBase = String(window.location.origin);
-            }
-            
-            if (!backendBase) {
-                throw new Error('No backend URL configured');
-            }
-            
-            const url = `${backendBase.replace(/\/$/, '')}/api/leaderboard`;
-            console.log('[Leaderboard] Fetching from:', url);
-            
-            // Use fetchOptions from config with GET method, but override credentials
-            const requestOptions = {
-                ...fetchOptions,    // Copy all properties from fetchOptions
-                method: 'GET',      // Override to use GET method
-                credentials: 'omit' // Override credentials to omit for public leaderboard
-            };
-            
-            console.log('[Leaderboard] Fetch options:', requestOptions);
-            
-            const res = await fetch(url, requestOptions);
-            console.log('[Leaderboard] Response status:', res.status);
-            
-            if (!res.ok) {
-                const errorMsg = 'Error: ' + res.status;
-                console.log(errorMsg);
-                throw new Error(`HTTP ${res.status}`);
-            }
-            
+            const base =
+                window.javaBackendUrl ||
+                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
+
+            const res = await fetch(
+                `${base.replace(/\/$/, '')}/api/leaderboard`,
+                { ...fetchOptions, method: 'GET', credentials: 'omit' }
+            );
+
+            if (!res.ok) throw new Error(res.status);
             const data = await res.json();
-            console.log('[Leaderboard] Data received:', data);
             this.displayLeaderboard(data);
-        } catch (err) {
-            console.error('[Leaderboard] Fetch error:', err);
-            
-            // More user-friendly error messages
-            let errorMsg = 'Failed to load leaderboard';
-            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || 
-                err.message.includes('ERR_CONNECTION_REFUSED')) {
-                errorMsg = 'Cannot connect to server - is it running on port 8585?';
-            } else if (err.message.includes('CORS')) {
-                errorMsg = 'Possible CORS or Service Down error';
-            } else if (err.message.includes('404')) {
-                errorMsg = 'Leaderboard endpoint not found';
-            } else if (err.message.includes('500')) {
-                errorMsg = 'Server error - please try again later';
-            } else if (err.message.includes('No backend URL')) {
-                errorMsg = 'Backend URL not configured';
-            }
-            
-            list.innerHTML = `<p class="error">${errorMsg}<br/><small>${err.message}</small></p>`;
+        } catch {
+            list.innerHTML = `<p class="error">Failed to load leaderboard</p>`;
         }
     }
 
     displayLeaderboard(data) {
         const list = document.getElementById('leaderboard-list');
-        if (!list) return;
+        const preview = document.getElementById('leaderboard-preview');
 
-        if (!Array.isArray(data) || data.length === 0) {
-            list.innerHTML = '<p class="empty">No scores yet</p>';
+        if (!Array.isArray(data) || !data.length) {
+            list.innerHTML = '<p>No scores yet</p>';
             return;
         }
 
+        const top = data[0];
+        preview.textContent =
+            ` – High Score: ${top.user || top.username}: ${Number(top.score).toLocaleString()}`;
+
         let html = `
-        <table class="leaderboard-table">
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Player</th>
-                    <th>Game</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Game</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
         `;
 
-        data.forEach((entry, index) => {
-            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
-            
-            // Handle both camelCase and snake_case field names from backend
-            const user = entry.user || entry.username || 'Unknown';
-            const gameName = entry.gameName || entry.game_name || entry.game || 'Unknown';
-            const score = entry.score || 0;
-            
+        data.forEach((e, i) => {
             html += `
-            <tr>
-                <td class="rank">${medal || (index + 1)}</td>
-                <td class="username">${this.escape(user)}</td>
-                <td class="game-name">${this.escape(gameName)}</td>
-                <td class="score">${Number(score).toLocaleString()}</td>
-            </tr>
+                <tr>
+                    <td class="rank">${i + 1}</td>
+                    <td class="username">${this.escape(e.user || e.username)}</td>
+                    <td>${this.escape(e.gameName || e.game)}</td>
+                    <td class="score">${Number(e.score).toLocaleString()}</td>
+                </tr>
             `;
         });
 
         html += '</tbody></table>';
         list.innerHTML = html;
-        console.log('[Leaderboard] Displayed', data.length, 'entries');
     }
 
     escape(str = '') {
@@ -424,9 +607,6 @@ export default class Leaderboard {
         if (this.refreshInterval) {
             clearInterval(this.refreshInterval);
         }
-        const container = document.getElementById('leaderboard-container');
-        if (container) {
-            container.remove();
-        }
+        document.getElementById('leaderboard-container')?.remove();
     }
 }
