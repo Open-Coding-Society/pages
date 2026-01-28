@@ -1,4 +1,4 @@
-import Character from '../../MansionEngine/Character.js';
+import Character from '../../BetterGameEngine/MansionEngine/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from "./HealthBars.js";
 

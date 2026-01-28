@@ -1,9 +1,9 @@
-import Enemy from '../../MansionEngine/Enemy.js';
+import Enemy from '../../BetterGameEngine/MansionEngine/Enemy.js';
 import Boomerang from './Boomerang.js';
 import Projectile from './Projectile.js';
 import Arm from './Arm.js';
 import showEndScreen from './EndScreen.js';
-import Player from '../../MansionEngine/Player.js';
+import Player from '../../BetterGameEngine/MansionEngine/Player.js';
 import { updateBossHealthBar } from './HealthBars.js';
 
 /*

@@ -1,6 +1,6 @@
 import { Vec2, Vec3 } from '../essentials/Vectors.js';
 import { Transform } from '../Transform.js';
-import { ballCollide } from '../../adventureGame/GameEngine/Collision.js';
+import { ballCollide } from '../GameEngine/Collision.js';
 import { camera } from '../Camera.js';
 
 export const deltaTime = 0.1;
