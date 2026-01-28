@@ -1,17 +1,17 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from '../BetterGameEngine/GameEngine/GameEnvBackground.js';
-import Player from '../BetterGameEngine/GameEngine/Player.js';
-import Npc from '../BetterGameEngine/GameEngine/Npc.js';
-import Coin from '../BetterGameEngine/GameEngine/Coin.js';
+import GamEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import Player from '../BetterGameEngine/adventureLogic/Player.js';
+import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
+import Coin from '../BetterGameEngine/adventureLogic/Coin.js';
 import Quiz from './Quiz.js';
-import DialogueSystem from '../BetterGameEngine/GameEngine/DialogueSystem.js';
-import GameControl from '../BetterGameEngine/GameEngine/GameControl.js';
+import DialogueSystem from '../BetterGameEngine/adventureLogic/DialogueSystem.js';
+import GameControl from '../BetterGameEngine/adventureLogic/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
-import AINpc from '../BetterGameEngine/GameEngine/aiNpc.js';
+import AINpc from '../BetterGameEngine/adventureLogic/aiNpc.js';
 
 class GameLevelDesert {
   constructor(gameEnv) {

@@ -1,6 +1,6 @@
-import GameEnvBackground from '../BetterGameEngine/GameEngine/GameEnvBackground.js';
-import Player from '../BetterGameEngine/GameEngine/Player.js';
-import Npc from '../BetterGameEngine/GameEngine/Npc.js';
+import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import Player from '../BetterGameEngine/adventureLogic/Player.js';
+import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
 import Projectile from './Projectile.js';
 
 class GameLevelStarWars {
