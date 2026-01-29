@@ -125,7 +125,7 @@ async function loadLessonProgress() {
   const lessonKey = window.location.pathname.split("/").pop() || "lesson";
   const URL = `${javaURI}/api/lesson-progress/${lessonKey}`;
 
-  const res = await fetch(URL, { ...fetchOptions, credentials: 'include' });
+  const res = await fetch(URL, fetchOptions);
   if (!res.ok) return console.warn("No lesson progress found");
   const progress = await res.json();
 
@@ -363,7 +363,7 @@ async function syncLessonProgress() {
     const URL = `${javaURI}/api/lesson-progress/${lessonKey}`;
 
     // Fetch existing record (backend ensures it exists)
-    const getRes = await fetch(URL, { ...fetchOptions, credentials: 'include' });
+    const getRes = await fetch(URL, fetchOptions);
     if (!getRes.ok) throw new Error(`GET failed ${getRes.status}`);
     const progress = await getRes.json();
 
@@ -384,8 +384,6 @@ async function syncLessonProgress() {
     const putRes = await fetch(`${javaURI}/api/lesson-progress/${progress.id}`, {
       ...fetchOptions,
       method: 'PUT',
-      headers: { ...fetchOptions.headers, 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify(progress)
     });
 
