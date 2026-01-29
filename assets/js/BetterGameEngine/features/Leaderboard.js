@@ -161,6 +161,8 @@ export default class Leaderboard {
             border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
+            background: #2d2d2d;
+            color: #fff;
         }
 
         .form-group input:focus {
@@ -210,6 +212,22 @@ export default class Leaderboard {
         .back-btn:hover {
             background: rgba(255,255,255,.3);
         }
+
+        .delete-btn {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
         `;
         document.head.appendChild(style);
     }
@@ -253,7 +271,7 @@ export default class Leaderboard {
                     <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
                     <span id="leaderboard-title">🏆 Leaderboard</span>
                     <span id="leaderboard-preview"
-                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Click "+" choose a leaderboard!</span>
+                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Collapse to choose a leaderboard</span>
                 </div>
                 <button id="toggle-leaderboard" class="toggle-btn">+</button>
             </div>
@@ -417,6 +435,7 @@ export default class Leaderboard {
     }
 
     async addElementaryScore() {
+        console.log('=== ADD ELEMENTARY SCORE - NEW VERSION v2 ===');
         const nameInput = document.getElementById('player-name');
         const scoreInput = document.getElementById('player-score');
 
@@ -428,43 +447,46 @@ export default class Leaderboard {
             return;
         }
 
+        const endpoint = '/api/elementary-leaderboard';
+        console.log('POST endpoint:', endpoint);
+
         try {
             const base =
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
+            const url = `${base.replace(/\/$/, '')}${endpoint}`;
+            console.log('Full URL:', url);
+
+            // Create payload without id to ensure new entry is created
+            const payload = {
+                user: name,
+                score: score,
+                gameName: this.gameName
+            };
+            console.log('Payload:', JSON.stringify(payload));
+
             // POST to backend
             const res = await fetch(
-                `${base.replace(/\/$/, '')}/api/leaderboard`,
+                url,
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'omit',
-                    body: JSON.stringify({
-                        user: name,
-                        username: name,
-                        score: score,
-                        gameName: this.gameName,
-                        game: this.gameName
-                    })
+                    body: JSON.stringify(payload)
                 }
             );
 
-            if (!res.ok) throw new Error('Failed to save score');
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Server error:', errorText);
+                throw new Error(`Failed to save score: ${res.status} - ${errorText}`);
+            }
 
-            // Add to local array
-            this.elementaryEntries.push({
-                user: name,
-                username: name,
-                score: score,
-                gameName: this.gameName,
-                game: this.gameName
-            });
-
-            // Sort by score descending
-            this.elementaryEntries.sort((a, b) => b.score - a.score);
+            const savedEntry = await res.json();
+            console.log('Score saved successfully:', savedEntry);
 
             // Clear inputs
             nameInput.value = '';
@@ -475,30 +497,89 @@ export default class Leaderboard {
 
         } catch (error) {
             console.error('Error adding score:', error);
-            alert('Failed to save score. Please try again.');
+            
+            // Check if it's a network error
+            if (error.message.includes('Failed to fetch')) {
+                alert('Network error: Unable to connect to server. Please check if the backend is running.');
+            } else {
+                alert(`Failed to save score: ${error.message}`);
+            }
         }
     }
 
-    async fetchElementaryLeaderboard() {
+    async deleteElementaryScore(id) {
+        if (!confirm('Are you sure you want to delete this score?')) {
+            return;
+        }
+
+        console.log('=== DELETE SCORE ===');
+        console.log('Deleting ID:', id);
+
         try {
             const base =
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
+            const url = `${base.replace(/\/$/, '')}/api/elementary-leaderboard/${id}`;
+            console.log('DELETE URL:', url);
+
+            // DELETE from backend
             const res = await fetch(
-                `${base.replace(/\/$/, '')}/api/leaderboard`,
-                { ...fetchOptions, method: 'GET', credentials: 'omit' }
+                url,
+                {
+                    method: 'DELETE',
+                    credentials: 'omit'
+                }
+            );
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Delete failed:', res.status, errorText);
+                throw new Error(`Failed to delete: ${res.status} - ${errorText}`);
+            }
+
+            console.log('Score deleted successfully');
+
+            // Fetch updated leaderboard from backend
+            await this.fetchElementaryLeaderboard();
+
+        } catch (error) {
+            console.error('Error deleting score:', error);
+            alert(`Failed to delete score: ${error.message}`);
+        }
+    }
+
+    async fetchElementaryLeaderboard() {
+        console.log('=== FETCHING ELEMENTARY LEADERBOARD ===');
+        try {
+            const base =
+                window.javaBackendUrl ||
+                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
+
+            const url = `${base.replace(/\/$/, '')}/api/elementary-leaderboard`;
+            console.log('Fetching from:', url);
+
+            const res = await fetch(
+                url,
+                { method: 'GET', credentials: 'omit' }
             );
 
             if (!res.ok) throw new Error(res.status);
             const data = await res.json();
             
+            console.log('Received data:', data);
+            console.log('Number of entries:', data.length);
+            
             // Update local entries with backend data
             this.elementaryEntries = data;
+            console.log('Updated elementaryEntries:', this.elementaryEntries);
+            
+            // Force display update
             this.displayElementaryLeaderboard();
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
-            // Fall back to local data if fetch fails
+            // Don't fall back to local data - show empty if fetch fails
+            this.elementaryEntries = [];
             this.displayElementaryLeaderboard();
         }
     }
@@ -507,38 +588,45 @@ export default class Leaderboard {
         const list = document.getElementById('leaderboard-list');
         const preview = document.getElementById('leaderboard-preview');
 
-        if (!this.elementaryEntries.length) return;
+        if (!list) return;
 
-        const top = this.elementaryEntries[0];
-        if (preview) {
-            preview.textContent = `High Score: ${top.user} - ${Number(top.score).toLocaleString()}`;
-        }
+        let html = '';
 
-        let html = `
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        // Only update preview if there are entries
+        if (this.elementaryEntries.length > 0) {
+            const top = this.elementaryEntries[0];
+            if (preview) {
+                preview.textContent = `High Score: ${top.user} - ${Number(top.score).toLocaleString()}`;
+            }
 
-        this.elementaryEntries.forEach((e, i) => {
-            html += `
-                <tr>
-                    <td class="rank">${i + 1}</td>
-                    <td class="username">${this.escape(e.user)}</td>
-                    <td class="score">${Number(e.score).toLocaleString()}</td>
-                </tr>
+            html = `
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Score</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
-        });
 
-        html += '</tbody></table>';
+            this.elementaryEntries.forEach((e, i) => {
+                html += `
+                    <tr>
+                        <td class="rank">${i + 1}</td>
+                        <td class="username">${this.escape(e.user)}</td>
+                        <td class="score">${Number(e.score).toLocaleString()}</td>
+                        <td><button class="delete-btn" data-id="${e.id}">Delete</button></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+        }
         
-        // Add form to add more scores
+        // Always show form to add more scores
         html += `
             <div class="elementary-form" style="border-top: 2px solid #f1f3f5; margin-top: 12px;">
                 <div class="form-group">
@@ -553,6 +641,7 @@ export default class Leaderboard {
             </div>
         `;
 
+        // Set innerHTML to clear old content and listeners
         list.innerHTML = html;
 
         // Bind event listeners after setting innerHTML
@@ -571,6 +660,16 @@ export default class Leaderboard {
                 if (e.key === 'Enter') this.addElementaryScore();
             });
         }
+
+        // Bind delete button event listeners for each delete button
+        const deleteButtons = list.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = e.target.getAttribute('data-id');
+                this.deleteElementaryScore(id);
+            });
+        });
     }
 
     async fetchLeaderboard() {
