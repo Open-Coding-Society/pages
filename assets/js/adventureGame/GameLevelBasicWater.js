@@ -1,5 +1,5 @@
-import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
-import Player from '../BetterGameEngine/adventureLogic/Player.js';
+import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
 
 class GameLevelBasicWater {
   constructor(gameEnv) {

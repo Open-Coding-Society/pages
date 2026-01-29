@@ -28,7 +28,7 @@ This folder contains template files to help you create new games using the **Bet
 
 **Example Import:**
 ```javascript
-import Game from './adventureGame/adventureLogic/Game.js';
+import Game from './BetterGameEngine/essentials/Game.js';
 Game.main();
 ```
 
@@ -350,7 +350,7 @@ playSound(filename) {
 ## Looking for Working Examples?
 
 Check out these actual game implementations:
-- **Adventure Game:** `/assets/js/adventureGame/adventureLogic/`
+- **Adventure Game:** `/assets/js/BetterGameEngine/essentials/`
 - **Mansion Game:** `/assets/js/mansionGame/MansionLogic/`
 
 Both follow this template structure and show real working code!

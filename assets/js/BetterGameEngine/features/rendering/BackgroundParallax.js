@@ -1,4 +1,4 @@
-import GameObject from './GameObject.js';
+import GameObject from '../../essentials/GameObject.js';
 
 /** Parallax Background GameObject
  * - Tiling: draw multiple of the image to fill the gameCanvas extents

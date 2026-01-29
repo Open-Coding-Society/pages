@@ -10,8 +10,8 @@ permalink: /digital-famine/planets
 </div>
 
 <script type="module">
-    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/adventureLogic/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/adventureLogic/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/essentials/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/essentials/GameControl.js";
     import GameLevelHomePage from "{{site.baseurl}}/assets/js/digitalFamine/GameLevelHomePage.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 

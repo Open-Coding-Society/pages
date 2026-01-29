@@ -1,7 +1,7 @@
-import Background from '../BetterGameEngine/adventureLogic/Background.js';
-import Player from '../BetterGameEngine/adventureLogic/Player.js';
-import Npc from '../BetterGameEngine/adventureLogic/Npc.js';
-import GameControl from '../BetterGameEngine/adventureLogic/GameControl.js';
+import Background from '../BetterGameEngine/essentials/Background.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
+import Npc from '../BetterGameEngine/gameObjects/Npc.js';
+import GameControl from '../BetterGameEngine/essentials/GameControl.js';
 import GameLevelDesert from './GameLevelDesert.js';
 import Creeper from './Creeper.js';
 

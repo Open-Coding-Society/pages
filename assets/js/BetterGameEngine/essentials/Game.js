@@ -159,9 +159,21 @@ class GameCore {
         // Dynamically import the features and create controls
         Promise.all([
             import('../features/ScoreFeature.js'),
+            import('../features/PauseFeature.js'),
             import('../features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, LevelSkipModule]) => {
+        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
             const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
+            
+            // Create a lightweight pause menu object that ScoreFeature can use
+            const pauseMenuObj = {
+                gameControl: this.gameControl,
+                options: { parentId: 'gameContainer' },
+                counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
+                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score',
+                stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
+                score: 0,
+                _saveStatusNode: null
+            };
             
             // Create button bar
             const buttonBar = document.createElement('div');
@@ -187,19 +199,26 @@ class GameCore {
                 }
             });
 
-            // Save Score button
+            // Save Score button - with real save functionality
             const btnSave = document.createElement('button');
             btnSave.className = 'pause-btn save-score';
             btnSave.innerText = 'Save Score';
-            btnSave.addEventListener('click', () => {
-                // Simple save feedback
-                const originalText = btnSave.innerText;
-                btnSave.innerText = 'Saved!';
-                btnSave.disabled = true;
-                setTimeout(() => {
-                    btnSave.innerText = originalText;
-                    btnSave.disabled = false;
-                }, 2000);
+            
+            // Instantiate ScoreFeature for real save functionality
+            let scoreFeature = null;
+            try {
+                scoreFeature = new ScoreModule.default(pauseMenuObj);
+            } catch (e) {
+                console.warn('ScoreFeature init failed:', e);
+            }
+            
+            // Wire the save button to ScoreFeature.saveScore
+            btnSave.addEventListener('click', async () => {
+                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
+                    await scoreFeature.saveScore(btnSave);
+                } else {
+                    console.warn('ScoreFeature saveScore not available');
+                }
             });
 
             // Skip Level button
@@ -222,19 +241,7 @@ class GameCore {
             buttonBar.appendChild(btnSave);
             buttonBar.appendChild(btnSkipLevel);
             parent.appendChild(buttonBar);
-
-            // Create score counter using ScoreFeature
-            const scoreFeatureMock = {
-                gameControl: this.gameControl,
-                options: { parentId: 'gameContainer' },
-                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score'
-            };
             
-            try {
-                new ScoreModule.default(scoreFeatureMock);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
-            }
         }).catch(err => {
             console.warn('Failed to load control features:', err);
         });
