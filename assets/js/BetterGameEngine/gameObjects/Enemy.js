@@ -1,4 +1,4 @@
-import Character from './Character.js';
+import Character from '../essentials/Character.js';
 import Player from './Player.js';
 
 class Enemy extends Character {

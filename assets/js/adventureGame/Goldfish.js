@@ -1,5 +1,5 @@
-import Enemy from '../BetterGameEngine/adventureLogic/Enemy.js';
-import Player from '../BetterGameEngine/adventureLogic/Player.js';
+import Enemy from '../BetterGameEngine/gameObjects/Enemy.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
 
 class Goldfish extends Enemy {
     constructor(data = null, gameEnv = null) {
