@@ -440,12 +440,8 @@ active_tab: profile
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
             
-            // Get user's personas (now organized by category)
-            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // Get user's personas from the RIGHT endpoint
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
             
             if (!userPersonasResp.ok) {
                 console.log('No personas found for user or not authenticated');

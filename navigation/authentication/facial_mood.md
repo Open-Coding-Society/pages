@@ -80,9 +80,8 @@ show_reading_time: false
 </div>
 
 <script type="module">
-import { fetchOptions, baseurl } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-const pythonURI = "http://localhost:8001";
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video');
@@ -132,7 +131,8 @@ window.addEventListener('DOMContentLoaded', () => {
     function sendImage(imageData) {
         const moodResult = document.getElementById('moodResult');
 
-        fetch(`${pythonURI}/api/mood/detect`, {
+        fetch(`${pythonURI}/facial/authenticate`, {
+            ...fetchOptions,
             method: 'POST',
             body: JSON.stringify({ image: imageData })
         })
