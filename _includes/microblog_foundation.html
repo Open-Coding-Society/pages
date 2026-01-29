@@ -110,11 +110,8 @@ window.handleGuestSignup = async function(event) {
 
     // Step 2: Login with the credentials (whether account was just created or already existed)
     const loginResponse = await fetch(`${pythonURI}/authenticate`, {
+      ...fetchOptions,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
       body: JSON.stringify(signupData)
     });
 

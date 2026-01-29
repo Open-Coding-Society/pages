@@ -154,7 +154,7 @@ import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/a
 // --- Certificates ---
 async function getCredentials() {
     try {
-        const res = await fetch(`${pythonURI}/api/id`, { ...fetchOptions, method: 'GET' });
+        const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
         if (res.ok) return (await res.json()).name || 'Student Name';
     } catch (err) { console.error("Error fetching credentials:", err); }
     return 'Student Name';

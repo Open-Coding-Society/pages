@@ -630,13 +630,7 @@ Check if this is a course lesson and determine which course context to use
   // NOTE: This getUid function is duplicated from admin_foundation.html logic
   async function getUid() {
     try {
-      const res = await fetch(`${pythonURI}/api/id`, {
-        ...fetchOptions,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions ); 
 
       if (res.ok) {
         const data = await res.json();
@@ -1514,6 +1508,11 @@ Check if this is a course lesson and determine which course context to use
   {%- include disqus_comments.html -%}
   {%- endif -%}
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+  
+  <!-- Enhanced Analytics Tracking -->
+  <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>
+  <script src="{{ site.baseurl }}/assets/js/lesson-completion.js"></script>
 </article>
 
 {% endif %}

@@ -249,8 +249,8 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
-    javaLogin();  // Call Java login
     pythonLogin();
+    javaLogin();  // Call Java login
 };
     // Function to handle Python login
     window.pythonLogin = function () {
@@ -287,7 +287,7 @@ show_reading_time: false
             if (!response.ok) {
                 throw new Error("Invalid login");
             }
-            return response.json();
+            return response.text();
         })
         .then(data => {
             console.log("Login successful!", data);

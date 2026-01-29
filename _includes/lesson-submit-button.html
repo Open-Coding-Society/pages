@@ -1,0 +1,301 @@
+<!-- 
+  Lesson Submit Button - Submit ALL challenges from a lesson at once
+  
+  Usage: include lesson-submit-button.html lesson_key="csa-frqs-2019-3"
+  
+  This button is placed at the bottom of notebooks when the frontmatter 
+  flag 'challenge_submit: true' is set. It collects code from all 
+  code-runner instances on the page and submits them together.
+-->
+<div class="lesson-submit-container" id="lesson-submit-{{ include.lesson_key }}"
+    data-lesson-key="{{ include.lesson_key }}">
+    <div class="lesson-submit-header">
+        <h3>Submit Your Work</h3>
+        <p>Submit all your code challenges for this lesson.</p>
+    </div>
+
+    <div class="lesson-submit-controls">
+        <button class="lesson-submit-btn" title="Submit all challenges">
+            <span class="btn-icon">📤</span>
+            <span class="btn-text">Submit All Challenges</span>
+        </button>
+        <span class="submit-status"></span>
+    </div>
+
+    <div class="submission-preview">
+        <details>
+            <summary>Preview Submission (<span class="challenge-count">0</span> challenges)</summary>
+            <div class="preview-content"></div>
+        </details>
+    </div>
+</div>
+
+<style>
+    .lesson-submit-container {
+        margin: 40px 0;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(33, 150, 243, 0.1));
+        border: 2px solid rgba(76, 175, 80, 0.3);
+        border-radius: 12px;
+    }
+
+    .lesson-submit-header h3 {
+        margin: 0 0 8px 0;
+        color: var(--text-color, #333);
+        font-size: 1.3em;
+    }
+
+    .lesson-submit-header p {
+        margin: 0 0 16px 0;
+        color: var(--text-muted, #666);
+        font-size: 0.9em;
+    }
+
+    .lesson-submit-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .lesson-submit-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #4CAF50, #2196F3);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+
+    .lesson-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+    }
+
+    .lesson-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .lesson-submit-btn:disabled {
+        background: #888;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .lesson-submit-btn .btn-icon {
+        font-size: 20px;
+    }
+
+    .lesson-submit-container .submit-status {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .lesson-submit-container .submit-status.success {
+        color: #4CAF50;
+        font-weight: 500;
+    }
+
+    .lesson-submit-container .submit-status.error {
+        color: #f44336;
+    }
+
+    .lesson-submit-container .submit-status.loading {
+        color: #2196F3;
+    }
+
+    .submission-preview {
+        margin-top: 12px;
+    }
+
+    .submission-preview summary {
+        cursor: pointer;
+        color: var(--text-muted, #666);
+        font-size: 0.9em;
+    }
+
+    .submission-preview .preview-content {
+        margin-top: 12px;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .preview-item {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .preview-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .preview-item-header {
+        font-weight: bold;
+        color: #4CAF50;
+        margin-bottom: 4px;
+    }
+
+    .preview-item-code {
+        white-space: pre-wrap;
+        word-break: break-all;
+        color: #333;
+        max-height: 100px;
+        overflow-y: auto;
+    }
+</style>
+
+<script type="module">
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    (function () {
+        const container = document.getElementById('lesson-submit-{{ include.lesson_key }}');
+        if (!container) return;
+
+        const lessonKey = container.dataset.lessonKey;
+        const submitBtn = container.querySelector('.lesson-submit-btn');
+        const statusSpan = container.querySelector('.submit-status');
+        const previewContent = container.querySelector('.preview-content');
+        const challengeCountSpan = container.querySelector('.challenge-count');
+
+        /**
+         * Collect all code from all code-runner instances on the page
+         */
+        function collectAllChallenges() {
+            const challenges = {};
+
+            // Find all code-runner containers
+            const runners = document.querySelectorAll('.code-runner-container[data-runner-id]');
+
+            runners.forEach(runner => {
+                const runnerId = runner.dataset.runnerId;
+
+                // Get code from CodeMirror
+                const cmElement = runner.querySelector('.CodeMirror');
+                let code = null;
+
+                if (cmElement && cmElement.CodeMirror) {
+                    code = cmElement.CodeMirror.getValue();
+                } else {
+                    // Fallback: try textarea
+                    const textarea = runner.querySelector('.editor-textarea');
+                    if (textarea) {
+                        code = textarea.value;
+                    }
+                }
+
+                if (code && code.trim()) {
+                    challenges[runnerId] = code;
+                }
+            });
+
+            return challenges;
+        }
+
+        /**
+         * Update the preview section
+         */
+        function updatePreview() {
+            const challenges = collectAllChallenges();
+            const count = Object.keys(challenges).length;
+
+            challengeCountSpan.textContent = count;
+
+            if (count === 0) {
+                previewContent.innerHTML = '<em>No challenges found on this page.</em>';
+                return;
+            }
+
+            let html = '';
+            for (const [id, code] of Object.entries(challenges)) {
+                const truncatedCode = code.length > 200 ? code.substring(0, 200) + '...' : code;
+                html += `
+        <div class="preview-item">
+          <div class="preview-item-header">${id}</div>
+          <div class="preview-item-code">${escapeHtml(truncatedCode)}</div>
+        </div>
+      `;
+            }
+            previewContent.innerHTML = html;
+        }
+
+        /**
+         * Escape HTML to prevent XSS
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        /**
+         * Submit all challenges to the backend
+         */
+        async function submitAllChallenges() {
+            const challenges = collectAllChallenges();
+            const count = Object.keys(challenges).length;
+
+            if (count === 0) {
+                statusSpan.textContent = '⚠️ No challenges to submit';
+                statusSpan.className = 'submit-status error';
+                return;
+            }
+
+            // Update UI
+            submitBtn.disabled = true;
+            statusSpan.textContent = `⏳ Submitting ${count} challenges...`;
+            statusSpan.className = 'submit-status loading';
+
+            try {
+                const response = await fetch(`${javaURI}/api/challenge-submission/submit`, {
+                    ...fetchOptions,
+                    method: 'POST',
+                    body: JSON.stringify({
+                        lessonKey: lessonKey,
+                        challenges: challenges
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusSpan.textContent = `✅ Successfully submitted ${count} challenges!`;
+                    statusSpan.className = 'submit-status success';
+                } else {
+                    statusSpan.textContent = '❌ ' + (result.error || 'Submission failed');
+                    statusSpan.className = 'submit-status error';
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                statusSpan.textContent = '❌ Network error - please try again';
+                statusSpan.className = 'submit-status error';
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Initialize preview on load
+        setTimeout(updatePreview, 500); // Small delay to let CodeMirror initialize
+
+        // Update preview when details is opened
+        container.querySelector('details').addEventListener('toggle', updatePreview);
+
+        // Attach click handler
+        submitBtn.addEventListener('click', submitAllChallenges);
+    })();
+</script>

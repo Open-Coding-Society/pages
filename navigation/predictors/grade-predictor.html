@@ -332,10 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       // Call ML API for grade prediction
       const mlResponse = await fetch(`${pythonURI}/api/grade/predict`, {
+        ...fetchOptions,
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           inputs: mlInputs
         })
@@ -428,11 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // PUT request to update user
       try {
         const response = await fetch(`${pythonURI}/api/user`, {
+          ...fetchOptions,
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: "include",
           body: JSON.stringify(updatedUser)
         });
         const result = await response.json();
@@ -448,10 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchCurrentUser() {
         try {
-            const response = await fetch(`${pythonURI}/api/user`, {
-                method: 'GET',
-                credentials: 'include',
-            });
+            const response = await fetch(`${pythonURI}/api/user`, fetchOptions ); 
             if (response.ok) {
                 currentUser = await response.json();
                 console.log("Fetched current user:", currentUser);

@@ -314,13 +314,7 @@ microblog: true
 
   async function getCredentials() {
         try {
-            const res = await fetch(`${pythonURI}/api/id`, {
-                ...fetchOptions,
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
+            const res = await fetch(`${pythonURI}/api/id`, fetchOptions );
 
             if (res.ok) {
                 const data = await res.json();
@@ -338,13 +332,7 @@ microblog: true
   async function getLessonData() {
       const username = await getCredentials();
       try {
-          const res = await fetch(`${javaURI}/api/stats`, {
-              ...fetchOptions,
-              method: "GET",
-              headers: {
-                  "Content-Type": "application/json"
-              },
-          });
+          const res = await fetch(`${javaURI}/api/stats`, fetchOptions );
 
           if (!res.ok) {
               console.log(`Request failed with status ${res.status}`);
