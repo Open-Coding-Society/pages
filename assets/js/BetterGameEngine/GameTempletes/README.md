@@ -212,9 +212,9 @@ Your game can use these pre-made features without needing to create them:
 - Usage: `import ScoreFeature from '../../BetterGameEngine/features/ScoreFeature.js'`
 
 ### **Collision.js**
-- Rectangle collision detection
+- Rectangle and circle collision detection
 - Usage: `import Collision from '../../BetterGameEngine/essentials/Collision.js'`
-- Method: `Collision.checkRectRect(obj1, obj2)`
+- Methods: `new Collision().boxCollide(obj1, obj2)` and `new Collision().ballCollide(obj1, obj2)`
 
 ### **Transform.js**
 - Position and rotation utilities
@@ -306,8 +306,9 @@ Use the Collision class from BetterGameEngine:
 ```javascript
 import Collision from '../../BetterGameEngine/essentials/Collision.js';
 
-// Check if two objects collide
-if (Collision.checkRectRect(player, platform)) {
+const collision = new Collision();
+// Check if two objects collide (box/rectangle collision)
+if (collision.boxCollide(player, platform)) {
   player.collideWithPlatform(platform);
 }
 ```
