@@ -750,4 +750,26 @@ export default class Leaderboard {
         }
         document.getElementById('leaderboard-container')?.remove();
     }
+
+    /**
+     * Toggle visibility of the entire leaderboard widget
+     */
+    toggleVisibility() {
+        const container = document.getElementById('leaderboard-container');
+        if (container) {
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+    }
+
+    /**
+     * Check if leaderboard is currently visible
+     */
+    isVisible() {
+        const container = document.getElementById('leaderboard-container');
+        return container && container.style.display !== 'none';
+    }
 }

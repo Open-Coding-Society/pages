@@ -19,6 +19,9 @@ class GameCore {
     this.initUser();
     const gameLevelClasses = [...this.initialLevelClasses];
     
+    // Store leaderboard instance reference
+    this.leaderboardInstance = null;
+    
     // If GameControlClass provided, use it immediately
     if (GameControlClass) {
         this.gameControl = new GameControlClass(this, gameLevelClasses);
@@ -50,7 +53,8 @@ class GameCore {
                     parentId = this.gameContainer.id || 'gameContainer';
                 }
                 
-                new mod.default(this.gameControl, { 
+                // Store leaderboard instance
+                this.leaderboardInstance = new mod.default(this.gameControl, { 
                     gameName: 'AdventureGame',
                     parentId: parentId
                 }); 
@@ -84,7 +88,8 @@ class GameCore {
                         } else if (this.gameContainer instanceof HTMLElement) {
                             parentId = this.gameContainer.id || 'gameContainer';
                         }
-                        new mod.default(this.gameControl, { 
+                        // Store leaderboard instance
+                        this.leaderboardInstance = new mod.default(this.gameControl, { 
                             gameName: 'AdventureGame',
                             parentId: parentId
                         }); 
@@ -237,9 +242,29 @@ class GameCore {
                 }
             });
 
+            // NEW: Toggle Leaderboard button
+            const btnToggleLeaderboard = document.createElement('button');
+            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
+            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+            btnToggleLeaderboard.addEventListener('click', () => {
+                if (this.leaderboardInstance) {
+                    this.leaderboardInstance.toggleVisibility();
+                    
+                    // Update button text based on visibility
+                    if (this.leaderboardInstance.isVisible()) {
+                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+                    } else {
+                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
+                    }
+                } else {
+                    console.warn('Leaderboard instance not available');
+                }
+            });
+
             buttonBar.appendChild(btnPause);
             buttonBar.appendChild(btnSave);
             buttonBar.appendChild(btnSkipLevel);
+            buttonBar.appendChild(btnToggleLeaderboard);
             parent.appendChild(buttonBar);
             
         }).catch(err => {
