@@ -1,5 +1,9 @@
 <!-- Reusable Code Runner Component -->
-<div class="code-runner-container" id="runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+<div class="code-runner-container"
+  id="runner-{{ include.runner_id }}"
+  data-runner-id="{{ include.runner_id }}"
+  data-default-code="{{ include.code | jsonify | escape }}"
+  data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   <div class="challenge-box">
     <h3>Code Runner Challenge {% if include.challenge_number %}#{{ include.challenge_number }}{% endif %}</h3>
     <p>{{ include.challenge }}</p>
@@ -61,8 +65,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (!container) return;
   
   const initialLang = "{{ include.language }}";
-  // defayktCide assugbnebt alerts but is valid for template literal support
-  const defaultCode = {{ include.code | jsonify }};
+  const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
   const editorHeight = "{{ include.height }}";
   const storageKey = container.dataset.storageKey;
   
@@ -204,6 +207,8 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     const startTime = Date.now();
     const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
+    // Code execution is handled by language runners (Flask for python/js; Spring for java).
+    // Challenge submissions are persisted separately via /api/challenge-submission/*.
     let runURL;
     if (lang === "python") runURL = `${pythonURI}/run/python`;
     else if (lang === "java") runURL = `${javaURI}/run/java`;
