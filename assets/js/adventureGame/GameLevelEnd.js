@@ -1,4 +1,4 @@
-import GamEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
+import GameEnvBackground from '../BetterGameEngine/adventureLogic/GameEnvBackground.js';
 import BackgroundParallax from '../BetterGameEngine/adventureLogic/BackgroundParallax.js';
 import Player from '../BetterGameEngine/adventureLogic/Player.js';
 import Npc from '../BetterGameEngine/adventureLogic/Npc.js';  // Direct import for portal creation
@@ -38,7 +38,7 @@ class GameLevelEnd {
         position: { x: 0, y: 0 },
         velocity: 0.2,  // Slower velocity for a more subtle effect
         layer: 0,  // Explicitly set the layer to 0 (furthest back)
-        zIndex: 1  // Use positive z-index but keep it low
+        zIndex: -1  // Lower z-index so main background appears on top
     };
     
     const image_src_end = path + "/images/gamify/TransparentEnd.png";
@@ -195,8 +195,8 @@ class GameLevelEnd {
                     // === PLAYER DEATH: ALL FUNCTIONALITY INLINE ===
                     
                     // 1. Play death animation - particle effect
-                    const playerX = player.position.x;
-                    const playerY = player.position.y;
+                    const playerX = player.transform.x;
+                    const playerY = player.transform.y;
                     
                     // Create explosion effect
                     for (let i = 0; i < 20; i++) {
@@ -490,7 +490,7 @@ class GameLevelEnd {
     
     this.classes = [
       { class: BackgroundParallax, data: image_data_parallax },  // Add parallax background first
-      { class: GamEnvBackground, data: image_data_end },         // Then regular background
+      { class: GameEnvBackground, data: image_data_end },         // Then regular background
       { class: Player, data: sprite_data_steve },
       { class: Npc, data: sprite_data_endship },
       { class: Collectible, data: sprite_data_eye },

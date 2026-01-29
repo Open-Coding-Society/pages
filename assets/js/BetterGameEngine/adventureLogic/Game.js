@@ -22,24 +22,13 @@ class GameCore {
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
 
-    // Try to dynamically load the centralized PauseMenu (prefer the shared one)
-    // Skip if disablePauseMenu is set in environment
+    // Create top control buttons directly using features
     if (!this.environment.disablePauseMenu) {
-        import('./PauseMenu.js')
-            .then(mod => {
-                try {
-                    // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
-                    const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
-                    new mod.default(this.gameControl, pmOptions);
-                } catch (e) { console.warn('PauseMenu init failed:', e); }
-            })
-            .catch(() => {
-                // no-op: PauseMenu is optional
-        });
+        this._createTopControls();
     }
 
     // Try to dynamically load the Leaderboard
-    import('./Leaderboard.js')
+    import('../features/Leaderboard.js')
         .then(mod => {
             try {
                 // Get the actual container element from gameContainer
@@ -111,6 +100,100 @@ class GameCore {
         } else {
             console.warn("No previous level to load");
         }
+    }
+
+    _createTopControls() {
+        // Ensure pause-menu.css is loaded for button styling
+        const cssPath = '/assets/css/pause-menu.css';
+        if (!document.querySelector(`link[href="${cssPath}"]`)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            document.head.appendChild(link);
+        }
+
+        // Dynamically import the features and create controls
+        Promise.all([
+            import('../features/ScoreFeature.js'),
+            import('../features/LevelSkipFeature.js')
+        ]).then(([ScoreModule, LevelSkipModule]) => {
+            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
+            
+            // Create button bar
+            const buttonBar = document.createElement('div');
+            buttonBar.className = 'pause-button-bar';
+            buttonBar.style.position = 'fixed';
+            buttonBar.style.top = '60px';
+            buttonBar.style.left = '20px';
+            buttonBar.style.display = 'flex';
+            buttonBar.style.gap = '10px';
+            buttonBar.style.zIndex = '9999';
+
+            // Pause button
+            const btnPause = document.createElement('button');
+            btnPause.className = 'pause-btn pause-toggle';
+            btnPause.innerText = 'Pause';
+            btnPause.addEventListener('click', () => {
+                if (this.gameControl.isPaused) {
+                    this.gameControl.resume();
+                    btnPause.innerText = 'Pause';
+                } else {
+                    this.gameControl.pause();
+                    btnPause.innerText = 'Resume';
+                }
+            });
+
+            // Save Score button
+            const btnSave = document.createElement('button');
+            btnSave.className = 'pause-btn save-score';
+            btnSave.innerText = 'Save Score';
+            btnSave.addEventListener('click', () => {
+                // Simple save feedback
+                const originalText = btnSave.innerText;
+                btnSave.innerText = 'Saved!';
+                btnSave.disabled = true;
+                setTimeout(() => {
+                    btnSave.innerText = originalText;
+                    btnSave.disabled = false;
+                }, 2000);
+            });
+
+            // Skip Level button
+            const btnSkipLevel = document.createElement('button');
+            btnSkipLevel.className = 'pause-btn skip-level';
+            btnSkipLevel.innerText = 'Skip Level';
+            btnSkipLevel.addEventListener('click', () => {
+                if (typeof this.gameControl.endLevel === 'function') {
+                    this.gameControl.endLevel();
+                } else {
+                    // Fallback: synthesize 'L' key
+                    const event = new KeyboardEvent('keydown', {
+                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                }
+            });
+
+            buttonBar.appendChild(btnPause);
+            buttonBar.appendChild(btnSave);
+            buttonBar.appendChild(btnSkipLevel);
+            parent.appendChild(buttonBar);
+
+            // Create score counter using ScoreFeature
+            const scoreFeatureMock = {
+                gameControl: this.gameControl,
+                options: { parentId: 'gameContainer' },
+                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score'
+            };
+            
+            try {
+                new ScoreModule.default(scoreFeatureMock);
+            } catch (e) {
+                console.warn('ScoreFeature init failed:', e);
+            }
+        }).catch(err => {
+            console.warn('Failed to load control features:', err);
+        });
     }
 
     initUser() {
