@@ -1,5 +1,6 @@
 
 import { Transform } from '../essentials/Transform.js';
+
 class Collision {
     constructor() {
         //
@@ -24,6 +25,6 @@ class Collision {
         }
         return false;
     }
-
-    
 }
+
+export default Collision;
