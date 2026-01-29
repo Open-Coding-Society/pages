@@ -859,7 +859,7 @@ class GameLevelDesert {
         }
     };
 
-    window.GEMINI_API_KEY = '';
+
     // ===== CUSTOM AI NPCs =====
     const historianNpc = new AINpc({
         id: "ProfessorHistory",  
