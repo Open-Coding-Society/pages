@@ -18,9 +18,16 @@ class GameCore {
 
     this.initUser();
     const gameLevelClasses = [...this.initialLevelClasses];
-    // create GameControl using the engine-provided class
-    this.gameControl = new GameControlClass(this, gameLevelClasses);
-    this.gameControl.start();
+    
+    // If GameControlClass provided, use it immediately
+    if (GameControlClass) {
+        this.gameControl = new GameControlClass(this, gameLevelClasses);
+        this.gameControl.start();
+    } else {
+        // For gamebuilder: defer initialization until GameControl is loaded
+        this._initializeGameControlAsync(gameLevelClasses);
+        return;
+    }
 
     // Create top control buttons directly using features
     if (!this.environment.disablePauseMenu) {
@@ -53,7 +60,44 @@ class GameCore {
         .catch(() => {
             // no-op: Leaderboard is optional
         });
-}
+    }
+
+    async _initializeGameControlAsync(gameLevelClasses) {
+        try {
+            const mod = await import('./GameControl.js');
+            const DefaultGameControl = mod.default || mod;
+            this.gameControl = new DefaultGameControl(this, gameLevelClasses);
+            this.gameControl.start();
+            
+            // Create top control buttons after GameControl is ready
+            if (!this.environment.disablePauseMenu) {
+                this._createTopControls();
+            }
+
+            // Try to dynamically load the Leaderboard
+            import('../features/Leaderboard.js')
+                .then(mod => {
+                    try {
+                        let parentId = 'gameContainer';
+                        if (typeof this.gameContainer === 'string') {
+                            parentId = this.gameContainer;
+                        } else if (this.gameContainer instanceof HTMLElement) {
+                            parentId = this.gameContainer.id || 'gameContainer';
+                        }
+                        new mod.default(this.gameControl, { 
+                            gameName: 'AdventureGame',
+                            parentId: parentId
+                        }); 
+                    }
+                    catch (e) { console.warn('Leaderboard init failed:', e); }
+                })
+                .catch(() => {
+                    // no-op: Leaderboard is optional
+                });
+        } catch (err) {
+            console.error('Failed to initialize GameControl:', err);
+        }
+    }
 
     static main(environment, GameControlClass) {
         return new GameCore(environment, GameControlClass);
@@ -197,25 +241,36 @@ class GameCore {
     }
 
     initUser() {
+        // Skip user initialization if no backend URIs are configured (e.g., in gamebuilder embed mode)
+        if (!this.pythonURI || this.pythonURI === '') {
+            console.log('Skipping user initialization - no backend configured');
+            return;
+        }
+
         const pythonURL = this.pythonURI + '/api/id';
         fetch(pythonURL, this.fetchOptions)
             .then(response => {
                 if (response.status !== 200) {
-                    console.error("HTTP status code: " + response.status);
+                    console.warn("Could not fetch user ID (HTTP " + response.status + "), continuing without user data");
                     return null;
                 }
                 return response.json();
             })
             .then(data => {
-                if (!data) return;
+                if (!data) {
+                    console.log('No user data available, continuing game without user tracking');
+                    return;
+                }
                 this.uid = data.uid;
 
                 const javaURL = this.javaURI + '/rpg_answer/person/' + this.uid;
                 return fetch(javaURL, this.fetchOptions);
             })
             .then(response => {
-                if (!response || !response.ok) {
-                    throw new Error(`Spring server response: ${response?.status}`);
+                if (!response) return;
+                if (!response.ok) {
+                    console.warn(`Spring server unavailable (${response.status}), continuing without user data`);
+                    return null;
                 }
                 return response.json();
             })
@@ -224,7 +279,8 @@ class GameCore {
                 this.id = data.id;
             })
             .catch(error => {
-                console.error("Error:", error);
+                console.warn("User initialization failed (non-critical):", error.message);
+                // Don't stop the game - user tracking is optional
             });
     }
 }

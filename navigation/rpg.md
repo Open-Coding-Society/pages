@@ -424,74 +424,32 @@ function closeCustomAlert() {
 
             let started = false;
             let lastStartError = null;
-            // Preferred: Use Adventure Game engine entrypoint with provided levels
+            // Always use Adventure engine for gamebuilder code (which only exports gameLevelClasses)
             if (levelClasses.length > 0 && Engine && typeof Engine.main === 'function') {
                 try {
-                    if (engineType === 'better') {
-                        // BetterGameEngine expects (environment, GameControlClass)
-                        // Accept both named and default exports
-                        const GameControlClass = mod.GameControl || mod?.default?.GameControl; // from user module
-                        if (!GameControlClass) throw new Error('GameControl export required for BetterGameEngine');
-                        // Prepare explicit dimensions similar to game-runner
-                        const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
-                        const containerHeight = Math.min(580, window.innerHeight);
-                        env.innerWidth = containerWidth;
-                        env.innerHeight = containerHeight;
-                        env.gameLevelClasses = levelClasses;
-                        try {
-                            liveAdventure = Engine.main(env, GameControlClass);
-                        } catch (startErrBetter) {
-                            lastStartError = startErrBetter;
-                            throw startErrBetter;
-                        }
-                    } else {
-                        // Adventure engine expects environment with level classes
-                        const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
-                        const containerHeight = Math.min(580, window.innerHeight);
-                        try {
-                            liveAdventure = Engine.main({
-                            path: env.path,
-                            gameContainer: env.gameContainer,
-                            gameCanvas: env.gameCanvas,
-                            pythonURI: env.pythonURI,
-                            javaURI: env.javaURI,
-                            fetchOptions: env.fetchOptions,
-                            innerWidth: containerWidth,
-                            innerHeight: containerHeight,
-                            gameLevelClasses: levelClasses
-                            });
-                        } catch (startErrAdv) {
-                            lastStartError = startErrAdv;
-                            throw startErrAdv;
-                        }
+                    // Force Adventure engine for all code coming through rpg.md (gamebuilder uses this)
+                    const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
+                    const containerHeight = Math.min(580, window.innerHeight);
+                    try {
+                        liveAdventure = Engine.main({
+                        path: env.path,
+                        gameContainer: env.gameContainer,
+                        gameCanvas: env.gameCanvas,
+                        pythonURI: env.pythonURI,
+                        javaURI: env.javaURI,
+                        fetchOptions: env.fetchOptions,
+                        innerWidth: containerWidth,
+                        innerHeight: containerHeight,
+                        gameLevelClasses: levelClasses
+                        });
+                    } catch (startErr) {
+                        lastStartError = startErr;
+                        throw startErr;
                     }
                     started = true;
                 } catch (e) {
-                    console.warn('Engine start failed, attempting Adventure fallback:', e);
-                    try {
-                        const Engine2 = await loadAdventureEngine();
-                        const containerWidth = env.gameContainer?.clientWidth || window.innerWidth;
-                        const containerHeight = Math.min(580, window.innerHeight);
-                        try {
-                            liveAdventure = Engine2.main({
-                            path: env.path,
-                            gameContainer: env.gameContainer,
-                            gameCanvas: env.gameCanvas,
-                            pythonURI: env.pythonURI,
-                            javaURI: env.javaURI,
-                            fetchOptions: env.fetchOptions,
-                            innerWidth: containerWidth,
-                            innerHeight: containerHeight,
-                            gameLevelClasses: levelClasses
-                            });
-                        } catch (startErrFB) {
-                            lastStartError = startErrFB;
-                            throw startErrFB;
-                        }
-                        started = true;
-                    } catch (ef) {
-                        console.error('Adventure fallback failed:', ef);
-                    }
+                    console.error('Game start failed:', e);
+                    lastStartError = e;
                 }
             }
 
