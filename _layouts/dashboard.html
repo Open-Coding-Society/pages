@@ -596,17 +596,15 @@ score += gists * 0.5
                         if (hasExistingEval) {
                             // Use PUT to update
                             res = await fetch(`${javaURI}/api/admin-evaluation/update/${currentPerson.id}`, {
+                                ...fetchOptions,
                                 method: 'PUT',
-                                credentials: 'include',
-                                headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(body)
                             });
                         } else {
                             // Use POST to create
                             res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
+                                ...fetchOptions,
                                 method: 'POST',
-                                credentials: 'include',
-                                headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(body)
                             });
                         }
@@ -937,10 +935,7 @@ score += gists * 0.5
                     // Fetch preferences from backend API
                     async function fetchPreferencesFromBackend() {
                         try {
-                            const res = await fetch(`${javaURI}/api/user/preferences`, {
-                                ...fetchOptions,
-                                method: 'GET'
-                            });
+                            const res = await fetch(`${javaURI}/api/user/preferences`, fetchOptions ); 
                             
                             if (res.status === 401) {
                                 // Not logged in
@@ -1741,10 +1736,7 @@ score += gists * 0.5
 
         // 2. Run Prediction
         try {
-            await fetch(`${javaURI}/api/grade-prediction/train`, {
-                ...fetchOptions,
-                method: 'GET'
-            });
+            await fetch(`${javaURI}/api/grade-prediction/train`, fetchOptions ); 
         } catch (error) {
             console.error("Error with training:", error);
         }
@@ -1886,13 +1878,7 @@ score += gists * 0.5
     const container = document.getElementById("user-feedback-table-container");
 
     try {
-        const res = await fetch(`${pythonURI}/api/feedback/user/${uid}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-            "Content-Type": "application/json"
-        }
-        });
+        const res = await fetch(`${pythonURI}/api/feedback/user/${uid}`, fetchOptions ); 
 
         if (!res.ok) throw new Error("Failed to fetch feedback");
 
@@ -2304,10 +2290,8 @@ score += gists * 0.5
         sendBtn.disabled = true;
 
         const res = await fetch(`${javaURI}/api/upai`, {
+          ...fetchDataOptions, 
           method: 'POST',
-          mode: 'cors',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt: promptText
           })

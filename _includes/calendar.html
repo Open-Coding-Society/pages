@@ -983,9 +983,8 @@
       const results = await Promise.all(
         events.map(event => 
           fetch(`${javaURI}/api/calendar/add_event`, {
+            ...fetchOptions,
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             body: JSON.stringify(event)
           }).then(res => res.ok).catch(() => false)
         )
@@ -1038,6 +1037,7 @@
     try {
       const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
       const javaURI = configModule.javaURI;
+      const fetchOptions = configModule.fetchOptions;
       
       const titlesToDelete = [];
       const priorities = ['P0', 'P1', 'P2', 'P3'];
@@ -1064,9 +1064,8 @@
       let deletedCount = 0;
       
       const bulkResponse = await fetch(`${javaURI}/api/calendar/delete_events`, {
+        ...fetchOptions,
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ titles: titlesToDelete })
       });
       
@@ -1077,9 +1076,8 @@
         const results = await Promise.all(
           titlesToDelete.map(title => 
             fetch(`${javaURI}/api/calendar/delete_event`, {
+              ...fetchOptions,
               method: 'DELETE',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
               body: JSON.stringify({ title: title })
             }).then(res => res.ok ? 1 : 0).catch(() => 0)
           )

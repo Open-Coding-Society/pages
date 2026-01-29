@@ -231,6 +231,12 @@ Check if this is a course lesson and determine which course context to use
     <div class="lesson-bottom">
       <div class="lesson-bottom-inner">
         <div class="bottom-actions">
+          {% if page.challenge_submit %}
+          <button class="btn btn-outline" id="submit-lesson-btn" type="button">
+            <i class="fas fa-upload"></i>
+            <span>Submit Lesson</span>
+          </button>
+          {% endif %}
           <button class="btn btn-outline" id="complete-btn" onclick="toggleComplete()">
             <i class="fas fa-circle" id="complete-icon"></i>
             <span id="complete-text">Mark Complete</span>
@@ -244,6 +250,31 @@ Check if this is a course lesson and determine which course context to use
     </div>
   </div>
 </div>
+
+{% if page.challenge_submit %}
+<script>
+  // Wire the bottom-bar "Submit Lesson" button to the lesson submit component injected by notebook conversion.
+  (function () {
+    const btn = document.getElementById('submit-lesson-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      // Prefer clicking the existing lesson submit button if present
+      const lessonSubmitBtn = document.querySelector('.lesson-submit-container .lesson-submit-btn');
+      if (lessonSubmitBtn) {
+        lessonSubmitBtn.click();
+        return;
+      }
+
+      // Fallback: scroll to any submit UI on the page
+      const submitContainer = document.querySelector('.lesson-submit-container');
+      if (submitContainer) {
+        submitContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  })();
+</script>
+{% endif %}
 
 <!-- Floating hamburger menu (mobile only) -->
 <button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
@@ -630,13 +661,7 @@ Check if this is a course lesson and determine which course context to use
   // NOTE: This getUid function is duplicated from admin_foundation.html logic
   async function getUid() {
     try {
-      const res = await fetch(`${pythonURI}/api/id`, {
-        ...fetchOptions,
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        },
-      });
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions ); 
 
       if (res.ok) {
         const data = await res.json();

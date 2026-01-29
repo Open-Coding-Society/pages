@@ -71,12 +71,8 @@ permalink: /crypto/energy-store
             try {
                 const url = `${javaURI}/api/mining/chooseEnergy/${encodeURIComponent(supplierName)}/${eem}`;
                 const response = await fetch(url, {
+                    ...fetchOptions,
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...fetchOptions.headers
-                    },
-                    credentials: 'include'
                 });
                 if (response.ok) {
                     const result = await response.json();

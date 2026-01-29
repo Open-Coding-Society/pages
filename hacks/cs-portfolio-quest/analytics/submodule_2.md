@@ -422,11 +422,7 @@ window.downloadCert = async function () {
 
     async function getCredentials() {
       try {
-        const res = await fetch(`${pythonURI}/api/id`, {
-          ...fetchOptions,
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
+        const res = await fetch(`${pythonURI}/api/id`, fetchOptions );
 
         if (res.ok) {
           const data = await res.json();

@@ -73,11 +73,15 @@ show_reading_time: false
     </div>
 
     <button class="capture-button" onclick="captureImage()">Capture Image</button>
-    <button class="submit-button" onclick="submitImage()" disabled>Login</button>
+    <button class="submit-button" onclick="submitImage()" disabled>Analyze Mood</button>
+
+    
+    <h3 id="moodResult" style="margin-top: 20px;"></h3>
 </div>
 
 <script type="module">
-import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
 window.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video');
@@ -119,32 +123,40 @@ window.addEventListener('DOMContentLoaded', () => {
     // Submit image to backend for facial authentication
     function submitImage() {
         const imageData = canvas.toDataURL('image/png');
+        sendImage(imageData);
+    }
+
+
+
+    function sendImage(imageData) {
+        const moodResult = document.getElementById('moodResult');
 
         fetch(`${pythonURI}/facial/authenticate`, {
+            ...fetchOptions,
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
             body: JSON.stringify({ image: imageData })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                alert(`Welcome back, ${data.user.name || data.user.uid}!`);
-                window.location.href = '/pages/gamify'; // Redirect on success
+            if (data.mood) {
+                moodResult.innerText = `Detected Mood: ${data.mood}`;
+                moodResult.style.color = "green";
+                // alert(`Detected Mood: ${data.mood}`);
             } else {
-                alert('Face not recognized. Please try again.');
+                moodResult.innerText = `Error: ${data.error || 'Unknown error'}`;
+                moodResult.style.color = "red";
             }
         })
         .catch(error => {
             console.error('Error submitting image:', error);
-            alert('Something went wrong. Please try again.');
+            moodResult.innerText = "Something went wrong. Please try again.";
+            moodResult.style.color = "red";
         });
     }
 
     // Expose functions to global scope
     window.captureImage = captureImage;
     window.submitImage = submitImage;
+
 });
 </script>

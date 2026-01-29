@@ -14,17 +14,13 @@ permalink: /navigation/courses/
 </div>
 
 <script type="module">
-    import { pythonURI, baseurl } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, baseurl, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     async function displayUserCourses() {
         const container = document.getElementById('userCourses');
         
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions );
 
             if (!response.ok) {
                 container.innerHTML = '<p>Please log in to view your courses.</p>';
