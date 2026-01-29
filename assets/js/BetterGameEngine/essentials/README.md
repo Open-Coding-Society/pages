@@ -1,68 +1,68 @@
-# Essentials
+# Essentials Folder
 
-This folder contains **core utility classes** that provide the foundational building blocks for all games built with BetterGameEngine. These are low-level tools for math operations, positioning, and collision detection that other game components depend on.
+This folder contains **core engine files** that are **required to run any game** built with BetterGameEngine. Every game needs these foundational classes to function.
 
 ---
 
 ## What's Inside
 
-The essentials folder has three main files:
+### Core Classes
+- **GameObject.js** - Base class for all game objects (players, enemies, platforms, collectibles)
+- **Character.js** - Extended GameObject for characters (players, NPCs, enemies) with animation support
+- **Game.js** - Main entry point and initialization for the game
+- **GameControl.js** - Game loop manager, level transitions, and input handling
+- **GameLevel.js** - Base class for creating individual levels
+- **GameEnv.js** - Game environment settings and canvas management
+- **GameEnvBackground.js** - Background and environment visuals
+- **Background.js** - Reusable background/scenery component
 
-- **Vectors.js** - 2D vector math (positions, velocities, directions)
-- **Transform.js** - Position and size management for game objects
-- **Collision.js** - Collision detection between objects
-
-These three utilities work together to handle the fundamental operations that games need: tracking where things are, moving them around, and detecting when they touch.
-
----
-
-## What Do They Do?
-
-**Vectors** provide math operations on 2D coordinates. Any game needs to do math with positions and movement, and Vec2 handles that.
-
-**Transform** stores the essential data about each game object: where it is, how fast it's moving, and how big it is. Every game object (player, enemy, platform, collectible) needs a Transform.
-
-**Collision** checks if objects are touching. When you need to know if the player hit an enemy, stepped on a platform, or picked up a coin, you use the collision detection tools.
+### Utilities
+- **Vectors.js** - 2D vector math for positions, velocities, and directions
+- **Transform.js** - Position, size, and velocity data for objects
+- **Collision.js** - Collision detection between game objects
 
 ---
 
 ## How They Work Together
 
 ```
-Vec2 (math)
-  ↓ used by
-Transform (position + size + velocity)
-  ↓ used by  
-Collision (detect overlaps)
+Game.js (entry point)
+  ↓ creates
+GameControl.js (game loop)
+  ↓ manages
+GameLevel.js (per-level logic)
+  ↓ contains
+GameObject.js / Character.js (game objects)
+  ↓ use
+Transform.js, Vectors.js, Collision.js (utilities)
 ```
 
-All three are used by the higher-level game objects and features. You'll import them into your Player, Enemy, Platform, and other game classes to give them the ability to exist in the game world and interact.
+**Every game you build needs all of these files.** They're the minimum required to:
+- Initialize and run the game
+- Create and manage game objects
+- Handle collisions
+- Control the game loop
+- Manage level progression
 
 ---
 
-## Why Separate These Out?
+## Why These Are Essential
 
-These essentials are separated into their own folder because:
-
-1. **Reusable** - Any game engine needs these foundational tools
-2. **Focused** - Each file does one thing well
-3. **Independent** - They don't depend on game-specific logic
-4. **Testable** - Easy to verify they work correctly
-5. **Clean** - Your game code stays focused on game logic, not low-level math
+1. **Required** - Every game built with this engine uses all of these
+2. **Foundational** - They provide the core game engine functionality
+3. **Reusable** - They work with any game you build on top of them
+4. **Stable** - These shouldn't change when building different games
 
 ---
 
-## Quick Overview
+## Getting Started
 
-| File | What It Does |
-|------|--------------|
-| **Vectors.js** | Add, subtract, multiply vectors; calculate distances and lengths |
-| **Transform.js** | Store position, velocity, and size for game objects |
-| **Collision.js** | Check if rectangular or circular objects are touching |
+All games import from essentials like this:
 
----
+```javascript
+import Game from './BetterGameEngine/essentials/Game.js';
+import GameControl from './BetterGameEngine/essentials/GameControl.js';
+import GameLevel from './BetterGameEngine/essentials/GameLevel.js';
+```
 
-## See Also
-
-- [Features README](../features/README.md) - Optional add-on features built on top of essentials
-- [Game Templates](../GameTempletes/README.md) - How to structure your game code
+Then build your game-specific classes on top of these essentials.
