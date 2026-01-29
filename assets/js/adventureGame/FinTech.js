@@ -1,8 +1,8 @@
 import Game from '../BetterGameEngine/essentials/Game.js';
 import GameControl from '../BetterGameEngine/essentials/GameControl.js';
 import Quiz from './Quiz.js';
-import Inventory from "./Inventory.js";
-import { defaultItems } from "./items.js";
+import Inventory from "../BetterGameEngine/features/Inventory.js";
+import { defaultItems } from "../BetterGameEngine/gameObjects/items.js";
 
 class StatsManager {
     constructor(game) {

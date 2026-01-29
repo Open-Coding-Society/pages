@@ -1,4 +1,4 @@
-import Inventory from './Inventory.js';
+import Inventory from "../BetterGameEngine/features/Inventory.js";
 import FloorItemManager from './FloorItemManager.js';
 
 class FloorItem {
