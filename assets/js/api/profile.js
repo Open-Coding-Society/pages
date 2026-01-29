@@ -137,7 +137,6 @@ export async function logoutUserJava() {
              const options = {
                  ...fetchOptions, // Include necessary headers from fetchOptions
                  method: 'POST',
-                 credentials: 'include', // Ensure cookies like JWT are included
              };
          
              console.log('Logout initiated.');

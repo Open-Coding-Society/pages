@@ -359,9 +359,6 @@ div class="container">
             const response = await fetch(`${pythonURI}/api/post`, {
                 ...fetchOptions,
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify(postData)
             });
 
