@@ -1,9 +1,11 @@
 import { Vec2, Vec3 } from '../essentials/Vectors.js';
-import { Transform } from '../Transform.js';
-import { ballCollide } from '../adventureLogic/Collision.js';
+import { Transform } from '../essentials/Transform.js';
+import Collision from '../essentials/Collision.js';
 import { camera } from '../Camera.js';
 
 export const deltaTime = 0.1;
+
+const collision = new Collision();
 
 export class RigidBody {
     constructor(object, mass, fixed=false) {
@@ -25,7 +27,7 @@ export class RigidBody {
 
         this.weight = 9.81 * this.mass;
 
-        this.collision = new Collider();
+        this.collision = new Collision();
     }
 
     LinearForce(force, dir) {
