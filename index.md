@@ -57,7 +57,7 @@ permalink: /
 <!-- ================= GAME SCRIPT ================= -->
 
 <script>
-<button id="revealAll">Reveal Map</button>
+
 
   //////////////////// METADATA ////////////////////
 
@@ -82,17 +82,7 @@ permalink: /
     fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
   }
 
-  function reveal(x, y, radius = 140) {
-    fogCtx.globalCompositeOperation = "destination-out";
-    const gradient = fogCtx.createRadialGradient(x, y, radius * 0.3, x, y, radius);
-    gradient.addColorStop(0, "rgba(0,0,0,1)");
-    gradient.addColorStop(1, "rgba(0,0,0,0)");
-    fogCtx.fillStyle = gradient;
-    fogCtx.beginPath();
-    fogCtx.arc(x, y, radius, 0, Math.PI * 2);
-    fogCtx.fill();
-    fogCtx.globalCompositeOperation = "source-over";
-  }
+
 
   window.addEventListener("resize", resizeFog);
 
@@ -128,7 +118,6 @@ animate(state, dx, dy) {
     this.frame = (this.frame + 1) % state.frames;
 
     const rect = this.el.getBoundingClientRect();
-    reveal(rect.left + rect.width / 2, rect.top + rect.height / 2);
   }, this.interval);
 }
 
@@ -186,11 +175,8 @@ window.addEventListener("keydown", e => {
     mario.start("Rest", 0);
   });
 
-  function revealAll() {
-  fogCtx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
-}
 
-document.getElementById("revealAll").addEventListener("click", revealAll);
+
 
 </script>
 
