@@ -1255,15 +1255,21 @@
     const selectedItems = {};
     const listEl = document.getElementById('sync-week-list');
     
-    listEl.querySelectorAll('.sync-week-item').forEach(weekItem => {
-      const weekNum = weekItem.dataset.week;
-      const checkboxes = weekItem.querySelectorAll('.item-checkbox:checked');
+    // Use correct selector: .sync-week-group (not .sync-week-item)
+    listEl.querySelectorAll('.sync-week-group').forEach(weekGroup => {
+      const weekNum = weekGroup.dataset.week;
+      const checkboxes = weekGroup.querySelectorAll('.item-checkbox:checked');
       
       if (checkboxes.length > 0) {
         selectedItems[weekNum] = { formative: [], summative: [] };
         
         checkboxes.forEach(cb => {
-          const itemData = JSON.parse(cb.dataset.item);
+          // Build item data from individual data attributes (not data-item JSON)
+          const itemData = {
+            title: cb.dataset.title,
+            url: cb.dataset.url || '',
+            id: cb.dataset.id
+          };
           if (cb.dataset.type === 'formative') {
             selectedItems[weekNum].formative.push(itemData);
           } else {
@@ -1301,26 +1307,39 @@
     const currentList = document.getElementById('current-events-list');
     const proposedList = document.getElementById('proposed-changes-list');
     
+    let currentEvents = [];
+    let fetchError = false;
+    
+    // Try to fetch current calendar events (optional - preview works without it)
     try {
       const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
       const javaURI = configModule.javaURI;
       
-      // Fetch current calendar events
-      const response = await fetch(`${javaURI}/api/calendar/events`, { credentials: 'include' });
-      const allEvents = response.ok ? await response.json() : [];
-      
-      // Filter to course events only
-      const currentEvents = allEvents.filter(e => e.period === courseName);
-      
-      // Build proposed events
-      const proposedEvents = buildEventsFromSelection(selectedItems, priority, courseName);
-      
-      // Categorize
-      const toAdd = [];
-      const toUpdate = [];
-      
-      proposedEvents.forEach(proposed => {
-        const existing = currentEvents.find(e => 
+      if (javaURI) {
+        const response = await fetch(`${javaURI}/api/calendar/events`, { credentials: 'include' });
+        if (response.ok) {
+          const allEvents = await response.json();
+          currentEvents = allEvents.filter(e => e.period === courseName);
+        } else {
+          fetchError = true;
+        }
+      } else {
+        fetchError = true;
+      }
+    } catch (e) {
+      console.warn('Could not fetch existing calendar events:', e);
+      fetchError = true;
+    }
+    
+    // Build proposed events (this part doesn't need the API)
+    const proposedEvents = buildEventsFromSelection(selectedItems, priority, courseName);
+    
+    // Categorize
+    const toAdd = [];
+    const toUpdate = [];
+    
+    proposedEvents.forEach(proposed => {
+      const existing = currentEvents.find(e => 
           e.title.includes(`Week ${proposed.weekNum}`) && 
           e.title.includes(proposed.type === 'formative' ? 'Formative' : 'Summative') &&
           e.title.includes(courseName)
@@ -1334,7 +1353,9 @@
       });
       
       // Display current events
-      if (currentEvents.length === 0) {
+      if (fetchError) {
+        currentList.innerHTML = '<p class="no-events"><i class="fas fa-exclamation-triangle"></i> Could not load current calendar (not logged in or API unavailable)</p>';
+      } else if (currentEvents.length === 0) {
         currentList.innerHTML = '<p class="no-events">No events currently on calendar for this course</p>';
       } else {
         currentList.innerHTML = currentEvents
@@ -1375,234 +1396,12 @@
       // Update counts
       document.getElementById('add-count').textContent = toAdd.length;
       document.getElementById('update-count').textContent = toUpdate.length;
-      
-    } catch (error) {
-      console.error('Error loading preview:', error);
-      currentList.innerHTML = '<p class="error-message">Error loading current calendar events</p>';
-      proposedList.innerHTML = '<p class="error-message">Error generating preview</p>';
-    }
   }
   
   function closePreviewModal() {
     document.getElementById('calendar-preview-modal').style.display = 'none';
     document.getElementById('selective-sync-modal').style.display = 'flex';
   }
-
-  // ========================================
-  // PREVIEW + EXPORT FEATURES
-  // ========================================
-
-  // Build events from selected items for both preview and export
-  function buildEventsFromSelectedItems(selectedItems, courseName) {
-    const events = [];
-  
-    selectedItems.forEach(item => {
-      const { weekNum, type, title, url, priority, customDate } = item;
-    
-      let eventDate = customDate;
-      let emoji, typeLabel;
-    
-      if (type === 'formative') {
-        if (!eventDate) eventDate = getReadingDate(weekNum);
-        emoji = '📚';
-        typeLabel = 'Formative';
-    } else {
-      if (!eventDate) eventDate = getAssessmentDate(weekNum);
-      emoji = '📝';
-      typeLabel = 'Summative';
-    }
-    
-    if (!eventDate) return;
-    
-    // Build full URL using current origin and baseurl
-    const baseurl = '{{ site.baseurl }}';
-    const fullUrl = url ? window.location.origin + baseurl + url : '';
-    
-    events.push({
-      title: `[${priority}] ${emoji} ${title} - ${courseName}`,
-      description: `${typeLabel} - Week ${weekNum}\n${fullUrl}`,
-      date: eventDate,
-      period: courseName,
-      priority: priority,
-      weekNum: weekNum,
-      type: type
-    });
-  });
-  
-  return events;
-}
-
-// iCAL EXPORT FUNCTIONS
-function generateICSFile(events) {
-  const icsLines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//School Calendar//Sprint Events//EN',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'X-WR-CALNAME:Sprint Calendar Events'
-  ];
-  
-  events.forEach(event => {
-    const uid = `${event.date}-${event.title.replace(/\s+/g, '-')}@school.edu`;
-    const dtstamp = formatICSDateTime(new Date());
-    const dtstart = formatICSDate(event.date);
-    
-    icsLines.push('BEGIN:VEVENT');
-    icsLines.push(`UID:${uid}`);
-    icsLines.push(`DTSTAMP:${dtstamp}`);
-    icsLines.push(`DTSTART;VALUE=DATE:${dtstart}`);
-    icsLines.push(`SUMMARY:${escapeICS(event.title)}`);
-    icsLines.push(`DESCRIPTION:${escapeICS(event.description)}`);
-    if (event.period) {
-      icsLines.push(`CATEGORIES:${escapeICS(event.period)}`);
-    }
-    icsLines.push('END:VEVENT');
-  });
-  
-  icsLines.push('END:VCALENDAR');
-  return icsLines.join('\r\n');
-}
-
-function formatICSDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}${month}${day}`;
-}
-
-function formatICSDateTime(date) {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const hour = String(date.getUTCHours()).padStart(2, '0');
-  const minute = String(date.getUTCMinutes()).padStart(2, '0');
-  const second = String(date.getUTCSeconds()).padStart(2, '0');
-  return `${year}${month}${day}T${hour}${minute}${second}Z`;
-}
-
-function escapeICS(text) {
-  if (!text) return '';
-  return text
-    .replace(/\\/g, '\\\\')
-    .replace(/;/g, '\\;')
-    .replace(/,/g, '\\,')
-    .replace(/\n/g, '\\n');
-}
-
-function downloadICSFile(icsContent, filename) {
-  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
-
-// PREVIEW MODAL FUNCTIONS
-async function showCalendarPreview() {
-  if (!currentSyncModalData) return;
-  
-  const { sprintKey, course } = currentSyncModalData;
-  const selectedItems = getSelectedItems('sync');
-  const courseName = course.toUpperCase();
-  
-  if (selectedItems.length === 0) {
-    alert('No items selected to preview.');
-    return;
-  }
-  
-  document.getElementById('selective-sync-modal').style.display = 'none';
-  document.getElementById('calendar-preview-modal').style.display = 'flex';
-  
-  await populateCalendarPreview(selectedItems, courseName);
-}
-
-async function populateCalendarPreview(selectedItems, courseName) {
-  const currentList = document.getElementById('current-events-list');
-  const proposedList = document.getElementById('proposed-changes-list');
-  
-  try {
-    const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
-    const javaURI = configModule.javaURI;
-    
-    const response = await fetch(`${javaURI}/api/calendar/events`, { credentials: 'include' });
-    const allEvents = response.ok ? await response.json() : [];
-    
-    const currentEvents = allEvents.filter(e => e.period === courseName);
-    const proposedEvents = buildEventsFromSelectedItems(selectedItems, courseName);
-    
-    const toAdd = [];
-    const toUpdate = [];
-    
-    proposedEvents.forEach(proposed => {
-      const existing = currentEvents.find(e => 
-        e.title.includes(proposed.title.split(' - ')[0]) &&
-        e.date === proposed.date
-      );
-      
-      if (existing) {
-        toUpdate.push({ ...proposed, status: 'update' });
-      } else {
-        toAdd.push({ ...proposed, status: 'add' });
-      }
-    });
-    
-    if (currentEvents.length === 0) {
-      currentList.innerHTML = '<p class="no-events">No events currently on calendar for this course</p>';
-    } else {
-      currentList.innerHTML = currentEvents
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .map(e => `
-          <div class="preview-event-item current">
-            <div class="event-title">${e.title}</div>
-            <div class="event-date">${formatDateDisplay(e.date)}</div>
-          </div>
-        `).join('');
-    }
-    
-    if (toAdd.length === 0 && toUpdate.length === 0) {
-      proposedList.innerHTML = '<p class="no-events">No changes to make</p>';
-    } else {
-      const addHTML = toAdd.map(e => `
-        <div class="preview-event-item add">
-          <div class="event-status"><i class="fas fa-plus-circle"></i> ADD</div>
-          <div class="event-title">${e.title}</div>
-          <div class="event-date">${formatDateDisplay(e.date)}</div>
-          <div class="event-description-preview">${e.description.substring(0, 100)}...</div>
-        </div>
-      `).join('');
-      
-      const updateHTML = toUpdate.map(e => `
-        <div class="preview-event-item update">
-          <div class="event-status"><i class="fas fa-sync-alt"></i> UPDATE</div>
-          <div class="event-title">${e.title}</div>
-          <div class="event-date">${formatDateDisplay(e.date)}</div>
-          <div class="event-description-preview">${e.description.substring(0, 100)}...</div>
-        </div>
-      `).join('');
-      
-      proposedList.innerHTML = addHTML + updateHTML;
-    }
-    
-    document.getElementById('add-count').textContent = toAdd.length;
-    document.getElementById('update-count').textContent = toUpdate.length;
-    
-  } catch (error) {
-    console.error('Error loading preview:', error);
-    currentList.innerHTML = '<p class="error-message">Error loading current calendar events</p>';
-    proposedList.innerHTML = '<p class="error-message">Error generating preview</p>';
-  }
-}
-
-function closePreviewModal() {
-  document.getElementById('calendar-preview-modal').style.display = 'none';
-  document.getElementById('selective-sync-modal').style.display = 'flex';
-}
 
 
 
@@ -1791,42 +1590,5 @@ function closePreviewModal() {
       
       showToastNotification(`✓ Downloaded ${events.length} events as ${sprintKey}-${courseName}.ics`, 'success');
     });
-
-  // Preview button
-  document.getElementById('preview-sync-changes')?.addEventListener('click', showCalendarPreview);
-  
-  // Preview modal handlers
-  document.getElementById('close-preview-modal')?.addEventListener('click', closePreviewModal);
-  document.getElementById('preview-back')?.addEventListener('click', closePreviewModal);
-  document.getElementById('preview-confirm')?.addEventListener('click', () => {
-    closePreviewModal();
-    executeSelectiveSync();
-  });
-  
-  document.getElementById('calendar-preview-modal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'calendar-preview-modal') closePreviewModal();
-  });
-  
-  // Export iCal button
-  document.getElementById('export-ics-sync')?.addEventListener('click', () => {
-    if (!currentSyncModalData) return;
-    
-    const { sprintKey, course } = currentSyncModalData;
-    const selectedItems = getSelectedItems('sync');
-    const courseName = course.toUpperCase();
-    
-    if (selectedItems.length === 0) {
-      alert('No items selected to export.');
-      return;
-    }
-    
-    const events = buildEventsFromSelectedItems(selectedItems, courseName);
-    const icsContent = generateICSFile(events);
-    downloadICSFile(icsContent, `${sprintKey}-${courseName}.ics`);
-    
-    showToastNotification(`✓ Downloaded ${events.length} events as ${sprintKey}-${courseName}.ics`, 'success');
-  });
-
-
   }
 </script>
