@@ -976,6 +976,55 @@ layout: post
     }
   }
 
+  // Show certificate notification toast
+  function showCertificateNotification(type, title, message) {
+    // Remove existing notification if any
+    const existing = document.querySelector('.cert-notification');
+    if (existing) existing.remove();
+
+    const notification = document.createElement('div');
+    notification.className = `cert-notification cert-notification-${type}`;
+    
+    const icons = {
+      success: '🎉',
+      warning: '⚠️',
+      error: '❌',
+      info: 'ℹ️'
+    };
+    
+    notification.innerHTML = `
+      <div class="cert-notification-icon">${icons[type] || icons.info}</div>
+      <div class="cert-notification-content">
+        <div class="cert-notification-title">${title}</div>
+        <div class="cert-notification-message">${message}</div>
+      </div>
+      <button class="cert-notification-close">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+      notification.classList.add('cert-notification-visible');
+    });
+    
+    // Close button handler
+    notification.querySelector('.cert-notification-close').addEventListener('click', () => {
+      notification.classList.remove('cert-notification-visible');
+      setTimeout(() => notification.remove(), 300);
+    });
+    
+    // Auto-dismiss after 5 seconds for success/info
+    if (type === 'success' || type === 'info') {
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.classList.remove('cert-notification-visible');
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 5000);
+    }
+  }
+
   // Function to request certificate from backend
   async function requestCertificate(sprintKey, formative, summative) {
     try {
@@ -1070,12 +1119,13 @@ layout: post
       return;
     }
 
-    // Show loading state
+    // Show loading state with spinner
     const viewBtn = document.getElementById('view-certificate-btn');
     const originalText = viewBtn ? viewBtn.textContent : 'View Your Certificate';
     if (viewBtn) {
       viewBtn.disabled = true;
-      viewBtn.textContent = 'Verifying with server...';
+      viewBtn.innerHTML = '<span class="cert-spinner"></span> Verifying...';
+      viewBtn.classList.add('cert-btn-loading');
     }
 
     // Request from backend
@@ -1083,29 +1133,31 @@ layout: post
     
     if (viewBtn) {
       viewBtn.disabled = false;
-      viewBtn.textContent = originalText;
+      viewBtn.innerHTML = originalText;
+      viewBtn.classList.remove('cert-btn-loading');
     }
 
-    // Handle different responses
+    // Handle different responses with improved notifications
     switch (result.status) {
       case 'INCOMPLETE':
-        alert(`⚠️ Server says you are missing grades for:\n• ${result.missingAssignments.join('\n• ')}`);
+        showCertificateNotification('warning', 'Missing Grades', `You are missing grades for: ${result.missingAssignments.join(', ')}`);
         return;
       case 'NOT_QUALIFIED':
-        alert(`❌ Your average score (${result.averageScore}%) is below the minimum required (${result.requiredMinimum}%).`);
+        showCertificateNotification('error', 'Score Below Minimum', `Your average score (${result.averageScore}%) is below the required ${result.requiredMinimum}%. Keep working to improve!`);
         return;
       case 'ALREADY_EARNED':
         console.log(`User already has ${result.existingType} certificate.`);
         // Proceed to show existing one
         break;
       case 'UPGRADED':
-        alert(`🎉 Congratulations! You improved your score to ${result.averageScore}% and have been upgraded to an EXCELLENCE certificate!`);
+        showCertificateNotification('success', 'Certificate Upgraded!', `Congratulations! You improved to ${result.averageScore}% and earned an EXCELLENCE certificate!`);
         break;
       case 'AWARDED':
-        console.log(`New ${result.certificateType} certificate awarded!`);
+        const awardType = result.certificateType === 'EXCELLENCE' ? 'Excellence' : 'Completion';
+        showCertificateNotification('success', `${awardType} Certificate Earned!`, `Your average score: ${result.averageScore}%`);
         break;
       case 'ERROR':
-        alert(`❌ Error connecting to server: ${result.message}`);
+        showCertificateNotification('error', 'Connection Error', result.message || 'Unable to verify certificate. Please try again.');
         return;
       default:
         console.log('Unexpected status:', result.status);
