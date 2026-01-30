@@ -32,7 +32,7 @@ permalink: /
     background-image: url('{{sprite_file}}');
     background-repeat: no-repeat;
     position: absolute;
-    z-index: 10;
+    z-index: 1001;
   }
 
   #mario {
@@ -78,7 +78,8 @@ permalink: /
   function resizeFog() {
     fogCanvas.width = window.innerWidth;
     fogCanvas.height = window.innerHeight;
-    fogCtx.fillStyle = "rgba(0,0,0,0.95)";
+    // Use a semi-transparent fog so page content remains readable
+    fogCtx.fillStyle = "rgba(0,0,0,0.6)";
     fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
   }
 
@@ -98,6 +99,8 @@ permalink: /
       this.speed = 0;
       this.frame = 0;
       this.interval = 100;
+      // smaller interval for smoother, continuous movement
+      this.interval = 16;
       this.timer = null;
     }
 
@@ -118,6 +121,9 @@ animate(state, dx, dy) {
     this.frame = (this.frame + 1) % state.frames;
 
     const rect = this.el.getBoundingClientRect();
+    // Update hole center to Mario's current position (animateFog will draw it)
+    hole.cx = rect.left + rect.width / 2;
+    hole.cy = rect.top + rect.height / 2;
   }, this.interval);
 }
 
@@ -136,35 +142,145 @@ start(name, dx = 0, dy = 0) {
 
   //////////////////// CONTROLS ////////////////////
 
-window.addEventListener("keydown", e => {
+// Helper: draw fog and punch a transparent hole
+// Hole state and animated fog drawing
+const hole = {
+  cx: 0,
+  cy: 0,
+  radius: 0,
+  targetRadius: 0,
+  expanding: false,
+  startTime: null,
+  duration: 6000 // milliseconds to fully expand
+};
+
+function drawFogWithHole() {
+  // Full fog base
+  fogCtx.globalCompositeOperation = 'source-over';
+  fogCtx.fillStyle = 'rgba(0,0,0,0.6)';
+  fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+
+  // Create radial gradient for soft edge
+  const inner = Math.max(8, hole.radius * 0.2);
+  const outer = hole.radius;
+  const grad = fogCtx.createRadialGradient(hole.cx, hole.cy, inner, hole.cx, hole.cy, outer);
+  grad.addColorStop(0, 'rgba(0,0,0,1)');
+  grad.addColorStop(0.7, 'rgba(0,0,0,0.5)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  fogCtx.globalCompositeOperation = 'destination-out';
+  fogCtx.fillStyle = grad;
+  fogCtx.beginPath();
+  fogCtx.rect(0, 0, fogCanvas.width, fogCanvas.height);
+  fogCtx.fill();
+
+  fogCtx.globalCompositeOperation = 'source-over';
+}
+
+function animateFog(timestamp) {
+  if (!hole.expanding) {
+    // still draw hole at current size
+    drawFogWithHole();
+    return;
+  }
+
+  if (!hole.startTime) hole.startTime = timestamp;
+  const elapsed = timestamp - hole.startTime;
+  const progress = Math.min(1, elapsed / hole.duration);
+  hole.radius = hole.targetRadius * progress;
+
+  drawFogWithHole();
+
+  if (progress < 1) {
+    requestAnimationFrame(animateFog);
+  } else {
+    // fully revealed: clear fog canvas so interaction remains fast
+    fogCanvas.style.display = 'none';
+    hole.expanding = false;
+  }
+}
+
+function startHoleExpansion(durationMs = 6000) {
+  hole.duration = durationMs;
+  // target radius = hypotenuse of viewport so circle covers whole screen
+  hole.targetRadius = Math.hypot(fogCanvas.width, fogCanvas.height);
+  hole.startTime = null;
+  hole.expanding = true;
+  fogCanvas.style.display = '';
+  requestAnimationFrame(animateFog);
+}
+
+// Keyboard movement using key state to avoid repeated keydown resets
+const keys = { left: false, right: false, up: false, down: false };
+
+function updateMovementFromKeys() {
   if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
 
-  switch (e.key.toLowerCase()) {
-    case "d":
-    case "arrowright":
-      mario.start("Walk", 5, 0);
-      break;
+  const dx = (keys.right ? 5 : 0) + (keys.left ? -5 : 0);
+  const dy = (keys.down ? 5 : 0) + (keys.up ? -5 : 0);
 
-    case "a":
-    case "arrowleft":
-      mario.start("WalkL", -5, 0);
-      break;
+  if (dx === 0 && dy === 0) {
+    mario.stop();
+    return;
+  }
 
-    case "w":
-    case "arrowup":
-      mario.start("Walk", 0, -5);
-      break;
+  // Choose animation based on horizontal direction
+  const anim = keys.left && !keys.right ? 'WalkL' : 'Walk';
+  mario.start(anim, dx, dy);
+}
 
-    case "s":
-    case "arrowdown":
-      mario.start("Walk", 0, 5);
+window.addEventListener('keydown', e => {
+  const key = e.key.toLowerCase();
+  if (["input", "textarea"].includes(document.activeElement.tagName.toLowerCase())) return;
+  switch (key) {
+    case 'd':
+    case 'arrowright':
+      keys.right = true;
+      break;
+    case 'a':
+    case 'arrowleft':
+      keys.left = true;
+      break;
+    case 'w':
+    case 'arrowup':
+      keys.up = true;
+      break;
+    case 's':
+    case 'arrowdown':
+      keys.down = true;
       break;
   }
+  updateMovementFromKeys();
 });
 
+window.addEventListener('keyup', e => {
+  const key = e.key.toLowerCase();
+  switch (key) {
+    case 'd':
+    case 'arrowright':
+      keys.right = false;
+      break;
+    case 'a':
+    case 'arrowleft':
+      keys.left = false;
+      break;
+    case 'w':
+    case 'arrowup':
+      keys.up = false;
+      break;
+    case 's':
+    case 'arrowdown':
+      keys.down = false;
+      break;
+  }
+  updateMovementFromKeys();
+});
 
-
-  window.addEventListener("blur", () => mario.stop());
+window.addEventListener("blur", () => {
+  // clear keys and stop movement when window loses focus
+  keys.left = keys.right = keys.up = keys.down = false;
+  mario.stop();
+});
 
   //////////////////// INIT ////////////////////
 
@@ -173,6 +289,14 @@ window.addEventListener("keydown", e => {
     const scale = window.devicePixelRatio || 1;
     mario.el.style.transform = `scale(${0.2 * scale})`;
     mario.start("Rest", 0);
+    // Initialize hole center at Mario and begin timed expansion to reveal page
+    const rect = mario.el.getBoundingClientRect();
+    hole.cx = rect.left + rect.width / 2;
+    hole.cy = rect.top + rect.height / 2;
+    hole.radius = 0;
+    hole.targetRadius = Math.hypot(fogCanvas.width, fogCanvas.height);
+    fogCanvas.style.display = '';
+    startHoleExpansion(6000);
   });
 
 
