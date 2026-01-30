@@ -1,4 +1,6 @@
 class Scoreboard {
+    static gameControl = null; // Reference to gameControl for stats updates
+
     static initUI() {
         const statsContainer = document.createElement('div');
         statsContainer.id = 'stats-container';
@@ -22,6 +24,13 @@ class Scoreboard {
         if (balance !== undefined) {
             document.getElementById("balance").textContent = balance;
             localStorage.setItem("balance", balance);
+            
+            // Also update gameControl stats if available
+            if (this.gameControl) {
+                if (!this.gameControl.stats) this.gameControl.stats = {};
+                this.gameControl.stats.coinsCollected = balance;
+                console.log('Scoreboard: updated gameControl.stats.coinsCollected to', balance);
+            }
         }
         if (questionAccuracy !== undefined) {
             const percent = Math.round(questionAccuracy * 100);

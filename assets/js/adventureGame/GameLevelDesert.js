@@ -870,7 +870,9 @@ class GameLevelDesert {
         spriteHeight: 263,
         scaleFactor: 0.5,
         animationRate: 10,
-        randomPosition: true,
+        randomPosition: false,  // ← Change this to false
+        posX: width * 0.3,      // ← Add specific X position (center)
+        posY: height * 0.5,
         gameEnv: gameEnv,
 
         // Sprite sheet layout
