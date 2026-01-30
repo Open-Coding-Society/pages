@@ -26,26 +26,10 @@ class GameCore {
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
 
-    // Try to dynamically load the centralized PauseMenu (prefer the shared one)
-    // Skip if disablePauseMenu is set in environment
+    // Create top control buttons directly using features
     if (!this.environment.disablePauseMenu) {
-        import('./PauseMenu.js')
-            .then(mod => {
-                try {
-                    // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
-                    const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
-                    new mod.default(this.gameControl, pmOptions);
-                    
-                    // Add toggle leaderboard button after pause menu renders
-                    setTimeout(() => this._addToggleButtonToPauseMenu(), 500);
-                } catch (e) { console.warn('PauseMenu init failed:', e); }
-            })
-            .catch(() => {
-                // no-op: PauseMenu is optional
-        });
+        this._createTopControls();
     }
-    // Create top control buttons (Pause, Save Score, Skip Level) from features
-    this._createTopControls();
 
     // Try to dynamically load the Leaderboard
     import('../../BetterGameEngine/features/Leaderboard.js')
@@ -76,23 +60,103 @@ class GameCore {
         });
 }
 
-    _addToggleButtonToPauseMenu() {
-        try {
-            // Find the pause button bar that was created by PauseMenu
-            const buttonBar = document.querySelector('.pause-button-bar');
+    _createTopControls() {
+        // Ensure pause-menu.css is loaded for button styling
+        const cssPath = '/assets/css/pause-menu.css';
+        if (!document.querySelector(`link[href="${cssPath}"]`)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            document.head.appendChild(link);
+        }
+
+        // Dynamically import the features and create controls
+        Promise.all([
+            import('../../BetterGameEngine/features/ScoreFeature.js'),
+            import('../../BetterGameEngine/features/PauseFeature.js'),
+            import('../../BetterGameEngine/features/LevelSkipFeature.js')
+        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
+            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
             
-            if (!buttonBar) {
-                console.warn('Pause button bar not found');
-                return;
-            }
+            // Create a lightweight pause menu object that ScoreFeature can use
+            const pauseMenuObj = {
+                gameControl: this.gameControl,
+                options: { parentId: 'gameContainer' },
+                counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
+                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score',
+                stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
+                // Use getter to dynamically pull score from stats
+                get score() {
+                    const varName = this.counterVar || 'levelsCompleted';
+                    return (this.stats && this.stats[varName]) || 0;
+                },
+                scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
+                _saveStatusNode: null
+            };
+            
+            // Create button bar
+            const buttonBar = document.createElement('div');
+            buttonBar.className = 'pause-button-bar';
+            buttonBar.style.position = 'fixed';
+            buttonBar.style.top = '60px';
+            buttonBar.style.left = '20px';
+            buttonBar.style.display = 'flex';
+            buttonBar.style.gap = '10px';
+            buttonBar.style.zIndex = '9999';
 
-            // Check if button already exists
-            if (buttonBar.querySelector('.toggle-leaderboard')) {
-                console.log('Toggle leaderboard button already exists');
-                return;
-            }
+            // Pause button
+            const btnPause = document.createElement('button');
+            btnPause.className = 'pause-btn pause-toggle';
+            btnPause.innerText = 'Pause';
+            btnPause.addEventListener('click', () => {
+                if (this.gameControl.isPaused) {
+                    this.gameControl.resume();
+                    btnPause.innerText = 'Pause';
+                } else {
+                    this.gameControl.pause();
+                    btnPause.innerText = 'Resume';
+                }
+            });
 
-            // Create the toggle leaderboard button
+            // Save Score button - with real save functionality
+            const btnSave = document.createElement('button');
+            btnSave.className = 'pause-btn save-score';
+            btnSave.innerText = 'Save Score';
+            
+            // Instantiate ScoreFeature for real save functionality
+            let scoreFeature = null;
+            try {
+                scoreFeature = new ScoreModule.default(pauseMenuObj);
+            } catch (e) {
+                console.warn('ScoreFeature init failed:', e);
+            }
+            
+            // Wire the save button to ScoreFeature.saveScore
+            btnSave.addEventListener('click', async () => {
+                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
+                    await scoreFeature.saveScore(btnSave);
+                } else {
+                    console.warn('ScoreFeature saveScore not available');
+                }
+            });
+
+            // Skip Level button
+            const btnSkipLevel = document.createElement('button');
+            btnSkipLevel.className = 'pause-btn skip-level';
+            btnSkipLevel.innerText = 'Skip Level';
+            btnSkipLevel.addEventListener('click', () => {
+                if (typeof this.gameControl.endLevel === 'function') {
+                    this.gameControl.endLevel();
+                } else {
+                    // Fallback: synthesize 'L' key
+                    const event = new KeyboardEvent('keydown', {
+                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                }
+            });
+
+            // Toggle Leaderboard button
             const btnToggleLeaderboard = document.createElement('button');
             btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
             btnToggleLeaderboard.innerText = 'Hide Leaderboard';
@@ -111,12 +175,15 @@ class GameCore {
                 }
             });
 
-            // Append the button to the button bar
+            buttonBar.appendChild(btnPause);
+            buttonBar.appendChild(btnSave);
+            buttonBar.appendChild(btnSkipLevel);
             buttonBar.appendChild(btnToggleLeaderboard);
-            console.log('Toggle leaderboard button added to pause menu');
-        } catch (error) {
-            console.warn('Failed to add toggle button:', error);
-        }
+            parent.appendChild(buttonBar);
+            
+        }).catch(err => {
+            console.warn('Failed to load control features:', err);
+        });
     }
 
     static main(environment, GameControlClass) {
@@ -198,112 +265,6 @@ class GameCore {
             .catch(error => {
                 console.error("Error:", error);
             });
-    }
-
-    _createTopControls() {
-        // Ensure pause-menu.css is loaded for button styling
-        const cssPath = '/assets/css/pause-menu.css';
-        if (!document.querySelector(`link[href="${cssPath}"]`)) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cssPath;
-            document.head.appendChild(link);
-        }
-
-        // Dynamically import the features and create controls
-        Promise.all([
-            import('../../BetterGameEngine/features/ScoreFeature.js'),
-            import('../../BetterGameEngine/features/PauseFeature.js'),
-            import('../../BetterGameEngine/features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
-            
-            // Create a lightweight pause menu object that ScoreFeature can use
-            const pauseMenuObj = {
-                gameControl: this.gameControl,
-                options: { parentId: 'gameContainer' },
-                counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
-                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Levels Completed',
-                stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
-                // Use getter to dynamically pull score from stats
-                get score() {
-                    const varName = this.counterVar || 'levelsCompleted';
-                    return (this.stats && this.stats[varName]) || 0;
-                },
-                scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
-                _saveStatusNode: null
-            };
-            
-            // Create button bar
-            const buttonBar = document.createElement('div');
-            buttonBar.className = 'pause-button-bar';
-            buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '60px';
-            buttonBar.style.left = '20px';
-            buttonBar.style.display = 'flex';
-            buttonBar.style.gap = '10px';
-            buttonBar.style.zIndex = '9999';
-
-            // Pause button
-            const btnPause = document.createElement('button');
-            btnPause.className = 'pause-btn pause-toggle';
-            btnPause.innerText = 'Pause';
-            btnPause.addEventListener('click', () => {
-                if (this.gameControl.isPaused) {
-                    this.gameControl.resume();
-                    btnPause.innerText = 'Pause';
-                } else {
-                    this.gameControl.pause();
-                    btnPause.innerText = 'Resume';
-                }
-            });
-
-            // Save Score button - with real save functionality
-            const btnSave = document.createElement('button');
-            btnSave.className = 'pause-btn save-score';
-            btnSave.innerText = 'Save Score';
-            
-            // Instantiate ScoreFeature for real save functionality
-            let scoreFeature = null;
-            try {
-                scoreFeature = new ScoreModule.default(pauseMenuObj);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
-            }
-            
-            // Wire the save button to ScoreFeature.saveScore
-            btnSave.addEventListener('click', async () => {
-                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
-                    await scoreFeature.saveScore(btnSave);
-                } else {
-                    console.warn('ScoreFeature saveScore not available');
-                }
-            });
-
-            // Skip Level button
-            const btnSkipLevel = document.createElement('button');
-            btnSkipLevel.className = 'pause-btn skip-level';
-            btnSkipLevel.innerText = 'Skip Level';
-            btnSkipLevel.addEventListener('click', () => {
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else {
-                    // Fallback: synthesize 'L' key
-                    const event = new KeyboardEvent('keydown', {
-                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
-                    });
-                    document.dispatchEvent(event);
-                }
-            });
-
-            // Add buttons to bar
-            buttonBar.appendChild(btnPause);
-            buttonBar.appendChild(btnSave);
-            buttonBar.appendChild(btnSkipLevel);
-            parent.appendChild(buttonBar);
-        }).catch(e => {
-            console.warn('Failed to load button features:', e);
-        });
     }
 }
 
