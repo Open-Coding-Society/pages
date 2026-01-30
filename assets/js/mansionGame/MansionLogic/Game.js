@@ -18,6 +18,10 @@ class GameCore {
 
     this.initUser();
     const gameLevelClasses = [...this.initialLevelClasses];
+    
+    // Store leaderboard instance reference
+    this.leaderboardInstance = null;
+    
     // create GameControl using the engine-provided class
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
@@ -31,6 +35,9 @@ class GameCore {
                     // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
                     const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
                     new mod.default(this.gameControl, pmOptions);
+                    
+                    // Add toggle leaderboard button after pause menu renders
+                    setTimeout(() => this._addToggleButtonToPauseMenu(), 500);
                 } catch (e) { console.warn('PauseMenu init failed:', e); }
             })
             .catch(() => {
@@ -54,7 +61,8 @@ class GameCore {
                     parentId = this.gameContainer.id || 'gameContainer';
                 }
                 
-                new mod.default(this.gameControl, { 
+                // Store leaderboard instance
+                this.leaderboardInstance = new mod.default(this.gameControl, { 
                     gameName: 'MansionGame',
                     parentId: parentId
                 }); 
@@ -65,6 +73,49 @@ class GameCore {
             // no-op: Leaderboard is optional
         });
 }
+
+    _addToggleButtonToPauseMenu() {
+        try {
+            // Find the pause button bar that was created by PauseMenu
+            const buttonBar = document.querySelector('.pause-button-bar');
+            
+            if (!buttonBar) {
+                console.warn('Pause button bar not found');
+                return;
+            }
+
+            // Check if button already exists
+            if (buttonBar.querySelector('.toggle-leaderboard')) {
+                console.log('Toggle leaderboard button already exists');
+                return;
+            }
+
+            // Create the toggle leaderboard button
+            const btnToggleLeaderboard = document.createElement('button');
+            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
+            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+            btnToggleLeaderboard.addEventListener('click', () => {
+                if (this.leaderboardInstance) {
+                    this.leaderboardInstance.toggleVisibility();
+                    
+                    // Update button text based on visibility
+                    if (this.leaderboardInstance.isVisible()) {
+                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+                    } else {
+                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
+                    }
+                } else {
+                    console.warn('Leaderboard instance not available');
+                }
+            });
+
+            // Append the button to the button bar
+            buttonBar.appendChild(btnToggleLeaderboard);
+            console.log('Toggle leaderboard button added to pause menu');
+        } catch (error) {
+            console.warn('Failed to add toggle button:', error);
+        }
+    }
 
     static main(environment, GameControlClass) {
         return new GameCore(environment, GameControlClass);
