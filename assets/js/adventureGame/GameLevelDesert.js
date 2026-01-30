@@ -1,16 +1,17 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './GameEngine/GameEnvBackground.js';
-import Player from './GameEngine/Player.js';
-import Npc from './GameEngine/Npc.js';
-import Coin from './GameEngine/Coin.js';
+import GamEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
+import Npc from '../BetterGameEngine/gameObjects/Npc.js';
+import Coin from './Coin.js';
 import Quiz from './Quiz.js';
-import DialogueSystem from './GameEngine/DialogueSystem.js';
-import GameControl from './GameEngine/GameControl.js';
+import DialogueSystem from '../BetterGameEngine/features/DialogueSystem.js';
+import GameControl from '../BetterGameEngine/essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
+import AINpc from '../BetterGameEngine/gameObjects/ai/AiNpc.js';
 
 class GameLevelDesert {
   constructor(gameEnv) {
@@ -858,6 +859,62 @@ class GameLevelDesert {
         }
     };
 
+
+    // ===== CUSTOM AI NPCs =====
+    const historianNpc = new AINpc({
+        id: "ProfessorHistory",  
+        greeting: "Hello! I'm an expert in history!",
+        expertise: "history",
+        sprite: path + "/assets/js/adventureGame/images/character-spritesheet.png",
+        spriteWidth: 559,
+        spriteHeight: 263,
+        scaleFactor: 0.5,
+        animationRate: 10,
+        randomPosition: true,
+        gameEnv: gameEnv,
+
+        // Sprite sheet layout
+        orientation: { rows: 4, columns: 9 },
+
+        // LOCK: use ONLY the 4th row (index 3) for every direction/state
+        down:      { row: 3, start: 0, columns: 9 },
+        up:        { row: 3, start: 0, columns: 9 },
+        left:      { row: 3, start: 0, columns: 9 },
+        right:     { row: 3, start: 0, columns: 9 },
+        downLeft:  { row: 3, start: 0, columns: 9 },
+        downRight: { row: 3, start: 0, columns: 9 },
+        upLeft:    { row: 3, start: 0, columns: 9 },
+        upRight:   { row: 3, start: 0, columns: 9 },
+
+        knowledgeBase: {
+            history: [
+            {
+                question: "What is ancient Egypt?",
+                answer:
+                "Ancient Egypt was one of the world's greatest civilizations, lasting over 3000 years! It had pyramids, pharaohs, and the mighty Nile River."
+            },
+            {
+                question: "Tell me about the Renaissance",
+                answer:
+                "The Renaissance was a period of great cultural and artistic change in Europe, starting in Italy around the 14th century. Artists like Leonardo da Vinci and Michelangelo created amazing works!"
+            },
+            { 
+                question: "When was the Industrial Revolution?",
+                answer:
+                "The Industrial Revolution took place from the late 1700s to the 1800s. It changed how people worked, moving from farms to factories and inventing new machines!"
+            },
+            {
+                question: "Who was Napoleon?",
+                answer:
+                "Napoleon Bonaparte was a French military leader who became Emperor. He conquered much of Europe but was eventually defeated and exiled."
+            }
+            ]
+        }
+        }).getData();
+
+      
+
+
     // List of objects defnitions for this level
     this.classes = [
       { class: GamEnvBackground, data: image_data_desert },
@@ -871,6 +928,7 @@ class GameLevelDesert {
       { class: Npc, data: sprite_data_minesweeper },
       { class: Npc, data: sprite_data_chickenj },
       { class: Npc, data: sprite_data_endportal },
+      { class: Npc, data: historianNpc },
       { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/2) }, size: 20, points: 5 } }
     ];
   }

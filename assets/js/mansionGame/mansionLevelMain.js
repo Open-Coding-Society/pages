@@ -1,8 +1,8 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from '../BetterGameEngine/MansionEngine/GameEnvBackground.js';
-import Player from '../BetterGameEngine/MansionEngine/Player.js';
-import Npc from '../BetterGameEngine/MansionEngine/Npc.js';
-// import GameControl from '../BetterGameEngine/MansionEngine/GameControl.js';
+import GamEnvBackground from './MansionLogic/GameEnvBackground.js';
+import Player from './MansionLogic/Player.js';
+import Npc from './MansionLogic/Npc.js';
+// import GameControl from '../MansionLogic/GameControl.js';
 import GameLevel1 from './mansionLevel1.js';
 import GameLevel2 from './mansionLevel2.js';
 import GameLevel3 from './mansionLevel3.js';
@@ -10,7 +10,7 @@ import GameLevel4 from './mansionLevel4.js';
 import GameLevel5 from './mansionLevel5.js';
 import GameLevel6 from './mansionLevel6.js';
 
-import('./Leaderboard.js')
+import('../BetterGameEngine/features/Leaderboard.js')
     .then(mod => {
         try { 
             new mod.default(this.gameControl, { 

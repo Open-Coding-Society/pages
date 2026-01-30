@@ -1,6 +1,6 @@
-import GameEnvBackground from './GameEngine/GameEnvBackground.js';
-import Npc from './GameEngine/Npc.js';
-import Player from './GameEngine/Player.js';
+import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
+import Npc from '../BetterGameEngine/gameObjects/Npc.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
 
 class GameLevelWallstreet {
   constructor(gameEnv) {

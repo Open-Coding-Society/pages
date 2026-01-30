@@ -1,7 +1,7 @@
-import GameEnvBackground from './GameEngine/GameEnvBackground.js';
-import Npc from './GameEngine/Npc.js';
-import Player from './GameEngine/Player.js';
-import GameControl from './GameEngine/GameControl.js';
+import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
+import Npc from '../BetterGameEngine/gameObjects/Npc.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
+import GameControl from '../BetterGameEngine/essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import Shark from './Shark.js';
 
@@ -35,7 +35,7 @@ class GameLevelWater {
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
         GRAVITY: true,
-        INIT_POSITION: { x: 0, y: height - (height/OCTOPUS_SCALE_FACTOR) }, 
+        INIT_POSITION: { x: 0, y: height - (height/OCTOPUS_SCALE_FACTOR) },
         pixels: {height: 250, width: 167},
         orientation: {rows: 3, columns: 2 },
         down: {row: 0, start: 0, columns: 2 },
@@ -47,7 +47,32 @@ class GameLevelWater {
         upLeft: {row: 1, start: 0, columns: 2, mirror: true, rotate: -Math.Pi/16 }, // mirror is used to flip the sprite
         upRight: {row: 1, start: 0, columns: 2, rotate: Math.PI/16 },
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-        keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
+        keypress: { up: 87, left: 65, down: 83, right: 68 }, // W, A, S, D
+        walkingArea: {
+          xMin: 0, // left boundary
+          xMax: width, // right boundary
+          yMin: 0, // top boundary
+          yMax: height - 50 // ground level - prevent falling below
+        },
+        updatePosition: function() {
+          // Constrain position within walking area
+          if (this.INIT_POSITION.x < this.walkingArea.xMin) {
+            this.INIT_POSITION.x = this.walkingArea.xMin;
+            this.velocityX = 0; // Stop horizontal velocity at left boundary
+          }
+          if (this.INIT_POSITION.x > this.walkingArea.xMax) {
+            this.INIT_POSITION.x = this.walkingArea.xMax;
+            this.velocityX = 0; // Stop horizontal velocity at right boundary
+          }
+          if (this.INIT_POSITION.y < this.walkingArea.yMin) {
+            this.INIT_POSITION.y = this.walkingArea.yMin;
+            this.velocityY = 0; // Stop vertical velocity at top boundary
+          }
+          if (this.INIT_POSITION.y > this.walkingArea.yMax) {
+            this.INIT_POSITION.y = this.walkingArea.yMax;
+            this.velocityY = 0; // Stop vertical velocity when on ground
+          }
+        }
     };
 
     // NPC Data for Byte Nomad (Smaller Version)

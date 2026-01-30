@@ -1,0 +1,245 @@
+/**
+ * Collectible.js Template
+ * ======================
+ * This class represents items that the player can collect for points.
+ * Examples: coins, gems, stars, power-ups, keys, etc.
+ * 
+ * Key Responsibilities:
+ * - Store collectible position and type
+ * - Handle being collected by player
+ * - Animate and render
+ * - Provide point value
+ * - Optional: animate floating/bobbing
+ */
+
+class Collectible {
+    /**
+     * Constructor - Initialize collectible at position
+     * 
+     * @param {Object} config - Collectible configuration
+     * @param {number} config.x - X position
+     * @param {number} config.y - Y position
+     * @param {string} config.type - Type: 'coin', 'gem', 'star', 'power-up', etc.
+     * @param {number} config.value - Points awarded when collected (default: 10)
+     * @param {number} config.width - Width (default: 15)
+     * @param {number} config.height - Height (default: 15)
+     */
+    constructor(config = {}) {
+        // TODO: Store position
+        // this.x = config.x || 0;
+        // this.y = config.y || 0;
+        // this.startY = this.y; // For bobbing animation
+
+        // TODO: Store dimensions
+        // this.width = config.width || 15;
+        // this.height = config.height || 15;
+
+        // TODO: Store type and value
+        // this.type = config.type || 'coin'; // 'coin', 'gem', 'star', 'power-up'
+        // this.value = config.value || 10; // Points given when collected
+
+        // TODO: Store state
+        // this.isCollected = false;
+        // this.collectionAnimation = 0; // For pickup animation
+
+        // TODO: Store animation state
+        // this.animationFrame = 0;
+        // this.rotation = 0;
+        // this.bobOffset = 0; // For floating animation
+
+        // TODO: Optional particle effect position
+        // this.particles = [];
+    }
+
+    /**
+     * Update collectible each frame
+     * - Animate bobbing/floating
+     * - Animate spinning
+     * - Handle collection animation
+     */
+    update() {
+        // TODO: Animate bobbing (float up and down)
+        // const time = Date.now() / 500; // Speed of bobbing
+        // this.bobOffset = Math.sin(time) * 5; // Bobs 5 pixels up/down
+
+        // TODO: Rotate the collectible
+        // this.rotation += 5; // Spin speed
+        // if (this.rotation >= 360) this.rotation = 0;
+
+        // TODO: If being collected, animate collection
+        // if (this.isCollected) {
+        //   this.collectionAnimation += 5;
+        //   this.y -= 3; // Float upward
+        //   this.scale *= 0.95; // Shrink
+        //   if (this.collectionAnimation >= 100) {
+        //     this.destroy();
+        //   }
+        // }
+
+        // TODO: Update particle effects if any
+        // this.updateParticles();
+    }
+
+    /**
+     * Handle being collected by player
+     * 
+     * @param {Player} player - The player collecting this item
+     */
+    collect(player) {
+        // TODO: Mark as collected
+        // this.isCollected = true;
+
+        // TODO: Award points to player/level
+        // if (player) {
+        //   player.score += this.value;
+        // }
+
+        // TODO: Play collection sound
+        // this.playSound('pickup.wav');
+
+        // TODO: Create particle effects
+        // this.createParticleEffect();
+
+        // TODO: Remove from level after animation
+        // This happens in update() when collectionAnimation >= 100
+    }
+
+    /**
+     * Create particle effect when collected
+     * Particles burst outward and fade
+     */
+    createParticleEffect() {
+        // TODO: Generate particles in random directions
+        // for (let i = 0; i < 8; i++) {
+        //   const angle = (i / 8) * Math.PI * 2;
+        //   const speed = 3 + Math.random() * 2;
+        //   this.particles.push({
+        //     x: this.x,
+        //     y: this.y,
+        //     vx: Math.cos(angle) * speed,
+        //     vy: Math.sin(angle) * speed,
+        //     life: 1.0,
+        //     decay: 0.02
+        //   });
+        // }
+    }
+
+    /**
+     * Update and render particles
+     */
+    updateParticles() {
+        // TODO: Update each particle position and life
+        // this.particles = this.particles.filter(p => {
+        //   p.x += p.vx;
+        //   p.y += p.vy;
+        //   p.life -= p.decay;
+        //   return p.life > 0;
+        // });
+    }
+
+    /**
+     * Render particles to canvas
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    renderParticles(ctx) {
+        // TODO: Draw each particle with fading alpha
+        // this.particles.forEach(p => {
+        //   ctx.globalAlpha = p.life;
+        //   ctx.fillStyle = 'yellow';
+        //   ctx.fillRect(p.x, p.y, 3, 3);
+        // });
+        // ctx.globalAlpha = 1.0;
+    }
+
+    /**
+     * Render collectible to canvas
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    render(ctx) {
+        // TODO: Skip rendering if collected
+        // if (this.isCollected) return;
+
+        // TODO: Save canvas state for rotation
+        // ctx.save();
+        // ctx.translate(this.x + this.width/2, this.y + this.height/2 + this.bobOffset);
+        // ctx.rotate(this.rotation * Math.PI / 180);
+
+        // TODO: Option 1 - Draw as colored circle
+        // ctx.fillStyle = this.getColor();
+        // ctx.beginPath();
+        // ctx.arc(-this.width/2, -this.height/2, this.width/2, 0, Math.PI * 2);
+        // ctx.fill();
+
+        // TODO: Option 2 - Draw as rectangle
+        // ctx.fillStyle = this.getColor();
+        // ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+
+        // TODO: Option 3 - Draw sprite image
+        // const sprite = this.getSprite();
+        // ctx.drawImage(sprite, -this.width/2, -this.height/2, this.width, this.height);
+
+        // TODO: Add shine/highlight effect
+        // ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        // ctx.fillRect(-this.width/4, -this.height/4, this.width/3, this.height/3);
+
+        // TODO: Restore canvas state
+        // ctx.restore();
+
+        // TODO: Render particles
+        // this.renderParticles(ctx);
+    }
+
+    /**
+     * Get color based on collectible type
+     * 
+     * @returns {string} CSS color string
+     */
+    getColor() {
+        // TODO: Return color based on type
+        // switch(this.type) {
+        //   case 'coin': return 'gold';
+        //   case 'gem': return 'cyan';
+        //   case 'star': return 'yellow';
+        //   case 'power-up': return 'red';
+        //   default: return 'orange';
+        // }
+    }
+
+    /**
+     * Get sprite image for this collectible type
+     * 
+     * @returns {HTMLImageElement} The sprite image
+     */
+    getSprite() {
+        // TODO: Load and return sprite based on type
+        // const spriteMap = {
+        //   'coin': '/images/coin.png',
+        //   'gem': '/images/gem.png',
+        //   'star': '/images/star.png'
+        // };
+        // return new Image(); // Load from spriteMap[this.type]
+    }
+
+    /**
+     * Play a sound effect
+     * 
+     * @param {string} soundFile - Path to sound file
+     */
+    playSound(soundFile) {
+        // TODO: Load and play sound
+        // const audio = new Audio(`/sounds/${soundFile}`);
+        // audio.play();
+    }
+
+    /**
+     * Destroy this collectible (remove from level)
+     */
+    destroy() {
+        // TODO: Mark for removal from level.gameObjects
+        // this.isDestroyed = true;
+    }
+}
+
+export default Collectible;

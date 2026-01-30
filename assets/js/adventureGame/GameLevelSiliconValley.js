@@ -1,10 +1,10 @@
-import GameEnvBackground from './GameEngine/GameEnvBackground.js';
-import Npc from './GameEngine/Npc.js';
-import Player from './GameEngine/Player.js';
-import GameControl from './GameEngine/GameControl.js';
+import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
+import Npc from '../BetterGameEngine/gameObjects/Npc.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
+import GameControl from '../BetterGameEngine/essentials/GameControl.js';
 
 import GameLevelRetro from './GameLevelRetro.js';
-import Game from './Game.js';
+import Game from '../BetterGameEngine/essentials/Game.js';
 import StockMoodModal from './StockMoodModal.js';
 import Market from './Market.js';
 import HelpPanel2 from './HelpPanel2.js'; // ✅ new import

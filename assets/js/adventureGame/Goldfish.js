@@ -1,5 +1,5 @@
-import Enemy from './GameEngine/Enemy.js';
-import Player from './GameEngine/Player.js';
+import Enemy from '../BetterGameEngine/gameObjects/Enemy.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
 
 class Goldfish extends Enemy {
     constructor(data = null, gameEnv = null) {

@@ -1,12 +1,12 @@
-import GamEnvBackground from './GameEngine/GameEnvBackground.js';
-import BackgroundParallax from './GameEngine/BackgroundParallax.js';
-import Player from './GameEngine/Player.js';
-import Npc from './GameEngine/Npc.js';  // Direct import for portal creation
-import Collectible from './GameEngine/Collectible.js';
-import Quiz from './Quiz.js';
-import Game from '../BetterGameEngine/GameEngine/Game.js';
-import Enemy from './GameEngine/Enemy.js';
-import DialogueSystem from './GameEngine/DialogueSystem.js';
+import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
+import BackgroundParallax from '../BetterGameEngine/features/rendering/BackgroundParallax.js';
+import Player from '../BetterGameEngine/gameObjects/Player.js';
+import Npc from '../BetterGameEngine/gameObjects/Npc.js';  // Direct import for portal creation
+import Collectible from '../BetterGameEngine/gameObjects/Collectible.js';
+import Barrier from './Barrier.js';
+import Game from '../BetterGameEngine/essentials/Game.js';
+import Enemy from '../BetterGameEngine/gameObjects/Enemy.js';
+import DialogueSystem from '../BetterGameEngine/features/DialogueSystem.js';
 
 class GameLevelEnd {
   constructor(gameEnv) {
@@ -38,7 +38,7 @@ class GameLevelEnd {
         position: { x: 0, y: 0 },
         velocity: 0.2,  // Slower velocity for a more subtle effect
         layer: 0,  // Explicitly set the layer to 0 (furthest back)
-        zIndex: 1  // Use positive z-index but keep it low
+        zIndex: -1  // Lower z-index so main background appears on top
     };
     
     const image_src_end = path + "/images/gamify/TransparentEnd.png";
@@ -195,8 +195,8 @@ class GameLevelEnd {
                     // === PLAYER DEATH: ALL FUNCTIONALITY INLINE ===
                     
                     // 1. Play death animation - particle effect
-                    const playerX = player.position.x;
-                    const playerY = player.position.y;
+                    const playerX = player.transform.x;
+                    const playerY = player.transform.y;
                     
                     // Create explosion effect
                     for (let i = 0; i < 20; i++) {
@@ -324,7 +324,7 @@ class GameLevelEnd {
               document.removeEventListener('keydown', handleKeyPress);
               
               // Redirect to the specified URL
-              window.location.href = '/assets/js/adventureGame/GameEngine/endplatformer.html';
+              window.location.href = '/assets/js/adventureGame/adventureLogic/endplatformer.html';
             }
           };
           
@@ -490,7 +490,7 @@ class GameLevelEnd {
     
     this.classes = [
       { class: BackgroundParallax, data: image_data_parallax },  // Add parallax background first
-      { class: GamEnvBackground, data: image_data_end },         // Then regular background
+      { class: GameEnvBackground, data: image_data_end },         // Then regular background
       { class: Player, data: sprite_data_steve },
       { class: Npc, data: sprite_data_endship },
       { class: Collectible, data: sprite_data_eye },

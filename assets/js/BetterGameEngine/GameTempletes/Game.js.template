@@ -1,0 +1,99 @@
+/**
+ * Game.js Template
+ * ================
+ * This is the core game initialization file that sets up and manages the game instance.
+ * 
+ * Key Responsibilities:
+ * - Initialize game with environment data (canvas, container, API endpoints)
+ * - Create GameControl instance and start the game loop
+ * - Handle PauseMenu and Leaderboard initialization
+ * - Manage user authentication and game state
+ * 
+ * Usage in HTML:
+ * import Core from "./path/to/Game.js";
+ * const game = Core.main(environment, GameControl);
+ */
+
+class GameCore {
+    /**
+     * Constructor - Initialize the game with environment and GameControl
+     * 
+     * @param {Object} environment - Configuration object containing:
+     *   - gameContainer: HTML element or ID for game container
+     *   - gameCanvas: Canvas element for rendering
+     *   - pythonURI: Backend Python API endpoint
+     *   - javaURI: Backend Java API endpoint
+     *   - fetchOptions: Fetch configuration (credentials, headers, etc.)
+     *   - gameLevelClasses: Array of level classes to load
+     * 
+     * @param {Class} GameControlClass - Your game's GameControl class
+     */
+    constructor(environment, GameControlClass) {
+        // TODO: Store environment data
+        // this.gameContainer = environment.gameContainer;
+        // this.gameCanvas = environment.gameCanvas;
+        // etc.
+
+        // TODO: Initialize game control with level classes
+        // this.gameControl = new GameControlClass(this, gameLevelClasses);
+        // this.gameControl.start();
+
+        // TODO: Dynamically load PauseMenu if available
+        // import('./PauseMenu.js')
+        //   .then(mod => new mod.default(this.gameControl, options))
+        //   .catch(() => { /* optional */ });
+
+        // TODO: Dynamically load Leaderboard if available
+        // import('./Leaderboard.js')
+        //   .then(mod => new mod.default(this.gameControl, options))
+        //   .catch(() => { /* optional */ });
+    }
+
+    /**
+     * Static factory method to create and return GameCore instance
+     */
+    static main(environment, GameControlClass) {
+        return new GameCore(environment, GameControlClass);
+    }
+
+    /**
+     * Restart the game from the beginning
+     * - Destroy current level
+     * - Reset to first level
+     * - Restart game loop
+     */
+    returnHome() {
+        // TODO: Implement level cleanup and restart logic
+    }
+
+    /**
+     * Progress to the next level
+     */
+    loadNextLevel() {
+        // TODO: Implement level progression logic
+    }
+
+    /**
+     * Go back to the previous level
+     */
+    loadPreviousLevel() {
+        // TODO: Implement level rewind logic
+    }
+
+    /**
+     * Initialize user authentication
+     * - Fetch user ID from Python backend
+     * - Fetch user profile from Java backend
+     * - Store credentials for use during gameplay
+     */
+    initUser() {
+        // TODO: Implement user authentication
+        // const response = await fetch(`${this.pythonURI}/api/id`);
+        // const userData = await response.json();
+        // Store user data for leaderboard/scoring
+    }
+}
+
+export default {
+    main: (environment, GameControlClass) => GameCore.main(environment, GameControlClass)
+};

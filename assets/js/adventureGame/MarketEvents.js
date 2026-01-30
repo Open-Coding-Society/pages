@@ -1,4 +1,4 @@
-import SoundManager from './SoundManager.js';
+import SoundManager from '../BetterGameEngine/features/systems/SoundManager.js';
 
 class MarketEvents {
     constructor(gameEnv) {

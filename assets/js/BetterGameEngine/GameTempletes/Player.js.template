@@ -1,0 +1,319 @@
+/**
+ * Player.js Template
+ * =================
+ * This class represents the player character controlled by the user.
+ * 
+ * Key Responsibilities:
+ * - Store player position and state
+ * - Handle player movement and controls
+ * - Manage animation states
+ * - Track health/lives
+ * - Handle interactions with environment
+ * 
+ * Extends or uses:
+ * - RigidBody: Physics for gravity and movement
+ * - Transform: Position and size
+ * - Collision: Hit detection
+ */
+
+class Player {
+    /**
+     * Constructor - Initialize player with position and properties
+     * 
+     * @param {Object} config - Player configuration
+     * @param {number} config.x - Starting X position
+     * @param {number} config.y - Starting Y position
+     * @param {number} config.width - Player width (default: 30)
+     * @param {number} config.height - Player height (default: 40)
+     * @param {number} config.speed - Movement speed (pixels per frame)
+     * @param {number} config.jumpForce - Jump strength (default: 15)
+     */
+    constructor(config = {}) {
+        // TODO: Store position
+        // this.x = config.x || 0;
+        // this.y = config.y || 0;
+
+        // TODO: Store dimensions
+        // this.width = config.width || 30;
+        // this.height = config.height || 40;
+
+        // TODO: Store movement properties
+        // this.speed = config.speed || 5; // pixels per frame
+        // this.vx = 0; // velocity x
+        // this.vy = 0; // velocity y
+        // this.jumpForce = config.jumpForce || 15;
+
+        // TODO: Initialize state flags
+        // this.isJumping = false;
+        // this.isFalling = false;
+        // this.isGrounded = false;
+        // this.facingRight = true;
+
+        // TODO: Initialize health/lives
+        // this.health = config.health || 3;
+        // this.maxHealth = config.maxHealth || 3;
+
+        // TODO: Initialize animation state
+        // this.currentAnimation = 'idle';
+        // this.animationFrame = 0;
+        // this.animationSpeed = 5; // frame increment per update
+
+        // TODO: Optional: Create or link RigidBody for physics
+        // this.rigidBody = new RigidBody(this, { mass: 1, gravity: 0.6 });
+    }
+
+    /**
+     * Handle keyboard input - move left/right/jump
+     * Called when player presses arrow keys or WASD
+     * 
+     * @param {string} direction - 'left', 'right', 'jump', etc.
+     */
+    handleInput(direction) {
+        // TODO: Handle movement input
+        // if (direction === 'left') {
+        //   this.vx = -this.speed;
+        //   this.facingRight = false;
+        // } else if (direction === 'right') {
+        //   this.vx = this.speed;
+        //   this.facingRight = true;
+        // }
+
+        // TODO: Handle jump input
+        // if (direction === 'jump' && this.isGrounded) {
+        //   this.vy = -this.jumpForce;
+        //   this.isJumping = true;
+        //   this.isGrounded = false;
+        //   this.playSound('jump.wav');
+        // }
+    }
+
+    /**
+     * Update player state (called each frame)
+     * - Apply velocity
+     * - Check falling/jumping
+     * - Update animation
+     * - Apply gravity
+     */
+    update() {
+        // TODO: Apply gravity (if not using RigidBody)
+        // this.vy += 0.6; // gravity constant
+        // if (this.vy > 20) this.vy = 20; // terminal velocity
+
+        // TODO: Apply velocity to position
+        // this.x += this.vx;
+        // this.y += this.vy;
+
+        // TODO: Friction (slow down horizontal movement)
+        // this.vx *= 0.95;
+
+        // TODO: Update animation based on state
+        // this.updateAnimation();
+
+        // TODO: Check if player is out of bounds
+        // if (this.y > 1000) this.takeDamage(1); // Fell off screen
+    }
+
+    /**
+     * Handle collision with platform/ground
+     * - Stop falling
+     * - Set isGrounded flag
+     * - Stop vertical velocity
+     * 
+     * @param {Platform} platform - The platform being collided with
+     */
+    collideWithPlatform(platform) {
+        // TODO: Check collision type (top, side, bottom)
+        // if (collision from top) {
+        //   this.y = platform.y - this.height; // Move above platform
+        //   this.vy = 0;
+        //   this.isGrounded = true;
+        //   this.isJumping = false;
+        // } else if (collision from bottom) {
+        //   this.y = platform.y + platform.height; // Bonk head
+        //   this.vy = 0;
+        // }
+    }
+
+    /**
+     * Handle collision with collectible item
+     * 
+     * @param {Collectible} item - The collectible to pick up
+     */
+    collideWithItem(item) {
+        // TODO: Increase score
+        // this.score += item.value;
+
+        // TODO: Play pickup sound
+        // this.playSound('pickup.wav');
+
+        // TODO: Remove item from level
+        // item.destroy();
+    }
+
+    /**
+     * Handle collision with enemy
+     * - Take damage
+     * - Apply knockback
+     * - Check if dead
+     * 
+     * @param {Enemy} enemy - The enemy colliding with player
+     */
+    collideWithEnemy(enemy) {
+        // TODO: Apply knockback (push player away)
+        // this.vx = enemy.x > this.x ? -8 : 8;
+        // this.vy = -5;
+
+        // TODO: Take damage
+        // this.takeDamage(1);
+
+        // TODO: Play hurt sound
+        // this.playSound('hurt.wav');
+    }
+
+    /**
+     * Player takes damage from enemy or hazard
+     * 
+     * @param {number} damage - Amount of damage to take (default: 1)
+     */
+    takeDamage(damage = 1) {
+        // TODO: Reduce health
+        // this.health -= damage;
+
+        // TODO: Play damage animation/sound
+        // this.playSound('damage.wav');
+
+        // TODO: Check if dead
+        // if (this.health <= 0) {
+        //   this.die();
+        // }
+    }
+
+    /**
+     * Player death
+     * - Play death animation
+     * - Alert game that player is dead
+     * - Stop movement
+     */
+    die() {
+        // TODO: Play death animation
+        // TODO: Play death sound
+        // TODO: Call level.handlePlayerDeath()
+        // TODO: Disable further input
+    }
+
+    /**
+     * Update animation frame and state
+     * Select which sprite/animation to display based on player state
+     */
+    updateAnimation() {
+        // TODO: Select animation based on state
+        // if (this.isJumping) {
+        //   this.currentAnimation = 'jump';
+        // } else if (this.isGrounded && this.vx !== 0) {
+        //   this.currentAnimation = 'run';
+        // } else if (this.isGrounded) {
+        //   this.currentAnimation = 'idle';
+        // } else {
+        //   this.currentAnimation = 'fall';
+        // }
+
+        // TODO: Increment animation frame counter
+        // this.animationFrame += 1;
+    }
+
+    /**
+     * Render the player to canvas
+     * - Draw sprite or shape
+     * - Draw animation frame
+     * - Draw health/UI if needed
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    render(ctx) {
+        // TODO: Option 1 - Draw as rectangle (for testing)
+        // ctx.fillStyle = 'blue';
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // TODO: Option 2 - Draw sprite animation
+        // const sprite = this.getAnimationSprite();
+        // ctx.drawImage(sprite, this.x, this.y, this.width, this.height);
+
+        // TODO: Option 3 - Draw more complex character (multiple body parts)
+        // this.drawCharacter(ctx);
+
+        // TODO: Debug: Draw hitbox
+        // ctx.strokeStyle = 'green';
+        // ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
+
+    /**
+     * Draw a more detailed character with body parts
+     * Used instead of simple sprite for pixel art style
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    drawCharacter(ctx) {
+        // TODO: Draw head
+        // ctx.fillStyle = 'peachpuff';
+        // ctx.fillRect(this.x + 5, this.y + 5, 20, 20);
+
+        // TODO: Draw body
+        // ctx.fillStyle = 'blue';
+        // ctx.fillRect(this.x + 8, this.y + 25, 14, 15);
+
+        // TODO: Draw legs/feet
+        // ctx.fillStyle = 'black';
+        // ctx.fillRect(this.x + 8, this.y + 40, 4, 8);
+        // ctx.fillRect(this.x + 16, this.y + 40, 4, 8);
+    }
+
+    /**
+     * Get the current animation sprite based on animation state and frame
+     * 
+     * @returns {HTMLImageElement} The sprite to render
+     */
+    getAnimationSprite() {
+        // TODO: Load sprite sheet
+        // TODO: Calculate which frame of animation to show
+        // TODO: Return the appropriate sprite image or canvas section
+        // Example: const frameIndex = Math.floor(this.animationFrame / this.animationSpeed) % 4;
+        // return this.spriteSheet[this.currentAnimation][frameIndex];
+    }
+
+    /**
+     * Play a sound effect
+     * 
+     * @param {string} soundFile - Path to sound file
+     */
+    playSound(soundFile) {
+        // TODO: Load and play sound
+        // const audio = new Audio(`/sounds/${soundFile}`);
+        // audio.play();
+    }
+
+    /**
+     * Reset player to starting position (for level restart)
+     */
+    reset() {
+        // TODO: Reset position to start
+        // this.x = this.startX;
+        // this.y = this.startY;
+
+        // TODO: Reset velocity
+        // this.vx = 0;
+        // this.vy = 0;
+
+        // TODO: Reset state flags
+        // this.isGrounded = false;
+        // this.isJumping = false;
+
+        // TODO: Reset health
+        // this.health = this.maxHealth;
+
+        // TODO: Reset animation
+        // this.currentAnimation = 'idle';
+        // this.animationFrame = 0;
+    }
+}
+
+export default Player;

@@ -768,11 +768,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
         function generateBaselineCode() {
-                return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-    import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
+                return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
+import Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';
+import Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';
+    import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -791,7 +790,6 @@ class CustomLevel {
     }
 }
 
-export { GameControl };
 export const gameLevelClasses = [CustomLevel];`;
         }
 
@@ -804,11 +802,10 @@ export const gameLevelClasses = [CustomLevel];`;
                         : '{ up: 87, left: 65, down: 83, right: 68 }';
 
                 function header() {
-                        return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
+                        return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
+import Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';
+import Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';
+import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
     constructor(gameEnv) {
@@ -825,7 +822,6 @@ class CustomLevel {
     }
 }
 
-export { GameControl };
 export const gameLevelClasses = [CustomLevel];`;
                 }
 
@@ -1205,12 +1201,23 @@ export const gameLevelClasses = [CustomLevel];`;
     function runInEmbed() {
         renderOverlay();
         const code = safeCodeToRun();
-        ui.iframe.src = ui.iframe.src;
+        const currentSrc = ui.iframe.src;
+        
+        // Set up message handler first
         ui.iframe.onload = () => {
             setTimeout(() => {
-                ui.iframe.contentWindow.postMessage({ type: 'rpg:run-code', code: code }, '*');
-            }, 100);
+                try {
+                    ui.iframe.contentWindow.postMessage({ type: 'rpg:run-code', code: code }, '*');
+                } catch (e) {
+                    console.error('Failed to send code to iframe:', e);
+                }
+            }, 200);
         };
+        
+        // Force iframe reload by changing src to self with cache bust
+        const urlObj = new URL(currentSrc, window.location.origin);
+        urlObj.searchParams.set('t', Date.now());
+        ui.iframe.src = urlObj.toString();
     }
 
     document.getElementById('btn-run').addEventListener('click', runInEmbed);

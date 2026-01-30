@@ -1,4 +1,4 @@
-import Character from '../../BetterGameEngine/MansionEngine/Character.js';
+import Character from '../MansionLogic/Character.js';
 
 /*
     Arm class for the Reaper boss.
