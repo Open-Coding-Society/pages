@@ -14,28 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Set API URI based on environment
-const javaURI = (location.hostname === "localhost" || location.hostname === "127.0.0.1") 
-    ? "http://localhost:8585" 
-    : "https://spring.opencodingsociety.com";
-    const baseFetchOptions = {
-        mode: 'cors',
-        cache: 'default',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Origin': 'client'
-        }
-    };
-    
-    const fetchOptions = {
-        ...baseFetchOptions,
-        method: 'GET'
-    };
-    
-    const fetchOptionsPost = {
-        ...baseFetchOptions,
-        method: 'POST'
-    };
+import {javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 // Global variables
 let allPeople = [];
@@ -266,7 +245,8 @@ function createGroup() {
     };
 
     fetch(`${javaURI}/api/groups`, {
-        ...fetchOptionsPost,
+        ...fetchOptions,
+        method: 'POST',
         body: JSON.stringify(groupData)
     })
     .then(response => {
