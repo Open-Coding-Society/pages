@@ -1712,24 +1712,27 @@
 
   .calendar-action-modal-footer {
     display: flex;
-    justify-content: flex-end;
-    gap: 12px;
+    justify-content: stretch;
+    gap: 10px;
     padding: 16px 24px;
     border-top: 1px solid $bg-3;
     flex-shrink: 0;
   }
 
   .modal-btn {
-    padding: 10px 20px;
+    flex: 1;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 6px;
     transition: all 0.2s;
     border: none;
+    white-space: nowrap;
 
     &.primary {
       background: var(--pref-accent-color);
@@ -1752,6 +1755,15 @@
 
       &:hover {
         background: $bg-3;
+      }
+    }
+
+    &.export-blue {
+      background: #3b82f6;
+      color: white;
+
+      &:hover {
+        background: #2563eb;
       }
     }
 

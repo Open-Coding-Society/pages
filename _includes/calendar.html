@@ -48,9 +48,10 @@
     
     <div class="calendar-action-modal-footer">
       <button type="button" class="modal-btn secondary" id="cancel-selective-sync">Cancel</button>
-      <button type="button" class="modal-btn secondary" id="export-ics-sync"><i class="fas fa-download"></i> Export .ics</button>
+      <button type="button" class="modal-btn export-blue" id="export-ics-sync"><i class="fas fa-download"></i> Export</button>
+      <button type="button" class="modal-btn export-blue" id="update-ics-file"><i class="fas fa-save"></i> Update</button>
       <button type="button" class="modal-btn info" id="preview-sync-changes"><i class="fas fa-eye"></i> Preview</button>
-      <button type="button" class="modal-btn primary" id="confirm-selective-sync"><i class="fas fa-sync"></i> Sync Selected</button>
+      <button type="button" class="modal-btn primary" id="confirm-selective-sync"><i class="fas fa-sync"></i> Sync</button>
     </div>
   </div>
 </div>
@@ -1589,6 +1590,65 @@
       downloadICSFile(icsContent, `${sprintKey}-${courseName}.ics`);
       
       showToastNotification(`✓ Downloaded ${events.length} events as ${sprintKey}-${courseName}.ics`, 'success');
+    });
+    
+    // Update .ics file handler (File System Access API)
+    document.getElementById('update-ics-file')?.addEventListener('click', async () => {
+      if (!currentSyncModalData) return;
+      
+      // Check browser support
+      if (!('showOpenFilePicker' in window)) {
+        alert('Your browser does not support the File System Access API. Please use Chrome or Edge, or use the regular Export button instead.');
+        return;
+      }
+      
+      const { sprintKey, course } = currentSyncModalData;
+      const selectedItems = getSelectedItemsFromModal();
+      const priority = document.querySelector('input[name="sync-modal-priority"]:checked')?.value || 'P2';
+      const courseName = course.toUpperCase();
+      
+      if (Object.keys(selectedItems).length === 0) {
+        alert('No items selected to export.');
+        return;
+      }
+      
+      try {
+        // Prompt user to select an existing .ics file to overwrite
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [{
+            description: 'iCalendar Files',
+            accept: { 'text/calendar': ['.ics', '.ical'] }
+          }],
+          multiple: false
+        });
+        
+        // Validate file extension
+        const fileName = fileHandle.name.toLowerCase();
+        if (!fileName.endsWith('.ics') && !fileName.endsWith('.ical')) {
+          alert('Unsupported file type. Please select a .ics or .ical file.');
+          return;
+        }
+        
+        // Generate new calendar content
+        const events = buildEventsFromSelection(selectedItems, priority, courseName);
+        const icsContent = generateICSFile(events);
+        
+        // Write to the selected file
+        const writable = await fileHandle.createWritable();
+        await writable.write(icsContent);
+        await writable.close();
+        
+        showToastNotification(`✓ Updated ${fileHandle.name} with ${events.length} events`, 'success');
+        
+      } catch (err) {
+        // User cancelled the picker or permission denied
+        if (err.name === 'AbortError') {
+          // User cancelled - do nothing
+          return;
+        }
+        console.error('Error updating .ics file:', err);
+        alert('Failed to update the file. Make sure you have permission to write to this location.');
+      }
     });
   }
 </script>
