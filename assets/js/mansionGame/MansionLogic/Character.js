@@ -307,9 +307,9 @@ class Character extends GameObject {
         // Recalculate the object's size based on the new scale
         this.size = this.scale.height / this.scaleFactor; 
 
-        // Recalculate the object's velocity steps based on the new scale (3x faster)
-        this.xVelocity = (this.scale.width / this.stepFactor) * 3;
-        this.yVelocity = (this.scale.height / this.stepFactor) * 3;
+        // Recalculate the object's velocity steps based on the new scale (6x faster)
+        this.xVelocity = (this.scale.width / this.stepFactor) * 6;
+        this.yVelocity = (this.scale.height / this.stepFactor) * 6;
 
         // Set the object's width and height to the new size (object is a square)
         this.width = this.size;

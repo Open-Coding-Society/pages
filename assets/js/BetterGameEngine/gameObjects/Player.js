@@ -82,11 +82,11 @@ class Player extends Character {
             this.moved = true;
 
             if (this.pressedKeys[this.keypress.right]) {
-                this.transform.xv += 0.6 * this.time;
+                this.transform.xv += 1.2 * this.time;
             }
 
             else if (this.pressedKeys[this.keypress.left]) {
-                this.transform.xv -= 0.6 * this.time;
+                this.transform.xv -= 1.2 * this.time;
             }
         }
 
@@ -94,7 +94,7 @@ class Player extends Character {
             this.moved = true;
 
             if (this.pressedKeys[this.keypress.up]) {
-                this.transform.yv -= 0.6 * this.time;
+                this.transform.yv -= 1.2 * this.time;
             }
 
             else if (this.pressedKeys[this.keypress.down]) {
