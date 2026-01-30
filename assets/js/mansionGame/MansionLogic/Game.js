@@ -152,10 +152,12 @@ class GameCore {
     loadPreviousLevel() {
         if (this.gameControl && this.gameControl.currentLevelIndex > 0) {
             try {
-                this.gameControl.currentLevel.destroy();
+                if (this.gameControl.currentLevel && typeof this.gameControl.currentLevel.destroy === 'function') {
+                    this.gameControl.currentLevel.destroy();
+                }
                 this.gameControl.cleanupInteractionHandlers();
             } catch (error) {
-                console.error("Error during cleanup when returning home:", error);
+                console.error("Error during cleanup when loading previous level:", error);
             }
             this.gameControl.currentLevelIndex--;
             this.gameControl.transitionToLevel();
