@@ -8,6 +8,14 @@ permalink: /rpg/gamebuilder
 <style>
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
 
+/* Hide BetterGameEngine control buttons in gamebuilder iframe */
+iframe .pause-button-bar,
+iframe button.pause-btn,
+iframe .leaderboard-widget {
+    display: none !important;
+    visibility: hidden !important;
+}
+
 .gamebuilder-title {
     text-align: center;
     font-size: 2em;
@@ -1227,6 +1235,29 @@ export const gameLevelClasses = [CustomLevel];`;
     setIndicator();
     updateStepUI();
     renderOverlay();
+    
+    // Hide control buttons in the iframe by injecting CSS
+    ui.iframe.addEventListener('load', () => {
+        try {
+            const style = ui.iframe.contentDocument.createElement('style');
+            style.textContent = `
+                .pause-button-bar { display: none !important; }
+                .leaderboard-widget { display: none !important; }
+                .score-display { display: none !important; }
+                .score-counter { display: none !important; }
+                .stats-display { display: none !important; }
+                #scoreDisplay { display: none !important; }
+                #score { display: none !important; }
+                .hud { display: none !important; }
+                [id*="score" i] { display: none !important; }
+                [class*="score" i] { display: none !important; }
+            `;
+            ui.iframe.contentDocument.head.appendChild(style);
+        } catch (e) {
+            // Cross-origin restriction, ignore
+            console.debug('Cannot inject CSS into iframe:', e);
+        }
+    });
 });
 </script>
 
