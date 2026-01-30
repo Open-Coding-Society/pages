@@ -24,7 +24,8 @@ class GameControl {
     // Games can override these values if they want to count a different stat name/label.
     this.pauseMenuOptions = {
         counterVar: 'coinsCollected',
-        counterLabel: 'Coins collected'
+        counterLabel: 'Coins collected',
+        scoreVar: 'coinsCollected'
     };
     // Whether to show per-level counts. We want a single cumulative counter for coins collected.
     this.pauseMenuOptions.counterPerLevel = false;

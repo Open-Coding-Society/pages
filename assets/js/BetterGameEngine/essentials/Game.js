@@ -37,6 +37,21 @@ class GameCore {
         this._createTopControls();
     }
 
+    // Try to dynamically load Scoreboard (for adventure game stats syncing)
+    import('../../assets/js/adventureGame/Scoreboard.js')
+        .then(mod => {
+            try {
+                const Scoreboard = mod.default || mod.Scoreboard;
+                // Set gameControl reference so Scoreboard can update stats
+                Scoreboard.gameControl = this.gameControl;
+                console.log('Scoreboard gameControl reference set');
+            }
+            catch (e) { console.debug('Scoreboard init (optional):', e); }
+        })
+        .catch(() => {
+            // no-op: Scoreboard is optional
+        });
+
     // Try to dynamically load the Leaderboard
     import('../features/Leaderboard.js')
         .then(mod => {
@@ -176,7 +191,12 @@ class GameCore {
                 counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
                 counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score',
                 stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
-                score: 0,
+                // Use getter to dynamically pull score from stats
+                get score() {
+                    const varName = this.counterVar || 'levelsCompleted';
+                    return (this.stats && this.stats[varName]) || 0;
+                },
+                scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
                 _saveStatusNode: null
             };
             

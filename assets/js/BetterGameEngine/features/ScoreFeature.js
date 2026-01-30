@@ -2,10 +2,44 @@
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 export default class ScoreFeature {
-    constructor(pauseMenu) {
+    constructor(pauseMenu, scoreSettings = null) {
         this.pauseMenu = pauseMenu;
+        this.scoreSettings = scoreSettings || null;
+        this._loadScoreSettings();
         this._createScoreCounter();
         this._setupAutoUpdate();
+    }
+
+    /**
+     * Load game-specific score settings if available
+     */
+    _loadScoreSettings() {
+        // If scoreSettings already provided, use it
+        if (this.scoreSettings) return;
+        
+        // Try to detect and load game-specific settings
+        try {
+            // Try mansion game settings
+            if (window.location.pathname.includes('mansion')) {
+                import('../../../assets/js/mansionGame/scoreSettings.js')
+                    .then(mod => {
+                        this.scoreSettings = mod.default || mod.scoreSettings;
+                        console.log('ScoreFeature: loaded mansion game settings');
+                    })
+                    .catch(e => console.debug('Mansion settings not found:', e));
+            }
+            // Try adventure game settings
+            else if (window.location.pathname.includes('adventure') || window.location.pathname.includes('gamify')) {
+                import('../../../assets/js/adventureGame/scoreSettings.js')
+                    .then(mod => {
+                        this.scoreSettings = mod.default || mod.scoreSettings;
+                        console.log('ScoreFeature: loaded adventure game settings');
+                    })
+                    .catch(e => console.debug('Adventure settings not found:', e));
+            }
+        } catch (e) {
+            console.debug('Could not load game-specific settings:', e);
+        }
     }
 
     /**
@@ -37,7 +71,8 @@ export default class ScoreFeature {
         scoreLabel.style.fontSize = '12px';
         scoreLabel.style.color = '#aaa';
         scoreLabel.style.marginBottom = '5px';
-        scoreLabel.innerText = this.pauseMenu.counterLabelText || 'Score';
+        const labelText = this._getCounterLabel();
+        scoreLabel.innerText = labelText;
         
         const scoreValue = document.createElement('div');
         scoreValue.className = 'pause-score-value';
@@ -50,6 +85,16 @@ export default class ScoreFeature {
         
         this._scoreValue = scoreValue;
         this._scoreLabel = scoreLabel;
+    }
+
+    /**
+     * Get the counter label from settings or pauseMenu
+     */
+    _getCounterLabel() {
+        if (this.scoreSettings && this.scoreSettings.counterLabel) {
+            return this.scoreSettings.counterLabel;
+        }
+        return this.pauseMenu.counterLabelText || 'Score';
     }
 
     /**
@@ -68,11 +113,21 @@ export default class ScoreFeature {
     _syncScoreDisplay() {
         if (!this.pauseMenu.gameControl) return;
         
-        const varName = this.pauseMenu.counterVar || 'levelsCompleted';
+        const varName = this._getCounterVar();
         const stats = this.pauseMenu.gameControl.stats || this.pauseMenu.gameControl;
         const currentValue = stats[varName] || this.pauseMenu.gameControl[varName] || 0;
         
         this.updateScoreDisplay(currentValue);
+    }
+
+    /**
+     * Get the counter variable name from settings or pauseMenu
+     */
+    _getCounterVar() {
+        if (this.scoreSettings && this.scoreSettings.counterVar) {
+            return this.scoreSettings.counterVar;
+        }
+        return this.pauseMenu.counterVar || 'levelsCompleted';
     }
 
     /**
@@ -151,8 +206,20 @@ export default class ScoreFeature {
      * Build the DTO for backend save
      */
     _buildServerDto() {
+        // Use custom DTO builder if scoreSettings provided it
+        if (this.scoreSettings && typeof this.scoreSettings.buildDto === 'function') {
+            return this.scoreSettings.buildDto(this.pauseMenu);
+        }
+        
+        // Fallback to default DTO
         const uid = 'guest';
-        const varName = this.pauseMenu.counterVar || 'levelsCompleted';
+        const varName = this._getCounterVar();
+        
+        // Always ensure stats is synced with gameControl.stats
+        if (this.pauseMenu.gameControl && this.pauseMenu.gameControl.stats) {
+            this.pauseMenu.stats = this.pauseMenu.gameControl.stats;
+        }
+        
         const levels = this.pauseMenu.stats && this.pauseMenu.stats[varName] ? Number(this.pauseMenu.stats[varName]) : 0;
         const sessionTime = this.pauseMenu.stats && (this.pauseMenu.stats.sessionTime || this.pauseMenu.stats.elapsedMs || this.pauseMenu.stats.timePlayed || 0);
         const gameName = this._extractGameName();
@@ -167,6 +234,7 @@ export default class ScoreFeature {
             gameName: gameName,
             variableName: varName
         };
+        console.log('ScoreFeature: built DTO', dto);
         return dto;
     }
 
@@ -244,9 +312,20 @@ export default class ScoreFeature {
         buttonEl.innerText = 'Saving...';
 
         try {
-            const cv = this.pauseMenu.counterVar || 'levelsCompleted';
-            if (!this.pauseMenu.stats) this.pauseMenu.stats = {};
-            this.pauseMenu.stats[cv] = Number(this.pauseMenu.score || 0);
+            const cv = this._getCounterVar();
+            
+            // Ensure stats object exists on gameControl
+            if (!this.pauseMenu.gameControl.stats) {
+                this.pauseMenu.gameControl.stats = {};
+            }
+            
+            // Always sync pauseMenu.stats to gameControl.stats (they should be the same object)
+            this.pauseMenu.stats = this.pauseMenu.gameControl.stats;
+            
+            // Update the counter variable with current score
+            const currentScore = this.pauseMenu.score;
+            console.log(`ScoreFeature: setting ${cv} to ${currentScore}`);
+            this.pauseMenu.stats[cv] = Number(currentScore || 0);
 
             // Attempt server save
             const backend = this._getBackendBase();
