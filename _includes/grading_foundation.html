@@ -1,0 +1,294 @@
+<!-- ===================== GRADING FEATURE ===================== -->
+
+<script>
+  window.PageFeatures = window.PageFeatures || {};
+  window.PageFeatures.grading = true;
+</script>
+
+<!-- Button Container -->
+<div id="grading-button-container" class="grading-button-container"></div>
+
+<!-- Grading Toggle Button -->
+<button
+  id="grading-toggle-btn"
+  class="grading-btn"
+  aria-label="Open Grading"
+  hidden
+>
+  Grading
+</button>
+
+<!-- ===================== CREATE ASSIGNMENT BUTTON ===================== -->
+<button id="create-assignment-btn" style="margin:10px 0;">➕ Create Assignment</button>
+
+<!-- ===================== CREATE ASSIGNMENT MODAL ===================== -->
+<div id="assignment-modal" style="display:none;">
+  <div class="assignment-box">
+    <h2>Create Assignment</h2>
+
+    <input id="assignment-title" placeholder="Title" />
+    <textarea id="assignment-desc" placeholder="Description"></textarea>
+    <input id="assignment-max" type="number" placeholder="Max Score" />
+    <input id="assignment-due" type="date" />
+
+    <div style="margin-top:12px; text-align:right;">
+      <button id="save-assignment">Create</button>
+      <button id="cancel-assignment">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== GRADING PANEL ===================== -->
+<aside
+  id="grading-panel"
+  class="grading-panel"
+  tabindex="-1"
+  aria-label="Grading Panel"
+  hidden
+>
+  <div class="grading-panel-inner">
+    <header class="grading-header">
+      <h1> Grading Dashboard</h1>
+      <button
+        id="grading-close-btn"
+        class="grading-close-btn"
+        aria-label="Close Grading"
+      >&times;</button>
+    </header>
+
+    <!-- Assignment Selector -->
+    <div class="assignment-selector-container">
+      <label>Select Assignment:</label>
+      <select id="assignment-selector">
+        <option value="">Loading assignments…</option>
+      </select>
+    </div>
+
+    <!-- Search -->
+    <input
+      type="text"
+      id="grading-search"
+      placeholder="Search by student…"
+      class="grading-search-input"
+    />
+
+    <!-- Grading Content -->
+    <section id="grading-content">
+      <table class="grading-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Assignment</th>
+            <th>Submitted</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Link</th>
+            <th>Rubric</th>
+          </tr>
+        </thead>
+        <tbody id="grading-tbody">
+          <tr>
+            <td colspan="7" style="text-align:center;">
+              <em>Loading submissions…</em>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</aside>
+
+<!-- ===================== RUBRIC PANEL ===================== -->
+<aside id="rubric-panel" class="rubric-panel" style="display:none;">
+  <div class="rubric-inner">
+    <header>
+      <h2>Grading Rubric</h2>
+      <button id="rubric-close-btn" aria-label="Close Rubric">&times;</button>
+    </header>
+
+    <div id="rubric-student-name" style="margin-bottom:10px;"></div>
+
+    <div class="rubric-row" data-criterion="content">
+      <div class="rubric-label">Content Understanding</div>
+      <select class="rubric-score">
+        <option value="">–</option>
+        <option value="4">4 – Excellent</option>
+        <option value="3">3 – Good</option>
+        <option value="2">2 – Fair</option>
+        <option value="1">1 – Poor</option>
+      </select>
+      <textarea class="rubric-comment" placeholder="Comment…"></textarea>
+    </div>
+
+    <div class="rubric-row" data-criterion="accuracy">
+      <div class="rubric-label">Accuracy</div>
+      <select class="rubric-score">
+        <option value="">–</option>
+        <option value="4">4 – Excellent</option>
+        <option value="3">3 – Good</option>
+        <option value="2">2 – Fair</option>
+        <option value="1">1 – Poor</option>
+      </select>
+      <textarea class="rubric-comment" placeholder="Comment…"></textarea>
+    </div>
+
+    <div class="rubric-row" data-criterion="clarity">
+      <div class="rubric-label">Clarity & Organization</div>
+      <select class="rubric-score">
+        <option value="">–</option>
+        <option value="4">4 – Excellent</option>
+        <option value="3">3 – Good</option>
+        <option value="2">2 – Fair</option>
+        <option value="1">1 – Poor</option>
+      </select>
+      <textarea class="rubric-comment" placeholder="Comment…"></textarea>
+    </div>
+
+    <div class="rubric-footer">
+      <strong>Total Score:</strong>
+      <span id="rubric-total">0</span> / 12
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== BACKEND & JS ===================== -->
+<script>
+const API_BASE = "https://spring.opencodingsociety.com";
+let gradingAssignments = [];
+let selectedAssignmentId = null;
+
+/* ===================== INIT ===================== */
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!window.PageFeatures.grading) return;
+
+  // Grading toggle button
+  const container = document.getElementById("grading-button-container");
+  const toggleBtn = document.getElementById("grading-toggle-btn");
+  if (container && toggleBtn && !container.contains(toggleBtn)) container.appendChild(toggleBtn);
+  toggleBtn.hidden = false;
+  toggleBtn.addEventListener("click", openGradingPanel);
+
+  document.getElementById("grading-close-btn")?.addEventListener("click", closeGradingPanel);
+  document.getElementById("grading-search")?.addEventListener("input", e => renderGradingTable(e.target.value));
+  document.getElementById("assignment-selector")?.addEventListener("change", e => { selectedAssignmentId = e.target.value; renderGradingTable(); });
+  document.getElementById("rubric-close-btn")?.addEventListener("click", () => document.getElementById("rubric-panel").style.display = "none");
+
+  // Assignment modal controls
+  const assignmentModal = document.getElementById("assignment-modal");
+  document.getElementById("create-assignment-btn").addEventListener("click", () => {
+    assignmentModal.style.display = "flex";
+  });
+  document.getElementById("cancel-assignment").addEventListener("click", () => {
+    assignmentModal.style.display = "none";
+  });
+
+  document.getElementById("save-assignment").addEventListener("click", async () => {
+    const title = document.getElementById("assignment-title").value.trim();
+    const desc = document.getElementById("assignment-desc").value.trim();
+    const maxScore = document.getElementById("assignment-max").value;
+    const due = document.getElementById("assignment-due").value;
+
+    if (!title || !maxScore) return alert("Title and max score required.");
+
+    const payload = { title, description: desc, max_score: Number(maxScore), due_date: due || null };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/assignments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to create assignment");
+
+      assignmentModal.style.display = "none";
+      alert("Assignment created successfully!");
+      loadGradingAssignments();
+    } catch (err) {
+      console.error(err);
+      alert("Error creating assignment");
+    }
+  });
+
+  await loadGradingAssignments();
+});
+
+/* ===================== PANEL CONTROLS ===================== */
+function openGradingPanel() { document.getElementById("grading-panel").hidden = false; renderGradingTable(); }
+function closeGradingPanel() { document.getElementById("grading-panel").hidden = true; }
+
+/* ===================== LOAD GRADES ===================== */
+async function loadGradingAssignments() {
+  try {
+    const resp = await fetch(`${API_BASE}/api/grades`);
+    if (!resp.ok) throw new Error("Failed to fetch grades");
+    const grades = await resp.json();
+    const list = Array.isArray(grades) ? grades : grades.data || [];
+
+    const map = new Map();
+    list.forEach(g => {
+      const key = g.assignment || "Unknown Assignment";
+      if (!map.has(key)) map.set(key, { id: key.toLowerCase().replace(/[^a-z0-9]+/g, "-"), title: key, submissions: [] });
+      map.get(key).submissions.push({
+        student: g.uid || "Unknown",
+        submitted_at: g.submitted_at || new Date().toISOString(),
+        score: g.score ?? "",
+        link: g.submission || "",
+        status: g.score > 0 ? "graded" : "pending"
+      });
+    });
+
+    gradingAssignments = Array.from(map.values());
+    populateAssignmentDropdown();
+
+    if (gradingAssignments.length) {
+      selectedAssignmentId = gradingAssignments[0].id;
+      document.getElementById("assignment-selector").value = selectedAssignmentId;
+    }
+  } catch (err) {
+    console.error("Grading load failed:", err);
+  }
+}
+
+/* ===================== DROPDOWN ===================== */
+function populateAssignmentDropdown() {
+  const selector = document.getElementById("assignment-selector");
+  selector.innerHTML = "";
+  if (!gradingAssignments.length) return selector.innerHTML = '<option value="">No submissions</option>';
+  gradingAssignments.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.id;
+    opt.textContent = `${a.title} (${a.submissions.length})`;
+    selector.appendChild(opt);
+  });
+}
+
+/* ===================== TABLE RENDER ===================== */
+function renderGradingTable(filter = "") {
+  const tbody = document.getElementById("grading-tbody");
+  tbody.innerHTML = "";
+  const assignment = gradingAssignments.find(a => a.id === selectedAssignmentId);
+  if (!assignment) return tbody.innerHTML = '<tr><td colspan="7">No assignment selected.</td></tr>';
+
+  const rows = assignment.submissions.filter(s => s.student.toLowerCase().includes(filter.toLowerCase()));
+  if (!rows.length) return tbody.innerHTML = '<tr><td colspan="7">No matching students.</td></tr>';
+
+  tbody.innerHTML = rows.map(s => `
+    <tr>
+      <td>${s.student}</td>
+      <td>${assignment.title}</td>
+      <td>${new Date(s.submitted_at).toLocaleString()}</td>
+      <td>${s.score}</td>
+      <td><span class="status-badge ${s.status}">${s.status === "graded" ? "Graded" : "Pending"}</span></td>
+      <td>${s.link ? `<a href="${s.link}" target="_blank">View</a>` : "—"}</td>
+      <td><button class="rubric-btn" data-student="${s.student}">Rubric</button></td>
+    </tr>
+  `).join("");
+
+  document.querySelectorAll(".rubric-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("rubric-student-name").textContent = `Student: ${btn.dataset.student}`;
+      document.getElementById("rubric-panel").style.display = "block";
+    });
+  });
+}
+</script>
