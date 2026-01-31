@@ -26,26 +26,10 @@ class GameCore {
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
 
-    // Try to dynamically load the centralized PauseMenu (prefer the shared one)
-    // Skip if disablePauseMenu is set in environment
+    // Create top control buttons directly using features
     if (!this.environment.disablePauseMenu) {
-        import('./PauseMenu.js')
-            .then(mod => {
-                try {
-                    // Allow GameControl to specify PauseMenu options (like counterVar/counterLabel)
-                    const pmOptions = Object.assign({ parentId: 'gameContainer' }, this.gameControl.pauseMenuOptions || {});
-                    new mod.default(this.gameControl, pmOptions);
-                    
-                    // Add toggle leaderboard button after pause menu renders
-                    setTimeout(() => this._addToggleButtonToPauseMenu(), 500);
-                } catch (e) { console.warn('PauseMenu init failed:', e); }
-            })
-            .catch(() => {
-                // no-op: PauseMenu is optional
-        });
+        this._createTopControls();
     }
-    // Create top control buttons (Pause, Save Score, Skip Level) from features
-    this._createTopControls();
 
     // Try to dynamically load the Leaderboard
     import('../../BetterGameEngine/features/Leaderboard.js')
@@ -76,128 +60,6 @@ class GameCore {
         });
 }
 
-    _addToggleButtonToPauseMenu() {
-        try {
-            // Find the pause button bar that was created by PauseMenu
-            const buttonBar = document.querySelector('.pause-button-bar');
-            
-            if (!buttonBar) {
-                console.warn('Pause button bar not found');
-                return;
-            }
-
-            // Check if button already exists
-            if (buttonBar.querySelector('.toggle-leaderboard')) {
-                console.log('Toggle leaderboard button already exists');
-                return;
-            }
-
-            // Create the toggle leaderboard button
-            const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
-            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-            btnToggleLeaderboard.addEventListener('click', () => {
-                if (this.leaderboardInstance) {
-                    this.leaderboardInstance.toggleVisibility();
-                    
-                    // Update button text based on visibility
-                    if (this.leaderboardInstance.isVisible()) {
-                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-                    } else {
-                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
-                    }
-                } else {
-                    console.warn('Leaderboard instance not available');
-                }
-            });
-
-            // Append the button to the button bar
-            buttonBar.appendChild(btnToggleLeaderboard);
-            console.log('Toggle leaderboard button added to pause menu');
-        } catch (error) {
-            console.warn('Failed to add toggle button:', error);
-        }
-    }
-
-    static main(environment, GameControlClass) {
-        return new GameCore(environment, GameControlClass);
-    }
-
-    returnHome() {
-        if (!this.gameControl || !this.initialLevelClasses.length) return;
-
-        try {
-            if (this.gameControl.currentLevel && typeof this.gameControl.currentLevel.destroy === 'function') {
-                this.gameControl.currentLevel.destroy();
-            }
-            this.gameControl.cleanupInteractionHandlers();
-        } catch (error) {
-            console.error("Error during cleanup when returning home:", error);
-        }
-
-        // Restore the original level order and restart from the first one
-        this.gameControl.levelClasses = [...this.initialLevelClasses];
-        this.gameControl.currentLevelIndex = 0;
-        this.gameControl.isPaused = false;
-        this.gameControl.transitionToLevel();
-    }
-
-    loadNextLevel() {
-        if (this.gameControl && this.gameControl.currentLevel) {
-            this.gameControl.currentLevel.continue = false;
-            console.log("Loading next level...");
-        } else {
-            console.warn("GameControl or currentLevel not available");
-        }
-    }
-
-    loadPreviousLevel() {
-        if (this.gameControl && this.gameControl.currentLevelIndex > 0) {
-            try {
-                this.gameControl.currentLevel.destroy();
-                this.gameControl.cleanupInteractionHandlers();
-            } catch (error) {
-                console.error("Error during cleanup when returning home:", error);
-            }
-            this.gameControl.currentLevelIndex--;
-            this.gameControl.transitionToLevel();
-        } else {
-            console.warn("No previous level to load");
-        }
-    }
-
-    initUser() {
-        const pythonURL = this.pythonURI + '/api/id';
-        fetch(pythonURL, this.fetchOptions)
-            .then(response => {
-                if (response.status !== 200) {
-                    console.error("HTTP status code: " + response.status);
-                    return null;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-                this.uid = data.uid;
-
-                const javaURL = this.javaURI + '/rpg_answer/person/' + this.uid;
-                return fetch(javaURL, this.fetchOptions);
-            })
-            .then(response => {
-                if (!response || !response.ok) {
-                    throw new Error(`Spring server response: ${response?.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-                this.id = data.id;
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    }
-
     _createTopControls() {
         // Ensure pause-menu.css is loaded for button styling
         const cssPath = '/assets/css/pause-menu.css';
@@ -221,7 +83,7 @@ class GameCore {
                 gameControl: this.gameControl,
                 options: { parentId: 'gameContainer' },
                 counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
-                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Levels Completed',
+                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score',
                 stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
                 // Use getter to dynamically pull score from stats
                 get score() {
@@ -294,14 +156,115 @@ class GameCore {
                 }
             });
 
-            // Add buttons to bar
+            // Toggle Leaderboard button
+            const btnToggleLeaderboard = document.createElement('button');
+            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
+            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+            btnToggleLeaderboard.addEventListener('click', () => {
+                if (this.leaderboardInstance) {
+                    this.leaderboardInstance.toggleVisibility();
+                    
+                    // Update button text based on visibility
+                    if (this.leaderboardInstance.isVisible()) {
+                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+                    } else {
+                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
+                    }
+                } else {
+                    console.warn('Leaderboard instance not available');
+                }
+            });
+
             buttonBar.appendChild(btnPause);
             buttonBar.appendChild(btnSave);
             buttonBar.appendChild(btnSkipLevel);
+            buttonBar.appendChild(btnToggleLeaderboard);
             parent.appendChild(buttonBar);
-        }).catch(e => {
-            console.warn('Failed to load button features:', e);
+            
+        }).catch(err => {
+            console.warn('Failed to load control features:', err);
         });
+    }
+
+    static main(environment, GameControlClass) {
+        return new GameCore(environment, GameControlClass);
+    }
+
+    returnHome() {
+        if (!this.gameControl || !this.initialLevelClasses.length) return;
+
+        try {
+            if (this.gameControl.currentLevel && typeof this.gameControl.currentLevel.destroy === 'function') {
+                this.gameControl.currentLevel.destroy();
+            }
+            this.gameControl.cleanupInteractionHandlers();
+        } catch (error) {
+            console.error("Error during cleanup when returning home:", error);
+        }
+
+        // Restore the original level order and restart from the first one
+        this.gameControl.levelClasses = [...this.initialLevelClasses];
+        this.gameControl.currentLevelIndex = 0;
+        this.gameControl.isPaused = false;
+        this.gameControl.transitionToLevel();
+    }
+
+    loadNextLevel() {
+        if (this.gameControl && this.gameControl.currentLevel) {
+            this.gameControl.currentLevel.continue = false;
+            console.log("Loading next level...");
+        } else {
+            console.warn("GameControl or currentLevel not available");
+        }
+    }
+
+    loadPreviousLevel() {
+        if (this.gameControl && this.gameControl.currentLevelIndex > 0) {
+            try {
+                if (this.gameControl.currentLevel && typeof this.gameControl.currentLevel.destroy === 'function') {
+                    this.gameControl.currentLevel.destroy();
+                }
+                this.gameControl.cleanupInteractionHandlers();
+            } catch (error) {
+                console.error("Error during cleanup when loading previous level:", error);
+            }
+            this.gameControl.currentLevelIndex--;
+            this.gameControl.transitionToLevel();
+        } else {
+            console.warn("No previous level to load");
+        }
+    }
+
+    initUser() {
+        const pythonURL = this.pythonURI + '/api/id';
+        fetch(pythonURL, this.fetchOptions)
+            .then(response => {
+                if (response.status !== 200) {
+                    console.error("HTTP status code: " + response.status);
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+                this.uid = data.uid;
+
+                const javaURL = this.javaURI + '/rpg_answer/person/' + this.uid;
+                return fetch(javaURL, this.fetchOptions);
+            })
+            .then(response => {
+                if (!response || !response.ok) {
+                    throw new Error(`Spring server response: ${response?.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+                this.id = data.id;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
     }
 }
 
