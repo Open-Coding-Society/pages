@@ -456,6 +456,8 @@ iframe { width: 100%; height: 100%; border: none; }
 </div>
 
 <script>
+// Shared container for preloaded engine sources so editor helpers can access them
+window.engineSources = window.engineSources || {};
 document.addEventListener('DOMContentLoaded', () => {
     const assets = {
         bg: {
@@ -503,6 +505,40 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.viewBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
+    
+            // --- Preload actual engine source files so editor can show real code ---
+            async function fetchModuleSource(path) {
+                try {
+                    const resp = await fetch(path, { cache: 'no-store' });
+                    if (!resp.ok) return null;
+                    const text = await resp.text();
+                    return text;
+                } catch (e) {
+                    return null;
+                }
+            }
+    
+            async function preloadEngineSources() {
+                // Use root-relative paths; rpg runner will rewrite imports when executing
+                const toFetch = {
+                    GameEnvBackground: '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js',
+                    Player: '/assets/js/BetterGameEngine/gameObjects/Player.js',
+                    Npc: '/assets/js/BetterGameEngine/gameObjects/Npc.js',
+                    Barrier: '/assets/js/adventureGame/Barrier.js'
+                };
+                await Promise.all(Object.keys(toFetch).map(async (k) => {
+                    const p = toFetch[k];
+                    const src = await fetchModuleSource(p);
+                    if (src) window.engineSources[k] = { path: p, src };
+                }));
+                // If editor currently contains baseline/imports, refresh to show fetched content
+                if (ui.editor && ui.editor.value) {
+                    const old = ui.editor.value;
+                    const updated = ui.editor.value; // regenerate below where functions use engineSources
+                }
+            }
+            // Start preloading but don't block the UI
+            preloadEngineSources();
     });
 
     // npcs
@@ -776,30 +812,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
         function generateBaselineCode() {
-                return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
-import Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';
-import Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';
-    import Barrier from '/assets/js/adventureGame/Barrier.js';
+                    const importBlock = getImportsBlock();
+                    return `${importBlock}class CustomLevel {
+        constructor(gameEnv) {
+            const path = gameEnv.path;
+            const width = gameEnv.innerWidth;
+            const height = gameEnv.innerHeight;
 
-class CustomLevel {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;
+            // Definitions will be added here per step
 
-        // Definitions will be added here per step
-
-        // Define objects for this level progressively via Confirm Step
-        this.classes = [
-            // Step 1: add GameEnvBackground
-            // Step 2: add Player
-            // Step 3: add Npc
-        ];
-    }
-}
-
-export const gameLevelClasses = [CustomLevel];`;
+            // Define objects for this level progressively via Confirm Step
+            this.classes = [
+                // Step 1: add GameEnvBackground
+                // Step 2: add Player
+                // Step 3: add Npc
+            ];
         }
+    }
+
+    export const gameLevelClasses = [CustomLevel];`;
+        }
+
+            function getImportsBlock() {
+                const keys = ['GameEnvBackground','Player','Npc','Barrier'];
+                    if (!window.engineSources || Object.keys(window.engineSources).length === 0) {
+                    return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';\nimport Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
+                }
+                let out = '';
+                keys.forEach(k => {
+                    const e = window.engineSources[k];
+                    if (e && e.src) {
+                        out += `// --- ${e.path} ---\n/*\n${e.src.replace(/\*\//g, '*\\/') }\n*/\n\n`;
+                    } else {
+                        let path = '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
+                        if (k === 'Player') path = '/assets/js/BetterGameEngine/gameObjects/Player.js';
+                        if (k === 'Npc') path = '/assets/js/BetterGameEngine/gameObjects/Npc.js';
+                        if (k === 'Barrier') path = '/assets/js/adventureGame/Barrier.js';
+                        out += `import ${k} from '${path}';\n`;
+                    }
+                });
+                out += '\n';
+                return out;
+            }
 
         function generateStepCode(currentStep) {
                 const bg = assets.bg[ui.bg.value];
@@ -810,16 +864,12 @@ export const gameLevelClasses = [CustomLevel];`;
                         : '{ up: 87, left: 65, down: 83, right: 68 }';
 
                 function header() {
-                        return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
-import Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';
-import Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';
-import Barrier from '/assets/js/adventureGame/Barrier.js';
-
-class CustomLevel {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;`;
+                    const ib = getImportsBlock();
+                    return `${ib}class CustomLevel {
+            constructor(gameEnv) {
+            const path = gameEnv.path;
+            const width = gameEnv.innerWidth;
+            const height = gameEnv.innerHeight;`;
                 }
                 function footer(classesArray) {
                         return `
@@ -1097,7 +1147,7 @@ export const gameLevelClasses = [CustomLevel];`;
         state.persistent = null;
         state.typing = { startLine, lineCount: Math.max(1, lineCount) };
         renderOverlay();
-        const speed = 6; 
+        const speed = (startLine === 0 ? 60 : 6);
         function step() {
             for (let i = 0; i < speed && typed.length < targetBlock.length; i++) typed += targetBlock[typed.length];
             const partial = typed.split('\n');
@@ -1105,11 +1155,19 @@ export const gameLevelClasses = [CustomLevel];`;
                 current[startLine + i] = partial[i] !== undefined ? partial[i] : '';
             }
             ui.editor.value = current.join('\n');
+            // Auto-scroll editor so the typing area stays visible
+            try {
+                const visibleLine = startLine + Math.max(0, partial.length - 1);
+                const scrollTarget = Math.max(0, (visibleLine * LINE_HEIGHT) - (ui.editor.clientHeight - LINE_HEIGHT));
+                ui.editor.scrollTop = scrollTarget;
+            } catch (e) {}
             renderOverlay();
             if (typed.length < targetBlock.length) {
                 requestAnimationFrame(step);
             } else {
                 ui.editor.value = newCode;
+                // Ensure final code is visible
+                try { ui.editor.scrollTop = ui.editor.scrollHeight; } catch (e) {}
                 state.programmaticEdit = false;
                 state.typing = null;
                 state.persistent = { startLine, lineCount: Math.max(1, lineCount) };
@@ -1203,7 +1261,31 @@ export const gameLevelClasses = [CustomLevel];`;
     function safeCodeToRun() {
         const code = ui.editor.value || '';
         const hasLevels = /export\s+const\s+gameLevelClasses/.test(code);
-        return hasLevels ? code : generateBaselineCode();
+        const source = hasLevels ? code : generateBaselineCode();
+        // If editor inlined engine sources as commented blocks, convert them to imports for runtime
+        return prepareRunnableCode(source);
+    }
+
+    function prepareRunnableCode(code) {
+        if (!code) return code;
+        // Replace inlined commented module blocks of form:
+        // // --- /path/to/module.js ---\n/*\n...src...\n*/\n
+        const inlineRe = /\/\/ --- (\/[\w\-\/\.]+\.js) ---\n\/\*[\s\S]*?\*\/\n*/g;
+        const imports = new Set();
+        const transformed = code.replace(inlineRe, (m, p) => {
+            try {
+                const name = p.split('/').pop().replace(/\.js$/, '');
+                imports.add(`import ${name} from '${p}';`);
+                return '';
+            } catch (e) {
+                return '';
+            }
+        });
+        // If we collected imports, prepend them to the file
+        if (imports.size > 0) {
+            return Array.from(imports).join('\n') + '\n\n' + transformed;
+        }
+        return transformed;
     }
 
     function runInEmbed() {
