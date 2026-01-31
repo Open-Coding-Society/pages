@@ -456,8 +456,6 @@ iframe { width: 100%; height: 100%; border: none; }
 </div>
 
 <script>
-// Shared container for preloaded engine sources so editor helpers can access them
-window.engineSources = window.engineSources || {};
 document.addEventListener('DOMContentLoaded', () => {
     const assets = {
         bg: {
@@ -506,39 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
         });
     
-            // --- Preload actual engine source files so editor can show real code ---
-            async function fetchModuleSource(path) {
-                try {
-                    const resp = await fetch(path, { cache: 'no-store' });
-                    if (!resp.ok) return null;
-                    const text = await resp.text();
-                    return text;
-                } catch (e) {
-                    return null;
-                }
-            }
-    
-            async function preloadEngineSources() {
-                // Use root-relative paths; rpg runner will rewrite imports when executing
-                const toFetch = {
-                    GameEnvBackground: '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js',
-                    Player: '/assets/js/BetterGameEngine/gameObjects/Player.js',
-                    Npc: '/assets/js/BetterGameEngine/gameObjects/Npc.js',
-                    Barrier: '/assets/js/adventureGame/Barrier.js'
-                };
-                await Promise.all(Object.keys(toFetch).map(async (k) => {
-                    const p = toFetch[k];
-                    const src = await fetchModuleSource(p);
-                    if (src) window.engineSources[k] = { path: p, src };
-                }));
-                // If editor currently contains baseline/imports, refresh to show fetched content
-                if (ui.editor && ui.editor.value) {
-                    const old = ui.editor.value;
-                    const updated = ui.editor.value; // regenerate below where functions use engineSources
-                }
-            }
-            // Start preloading but don't block the UI
-            preloadEngineSources();
+            // NOTE: removed preloading/inlining of full engine sources to keep the editor focused
+            // Students only need the import lines and asset/JSON definitions; no fetching here.
     });
 
     // npcs
@@ -834,25 +801,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
             function getImportsBlock() {
-                const keys = ['GameEnvBackground','Player','Npc','Barrier'];
-                    if (!window.engineSources || Object.keys(window.engineSources).length === 0) {
-                    return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';\nimport Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
-                }
-                let out = '';
-                keys.forEach(k => {
-                    const e = window.engineSources[k];
-                    if (e && e.src) {
-                        out += `// --- ${e.path} ---\n/*\n${e.src.replace(/\*\//g, '*\\/') }\n*/\n\n`;
-                    } else {
-                        let path = '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
-                        if (k === 'Player') path = '/assets/js/BetterGameEngine/gameObjects/Player.js';
-                        if (k === 'Npc') path = '/assets/js/BetterGameEngine/gameObjects/Npc.js';
-                        if (k === 'Barrier') path = '/assets/js/adventureGame/Barrier.js';
-                        out += `import ${k} from '${path}';\n`;
-                    }
-                });
-                out += '\n';
-                return out;
+                // Keep the editor focused for learners: only show the minimal import lines
+                return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';\nimport Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
             }
 
         function generateStepCode(currentStep) {
