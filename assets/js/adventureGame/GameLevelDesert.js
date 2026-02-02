@@ -735,6 +735,17 @@ class GameLevelDesert {
               }
           },
           interact: function() {
+              // Hide all NPCs and the Player in the main level
+              const allCharacters = gameEnv.gameObjects.filter(obj => 
+                  obj instanceof Npc || obj instanceof Player
+              );
+              
+              allCharacters.forEach(character => {
+                  if (character.canvas) {
+                      character.canvas.style.display = 'none';
+                  }
+              });
+              
               // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
               // Set a primary game reference from the game environment
               let primaryGame = gameEnv.gameControl;
@@ -744,10 +755,15 @@ class GameLevelDesert {
           
               // Create and style the fade overlay
               const fadeOverlay = document.createElement('div');
+              
+              // Get canvas position to center the overlay
+              const canvas = gameEnv.gameCanvas || document.querySelector('canvas');
+              const canvasRect = canvas ? canvas.getBoundingClientRect() : { top: 0, left: 0 };
+              
               Object.assign(fadeOverlay.style, {
-                  position: 'absolute',
-                  top: '0px',
-                  left: '0px',
+                  position: 'fixed',
+                  top: canvasRect.top + 'px',
+                  left: canvasRect.left + 'px',
                   width: width + 'px',
                   height: height + 'px',
                   backgroundColor: '#0a0a1a',
@@ -798,10 +814,35 @@ class GameLevelDesert {
               setTimeout(() => {
                   // Start the new game
                   gameInGame.start();
+                  
+                  // Keep all characters hidden while mini-game is running
+                  const hideCharactersInterval = setInterval(() => {
+                      const allCharacters = gameEnv.gameObjects.filter(obj => 
+                          obj instanceof Npc || obj instanceof Player
+                      );
+                      
+                      allCharacters.forEach(character => {
+                          if (character.canvas) {
+                              character.canvas.style.display = 'none';
+                          }
+                      });
+                  }, 100); // Check and hide every 100ms
           
                   // Setup return to main game after mini-game ends
                   gameInGame.gameOver = function() {
+                      clearInterval(hideCharactersInterval); // Stop hiding characters
                       primaryGame.resume();
+                      
+                      // Keep all characters hidden after resume
+                      const allCharacters = gameEnv.gameObjects.filter(obj => 
+                          obj instanceof Npc || obj instanceof Player
+                      );
+                      
+                      allCharacters.forEach(character => {
+                          if (character.canvas) {
+                              character.canvas.style.display = 'none';
+                          }
+                      });
                   };
           
                   // Fade out

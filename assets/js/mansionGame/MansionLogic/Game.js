@@ -25,8 +25,10 @@ class GameCore {
     // create GameControl using the engine-provided class
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
+    // Setup Escape key for pause/resume
+    this._setupEscapeKey();
 
-    // Create top control buttons directly using features
+    // Create top control buttons (unless disabled for game runner/builder)
     if (!this.environment.disablePauseMenu) {
         this._createTopControls();
     }
@@ -59,6 +61,30 @@ class GameCore {
             // no-op: Leaderboard is optional
         });
 }
+
+    /**
+     * Setup Escape key listener for pause/resume functionality.
+     * This always works regardless of whether pause control buttons are enabled.
+     */
+    _setupEscapeKey() {
+        if (this.escapeKeyHandler) {
+            // Already set up, don't add duplicate listeners
+            return;
+        }
+        
+        this.escapeKeyHandler = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (this.gameControl && this.gameControl.isPaused) {
+                    this.gameControl.resume();
+                } else if (this.gameControl) {
+                    this.gameControl.pause();
+                }
+            }
+        };
+        
+        document.addEventListener('keydown', this.escapeKeyHandler);
+    }
 
     _createTopControls() {
         // Ensure pause-menu.css is loaded for button styling
@@ -103,20 +129,6 @@ class GameCore {
             buttonBar.style.display = 'flex';
             buttonBar.style.gap = '10px';
             buttonBar.style.zIndex = '9999';
-
-            // Pause button
-            const btnPause = document.createElement('button');
-            btnPause.className = 'pause-btn pause-toggle';
-            btnPause.innerText = 'Pause';
-            btnPause.addEventListener('click', () => {
-                if (this.gameControl.isPaused) {
-                    this.gameControl.resume();
-                    btnPause.innerText = 'Pause';
-                } else {
-                    this.gameControl.pause();
-                    btnPause.innerText = 'Resume';
-                }
-            });
 
             // Save Score button - with real save functionality
             const btnSave = document.createElement('button');
@@ -175,7 +187,6 @@ class GameCore {
                 }
             });
 
-            buttonBar.appendChild(btnPause);
             buttonBar.appendChild(btnSave);
             buttonBar.appendChild(btnSkipLevel);
             buttonBar.appendChild(btnToggleLeaderboard);
