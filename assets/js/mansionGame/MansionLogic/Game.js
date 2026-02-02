@@ -32,7 +32,7 @@ class GameCore {
     }
 
     // Try to dynamically load the Leaderboard
-    import('../../BetterGameEngine/features/Leaderboard.js')
+    import('../../GameEngine/features/Leaderboard.js')
         .then(mod => {
             try {
                 // Get the actual container element from gameContainer

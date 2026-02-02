@@ -23,7 +23,7 @@ This folder contains **optional add-on features** that enhance your game with pa
 
 **Usage:**
 ```javascript
-import PauseFeature from '../../BetterGameEngine/features/PauseFeature.js';
+import PauseFeature from '../../GameEngine/features/PauseFeature.js';
 
 // Create pause feature
 const pauseFeature = new PauseFeature(gameControl);
@@ -57,7 +57,7 @@ scoreFeature.saveScore(buttonElement);
 
 **Usage:**
 ```javascript
-import ScoreFeature from '../../BetterGameEngine/features/ScoreFeature.js';
+import ScoreFeature from '../../GameEngine/features/ScoreFeature.js';
 
 const scoreFeature = new ScoreFeature(pauseMenu);
 scoreFeature.saveScore(buttonElement);
@@ -79,7 +79,7 @@ scoreFeature.saveScore(buttonElement);
 
 **Usage:**
 ```javascript
-import Leaderboard from '../../BetterGameEngine/features/Leaderboard.js';
+import Leaderboard from '../../GameEngine/features/Leaderboard.js';
 
 const leaderboard = new Leaderboard(gameControl, {
   gameName: 'AdventureGame',
@@ -93,7 +93,7 @@ const leaderboard = new Leaderboard(gameControl, {
 
 **Usage:**
 ```javascript
-import LevelSkipFeature from '../../BetterGameEngine/features/LevelSkipFeature.js';
+import LevelSkipFeature from '../../GameEngine/features/LevelSkipFeature.js';
 
 // Create level skip feature
 const skipFeature = new LevelSkipFeature(gameControl);
@@ -133,7 +133,7 @@ pauseMenu.skipLevel();
 
 **Usage:**
 ```javascript
-import DialogueSystem from '../../BetterGameEngine/features/DialogueSystem.js';
+import DialogueSystem from '../../GameEngine/features/DialogueSystem.js';
 
 const dialogue = new DialogueSystem(npc, player);
 dialogue.startConversation();
@@ -155,7 +155,7 @@ dialogue.startConversation();
 
 **Usage:**
 ```javascript
-import { RigidBody } from '../../BetterGameEngine/features/RigidBody.js';
+import { RigidBody } from '../../GameEngine/features/RigidBody.js';
 
 const rigidBody = new RigidBody(transform, mass = 1, fixed = false);
 rigidBody.LinearForce(force = 50, direction = 45);
@@ -172,7 +172,7 @@ Visual effects and rendering features
 
 **Usage:**
 ```javascript
-import BackgroundParallax from '../../BetterGameEngine/features/rendering/BackgroundParallax.js';
+import BackgroundParallax from '../../GameEngine/features/rendering/BackgroundParallax.js';
 
 const parallax = new BackgroundParallax(gameEnv, [
   { image: 'bg-far.png', speed: 0.3 },
@@ -190,7 +190,7 @@ Game system utilities
 
 **Usage:**
 ```javascript
-import InteractionManager from '../../BetterGameEngine/features/systems/InteractionManager.js';
+import InteractionManager from '../../GameEngine/features/systems/InteractionManager.js';
 
 const interactions = new InteractionManager(player, gameObjects);
 interactions.checkInteractions(); // Each frame
@@ -203,24 +203,24 @@ interactions.checkInteractions(); // Each frame
 ### Option 1: Import Individual Features
 ```javascript
 // Just what you need
-import ScoreFeature from '../../BetterGameEngine/features/ScoreFeature.js';
-import Leaderboard from '../../BetterGameEngine/features/Leaderboard.js';
-import { RigidBody } from '../../BetterGameEngine/features/RigidBody.js';
+import ScoreFeature from '../../GameEngine/features/ScoreFeature.js';
+import Leaderboard from '../../GameEngine/features/Leaderboard.js';
+import { RigidBody } from '../../GameEngine/features/RigidBody.js';
 ```
 
 ### Option 3: Mix and Match
 ```javascript
 // Use some features, skip others
-import PauseMenu from '../../BetterGameEngine/features/PauseMenu.js';
-import DialogueSystem from '../../BetterGameEngine/features/DialogueSystem.js';
-import { BackgroundParallax } from '../../BetterGameEngine/features/rendering/BackgroundParallax.js';
+import PauseMenu from '../../GameEngine/features/PauseMenu.js';
+import DialogueSystem from '../../GameEngine/features/DialogueSystem.js';
+import { BackgroundParallax } from '../../GameEngine/features/rendering/BackgroundParallax.js';
 ```
 
 ---Import just what you need
-import PauseFeature from '../../BetterGameEngine/features/PauseFeature.js';
-import ScoreFeature from '../../BetterGameEngine/features/ScoreFeature.js';
-import Leaderboard from '../../BetterGameEngine/features/Leaderboard.js';
-import { RigidBody } from '../../BetterGameEngine/features/RigidBody.js';
+import PauseFeature from '../../GameEngine/features/PauseFeature.js';
+import ScoreFeature from '../../GameEngine/features/ScoreFeature.js';
+import Leaderboard from '../../GameEngine/features/Leaderboard.js';
+import { RigidBody } from '../../GameEngine/features/RigidBody.js';
 
 // Set up in your game
 const pauseFeature = new PauseFeature(gameControl);
@@ -230,9 +230,9 @@ const scoreFeature = new ScoreFeature(scoreConfig);
 ### Option 2: Mix and Match
 ```javascript
 // Use some features, skip others
-import DialogueSystem from '../../BetterGameEngine/features/DialogueSystem.js';
-import { BackgroundParallax } from '../../BetterGameEngine/features/rendering/BackgroundParallax.js';
-import LevelSkipFeature from '../../BetterGameEngine/features/LevelSkipFeature
+import DialogueSystem from '../../GameEngine/features/DialogueSystem.js';
+import { BackgroundParallax } from '../../GameEngine/features/rendering/BackgroundParallax.js';
+import LevelSkipFeature from '../../GameEngine/features/LevelSkipFeature
 
 RigidBody (standalone)
   └─ Feature (standalone)

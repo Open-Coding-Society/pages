@@ -11,8 +11,8 @@ permalink: /gamify/basic
 
 <script type="module">
     // Adventure Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/essentials/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/essentials/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/GameEngine/essentials/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/GameEngine/essentials/GameControl.js";
     import GameLevelBasic from "{{site.baseurl}}/assets/js/adventureGame/GameLevelBasic.js";
     import GameLevelBasicWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelBasicWater.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';

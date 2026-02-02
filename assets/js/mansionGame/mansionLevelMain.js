@@ -10,7 +10,7 @@ import GameLevel4 from './mansionLevel4.js';
 import GameLevel5 from './mansionLevel5.js';
 import GameLevel6 from './mansionLevel6.js';
 
-import('../BetterGameEngine/features/Leaderboard.js')
+import('../GameEngine/features/Leaderboard.js')
     .then(mod => {
         try { 
             new mod.default(this.gameControl, { 

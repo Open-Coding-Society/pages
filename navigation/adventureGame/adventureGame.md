@@ -35,8 +35,8 @@ body {
 <script type="module">
 
     // Adventure Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/essentials/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/BetterGameEngine/essentials/GameControl.js";
+    import Core from "{{site.baseurl}}/assets/js/GameEngine/essentials/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/GameEngine/essentials/GameControl.js";
     import GameLevelWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWater.js";
     import GameLevelDesert from "{{site.baseurl}}/assets/js/adventureGame/GameLevelDesert.js";
     import GameLevelEnd from "{{site.baseurl}}/assets/js/adventureGame/GameLevelEnd.js";

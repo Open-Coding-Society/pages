@@ -1,4 +1,4 @@
-import GameObject from '../BetterGameEngine/essentials/GameObject.js';
+import GameObject from '../GameEngine/essentials/GameObject.js';
 
 class Barrier extends GameObject {
     constructor(data = {}, gameEnv = null) {

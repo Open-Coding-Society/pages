@@ -1,10 +1,10 @@
-import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
-import Npc from '../BetterGameEngine/gameObjects/Npc.js';
-import Player from '../BetterGameEngine/gameObjects/Player.js';
-import GameControl from '../BetterGameEngine/essentials/GameControl.js';
+import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
+import Npc from '../GameEngine/gameObjects/Npc.js';
+import Player from '../GameEngine/gameObjects/Player.js';
+import GameControl from '../GameEngine/essentials/GameControl.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 
-import Game from '../BetterGameEngine/essentials/Game.js';
+import Game from '../GameEngine/essentials/Game.js';
 import GameLevelWallstreet from './GameLevelWallstreet.js';
 class GameLevelRetro {
   /**
