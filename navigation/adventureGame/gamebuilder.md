@@ -8,7 +8,7 @@ permalink: /rpg/gamebuilder
 <style>
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
 
-/* Hide BetterGameEngine control buttons in gamebuilder iframe */
+/* Hide GameEngine control buttons in gamebuilder iframe */
 iframe .pause-button-bar,
 iframe button.pause-btn,
 iframe .leaderboard-widget {
@@ -802,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function getImportsBlock() {
                 // Keep the editor focused for learners: only show the minimal import lines
-                return `import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';\nimport Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
+                return `import GameEnvBackground from '/assets/js/GameEngine/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/GameEngine/gameObjects/Player.js';\nimport Npc from '/assets/js/GameEngine/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
             }
 
         function generateStepCode(currentStep) {

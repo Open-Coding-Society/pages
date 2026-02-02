@@ -72,9 +72,9 @@ class GameCore {
 
         // Dynamically import the features and create controls
         Promise.all([
-            import('../../BetterGameEngine/features/ScoreFeature.js'),
-            import('../../BetterGameEngine/features/PauseFeature.js'),
-            import('../../BetterGameEngine/features/LevelSkipFeature.js')
+            import('../../GameEngine/features/ScoreFeature.js'),
+            import('../../GameEngine/features/PauseFeature.js'),
+            import('../../GameEngine/features/LevelSkipFeature.js')
         ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
             const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
             
