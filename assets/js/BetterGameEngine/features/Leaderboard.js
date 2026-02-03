@@ -435,7 +435,7 @@ export default class Leaderboard {
     }
 
     async addElementaryScore() {
-        console.log('=== ADD ELEMENTARY SCORE - NEW VERSION v2 ===');
+        console.log('=== ADD ELEMENTARY SCORE ===');
         const nameInput = document.getElementById('player-name');
         const scoreInput = document.getElementById('player-score');
 
@@ -447,7 +447,7 @@ export default class Leaderboard {
             return;
         }
 
-        const endpoint = '/api/elementary-leaderboard';
+        const endpoint = '/api/events/ELEMENTARY_LEADERBOARD';
         console.log('POST endpoint:', endpoint);
 
         try {
@@ -458,13 +458,15 @@ export default class Leaderboard {
             const url = `${base.replace(/\/$/, '')}${endpoint}`;
             console.log('Full URL:', url);
 
-            // Create payload without id to ensure new entry is created
-            const payload = {
-                user: name,
-                score: score,
-                gameName: this.gameName
+            // Create payload matching Java backend structure
+            const requestBody = {
+                payload: {
+                    user: name,
+                    score: score,
+                    gameName: this.gameName
+                }
             };
-            console.log('Payload:', JSON.stringify(payload));
+            console.log('Payload:', JSON.stringify(requestBody));
 
             // POST to backend
             const res = await fetch(
@@ -475,7 +477,7 @@ export default class Leaderboard {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'omit',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(requestBody)
                 }
             );
 
@@ -520,7 +522,7 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
-            const url = `${base.replace(/\/$/, '')}/api/elementary-leaderboard/${id}`;
+            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
             console.log('DELETE URL:', url);
 
             // DELETE from backend
@@ -556,7 +558,7 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
-            const url = `${base.replace(/\/$/, '')}/api/elementary-leaderboard`;
+            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD`;
             console.log('Fetching from:', url);
 
             const res = await fetch(
@@ -570,9 +572,20 @@ export default class Leaderboard {
             console.log('Received data:', data);
             console.log('Number of entries:', data.length);
             
-            // Update local entries with backend data
-            this.elementaryEntries = data;
-            console.log('Updated elementaryEntries:', this.elementaryEntries);
+            // Transform backend data to frontend format
+            // Backend returns: { id, user (User object or null), algoName, payload, timestamp }
+            // Frontend needs: { id, user (string), score, gameName }
+            this.elementaryEntries = data
+                .map(event => ({
+                    id: event.id,
+                    user: event.payload?.user || 'Anonymous',
+                    score: event.payload?.score || 0,
+                    gameName: event.payload?.gameName || this.gameName,
+                    timestamp: event.timestamp
+                }))
+                .sort((a, b) => b.score - a.score); // Sort by score descending
+            
+            console.log('Transformed elementaryEntries:', this.elementaryEntries);
             
             // Force display update
             this.displayElementaryLeaderboard();
@@ -684,7 +697,7 @@ export default class Leaderboard {
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
             const res = await fetch(
-                `${base.replace(/\/$/, '')}/api/leaderboard`,
+                `${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`,
                 { ...fetchOptions, method: 'GET', credentials: 'omit' }
             );
 
@@ -700,12 +713,27 @@ export default class Leaderboard {
         const list = document.getElementById('leaderboard-list');
         const preview = document.getElementById('leaderboard-preview');
 
-        if (!Array.isArray(data) || !data.length) {
+        // Transform backend data to frontend format
+        // Backend returns: { id, user (User object or null), algoName, payload, timestamp }
+        // Frontend needs: { user (string), score, gameName }
+        const transformedData = data
+            .map(event => ({
+                id: event.id,
+                user: event.payload?.user || event.payload?.username || 'Anonymous',
+                username: event.payload?.user || event.payload?.username || 'Anonymous',
+                score: event.payload?.score || 0,
+                gameName: event.payload?.gameName || event.payload?.game || 'Unknown',
+                game: event.payload?.gameName || event.payload?.game || 'Unknown',
+                timestamp: event.timestamp
+            }))
+            .sort((a, b) => b.score - a.score); // Sort by score descending
+
+        if (!Array.isArray(transformedData) || !transformedData.length) {
             list.innerHTML = '<p>No scores yet</p>';
             return;
         }
 
-        const top = data[0];
+        const top = transformedData[0];
         if (preview) {
             preview.textContent = `High Score: ${top.user || top.username} - ${Number(top.score).toLocaleString()}`;
         }
@@ -723,7 +751,7 @@ export default class Leaderboard {
                 <tbody>
         `;
 
-        data.forEach((e, i) => {
+        transformedData.forEach((e, i) => {
             html += `
                 <tr>
                     <td class="rank">${i + 1}</td>
