@@ -168,10 +168,10 @@ class GameCore {
                 }
             });
 
-            // Toggle Leaderboard button
+            // Toggle Leaderboard button - starts as "Show Leaderboard" since it's hidden by default
             const btnToggleLeaderboard = document.createElement('button');
             btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
-            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+            btnToggleLeaderboard.innerText = 'Show Leaderboard';
             btnToggleLeaderboard.addEventListener('click', () => {
                 if (this.leaderboardInstance) {
                     this.leaderboardInstance.toggleVisibility();
