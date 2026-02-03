@@ -58,7 +58,7 @@ body {
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
         gameLevelClasses: gameLevelClasses,
-        disablePauseMenu: true,  // Disable pause menu buttons
+        disablePauseMenu: false,  // Enable pause menu buttons
         // Global photographic background for the entire game. Replace with your local image if desired.
         globalBackgroundData: {
             src: "{{site.baseurl}}/images/mansionGame/mansion_outside_photo.png",

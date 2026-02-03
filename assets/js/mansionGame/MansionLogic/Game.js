@@ -128,12 +128,30 @@ class GameCore {
             buttonBar.style.left = '20px';
             buttonBar.style.display = 'flex';
             buttonBar.style.gap = '10px';
+            buttonBar.style.alignItems = 'center';
+            buttonBar.style.flexWrap = 'wrap';
             buttonBar.style.zIndex = '9999';
+
+            // Toggle button for showing/hiding Save/Skip controls
+            const btnToggleControls = document.createElement('button');
+            btnToggleControls.className = 'pause-btn toggle-controls';
+            btnToggleControls.innerText = 'Settings';
+            btnToggleControls.title = 'Show score/skip controls';
+            btnToggleControls.setAttribute('aria-expanded', 'false');
+
+            // Container for toggled controls
+            const actionContainer = document.createElement('div');
+            actionContainer.className = 'pause-controls-dropdown';
 
             // Save Score button - with real save functionality
             const btnSave = document.createElement('button');
             btnSave.className = 'pause-btn save-score';
             btnSave.innerText = 'Save Score';
+            btnSave.style.display = 'inline-flex';
+            btnSave.style.width = 'auto';
+            btnSave.style.margin = '0';
+            btnSave.style.padding = '8px 12px';
+            btnSave.style.fontSize = '0.9rem';
             
             // Instantiate ScoreFeature for real save functionality
             let scoreFeature = null;
@@ -156,6 +174,11 @@ class GameCore {
             const btnSkipLevel = document.createElement('button');
             btnSkipLevel.className = 'pause-btn skip-level';
             btnSkipLevel.innerText = 'Skip Level';
+            btnSkipLevel.style.display = 'inline-flex';
+            btnSkipLevel.style.width = 'auto';
+            btnSkipLevel.style.margin = '0';
+            btnSkipLevel.style.padding = '8px 12px';
+            btnSkipLevel.style.fontSize = '0.9rem';
             btnSkipLevel.addEventListener('click', () => {
                 if (typeof this.gameControl.endLevel === 'function') {
                     this.gameControl.endLevel();
@@ -187,10 +210,20 @@ class GameCore {
                 }
             });
 
-            buttonBar.appendChild(btnSave);
-            buttonBar.appendChild(btnSkipLevel);
+            btnToggleControls.addEventListener('click', () => {
+                const isHidden = !actionContainer.classList.contains('is-open');
+                actionContainer.classList.toggle('is-open', isHidden);
+                btnToggleControls.title = isHidden ? 'Hide score/skip controls' : 'Show score/skip controls';
+                btnToggleControls.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            });
+
+            actionContainer.appendChild(btnSave);
+            actionContainer.appendChild(btnSkipLevel);
+
+            buttonBar.appendChild(btnToggleControls);
             buttonBar.appendChild(btnToggleLeaderboard);
             parent.appendChild(buttonBar);
+            parent.appendChild(actionContainer);
             
         }).catch(err => {
             console.warn('Failed to load control features:', err);
