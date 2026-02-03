@@ -19,7 +19,7 @@ Unlike essentials (required) or features (optional), game objects are **building
 
 **Usage:**
 ```javascript
-import Player from '../../BetterGameEngine/gameObjects/Player.js';
+import Player from '../../GameEngine/gameObjects/Player.js';
 
 const player = new Player(gameEnv, x, y, 'assets/sprites/player.png');
 player.setSpeed(5);
@@ -38,7 +38,7 @@ player.setSpeed(5);
 
 **Usage:**
 ```javascript
-import Enemy from '../../BetterGameEngine/gameObjects/Enemy.js';
+import Enemy from '../../GameEngine/gameObjects/Enemy.js';
 
 const enemy = new Enemy(gameEnv, x, y, 'assets/sprites/enemy.png');
 enemy.setMovementPattern('patrol', [x1, x2]); // Patrol between points
@@ -57,7 +57,7 @@ enemy.setMovementPattern('patrol', [x1, x2]); // Patrol between points
 
 **Usage:**
 ```javascript
-import Npc from '../../BetterGameEngine/gameObjects/Npc.js';
+import Npc from '../../GameEngine/gameObjects/Npc.js';
 
 const npc = new Npc(gameEnv, x, y, 'assets/sprites/npc.png');
 npc.setDialogue([
@@ -79,7 +79,7 @@ npc.setDialogue([
 
 **Usage:**
 ```javascript
-import Collectible from '../../BetterGameEngine/gameObjects/Collectible.js';
+import Collectible from '../../GameEngine/gameObjects/Collectible.js';
 
 const coin = new Collectible(gameEnv, x, y, 'coin', 10);
 coin.onCollect = (player) => {
@@ -100,7 +100,7 @@ coin.onCollect = (player) => {
 
 **Usage:**
 ```javascript
-import AiNpc from '../../BetterGameEngine/gameObjects/ai/AiNpc.js';
+import AiNpc from '../../GameEngine/gameObjects/ai/AiNpc.js';
 
 const aiNpc = new AiNpc(gameEnv, x, y, 'assets/sprites/npc-smart.png');
 aiNpc.setBehavior('chase_player'); // Or 'patrol', 'flee', 'idle'
@@ -134,7 +134,7 @@ Each class:
 
 ### Simple Object (copy and modify):
 ```javascript
-import Character from '../../BetterGameEngine/essentials/Character.js';
+import Character from '../../GameEngine/essentials/Character.js';
 
 export default class MyCustomEnemy extends Character {
   constructor(gameEnv, x, y, imagePath) {
@@ -247,8 +247,8 @@ class BossEnemy extends Enemy {
 
 ### With DialogueSystem:
 ```javascript
-import Npc from '../../BetterGameEngine/gameObjects/Npc.js';
-import DialogueSystem from '../../BetterGameEngine/features/DialogueSystem.js';
+import Npc from '../../GameEngine/gameObjects/Npc.js';
+import DialogueSystem from '../../GameEngine/features/DialogueSystem.js';
 
 const merchant = new Npc(gameEnv, 300, 200, 'merchant.png');
 const dialogue = new DialogueSystem(merchant, player);
@@ -266,7 +266,7 @@ coin.onCollect = (player) => {
 
 ### With Physics (RigidBody):
 ```javascript
-import { RigidBody } from '../../BetterGameEngine/features/RigidBody.js';
+import { RigidBody } from '../../GameEngine/features/RigidBody.js';
 
 const rigidEnemy = new Enemy(gameEnv, x, y, 'enemy.png');
 rigidEnemy.rigidBody = new RigidBody(rigidEnemy.transform, 2, false);

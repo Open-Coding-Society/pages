@@ -25,14 +25,16 @@ class GameCore {
     // create GameControl using the engine-provided class
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
+    // Setup Escape key for pause/resume
+    this._setupEscapeKey();
 
-    // Create top control buttons directly using features
+    // Create top control buttons (unless disabled for game runner/builder)
     if (!this.environment.disablePauseMenu) {
         this._createTopControls();
     }
 
     // Try to dynamically load the Leaderboard
-    import('../../BetterGameEngine/features/Leaderboard.js')
+    import('../../GameEngine/features/Leaderboard.js')
         .then(mod => {
             try {
                 // Get the actual container element from gameContainer
@@ -60,6 +62,30 @@ class GameCore {
         });
 }
 
+    /**
+     * Setup Escape key listener for pause/resume functionality.
+     * This always works regardless of whether pause control buttons are enabled.
+     */
+    _setupEscapeKey() {
+        if (this.escapeKeyHandler) {
+            // Already set up, don't add duplicate listeners
+            return;
+        }
+        
+        this.escapeKeyHandler = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (this.gameControl && this.gameControl.isPaused) {
+                    this.gameControl.resume();
+                } else if (this.gameControl) {
+                    this.gameControl.pause();
+                }
+            }
+        };
+        
+        document.addEventListener('keydown', this.escapeKeyHandler);
+    }
+
     _createTopControls() {
         // Ensure pause-menu.css is loaded for button styling
         const cssPath = '/assets/css/pause-menu.css';
@@ -72,9 +98,9 @@ class GameCore {
 
         // Dynamically import the features and create controls
         Promise.all([
-            import('../../BetterGameEngine/features/ScoreFeature.js'),
-            import('../../BetterGameEngine/features/PauseFeature.js'),
-            import('../../BetterGameEngine/features/LevelSkipFeature.js')
+            import('../../GameEngine/features/ScoreFeature.js'),
+            import('../../GameEngine/features/PauseFeature.js'),
+            import('../../GameEngine/features/LevelSkipFeature.js')
         ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
             const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
             
@@ -103,20 +129,6 @@ class GameCore {
             buttonBar.style.display = 'flex';
             buttonBar.style.gap = '10px';
             buttonBar.style.zIndex = '9999';
-
-            // Pause button
-            const btnPause = document.createElement('button');
-            btnPause.className = 'pause-btn pause-toggle';
-            btnPause.innerText = 'Pause';
-            btnPause.addEventListener('click', () => {
-                if (this.gameControl.isPaused) {
-                    this.gameControl.resume();
-                    btnPause.innerText = 'Pause';
-                } else {
-                    this.gameControl.pause();
-                    btnPause.innerText = 'Resume';
-                }
-            });
 
             // Save Score button - with real save functionality
             const btnSave = document.createElement('button');
@@ -175,7 +187,6 @@ class GameCore {
                 }
             });
 
-            buttonBar.appendChild(btnPause);
             buttonBar.appendChild(btnSave);
             buttonBar.appendChild(btnSkipLevel);
             buttonBar.appendChild(btnToggleLeaderboard);
