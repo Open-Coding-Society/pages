@@ -1,10 +1,9 @@
 /**
- * AINpc.js - BASE CLASS (DO NOT MODIFY)
- * Modified to integrate chat into dialogue box
- * DEBUG VERSION - WITH EXTENSIVE CONSOLE LOGGING
+ * AINpc.js - BASE CLASS 
  */
 
 import DialogueSystem from '../../features/DialogueSystem.js';
+import { pythonURI, javaURI, fetchOptions } from '../../../api/config.js';
 
 class AINpc {
   constructor(config) {
@@ -164,9 +163,9 @@ class AINpc {
             // Create a unique session ID for this NPC conversation
             const sessionId = `player-${config.id}`;
 
-            const response = await fetch('http://127.0.0.1:8587/api/ainpc/prompt', {
+            const response = await fetch(`${pythonURI}/api/ainpc/prompt`, {
+              ...fetchOptions,
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 prompt: userMessage,
                 session_id: sessionId,
