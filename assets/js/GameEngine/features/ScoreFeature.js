@@ -55,7 +55,7 @@ export default class ScoreFeature {
         const scoreCounter = document.createElement('div');
         scoreCounter.className = 'pause-score-counter';
         scoreCounter.style.position = 'fixed';
-        scoreCounter.style.top = '20px';
+        scoreCounter.style.top = '130px';
         scoreCounter.style.right = '20px';
         scoreCounter.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
         scoreCounter.style.color = '#fff';

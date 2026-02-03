@@ -259,8 +259,11 @@ class GameCore {
             import('../features/PauseFeature.js'),
             import('../features/LevelSkipFeature.js')
         ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
-            
+            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;            
+            // Ensure parent has proper positioning context for fixed elements
+            if (parent !== document.body) {
+                parent.style.position = 'relative';
+            }            
             // Create a lightweight pause menu object that ScoreFeature can use
             const pauseMenuObj = {
                 gameControl: this.gameControl,
@@ -291,10 +294,16 @@ class GameCore {
 
             // Toggle button for showing/hiding Save/Skip controls
             const btnToggleControls = document.createElement('button');
-            btnToggleControls.className = 'pause-btn toggle-controls';
+            btnToggleControls.className = 'medium filledHighlight primary';
             btnToggleControls.innerText = 'Settings';
             btnToggleControls.title = 'Show score/skip controls';
             btnToggleControls.setAttribute('aria-expanded', 'false');
+            btnToggleControls.style.cssText = `
+                background-color: #a46ae3ff;
+                font-weight: bold;
+                font-size: 12px;
+                font: 'Press Start 2P', monospace;
+            `;
 
             // Container for toggled controls
             const actionContainer = document.createElement('div');
@@ -350,8 +359,14 @@ class GameCore {
 
             // NEW: Toggle Leaderboard button - starts as "Show Leaderboard" since it's hidden by default
             const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
+            btnToggleLeaderboard.className = 'medium filledHighlight primary';
             btnToggleLeaderboard.innerText = 'Show Leaderboard';
+            btnToggleLeaderboard.style.cssText = `
+                background-color: #e67e22;
+                font-weight: bold;
+                font-size: 12px;
+                font: 'Press Start 2P', monospace;
+            `;
             btnToggleLeaderboard.addEventListener('click', () => {
                 if (this.leaderboardInstance) {
                     this.leaderboardInstance.toggleVisibility();

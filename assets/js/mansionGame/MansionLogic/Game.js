@@ -100,9 +100,17 @@ class GameCore {
         Promise.all([
             import('../../GameEngine/features/ScoreFeature.js'),
             import('../../GameEngine/features/PauseFeature.js'),
-            import('../../GameEngine/features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
+            import('../../GameEngine/features/LevelSkipFeature.js'),
+            import('./cheats.js')
+        ]).then(([ScoreModule, PauseModule, LevelSkipModule, CheatsModule]) => {
+            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;            
+            // Ensure parent has proper positioning context for fixed elements
+            if (parent !== document.body) {
+                parent.style.position = 'relative';
+            }
+            
+            // Initialize footer layout with level navigation and cheats menu
+            CheatsModule.addLevelNavigationButtons(this);
             
             // Create a lightweight pause menu object that ScoreFeature can use
             const pauseMenuObj = {
@@ -119,25 +127,19 @@ class GameCore {
                 scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
                 _saveStatusNode: null
             };
-            
-            // Create button bar
-            const buttonBar = document.createElement('div');
-            buttonBar.className = 'pause-button-bar';
-            buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '60px';
-            buttonBar.style.left = '20px';
-            buttonBar.style.display = 'flex';
-            buttonBar.style.gap = '10px';
-            buttonBar.style.alignItems = 'center';
-            buttonBar.style.flexWrap = 'wrap';
-            buttonBar.style.zIndex = '9999';
 
             // Toggle button for showing/hiding Save/Skip controls
             const btnToggleControls = document.createElement('button');
-            btnToggleControls.className = 'pause-btn toggle-controls';
+            btnToggleControls.className = 'medium filledHighlight primary';
             btnToggleControls.innerText = 'Settings';
             btnToggleControls.title = 'Show score/skip controls';
             btnToggleControls.setAttribute('aria-expanded', 'false');
+            btnToggleControls.style.cssText = `
+                background-color: #a46ae3ff;
+                font-weight: bold;
+                font-size: 12px;
+                font: 'Press Start 2P', monospace;
+            `;
 
             // Container for toggled controls
             const actionContainer = document.createElement('div');
@@ -193,8 +195,14 @@ class GameCore {
 
             // Toggle Leaderboard button - starts as "Show Leaderboard" since it's hidden by default
             const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
+            btnToggleLeaderboard.className = 'medium filledHighlight primary';
             btnToggleLeaderboard.innerText = 'Show Leaderboard';
+            btnToggleLeaderboard.style.cssText = `
+                background-color: #e67e22;
+                font-weight: bold;
+                font-size: 12px;
+                font: 'Press Start 2P', monospace;
+            `;
             btnToggleLeaderboard.addEventListener('click', () => {
                 if (this.leaderboardInstance) {
                     this.leaderboardInstance.toggleVisibility();
@@ -228,10 +236,30 @@ class GameCore {
                 setControlsOpen(isHidden);
             });
 
-            buttonBar.appendChild(btnToggleControls);
-            buttonBar.appendChild(btnToggleLeaderboard);
-            parent.appendChild(buttonBar);
-            parent.appendChild(actionContainer);
+            // Place buttons in the left-of-home container that was created by addLevelNavigationButtons
+            const leftContainer = document.getElementById('mansion-game-controls-container');
+            if (leftContainer) {
+                leftContainer.appendChild(btnToggleControls);
+                leftContainer.appendChild(btnToggleLeaderboard);
+                parent.appendChild(actionContainer);
+                console.log('Settings and Leaderboard buttons placed in footer left container');
+            } else {
+                console.warn('mansion-game-controls-container not found, using default placement');
+                const buttonBar = document.createElement('div');
+                buttonBar.className = 'pause-button-bar';
+                buttonBar.style.position = 'fixed';
+                buttonBar.style.top = '60px';
+                buttonBar.style.left = '20px';
+                buttonBar.style.display = 'flex';
+                buttonBar.style.gap = '10px';
+                buttonBar.style.alignItems = 'center';
+                buttonBar.style.flexWrap = 'wrap';
+                buttonBar.style.zIndex = '9999';
+                buttonBar.appendChild(btnToggleControls);
+                buttonBar.appendChild(btnToggleLeaderboard);
+                parent.appendChild(buttonBar);
+                parent.appendChild(actionContainer);
+            }
             
         }).catch(err => {
             console.warn('Failed to load control features:', err);
