@@ -367,15 +367,23 @@ class GameCore {
                 }
             });
 
+            const setControlsOpen = (open) => {
+                actionContainer.classList.toggle('is-open', open);
+                btnToggleControls.title = open ? 'Hide score/skip controls' : 'Show score/skip controls';
+                btnToggleControls.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (open) {
+                    actionContainer.replaceChildren(btnSave, btnSkipLevel);
+                    console.log('Buttons added to DOM', 'Container children count:', actionContainer.children.length);
+                } else {
+                    actionContainer.replaceChildren();
+                    console.log('Buttons deleted from DOM', 'Container children count:', actionContainer.children.length);
+                }
+            };
+
             btnToggleControls.addEventListener('click', () => {
                 const isHidden = !actionContainer.classList.contains('is-open');
-                actionContainer.classList.toggle('is-open', isHidden);
-                btnToggleControls.title = isHidden ? 'Hide score/skip controls' : 'Show score/skip controls';
-                btnToggleControls.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+                setControlsOpen(isHidden);
             });
-
-            actionContainer.appendChild(btnSave);
-            actionContainer.appendChild(btnSkipLevel);
 
             buttonBar.appendChild(btnToggleControls);
             buttonBar.appendChild(btnToggleLeaderboard);
