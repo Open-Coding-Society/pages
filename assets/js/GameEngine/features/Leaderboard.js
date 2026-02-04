@@ -10,6 +10,7 @@ export default class Leaderboard {
         this.mode = null; // 'dynamic' or 'elementary'
         this.showingTypeSelection = true;
         this.elementaryEntries = []; // Store elementary entries locally
+        this.initiallyHidden = options.initiallyHidden !== false; // Default to hidden
 
         if (!javaURI) {
             console.error('[Leaderboard] javaURI is not defined');
@@ -32,12 +33,17 @@ export default class Leaderboard {
         style.textContent = `
         .leaderboard-widget {
             width: 350px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #1a1a1a;
+            border: 2px solid #333;
             border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,.35);
+            box-shadow: 0 10px 40px rgba(0,0,0,.6);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             z-index: 1000;
             overflow: hidden;
+        }
+
+        .leaderboard-widget.initially-hidden {
+            display: none;
         }
 
         /* Embedded inside game canvas */
@@ -62,22 +68,29 @@ export default class Leaderboard {
             color: white;
             font-size: 20px;
             font-weight: 700;
-            background: rgba(255,255,255,0.1);
+            background: #2d2d2d;
+            border-bottom: 2px solid #444;
         }
 
         .toggle-btn {
-            background: rgba(255,255,255,.2);
-            border: none;
+            background: #3a3a3a;
+            border: 1px solid #555;
             color: white;
             width: 32px;
             height: 32px;
             border-radius: 50%;
             font-size: 22px;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #4a4a4a;
+            border-color: #666;
         }
 
         .leaderboard-content {
-            background: white;
+            background: #1a1a1a;
             max-height: 400px;
             overflow-y: auto;
         }
@@ -95,12 +108,22 @@ export default class Leaderboard {
         .leaderboard-table td {
             padding: 12px 8px;
             font-size: 14px;
-            border-bottom: 1px solid #f1f3f5;
+            border-bottom: 1px solid #333;
         }
 
-        .rank { font-weight: 800; }
-        .username { font-weight: 600; }
-        .score { font-weight: 800; color: #667eea; }
+        .leaderboard-table th {
+            color: #aaa;
+            font-weight: 600;
+            background: #252525;
+        }
+
+        .leaderboard-table td {
+            color: #ddd;
+        }
+
+        .rank { font-weight: 800; color: #ffd700; }
+        .username { font-weight: 600; color: #fff; }
+        .score { font-weight: 800; color: #4a9eff; }
 
         /* Type selection styles */
         .type-selection {
@@ -110,7 +133,7 @@ export default class Leaderboard {
 
         .type-selection h3 {
             margin: 0 0 20px 0;
-            color: #333;
+            color: #fff;
             font-size: 18px;
         }
 
@@ -122,9 +145,9 @@ export default class Leaderboard {
 
         .type-btn {
             padding: 14px 20px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
+            border: 2px solid #4a9eff;
+            background: #2d2d2d;
+            color: #4a9eff;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
@@ -133,13 +156,15 @@ export default class Leaderboard {
         }
 
         .type-btn:hover {
-            background: #667eea;
-            color: white;
+            background: #4a9eff;
+            color: #1a1a1a;
+            border-color: #5aafff;
         }
 
         /* Elementary form styles */
         .elementary-form {
             padding: 20px;
+            background: #1a1a1a;
         }
 
         .form-group {
@@ -149,7 +174,7 @@ export default class Leaderboard {
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            color: #333;
+            color: #ccc;
             font-weight: 600;
             font-size: 14px;
         }
@@ -157,49 +182,52 @@ export default class Leaderboard {
         .form-group input {
             width: 100%;
             padding: 10px;
-            border: 2px solid #e1e8ed;
+            border: 2px solid #333;
             border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
             background: #2d2d2d;
             color: #fff;
+            transition: border-color 0.2s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #4a9eff;
         }
 
         .submit-btn {
             width: 100%;
             padding: 12px;
-            background: #667eea;
-            color: white;
+            background: #4a9eff;
+            color: #1a1a1a;
             border: none;
             border-radius: 6px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 8px;
+            transition: all 0.2s;
         }
 
         .submit-btn:hover {
-            background: #5568d3;
+            background: #5aafff;
+            transform: translateY(-1px);
         }
 
         .loading, .error {
             padding: 20px;
             text-align: center;
-            color: #666;
+            color: #aaa;
         }
 
         .error {
-            color: #e74c3c;
+            color: #ff6b6b;
         }
 
         .back-btn {
-            background: rgba(255,255,255,.2);
-            border: none;
+            background: #3a3a3a;
+            border: 1px solid #555;
             color: white;
             padding: 8px 16px;
             border-radius: 6px;
@@ -207,14 +235,16 @@ export default class Leaderboard {
             font-weight: 600;
             cursor: pointer;
             margin-right: 10px;
+            transition: all 0.2s;
         }
 
         .back-btn:hover {
-            background: rgba(255,255,255,.3);
+            background: #4a4a4a;
+            border-color: #666;
         }
 
         .delete-btn {
-            background: #e74c3c;
+            background: #ff6b6b;
             border: none;
             color: white;
             padding: 6px 12px;
@@ -222,11 +252,12 @@ export default class Leaderboard {
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .delete-btn:hover {
-            background: #c0392b;
+            background: #ff5252;
+            transform: translateY(-1px);
         }
         `;
         document.head.appendChild(style);
@@ -263,7 +294,7 @@ export default class Leaderboard {
         container.id = 'leaderboard-container';
         container.className = `leaderboard-widget ${
             embedded ? 'leaderboard-embedded' : 'leaderboard-fixed'
-        }`;
+        }${this.initiallyHidden ? ' initially-hidden' : ''}`;
 
         container.innerHTML = `
             <div class="leaderboard-header">
@@ -435,7 +466,7 @@ export default class Leaderboard {
     }
 
     async addElementaryScore() {
-        console.log('=== ADD ELEMENTARY SCORE - NEW VERSION v2 ===');
+        console.log('=== ADD ELEMENTARY SCORE ===');
         const nameInput = document.getElementById('player-name');
         const scoreInput = document.getElementById('player-score');
 
@@ -447,7 +478,7 @@ export default class Leaderboard {
             return;
         }
 
-        const endpoint = '/api/elementary-leaderboard';
+        const endpoint = '/api/events/ELEMENTARY_LEADERBOARD';
         console.log('POST endpoint:', endpoint);
 
         try {
@@ -458,13 +489,15 @@ export default class Leaderboard {
             const url = `${base.replace(/\/$/, '')}${endpoint}`;
             console.log('Full URL:', url);
 
-            // Create payload without id to ensure new entry is created
-            const payload = {
-                user: name,
-                score: score,
-                gameName: this.gameName
+            // Create payload matching Java backend structure
+            const requestBody = {
+                payload: {
+                    user: name,
+                    score: score,
+                    gameName: this.gameName
+                }
             };
-            console.log('Payload:', JSON.stringify(payload));
+            console.log('Payload:', JSON.stringify(requestBody));
 
             // POST to backend
             const res = await fetch(
@@ -475,7 +508,7 @@ export default class Leaderboard {
                         'Content-Type': 'application/json',
                     },
                     credentials: 'omit',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(requestBody)
                 }
             );
 
@@ -520,7 +553,7 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
-            const url = `${base.replace(/\/$/, '')}/api/elementary-leaderboard/${id}`;
+            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
             console.log('DELETE URL:', url);
 
             // DELETE from backend
@@ -556,7 +589,7 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
-            const url = `${base.replace(/\/$/, '')}/api/elementary-leaderboard`;
+            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD`;
             console.log('Fetching from:', url);
 
             const res = await fetch(
@@ -570,9 +603,20 @@ export default class Leaderboard {
             console.log('Received data:', data);
             console.log('Number of entries:', data.length);
             
-            // Update local entries with backend data
-            this.elementaryEntries = data;
-            console.log('Updated elementaryEntries:', this.elementaryEntries);
+            // Transform backend data to frontend format
+            // Backend returns: { id, user (User object or null), algoName, payload, timestamp }
+            // Frontend needs: { id, user (string), score, gameName }
+            this.elementaryEntries = data
+                .map(event => ({
+                    id: event.id,
+                    user: event.payload?.user || 'Anonymous',
+                    score: event.payload?.score || 0,
+                    gameName: event.payload?.gameName || this.gameName,
+                    timestamp: event.timestamp
+                }))
+                .sort((a, b) => b.score - a.score); // Sort by score descending
+            
+            console.log('Transformed elementaryEntries:', this.elementaryEntries);
             
             // Force display update
             this.displayElementaryLeaderboard();
@@ -628,7 +672,7 @@ export default class Leaderboard {
         
         // Always show form to add more scores
         html += `
-            <div class="elementary-form" style="border-top: 2px solid #f1f3f5; margin-top: 12px;">
+            <div class="elementary-form" style="border-top: 2px solid #333; margin-top: 12px;">
                 <div class="form-group">
                     <label for="player-name">Player Name</label>
                     <input type="text" id="player-name" placeholder="Enter name" />
@@ -684,7 +728,7 @@ export default class Leaderboard {
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
             const res = await fetch(
-                `${base.replace(/\/$/, '')}/api/leaderboard`,
+                `${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`,
                 { ...fetchOptions, method: 'GET', credentials: 'omit' }
             );
 
@@ -700,12 +744,27 @@ export default class Leaderboard {
         const list = document.getElementById('leaderboard-list');
         const preview = document.getElementById('leaderboard-preview');
 
-        if (!Array.isArray(data) || !data.length) {
+        // Transform backend data to frontend format
+        // Backend returns: { id, user (User object or null), algoName, payload, timestamp }
+        // Frontend needs: { user (string), score, gameName }
+        const transformedData = data
+            .map(event => ({
+                id: event.id,
+                user: event.payload?.user || event.payload?.username || 'Anonymous',
+                username: event.payload?.user || event.payload?.username || 'Anonymous',
+                score: event.payload?.score || 0,
+                gameName: event.payload?.gameName || event.payload?.game || 'Unknown',
+                game: event.payload?.gameName || event.payload?.game || 'Unknown',
+                timestamp: event.timestamp
+            }))
+            .sort((a, b) => b.score - a.score); // Sort by score descending
+
+        if (!Array.isArray(transformedData) || !transformedData.length) {
             list.innerHTML = '<p>No scores yet</p>';
             return;
         }
 
-        const top = data[0];
+        const top = transformedData[0];
         if (preview) {
             preview.textContent = `High Score: ${top.user || top.username} - ${Number(top.score).toLocaleString()}`;
         }
@@ -723,7 +782,7 @@ export default class Leaderboard {
                 <tbody>
         `;
 
-        data.forEach((e, i) => {
+        transformedData.forEach((e, i) => {
             html += `
                 <tr>
                     <td class="rank">${i + 1}</td>
@@ -757,8 +816,9 @@ export default class Leaderboard {
     toggleVisibility() {
         const container = document.getElementById('leaderboard-container');
         if (container) {
-            if (container.style.display === 'none') {
+            if (container.style.display === 'none' || container.classList.contains('initially-hidden')) {
                 container.style.display = 'block';
+                container.classList.remove('initially-hidden');
             } else {
                 container.style.display = 'none';
             }
@@ -770,6 +830,6 @@ export default class Leaderboard {
      */
     isVisible() {
         const container = document.getElementById('leaderboard-container');
-        return container && container.style.display !== 'none';
+        return container && container.style.display !== 'none' && !container.classList.contains('initially-hidden');
     }
 }

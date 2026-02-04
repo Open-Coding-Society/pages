@@ -1,6 +1,6 @@
 # Essentials Folder
 
-This folder contains **core engine files** that are **required to run any game** built with BetterGameEngine. Every game needs these foundational classes to function.
+This folder contains **core engine files** that are **required to run any game** built with GameEngine. Every game needs these foundational classes to function.
 
 ---
 
@@ -60,9 +60,9 @@ Transform.js, Vectors.js, Collision.js (utilities)
 All games import from essentials like this:
 
 ```javascript
-import Game from './BetterGameEngine/essentials/Game.js';
-import GameControl from './BetterGameEngine/essentials/GameControl.js';
-import GameLevel from './BetterGameEngine/essentials/GameLevel.js';
+import Game from './GameEngine/essentials/Game.js';
+import GameControl from './GameEngine/essentials/GameControl.js';
+import GameLevel from './GameEngine/essentials/GameLevel.js';
 ```
 
 Then build your game-specific classes on top of these essentials.

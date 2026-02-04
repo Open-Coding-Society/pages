@@ -1,6 +1,6 @@
 # Game Templates Guide
 
-This folder is a **reference guide** showing you what files you need to create a new game using BetterGameEngine, with example code and explanations for each.
+This folder is a **reference guide** showing you what files you need to create a new game using Engine, with example code and explanations for each.
 
 ---
 
@@ -17,7 +17,7 @@ Then create your own versions tailored to your game's specific needs.
 
 ## Game Structure Overview
 
-Every game built with BetterGameEngine needs:
+Every game built with GameEngine needs:
 
 ```
 Your Game
@@ -49,7 +49,7 @@ These templates show you how to structure each of these files.
 
 **Template structure:**
 ```javascript
-import Game from './BetterGameEngine/essentials/Game.js';
+import Game from './GameEngine/essentials/Game.js';
 
 export default class MyGame extends Game {
   constructor() {
@@ -88,7 +88,7 @@ MyGame.main();
 
 **Template structure:**
 ```javascript
-import GameControl from './BetterGameEngine/essentials/GameControl.js';
+import GameControl from './GameEngine/essentials/GameControl.js';
 import GameLevelOne from './GameLevelOne.js';
 import GameLevelTwo from './GameLevelTwo.js';
 
@@ -127,9 +127,9 @@ const gameControl = new MyGameControl(game, levelClasses);
 
 **Template structure:**
 ```javascript
-import GameLevel from './BetterGameEngine/essentials/GameLevel.js';
-import Player from './BetterGameEngine/gameObjects/Player.js';
-import Enemy from './BetterGameEngine/gameObjects/Enemy.js';
+import GameLevel from './GameEngine/essentials/GameLevel.js';
+import Player from './GameEngine/gameObjects/Player.js';
+import Enemy from './GameEngine/gameObjects/Enemy.js';
 import Coin from './MyGame/Coin.js'; // Your custom collectible
 
 export default class GameLevelOne extends GameLevel {
@@ -174,7 +174,7 @@ export default class GameLevelOne extends GameLevel {
 
 **Template structure:**
 ```javascript
-import Collectible from './BetterGameEngine/gameObjects/Collectible.js';
+import Collectible from './GameEngine/gameObjects/Collectible.js';
 
 export default class Coin extends Collectible {
   constructor(gameEnv, x, y) {
@@ -197,8 +197,8 @@ Here's a minimal working game structure:
 
 ### Game.js
 ```javascript
-import Game from './BetterGameEngine/essentials/Game.js';
-import GameControl from './BetterGameEngine/essentials/GameControl.js';
+import Game from './GameEngine/essentials/Game.js';
+import GameControl from './GameEngine/essentials/GameControl.js';
 import GameLevelOne from './GameLevelOne.js';
 
 export default class MyFirstGame extends Game {
@@ -225,9 +225,9 @@ export default class MyFirstGame extends Game {
 
 ### GameLevelOne.js
 ```javascript
-import GameLevel from './BetterGameEngine/essentials/GameLevel.js';
-import Player from './BetterGameEngine/gameObjects/Player.js';
-import Enemy from './BetterGameEngine/gameObjects/Enemy.js';
+import GameLevel from './GameEngine/essentials/GameLevel.js';
+import Player from './GameEngine/gameObjects/Player.js';
+import Enemy from './GameEngine/gameObjects/Enemy.js';
 
 export default class GameLevelOne extends GameLevel {
   constructor(gameEnv) {
@@ -287,7 +287,7 @@ Once your basic game works, add features from the features folder:
 
 ### Add Pause Menu
 ```javascript
-import PauseMenu from './BetterGameEngine/features/PauseMenu.js';
+import PauseMenu from './GameEngine/features/PauseMenu.js';
 
 class MyGameControl extends GameControl {
   constructor(game, levelClasses) {
@@ -302,7 +302,7 @@ class MyGameControl extends GameControl {
 
 ### Add Physics
 ```javascript
-import { RigidBody } from './BetterGameEngine/features/RigidBody.js';
+import { RigidBody } from './GameEngine/features/RigidBody.js';
 
 // In your level:
 const player = new Player(...);
@@ -311,7 +311,7 @@ player.rigidBody = new RigidBody(player.transform, 1, false);
 
 ### Add Dialogue
 ```javascript
-import DialogueSystem from './BetterGameEngine/features/DialogueSystem.js';
+import DialogueSystem from './GameEngine/features/DialogueSystem.js';
 
 const npc = new Npc(...);
 const dialogue = new DialogueSystem(npc, player);
@@ -335,10 +335,10 @@ npc.dialogue = ['Hello!', 'Nice to meet you!'];
 2. **Importing from wrong paths**
    ```javascript
    // Wrong - essentials are in essentials folder, not gameObjects
-   import Player from './BetterGameEngine/essentials/Player.js';
+   import Player from './GameEngine/essentials/Player.js';
    
    // Right - Player is in gameObjects
-   import Player from './BetterGameEngine/gameObjects/Player.js';
+   import Player from './rGameEngine/gameObjects/Player.js';
    ```
 
 3. **Forgetting super.init() or super.update()**
