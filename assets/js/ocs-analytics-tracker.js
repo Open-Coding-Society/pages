@@ -24,12 +24,14 @@
     // Analytics session state
     let analyticsState = {
         sessionStartTime: new Date(),
+        lastSubmitTime: new Date(), // Track last submission time for duration calculation
         sessionEndTime: null,
         questName: null,
         moduleName: null,
         lessonNumber: null,
         pageTitle: null,
         pageUrl: window.location.href,
+        maxScrollDepth: 0, // Track maximum scroll depth reached
         
         // Counters
         lessonsViewed: new Set(),
@@ -142,6 +144,24 @@
         document.addEventListener('click', function(e) {
             analyticsState.mouseClicksCount++;
             
+            // Track code execution button clicks - catches all variations
+            if (e.target.closest('[data-action="run"]') ||
+                e.target.closest('.run-btn') ||
+                e.target.closest('.code-runner-btn') ||
+                e.target.closest('.execute-btn') ||
+                e.target.closest('[onclick*="run"]') ||
+                e.target.closest('[onclick*="execute"]') ||
+                e.target.textContent.includes('Run') ||
+                e.target.textContent.includes('Execute') ||
+                e.target.closest('.code-runner')?.querySelector('[data-action="run"]') === e.target ||
+                e.target.id?.includes('run') ||
+                e.target.id?.includes('execute') ||
+                e.target.className?.includes('run') ||
+                e.target.className?.includes('execute')) {
+                analyticsState.codeExecutions++;
+                debug('Code execution button clicked');
+            }
+            
             // Track video clicks
             if (e.target.tagName === 'VIDEO' || 
                 e.target.closest('video') ||
@@ -181,8 +201,14 @@
             const documentHeight = document.documentElement.scrollHeight;
             const scrollTop = window.scrollY;
             
-            const scrollPercent = (scrollTop + windowHeight) / documentHeight;
-            analyticsState.scrollDepthPercentage = Math.round(scrollPercent * 100);
+            // Calculate how far down the user has scrolled (0-100%)
+            const scrollPercent = Math.min(100, Math.round((scrollTop + windowHeight) / documentHeight * 100));
+            
+            // Track the maximum scroll depth reached
+            if (scrollPercent > analyticsState.maxScrollDepth) {
+                analyticsState.maxScrollDepth = scrollPercent;
+                analyticsState.scrollDepthPercentage = scrollPercent;
+            }
         }, { passive: true });
     }
 
@@ -294,10 +320,24 @@
      */
     function preparePayload() {
         const now = new Date();
-        const durationSeconds = Math.round((now - analyticsState.sessionStartTime) / 1000);
+        // Calculate duration only since last submission, not from session start
+        const durationSeconds = Math.round((now - analyticsState.lastSubmitTime) / 1000);
+        
+        // Calculate interaction percentage
+        // Rough estimate: sum of all user interactions as percentage of session duration
+        const totalInteractions = 
+            (analyticsState.mouseClicksCount || 0) +
+            (analyticsState.keyboardInputEvents || 0) +
+            (analyticsState.hoverEventsCount || 0) +
+            (analyticsState.codeExecutions || 0) * 5 + // Weight code execution higher
+            (analyticsState.videosWatched || 0) * 10; // Weight video watching higher
+        
+        const interactionPercentage = durationSeconds > 0 
+            ? Math.min(100, (totalInteractions / durationSeconds) * 10) // Normalized to reasonable %
+            : 0;
         
         return {
-            sessionStartTime: analyticsState.sessionStartTime.toISOString(),
+            sessionStartTime: analyticsState.lastSubmitTime.toISOString(),
             sessionEndTime: now.toISOString(),
             sessionDurationSeconds: durationSeconds,
             
@@ -326,6 +366,7 @@
             
             // Engagement
             scrollDepthPercentage: analyticsState.scrollDepthPercentage,
+            interactionPercentage: interactionPercentage,
             hoverEventsCount: analyticsState.hoverEventsCount,
             keyboardInputEvents: analyticsState.keyboardInputEvents,
             mouseClicksCount: analyticsState.mouseClicksCount,
@@ -372,6 +413,25 @@
             
             if (response.ok) {
                 debug('Analytics submitted successfully');
+                // Reset tracking counters and timers after successful submission
+                analyticsState.lastSubmitTime = new Date();
+                analyticsState.videosWatched = 0;
+                analyticsState.videosCompleted = 0;
+                analyticsState.codeExecutions = 0;
+                analyticsState.copyPasteAttempts = 0;
+                analyticsState.questionsAnswered = 0;
+                analyticsState.questionsCorrect = 0;
+                analyticsState.exercisesAttempted = 0;
+                analyticsState.exercisesCompleted = 0;
+                analyticsState.assessmentsAttempted = 0;
+                analyticsState.assessmentScores = [];
+                analyticsState.hoverEventsCount = 0;
+                analyticsState.keyboardInputEvents = 0;
+                analyticsState.mouseClicksCount = 0;
+                analyticsState.timeoutErrors = 0;
+                analyticsState.validationErrors = 0;
+                analyticsState.maxScrollDepth = 0; // Reset scroll depth tracking
+                // Note: Keep lessonsViewed and modulesViewed as they track across session
             } else {
                 console.warn('Failed to submit analytics:', response.status);
             }
