@@ -42,6 +42,49 @@
 .pause-btn.restart { background: linear-gradient(180deg,#e86b6b,#d43b3b); border: none; }
 .pause-btn.exit { background: linear-gradient(180deg,#666,#444); border: none; }
 
+/* Top control bar (Settings/Leaderboard) */
+.pause-button-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pause-button-bar .pause-btn {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Dropdown for Save/Skip controls */
+.pause-controls-dropdown {
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 10px;
+  display: none;
+  gap: 10px;
+  z-index: 9998;
+}
+
+.pause-controls-dropdown.is-open {
+  display: flex;
+}
+
+.pause-controls-dropdown .pause-btn {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
 /* Top counter showing levels completed */
 .pause-counter-wrap {
   display: flex;

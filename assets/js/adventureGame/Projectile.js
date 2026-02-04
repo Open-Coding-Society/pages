@@ -1,4 +1,4 @@
-import Character from "../BetterGameEngine/essentials/Character.js";
+import Character from "../GameEngine/essentials/Character.js";
 import ProjectileExplosion from './ProjectileExplosion.js';
 
 function newProjectileExplosion(data, gameEnv) {

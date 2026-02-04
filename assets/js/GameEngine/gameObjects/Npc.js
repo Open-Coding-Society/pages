@@ -20,7 +20,7 @@ class Npc extends Character {
         if (data?.dialogues) {
             this.dialogueSystem = new DialogueSystem({
                 dialogues: data.dialogues,
-                
+                gameControl: gameEnv?.gameControl,
                 id: this.uniqueId
             });
         } else {
@@ -32,6 +32,7 @@ class Npc extends Character {
                     "Nice weather we're having, isn't it?",
                     "I've been standing here for quite some time."
                 ],
+                gameControl: gameEnv?.gameControl,
                 // Pass unique ID to prevent conflicts
                 id: this.uniqueId
             });

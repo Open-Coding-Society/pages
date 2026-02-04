@@ -8,7 +8,6 @@
   <div class="editor-container">
     <div class="control-panel">
       <button class="runBtn" title="Start Game">▶ Start</button>
-      <button class="pauseBtn" title="Pause Game">⏸ Pause</button>
       <button class="stopBtn" title="Stop Game">■ Stop</button>
       <button class="resetBtn" title="Reset Game">↻ Reset</button>
       <select class="levelSelect" title="Select Level">
@@ -71,7 +70,6 @@
 
   // Get UI elements
   const runBtn = container.querySelector('.runBtn');
-  const pauseBtn = container.querySelector('.pauseBtn');
   const stopBtn = container.querySelector('.stopBtn');
   const resetBtn = container.querySelector('.resetBtn');
   const levelSelect = container.querySelector('.levelSelect');
@@ -84,9 +82,9 @@
   let gameControl = null;
   let gameInstance = null;
   let currentLevelIndex = 0;
+  let escapeKeyHandler = null;
 
   // Disable game controls initially
-  pauseBtn.disabled = true;
   stopBtn.disabled = true;
 
   // Update stats
@@ -176,18 +174,21 @@
     
     updateStatus('Stopped');
     runBtn.disabled = false;
-    pauseBtn.disabled = true;
     stopBtn.disabled = true;
     levelSelect.disabled = false;
+    
+    // Remove escape key listener
+    if (escapeKeyHandler) {
+      document.removeEventListener('keydown', escapeKeyHandler);
+      escapeKeyHandler = null;
+    }
   }
 
-  // Pause game
+  // Pause game via Escape key via Escape key
   function pauseGame() {
     if (gameControl && gameControl.pause) {
       gameControl.pause();
-      updateStatus('Paused');
-      pauseBtn.innerHTML = '▶ Resume';
-      pauseBtn.onclick = resumeGame;
+      updateStatus('Paused (Press Esc to Resume)');
     }
   }
 
@@ -196,8 +197,6 @@
     if (gameControl && gameControl.resume) {
       gameControl.resume();
       updateStatus('Running');
-      pauseBtn.innerHTML = '⏸ Pause';
-      pauseBtn.onclick = pauseGame;
     }
   }
 
@@ -221,9 +220,23 @@
 
       updateStatus('Loading...');
       runBtn.disabled = true;
-      pauseBtn.disabled = false;
       stopBtn.disabled = false;
       levelSelect.disabled = true;
+
+      // Setup Escape key listener for pause/resume
+      escapeKeyHandler = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          if (gameControl) {
+            if (gameControl.isPaused) {
+              resumeGame();
+            } else {
+              pauseGame();
+            }
+          }
+        }
+      };
+      document.addEventListener('keydown', escapeKeyHandler);
 
       // Get canvas and container
       const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
@@ -246,7 +259,7 @@
       });
       
       // Import core Game engine
-      const GameModule = await import(baseUrl + '/assets/js/BetterGameEngine/essentials/Game.js');
+      const GameModule = await import(baseUrl + '/assets/js/GameEngine/essentials/Game.js');
       const Game = GameModule.default;
       
       // Create a blob URL to execute user code as a module
@@ -299,9 +312,7 @@
         gameInstance = Game.main(environment, GameControl);
         gameControl = gameInstance; // Store reference for pause/stop
         
-        updateStatus('Running');
-        pauseBtn.innerHTML = '⏸ Pause';
-        pauseBtn.onclick = pauseGame;
+        updateStatus('Running (Press Esc to Pause)');
         
       } finally {
         // Clean up blob URL
@@ -312,15 +323,19 @@
       updateStatus('Error: ' + error.message);
       console.error('Game error:', error);
       runBtn.disabled = false;
-      pauseBtn.disabled = true;
       stopBtn.disabled = true;
       levelSelect.disabled = false;
+      
+      // Remove escape key listener on error
+      if (escapeKeyHandler) {
+        document.removeEventListener('keydown', escapeKeyHandler);
+        escapeKeyHandler = null;
+      }
     }
   }
 
   // Event listeners
   runBtn.onclick = runGame;
-  pauseBtn.onclick = pauseGame;
   stopBtn.onclick = stopGame;
   resetBtn.onclick = resetGame;
 

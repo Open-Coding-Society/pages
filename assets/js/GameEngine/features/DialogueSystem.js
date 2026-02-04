@@ -18,6 +18,11 @@ class DialogueSystem {
    this.dialogueText = null;
    this.closeBtn = null;
   
+   // Game control reference for pausing
+   this.gameControl = options.gameControl || null;
+   // Track if this dialogue system paused the game
+   this.didPauseGame = false;
+  
    // Sound effect option
    this.enableSound = options.enableSound !== undefined ? options.enableSound : false;
    this.soundUrl = options.soundUrl || "./sounds/dialogue.mp3";
@@ -320,6 +325,17 @@ class DialogueSystem {
    // Show the dialogue box
    this.dialogueBox.style.display = "block";
   
+   // Pause the game if gameControl is available and not already paused
+   if (this.gameControl && typeof this.gameControl.pause === 'function') {
+     // Only pause if the game isn't already paused
+     if (!this.gameControl.isPaused) {
+       this.gameControl.pause();
+       this.didPauseGame = true; // Mark that we paused it
+     } else {
+       this.didPauseGame = false; // We didn't pause it
+     }
+   }
+  
    // Play sound effect if enabled
    if (this.sound) {
      this.sound.currentTime = 0;
@@ -376,6 +392,12 @@ class DialogueSystem {
    // Hide the dialogue box
    this.dialogueBox.style.display = "none";
    this.isOpen = false;
+  
+   // Resume the game only if we were the ones who paused it
+   if (this.gameControl && typeof this.gameControl.resume === 'function' && this.didPauseGame) {
+     this.gameControl.resume();
+     this.didPauseGame = false; // Reset the flag
+   }
   
    // Remove any custom buttons
    const buttonContainers = this.dialogueBox.querySelectorAll('div[style*="display: flex"]');

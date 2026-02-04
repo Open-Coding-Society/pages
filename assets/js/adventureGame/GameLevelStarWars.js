@@ -1,6 +1,6 @@
-import GameEnvBackground from '../BetterGameEngine/essentials/GameEnvBackground.js';
-import Player from '../BetterGameEngine/gameObjects/Player.js';
-import Npc from '../BetterGameEngine/gameObjects/Npc.js';
+import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
+import Player from '../GameEngine/gameObjects/Player.js';
+import Npc from '../GameEngine/gameObjects/Npc.js';
 import Projectile from './Projectile.js';
 
 class GameLevelStarWars {
