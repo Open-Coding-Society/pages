@@ -71,14 +71,8 @@ class AdventureGame extends GameCore {
 
             // Settings menu button that opens a modal
             const settingsSummary = document.createElement('button');
-            settingsSummary.className = 'medium filledHighlight primary';
             settingsSummary.innerText = 'Settings';
-            settingsSummary.style.cssText = `
-                background-color: #a46ae3ff;
-                font-weight: bold;
-                font-size: 12px;
-                font: 'Press Start 2P', monospace;
-            `;
+            settingsSummary.style.background = 'black';
             
             // Create Settings modal when button is clicked
             settingsSummary.addEventListener('click', () => {
@@ -100,51 +94,30 @@ class AdventureGame extends GameCore {
                     justify-content: center;
                     align-items: center;
                     z-index: 10000;
-                    backdrop-filter: blur(5px);
                 `;
                 
                 const modalContent = document.createElement('div');
-                modalContent.style.cssText = `
-                    background: linear-gradient(145deg, #2c3e50, #34495e);
-                    border: 4px solid #a46ae3ff;
-                    border-radius: 15px;
-                    padding: 30px;
-                    max-width: 400px;
-                    width: 90%;
-                    box-shadow: 0 0 30px rgba(164, 106, 227, 0.5);
-                    font-family: 'Press Start 2P', monospace;
-                    color: #ecf0f1;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 15px;
-                `;
+                modalContent.style.background = 'black';
+                modalContent.style.color = 'white';
+                modalContent.style.padding = '30px';
+                modalContent.style.maxWidth = '400px';
+                modalContent.style.width = '90%';
+                modalContent.style.display = 'flex';
+                modalContent.style.flexDirection = 'column';
+                modalContent.style.gap = '15px';
                 
                 const title = document.createElement('h2');
-                title.innerText = '⚙️ SETTINGS ⚙️';
+                title.innerText = 'SETTINGS';
                 title.style.cssText = `
                     text-align: center;
-                    color: #a46ae3ff;
                     margin: 0 0 15px 0;
-                    font-size: 18px;
-                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
                 `;
                 modalContent.appendChild(title);
                 
                 // Save Score button
                 const modalBtnSave = document.createElement('button');
                 modalBtnSave.innerText = 'Save Score';
-                modalBtnSave.style.cssText = `
-                    background: linear-gradient(145deg, #34495e, #2c3e50);
-                    color: #ecf0f1;
-                    border: 2px solid #a46ae3ff;
-                    border-radius: 8px;
-                    padding: 10px 12px;
-                    font-size: 11px;
-                    font-family: 'Press Start 2P', monospace;
-                    font-weight: bold;
-                    cursor: pointer;
-                    width: 100%;
-                `;
+                modalBtnSave.style.background = 'black';
                 
                 modalBtnSave.addEventListener('click', async () => {
                     console.log('Save Score clicked, scoreFeature:', scoreFeature);
@@ -159,18 +132,7 @@ class AdventureGame extends GameCore {
                 // Skip Level button
                 const modalBtnSkipLevel = document.createElement('button');
                 modalBtnSkipLevel.innerText = 'Skip Level';
-                modalBtnSkipLevel.style.cssText = `
-                    background: linear-gradient(145deg, #34495e, #2c3e50);
-                    color: #ecf0f1;
-                    border: 2px solid #a46ae3ff;
-                    border-radius: 8px;
-                    padding: 10px 12px;
-                    font-size: 11px;
-                    font-family: 'Press Start 2P', monospace;
-                    font-weight: bold;
-                    cursor: pointer;
-                    width: 100%;
-                `;
+                modalBtnSkipLevel.style.background = 'black';
                 
                 modalBtnSkipLevel.addEventListener('click', () => {
                     if (typeof this.gameControl.endLevel === 'function') {
@@ -187,20 +149,8 @@ class AdventureGame extends GameCore {
                 
                 // Close button
                 const closeBtn = document.createElement('button');
-                closeBtn.innerText = '✕ CLOSE';
-                closeBtn.style.cssText = `
-                    background: linear-gradient(145deg, #34495e, #2c3e50);
-                    color: #ecf0f1;
-                    border: 2px solid #e67e22;
-                    border-radius: 8px;
-                    padding: 10px 12px;
-                    font-size: 11px;
-                    font-family: 'Press Start 2P', monospace;
-                    font-weight: bold;
-                    cursor: pointer;
-                    width: 100%;
-                    margin-top: 10px;
-                `;
+                closeBtn.innerText = 'CLOSE';
+                closeBtn.style.background = 'black';
                 closeBtn.addEventListener('click', () => {
                     modal.style.display = 'none';
                 });
@@ -218,14 +168,8 @@ class AdventureGame extends GameCore {
 
             // Toggle Leaderboard button
             const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'medium filledHighlight primary';
             btnToggleLeaderboard.innerText = 'Show Leaderboard';
-            btnToggleLeaderboard.style.cssText = `
-                background-color: #e67e22;
-                font-weight: bold;
-                font-size: 12px;
-                font: 'Press Start 2P', monospace;
-            `;
+            btnToggleLeaderboard.style.background = 'black';
             btnToggleLeaderboard.addEventListener('click', () => {
                 if (this.leaderboardInstance) {
                     this.leaderboardInstance.toggleVisibility();
