@@ -213,7 +213,7 @@ class GameLevel {
         // TODO: Check player vs collectibles
         // TODO: Check player vs enemies (damage/death)
         // TODO: Check projectiles vs enemies
-        // TODO: Use Collision class from BetterGameEngine/essentials
+        // TODO: Use Collision class from GameEngine/essentials
     }
 
     /**

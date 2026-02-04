@@ -24,7 +24,7 @@ export function addLevelNavigationButtons(gameInstance) {
     footer.style.display = "flex";
     footer.style.justifyContent = "space-between";
     footer.style.alignItems = "center";
-    footer.style.flexWrap = "wrap";
+    footer.style.flexWrap = "nowrap";
     footer.style.width = "100vw";
     footer.style.maxWidth = "100vw";
     footer.style.boxSizing = "border-box";
@@ -91,7 +91,7 @@ export function addLevelNavigationButtons(gameInstance) {
     centerContainer.style.justifyContent = "center";
     centerContainer.style.alignItems = "center";
     centerContainer.style.gap = "10px";
-    centerContainer.style.flex = "0 1 auto";
+    centerContainer.style.flex = "0 0 auto";
 
     // Create Cheats Menu button (left of Home)
     const cheatsButton = document.createElement("button");
@@ -278,18 +278,57 @@ export function addLevelNavigationButtons(gameInstance) {
         console.log("Info menu opened");
     }
 
-    // Add Cheats Menu, Home, and Info to center container
-    centerContainer.appendChild(cheatsButton);
+    // Shift the center group slightly right to match desired layout
+    centerContainer.style.marginLeft = "40px";
+
+    // Containers around the Home button
+    const leftOfHome = document.createElement("div");
+    leftOfHome.style.display = "flex";
+    leftOfHome.style.alignItems = "center";
+    leftOfHome.style.gap = "10px";
+    leftOfHome.id = "mansion-game-controls-container";
+
+    const rightOfHome = document.createElement("div");
+    rightOfHome.style.display = "flex";
+    rightOfHome.style.alignItems = "center";
+    rightOfHome.style.gap = "10px";
+
+    // Add controls around Home (Home centered in the group)
+    centerContainer.appendChild(leftOfHome);
     centerContainer.appendChild(homeButton);
-    centerContainer.appendChild(infoButton);
+    centerContainer.appendChild(rightOfHome);
+
+    // Create left and right containers for spacing
+    const leftContainer = document.createElement("div");
+    leftContainer.style.display = "flex";
+    leftContainer.style.alignItems = "center";
+    leftContainer.style.gap = "10px";
+    leftContainer.style.flex = "1 1 0";
+
+    const rightContainer = document.createElement("div");
+    rightContainer.style.display = "flex";
+    rightContainer.style.alignItems = "center";
+    rightContainer.style.justifyContent = "flex-end";
+    rightContainer.style.gap = "10px";
+    rightContainer.style.flex = "1 1 0";
 
     // Clear footer before adding new layout
     footer.innerHTML = "";
     // Add buttons to footer in correct positions
-    footer.appendChild(prevButton); // far left
-    footer.appendChild(centerContainer); // center
-    footer.appendChild(nextButton); // far right
+    leftContainer.appendChild(prevButton);
+    footer.appendChild(leftContainer); // far left (Prev)
+    footer.appendChild(centerContainer); // center (Settings, Home, Info/Cheats)
+    rightContainer.appendChild(nextButton);
+    footer.appendChild(rightContainer); // far right (Next)
+    
+    // Add Info and Cheats to the right of Home
+    rightOfHome.appendChild(infoButton);
+    rightOfHome.appendChild(cheatsButton);
+    
     console.log("Level navigation and cheats buttons added to footer");
+    
+    // Return the left-of-home container so Game.js can add Settings/Leaderboard buttons
+    return leftOfHome;
 }
 
 /**

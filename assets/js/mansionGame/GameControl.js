@@ -257,8 +257,12 @@ class GameControl {
                     console.warn('Error toggling pause menu:', e);
                 }
             } else {
-                // fallback: end the level when no pause menu is present
-                this.currentLevel.continue = false;
+                // When no pause menu is present, just toggle pause/resume instead of ending level
+                if (this.isPaused) {
+                    this.resume();
+                } else {
+                    this.pause();
+                }
             }
         }
     }

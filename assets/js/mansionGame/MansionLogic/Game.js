@@ -25,14 +25,16 @@ class GameCore {
     // create GameControl using the engine-provided class
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
+    // Setup Escape key for pause/resume
+    this._setupEscapeKey();
 
-    // Create top control buttons directly using features
+    // Create top control buttons (unless disabled for game runner/builder)
     if (!this.environment.disablePauseMenu) {
         this._createTopControls();
     }
 
     // Try to dynamically load the Leaderboard
-    import('../../BetterGameEngine/features/Leaderboard.js')
+    import('../../GameEngine/features/Leaderboard.js')
         .then(mod => {
             try {
                 // Get the actual container element from gameContainer
@@ -60,6 +62,30 @@ class GameCore {
         });
 }
 
+    /**
+     * Setup Escape key listener for pause/resume functionality.
+     * This always works regardless of whether pause control buttons are enabled.
+     */
+    _setupEscapeKey() {
+        if (this.escapeKeyHandler) {
+            // Already set up, don't add duplicate listeners
+            return;
+        }
+        
+        this.escapeKeyHandler = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (this.gameControl && this.gameControl.isPaused) {
+                    this.gameControl.resume();
+                } else if (this.gameControl) {
+                    this.gameControl.pause();
+                }
+            }
+        };
+        
+        document.addEventListener('keydown', this.escapeKeyHandler);
+    }
+
     _createTopControls() {
         // Ensure pause-menu.css is loaded for button styling
         const cssPath = '/assets/css/pause-menu.css';
@@ -72,11 +98,19 @@ class GameCore {
 
         // Dynamically import the features and create controls
         Promise.all([
-            import('../../BetterGameEngine/features/ScoreFeature.js'),
-            import('../../BetterGameEngine/features/PauseFeature.js'),
-            import('../../BetterGameEngine/features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
+            import('../../GameEngine/features/ScoreFeature.js'),
+            import('../../GameEngine/features/PauseFeature.js'),
+            import('../../GameEngine/features/LevelSkipFeature.js'),
+            import('./cheats.js')
+        ]).then(([ScoreModule, PauseModule, LevelSkipModule, CheatsModule]) => {
+            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;            
+            // Ensure parent has proper positioning context for fixed elements
+            if (parent !== document.body) {
+                parent.style.position = 'relative';
+            }
+            
+            // Initialize footer layout with level navigation and cheats menu
+            CheatsModule.addLevelNavigationButtons(this);
             
             // Create a lightweight pause menu object that ScoreFeature can use
             const pauseMenuObj = {
@@ -93,93 +127,235 @@ class GameCore {
                 scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
                 _saveStatusNode: null
             };
+
+            // Settings menu button that opens a modal
+            const settingsSummary = document.createElement('button');
+            settingsSummary.className = 'medium filledHighlight primary';
+            settingsSummary.innerText = 'Settings';
+            settingsSummary.style.cssText = `
+                background-color: #a46ae3ff;
+                font-weight: bold;
+                font-size: 12px;
+                font: 'Press Start 2P', monospace;
+            `;
             
-            // Create button bar
-            const buttonBar = document.createElement('div');
-            buttonBar.className = 'pause-button-bar';
-            buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '60px';
-            buttonBar.style.left = '20px';
-            buttonBar.style.display = 'flex';
-            buttonBar.style.gap = '10px';
-            buttonBar.style.zIndex = '9999';
-
-            // Pause button
-            const btnPause = document.createElement('button');
-            btnPause.className = 'pause-btn pause-toggle';
-            btnPause.innerText = 'Pause';
-            btnPause.addEventListener('click', () => {
-                if (this.gameControl.isPaused) {
-                    this.gameControl.resume();
-                    btnPause.innerText = 'Pause';
-                } else {
-                    this.gameControl.pause();
-                    btnPause.innerText = 'Resume';
+            // Create Settings modal when button is clicked
+            settingsSummary.addEventListener('click', () => {
+                // Create modal overlay
+                const modal = document.createElement('div');
+                modal.id = 'settingsModal';
+                modal.style.cssText = `
+                    display: flex;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.8);
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                    backdrop-filter: blur(5px);
+                `;
+                
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: linear-gradient(145deg, #2c3e50, #34495e);
+                    border: 4px solid #a46ae3ff;
+                    border-radius: 15px;
+                    padding: 30px;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 0 30px rgba(164, 106, 227, 0.5);
+                    font-family: 'Press Start 2P', monospace;
+                    color: #ecf0f1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                `;
+                
+                // Modal title
+                const title = document.createElement('h2');
+                title.innerText = '⚙️ SETTINGS ⚙️';
+                title.style.cssText = `
+                    text-align: center;
+                    color: #a46ae3ff;
+                    margin: 0 0 15px 0;
+                    font-size: 18px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                `;
+                modalContent.appendChild(title);
+                
+                // Save Score button for modal
+                const modalBtnSave = document.createElement('button');
+                modalBtnSave.innerText = 'Save Score';
+                modalBtnSave.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                
+                // Instantiate ScoreFeature for real save functionality
+                let scoreFeature = null;
+                try {
+                    scoreFeature = new ScoreModule.default(pauseMenuObj);
+                } catch (e) {
+                    console.warn('ScoreFeature init failed:', e);
                 }
-            });
-
-            // Save Score button - with real save functionality
-            const btnSave = document.createElement('button');
-            btnSave.className = 'pause-btn save-score';
-            btnSave.innerText = 'Save Score';
-            
-            // Instantiate ScoreFeature for real save functionality
-            let scoreFeature = null;
-            try {
-                scoreFeature = new ScoreModule.default(pauseMenuObj);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
-            }
-            
-            // Wire the save button to ScoreFeature.saveScore
-            btnSave.addEventListener('click', async () => {
-                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
-                    await scoreFeature.saveScore(btnSave);
-                } else {
-                    console.warn('ScoreFeature saveScore not available');
-                }
-            });
-
-            // Skip Level button
-            const btnSkipLevel = document.createElement('button');
-            btnSkipLevel.className = 'pause-btn skip-level';
-            btnSkipLevel.innerText = 'Skip Level';
-            btnSkipLevel.addEventListener('click', () => {
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else {
-                    // Fallback: synthesize 'L' key
-                    const event = new KeyboardEvent('keydown', {
-                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
-                    });
-                    document.dispatchEvent(event);
-                }
-            });
-
-            // Toggle Leaderboard button
-            const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
-            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-            btnToggleLeaderboard.addEventListener('click', () => {
-                if (this.leaderboardInstance) {
-                    this.leaderboardInstance.toggleVisibility();
-                    
-                    // Update button text based on visibility
-                    if (this.leaderboardInstance.isVisible()) {
-                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
+                
+                modalBtnSave.addEventListener('click', async () => {
+                    if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
+                        await scoreFeature.saveScore(modalBtnSave);
                     } else {
-                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
+                        console.warn('ScoreFeature saveScore not available');
                     }
-                } else {
-                    console.warn('Leaderboard instance not available');
-                }
+                });
+                modalContent.appendChild(modalBtnSave);
+                
+                // Skip Level button for modal
+                const modalBtnSkipLevel = document.createElement('button');
+                modalBtnSkipLevel.innerText = 'Skip Level';
+                modalBtnSkipLevel.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                
+                modalBtnSkipLevel.addEventListener('click', () => {
+                    if (typeof this.gameControl.endLevel === 'function') {
+                        this.gameControl.endLevel();
+                    } else {
+                        const event = new KeyboardEvent('keydown', {
+                            key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
+                        });
+                        document.dispatchEvent(event);
+                    }
+                    modal.style.display = 'none';
+                    modal.remove();
+                });
+                modalContent.appendChild(modalBtnSkipLevel);
+                
+                // Toggle Leaderboard button
+                const modalBtnLeaderboard = document.createElement('button');
+                modalBtnLeaderboard.innerText = 'Show Leaderboard';
+                modalBtnLeaderboard.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                modalBtnLeaderboard.addEventListener('click', () => {
+                    if (this.leaderboardInstance) {
+                        this.leaderboardInstance.toggleVisibility();
+                        if (this.leaderboardInstance.isVisible()) {
+                            modalBtnLeaderboard.innerText = 'Hide Leaderboard';
+                        } else {
+                            modalBtnLeaderboard.innerText = 'Show Leaderboard';
+                        }
+                    } else {
+                        console.warn('Leaderboard instance not available');
+                    }
+                });
+                modalContent.appendChild(modalBtnLeaderboard);
+                
+                // Toggle Score Counter button
+                const modalBtnScore = document.createElement('button');
+                modalBtnScore.innerText = 'Show Score';
+                modalBtnScore.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                modalBtnScore.addEventListener('click', () => {
+                    const sc = document.querySelector('.pause-score-counter');
+                    if (sc) {
+                        const isHidden = sc.style.display === 'none';
+                        sc.style.display = isHidden ? 'block' : 'none';
+                        modalBtnScore.innerText = isHidden ? 'Hide Score' : 'Show Score';
+                    }
+                });
+                modalContent.appendChild(modalBtnScore);
+                
+                // Close button
+                const closeBtn = document.createElement('button');
+                closeBtn.innerText = '✕ CLOSE';
+                closeBtn.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #e67e22;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                    margin-top: 10px;
+                `;
+                closeBtn.addEventListener('click', () => {
+                    modal.remove();
+                });
+                modalContent.appendChild(closeBtn);
+                
+                // Close modal when clicking outside
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
             });
 
-            buttonBar.appendChild(btnPause);
-            buttonBar.appendChild(btnSave);
-            buttonBar.appendChild(btnSkipLevel);
-            buttonBar.appendChild(btnToggleLeaderboard);
-            parent.appendChild(buttonBar);
+            // Place Settings button in the left-of-home container
+            const leftContainer = document.getElementById('mansion-game-controls-container');
+            if (leftContainer) {
+                leftContainer.appendChild(settingsSummary);
+                console.log('Settings modal placed in footer left container');
+            } else {
+                console.warn('mansion-game-controls-container not found, using default placement');
+                const buttonBar = document.createElement('div');
+                buttonBar.className = 'pause-button-bar';
+                buttonBar.style.position = 'fixed';
+                buttonBar.style.top = '60px';
+                buttonBar.style.left = '20px';
+                buttonBar.style.display = 'flex';
+                buttonBar.style.gap = '10px';
+                buttonBar.style.alignItems = 'center';
+                buttonBar.style.flexWrap = 'wrap';
+                buttonBar.style.zIndex = '9999';
+                buttonBar.appendChild(settingsSummary);
+                parent.appendChild(buttonBar);
+            }
             
         }).catch(err => {
             console.warn('Failed to load control features:', err);
