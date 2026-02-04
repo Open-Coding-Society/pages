@@ -184,184 +184,6 @@ breadcrumb: True
             font-size: 0.9rem;
         }
 
-        .game-layout {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .canvas-area {
-            background: #000;
-            border: 2px solid #2d3340;
-            padding: 2rem;
-            border-radius: 8px;
-        }
-
-        .canvas-title {
-            color: #00ccff;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .pixel-grid {
-            display: grid;
-            grid-template-columns: repeat(16, 1fr);
-            gap: 2px;
-            max-width: 500px;
-            margin: 0 auto;
-            background: #1a1f2e;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .pixel {
-            aspect-ratio: 1;
-            background: #0a0e14;
-            border: 1px solid #2d3340;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            color: #8f93a2;
-        }
-
-        .pixel:hover {
-            border-color: #00ff9f;
-            transform: scale(1.1);
-            z-index: 10;
-        }
-
-        .pixel.filled {
-            cursor: default;
-            animation: fillPixel 0.3s ease;
-        }
-
-        @keyframes fillPixel {
-            0% { transform: scale(0.5); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .pixel.filled:hover {
-            transform: scale(1);
-        }
-
-        .clue-panel {
-            background: #151921;
-            border: 1px solid #2d3340;
-            padding: 1.5rem;
-            border-radius: 8px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .clue-panel-title {
-            color: #00ccff;
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-        }
-
-        .current-clue {
-            background: #1f2430;
-            border: 2px solid #00ff9f;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-radius: 4px;
-        }
-
-        .clue-error {
-            background: #0a0e14;
-            border-left: 3px solid #ff3366;
-            padding: 0.75rem;
-            margin: 0.75rem 0;
-            color: #ff3366;
-            font-size: 0.85rem;
-            font-family: monospace;
-        }
-
-        .clue-question {
-            color: #e6e6e6;
-            margin: 1rem 0;
-            font-size: 0.95rem;
-        }
-
-        .answer-options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .answer-btn {
-            background: #0a0e14;
-            border: 2px solid #2d3340;
-            padding: 1rem;
-            color: #e6e6e6;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .answer-btn:hover {
-            border-color: #00ff9f;
-            background: #151921;
-        }
-
-        .answer-btn.correct {
-            border-color: #00ff9f;
-            background: rgba(0, 255, 159, 0.1);
-        }
-
-        .answer-btn.incorrect {
-            border-color: #ff3366;
-            background: rgba(255, 51, 102, 0.1);
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .color-legend {
-            background: #1f2430;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 4px;
-        }
-
-        .legend-title {
-            color: #8f93a2;
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-        }
-
-        .legend-items {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border: 1px solid #2d3340;
-        }
-
         .stats {
             display: flex;
             justify-content: space-around;
@@ -387,6 +209,175 @@ breadcrumb: True
             font-weight: bold;
         }
 
+        .canvas-area {
+            background: #000;
+            border: 2px solid #2d3340;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .canvas-title {
+            color: #00ccff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #1a1f2e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .pixel {
+            aspect-ratio: 1;
+            background: #0a0e14;
+            border: 2px solid #2d3340;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #8f93a2;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .pixel:hover {
+            border-color: #00ff9f;
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .pixel.filled {
+            cursor: default;
+            animation: fillPixel 0.4s ease;
+            border-color: transparent;
+        }
+
+        @keyframes fillPixel {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pixel.filled:hover {
+            transform: scale(1);
+        }
+
+        .clue-section {
+            background: #151921;
+            border: 2px solid #2d3340;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .clue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .clue-title {
+            color: #00ccff;
+            font-size: 1.2rem;
+        }
+
+        .color-legend {
+            background: #1f2430;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #2d3340;
+            border-radius: 3px;
+        }
+
+        .current-clue {
+            background: #1f2430;
+            border: 2px solid #00ff9f;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .clue-error {
+            background: #0a0e14;
+            border-left: 4px solid #ff3366;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #ff3366;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        .clue-question {
+            color: #e6e6e6;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .answer-btn {
+            background: #0a0e14;
+            border: 2px solid #2d3340;
+            padding: 1.25rem;
+            color: #e6e6e6;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            border-radius: 4px;
+        }
+
+        .answer-btn:hover {
+            border-color: #00ff9f;
+            background: #151921;
+            transform: translateX(5px);
+        }
+
+        .answer-btn.correct {
+            border-color: #00ff9f;
+            background: rgba(0, 255, 159, 0.1);
+        }
+
+        .answer-btn.incorrect {
+            border-color: #ff3366;
+            background: rgba(255, 51, 102, 0.1);
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
         .completion {
             text-align: center;
             padding: 3rem;
@@ -402,8 +393,8 @@ breadcrumb: True
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .completion-title {
@@ -412,10 +403,19 @@ breadcrumb: True
             margin-bottom: 1rem;
         }
 
-        .revealed-image {
-            max-width: 400px;
+        .completion-message {
+            font-size: 1.2rem;
+            color: #8f93a2;
+            margin-bottom: 2rem;
+        }
+
+        .final-art {
+            max-width: 500px;
             margin: 2rem auto;
-            border: 2px solid #00ff9f;
+            padding: 2rem;
+            background: #000;
+            border: 3px solid #00ff9f;
+            border-radius: 8px;
         }
 
         .restart-btn {
@@ -427,6 +427,7 @@ breadcrumb: True
             font-size: 1rem;
             margin-top: 1rem;
             transition: all 0.3s;
+            border-radius: 4px;
         }
 
         .restart-btn:hover {
@@ -434,9 +435,10 @@ breadcrumb: True
             transform: scale(1.05);
         }
 
-        @media (max-width: 1024px) {
-            .game-layout {
-                grid-template-columns: 1fr;
+        @media (max-width: 768px) {
+            .clue-header {
+                flex-direction: column;
+                gap: 1rem;
             }
         }
     </style>
@@ -583,7 +585,7 @@ breadcrumb: True
                 <div class="stats">
                     <div class="stat">
                         <div class="stat-label">Progress</div>
-                        <div class="stat-value" id="progress">0/48</div>
+                        <div class="stat-value" id="progress">0/15</div>
                     </div>
                     <div class="stat">
                         <div class="stat-label">Correct</div>
@@ -595,68 +597,62 @@ breadcrumb: True
                     </div>
                 </div>
 
-                <div class="game-layout">
-                    <div class="canvas-area">
-                        <h3 class="canvas-title">Your Pixel Art</h3>
-                        <div class="pixel-grid" id="pixelGrid">
+                <div class="canvas-area">
+                    <h3 class="canvas-title">Click a number to solve its error</h3>
+                    <div class="pixel-grid" id="pixelGrid"></div>
+                </div>
+
+                <div class="clue-section">
+                    <div class="clue-header">
+                        <h3 class="clue-title">Current Clue</h3>
+                        <div class="color-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ff6b6b;"></div>
+                                <span>1 - Not Found</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #4ecdc4;"></div>
+                                <span>2 - No File</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ffe66d;"></div>
+                                <span>3 - Typo</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #a8e6cf;"></div>
+                                <span>4 - Tab</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ff8b94;"></div>
+                                <span>5 - Permission</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #c7ceea;"></div>
+                                <span>6 - Tool</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="clue-panel">
-                        <h3 class="clue-panel-title">Current Clue</h3>
-                        
-                        <div class="current-clue" id="currentClue">
-                            <div class="clue-error" id="clueError">Click a numbered pixel to start!</div>
-                            <div class="clue-question" id="clueQuestion">Select any pixel with a number.</div>
-                            <div class="answer-options" id="answerOptions">
-                            </div>
-                        </div>
-
-                        <div class="color-legend">
-                            <div class="legend-title">Color Code</div>
-                            <div class="legend-items">
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #ff6b6b;"></div>
-                                    <span>1 - Make Not Found</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #4ecdc4;"></div>
-                                    <span>2 - No Makefile</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #ffe66d;"></div>
-                                    <span>3 - No Rule/Typo</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #a8e6cf;"></div>
-                                    <span>4 - Missing Tab</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #ff8b94;"></div>
-                                    <span>5 - Permission</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color" style="background: #c7ceea;"></div>
-                                    <span>6 - Missing Tool</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="current-clue" id="currentClue">
+                        <div class="clue-error" id="clueError">Click a numbered pixel above to start!</div>
+                        <div class="clue-question" id="clueQuestion">Select any pixel with a number to see its error.</div>
+                        <div class="answer-options" id="answerOptions"></div>
                     </div>
                 </div>
 
                 <div class="completion" id="completion">
-                    <h2 class="completion-title">Masterpiece Complete!</h2>
-                    <p class="subtitle">You have mastered make debugging</p>
-                    <div class="revealed-image">
+                    <h2 class="completion-title">Build Successful!</h2>
+                    <p class="completion-message">You have mastered make debugging</p>
+                    <div class="final-art">
                         <div class="pixel-grid" id="finalImage" style="max-width: 100%;"></div>
                     </div>
-                    <div class="stats" style="margin-top: 2rem;">
+                    <div class="stats">
                         <div class="stat">
                             <div class="stat-label">Accuracy</div>
                             <div class="stat-value" id="accuracy">0%</div>
                         </div>
                     </div>
-                    <button class="restart-btn" onclick="restartGame()">Create New Art</button>
+                    <button class="restart-btn" onclick="restartGame()">Build Again</button>
                 </div>
             </div>
         </div>
@@ -678,23 +674,13 @@ breadcrumb: True
             6: '#c7ceea'
         };
 
+        // Simple 5x5 grid - checkmark pattern
         const pattern = [
-            [0,0,0,0,6,6,6,6,6,6,6,6,0,0,0,0],
-            [0,0,0,6,1,1,1,1,1,1,1,1,6,0,0,0],
-            [0,0,6,2,2,2,2,2,2,2,2,2,2,6,0,0],
-            [0,6,3,3,3,3,3,3,3,3,3,3,3,3,6,0],
-            [0,6,4,4,0,0,4,4,4,4,0,0,4,4,6,0],
-            [6,5,5,5,0,0,5,5,5,5,0,0,5,5,5,6],
-            [6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,6],
-            [6,2,2,1,2,2,2,2,2,2,2,2,1,2,2,6],
-            [6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,6],
-            [6,4,4,4,4,4,4,4,4,4,4,4,4,4,4,6],
-            [6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6],
-            [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
-            [0,0,6,1,1,1,6,6,6,6,2,2,2,6,0,0],
-            [0,0,0,6,6,6,0,0,0,0,6,6,6,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            [0,0,0,0,6],
+            [5,0,0,6,0],
+            [0,4,6,0,0],
+            [0,3,2,0,0],
+            [1,0,0,0,0]
         ];
 
         const clues = [
@@ -805,8 +791,8 @@ breadcrumb: True
             const grid = document.getElementById('pixelGrid');
             grid.innerHTML = '';
             
-            for (let row = 0; row < 16; row++) {
-                for (let col = 0; col < 16; col++) {
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
                     const pixel = document.createElement('div');
                     pixel.className = 'pixel';
                     pixel.dataset.row = row;
@@ -826,6 +812,9 @@ breadcrumb: True
             }
             
             document.getElementById('completion').classList.remove('show');
+            document.getElementById('clueError').textContent = 'Click a numbered pixel above to start!';
+            document.getElementById('clueQuestion').textContent = 'Select any pixel with a number to see its error.';
+            document.getElementById('answerOptions').innerHTML = '';
         }
 
         function selectPixel(row, col) {
@@ -837,7 +826,7 @@ breadcrumb: True
             document.querySelectorAll('.pixel').forEach(p => {
                 p.style.boxShadow = '';
             });
-            pixel.style.boxShadow = '0 0 15px #00ff9f';
+            pixel.style.boxShadow = '0 0 20px #00ff9f';
             
             const clueType = pattern[row][col];
             loadClue(clueType);
@@ -887,12 +876,12 @@ breadcrumb: True
                 
                 setTimeout(function() {
                     currentPixel = null;
-                    document.getElementById('clueError').textContent = 'Click a numbered pixel to start!';
-                    document.getElementById('clueQuestion').textContent = 'Select any pixel with a number.';
+                    document.getElementById('clueError').textContent = 'Great! Click another number.';
+                    document.getElementById('clueQuestion').textContent = 'Keep going to reveal the image!';
                     document.getElementById('answerOptions').innerHTML = '';
                     
                     checkCompletion();
-                }, 1000);
+                }, 1200);
                 
             } else {
                 errorCount++;
@@ -903,7 +892,7 @@ breadcrumb: True
                         btn.disabled = false;
                         btn.classList.remove('incorrect');
                     });
-                }, 500);
+                }, 600);
             }
             
             updateStats();
@@ -921,7 +910,7 @@ breadcrumb: True
             if (filledPixels >= totalPixels) {
                 setTimeout(function() {
                     showCompletion();
-                }, 500);
+                }, 800);
             }
         }
 
@@ -932,8 +921,8 @@ breadcrumb: True
             const finalGrid = document.getElementById('finalImage');
             finalGrid.innerHTML = '';
             
-            for (let row = 0; row < 16; row++) {
-                for (let col = 0; col < 16; col++) {
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
                     const pixel = document.createElement('div');
                     pixel.className = 'pixel filled';
                     
