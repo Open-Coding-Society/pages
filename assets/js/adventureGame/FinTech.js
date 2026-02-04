@@ -1,4 +1,4 @@
-import Game from '../GameEngine/essentials/Game.js';
+import Game from './AdventureGame.js';
 import GameControl from '../GameEngine/essentials/GameControl.js';
 import Quiz from './Quiz.js';
 import Inventory from "../GameEngine/features/Inventory.js";

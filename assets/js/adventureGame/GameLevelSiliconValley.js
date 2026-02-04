@@ -4,7 +4,7 @@ import Player from '../GameEngine/gameObjects/Player.js';
 import GameControl from '../GameEngine/essentials/GameControl.js';
 
 import GameLevelRetro from './GameLevelRetro.js';
-import Game from '../GameEngine/essentials/Game.js';
+import Game from './AdventureGame.js';
 import StockMoodModal from './StockMoodModal.js';
 import Market from './Market.js';
 import HelpPanel2 from './HelpPanel2.js'; 

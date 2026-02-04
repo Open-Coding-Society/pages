@@ -4,7 +4,7 @@ import Player from '../GameEngine/gameObjects/Player.js';
 import GameControl from '../GameEngine/essentials/GameControl.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 
-import Game from '../GameEngine/essentials/Game.js';
+import Game from './AdventureGame.js';
 import GameLevelWallstreet from './GameLevelWallstreet.js';
 class GameLevelRetro {
   /**

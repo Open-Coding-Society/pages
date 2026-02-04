@@ -4,7 +4,7 @@ import Player from '../GameEngine/gameObjects/Player.js';
 import Npc from '../GameEngine/gameObjects/Npc.js';  // Direct import for portal creation
 import Collectible from '../GameEngine/gameObjects/Collectible.js';
 import Barrier from './Barrier.js';
-import Game from '../GameEngine/essentials/Game.js';
+import Game from './AdventureGame.js';
 import Enemy from '../GameEngine/gameObjects/Enemy.js';
 import DialogueSystem from '../GameEngine/features/DialogueSystem.js';
 

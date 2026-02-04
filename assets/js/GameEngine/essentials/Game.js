@@ -64,7 +64,7 @@ class GameCore {
     }
 
     // Try to dynamically load Scoreboard (for adventure game stats syncing)
-    import('../../assets/js/adventureGame/Scoreboard.js')
+    import('../../adventureGame/Scoreboard.js')
         .then(mod => {
             try {
                 const Scoreboard = mod.default || mod.Scoreboard;
@@ -241,173 +241,18 @@ class GameCore {
      * - Skip Level button: Advances to the next level
      * - Toggle Leaderboard button: Shows/hides the leaderboard
      * 
-     * Note: Pause/Resume is controlled by pressing the Escape key (no button)
+    /**
+     * Creates top controls (buttons, UI elements).
+     * Override this method in game-specific classes to add custom UI.
+     * Base implementation does nothing - keeps the engine generic.
+     * 
+     * Example override in AdventureGame.js or MansionGame.js
      */
     _createTopControls() {
-        // Ensure pause-menu.css is loaded for button styling
-        const cssPath = '/assets/css/pause-menu.css';
-        if (!document.querySelector(`link[href="${cssPath}"]`)) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cssPath;
-            document.head.appendChild(link);
-        }
-
-        // Dynamically import the features and create controls
-        Promise.all([
-            import('../features/ScoreFeature.js'),
-            import('../features/PauseFeature.js'),
-            import('../features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;            
-            // Ensure parent has proper positioning context for fixed elements
-            if (parent !== document.body) {
-                parent.style.position = 'relative';
-            }            
-            // Create a lightweight pause menu object that ScoreFeature can use
-            const pauseMenuObj = {
-                gameControl: this.gameControl,
-                options: { parentId: 'gameContainer' },
-                counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
-                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score',
-                stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
-                // Use getter to dynamically pull score from stats
-                get score() {
-                    const varName = this.counterVar || 'levelsCompleted';
-                    return (this.stats && this.stats[varName]) || 0;
-                },
-                scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
-                _saveStatusNode: null
-            };
-            
-            // Create button bar
-            const buttonBar = document.createElement('div');
-            buttonBar.className = 'pause-button-bar';
-            buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '60px';
-            buttonBar.style.left = '20px';
-            buttonBar.style.display = 'flex';
-            buttonBar.style.gap = '10px';
-            buttonBar.style.alignItems = 'center';
-            buttonBar.style.flexWrap = 'wrap';
-            buttonBar.style.zIndex = '9999';
-
-            // Toggle button for showing/hiding Save/Skip controls
-            const btnToggleControls = document.createElement('button');
-            btnToggleControls.className = 'medium filledHighlight primary';
-            btnToggleControls.innerText = 'Settings';
-            btnToggleControls.title = 'Show score/skip controls';
-            btnToggleControls.setAttribute('aria-expanded', 'false');
-            btnToggleControls.style.cssText = `
-                background-color: #a46ae3ff;
-                font-weight: bold;
-                font-size: 12px;
-                font: 'Press Start 2P', monospace;
-            `;
-
-            // Container for toggled controls
-            const actionContainer = document.createElement('div');
-            actionContainer.className = 'pause-controls-dropdown';
-
-            // Save Score button - with real save functionality
-            const btnSave = document.createElement('button');
-            btnSave.className = 'pause-btn save-score';
-            btnSave.innerText = 'Save Score';
-            btnSave.style.display = 'inline-flex';
-            btnSave.style.width = 'auto';
-            btnSave.style.margin = '0';
-            btnSave.style.padding = '8px 12px';
-            btnSave.style.fontSize = '0.9rem';
-            
-            // Instantiate ScoreFeature for real save functionality
-            let scoreFeature = null;
-            try {
-                scoreFeature = new ScoreModule.default(pauseMenuObj);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
-            }
-            
-            // Wire the save button to ScoreFeature.saveScore
-            btnSave.addEventListener('click', async () => {
-                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
-                    await scoreFeature.saveScore(btnSave);
-                } else {
-                    console.warn('ScoreFeature saveScore not available');
-                }
-            });
-
-            // Skip Level button
-            const btnSkipLevel = document.createElement('button');
-            btnSkipLevel.className = 'pause-btn skip-level';
-            btnSkipLevel.innerText = 'Skip Level';
-            btnSkipLevel.style.display = 'inline-flex';
-            btnSkipLevel.style.width = 'auto';
-            btnSkipLevel.style.margin = '0';
-            btnSkipLevel.style.padding = '8px 12px';
-            btnSkipLevel.style.fontSize = '0.9rem';
-            btnSkipLevel.addEventListener('click', () => {
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else {
-                    // Fallback: synthesize 'L' key
-                    const event = new KeyboardEvent('keydown', {
-                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
-                    });
-                    document.dispatchEvent(event);
-                }
-            });
-
-            // NEW: Toggle Leaderboard button - starts as "Show Leaderboard" since it's hidden by default
-            const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'medium filledHighlight primary';
-            btnToggleLeaderboard.innerText = 'Show Leaderboard';
-            btnToggleLeaderboard.style.cssText = `
-                background-color: #e67e22;
-                font-weight: bold;
-                font-size: 12px;
-                font: 'Press Start 2P', monospace;
-            `;
-            btnToggleLeaderboard.addEventListener('click', () => {
-                if (this.leaderboardInstance) {
-                    this.leaderboardInstance.toggleVisibility();
-                    
-                    // Update button text based on visibility
-                    if (this.leaderboardInstance.isVisible()) {
-                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-                    } else {
-                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
-                    }
-                } else {
-                    console.warn('Leaderboard instance not available');
-                }
-            });
-
-            const setControlsOpen = (open) => {
-                actionContainer.classList.toggle('is-open', open);
-                btnToggleControls.title = open ? 'Hide score/skip controls' : 'Show score/skip controls';
-                btnToggleControls.setAttribute('aria-expanded', open ? 'true' : 'false');
-                if (open) {
-                    actionContainer.replaceChildren(btnSave, btnSkipLevel);
-                    console.log('Buttons added to DOM', 'Container children count:', actionContainer.children.length);
-                } else {
-                    actionContainer.replaceChildren();
-                    console.log('Buttons deleted from DOM', 'Container children count:', actionContainer.children.length);
-                }
-            };
-
-            btnToggleControls.addEventListener('click', () => {
-                const isHidden = !actionContainer.classList.contains('is-open');
-                setControlsOpen(isHidden);
-            });
-
-            buttonBar.appendChild(btnToggleControls);
-            buttonBar.appendChild(btnToggleLeaderboard);
-            parent.appendChild(buttonBar);
-            parent.appendChild(actionContainer);
-            
-        }).catch(err => {
-            console.warn('Failed to load control features:', err);
-        });
+        // Base implementation - no default UI
+        // Override in game-specific wrappers like:
+        // - /assets/js/adventureGame/AdventureGame.js
+        // - /assets/js/mansionGame/MansionLogic/Game.js
     }
 
     initUser() {
@@ -455,6 +300,7 @@ class GameCore {
     }
 }
 
+export { GameCore };
 export default {
     main: (environment, GameControlClass) => GameCore.main(environment, GameControlClass)
 };
