@@ -128,69 +128,163 @@ class GameCore {
                 _saveStatusNode: null
             };
 
-            // Toggle button for showing/hiding Save/Skip controls
-            const btnToggleControls = document.createElement('button');
-            btnToggleControls.className = 'medium filledHighlight primary';
-            btnToggleControls.innerText = 'Settings';
-            btnToggleControls.title = 'Show score/skip controls';
-            btnToggleControls.setAttribute('aria-expanded', 'false');
-            btnToggleControls.style.cssText = `
+            // Settings menu button that opens a modal
+            const settingsSummary = document.createElement('button');
+            settingsSummary.className = 'medium filledHighlight primary';
+            settingsSummary.innerText = 'Settings';
+            settingsSummary.style.cssText = `
                 background-color: #a46ae3ff;
                 font-weight: bold;
                 font-size: 12px;
                 font: 'Press Start 2P', monospace;
             `;
-
-            // Container for toggled controls
-            const actionContainer = document.createElement('div');
-            actionContainer.className = 'pause-controls-dropdown';
-
-            // Save Score button - with real save functionality
-            const btnSave = document.createElement('button');
-            btnSave.className = 'pause-btn save-score';
-            btnSave.innerText = 'Save Score';
-            btnSave.style.display = 'inline-flex';
-            btnSave.style.width = 'auto';
-            btnSave.style.margin = '0';
-            btnSave.style.padding = '8px 12px';
-            btnSave.style.fontSize = '0.9rem';
             
-            // Instantiate ScoreFeature for real save functionality
-            let scoreFeature = null;
-            try {
-                scoreFeature = new ScoreModule.default(pauseMenuObj);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
-            }
-            
-            // Wire the save button to ScoreFeature.saveScore
-            btnSave.addEventListener('click', async () => {
-                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
-                    await scoreFeature.saveScore(btnSave);
-                } else {
-                    console.warn('ScoreFeature saveScore not available');
+            // Create Settings modal when button is clicked
+            settingsSummary.addEventListener('click', () => {
+                // Check if modal already exists
+                if (document.getElementById('settingsModal')) {
+                    document.getElementById('settingsModal').style.display = 'flex';
+                    return;
                 }
-            });
-
-            // Skip Level button
-            const btnSkipLevel = document.createElement('button');
-            btnSkipLevel.className = 'pause-btn skip-level';
-            btnSkipLevel.innerText = 'Skip Level';
-            btnSkipLevel.style.display = 'inline-flex';
-            btnSkipLevel.style.width = 'auto';
-            btnSkipLevel.style.margin = '0';
-            btnSkipLevel.style.padding = '8px 12px';
-            btnSkipLevel.style.fontSize = '0.9rem';
-            btnSkipLevel.addEventListener('click', () => {
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else {
-                    // Fallback: synthesize 'L' key
-                    const event = new KeyboardEvent('keydown', {
-                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
-                    });
-                    document.dispatchEvent(event);
+                
+                // Create modal overlay
+                const modal = document.createElement('div');
+                modal.id = 'settingsModal';
+                modal.style.cssText = `
+                    display: flex;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.8);
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                    backdrop-filter: blur(5px);
+                `;
+                
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: linear-gradient(145deg, #2c3e50, #34495e);
+                    border: 4px solid #a46ae3ff;
+                    border-radius: 15px;
+                    padding: 30px;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 0 30px rgba(164, 106, 227, 0.5);
+                    font-family: 'Press Start 2P', monospace;
+                    color: #ecf0f1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                `;
+                
+                // Modal title
+                const title = document.createElement('h2');
+                title.innerText = '⚙️ SETTINGS ⚙️';
+                title.style.cssText = `
+                    text-align: center;
+                    color: #a46ae3ff;
+                    margin: 0 0 15px 0;
+                    font-size: 18px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                `;
+                modalContent.appendChild(title);
+                
+                // Save Score button for modal
+                const modalBtnSave = document.createElement('button');
+                modalBtnSave.innerText = 'Save Score';
+                modalBtnSave.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                
+                // Instantiate ScoreFeature for real save functionality
+                let scoreFeature = null;
+                try {
+                    scoreFeature = new ScoreModule.default(pauseMenuObj);
+                } catch (e) {
+                    console.warn('ScoreFeature init failed:', e);
                 }
+                
+                modalBtnSave.addEventListener('click', async () => {
+                    if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
+                        await scoreFeature.saveScore(modalBtnSave);
+                    } else {
+                        console.warn('ScoreFeature saveScore not available');
+                    }
+                });
+                modalContent.appendChild(modalBtnSave);
+                
+                // Skip Level button for modal
+                const modalBtnSkipLevel = document.createElement('button');
+                modalBtnSkipLevel.innerText = 'Skip Level';
+                modalBtnSkipLevel.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                
+                modalBtnSkipLevel.addEventListener('click', () => {
+                    if (typeof this.gameControl.endLevel === 'function') {
+                        this.gameControl.endLevel();
+                    } else {
+                        const event = new KeyboardEvent('keydown', {
+                            key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
+                        });
+                        document.dispatchEvent(event);
+                    }
+                    modal.style.display = 'none';
+                });
+                modalContent.appendChild(modalBtnSkipLevel);
+                
+                // Close button
+                const closeBtn = document.createElement('button');
+                closeBtn.innerText = '✕ CLOSE';
+                closeBtn.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #e67e22;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                    margin-top: 10px;
+                `;
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+                modalContent.appendChild(closeBtn);
+                
+                // Close modal when clicking outside
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+                
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
             });
 
             // Toggle Leaderboard button - starts as "Show Leaderboard" since it's hidden by default
@@ -218,31 +312,15 @@ class GameCore {
                 }
             });
 
-            const setControlsOpen = (open) => {
-                actionContainer.classList.toggle('is-open', open);
-                btnToggleControls.title = open ? 'Hide score/skip controls' : 'Show score/skip controls';
-                btnToggleControls.setAttribute('aria-expanded', open ? 'true' : 'false');
-                if (open) {
-                    actionContainer.replaceChildren(btnSave, btnSkipLevel);
-                    console.log('Buttons added to DOM', 'Container children count:', actionContainer.children.length);
-                } else {
-                    actionContainer.replaceChildren();
-                    console.log('Buttons deleted from DOM', 'Container children count:', actionContainer.children.length);
-                }
-            };
+            // Handle dropdown opening/closing with native <details>
+            // (Not needed anymore - modal is created on click)
 
-            btnToggleControls.addEventListener('click', () => {
-                const isHidden = !actionContainer.classList.contains('is-open');
-                setControlsOpen(isHidden);
-            });
-
-            // Place buttons in the left-of-home container that was created by addLevelNavigationButtons
+            // Place Settings button and Leaderboard button in the left-of-home container
             const leftContainer = document.getElementById('mansion-game-controls-container');
             if (leftContainer) {
-                leftContainer.appendChild(btnToggleControls);
+                leftContainer.appendChild(settingsSummary);
                 leftContainer.appendChild(btnToggleLeaderboard);
-                parent.appendChild(actionContainer);
-                console.log('Settings and Leaderboard buttons placed in footer left container');
+                console.log('Settings modal and Leaderboard buttons placed in footer left container');
             } else {
                 console.warn('mansion-game-controls-container not found, using default placement');
                 const buttonBar = document.createElement('div');
@@ -255,10 +333,9 @@ class GameCore {
                 buttonBar.style.alignItems = 'center';
                 buttonBar.style.flexWrap = 'wrap';
                 buttonBar.style.zIndex = '9999';
-                buttonBar.appendChild(btnToggleControls);
+                buttonBar.appendChild(settingsSummary);
                 buttonBar.appendChild(btnToggleLeaderboard);
                 parent.appendChild(buttonBar);
-                parent.appendChild(actionContainer);
             }
             
         }).catch(err => {
