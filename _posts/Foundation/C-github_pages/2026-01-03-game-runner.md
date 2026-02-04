@@ -158,11 +158,11 @@ Run the basic game. Use WASD or arrow keys to move Chill Guy around the desert. 
 
 {% capture code1 %}
 // Import for GameRunner
-import GameControl from '/assets/js/BetterGameEngine/essentials/GameControl.js';
+import GameControl from '/assets/js/GameEngine/essentials/GameControl.js';
 // Import GameEngine modules
-import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
-import Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';
-import Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';
+import GameEnvBackground from '/assets/js/GameEngine/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEngine/gameObjects/Player.js';
+import Npc from '/assets/js/GameEngine/gameObjects/Npc.js';
 import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
