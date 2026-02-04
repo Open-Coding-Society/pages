@@ -279,7 +279,28 @@ comments: false
     </div>
 
     <!-- Message Input Area -->
-    <div class="p-4 border-t border-neutral-700">
+    <div class="p-4 border-t border-neutral-700 relative">
+      <!-- Slash Command Popup -->
+      <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
+        <div id="slashCommandList">
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+            <span class="text-lg">📅</span>
+            <div>
+              <div class="text-white text-sm font-medium">/calendar</div>
+              <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+            </div>
+          </div>
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
+            <span class="text-lg">👤</span>
+            <div>
+              <div class="text-white text-sm font-medium">/adduser</div>
+              <div class="text-gray-400 text-xs">Mention or add a user to the conversation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="imageMessageBox" class="mt-4 mb-4"></div>
       <div class="flex items-center gap-2">
         <input
@@ -287,10 +308,13 @@ comments: false
           id="chatInput"
           placeholder="Message #group-name"
           class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          onkeydown="handleChatInputKeydown(event)"
+          oninput="handleChatInputChange(event)"
         />
         <button
           class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
-          title="Send message">
+          title="Send message"
+          onclick="sendChatMessage()">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
           </svg>
@@ -301,6 +325,142 @@ comments: false
 </div>
 
 <script>
+  // Slash command handling
+  const slashCommands = ['/calendar', '/adduser'];
+  let selectedCommandIndex = 0;
+
+  function handleChatInputChange(event) {
+    const input = event.target;
+    const value = input.value;
+    const popup = document.getElementById('slashCommandPopup');
+
+    // Show popup when input starts with "/" and is just the slash or partial command
+    if (value.startsWith('/') && !value.includes(' ')) {
+      const filter = value.toLowerCase();
+      const items = document.querySelectorAll('.slash-command-item');
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const command = item.querySelector('.text-white').textContent.toLowerCase();
+        if (command.startsWith(filter)) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount > 0) {
+        popup.classList.remove('hidden');
+        selectedCommandIndex = 0;
+        updateCommandSelection();
+      } else {
+        popup.classList.add('hidden');
+      }
+    } else {
+      popup.classList.add('hidden');
+    }
+  }
+
+  function handleChatInputKeydown(event) {
+    const popup = document.getElementById('slashCommandPopup');
+    const isPopupVisible = !popup.classList.contains('hidden');
+
+    if (isPopupVisible) {
+      const visibleItems = Array.from(document.querySelectorAll('.slash-command-item:not(.hidden)'));
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        selectedCommandIndex = Math.min(selectedCommandIndex + 1, visibleItems.length - 1);
+        updateCommandSelection();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        selectedCommandIndex = Math.max(selectedCommandIndex - 1, 0);
+        updateCommandSelection();
+      } else if (event.key === 'Enter' || event.key === 'Tab') {
+        event.preventDefault();
+        const selectedItem = visibleItems[selectedCommandIndex];
+        if (selectedItem) {
+          const command = selectedItem.querySelector('.text-white').textContent;
+          selectSlashCommand(command);
+        }
+      } else if (event.key === 'Escape') {
+        popup.classList.add('hidden');
+      }
+    } else if (event.key === 'Enter') {
+      sendChatMessage();
+    }
+  }
+
+  function updateCommandSelection() {
+    const items = document.querySelectorAll('.slash-command-item:not(.hidden)');
+    items.forEach((item, index) => {
+      if (index === selectedCommandIndex) {
+        item.classList.add('bg-neutral-600');
+      } else {
+        item.classList.remove('bg-neutral-600');
+      }
+    });
+  }
+
+  function selectSlashCommand(command) {
+    const input = document.getElementById('chatInput');
+    const popup = document.getElementById('slashCommandPopup');
+
+    input.value = command + ' ';
+    popup.classList.add('hidden');
+    input.focus();
+
+    // Trigger highlighting
+    highlightCommand(input);
+  }
+
+  function highlightCommand(input) {
+    // Add a visual indicator that a command is active
+    const value = input.value;
+    const commandMatch = value.match(/^\/\w+/);
+
+    if (commandMatch) {
+      input.classList.add('has-command');
+    } else {
+      input.classList.remove('has-command');
+    }
+  }
+
+  // Send chat message function
+  function sendChatMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const imageMessageBox = document.getElementById('imageMessageBox');
+    const chatMessages = document.getElementById('chatMessages');
+
+    const text = chatInput.value.trim();
+    const imageEl = imageMessageBox.querySelector('img');
+
+    // Don't send if both text and image are empty
+    if (!text && !imageEl) return;
+
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = `
+      <div class="flex items-baseline gap-2 mb-1">
+        <span class="text-white font-semibold text-sm">You</span>
+        <span class="text-gray-500 text-xs">Just now</span>
+      </div>
+      ${text ? `<p class="text-gray-200 text-sm">${text}</p>` : ''}
+      ${imageEl ? `<img src="${imageEl.src}" alt="Shared image" class="mt-2 max-w-xs rounded-lg" />` : ''}
+    `;
+
+    // Add to chat messages
+    chatMessages.appendChild(messageDiv);
+
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Clear input and image
+    chatInput.value = '';
+    imageMessageBox.innerHTML = '';
+  }
+
   document.addEventListener('paste', function(event) {
     const items = (event.clipboardData || window.clipboardData).items;
     let imageFile = null;
@@ -372,6 +532,28 @@ comments: false
   /* Prevent body scroll when modal is open */
   body.modal-open {
     overflow: hidden;
+  }
+
+  /* Slash command input styling */
+  #chatInput.has-command {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(64, 64, 64, 1) 30%);
+    border: 1px solid rgba(99, 102, 241, 0.5);
+  }
+
+  /* Slash command popup animation */
+  #slashCommandPopup {
+    animation: slideUp 0.15s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 
