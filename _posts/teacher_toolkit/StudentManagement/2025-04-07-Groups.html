@@ -156,7 +156,7 @@ comments: false
           </div>
         </div>
 
-        <div id="addGroupExpanded" class="hidden mt-6 space-y-4">
+        <div id="addGroupExpanded" class="mt-6 space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-200 mb-2">Group Name</label>
             <input type="text" id="newGroupName" placeholder="Enter group name"
@@ -219,6 +219,88 @@ comments: false
   </div>
 </div>
 
+<!-- Chat Modal -->
+<div id="chatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeGroupChat()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col" style="height: 600px;">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <div>
+        <h3 id="chatModalTitle" class="text-xl font-semibold text-white">Group Chat</h3>
+        <p id="chatModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+      </div>
+      <button onclick="closeGroupChat()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Chat Messages Area -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <!-- Sample Messages (Static - Non-functional) -->
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Sarah Chen</span>
+            <span class="text-gray-500 text-xs">2h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Hey everyone! Should we meet tomorrow to review the calculus problems?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Marcus Rodriguez</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">That works for me! I'm free after 3pm.</p>
+          <p class="text-gray-200 text-sm mt-2">Also, did anyone finish problem set 7 yet?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Emily Watson</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">I did! The last three questions were tough though.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">James Park</span>
+            <span class="text-gray-500 text-xs">30m ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Same here. Let's definitely go over those together.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input Area -->
+    <div class="p-4 border-t border-neutral-700">
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Message #group-name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          disabled
+        />
+        <button
+          class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+          disabled
+          title="Send message (non-functional)">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   .loading-spinner {
     width: 12px;
@@ -229,6 +311,30 @@ comments: false
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Chat Modal Scrollbar Styling */
+  #chatMessages::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #chatMessages::-webkit-scrollbar-track {
+    background: #262626;
+    border-radius: 4px;
+  }
+
+  #chatMessages::-webkit-scrollbar-thumb {
+    background: #525252;
+    border-radius: 4px;
+  }
+
+  #chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #737373;
+  }
+
+  /* Prevent body scroll when modal is open */
+  body.modal-open {
+    overflow: hidden;
+  }
 </style>
 
 <script type="module">
@@ -516,21 +622,39 @@ window.removeMemberFromGroup = function (groupId, personId) {
     .finally(() => hideLoading());
 }
 
-// Open group chat with placeholder functionality
+// Open group chat modal
 window.openGroupChat = function (groupId, groupName) {
   const group = allGroups.find(g => g.id === groupId);
-  if (!group || !group.members || group.members.length === 0) {
-    alert(`No members in ${groupName} to chat with`);
+  if (!group) {
+    alert(`Group not found`);
     return;
   }
-  
-  // TODO: Implement chat functionality
-  // This is a placeholder for chat integration
+
+  const memberCount = (group.members || []).length;
+
+  // Update modal header
+  document.getElementById('chatModalTitle').textContent = groupName;
+  document.getElementById('chatModalSubtitle').textContent =
+    `Period ${group.period} · ${group.course} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+
+  // Update input placeholder
+  const chatInput = document.getElementById('chatInput');
+  const groupNameFormatted = groupName.toLowerCase().replace(/\s+/g, '-');
+  chatInput.placeholder = `Message #${groupNameFormatted}`;
+
+  // Show modal and prevent body scroll
+  document.getElementById('chatModal').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+
+  // Log for debugging
   console.log(`Opening chat for group: ${groupName} (ID: ${groupId})`);
   console.log("Group members:", group.members);
-  
-  // Example placeholder action:
-  alert(`Chat feature coming soon for ${groupName}!\nMembers: ${group.members.map(m => m.name).join(", ")}`);
+}
+
+// Close group chat modal
+window.closeGroupChat = function () {
+  document.getElementById('chatModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 // Delete group with chaining - updates local state instead of refetching
@@ -592,6 +716,8 @@ window.saveNewGroup = function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
+
+  console.log("Submit button clicked! Group Name:", name, "Period:", period, "Course:", course);
 
   if (!name || !period || !course) {
     alert("Please fill all required fields.");
