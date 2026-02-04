@@ -280,6 +280,7 @@ comments: false
 
     <!-- Message Input Area -->
     <div class="p-4 border-t border-neutral-700">
+      <div id="imageMessageBox" class="mt-4 mb-4"></div>
       <div class="flex items-center gap-2">
         <input
           type="text"
@@ -298,6 +299,45 @@ comments: false
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('paste', function(event) {
+    const items = (event.clipboardData || window.clipboardData).items;
+    let imageFile = null;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        imageFile = items[i].getAsFile();
+        break;
+      }
+    }
+
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '100px'; // Smaller version
+        img.alt = 'Copied Image';
+
+        // Show the image in a message box or a designated area
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '';
+        messageBox.appendChild(img);
+      };
+      reader.onerror = function() {
+        console.error('Image copy failed');
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '<span style="color: red;">Image copy failed</span>';
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      console.error('No image found in clipboard');
+      const messageBox = document.getElementById('imageMessageBox');
+      messageBox.innerHTML = '<span style="color: red;">No image found in clipboard</span>';
+    }
+  });
+</script>
 
 <style>
   .loading-spinner {
