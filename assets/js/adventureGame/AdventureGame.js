@@ -147,6 +147,24 @@ class AdventureGame extends GameCore {
                 });
                 modalContent.appendChild(modalBtnSkipLevel);
                 
+                // Toggle Leaderboard button
+                const modalBtnLeaderboard = document.createElement('button');
+                modalBtnLeaderboard.innerText = 'Show Leaderboard';
+                modalBtnLeaderboard.style.background = 'black';
+                modalBtnLeaderboard.addEventListener('click', () => {
+                    if (this.leaderboardInstance) {
+                        this.leaderboardInstance.toggleVisibility();
+                        if (this.leaderboardInstance.isVisible()) {
+                            modalBtnLeaderboard.innerText = 'Hide Leaderboard';
+                        } else {
+                            modalBtnLeaderboard.innerText = 'Show Leaderboard';
+                        }
+                    } else {
+                        console.warn('Leaderboard instance not available');
+                    }
+                });
+                modalContent.appendChild(modalBtnLeaderboard);
+                
                 // Close button
                 const closeBtn = document.createElement('button');
                 closeBtn.innerText = 'CLOSE';
@@ -166,26 +184,7 @@ class AdventureGame extends GameCore {
                 document.body.appendChild(modal);
             });
 
-            // Toggle Leaderboard button
-            const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.innerText = 'Show Leaderboard';
-            btnToggleLeaderboard.style.background = 'black';
-            btnToggleLeaderboard.addEventListener('click', () => {
-                if (this.leaderboardInstance) {
-                    this.leaderboardInstance.toggleVisibility();
-                    
-                    if (this.leaderboardInstance.isVisible()) {
-                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-                    } else {
-                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
-                    }
-                } else {
-                    console.warn('Leaderboard instance not available');
-                }
-            });
-
             buttonBar.appendChild(settingsSummary);
-            buttonBar.appendChild(btnToggleLeaderboard);
             parent.appendChild(buttonBar);
             
             console.log('Adventure game buttons added to DOM. ButtonBar:', buttonBar, 'Parent:', parent);

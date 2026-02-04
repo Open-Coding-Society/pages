@@ -255,6 +255,35 @@ class GameCore {
                 });
                 modalContent.appendChild(modalBtnSkipLevel);
                 
+                // Toggle Leaderboard button
+                const modalBtnLeaderboard = document.createElement('button');
+                modalBtnLeaderboard.innerText = 'Show Leaderboard';
+                modalBtnLeaderboard.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #e67e22;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                modalBtnLeaderboard.addEventListener('click', () => {
+                    if (this.leaderboardInstance) {
+                        this.leaderboardInstance.toggleVisibility();
+                        if (this.leaderboardInstance.isVisible()) {
+                            modalBtnLeaderboard.innerText = 'Hide Leaderboard';
+                        } else {
+                            modalBtnLeaderboard.innerText = 'Show Leaderboard';
+                        }
+                    } else {
+                        console.warn('Leaderboard instance not available');
+                    }
+                });
+                modalContent.appendChild(modalBtnLeaderboard);
+                
                 // Close button
                 const closeBtn = document.createElement('button');
                 closeBtn.innerText = '✕ CLOSE';
@@ -287,40 +316,11 @@ class GameCore {
                 document.body.appendChild(modal);
             });
 
-            // Toggle Leaderboard button - starts as "Show Leaderboard" since it's hidden by default
-            const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'medium filledHighlight primary';
-            btnToggleLeaderboard.innerText = 'Show Leaderboard';
-            btnToggleLeaderboard.style.cssText = `
-                background-color: #e67e22;
-                font-weight: bold;
-                font-size: 12px;
-                font: 'Press Start 2P', monospace;
-            `;
-            btnToggleLeaderboard.addEventListener('click', () => {
-                if (this.leaderboardInstance) {
-                    this.leaderboardInstance.toggleVisibility();
-                    
-                    // Update button text based on visibility
-                    if (this.leaderboardInstance.isVisible()) {
-                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-                    } else {
-                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
-                    }
-                } else {
-                    console.warn('Leaderboard instance not available');
-                }
-            });
-
-            // Handle dropdown opening/closing with native <details>
-            // (Not needed anymore - modal is created on click)
-
-            // Place Settings button and Leaderboard button in the left-of-home container
+            // Place Settings button in the left-of-home container
             const leftContainer = document.getElementById('mansion-game-controls-container');
             if (leftContainer) {
                 leftContainer.appendChild(settingsSummary);
-                leftContainer.appendChild(btnToggleLeaderboard);
-                console.log('Settings modal and Leaderboard buttons placed in footer left container');
+                console.log('Settings modal placed in footer left container');
             } else {
                 console.warn('mansion-game-controls-container not found, using default placement');
                 const buttonBar = document.createElement('div');
@@ -334,7 +334,6 @@ class GameCore {
                 buttonBar.style.flexWrap = 'wrap';
                 buttonBar.style.zIndex = '9999';
                 buttonBar.appendChild(settingsSummary);
-                buttonBar.appendChild(btnToggleLeaderboard);
                 parent.appendChild(buttonBar);
             }
             
