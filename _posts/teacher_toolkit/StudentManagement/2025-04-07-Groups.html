@@ -822,7 +822,7 @@ window.renderGroups = function () {
     const el = document.createElement("div");
     el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
 
-    const isCollapsed = collapsedGroups[group.id];
+    const isCollapsed = collapsedGroups[group.id] !== false;
 
     el.innerHTML = `
       <!-- Header -->
@@ -966,7 +966,7 @@ window.toggleAddGroup = function () {
 
 // Toggle visibility of group member details
 window.toggleGroupDetails = function (groupId) {
-  collapsedGroups[groupId] = !collapsedGroups[groupId];
+  collapsedGroups[groupId] = collapsedGroups[groupId] === false ? true : false;
   renderGroups();
 }
 
