@@ -18,9 +18,9 @@ Create a basic game level with a player character. Use the GameEngine to set up 
 {% endcapture %}
 
 {% capture code1 %}
-import GameEnvBackground from '/assets/js/BetterGameEngine/essentials/GameEnvBackground.js';
-import Player from '/assets/js/BetterGameEngine/gameObjects/Player.js';
-import Npc from '/assets/js/BetterGameEngine/gameObjects/Npc.js';
+import GameEnvBackground from '/assets/js/GameEngine/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEngine/gameObjects/Player.js';
+import Npc from '/assets/js/GameEngine/gameObjects/Npc.js';
 import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
