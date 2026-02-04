@@ -48,8 +48,8 @@ class GameEnv {
         this.setTop();
         this.setBottom();
         // Use fixed dimensions for consistent game size
-        this.innerWidth = 800;
-        this.innerHeight = 800;
+        this.innerWidth = this.game?.innerWidth || window.innerWidth;
+        this.innerHeight = (this.game?.innerHeight || window.innerHeight) - this.top - this.bottom;
         this.size();
     }
 
