@@ -1,5 +1,29 @@
 // Adventure Game - Game Core
 
+/**
+ * GameCore - Main game initialization and management class
+ * 
+ * Environment Configuration Options:
+ * - path: Base path for game assets (required)
+ * - gameContainer: DOM element for game container (required)
+ * - gameCanvas: Canvas element for rendering (required)
+ * - gameLevelClasses: Array of GameLevel classes (required)
+ * - pythonURI, javaURI: Backend URIs for API calls (optional)
+ * - fetchOptions: Options for fetch requests (optional)
+ * 
+ * Example:
+ * ```javascript
+ * const environment = {
+ *     path: "{{site.baseurl}}",
+ *     gameContainer: document.getElementById("gameContainer"),
+ *     gameCanvas: document.getElementById("gameCanvas"),
+ *     gameLevelClasses: [GameLevel1, GameLevel2]
+ * };
+ * ```
+ * 
+ * Control buttons (Save Score, Skip Level, Toggle Leaderboard) appear by default.
+ * Press Escape key to pause/resume the game.
+ */
 class GameCore {
     constructor(environment, GameControlClass) {
     this.environment = environment;
@@ -26,19 +50,21 @@ class GameCore {
     if (GameControlClass) {
         this.gameControl = new GameControlClass(this, gameLevelClasses);
         this.gameControl.start();
+        // Setup Escape key for pause/resume
+        this._setupEscapeKey();
     } else {
         // For gamebuilder: defer initialization until GameControl is loaded
         this._initializeGameControlAsync(gameLevelClasses);
         return;
     }
 
-    // Create top control buttons directly using features
+    // Create top control buttons (unless disabled for game runner/builder)
     if (!this.environment.disablePauseMenu) {
         this._createTopControls();
     }
 
     // Try to dynamically load Scoreboard (for adventure game stats syncing)
-    import('../../assets/js/adventureGame/Scoreboard.js')
+    import('../../adventureGame/Scoreboard.js')
         .then(mod => {
             try {
                 const Scoreboard = mod.default || mod.Scoreboard;
@@ -87,8 +113,10 @@ class GameCore {
             const DefaultGameControl = mod.default || mod;
             this.gameControl = new DefaultGameControl(this, gameLevelClasses);
             this.gameControl.start();
+            // Setup Escape key for pause/resume
+            this._setupEscapeKey();
             
-            // Create top control buttons after GameControl is ready
+            // Create top control buttons after GameControl is ready (unless disabled)
             if (!this.environment.disablePauseMenu) {
                 this._createTopControls();
             }
@@ -166,130 +194,65 @@ class GameCore {
         }
     }
 
-    _createTopControls() {
-        // Ensure pause-menu.css is loaded for button styling
-        const cssPath = '/assets/css/pause-menu.css';
-        if (!document.querySelector(`link[href="${cssPath}"]`)) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cssPath;
-            document.head.appendChild(link);
+    /**
+     * Setup Escape key listener for pause/resume functionality.
+     * This always works regardless of whether pause control buttons are enabled.
+     */
+    _setupEscapeKey() {
+        if (this.escapeKeyHandler) {
+            // Already set up, don't add duplicate listeners
+            return;
         }
-
-        // Dynamically import the features and create controls
-        Promise.all([
-            import('../features/ScoreFeature.js'),
-            import('../features/PauseFeature.js'),
-            import('../features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
-            
-            // Create a lightweight pause menu object that ScoreFeature can use
-            const pauseMenuObj = {
-                gameControl: this.gameControl,
-                options: { parentId: 'gameContainer' },
-                counterVar: this.gameControl.pauseMenuOptions?.counterVar || 'levelsCompleted',
-                counterLabelText: this.gameControl.pauseMenuOptions?.counterLabel || 'Score',
-                stats: this.gameControl.stats || { levelsCompleted: 0, points: 0 },
-                // Use getter to dynamically pull score from stats
-                get score() {
-                    const varName = this.counterVar || 'levelsCompleted';
-                    return (this.stats && this.stats[varName]) || 0;
-                },
-                scoreVar: this.gameControl.pauseMenuOptions?.scoreVar || 'levelsCompleted',
-                _saveStatusNode: null
-            };
-            
-            // Create button bar
-            const buttonBar = document.createElement('div');
-            buttonBar.className = 'pause-button-bar';
-            buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '60px';
-            buttonBar.style.left = '20px';
-            buttonBar.style.display = 'flex';
-            buttonBar.style.gap = '10px';
-            buttonBar.style.zIndex = '9999';
-
-            // Pause button
-            const btnPause = document.createElement('button');
-            btnPause.className = 'pause-btn pause-toggle';
-            btnPause.innerText = 'Pause';
-            btnPause.addEventListener('click', () => {
-                if (this.gameControl.isPaused) {
+        
+        this.escapeKeyHandler = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (this.gameControl && this.gameControl.isPaused) {
                     this.gameControl.resume();
-                    btnPause.innerText = 'Pause';
-                } else {
+                } else if (this.gameControl) {
                     this.gameControl.pause();
-                    btnPause.innerText = 'Resume';
                 }
-            });
-
-            // Save Score button - with real save functionality
-            const btnSave = document.createElement('button');
-            btnSave.className = 'pause-btn save-score';
-            btnSave.innerText = 'Save Score';
-            
-            // Instantiate ScoreFeature for real save functionality
-            let scoreFeature = null;
-            try {
-                scoreFeature = new ScoreModule.default(pauseMenuObj);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
             }
-            
-            // Wire the save button to ScoreFeature.saveScore
-            btnSave.addEventListener('click', async () => {
-                if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
-                    await scoreFeature.saveScore(btnSave);
-                } else {
-                    console.warn('ScoreFeature saveScore not available');
-                }
-            });
+        };
+        
+        document.addEventListener('keydown', this.escapeKeyHandler);
+    }
 
-            // Skip Level button
-            const btnSkipLevel = document.createElement('button');
-            btnSkipLevel.className = 'pause-btn skip-level';
-            btnSkipLevel.innerText = 'Skip Level';
-            btnSkipLevel.addEventListener('click', () => {
-                if (typeof this.gameControl.endLevel === 'function') {
-                    this.gameControl.endLevel();
-                } else {
-                    // Fallback: synthesize 'L' key
-                    const event = new KeyboardEvent('keydown', {
-                        key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
-                    });
-                    document.dispatchEvent(event);
-                }
-            });
-
-            // NEW: Toggle Leaderboard button
-            const btnToggleLeaderboard = document.createElement('button');
-            btnToggleLeaderboard.className = 'pause-btn toggle-leaderboard';
-            btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-            btnToggleLeaderboard.addEventListener('click', () => {
-                if (this.leaderboardInstance) {
-                    this.leaderboardInstance.toggleVisibility();
-                    
-                    // Update button text based on visibility
-                    if (this.leaderboardInstance.isVisible()) {
-                        btnToggleLeaderboard.innerText = 'Hide Leaderboard';
-                    } else {
-                        btnToggleLeaderboard.innerText = 'Show Leaderboard';
-                    }
-                } else {
-                    console.warn('Leaderboard instance not available');
-                }
-            });
-
-            buttonBar.appendChild(btnPause);
-            buttonBar.appendChild(btnSave);
-            buttonBar.appendChild(btnSkipLevel);
-            buttonBar.appendChild(btnToggleLeaderboard);
-            parent.appendChild(buttonBar);
-            
-        }).catch(err => {
-            console.warn('Failed to load control features:', err);
-        });
+    /**
+     * Creates the pause control buttons (Save Score, Skip Level, Toggle Leaderboard).
+     * 
+     * These buttons appear by default in the top-left corner.
+     * Pause/Resume functionality is handled by the Escape key.
+     * 
+     * Example usage:
+     * ```javascript
+     * const environment = {
+     *     path: "{{site.baseurl}}",
+     *     gameContainer: document.getElementById("gameContainer"),
+     *     gameCanvas: document.getElementById("gameCanvas"),
+     *     gameLevelClasses: [Level1, Level2]
+     * };
+     * 
+     * const game = Game.main(environment, GameControl);
+     * ```
+     * 
+     * The button bar will appear in the top-left corner with:
+     * - Save Score button: Saves current score to backend
+     * - Skip Level button: Advances to the next level
+     * - Toggle Leaderboard button: Shows/hides the leaderboard
+     * 
+    /**
+     * Creates top controls (buttons, UI elements).
+     * Override this method in game-specific classes to add custom UI.
+     * Base implementation does nothing - keeps the engine generic.
+     * 
+     * Example override in AdventureGame.js or MansionGame.js
+     */
+    _createTopControls() {
+        // Base implementation - no default UI
+        // Override in game-specific wrappers like:
+        // - /assets/js/adventureGame/AdventureGame.js
+        // - /assets/js/mansionGame/MansionLogic/Game.js
     }
 
     initUser() {
@@ -337,6 +300,7 @@ class GameCore {
     }
 }
 
+export { GameCore };
 export default {
     main: (environment, GameControlClass) => GameCore.main(environment, GameControlClass)
 };
