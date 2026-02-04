@@ -61,8 +61,8 @@ class AdventureGame extends GameCore {
             const buttonBar = document.createElement('div');
             buttonBar.className = 'pause-button-bar';
             buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '60px';
-            buttonBar.style.left = '20px';
+            buttonBar.style.top = '80px';
+            buttonBar.style.left = '10px';
             buttonBar.style.display = 'flex';
             buttonBar.style.gap = '10px';
             buttonBar.style.alignItems = 'center';
@@ -73,6 +73,12 @@ class AdventureGame extends GameCore {
             const settingsSummary = document.createElement('button');
             settingsSummary.innerText = 'Settings';
             settingsSummary.style.background = 'black';
+            settingsSummary.style.color = 'white';
+            settingsSummary.style.padding = '12px 20px';
+            settingsSummary.style.fontSize = '16px';
+            settingsSummary.style.border = '2px solid white';
+            settingsSummary.style.cursor = 'pointer';
+            settingsSummary.style.fontFamily = "'Press Start 2P', monospace";
             
             // Create Settings modal when button is clicked
             settingsSummary.addEventListener('click', () => {
@@ -159,6 +165,20 @@ class AdventureGame extends GameCore {
                     }
                 });
                 modalContent.appendChild(modalBtnLeaderboard);
+                
+                // Toggle Score Counter button
+                const modalBtnScore = document.createElement('button');
+                modalBtnScore.innerText = 'Show Score';
+                modalBtnScore.style.background = 'black';
+                modalBtnScore.addEventListener('click', () => {
+                    const sc = document.querySelector('.pause-score-counter');
+                    if (sc) {
+                        const isHidden = sc.style.display === 'none';
+                        sc.style.display = isHidden ? 'block' : 'none';
+                        modalBtnScore.innerText = isHidden ? 'Hide Score' : 'Show Score';
+                    }
+                });
+                modalContent.appendChild(modalBtnScore);
                 
                 // Close button
                 const closeBtn = document.createElement('button');

@@ -256,7 +256,7 @@ class GameCore {
                 modalBtnLeaderboard.style.cssText = `
                     background: linear-gradient(145deg, #34495e, #2c3e50);
                     color: #ecf0f1;
-                    border: 2px solid #e67e22;
+                    border: 2px solid #a46ae3ff;
                     border-radius: 8px;
                     padding: 10px 12px;
                     font-size: 11px;
@@ -278,6 +278,31 @@ class GameCore {
                     }
                 });
                 modalContent.appendChild(modalBtnLeaderboard);
+                
+                // Toggle Score Counter button
+                const modalBtnScore = document.createElement('button');
+                modalBtnScore.innerText = 'Show Score';
+                modalBtnScore.style.cssText = `
+                    background: linear-gradient(145deg, #34495e, #2c3e50);
+                    color: #ecf0f1;
+                    border: 2px solid #a46ae3ff;
+                    border-radius: 8px;
+                    padding: 10px 12px;
+                    font-size: 11px;
+                    font-family: 'Press Start 2P', monospace;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                `;
+                modalBtnScore.addEventListener('click', () => {
+                    const sc = document.querySelector('.pause-score-counter');
+                    if (sc) {
+                        const isHidden = sc.style.display === 'none';
+                        sc.style.display = isHidden ? 'block' : 'none';
+                        modalBtnScore.innerText = isHidden ? 'Hide Score' : 'Show Score';
+                    }
+                });
+                modalContent.appendChild(modalBtnScore);
                 
                 // Close button
                 const closeBtn = document.createElement('button');
