@@ -76,11 +76,6 @@ class AdventureGame extends GameCore {
             
             // Create Settings modal when button is clicked
             settingsSummary.addEventListener('click', () => {
-                if (document.getElementById('settingsModal')) {
-                    document.getElementById('settingsModal').style.display = 'flex';
-                    return;
-                }
-                
                 const modal = document.createElement('div');
                 modal.id = 'settingsModal';
                 modal.style.cssText = `
@@ -143,7 +138,7 @@ class AdventureGame extends GameCore {
                         });
                         document.dispatchEvent(event);
                     }
-                    modal.style.display = 'none';
+                    modal.remove();
                 });
                 modalContent.appendChild(modalBtnSkipLevel);
                 
@@ -170,13 +165,14 @@ class AdventureGame extends GameCore {
                 closeBtn.innerText = 'CLOSE';
                 closeBtn.style.background = 'black';
                 closeBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
+                    modal.remove();
                 });
                 modalContent.appendChild(closeBtn);
                 
+                // Close modal when clicking outside
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
-                        modal.style.display = 'none';
+                        modal.remove();
                     }
                 });
                 
