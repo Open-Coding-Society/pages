@@ -2,30 +2,47 @@
 export default class PauseFeature {
     constructor(pauseMenu) {
         this.pauseMenu = pauseMenu;
-        this.isPaused = false; // Track pause state
+        this.gameControl = pauseMenu?.gameControl;
+        this.isPaused = false;
     }
 
+    /**
+     * Pause the game: stop game logic but keep rendering
+     */
     show() {
-        if (!this.pauseMenu.container) return;
+        if (!this.gameControl) return;
         
         this.isPaused = true;
+        this.gameControl.isPaused = true;
         
-        // Pause the game
-        if (this.pauseMenu.gameControl && typeof this.pauseMenu.gameControl.pause === 'function') {
-            this.pauseMenu.gameControl.pause();
+        // Remove exit key listener to prevent interference
+        if (typeof this.gameControl.removeExitKeyListener === 'function') {
+            this.gameControl.removeExitKeyListener();
         }
         
-        // Don't show the pause menu UI - just pause the game silently
+        // Save interaction handlers before cleaning up (for game-in-game scenarios)
+        if (typeof this.gameControl.cleanupInteractionHandlers === 'function') {
+            this.gameControl.cleanupInteractionHandlers(true);
+        }
     }
 
+    /**
+     * Resume the game: restart game logic
+     */
     hide() {
-        if (!this.pauseMenu.container) return;
+        if (!this.gameControl) return;
         
         this.isPaused = false;
+        this.gameControl.isPaused = false;
         
-        // Resume the game
-        if (this.pauseMenu.gameControl && typeof this.pauseMenu.gameControl.resume === 'function') {
-            this.pauseMenu.gameControl.resume();
+        // Restore exit key listener
+        if (typeof this.gameControl.addExitKeyListener === 'function') {
+            this.gameControl.addExitKeyListener();
+        }
+        
+        // Restore interaction handlers for outer game
+        if (typeof this.gameControl.restoreInteractionHandlers === 'function') {
+            this.gameControl.restoreInteractionHandlers();
         }
     }
 
