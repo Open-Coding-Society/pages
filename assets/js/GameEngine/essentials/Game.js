@@ -50,6 +50,8 @@ class GameCore {
     if (GameControlClass) {
         this.gameControl = new GameControlClass(this, gameLevelClasses);
         this.gameControl.start();
+        // Initialize PauseFeature for handling pause/resume
+        this._initializePauseFeature();
         // Setup Escape key for pause/resume
         this._setupEscapeKey();
     } else {
@@ -113,7 +115,10 @@ class GameCore {
             const DefaultGameControl = mod.default || mod;
             this.gameControl = new DefaultGameControl(this, gameLevelClasses);
             this.gameControl.start();
+            // Initialize PauseFeature for handling pause/resume
+            this._initializePauseFeature();
             // Setup Escape key for pause/resume
+            this._setupEscapeKey();
             this._setupEscapeKey();
             
             // Create top control buttons after GameControl is ready (unless disabled)
@@ -193,6 +198,27 @@ class GameCore {
             console.warn("No previous level to load");
         }
     }
+    /**
+     * Initialize PauseFeature for handling pause/resume logic
+     */
+    _initializePauseFeature() {
+        if (!this.gameControl) return;
+        
+        try {
+            import('../features/PauseFeature.js').then(mod => {
+                const PauseFeature = mod.default;
+                const pauseMenuObj = {
+                    gameControl: this.gameControl,
+                    container: null
+                };
+                this.gameControl.pauseFeature = new PauseFeature(pauseMenuObj);
+            }).catch(err => {
+                console.warn('Failed to load PauseFeature:', err);
+            });
+        } catch (err) {
+            console.warn('Error initializing PauseFeature:', err);
+        }
+    }
 
     /**
      * Setup Escape key listener for pause/resume functionality.
@@ -207,10 +233,25 @@ class GameCore {
         this.escapeKeyHandler = (e) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
-                if (this.gameControl && this.gameControl.isPaused) {
-                    this.gameControl.resume();
-                } else if (this.gameControl) {
-                    this.gameControl.pause();
+                
+                // If there's already a pause modal open, close it and resume
+                const existingModal = document.getElementById('pauseModal');
+                if (existingModal) {
+                    existingModal.remove();
+                    if (this.gameControl) this.gameControl.resume();
+                    return;
+                }
+                
+                // Show pause modal if method exists (adventure game)
+                if (typeof this.showPauseModal === 'function') {
+                    this.showPauseModal();
+                } else {
+                    // Fallback: simple pause/resume toggle
+                    if (this.gameControl && this.gameControl.isPaused) {
+                        this.gameControl.resume();
+                    } else if (this.gameControl) {
+                        this.gameControl.pause();
+                    }
                 }
             }
         };

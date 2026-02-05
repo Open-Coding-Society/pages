@@ -489,7 +489,7 @@ export default class Leaderboard {
             const url = `${base.replace(/\/$/, '')}${endpoint}`;
             console.log('Full URL:', url);
 
-            // Create payload matching Java backend structure
+            // Create payload matching Java backend AlgorithmicEvent structure
             const requestBody = {
                 payload: {
                     user: name,
@@ -499,15 +499,17 @@ export default class Leaderboard {
             };
             console.log('Payload:', JSON.stringify(requestBody));
 
-            // POST to backend
+            // POST to backend - using include credentials for authentication
             const res = await fetch(
                 url,
                 {
+                    ...fetchOptions,
                     method: 'POST',
                     headers: {
+                        ...fetchOptions?.headers,
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'omit',
+                    credentials: 'include', // Changed from 'omit' to 'include'
                     body: JSON.stringify(requestBody)
                 }
             );
@@ -553,15 +555,17 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
+            // Note: GenericEventController doesn't have a DELETE endpoint
+            // You may need to add one to your backend or handle deletion differently
             const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
             console.log('DELETE URL:', url);
 
-            // DELETE from backend
+            // DELETE from backend - using include credentials for authentication
             const res = await fetch(
                 url,
                 {
                     method: 'DELETE',
-                    credentials: 'omit'
+                    credentials: 'include' // Changed from 'omit' to 'include'
                 }
             );
 
@@ -594,7 +598,10 @@ export default class Leaderboard {
 
             const res = await fetch(
                 url,
-                { method: 'GET', credentials: 'omit' }
+                { 
+                    method: 'GET', 
+                    credentials: 'include' // Changed from 'omit' to 'include'
+                }
             );
 
             if (!res.ok) throw new Error(res.status);
@@ -604,8 +611,7 @@ export default class Leaderboard {
             console.log('Number of entries:', data.length);
             
             // Transform backend data to frontend format
-            // Backend returns: { id, user (User object or null), algoName, payload, timestamp }
-            // Frontend needs: { id, user (string), score, gameName }
+            // Backend returns AlgorithmicEvent with payload field
             this.elementaryEntries = data
                 .map(event => ({
                     id: event.id,
@@ -729,7 +735,7 @@ export default class Leaderboard {
 
             const res = await fetch(
                 `${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`,
-                { ...fetchOptions, method: 'GET', credentials: 'omit' }
+                { ...fetchOptions, method: 'GET', credentials: 'include' }
             );
 
             if (!res.ok) throw new Error(res.status);

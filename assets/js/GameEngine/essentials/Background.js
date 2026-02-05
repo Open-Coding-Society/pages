@@ -55,10 +55,21 @@ export class Background extends GameObject {
             console.error("Game canvas not found");
             return;
         }
+        const container = this.gameEnv?.container || gameCanvas.parentElement || document.body;
+        const containerRect = container?.getBoundingClientRect?.();
+        const canvasRect = gameCanvas.getBoundingClientRect();
+
         this.canvas.width = gameCanvas.width;
         this.canvas.height = gameCanvas.height;
-        this.canvas.style.width = `${gameCanvas.width}px`;
-        this.canvas.style.height = `${gameCanvas.height}px`;
+        this.canvas.style.width = `${canvasRect.width}px`;
+        this.canvas.style.height = `${canvasRect.height}px`;
+        if (containerRect && canvasRect) {
+            this.canvas.style.left = `${canvasRect.left - containerRect.left}px`;
+            this.canvas.style.top = `${canvasRect.top - containerRect.top}px`;
+        } else {
+            this.canvas.style.left = '0px';
+            this.canvas.style.top = '0px';
+        }
     }
 
     /**

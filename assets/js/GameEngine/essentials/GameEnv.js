@@ -28,6 +28,10 @@ class GameEnv {
         this.innerHeight = 0;
         this.top = 0;
         this.bottom = 0;
+        this.canvasOffsetLeft = 0;
+        this.canvasOffsetTop = 0;
+        this.canvasScaleX = 1;
+        this.canvasScaleY = 1;
         /* Below properties are not part of is-A or has-A relationships,
         *  they are references for easy accessibility in game objects */
         this.game = null; // Reference to the Game static environment variables
@@ -135,6 +139,21 @@ class GameEnv {
         this.canvas.height = this.innerHeight;
         this.canvas.style.width = `${this.innerWidth}px`;
         this.canvas.style.height = `${this.innerHeight}px`;
+
+        // Track canvas offset relative to container for accurate object positioning
+        const containerRect = this.container?.getBoundingClientRect?.();
+        const canvasRect = this.canvas?.getBoundingClientRect?.();
+        if (containerRect && canvasRect) {
+            this.canvasOffsetLeft = canvasRect.left - containerRect.left;
+            this.canvasOffsetTop = canvasRect.top - containerRect.top;
+            this.canvasScaleX = this.canvas.width ? canvasRect.width / this.canvas.width : 1;
+            this.canvasScaleY = this.canvas.height ? canvasRect.height / this.canvas.height : 1;
+        } else {
+            this.canvasOffsetLeft = 0;
+            this.canvasOffsetTop = 0;
+            this.canvasScaleX = 1;
+            this.canvasScaleY = 1;
+        }
     }
 
 
