@@ -908,7 +908,12 @@ window.deleteGroup = function (groupId) {
     .finally(() => hideLoading());
 };
 
-
+// Navigate to group dashboard page
+window.navigateToGroupDashboard = function (groupName) {
+  // Convert group name to URL-friendly format
+  const urlFriendlyName = encodeURIComponent(groupName.toLowerCase().replace(/\s+/g, '-'));
+  window.location.href = `{{ site.baseurl }}/student/groups/dashboard?group=${urlFriendlyName}`;
+};
 
 /* ================================
    API CALLS
@@ -1026,8 +1031,8 @@ window.renderGroups = function () {
               </svg>
             `}
           </button>
-          <div>
-            <h4 class="text-lg font-semibold text-white">${group.name}</h4>
+          <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
+            <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
             <p class="text-sm text-gray-400">
               Period ${group.period} · ${group.course}${isCollapsed ? ` · ${(group.members || []).length} members` : ''}
             </p>
@@ -1036,6 +1041,13 @@ window.renderGroups = function () {
 
         <!-- Action buttons -->
         <div class="flex gap-2">
+          <!-- Dashboard button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
+            title="View group dashboard"
+            onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
+            📊
+          </button>
           <!-- Chat button -->
           <button
             class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-green-600 text-gray-300 hover:text-white transition-colors"
