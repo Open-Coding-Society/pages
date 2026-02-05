@@ -6,7 +6,6 @@ permalink: /tools-help/merge
 breadcrumb: True
 ---
 
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -35,7 +34,7 @@ breadcrumb: True
         .header-section h1 {
             font-size: 2.5em;
             margin-bottom: 15px;
-            color: #00ff88;
+            color: #ffffff;
             text-align: center;
         }
 
@@ -57,7 +56,7 @@ breadcrumb: True
         .lesson-content h2 {
             font-size: 1.8em;
             margin-bottom: 25px;
-            color: #00ff88;
+            color: #fcfcfc;
         }
 
         .lesson-content ul {
@@ -82,7 +81,7 @@ breadcrumb: True
         }
 
         .start-button-container button {
-            background: #00ff88;
+            background: #ffffff;
             color: #000;
             border: none;
             padding: 15px 40px;
@@ -94,7 +93,7 @@ breadcrumb: True
         }
 
         .start-button-container button:hover {
-            background: #00dd77;
+            background: #ffffff;
             transform: translateY(-2px);
         }
 
@@ -139,13 +138,13 @@ breadcrumb: True
         h2 {
             font-size: 1.8em;
             margin-bottom: 25px;
-            color: #00ff88;
+            color: #ffffff;
         }
 
         .scenario {
             background: #252525;
             padding: 20px;
-            border-left: 3px solid #00ff88;
+            border-left: 3px solid #ffffff;
             margin-bottom: 30px;
             border-radius: 4px;
             font-size: 1em;
@@ -204,7 +203,7 @@ breadcrumb: True
         }
 
         button {
-            background: #00ff88;
+            background: #ffffff;
             color: #000;
             border: none;
             padding: 15px 30px;
