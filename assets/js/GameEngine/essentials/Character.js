@@ -248,13 +248,15 @@ class Character extends GameObject {
      * Sets up the canvas dimensions and styles.
      */
     setupCanvas() {
-        const scaleX = this.gameEnv?.canvasScaleX || 1;
-        const scaleY = this.gameEnv?.canvasScaleY || 1;
-        this.canvas.style.width = `${this.width * scaleX}px`;
-        this.canvas.style.height = `${this.height * scaleY}px`;
+        // Keep the character size constant - don't scale by canvasScale
+        // Only apply scale to position for responsive alignment
+        this.canvas.style.width = `${this.width}px`;
+        this.canvas.style.height = `${this.height}px`;
         this.canvas.style.position = 'absolute';
         const offsetLeft = this.gameEnv?.canvasOffsetLeft || 0;
         const offsetTop = this.gameEnv?.canvasOffsetTop || 0;
+        const scaleX = this.gameEnv?.canvasScaleX || 1;
+        const scaleY = this.gameEnv?.canvasScaleY || 1;
         this.canvas.style.left = `${offsetLeft + (this.transform.x * scaleX)}px`;
         this.canvas.style.top = `${offsetTop + (this.transform.y * scaleY)}px`;
         
