@@ -122,16 +122,6 @@ comments: false
     return colors[id % colors.length];
   }
 
-  // Override the chat function to use loaded group data
-  window.openGroupChatFromDashboard = function() {
-    if (window.currentGroupData) {
-      // Could open a chat modal here
-      alert(`Chat for "${window.currentGroupData.name}" coming soon!`);
-    } else {
-      alert('Chat feature coming soon!');
-    }
-  }
-
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', loadGroupDashboard);
 </script>
