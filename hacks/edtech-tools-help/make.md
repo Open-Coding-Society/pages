@@ -5,6 +5,13 @@ author: Nithika Vivek
 permalink: /tools-help/make
 breadcrumb: True
 ---
+---
+layout: post
+title: Edtech Make
+author: Nithika Vivek
+permalink: /tools-help/make
+breadcrumb: True
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -281,15 +288,13 @@ breadcrumb: True
         }
 
         .clue-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 1.5rem;
         }
 
         .clue-title {
             color: #00ccff;
             font-size: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .color-legend {
@@ -299,6 +304,7 @@ breadcrumb: True
             display: flex;
             gap: 1.5rem;
             flex-wrap: wrap;
+            margin-bottom: 1.5rem;
         }
 
         .legend-item {
@@ -436,9 +442,8 @@ breadcrumb: True
         }
 
         @media (max-width: 768px) {
-            .clue-header {
+            .color-legend {
                 flex-direction: column;
-                gap: 1rem;
             }
         }
     </style>
@@ -585,7 +590,7 @@ breadcrumb: True
                 <div class="stats">
                     <div class="stat">
                         <div class="stat-label">Progress</div>
-                        <div class="stat-value" id="progress">0/15</div>
+                        <div class="stat-value" id="progress">0/13</div>
                     </div>
                     <div class="stat">
                         <div class="stat-label">Correct</div>
@@ -674,13 +679,14 @@ breadcrumb: True
             6: '#c7ceea'
         };
 
-        // Simple 5x5 grid - checkmark pattern
+        // Simple 5x5 grid - computer with code lines
+        // Computer monitor shape with code lines inside
         const pattern = [
-            [0,0,0,0,6],
-            [5,0,0,6,0],
-            [0,4,6,0,0],
-            [0,3,2,0,0],
-            [1,0,0,0,0]
+            [1,1,1,1,1],
+            [2,4,4,4,3],
+            [2,5,5,5,3],
+            [0,0,6,0,0],
+            [0,6,6,6,0]
         ];
 
         const clues = [
