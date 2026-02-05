@@ -31,6 +31,8 @@ export default class CoinObject extends GameObject {
         // Position on canvas (defaults near top-left)
         this.x = (data.INIT_POSITION && data.INIT_POSITION.x) || (data.x || 50);
         this.y = (data.INIT_POSITION && data.INIT_POSITION.y) || (data.y || 50);
+        this.xRatio = data.xRatio;
+        this.yRatio = data.yRatio;
         this.points = data.points || 1;
         this.size = data.size || 16;
         this.hitbox = data.hitbox || { widthPercentage: 0.0, heightPercentage: 0.0 };
@@ -38,14 +40,13 @@ export default class CoinObject extends GameObject {
         // Create a canvas element for collision detection
         this.canvas = document.createElement('div');
         this.canvas.id = `coin-${Math.random().toString(36).substr(2, 9)}`;
-        this.canvas.style.position = 'fixed';
-        this.canvas.style.left = this.x + 'px';
-        this.canvas.style.top = this.y + 'px';
-        this.canvas.style.width = this.size + 'px';
-        this.canvas.style.height = this.size + 'px';
+        this.canvas.style.position = 'absolute';
         this.canvas.style.pointerEvents = 'none';
         this.score = 0;
-        document.body.appendChild(this.canvas);
+        const container = this.gameEnv?.container || document.body;
+        container.appendChild(this.canvas);
+        this.updatePositionRatios();
+        this.updateCollisionElement();
     }
 
     update() {
@@ -63,8 +64,47 @@ export default class CoinObject extends GameObject {
     }
 
     resize() {
-        // Nothing special to do on resize for the coin
+        this.applyPositionRatios();
+        this.clampToCanvas();
+        this.updatePositionRatios();
+        this.updateCollisionElement();
         this.draw();
+    }
+
+    updatePositionRatios() {
+        const width = this.gameEnv?.innerWidth || window.innerWidth;
+        const height = this.gameEnv?.innerHeight || window.innerHeight;
+        if (width > 0) this.xRatio = this.x / width;
+        if (height > 0) this.yRatio = this.y / height;
+    }
+
+    applyPositionRatios() {
+        const width = this.gameEnv?.innerWidth || window.innerWidth;
+        const height = this.gameEnv?.innerHeight || window.innerHeight;
+        if (this.xRatio !== undefined && width > 0) this.x = this.xRatio * width;
+        if (this.yRatio !== undefined && height > 0) this.y = this.yRatio * height;
+    }
+
+    clampToCanvas() {
+        const width = this.gameEnv?.innerWidth || window.innerWidth;
+        const height = this.gameEnv?.innerHeight || window.innerHeight;
+        const maxX = Math.max(0, width - this.size);
+        const maxY = Math.max(0, height - this.size);
+
+        this.x = Math.min(Math.max(0, this.x), maxX);
+        this.y = Math.min(Math.max(0, this.y), maxY);
+    }
+
+    updateCollisionElement() {
+        const scaleX = this.gameEnv?.canvasScaleX || 1;
+        const scaleY = this.gameEnv?.canvasScaleY || 1;
+        const offsetLeft = this.gameEnv?.canvasOffsetLeft || 0;
+        const offsetTop = this.gameEnv?.canvasOffsetTop || 0;
+
+        this.canvas.style.left = `${offsetLeft + (this.x * scaleX)}px`;
+        this.canvas.style.top = `${offsetTop + (this.y * scaleY)}px`;
+        this.canvas.style.width = `${this.size * scaleX}px`;
+        this.canvas.style.height = `${this.size * scaleY}px`;
     }
 
     /**
@@ -126,15 +166,19 @@ export default class CoinObject extends GameObject {
         
         // Generate random position with padding to keep coin visible
         const padding = 50;
-        const newX = Math.floor(Math.random() * (width - padding * 2) + padding);
-        const newY = Math.floor(Math.random() * (height - padding * 2) + padding);
+        const safeWidth = Math.max(0, width - padding * 2);
+        const safeHeight = Math.max(0, height - padding * 2);
+        const newX = Math.floor(Math.random() * safeWidth + padding);
+        const newY = Math.floor(Math.random() * safeHeight + padding);
         
         // Create new coin with random position
         const newCoinData = {
             INIT_POSITION: { x: newX, y: newY },
             size: this.size,
             points: this.points,
-            color: this.spriteData.color || 'yellow'
+            color: this.spriteData.color || 'yellow',
+            xRatio: width > 0 ? newX / width : undefined,
+            yRatio: height > 0 ? newY / height : undefined
         };
         
         const newCoin = new CoinObject(newCoinData, this.gameEnv);

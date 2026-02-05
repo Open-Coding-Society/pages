@@ -18,6 +18,7 @@ class GameControl {
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
     this.isPaused = false;
+    this.animFrameId = null;
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
     // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)
@@ -44,7 +45,7 @@ class GameControl {
 
     
     start() {
-        this.addExitKeyListener();
+        // Don't add exit key listener - Game.js handles it via _setupEscapeKey()
         // Add listener for opening the pause menu (toggle with 'p') and skip key (L)
         document.addEventListener('keydown', this.pauseKeyListener);
         this.addSkipKeyListener();
@@ -155,15 +156,15 @@ class GameControl {
             this.handleLevelEnd();
             return;
         }
-        // If the game level is paused, stop the game loop
-        if (this.isPaused) {
-            return;
+        
+        // Only update/render when not paused to freeze the last frame in place
+        if (!this.isPaused) {
+            this.currentLevel.update();
+            this.handleInLevelLogic();
         }
-        // Level updates
-        this.currentLevel.update();
-        this.handleInLevelLogic();
-        // Recurse at frame rate speed
-        requestAnimationFrame(this.gameLoop.bind(this));
+        
+        // Always recurse - keep animation frame going
+        this.animFrameId = requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     /**
@@ -422,37 +423,17 @@ class GameControl {
     }
 
     /**
-     * Game level in Game Level helper method to pause the underlying game level
-     * 1. Set the current game level to paused
-     * 2. Remove the exit key listener
-     * 3. Save the current canvas game containers state
-     * 4. Hide the current canvas game containers
+     * Pause the game - just set flag, PauseFeature handles animation frame management
      */
     pause() {
         this.isPaused = true;
-        this.removeExitKeyListener();
-        this.saveCanvasState();
-        this.hideCanvasState();
-        
-        // Save interaction handlers before cleaning up for game-in-game
-        this.cleanupInteractionHandlers(true);
-     }
+    }
 
-     /**
-      * Game level in Game Level helper method to resume the underlying game level
-      * 1. Set the current game level to not be paused
-      * 2. Add the exit key listener
-      * 3. Show the current canvas game containers
-      * 4. Start the game loop
-      */
+    /**
+     * Resume the game - just clear flag, PauseFeature handles animation frame management
+     */
     resume() {
         this.isPaused = false;
-        this.addExitKeyListener();
-        this.showCanvasState();
-        this.gameLoop();
-
-        // Restore interaction handlers for outer game
-        this.restoreInteractionHandlers();
     }
 }
 
