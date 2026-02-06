@@ -108,14 +108,6 @@
   margin-top: 0.25rem;
 }
 
-/* Inbox-specific text inputs for title and link labels */
-.inbox-panel--compact .microblog-form input[type="text"],
-.inbox-panel--compact .microblog-form input[type="url"] {
-  background: #1f2937;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
 .microblog-form textarea {
   display: block;
   width: 100%;
@@ -163,33 +155,9 @@
   background: #475569;
 }
 
-/* Override button styles inside inbox forms for Remove and Clear buttons */
-.inbox-panel--compact .microblog-form .microblog-btn-cancel {
-  background: #2563eb;
-  border: none;
-  border-radius: 0.375rem;
-  color: #fff;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-}
-
-.inbox-panel--compact .microblog-form .microblog-btn-cancel:hover {
-  background: #1e40af;
-}
-
-.inbox-panel--compact .microblog-form .microblog-btn {
-  background: #2563eb;
-  border-radius: 0.375rem;
-  color: #fff;
-}
-
-.inbox-panel--compact .microblog-form .microblog-btn:hover {
-  background: #1e40af;
-}
-
 /* Floating Action Button */
 
-/* Container that holds the microblog FAB and the inbox FAB so they sit adjacent */
+/* Container that holds the microblog FAB */
 .micro-actions-wrapper {
   position: fixed;
   top: 5rem;
@@ -225,160 +193,6 @@
 @media (max-width: 600px) {
   .micro-actions-wrapper { top: 1rem; right: 1rem; }
   .microblog-fab { font-size: 1.2rem; min-width: 56px; height: var(--fab-size,56px); }
-}
-
-/* Small Inbox FAB - sits to the left of the main microblog FAB */
-.inbox-fab {
-  background: #10b981;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: var(--fab-size, 56px);
-  height: var(--fab-size, 56px);
-  padding: 0;
-  font-size: 1.1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  cursor: pointer;
-  transition: background 0.18s, transform 0.12s;
-  position: relative;
-}
-.inbox-fab:hover { background: #059669; transform: translateY(-1px); }
-
-/* Notification badge on inbox FAB */
-.inbox-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ef4444;
-  color: #fff;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 700;
-  border: 2px solid var(--green-bg);
-  opacity: 1;
-  transition: opacity 0.2s;
-}
-
-.inbox-badge.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-@media (max-width: 600px) {
-  .inbox-fab { width: var(--fab-size,56px); height: var(--fab-size,56px); font-size:1.35rem; }
-}
-
-/* Compact inbox panel - small, anchored near the inbox FAB */
-.inbox-panel--compact {
-  right: calc(2rem + 0px); /* sits near the micro-actions wrapper */
-  top: calc(5rem + 3px);
-  width: 420px;
-  max-width: 92vw;
-  height: auto;
-  min-height: 8rem;
-  max-height: calc(100vh - 6rem);
-  overflow: auto;
-  transform: translateX(8px) translateY(-8px) translateZ(0);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-  border-radius: 0.5rem;
-}
-.inbox-panel--compact.open {
-  transform: translateX(0) translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (max-width: 768px) {
-  .inbox-panel--compact { right: 4.4rem; top: 4.2rem; }
-}
-
-/* Inbox-specific input sizing to make title smaller and same width as content */
-.inbox-panel--compact .microblog-input {
-  font-size: 0.95rem;
-  padding: 0.35rem 0.5rem;
-  box-sizing: border-box;
-  width: 100%;
-}
-.inbox-panel--compact .microblog-textarea {
-  width: 100%;
-  min-height: 120px;
-  box-sizing: border-box;
-}
-
-/* Make inbox inputs dark gray by default and ensure text is readable */
-.inbox-panel--compact .microblog-input,
-.inbox-panel--compact .microblog-textarea {
-  background: #1f2937; /* dark gray */
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-/* Admin control buttons in inbox: make all buttons blue with rounded corners.
-   Provide a square, rounded 'done' button sized to match the height of other buttons. */
-.inbox-panel--compact .inbox-admin-controls .microblog-btn,
-.inbox-panel--compact .inbox-admin-controls .microblog-btn-cancel,
-.inbox-panel--compact .inbox-admin-controls .microblog-btn-done {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.4rem 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px; /* uniform height for controls */
-}
-
-.inbox-panel--compact .inbox-admin-controls .microblog-btn:hover,
-.inbox-panel--compact .inbox-admin-controls .microblog-btn-cancel:hover,
-.inbox-panel--compact .inbox-admin-controls .microblog-btn-done:hover {
-  background: #1e40af;
-}
-
-/* Square done button matching the controls' height */
-.inbox-panel--compact .inbox-admin-controls .microblog-btn-done {
-  width: 36px;
-  padding: 0;
-  border-radius: 8px; /* slightly rounded square */
-}
-
-/* Ensure generic microblog buttons used elsewhere inside inbox also follow blue styling */
-.inbox-panel--compact .microblog-btn {
-  background: #2563eb;
-  color: #fff;
-  border-radius: 0.375rem;
-}
-.inbox-panel--compact .microblog-btn-cancel {
-  background: #2563eb;
-  color: #fff;
-}
-
-/* Messages container: newest first visually (we prepend via JS too) */
-.inbox-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Simple visual for tabs inside inbox */
-.inbox-tabs .inbox-tab {
-  color: var(--white);
-  border: 1px solid transparent;
-}
-.inbox-tabs .inbox-tab:hover {
-  background: rgba(255,255,255,0.04);
 }
 
 /* Side Panel */
@@ -533,23 +347,6 @@
   color: #222;
   background: #fff;
   box-sizing: border-box;
-}
-
-/* Unread indicator for messages in the inbox */
-.inbox-message.unread {
-  border-left: 3px solid #ef4444;
-  background: rgba(239, 68, 68, 0.05);
-}
-
-.inbox-message.unread::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ef4444;
-  margin-right: 0.5rem;
-  flex-shrink: 0;
 }
 
 .guest-submit-btn {
