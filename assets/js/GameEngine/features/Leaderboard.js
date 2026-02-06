@@ -499,7 +499,7 @@ export default class Leaderboard {
             };
             console.log('Payload:', JSON.stringify(requestBody));
 
-            // POST to backend - using include credentials for authentication
+            // POST to backend - using fetchOptions for proper authentication
             const res = await fetch(
                 url,
                 {
@@ -509,7 +509,6 @@ export default class Leaderboard {
                         ...fetchOptions?.headers,
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include', // Changed from 'omit' to 'include'
                     body: JSON.stringify(requestBody)
                 }
             );
@@ -555,17 +554,15 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
-            // Note: GenericEventController doesn't have a DELETE endpoint
-            // You may need to add one to your backend or handle deletion differently
-            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
+            const url = `${base.replace(/\/$/, '')}/api/events/${id}`;
             console.log('DELETE URL:', url);
 
-            // DELETE from backend - using include credentials for authentication
+            // DELETE from backend - using fetchOptions for proper authentication
             const res = await fetch(
                 url,
                 {
-                    method: 'DELETE',
-                    credentials: 'include' // Changed from 'omit' to 'include'
+                    ...fetchOptions,
+                    method: 'DELETE'
                 }
             );
 
@@ -599,8 +596,8 @@ export default class Leaderboard {
             const res = await fetch(
                 url,
                 { 
-                    method: 'GET', 
-                    credentials: 'include' // Changed from 'omit' to 'include'
+                    ...fetchOptions,
+                    method: 'GET'
                 }
             );
 
@@ -735,7 +732,10 @@ export default class Leaderboard {
 
             const res = await fetch(
                 `${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`,
-                { ...fetchOptions, method: 'GET', credentials: 'include' }
+                { 
+                    ...fetchOptions, 
+                    method: 'GET'
+                }
             );
 
             if (!res.ok) throw new Error(res.status);
