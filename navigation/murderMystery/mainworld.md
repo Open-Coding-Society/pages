@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: Mansion Game
-permalink: /gamify/mansionGame
+title: Murder Mystery Game
+permalink: /murderMysteryGame
 microblog: true
 ---
 
