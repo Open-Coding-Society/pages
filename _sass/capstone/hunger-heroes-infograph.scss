@@ -1,0 +1,316 @@
+// Hunger Heroes Infographic Styles
+// Located in _sass/capstone/
+
+// Variables
+$hh-primary: #ff6b35;
+$hh-secondary: #f7931e;
+$hh-dark-bg: #1a1a2e;
+$hh-card-bg: #1e1e2e;
+$hh-text-muted: #b0bec5;
+$hh-text-light: #e0e0e0;
+
+// Main Container
+.hh-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+// Header Section
+.hh-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($hh-primary, 0.3);
+}
+
+.hh-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $hh-primary, $hh-secondary);
+  color: #000;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+.hh-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, $hh-primary, $hh-secondary, $hh-primary);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: hh-gradient 3s ease infinite;
+  margin: 0 0 1rem 0;
+}
+
+@keyframes hh-gradient {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.hh-description {
+  color: $hh-text-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Card Section
+.hh-card {
+  background: linear-gradient(145deg, $hh-card-bg 0%, #252540 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($hh-primary, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.hh-card-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Visual Section
+.hh-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  border: 1px solid rgba($hh-primary, 0.2);
+
+  @media (max-width: 1024px) {
+    grid-column: 1 / -1;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+.hh-image-link {
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba($hh-primary, 0.3);
+  width: 100%;
+
+  &:hover .hh-image {
+    transform: scale(1.05);
+  }
+
+  &:hover .hh-overlay {
+    opacity: 1;
+  }
+}
+
+.hh-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.hh-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba($hh-primary, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #000;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+}
+
+.hh-status {
+  background: linear-gradient(135deg, $hh-primary, $hh-secondary);
+  color: #000;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.hh-team {
+  text-align: center;
+  margin-top: auto;
+}
+
+.hh-team-label {
+  display: block;
+  color: #78909c;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.hh-team-name {
+  display: block;
+  color: $hh-primary;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+// Content Section
+.hh-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  border: 1px solid rgba($hh-primary, 0.2);
+}
+
+.hh-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+}
+
+.hh-subtitle {
+  color: $hh-primary;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($hh-primary, 0.2);
+}
+
+// Key Points
+.hh-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.hh-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: $hh-text-light;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.hh-check {
+  color: $hh-primary;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+// Tech Stack
+.hh-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.hh-tech-tag {
+  background: rgba($hh-primary, 0.15);
+  color: $hh-primary;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba($hh-primary, 0.3);
+}
+
+// Details Section
+.hh-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  border: 1px solid rgba($hh-primary, 0.2);
+}
+
+.hh-section-title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($hh-primary, 0.3);
+}
+
+.hh-about {
+  color: $hh-text-muted;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+// Impact List
+.hh-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.hh-impact-item {
+  background: rgba($hh-primary, 0.1);
+  color: $hh-text-light;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid $hh-primary;
+}
+
+// Button
+.hh-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $hh-primary, $hh-secondary);
+  color: #000;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($hh-primary, 0.4);
+    color: #000;
+    text-decoration: none;
+  }
+}

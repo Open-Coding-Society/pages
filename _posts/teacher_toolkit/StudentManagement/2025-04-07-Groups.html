@@ -156,7 +156,7 @@ comments: false
           </div>
         </div>
 
-        <div id="addGroupExpanded" class="hidden mt-6 space-y-4">
+        <div id="addGroupExpanded" class="mt-6 space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-200 mb-2">Group Name</label>
             <input type="text" id="newGroupName" placeholder="Enter group name"
@@ -219,6 +219,286 @@ comments: false
   </div>
 </div>
 
+<!-- Chat Modal -->
+<div id="chatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeGroupChat()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col" style="height: 600px;">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <div>
+        <h3 id="chatModalTitle" class="text-xl font-semibold text-white">Group Chat</h3>
+        <p id="chatModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+      </div>
+      <button onclick="closeGroupChat()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Chat Messages Area -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <!-- Sample Messages (Static - Non-functional) -->
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Sarah Chen</span>
+            <span class="text-gray-500 text-xs">2h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Hey everyone! Should we meet tomorrow to review the calculus problems?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Marcus Rodriguez</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">That works for me! I'm free after 3pm.</p>
+          <p class="text-gray-200 text-sm mt-2">Also, did anyone finish problem set 7 yet?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Emily Watson</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">I did! The last three questions were tough though.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">James Park</span>
+            <span class="text-gray-500 text-xs">30m ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Same here. Let's definitely go over those together.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input Area -->
+    <div class="p-4 border-t border-neutral-700 relative">
+      <!-- Slash Command Popup -->
+      <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
+        <div id="slashCommandList">
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+            <span class="text-lg">📅</span>
+            <div>
+              <div class="text-white text-sm font-medium">/calendar</div>
+              <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+            </div>
+          </div>
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
+            <span class="text-lg">👤</span>
+            <div>
+              <div class="text-white text-sm font-medium">/adduser</div>
+              <div class="text-gray-400 text-xs">Add a user to the conversation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="imageMessageBox" class="mt-4 mb-4"></div>
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Message #group-name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          onkeydown="handleChatInputKeydown(event)"
+          oninput="handleChatInputChange(event)"
+        />
+        <button
+          class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+          title="Send message"
+          onclick="sendChatMessage()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Slash command handling
+  const slashCommands = ['/calendar', '/adduser'];
+  let selectedCommandIndex = 0;
+
+  function handleChatInputChange(event) {
+    const input = event.target;
+    const value = input.value;
+    const popup = document.getElementById('slashCommandPopup');
+
+    // Show popup when input starts with "/" and is just the slash or partial command
+    if (value.startsWith('/') && !value.includes(' ')) {
+      const filter = value.toLowerCase();
+      const items = document.querySelectorAll('.slash-command-item');
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const command = item.querySelector('.text-white').textContent.toLowerCase();
+        if (command.startsWith(filter)) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount > 0) {
+        popup.classList.remove('hidden');
+        selectedCommandIndex = 0;
+        updateCommandSelection();
+      } else {
+        popup.classList.add('hidden');
+      }
+    } else {
+      popup.classList.add('hidden');
+    }
+  }
+
+  function handleChatInputKeydown(event) {
+    const popup = document.getElementById('slashCommandPopup');
+    const isPopupVisible = !popup.classList.contains('hidden');
+
+    if (isPopupVisible) {
+      const visibleItems = Array.from(document.querySelectorAll('.slash-command-item:not(.hidden)'));
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        selectedCommandIndex = Math.min(selectedCommandIndex + 1, visibleItems.length - 1);
+        updateCommandSelection();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        selectedCommandIndex = Math.max(selectedCommandIndex - 1, 0);
+        updateCommandSelection();
+      } else if (event.key === 'Enter' || event.key === 'Tab') {
+        event.preventDefault();
+        const selectedItem = visibleItems[selectedCommandIndex];
+        if (selectedItem) {
+          const command = selectedItem.querySelector('.text-white').textContent;
+          selectSlashCommand(command);
+        }
+      } else if (event.key === 'Escape') {
+        popup.classList.add('hidden');
+      }
+    } else if (event.key === 'Enter') {
+      sendChatMessage();
+    }
+  }
+
+  function updateCommandSelection() {
+    const items = document.querySelectorAll('.slash-command-item:not(.hidden)');
+    items.forEach((item, index) => {
+      if (index === selectedCommandIndex) {
+        item.classList.add('bg-neutral-600');
+      } else {
+        item.classList.remove('bg-neutral-600');
+      }
+    });
+  }
+
+  function selectSlashCommand(command) {
+    const input = document.getElementById('chatInput');
+    const popup = document.getElementById('slashCommandPopup');
+
+    input.value = command + ' ';
+    popup.classList.add('hidden');
+    input.focus();
+
+    // Trigger highlighting
+    highlightCommand(input);
+  }
+
+  function highlightCommand(input) {
+    // Add a visual indicator that a command is active
+    const value = input.value;
+    const commandMatch = value.match(/^\/\w+/);
+
+    if (commandMatch) {
+      input.classList.add('has-command');
+    } else {
+      input.classList.remove('has-command');
+    }
+  }
+
+  // Send chat message function
+  function sendChatMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const imageMessageBox = document.getElementById('imageMessageBox');
+    const chatMessages = document.getElementById('chatMessages');
+
+    const text = chatInput.value.trim();
+    const imageEl = imageMessageBox.querySelector('img');
+
+    // Don't send if both text and image are empty
+    if (!text && !imageEl) return;
+
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = `
+      <div class="flex items-baseline gap-2 mb-1">
+        <span class="text-white font-semibold text-sm">You</span>
+        <span class="text-gray-500 text-xs">Just now</span>
+      </div>
+      ${text ? `<p class="text-gray-200 text-sm">${text}</p>` : ''}
+      ${imageEl ? `<img src="${imageEl.src}" alt="Shared image" class="mt-2 max-w-xs rounded-lg" />` : ''}
+    `;
+
+    // Add to chat messages
+    chatMessages.appendChild(messageDiv);
+
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Clear input and image
+    chatInput.value = '';
+    imageMessageBox.innerHTML = '';
+  }
+
+  document.addEventListener('paste', function(event) {
+    const items = (event.clipboardData || window.clipboardData).items;
+    let imageFile = null;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        imageFile = items[i].getAsFile();
+        break;
+      }
+    }
+
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '100px'; // Smaller version
+        img.alt = 'Copied Image';
+
+        // Show the image in a message box or a designated area
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '';
+        messageBox.appendChild(img);
+      };
+      reader.onerror = function() {
+        console.error('Image copy failed');
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '<span style="color: red;">Image copy failed</span>';
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      console.error('No image found in clipboard');
+      const messageBox = document.getElementById('imageMessageBox');
+      messageBox.innerHTML = '<span style="color: red;">No image found in clipboard</span>';
+    }
+  });
+</script>
+
 <style>
   .loading-spinner {
     width: 12px;
@@ -229,6 +509,52 @@ comments: false
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Chat Modal Scrollbar Styling */
+  #chatMessages::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #chatMessages::-webkit-scrollbar-track {
+    background: #262626;
+    border-radius: 4px;
+  }
+
+  #chatMessages::-webkit-scrollbar-thumb {
+    background: #525252;
+    border-radius: 4px;
+  }
+
+  #chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #737373;
+  }
+
+  /* Prevent body scroll when modal is open */
+  body.modal-open {
+    overflow: hidden;
+  }
+
+  /* Slash command input styling */
+  #chatInput.has-command {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(64, 64, 64, 1) 30%);
+    border: 1px solid rgba(99, 102, 241, 0.5);
+  }
+
+  /* Slash command popup animation */
+  #slashCommandPopup {
+    animation: slideUp 0.15s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
 
 <script type="module">
@@ -247,6 +573,7 @@ let activeClasses = [];
 let loadingCount = 0;  // Track concurrent loading operations
 let isAdmin = false;   // Track if current user is an admin
 let selectedUsersForGroup = {}; // Track multi-select members per group
+let collapsedGroups = {}; // Track collapsed state per group ID
 
 /* ================================
    LOADING HELPERS
@@ -516,21 +843,39 @@ window.removeMemberFromGroup = function (groupId, personId) {
     .finally(() => hideLoading());
 }
 
-// Open group chat with placeholder functionality
+// Open group chat modal
 window.openGroupChat = function (groupId, groupName) {
   const group = allGroups.find(g => g.id === groupId);
-  if (!group || !group.members || group.members.length === 0) {
-    alert(`No members in ${groupName} to chat with`);
+  if (!group) {
+    alert(`Group not found`);
     return;
   }
-  
-  // TODO: Implement chat functionality
-  // This is a placeholder for chat integration
+
+  const memberCount = (group.members || []).length;
+
+  // Update modal header
+  document.getElementById('chatModalTitle').textContent = groupName;
+  document.getElementById('chatModalSubtitle').textContent =
+    `Period ${group.period} · ${group.course} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+
+  // Update input placeholder
+  const chatInput = document.getElementById('chatInput');
+  const groupNameFormatted = groupName.toLowerCase().replace(/\s+/g, '-');
+  chatInput.placeholder = `Message #${groupNameFormatted}`;
+
+  // Show modal and prevent body scroll
+  document.getElementById('chatModal').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+
+  // Log for debugging
   console.log(`Opening chat for group: ${groupName} (ID: ${groupId})`);
   console.log("Group members:", group.members);
-  
-  // Example placeholder action:
-  alert(`Chat feature coming soon for ${groupName}!\nMembers: ${group.members.map(m => m.name).join(", ")}`);
+}
+
+// Close group chat modal
+window.closeGroupChat = function () {
+  document.getElementById('chatModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
 }
 
 // Delete group with chaining - updates local state instead of refetching
@@ -563,7 +908,12 @@ window.deleteGroup = function (groupId) {
     .finally(() => hideLoading());
 };
 
-
+// Navigate to group dashboard page
+window.navigateToGroupDashboard = function (groupName) {
+  // Convert group name to URL-friendly format
+  const urlFriendlyName = encodeURIComponent(groupName.toLowerCase().replace(/\s+/g, '-'));
+  window.location.href = `{{ site.baseurl }}/student/groups/dashboard?group=${urlFriendlyName}`;
+};
 
 /* ================================
    API CALLS
@@ -592,6 +942,8 @@ window.saveNewGroup = function () {
   const name = document.getElementById("newGroupName").value.trim();
   const period = document.getElementById("newGroupPeriod").value;
   const course = document.getElementById("newGroupClass").value;
+
+  console.log("Submit button clicked! Group Name:", name, "Period:", period, "Course:", course);
 
   if (!name || !period || !course) {
     alert("Please fill all required fields.");
@@ -657,18 +1009,45 @@ window.renderGroups = function () {
     const el = document.createElement("div");
     el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
 
+    const isCollapsed = collapsedGroups[group.id] !== false;
+
     el.innerHTML = `
       <!-- Header -->
       <div class="flex justify-between items-start">
-        <div>
-          <h4 class="text-lg font-semibold text-white">${group.name}</h4>
-          <p class="text-sm text-gray-400">
-            Period ${group.period} · ${group.course}
-          </p>
+        <div class="flex items-center gap-2">
+          <!-- Toggle visibility button -->
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded bg-neutral-600 hover:bg-neutral-500 text-gray-300 hover:text-white transition-colors"
+            title="${isCollapsed ? 'Show' : 'Hide'} member details"
+            onclick="toggleGroupDetails(${group.id})">
+            ${isCollapsed ? `
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+              </svg>
+            ` : `
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+            `}
+          </button>
+          <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
+            <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
+            <p class="text-sm text-gray-400">
+              Period ${group.period} · ${group.course}${isCollapsed ? ` · ${(group.members || []).length} members` : ''}
+            </p>
+          </div>
         </div>
 
         <!-- Action buttons -->
         <div class="flex gap-2">
+          <!-- Dashboard button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
+            title="View group dashboard"
+            onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
+            📊
+          </button>
           <!-- Chat button -->
           <button
             class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-green-600 text-gray-300 hover:text-white transition-colors"
@@ -689,10 +1068,11 @@ window.renderGroups = function () {
         </div>
       </div>
 
+      ${!isCollapsed ? `
       <!-- Members row -->
       <div class="mt-3 flex flex-wrap gap-2">
         ${(group.members || []).map(m => `
-          <span 
+          <span
             class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
             onclick="removeMemberFromGroup(${group.id}, ${m.id})"
             title="Click to remove">
@@ -736,11 +1116,12 @@ window.renderGroups = function () {
         </div>
 
         <!-- Search results dropdown -->
-        <div 
-          id="search-results-${group.id}" 
+        <div
+          id="search-results-${group.id}"
           class="hidden absolute left-0 right-12 mt-1 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto">
         </div>
       </div>
+      ` : ''}
     `;
     container.appendChild(el);
     updateAddSelectedButton(group.id);
@@ -775,6 +1156,12 @@ function updateSearchResultsSelection(groupId) {
 window.toggleAddGroup = function () {
   document.getElementById("addGroupExpanded").classList.toggle("hidden");
   document.getElementById("addGroupChevron").classList.toggle("rotate-180");
+}
+
+// Toggle visibility of group member details
+window.toggleGroupDetails = function (groupId) {
+  collapsedGroups[groupId] = collapsedGroups[groupId] === false ? true : false;
+  renderGroups();
 }
 
 window.cancelAddGroup = function () {
