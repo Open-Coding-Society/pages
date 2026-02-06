@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Murder Mystery Level 1
-permalink: /gamify/murdermystery1
+permalink: /murdermystery1
 microblog: true
 ---
 
