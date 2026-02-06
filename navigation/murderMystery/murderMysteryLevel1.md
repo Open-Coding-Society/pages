@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: Mansion Level 1
-permalink: /gamify/mansion1
+title: Murder Mystery Level 1
+permalink: /gamify/murdermystery1
 microblog: true
 ---
 

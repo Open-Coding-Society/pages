@@ -5,7 +5,7 @@ import Player from '/assets/js/adventureGame/GameEngine/Player.js';
 import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
 import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
 
-class CustomLevel {
+class MurderMysteryLevel1  {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -59,5 +59,4 @@ class CustomLevel {
     }
 }
 
-export { GameControl };
-export const gameLevelClasses = [CustomLevel]
+export default MurderMysteryLevel1;
