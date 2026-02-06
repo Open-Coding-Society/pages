@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Mansion Level 3
-permalink: /gamify/mansion3
+permalink: /murdermystery3
 microblog: true
 ---
 
