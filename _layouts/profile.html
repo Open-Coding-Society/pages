@@ -975,7 +975,7 @@ active_tab: profile
         classEntries.forEach((entry, index) => {
             originalValues.classEntries[index] = {
                 name: entry.querySelector('.class-name').value,
-                year: entry.querySelector('.class-year').value
+                //year: entry.querySelector('.class-year').value
             };
         });
     }
@@ -1226,7 +1226,7 @@ active_tab: profile
         // get class info
         const classEntries = Array.from(document.querySelectorAll('.class-entry')).map(entry => ({
             name: entry.querySelector('.class-name').value,
-            year: entry.querySelector('.class-year').value
+            //year: entry.querySelector('.class-year').value
         }));
 
         // import api helpers
