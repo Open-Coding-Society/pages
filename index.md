@@ -346,11 +346,11 @@ Empower yourself to solve real-world problems, unlock creativity, and open doors
   </div>
 </div>
 
-## Project-based learning (PBL)
+### Project-based learning (PBL)
 
-Conventional learning, such as tests, is used only for diagnostic purposes, allowing students to make corrections before grading. In AP or Articulated courses, tests are also used to establish standing against College Board or community college requirements.
+> Conventional learning, such as tests, is used only for diagnostic purposes, allowing students to make corrections before grading. In AP or Articulated courses, tests are also used to establish standing against College Board or community college requirements.
 
-In PBL, student progress and understanding are assessed continuously through project checkpoints, analytics, observation and verbal discussions, both individually and within teams.
+In PBL, student progress and understanding are assessed continuously through project checkpoints, analytics, teacher observation, and verbal discussions, both individually and within teams.
 
 Learning begins with instructor-created materials, including schema foundations, project-starter code, project requirements, and ongoing support.
 
@@ -372,10 +372,10 @@ Instructor is extremely focused on work, routines, and culture established in th
 
 - Learning objectives are scheduled over a Sprint
 - Sprints last 2–4 weeks
-- Classroom work is 4+ hours per week, including weeks with Pro-Grow, Parent Confernences, or other shortned schoool instruction time.
+- Classroom work is 4+ hours per week, including weeks with Pro-Grow, Parent Conferences, or other shortened school instruction time.
   - Make the most of every opportunity in class
   - Balance technical work with collaboration and team activities
-- Homework can be 1–2 hours per week, primarily to prepare yourself for classroom and team work
+- Homework can be 1–2 hours per week, primarily to prepare for classroom and team work
   - Review materials discussed in class
   - Mentally prepare for the next day (e.g., update issues or Kanban)
   - Complete additional preparation if you miss class, fall behind, or have upcoming live reviews
@@ -386,13 +386,13 @@ Instructor believes absences disrupt work culture and routines.
 
 - Communicate absences in advance with the instructor and team members
 - Make a plan to recreate the situation or work missed in class
-- Do not disrupt class to make up your missed work. Be responsible, by meeting with peers or teacher in office hours regarding missed work
+- Do not disrupt class to make up missed work; be responsible by coordinating with peers or the instructor during office hours
 
 > Students are expected to be in class, similar to workplace expectations.
 
 - Make-up work is challenging for everyone, not just the student who missed class
 - Time lost in class is difficult to recover, since individuals work closely with teams, lead lessons, or participate in live reviews
-- The instructor reserves the right to adjust instruction during the week according to classroom needs, so the schedule is typically adjusted week by week
+- The instructor reserves the right to adjust instruction during the week according to classroom needs; the schedule is typically adjusted week by week
 - Modalities of instruction are flexible to support different learning styles and may go beyond published materials
 
 ![ccr]({{site.baseurl}}/images/course-brag/ccr.png)
