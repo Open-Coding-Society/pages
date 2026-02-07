@@ -413,7 +413,7 @@ Computer Science Principles is designed as a college-level introduction to compu
   - Rising 11th-12th graders: GPA above 3.5 and expectation of experience with JavaScript or other programming languages
 - Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
 
-> Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer programs independently and includes AP review and AP project time. The course utilizes JavaScript and Python languages to instruct on the imperative and object-oriented programming paradigms. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
+> Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer programs independently and includes AP review and AP project time. The course concludes with the Data Foundations Project, an applied capstone where students design and present an independent computing solution using data, algorithms, and programmatic reasoning. The course utilizes JavaScript and Python languages to instruct on the imperative and object-oriented programming paradigms. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
 
 - Prerequisites: AP Computer Science Principles 1,2
 - Meets UC/CSU G requirements
@@ -431,10 +431,18 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
   - Or a teacher recommendation with an expectation of understanding JavaScript, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology and GitHub source control.
 - Meets UC/CSU G requirements, also an alternate for 4th year C requirement
 
-> Data Structures 2 serves as the third trimester for the Computer Science "A" course and is the capstone for the Del Norte Computer Science Pathway. It is designed as a companion to AP Computer Science 'A'. This course focuses on basic data structures, algorithms, and includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs). The course utilizes the JavaScript and Java languages to instruct on object-oriented programming paradigm programming and design. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs. The course concludes with team-oriented project-based learning and a final project.
+> Data Structures 2 serves as the third trimester for the Computer Science "A" course and is the course-level capstone for APCSA.  The course concludes with the Data Structures & Systems Project, a team-oriented culminating project emphasizing data structures, algorithmic efficiency, and system design. This course focuses on basic data structures, algorithms, and includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs). The course utilizes the JavaScript and Java languages to instruct on object-oriented programming paradigm programming and design. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs. The course concludes with team-oriented project-based learning and a final project.
 
 - Prerequisites: AP Computer Science ‘A’ 1,2
 - Meets UC/CSU G requirements
 - Data Structures 1,2 receives Articulated College Credit to Mira Costa CC for "CS 113: Basic Data Structures and Algorithms". Mira Costa CC requires and provides free registration to receive UC college credit.
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
+
+## Computer Science Pathway Capstone (Seniors Only)
+
+The Computer Science Pathway Capstone is a **year-long, senior-only, interdisciplinary project** aligned with CTE and PLTW capstone expectations.
+
+> Students work in teams to identify a real-world problem, conduct research, design and prototype a solution, and present their work to an external audience.
+
+This capstone integrates computer science with related disciplines such as engineering, biomedical science, and other applied fields. The project emphasizes professional collaboration, technical documentation, and public presentation of a student-designed solution to a real-world problem.
