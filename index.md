@@ -456,7 +456,7 @@ The course utilizes **Java with the Spring framework**, with the option to also 
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
 
-## Computer Science "H" (12th grade)
+## Computer Science "H" 1,2 (12th grade)
 
 Computer Science "H" is a **year-long, senior-only, interdisciplinary honors course**, serving as the **Pathway Capstone** aligned with CTE and PLTW capstone expectations.
 
