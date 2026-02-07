@@ -346,47 +346,54 @@ Empower yourself to solve real-world problems, unlock creativity, and open doors
   </div>
 </div>
 
-## Project-based learning
+### Project-based learning (PBL)
 
-Instructor created projects, project requirements, technical materials, and support.
+> Conventional learning, such as tests, is used only for diagnostic purposes, allowing students to make corrections before grading. In AP or Articulated courses, tests are also used to establish standing against College Board or community college requirements.
 
-> Grades are based on projects, time invested, engagement, learned concepts, participation with peers, and live reviews between student(s) and instructor.
+In PBL, student progress and understanding are assessed continuously through project checkpoints, analytics, teacher observation, and verbal discussions, both individually and within teams.
 
-- Performing Agile/Scrum development
-- Coding, frontend, backend, devops, version control, and using algorithmic thinking
-- Creativity, research, design, data structures, and utilizing ChatGPT
-- Performing teamwork, team communication and collaboration, peer reviews/grading
-- Focus on technical communications through project presentations and student-led teaching
+Learning begins with instructor-created materials, including schema foundations, project-starter code, project requirements, and ongoing support.
+
+Student grades are primarily based on project work, time invested, engagement, learned concepts, participation with peers, project analytics, and live reviews between student(s) and instructor.
+
+These are sample indicators of success:
+
+- Performing Agile/Scrum methodologies to promote iterative improvement  
+- Coding, frontend, backend, DevOps, version control, and algorithmic thinking  
+- Creativity, research, design, data structures, and responsible use of AI  
+- Teamwork, communication, collaboration, and peer reviews/grading  
+- Technical communication through project presentations and student-led teaching
 
 ### Time Breakdown
 
 Instructor is extremely focused on work, routines, and culture established in the classroom.
 
-> If individuals, groups and teams, and classroom are effective with class time, homework will not be assigned.
+> If individuals, groups, and teams use class time effectively, homework will generally not be assigned.
 
 - Learning objectives are scheduled over a Sprint
-- Sprints last 2–4 weeks.
-- Classroom work is 4+ hours per week.
-  - Do not waste time opportunities given.
-  - Balance technical time and collaboration time.
-- Homework is 1–2 hours per week.  
-  - Review materials discussed in class.
-  - Mentally prep for next day (ie update issues or kanban).
-  - Extra prep should be considered for live reviews.
+- Sprints last 2–4 weeks
+- Classroom work is 4+ hours per week, including weeks with Pro-Grow, Parent Conferences, or other shortened school instruction time.
+  - Make the most of every opportunity in class
+  - Balance technical work with collaboration and team activities
+- Homework can be 1–2 hours per week, primarily to prepare for classroom and team work
+  - Review materials discussed in class
+  - Mentally prepare for the next day (e.g., update issues or Kanban)
+  - Complete additional preparation if you miss class, fall behind, or have upcoming live reviews
 
 ### Make-up Policy
 
 Instructor believes absences disrupt work culture and routines.
 
-- Communicate absence beforehand with the instructor and team members.
-- Make a make-up plan and try to recreate situation missed.
+- Communicate absences in advance with the instructor and team members
+- Make a plan to recreate the situation or work missed in class
+- Do not disrupt class to make up missed work; be responsible by coordinating with peers or the instructor during office hours
 
-> Instructor believes student is supposed to be in class.  Similar to how an employee is expected to be at work.
+> Students are expected to be in class, similar to workplace expectations.
 
-- Make-up work is challenging for everyone—not just the person who missed class.
-- Time lost in class is extremely hard to make up, since individuals are working with team members, team teaching lessons to the class, or performing live reviews with the teacher.
-- Instructor has freedom to adjust instruction during the week according to needs of classroom.  
-- Modalities of instruction, for various learning styles, do not stick to published materials only.
+- Make-up work is challenging for everyone, not just the student who missed class
+- Time lost in class is difficult to recover, since individuals work closely with teams, lead lessons, or participate in live reviews
+- The instructor reserves the right to adjust instruction during the week according to classroom needs; the schedule is typically adjusted week by week
+- Modalities of instruction are flexible to support different learning styles and may go beyond published materials
 
 ![ccr]({{site.baseurl}}/images/course-brag/ccr.png)
 
@@ -394,7 +401,7 @@ Instructor believes absences disrupt work culture and routines.
 
 CSSE 1,2 prepares students for the AP Computer Science pathway. This course focuses on teaching the JavaScript programming language, object-oriented programming and inheritance, and developing algorithmic thinking skills.
 
-> Through game development projects, students will engage in engineering skills, learn fundamentals of programming, work with data structures, and foster collaboration skills with their peers. Tech talks will be conducted by teachers to introduce concepts, provide guidance on tools, and support ideas to establish development requirements. By performing development and exploration, this course aims to raise students' awareness of the tremendous capabilities of computers and software engineering skills across various fields.
+> Through game development projects, students will engage in engineering skills, learn fundamentals of programming, work with data structures, and foster collaboration skills with their peers. Tech talks conducted by teachers and students introduce concepts, provide guidance on tools, and support ideas to establish development requirements. By performing development and exploration, this course raises students' awareness of the tremendous capabilities of computers and software engineering skills across various fields.
 
 - Prerequisites: None
 - Meets UC/CSU G requirements
@@ -406,35 +413,65 @@ CSSE 1,2 prepares students for the AP Computer Science pathway. This course focu
 
 Computer Science Principles is designed as a college-level introduction to computer science. The AP Computer Science Principles curriculum is integrated into this course, covering creative development, data, algorithms and programming, computer systems and networks, and the impact of computing.
 
-> Students will work on individual and team projects to build computer systems, write algorithms, analyze for correctness, and engage in discussions about solutions. The course will establish fluency in Python, utilize prerequisite knowledge in JavaScript, and develop fluency in Linux.
+> Students work on individual and team projects to build computer systems, write algorithms, analyze for correctness, and engage in discussions about solutions. The course establishes fluency in Python, utilizes prerequisite knowledge in JavaScript, and develops fluency in Linux.
 
 - Prerequisites:
   - Rising 10th graders: Computer Science and Software Engineering (CSSE)
-  - Rising 11th-12th graders: GPA above 3.5 and expectation of experience with JavaScript or other programming languages
-- Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
+  - Rising 11th–12th graders: GPA above 3.5 and prior experience with JavaScript or other programming languages, including familiarity with version control using GitHub, basic Linux command-line operations, and development in VSCode or a similar IDE.
+  - Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
 
-> Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer programs independently and includes AP review and AP project time. The course utilizes JavaScript and Python languages to instruct on the imperative and object-oriented programming paradigms. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
+> Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer projects in small groups, with the instructor serving as a guide rather than a director, and includes AP review and AP project time.
 
-- Prerequisites: AP Computer Science Principles 1,2
+Through Open Coding Society–supported project guidelines and tracking, students engage in authentic educational or technical projects that may include industry- or community-informed problem contexts, as available. Projects emphasize iterative development using principles from **agile-scrum methodologies** and **design-based research**, with multiple refinement cycles leading to a functional prototype suitable for a business client, educational use, or contribution to Open Coding Society initiatives.
+
+The course utilizes **JavaScript and Python languages, the Flask framework and supporting libraries, SQL databases, and object-oriented programming paradigms**. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
+
+- Prerequisites: AP Computer Science Principles 1,2; Data Structures 1
 - Meets UC/CSU G requirements
 
 ![csp]({{site.baseurl}}/images/course-brag/csp24.png)
 
 ## Computer Science "A" 1,2 and Data Structures 2; Grades 11-12
 
-AP Computer Science A is an in-depth course that focuses on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, which covers the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
+AP Computer Science A is an in-depth course focusing on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, covering the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
 
-> Students will gain understanding through analysis, coding, and individual and team projects. The course will establish fluency in Java, utilize JavaScript, and work with Linux.
+> Students gain understanding through analysis, coding, and individual and team projects. The course establishes fluency in Java, builds on JavaScript skills, and incorporates Linux usage.
 
-- Prerequisites: a rising 11th or 12th grader
+- **Prerequisites:** Rising 11th or 12th grader
   - AP Computer Science Principles 1,2 and Data Structures 1
-  - Or a teacher recommendation with an expectation of understanding JavaScript, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology and GitHub source control.
+  - Or teacher recommendation, with expectation of understanding JavaScript, Python, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology, design-based research, and GitHub source control
 - Meets UC/CSU G requirements, also an alternate for 4th year C requirement
 
-> Data Structures 2 serves as the third trimester for the Computer Science "A" course and is the capstone for the Del Norte Computer Science Pathway. It is designed as a companion to AP Computer Science 'A'. This course focuses on basic data structures, algorithms, and includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs). The course utilizes the JavaScript and Java languages to instruct on object-oriented programming paradigm programming and design. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs. The course concludes with team-oriented project-based learning and a final project.
+> Data Structures 2 serves as the third trimester for the Computer Science “A” course and is the **course-level capstone** for AP Computer Science A. This course builds directly on previously defined pathway knowledge, **advancing former personal or group ideas** into more robust systems guided by clearer requirements, enhanced algorithmic solutions, and testing for performance, reliability, and reuse. In parallel, the course includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs).
 
-- Prerequisites: AP Computer Science ‘A’ 1,2
-- Meets UC/CSU G requirements
+Through Open Coding Society–supported project guidelines and tracking, teams define, refine, and extend prior work to address sponsor-informed or system-defined requirements, as available. Projects may advance a prototype in response to **direct stakeholder feedback**, support production services, or contribute to a deployed system or Open Coding Society initiative. These projects emphasize **technology growth, authentic problems, and meaningful stakeholder engagement**.
+
+The course utilizes **Java with the Spring framework**, with the option to also use **Python with Flask**, or combine both environments as appropriate, to instruct object-oriented programming, system design, and abstraction. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
+
+- Prerequisites: AP Computer Science ‘A’ 1,2  
+- Meets UC/CSU G requirements  
 - Data Structures 1,2 receives Articulated College Credit to Mira Costa CC for "CS 113: Basic Data Structures and Algorithms". Mira Costa CC requires and provides free registration to receive UC college credit.
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
+
+## Computer Science "H" 1,2 (12th grade)
+
+Computer Science "H" is a **year-long, senior-only, interdisciplinary honors course**, serving as the **Pathway Capstone** aligned with CTE and PLTW capstone expectations.
+
+> This course functions as a high school senior thesis and a **culminating honors experience**, emphasizing professional collaboration, technical documentation, public presentation, and the development of a fully realized solution to a real-world problem.
+
+Students work in teams to identify a real-world problem, conduct research, design and prototype a solution, and present their work to an external audience. The project integrates computer science with related disciplines such as engineering, biomedical science, or other applied fields. Team members may contribute through thesis or project components from their respective disciplines to support interdisciplinary work.
+
+- **Prerequisites for Computer Science students:** Completion of AP Computer Science A 1,2 and Data Structures 1,2 (or teacher recommendation), with demonstrated proficiency in:
+  - Programming in Java and/or Python
+  - Object-oriented programming and algorithmic problem solving
+  - Version control and collaborative workflows using GitHub
+  - Linux command-line navigation and scripting
+  - Development in VSCode or a similar IDE
+  - Participation in team-based projects and iterative development cycles (e.g., agile methodologies, design-based research)
+
+- **Optional prerequisites for Engineering, Biomedical Science, or other applied discipline students:** Defined by their program advisement and aligned with PLTW course expectations.
+
+> Student projects are tracked and guided using Open Coding Society–supported project guidelines, including enrollment, issue tracking, and iterative review cycles, ensuring progress is documented and supported across disciplines.
+
+This capstone emphasizes creating a **student-designed solution to a real-world problem**, integrating computer science with other applied fields while highlighting professional collaboration, technical documentation, and public presentation.
