@@ -346,47 +346,54 @@ Empower yourself to solve real-world problems, unlock creativity, and open doors
   </div>
 </div>
 
-## Project-based learning
+## Project-based learning (PBL)
 
-Instructor created projects, project requirements, technical materials, and support.
+Conventional learning, such as tests, is used only for diagnostic purposes, allowing students to make corrections before grading. In AP or Articulated courses, tests are also used to establish standing against College Board or community college requirements.
 
-> Grades are based on projects, time invested, engagement, learned concepts, participation with peers, and live reviews between student(s) and instructor.
+In PBL, student progress and understanding are assessed continuously through project checkpoints, analytics, observation and verbal discussions, both individually and within teams.
 
-- Performing Agile/Scrum development
-- Coding, frontend, backend, devops, version control, and using algorithmic thinking
-- Creativity, research, design, data structures, and utilizing ChatGPT
-- Performing teamwork, team communication and collaboration, peer reviews/grading
-- Focus on technical communications through project presentations and student-led teaching
+Learning begins with instructor-created materials, including schema foundations, project-starter code, project requirements, and ongoing support.
+
+Student grades are primarily based on project work, time invested, engagement, learned concepts, participation with peers, project analytics, and live reviews between student(s) and instructor.
+
+These are sample indicators of success:
+
+- Performing Agile/Scrum methodologies to promote iterative improvement  
+- Coding, frontend, backend, DevOps, version control, and algorithmic thinking  
+- Creativity, research, design, data structures, and responsible use of AI  
+- Teamwork, communication, collaboration, and peer reviews/grading  
+- Technical communication through project presentations and student-led teaching
 
 ### Time Breakdown
 
 Instructor is extremely focused on work, routines, and culture established in the classroom.
 
-> If individuals, groups and teams, and classroom are effective with class time, homework will not be assigned.
+> If individuals, groups, and teams use class time effectively, homework will generally not be assigned.
 
 - Learning objectives are scheduled over a Sprint
-- Sprints last 2–4 weeks.
-- Classroom work is 4+ hours per week.
-  - Do not waste time opportunities given.
-  - Balance technical time and collaboration time.
-- Homework is 1–2 hours per week.  
-  - Review materials discussed in class.
-  - Mentally prep for next day (ie update issues or kanban).
-  - Extra prep should be considered for live reviews.
+- Sprints last 2–4 weeks
+- Classroom work is 4+ hours per week, including weeks with Pro-Grow, Parent Confernences, or other shortned schoool instruction time.
+  - Make the most of every opportunity in class
+  - Balance technical work with collaboration and team activities
+- Homework can be 1–2 hours per week, primarily to prepare yourself for classroom and team work
+  - Review materials discussed in class
+  - Mentally prepare for the next day (e.g., update issues or Kanban)
+  - Complete additional preparation if you miss class, fall behind, or have upcoming live reviews
 
 ### Make-up Policy
 
 Instructor believes absences disrupt work culture and routines.
 
-- Communicate absence beforehand with the instructor and team members.
-- Make a make-up plan and try to recreate situation missed.
+- Communicate absences in advance with the instructor and team members
+- Make a plan to recreate the situation or work missed in class
+- Do not disrupt class to make up your missed work. Be responsible, by meeting with peers or teacher in office hours regarding missed work
 
-> Instructor believes student is supposed to be in class.  Similar to how an employee is expected to be at work.
+> Students are expected to be in class, similar to workplace expectations.
 
-- Make-up work is challenging for everyone—not just the person who missed class.
-- Time lost in class is extremely hard to make up, since individuals are working with team members, team teaching lessons to the class, or performing live reviews with the teacher.
-- Instructor has freedom to adjust instruction during the week according to needs of classroom.  
-- Modalities of instruction, for various learning styles, do not stick to published materials only.
+- Make-up work is challenging for everyone, not just the student who missed class
+- Time lost in class is difficult to recover, since individuals work closely with teams, lead lessons, or participate in live reviews
+- The instructor reserves the right to adjust instruction during the week according to classroom needs, so the schedule is typically adjusted week by week
+- Modalities of instruction are flexible to support different learning styles and may go beyond published materials
 
 ![ccr]({{site.baseurl}}/images/course-brag/ccr.png)
 
