@@ -435,23 +435,21 @@ The course utilizes **JavaScript and Python languages, the Flask framework and s
 
 AP Computer Science A is an in-depth course focusing on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, covering the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
 
-> Students gain understanding through analysis, coding, and individual and team projects. The course establishes fluency in Java, utilizes JavaScript, and works with Linux.
+> Students gain understanding through analysis, coding, and individual and team projects. The course establishes fluency in Java, builds on JavaScript skills, and incorporates Linux usage.
 
-- Prerequisites: Rising 11th or 12th grader
+- **Prerequisites:** Rising 11th or 12th grader
   - AP Computer Science Principles 1,2 and Data Structures 1
-  - Or teacher recommendation with expectation of understanding JavaScript, Python, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology, design-based research and GitHub source control
+  - Or teacher recommendation, with expectation of understanding JavaScript, Python, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology, design-based research, and GitHub source control
 - Meets UC/CSU G requirements, also an alternate for 4th year C requirement
 
-> Data Structures 2 serves as the third trimester for the Computer Science “A” course and is the course-level capstone for AP Computer Science A. This course builds directly on previously defined projects within the pathway, **advancing former personal or group ideas** into more robust systems guided by clearer requirements, enhanced algorithmic solutions, and testing of performance constraints, reliability, and reuse.
+> Data Structures 2 serves as the third trimester for the Computer Science “A” course and is the **course-level capstone** for AP Computer Science A. This course builds directly on previously defined pathway knowledge, **advancing former personal or group ideas** into more robust systems guided by clearer requirements, enhanced algorithmic solutions, and testing for performance, reliability, and reuse. In parallel, the course includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs).
 
-Through Open Coding Society–supported project guidelines and tracking, teams refine and extend prior work to address sponsor-informed or system-defined requirements, as available. Projects may advance a prototype in response to direct stakeholder feedback, support production services, or contribute to a deployed system or Open Coding Society initiative.
+Through Open Coding Society–supported project guidelines and tracking, teams define, refine, and extend prior work to address sponsor-informed or system-defined requirements, as available. Projects may advance a prototype in response to **direct stakeholder feedback**, support production services, or contribute to a deployed system or Open Coding Society initiative. These projects emphasize **technology growth, authentic problems, and meaningful stakeholder engagement**.
 
-The course concludes with the **Data Structures & Systems Project**, a team-oriented culminating experience emphasizing data structures, algorithmic efficiency, system design, and technical communication. In parallel, the course includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs).
+The course utilizes **Java with the Spring framework**, with the option to also use **Python with Flask**, or combine both environments as appropriate, to instruct object-oriented programming, system design, and abstraction. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
 
-The course utilizes **Java with the Spring framework**, with the option to also utilize **Python with Flask**, or to combine both environments where appropriate, to instruct object-oriented programming, system design, and abstraction. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
-
-- Prerequisites: AP Computer Science ‘A’ 1,2
-- Meets UC/CSU G requirements
+- Prerequisites: AP Computer Science ‘A’ 1,2  
+- Meets UC/CSU G requirements  
 - Data Structures 1,2 receives Articulated College Credit to Mira Costa CC for "CS 113: Basic Data Structures and Algorithms". Mira Costa CC requires and provides free registration to receive UC college credit.
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
