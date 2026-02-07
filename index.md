@@ -410,8 +410,8 @@ Computer Science Principles is designed as a college-level introduction to compu
 
 - Prerequisites:
   - Rising 10th graders: Computer Science and Software Engineering (CSSE)
-  - Rising 11th–12th graders: GPA above 3.5 and expectation of experience with JavaScript or other programming languages
-- Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
+  - Rising 11th–12th graders: GPA above 3.5 and prior experience with JavaScript or other programming languages, including familiarity with version control using GitHub, basic Linux command-line operations, and development in VSCode or a similar IDE.
+  - Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
 
 > Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer projects in small groups, with the instructor serving as a guide rather than a director, and includes AP review and AP project time.
 
@@ -419,7 +419,7 @@ Through Open Coding Society–supported project guidelines and tracking, student
 
 The course utilizes **JavaScript and Python languages, the Flask framework and supporting libraries, SQL databases, and object-oriented programming paradigms**. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
 
-- Prerequisites: AP Computer Science Principles 1,2
+- Prerequisites: AP Computer Science Principles 1,2; Data Structures 1
 - Meets UC/CSU G requirements
 
 ![csp]({{site.baseurl}}/images/course-brag/csp24.png)
@@ -456,3 +456,16 @@ The Computer Science Pathway Capstone is a **year-long, senior-only, interdiscip
 > Students work in teams to identify a real-world problem, conduct research, design and prototype a solution, and present their work to an external audience.
 
 This capstone integrates computer science with related disciplines such as engineering, biomedical science, and other applied fields. The project emphasizes professional collaboration, technical documentation, and public presentation of a **student-designed solution to a real-world problem**.
+
+- Prerequisites for Computer Science students: Completion of AP Computer Science A 1,2 and Data Structures 1,2 (or teacher recommendation), with demonstrated proficiency in:
+  - Programming in Java and/or Python
+  - Object-oriented programming and algorithmic problem solving
+  - Version control and collaborative workflows using GitHub
+  - Linux command-line navigation and scripting
+  - Development in VSCode or a similar IDE
+  - Participation in team-based projects and iterative development cycles (e.g., agile methodologies, design-based research)
+
+- Optional prerequisites for Engineering, Biomedical Science, or other applied discipline students: Defined by their program advisement and aligned with PLTW course expectations.
+
+> Student projects will be tracked and guided using Open Coding Society–supported project guidelines, including enrollment, issue tracking, and iterative review cycles, ensuring progress is documented and supported across disciplines.
+
