@@ -1,7 +1,7 @@
-import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
-import Npc from '../GameEngine/gameObjects/Npc.js';
-import Player from '../GameEngine/gameObjects/Player.js';
-import GameControl from '../GameEngine/essentials/GameControl.js';
+import GameEnvBackground from '../GameEnginev2/essentials/GameEnvBackground.js';
+import Npc from '../GameEnginev2/gameObjects/Npc.js';
+import Player from '../GameEnginev2/gameObjects/Player.js';
+import GameControl from '../GameEnginev2/essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import Shark from './Shark.js';
 

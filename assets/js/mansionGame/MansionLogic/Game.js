@@ -36,7 +36,7 @@ class GameCore {
     }
 
     // Try to dynamically load the Leaderboard
-    import('../../GameEngine/features/Leaderboard.js')
+    import('../../GameEnginev2/features/Leaderboard.js')
         .then(mod => {
             try {
                 // Get the actual container element from gameContainer
@@ -71,7 +71,7 @@ class GameCore {
         if (!this.gameControl) return;
         
         try {
-            import('../../GameEngine/features/PauseFeature.js').then(mod => {
+            import('../../GameEnginev2/features/PauseFeature.js').then(mod => {
                 const PauseFeature = mod.default;
                 const pauseMenuObj = {
                     gameControl: this.gameControl,
@@ -122,9 +122,9 @@ class GameCore {
 
         // Dynamically import the features and create controls
         Promise.all([
-            import('../../GameEngine/features/ScoreFeature.js'),
-            import('../../GameEngine/features/PauseFeature.js'),
-            import('../../GameEngine/features/LevelSkipFeature.js'),
+            import('../../GameEnginev2/features/ScoreFeature.js'),
+            import('../../GameEnginev2/features/PauseFeature.js'),
+            import('../../GameEnginev2/features/LevelSkipFeature.js'),
             import('./cheats.js')
         ]).then(([ScoreModule, PauseModule, LevelSkipModule, CheatsModule]) => {
             const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;            

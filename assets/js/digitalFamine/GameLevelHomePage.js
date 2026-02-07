@@ -1,8 +1,8 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
-import Player from '../GameEngine/gameObjects/Player.js';
-import Npc from '../GameEngine/gameObjects/Npc.js';
-import DialogueSystem from '../GameEngine/features/DialogueSystem.js';
+import GameEnvBackground from '../GameEnginev2/essentials/GameEnvBackground.js';
+import Player from '../GameEnginev2/gameObjects/Player.js';
+import Npc from '../GameEnginev2/gameObjects/Npc.js';
+import DialogueSystem from '../GameEnginev2/features/DialogueSystem.js';
 import { initPlanetNavigation } from './planetNavigation.js';
 
 class GameLevelHomePage {

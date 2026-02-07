@@ -1,4 +1,4 @@
-import Character from "../GameEngine/essentials/Character.js";
+import Character from "../GameEnginev2/essentials/Character.js";
 
 class Meteor extends Character {
   constructor(data, gameEnv) {

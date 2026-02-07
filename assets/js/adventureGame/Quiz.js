@@ -1,4 +1,4 @@
-import Game from "../GameEngine/essentials/Game.js";
+import Game from "../GameEnginev2/essentials/Game.js";
 class Quiz {
     constructor(game = null) {
         this.game = game;

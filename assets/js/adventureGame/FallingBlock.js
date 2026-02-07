@@ -1,4 +1,4 @@
-import Npc from '../GameEngine/gameObjects/Npc.js';
+import Npc from '../GameEnginev2/gameObjects/Npc.js';
 
 class FallingBlock extends Npc {
     constructor(data = null, gameEnv = null) {
