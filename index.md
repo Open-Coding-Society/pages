@@ -413,7 +413,11 @@ Computer Science Principles is designed as a college-level introduction to compu
   - Rising 11th-12th graders: GPA above 3.5 and expectation of experience with JavaScript or other programming languages
 - Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
 
-> Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer programs independently and includes AP review and AP project time. The course concludes with the Data Foundations Project, an applied capstone where students design and present an independent computing solution using data, algorithms, and programmatic reasoning. The course utilizes JavaScript and Python languages to instruct on the imperative and object-oriented programming paradigms. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
+> Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer projects in small groups, with the instructor serving as a guide rather than a director, and includes AP review and AP project time.
+
+Through Open Coding Society–supported project guidelines and tracking, students engage in authentic educational or technical projects that may include industry- or community-informed problem contexts, as available. Projects emphasize iterative development using principles from agile-scrum methodologies and design-based research, with multiple refinement cycles leading to a functional prototype suitable for a business client, educational use, or contribution to Open Coding Society initiatives.
+
+The course utilizes JavaScript and Python languages, the Flask framework and supporting libraries, SQL databases, and object-oriented programming paradigms. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
 
 - Prerequisites: AP Computer Science Principles 1,2
 - Meets UC/CSU G requirements
@@ -431,7 +435,13 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
   - Or a teacher recommendation with an expectation of understanding JavaScript, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology and GitHub source control.
 - Meets UC/CSU G requirements, also an alternate for 4th year C requirement
 
-> Data Structures 2 serves as the third trimester for the Computer Science "A" course and is the course-level capstone for APCSA.  The course concludes with the Data Structures & Systems Project, a team-oriented culminating project emphasizing data structures, algorithmic efficiency, and system design. This course focuses on basic data structures, algorithms, and includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs). The course utilizes the JavaScript and Java languages to instruct on object-oriented programming paradigm programming and design. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs. The course concludes with team-oriented project-based learning and a final project.
+> Data Structures 2 serves as the third trimester for the Computer Science “A” course and is the course-level capstone for AP Computer Science A. This course builds directly on previously defined projects within the pathway, advancing former personal or group ideas into more robust systems guided by clearer requirements, enhanced algorithmic solutions, and testing of performance constraints, reliability, and reuse.
+
+Through Open Coding Society–supported project guidelines and tracking, teams refine and extend prior work to address sponsor-informed or system-defined requirements, as available. Projects may advance a prototype in response to direct stakeholder feedback, support production services, or contribute to a deployed system or Open Coding Society initiative.
+
+The course concludes with the Data Structures & Systems Project, a team-oriented culminating experience emphasizing data structures, algorithmic efficiency, system design, and technical communication. In parallel, the course includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs).
+
+The course utilizes Java with the Spring framework, with the option to also utilize Python with Flask, or to combine both environments where appropriate, to instruct object-oriented programming, system design, and abstraction. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
 
 - Prerequisites: AP Computer Science ‘A’ 1,2
 - Meets UC/CSU G requirements
