@@ -451,11 +451,11 @@ The course utilizes **Java with the Spring framework**, with the option to also 
 
 ## Computer Science Pathway Capstone (Seniors Only)
 
-The Computer Science Pathway Capstone is a **year-long, senior-only, interdisciplinary project** aligned with CTE and PLTW capstone expectations.
+The Computer Science Pathway Capstone is a **year-long, senior-only, interdisciplinary honors project** aligned with CTE and PLTW capstone expectations.
 
-> Students work in teams to identify a real-world problem, conduct research, design and prototype a solution, and present their work to an external audience.
+> The Pathway Capstone serves as a **culminating honors experience**, functioning as a high school senior thesis. It emphasizes professional collaboration, technical documentation, public presentation, and the development of a fully realized solution to a real-world problem.
 
-This capstone integrates computer science with related disciplines such as engineering, biomedical science, and other applied fields. The project emphasizes professional collaboration, technical documentation, and public presentation of a **student-designed solution to a real-world problem**.
+Students work in teams to identify a real-world problem, conduct research, design and prototype a solution, and present their work to an external audience. The project integrates computer science with related disciplines such as engineering, biomedical science, and other applied fields. To support interdisciplinary work, team members may contribute through thesis or project components from their respective disciplines.
 
 - Prerequisites for Computer Science students: Completion of AP Computer Science A 1,2 and Data Structures 1,2 (or teacher recommendation), with demonstrated proficiency in:
   - Programming in Java and/or Python
@@ -469,3 +469,4 @@ This capstone integrates computer science with related disciplines such as engin
 
 > Student projects will be tracked and guided using Open Coding Society–supported project guidelines, including enrollment, issue tracking, and iterative review cycles, ensuring progress is documented and supported across disciplines.
 
+This capstone emphasizes professional collaboration, technical documentation, and public presentation of a **student-designed solution to a real-world problem**, integrating computer science with other applied fields as appropriate.
