@@ -394,7 +394,7 @@ Instructor believes absences disrupt work culture and routines.
 
 CSSE 1,2 prepares students for the AP Computer Science pathway. This course focuses on teaching the JavaScript programming language, object-oriented programming and inheritance, and developing algorithmic thinking skills.
 
-> Through game development projects, students will engage in engineering skills, learn fundamentals of programming, work with data structures, and foster collaboration skills with their peers. Tech talks will be conducted by teachers and students to introduce concepts, provide guidance on tools, and support ideas to establish development requirements. By performing development and exploration, this course aims to raise students' awareness of the tremendous capabilities of computers and software engineering skills across various fields.
+> Through game development projects, students will engage in engineering skills, learn fundamentals of programming, work with data structures, and foster collaboration skills with their peers. Tech talks conducted by teachers and students introduce concepts, provide guidance on tools, and support ideas to establish development requirements. By performing development and exploration, this course raises students' awareness of the tremendous capabilities of computers and software engineering skills across various fields.
 
 - Prerequisites: None
 - Meets UC/CSU G requirements
@@ -406,18 +406,18 @@ CSSE 1,2 prepares students for the AP Computer Science pathway. This course focu
 
 Computer Science Principles is designed as a college-level introduction to computer science. The AP Computer Science Principles curriculum is integrated into this course, covering creative development, data, algorithms and programming, computer systems and networks, and the impact of computing.
 
-> Students will work on individual and team projects to build computer systems, write algorithms, analyze for correctness, and engage in discussions about solutions. The course will establish fluency in Python, utilize prerequisite knowledge in JavaScript, and develop fluency in Linux.
+> Students work on individual and team projects to build computer systems, write algorithms, analyze for correctness, and engage in discussions about solutions. The course establishes fluency in Python, utilizes prerequisite knowledge in JavaScript, and develops fluency in Linux.
 
 - Prerequisites:
   - Rising 10th graders: Computer Science and Software Engineering (CSSE)
-  - Rising 11th-12th graders: GPA above 3.5 and expectation of experience with JavaScript or other programming languages
+  - Rising 11th–12th graders: GPA above 3.5 and expectation of experience with JavaScript or other programming languages
 - Meets UC/CSU G requirements, also an alternate for 3rd year D requirement
 
 > Data Structures 1 serves as the third trimester for the Computer Science Principles course. It is the capstone for non-computer science majors/minors and prepares other students to complete the PUSD computer science pathway. Data Structures 1 focuses on creating computer projects in small groups, with the instructor serving as a guide rather than a director, and includes AP review and AP project time.
 
-Through Open Coding Society–supported project guidelines and tracking, students engage in authentic educational or technical projects that may include industry- or community-informed problem contexts, as available. Projects emphasize iterative development using principles from agile-scrum methodologies and design-based research, with multiple refinement cycles leading to a functional prototype suitable for a business client, educational use, or contribution to Open Coding Society initiatives.
+Through Open Coding Society–supported project guidelines and tracking, students engage in authentic educational or technical projects that may include industry- or community-informed problem contexts, as available. Projects emphasize iterative development using principles from **agile-scrum methodologies** and **design-based research**, with multiple refinement cycles leading to a functional prototype suitable for a business client, educational use, or contribution to Open Coding Society initiatives.
 
-The course utilizes JavaScript and Python languages, the Flask framework and supporting libraries, SQL databases, and object-oriented programming paradigms. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
+The course utilizes **JavaScript and Python languages, the Flask framework and supporting libraries, SQL databases, and object-oriented programming paradigms**. Topics covered include graphical user interfaces, input and output, lists, dictionaries, databases, searching, sorting, and algorithm analysis.
 
 - Prerequisites: AP Computer Science Principles 1,2
 - Meets UC/CSU G requirements
@@ -426,22 +426,22 @@ The course utilizes JavaScript and Python languages, the Flask framework and sup
 
 ## Computer Science "A" 1,2 and Data Structures 2; Grades 11-12
 
-AP Computer Science A is an in-depth course that focuses on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, which covers the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
+AP Computer Science A is an in-depth course focusing on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, covering the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
 
-> Students will gain understanding through analysis, coding, and individual and team projects. The course will establish fluency in Java, utilize JavaScript, and work with Linux.
+> Students gain understanding through analysis, coding, and individual and team projects. The course establishes fluency in Java, utilizes JavaScript, and works with Linux.
 
-- Prerequisites: a rising 11th or 12th grader
+- Prerequisites: Rising 11th or 12th grader
   - AP Computer Science Principles 1,2 and Data Structures 1
-  - Or a teacher recommendation with an expectation of understanding JavaScript, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology and GitHub source control.
+  - Or teacher recommendation with expectation of understanding JavaScript, Python, OOP, Linux, and Data Structures; foundation in team projects, awareness of agile methodology, design-based research and GitHub source control
 - Meets UC/CSU G requirements, also an alternate for 4th year C requirement
 
-> Data Structures 2 serves as the third trimester for the Computer Science “A” course and is the course-level capstone for AP Computer Science A. This course builds directly on previously defined projects within the pathway, advancing former personal or group ideas into more robust systems guided by clearer requirements, enhanced algorithmic solutions, and testing of performance constraints, reliability, and reuse.
+> Data Structures 2 serves as the third trimester for the Computer Science “A” course and is the course-level capstone for AP Computer Science A. This course builds directly on previously defined projects within the pathway, **advancing former personal or group ideas** into more robust systems guided by clearer requirements, enhanced algorithmic solutions, and testing of performance constraints, reliability, and reuse.
 
 Through Open Coding Society–supported project guidelines and tracking, teams refine and extend prior work to address sponsor-informed or system-defined requirements, as available. Projects may advance a prototype in response to direct stakeholder feedback, support production services, or contribute to a deployed system or Open Coding Society initiative.
 
-The course concludes with the Data Structures & Systems Project, a team-oriented culminating experience emphasizing data structures, algorithmic efficiency, system design, and technical communication. In parallel, the course includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs).
+The course concludes with the **Data Structures & Systems Project**, a team-oriented culminating experience emphasizing data structures, algorithmic efficiency, system design, and technical communication. In parallel, the course includes AP preparation for College Board multiple-choice questions (MCQs) and free-response questions (FRQs).
 
-The course utilizes Java with the Spring framework, with the option to also utilize Python with Flask, or to combine both environments where appropriate, to instruct object-oriented programming, system design, and abstraction. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
+The course utilizes **Java with the Spring framework**, with the option to also utilize **Python with Flask**, or to combine both environments where appropriate, to instruct object-oriented programming, system design, and abstraction. Topics covered include searching, sorting, hashing, algorithm analysis, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
 
 - Prerequisites: AP Computer Science ‘A’ 1,2
 - Meets UC/CSU G requirements
@@ -455,4 +455,4 @@ The Computer Science Pathway Capstone is a **year-long, senior-only, interdiscip
 
 > Students work in teams to identify a real-world problem, conduct research, design and prototype a solution, and present their work to an external audience.
 
-This capstone integrates computer science with related disciplines such as engineering, biomedical science, and other applied fields. The project emphasizes professional collaboration, technical documentation, and public presentation of a student-designed solution to a real-world problem.
+This capstone integrates computer science with related disciplines such as engineering, biomedical science, and other applied fields. The project emphasizes professional collaboration, technical documentation, and public presentation of a **student-designed solution to a real-world problem**.
