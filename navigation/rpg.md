@@ -107,7 +107,7 @@ function closeCustomAlert() {
         let lastErr = null;
         for (const cand of uniq) {
             try {
-                const testUrl = `${cand}/assets/js/GameEnginev2/essentials/Game.js?v=${Date.now()}`;
+                const testUrl = `${cand}/assets/js/GameEnginev1.5/essentials/Game.js?v=${Date.now()}`;
                 const res = await fetch(testUrl, { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
                 if (res && res.ok) {
                     const ctype = (res.headers.get('content-type') || '').toLowerCase();
@@ -151,7 +151,7 @@ function closeCustomAlert() {
         // Prefer Adventure engine first (present in this workspace), fallback to Better
         try {
             const prefix = await ensureBasePrefix();
-            const advUrl = `${prefix}/assets/js/GameEnginev2/essentials/Game.js?v=${Date.now()}`;
+            const advUrl = `${prefix}/assets/js/GameEnginev1.5/essentials/Game.js?v=${Date.now()}`;
             // Prefetch to validate MIME/content to avoid HTML imports
             try {
                 const r = await fetch(advUrl, { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
@@ -198,7 +198,7 @@ function closeCustomAlert() {
     async function loadAdventureEngine() {
         try {
             const prefix = await ensureBasePrefix();
-            const url = `${prefix}/assets/js/GameEnginev2/essentials/Game.js?v=${Date.now()}`;
+            const url = `${prefix}/assets/js/GameEnginev1.5/essentials/Game.js?v=${Date.now()}`;
             // Prefetch and validate response isn't HTML
             try {
                 const r = await fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'no-store' });

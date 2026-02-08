@@ -1,9 +1,9 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from '../GameEnginev2/essentials/GameEnvBackground.js';
-import Player from '../GameEnginev2/gameObjects/Player.js';
-import Npc from '../GameEnginev2/gameObjects/Npc.js';
+import GamEnvBackground from '../GameEnginev1.5/essentials/GameEnvBackground.js';
+import Player from '../GameEnginev1.5/gameObjects/Player.js';
+import Npc from '../GameEnginev1.5/gameObjects/Npc.js';
 import Coin from './Coin.js';
-import GameControl from '../GameEnginev2/essentials/GameControl.js';
+import GameControl from '../GameEnginev1.5/essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
 class GameLevelBasic {

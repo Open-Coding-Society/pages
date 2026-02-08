@@ -802,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function getImportsBlock() {
                 // Keep the editor focused for learners: only show the minimal import lines
-                return `import GameEnvBackground from '/assets/js/GameEnginev2/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/GameEnginev2/gameObjects/Player.js';\nimport Npc from '/assets/js/GameEnginev2/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
+                return `import GameEnvBackground from '/assets/js/GameEnginev1.5/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/GameEnginev1.5/gameObjects/Player.js';\nimport Npc from '/assets/js/GameEnginev1.5/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
             }
 
         function generateStepCode(currentStep) {

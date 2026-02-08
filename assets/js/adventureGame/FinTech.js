@@ -1,8 +1,8 @@
 import Game from './AdventureGame.js';
-import GameControl from '../GameEnginev2/essentials/GameControl.js';
+import GameControl from '../GameEnginev1.5/essentials/GameControl.js';
 import Quiz from './Quiz.js';
-import Inventory from "../GameEnginev2/features/Inventory.js";
-import { defaultItems } from "../GameEnginev2/gameObjects/items.js";
+import Inventory from "../GameEnginev1.5/features/Inventory.js";
+import { defaultItems } from "../GameEnginev1.5/gameObjects/items.js";
 
 class StatsManager {
     constructor(game) {

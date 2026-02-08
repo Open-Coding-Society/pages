@@ -1,17 +1,17 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from '../GameEnginev2/essentials/GameEnvBackground.js';
-import Player from '../GameEnginev2/gameObjects/Player.js';
-import Npc from '../GameEnginev2/gameObjects/Npc.js';
+import GamEnvBackground from '../GameEnginev1.5/essentials/GameEnvBackground.js';
+import Player from '../GameEnginev1.5/gameObjects/Player.js';
+import Npc from '../GameEnginev1.5/gameObjects/Npc.js';
 import Coin from './Coin.js';
 import Quiz from './Quiz.js';
-import DialogueSystem from '../GameEnginev2/features/DialogueSystem.js';
-import GameControl from '../GameEnginev2/essentials/GameControl.js';
+import DialogueSystem from '../GameEnginev1.5/features/DialogueSystem.js';
+import GameControl from '../GameEnginev1.5/essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
-import AINpc from '../GameEnginev2/gameObjects/ai/AiNpc.js';
+import AINpc from '../GameEnginev1.5/gameObjects/ai/AiNpc.js';
 
 class GameLevelDesert {
   constructor(gameEnv) {
