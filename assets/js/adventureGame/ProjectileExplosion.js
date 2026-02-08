@@ -1,4 +1,4 @@
-import Character from "./GameEngine/Character.js";
+import Character from "../GameEngine/essentials/Character.js";
 
 class ProjectileExplosion extends Character {
     constructor(data, gameEnv) {

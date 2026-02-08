@@ -10,7 +10,6 @@
         {% if page.microblog %}
           <div class="micro-actions-wrapper">
             {% include microblog_foundation.html %}
-            {% include inbox_foundation.html %}
           </div>
         {% endif %}
 
@@ -21,6 +20,13 @@
         {% if page.admin %}
           {% include admin_foundation.html %}
         {% endif %}
+
+        {% if page.grading %}
+          <div class="grading-actions-wrapper">
+            {% include grading_foundation.html %}
+          </div>
+        {% endif %}
+
 
         <main class="page-content" aria-label="Content">
             <div class="wrapper">

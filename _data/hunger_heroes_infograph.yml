@@ -1,0 +1,36 @@
+# Hunger Heroes Capstone Infographic
+Title: "Hunger Heroes Capstone"
+Description: "A Design-Based Research (DBR) capstone project tackling food insecurity through innovative technology. This full-stack platform uses JavaScript, Python, and Flask to connect food donors with those in need—reducing waste while fighting hunger in our communities."
+
+Topics:
+  - title: "Hunger Heroes"
+    image: "capstone/hunger_heroes.svg"
+    link: "/capstone/hunger-heroes"
+    alt: "Hunger Heroes - Food Redistribution Platform"
+    keyPoints:
+      - "Real-time food donation matching system"
+      - "Graph-based proximity algorithm for optimal routing"
+      - "Python Flask REST API backend"
+      - "JavaScript interactive frontend"
+      - "SQLite/PostgreSQL database integration"
+      - "Real-time notifications for time-sensitive donations"
+    subtitle: "Fighting Food Insecurity with Technology"
+    description: "A community-driven platform connecting restaurants, grocery stores, and individuals with excess fresh food to local shelters, food banks, and families in need. Features intelligent graph algorithms for optimal location matching, real-time donor-receiver pairing, and time-sensitive notifications to ensure food reaches those in need before it spoils. Supports UN Sustainable Development Goal 2: Zero Hunger."
+    tech:
+      - "Python Flask Backend"
+      - "JavaScript Frontend"
+      - "RESTful API Design"
+      - "Graph Data Structures"
+      - "SQLite/PostgreSQL Database"
+    impact:
+      - "Reduces food waste in communities"
+      - "Connects donors with those in need"
+      - "Supports SDG 2: Zero Hunger"
+      - "Real-time matching and notifications"
+    status: "In Development"
+    team:
+      - "Ahaan"
+      - "Shaurya"
+      - "Arnav"
+
+  

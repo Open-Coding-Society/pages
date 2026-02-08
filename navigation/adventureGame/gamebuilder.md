@@ -8,6 +8,14 @@ permalink: /rpg/gamebuilder
 <style>
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
 
+/* Hide GameEngine control buttons in gamebuilder iframe */
+iframe .pause-button-bar,
+iframe button.pause-btn,
+iframe .leaderboard-widget {
+    display: none !important;
+    visibility: hidden !important;
+}
+
 .gamebuilder-title {
     text-align: center;
     font-size: 2em;
@@ -495,6 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.viewBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
+    
+            // NOTE: removed preloading/inlining of full engine sources to keep the editor focused
+            // Students only need the import lines and asset/JSON definitions; no fetching here.
     });
 
     // npcs
@@ -768,32 +779,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
         function generateBaselineCode() {
-                return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-    import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
+                    const importBlock = getImportsBlock();
+                    return `${importBlock}class CustomLevel {
+        constructor(gameEnv) {
+            const path = gameEnv.path;
+            const width = gameEnv.innerWidth;
+            const height = gameEnv.innerHeight;
 
-class CustomLevel {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;
+            // Definitions will be added here per step
 
-        // Definitions will be added here per step
-
-        // Define objects for this level progressively via Confirm Step
-        this.classes = [
-            // Step 1: add GameEnvBackground
-            // Step 2: add Player
-            // Step 3: add Npc
-        ];
-    }
-}
-
-export { GameControl };
-export const gameLevelClasses = [CustomLevel];`;
+            // Define objects for this level progressively via Confirm Step
+            this.classes = [
+                // Step 1: add GameEnvBackground
+                // Step 2: add Player
+                // Step 3: add Npc
+            ];
         }
+    }
+
+    export const gameLevelClasses = [CustomLevel];`;
+        }
+
+            function getImportsBlock() {
+                // Keep the editor focused for learners: only show the minimal import lines
+                return `import GameEnvBackground from '/assets/js/GameEngine/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/GameEngine/gameObjects/Player.js';\nimport Npc from '/assets/js/GameEngine/gameObjects/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
+            }
 
         function generateStepCode(currentStep) {
                 const bg = assets.bg[ui.bg.value];
@@ -804,17 +814,12 @@ export const gameLevelClasses = [CustomLevel];`;
                         : '{ up: 87, left: 65, down: 83, right: 68 }';
 
                 function header() {
-                        return `import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-import Barrier from '/assets/js/adventureGame/GameEngine/Barrier.js';
-
-class CustomLevel {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;`;
+                    const ib = getImportsBlock();
+                    return `${ib}class CustomLevel {
+            constructor(gameEnv) {
+            const path = gameEnv.path;
+            const width = gameEnv.innerWidth;
+            const height = gameEnv.innerHeight;`;
                 }
                 function footer(classesArray) {
                         return `
@@ -825,7 +830,6 @@ class CustomLevel {
     }
 }
 
-export { GameControl };
 export const gameLevelClasses = [CustomLevel];`;
                 }
 
@@ -1093,7 +1097,7 @@ export const gameLevelClasses = [CustomLevel];`;
         state.persistent = null;
         state.typing = { startLine, lineCount: Math.max(1, lineCount) };
         renderOverlay();
-        const speed = 6; 
+        const speed = (startLine === 0 ? 60 : 6);
         function step() {
             for (let i = 0; i < speed && typed.length < targetBlock.length; i++) typed += targetBlock[typed.length];
             const partial = typed.split('\n');
@@ -1101,11 +1105,19 @@ export const gameLevelClasses = [CustomLevel];`;
                 current[startLine + i] = partial[i] !== undefined ? partial[i] : '';
             }
             ui.editor.value = current.join('\n');
+            // Auto-scroll editor so the typing area stays visible
+            try {
+                const visibleLine = startLine + Math.max(0, partial.length - 1);
+                const scrollTarget = Math.max(0, (visibleLine * LINE_HEIGHT) - (ui.editor.clientHeight - LINE_HEIGHT));
+                ui.editor.scrollTop = scrollTarget;
+            } catch (e) {}
             renderOverlay();
             if (typed.length < targetBlock.length) {
                 requestAnimationFrame(step);
             } else {
                 ui.editor.value = newCode;
+                // Ensure final code is visible
+                try { ui.editor.scrollTop = ui.editor.scrollHeight; } catch (e) {}
                 state.programmaticEdit = false;
                 state.typing = null;
                 state.persistent = { startLine, lineCount: Math.max(1, lineCount) };
@@ -1199,18 +1211,53 @@ export const gameLevelClasses = [CustomLevel];`;
     function safeCodeToRun() {
         const code = ui.editor.value || '';
         const hasLevels = /export\s+const\s+gameLevelClasses/.test(code);
-        return hasLevels ? code : generateBaselineCode();
+        const source = hasLevels ? code : generateBaselineCode();
+        // If editor inlined engine sources as commented blocks, convert them to imports for runtime
+        return prepareRunnableCode(source);
+    }
+
+    function prepareRunnableCode(code) {
+        if (!code) return code;
+        // Replace inlined commented module blocks of form:
+        // // --- /path/to/module.js ---\n/*\n...src...\n*/\n
+        const inlineRe = /\/\/ --- (\/[\w\-\/\.]+\.js) ---\n\/\*[\s\S]*?\*\/\n*/g;
+        const imports = new Set();
+        const transformed = code.replace(inlineRe, (m, p) => {
+            try {
+                const name = p.split('/').pop().replace(/\.js$/, '');
+                imports.add(`import ${name} from '${p}';`);
+                return '';
+            } catch (e) {
+                return '';
+            }
+        });
+        // If we collected imports, prepend them to the file
+        if (imports.size > 0) {
+            return Array.from(imports).join('\n') + '\n\n' + transformed;
+        }
+        return transformed;
     }
 
     function runInEmbed() {
         renderOverlay();
         const code = safeCodeToRun();
-        ui.iframe.src = ui.iframe.src;
+        const currentSrc = ui.iframe.src;
+        
+        // Set up message handler first
         ui.iframe.onload = () => {
             setTimeout(() => {
-                ui.iframe.contentWindow.postMessage({ type: 'rpg:run-code', code: code }, '*');
-            }, 100);
+                try {
+                    ui.iframe.contentWindow.postMessage({ type: 'rpg:run-code', code: code }, '*');
+                } catch (e) {
+                    console.error('Failed to send code to iframe:', e);
+                }
+            }, 200);
         };
+        
+        // Force iframe reload by changing src to self with cache bust
+        const urlObj = new URL(currentSrc, window.location.origin);
+        urlObj.searchParams.set('t', Date.now());
+        ui.iframe.src = urlObj.toString();
     }
 
     document.getElementById('btn-run').addEventListener('click', runInEmbed);
@@ -1220,6 +1267,29 @@ export const gameLevelClasses = [CustomLevel];`;
     setIndicator();
     updateStepUI();
     renderOverlay();
+    
+    // Hide control buttons in the iframe by injecting CSS
+    ui.iframe.addEventListener('load', () => {
+        try {
+            const style = ui.iframe.contentDocument.createElement('style');
+            style.textContent = `
+                .pause-button-bar { display: none !important; }
+                .leaderboard-widget { display: none !important; }
+                .score-display { display: none !important; }
+                .score-counter { display: none !important; }
+                .stats-display { display: none !important; }
+                #scoreDisplay { display: none !important; }
+                #score { display: none !important; }
+                .hud { display: none !important; }
+                [id*="score" i] { display: none !important; }
+                [class*="score" i] { display: none !important; }
+            `;
+            ui.iframe.contentDocument.head.appendChild(style);
+        } catch (e) {
+            // Cross-origin restriction, ignore
+            console.debug('Cannot inject CSS into iframe:', e);
+        }
+    });
 });
 </script>
 

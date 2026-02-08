@@ -30,6 +30,9 @@
       height: 580px;
       position: relative;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       
       // Only style the main canvas, not character canvases
       > canvas#gameCanvas {
@@ -38,9 +41,6 @@
         height: 580px !important;
         border: none;
         background: transparent;
-        position: absolute;
-        top: 0;
-        left: 0;
       }
       
       // Reset styles for all game-generated canvases

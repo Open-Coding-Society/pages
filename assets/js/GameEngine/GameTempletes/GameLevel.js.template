@@ -1,0 +1,252 @@
+/**
+ * GameLevel.js Template
+ * ====================
+ * This class represents a single game level/stage.
+ * Inherit from this to create specific levels with unique gameplay.
+ * 
+ * Key Responsibilities:
+ * - Initialize level elements (platforms, enemies, collectibles, etc.)
+ * - Manage level-specific game objects
+ * - Define level goals and win conditions
+ * - Handle level-specific input and events
+ * 
+ * Usage:
+ * class Level1 extends GameLevel {
+ *   constructor(game) {
+ *     super(game);
+ *     this.levelName = 'Level 1: Introduction';
+ *   }
+ *   
+ *   init() {
+ *     super.init();
+ *     this.createPlatforms();
+ *     this.createPlayer();
+ *     this.createEnemies();
+ *     this.createGoals();
+ *   }
+ * }
+ */
+
+class GameLevel {
+    /**
+     * Constructor - Set up basic level properties
+     * 
+     * @param {GameCore} game - Reference to the main game instance
+     */
+    constructor(game) {
+        // TODO: Store game reference
+        // this.game = game;
+
+        // TODO: Initialize level properties
+        // this.levelName = 'Level Name';
+        // this.levelDescription = 'What the player needs to do';
+        // this.goalCount = 0; // How many items to collect or enemies to defeat
+
+        // TODO: Initialize level objects array
+        // this.gameObjects = []; // All moving/interactive objects
+        // this.staticObjects = []; // Platforms, scenery, etc.
+
+        // TODO: Initialize player reference
+        // this.player = null;
+
+        // TODO: Initialize level boundaries
+        // this.width = 800;
+        // this.height = 600;
+    }
+
+    /**
+     * Initialize and populate the level
+     * Called once when level is loaded
+     */
+    init() {
+        // TODO: Create platforms/environment
+        // this.createEnvironment();
+
+        // TODO: Create player character
+        // this.createPlayer();
+
+        // TODO: Create enemies/obstacles
+        // this.createEnemies();
+
+        // TODO: Create collectibles/goals
+        // this.createCollectibles();
+
+        // TODO: Set up background
+        // this.setupBackground();
+
+        // TODO: Add level-specific event listeners
+        // document.addEventListener('keydown', this.handleKeyPress.bind(this));
+    }
+
+    /**
+     * Create the player character for this level
+     * Position them at the starting location
+     */
+    createPlayer() {
+        // TODO: Create player object
+        // this.player = new Player({
+        //   x: 100,
+        //   y: 300,
+        //   // other player properties
+        // });
+        // this.gameObjects.push(this.player);
+    }
+
+    /**
+     * Create all platforms, walls, and static level elements
+     */
+    createEnvironment() {
+        // TODO: Define platform positions and sizes
+        // const platforms = [
+        //   { x: 0, y: 550, width: 800, height: 50 }, // Ground
+        //   { x: 100, y: 450, width: 200, height: 20 }, // Platform 1
+        //   { x: 500, y: 350, width: 200, height: 20 }, // Platform 2
+        // ];
+
+        // TODO: Create platform objects and add to static objects
+        // platforms.forEach(p => {
+        //   this.staticObjects.push(new Platform(p.x, p.y, p.width, p.height));
+        // });
+    }
+
+    /**
+     * Create all enemies/hazards for this level
+     */
+    createEnemies() {
+        // TODO: Define enemy spawn positions and types
+        // const enemies = [
+        //   { type: 'patrol', x: 300, y: 500 },
+        //   { type: 'flying', x: 600, y: 300 },
+        // ];
+
+        // TODO: Create enemy objects and add to game objects
+        // enemies.forEach(e => {
+        //   const enemy = new Enemy(e.x, e.y, e.type);
+        //   this.gameObjects.push(enemy);
+        // });
+    }
+
+    /**
+     * Create collectibles and goal markers for this level
+     */
+    createCollectibles() {
+        // TODO: Define collectible positions
+        // const collectibles = [
+        //   { x: 150, y: 400 },
+        //   { x: 250, y: 300 },
+        //   { x: 550, y: 250 },
+        // ];
+
+        // TODO: Create collectible objects
+        // collectibles.forEach(c => {
+        //   this.gameObjects.push(new Collectible(c.x, c.y));
+        // });
+    }
+
+    /**
+     * Set up background image/parallax scrolling for this level
+     */
+    setupBackground() {
+        // TODO: Load and render background image
+        // TODO: If parallax: create multiple background layers at different scroll speeds
+        // this.background = new Background(this.game.ctx, 'path/to/image');
+    }
+
+    /**
+     * Update all level objects (called each frame)
+     */
+    update() {
+        // TODO: Update player position and state
+        // this.player.update();
+
+        // TODO: Update all game objects
+        // this.gameObjects.forEach(obj => {
+        //   if (obj.update) obj.update();
+        // });
+
+        // TODO: Check collision detection
+        // this.checkCollisions();
+
+        // TODO: Check win/lose conditions
+        // this.checkLevelCompletion();
+    }
+
+    /**
+     * Render all level elements to canvas
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    render(ctx) {
+        // TODO: Render background
+        // this.background.render(ctx);
+
+        // TODO: Render static objects
+        // this.staticObjects.forEach(obj => obj.render(ctx));
+
+        // TODO: Render game objects
+        // this.gameObjects.forEach(obj => obj.render(ctx));
+
+        // TODO: Render player on top
+        // this.player.render(ctx);
+
+        // TODO: Render UI (score, health, instructions)
+        // this.renderUI(ctx);
+    }
+
+    /**
+     * Render level UI (score, health, goals, etc.)
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    renderUI(ctx) {
+        // TODO: Render score
+        // TODO: Render health/lives
+        // TODO: Render goal progress
+        // TODO: Render instructions for this level
+    }
+
+    /**
+     * Check collision between all game objects
+     */
+    checkCollisions() {
+        // TODO: Check player vs platforms (walking on them)
+        // TODO: Check player vs collectibles
+        // TODO: Check player vs enemies (damage/death)
+        // TODO: Check projectiles vs enemies
+        // TODO: Use Collision class from GameEngine/essentials
+    }
+
+    /**
+     * Check if level is complete and handle victory
+     */
+    checkLevelCompletion() {
+        // TODO: Check if all goals are met
+        // TODO: Check if player reached the goal area
+        // TODO: If complete: trigger level complete animation/sound
+        // TODO: Return true if level won, false otherwise
+    }
+
+    /**
+     * Handle player death - restart level or end game
+     */
+    handlePlayerDeath() {
+        // TODO: Show death animation
+        // TODO: Decide: Restart level or Game Over?
+        // TODO: Play death sound effect
+    }
+
+    /**
+     * Clean up level when transitioning to next level
+     */
+    destroy() {
+        // TODO: Remove event listeners
+        // document.removeEventListener('keydown', this.handleKeyPress.bind(this));
+
+        // TODO: Clean up any running timers/intervals
+        // TODO: Clear game object references
+        // this.gameObjects = [];
+        // this.staticObjects = [];
+    }
+}
+
+export default GameLevel;

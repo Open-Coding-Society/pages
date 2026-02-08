@@ -4,6 +4,29 @@ title: Adventure Game
 permalink: /gamify/adventureGame
 ---
 
+<style>
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#gameContainer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    padding-top: 20px;
+    position: relative;
+    background: #000;
+}
+
+#gameCanvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+</style>
+
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
     <canvas id='gameCanvas'></canvas>
@@ -11,9 +34,9 @@ permalink: /gamify/adventureGame
 
 <script type="module">
 
-    // Adventure Game assets locations (use central core + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/BetterGameEngine/GameEngine/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/adventureGame/GameEngine/GameControl.js";
+    // Adventure Game assets locations (use AdventureGame wrapper + GameControl)
+    import Core from "{{site.baseurl}}/assets/js/adventureGame/AdventureGame.js";
+    import GameControl from "{{site.baseurl}}/assets/js/GameEngine/essentials/GameControl.js";
     import GameLevelWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWater.js";
     import GameLevelDesert from "{{site.baseurl}}/assets/js/adventureGame/GameLevelDesert.js";
     import GameLevelEnd from "{{site.baseurl}}/assets/js/adventureGame/GameLevelEnd.js";

@@ -1,6 +1,6 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from './GameEngine/GameEnvBackground.js';
-import Player from './GameEngine/Player.js';
+import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
+import Player from '../GameEngine/gameObjects/Player.js';
 
 // Minimal Definition
 class GameLevelSquares {

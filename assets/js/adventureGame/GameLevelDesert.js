@@ -1,16 +1,17 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './GameEngine/GameEnvBackground.js';
-import Player from './GameEngine/Player.js';
-import Npc from './GameEngine/Npc.js';
-import Coin from './GameEngine/Coin.js';
+import GamEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
+import Player from '../GameEngine/gameObjects/Player.js';
+import Npc from '../GameEngine/gameObjects/Npc.js';
+import Coin from './Coin.js';
 import Quiz from './Quiz.js';
-import DialogueSystem from './GameEngine/DialogueSystem.js';
-import GameControl from './GameEngine/GameControl.js';
+import DialogueSystem from '../GameEngine/features/DialogueSystem.js';
+import GameControl from '../GameEngine/essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
+import AINpc from '../GameEngine/gameObjects/ai/AiNpc.js';
 
 class GameLevelDesert {
   constructor(gameEnv) {
@@ -734,6 +735,17 @@ class GameLevelDesert {
               }
           },
           interact: function() {
+              // Hide all NPCs and the Player in the main level
+              const allCharacters = gameEnv.gameObjects.filter(obj => 
+                  obj instanceof Npc || obj instanceof Player
+              );
+              
+              allCharacters.forEach(character => {
+                  if (character.canvas) {
+                      character.canvas.style.display = 'none';
+                  }
+              });
+              
               // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
               // Set a primary game reference from the game environment
               let primaryGame = gameEnv.gameControl;
@@ -743,10 +755,15 @@ class GameLevelDesert {
           
               // Create and style the fade overlay
               const fadeOverlay = document.createElement('div');
+              
+              // Get canvas position to center the overlay
+              const canvas = gameEnv.gameCanvas || document.querySelector('canvas');
+              const canvasRect = canvas ? canvas.getBoundingClientRect() : { top: 0, left: 0 };
+              
               Object.assign(fadeOverlay.style, {
-                  position: 'absolute',
-                  top: '0px',
-                  left: '0px',
+                  position: 'fixed',
+                  top: canvasRect.top + 'px',
+                  left: canvasRect.left + 'px',
                   width: width + 'px',
                   height: height + 'px',
                   backgroundColor: '#0a0a1a',
@@ -797,10 +814,35 @@ class GameLevelDesert {
               setTimeout(() => {
                   // Start the new game
                   gameInGame.start();
+                  
+                  // Keep all characters hidden while mini-game is running
+                  const hideCharactersInterval = setInterval(() => {
+                      const allCharacters = gameEnv.gameObjects.filter(obj => 
+                          obj instanceof Npc || obj instanceof Player
+                      );
+                      
+                      allCharacters.forEach(character => {
+                          if (character.canvas) {
+                              character.canvas.style.display = 'none';
+                          }
+                      });
+                  }, 100); // Check and hide every 100ms
           
                   // Setup return to main game after mini-game ends
                   gameInGame.gameOver = function() {
+                      clearInterval(hideCharactersInterval); // Stop hiding characters
                       primaryGame.resume();
+                      
+                      // Keep all characters hidden after resume
+                      const allCharacters = gameEnv.gameObjects.filter(obj => 
+                          obj instanceof Npc || obj instanceof Player
+                      );
+                      
+                      allCharacters.forEach(character => {
+                          if (character.canvas) {
+                              character.canvas.style.display = 'none';
+                          }
+                      });
                   };
           
                   // Fade out
@@ -858,6 +900,64 @@ class GameLevelDesert {
         }
     };
 
+
+    // ===== CUSTOM AI NPCs =====
+    const historianNpc = new AINpc({
+        id: "ProfessorHistory",  
+        greeting: "Hello! I'm an expert in history!",
+        expertise: "history",
+        sprite: path + "/assets/js/adventureGame/images/character-spritesheet.png",
+        spriteWidth: 559,
+        spriteHeight: 263,
+        scaleFactor: 0.5,
+        animationRate: 10,
+        randomPosition: false,  // ← Change this to false
+        posX: width * 0.3,      // ← Add specific X position (center)
+        posY: height * 0.5,
+        gameEnv: gameEnv,
+
+        // Sprite sheet layout
+        orientation: { rows: 4, columns: 9 },
+
+        // LOCK: use ONLY the 4th row (index 3) for every direction/state
+        down:      { row: 3, start: 0, columns: 9 },
+        up:        { row: 3, start: 0, columns: 9 },
+        left:      { row: 3, start: 0, columns: 9 },
+        right:     { row: 3, start: 0, columns: 9 },
+        downLeft:  { row: 3, start: 0, columns: 9 },
+        downRight: { row: 3, start: 0, columns: 9 },
+        upLeft:    { row: 3, start: 0, columns: 9 },
+        upRight:   { row: 3, start: 0, columns: 9 },
+
+        knowledgeBase: {
+            history: [
+            {
+                question: "What is ancient Egypt?",
+                answer:
+                "Ancient Egypt was one of the world's greatest civilizations, lasting over 3000 years! It had pyramids, pharaohs, and the mighty Nile River."
+            },
+            {
+                question: "Tell me about the Renaissance",
+                answer:
+                "The Renaissance was a period of great cultural and artistic change in Europe, starting in Italy around the 14th century. Artists like Leonardo da Vinci and Michelangelo created amazing works!"
+            },
+            { 
+                question: "When was the Industrial Revolution?",
+                answer:
+                "The Industrial Revolution took place from the late 1700s to the 1800s. It changed how people worked, moving from farms to factories and inventing new machines!"
+            },
+            {
+                question: "Who was Napoleon?",
+                answer:
+                "Napoleon Bonaparte was a French military leader who became Emperor. He conquered much of Europe but was eventually defeated and exiled."
+            }
+            ]
+        }
+        }).getData();
+
+      
+
+
     // List of objects defnitions for this level
     this.classes = [
       { class: GamEnvBackground, data: image_data_desert },
@@ -871,6 +971,7 @@ class GameLevelDesert {
       { class: Npc, data: sprite_data_minesweeper },
       { class: Npc, data: sprite_data_chickenj },
       { class: Npc, data: sprite_data_endportal },
+      { class: Npc, data: historianNpc },
       { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/2) }, size: 20, points: 5 } }
     ];
   }

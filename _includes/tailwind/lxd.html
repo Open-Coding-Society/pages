@@ -280,6 +280,7 @@
       {
         name: "Individual Contribution",
         weight: 0.45,
+        comment: "",
         subcategories: [
           { name: "Commits in GitHub", weight: 0.15 },
           { name: "Collaboration", weight: 0.15 },
@@ -289,6 +290,7 @@
       {
         name: "Technical Skill",
         weight: 0.30,
+        comment: "",
         subcategories: [
           { name: "Good organization", weight: 0.10 },
           { name: "Easy to use and understand", weight: 0.10 },
@@ -298,6 +300,7 @@
       {
         name: "Innovation",
         weight: 0.15,
+        comment: "",
         subcategories: [
           { name: "Divergent thinking", weight: 0.05 },
           { name: "Useful features", weight: 0.05 },
@@ -1222,6 +1225,15 @@
           `).join('')}
         </div>
         <button onclick="addGradingSub(${idx})" style="padding:4px 12px; border-radius:6px; border:none; font-size:0.875rem; cursor:pointer; margin-top:8px;">+ Add Sub-criterion</button>
+        <div class="mt-3">
+          <label class="block text-white font-semibold mb-1 text-sm">Comments for this section:</label>
+          <textarea 
+            class="w-full px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 text-sm" 
+            rows="3" 
+            placeholder="Add feedback for ${cat.name}..."
+            data-gcat-comment="${idx}"
+          >${cat.comment || ''}</textarea>
+        </div>
       </div>
     `;
     }).join('');
@@ -1325,7 +1337,7 @@
 
   function addGradingCategory() {
     const rubric = getCurrentRubric();
-    rubric.categories.push({ name: 'New Category', weight: 0, subcategories: [] });
+    rubric.categories.push({ name: 'New Category', weight: 0, comment: '', subcategories: [] });
     renderGradingEdit(rubric);
   }
 
@@ -1398,7 +1410,8 @@
     document.querySelectorAll('[data-gcat]').forEach((catEl, catIdx) => {
       const name = catEl.querySelector(`[data-gcat-name="${catIdx}"]`)?.value || 'Category';
       const weight = parseFloat(catEl.querySelector(`[data-gcat-weight="${catIdx}"]`)?.value) || 0;
-      const category = { name, weight, subcategories: [] };
+      const comment = catEl.querySelector(`[data-gcat-comment="${catIdx}"]`)?.value || '';
+      const category = { name, weight, comment, subcategories: [] };
       catEl.querySelectorAll('[data-gsub]').forEach(subEl => {
         const [cidx, sidx] = subEl.getAttribute('data-gsub').split('-').map(Number);
         const subName = subEl.querySelector(`[data-gsub-name="${cidx}-${sidx}"]`)?.value || 'Sub-criterion';

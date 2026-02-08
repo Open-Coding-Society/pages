@@ -1,0 +1,308 @@
+/**
+ * Platform.js Template
+ * ===================
+ * This class represents static platforms and terrain in the game.
+ * Platforms are where the player walks and stands.
+ * 
+ * Key Responsibilities:
+ * - Define platform position and size
+ * - Provide collision information
+ * - Render to canvas
+ * - Optional: animated/moving platforms
+ * 
+ * Platform Types:
+ * - Static: Normal platform that doesn't move
+ * - Moving: Platform that slides left/right or up/down
+ * - Falling: Platform that falls when player steps on it
+ * - Rotating: Platform that rotates
+ * - Sinking: Platform that sinks into ground
+ */
+
+class Platform {
+    /**
+     * Constructor - Initialize platform
+     * 
+     * @param {Object} config - Platform configuration
+     * @param {number} config.x - X position (left edge)
+     * @param {number} config.y - Y position (top edge)
+     * @param {number} config.width - Platform width
+     * @param {number} config.height - Platform height (usually 20px or less)
+     * @param {string} config.type - Platform type: 'static', 'moving', 'falling', etc.
+     * @param {string} config.color - Platform color (default: 'brown')
+     */
+    constructor(config = {}) {
+        // TODO: Store position
+        // this.x = config.x || 0;
+        // this.y = config.y || 0;
+        // this.startX = this.x;
+        // this.startY = this.y;
+
+        // TODO: Store dimensions
+        // this.width = config.width || 100;
+        // this.height = config.height || 20;
+
+        // TODO: Store type
+        // this.type = config.type || 'static'; // 'static', 'moving', 'falling', 'rotating'
+
+        // TODO: Store appearance
+        // this.color = config.color || 'brown';
+        // this.texture = config.texture || null; // Optional texture image
+
+        // TODO: For moving platforms - store movement properties
+        // this.moveSpeed = config.moveSpeed || 2;
+        // this.moveDistance = config.moveDistance || 50;
+        // this.moveDirection = 1; // 1 for right/down, -1 for left/up
+        // this.moveAxis = config.moveAxis || 'x'; // 'x' or 'y'
+
+        // TODO: For falling platforms - store state
+        // this.isFalling = false;
+        // this.fallDelay = 500; // ms before platform falls
+        // this.fallTime = 0; // How long since player stepped on it
+
+        // TODO: For moving platforms - velocity
+        // this.vx = 0;
+        // this.vy = 0;
+    }
+
+    /**
+     * Update platform (for moving, falling, etc.)
+     * Called each frame
+     */
+    update() {
+        // TODO: Call update based on type
+        // switch(this.type) {
+        //   case 'moving':
+        //     this.updateMoving();
+        //     break;
+        //   case 'falling':
+        //     this.updateFalling();
+        //     break;
+        //   case 'rotating':
+        //     this.updateRotating();
+        //     break;
+        // }
+    }
+
+    /**
+     * Update moving platform - slide left/right or up/down
+     */
+    updateMoving() {
+        // TODO: Move platform
+        // if (this.moveAxis === 'x') {
+        //   this.x += this.moveSpeed * this.moveDirection;
+        //   if (this.x <= this.startX - this.moveDistance ||
+        //       this.x >= this.startX + this.moveDistance) {
+        //     this.moveDirection *= -1; // Reverse direction
+        //   }
+        // } else if (this.moveAxis === 'y') {
+        //   this.y += this.moveSpeed * this.moveDirection;
+        //   if (this.y <= this.startY - this.moveDistance ||
+        //       this.y >= this.startY + this.moveDistance) {
+        //     this.moveDirection *= -1;
+        //   }
+        // }
+    }
+
+    /**
+     * Update falling platform - start falling when stepped on
+     */
+    updateFalling() {
+        // TODO: If falling, apply gravity
+        // if (this.isFalling) {
+        //   this.vy += 0.4; // gravity
+        //   this.y += this.vy;
+        //   
+        //   // Remove platform if it falls too far
+        //   if (this.y > 1000) {
+        //     this.destroy();
+        //   }
+        // }
+    }
+
+    /**
+     * Update rotating platform
+     */
+    updateRotating() {
+        // TODO: Rotate platform
+        // this.rotation += 2; // rotation speed
+        // if (this.rotation >= 360) this.rotation = 0;
+    }
+
+    /**
+     * Handle player stepping on platform
+     * Used by falling platforms to trigger fall
+     * 
+     * @param {Player} player - The player stepping on platform
+     */
+    onPlayerStep(player) {
+        // TODO: If falling platform, start falling sequence
+        // if (this.type === 'falling' && !this.isFalling) {
+        //   setTimeout(() => {
+        //     this.isFalling = true;
+        //     this.vy = 0; // Start from rest
+        //   }, this.fallDelay);
+        // }
+    }
+
+    /**
+     * Check if point is on this platform (for collision detection)
+     * 
+     * @param {number} px - Point X coordinate
+     * @param {number} py - Point Y coordinate
+     * @returns {boolean} True if point is on platform
+     */
+    containsPoint(px, py) {
+        // TODO: Check if point is within platform bounds
+        // return px >= this.x && px <= this.x + this.width &&
+        //        py >= this.y && py <= this.y + this.height;
+    }
+
+    /**
+     * Get platform bounds for collision detection
+     * 
+     * @returns {Object} Object with left, right, top, bottom coordinates
+     */
+    getBounds() {
+        // TODO: Return platform boundaries
+        // return {
+        //   left: this.x,
+        //   right: this.x + this.width,
+        //   top: this.y,
+        //   bottom: this.y + this.height
+        // };
+    }
+
+    /**
+     * Render platform to canvas
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    render(ctx) {
+        // TODO: Option 1 - Draw as solid color
+        // ctx.fillStyle = this.color;
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // TODO: Option 2 - Draw with texture
+        // if (this.texture) {
+        //   ctx.drawImage(this.texture, this.x, this.y, this.width, this.height);
+        // } else {
+        //   ctx.fillStyle = this.color;
+        //   ctx.fillRect(this.x, this.y, this.width, this.height);
+        // }
+
+        // TODO: Option 3 - Draw with border/3D effect
+        // this.drawWith3DEffect(ctx);
+
+        // TODO: For moving platforms, draw direction arrow
+        // if (this.type === 'moving') {
+        //   ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        //   ctx.font = '12px Arial';
+        //   ctx.fillText('→', this.x + this.width/2, this.y + this.height/2);
+        // }
+
+        // TODO: For falling platforms, draw warning
+        // if (this.type === 'falling') {
+        //   ctx.strokeStyle = 'red';
+        //   ctx.lineWidth = 2;
+        //   ctx.strokeRect(this.x, this.y, this.width, this.height);
+        // }
+    }
+
+    /**
+     * Draw platform with 3D effect (adds depth)
+     * 
+     * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+     */
+    drawWith3DEffect(ctx) {
+        // TODO: Draw top surface (main color)
+        // ctx.fillStyle = this.color;
+        // ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // TODO: Draw bottom shadow (darker)
+        // ctx.fillStyle = this.getDarkerColor(this.color);
+        // ctx.fillRect(this.x, this.y + this.height - 3, this.width, 3);
+
+        // TODO: Draw right edge shadow
+        // ctx.fillRect(this.x + this.width - 3, this.y, 3, this.height);
+
+        // TODO: Draw highlight on top-left
+        // ctx.fillStyle = this.getLighterColor(this.color);
+        // ctx.fillRect(this.x, this.y, this.width - 2, 2);
+    }
+
+    /**
+     * Get darker version of color (for shadows)
+     * 
+     * @param {string} color - Color to darken
+     * @returns {string} Darker color
+     */
+    getDarkerColor(color) {
+        // TODO: Simple color darkening
+        // Can be improved with more sophisticated RGB manipulation
+        // return 'rgba(0, 0, 0, 0.3)';
+    }
+
+    /**
+     * Get lighter version of color (for highlights)
+     * 
+     * @param {string} color - Color to lighten
+     * @returns {string} Lighter color
+     */
+    getLighterColor(color) {
+        // TODO: Simple color lightening
+        // return 'rgba(255, 255, 255, 0.3)';
+    }
+
+    /**
+     * Check if moving platform is at one of its boundaries
+     * 
+     * @returns {boolean} True if at min or max position
+     */
+    isAtBoundary() {
+        // TODO: Check boundaries based on move axis
+        // if (this.moveAxis === 'x') {
+        //   return this.x <= this.startX - this.moveDistance ||
+        //          this.x >= this.startX + this.moveDistance;
+        // } else {
+        //   return this.y <= this.startY - this.moveDistance ||
+        //          this.y >= this.startY + this.moveDistance;
+        // }
+    }
+
+    /**
+     * Get current velocity for moving platforms
+     * Used to apply momentum to player standing on it
+     * 
+     * @returns {Object} Velocity {vx, vy}
+     */
+    getVelocity() {
+        // TODO: Return current velocity
+        // return {
+        //   vx: this.moveAxis === 'x' ? this.moveSpeed * this.moveDirection : 0,
+        //   vy: this.moveAxis === 'y' ? this.moveSpeed * this.moveDirection : 0
+        // };
+    }
+
+    /**
+     * Destroy platform (for falling platforms that fall off screen)
+     */
+    destroy() {
+        // TODO: Mark for removal from level.staticObjects
+        // this.isDestroyed = true;
+    }
+
+    /**
+     * Reset platform to starting position (for level restart)
+     */
+    reset() {
+        // TODO: Restore initial state
+        // this.x = this.startX;
+        // this.y = this.startY;
+        // this.isFalling = false;
+        // this.fallTime = 0;
+        // this.vy = 0;
+        // this.moveDirection = 1;
+    }
+}
+
+export default Platform;

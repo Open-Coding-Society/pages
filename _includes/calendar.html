@@ -48,7 +48,10 @@
     
     <div class="calendar-action-modal-footer">
       <button type="button" class="modal-btn secondary" id="cancel-selective-sync">Cancel</button>
-      <button type="button" class="modal-btn primary" id="confirm-selective-sync"><i class="fas fa-sync"></i> Sync Selected</button>
+      <button type="button" class="modal-btn export-blue" id="export-ics-sync"><i class="fas fa-download"></i> Export</button>
+      <button type="button" class="modal-btn export-blue" id="update-ics-file"><i class="fas fa-save"></i> Update</button>
+      <button type="button" class="modal-btn info" id="preview-sync-changes"><i class="fas fa-eye"></i> Preview</button>
+      <button type="button" class="modal-btn primary" id="confirm-selective-sync"><i class="fas fa-sync"></i> Sync</button>
     </div>
   </div>
 </div>
@@ -92,6 +95,44 @@
     <div class="calendar-action-modal-footer">
       <button type="button" class="modal-btn secondary" id="cancel-selective-remove">Cancel</button>
       <button type="button" class="modal-btn danger" id="confirm-selective-remove"><i class="fas fa-trash-alt"></i> Remove Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   CALENDAR PREVIEW MODAL       -->
+<!-- ============================= -->
+<div id="calendar-preview-modal" class="calendar-action-modal">
+  <div class="calendar-action-modal-content preview-modal">
+    <div class="calendar-action-modal-header">
+      <h2><i class="fas fa-eye"></i> Preview Calendar Changes</h2>
+      <button id="close-preview-modal" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="calendar-action-modal-body">
+      <div class="preview-comparison">
+        <div class="preview-column current">
+          <h3><i class="fas fa-calendar"></i> Current Calendar</h3>
+          <div id="current-events-list" class="preview-events-list">
+            <div class="preview-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+        
+        <div class="preview-column changes">
+          <h3><i class="fas fa-arrow-right"></i> Proposed Changes</h3>
+          <div id="proposed-changes-list" class="preview-events-list"></div>
+        </div>
+      </div>
+      
+      <div class="preview-summary">
+        <div class="summary-item add"><i class="fas fa-plus-circle"></i> <span id="add-count">0</span> to add</div>
+        <div class="summary-item update"><i class="fas fa-sync-alt"></i> <span id="update-count">0</span> to update</div>
+      </div>
+    </div>
+    
+    <div class="calendar-action-modal-footer">
+      <button type="button" class="modal-btn secondary" id="preview-back">Back to Selection</button>
+      <button type="button" class="modal-btn primary" id="preview-confirm"><i class="fas fa-check"></i> Confirm & Sync</button>
     </div>
   </div>
 </div>
@@ -1083,6 +1124,290 @@
     currentRemoveModalData = null;
   }
   
+  // ===========================
+  // HELPER: Build events from selected items
+  // ===========================
+  function buildEventsFromSelection(selectedItems, priority, courseName) {
+    const events = [];
+    
+    Object.keys(selectedItems).forEach(weekNum => {
+      const weekData = selectedItems[weekNum];
+      const readingDate = getReadingDate(parseInt(weekNum));
+      const assessmentDate = getAssessmentDate(parseInt(weekNum));
+      
+      // Build formative event
+      if (weekData.formative && weekData.formative.length > 0 && readingDate) {
+        const lessonItems = weekData.formative.map(item => {
+          const fullUrl = item.url ? window.location.origin + '{{ site.baseurl }}' + item.url : '';
+          return `• ${item.title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+        }).join('\n\n');
+        
+        events.push({
+          title: `[${priority}] 📚 Week ${weekNum} Formative - ${courseName}`,
+          description: `Reading Materials:\n\n${lessonItems}`,
+          date: readingDate,
+          period: courseName,
+          priority: priority,
+          weekNum: parseInt(weekNum),
+          type: 'formative'
+        });
+      }
+      
+      // Build summative event
+      if (weekData.summative && weekData.summative.length > 0 && assessmentDate) {
+        const assignmentItems = weekData.summative.map(item => {
+          const fullUrl = item.url ? window.location.origin + '{{ site.baseurl }}' + item.url : '';
+          return `• ${item.title}${fullUrl ? '\n  ' + fullUrl : ''}`;
+        }).join('\n\n');
+        
+        events.push({
+          title: `[${priority}] 📝 Week ${weekNum} Summative - ${courseName}`,
+          description: `Assessments Due:\n\n${assignmentItems}`,
+          date: assessmentDate,
+          period: courseName,
+          priority: priority,
+          weekNum: parseInt(weekNum),
+          type: 'summative'
+        });
+      }
+    });
+    
+    return events;
+  }
+  
+  // ===========================
+  // iCAL EXPORT FUNCTIONS
+  // ===========================
+  function generateICSFile(events) {
+    const icsLines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//School Calendar//Sprint Events//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:Sprint Events'
+    ];
+    
+    events.forEach(event => {
+      const uid = `${event.date}-${event.title.replace(/\s+/g, '-')}@school.edu`;
+      const dtstamp = formatICSDateTime(new Date());
+      const dtstart = formatICSDate(event.date);
+      
+      icsLines.push('BEGIN:VEVENT');
+      icsLines.push(`UID:${uid}`);
+      icsLines.push(`DTSTAMP:${dtstamp}`);
+      icsLines.push(`DTSTART;VALUE=DATE:${dtstart}`);
+      icsLines.push(`SUMMARY:${escapeICS(event.title)}`);
+      icsLines.push(`DESCRIPTION:${escapeICS(event.description)}`);
+      if (event.period) {
+        icsLines.push(`CATEGORIES:${escapeICS(event.period)}`);
+      }
+      icsLines.push('END:VEVENT');
+    });
+    
+    icsLines.push('END:VCALENDAR');
+    
+    return icsLines.join('\r\n');
+  }
+  
+  function formatICSDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+  }
+  
+  function formatICSDateTime(date) {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const hour = String(date.getUTCHours()).padStart(2, '0');
+    const minute = String(date.getUTCMinutes()).padStart(2, '0');
+    const second = String(date.getUTCSeconds()).padStart(2, '0');
+    return `${year}${month}${day}T${hour}${minute}${second}Z`;
+  }
+  
+  function escapeICS(text) {
+    if (!text) return '';
+    return text
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\n/g, '\\n');
+  }
+  
+  function downloadICSFile(icsContent, filename) {
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  
+  // ===========================
+  // PREVIEW MODAL FUNCTIONS
+  // ===========================
+  function getSelectedItemsFromModal() {
+    const selectedItems = {};
+    const listEl = document.getElementById('sync-week-list');
+    
+    // Use correct selector: .sync-week-group (not .sync-week-item)
+    listEl.querySelectorAll('.sync-week-group').forEach(weekGroup => {
+      const weekNum = weekGroup.dataset.week;
+      const checkboxes = weekGroup.querySelectorAll('.item-checkbox:checked');
+      
+      if (checkboxes.length > 0) {
+        selectedItems[weekNum] = { formative: [], summative: [] };
+        
+        checkboxes.forEach(cb => {
+          // Build item data from individual data attributes (not data-item JSON)
+          const itemData = {
+            title: cb.dataset.title,
+            url: cb.dataset.url || '',
+            id: cb.dataset.id
+          };
+          if (cb.dataset.type === 'formative') {
+            selectedItems[weekNum].formative.push(itemData);
+          } else {
+            selectedItems[weekNum].summative.push(itemData);
+          }
+        });
+      }
+    });
+    
+    return selectedItems;
+  }
+  
+  async function showCalendarPreview() {
+    if (!currentSyncModalData) return;
+    
+    const { sprintKey, course } = currentSyncModalData;
+    const selectedItems = getSelectedItemsFromModal();
+    const priority = document.querySelector('input[name="sync-modal-priority"]:checked')?.value || 'P2';
+    const courseName = course.toUpperCase();
+    
+    if (Object.keys(selectedItems).length === 0) {
+      alert('No items selected to preview.');
+      return;
+    }
+    
+    // Hide sync modal, show preview modal
+    document.getElementById('selective-sync-modal').style.display = 'none';
+    document.getElementById('calendar-preview-modal').style.display = 'flex';
+    
+    // Populate preview
+    await populateCalendarPreview(selectedItems, priority, courseName);
+  }
+  
+  async function populateCalendarPreview(selectedItems, priority, courseName) {
+    const currentList = document.getElementById('current-events-list');
+    const proposedList = document.getElementById('proposed-changes-list');
+    
+    let currentEvents = [];
+    let fetchError = false;
+    
+    // Try to fetch current calendar events (optional - preview works without it)
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const javaURI = configModule.javaURI;
+      
+      if (javaURI) {
+        const response = await fetch(`${javaURI}/api/calendar/events`, { credentials: 'include' });
+        if (response.ok) {
+          const allEvents = await response.json();
+          currentEvents = allEvents.filter(e => e.period === courseName);
+        } else {
+          fetchError = true;
+        }
+      } else {
+        fetchError = true;
+      }
+    } catch (e) {
+      console.warn('Could not fetch existing calendar events:', e);
+      fetchError = true;
+    }
+    
+    // Build proposed events (this part doesn't need the API)
+    const proposedEvents = buildEventsFromSelection(selectedItems, priority, courseName);
+    
+    // Categorize
+    const toAdd = [];
+    const toUpdate = [];
+    
+    proposedEvents.forEach(proposed => {
+      const existing = currentEvents.find(e => 
+          e.title.includes(`Week ${proposed.weekNum}`) && 
+          e.title.includes(proposed.type === 'formative' ? 'Formative' : 'Summative') &&
+          e.title.includes(courseName)
+        );
+        
+        if (existing) {
+          toUpdate.push({ ...proposed, status: 'update', existingId: existing.id });
+        } else {
+          toAdd.push({ ...proposed, status: 'add' });
+        }
+      });
+      
+      // Display current events
+      if (fetchError) {
+        currentList.innerHTML = '<p class="no-events"><i class="fas fa-exclamation-triangle"></i> Could not load current calendar (not logged in or API unavailable)</p>';
+      } else if (currentEvents.length === 0) {
+        currentList.innerHTML = '<p class="no-events">No events currently on calendar for this course</p>';
+      } else {
+        currentList.innerHTML = currentEvents
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .map(e => `
+            <div class="preview-event-item current">
+              <div class="event-title">${e.title}</div>
+              <div class="event-date">${formatDateDisplay(e.date)}</div>
+            </div>
+          `).join('');
+      }
+      
+      // Display proposed changes
+      if (toAdd.length === 0 && toUpdate.length === 0) {
+        proposedList.innerHTML = '<p class="no-events">No changes to make</p>';
+      } else {
+        const addHTML = toAdd.map(e => `
+          <div class="preview-event-item add">
+            <div class="event-status"><i class="fas fa-plus-circle"></i> ADD</div>
+            <div class="event-title">${e.title}</div>
+            <div class="event-date">${formatDateDisplay(e.date)}</div>
+            <div class="event-description-preview">${e.description.substring(0, 100)}...</div>
+          </div>
+        `).join('');
+        
+        const updateHTML = toUpdate.map(e => `
+          <div class="preview-event-item update">
+            <div class="event-status"><i class="fas fa-sync-alt"></i> UPDATE</div>
+            <div class="event-title">${e.title}</div>
+            <div class="event-date">${formatDateDisplay(e.date)}</div>
+            <div class="event-description-preview">${e.description.substring(0, 100)}...</div>
+          </div>
+        `).join('');
+        
+        proposedList.innerHTML = addHTML + updateHTML;
+      }
+      
+      // Update counts
+      document.getElementById('add-count').textContent = toAdd.length;
+      document.getElementById('update-count').textContent = toUpdate.length;
+  }
+  
+  function closePreviewModal() {
+    document.getElementById('calendar-preview-modal').style.display = 'none';
+    document.getElementById('selective-sync-modal').style.display = 'flex';
+  }
+
+
+
+
+  
   // Initialize modal event handlers
   function initializeSelectiveSyncModals() {
     // Close buttons
@@ -1173,15 +1498,21 @@
       updateSelectedCount('remove');
     });
     
-    // Bulk priority buttons
-    document.querySelectorAll('.set-all-priority-btn').forEach(btn => {
+    // Bulk priority buttons - set all items to the selected priority
+    document.querySelectorAll('.bulk-priority-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const priority = btn.dataset.priority;
+
+        // Update all priority dropdowns in the sync modal
         document.querySelectorAll('#sync-week-list .item-priority-select').forEach(select => {
           select.value = priority;
           // Also save to localStorage
           savePriorityToStorage(select);
         });
+
+        // Visual feedback - highlight the clicked button
+        document.querySelectorAll('.bulk-priority-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
       });
     });
     
@@ -1224,6 +1555,100 @@
     
     document.getElementById('selective-remove-modal')?.addEventListener('click', (e) => {
       if (e.target.id === 'selective-remove-modal') closeSelectiveRemoveModal();
+    });
+    
+    // Preview modal handlers
+    document.getElementById('close-preview-modal')?.addEventListener('click', closePreviewModal);
+    document.getElementById('preview-back')?.addEventListener('click', closePreviewModal);
+    document.getElementById('preview-confirm')?.addEventListener('click', () => {
+      closePreviewModal();
+      executeSelectiveSync();
+    });
+    document.getElementById('calendar-preview-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'calendar-preview-modal') closePreviewModal();
+    });
+    
+    // Preview button handler
+    document.getElementById('preview-sync-changes')?.addEventListener('click', showCalendarPreview);
+    
+    // Export iCal handler
+    document.getElementById('export-ics-sync')?.addEventListener('click', () => {
+      if (!currentSyncModalData) return;
+      
+      const { sprintKey, course } = currentSyncModalData;
+      const selectedItems = getSelectedItemsFromModal();
+      const priority = document.querySelector('input[name="sync-modal-priority"]:checked')?.value || 'P2';
+      const courseName = course.toUpperCase();
+      
+      if (Object.keys(selectedItems).length === 0) {
+        alert('No items selected to export.');
+        return;
+      }
+      
+      const events = buildEventsFromSelection(selectedItems, priority, courseName);
+      const icsContent = generateICSFile(events);
+      downloadICSFile(icsContent, `${sprintKey}-${courseName}.ics`);
+      
+      showToastNotification(`✓ Downloaded ${events.length} events as ${sprintKey}-${courseName}.ics`, 'success');
+    });
+    
+    // Update .ics file handler (File System Access API)
+    document.getElementById('update-ics-file')?.addEventListener('click', async () => {
+      if (!currentSyncModalData) return;
+      
+      // Check browser support
+      if (!('showOpenFilePicker' in window)) {
+        alert('Your browser does not support the File System Access API. Please use Chrome or Edge, or use the regular Export button instead.');
+        return;
+      }
+      
+      const { sprintKey, course } = currentSyncModalData;
+      const selectedItems = getSelectedItemsFromModal();
+      const priority = document.querySelector('input[name="sync-modal-priority"]:checked')?.value || 'P2';
+      const courseName = course.toUpperCase();
+      
+      if (Object.keys(selectedItems).length === 0) {
+        alert('No items selected to export.');
+        return;
+      }
+      
+      try {
+        // Prompt user to select an existing .ics file to overwrite
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [{
+            description: 'iCalendar Files',
+            accept: { 'text/calendar': ['.ics', '.ical'] }
+          }],
+          multiple: false
+        });
+        
+        // Validate file extension
+        const fileName = fileHandle.name.toLowerCase();
+        if (!fileName.endsWith('.ics') && !fileName.endsWith('.ical')) {
+          alert('Unsupported file type. Please select a .ics or .ical file.');
+          return;
+        }
+        
+        // Generate new calendar content
+        const events = buildEventsFromSelection(selectedItems, priority, courseName);
+        const icsContent = generateICSFile(events);
+        
+        // Write to the selected file
+        const writable = await fileHandle.createWritable();
+        await writable.write(icsContent);
+        await writable.close();
+        
+        showToastNotification(`✓ Updated ${fileHandle.name} with ${events.length} events`, 'success');
+        
+      } catch (err) {
+        // User cancelled the picker or permission denied
+        if (err.name === 'AbortError') {
+          // User cancelled - do nothing
+          return;
+        }
+        console.error('Error updating .ics file:', err);
+        alert('Failed to update the file. Make sure you have permission to write to this location.');
+      }
     });
   }
 </script>

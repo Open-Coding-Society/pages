@@ -1,6 +1,6 @@
-import GameEnvBackground  from "./GameEngine/GameEnvBackground.js";
-import Player from "./GameEngine/Player.js";
-import Npc from "./GameEngine/Npc.js";
+import GameEnvBackground  from "../../GameEngine/MansionLogic/GameEnvBackground.js";
+import Player from "../../GameEngine/MansionLogic/Player.js";
+import Npc from "../../GameEngine/MansionLogic/Npc.js";
 import MansionLevel1 from './mansionLevel1.js';
 
 class MansionLevel1_Pantry {

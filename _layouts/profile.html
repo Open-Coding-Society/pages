@@ -444,29 +444,22 @@ active_tab: profile
             const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
             
             if (!userPersonasResp.ok) {
-                // If 401, user might not be authenticated or endpoint doesn't exist
                 console.log('No personas found for user or not authenticated');
-                showPersonaSelectionCards(personas);
+                showPersonaSelectionCards(personas, {});
                 return;
             }
             
             const userPersonasData = await userPersonasResp.json();
+            const selectedPersonas = userPersonasData.personas || {};
+            const totalSelected = userPersonasData.total_selected || 0;
             
-            // Check if user has personas
-            if (userPersonasData.personas && userPersonasData.personas.length > 0) {
-                const userPersona = userPersonasData.personas[0];
-                const personaId = userPersona.persona_id || userPersona.id;
-                
-                // Find the full persona details
-                const selectedPersona = personas.find(p => p.id === personaId);
-                if (selectedPersona) {
-                    showSelectedPersona(selectedPersona, personas);  // Pass all personas
-                    return;
-                }
+            // If user has selected all 4 categories, show the completed view
+            if (totalSelected === 4) {
+                showCompletedPersonas(selectedPersonas, personas);
+            } else {
+                // Show selection interface with partial selections
+                showPersonaSelectionCards(personas, selectedPersonas);
             }
-            
-            // If no persona selected, show all cards to choose from
-            showPersonaSelectionCards(personas);
             
         } catch (error) {
             console.error('Error loading personas:', error);
@@ -476,10 +469,10 @@ active_tab: profile
         }
     }
 
-    function showPersonaSelectionCards(personas) {
+    function showPersonaSelectionCards(allPersonas, selectedPersonas) {
         const container = document.getElementById('personaSelectionContainer');
         
-        if (personas.length === 0) {
+        if (allPersonas.length === 0) {
             container.innerHTML = `
                 <p class="text-gray-400 text-center py-4">No personas available.</p>
             `;
@@ -487,7 +480,7 @@ active_tab: profile
         }
         
         // Group personas by category
-        const grouped = personas.reduce((acc, persona) => {
+        const grouped = allPersonas.reduce((acc, persona) => {
             const category = persona.category || 'other';
             if (!acc[category]) acc[category] = [];
             acc[category].push(persona);
@@ -495,56 +488,121 @@ active_tab: profile
         }, {});
         
         const categoryLabels = {
-            'student': 'Student Archetypes',
-            'social': 'Social Interests',
+            'student': 'Student Archetype',
+            'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
-            'fantasy': 'Fantasy Personas'
+            'fantasy': 'Fantasy Persona'
         };
+        
+        const categoryDescriptions = {
+            'student': 'How you approach learning and teamwork',
+            'social': 'Your hobbies and social interests',
+            'achievement': 'What drives and motivates you',
+            'fantasy': 'Your aspirational superpower'
+        };
+        
+        const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
+        const totalSelected = Object.keys(selectedPersonas).length;
+        
+        window.allPersonasData = allPersonas;
+        window.selectedPersonasData = selectedPersonas;
         
         container.innerHTML = `
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-gray-100 mb-2">Choose Your Persona</h2>
-                <p class="text-gray-400">Select the persona that best represents you</p>
+                <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
+                <p class="text-gray-400">Select one persona from each category (${totalSelected}/4 selected)</p>
+                ${totalSelected > 0 ? `
+                    <div class="mt-4 flex justify-center gap-2">
+                        ${categoryOrder.map(cat => `
+                            <div class="w-3 h-3 rounded-full ${selectedPersonas[cat] ? 'bg-indigo-500' : 'bg-gray-700'}"></div>
+                        `).join('')}
+                    </div>
+                ` : ''}
             </div>
             
-            ${Object.entries(grouped).map(([category, personas]) => `
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-indigo-400 mb-4 border-b border-gray-700 pb-2">
-                        ${categoryLabels[category] || category}
-                    </h3>
-                                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        ${personas.map(persona => {
-                            const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                            const description = persona.bio_map?.description || 'No description';
-                            
-                            return `
-                                <div 
-                                    class="flex flex-col p-4 bg-neutral-800 hover:bg-neutral-700 border border-gray-700 hover:border-indigo-500 rounded-lg cursor-pointer transition-all group h-full"
-                                    onclick="selectPersona(${persona.id})">
-                                    <h4 class="font-semibold text-gray-200 group-hover:text-indigo-300 mb-2">${title}</h4>
-                                    <p class="text-sm text-gray-400 flex-1 line-clamp-4">${description}</p>
-                                    <div class="mt-3 flex justify-end">
-                                        <svg class="w-6 h-6 text-gray-600 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
+            ${categoryOrder.map(category => {
+                const personas = grouped[category] || [];
+                const selectedInCategory = selectedPersonas[category];
+                
+                return `
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-semibold ${selectedInCategory ? 'text-indigo-400' : 'text-gray-300'} flex items-center gap-2">
+                                    ${selectedInCategory ? '✓' : '○'} ${categoryLabels[category]}
+                                    ${selectedInCategory ? '<span class="text-sm font-normal text-gray-400">(Selected)</span>' : ''}
+                                </h3>
+                                <p class="text-sm text-gray-500">${categoryDescriptions[category]}</p>
+                            </div>
+                            ${selectedInCategory ? `
+                                <button 
+                                    onclick="changeCategory('${category}')"
+                                    class="px-3 py-1 text-sm bg-neutral-700 hover:bg-neutral-600 text-gray-300 rounded transition">
+                                    Change
+                                </button>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${personas.map(persona => {
+                                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                                const description = persona.bio_map?.description || 'No description';
+                                const isSelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+                                
+                                return `
+                                    <div 
+                                        class="flex flex-col p-4 ${isSelected 
+                                            ? 'bg-indigo-900/30 border-2 border-indigo-500' 
+                                            : 'bg-neutral-800 hover:bg-neutral-700 border border-gray-700 hover:border-indigo-500'
+                                        } rounded-lg ${!isSelected ? 'cursor-pointer' : ''} transition-all group h-full"
+                                        ${!isSelected ? `onclick="selectPersona(${persona.id}, '${category}')"` : ''}>
+                                        
+                                        ${isSelected ? `
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs font-semibold text-indigo-400 uppercase">Selected</span>
+                                                <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                        ` : ''}
+                                        
+                                        <h4 class="font-semibold ${isSelected ? 'text-indigo-200' : 'text-gray-200 group-hover:text-indigo-300'} mb-2">
+                                            ${title}
+                                        </h4>
+                                        <p class="text-sm text-gray-400 flex-1 line-clamp-3">${description}</p>
+                                        
+                                        ${!isSelected ? `
+                                            <div class="mt-3 flex justify-end">
+                                                <svg class="w-6 h-6 text-gray-600 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </div>
+                                        ` : ''}
                                     </div>
-                                </div>
-                            `;
-                        }).join('')}
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
+                `;
+            }).join('')}
+            
+            ${totalSelected === 4 ? `
+                <div class="text-center mt-8">
+                    <button 
+                        onclick="viewCompletedProfile()"
+                        class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition flex items-center gap-2 mx-auto">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        View Your Complete Profile
+                    </button>
                 </div>
-            `).join('')}
+            ` : ''}
         `;
     }
-    function showSelectedPersona(persona, allPersonas) {
+
+    function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
-        const title = persona.bio_map?.title || persona.alias || 'Unnamed Persona';
-        const description = persona.bio_map?.description || 'No description available';
-        const category = persona.category || persona._category || 'Uncategorized';
-        const says = persona.empathy_map?.says?.[0] || '';
-        const thinks = persona.empathy_map?.thinks?.[0] || '';
-        const feels = persona.empathy_map?.feels?.[0] || '';
-        const does = persona.empathy_map?.does?.[0] || '';
         
         const categoryLabels = {
             'student': 'Student Archetype',
@@ -552,150 +610,125 @@ active_tab: profile
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        window.allPersonasData = allPersonas;
-        container.innerHTML = `
-            <div class="max-w-4xl mx-auto">
-                <!-- Header with change button -->
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-100">Your Persona</h2>
-                        <p class="text-gray-400 text-sm">This represents your personality and interests</p>
-                    </div>
-                    <button 
-                        onclick="showAllPersonas()"
-                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Change Persona
-                    </button>
-                </div>
-                
-                <!-- Selected persona card -->
-                <div class="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500 rounded-xl p-6 mb-6">
-                    <div class="flex items-start gap-4">
-                        <div class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-3xl flex-shrink-0">
-                            ${getPersonaEmoji(category)}
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <h3 class="text-2xl font-bold text-gray-100">${title}</h3>
-                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-indigo-600 text-white">
-                                    ${categoryLabels[category] || category}
-                                </span>
-                            </div>
-                            <p class="text-gray-300 leading-relaxed">${description}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                ${says || thinks || feels || does ? `
-                    <!-- Persona insights -->
-                    <div class="bg-neutral-800 border border-gray-700 rounded-xl p-6">
-                        <h4 class="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
-                            </svg>
-                            Persona Insights
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            ${says ? `
-                                <div class="bg-neutral-900 rounded-lg p-4 border-l-4 border-blue-500">
-                                    <h5 class="font-medium text-blue-400 mb-2 text-sm">💬 Says</h5>
-                                    <p class="text-gray-300 text-sm italic">"${says}"</p>
-                                </div>
-                            ` : ''}
-                            
-                            ${thinks ? `
-                                <div class="bg-neutral-900 rounded-lg p-4 border-l-4 border-purple-500">
-                                    <h5 class="font-medium text-purple-400 mb-2 text-sm">💭 Thinks</h5>
-                                    <p class="text-gray-300 text-sm">${thinks}</p>
-                                </div>
-                            ` : ''}
-                            
-                            ${feels ? `
-                                <div class="bg-neutral-900 rounded-lg p-4 border-l-4 border-pink-500">
-                                    <h5 class="font-medium text-pink-400 mb-2 text-sm">❤️ Feels</h5>
-                                    <p class="text-gray-300 text-sm">${feels}</p>
-                                </div>
-                            ` : ''}
-                            
-                            ${does ? `
-                                <div class="bg-neutral-900 rounded-lg p-4 border-l-4 border-green-500">
-                                    <h5 class="font-medium text-green-400 mb-2 text-sm">⚡ Does</h5>
-                                    <p class="text-gray-300 text-sm">${does}</p>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-    }
-
-    function getPersonaEmoji(category) {
-        const emojis = {
+        
+        const categoryEmojis = {
             'student': '📚',
             'social': '🎉',
             'achievement': '🏆',
             'fantasy': '✨'
         };
-        return emojis[category] || '👤';
+        
+        const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
+        
+        window.allPersonasData = allPersonas;
+        window.selectedPersonasData = selectedPersonas;
+        
+        container.innerHTML = `
+            <div class="max-w-6xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-100 mb-2">Your Persona Profile</h2>
+                        <p class="text-gray-400">These personas represent your personality and preferences</p>
+                    </div>
+                    <button 
+                        onclick="editProfile()"
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit Profile
+                    </button>
+                </div>
+                
+                <!-- 2x2 Grid of Selected Personas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    ${categoryOrder.map(category => {
+                        const personaData = selectedPersonas[category];
+                        if (!personaData) return '';
+                        
+                        const persona = allPersonas.find(p => p.id === personaData.persona_id);
+                        if (!persona) return '';
+                        
+                        const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                        const description = persona.bio_map?.description || 'No description';
+                        const empathyMap = persona.empathy_map || {};
+                        
+                        return `
+                            <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
+                                <div class="flex items-start gap-4 mb-4">
+                                    <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
+                                        ${categoryEmojis[category]}
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-medium text-indigo-400 uppercase">${categoryLabels[category]}</span>
+                                        </div>
+                                        <h3 class="text-xl font-bold text-gray-100">${title}</h3>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-gray-300 text-sm leading-relaxed mb-4">${description}</p>
+                                
+                                ${empathyMap.says?.[0] || empathyMap.thinks?.[0] ? `
+                                    <div class="border-t border-gray-700 pt-4 space-y-2">
+                                        ${empathyMap.says?.[0] ? `
+                                            <div class="flex items-start gap-2">
+                                                <span class="text-blue-400 text-xs font-medium mt-0.5">💬</span>
+                                                <p class="text-gray-400 text-xs italic">"${empathyMap.says[0]}"</p>
+                                            </div>
+                                        ` : ''}
+                                        ${empathyMap.thinks?.[0] ? `
+                                            <div class="flex items-start gap-2">
+                                                <span class="text-purple-400 text-xs font-medium mt-0.5">💭</span>
+                                                <p class="text-gray-400 text-xs">${empathyMap.thinks[0]}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
     }
 
-    function showAllPersonas() {
-        if (window.allPersonasData) {
-            showPersonaSelectionCards(window.allPersonasData);
-        } else {
-            loadPersonas();
-        }
-    }
-
-    async function selectPersona(personaId) {
-        console.log('selectPersona called with ID:', personaId);
+    async function selectPersona(personaId, category) {
+        console.log('Selecting persona:', personaId, 'for category:', category);
         
         try {
-            // Show loading
             const container = document.getElementById('personaSelectionContainer');
+            const tempHTML = container.innerHTML;
+            
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-16">
                     <svg class="animate-spin h-12 w-12 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <p class="text-gray-300 font-medium">Saving your persona selection...</p>
+                    <p class="text-gray-300 font-medium">Saving your selection...</p>
                 </div>
             `;
             
-            console.log('About to make POST request...');
-            
-            // Add the new persona - backend handles replacement
             const response = await fetch(`${pythonURI}/api/user/persona`, {
                 ...fetchOptions,
                 method: 'POST',
                 body: JSON.stringify({ 
-                    persona_id: personaId,
-                    weight: 2
+                    persona_id: personaId
                 })
             });
             
-            console.log('POST request completed, status:', response.status);
-            
             if (!response.ok) {
                 const error = await response.json();
-                console.error('Response not OK:', error);
                 throw new Error(error.message || 'Failed to select persona');
             }
             
-            console.log('About to call loadPersonas()...');
-            
-            // Success - reload to show selected persona
+            // Reload to show updated selections
             loadPersonas();
             
         } catch (error) {
-            console.error('Error in selectPersona:', error);
-            console.error('Error stack:', error.stack);
+            console.error('Error selecting persona:', error);
             
             const container = document.getElementById('personaSelectionContainer');
             container.innerHTML = `
@@ -717,19 +750,30 @@ active_tab: profile
         }
     }
 
-    function changePersona() {
-        // Simply reload which will show selection cards again
+    function changeCategory(category) {
+        // Just scroll to that category section
         loadPersonas();
+    }
+
+    function editProfile() {
+        showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData);
+    }
+
+    function viewCompletedProfile() {
+        showCompletedPersonas(window.selectedPersonasData, window.allPersonasData);
     }
 
     // Make functions globally accessible
     window.loadPersonas = loadPersonas;
     window.selectPersona = selectPersona;
-    window.changePersona = changePersona;
+    window.changeCategory = changeCategory;
+    window.editProfile = editProfile;
+    window.viewCompletedProfile = viewCompletedProfile;
     window.showPersonaSelectionCards = showPersonaSelectionCards;
-    window.showSelectedPersona = showSelectedPersona;
-    window.showAllPersonas = showAllPersonas;
+    window.showCompletedPersonas = showCompletedPersonas;
 </script>
+
+
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
@@ -931,7 +975,7 @@ active_tab: profile
         classEntries.forEach((entry, index) => {
             originalValues.classEntries[index] = {
                 name: entry.querySelector('.class-name').value,
-                year: entry.querySelector('.class-year').value
+                //year: entry.querySelector('.class-year').value
             };
         });
     }
@@ -1182,7 +1226,7 @@ active_tab: profile
         // get class info
         const classEntries = Array.from(document.querySelectorAll('.class-entry')).map(entry => ({
             name: entry.querySelector('.class-name').value,
-            year: entry.querySelector('.class-year').value
+            //year: entry.querySelector('.class-year').value
         }));
 
         // import api helpers
