@@ -13,15 +13,9 @@ default: serve-current
 	@touch /tmp/.notebook_watch_marker
 	@make watch-notebooks &
 	@make watch-files &
-	@make upload-assignments-to-db &
 	@echo "Server running in background on http://localhost:$(PORT)"
 	@echo "  View logs: tail -f $(LOG_FILE)"
 	@echo "  Stop: make stop"
-
-upload-assignments-to-db:
-	@echo "Uploading assignments to database!"
-	@python3 scripts/upload_assignments_to_db.py
-	@echo "Assignment upload complete."
 
 # File watcher - monitors log for file changes and triggers conversion
 watch-files:
