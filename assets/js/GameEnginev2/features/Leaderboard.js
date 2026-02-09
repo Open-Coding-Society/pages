@@ -499,7 +499,7 @@ export default class Leaderboard {
             };
             console.log('Payload:', JSON.stringify(requestBody));
 
-            // POST to backend - using include credentials for authentication
+            // POST to backend - using fetchOptions for proper authentication
             const res = await fetch(
                 url,
                 {
@@ -509,7 +509,6 @@ export default class Leaderboard {
                         ...fetchOptions?.headers,
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include', // Changed from 'omit' to 'include'
                     body: JSON.stringify(requestBody)
                 }
             );
@@ -555,17 +554,15 @@ export default class Leaderboard {
                 window.javaBackendUrl ||
                 (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
 
-            // Note: GenericEventController doesn't have a DELETE endpoint
-            // You may need to add one to your backend or handle deletion differently
             const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
             console.log('DELETE URL:', url);
 
-            // DELETE from backend - using include credentials for authentication
+            // DELETE from backend - using fetchOptions for proper authentication
             const res = await fetch(
                 url,
                 {
-                    method: 'DELETE',
-                    credentials: 'include' // Changed from 'omit' to 'include'
+                    ...fetchOptions,
+                    method: 'DELETE'
                 }
             );
 
@@ -599,8 +596,8 @@ export default class Leaderboard {
             const res = await fetch(
                 url,
                 { 
-                    method: 'GET', 
-                    credentials: 'include' // Changed from 'omit' to 'include'
+                    ...fetchOptions,
+                    method: 'GET'
                 }
             );
 
@@ -735,7 +732,10 @@ export default class Leaderboard {
 
             const res = await fetch(
                 `${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`,
-                { ...fetchOptions, method: 'GET', credentials: 'include' }
+                { 
+                    ...fetchOptions, 
+                    method: 'GET'
+                }
             );
 
             if (!res.ok) throw new Error(res.status);
@@ -743,6 +743,77 @@ export default class Leaderboard {
             this.displayLeaderboard(data);
         } catch {
             list.innerHTML = `<p class="error">Failed to load leaderboard</p>`;
+        }
+    }
+
+    /**
+     * Submit a score to the SCORE_COUNTER endpoint
+     * @param {string} username - Player username
+     * @param {number} score - Player score
+     * @param {string} gameName - Name of the game (optional, uses this.gameName if not provided)
+     * @returns {Promise<Object>} The saved score entry
+     */
+    async submitScore(username, score, gameName = null) {
+        console.log('=== SUBMIT SCORE TO SCORE_COUNTER ===');
+        
+        if (!username || isNaN(score)) {
+            throw new Error('Invalid username or score');
+        }
+
+        const endpoint = '/api/events/SCORE_COUNTER';
+        console.log('POST endpoint:', endpoint);
+
+        try {
+            const base =
+                window.javaBackendUrl ||
+                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
+
+            const url = `${base.replace(/\/$/, '')}${endpoint}`;
+            console.log('Full URL:', url);
+
+            // Create payload matching Java backend AlgorithmicEvent structure
+            const requestBody = {
+                payload: {
+                    user: username,
+                    score: score,
+                    gameName: gameName || this.gameName
+                }
+            };
+            console.log('Payload:', JSON.stringify(requestBody));
+
+            // POST to backend - using fetchOptions for proper authentication
+            const res = await fetch(
+                url,
+                {
+                    ...fetchOptions,
+                    method: 'POST',
+                    headers: {
+                        ...fetchOptions?.headers,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                }
+            );
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Server error:', errorText);
+                throw new Error(`Failed to save score: ${res.status} - ${errorText}`);
+            }
+
+            const savedEntry = await res.json();
+            console.log('Score saved successfully to SCORE_COUNTER:', savedEntry);
+
+            // Refresh leaderboard if we're in dynamic mode
+            if (this.mode === 'dynamic') {
+                await this.fetchLeaderboard();
+            }
+
+            return savedEntry;
+
+        } catch (error) {
+            console.error('Error submitting score:', error);
+            throw error;
         }
     }
 
@@ -765,41 +836,44 @@ export default class Leaderboard {
             }))
             .sort((a, b) => b.score - a.score); // Sort by score descending
 
+        let html = '';
+
         if (!Array.isArray(transformedData) || !transformedData.length) {
-            list.innerHTML = '<p>No scores yet</p>';
-            return;
-        }
+            html = '<p class="loading">No scores yet</p>';
+        } else {
+            const top = transformedData[0];
+            if (preview) {
+                preview.textContent = `High Score: ${top.user || top.username} - ${Number(top.score).toLocaleString()}`;
+            }
 
-        const top = transformedData[0];
-        if (preview) {
-            preview.textContent = `High Score: ${top.user || top.username} - ${Number(top.score).toLocaleString()}`;
-        }
-
-        let html = `
-            <table class="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player</th>
-                        <th>Game</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        transformedData.forEach((e, i) => {
-            html += `
-                <tr>
-                    <td class="rank">${i + 1}</td>
-                    <td class="username">${this.escape(e.user || e.username)}</td>
-                    <td>${this.escape(e.gameName || e.game)}</td>
-                    <td class="score">${Number(e.score).toLocaleString()}</td>
-                </tr>
+            // Dynamic leaderboard is READ-ONLY - no input form
+            html = `
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Game</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
-        });
 
-        html += '</tbody></table>';
+            transformedData.forEach((e, i) => {
+                html += `
+                    <tr>
+                        <td class="rank">${i + 1}</td>
+                        <td class="username">${this.escape(e.user || e.username)}</td>
+                        <td>${this.escape(e.gameName || e.game)}</td>
+                        <td class="score">${Number(e.score).toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+        }
+
         list.innerHTML = html;
     }
 

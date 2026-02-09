@@ -866,6 +866,127 @@
     position: relative;
     font-family: 'Crimson Text', serif;
     color: var(--text);
+    transition: all 0.3s ease;
+
+    &.excellence-theme {
+      border-color: #ffd700; // Gold
+      box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+      background: linear-gradient(135deg, var(--bg-1) 0%, #fffdf0 100%);
+
+      &::before {
+        border-color: #ffd700;
+      }
+
+      .certificate-emblem {
+        border-color: #ffd700;
+        background: #fffdf0;
+      }
+
+      .certify-text {
+        color: #b8860b; // Dark Gold
+      }
+    }
+  }
+
+  // Certificate notification toast styles
+  .cert-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    z-index: 10001;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+
+    &.cert-notification-visible {
+      transform: translateX(0);
+    }
+
+    &.cert-notification-success {
+      background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+      border: 1px solid #10b981;
+    }
+
+    &.cert-notification-warning {
+      background: linear-gradient(135deg, #92400e 0%, #b45309 100%);
+      border: 1px solid #f59e0b;
+    }
+
+    &.cert-notification-error {
+      background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%);
+      border: 1px solid #ef4444;
+    }
+
+    &.cert-notification-info {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+      border: 1px solid #3b82f6;
+    }
+  }
+
+  .cert-notification-icon {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .cert-notification-content {
+    flex: 1;
+  }
+
+  .cert-notification-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .cert-notification-message {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.4;
+  }
+
+  .cert-notification-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  // Certificate button loading spinner
+  .cert-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: cert-spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes cert-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .cert-btn-loading {
+    opacity: 0.8;
+    cursor: wait;
   }
 
   #certificate-content::before {
