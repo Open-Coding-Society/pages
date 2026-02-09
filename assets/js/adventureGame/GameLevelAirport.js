@@ -1,6 +1,6 @@
-import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
-import Npc from '../GameEngine/gameObjects/Npc.js';
-import Player from '../GameEngine/gameObjects/Player.js';
+import GameEnvBackground from '../GameEnginev1.5/GameEnvBackground.js';
+import Npc from '../GameEnginev1.5/Npc.js';
+import Player from '../GameEnginev1.5/Player.js';
 import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from './DialogBox.js';
 import WaypointArrow from './WaypointArrow.js';
 import NpcProgressSystem from './NpcProgressSystem.js';

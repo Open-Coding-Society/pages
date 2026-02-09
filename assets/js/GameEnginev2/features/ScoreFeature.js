@@ -172,17 +172,17 @@ export default class ScoreFeature {
     }
 
     /**
-     * Build fetch options with proper headers
+     * Build fetch options with proper headers and authentication
      */
     _getFetchOptions(method = 'GET', body = null) {
         const options = {
+            ...fetchOptions,
             method,
             headers: {
+                ...fetchOptions?.headers,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
-            },
-            mode: 'cors',
-            credentials: 'omit'
+            }
         };
         if (body) {
             options.body = JSON.stringify(body);
@@ -204,7 +204,51 @@ export default class ScoreFeature {
     }
 
     /**
-     * Build the DTO for backend save
+     * Get the logged-in user's username from JWT token
+     * Returns the username if authenticated, otherwise 'guest'
+     */
+    _getLoggedInUser() {
+        try {
+            // Get JWT token from cookie
+            const cookieName = 'jwt_java_spring';
+            const cookies = document.cookie.split(';');
+            let jwtToken = null;
+            
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === cookieName) {
+                    jwtToken = value;
+                    break;
+                }
+            }
+            
+            if (!jwtToken) {
+                return 'guest';
+            }
+            
+            // Decode JWT token (it's base64 encoded)
+            // JWT format: header.payload.signature
+            const parts = jwtToken.split('.');
+            if (parts.length !== 3) {
+                return 'guest';
+            }
+            
+            // Decode the payload (second part)
+            const payload = parts[1];
+            const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+            const payloadObj = JSON.parse(decodedPayload);
+            
+            // The username is stored in the 'sub' (subject) field of the JWT
+            return payloadObj.sub || 'guest';
+            
+        } catch (error) {
+            console.error('Error getting logged-in user:', error);
+            return 'guest';
+        }
+    }
+
+    /**
+     * Build the DTO for backend save - matches AlgorithmicEvent payload structure
      */
     _buildServerDto() {
         // Use custom DTO builder if scoreSettings provided it
@@ -212,8 +256,8 @@ export default class ScoreFeature {
             return this.scoreSettings.buildDto(this.pauseMenu);
         }
         
-        // Fallback to default DTO
-        const uid = 'guest';
+        // Build DTO matching AlgorithmicEvent structure
+        const uid = this._getLoggedInUser(); // Get actual logged-in user or 'guest'
         const varName = this._getCounterVar();
         
         // Always ensure stats is synced with gameControl.stats
@@ -225,15 +269,18 @@ export default class ScoreFeature {
         const sessionTime = this.pauseMenu.stats && (this.pauseMenu.stats.sessionTime || this.pauseMenu.stats.elapsedMs || this.pauseMenu.stats.timePlayed || 0);
         const gameName = this._extractGameName();
 
+        // Create payload matching AlgorithmicEvent structure
         const dto = {
-            user: uid,
-            score: this.pauseMenu.stats && this.pauseMenu.stats[this.pauseMenu.scoreVar] ? Number(this.pauseMenu.stats[this.pauseMenu.scoreVar]) : 0,
-            levelsCompleted: levels,
-            sessionTime: Number(sessionTime) || 0,
-            totalPowerUps: (this.pauseMenu.stats && Number(this.pauseMenu.stats.totalPowerUps)) || 0,
-            status: 'PAUSED',
-            gameName: gameName,
-            variableName: varName
+            payload: {
+                user: uid,
+                score: this.pauseMenu.stats && this.pauseMenu.stats[this.pauseMenu.scoreVar] ? Number(this.pauseMenu.stats[this.pauseMenu.scoreVar]) : 0,
+                levelsCompleted: levels,
+                sessionTime: Number(sessionTime) || 0,
+                totalPowerUps: (this.pauseMenu.stats && Number(this.pauseMenu.stats.totalPowerUps)) || 0,
+                status: 'PAUSED',
+                gameName: gameName,
+                variableName: varName
+            }
         };
         console.log('ScoreFeature: built DTO', dto);
         return dto;
@@ -246,37 +293,12 @@ export default class ScoreFeature {
         const base = this._getBackendBase();
         if (!base) return Promise.reject(new Error('No backend configured'));
 
-        const apiBase = base.replace(/\/$/, '') + '/api/pausemenu/score';
+        const apiBase = base.replace(/\/$/, '') + '/api/events/SCORE_COUNTER';
         const dto = this._buildServerDto();
 
         try {
-            // Check if we have an existing server ID to update
-            const serverId = this.pauseMenu.stats && (this.pauseMenu.stats.serverId || this.pauseMenu.stats._serverId || null);
-            if (serverId) {
-                const url = `${apiBase}/${serverId}`;
-                console.debug('ScoreFeature: PUT', url, dto);
-                const options = this._getFetchOptions('PUT', dto);
-                const resp = await fetch(url, options);
-                const text = await resp.text();
-                let body;
-                try {
-                    body = text ? JSON.parse(text) : null;
-                } catch (e) {
-                    body = text;
-                }
-                const ok = resp.ok && (!(body && body.success === false));
-                if (!ok) {
-                    console.error('ScoreFeature: server PUT responded with status', resp.status, text);
-                    throw new Error('Server PUT failed: ' + resp.status);
-                }
-                console.debug('ScoreFeature: server PUT response', body);
-                if (body && body.id && this.pauseMenu.stats) {
-                    this.pauseMenu.stats.serverId = body.id;
-                }
-                return body;
-            }
-
-            // Create a new server record
+            // For events API, we always POST (no PUT/update)
+            // The GenericEventController only has POST and GET endpoints
             const url = `${apiBase}`;
             console.debug('ScoreFeature: POST', url, dto);
             const options = this._getFetchOptions('POST', dto);

@@ -1,7 +1,7 @@
-import GameEnvBackground from '../GameEngine/essentials/GameEnvBackground.js';
-import Npc from '../GameEngine/gameObjects/Npc.js';
-import Player from '../GameEngine/gameObjects/Player.js';
-import GameControl from '../GameEngine/essentials/GameControl.js';
+import GameEnvBackground from '../GameEnginev1.5/GameEnvBackground.js';
+import Npc from '../GameEnginev1.5/Npc.js';
+import Player from '../GameEnginev1.5/Player.js';
+import GameControl from '../GameEnginev1.5/GameControl.js';
 
 import GameLevelRetro from './GameLevelRetro.js';
 import Game from './AdventureGame.js';
