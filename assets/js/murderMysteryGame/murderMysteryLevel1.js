@@ -1,9 +1,8 @@
-
 import GameEnvBackground  from "./murderMysteryGameLogic/GameEnvBackground.js";
 import Player from "./murderMysteryGameLogic/Player.js";
-// import Npc from './MansionLogic/Npc.js';
-// import DialogueSystem from "./MansionLogic/DialogueSystem.js";
-// import MansionLevel1_Pantry from "./mansionLevel1_Pantry.js";
+import Npc from '../MansionLogic/Npc.js';
+import DialogueSystem from "../MansionLogic/DialogueSystem.js";
+import MansionLevel1_Pantry from "../mansionLevel1_Pantry.js";
 
 class MansionLevel1 {
   constructor(gameEnv) {

@@ -28,7 +28,7 @@ microblog: true
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [GameLevel1, GameLevel2]
+        gameLevelClasses: [MansionLevel1, GameLevel2]
 
     }
     // Launch Mansion Game using the central core and mansion GameControl
