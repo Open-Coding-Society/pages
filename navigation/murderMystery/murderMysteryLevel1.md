@@ -15,7 +15,7 @@ microblog: true
     import Core from "{{site.baseurl}}/assets/js/mansionGame/MansionLogic/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/mansionGame/GameControl.js";
     import { initCheats } from "{{site.baseurl}}/assets/js/mansionGame/cheats.js";
-    import GameLevel1 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel1.js";
+    import GameLevel1 from "{{site.baseurl}}/assets/js/murderMysteryGame/murderMysteryLevel1.js";
     import GameLevel2 from "{{site.baseurl}}/assets/js/mansionGame/mansionLevel2.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
