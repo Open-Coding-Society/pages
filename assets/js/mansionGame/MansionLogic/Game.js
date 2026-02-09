@@ -25,6 +25,8 @@ class GameCore {
     // create GameControl using the engine-provided class
     this.gameControl = new GameControlClass(this, gameLevelClasses);
     this.gameControl.start();
+    // Initialize PauseFeature for handling pause/resume
+    this._initializePauseFeature();
     // Setup Escape key for pause/resume
     this._setupEscapeKey();
 
@@ -34,7 +36,7 @@ class GameCore {
     }
 
     // Try to dynamically load the Leaderboard
-    import('../../GameEngine/features/Leaderboard.js')
+    import('../../GameEnginev1.5/Leaderboard.js')
         .then(mod => {
             try {
                 // Get the actual container element from gameContainer
@@ -61,6 +63,28 @@ class GameCore {
             // no-op: Leaderboard is optional
         });
 }
+
+    /**
+     * Initialize PauseFeature for handling pause/resume logic
+     */
+    _initializePauseFeature() {
+        if (!this.gameControl) return;
+        
+        try {
+            import('../../GameEnginev1.5/PauseFeature.js').then(mod => {
+                const PauseFeature = mod.default;
+                const pauseMenuObj = {
+                    gameControl: this.gameControl,
+                    container: null
+                };
+                this.gameControl.pauseFeature = new PauseFeature(pauseMenuObj);
+            }).catch(err => {
+                console.warn('Failed to load PauseFeature:', err);
+            });
+        } catch (err) {
+            console.warn('Error initializing PauseFeature:', err);
+        }
+    }
 
     /**
      * Setup Escape key listener for pause/resume functionality.
@@ -98,9 +122,9 @@ class GameCore {
 
         // Dynamically import the features and create controls
         Promise.all([
-            import('../../GameEngine/features/ScoreFeature.js'),
-            import('../../GameEngine/features/PauseFeature.js'),
-            import('../../GameEngine/features/LevelSkipFeature.js'),
+            import('../../GameEnginev1.5/ScoreFeature.js'),
+            import('../../GameEnginev1.5/PauseFeature.js'),
+            import('../../GameEnginev1.5/LevelSkipFeature.js'),
             import('./cheats.js')
         ]).then(([ScoreModule, PauseModule, LevelSkipModule, CheatsModule]) => {
             const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;            
@@ -141,6 +165,26 @@ class GameCore {
             
             // Create Settings modal when button is clicked
             settingsSummary.addEventListener('click', () => {
+                if (document.getElementById('settingsModal')) return;
+
+                const pauseGame = () => {
+                    if (this.gameControl?.pauseFeature?.show) {
+                        this.gameControl.pauseFeature.show();
+                    } else if (this.gameControl) {
+                        this.gameControl.pause();
+                    }
+                };
+
+                const resumeGame = () => {
+                    if (this.gameControl?.pauseFeature?.hide) {
+                        this.gameControl.pauseFeature.hide();
+                    } else if (this.gameControl) {
+                        this.gameControl.resume();
+                    }
+                };
+
+                pauseGame();
+
                 // Create modal overlay
                 const modal = document.createElement('div');
                 modal.id = 'settingsModal';
@@ -247,6 +291,7 @@ class GameCore {
                     }
                     modal.style.display = 'none';
                     modal.remove();
+                    resumeGame();
                 });
                 modalContent.appendChild(modalBtnSkipLevel);
                 
@@ -322,6 +367,7 @@ class GameCore {
                 `;
                 closeBtn.addEventListener('click', () => {
                     modal.remove();
+                    resumeGame();
                 });
                 modalContent.appendChild(closeBtn);
                 
@@ -329,6 +375,7 @@ class GameCore {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
                         modal.remove();
+                        resumeGame();
                     }
                 });
                 

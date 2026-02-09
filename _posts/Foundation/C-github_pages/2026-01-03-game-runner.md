@@ -18,9 +18,9 @@ Create a basic game level with a player character. Use the GameEngine to set up 
 {% endcapture %}
 
 {% capture code1 %}
-import GameEnvBackground from '/assets/js/GameEngine/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEngine/gameObjects/Player.js';
-import Npc from '/assets/js/GameEngine/gameObjects/Npc.js';
+import GameEnvBackground from '/assets/js/GameEnginev2/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev2/Player.js';
+import Npc from '/assets/js/GameEnginev2/Npc.js';
 import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
@@ -141,7 +141,7 @@ Your game code must export two things:
 2. **gameLevelClasses**: Array of game level classes
 
 ```javascript
-import GameControl from '/assets/js/GameEngine/essentials/GameControl.js';
+import GameControl from '/assets/js/GameEnginev2/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 
 export const GameControl = GameControl;
@@ -158,11 +158,11 @@ Run the basic game. Use WASD or arrow keys to move Chill Guy around the desert. 
 
 {% capture code1 %}
 // Import for GameRunner
-import GameControl from '/assets/js/GameEngine/essentials/GameControl.js';
+import GameControl from '/assets/js/GameEnginev2/GameControl.js';
 // Import GameEngine modules
-import GameEnvBackground from '/assets/js/GameEngine/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEngine/gameObjects/Player.js';
-import Npc from '/assets/js/GameEngine/gameObjects/Npc.js';
+import GameEnvBackground from '/assets/js/GameEnginev2/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev2/Player.js';
+import Npc from '/assets/js/GameEnginev2/Npc.js';
 import Barrier from '/assets/js/adventureGame/Barrier.js';
 
 class CustomLevel {
@@ -236,7 +236,7 @@ export { GameControl };
 
 Always import necessary GameEngine modules:
 ```javascript
-import GameControl from '/assets/js/GameEngine/essentials/GameControl.js';
+import GameControl from '/assets/js/GameEnginev2/GameControl.js';
 import GameLevelBasic from '/assets/js/adventureGame/GameLevelBasic.js';
 ```
 

@@ -1,5 +1,5 @@
 // AdventureGame.js - Adventure-specific game wrapper with UI controls
-import { GameCore } from '../GameEngine/essentials/Game.js';
+import { GameCore } from '../GameEnginev2/essentials/Game.js';
 
 class AdventureGame extends GameCore {
     constructor(environment, GameControlClass) {
@@ -12,202 +12,186 @@ class AdventureGame extends GameCore {
     _createTopControls() {
         console.log('AdventureGame _createTopControls called', 'gameControl:', this.gameControl);
         
-        // Ensure pause-menu.css is loaded for button styling
-        const cssPath = '/assets/css/pause-menu.css';
-        if (!document.querySelector(`link[href="${cssPath}"]`)) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cssPath;
-            document.head.appendChild(link);
-        }
-        
         const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
-        console.log('Parent element for buttons:', parent);
 
         // Create pause menu object for features
         const pauseMenuObj = {
             gameControl: this.gameControl,
             options: { parentId: 'gameContainer' },
-            counterVar: this.gameControl?.pauseMenuOptions?.counterVar || 'levelsCompleted',
-            counterLabelText: this.gameControl?.pauseMenuOptions?.counterLabel || 'Score',
-            stats: this.gameControl?.stats || { levelsCompleted: 0, points: 0 },
+            counterVar: this.gameControl?.pauseMenuOptions?.counterVar || 'coinsCollected',
+            counterLabelText: this.gameControl?.pauseMenuOptions?.counterLabel || 'Coins Collected',
+            stats: this.gameControl?.stats || { coinsCollected: 0 },
             get score() {
-                const varName = this.counterVar || 'levelsCompleted';
+                const varName = this.counterVar || 'coinsCollected';
                 return (this.stats && this.stats[varName]) || 0;
             },
-            scoreVar: this.gameControl?.pauseMenuOptions?.scoreVar || 'levelsCompleted',
+            scoreVar: this.gameControl?.pauseMenuOptions?.scoreVar || 'coinsCollected',
             _saveStatusNode: null
         };
 
+        // Store references for modal function
+        this.pauseMenuConfig = pauseMenuObj;
+        
         // Dynamically import features
-        Promise.all([
-            import('../GameEngine/features/ScoreFeature.js'),
-            import('../GameEngine/features/PauseFeature.js'),
-            import('../GameEngine/features/LevelSkipFeature.js')
-        ]).then(([ScoreModule, PauseModule, LevelSkipModule]) => {
-            
-            console.log('Adventure game features loaded, creating buttons');
-            
-            // Initialize score feature once
-            let scoreFeature = null;
-            try {
-                scoreFeature = new ScoreModule.default(pauseMenuObj);
-                console.log('ScoreFeature initialized:', scoreFeature);
-            } catch (e) {
-                console.warn('ScoreFeature init failed:', e);
-            }
-            
-            // Create button bar
-            const buttonBar = document.createElement('div');
-            buttonBar.className = 'pause-button-bar';
-            buttonBar.style.position = 'fixed';
-            buttonBar.style.top = '80px';
-            buttonBar.style.left = '10px';
-            buttonBar.style.display = 'flex';
-            buttonBar.style.gap = '10px';
-            buttonBar.style.alignItems = 'center';
-            buttonBar.style.flexWrap = 'wrap';
-            buttonBar.style.zIndex = '9999';
-
-            // Settings menu button that opens a modal
-            const settingsSummary = document.createElement('button');
-            settingsSummary.innerText = 'Settings';
-            settingsSummary.style.background = 'black';
-            settingsSummary.style.color = 'white';
-            settingsSummary.style.padding = '12px 20px';
-            settingsSummary.style.fontSize = '16px';
-            settingsSummary.style.border = '2px solid white';
-            settingsSummary.style.cursor = 'pointer';
-            settingsSummary.style.fontFamily = "'Press Start 2P', monospace";
-            
-            // Create Settings modal when button is clicked
-            settingsSummary.addEventListener('click', () => {
-                const modal = document.createElement('div');
-                modal.id = 'settingsModal';
-                modal.style.cssText = `
-                    display: flex;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.8);
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10000;
-                `;
-                
-                const modalContent = document.createElement('div');
-                modalContent.style.background = 'black';
-                modalContent.style.color = 'white';
-                modalContent.style.padding = '30px';
-                modalContent.style.maxWidth = '400px';
-                modalContent.style.width = '90%';
-                modalContent.style.display = 'flex';
-                modalContent.style.flexDirection = 'column';
-                modalContent.style.gap = '15px';
-                
-                const title = document.createElement('h2');
-                title.innerText = 'SETTINGS';
-                title.style.cssText = `
-                    text-align: center;
-                    margin: 0 0 15px 0;
-                `;
-                modalContent.appendChild(title);
-                
-                // Save Score button
-                const modalBtnSave = document.createElement('button');
-                modalBtnSave.innerText = 'Save Score';
-                modalBtnSave.style.background = 'black';
-                
-                modalBtnSave.addEventListener('click', async () => {
-                    console.log('Save Score clicked, scoreFeature:', scoreFeature);
-                    if (scoreFeature && typeof scoreFeature.saveScore === 'function') {
-                        await scoreFeature.saveScore(modalBtnSave);
-                    } else {
-                        console.warn('ScoreFeature saveScore not available');
-                    }
-                });
-                modalContent.appendChild(modalBtnSave);
-                
-                // Skip Level button
-                const modalBtnSkipLevel = document.createElement('button');
-                modalBtnSkipLevel.innerText = 'Skip Level';
-                modalBtnSkipLevel.style.background = 'black';
-                
-                modalBtnSkipLevel.addEventListener('click', () => {
-                    if (typeof this.gameControl.endLevel === 'function') {
-                        this.gameControl.endLevel();
-                    } else {
-                        const event = new KeyboardEvent('keydown', {
-                            key: 'L', code: 'KeyL', keyCode: 76, which: 76, bubbles: true
-                        });
-                        document.dispatchEvent(event);
-                    }
-                    modal.remove();
-                });
-                modalContent.appendChild(modalBtnSkipLevel);
-                
-                // Toggle Leaderboard button
-                const modalBtnLeaderboard = document.createElement('button');
-                modalBtnLeaderboard.innerText = 'Show Leaderboard';
-                modalBtnLeaderboard.style.background = 'black';
-                modalBtnLeaderboard.addEventListener('click', () => {
-                    if (this.leaderboardInstance) {
-                        this.leaderboardInstance.toggleVisibility();
-                        if (this.leaderboardInstance.isVisible()) {
-                            modalBtnLeaderboard.innerText = 'Hide Leaderboard';
-                        } else {
-                            modalBtnLeaderboard.innerText = 'Show Leaderboard';
-                        }
-                    } else {
-                        console.warn('Leaderboard instance not available');
-                    }
-                });
-                modalContent.appendChild(modalBtnLeaderboard);
-                
-                // Toggle Score Counter button
-                const modalBtnScore = document.createElement('button');
-                modalBtnScore.innerText = 'Show Score';
-                modalBtnScore.style.background = 'black';
-                modalBtnScore.addEventListener('click', () => {
-                    const sc = document.querySelector('.pause-score-counter');
-                    if (sc) {
-                        const isHidden = sc.style.display === 'none';
-                        sc.style.display = isHidden ? 'block' : 'none';
-                        modalBtnScore.innerText = isHidden ? 'Hide Score' : 'Show Score';
-                    }
-                });
-                modalContent.appendChild(modalBtnScore);
-                
-                // Close button
-                const closeBtn = document.createElement('button');
-                closeBtn.innerText = 'CLOSE';
-                closeBtn.style.background = 'black';
-                closeBtn.addEventListener('click', () => {
-                    modal.remove();
-                });
-                modalContent.appendChild(closeBtn);
-                
-                // Close modal when clicking outside
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.remove();
-                    }
-                });
-                
-                modal.appendChild(modalContent);
-                document.body.appendChild(modal);
-            });
-
-            buttonBar.appendChild(settingsSummary);
-            parent.appendChild(buttonBar);
-            
-            console.log('Adventure game buttons added to DOM. ButtonBar:', buttonBar, 'Parent:', parent);
-            
-        }).catch(err => {
-            console.warn('Failed to load control features:', err);
+        import('../GameEnginev1.5/ScoreFeature.js').then(ScoreModule => {
+            this.scoreFeature = new ScoreModule.default(pauseMenuObj);
+            console.log('ScoreFeature initialized:', this.scoreFeature);
+        }).catch(e => {
+            console.warn('ScoreFeature init failed:', e);
         });
+    }
+    
+    /**
+     * Show the pause menu modal (called when ESC is pressed)
+     */
+    showPauseModal() {
+        // Don't create duplicate modals
+        if (document.getElementById('pauseModal')) return;
+        
+        // Pause the game
+        if (this.gameControl) this.gameControl.pause();
+        
+        const modal = document.createElement('div');
+        modal.id = 'pauseModal';
+        modal.style.cssText = `
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: #1a1a1a;
+            color: white;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 3px solid white;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            font-family: 'Press Start 2P', monospace;
+        `;
+        
+        const title = document.createElement('h2');
+        title.innerText = 'PAUSED';
+        title.style.cssText = `
+            text-align: center;
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            letter-spacing: 3px;
+        `;
+        modalContent.appendChild(title);
+        
+        const buttonStyle = `
+            background: black;
+            color: white;
+            padding: 15px 25px;
+            font-size: 14px;
+            border: 2px solid white;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            transition: all 0.3s;
+        `;
+        
+        // Show Score button
+        const showScoreBtn = document.createElement('button');
+        showScoreBtn.innerText = 'Show Score';
+        showScoreBtn.style.cssText = buttonStyle;
+        showScoreBtn.addEventListener('mouseover', () => {
+            showScoreBtn.style.background = 'white';
+            showScoreBtn.style.color = 'black';
+        });
+        showScoreBtn.addEventListener('mouseout', () => {
+            showScoreBtn.style.background = 'black';
+            showScoreBtn.style.color = 'white';
+        });
+        showScoreBtn.addEventListener('click', () => {
+            const sc = document.querySelector('.pause-score-counter');
+            if (sc) {
+                const isHidden = sc.style.display === 'none';
+                sc.style.display = isHidden ? 'block' : 'none';
+                showScoreBtn.innerText = isHidden ? 'Hide Score' : 'Show Score';
+            }
+        });
+        modalContent.appendChild(showScoreBtn);
+        
+        // Save Score button
+        const saveBtn = document.createElement('button');
+        saveBtn.innerText = 'Save Score';
+        saveBtn.style.cssText = buttonStyle;
+        saveBtn.addEventListener('mouseover', () => {
+            saveBtn.style.background = 'white';
+            saveBtn.style.color = 'black';
+        });
+        saveBtn.addEventListener('mouseout', () => {
+            saveBtn.style.background = 'black';
+            saveBtn.style.color = 'white';
+        });
+        saveBtn.addEventListener('click', async () => {
+            if (this.scoreFeature && typeof this.scoreFeature.saveScore === 'function') {
+                await this.scoreFeature.saveScore(saveBtn);
+            }
+        });
+        modalContent.appendChild(saveBtn);
+        
+        // Skip Level button
+        const skipBtn = document.createElement('button');
+        skipBtn.innerText = 'Skip Level';
+        skipBtn.style.cssText = buttonStyle;
+        skipBtn.addEventListener('mouseover', () => {
+            skipBtn.style.background = 'white';
+            skipBtn.style.color = 'black';
+        });
+        skipBtn.addEventListener('mouseout', () => {
+            skipBtn.style.background = 'black';
+            skipBtn.style.color = 'white';
+        });
+        skipBtn.addEventListener('click', () => {
+            if (this.gameControl?.endLevel) {
+                this.gameControl.endLevel();
+            }
+            modal.remove();
+            if (this.gameControl) this.gameControl.resume();
+        });
+        modalContent.appendChild(skipBtn);
+        
+        // Toggle Leaderboard button
+        const leaderboardBtn = document.createElement('button');
+        leaderboardBtn.innerText = 'Toggle Leaderboard';
+        leaderboardBtn.style.cssText = buttonStyle;
+        leaderboardBtn.addEventListener('mouseover', () => {
+            leaderboardBtn.style.background = 'white';
+            leaderboardBtn.style.color = 'black';
+        });
+        leaderboardBtn.addEventListener('mouseout', () => {
+            leaderboardBtn.style.background = 'black';
+            leaderboardBtn.style.color = 'white';
+        });
+        leaderboardBtn.addEventListener('click', () => {
+            if (this.leaderboardInstance) {
+                this.leaderboardInstance.toggleVisibility();
+            }
+        });
+        modalContent.appendChild(leaderboardBtn);
+        
+        // Close modal when clicking outside or pressing ESC
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                if (this.gameControl) this.gameControl.resume();
+            }
+        });
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
     }
 
     static main(environment, GameControlClass) {
