@@ -393,4 +393,198 @@ class GameControl {
     }
 }
 
+// --- Flappy-like mini-game integration ---
+// The following block integrates the provided Flappy code into this module.
+// It preserves all original variable names and creates the necessary DOM
+// elements only if they are not already present in the document.
+(function integrateFlappy() {
+    // If the canvas already exists, assume the mini-game is already present.
+    if (document.getElementById('flappyCanvas')) return;
+
+    // Create container with inline styles (matches provided HTML)
+    const container = document.createElement('div');
+    container.id = 'gameContainer';
+    container.style.position = 'relative';
+    container.style.width = '100%';
+    container.style.maxWidth = '400px';
+    container.style.height = '400px';
+    container.style.background = '#70c5ce';
+    container.style.overflow = 'hidden';
+    container.style.border = '4px solid #333';
+    container.style.borderRadius = '10px';
+    container.style.margin = '20px auto';
+
+    const canvasEl = document.createElement('canvas');
+    canvasEl.id = 'flappyCanvas';
+    canvasEl.style.display = 'block';
+    container.appendChild(canvasEl);
+
+    const scoreDiv = document.createElement('div');
+    scoreDiv.id = 'scoreDisplay';
+    scoreDiv.style.position = 'absolute';
+    scoreDiv.style.top = '15px';
+    scoreDiv.style.width = '100%';
+    scoreDiv.style.textAlign = 'center';
+    scoreDiv.style.fontFamily = "'Arial Black', sans-serif";
+    scoreDiv.style.fontSize = '32px';
+    scoreDiv.style.color = 'white';
+    scoreDiv.style.textShadow = '2px 2px #000';
+    scoreDiv.style.pointerEvents = 'none';
+    scoreDiv.innerText = '0';
+    container.appendChild(scoreDiv);
+
+    // Append to body (non-intrusive). If a game container exists in the app UI,
+    // developers can move these nodes where desired.
+    document.body.appendChild(container);
+
+    // --- Begin provided game JS (variable names preserved) ---
+    const canvas = document.getElementById('flappyCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreElement = document.getElementById('scoreDisplay');
+
+    canvas.width = 400;
+    canvas.height = 400;
+
+    // --- CONFIGURATION ---
+    const config = {
+        gravity: 0.25,
+        jump: -5.5,
+        pipeSpeed: 2.5,
+        pipeInterval: 90, // spawn every 90 frames
+        gap: 130,         // size of the hole to fly through
+        birdSize: 30
+    };
+
+    // --- STATE ---
+    let bird = { x: 50, y: 200, velocity: 0 };
+    let pipes = [];
+    let score = 0;
+    let frames = 0;
+    let isGameOver = false;
+
+    // --- CONTROLS ---
+    const handleAction = () => {
+        if (isGameOver) restart();
+        else bird.velocity = config.jump;
+    };
+
+    window.addEventListener('keydown', (e) => { if (e.code === 'Space') handleAction(); });
+    canvas.addEventListener('mousedown', handleAction);
+
+    function restart() {
+        bird = { x: 50, y: 200, velocity: 0 };
+        pipes = [];
+        score = 0;
+        frames = 0;
+        isGameOver = false;
+        scoreElement.innerText = "0";
+        render();
+    }
+
+    function spawnPipe() {
+        const minHeight = 40;
+        const maxHeight = canvas.height - config.gap - minHeight;
+        const topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+        
+        pipes.push({
+            x: canvas.width,
+            top: topHeight,
+            width: 50,
+            passed: false
+        });
+    }
+
+    // --- CORE LOOP ---
+    function render() {
+        if (isGameOver) return;
+
+        // 1. Background
+        ctx.fillStyle = "#70c5ce";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Physics
+        bird.velocity += config.gravity;
+        bird.y += bird.velocity;
+
+        // 3. Pipe Logic & Collision Detection
+        if (frames % config.pipeInterval === 0) spawnPipe();
+
+        for (let i = pipes.length - 1; i >= 0; i--) {
+            let p = pipes[i];
+            p.x -= config.pipeSpeed;
+
+            // Draw Pipes
+            ctx.fillStyle = "#2ecc71";
+            ctx.strokeStyle = "#1a5c34";
+            ctx.lineWidth = 2;
+            
+            // Top Pipe
+            ctx.fillRect(p.x, 0, p.width, p.top);
+            ctx.strokeRect(p.x, 0, p.width, p.top);
+            // Bottom Pipe
+            ctx.fillRect(p.x, p.top + config.gap, p.width, canvas.height);
+            ctx.strokeRect(p.x, p.top + config.gap, p.width, canvas.height);
+
+            // --- COLLISION LOGIC ---
+            // Create a small hitbox padding for "forgiveness"
+            const padding = 4;
+            const birdRect = {
+                left: bird.x + padding,
+                right: bird.x + config.birdSize - padding,
+                top: bird.y + padding,
+                bottom: bird.y + config.birdSize - padding
+            };
+
+            // Check if bird is within pipe's X-range
+            if (birdRect.right > p.x && birdRect.left < p.x + p.width) {
+                // Check if bird hits top or bottom pipe
+                if (birdRect.top < p.top || birdRect.bottom > p.top + config.gap) {
+                    endGame();
+                }
+            }
+
+            // Score check
+            if (!p.passed && bird.x > p.x + p.width) {
+                score++;
+                p.passed = true;
+                scoreElement.innerText = score;
+            }
+
+            if (p.x + p.width < 0) pipes.splice(i, 1);
+        }
+
+        // 4. Boundary Collision (Floor/Ceiling)
+        if (bird.y + config.birdSize > canvas.height || bird.y < 0) {
+            endGame();
+        }
+
+        // 5. Draw Bird
+        ctx.fillStyle = "#f1c40f";
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 2;
+        ctx.fillRect(bird.x, bird.y, config.birdSize, config.birdSize);
+        ctx.strokeRect(bird.x, bird.y, config.birdSize, config.birdSize);
+
+        frames++;
+        requestAnimationFrame(render);
+    }
+
+    function endGame() {
+        isGameOver = true;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.font = "bold 24px Arial";
+        ctx.fillText("CRASHED!", canvas.width / 2, canvas.height / 2 - 10);
+        ctx.font = "16px Arial";
+        ctx.fillText("Click to Try Again", canvas.width / 2, canvas.height / 2 + 25);
+    }
+
+    // Start the game loop
+    render();
+    // --- End Flappy mini-game ---
+})();
+
 export default GameControl;
