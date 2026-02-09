@@ -427,9 +427,6 @@ active_tab: profile
 <script type="module">
     import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadPersonas();
-    });
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
@@ -485,13 +482,22 @@ active_tab: profile
             `;
         }
     }
-
-    function showPersonaSelectionCards(allPersonas, selectedPersonas) {
+    function editProfile() {
+        console.log('📝 Edit profile clicked - showing all categories');
+        
+        if (window.allPersonasData && window.selectedPersonasData) {
+            showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData, true); // Pass true to force show all
+        } else {
+            loadPersonas();
+        }
+    }
+    function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
         
         console.log('🎨 Rendering selection cards');
         console.log('Total personas:', allPersonas.length);
         console.log('Selected:', selectedPersonas);
+        console.log('Force show all:', forceShowAll);
         
         if (allPersonas.length === 0) {
             container.innerHTML = `
@@ -543,13 +549,13 @@ active_tab: profile
                     const personas = grouped[category] || [];
                     const selectedInCategory = selectedPersonas[category];
                     
-                    // If this category has a selection, HIDE IT (don't show anything)
-                    if (selectedInCategory) {
+                    // CHANGED: Only hide if NOT forcing show all AND category is selected
+                    if (!forceShowAll && selectedInCategory) {
                         console.log(`✓ Category ${category} already selected, hiding it`);
-                        return '';  // Don't render anything for completed categories
+                        return '';
                     }
                     
-                    // Show the selection grid for unselected categories
+                    // Show the selection grid
                     console.log(`🎯 Showing selection grid for ${category}`);
                     
                     return `
@@ -557,7 +563,8 @@ active_tab: profile
                             <div class="flex items-center justify-between mb-4">
                                 <div>
                                     <h3 class="text-xl font-semibold text-gray-300 flex items-center gap-2">
-                                        ○ ${categoryLabels[category]}
+                                        ${selectedInCategory ? '✓' : '○'} ${categoryLabels[category]}
+                                        ${selectedInCategory ? '<span class="text-sm text-green-400 ml-2">(Currently selected)</span>' : ''}
                                     </h3>
                                     <p class="text-sm text-gray-500">${categoryDescriptions[category]}</p>
                                 </div>
@@ -567,11 +574,12 @@ active_tab: profile
                                 ${personas.map(persona => {
                                     const title = persona.bio_map?.title || persona.alias || 'Unnamed';
                                     const description = persona.bio_map?.description || 'No description';
+                                    const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
                                     
                                     return `
                                         <div 
                                             id="persona-card-${persona.id}"
-                                            class="flex flex-col p-4 bg-neutral-800 hover:bg-neutral-700 border border-gray-700 hover:border-indigo-500 rounded-lg cursor-pointer transition-all group h-full relative"
+                                            class="flex flex-col p-4 ${isCurrentlySelected ? 'bg-indigo-900 border-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'} border ${isCurrentlySelected ? 'border-indigo-400' : 'border-gray-700 hover:border-indigo-500'} rounded-lg cursor-pointer transition-all group h-full relative"
                                             onclick="selectPersona(${persona.id}, '${category}')">
                                             
                                             <div class="loading-overlay hidden absolute inset-0 bg-black/70 rounded-lg flex items-center justify-center z-10">
@@ -581,7 +589,9 @@ active_tab: profile
                                                 </svg>
                                             </div>
                                             
-                                            <h4 class="font-semibold text-gray-200 group-hover:text-indigo-300 mb-2">
+                                            ${isCurrentlySelected ? '<div class="absolute top-2 right-2 bg-indigo-500 text-white rounded-full p-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>' : ''}
+                                            
+                                            <h4 class="font-semibold ${isCurrentlySelected ? 'text-indigo-200' : 'text-gray-200 group-hover:text-indigo-300'} mb-2">
                                                 ${title}
                                             </h4>
                                             <p class="text-sm text-gray-400 flex-1 line-clamp-3">${description}</p>
@@ -601,7 +611,6 @@ active_tab: profile
             </div>
         `;
     }
-
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
         
@@ -635,7 +644,7 @@ active_tab: profile
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
-                        Edit Profile
+                        Change Personas
                     </button>
                 </div>
                 
@@ -653,18 +662,9 @@ active_tab: profile
                         const empathyMap = persona.empathy_map || {};
                         
                         return `
-                            <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition relative">
-                                <!-- Delete button in corner -->
-                                <button 
-                                    onclick="deletePersona(${personaData.persona_id}, '${category}')"
-                                    class="absolute top-4 right-4 p-2 bg-red-900/30 hover:bg-red-900/50 text-red-400 hover:text-red-300 rounded-lg transition"
-                                    title="Remove this persona">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
+                            <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
                                 
-                                <div class="flex items-start gap-4 mb-4 pr-12">
+                                <div class="flex items-start gap-4 mb-4">
                                     <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
                                         ${categoryEmojis[category]}
                                     </div>
@@ -715,7 +715,6 @@ active_tab: profile
             </div>
         `;
     }
-
     async function selectPersona(personaId, category) {
         console.log('🎯 SELECT PERSONA CALLED');
         console.log('   Persona ID:', personaId);
@@ -820,59 +819,15 @@ active_tab: profile
             }
         }
     }
-
-    async function deletePersona(personaId, category) {
-        console.log('🗑️ DELETE PERSONA CALLED');
-        console.log('   Persona ID:', personaId);
-        console.log('   Category:', category);
-        
-        if (!confirm(`Remove your ${category} persona? You'll need to select a new one.`)) {
-            return;
-        }
-        
-        try {
-            const url = `${pythonURI}/api/user/persona/${personaId}`;
-            
-            console.log('📤 Making DELETE request');
-            console.log('   URL:', url);
-            
-            const response = await fetch(url, {
-                ...fetchOptions,
-                method: 'DELETE',
-            });
-            
-            console.log('📥 Response received');
-            console.log('   Status:', response.status);
-            
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to delete persona');
-            }
-            
-            console.log('✅ Deletion successful!');
-            console.log('   🔄 Reloading personas...');
-            
-            // Reload to show selection interface
-            loadPersonas();
-            
-        } catch (error) {
-            console.error('❌ ERROR deleting persona:', error);
-            alert(`Failed to remove persona: ${error.message}`);
-        }
-    }
-
-    function editProfile() {
-        // Just reload - it will show the selection interface since not all are selected
-        loadPersonas();
-    }
-
     // Make functions globally accessible
     window.loadPersonas = loadPersonas;
     window.selectPersona = selectPersona;
-    window.deletePersona = deletePersona;
     window.editProfile = editProfile;
     window.showPersonaSelectionCards = showPersonaSelectionCards;
     window.showCompletedPersonas = showCompletedPersonas;
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPersonas();
+    });
 </script>
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
