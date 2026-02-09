@@ -1,5 +1,5 @@
 // AdventureGame.js - Adventure-specific game wrapper with UI controls
-import { GameCore } from '../GameEngine/essentials/Game.js';
+import { GameCore } from '../GameEnginev2/essentials/Game.js';
 
 class AdventureGame extends GameCore {
     constructor(environment, GameControlClass) {
@@ -33,7 +33,7 @@ class AdventureGame extends GameCore {
         this.pauseMenuConfig = pauseMenuObj;
         
         // Dynamically import features
-        import('../GameEngine/features/ScoreFeature.js').then(ScoreModule => {
+        import('../GameEnginev1.5/ScoreFeature.js').then(ScoreModule => {
             this.scoreFeature = new ScoreModule.default(pauseMenuObj);
             console.log('ScoreFeature initialized:', this.scoreFeature);
         }).catch(e => {

@@ -1,5 +1,5 @@
-import Enemy from '../GameEngine/gameObjects/Enemy.js';
-import Player from '../GameEngine/gameObjects/Player.js';
+import Enemy from '../GameEnginev1.5/Enemy.js';
+import Player from '../GameEnginev1.5/Player.js';
 
 class Shark extends Enemy {
     constructor(data = null, gameEnv = null) {
