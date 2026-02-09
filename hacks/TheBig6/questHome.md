@@ -63,4 +63,4 @@ lxdData:
       Image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
       Alt: "CS Portfolio Quest Mastery Certificate"
 ---
-{%- include tailwind/cs-portfolio-quest_info.html -%}
+{%- include tailwind/cs-portfolio-big6_info.html -%}
