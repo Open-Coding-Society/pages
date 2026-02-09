@@ -1,5 +1,5 @@
-import Enemy from './Enemy.js';
-import Player from './Player.js';
+import Enemy from './essentials/Enemy.js';
+import Player from './essentials/Player.js';
 
 class Creeper extends Enemy {
     constructor(data = null, gameEnv = null) {
