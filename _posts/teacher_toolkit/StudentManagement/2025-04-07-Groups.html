@@ -1392,13 +1392,7 @@ window.generateSmartGroups = async function() {
     if (!peopleResp.ok) throw new Error('Failed to fetch people');
     const allPeople = await peopleResp.json();
 
-    // Filter by period and class (assuming people have these fields)
-    // If your Person model doesn't have period/class, you might need to filter differently
-    const studentsInClass = allPeople.filter(p => {
-      // Adjust this filter based on your actual Person model structure
-      // For now, we'll use all people - you may need to add period/class to Person
-      return true;
-    });
+    const studentsInClass = allPeople;
 
     if (studentsInClass.length < groupSize) {
       alert(`Not enough students in Period ${period} ${course}. Found ${studentsInClass.length}, need at least ${groupSize}.`);
@@ -1406,28 +1400,86 @@ window.generateSmartGroups = async function() {
       return;
     }
 
-    // Step 2: Call Flask API to form optimal groups
     const user_uids = studentsInClass.map(p => p.uid);
     
-    const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify({
-        user_uids: user_uids,
-        group_size: groupSize
-      })
-    });
+    // Step 2: Check how many students have personas
+    let studentsWithPersonas = 0;
+    let useAI = false;
+    
+    try {
+      const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ user_uids: user_uids })
+      });
 
-    if (!formGroupsResp.ok) {
-      const error = await formGroupsResp.json();
-      throw new Error(error.message || 'Failed to form groups');
+      if (checkResp.ok) {
+        const checkResult = await checkResp.json();
+        studentsWithPersonas = checkResult.members.filter(m => m.personas && m.personas.length > 0).length;
+        
+        // Minimum threshold: need at least 50% of students OR at least 2 groups worth
+        const minRequired = Math.max(groupSize * 2, Math.ceil(studentsInClass.length * 0.5));
+        useAI = studentsWithPersonas >= minRequired;
+      }
+    } catch (err) {
+      console.log('⚠️ Persona check failed, falling back to random:', err);
+      useAI = false;
     }
 
-    const result = await formGroupsResp.json();
-    console.log('✅ Groups formed:', result);
+    let result;
+
+    if (useAI) {
+      // AI-POWERED GROUPING
+      console.log(`✨ Using AI grouping (${studentsWithPersonas} students have personas)`);
+      
+      showLoading('Using AI to create optimal groups...');
+      
+      const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({
+          user_uids: user_uids,
+          group_size: groupSize
+        })
+      });
+
+      if (!formGroupsResp.ok) {
+        const error = await formGroupsResp.json();
+        throw new Error(error.message || 'Failed to form groups');
+      }
+
+      result = await formGroupsResp.json();
+      console.log('✅ AI groups formed:', result);
+      
+    } else {
+      // RANDOM GROUPING FALLBACK
+      console.log(`🎲 Using random grouping (only ${studentsWithPersonas} students have personas)`);
+      
+      showLoading('Creating random groups...');
+      
+      // Fisher-Yates shuffle
+      const shuffled = [...studentsInClass].sort(() => Math.random() - 0.5);
+      const randomGroups = [];
+      
+      for (let i = 0; i < shuffled.length; i += groupSize) {
+        const groupMembers = shuffled.slice(i, i + groupSize);
+        randomGroups.push({
+          user_uids: groupMembers.map(p => p.uid),
+          team_score: null // null indicates random grouping
+        });
+      }
+      
+      result = {
+        groups: randomGroups,
+        average_score: null,
+        method: 'random' // Flag to show in UI
+      };
+      
+      console.log('✅ Random groups formed:', result);
+    }
 
     // Step 3: Display results
-    displaySmartGroupResults(result, period, course, studentsInClass);
+    displaySmartGroupResults(result, period, course, studentsInClass, useAI);
 
   } catch (error) {
     console.error('❌ Error generating groups:', error);
@@ -1436,8 +1488,1497 @@ window.generateSmartGroups = async function() {
     hideLoading();
   }
 }
+---
+layout: aesthetihawk
+active_tab: groups
+title: Groups Management
+type: issues
+permalink: /student/groups
+comments: false
+---
 
-function displaySmartGroupResults(result, period, course, allPeople) {
+<div class="min-h-screen bg-neutral-900 py-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <!-- Subtle Loading Indicator - inline badge style -->
+    <div id="loadingOverlay" class="hidden fixed bottom-4 right-4 z-40 bg-neutral-800/90 backdrop-blur-sm border border-neutral-700 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-md text-xs">
+      <div class="loading-spinner"></div>
+      <span id="loadingText" class="text-gray-400">Loading...</span>
+    </div>
+
+    <!-- Page Title -->
+    <h2 class="text-2xl font-semibold text-white mb-6">Groups Management</h2>
+
+    <!-- Unified Filter Bar -->
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4 mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="text-sm text-gray-300">
+          <span class="font-semibold text-white">Filters</span> · Narrow groups by period and class
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <!-- Period filter dropdown -->
+          <div class="relative" id="periodFilterWrapper">
+            <button id="periodFilterButton" type="button"
+              class="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg text-sm border border-neutral-600 hover:bg-neutral-600 transition-colors"
+              onclick="toggleDropdown('period')">
+              <span id="periodFilterLabel">All Periods</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div id="periodDropdown"
+              class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20">
+              <div class="p-3 space-y-2 text-sm text-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="periodAllCheckbox" type="checkbox" class="accent-indigo-500" checked
+                    onchange="onPeriodAllChange(this)" />
+                  <span>All Periods</span>
+                </label>
+                <div class="border-t border-neutral-700 my-2"></div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="1"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 1</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="2"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 2</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="3"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 3</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="4"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 4</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="5"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 5</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Class filter dropdown -->
+          <div class="relative" id="classFilterWrapper">
+            <button id="classFilterButton" type="button"
+              class="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg text-sm border border-neutral-600 hover:bg-neutral-600 transition-colors"
+              onclick="toggleDropdown('class')">
+              <span id="classFilterLabel">All Classes</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div id="classDropdown"
+              class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20">
+              <div class="p-3 space-y-2 text-sm text-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="classAllCheckbox" type="checkbox" class="accent-indigo-500" checked
+                    onchange="onClassAllChange(this)" />
+                  <span>All Classes</span>
+                </label>
+                <div class="border-t border-neutral-700 my-2"></div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 class-checkbox" value="CSSE"
+                    onchange="onClassCheckboxChange(this)" />
+                  <span>CSSE</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 class-checkbox" value="CSP"
+                    onchange="onClassCheckboxChange(this)" />
+                  <span>CSP</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 class-checkbox" value="CSA"
+                    onchange="onClassCheckboxChange(this)" />
+                  <span>CSA</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clear filters -->
+          <button type="button"
+            class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
+            onclick="clearAllFilters()">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Groups Display Area -->
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
+      <!-- Search bar -->
+      <div class="flex gap-2 mb-6">
+        <input type="text" id="searchInput" placeholder="Search by Group Name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          onkeydown="if(event.key==='Enter') searchGroups()" />
+        <button onclick="searchGroups()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium">
+          Search
+        </button>
+      </div>
+
+      <!-- Add Group Section -->
+      <div id="addGroupSection" class="mb-6 bg-neutral-700 border-2 border-dashed border-neutral-600 rounded-lg p-6">
+        <div id="addGroupCollapsed" class="cursor-pointer" onclick="toggleAddGroup()">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Add New Group</h3>
+                <p class="text-sm text-gray-400">Click to create a new group</p>
+              </div>
+            </div>
+            <svg id="addGroupChevron" class="w-6 h-6 text-gray-400 transition-transform" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div id="addGroupExpanded" class="mt-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Group Name</label>
+            <input type="text" id="newGroupName" placeholder="Enter group name"
+              class="w-full px-4 py-2 bg-neutral-600 text-white placeholder-gray-400 border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Period</label>
+            <select id="newGroupPeriod"
+              class="w-full px-4 py-2 bg-neutral-600 text-white border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Select period</option>
+              <option value="1">Period 1</option>
+              <option value="2">Period 2</option>
+              <option value="3">Period 3</option>
+              <option value="4">Period 4</option>
+              <option value="5">Period 5</option>
+            </select>
+          </div>
+
+          <!-- Class selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Class</label>
+            <select id="newGroupClass"
+              class="w-full px-4 py-2 bg-neutral-600 text-white border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Select class</option>
+              <option value="CSSE">CSSE</option>
+              <option value="CSP">CSP</option>
+              <option value="CSA">CSA</option>
+            </select>
+          </div>
+
+          <div class="flex gap-3 justify-end">
+            <button onclick="cancelAddGroup()"
+              class="px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-white rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onclick="saveNewGroup()"
+              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+              Create Group
+            </button>
+          </div>
+        </div>
+      </div>
+
+    <div class="mb-6 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500/50 rounded-lg p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-white">AI-Powered Group Formation</h3>
+            <p class="text-sm text-gray-400">Create balanced groups based on student personas and team compatibility</p>
+          </div>
+        </div>
+        <button 
+          onclick="openSmartGroupFormation()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Form Smart Groups
+        </button>
+      </div>
+    </div>
+
+      <!-- Groups List -->
+      <div id="groupsContainer" class="space-y-3">
+        <!-- Groups will be injected here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-12 text-gray-400">
+        <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+          </path>
+        </svg>
+        <p class="text-lg">No groups found</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeGroupChat()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col" style="height: 600px;">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <div>
+        <h3 id="chatModalTitle" class="text-xl font-semibold text-white">Group Chat</h3>
+        <p id="chatModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+      </div>
+      <button onclick="closeGroupChat()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Chat Messages Area -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <!-- Sample Messages (Static - Non-functional) -->
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Sarah Chen</span>
+            <span class="text-gray-500 text-xs">2h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Hey everyone! Should we meet tomorrow to review the calculus problems?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Marcus Rodriguez</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">That works for me! I'm free after 3pm.</p>
+          <p class="text-gray-200 text-sm mt-2">Also, did anyone finish problem set 7 yet?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Emily Watson</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">I did! The last three questions were tough though.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">James Park</span>
+            <span class="text-gray-500 text-xs">30m ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Same here. Let's definitely go over those together.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input Area -->
+    <div class="p-4 border-t border-neutral-700 relative">
+      <!-- Slash Command Popup -->
+      <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
+        <div id="slashCommandList">
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+            <span class="text-lg">📅</span>
+            <div>
+              <div class="text-white text-sm font-medium">/calendar</div>
+              <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+            </div>
+          </div>
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
+            <span class="text-lg">👤</span>
+            <div>
+              <div class="text-white text-sm font-medium">/adduser</div>
+              <div class="text-gray-400 text-xs">Add a user to the conversation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="imageMessageBox" class="mt-4 mb-4"></div>
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Message #group-name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          onkeydown="handleChatInputKeydown(event)"
+          oninput="handleChatInputChange(event)"
+        />
+        <button
+          class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+          title="Send message"
+          onclick="sendChatMessage()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Smart Group Formation Modal -->
+  <div id="smartGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeSmartGroupModal()"></div>
+  
+    <!-- Modal Content -->
+    <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-neutral-700">
+        <div>
+          <h3 class="text-2xl font-semibold text-white">AI-Powered Group Formation</h3>
+          <p class="text-sm text-gray-400 mt-1">Create balanced groups using persona compatibility</p>
+        </div>
+        <button onclick="closeSmartGroupModal()" class="text-gray-400 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+  
+      <!-- Form -->
+      <div class="p-6 space-y-6">
+        <!-- Period Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Select Period</label>
+          <select id="smartGroupPeriod" 
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Choose a period...</option>
+            <option value="1">Period 1</option>
+            <option value="2">Period 2</option>
+            <option value="3">Period 3</option>
+            <option value="4">Period 4</option>
+            <option value="5">Period 5</option>
+          </select>
+        </div>
+  
+        <!-- Class Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Select Class</label>
+          <select id="smartGroupClass"
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Choose a class...</option>
+            <option value="CSSE">CSSE</option>
+            <option value="CSP">CSP</option>
+            <option value="CSA">CSA</option>
+          </select>
+        </div>
+  
+        <!-- Group Size -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Group Size</label>
+          <input type="number" id="smartGroupSize" value="4" min="2" max="10"
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Recommended: 3-5 students per group</p>
+        </div>
+  
+        <!-- Group Name Prefix -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Group Name Prefix (Optional)</label>
+          <input type="text" id="smartGroupPrefix" placeholder="e.g., 'Team', 'Squad', 'Group'"
+            class="w-full px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
+        </div>
+  
+        <!-- Action Buttons -->
+        <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
+          <button onclick="closeSmartGroupModal()"
+            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button onclick="generateSmartGroups()"
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Generate Groups
+          </button>
+        </div>
+      </div>
+  
+      <!-- Results Section (hidden initially) -->
+      <div id="smartGroupResults" class="hidden p-6 border-t border-neutral-700 bg-neutral-900/50">
+        <h4 class="text-lg font-semibold text-white mb-4">Generated Groups Preview</h4>
+        <div id="smartGroupResultsContent" class="space-y-3 mb-6">
+          <!-- Results will be inserted here -->
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button onclick="closeSmartGroupModal()"
+            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Discard
+          </button>
+          <button onclick="saveSmartGroups()"
+            class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-semibold">
+            Save All Groups
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+<script>
+  // Slash command handling
+  const slashCommands = ['/calendar', '/adduser'];
+  let selectedCommandIndex = 0;
+
+  function handleChatInputChange(event) {
+    const input = event.target;
+    const value = input.value;
+    const popup = document.getElementById('slashCommandPopup');
+
+    // Show popup when input starts with "/" and is just the slash or partial command
+    if (value.startsWith('/') && !value.includes(' ')) {
+      const filter = value.toLowerCase();
+      const items = document.querySelectorAll('.slash-command-item');
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const command = item.querySelector('.text-white').textContent.toLowerCase();
+        if (command.startsWith(filter)) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount > 0) {
+        popup.classList.remove('hidden');
+        selectedCommandIndex = 0;
+        updateCommandSelection();
+      } else {
+        popup.classList.add('hidden');
+      }
+    } else {
+      popup.classList.add('hidden');
+    }
+  }
+
+  function handleChatInputKeydown(event) {
+    const popup = document.getElementById('slashCommandPopup');
+    const isPopupVisible = !popup.classList.contains('hidden');
+
+    if (isPopupVisible) {
+      const visibleItems = Array.from(document.querySelectorAll('.slash-command-item:not(.hidden)'));
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        selectedCommandIndex = Math.min(selectedCommandIndex + 1, visibleItems.length - 1);
+        updateCommandSelection();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        selectedCommandIndex = Math.max(selectedCommandIndex - 1, 0);
+        updateCommandSelection();
+      } else if (event.key === 'Enter' || event.key === 'Tab') {
+        event.preventDefault();
+        const selectedItem = visibleItems[selectedCommandIndex];
+        if (selectedItem) {
+          const command = selectedItem.querySelector('.text-white').textContent;
+          selectSlashCommand(command);
+        }
+      } else if (event.key === 'Escape') {
+        popup.classList.add('hidden');
+      }
+    } else if (event.key === 'Enter') {
+      sendChatMessage();
+    }
+  }
+
+  function updateCommandSelection() {
+    const items = document.querySelectorAll('.slash-command-item:not(.hidden)');
+    items.forEach((item, index) => {
+      if (index === selectedCommandIndex) {
+        item.classList.add('bg-neutral-600');
+      } else {
+        item.classList.remove('bg-neutral-600');
+      }
+    });
+  }
+
+  function selectSlashCommand(command) {
+    const input = document.getElementById('chatInput');
+    const popup = document.getElementById('slashCommandPopup');
+
+    input.value = command + ' ';
+    popup.classList.add('hidden');
+    input.focus();
+
+    // Trigger highlighting
+    highlightCommand(input);
+  }
+
+  function highlightCommand(input) {
+    // Add a visual indicator that a command is active
+    const value = input.value;
+    const commandMatch = value.match(/^\/\w+/);
+
+    if (commandMatch) {
+      input.classList.add('has-command');
+    } else {
+      input.classList.remove('has-command');
+    }
+  }
+
+  // Send chat message function
+  function sendChatMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const imageMessageBox = document.getElementById('imageMessageBox');
+    const chatMessages = document.getElementById('chatMessages');
+
+    const text = chatInput.value.trim();
+    const imageEl = imageMessageBox.querySelector('img');
+
+    // Don't send if both text and image are empty
+    if (!text && !imageEl) return;
+
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = `
+      <div class="flex items-baseline gap-2 mb-1">
+        <span class="text-white font-semibold text-sm">You</span>
+        <span class="text-gray-500 text-xs">Just now</span>
+      </div>
+      ${text ? `<p class="text-gray-200 text-sm">${text}</p>` : ''}
+      ${imageEl ? `<img src="${imageEl.src}" alt="Shared image" class="mt-2 max-w-xs rounded-lg" />` : ''}
+    `;
+
+    // Add to chat messages
+    chatMessages.appendChild(messageDiv);
+
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Clear input and image
+    chatInput.value = '';
+    imageMessageBox.innerHTML = '';
+  }
+
+  document.addEventListener('paste', function(event) {
+    const items = (event.clipboardData || window.clipboardData).items;
+    let imageFile = null;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        imageFile = items[i].getAsFile();
+        break;
+      }
+    }
+
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '100px'; // Smaller version
+        img.alt = 'Copied Image';
+
+        // Show the image in a message box or a designated area
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '';
+        messageBox.appendChild(img);
+      };
+      reader.onerror = function() {
+        console.error('Image copy failed');
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '<span style="color: red;">Image copy failed</span>';
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      console.error('No image found in clipboard');
+      const messageBox = document.getElementById('imageMessageBox');
+      messageBox.innerHTML = '<span style="color: red;">No image found in clipboard</span>';
+    }
+  });
+</script>
+
+<style>
+  .loading-spinner {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #6b7280;
+    border-top-color: #818cf8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Chat Modal Scrollbar Styling */
+  #chatMessages::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #chatMessages::-webkit-scrollbar-track {
+    background: #262626;
+    border-radius: 4px;
+  }
+
+  #chatMessages::-webkit-scrollbar-thumb {
+    background: #525252;
+    border-radius: 4px;
+  }
+
+  #chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #737373;
+  }
+
+  /* Prevent body scroll when modal is open */
+  body.modal-open {
+    overflow: hidden;
+  }
+
+  /* Slash command input styling */
+  #chatInput.has-command {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(64, 64, 64, 1) 30%);
+    border: 1px solid rgba(99, 102, 241, 0.5);
+  }
+
+  /* Slash command popup animation */
+  #slashCommandPopup {
+    animation: slideUp 0.15s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script type="module">
+/* ================================
+   CONFIG
+================================ */
+import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+/* ================================
+   STATE
+================================ */
+let allGroups = [];
+let peopleCache = [];  // Cache people to avoid repeated API calls
+let activePeriods = [];
+let activeClasses = [];
+let loadingCount = 0;  // Track concurrent loading operations
+let isAdmin = false;   // Track if current user is an admin
+let selectedUsersForGroup = {}; // Track multi-select members per group
+let collapsedGroups = {}; // Track collapsed state per group ID
+
+/* ================================
+   LOADING HELPERS
+================================ */
+function showLoading(message = "Loading...") {
+  loadingCount++;
+  document.getElementById("loadingText").textContent = message;
+  document.getElementById("loadingOverlay").classList.remove("hidden");
+}
+
+function hideLoading() {
+  loadingCount = Math.max(0, loadingCount - 1);
+  if (loadingCount === 0) {
+    document.getElementById("loadingOverlay").classList.add("hidden");
+  }
+}
+
+/* ================================
+   INIT
+================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  initializeData();
+});
+
+// Search groups using API with chaining for better performance
+window.searchGroups = function () {
+  const searchTerm = document.getElementById("searchInput").value.trim();
+  const url = searchTerm 
+    ? `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`
+    : `${javaURI}/api/groups`;
+  
+  showLoading("Searching...");
+  
+  fetch(url, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => console.error("Search failed", err))
+    .finally(() => hideLoading());
+}
+
+// Load groups, people, and admin status in parallel on page load with chaining
+function initializeData() {
+  showLoading("Loading groups...");
+  
+  Promise.all([
+    fetch(`${javaURI}/api/groups`, fetchOptions)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
+    fetch(`${javaURI}/api/people`, fetchOptions)
+      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people"))),
+    fetch(`${pythonURI}/api/id`, fetchOptions)
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null)  // Don't fail if user check fails
+  ])
+    .then(([groups, people, user]) => {
+      allGroups = groups;
+      peopleCache = people;
+      isAdmin = user && user.role === "Admin";
+      renderGroups();
+    })
+    .catch(err => console.error("Failed to initialize data", err))
+    .finally(() => hideLoading());
+}
+
+window.parseUIDs = function (raw) {
+  return raw
+    .split("\n")
+    .map(u => u.trim())
+    .filter(Boolean);
+}
+
+// Synchronous lookup from cache - no API call needed
+window.getPersonIdFromUID = function (uid) {
+  const match = peopleCache.find(p => p.uid === uid);
+  if (!match) {
+    throw new Error(`UID not found: ${uid}`);
+  }
+  return match.id;
+};
+
+// Get person object from cache by ID
+window.getPersonById = function (personId) {
+  return peopleCache.find(p => p.id === personId);
+};
+
+// Helpers for multi-select state per group
+function getSelectedUsers(groupId) {
+  return selectedUsersForGroup[groupId] || [];
+}
+
+function setSelectedUsers(groupId, users) {
+  selectedUsersForGroup[groupId] = users;
+  updateAddSelectedButton(groupId);
+  updateSearchResultsSelection(groupId);
+}
+
+// Search for users by name or GitHub ID with chaining
+window.searchPeopleForGroup = function (groupId) {
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  const query = searchInput.value.trim();
+  
+  if (!query) {
+    alert("Please enter a search term");
+    return;
+  }
+  
+  showLoading("Searching users...");
+  
+  fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+    .then(results => displaySearchResults(groupId, results))
+    .catch(err => {
+      console.error("User search failed", err);
+      alert("Failed to search users");
+    })
+    .finally(() => hideLoading());
+}
+
+// Display search results in dropdown
+window.displaySearchResults = function (groupId, results) {
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  const selected = getSelectedUsers(groupId).map(u => u.id);
+  
+  if (!results || results.length === 0) {
+    dropdown.innerHTML = `
+      <div class="p-3 text-gray-400 text-sm text-center">No users found</div>
+    `;
+    dropdown.classList.remove("hidden");
+    return;
+  }
+  
+  dropdown.innerHTML = results.map(person => {
+    const isSelected = selected.includes(person.id);
+    return `
+      <div 
+        class="px-3 py-2 ${isSelected ? "bg-neutral-600 border border-neutral-500" : "hover:bg-neutral-600"} cursor-pointer flex items-center justify-between text-sm"
+        data-person-id="${person.id}"
+        onclick="toggleUserSelectionFromResult(${groupId}, ${person.id}, '${person.uid}', '${person.name.replace(/'/g, "\\'")}')">
+        <div>
+          <span class="text-white font-medium">${person.name}</span>
+          <span class="text-gray-400 ml-2">@${person.uid}</span>
+        </div>
+        <span class="text-xs ${isSelected ? "text-green-400" : "text-gray-500"}">${isSelected ? "Selected" : "Tap to select"}</span>
+      </div>
+    `;
+  }).join("");
+  
+  dropdown.classList.remove("hidden");
+}
+
+// Toggle user selection from search results
+window.toggleUserSelectionFromResult = function (groupId, personId, uid, name) {
+  const current = getSelectedUsers(groupId);
+  const exists = current.find(u => u.id === personId);
+  const updated = exists
+    ? current.filter(u => u.id !== personId)
+    : [...current, { id: personId, uid, name }];
+  setSelectedUsers(groupId, updated);
+}
+
+// Clear selected users for a group
+window.clearSearchSelection = function (groupId) {
+  setSelectedUsers(groupId, []);
+  const searchInput = document.getElementById(`member-search-${groupId}`);
+  if (searchInput) searchInput.value = "";
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  if (dropdown) dropdown.classList.add("hidden");
+}
+
+// Add all selected members to group with chaining
+window.addSelectedMembersToGroup = async function (groupId) {
+  const selected = getSelectedUsers(groupId);
+  
+  if (!selected.length) {
+    alert("Please select at least one user");
+    return;
+  }
+  
+  showLoading("Adding members...");
+  const successes = [];
+  const failures = [];
+
+  for (const person of selected) {
+    try {
+      const res = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, { ...fetchOptions, method: "POST" });
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("ADD MEMBER ERROR:", text);
+        failures.push(person);
+        continue;
+      }
+      successes.push(person);
+    } catch (err) {
+      console.error("ADD MEMBER ERROR:", err);
+      failures.push(person);
+    }
+  }
+
+  const group = allGroups.find(g => g.id === groupId);
+  if (group) {
+    if (!group.members) group.members = [];
+    successes.forEach(person => {
+      if (!group.members.find(m => m.id === person.id)) {
+        group.members.push({ id: person.id, name: person.name, uid: person.uid });
+      }
+    });
+  }
+
+  setSelectedUsers(groupId, []);
+  renderGroups();
+  if (failures.length) {
+    alert(`Added ${successes.length} member(s). ${failures.length} failed. Is the user already a member of the group? Check console for details.`);
+  }
+  hideLoading();
+}
+
+// Add member to group with chaining - updates local state instead of refetching
+window.addMemberToGroup = function (groupId, uid) {
+  showLoading("Adding member...");
+  
+  const personId = getPersonIdFromUID(uid);
+  const person = getPersonById(personId);
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "POST" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("ADD MEMBER ERROR:", text);
+          return Promise.reject(new Error("Failed to add member"));
+        });
+      }
+      return res;
+    })
+    .then(() => {
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group) {
+        if (!group.members) group.members = [];
+        // Only add if not already present
+        if (!group.members.find(m => m.id === personId)) {
+          group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+        }
+      }
+      renderGroups();
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
+}
+
+// Remove member from group with chaining - updates local state instead of refetching
+window.removeMemberFromGroup = function (groupId, personId) {
+  showLoading("Removing member...");
+  
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "DELETE" })
+    .then(res => res.ok ? res : Promise.reject(new Error("Failed to remove member")))
+    .then(() => {
+      // Update local state instead of refetching all groups
+      const group = allGroups.find(g => g.id === groupId);
+      if (group && group.members) {
+        group.members = group.members.filter(m => m.id !== personId);
+      }
+      renderGroups();
+    })
+    .catch(err => alert(err.message))
+    .finally(() => hideLoading());
+}
+
+// Open group chat modal
+window.openGroupChat = function (groupId, groupName) {
+  const group = allGroups.find(g => g.id === groupId);
+  if (!group) {
+    alert(`Group not found`);
+    return;
+  }
+
+  const memberCount = (group.members || []).length;
+
+  // Update modal header
+  document.getElementById('chatModalTitle').textContent = groupName;
+  document.getElementById('chatModalSubtitle').textContent =
+    `Period ${group.period} · ${group.course} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+
+  // Update input placeholder
+  const chatInput = document.getElementById('chatInput');
+  const groupNameFormatted = groupName.toLowerCase().replace(/\s+/g, '-');
+  chatInput.placeholder = `Message #${groupNameFormatted}`;
+
+  // Show modal and prevent body scroll
+  document.getElementById('chatModal').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+
+  // Log for debugging
+  console.log(`Opening chat for group: ${groupName} (ID: ${groupId})`);
+  console.log("Group members:", group.members);
+}
+
+// Close group chat modal
+window.closeGroupChat = function () {
+  document.getElementById('chatModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
+// Delete group with chaining - updates local state instead of refetching
+window.deleteGroup = function (groupId) {
+  const confirmed = confirm(
+    "Are you sure you want to delete this group?\n\nThis action cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  showLoading("Deleting group...");
+  
+  fetch(`${javaURI}/api/groups/${groupId}`, { ...fetchOptions, method: "DELETE" })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("DELETE GROUP ERROR:", text);
+          alert("Failed to delete group");
+          return Promise.reject(new Error("Failed to delete group"));
+        });
+      }
+      return res;
+    })
+    .then(() => {
+      // Update local state instead of refetching all groups
+      allGroups = allGroups.filter(g => g.id !== groupId);
+      renderGroups();
+    })
+    .catch(err => console.error(err))
+    .finally(() => hideLoading());
+};
+
+// Navigate to group dashboard page
+window.navigateToGroupDashboard = function (groupName) {
+  // Convert group name to URL-friendly format
+  const urlFriendlyName = encodeURIComponent(groupName.toLowerCase().replace(/\s+/g, '-'));
+  window.location.href = `{{ site.baseurl }}/student/groups/dashboard?group=${urlFriendlyName}`;
+};
+
+/* ================================
+   API CALLS
+================================ */
+// Manual refresh function with chaining - only call when absolutely needed
+window.loadGroups = function () {
+  fetch(`${javaURI}/api/groups`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups")))
+    .then(data => {
+      allGroups = data;
+      renderGroups();
+    })
+    .catch(err => console.error("Failed to load groups", err));
+}
+
+// Refresh people cache with chaining if needed (e.g., new user registered)
+window.refreshPeopleCache = function () {
+  fetch(`${javaURI}/api/people`, fetchOptions)
+    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to refresh people")))
+    .then(data => { peopleCache = data; })
+    .catch(err => console.error("Failed to refresh people cache", err));
+}
+
+// Create new group with chaining (single API call)
+window.saveNewGroup = function () {
+  const name = document.getElementById("newGroupName").value.trim();
+  const period = document.getElementById("newGroupPeriod").value;
+  const course = document.getElementById("newGroupClass").value;
+
+  console.log("Submit button clicked! Group Name:", name, "Period:", period, "Course:", course);
+
+  if (!name || !period || !course) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  showLoading("Creating group...");
+  
+  fetch(`${javaURI}/api/groups`, {
+    ...fetchOptions,
+    method: "POST",
+    body: JSON.stringify({ name, period: String(period), course })
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => {
+          console.error("GROUP CREATION ERROR:", text);
+          return Promise.reject(new Error("Group creation failed"));
+        });
+      }
+      return res.json();
+    })
+    .then(newGroup => {
+      newGroup.members = [];
+      // Update local state instead of refetching
+      allGroups.push(newGroup);
+      cancelAddGroup();
+      renderGroups();
+    })
+    .catch(err => {
+      console.error(err);
+      alert(err.message);
+    })
+    .finally(() => hideLoading());
+};
+
+
+
+/* ================================
+   RENDERING
+================================ */
+window.renderGroups = function () {
+  const container = document.getElementById("groupsContainer");
+  const empty = document.getElementById("emptyState");
+
+  container.innerHTML = "";
+
+  // Only filter by period/class (search is handled by API)
+  const filtered = allGroups.filter(g => {
+    if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
+    if (activeClasses.length && !activeClasses.includes(g.course)) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    empty.classList.remove("hidden");
+    return;
+  }
+
+  empty.classList.add("hidden");
+
+  filtered.forEach(group => {
+    const el = document.createElement("div");
+    el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
+
+    const isCollapsed = collapsedGroups[group.id] !== false;
+
+    el.innerHTML = `
+      <!-- Header -->
+      <div class="flex justify-between items-start">
+        <div class="flex items-center gap-2">
+          <!-- Toggle visibility button -->
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded bg-neutral-600 hover:bg-neutral-500 text-gray-300 hover:text-white transition-colors"
+            title="${isCollapsed ? 'Show' : 'Hide'} member details"
+            onclick="toggleGroupDetails(${group.id})">
+            ${isCollapsed ? `
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+              </svg>
+            ` : `
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+            `}
+          </button>
+          <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
+            <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
+            <p class="text-sm text-gray-400">
+              Period ${group.period} · ${group.course}${isCollapsed ? ` · ${(group.members || []).length} members` : ''}
+            </p>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex gap-2">
+          <!-- Dashboard button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
+            title="View group dashboard"
+            onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
+            📊
+          </button>
+          <!-- Chat button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-green-600 text-gray-300 hover:text-white transition-colors"
+            title="Chat with group members"
+            onclick="openGroupChat(${group.id}, '${group.name.replace(/'/g, "\\'")}')" >
+            💬
+          </button>
+
+          <!-- Trash (admin only) -->
+          ${isAdmin ? `
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
+            title="Delete group (Admin only)"
+            onclick="deleteGroup(${group.id})">
+            🗑️
+          </button>
+          ` : ''}
+        </div>
+      </div>
+
+      ${!isCollapsed ? `
+      <!-- Members row -->
+      <div class="mt-3 flex flex-wrap gap-2">
+        ${(group.members || []).map(m => `
+          <span
+            class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
+            onclick="removeMemberFromGroup(${group.id}, ${m.id})"
+            title="Click to remove">
+            <span class="group-hover:hidden">${m.name} <span class="text-gray-400">@${m.uid}</span></span>
+            <span class="hidden group-hover:inline">Remove ${m.uid}</span>
+          </span>
+        `).join("")}
+      </div>
+
+      <!-- Add member by search -->
+      <div class="mt-4 relative">
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search by full name"
+            class="flex-1 px-3 py-2 bg-neutral-600 text-white text-sm rounded-lg border border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            id="member-search-${group.id}"
+            onkeydown="if(event.key==='Enter') searchPeopleForGroup(${group.id})"
+            oninput="if(!this.value.trim()) document.getElementById('search-results-${group.id}').classList.add('hidden')"
+          />
+
+          <!-- Search button -->
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+            title="Search users"
+            onclick="searchPeopleForGroup(${group.id})">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+
+          <!-- Add selected user -->
+          <button
+            id="add-selected-btn-${group.id}"
+            class="px-4 h-10 flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Add selected members"
+            onclick="addSelectedMembersToGroup(${group.id})"
+            disabled>
+            Add Selected
+          </button>
+        </div>
+
+        <!-- Search results dropdown -->
+        <div
+          id="search-results-${group.id}"
+          class="hidden absolute left-0 right-12 mt-1 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg z-30 max-h-48 overflow-y-auto">
+        </div>
+      </div>
+      ` : ''}
+    `;
+    container.appendChild(el);
+    updateAddSelectedButton(group.id);
+  });
+}
+
+// Update add button label/state based on selection count
+function updateAddSelectedButton(groupId) {
+  const btn = document.getElementById(`add-selected-btn-${groupId}`);
+  if (!btn) return;
+  const count = getSelectedUsers(groupId).length;
+  btn.textContent = count ? `Add Selected (${count})` : "Add Selected";
+  btn.disabled = count === 0;
+}
+
+// Highlight selected rows in search dropdown after rerender
+function updateSearchResultsSelection(groupId) {
+  const dropdown = document.getElementById(`search-results-${groupId}`);
+  if (!dropdown) return;
+  const selectedIds = getSelectedUsers(groupId).map(u => u.id);
+  dropdown.querySelectorAll("[data-person-id]").forEach(item => {
+    const id = Number(item.dataset.personId);
+    const isSelected = selectedIds.includes(id);
+    item.classList.toggle("bg-neutral-600", isSelected);
+    item.classList.toggle("border", isSelected);
+  });
+}
+
+/* ================================
+   ADD GROUP TOGGLE
+================================ */
+window.toggleAddGroup = function () {
+  document.getElementById("addGroupExpanded").classList.toggle("hidden");
+  document.getElementById("addGroupChevron").classList.toggle("rotate-180");
+}
+
+// Toggle visibility of group member details
+window.toggleGroupDetails = function (groupId) {
+  collapsedGroups[groupId] = collapsedGroups[groupId] === false ? true : false;
+  renderGroups();
+}
+
+window.cancelAddGroup = function () {
+  document.getElementById("addGroupExpanded").classList.add("hidden");
+  document.getElementById("newGroupName").value = "";
+  document.getElementById("newGroupPeriod").value = "";
+  document.getElementById("newGroupClass").value = "";
+}
+
+/* ================================
+   FILTERS
+================================ */
+window.toggleDropdown = function (type) {
+  document.getElementById(type + "Dropdown").classList.toggle("hidden");
+}
+
+window.clearAllFilters = function () {
+  activePeriods = [];
+  activeClasses = [];
+  document.querySelectorAll(".period-checkbox,.class-checkbox").forEach(cb => cb.checked = false);
+  document.getElementById("periodAllCheckbox").checked = true;
+  document.getElementById("classAllCheckbox").checked = true;
+  document.getElementById("periodFilterLabel").textContent = "All Periods";
+  document.getElementById("classFilterLabel").textContent = "All Classes";
+  document.getElementById("searchInput").value = "";
+  searchGroups();  // Reload all groups
+}
+
+window.onPeriodCheckboxChange = function (cb) {
+  activePeriods = [...document.querySelectorAll(".period-checkbox:checked")].map(c => c.value);
+  document.getElementById("periodAllCheckbox").checked = !activePeriods.length;
+  document.getElementById("periodFilterLabel").textContent =
+    activePeriods.length ? `Periods: ${activePeriods.join(", ")}` : "All Periods";
+  renderGroups();
+}
+
+window.onClassCheckboxChange = function (cb) {
+  activeClasses = [...document.querySelectorAll(".class-checkbox:checked")].map(c => c.value);
+  document.getElementById("classAllCheckbox").checked = !activeClasses.length;
+  document.getElementById("classFilterLabel").textContent =
+    activeClasses.length ? `Classes: ${activeClasses.join(", ")}` : "All Classes";
+  renderGroups();
+}
+
+window.onPeriodAllChange = function (cb) {
+  if (cb.checked) {
+    document.querySelectorAll(".period-checkbox").forEach(c => c.checked = false);
+    activePeriods = [];
+    renderGroups();
+  }
+}
+
+window.onClassAllChange = function (cb) {
+  if (cb.checked) {
+    document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
+    activeClasses = [];
+    renderGroups();
+  }
+}
+
+/* ================================
+   SMART GROUP FORMATION
+================================ */
+let generatedGroups = []; // Store generated groups before saving
+
+window.openSmartGroupFormation = function() {
+  document.getElementById('smartGroupModal').classList.remove('hidden');
+  document.getElementById('smartGroupResults').classList.add('hidden');
+  document.body.classList.add('modal-open');
+}
+
+window.closeSmartGroupModal = function() {
+  document.getElementById('smartGroupModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  // Reset form
+  document.getElementById('smartGroupPeriod').value = '';
+  document.getElementById('smartGroupClass').value = '';
+  document.getElementById('smartGroupSize').value = '4';
+  document.getElementById('smartGroupPrefix').value = '';
+  generatedGroups = [];
+}
+
+window.generateSmartGroups = async function() {
+  const period = document.getElementById('smartGroupPeriod').value;
+  const course = document.getElementById('smartGroupClass').value;
+  const groupSize = parseInt(document.getElementById('smartGroupSize').value);
+
+  // Validation
+  if (!period || !course) {
+    alert('Please select both period and class');
+    return;
+  }
+
+  if (groupSize < 2 || groupSize > 10) {
+    alert('Group size must be between 2 and 10');
+    return;
+  }
+
+  showLoading('Finding students and analyzing personas...');
+
+  try {
+    // Step 1: Get all people from the selected period/class
+    const peopleResp = await fetch(`${javaURI}/api/people`, fetchOptions);
+    if (!peopleResp.ok) throw new Error('Failed to fetch people');
+    const allPeople = await peopleResp.json();
+
+    const studentsInClass = allPeople;
+
+    if (studentsInClass.length < groupSize) {
+      alert(`Not enough students in Period ${period} ${course}. Found ${studentsInClass.length}, need at least ${groupSize}.`);
+      hideLoading();
+      return;
+    }
+
+    const user_uids = studentsInClass.map(p => p.uid);
+    
+    // Step 2: Check how many students have personas
+    let studentsWithPersonas = 0;
+    let useAI = false;
+    
+    try {
+      const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ user_uids: user_uids })
+      });
+
+      if (checkResp.ok) {
+        const checkResult = await checkResp.json();
+        studentsWithPersonas = checkResult.members.filter(m => m.personas && m.personas.length > 0).length;
+        
+        // Minimum threshold: need at least 50% of students OR at least 2 groups worth
+        const minRequired = Math.max(groupSize * 2, Math.ceil(studentsInClass.length * 0.5));
+        useAI = studentsWithPersonas >= minRequired;
+      }
+    } catch (err) {
+      console.log('⚠️ Persona check failed, falling back to random:', err);
+      useAI = false;
+    }
+
+    let result;
+
+    if (useAI) {
+      // AI-POWERED GROUPING
+      console.log(`✨ Using AI grouping (${studentsWithPersonas} students have personas)`);
+      
+      showLoading('Using AI to create optimal groups...');
+      
+      const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({
+          user_uids: user_uids,
+          group_size: groupSize
+        })
+      });
+
+      if (!formGroupsResp.ok) {
+        const error = await formGroupsResp.json();
+        throw new Error(error.message || 'Failed to form groups');
+      }
+
+      result = await formGroupsResp.json();
+      console.log('✅ AI groups formed:', result);
+      
+    } else {
+      // RANDOM GROUPING FALLBACK
+      console.log(`🎲 Using random grouping (only ${studentsWithPersonas} students have personas)`);
+      
+      showLoading('Creating random groups...');
+      
+      // Fisher-Yates shuffle
+      const shuffled = [...studentsInClass].sort(() => Math.random() - 0.5);
+      const randomGroups = [];
+      
+      for (let i = 0; i < shuffled.length; i += groupSize) {
+        const groupMembers = shuffled.slice(i, i + groupSize);
+        randomGroups.push({
+          user_uids: groupMembers.map(p => p.uid),
+          team_score: null // null indicates random grouping
+        });
+      }
+      
+      result = {
+        groups: randomGroups,
+        average_score: null,
+        method: 'random' // Flag to show in UI
+      };
+      
+      console.log('✅ Random groups formed:', result);
+    }
+
+    // Step 3: Display results
+    displaySmartGroupResults(result, period, course, studentsInClass, useAI);
+
+  } catch (error) {
+    console.error('❌ Error generating groups:', error);
+    alert(`Failed to generate groups: ${error.message}`);
+  } finally {
+    hideLoading();
+  }
+}
+function displaySmartGroupResults(result, period, course, allPeople, useAI = true) {
   const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
   const resultsContent = document.getElementById('smartGroupResultsContent');
   
@@ -1463,32 +3004,58 @@ function displaySmartGroupResults(result, period, course, allPeople) {
     };
   });
 
-  // Display preview
-  resultsContent.innerHTML = generatedGroups.map((group, index) => `
-    <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
-      <div class="flex items-center justify-between mb-3">
+  // Display preview with method indicator
+  const methodBadge = useAI 
+    ? '<span class="px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
+    : '<span class="px-3 py-1 bg-gray-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+
+  resultsContent.innerHTML = `
+    <div class="mb-4 p-3 bg-neutral-700 rounded-lg border border-neutral-600">
+      <div class="flex items-center justify-between">
         <div>
-          <h5 class="text-white font-semibold">${group.name}</h5>
-          <p class="text-xs text-gray-400">Period ${group.period} · ${group.course} · ${group.members.length} members</p>
+          <p class="text-sm text-gray-300">Grouping Method</p>
+          <p class="text-xs text-gray-500 mt-1">
+            ${useAI 
+              ? 'Groups optimized using persona compatibility analysis' 
+              : 'Random assignment (more students need to complete persona profiles for AI grouping)'}
+          </p>
         </div>
-        <div class="text-right">
-          <div class="text-sm font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">
-            Score: ${group.team_score.toFixed(1)}
-          </div>
-          <div class="text-xs text-gray-500">
-            ${group.team_score >= 80 ? 'Excellent' : group.team_score >= 70 ? 'Good' : group.team_score >= 60 ? 'Fair' : 'Needs Work'}
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        ${group.members.map(m => `
-          <span class="px-2 py-1 bg-neutral-700 text-xs text-gray-300 rounded">
-            ${m.name} <span class="text-gray-500">@${m.uid}</span>
-          </span>
-        `).join('')}
+        ${methodBadge}
       </div>
     </div>
-  `).join('');
+    
+    ${generatedGroups.map((group, index) => `
+      <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h5 class="text-white font-semibold">${group.name}</h5>
+            <p class="text-xs text-gray-400">Period ${group.period} · ${group.course} · ${group.members.length} members</p>
+          </div>
+          ${group.team_score !== null ? `
+            <div class="text-right">
+              <div class="text-sm font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">
+                Score: ${group.team_score.toFixed(1)}
+              </div>
+              <div class="text-xs text-gray-500">
+                ${group.team_score >= 80 ? 'Excellent' : group.team_score >= 70 ? 'Good' : group.team_score >= 60 ? 'Fair' : 'Needs Work'}
+              </div>
+            </div>
+          ` : `
+            <div class="text-right">
+              <div class="text-xs text-gray-500">Random</div>
+            </div>
+          `}
+        </div>
+        <div class="flex flex-wrap gap-2">
+          ${group.members.map(m => `
+            <span class="px-2 py-1 bg-neutral-700 text-xs text-gray-300 rounded">
+              ${m.name} <span class="text-gray-500">@${m.uid}</span>
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+  `;
 
   // Show results section
   document.getElementById('smartGroupResults').classList.remove('hidden');
@@ -1496,7 +3063,6 @@ function displaySmartGroupResults(result, period, course, allPeople) {
   // Scroll to results
   document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-
 window.saveSmartGroups = async function() {
   if (!generatedGroups.length) {
     alert('No groups to save');
