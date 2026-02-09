@@ -22,10 +22,10 @@ class GameLevel1 {
         id: 'Archie',
         greeting: "Hi, I am Archie.",
         src: path + "/images/murderMystery/archie_left.png",
-        SCALE_FACTOR: 3,
+        SCALE_FACTOR: 2,
         STEP_FACTOR: 800,
         ANIMATION_RATE: 10,
-        INIT_POSITION: { x: 500, y: 300 },
+        INIT_POSITION: { x: 250, y: 300 },
         pixels: {height: 150, width: 100},
         orientation: {rows: 4, columns: 3},
         down: {row: 0, start: 0, columns: 3},
@@ -40,7 +40,7 @@ class GameLevel1 {
         SCALE_FACTOR: 2,
         STEP_FACTOR: 800, // Same speed as Archie
         ANIMATION_RATE: 10,
-        INIT_POSITION: { x: 450, y: 350 }, // Positioned slightly under Archie
+        INIT_POSITION: { x: 200, y: 300 }, // Positioned slightly under Archie
         pixels: { height: 200, width: 400 }, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
@@ -55,7 +55,7 @@ class GameLevel1 {
         src: path + "/images/murderMystery/island_target.png", // An invisible or small target sprite
         SCALE_FACTOR: 2,
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: width - 200, y: 300 }, // Placed at the right edge
+        INIT_POSITION: { x: width - 200, y: 200 }, // Placed at the right edge
         pixels: { height: 100, width: 100 },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
