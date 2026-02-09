@@ -337,7 +337,7 @@ breadcrumb: True
                 </div>
                 
                 <div class="repo-info">
-                    <div>📄 Public repository</div>
+                    <div> Public repository</div>
                     <div style="margin-top: 5px; color: #888;">A sample repository for learning merge conflicts</div>
                 </div>
                 
@@ -383,9 +383,9 @@ breadcrumb: True
                     <div style="padding: 10px; border-bottom: 1px solid #333; color: #888;">
                         <span id="branch-file-count">3 files</span>
                     </div>
-                    <div class="file-item">📄 README.md</div>
-                    <div class="file-item">📄 app.js</div>
-                    <div class="file-item">📄 styles.css</div>
+                    <div class="file-item"> README.md</div>
+                    <div class="file-item"> app.js</div>
+                    <div class="file-item"> styles.css</div>
                 </div>
             </div>
         </div>
@@ -646,11 +646,6 @@ export default config;</textarea>
             </div>
         </div>
         
-        <div class="section" style="text-align: center; margin-top: 40px;">
-            <h2>🎉 Tutorial Complete!</h2>
-            <p style="margin: 20px 0;">You've learned the basics of resolving merge conflicts in GitHub.</p>
-            <p>Remember: Always test your code after resolving conflicts!</p>
-        </div>
     </div>
 
     <script>
@@ -673,9 +668,9 @@ export default config;</textarea>
             },
             'ls': () => {
                 if (currentDir.includes('learning-merge-conflicts')) {
-                    return 'README.md  app.js  styles.css  package.json';
+                    return '<span style="color: #000;">README.md  app.js  styles.css  package.json</span>';
                 }
-                return 'Documents  Downloads  learning-merge-conflicts';
+                return '<span style="color: #000;">Documents  Downloads  learning-merge-conflicts</span>';
             },
             'code .': () => {
                 if (currentDir.includes('learning-merge-conflicts')) {
