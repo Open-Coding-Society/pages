@@ -202,6 +202,20 @@ date: 2025-12-02
 let currentStep = 0;
 const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
 const STORAGE_KEY = 'ai_combined_v1';
+// ========== Big Six Lesson Metadata ==========
+const BIG_SIX_META = {
+  module: "ai_lesson",
+  lesson: 5
+};
+
+function completeBigSixLesson() {
+  const key = `bigsix:${BIG_SIX_META.module}:lesson:${BIG_SIX_META.lesson}`;
+  if (localStorage.getItem(key) !== "done") {
+    localStorage.setItem(key, "done");
+    console.log(`✅ Big Six completed: ${key}`);
+  }
+}
+
 
 function showStep(n) {
   currentStep = Math.max(0, Math.min(steps.length - 1, n));
@@ -223,7 +237,13 @@ function showStep(n) {
   if (nextBtn) nextBtn.disabled = currentStep === steps.length - 1;
 
   persist();
+
+  // ✅ BIG SIX COMPLETION HOOK (FINAL STEP)
+  if (currentStep === steps.length - 1) {
+    completeBigSixLesson();
+  }
 }
+
 
 function prevStep() { showStep(currentStep - 1); }
 function nextStep() { showStep(currentStep + 1); }
