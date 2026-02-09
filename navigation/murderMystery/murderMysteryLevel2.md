@@ -1,6 +1,9 @@
+---
 layout: opencs
 title: Adventure Game
 permalink: /gamify/mansion2
+---
+
 <div id="gameContainer" style="position: relative;">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
     <canvas id='gameCanvas'></canvas>
