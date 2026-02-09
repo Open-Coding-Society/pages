@@ -201,6 +201,30 @@ comments: false
         </div>
       </div>
 
+    <div class="mb-6 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500/50 rounded-lg p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-white">AI-Powered Group Formation</h3>
+            <p class="text-sm text-gray-400">Create balanced groups based on student personas and team compatibility</p>
+          </div>
+        </div>
+        <button 
+          onclick="openSmartGroupFormation()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Form Smart Groups
+        </button>
+      </div>
+    </div>
+
       <!-- Groups List -->
       <div id="groupsContainer" class="space-y-3">
         <!-- Groups will be injected here -->
@@ -323,6 +347,106 @@ comments: false
     </div>
   </div>
 </div>
+  <!-- Smart Group Formation Modal -->
+  <div id="smartGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeSmartGroupModal()"></div>
+  
+    <!-- Modal Content -->
+    <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-neutral-700">
+        <div>
+          <h3 class="text-2xl font-semibold text-white">AI-Powered Group Formation</h3>
+          <p class="text-sm text-gray-400 mt-1">Create balanced groups using persona compatibility</p>
+        </div>
+        <button onclick="closeSmartGroupModal()" class="text-gray-400 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+  
+      <!-- Form -->
+      <div class="p-6 space-y-6">
+        <!-- Period Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Select Period</label>
+          <select id="smartGroupPeriod" 
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Choose a period...</option>
+            <option value="1">Period 1</option>
+            <option value="2">Period 2</option>
+            <option value="3">Period 3</option>
+            <option value="4">Period 4</option>
+            <option value="5">Period 5</option>
+          </select>
+        </div>
+  
+        <!-- Class Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Select Class</label>
+          <select id="smartGroupClass"
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Choose a class...</option>
+            <option value="CSSE">CSSE</option>
+            <option value="CSP">CSP</option>
+            <option value="CSA">CSA</option>
+          </select>
+        </div>
+  
+        <!-- Group Size -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Group Size</label>
+          <input type="number" id="smartGroupSize" value="4" min="2" max="10"
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Recommended: 3-5 students per group</p>
+        </div>
+  
+        <!-- Group Name Prefix -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Group Name Prefix (Optional)</label>
+          <input type="text" id="smartGroupPrefix" placeholder="e.g., 'Team', 'Squad', 'Group'"
+            class="w-full px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
+        </div>
+  
+        <!-- Action Buttons -->
+        <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
+          <button onclick="closeSmartGroupModal()"
+            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button onclick="generateSmartGroups()"
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Generate Groups
+          </button>
+        </div>
+      </div>
+  
+      <!-- Results Section (hidden initially) -->
+      <div id="smartGroupResults" class="hidden p-6 border-t border-neutral-700 bg-neutral-900/50">
+        <h4 class="text-lg font-semibold text-white mb-4">Generated Groups Preview</h4>
+        <div id="smartGroupResultsContent" class="space-y-3 mb-6">
+          <!-- Results will be inserted here -->
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button onclick="closeSmartGroupModal()"
+            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Discard
+          </button>
+          <button onclick="saveSmartGroups()"
+            class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-semibold">
+            Save All Groups
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 <script>
   // Slash command handling
@@ -1219,6 +1343,205 @@ window.onClassAllChange = function (cb) {
     document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
     activeClasses = [];
     renderGroups();
+  }
+}
+
+/* ================================
+   SMART GROUP FORMATION
+================================ */
+let generatedGroups = []; // Store generated groups before saving
+
+window.openSmartGroupFormation = function() {
+  document.getElementById('smartGroupModal').classList.remove('hidden');
+  document.getElementById('smartGroupResults').classList.add('hidden');
+  document.body.classList.add('modal-open');
+}
+
+window.closeSmartGroupModal = function() {
+  document.getElementById('smartGroupModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  // Reset form
+  document.getElementById('smartGroupPeriod').value = '';
+  document.getElementById('smartGroupClass').value = '';
+  document.getElementById('smartGroupSize').value = '4';
+  document.getElementById('smartGroupPrefix').value = '';
+  generatedGroups = [];
+}
+
+window.generateSmartGroups = async function() {
+  const period = document.getElementById('smartGroupPeriod').value;
+  const course = document.getElementById('smartGroupClass').value;
+  const groupSize = parseInt(document.getElementById('smartGroupSize').value);
+
+  // Validation
+  if (!period || !course) {
+    alert('Please select both period and class');
+    return;
+  }
+
+  if (groupSize < 2 || groupSize > 10) {
+    alert('Group size must be between 2 and 10');
+    return;
+  }
+
+  showLoading('Finding students and analyzing personas...');
+
+  try {
+    // Step 1: Get all people from the selected period/class
+    const peopleResp = await fetch(`${javaURI}/api/people`, fetchOptions);
+    if (!peopleResp.ok) throw new Error('Failed to fetch people');
+    const allPeople = await peopleResp.json();
+
+    // Filter by period and class (assuming people have these fields)
+    // If your Person model doesn't have period/class, you might need to filter differently
+    const studentsInClass = allPeople.filter(p => {
+      // Adjust this filter based on your actual Person model structure
+      // For now, we'll use all people - you may need to add period/class to Person
+      return true;
+    });
+
+    if (studentsInClass.length < groupSize) {
+      alert(`Not enough students in Period ${period} ${course}. Found ${studentsInClass.length}, need at least ${groupSize}.`);
+      hideLoading();
+      return;
+    }
+
+    // Step 2: Call Flask API to form optimal groups
+    const user_uids = studentsInClass.map(p => p.uid);
+    
+    const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        user_uids: user_uids,
+        group_size: groupSize
+      })
+    });
+
+    if (!formGroupsResp.ok) {
+      const error = await formGroupsResp.json();
+      throw new Error(error.message || 'Failed to form groups');
+    }
+
+    const result = await formGroupsResp.json();
+    console.log('✅ Groups formed:', result);
+
+    // Step 3: Display results
+    displaySmartGroupResults(result, period, course, studentsInClass);
+
+  } catch (error) {
+    console.error('❌ Error generating groups:', error);
+    alert(`Failed to generate groups: ${error.message}`);
+  } finally {
+    hideLoading();
+  }
+}
+
+function displaySmartGroupResults(result, period, course, allPeople) {
+  const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
+  const resultsContent = document.getElementById('smartGroupResultsContent');
+  
+  // Build groups with member details
+  generatedGroups = result.groups.map((group, index) => {
+    const letter = String.fromCharCode(65 + index); // A, B, C, etc.
+    const members = group.user_uids.map(uid => {
+      const person = allPeople.find(p => p.uid === uid);
+      return {
+        id: person?.id,
+        uid: uid,
+        name: person?.name || uid
+      };
+    });
+
+    return {
+      name: `${prefix} ${letter}`,
+      period: period,
+      course: course,
+      team_score: group.team_score,
+      memberIds: members.map(m => m.id),
+      members: members
+    };
+  });
+
+  // Display preview
+  resultsContent.innerHTML = generatedGroups.map((group, index) => `
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h5 class="text-white font-semibold">${group.name}</h5>
+          <p class="text-xs text-gray-400">Period ${group.period} · ${group.course} · ${group.members.length} members</p>
+        </div>
+        <div class="text-right">
+          <div class="text-sm font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">
+            Score: ${group.team_score.toFixed(1)}
+          </div>
+          <div class="text-xs text-gray-500">
+            ${group.team_score >= 80 ? 'Excellent' : group.team_score >= 70 ? 'Good' : group.team_score >= 60 ? 'Fair' : 'Needs Work'}
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${group.members.map(m => `
+          <span class="px-2 py-1 bg-neutral-700 text-xs text-gray-300 rounded">
+            ${m.name} <span class="text-gray-500">@${m.uid}</span>
+          </span>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Show results section
+  document.getElementById('smartGroupResults').classList.remove('hidden');
+  
+  // Scroll to results
+  document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+window.saveSmartGroups = async function() {
+  if (!generatedGroups.length) {
+    alert('No groups to save');
+    return;
+  }
+
+  showLoading(`Creating ${generatedGroups.length} groups...`);
+
+  try {
+    // Use bulk create endpoint
+    const response = await fetch(`${javaURI}/api/groups/bulk`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        groups: generatedGroups.map(g => ({
+          name: g.name,
+          period: g.period,
+          course: g.course,
+          memberIds: g.memberIds
+        }))
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create groups');
+    }
+
+    const result = await response.json();
+    console.log('✅ Groups created:', result);
+
+    // Update local state
+    if (result.created && result.created.length > 0) {
+      allGroups.push(...result.created);
+    }
+
+    alert(`Successfully created ${result.created.length} groups!`);
+    closeSmartGroupModal();
+    renderGroups();
+
+  } catch (error) {
+    console.error('❌ Error saving groups:', error);
+    alert(`Failed to save groups: ${error.message}`);
+  } finally {
+    hideLoading();
   }
 }
 </script>
