@@ -1,4 +1,4 @@
-import Npc from "../GameEnginev1.5/gameObjects/Npc.js";
+import Npc from "../GameEnginev1.5/Npc.js";
 
 class FinancialAdvisor extends Npc {
     constructor(data = null, gameEnv = null) {

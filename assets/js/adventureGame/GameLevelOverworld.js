@@ -1,7 +1,7 @@
-import Background from '../GameEnginev1.5/essentials/Background.js';
-import Player from '../GameEnginev1.5/gameObjects/Player.js';
-import Npc from '../GameEnginev1.5/gameObjects/Npc.js';
-import GameControl from '../GameEnginev1.5/essentials/GameControl.js';
+import Background from '../GameEnginev1.5/Background.js';
+import Player from '../GameEnginev1.5/Player.js';
+import Npc from '../GameEnginev1.5/Npc.js';
+import GameControl from '../GameEnginev1.5/GameControl.js';
 import GameLevelDesert from './GameLevelDesert.js';
 import Creeper from './Creeper.js';
 

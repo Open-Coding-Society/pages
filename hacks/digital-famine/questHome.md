@@ -48,8 +48,8 @@ permalink: /digital-famine/
 
 <!-- Game Script -->
 <script type="module">
-import Core from "{{ site.baseurl }}/assets/js/GameEnginev1.5/essentials/Game.js";
-import GameControl from "{{ site.baseurl }}/assets/js/GameEnginev1.5/essentials/GameControl.js";
+import Core from "{{ site.baseurl }}/assets/js/GameEnginev1.5/Game.js";
+import GameControl from "{{ site.baseurl }}/assets/js/GameEnginev1.5/GameControl.js";
 import GameLevelHomePage from "{{ site.baseurl }}/assets/js/digitalFamine/GameLevelHomePage.js";
 import { pythonURI, javaURI, fetchOptions } from "{{ site.baseurl }}/assets/js/api/config.js";
 

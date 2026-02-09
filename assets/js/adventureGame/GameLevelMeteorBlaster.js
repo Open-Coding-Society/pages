@@ -1,7 +1,7 @@
-import GameEnvBackground from "../GameEnginev1.5/essentials/GameEnvBackground.js"
-import Player from "../GameEnginev1.5/gameObjects/Player.js"
+import GameEnvBackground from "../GameEnginev1.5/GameEnvBackground.js"
+import Player from "../GameEnginev1.5/Player.js"
 import Meteor from './Meteor.js';
-import Character from "../GameEnginev1.5/essentials/Character.js";
+import Character from "../GameEnginev1.5/Character.js";
 import Quiz from "./Quiz.js"
 
 class GameLevelMeteorBlaster {
