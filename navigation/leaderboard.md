@@ -310,6 +310,32 @@ permalink: /leaderboard
   .badge.xp { border-color: rgba(96, 165, 250, 0.3); color: #60a5fa; }
   .badge.certificate { border-color: rgba(168, 85, 247, 0.3); color: #a855f7; }
   .badge.master { border-color: rgba(34, 197, 94, 0.3); color: #22c55e; }
+  .badge.tutor { 
+    border-color: rgba(251, 191, 36, 0.5); 
+    color: #fbbf24; 
+    background: rgba(251, 191, 36, 0.1);
+    font-weight: 600;
+  }
+
+  /* Tutor Status Card Styles */
+  .stat-icon.tutor {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+    color: #6b7280;
+  }
+
+  .stat-card.tutor-unlocked {
+    border-color: rgba(251, 191, 36, 0.3);
+    background: linear-gradient(135deg, #0a0a0a 0%, rgba(251, 191, 36, 0.05) 100%);
+  }
+
+  .stat-card.tutor-unlocked .stat-icon.tutor {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+    color: #fbbf24;
+  }
+
+  .stat-card.tutor-unlocked .stat-value {
+    color: #fbbf24;
+  }
 
   /* Analytics Section */
   .analytics-section {
@@ -513,6 +539,14 @@ permalink: /leaderboard
       <div class="stat-label">Certificates</div>
       <div class="stat-value" id="user-certificates">0</div>
       <div class="stat-subtitle">earned</div>
+    </div>
+    <div class="stat-card" id="tutor-status-card">
+      <div class="stat-icon tutor">
+        <i class="fas fa-chalkboard-teacher"></i>
+      </div>
+      <div class="stat-label">Tutor Status</div>
+      <div class="stat-value" id="tutor-status">Locked</div>
+      <div class="stat-subtitle" id="tutor-subtitle">Earn an Excellence certificate</div>
     </div>
   </div>
 
@@ -721,6 +755,18 @@ permalink: /leaderboard
     return storedCerts.sort((a, b) => new Date(b.earnedDate) - new Date(a.earnedDate));
   }
 
+  // Check if user has tutor status (earned at least one Excellence certificate)
+  function hasTutorStatus() {
+    const certs = getEarnedCertificatesWithDetails();
+    return certs.some(cert => cert.certType === 'EXCELLENCE' || cert.type === 'EXCELLENCE');
+  }
+
+  // Get count of Excellence certificates
+  function getExcellenceCertCount() {
+    const certs = getEarnedCertificatesWithDetails();
+    return certs.filter(cert => cert.certType === 'EXCELLENCE' || cert.type === 'EXCELLENCE').length;
+  }
+
   // Refresh leaderboard display
   function refreshLeaderboardDisplay() {
     const leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
@@ -790,6 +836,12 @@ permalink: /leaderboard
   function generateBadges(user) {
     const badges = [];
     const certs = getEarnedCertificatesCount(user);
+    const excellenceCerts = getExcellenceCertCount();
+
+    // Tutor badge takes priority - shown first
+    if (excellenceCerts > 0) {
+      badges.push('<span class="badge tutor"><i class="fas fa-chalkboard-teacher"></i> Tutor</span>');
+    }
 
     if (user.currentStreak >= 7) {
       badges.push('<span class="badge streak"><i class="fas fa-fire"></i> ' + user.currentStreak + ' Day Streak</span>');
@@ -829,6 +881,28 @@ permalink: /leaderboard
     const rankChange = document.getElementById('rank-change');
     if (rank > 0 && leaderboard.length > 1) {
       rankChange.textContent = 'of ' + leaderboard.length + ' students';
+    }
+
+    // Update tutor status
+    updateTutorStatusDisplay();
+  }
+
+  // Update tutor status card
+  function updateTutorStatusDisplay() {
+    const isTutor = hasTutorStatus();
+    const excellenceCount = getExcellenceCertCount();
+    const tutorCard = document.getElementById('tutor-status-card');
+    const tutorStatus = document.getElementById('tutor-status');
+    const tutorSubtitle = document.getElementById('tutor-subtitle');
+
+    if (isTutor) {
+      tutorCard.classList.add('tutor-unlocked');
+      tutorStatus.textContent = 'Active';
+      tutorSubtitle.textContent = excellenceCount + ' Excellence cert' + (excellenceCount > 1 ? 's' : '');
+    } else {
+      tutorCard.classList.remove('tutor-unlocked');
+      tutorStatus.textContent = 'Locked';
+      tutorSubtitle.textContent = 'Earn an Excellence certificate';
     }
   }
 

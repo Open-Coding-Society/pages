@@ -281,7 +281,8 @@ layout: post
           <img id="certificate-logo" src="{{ '/assets/images/ocs-logo.png' | relative_url }}" alt="Open Coding Society Logo">
         </div>
         <div class="header-text">Open Coding Society</div>
-        <div class="certify-text">Certificate of Completion</div>
+        <div id="certificate-type-text" class="certify-text">Certificate of Completion</div>
+        <div id="certificate-score-display" style="margin-top: 5px; font-size: 1.1rem; color: #4b5563;"></div>
         <div class="certificate-subtitle">Presented to</div>
       </div>
 
@@ -898,8 +899,98 @@ layout: post
     }
   }
 
+  // Show certificate notification toast
+  function showCertificateNotification(type, title, message) {
+    // Remove existing notification if any
+    const existing = document.querySelector('.cert-notification');
+    if (existing) existing.remove();
+
+    const notification = document.createElement('div');
+    notification.className = `cert-notification cert-notification-${type}`;
+    
+    const icons = {
+      success: '🎉',
+      warning: '⚠️',
+      error: '❌',
+      info: 'ℹ️'
+    };
+    
+    notification.innerHTML = `
+      <div class="cert-notification-icon">${icons[type] || icons.info}</div>
+      <div class="cert-notification-content">
+        <div class="cert-notification-title">${title}</div>
+        <div class="cert-notification-message">${message}</div>
+      </div>
+      <button class="cert-notification-close">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+      notification.classList.add('cert-notification-visible');
+    });
+    
+    // Close button handler
+    notification.querySelector('.cert-notification-close').addEventListener('click', () => {
+      notification.classList.remove('cert-notification-visible');
+      setTimeout(() => notification.remove(), 300);
+    });
+    
+    // Auto-dismiss after 5 seconds for success/info
+    if (type === 'success' || type === 'info') {
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.classList.remove('cert-notification-visible');
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 5000);
+    }
+  }
+
+  // Function to request certificate from backend
+  async function requestCertificate(sprintKey, formative, summative) {
+    try {
+      const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
+      const { javaURI, fetchOptions } = configModule;
+      
+      // Fine-tune: Convert "Sprint1" to "Sprint 1" and extract ID
+      const sprintNumber = sprintKey.replace('Sprint', '');
+      const formattedSprintName = `Sprint ${sprintNumber}`;
+      const certId = parseInt(sprintNumber) || 1; // Sprint 1 -> ID 1, etc.
+
+      const payload = {
+        formativeAssignments: formative,
+        summativeAssignments: summative,
+        sprintName: formattedSprintName,
+        certificateId: certId 
+      };
+
+      console.log('Sending Certificate Request:', payload);
+
+      const response = await fetch(`${javaURI}/api/user-certificates/request`, {
+        ...fetchOptions,
+        method: 'POST',
+        headers: {
+          ...fetchOptions.headers,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error requesting certificate:', error);
+      return { status: 'ERROR', message: error.message };
+    }
+  }
+
   // Open certificate for sprint (directly show the certificate, no list needed)
-  function openCertificateListModal(sprintKey, startWeek, endWeek) {
+  async function openCertificateListModal(sprintKey, startWeek, endWeek) {
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
     if (!sprintCard) {
       console.error('Sprint card not found');
@@ -912,6 +1003,8 @@ layout: post
     // Check if sprint is complete
     let totalTasks = 0;
     let completedTasks = 0;
+    const formative = [];
+    const summative = [];
     const allGoals = [];
     
     for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
@@ -926,10 +1019,17 @@ layout: post
           if (card.classList.contains('completed')) {
             completedTasks++;
           }
-          // Collect unique task titles as goals
+          // Collect unique task titles
           const taskTitle = card.querySelector('.item-title')?.textContent.trim();
-          if (taskTitle && !allGoals.includes(taskTitle)) {
-            allGoals.push(taskTitle);
+          const itemType = card.dataset.type; // "lesson" (formative) or "assignment" (summative)
+          
+          if (taskTitle) {
+            if (itemType === 'lesson') {
+              if (!formative.includes(taskTitle)) formative.push(taskTitle);
+            } else {
+              if (!summative.includes(taskTitle)) summative.push(taskTitle);
+            }
+            if (!allGoals.includes(taskTitle)) allGoals.push(taskTitle);
           }
         });
       }
@@ -941,17 +1041,68 @@ layout: post
       alert('Please complete all tasks in this sprint to unlock the certificate.');
       return;
     }
+
+    // Show loading state with spinner
+    const viewBtn = document.getElementById('view-certificate-btn');
+    const originalText = viewBtn ? viewBtn.textContent : 'View Your Certificate';
+    if (viewBtn) {
+      viewBtn.disabled = true;
+      viewBtn.innerHTML = '<span class="cert-spinner"></span> Verifying...';
+      viewBtn.classList.add('cert-btn-loading');
+    }
+
+    // Request from backend
+    const result = await requestCertificate(sprintKey, formative, summative);
+    
+    if (viewBtn) {
+      viewBtn.disabled = false;
+      viewBtn.innerHTML = originalText;
+      viewBtn.classList.remove('cert-btn-loading');
+    }
+
+    // Handle different responses with improved notifications
+    switch (result.status) {
+      case 'INCOMPLETE':
+        showCertificateNotification('warning', 'Missing Grades', `You are missing grades for: ${result.missingAssignments.join(', ')}`);
+        return;
+      case 'NOT_QUALIFIED':
+        showCertificateNotification('error', 'Score Below Minimum', `Your average score (${result.averageScore}%) is below the required ${result.requiredMinimum}%. Keep working to improve!`);
+        return;
+      case 'ALREADY_EARNED':
+        console.log(`User already has ${result.existingType} certificate.`);
+        // Proceed to show existing one
+        break;
+      case 'UPGRADED':
+        showCertificateNotification('success', 'Certificate Upgraded!', `Congratulations! You improved to ${result.averageScore}% and earned an EXCELLENCE certificate!`);
+        break;
+      case 'AWARDED':
+        const awardType = result.certificateType === 'EXCELLENCE' ? 'Excellence' : 'Completion';
+        showCertificateNotification('success', `${awardType} Certificate Earned!`, `Your average score: ${result.averageScore}%`);
+        break;
+      case 'ERROR':
+        showCertificateNotification('error', 'Connection Error', result.message || 'Unable to verify certificate. Please try again.');
+        return;
+      default:
+        console.log('Unexpected status:', result.status);
+    }
+
+    // Determine certificate type for display (Use existingType if ALREADY_EARNED)
+    const backendCertType = result.status === 'ALREADY_EARNED' ? result.existingType : result.certificateType;
+    const certTypeLabel = backendCertType === 'EXCELLENCE' ? 'Excellence' : 'Completion';
+    const displayTheme = `${sprintTitle} (${certTypeLabel})`;
     
     // Create sprint-level certificate profile
     const certificateProfile = {
       sprintKey: sprintKey,
-      theme: sprintTitle,
-      displayName: sprintTitle,
+      theme: displayTheme,
+      displayName: displayTheme,
       courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
-      goal: sprintTitle,
-      goals: allGoals.slice(0, 6), // Limit to first 6 goals for display
+      goal: `${certTypeLabel} in ${sprintTitle}`,
+      goals: allGoals.slice(0, 6), 
       weekRange: `Weeks ${startWeek}-${endWeek}`,
-      description: sprintDescription
+      description: sprintDescription,
+      averageScore: result.averageScore || result.score, // Handle both payload versions
+      certType: backendCertType
     };
     
     // Open certificate modal directly
@@ -1047,6 +1198,28 @@ layout: post
     activeCertificateProfile = profile;
     document.getElementById('certificate-week-theme').textContent = profile.theme;
     document.getElementById('certificate-course-name').textContent = profile.courseName;
+
+    // Set type and score if available
+    const typeText = document.getElementById('certificate-type-text');
+    const scoreDisplay = document.getElementById('certificate-score-display');
+    const content = document.getElementById('certificate-content');
+
+    if (typeText) {
+      typeText.textContent = profile.certType === 'EXCELLENCE' ? 'Certificate of Excellence' : 'Certificate of Completion';
+    }
+
+    if (scoreDisplay) {
+      scoreDisplay.textContent = profile.averageScore ? `Average Score: ${profile.averageScore}%` : '';
+    }
+
+    // Apply special styling for Excellence
+    if (content) {
+      if (profile.certType === 'EXCELLENCE') {
+        content.classList.add('excellence-theme');
+      } else {
+        content.classList.remove('excellence-theme');
+      }
+    }
 
     // Set date
     const now = new Date();

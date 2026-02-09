@@ -156,3 +156,185 @@ td > img[src*="logo.png"] {
 td:has(> img[src*="logo.png"]) {
   display: none !important;
 }
+
+// ===========================
+// FullCalendar Theme Overrides
+// ===========================
+
+// Override FullCalendar backgrounds with theme colors
+.fc {
+  background-color: var(--bg-0);
+}
+
+.fc .fc-view-harness {
+  background-color: var(--bg-0);
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  background-color: var(--bg-0);
+  border-color: var(--accent);
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border-color: var(--accent);
+}
+
+// Alternating row backgrounds
+.fc-daygrid-day {
+  background-color: var(--bg-0);
+
+  &:nth-child(even) {
+    background-color: var(--bg-1);
+  }
+}
+
+// Header styling
+.fc .fc-col-header-cell {
+  background-color: var(--bg-2);
+  color: var(--text);
+  border-bottom: none;
+}
+
+// Day cells
+.fc .fc-daygrid-day-number {
+  color: var(--text);
+}
+
+// Remove top border from day grid body to prevent double line
+.fc .fc-daygrid-body {
+  border-top: none;
+}
+
+// Today highlighting
+.fc .fc-day-today {
+  background-color: color-mix(in srgb, var(--accent) 20%, var(--bg-0) 80%) !important;
+}
+
+// ===========================
+// Break Day Styles
+// ===========================
+
+.fc-event-break {
+  background-color: #2a2a2a !important;
+  border-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.fc-daygrid-day.break-day {
+  background-color: #2a2a2a !important;
+}
+
+// ===========================
+// Priority-based Event Colors
+// ===========================
+
+// Priority color variables
+$priority-p0: #dc2626; // Red 600
+$priority-p0-border: #b91c1c;
+$priority-p1: #ea580c; // Orange 600
+$priority-p1-border: #c2410c;
+$priority-p2: #ca8a04; // Yellow 600
+$priority-p2-border: #a16207;
+$priority-p3: #16a34a; // Green 600
+$priority-p3-border: #15803d;
+
+.fc-event.priority-p0 {
+  background-color: $priority-p0 !important;
+  border-color: $priority-p0-border !important;
+  color: white !important;
+}
+
+.fc-event.priority-p1 {
+  background-color: $priority-p1 !important;
+  border-color: $priority-p1-border !important;
+  color: white !important;
+}
+
+.fc-event.priority-p2 {
+  background-color: $priority-p2 !important;
+  border-color: $priority-p2-border !important;
+  color: white !important;
+}
+
+.fc-event.priority-p3 {
+  background-color: $priority-p3 !important;
+  border-color: $priority-p3-border !important;
+  color: white !important;
+}
+
+// Priority badge in event title
+.event-priority-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-right: 4px;
+  vertical-align: middle;
+
+  &.p0 {
+    background: $priority-p0;
+    color: white;
+  }
+  &.p1 {
+    background: $priority-p1;
+    color: white;
+  }
+  &.p2 {
+    background: $priority-p2;
+    color: white;
+  }
+  &.p3 {
+    background: $priority-p3;
+    color: white;
+  }
+}
+
+// ===========================
+// Period Filter Dropdown
+// ===========================
+
+#periodFilterDropdown {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--accent, #666);
+  background-color: var(--bg-1, #fff);
+  color: var(--text, #333);
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 8px;
+
+  &:hover {
+    background-color: var(--bg-2, #f0f0f0);
+  }
+}
+
+// ===========================
+// Appointment Custom Display
+// ===========================
+
+.fc-event-appointment {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 4px;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.fc-event-individual {
+  font-weight: bold;
+  font-size: 0.85em;
+  opacity: 0.9;
+}
+
+.fc-event-title-custom {
+  font-size: 0.9em;
+}
+
+.fc-event-group {
+  font-size: 0.8em;
+  font-style: italic;
+  opacity: 0.85;
+}

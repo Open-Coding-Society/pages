@@ -1,0 +1,127 @@
+---
+layout: aesthetihawk
+title: Group Dashboard
+type: issues
+permalink: /student/groups/dashboard
+comments: false
+---
+
+<!-- 
+  This page serves as a dynamic dashboard for individual groups.
+  The group name is passed via URL query parameter: /student/groups/dashboard?group=group-name
+-->
+
+{% include group_dashboard.html %}
+
+<script type="module">
+  import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+  // Extract group name from URL query parameter
+  function getGroupNameFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const groupName = params.get('group');
+    if (groupName) {
+      return decodeURIComponent(groupName).replace(/-/g, ' ');
+    }
+    return null;
+  }
+
+  // Load group data based on name
+  async function loadGroupDashboard() {
+    const groupName = getGroupNameFromURL();
+    
+    if (!groupName) {
+      // Redirect to groups list if no group specified
+      window.location.href = '{{site.baseurl}}/student/groups';
+      return;
+    }
+
+    // Update page title
+    document.getElementById('dashboardGroupName').textContent = groupName;
+    document.title = `${groupName} - Dashboard`;
+
+    try {
+      // Try to fetch group data from API
+      const response = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(groupName)}`, fetchOptions);
+      
+      if (response.ok) {
+        const groups = await response.json();
+        const group = groups.find(g => g.name.toLowerCase() === groupName.toLowerCase());
+        
+        if (group) {
+          populateDashboard(group);
+        } else {
+          // Group not found - show placeholder data
+          console.log('Group not found, showing placeholder data');
+          document.getElementById('dashboardGroupMeta').textContent = 'Group data not available';
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load group data:', error);
+      // Show placeholder data on error
+      document.getElementById('dashboardGroupMeta').textContent = 'Unable to load group data';
+    }
+  }
+
+  // Populate dashboard with group data
+  function populateDashboard(group) {
+    const memberCount = (group.members || []).length;
+    
+    // Update header
+    document.getElementById('dashboardGroupName').textContent = group.name;
+    document.getElementById('dashboardGroupMeta').textContent = 
+      `Period ${group.period || 'N/A'} · ${group.course || 'N/A'} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+
+    // Update stats
+    document.getElementById('statTotalMembers').textContent = memberCount;
+
+    // Update member analytics table if we have real members
+    if (group.members && group.members.length > 0) {
+      const tbody = document.getElementById('memberAnalyticsBody');
+      tbody.innerHTML = group.members.map(member => {
+        const initials = getInitials(member.name || member.uid);
+        const color = getRandomColor(member.id);
+        return `
+          <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
+            <td class="py-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
+                <span>${member.name || member.uid}</span>
+              </div>
+            </td>
+            <td class="py-3">--</td>
+            <td class="py-3">--</td>
+            <td class="py-3">--</td>
+            <td class="py-3"><span class="px-2 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Unknown</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Store group data for chat functionality
+    window.currentGroupData = group;
+  }
+
+  // Helper to get initials from name
+  function getInitials(name) {
+    if (!name) return '??';
+    return name.split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
+  // Helper to get a consistent color based on ID
+  function getRandomColor(id) {
+    const colors = [
+      'bg-indigo-600', 'bg-purple-600', 'bg-orange-600', 
+      'bg-teal-600', 'bg-pink-600', 'bg-blue-600', 
+      'bg-green-600', 'bg-red-600', 'bg-yellow-600'
+    ];
+    return colors[id % colors.length];
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', loadGroupDashboard);
+</script>
