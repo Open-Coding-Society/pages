@@ -25,13 +25,17 @@ class GameLevel1 {
         SCALE_FACTOR: 4,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 250, y: 300 },
+        INIT_POSITION: { x: 250, y: 350 },
         pixels: {height: 150, width: 100},
         orientation: {rows: 1, columns: 1},
         down: {row: 0, start: 0, columns: 1},
+        downRight: {row: 0, start: 0, columns: 1},
+        downLeft: {row: 0, start: 0, columns: 1},
         left: {row: 0, start: 0, columns: 1},
         right: {row: 0, start: 0, columns: 1},
         up: {row: 0, start: 0, columns: 1},
+        upLeft: {row: 0, start: 0, columns: 1},
+        upRight: {row: 0, start: 0, columns: 1},
         hitbox: {widthPercentage: 0.5, heightPercentage: 0.5},
         keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
     };
@@ -43,13 +47,17 @@ class GameLevel1 {
         SCALE_FACTOR: 2,
         STEP_FACTOR: 1000, // Same speed as Archie
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 200, y: 300 }, // Positioned slightly under Archie
+        INIT_POSITION: { x: 250, y: 400 }, // Positioned slightly under Archie
         pixels: { height: 200, width: 400 }, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
+        downRight: {row: 0, start: 0, columns: 1},
+        downLeft: {row: 0, start: 0, columns: 1},
         left: { row: 0, start: 0, columns: 1 },
         right: { row: 0, start: 0, columns: 1 },
         up: { row: 0, start: 0, columns: 1 },
+        upLeft: {row: 0, start: 0, columns: 1},
+        upRight: {row: 0, start: 0, columns: 1},
         hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 },
         keypress: { left: 65, right: 68, up: 87, down: 83 } // Same keys as Archie
    };
