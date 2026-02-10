@@ -1416,12 +1416,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* code generation (baseline and steps) */
         function generateBaselineCode() {
-                return `import GameEnvBackground from '{{ site.baseurl }}/assets/js/GameEnginev1.5/GameEnvBackground.js';
-            import Player from '{{ site.baseurl }}/assets/js/GameEnginev1.5/Player.js';
-            import Npc from '{{ site.baseurl }}/assets/js/GameEnginev1.5/Npc.js';
+            return `import GameEnvBackground from '{{ site.baseurl }}/assets/js/GameEnginev1.5/GameEnvBackground.js';
+    import Player from '{{ site.baseurl }}/assets/js/GameEnginev1.5/Player.js';
+    import Npc from '{{ site.baseurl }}/assets/js/GameEnginev1.5/Npc.js';
     import Barrier from '{{ site.baseurl }}/assets/js/adventureGame/Barrier.js';
 
-class CustomLevel {
+class GameLevelCustom {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -1438,7 +1438,7 @@ class CustomLevel {
     }
 }
 
-export const gameLevelClasses = [CustomLevel];`;
+export const gameLevelClasses = [GameLevelCustom];`;
         }
 
         function generateStepCode(currentStep) {
@@ -1456,7 +1456,7 @@ export const gameLevelClasses = [CustomLevel];`;
         import Npc from '{{ site.baseurl }}/assets/js/GameEnginev1.5/Npc.js';
         import Barrier from '{{ site.baseurl }}/assets/js/adventureGame/Barrier.js';
 
-class CustomLevel {
+class GameLevelCustom {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -1539,7 +1539,7 @@ class CustomLevel {
     }
 }
 
-export const gameLevelClasses = [CustomLevel];`;
+export const gameLevelClasses = [GameLevelCustom];`;
                 }
 
                 if (currentStep === 'background') {
@@ -2595,15 +2595,15 @@ export const gameLevelClasses = [CustomLevel];`;
         code = code.replace(/\/\* BUILDER_HOOKS_START \*\/[\s\S]*?\/\* BUILDER_HOOKS_END \*\//g, '');
         code = code.replace(/import\s+GameControl\s+from\s+[^\n]+\n/g, '');
         code = code.replace(/export\s*\{\s*GameControl\s*\};?/g, '');
-        code = code.replace(/export\s+const\s+gameLevelClasses\s*=\s*\[\s*CustomLevel\s*\];?/g, 'export default CustomLevel;');
-        const header = `// Adventure Game Custom Level\n// Exported from GameBuilder on ${(new Date()).toISOString()}\n// Drop this file into your Adventure Game project (e.g., assets/js/adventureGame/levels).\n`;
+        code = code.replace(/export\s+const\s+gameLevelClasses\s*=\s*\[\s*GameLevelCustom\s*\];?/g, 'export default GameLevelCustom;');
+        const header = `// Adventure Game Custom Level\n// Exported from GameBuilder on ${(new Date()).toISOString()}\n// How to use this file:\n// 1) Save as assets/js/adventureGame/GameLevelCustom.js in your repo.\n// 2) Reference it in your runner or level selector. Examples:\n//    import GameLevelCustom from '/assets/js/adventureGame/GameLevelCustom.js';\n//    export const gameLevelClasses = [GameLevelBasic, GameLevelCustom];\n//    // or pass it directly to your GameControl as the only level.\n// 3) Ensure images exist and paths resolve via 'path' provided by the engine.\n// 4) You can add more objects to this.classes inside the constructor.\n`;
         code = header + code;
         const blob = new Blob([code], { type: 'text/javascript;charset=utf-8' });
         const a = document.createElement('a');
         const url = URL.createObjectURL(blob);
         a.href = url;
-        const suggestedName = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'CustomLevel')
-            .replace(/[^a-zA-Z0-9_-]+/g, '_') || 'CustomLevel';
+        const suggestedName = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'GameLevelCustom')
+            .replace(/[^a-zA-Z0-9_-]+/g, '_') || 'GameLevelCustom';
         a.download = `${suggestedName}.js`;
         document.body.appendChild(a);
         a.click();
