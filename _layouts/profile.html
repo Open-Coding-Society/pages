@@ -109,60 +109,94 @@ active_tab: profile
                 Add Class
             </button>
         </div>
-    
+
         <div id="classesContainer">
             <!-- Classes will be loaded here dynamically -->
             <p class="text-gray-400 text-center py-4">Loading classes...</p>
         </div>
     </div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Group Information</h2>
 
-    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
-            Loading group information...
-        </div>
-    </div>
-</div>
-
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <div class="flex items-start justify-between gap-4 mb-4">
-        <div>
-            <h2 class="text-xl font-semibold">Join a Group</h2>
-        </div>
-        <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4">
-        <div>
-            <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
-                Groups</label>
-            <div class="flex gap-2">
-                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    autocomplete="off">
-                <button id="groupSearchBtn" type="button"
-                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
-                    Search
-                </button>
+        <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-1 md:col-span-2 text-center text-gray-400">
+                Loading group information...
             </div>
         </div>
-        <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+    </div>
+
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">Join a Group</h2>
+            </div>
+            <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            <div>
+                <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
+                    Groups</label>
+                <div class="flex gap-2">
+                    <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                        class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        autocomplete="off">
+                    <button id="groupSearchBtn" type="button"
+                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div id="groupResultsList"
+                class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+            </div>
         </div>
     </div>
-</div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
-    
-    <div id="personaSelectionContainer">
-        <p class="text-gray-400 text-center py-4">Loading personas...</p>
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
+
+        <div id="personaSelectionContainer">
+            <p class="text-gray-400 text-center py-4">Loading personas...</p>
+        </div>
     </div>
-</div>
 
 
 </form>
+
+<!-- Webcam Modal -->
+<div id="webcamModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 hidden">
+    <div class="bg-neutral-800 p-6 rounded-lg shadow-xl max-w-lg w-full border border-neutral-700">
+        <h2 class="text-xl font-bold text-white mb-4">Set Your Profile Picture</h2>
+        <p class="text-gray-300 mb-4">You haven't set a profile picture yet. Please take a photo to continue.</p>
+
+        <div class="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4 border border-neutral-600">
+            <video id="webcamVideo" class="w-full h-full object-cover" autoplay playsinline></video>
+            <canvas id="webcamCanvas" class="w-full h-full object-cover absolute top-0 left-0 hidden"></canvas>
+        </div>
+
+        <div class="flex justify-between gap-4">
+            <button id="retakeBtn"
+                class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 hidden transition-colors">
+                Retake
+            </button>
+            <button id="captureBtn"
+                class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex-1 transition-colors">
+                Take Picture
+            </button>
+            <button id="savePfpBtn"
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 hidden flex-1 transition-colors">
+                Save Picture
+            </button>
+            <button id="closeModalBtn"
+                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -185,7 +219,7 @@ active_tab: profile
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
-        
+
         // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
@@ -213,7 +247,7 @@ active_tab: profile
             })
             .then(personData => {
                 if (!personData) return null; // Chain was stopped
-                
+
                 // Cache user identity for reuse in join/leave operations
                 currentPersonId = personData.id;
                 currentUid = personData.uid;
@@ -227,10 +261,10 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
-           
+
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
-                
+
                 // Handle group fetch response
                 if (groupResp.ok) {
                     return groupResp.json();
@@ -252,7 +286,7 @@ active_tab: profile
             })
             .then(userGroups => {
                 if (!userGroups) return; // Chain was stopped
-                
+
                 const groups = Array.isArray(userGroups) ? userGroups : [];
 
                 // Build a Set of user's group IDs for O(1) lookup during search
@@ -305,7 +339,7 @@ active_tab: profile
             // Search function using server-side API
             const searchGroups = async (query) => {
                 const normalized = query.trim();
-                
+
                 if (!normalized) {
                     groupResultsList.classList.add('hidden');
                     return;
@@ -314,7 +348,7 @@ active_tab: profile
                 try {
                     const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
                     if (!searchResp.ok) throw new Error('Search failed');
-                    
+
                     const filtered = await searchResp.json();
 
                     if (filtered.length === 0) {
@@ -327,7 +361,7 @@ active_tab: profile
                         const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
                         const isAlreadyMember = userGroupIds.has(group.id);
                         const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                        const membersText = group.members?.length > 0 
+                        const membersText = group.members?.length > 0
                             ? group.members.map(m => m.name).join(', ')
                             : 'No members';
                         return `
@@ -376,20 +410,20 @@ active_tab: profile
                     ...fetchOptions,
                     method: 'POST',
                 })
-                .then(joinResp => {
-                    if (!joinResp.ok) {
-                        return joinResp.text().then(body => {
-                            throw new Error(body || 'Failed to join group');
-                        });
-                    }
-                    joinGroupStatus.textContent = 'Refreshing...';
-                    window.location.reload();
-                })
-                .catch(joinError => {
-                    console.error('Join group error:', joinError);
-                    joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
-                    groupSearchInput.disabled = false;
-                });
+                    .then(joinResp => {
+                        if (!joinResp.ok) {
+                            return joinResp.text().then(body => {
+                                throw new Error(body || 'Failed to join group');
+                            });
+                        }
+                        joinGroupStatus.textContent = 'Refreshing...';
+                        window.location.reload();
+                    })
+                    .catch(joinError => {
+                        console.error('Join group error:', joinError);
+                        joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
+                        groupSearchInput.disabled = false;
+                    });
             };
         }
     });
@@ -433,26 +467,26 @@ active_tab: profile
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         try {
             // Fetch all available personas
-            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions); 
+            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions);
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
-            
+
             // Get user's personas from the RIGHT endpoint
-            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
-            
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions);
+
             if (!userPersonasResp.ok) {
                 console.log('No personas found for user or not authenticated');
                 showPersonaSelectionCards(personas, {});
                 return;
             }
-            
+
             const userPersonasData = await userPersonasResp.json();
             const selectedPersonas = userPersonasData.personas || {};
             const totalSelected = userPersonasData.total_selected || 0;
-            
+
             // If user has selected all 4 categories, show the completed view
             if (totalSelected === 4) {
                 showCompletedPersonas(selectedPersonas, personas);
@@ -460,7 +494,7 @@ active_tab: profile
                 // Show selection interface with partial selections
                 showPersonaSelectionCards(personas, selectedPersonas);
             }
-            
+
         } catch (error) {
             console.error('Error loading personas:', error);
             container.innerHTML = `
@@ -471,14 +505,14 @@ active_tab: profile
 
     function showPersonaSelectionCards(allPersonas, selectedPersonas) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         if (allPersonas.length === 0) {
             container.innerHTML = `
                 <p class="text-gray-400 text-center py-4">No personas available.</p>
             `;
             return;
         }
-        
+
         // Group personas by category
         const grouped = allPersonas.reduce((acc, persona) => {
             const category = persona.category || 'other';
@@ -486,27 +520,27 @@ active_tab: profile
             acc[category].push(persona);
             return acc;
         }, {});
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryDescriptions = {
             'student': 'How you approach learning and teamwork',
             'social': 'Your hobbies and social interests',
             'achievement': 'What drives and motivates you',
             'fantasy': 'Your aspirational superpower'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
         const totalSelected = Object.keys(selectedPersonas).length;
-        
+
         window.allPersonasData = allPersonas;
         window.selectedPersonasData = selectedPersonas;
-        
+
         container.innerHTML = `
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
@@ -521,10 +555,10 @@ active_tab: profile
             </div>
             
             ${categoryOrder.map(category => {
-                const personas = grouped[category] || [];
-                const selectedInCategory = selectedPersonas[category];
-                
-                return `
+            const personas = grouped[category] || [];
+            const selectedInCategory = selectedPersonas[category];
+
+            return `
                     <div class="mb-8">
                         <div class="flex items-center justify-between mb-4">
                             <div>
@@ -545,16 +579,16 @@ active_tab: profile
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             ${personas.map(persona => {
-                                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                                const description = persona.bio_map?.description || 'No description';
-                                const isSelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
-                                
-                                return `
+                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                const description = persona.bio_map?.description || 'No description';
+                const isSelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+
+                return `
                                     <div 
-                                        class="flex flex-col p-4 ${isSelected 
-                                            ? 'bg-indigo-900/30 border-2 border-indigo-500' 
-                                            : 'bg-neutral-800 hover:bg-neutral-700 border border-gray-700 hover:border-indigo-500'
-                                        } rounded-lg ${!isSelected ? 'cursor-pointer' : ''} transition-all group h-full"
+                                        class="flex flex-col p-4 ${isSelected
+                        ? 'bg-indigo-900/30 border-2 border-indigo-500'
+                        : 'bg-neutral-800 hover:bg-neutral-700 border border-gray-700 hover:border-indigo-500'
+                    } rounded-lg ${!isSelected ? 'cursor-pointer' : ''} transition-all group h-full"
                                         ${!isSelected ? `onclick="selectPersona(${persona.id}, '${category}')"` : ''}>
                                         
                                         ${isSelected ? `
@@ -580,11 +614,11 @@ active_tab: profile
                                         ` : ''}
                                     </div>
                                 `;
-                            }).join('')}
+            }).join('')}
                         </div>
                     </div>
                 `;
-            }).join('')}
+        }).join('')}
             
             ${totalSelected === 4 ? `
                 <div class="text-center mt-8">
@@ -603,26 +637,26 @@ active_tab: profile
 
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryEmojis = {
             'student': '📚',
             'social': '🎉',
             'achievement': '🏆',
             'fantasy': '✨'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
-        
+
         window.allPersonasData = allPersonas;
         window.selectedPersonasData = selectedPersonas;
-        
+
         container.innerHTML = `
             <div class="max-w-6xl mx-auto">
                 <!-- Header -->
@@ -644,17 +678,17 @@ active_tab: profile
                 <!-- 2x2 Grid of Selected Personas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     ${categoryOrder.map(category => {
-                        const personaData = selectedPersonas[category];
-                        if (!personaData) return '';
-                        
-                        const persona = allPersonas.find(p => p.id === personaData.persona_id);
-                        if (!persona) return '';
-                        
-                        const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                        const description = persona.bio_map?.description || 'No description';
-                        const empathyMap = persona.empathy_map || {};
-                        
-                        return `
+            const personaData = selectedPersonas[category];
+            if (!personaData) return '';
+
+            const persona = allPersonas.find(p => p.id === personaData.persona_id);
+            if (!persona) return '';
+
+            const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+            const description = persona.bio_map?.description || 'No description';
+            const empathyMap = persona.empathy_map || {};
+
+            return `
                             <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
                                 <div class="flex items-start gap-4 mb-4">
                                     <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
@@ -688,7 +722,7 @@ active_tab: profile
                                 ` : ''}
                             </div>
                         `;
-                    }).join('')}
+        }).join('')}
                 </div>
             </div>
         `;
@@ -696,11 +730,11 @@ active_tab: profile
 
     async function selectPersona(personaId, category) {
         console.log('Selecting persona:', personaId, 'for category:', category);
-        
+
         try {
             const container = document.getElementById('personaSelectionContainer');
             const tempHTML = container.innerHTML;
-            
+
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-16">
                     <svg class="animate-spin h-12 w-12 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -710,26 +744,26 @@ active_tab: profile
                     <p class="text-gray-300 font-medium">Saving your selection...</p>
                 </div>
             `;
-            
+
             const response = await fetch(`${pythonURI}/api/user/persona`, {
                 ...fetchOptions,
                 method: 'POST',
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     persona_id: personaId
                 })
             });
-            
+
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.message || 'Failed to select persona');
             }
-            
+
             // Reload to show updated selections
             loadPersonas();
-            
+
         } catch (error) {
             console.error('Error selecting persona:', error);
-            
+
             const container = document.getElementById('personaSelectionContainer');
             container.innerHTML = `
                 <div class="text-center py-12">
@@ -917,10 +951,10 @@ active_tab: profile
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
         console.log('DOMContentLoaded fired'); // ADD THIS
-        
+
         // Store original values
         saveOriginalValues();
-        
+
         // Load user classes
         loadUserClasses();
 
@@ -932,7 +966,7 @@ active_tab: profile
         const addClassBtn = document.getElementById('addClassBtn');
         console.log('Add Class Button:', addClassBtn); // ADD THIS
         if (addClassBtn) {
-            addClassBtn.addEventListener('click', function() {
+            addClassBtn.addEventListener('click', function () {
                 console.log('Add Class button clicked!'); // ADD THIS
                 addClass();
             });
@@ -954,7 +988,7 @@ active_tab: profile
             }
         });
     });
-    
+
     // Save original form values
     function saveOriginalValues() {
         const form = document.getElementById('profileSettingsForm');
@@ -1021,10 +1055,10 @@ active_tab: profile
             saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
         }
     }
-    
+
     async function loadUserClasses() {
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
             if (!response.ok) {
                 console.error('Failed to load classes');
                 return;
@@ -1041,7 +1075,7 @@ active_tab: profile
     // Render classes in the UI
     function renderClasses(classes) {
         const container = document.getElementById('classesContainer');
-        
+
         if (!container) return;
 
         if (!classes || classes.length === 0) {
@@ -1113,9 +1147,9 @@ active_tab: profile
             const response = await fetch(`${pythonURI}/api/user/class`, {
                 ...fetchOptions,
                 method: 'POST',
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     action: 'remove',
-                    class: classToRemove 
+                    class: classToRemove
                 })
             });
 
@@ -1167,14 +1201,14 @@ active_tab: profile
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
             }
 
             const data = await response.json();
             console.log('Grade Prediction Data:', data);
-            
+
             // Process and display the grade prediction data
             if (data && data.prediction) {
                 displayGradePrediction(data);
@@ -1193,7 +1227,7 @@ active_tab: profile
     // Display grade prediction results
     function displayGradePrediction(data) {
         console.log('Displaying grade prediction:', data);
-        
+
         // You can add UI elements here to display the prediction
         // For now, just log to console
         if (data.prediction) {
@@ -1420,7 +1454,7 @@ active_tab: profile
     window.displayGradePrediction = displayGradePrediction;
 
     // Leave group function
-    window.leaveGroup = async function(groupId, personId) {
+    window.leaveGroup = async function (groupId, personId) {
         if (!confirm('Are you sure you want to leave this group?')) {
             return;
         }
@@ -1442,4 +1476,130 @@ active_tab: profile
             alert(`Error leaving group: ${error.message}`);
         }
     };
+</script>
+
+<script type="module">
+    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    const webcamModal = document.getElementById('webcamModal');
+    const video = document.getElementById('webcamVideo');
+    const canvas = document.getElementById('webcamCanvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const saveBtn = document.getElementById('savePfpBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    let stream = null;
+
+    // Check if user has pfp
+    async function checkPfp() {
+        try {
+            const response = await fetch(`${pythonURI}/api/id/pfp`, fetchOptions);
+            if (response.status === 404) {
+                showModal();
+            }
+        } catch (error) {
+            console.error("Error checking PFP:", error);
+        }
+    }
+
+    function showModal() {
+        webcamModal.classList.remove('hidden');
+        startWebcam();
+    }
+
+    function hideModal() {
+        webcamModal.classList.add('hidden');
+        stopWebcam();
+    }
+
+    async function startWebcam() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        } catch (err) {
+            console.error("Error accessing webcam:", err);
+            alert("Could not access webcam. Please allow camera permissions.");
+        }
+    }
+
+    function stopWebcam() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+    }
+
+    if (captureBtn) {
+        captureBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // prevent form submission if any
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            video.classList.add('hidden');
+            canvas.classList.remove('hidden');
+
+            captureBtn.classList.add('hidden');
+            retakeBtn.classList.remove('hidden');
+            saveBtn.classList.remove('hidden');
+        });
+    }
+
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            video.classList.remove('hidden');
+            canvas.classList.add('hidden');
+
+            captureBtn.classList.remove('hidden');
+            retakeBtn.classList.add('hidden');
+            saveBtn.classList.add('hidden');
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const dataUrl = canvas.toDataURL('image/png');
+            const base64Data = dataUrl.split(',')[1];
+
+            // Show loading state
+            saveBtn.innerText = "Saving...";
+            saveBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${pythonURI}/api/id/pfp`, {
+                    ...fetchOptions,
+                    method: 'PUT',
+                    body: JSON.stringify({ pfp: base64Data })
+                });
+
+                if (response.ok) {
+                    alert("Profile picture saved!");
+                    hideModal();
+                    window.location.reload(); // Reload to show new PFP
+                } else {
+                    const error = await response.json();
+                    alert("Failed to save: " + (error.message || response.statusText));
+                    saveBtn.innerText = "Save Picture";
+                    saveBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error("Error saving PFP:", error);
+                alert("Error saving profile picture.");
+                saveBtn.innerText = "Save Picture";
+                saveBtn.disabled = false;
+            }
+        });
+    }
+
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal();
+        });
+    }
+
+    // Run check on load
+    document.addEventListener('DOMContentLoaded', checkPfp);
 </script>
