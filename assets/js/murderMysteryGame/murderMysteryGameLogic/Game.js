@@ -96,9 +96,9 @@ class GameCore {
             return;
         }
         
-        this.escapeKeyHandler = (e) => {
-            if (e.key === 'Escape') {
-                e.preventDefault();
+        this.escapeKeyHandler = (f) => {
+            if (f.key === 'Escape') {
+                f.preventDefault();
                 if (this.gameControl && this.gameControl.isPaused) {
                     this.gameControl.resume();
                 } else if (this.gameControl) {

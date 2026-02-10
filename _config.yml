@@ -18,9 +18,9 @@
 title: Open Coding 
 description: "Class of 2026"
 owner_name: Open Coding Society 
-github_username: open-coding-society 
-github_repo: "pages" 
-baseurl: "" 
+github_username: rsharma5128
+github_repo: "teamfork" 
+baseurl: "/teamfork" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
