@@ -11,9 +11,9 @@ permalink: /gamify/water
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "{{site.baseurl}}/assets/js/adventureGame/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1.5/GameControl.js";
-    import GameLevelWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWater.js";
+    import Core from "/assets/js/GameEnginev1/essentials/Game.js";
+    import GameControl from "/assets/js/GameEnginev1/essentials/GameControl.js";
+    import GameLevelWater from "/assets/js/GameEnginev1/GameLevelWater.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     const gameLevelClasses = [GameLevelWater];
