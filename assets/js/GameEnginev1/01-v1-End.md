@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: Adventure Game
-permalink: /gamify/basic
+title: End Game
+permalink: /gamify/end
 ---
 
 <div id="gameContainer">
@@ -10,24 +10,25 @@ permalink: /gamify/basic
 </div>
 
 <script type="module">
-    // Adventure Game assets locations (use AdventureGame wrapper + GameControl)
-    import Core from "{{site.baseurl}}/assets/js/adventureGame/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1.5/GameControl.js";
-    import GameLevelBasic from "{{site.baseurl}}/assets/js/adventureGame/GameLevelBasic.js";
-    import GameLevelBasicWater from "{{site.baseurl}}/assets/js/adventureGame/GameLevelBasicWater.js";
+    // Adnventure Game assets locations
+    import Core from "/assets/js/GameEnginev1/essentials/Game.js";
+    import GameControl from "/assets/js/GameEnginev1/essentials/GameControl.js";
+    import GameLevelEnd from "/assets/js/GameEnginev1/GameLevelEnd.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    const gameLevelClasses = [GameLevelEnd];
 
     // Web Server Environment data
     const environment = {
-        path:"{{site.baseurl}}",
+        path: "{{site.baseurl}}",
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [GameLevelBasic, GameLevelBasicWater]
-
+        gameLevelClasses: gameLevelClasses
     }
+
     // Launch Adventure Game using the central core and adventure GameControl
     Core.main(environment, GameControl);
 </script>

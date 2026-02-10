@@ -8,14 +8,6 @@ permalink: /rpg/gamebuilder
 <style>
 .page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
 
-/* Hide GameEngine control buttons in gamebuilder iframe */
-iframe .pause-button-bar,
-iframe button.pause-btn,
-iframe .leaderboard-widget {
-    display: none !important;
-    visibility: hidden !important;
-}
-
 .gamebuilder-title {
     text-align: center;
     font-size: 2em;
@@ -31,16 +23,16 @@ iframe .leaderboard-widget {
     box-sizing: border-box;
 }
 
-.col-asset { 
-    flex: 0 0 20%; 
-    display: flex; 
-    flex-direction: column; 
+.col-asset {
+    flex: 0 0 20%;
+    display: flex;
+    flex-direction: column;
 }
 
-.col-main { 
-    flex: 1; 
-    display: flex; 
-    flex-direction: column; 
+.col-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
     position: relative;
 }
@@ -174,9 +166,9 @@ iframe .leaderboard-widget {
     padding: 14px;
     margin-bottom: 15px;
 }
-.group-title { 
-    font-size: 0.8em; 
-    font-weight: bold; 
+.group-title {
+    font-size: 0.8em;
+    font-weight: bold;
     margin-bottom: 12px;
     display: flex;
     align-items: center;
@@ -263,7 +255,7 @@ select:disabled, option[disabled] { color: #fff; }
     box-sizing: border-box;
     font-family: 'Fira Code', 'Courier New', monospace;
     font-size: 13px;
-    line-height: 20px; 
+    line-height: 20px;
     border: none;
     resize: none;
     outline: none;
@@ -277,7 +269,7 @@ select:disabled, option[disabled] { color: #fff; }
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 20px; 
+    padding: 20px;
     box-sizing: border-box;
     pointer-events: none;
     z-index: 1;
@@ -288,7 +280,7 @@ select:disabled, option[disabled] { color: #fff; }
     border-left: 4px solid var(--pref-accent-color);
     left: 10px;
     width: calc(100% - 20px);
-    display: block !important; 
+    display: block !important;
 }
 
 .highlight-persistent-block {
@@ -309,7 +301,6 @@ select:disabled, option[disabled] { color: #fff; }
 }
 
 .game-frame { flex: 1; }
-iframe { width: 100%; height: 100%; border: none; }
 .wall-slot { margin-top:8px; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
 .wall-fields label { display:block; }
 
@@ -318,42 +309,42 @@ iframe { width: 100%; height: 100%; border: none; }
         flex-direction: column;
         height: auto;
     }
-    
-    .col-asset { 
-        flex: none; 
-        max-height: 300px; 
+
+    .col-asset {
+        flex: none;
+        max-height: 300px;
     }
-    
+
     .col-main {
         flex: none;
         min-height: 600px;
     }
-    
+
     .col-main.view-code,
     .col-main.view-game {
     }
-    
+
     .col-main.view-code .panel-game,
     .col-main.view-game .panel-code {
         display: flex !important;
     }
-    
+
     .col-main .main-content {
         flex-direction: column !important;
     }
-    
-    .col-main .panel-game { 
+
+    .col-main .panel-game {
         flex: 0 0 45% !important;
     }
-    
-    .col-main .panel-code { 
+
+    .col-main .panel-code {
         flex: 1 !important;
     }
-    
+
     .view-controls {
         display: none;
     }
-    
+
     .gamebuilder-title {
         font-size: 1.2em;
     }
@@ -441,11 +432,21 @@ iframe { width: 100%; height: 100%; border: none; }
             <div class="glass-panel panel-game">
                 <div class="panel-header">Game View</div>
                 <div class="game-frame">
-                    <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
+                    <div class="game-output" id="game-output-builder">
+                        <div id="game-container-builder" class="gameContainer">
+                            <canvas id="game-canvas-builder"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="glass-panel code-panel panel-code">
-                <div class="panel-header">Code View (JS)</div>
+                <div class="panel-header">
+                    <span>Code View (JS)</span>
+                    <div class="panel-controls">
+                        <button id="btn-code-play" class="icon-btn" data-tooltip="Run Code">▶</button>
+                        <button id="btn-code-stop" class="icon-btn" data-tooltip="Stop Game">■</button>
+                    </div>
+                </div>
                 <div class="editor-container" id="editor-container">
                     <div id="highlight-layer" class="highlight-layer"></div>
                     <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
@@ -476,21 +477,24 @@ document.addEventListener('DOMContentLoaded', () => {
         pX: document.getElementById('player-x'),
         pY: document.getElementById('player-y'),
         pName: document.getElementById('player-name'),
-        
-        // NPCs UI 
+
+        // NPCs UI
         addNpcBtn: document.getElementById('add-npc'),
         npcsContainer: document.getElementById('npcs-container'),
         npcs: [],
 
-        // Walls UI 
+        // Walls UI
         addWallBtn: document.getElementById('add-wall'),
         wallsContainer: document.getElementById('walls-container'),
         walls: [],
 
         editor: document.getElementById('code-editor'),
         hLayer: document.getElementById('highlight-layer'),
-        iframe: document.getElementById('game-iframe'),
-        
+        gameContainer: document.getElementById('game-container-builder'),
+        gameCanvas: document.getElementById('game-canvas-builder'),
+        codePlayBtn: document.getElementById('btn-code-play'),
+        codeStopBtn: document.getElementById('btn-code-stop'),
+
         //  controls
         colMain: document.querySelector('.col-main'),
         viewBtns: document.querySelectorAll('.view-btn')
@@ -503,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.viewBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
-    
+
             // NOTE: removed preloading/inlining of full engine sources to keep the editor focused
             // Students only need the import lines and asset/JSON definitions; no fetching here.
     });
@@ -681,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const LINE_HEIGHT = 20;
     const state = { persistent: null, typing: null, userEdited: false, programmaticEdit: false };
     const steps = ['background','player','freestyle'];
-    let stepIndex = 0; 
+    let stepIndex = 0;
     const stepIndicatorMini = document.getElementById('step-indicator-mini');
     const helpBtn = document.getElementById('btn-help');
     const helpPanel = document.getElementById('help-panel');
@@ -802,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function getImportsBlock() {
                 // Keep the editor focused for learners: only show the minimal import lines
-                return `import GameEnvBackground from '/assets/js/GameEnginev1.5/GameEnvBackground.js';\nimport Player from '/assets/js/GameEnginev1.5/Player.js';\nimport Npc from '/assets/js/GameEnginev1.5/Npc.js';\nimport Barrier from '/assets/js/adventureGame/Barrier.js';\n\n`;
+                return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';\nimport Player from '/assets/js/GameEnginev1/essentials/Player.js';\nimport Npc from '/assets/js/GameEnginev1/essentials/Npc.js';\nimport Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';\n\n`;
             }
 
         function generateStepCode(currentStep) {
@@ -1071,7 +1075,7 @@ export const gameLevelClasses = [CustomLevel];`;
     function syncFromControlsIfFreestyle() {
         const current = steps[stepIndex];
         if (current !== 'freestyle') return;
-        if (state.userEdited) return; 
+        if (state.userEdited) return;
         const hasNPCs = ui.npcs.length > 0;
         const hasWalls = ui.walls.length > 0;
         const hasPlayer = !!ui.pSprite.value;
@@ -1081,7 +1085,7 @@ export const gameLevelClasses = [CustomLevel];`;
         if (newCode) {
             const oldCode = ui.editor.value;
             animateTypingDiff(oldCode, newCode, () => {
-                runInEmbed();
+                runInRunner();
             });
         }
     }
@@ -1129,6 +1133,11 @@ export const gameLevelClasses = [CustomLevel];`;
     }
 
     const mvEl = document.getElementById('movement-keys');
+    let runnerGameControl = null;
+    let runnerGameInstance = null;
+    let runnerEscapeKeyHandler = null;
+    let originalCanvasId = null;
+    let originalContainerId = null;
     if (ui.bg) ui.bg.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pSprite) ui.pSprite.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pX) ui.pX.addEventListener('input', syncFromControlsIfFreestyle);
@@ -1204,7 +1213,7 @@ export const gameLevelClasses = [CustomLevel];`;
             }
             setIndicator();
             updateStepUI();
-            runInEmbed();
+            runInRunner();
         });
     });
 
@@ -1238,64 +1247,129 @@ export const gameLevelClasses = [CustomLevel];`;
         return transformed;
     }
 
-    function runInEmbed() {
-        renderOverlay();
-        const code = safeCodeToRun();
-        const currentSrc = ui.iframe.src;
-        
-        // Set up message handler first
-        ui.iframe.onload = () => {
-            setTimeout(() => {
-                try {
-                    ui.iframe.contentWindow.postMessage({ type: 'rpg:run-code', code: code }, '*');
-                } catch (e) {
-                    console.error('Failed to send code to iframe:', e);
+    function stopRunner() {
+        if (runnerGameControl) {
+            try {
+                if (runnerGameControl.destroy) {
+                    runnerGameControl.destroy();
                 }
-            }, 200);
-        };
-        
-        // Force iframe reload by changing src to self with cache bust
-        const urlObj = new URL(currentSrc, window.location.origin);
-        urlObj.searchParams.set('t', Date.now());
-        ui.iframe.src = urlObj.toString();
+            } catch (e) {
+                console.warn('Error destroying game:', e);
+            }
+            runnerGameControl = null;
+            runnerGameInstance = null;
+        }
+
+        const canvas = document.getElementById('gameCanvas') || ui.gameCanvas;
+        const container = document.getElementById('gameContainer') || ui.gameContainer;
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        if (container) {
+            const canvases = container.querySelectorAll('canvas:not(#game-canvas-builder):not(#gameCanvas)');
+            canvases.forEach(c => c.remove());
+        }
+
+        if (canvas && originalCanvasId !== null) {
+            canvas.id = originalCanvasId;
+            originalCanvasId = null;
+        }
+        if (container && originalContainerId !== null) {
+            container.id = originalContainerId;
+            originalContainerId = null;
+        }
+
+        if (runnerEscapeKeyHandler) {
+            document.removeEventListener('keydown', runnerEscapeKeyHandler);
+            runnerEscapeKeyHandler = null;
+        }
     }
 
-    document.getElementById('btn-run').addEventListener('click', runInEmbed);
+    async function runInRunner() {
+        renderOverlay();
+        stopRunner();
 
+        let code = safeCodeToRun();
+        if (!code || !code.trim()) return;
+
+        const path = '{{ site.baseurl }}';
+        const baseUrl = window.location.origin + path;
+
+        code = code.replace(/from\s+['"](\/?[^'\"]+)['"]/g, (match, importPath) => {
+            if (importPath.startsWith('/')) return `from '${baseUrl}${importPath}'`;
+            if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
+                return `from '${baseUrl}/${importPath}'`;
+            }
+            return match;
+        });
+
+        if (ui.gameCanvas) {
+            originalCanvasId = ui.gameCanvas.id;
+            ui.gameCanvas.id = 'gameCanvas';
+        }
+        if (ui.gameContainer) {
+            originalContainerId = ui.gameContainer.id;
+            ui.gameContainer.id = 'gameContainer';
+        }
+
+        const GameModule = await import(baseUrl + '/assets/js/GameEnginev1/essentials/Game.js');
+        const Game = GameModule.default;
+
+        const blob = new Blob([code], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+        try {
+            const userModule = await import(blobUrl);
+            const gameLevelClasses = userModule.gameLevelClasses;
+            if (!gameLevelClasses) throw new Error('Code must export gameLevelClasses');
+
+            const containerWidth = ui.gameContainer?.parentElement?.clientWidth || 800;
+            const containerHeight = 580;
+            ui.gameCanvas.width = containerWidth;
+            ui.gameCanvas.height = containerHeight;
+
+            const environment = {
+                path: path,
+                gameContainer: ui.gameContainer,
+                gameCanvas: ui.gameCanvas,
+                gameLevelClasses: gameLevelClasses,
+                innerWidth: containerWidth,
+                innerHeight: containerHeight,
+                disablePauseMenu: true
+            };
+
+            runnerGameInstance = Game.main(environment);
+            runnerGameControl = runnerGameInstance?.gameControl || runnerGameInstance;
+        } finally {
+            URL.revokeObjectURL(blobUrl);
+        }
+
+        runnerEscapeKeyHandler = (e) => {
+            if (e.key !== 'Escape') return;
+            e.preventDefault();
+            if (!runnerGameControl) return;
+            if (runnerGameControl.isPaused) runnerGameControl.resume();
+            else runnerGameControl.pause();
+        };
+        document.addEventListener('keydown', runnerEscapeKeyHandler);
+    }
+
+    document.getElementById('btn-run').addEventListener('click', runInRunner);
+    if (ui.codePlayBtn) ui.codePlayBtn.addEventListener('click', runInRunner);
+    if (ui.codeStopBtn) ui.codeStopBtn.addEventListener('click', stopRunner);
 
     ui.editor.value = generateBaselineCode();
     setIndicator();
     updateStepUI();
     renderOverlay();
-    
-    // Hide control buttons in the iframe by injecting CSS
-    ui.iframe.addEventListener('load', () => {
-        try {
-            const style = ui.iframe.contentDocument.createElement('style');
-            style.textContent = `
-                .pause-button-bar { display: none !important; }
-                .leaderboard-widget { display: none !important; }
-                .score-display { display: none !important; }
-                .score-counter { display: none !important; }
-                .stats-display { display: none !important; }
-                #scoreDisplay { display: none !important; }
-                #score { display: none !important; }
-                .hud { display: none !important; }
-                [id*="score" i] { display: none !important; }
-                [class*="score" i] { display: none !important; }
-            `;
-            ui.iframe.contentDocument.head.appendChild(style);
-        } catch (e) {
-            // Cross-origin restriction, ignore
-            console.debug('Cannot inject CSS into iframe:', e);
-        }
-    });
+
+    // GameRunner view uses the local canvas; no iframe injection needed.
 });
 </script>
 
 <script>
 window.addEventListener('keydown', function(e) {
-    const keys = [32, 37, 38, 39, 40]; 
+    const keys = [32, 37, 38, 39, 40];
     if (keys.includes(e.keyCode)) {
         if (!(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
             e.preventDefault();

@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: Adventure Game
-permalink: /gamify/adventuregamev1
+title: Murder Mystery Game 
+permalink: /gamify/murdermystery
 ---
 
 <div id="gameContainer">
@@ -12,14 +12,12 @@ permalink: /gamify/adventuregamev1
 <script type="module">
 
     // Adnventure Game assets locations
-    import Game from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/Game.js";
-    import GameLevelWater from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelWater.js";
-    import GameLevelDesert from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelDesert.js";
-    import GameLevelEnd from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelEnd.js";
-    import GameLevelOverworld from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelOverworld.js";
-    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import Game from "/assets/js/GameEnginev1/essentials/Game.js";
+    import MurderMysteryL1 from "/assets/js/murderMystery/MurderMysteryL1.js";
+    import MurderMysteryL2 from "/assets/js/murderMystery/MurderMysteryL2.js";
+    import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
-    const gameLevelClasses = [GameLevelDesert, GameLevelWater, GameLevelEnd, GameLevelOverworld ];
+    const gameLevelClasses = [MurderMysteryL1, MurderMysteryL2];
 
     // Web Server Environment data
     const environment = {
