@@ -36,3 +36,5 @@ microblog: true
     // Initialize cheats/navigation buttons
     initCheats(game);
 </script>
+
+export default murderMysteryLevel3;
