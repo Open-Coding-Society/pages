@@ -1,4 +1,4 @@
-import Character from "./Character.js";
+import Character from "./essentials/Character.js";;
 import ProjectileExplosion from './ProjectileExplosion.js';
 
 function newProjectileExplosion(data, gameEnv) {
@@ -59,8 +59,8 @@ class Projectile extends Character {
         }
 
         // Calculate the intermediate position of the projectile
-        this.transform.x = this.startPosition.x + (this.endPosition.x - this.startPosition.x) * progress;
-        this.transform.y = this.startPosition.y + (this.endPosition.y - this.startPosition.y) * progress;
+        this.position.x = this.startPosition.x + (this.endPosition.x - this.startPosition.x) * progress;
+        this.position.y = this.startPosition.y + (this.endPosition.y - this.startPosition.y) * progress;
 
         // Calculate the new scale factor as the projectile gets larger as it travels
         this.scaleFactor = this.startScaleFactor + (this.endScaleFactor - this.startScaleFactor) * progress;
@@ -98,8 +98,7 @@ class Projectile extends Character {
         this.startTime = Date.now();
         this.delayStartTime = null;
         this.calculateTranslatePositions();
-        this.transform.x = this.startPosition.x;
-        this.transform.y = this.startPosition.y;
+        this.position = { ...this.startPosition };
         this.scaleFactor = this.startScaleFactor;
         this.canvas.style.display = "block";
     }
