@@ -12,7 +12,7 @@ active_tab: dashboard
         <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
             <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
                 <li class="me-2">
-                    <a href="#" id="tab-preferences"
+                    <a href="#" id="tab-admin-evaluation"
                         class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500" aria-current="page">
                         Preferences
                     </a>
@@ -26,9 +26,10 @@ active_tab: dashboard
 
         <!-- tab content container -->
         <div id="tab-content-container" class="relative min-h-[400px]">
-            <!-- Preferences tab content -->
-            <div id="tab-content-preferences" class="tab-content block px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
-                <h2 class="text-xl font-semibold mb-4">Admin: Search & Evaluate Users</h2>
+            <!-- Admin Evaluation UI (hidden by default, shown only for admins) -->
+            <div id="admin-only" style="display:none;">
+                <div id="tab-content-admin-evaluation" class="tab-content block px-6 py-4 text-neutral-200 max-w-5xl mx-auto">
+                    <h2 class="text-xl font-semibold mb-4">Admin: Search & Evaluate Users</h2>
                 <div id="admin-people-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <p class="col-span-full text-neutral-400" id="admin-people-loading">Loading users...</p>
                 </div>
@@ -259,14 +260,9 @@ active_tab: dashboard
                 };
 
                 // --- Initial load ---
-                fetchPeople();
+                // Expose fetchPeople globally so it can be called after admin check
+                window.adminFetchPeople = fetchPeople;
                 </script>
-            </div>
-
-            <div id="tab-content-your-feedback" class="tab-content hidden px-6 py-4 text-neutral-200">
-                <h2 class="text-xl font-semibold mb-4">Your Feedback</h2>
-                <div id="user-feedback-table-container">
-                    <p class="text-neutral-400">Loading your feedback history...</p>
                 </div>
             </div>
 
@@ -1209,12 +1205,6 @@ active_tab: dashboard
                 })();
                 </script>
 
-            <!-- Grade analytics tab content -->
-            <div id="tab-content-grade-analytics" class="tab-content hidden">
-                <div class="items-center justify-center text-neutral-300" id="grade-analytics-container">
-                    <p>Loading grade analytics...</p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -1266,18 +1256,36 @@ active_tab: dashboard
         });
     });
 
-    // Window load
-    window.onload = async () => {
+    // Initialize dashboard on DOM ready
+    document.addEventListener('DOMContentLoaded', async () => {
         const activeTab = document.querySelector(".tab-btn.active");
         if (activeTab) setUnderline(activeTab);
+
+        // Check admin status and gate UI
+        try {
+            const userRes = await fetch(`${javaURI}/api/user/info`, fetchOptions);
+            if (userRes.ok) {
+                const user = await userRes.json();
+                const isAdmin = user?.role === "admin";
+                if (isAdmin) {
+                    document.getElementById("admin-only").style.display = "block";
+                    // Trigger admin evaluation fetch
+                    if (window.adminFetchPeople && typeof window.adminFetchPeople === 'function') {
+                        window.adminFetchPeople();
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error checking admin status', e);
+        }
 
         // Load and apply saved preferences
         try {
             if (window.loadPreferences) await window.loadPreferences();
         } catch (e) {
-            console.error('Error loading preferences on window.onload', e);
+            console.error('Error loading preferences on DOMContentLoaded', e);
         }
-    };
+    });
 </script>
 
 <script type="module">
@@ -1387,7 +1395,7 @@ active_tab: dashboard
         sendBtn.disabled = true;
 
         const res = await fetch(`${javaURI}/api/upai`, {
-          ...fetchDataOptions, 
+          ...fetchOptions,
           method: 'POST',
           body: JSON.stringify({
             prompt: promptText
