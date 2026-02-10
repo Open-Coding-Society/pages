@@ -33,6 +33,7 @@ Game Runner integrates your GameEngine framework for teaching game development. 
 #### Game Output Area
 
 The game renders in a constrained canvas for educational purposes:
+
 - Min height: 400px
 - Max height: 600px
 - Canvas max height: 580px
@@ -53,6 +54,7 @@ The game renders in a constrained canvas for educational purposes:
 #### Code Structure
 
 Your game code must export two things:
+
 1. **GameControl**: Your GameControl class (usually imported)
 2. **gameLevelClasses**: Array of game level classes
 
@@ -76,6 +78,7 @@ Run the basic game. Use WASD or arrow keys to move Chill Guy around the desert. 
 // Import for GameRunner
 import GameControl from '/assets/js/GameEnginev1/essentials/GameControl.js';
 // Level Code
+import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 
 class CustomLevel {
@@ -83,6 +86,11 @@ class CustomLevel {
     const path = gameEnv.path;
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
+    const bgData = {
+        name: 'custom_bg',
+        src: path + "/images/gamebuilder/clouds.jpg",
+        pixels: { height: 720, width: 1280 }
+    };
     const playerData = {
       id: 'Hero',
       src: path + "/images/gamify/chillguy.png",
@@ -105,6 +113,7 @@ class CustomLevel {
     };
 
     this.classes = [
+      { class: GameEnvBackground, data: bgData },
       { class: Player, data: playerData },
     ];
   }
@@ -126,6 +135,7 @@ export { GameControl };
 ### Import Structure
 
 Always import necessary GameEngine modules:
+
 ```javascript
 import GameControl from '/assets/js/GameEnginev1/essentials/GameControl.js';
 import GameLevelBasic from '/assets/js/GameEnginev1/GameLevelBasic.js';
@@ -134,6 +144,7 @@ import GameLevelBasic from '/assets/js/GameEnginev1/GameLevelBasic.js';
 ### Export Requirements
 
 Your code must export:
+
 ```javascript
 export { GameControl };
 export const gameLevelClasses = [GameLevelBasic, GameLevelWater];
@@ -142,6 +153,7 @@ export const gameLevelClasses = [GameLevelBasic, GameLevelWater];
 ### Level Class Structure
 
 Each level class needs a constructor that defines:
+
 - Background data
 - Player/character data
 - NPC data
@@ -158,6 +170,7 @@ Each level class needs a constructor that defines:
 ### Debugging
 
 Use the game controls to debug:
+
 - **Pause**: Stop to examine game state
 - **Stop**: Clear and restart fresh
 - **Reset**: Restore original code
@@ -179,16 +192,19 @@ Use the game controls to debug:
 ### Common Modifications
 
 **Change Player Start Position:**
+
 ```javascript
 INIT_POSITION: { x: 200, y: 300 }
 ```
 
 **Adjust Player Speed:**
+
 ```javascript
 STEP_FACTOR: 500  // Faster movement
 ```
 
 **Different Background:**
+
 ```javascript
 src: path + "/images/gamify/water.png"
 ```
@@ -196,6 +212,7 @@ src: path + "/images/gamify/water.png"
 ### Game Development Concepts
 
 The GameEngine teaches:
+
 - **Object-Oriented Programming**: Classes, inheritance, composition
 - **Game Loop**: Update and render cycles
 - **Sprite Animation**: Frame-based animation
@@ -206,16 +223,19 @@ The GameEngine teaches:
 ### Troubleshooting
 
 **Game won't start:**
+
 - Check console for import errors
 - Verify all import paths start with `/assets/`
 - Ensure exports are correct
 
 **Player not moving:**
+
 - Check keypress configuration
 - Verify STEP_FACTOR is set
 - Check hitbox doesn't block movement
 
 **Canvas is blank:**
+
 - Verify background image path
 - Check canvas dimensions
 - Look for JavaScript errors in console
