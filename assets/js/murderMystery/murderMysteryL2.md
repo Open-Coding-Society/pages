@@ -12,9 +12,9 @@ permalink: /gamify/murdermystery2
 <script type="module">
 
     // Adnventure Game assets locations
-    import Game from "{{site.baseurl}}/assets/js/murderMystery/essentials/Game.js";
-    import MurderMysteryL2 from "{{site.baseurl}}/assets/js/murderMystery/MurderMysteryL2.js";
-    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import Game from "/assets/js/GameEnginev1/essentials/Game.js";
+    import MurderMysteryL2 from "/assets/js/murderMystery/MurderMysteryL2.js";
+    import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
     const gameLevelClasses = [MurderMysteryL2];
 
