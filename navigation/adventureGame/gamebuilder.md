@@ -441,11 +441,21 @@ iframe { width: 100%; height: 100%; border: none; }
             <div class="glass-panel panel-game">
                 <div class="panel-header">Game View</div>
                 <div class="game-frame">
-                    <iframe id="game-iframe" src="{{ site.baseurl }}/rpg/latest?embed=1&autostart=0"></iframe>
+                    <div class="game-output" id="game-output-builder">
+                        <div id="game-container-builder" class="gameContainer">
+                            <canvas id="game-canvas-builder"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="glass-panel code-panel panel-code">
-                <div class="panel-header">Code View (JS)</div>
+                <div class="panel-header">
+                    <span>Code View (JS)</span>
+                    <div class="panel-controls">
+                        <button id="btn-code-play" class="icon-btn" data-tooltip="Run Code">▶</button>
+                        <button id="btn-code-stop" class="icon-btn" data-tooltip="Stop Game">■</button>
+                    </div>
+                </div>
                 <div class="editor-container" id="editor-container">
                     <div id="highlight-layer" class="highlight-layer"></div>
                     <textarea id="code-editor" class="code-layer" readonly spellcheck="false"></textarea>
@@ -489,7 +499,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         editor: document.getElementById('code-editor'),
         hLayer: document.getElementById('highlight-layer'),
-        iframe: document.getElementById('game-iframe'),
+        gameContainer: document.getElementById('game-container-builder'),
+        gameCanvas: document.getElementById('game-canvas-builder'),
+        codePlayBtn: document.getElementById('btn-code-play'),
+        codeStopBtn: document.getElementById('btn-code-stop'),
         
         //  controls
         colMain: document.querySelector('.col-main'),
@@ -1081,7 +1094,7 @@ export const gameLevelClasses = [CustomLevel];`;
         if (newCode) {
             const oldCode = ui.editor.value;
             animateTypingDiff(oldCode, newCode, () => {
-                runInEmbed();
+                runInRunner();
             });
         }
     }
@@ -1129,6 +1142,11 @@ export const gameLevelClasses = [CustomLevel];`;
     }
 
     const mvEl = document.getElementById('movement-keys');
+    let runnerGameControl = null;
+    let runnerGameInstance = null;
+    let runnerEscapeKeyHandler = null;
+    let originalCanvasId = null;
+    let originalContainerId = null;
     if (ui.bg) ui.bg.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pSprite) ui.pSprite.addEventListener('change', syncFromControlsIfFreestyle);
     if (ui.pX) ui.pX.addEventListener('input', syncFromControlsIfFreestyle);
@@ -1204,7 +1222,7 @@ export const gameLevelClasses = [CustomLevel];`;
             }
             setIndicator();
             updateStepUI();
-            runInEmbed();
+            runInRunner();
         });
     });
 
@@ -1238,29 +1256,116 @@ export const gameLevelClasses = [CustomLevel];`;
         return transformed;
     }
 
-    function runInEmbed() {
-        renderOverlay();
-        const code = safeCodeToRun();
-        const currentSrc = ui.iframe.src;
-        
-        // Set up message handler first
-        ui.iframe.onload = () => {
-            setTimeout(() => {
-                try {
-                    ui.iframe.contentWindow.postMessage({ type: 'rpg:run-code', code: code }, '*');
-                } catch (e) {
-                    console.error('Failed to send code to iframe:', e);
+    function stopRunner() {
+        if (runnerGameControl) {
+            try {
+                if (runnerGameControl.destroy) {
+                    runnerGameControl.destroy();
                 }
-            }, 200);
-        };
-        
-        // Force iframe reload by changing src to self with cache bust
-        const urlObj = new URL(currentSrc, window.location.origin);
-        urlObj.searchParams.set('t', Date.now());
-        ui.iframe.src = urlObj.toString();
+            } catch (e) {
+                console.warn('Error destroying game:', e);
+            }
+            runnerGameControl = null;
+            runnerGameInstance = null;
+        }
+
+        const canvas = document.getElementById('gameCanvas') || ui.gameCanvas;
+        const container = document.getElementById('gameContainer') || ui.gameContainer;
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        if (container) {
+            const canvases = container.querySelectorAll('canvas:not(#game-canvas-builder):not(#gameCanvas)');
+            canvases.forEach(c => c.remove());
+        }
+
+        if (canvas && originalCanvasId !== null) {
+            canvas.id = originalCanvasId;
+            originalCanvasId = null;
+        }
+        if (container && originalContainerId !== null) {
+            container.id = originalContainerId;
+            originalContainerId = null;
+        }
+
+        if (runnerEscapeKeyHandler) {
+            document.removeEventListener('keydown', runnerEscapeKeyHandler);
+            runnerEscapeKeyHandler = null;
+        }
     }
 
-    document.getElementById('btn-run').addEventListener('click', runInEmbed);
+    async function runInRunner() {
+        renderOverlay();
+        stopRunner();
+
+        let code = safeCodeToRun();
+        if (!code || !code.trim()) return;
+
+        const path = '{{ site.baseurl }}';
+        const baseUrl = window.location.origin + path;
+
+        code = code.replace(/from\s+['"](\/?[^'\"]+)['"]/g, (match, importPath) => {
+            if (importPath.startsWith('/')) return `from '${baseUrl}${importPath}'`;
+            if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
+                return `from '${baseUrl}/${importPath}'`;
+            }
+            return match;
+        });
+
+        if (ui.gameCanvas) {
+            originalCanvasId = ui.gameCanvas.id;
+            ui.gameCanvas.id = 'gameCanvas';
+        }
+        if (ui.gameContainer) {
+            originalContainerId = ui.gameContainer.id;
+            ui.gameContainer.id = 'gameContainer';
+        }
+
+        const GameModule = await import(baseUrl + '/assets/js/GameEnginev1/essentials/Game.js');
+        const Game = GameModule.default;
+
+        const blob = new Blob([code], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+        try {
+            const userModule = await import(blobUrl);
+            const gameLevelClasses = userModule.gameLevelClasses;
+            if (!gameLevelClasses) throw new Error('Code must export gameLevelClasses');
+
+            const containerWidth = ui.gameContainer?.parentElement?.clientWidth || 800;
+            const containerHeight = 580;
+            ui.gameCanvas.width = containerWidth;
+            ui.gameCanvas.height = containerHeight;
+
+            const environment = {
+                path: path,
+                gameContainer: ui.gameContainer,
+                gameCanvas: ui.gameCanvas,
+                gameLevelClasses: gameLevelClasses,
+                innerWidth: containerWidth,
+                innerHeight: containerHeight,
+                disablePauseMenu: true
+            };
+
+            runnerGameInstance = Game.main(environment);
+            runnerGameControl = runnerGameInstance?.gameControl || runnerGameInstance;
+        } finally {
+            URL.revokeObjectURL(blobUrl);
+        }
+
+        runnerEscapeKeyHandler = (e) => {
+            if (e.key !== 'Escape') return;
+            e.preventDefault();
+            if (!runnerGameControl) return;
+            if (runnerGameControl.isPaused) runnerGameControl.resume();
+            else runnerGameControl.pause();
+        };
+        document.addEventListener('keydown', runnerEscapeKeyHandler);
+    }
+
+    document.getElementById('btn-run').addEventListener('click', runInRunner);
+    if (ui.codePlayBtn) ui.codePlayBtn.addEventListener('click', runInRunner);
+    if (ui.codeStopBtn) ui.codeStopBtn.addEventListener('click', stopRunner);
 
 
     ui.editor.value = generateBaselineCode();
@@ -1268,28 +1373,7 @@ export const gameLevelClasses = [CustomLevel];`;
     updateStepUI();
     renderOverlay();
     
-    // Hide control buttons in the iframe by injecting CSS
-    ui.iframe.addEventListener('load', () => {
-        try {
-            const style = ui.iframe.contentDocument.createElement('style');
-            style.textContent = `
-                .pause-button-bar { display: none !important; }
-                .leaderboard-widget { display: none !important; }
-                .score-display { display: none !important; }
-                .score-counter { display: none !important; }
-                .stats-display { display: none !important; }
-                #scoreDisplay { display: none !important; }
-                #score { display: none !important; }
-                .hud { display: none !important; }
-                [id*="score" i] { display: none !important; }
-                [class*="score" i] { display: none !important; }
-            `;
-            ui.iframe.contentDocument.head.appendChild(style);
-        } catch (e) {
-            // Cross-origin restriction, ignore
-            console.debug('Cannot inject CSS into iframe:', e);
-        }
-    });
+    // GameRunner view uses the local canvas; no iframe injection needed.
 });
 </script>
 
