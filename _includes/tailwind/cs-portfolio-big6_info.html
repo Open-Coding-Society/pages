@@ -335,11 +335,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // count done up to a passed total
-  function moduleCountDone(slug, total) {
-    let c = 0;
-    for (let i = 1; i <= total; i++) if (lessonDone(slug, i)) c++;
-    return c;
+  function moduleCountDone(moduleKey, lessonCount) {
+    let completed = 0;
+
+    for (let i = 1; i <= lessonCount; i++) {
+      if (localStorage.getItem(`bigsix:${moduleKey}:lesson:${i}`) === "done") {
+        completed++;
+      }
+    }
+
+    return completed; // ✅ return COUNT, not boolean
   }
+
+
 
   // collect modules in visual order
   const cards = Array.from(document.querySelectorAll('[data-module]'));
@@ -398,7 +406,19 @@ document.addEventListener("DOMContentLoaded", function () {
   // overall progress
   const overall = document.getElementById("overall-progress");
   const progressText = document.getElementById("progress-text");
-  if (overall) overall.style.width = ((completedModules / modules.length) * 100) + "%";
+  if (overall) {
+    const pct = Math.round((completedModules / modules.length) * 100);
+    overall.style.width = pct + "%";
+
+    overall.className = ""; // reset
+    if (pct <= 16) overall.classList.add("p-red");
+    else if (pct <= 33) overall.classList.add("p-orange");
+    else if (pct <= 50) overall.classList.add("p-yellow");
+    else if (pct <= 66) overall.classList.add("p-lightgreen");
+    else if (pct <= 83) overall.classList.add("p-green");
+    else overall.classList.add("p-complete");
+  }
+
   if (progressText) {
     const allDone = modules.length > 0 && completedModules === modules.length;
     progressText.textContent = allDone

@@ -224,7 +224,7 @@ button:hover {
 .recap-val code { background: var(--panel-2); color: #f3f4f6; border-radius: 6px; padding: 2px 6px; font-size: 12px; word-break: break-word; }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Data Visualization — All-in-One</h1>
     <p>Interactive lessons: REST APIs, Spring Boot CRUD, search, filtering, pagination, and data queries.</p>
@@ -856,3 +856,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

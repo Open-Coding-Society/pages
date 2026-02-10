@@ -70,7 +70,7 @@ date: 2025-12-02
     .action-button:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px rgba(30, 132, 73, 0.5); }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>AI Development — All-in-One</h1>
     <p>A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development.</p>
@@ -366,3 +366,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

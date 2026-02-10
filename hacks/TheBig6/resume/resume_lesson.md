@@ -14,7 +14,7 @@ date: 2025-12-01
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<div class="max-w-3xl mx-auto p-4">
+<div class="max-w-3xl mx-auto p-4 page-content">
   <h1 class="text-2xl font-bold mb-2">Resume — All-in-One</h1>
   <p class="text-gray-600 mb-4">Short, interactive steps. Autosaves locally.</p>
   <a href="../" class="button back-btn">Back</a>
@@ -426,3 +426,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

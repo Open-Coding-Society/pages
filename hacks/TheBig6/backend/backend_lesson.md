@@ -40,7 +40,7 @@ date: 2025-12-02
   .code-snippet { background: #020617; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 1rem; font-family: Consolas, monospace; font-size: 12px; color: #cfe8ff; white-space: pre-wrap; word-wrap: break-word; }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Backend Development — All-in-One</h1>
     <p>An interactive lesson covering backend fundamentals, frameworks, and advanced topics.</p>
@@ -177,18 +177,44 @@ date: 2025-12-02
 let currentStep = 0;
 const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
 const STORAGE_KEY = 'backend_combined_v1';
+// ========== Big Six Lesson Metadata ==========
+const BIG_SIX_META = {
+  module: "backend_lesson",  // Matches the permalink /bigsix/backend_lesson
+  totalLessons: 6            // Matches the lesson count in questHome
+};
+
+function saveBigSixProgress(stepNumber) {
+  const key = `bigsix:${BIG_SIX_META.module}:lesson:${stepNumber}`;
+  if (localStorage.getItem(key) !== "done") {
+    localStorage.setItem(key, "done");
+    console.log(`✅ Big Six step completed: ${key}`);
+  }
+}
 
 function showStep(n) {
   currentStep = Math.max(0, Math.min(steps.length - 1, n));
   steps.forEach((s, i) => document.getElementById(s).classList.toggle('active', i === currentStep));
+
   const bar = document.getElementById('progressBar');
-  if(bar) bar.innerHTML = steps.map((_, i) => `<div class="step ${i <= currentStep ? 'active' : ''}" onclick="showStep(${i})"></div>`).join('');
+  if(bar) bar.innerHTML = steps
+    .map((_, i) => `<div class="step ${i <= currentStep ? 'active' : ''}" onclick="showStep(${i})"></div>`)
+    .join('');
+
   const indicator = document.getElementById('stepIndicator');
   if(indicator) indicator.textContent = `Step ${currentStep + 1} / ${steps.length}`;
+
   document.getElementById('prevBtn').disabled = currentStep === 0;
   document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+
   persist();
+
+  // ✅ BIG SIX COMPLETION (FINAL STEP)
+  if (currentStep === steps.length - 1) {
+    completeBigSixLesson();
+  }
+  saveBigSixProgress(currentStep + 1);
 }
+
 window.showStep = showStep;
 function prevStep() { showStep(currentStep - 1); }
 window.prevStep = prevStep;
@@ -338,3 +364,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

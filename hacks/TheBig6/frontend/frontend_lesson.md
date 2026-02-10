@@ -79,7 +79,7 @@ date: 2025-12-02
   @media (max-width: 900px) { .split-view { grid-template-columns: 1fr; } }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Frontend Development — All-in-One</h1>
     <p>Interactive lessons: Markdown → HTML, CSS styling, Tailwind + Sass, JavaScript, and code sandbox.</p>
@@ -513,3 +513,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

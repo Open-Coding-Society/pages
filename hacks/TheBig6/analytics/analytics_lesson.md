@@ -49,7 +49,7 @@ date: 2025-12-02
   .detail-row { border-top-color: var(--accent); }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Analytics — All-in-One</h1>
     <p>Interactive lesson covering the admin dashboard, certificates, and mastery questions.</p>
@@ -268,3 +268,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script src="/assets/js/lesson-completion-bigsix.js"></script>
