@@ -13,17 +13,21 @@ active_tab: analytics
             <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
                 <li class="me-2">
                     <a href="#" id="tab-ocs-analytics"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500"
-                        >OCS Analytics</a>
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500" aria-current="page">
+                        OCS Analytics
+                    </a>
                 </li>
                 <li class="me-2">
                     <a href="#" id="tab-github"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300"
-                        >GitHub Analytics</a>
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        GitHub Analytics
+                    </a>
                 </li>
                 <li class="me-2">
                     <a href="#" id="tab-grade"
-                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">Grade Predictor</a>
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Grade Predictor
+                    </a>
                 </li>
             </ul>
             <!-- sliding underline indicator -->
@@ -34,6 +38,7 @@ active_tab: analytics
 
         <!-- tab content container -->
         <div id="tab-content-container" class="relative min-h-[400px]">
+            
             <!-- OCS Analytics tab content -->
             <div id="tab-content-ocs-analytics" class="tab-content block px-6 py-4 text-neutral-200">
                 <div class="flex items-center justify-center min-h-[400px]">
@@ -44,7 +49,7 @@ active_tab: analytics
                 </div>
             </div>
 
-            <!-- github analytics tab content -->
+            <!-- GitHub Analytics tab content -->
             <div id="tab-content-github" class="tab-content hidden px-6 py-4 text-neutral-200">
                 <!-- Grid -->
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-4 lg:grid-rows-2 gap-4 sm:gap-6 text-neutral-200">
@@ -111,13 +116,13 @@ active_tab: analytics
                 <div id="commitCardsContainer" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
-            <!-- grade predictor tab content -->
+            <!-- Grade Predictor tab content -->
             <div id="tab-content-grade" class="tab-content hidden px-6 py-4 text-neutral-200">
                 <h2 class="text-xl font-semibold mb-4">Grade Predictor</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Left: Technical analytics -->
                     <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 flex flex-col">
-                        <h3 class="text-lg font-semibold mb-2 text-blue-300">Technical analytics</h3>
+                        <h3 class="text-lg font-semibold mb-2 text-blue-300">Technical Analytics</h3>
                         <p class="mb-4 text-neutral-400 text-sm">
                             Predict your grade based on your GitHub activity (commits, PRs, issues, code changes, etc).
                         </p>
@@ -145,9 +150,10 @@ score += gists * 0.5
                         </button>
                         <p id="techGradeResult" class="text-xl font-semibold"></p>
                     </div>
+                    
                     <!-- Right: Evaluation matrix -->
                     <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 flex flex-col">
-                        <h3 class="text-lg font-semibold mb-2 text-green-300">Evaluation matrix</h3>
+                        <h3 class="text-lg font-semibold mb-2 text-green-300">Evaluation Matrix</h3>
                         <p class="mb-4 text-neutral-400 text-sm">
                             Adjust each slider to reflect your self-assessment or teacher's assessment for each skill (1 = lowest, 5 = highest).
                         </p>
@@ -215,16 +221,56 @@ score += gists * 0.5
                         <p id="userGrade" class="text-xl font-semibold mt-4"></p>
                     </div>
                 </div>
+
+                <!-- Help content -->
+                <div class="mt-8">
+                    <h2 class="text-2xl font-bold mb-4 text-blue-300">Analytics Help</h2>
+                    <details>
+                        <summary class="cursor-pointer text-lg font-semibold mb-2 text-blue-200">Click to expand help</summary>
+                        <div class="mb-6 p-4 rounded-lg bg-blue-900/40 border border-blue-700">
+                            <p class="mb-2">
+                                <strong>What is this dashboard?</strong>
+                                <br>
+                                <i>Making the portfolio easier to use with clickable contributions, better stats, and simple access to your profile so coders can show their work.</i>
+                                <br>
+                                This dashboard provides real-time analytics and grade predictions based on your GitHub activity. It uses a secure backend API to fetch your contributions, pull requests, issues, and more, then visualizes them for both students and admins.
+                            </p>
+                            <p>
+                                <strong>Why use it?</strong>
+                                <br>
+                                - Get accurate, up-to-date insights into your coding activity.<br>
+                                - Predict your grade based on real engagement.<br>
+                                - Admins can review and compare user contributions.
+                            </p>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mt-8 mb-2 text-blue-200">How It Works</h3>
+                        <ul class="list-disc list-inside mb-4">
+                            <li>All API endpoints are <span class="font-semibold text-blue-300">JWT-secured</span> using <code>@token_required</code>.</li>
+                            <li>Data is fetched from GitHub using both REST and GraphQL APIs for maximum detail.</li>
+                        </ul>
+
+                        <h3 class="text-xl font-semibold mt-8 mb-2 text-blue-200">Grade Prediction Logic</h3>
+                        <div class="mb-4">
+                            <p>The dashboard predicts your grade using two models:</p>
+                            <ul class="list-disc list-inside mb-2">
+                                <li><strong>Basic:</strong> Based only on commit count.</li>
+                                <li><strong>Smart:</strong> Uses a weighted formula including commits, additions, deletions, PRs, issues, repos, and gists.</li>
+                            </ul>
+                            <p>The final score is mapped to a letter grade (A, B, C, F) based on thresholds.</p>
+                        </div>
+                    </details>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal for info details -->
-<div id="dataModal" class="hidden" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-content">
-        <span class="close" title="Close modal">&times;</span>
-        <pre id="modalData"></pre>
+<div id="dataModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-3xl relative">
+        <span class="close absolute top-3 right-3 text-neutral-400 hover:text-white text-2xl cursor-pointer" title="Close modal">&times;</span>
+        <pre id="modalData" class="text-neutral-200 overflow-auto max-h-96"></pre>
     </div>
 </div>
 
@@ -237,7 +283,7 @@ score += gists * 0.5
 <script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
 
-<!-- Your GitHub analytics JS integrated -->
+<!-- Analytics JS -->
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
@@ -259,18 +305,15 @@ score += gists * 0.5
     async function getUserIdSpring() {
         if (springUserId) return springUserId;
         try {
-            // 1. Get UID from Python
             const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
             if (!pyRes.ok) throw new Error("Failed to fetch Python ID");
             const pyData = await pyRes.json();
             const uid = pyData.uid;
 
-            // 2. Get People from Spring
             const javaRes = await fetch(`${javaURI}/api/person/uid/${uid}`, fetchOptions);
             if (!javaRes.ok) throw new Error("Failed to fetch user from Spring");
             const person = await javaRes.json();
 
-            // 3. Match UID
             if (!person || person.uid !== uid) throw new Error("User not found in Spring");
             
             springUserId = person.id;
@@ -288,20 +331,36 @@ score += gists * 0.5
         try {
             const res = await fetch(`${javaURI}/api/student-evaluation/get/${id}`, fetchOptions);
             if (res.ok) {
-                const evalData = await res.json();
-                hasExistingStudentEval = true;
-                // Populate form with saved data if exists
-                if (evalData) {
-                    const fields = [
-                        "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
-                        "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
-                    ];
-                    fields.forEach(f => {
-                        const slider = document.getElementById(`slider-${f}`);
-                        const label = document.getElementById(`val-${f}`);
-                        if (slider && evalData[f]) {
-                            slider.value = evalData[f];
-                            if (label) label.textContent = evalData[f];
+                const json = await res.json();
+                const data = json.evaluation || json; 
+                if (data) {
+                    hasExistingStudentEval = true;
+                    
+                    const apiToSliderKey = {
+                        attendance: "attendance",
+                        workHabits: "work_habits",
+                        behavior: "behavior",
+                        timeliness: "timeliness",
+                        techSense: "tech_sense",
+                        techTalk: "tech_talk",
+                        techGrowth: "tech_growth",
+                        advocacy: "advocacy",
+                        communication: "communication",
+                        integrity: "integrity",
+                        organization: "organization"
+                    };
+
+                    Object.keys(apiToSliderKey).forEach(apiKey => {
+                        const sliderKey = apiToSliderKey[apiKey];
+                        let val = 4;
+                        if (typeof data[apiKey] !== "undefined") val = data[apiKey];
+                        else if (typeof data[sliderKey] !== "undefined") val = data[sliderKey];
+
+                        const slider = document.getElementById(`slider-${sliderKey}`);
+                        const label = document.getElementById(`val-${sliderKey}`);
+                        if (slider) {
+                            slider.value = val;
+                            if (label) label.textContent = val;
                         }
                     });
                 }
@@ -311,6 +370,7 @@ score += gists * 0.5
         }
     }
 
+    // Smart Predict Button Handler
     const smartPredictBtn = document.getElementById("smartPredictBtn");
     smartPredictBtn.onclick = async () => {
         const userGradeEl = document.getElementById("userGrade");
@@ -322,7 +382,6 @@ score += gists * 0.5
             return;
         }
 
-        // Collect slider values
         const fields = [
             "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
             "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
@@ -332,36 +391,42 @@ score += gists * 0.5
             body[f] = Number(document.getElementById(`slider-${f}`).value);
         });
 
-        // 1. Save Evaluation (POST or PUT)
         try {
             let res;
             if (hasExistingStudentEval) {
-                res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, { ...fetchOptions, method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, {
+                    ...fetchOptions,
+                    method: 'PUT',
+                    body: JSON.stringify(body)
+                });
             } else {
-                res = await fetch(`${javaURI}/api/student-evaluation/create`, { ...fetchOptions, method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                res = await fetch(`${javaURI}/api/student-evaluation/post`, {
+                    ...fetchOptions,
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
             }
             
             if (res.ok) {
                 hasExistingStudentEval = true;
                 userGradeEl.textContent = "Evaluation saved. Predicting...";
             } else {
-                userGradeEl.textContent = "Error saving evaluation.";
+                console.error("Failed to save evaluation");
             }
         } catch (e) {
             console.error("Error saving evaluation:", e);
         }
 
-        // 2. Run Prediction
         try {
-            await fetch(`${javaURI}/api/grade-prediction/train`, fetchOptions); 
+            await fetch(`${javaURI}/api/grade-prediction/train`, fetchOptions);
         } catch (error) {
             console.error("Error with training:", error);
         }
+        
         try {
             const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
                 ...fetchOptions,
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: 'POST',
                 body: JSON.stringify(body)
             });
             const data = await predict.json();
@@ -397,7 +462,7 @@ score += gists * 0.5
             ]);
 
             if (![profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes].every((res) => res.ok)) {
-                throw new Error("Failed to fetch analytics data");
+                throw new Error("One or more fetch requests failed.");
             }
 
             const profileLinks = await profileLinksRes.json();
@@ -429,7 +494,6 @@ score += gists * 0.5
             document.getElementById("followers").textContent = `Followers: ${userProfile.followers || 0}`;
             document.getElementById("following").textContent = `Following: ${userProfile.following || 0}`;
 
-            // Show lines changed in the new separate card
             document.getElementById("lines-changed").textContent = `+${totalAdditions} / -${totalDeletions}`;
 
             document.getElementById("commits-count").textContent = commitsCount;
@@ -440,19 +504,38 @@ score += gists * 0.5
             const commitCardsContainer = document.getElementById("commitCardsContainer");
             commitCardsContainer.innerHTML = "";
 
-            // Only show the 15 most recent commits
+            // Show the 15 most recent commits
             commitsArray.slice(0, 15).forEach((commit) => {
                 const card = document.createElement("div");
                 card.className = "flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-4";
+
                 card.innerHTML = `
-                    <a href="${commit.url}" target="_blank" class="text-blue-400 hover:underline font-semibold text-sm mb-2">${commit.message}</a>
-                    <p class="text-xs text-neutral-500 mb-1"><strong>Date:</strong> ${new Date(commit.date).toLocaleDateString()}</p>
-                    <p class="text-xs text-neutral-500 mb-1"><strong>Additions:</strong> +${commit.additions}</p>
-                    <p class="text-xs text-neutral-500 mb-1"><strong>Deletions:</strong> -${commit.deletions}</p>
-                    <p class="text-xs text-neutral-500"><strong>Repo:</strong> ${commit.repository}</p>
+                    <h4 class="text-sm font-medium mb-1">${commit.repository || "Unknown Repo"}</h4>
+                    <p class="text-xs mb-1">
+                        <strong>Message:</strong>
+                        <a href="${commit.url}" target="_blank" class="text-blue-400 hover:underline">
+                            ${commit.message || "No message"}
+                        </a>
+                    </p>
+                    <p class="text-xs mb-1"><strong>Date:</strong> ${new Date(commit.date).toLocaleString() || "Unknown"}</p>
+                    <p class="text-xs mb-1">
+                        <span class="text-green-400">+${commit.additions || 0}</span>
+                        /
+                        <span class="text-red-400">-${commit.deletions || 0}</span>
+                    </p>
                 `;
                 commitCardsContainer.appendChild(card);
             });
+
+            // Tech Grade Prediction Button
+            const predictTechGradeBtn = document.getElementById("predictTechGradeBtn");
+            if (predictTechGradeBtn) {
+                predictTechGradeBtn.onclick = () => {
+                    const grade = calculateGradeFromCommits(commitsCount);
+                    const techResult = document.getElementById("techGradeResult");
+                    if (techResult) techResult.textContent = `Grade based on commits: ${grade}`;
+                };
+            }
 
             // Info links to show modal details
             setupInfoModal("commits-info", commitsData);
@@ -465,19 +548,29 @@ score += gists * 0.5
         }
     }
 
-    function setupInfoModal(elementId, data) {
-        const el = document.getElementById(elementId);
-        el.addEventListener("click", (e) => {
-            e.preventDefault();
-            document.getElementById("modalData").textContent = JSON.stringify(data, null, 2);
-            document.getElementById("dataModal").classList.remove("hidden");
-            document.getElementById("dataModal").setAttribute("aria-hidden", "false");
-        });
+    function calculateGradeFromCommits(commitCount) {
+        if (commitCount > 20) return "90% (A)";
+        if (commitCount >= 10) return "85% (B)";
+        if (commitCount >= 5) return "75% (C)";
+        return "55% (F)";
     }
 
     // Modal code
     const dataModal = document.getElementById("dataModal");
+    const modalData = document.getElementById("modalData");
     const closeModal = dataModal.querySelector(".close");
+
+    function setupInfoModal(elementId, data) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                modalData.textContent = JSON.stringify(data, null, 2);
+                dataModal.classList.remove("hidden");
+                dataModal.setAttribute("aria-hidden", "false");
+            });
+        }
+    }
 
     closeModal.onclick = () => {
         dataModal.classList.add("hidden");
@@ -514,15 +607,39 @@ score += gists * 0.5
             document.getElementById(targetId).classList.add("block");
             tab.classList.add("active", "text-blue-500", "border-blue-500");
             setUnderline(tab);
+
+            if (targetId === "tab-content-ocs-analytics") {
+                if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
+                    await window.OCSAnalytics.loadAnalyticsSummary();
+                }
+            }
         });
     });
 
-    // Window load
+    // Initialize on load
     window.onload = async () => {
         const activeTab = document.querySelector(".tab-btn.active");
         if (activeTab) setUnderline(activeTab);
 
         await fetchData();
-        await loadStudentEvaluation(); // Load saved evaluation
+        await loadStudentEvaluation();
+        
+        // Load OCS Analytics if it's the active tab
+        if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
+            await window.OCSAnalytics.loadAnalyticsSummary();
+        }
     };
 </script>
+
+<style>
+    .info-icon {
+        font-size: 0.875rem;
+        color: #60a5fa;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .info-icon:hover {
+        color: #3b82f6;
+    }
+</style>
