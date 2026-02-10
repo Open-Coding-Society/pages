@@ -43,7 +43,22 @@
 <div class="pass-container" id="form-pass">
     <h2>A101 Pass</h2>
     <label for="studentName">Name: </label>
-    <input type="text" id="studentName" placeholder="Enter name here"><br><br>
+    <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <input type="text" id="studentName" placeholder="Enter name here" style="flex-grow: 1;">
+        <button class="medium primary" id="scanFaceBtn" type="button" onclick="toggleWebcam()">Scan Face</button>
+    </div>
+
+    <!-- Webcam Container (Hidden by default) -->
+    <div id="webcamContainer" class="hidden" style="margin-bottom: 20px;">
+        <div style="position: relative; width: 100%; max-width: 320px; margin: 0 auto;">
+            <video id="webcam" style="width: 100%; border-radius: 8px;" autoplay playsinline></video>
+            <canvas id="canvas" class="hidden"></canvas>
+            <div id="scanStatus" style="color: white; margin-top: 5px;"></div>
+        </div>
+        <button class="medium" style="background-color: #666; margin-top: 10px;" onclick="stopWebcam()">Cancel
+            Scan</button>
+    </div>
+
     <label for="choices">Choose Location:</label>
     <select id="choices" class="dropdown">
         <option value="Bathroom">Bathroom</option>
@@ -123,11 +138,117 @@
         fontColor = getRandomColor()
         for (var i = 0; i < elements.length; i++) {
             elements[i].style.backgroundColor = bgColor;
-            elements[i].style.color = fontColor;
-
         }
-        //document.getElementById("completed-pass").style.backgroundColor = getRandomColor();
-        //document.getElementById("completed-pass").style.color = getRandomColor();
-
     };
+
+    //document.getElementById("completed-pass").style.backgroundColor = getRandomColor();
+    //document.getElementById("completed-pass").style.color = getRandomColor();
+
+
+    // Facial Recognition Logic
+    let stream = null;
+    let scanInterval = null;
+    const video = document.getElementById('webcam');
+    const canvasElement = document.getElementById('canvas');
+    const webcamContainer = document.getElementById('webcamContainer');
+    const statusDiv = document.getElementById('scanStatus');
+    const nameInput = document.getElementById('studentName');
+
+    // Import config - we need pythonURI. Since this is a script tag inside an include, 
+    // we might not have module support directly unless type="module".
+    // Alternatively, we can assume pythonURI is available globally if defined elsewhere or hardcode/detect it.
+    // For now, let's try to detect it or use a fallback.
+    const pythonURI = location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://localhost:8587"
+        : "https://flask.opencodingsociety.com";
+
+    async function toggleWebcam() {
+        if (!webcamContainer.classList.contains('hidden')) {
+            stopWebcam();
+        } else {
+            webcamContainer.classList.remove('hidden');
+            statusDiv.innerText = "Accessing camera...";
+            startWebcam();
+        }
+    }
+
+    async function startWebcam() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            statusDiv.innerText = "Scanning...";
+
+            // Start scanning loop
+            scanInterval = setInterval(scanFace, 3000); // Scan every 3 seconds
+        } catch (err) {
+            console.error("Error accessing webcam:", err);
+            statusDiv.innerText = "Error: Could not access camera.";
+        }
+    }
+
+    function stopWebcam() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        if (scanInterval) {
+            clearInterval(scanInterval);
+            scanInterval = null;
+        }
+        webcamContainer.classList.add('hidden');
+        statusDiv.innerText = "";
+    }
+
+    async function scanFace() {
+        if (!stream) return;
+
+        // Draw video frame to canvas
+        canvasElement.width = video.videoWidth;
+        canvasElement.height = video.videoHeight;
+        const ctx = canvasElement.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+        // Get base64 data
+        const dataUrl = canvasElement.toDataURL('image/jpeg');
+        const base64Data = dataUrl.split(',')[1];
+
+        statusDiv.innerText = "Identifying...";
+
+        try {
+            const response = await fetch(`${pythonURI}/api/identify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add credentials if needed
+                },
+                body: JSON.stringify({ image: base64Data })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.match) {
+                    statusDiv.innerText = `Identified: ${data.name}`;
+                    nameInput.value = data.name;
+
+                    // Visual feedback
+                    nameInput.style.backgroundColor = "#e8f0fe";
+                    setTimeout(() => nameInput.style.backgroundColor = "", 1000);
+
+                    // Stop scanning after success
+                    setTimeout(stopWebcam, 1500);
+                } else {
+                    statusDiv.innerText = "No match found. Scanning...";
+                }
+            } else {
+                statusDiv.innerText = "Server error during scan.";
+            }
+        } catch (error) {
+            console.error("Scan error:", error);
+            statusDiv.innerText = "Connection error.";
+        }
+    }
+
+    // Override existing logic if needed or ensure it coexists
+    /* randomize(); */ // Call existng function if we want to run it on load logic
+
 </script>
