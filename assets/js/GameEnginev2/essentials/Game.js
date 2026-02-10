@@ -292,7 +292,7 @@ class GameCore {
     _createTopControls() {
         // Base implementation - no default UI
         // Override in game-specific wrappers like:
-        // - /assets/js/adventureGame/AdventureGame.js
+        // - /assets/js/adventureGame/Game.js
         // - /assets/js/mansionGame/MansionLogic/Game.js
     }
 

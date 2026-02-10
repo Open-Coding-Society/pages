@@ -1,7 +1,7 @@
 import Enemy from './essentials/Enemy.js';
 import Player from './essentials/Player.js';
 
-class Shark extends Enemy {
+class Pufferfish extends Enemy {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
     }
@@ -9,19 +9,19 @@ class Shark extends Enemy {
 
     /**
      * Check for proximity of objects.
-     * This method checks if any players are within a certain distance of the shark
+     * This method checks if any players are within a certain distance of the pufferfish
      * If players are within the specified distance, their names are collected and a response is generated.
      */
     checkProximityToPlayer() {
         //this.velocity.x=10
         // Filter all Player objects from the game environment
         var players = this.gameEnv.gameObjects.filter(obj => obj instanceof Player);
-        var shark = this;
+        var Pufferfish = this;
         var names = [];
 
         var player ;
 
-        if (players.length > 0 && shark) {
+        if (players.length > 0 && Pufferfish) {
             players.forEach(player => {
 
                 if (player.spriteData && player.spriteData.name == 'mainplayer') {
@@ -71,7 +71,7 @@ class Shark extends Enemy {
         //collided object is player
         if (player.id = this.collisionData.touchPoints.other.id) {
             
-            console.log("Shark collided with player!");
+            console.log("Pufferfish collided with player!");
 
         // Stop movement
         this.velocity.x = 0;
@@ -93,4 +93,4 @@ class Shark extends Enemy {
 }
 
 
-export default Shark;
+export default Pufferfish;

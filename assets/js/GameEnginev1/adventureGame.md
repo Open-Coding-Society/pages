@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Adventure Game
-permalink: /gamify/adventureGame
+permalink: /gamify/adventuregamev1
 ---
 
 <div id="gameContainer">
@@ -12,11 +12,11 @@ permalink: /gamify/adventureGame
 <script type="module">
 
     // Adnventure Game assets locations
-    import Game from "./GameEngine/Game.js";
-    import GameLevelWater from "./GameLevelWater.js";
-    import GameLevelDesert from "./GameLevelDesert.js";
-    import GameLevelEnd from "./GameLevelEnd.js";
-    import GameLevelOverworld from "./GameLevelOverworld.js";
+    import Game from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/Game.js";
+    import GameLevelWater from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelWater.js";
+    import GameLevelDesert from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelDesert.js";
+    import GameLevelEnd from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelEnd.js";
+    import GameLevelOverworld from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelOverworld.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     const gameLevelClasses = [GameLevelDesert, GameLevelWater, GameLevelEnd, GameLevelOverworld ];
