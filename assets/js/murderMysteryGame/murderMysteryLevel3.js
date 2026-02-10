@@ -1,7 +1,7 @@
-import GameEnvBackground from './MansionLogic/GameEnvBackground.js';
-import Player from './MansionLogic/Player.js';
-import GameObject from './MansionLogic/GameObject.js';
-import DialogueSystem from './MansionLogic/DialogueSystem.js';
+import GameEnvBackground from './murderMysteryGameLogic/GameEnvBackground.js';
+import Player from './murderMysteryGameLogic/Player.js';
+import GameObject from './murderMysteryGameLogic/GameObject.js';
+import DialogueSystem from './murderMysteryGameLogic/DialogueSystem.js';
 import MansionLevel4 from './mansionLevel4.js';
 
 console.log("🎮 mansionLevel3.js loaded!");
