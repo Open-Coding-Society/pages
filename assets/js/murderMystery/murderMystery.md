@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: Fortune Finders
-permalink: /gamify/fortuneFinders
+title: Murder Mystery Game 
+permalink: /gamify/murdermystery
 ---
 
 <div id="gameContainer">
@@ -10,13 +10,14 @@ permalink: /gamify/fortuneFinders
 </div>
 
 <script type="module">
-    // Adnventure Game assets locations
-    import FinTech from "{{site.baseurl}}/assets/js/adventureGame/FinTech.js";
-    import GameLevelAirport from "{{site.baseurl}}/assets/js/adventureGame/GameLevelAirport.js";
-    import GameLevelWallstreet from "{{site.baseurl}}/assets/js/adventureGame/GameLevelWallstreet.js";
-    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    const gameLevelClasses = [GameLevelAirport, GameLevelWallstreet];
+    // Adnventure Game assets locations
+    import Game from "/assets/js/GameEnginev1/essentials/Game.js";
+    import MurderMysteryL1 from "/assets/js/murderMystery/MurderMysteryL1.js";
+    import MurderMysteryL2 from "/assets/js/murderMystery/MurderMysteryL2.js";
+    import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+
+    const gameLevelClasses = [MurderMysteryL1, MurderMysteryL2];
 
     // Web Server Environment data
     const environment = {
@@ -29,6 +30,7 @@ permalink: /gamify/fortuneFinders
         gameLevelClasses: gameLevelClasses
 
     }
-    // Launch Adventure Game
-    FinTech.main(environment);
+    // Launch Adventure Game and keep the returned Game instance
+    const game = Game.main(environment);
+
 </script>

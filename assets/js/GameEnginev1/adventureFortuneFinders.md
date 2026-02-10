@@ -1,7 +1,7 @@
 ---
 layout: opencs
-title: End Game
-permalink: /gamify/end
+title: Fortune Finders
+permalink: /gamify/fortuneFinders
 ---
 
 <div id="gameContainer">
@@ -11,24 +11,24 @@ permalink: /gamify/end
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "{{site.baseurl}}/assets/js/adventureGame/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1.5/GameControl.js";
-    import GameLevelEnd from "{{site.baseurl}}/assets/js/adventureGame/GameLevelEnd.js";
+    import FinTech from "/assets/js/GameEnginev1/FinTech.js";
+    import GameLevelAirport from "/assets/js/GameEnginev1/GameLevelAirport.js";
+    import GameLevelWallstreet from "/assets/js/GameEnginev1/GameLevelWallstreet.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    const gameLevelClasses = [GameLevelEnd];
+    const gameLevelClasses = [GameLevelAirport, GameLevelWallstreet];
 
     // Web Server Environment data
     const environment = {
-        path: "{{site.baseurl}}",
+        path:"{{site.baseurl}}",
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
         gameLevelClasses: gameLevelClasses
-    }
 
-    // Launch Adventure Game using the central core and adventure GameControl
-    Core.main(environment, GameControl);
+    }
+    // Launch Adventure Game
+    FinTech.main(environment);
 </script>
