@@ -10,6 +10,8 @@ microblog: true
     <canvas id='gameCanvas'></canvas>
 </div>
 
+Launcher File
+
 <script type="module">
     // Mansion Game assets locations (use central core + GameControl)
     import Core from "{{site.baseurl}}/assets/js/murderMysteryGame/murderMysteryGameLogic/Game.js";
