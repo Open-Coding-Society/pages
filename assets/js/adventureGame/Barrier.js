@@ -14,7 +14,9 @@ class Barrier extends GameObject {
         this.canvas.width = width;
         this.canvas.height = height;
         this.ctx = this.canvas.getContext('2d');
-        this.gameEnv.container.appendChild(this.canvas);
+        // Attach to same container as other game objects for consistent coordinates
+        const gameContainer = document.getElementById('gameContainer');
+        if (gameContainer) gameContainer.appendChild(this.canvas);
         // Place using transform to align with existing engine conventions
         this.transform = { x: Number(this.spriteData.x || 0), y: Number(this.spriteData.y || 0), xv: 0, yv: 0 };
         // Full-rect collisions by default
@@ -27,10 +29,10 @@ class Barrier extends GameObject {
     }
 
     draw() {
-        // Position the collision canvas; draw only if editing/visible
+        // Position collision canvas using same coordinate system as Character
         this.canvas.style.position = 'absolute';
         this.canvas.style.left = `${this.transform.x}px`;
-        this.canvas.style.top = `${this.gameEnv.top + this.transform.y}px`;
+        this.canvas.style.top = `${(this.gameEnv?.top || 0) + this.transform.y}px`;
         this.canvas.style.width = `${this.canvas.width}px`;
         this.canvas.style.height = `${this.canvas.height}px`;
         this.canvas.style.zIndex = this.spriteData.zIndex !== undefined ? String(this.spriteData.zIndex) : '5';
