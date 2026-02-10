@@ -22,30 +22,36 @@ class GameLevel1 {
         id: 'Archie',
         greeting: "Hi, I am Archie.",
         src: path + "/images/murderMystery/archie_left.png",
-        SCALE_FACTOR: 10,
-        STEP_FACTOR: 200,
-        ANIMATION_RATE: 10,
+        SCALE_FACTOR: 4,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 0,
         INIT_POSITION: { x: 250, y: 300 },
         pixels: {height: 150, width: 100},
-        orientation: {rows: 4, columns: 3},
-        down: {row: 0, start: 0, columns: 3},
+        orientation: {rows: 1, columns: 1},
+        down: {row: 0, start: 0, columns: 1},
+        left: {row: 0, start: 0, columns: 1},
+        right: {row: 0, start: 0, columns: 1},
+        up: {row: 0, start: 0, columns: 1},
         hitbox: {widthPercentage: 0.5, heightPercentage: 0.5},
-        keypress: {left: 65, right:68}
+        keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
     };
 
 
     const sprite_data_boat = {
         id: 'Boat',
         src: path + "/images/murderMystery/boat.png",
-        SCALE_FACTOR: 7,
-        STEP_FACTOR: 800, // Same speed as Archie
-        ANIMATION_RATE: 10,
+        SCALE_FACTOR: 2,
+        STEP_FACTOR: 1000, // Same speed as Archie
+        ANIMATION_RATE: 0,
         INIT_POSITION: { x: 200, y: 300 }, // Positioned slightly under Archie
         pixels: { height: 200, width: 400 }, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
+        left: { row: 0, start: 0, columns: 1 },
+        right: { row: 0, start: 0, columns: 1 },
+        up: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 },
-        keypress: { left: 65, right: 68 } // Same keys as Archie
+        keypress: { left: 65, right: 68, up: 87, down: 83 } // Same keys as Archie
    };
 
 
