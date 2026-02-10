@@ -3,7 +3,7 @@ import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
 class MurderMysteryL2 {
-        constructor(gameEnv) {
+    constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
