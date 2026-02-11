@@ -9,7 +9,7 @@ class MurderMysteryL2 {
         const height = gameEnv.innerHeight;
         const bgData = {
             name: 'custom_bg',
-            src: path + "/images/gamebuilder/alien_planet.jpg",
+            src: path + "/assets/images/background.png",
             pixels: { height: 600, width: 1000 }
         };
         const playerData = {
