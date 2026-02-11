@@ -13,8 +13,8 @@ class GameLevelParallaxStairs {
         name: 'stairs',
         greeting: "Never ending stairs, leading to unknown depths.",
         src: image_src_stairs,
-        velocity: { x: 0, y: 0.5 },  // Move right (positive = left to right), no vertical movement
-        tiles: { x: 1, y: 1 },  // 2 schools visible (buffer tile added automatically for scrolling)
+        velocity: { x: 0, y: 0.3 },  // Vertical scrolling downward
+        scaleToFit: 'width',  // Scale image to fit screen width, tile vertically for scrolling
     }; 
 
     // List of objects defnitions for this level

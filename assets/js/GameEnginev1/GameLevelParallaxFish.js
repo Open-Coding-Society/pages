@@ -25,8 +25,7 @@ class GameLevelParallaxFish {
         pixels: {height: 472, width: 529},
         velocity: { x: 0.5, y: 0 },  // Move right (positive = left to right), no vertical movement
         opacity: "0.8",  // More visible
-        tiles: { x: 6, y: 1 },  // 2 schools visible (buffer tile added automatically for scrolling)
-        //zIndex: "2",  // Above the reef
+        tiles: { y: 1 },  // Control rows only; horizontal auto-calculates for smooth scrolling
     }; 
 
     // List of objects defnitions for this level

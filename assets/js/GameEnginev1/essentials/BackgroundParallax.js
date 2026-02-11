@@ -25,6 +25,7 @@ export class BackgroundParallax extends Background {
         this.position = data.position || { x: 0, y: 0 };
         this.velocity = data.velocity || { x: 0, y: 0 };
         this.tiles = data.tiles || null; // Optional: { x: num, y: num } to control tiling
+        this.scaleToFit = data.scaleToFit || null; // Optional: 'width' or 'height' to scale image instead of tile
         
         // Store reference to parent's onload to extend it
         const parentOnload = this.image.onload;
@@ -93,29 +94,57 @@ export class BackgroundParallax extends Background {
         const canvasWidth = this.canvas.width;
         const canvasHeight = this.canvas.height;
     
+        // Calculate scaled dimensions if scaleToFit is enabled
+        let drawWidth = this.width;
+        let drawHeight = this.height;
+        
+        if (this.scaleToFit === 'width') {
+            // Scale to fit canvas width, maintain aspect ratio
+            drawWidth = canvasWidth;
+            drawHeight = (this.height / this.width) * canvasWidth;
+        } else if (this.scaleToFit === 'height') {
+            // Scale to fit canvas height, maintain aspect ratio
+            drawHeight = canvasHeight;
+            drawWidth = (this.width / this.height) * canvasHeight;
+        }
+        
         // Calculate the wrapped position, Scrolling
-        let xWrapped = this.position.x % this.width;
-        let yWrapped = this.position.y % this.height;
+        let xWrapped = this.position.x % drawWidth;
+        let yWrapped = this.position.y % drawHeight;
     
         if (xWrapped > 0) {
-            xWrapped -= this.width;
+            xWrapped -= drawWidth;
         }
         if (yWrapped > 0) {
-            yWrapped -= this.height;
+            yWrapped -= drawHeight;
         }
    
         // Calculate the number of draws needed to fill the canvas, Tiling
-        // For configured tiles, add +1 buffer for smooth scrolling (tiles wrap seamlessly)
-        // For auto-calculated tiles, already includes +1 to fill screen
+        // Smart tiling: auto-calculate scrolling dimension, allow manual control of non-scrolling dimension
         let numHorizontalDraws, numVerticalDraws;
-        if (this.tiles) {
-            // User configured: add buffer tile for seamless wrapping
-            numHorizontalDraws = (this.velocity.x !== 0) ? this.tiles.x + 1 : this.tiles.x;
-            numVerticalDraws = (this.velocity.y !== 0) ? this.tiles.y + 1 : this.tiles.y;
+        
+        if (this.scaleToFit === 'width') {
+            // Scaled to width: only need 1 horizontal, calculate vertical for scrolling
+            numHorizontalDraws = 1;
+            numVerticalDraws = Math.ceil(canvasHeight / drawHeight) + 1;
+        } else if (this.scaleToFit === 'height') {
+            // Scaled to height: only need 1 vertical, calculate horizontal for scrolling
+            numVerticalDraws = 1;
+            numHorizontalDraws = Math.ceil(canvasWidth / drawWidth) + 1;
+        } else if (this.velocity.x !== 0) {
+            // Horizontal scrolling: auto-calculate horizontal tiles to cover screen width
+            numHorizontalDraws = Math.ceil(canvasWidth / drawWidth) + 1;
+            // Use configured vertical tiles or auto-calculate
+            numVerticalDraws = this.tiles?.y ? (this.velocity.y !== 0 ? this.tiles.y + 1 : this.tiles.y) : (Math.ceil(canvasHeight / drawHeight) + 1);
+        } else if (this.velocity.y !== 0) {
+            // Vertical scrolling: auto-calculate vertical tiles to cover screen height
+            numVerticalDraws = Math.ceil(canvasHeight / drawHeight) + 1;
+            // Use configured horizontal tiles or auto-calculate
+            numHorizontalDraws = this.tiles?.x ? this.tiles.x : (Math.ceil(canvasWidth / drawWidth) + 1);
         } else {
-            // Auto-calculate to fill screen
-            numHorizontalDraws = Math.ceil(canvasWidth / this.width) + 1;
-            numVerticalDraws = Math.ceil(canvasHeight / this.height) + 1;
+            // No scrolling or both directions: use configured tiles or auto-calculate both
+            numHorizontalDraws = this.tiles?.x || (Math.ceil(canvasWidth / drawWidth) + 1);
+            numVerticalDraws = this.tiles?.y || (Math.ceil(canvasHeight / drawHeight) + 1);
         }
 
         // Clear the canvas
@@ -127,7 +156,7 @@ export class BackgroundParallax extends Background {
                 this.ctx.drawImage(
                     this.image, // Source image
                     0, 0, this.width, this.height, // Source rectangle
-                    xWrapped + i * this.width, yWrapped + j * this.height, this.width, this.height); // Destination rectangle
+                    xWrapped + i * drawWidth, yWrapped + j * drawHeight, drawWidth, drawHeight); // Destination rectangle
             }
         }
     }
