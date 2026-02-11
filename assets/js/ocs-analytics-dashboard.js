@@ -123,14 +123,14 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                         <p class="text-xs text-neutral-500 mt-2">unique lessons</p>
                     </div>
 
-                    <!-- Modules Viewed -->
+                    <!-- Lessons Marked Complete -->
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
-                            <h3 class="text-neutral-300 font-medium">Modules Viewed</h3>
-                            <span class="text-purple-400">🎯</span>
+                            <h3 class="text-neutral-300 font-medium">Lessons Completed</h3>
+                            <span class="text-green-400">✅</span>
                         </div>
-                        <div class="text-3xl font-bold text-white">${summary.totalModulesViewed || 0}</div>
-                        <p class="text-xs text-neutral-500 mt-2">unique modules</p>
+                        <div class="text-3xl font-bold text-white">${summary.totalLessonsCompleted || 0}</div>
+                        <p class="text-xs text-neutral-500 mt-2">marked as complete</p>
                     </div>
 
                     <!-- Code Executions -->
@@ -189,6 +189,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <ul class="text-sm text-neutral-300 space-y-2">
                         <li>• <strong>Time Spent:</strong> Total hours/minutes spent on the platform</li>
                         <li>• <strong>Lessons Viewed:</strong> Number of unique lessons you've accessed</li>
+                        <li>• <strong>Lessons Completed:</strong> Number of lessons marked as complete via the burndown button</li>
                         <li>• <strong>Code Executions:</strong> Number of times you ran code in the code runner</li>
                         <li>• <strong>Interaction Rate:</strong> Percentage of time spent actively clicking, typing, scrolling vs idle</li>
                         <li>• <strong>Scroll Depth:</strong> Average percentage of page content you scroll through</li>

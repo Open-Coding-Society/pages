@@ -83,6 +83,8 @@
   let gameInstance = null;
   let currentLevelIndex = 0;
   let escapeKeyHandler = null;
+  let originalCanvasId = null;
+  let originalContainerId = null;
 
   // Disable game controls initially
   stopBtn.disabled = true;
@@ -156,8 +158,8 @@
     }
     
     // Clear canvas
-    const canvas = document.getElementById('game-canvas-{{ include.runner_id }}');
-    const container = document.getElementById('game-container-{{ include.runner_id }}');
+    const canvas = document.getElementById('gameCanvas') || document.getElementById('game-canvas-{{ include.runner_id }}');
+    const container = document.getElementById('gameContainer') || document.getElementById('game-container-{{ include.runner_id }}');
     
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -170,6 +172,16 @@
     if (container) {
       const canvases = container.querySelectorAll('canvas:not(#game-canvas-{{ include.runner_id }})');
       canvases.forEach(c => c.remove());
+    }
+
+    if (canvas && originalCanvasId !== null) {
+      canvas.id = originalCanvasId;
+      originalCanvasId = null;
+    }
+
+    if (container && originalContainerId !== null) {
+      container.id = originalContainerId;
+      originalContainerId = null;
     }
     
     updateStatus('Stopped');
@@ -241,6 +253,16 @@
       // Get canvas and container
       const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
       const gameCanvas = document.getElementById('game-canvas-{{ include.runner_id }}');
+
+      if (gameCanvas) {
+        originalCanvasId = gameCanvas.id;
+        gameCanvas.id = 'gameCanvas';
+      }
+
+      if (gameContainer) {
+        originalContainerId = gameContainer.id;
+        gameContainer.id = 'gameContainer';
+      }
       
       // Setup game environment
       const path = '{{ site.baseurl }}';
@@ -259,7 +281,7 @@
       });
       
       // Import core Game engine
-      const GameModule = await import(baseUrl + '/assets/js/GameEnginev1.5/Game.js');
+      const GameModule = await import(baseUrl + '/assets/js/GameEnginev1/essentials/Game.js');
       const Game = GameModule.default;
       
       // Create a blob URL to execute user code as a module
@@ -274,8 +296,8 @@
         const GameControl = userModule.GameControl;
         const gameLevelClasses = userModule.gameLevelClasses;
         
-        if (!GameControl || !gameLevelClasses) {
-          throw new Error('Code must export GameControl and gameLevelClasses');
+        if (!gameLevelClasses) {
+          throw new Error('Code must export gameLevelClasses');
         }
 
         // Initialize canvas dimensions before game starts

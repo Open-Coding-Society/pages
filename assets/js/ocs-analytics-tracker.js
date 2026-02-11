@@ -35,6 +35,7 @@
         
         // Counters
         lessonsViewed: new Set(),
+        lessonsCompleted: 0, // Track lessons marked as complete
         modulesViewed: new Set(),
         videosWatched: 0,
         videosCompleted: 0,
@@ -112,6 +113,22 @@
         }
         
         analyticsState.pageTitle = title;
+    }
+
+    /**
+     * Hook into the toggleComplete function to track lesson completion
+     * This is called from the #complete-btn button in the lesson player
+     */
+    function setupLessonCompletionTracking() {
+        if (typeof window.toggleComplete === 'function') {
+            const originalToggleComplete = window.toggleComplete;
+            window.toggleComplete = function() {
+                analyticsState.lessonsCompleted++;
+                debug('Lesson marked as complete via toggleComplete()');
+                // Call the original function
+                return originalToggleComplete.apply(this, arguments);
+            };
+        }
     }
 
     /**
@@ -350,6 +367,7 @@
             
             // User actions
             lessonsViewed: analyticsState.lessonsViewed.size,
+            lessonsCompleted: analyticsState.lessonsCompleted,
             modulesViewed: analyticsState.modulesViewed.size,
             videosWatched: analyticsState.videosWatched,
             videosCompleted: analyticsState.videosCompleted,
@@ -417,6 +435,7 @@
                 analyticsState.lastSubmitTime = new Date();
                 analyticsState.videosWatched = 0;
                 analyticsState.videosCompleted = 0;
+                analyticsState.lessonsCompleted = 0;
                 analyticsState.codeExecutions = 0;
                 analyticsState.copyPasteAttempts = 0;
                 analyticsState.questionsAnswered = 0;
@@ -451,6 +470,7 @@
         extractContentInfo();
         
         // Set up tracking
+        setupLessonCompletionTracking(); // Hook into toggleComplete() before other tracking
         trackCopyPaste();
         trackInteractions();
         trackScrollDepth();

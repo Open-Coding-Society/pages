@@ -30,7 +30,7 @@ export default class ScoreFeature {
             }
             // Try adventure game settings
             else if (window.location.pathname.includes('adventure') || window.location.pathname.includes('gamify')) {
-                import('../../../assets/js/adventureGame/scoreSettings.js')
+                import('../../adventureGame/scoreSettings.js')
                     .then(mod => {
                         this.scoreSettings = mod.default || mod.scoreSettings;
                         console.log('ScoreFeature: loaded adventure game settings');

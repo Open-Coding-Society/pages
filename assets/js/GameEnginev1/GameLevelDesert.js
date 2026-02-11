@@ -1,12 +1,14 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './GameEnvBackground.js';
-import Player from './Player.js';
-import Npc from './Npc.js';
-import Coin from './Coin.js';
+import GamEnvBackground from './essentials/GameEnvBackground.js';
+import Player from './essentials/Player.js';
+import Npc from './essentials/Npc.js';
+import Quiz from './Quiz.js';
 import DialogueSystem from './DialogueSystem.js';
-import GameControl from './GameControl.js';
+import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
+import GameLevelMinesweeper from './GameLevelMinesweeper.js';
+import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
 
 class GameLevelDesert {
@@ -87,10 +89,9 @@ class GameLevelDesert {
         },
         interact: function() {
             // Show random dialogue message
-            if (!this.dialogueSystem) {
-                this.dialogueSystem = new DialogueSystem();
+            if (this.dialogueSystem) {
+                this.showRandomDialogue();
             }
-            this.showRandomDialogue();
         }
     };
 
@@ -130,13 +131,147 @@ class GameLevelDesert {
           },
           interact: function() {
               // Show random dialogue message
-              if (!this.dialogueSystem) {
-                  this.dialogueSystem = new DialogueSystem();
+              if (this.dialogueSystem) {
+                  this.showRandomDialogue();
               }
-              this.showRandomDialogue();
           }
       };
     
+      const sprite_src_endportal = path + "/images/gamify/exitportalfull.png";
+      const sprite_greet_endportal = "Teleport to the End? Press E";
+      const sprite_data_endportal = {
+          id: 'End Portal',
+          greeting: sprite_greet_endportal,
+          src: sprite_src_endportal,
+          SCALE_FACTOR: 6,
+          ANIMATION_RATE: 100,
+          pixels: {width: 2029, height: 2025},
+          INIT_POSITION: { x: (width * 2 / 5), y: (height * 1 / 10)},
+          orientation: {rows: 1, columns: 1 },
+          down: {row: 0, start: 0, columns: 1 },
+          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+          // Add dialogues array for random messages
+          dialogues: [
+              "The End dimension awaits brave explorers.",
+              "Through this portal lies a realm of floating islands and strange creatures.",
+              "The Enderman guards ancient treasures. Who knows what else lurks beyond this portal?",
+              "Many have entered. Few have returned.",
+              "The void calls to you. Will you answer?",
+              "The End is not truly the end, but a new beginning.",
+              "Strange things await you beyond this portal..",
+              "Prepare yourself. The journey beyond won't be easy."
+          ],
+          reaction: function() {
+              // Don't show any reaction dialogue - this prevents the first alert
+              // The interact function will handle all dialogue instead
+          },
+          interact: function() {
+              // Clear any existing dialogue first to prevent duplicates
+              if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                  this.dialogueSystem.closeDialogue();
+              }
+              
+              // Create a new dialogue system if needed
+              if (!this.dialogueSystem) {
+                  this.dialogueSystem = new DialogueSystem();
+              }
+              
+              // Show portal dialogue with buttons
+              this.dialogueSystem.showDialogue(
+                  "Do you wish to enter The End dimension?",
+                  "End Portal",
+                  this.spriteData.src
+              );
+              
+              // Add buttons directly to the dialogue
+              this.dialogueSystem.addButtons([
+                  {
+                      text: "Enter Portal",
+                      primary: true,
+                      action: () => {
+                          this.dialogueSystem.closeDialogue();
+                          
+                          // Clean up the current game state
+                          if (gameEnv && gameEnv.gameControl) {
+                              // Store reference to the current game control
+                              const gameControl = gameEnv.gameControl;
+                              
+                              // Create fade overlay for transition
+                              const fadeOverlay = document.createElement('div');
+                              Object.assign(fadeOverlay.style, {
+                                  position: 'fixed',
+                                  top: '0',
+                                  left: '0',
+                                  width: '100%',
+                                  height: '100%',
+                                  backgroundColor: '#000',
+                                  opacity: '0',
+                                  transition: 'opacity 1s ease-in-out',
+                                  zIndex: '9999'
+                              });
+                              document.body.appendChild(fadeOverlay);
+                              
+                              console.log("Starting End level transition...");
+                              
+                              // Fade in
+                              requestAnimationFrame(() => {
+                                  fadeOverlay.style.opacity = '1';
+                                  
+                                  // After fade in, transition to End level
+                                  setTimeout(() => {
+                                      // Clean up current level properly
+                                      if (gameControl.currentLevel) {
+                                          // Properly destroy the current level
+                                          console.log("Destroying current level...");
+                                          gameControl.currentLevel.destroy();
+                                          
+                                          // Force cleanup of any remaining canvases
+                                          const gameContainer = document.getElementById('gameContainer');
+                                          const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                          oldCanvases.forEach(canvas => {
+                                              console.log("Removing old canvas:", canvas.id);
+                                              canvas.parentNode.removeChild(canvas);
+                                          });
+                                      }
+                                      
+                                      console.log("Setting up End level...");
+                                      
+                                      // IMPORTANT: Store the original level classes for return journey
+                                      gameControl._originalLevelClasses = gameControl.levelClasses;
+                                      
+                                      // Change the level classes to GameLevelEnd
+                                      gameControl.levelClasses = [GameLevelEnd];
+                                      gameControl.currentLevelIndex = 0;
+                                      
+                                      // Make sure game is not paused
+                                      gameControl.isPaused = false;
+                                      
+                                      // Start the End level with the same control
+                                      console.log("Transitioning to End level...");
+                                      gameControl.transitionToLevel();
+                                      
+                                      // Fade out overlay
+                                      setTimeout(() => {
+                                          fadeOverlay.style.opacity = '0';
+                                          setTimeout(() => {
+                                              document.body.removeChild(fadeOverlay);
+                                          }, 1000);
+                                      }, 500);
+                                  }, 1000);
+                              });
+                          }
+                      }
+                  },
+                  {
+                      text: "Not Ready",
+                      action: () => {
+                          this.dialogueSystem.closeDialogue();
+                      }
+                  }
+              ]);
+          }
+      }
+
       const sprite_src_chickenj = path + "/images/gamify/chickenj.png";
       const sprite_greet_chickenj = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
       const sprite_data_chickenj = {
@@ -309,10 +444,6 @@ class GameLevelDesert {
               }
               
               // Show a dialogue with buttons immediately
-              if (!this.dialogueSystem) {
-                  this.dialogueSystem = new DialogueSystem();
-              }
-              
               if (this.dialogueSystem) {
                   // Get a random dialogue message if available
                   let message = "I need help analyzing some stocks. Want to check out the market with me?";
@@ -429,10 +560,6 @@ class GameLevelDesert {
             }
             
             // Show a dialogue with buttons immediately
-            if (!this.dialogueSystem) {
-                this.dialogueSystem = new DialogueSystem();
-            }
-            
             if (this.dialogueSystem) {
                 // Get a random dialogue message if available
                 let message = "Feeling lucky? The casino awaits with games of chance and fortune!";
@@ -596,17 +723,6 @@ class GameLevelDesert {
               }
           },
           interact: function() {
-              // Hide all NPCs and the Player in the main level
-              const allCharacters = gameEnv.gameObjects.filter(obj => 
-                  obj instanceof Npc || obj instanceof Player
-              );
-              
-              allCharacters.forEach(character => {
-                  if (character.canvas) {
-                      character.canvas.style.display = 'none';
-                  }
-              });
-              
               // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
               // Set a primary game reference from the game environment
               let primaryGame = gameEnv.gameControl;
@@ -616,15 +732,10 @@ class GameLevelDesert {
           
               // Create and style the fade overlay
               const fadeOverlay = document.createElement('div');
-              
-              // Get canvas position to center the overlay
-              const canvas = gameEnv.gameCanvas || document.querySelector('canvas');
-              const canvasRect = canvas ? canvas.getBoundingClientRect() : { top: 0, left: 0 };
-              
               Object.assign(fadeOverlay.style, {
-                  position: 'fixed',
-                  top: canvasRect.top + 'px',
-                  left: canvasRect.left + 'px',
+                  position: 'absolute',
+                  top: '0px',
+                  left: '0px',
                   width: width + 'px',
                   height: height + 'px',
                   backgroundColor: '#0a0a1a',
@@ -675,35 +786,10 @@ class GameLevelDesert {
               setTimeout(() => {
                   // Start the new game
                   gameInGame.start();
-                  
-                  // Keep all characters hidden while mini-game is running
-                  const hideCharactersInterval = setInterval(() => {
-                      const allCharacters = gameEnv.gameObjects.filter(obj => 
-                          obj instanceof Npc || obj instanceof Player
-                      );
-                      
-                      allCharacters.forEach(character => {
-                          if (character.canvas) {
-                              character.canvas.style.display = 'none';
-                          }
-                      });
-                  }, 100); // Check and hide every 100ms
           
                   // Setup return to main game after mini-game ends
                   gameInGame.gameOver = function() {
-                      clearInterval(hideCharactersInterval); // Stop hiding characters
                       primaryGame.resume();
-                      
-                      // Keep all characters hidden after resume
-                      const allCharacters = gameEnv.gameObjects.filter(obj => 
-                          obj instanceof Npc || obj instanceof Player
-                      );
-                      
-                      allCharacters.forEach(character => {
-                          if (character.canvas) {
-                              character.canvas.style.display = 'none';
-                          }
-                      });
                   };
           
                   // Fade out
@@ -716,6 +802,50 @@ class GameLevelDesert {
           }
       };
 
+    const sprite_src_minesweeper = path + "/images/gamify/robot.png";
+    const sprite_greet_minesweeper = "Want to play a game of Minesweeper? Right-click to flag mines!";
+    const sprite_data_minesweeper = {
+        id: 'Minesweeper',
+        greeting: sprite_greet_minesweeper,
+        src: sprite_src_minesweeper,
+        SCALE_FACTOR: 10,
+        ANIMATION_RATE: 100,
+        pixels: {height: 316, width: 627},
+        INIT_POSITION: { x: (width * 2 / 3), y: (height * 2 / 3)},
+        orientation: {rows: 3, columns: 6},
+        down: {row: 1, start: 0, columns: 6},
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        // Add dialogues array for random messages
+        dialogues: [
+            "Minesweeper is all about logic and probability.",
+            "The numbers tell you how many mines are adjacent to that square.",
+            "Use right-click to flag squares you think contain mines.",
+            "The first click is always safe in modern Minesweeper.",
+            "Minesweeper was first included with Windows 3.1 in 1992.",
+            "The world record for expert Minesweeper is under 40 seconds!",
+            "Looking for patterns is key to solving Minesweeper efficiently.",
+            "Sometimes you have to make an educated guess - that's part of the game."
+        ],
+        reaction: function() {
+            // Use dialogue system instead of alert
+            if (this.dialogueSystem) {
+                this.showReactionDialogue();
+            } else {
+                console.log(sprite_greet_minesweeper);
+            }
+        },
+        interact: function() {
+            // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
+            let primaryGame = gameEnv.gameControl;
+            let levelArray = [GameLevelMinesweeper];
+            let gameInGame = new GameControl(gameEnv.game, levelArray);
+            primaryGame.pause();
+            gameInGame.start();
+            gameInGame.gameOver = function() {
+                primaryGame.resume();
+            }
+        }
+    };
 
     // List of objects defnitions for this level
     this.classes = [
@@ -727,8 +857,9 @@ class GameLevelDesert {
       { class: Npc, data: sprite_data_r2d2 },
       { class: Npc, data: sprite_data_stocks },
       { class: Npc, data: sprite_data_crypto },
+      { class: Npc, data: sprite_data_minesweeper },
       { class: Npc, data: sprite_data_chickenj },
-      { class: Coin, data: { INIT_POSITION: { x: Math.floor(width/2), y: Math.floor(height/2) }, size: 20, points: 5 } }
+      { class: Npc, data: sprite_data_endportal } 
     ];
   }
 

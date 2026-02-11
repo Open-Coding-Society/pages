@@ -1,7 +1,7 @@
-import GameEnvBackground from "./GameEnvBackground.js"
-import Player from "./Player.js"
-import Meteor from './Meteor.js';
-import Character from "./Character.js";
+import GameEnvBackground from "./essentials/GameEnvBackground.js"
+import Player from "./essentials/Player.js"
+import Meteor from "./Meteor.js"
+import Character from "./essentials/Character.js";
 import Quiz from "./Quiz.js"
 
 class GameLevelMeteorBlaster {
@@ -12,7 +12,7 @@ class GameLevelMeteorBlaster {
     let path = gameEnv.path
 
     console.log("Game path:", path)  // Debug log
-    // this.checkGameImages(path)
+    checkGameImages(path)
 
     this.score = 0
     this.lives = 3
@@ -388,20 +388,19 @@ class GameLevelMeteorBlaster {
       ...this.laserData,
       id: `Laser-${Math.random().toString(36).substring(2, 9)}`,
       INIT_POSITION: {
-        x: player.transform.x + player.width / 2 - 10,
-        y: player.transform.y - 20,
+        x: player.position.x + player.width / 2 - 10,
+        y: player.position.y - 20,
       },
     }
 
     const laser = new Character(laserData, this.gameEnv)
 
-    laser.transform.xv = 0
-    laser.transform.yv = -10;
+    laser.velocity = { x: 0, y: -10 }
 
     laser.update = function () {
-      this.transform.y += this.transform.yv
+      this.position.y += this.velocity.y
 
-      if (this.transform.y < -this.height) {
+      if (this.position.y < -this.height) {
         const index = this.gameEnv.gameObjects.indexOf(this)
         if (index !== -1) {
           this.gameEnv.gameObjects.splice(index, 1)
@@ -759,10 +758,10 @@ class GameLevelMeteorBlaster {
 
   isColliding(obj1, obj2) {
     return (
-      obj1.transform.x < obj2.transform.x + obj2.width &&
-      obj1.transform.x + obj1.width > obj2.transform.x &&
-      obj1.transform.y < obj2.transform.y + obj2.height &&
-      obj1.transform.y + obj1.height > obj2.transform.y
+      obj1.position.x < obj2.position.x + obj2.width &&
+      obj1.position.x + obj1.width > obj2.position.x &&
+      obj1.position.y < obj2.position.y + obj2.height &&
+      obj1.position.y + obj1.height > obj2.position.y
     )
   }
 
@@ -798,7 +797,7 @@ class GameLevelMeteorBlaster {
 
   checkGameOver() {
     for (let i = 0; i < this.meteors.length; i++) {
-      if (this.meteors[i].transform.y > this.gameEnv.innerHeight && !this.meteors[i].isHit) {
+      if (this.meteors[i].position.y > this.gameEnv.innerHeight && !this.meteors[i].isHit) {
         // Meteor reached bottom - no life lost, just remove it
         this.removeMeteor(i)
       }
@@ -855,7 +854,7 @@ class GameLevelMeteorBlaster {
 
     for (let i = this.lasers.length - 1; i >= 0; i--) {
       const laserIndex = this.gameEnv.gameObjects.indexOf(this.lasers[i])
-      if (laserIndex === -1 || this.lasers[i].transform.y < -this.lasers[i].height) {
+      if (laserIndex === -1 || this.lasers[i].position.y < -this.lasers[i].height) {
         this.removeLaser(i)
         continue
       }
