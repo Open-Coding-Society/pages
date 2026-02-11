@@ -59,7 +59,7 @@ date: 2025-12-02
           <ol>
             <li>
               <div style="margin-bottom:6px">You see this frontend call:
-                <pre style="display:inline-block;margin:6px 0;padding:6px;border-radius:4px;background:#574e4eff">fetch(`${javaURI}/api/responses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Ana", response: "Here is my answer" }) });</pre>
+                <pre style="display:inline-block;margin:6px 0;padding:6px;border-radius:4px;background:#574e4eff; white-space: pre-wrap; word-wrap: break-word;">fetch(`${javaURI}/api/responses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Ana", response: "Here is my answer" }) });</pre>
               </div>
               <div>What is the backend expected to do first when this request arrives?</div>
               <div><label><input type="radio" name="q0" value="C"> C. Validate the request format and required fields, then authenticate the user if needed</label></div>
