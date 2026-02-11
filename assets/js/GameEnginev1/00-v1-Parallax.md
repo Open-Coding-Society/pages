@@ -13,10 +13,11 @@ permalink: /gamify/parallax
     // Adnventure Game assets locations
     import Core from "/assets/js/GameEnginev1/essentials/Game.js";
     import GameControl from "/assets/js/GameEnginev1/essentials/GameControl.js";
-    import GameLevelFishParallax from "/assets/js/GameEnginev1/GameLevelFishParallax.js";
+    import GameLevelParallaxFish from "/assets/js/GameEnginev1/GameLevelParallaxFish.js";
+    import GameLevelParallaxStairs from "/assets/js/GameEnginev1/GameLevelParallaxStairs.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    const gameLevelClasses = [GameLevelFishParallax];
+    const gameLevelClasses = [GameLevelParallaxFish, GameLevelParallaxStairs];
 
     // Web Server Environment data
     const environment = {

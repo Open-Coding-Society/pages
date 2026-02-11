@@ -2,7 +2,7 @@
 import BackgroundParallax from './essentials/BackgroundParallax.js';
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 
-class GameLevelBasicParallax {
+class GameLevelParallaxFish {
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -38,4 +38,4 @@ class GameLevelBasicParallax {
 
 }
 
-export default GameLevelBasicParallax;
+export default GameLevelParallaxFish;
