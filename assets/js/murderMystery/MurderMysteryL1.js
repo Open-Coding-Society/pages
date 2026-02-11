@@ -1,3 +1,4 @@
+
 import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
