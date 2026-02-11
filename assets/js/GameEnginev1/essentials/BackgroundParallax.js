@@ -1,97 +1,78 @@
-import GameObject from './GameObject.js';
+import Background from './Background.js';
 
 /** Parallax Background GameObject
  * - Tiling: draw multiple of the image to fill the gameCanvas extents
  * - Scrolling: adds velocity or position updates to the update(), to scroll the background
  */
-export class BackgroundParallax extends GameObject {
+export class BackgroundParallax extends Background {
     /**
      * Constructor is called by GameLevel create() method
      * @param {Object} data - The data object for the background
      * @param {Object} gameEnv - The game environment object for convenient access to game properties 
      */
     constructor(data = null, gameEnv = null) {
-        super(gameEnv);
+        // Set default ID and zIndex for parallax backgrounds
+        const parallaxData = {
+            ...data,
+            id: data.id || "parallax-background",
+            zIndex: data.zIndex || "1"
+        };
         
-        if (!data || !data.src) {
-            console.error('BackgroundParallax requires a src property in data');
-            throw new Error('BackgroundParallax requires a src property in data');
-        }
+        // Call parent constructor which handles image loading and canvas creation
+        super(parallaxData, gameEnv);
         
-        this.data = data;
+        // Parallax-specific properties
         this.position = data.position || { x: 0, y: 0 };
-        this.velocity = data.velocity || 1;
+        this.velocity = data.velocity || { x: 0, y: 0 };
         
-        // Set the properties of the background
-        this.image = new Image();
-        this.image.src = data.src;
-        this.isInitialized = false; // Flag to track initialization
+        // Store reference to parent's onload to extend it
+        const parentOnload = this.image.onload;
         
-        // Finish initializing the background after the image loads 
+        // Extend the image.onload to add parallax-specific setup
         this.image.onload = () => {
-            // Width and height come from the image
-            this.width = this.image.width;
-            this.height = this.image.height;
-
-            // Create the canvas element and context
-            this.canvas = document.createElement("canvas");
-            this.canvas.style.position = "absolute";
-            this.canvas.id = data.id || "parallax-background";
-            this.ctx = this.canvas.getContext("2d");
-            
-            // Set z-index and opacity directly instead of using data
-            this.canvas.style.zIndex = "1"; // Use positive value to ensure visibility
-            this.canvas.style.opacity = "0.3"; // 30% opacity
-            
-            // Align the canvas size to the gameCanvas
-            this.alignCanvas();
-
-            // Append the canvas to the DOM first in the container to be behind everything
-            const gameContainer = document.getElementById("gameContainer");
-            if (gameContainer.firstChild) {
-                gameContainer.insertBefore(this.canvas, gameContainer.firstChild);
-            } else {
-                gameContainer.appendChild(this.canvas);
+            // Call parent onload first
+            if (parentOnload) {
+                parentOnload.call(this);
             }
             
-            this.isInitialized = true; // Mark as initialized
+            // Set opacity for parallax effect
+            this.canvas.style.opacity = data.opacity || "0.3";
+            
+            // Reposition canvas to be first in container (behind everything)
+            const gameContainer = document.getElementById("gameContainer");
+            if (gameContainer && this.canvas.parentNode) {
+                if (gameContainer.firstChild !== this.canvas) {
+                    gameContainer.insertBefore(this.canvas, gameContainer.firstChild);
+                }
+            }
         };
-        
-        this.image.onerror = () => {
-            console.error("Error loading background parallax image:", data.src);
-        };
-    }
-
-    /**
-     * Align canvas to be the same size and position as the gameCanvas 
-     */
-    alignCanvas() {
-        // align the canvas to the gameCanvas, Layered
-        const gameCanvas = document.getElementById("gameCanvas");
-        if (!gameCanvas) {
-            console.error("Game canvas not found");
-            return;
-        }
-        
-        this.canvas.width = gameCanvas.width;
-        this.canvas.height = gameCanvas.height;
-        this.canvas.style.left = gameCanvas.style.left;
-        this.canvas.style.top = gameCanvas.style.top;
     }
 
     /**
      * Update is called by GameLoop on all GameObjects 
+     * Overrides parent to add parallax scrolling
      */
     update() {
         // Update the position for parallax scrolling
-        this.position.x -= this.velocity; // Move left
-        this.position.y += this.velocity; // Move down (for snowfall effect)
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
 
         // Wrap the position to prevent overflow
-        if (this.position.x < -this.width) {
+        // For rightward movement (positive velocity.x), wrap when completing a full width cycle
+        if (this.velocity.x > 0 && this.position.x >= this.width) {
             this.position.x = 0;
         }
-        if (this.position.y > this.height) {
+        // For leftward movement (negative velocity.x), wrap when going too far left
+        if (this.velocity.x < 0 && this.position.x <= -this.width) {
+            this.position.x = 0;
+        }
+        
+        // For downward movement (positive velocity.y), wrap at bottom
+        if (this.velocity.y > 0 && this.position.y >= this.height) {
+            this.position.y = 0;
+        }
+        // For upward movement (negative velocity.y), wrap at top
+        if (this.velocity.y < 0 && this.position.y <= -this.height) {
             this.position.y = 0;
         }
 
@@ -100,7 +81,8 @@ export class BackgroundParallax extends GameObject {
     }
 
     /**
-     * Draws the background image within the canvas
+     * Draws the background image with tiling and scrolling
+     * Overrides parent to add parallax tiling effect
      */
     draw() {
         if (!this.isInitialized) {
@@ -135,32 +117,6 @@ export class BackgroundParallax extends GameObject {
                     this.image, // Source image
                     0, 0, this.width, this.height, // Source rectangle
                     xWrapped + i * this.width, yWrapped + j * this.height, this.width, this.height); // Destination rectangle
-            }
-        }
-    }
-    
-    /**
-     * Resize method is called by resize listener on all GameObjects
-     */
-    resize() {
-        this.alignCanvas(); // Align the canvas to the gameCanvas
-        this.draw(); // Redraw the canvas after resizing
-    }
-    
-    /**
-     * Destroy method to clean up resources
-     */
-    destroy() {
-        // Check if canvas exists before trying to remove it
-        if (this.canvas && this.canvas.parentNode) {
-            this.canvas.parentNode.removeChild(this.canvas);
-        }
-        
-        // Remove from gameObjects array if not already removed
-        if (this.gameEnv && this.gameEnv.gameObjects) {
-            const index = this.gameEnv.gameObjects.indexOf(this);
-            if (index !== -1) {
-                this.gameEnv.gameObjects.splice(index, 1);
             }
         }
     }
