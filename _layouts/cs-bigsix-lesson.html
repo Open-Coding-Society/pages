@@ -190,40 +190,48 @@ layout: opencs
       <!-- Navigation buttons -->
       <div class="max-w-5xl mx-auto mt-16 mb-8">
         <div class="flex items-center justify-between gap-6">
-          {% assign currentLesson = page.submodule | plus: 0 %}
-          {% assign prevLesson = currentLesson | minus: 1 %}
-          {% assign nextLesson = currentLesson | plus: 1 %}
-          {% assign basePath = page.url | split: '/submodule_' | first %}
-          
-          <!-- Dynamically find total submodules from quest home page -->
-          {% assign questHomePath = basePath | append: '/' %}
-          {% assign totalSubmodules = 6 %}
-          {% for p in site.pages %}
-            {% if p.url == questHomePath and p.lxdData.Topics %}
-              {% assign totalSubmodules = p.lxdData.Topics.size %}
+          {% assign lessons = site.pages
+            | where: "parent", page.parent
+            | where_exp: "item", "item.lesson_number"
+            | sort: "lesson_number" %}
+
+          {% assign currentIndex = nil %}
+          {% for lesson in lessons %}
+            {% if lesson.url == page.url %}
+              {% assign currentIndex = forloop.index0 %}
             {% endif %}
           {% endfor %}
-          
-          {% if currentLesson > 1 %}
-          <a href="{{ basePath }}/submodule_{{ prevLesson }}/" class="nav-button nav-button-prev">
-            <span class="nav-arrow">←</span>
-            <span class="nav-text">Previous Lesson</span>
-          </a>
+
+          {% assign prevIndex = currentIndex | minus: 1 %}
+          {% assign nextIndex = currentIndex | plus: 1 %}
+
+          {% if prevIndex >= 0 %}
+            {% assign prevLesson = lessons[prevIndex] %}
+            <a href="{{ prevLesson.url }}" class="nav-button nav-button-prev">
+              <span class="nav-arrow">←</span>
+              <span class="nav-text">Previous Lesson</span>
+            </a>
           {% else %}
-          <div style="width: 200px;"></div>
+            <div style="width: 200px;"></div>
           {% endif %}
 
-          {% if currentLesson < totalSubmodules %}
-          <a href="{{ basePath }}/submodule_{{ nextLesson }}/" id="next-lesson-btn" class="nav-button nav-button-next nav-button-disabled" aria-disabled="true">
-            <span class="nav-text">Next Lesson</span>
-            <span class="nav-arrow">→</span>
-          </a>
+          {% if nextIndex < lessons.size %}
+            {% assign nextLesson = lessons[nextIndex] %}
+            <a href="{{ nextLesson.url }}" id="next-lesson-btn"
+              class="nav-button nav-button-next nav-button-disabled"
+              aria-disabled="true">
+              <span class="nav-text">Next Lesson</span>
+              <span class="nav-arrow">→</span>
+            </a>
           {% else %}
-          <a href="{{ basePath }}/" id="back-to-module-btn" class="nav-button nav-button-next">
-            <span class="nav-text">Back to Module</span>
-            <span class="nav-arrow">→</span>
-          </a>
+            <a href="/bigsix/" id="back-to-module-btn"
+              class="nav-button nav-button-next">
+
+              <span class="nav-text">Back to Module</span>
+              <span class="nav-arrow">→</span>
+            </a>
           {% endif %}
+
         </div>
       </div>
 

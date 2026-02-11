@@ -3,7 +3,8 @@ layout: cs-bigsix-lesson
 title: "Backend Development — All-in-One Advanced Lesson"
 description: "A multi-step lesson on backend development, from fundamentals to advanced topics like serverless, IaC, and AI integration."
 permalink: /bigsix/backend_lesson
-parent: "Backend Development"
+parent: "bigsix"
+lesson_number: 2
 team: "Encrypters"
 categories: [CSP, Backend, Interactive, Advanced]
 tags: [backend, flask, spring, serverless, ai, interactive]

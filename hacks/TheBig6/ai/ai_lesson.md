@@ -3,7 +3,8 @@ layout: cs-bigsix-lesson
 title: "AI Development — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development."
 permalink: /bigsix/ai_lesson
-parent: "AI Usage"
+parent: "bigsix"
+lesson_number: 5
 team: "Thinkers"
 categories: [CSP, AI, Interactive]
 tags: [ai, prompt-engineering, interactive]

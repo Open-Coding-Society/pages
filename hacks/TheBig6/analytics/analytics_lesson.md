@@ -3,7 +3,8 @@ layout: cs-bigsix-lesson
 title: "Analytics — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson covering the admin dashboard, certificates, and mastery questions."
 permalink: /bigsix/analytics_lesson
-parent: "Analytics/Admin"
+parent: "bigsix"
+lesson_number: 6
 team: "Curators"
 categories: [CSP, Analytics, Interactive]
 tags: [analytics, admin, interactive]
