@@ -3,7 +3,8 @@ layout: cs-bigsix-lesson
 title: "Frontend Development — All-in-One Interactive Lesson"
 description: "Compact lesson combining Markdown, HTML, CSS, Sass, Tailwind, and JavaScript with interactive playgrounds"
 permalink: /bigsix/frontend_lesson
-parent: "Frontend Development"
+parent: "bigsix"
+lesson_number: 1
 team: "Creators"
 categories: [CSP, Frontend, Interactive]
 tags: [html, css, javascript, markdown, interactive]
