@@ -653,13 +653,19 @@ function renderQuiz() {
     it.opts.forEach((o, oi) => {
       const el = document.createElement('div');
       el.className = 'opt';
-      el.textContent = o;
+      el.innerHTML = `<span style="margin-right: 10px; display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--border);"></span>${o}`;
       el.dataset.i = i;
       el.dataset.oi = oi;
       el.onclick = () => {
         picks[i] = oi;
-        box.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => x.classList.remove('sel'));
+        box.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => {
+            x.classList.remove('sel');
+            const span = x.querySelector('span');
+            if (span) span.style.background = 'transparent';
+        });
         el.classList.add('sel');
+        const span = el.querySelector('span');
+        if (span) span.style.background = 'var(--accent)';
       };
       wrap.appendChild(el);
     });

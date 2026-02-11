@@ -62,7 +62,10 @@ date: 2025-12-02
                 <pre style="display:inline-block;margin:6px 0;padding:6px;border-radius:4px;background:#574e4eff; white-space: pre-wrap; word-wrap: break-word;">fetch(`${javaURI}/api/responses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Ana", response: "Here is my answer" }) });</pre>
               </div>
               <div>What is the backend expected to do first when this request arrives?</div>
+              <div><label><input type="radio" name="q0" value="A"> A. Immediately save the data to the database</label></div>
+              <div><label><input type="radio" name="q0" value="B"> B. Return a success message to the frontend</label></div>
               <div><label><input type="radio" name="q0" value="C"> C. Validate the request format and required fields, then authenticate the user if needed</label></div>
+              <div><label><input type="radio" name="q0" value="D"> D. Start a background job</label></div>
             </li>
           </ol>
           <div style="margin-top:12px;">
@@ -103,7 +106,10 @@ date: 2025-12-02
         <form id="quiz-form-3">
           <ol>
             <li><div style="margin-bottom:6px">In Spring Boot's layered architecture, which layer should contain business logic?</div>
+              <div><label><input type="radio" name="q1" value="A"> A. Controller</label></div>
               <div><label><input type="radio" name="q1" value="B"> B. Service</label></div>
+              <div><label><input type="radio" name="q1" value="C"> C. Repository</label></div>
+              <div><label><input type="radio" name="q1" value="D"> D. Entity</label></div>
             </li>
           </ol>
           <div style="margin-top:12px;">
@@ -240,7 +246,7 @@ function restore() {
  if(!form) return;
  const resultSpan = document.getElementById('quiz-result');
  const resetBtn = document.getElementById('quiz-reset');
- const answers = ['C','C','B','B','B'];
+ const answers = ['C'];
  form.addEventListener('submit', (e) => {
    e.preventDefault();
    let score = 0;
@@ -279,12 +285,12 @@ function restore() {
   const form = document.getElementById('quiz-form-3');
   if(!form) return;
   const resultSpan = document.getElementById('quiz-result-3');
-  const answers = ['A','B','B','B','B'];
+  const answers = ['B'];
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     let score = 0;
     for (let i = 0; i < answers.length; i++) {
-      const selected = form.elements['q' + i] ? form.elements['q' + i].value : null;
+      const selected = form.elements['q' + (i+1)] ? form.elements['q' + (i+1)].value : null;
       if (selected === answers[i]) score += 1;
     }
     resultSpan.textContent = `You scored ${score} / ${answers.length}`;
