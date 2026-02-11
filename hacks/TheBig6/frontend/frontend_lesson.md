@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "Frontend Development — All-in-One Interactive Lesson"
 description: "Compact lesson combining Markdown, HTML, CSS, Sass, Tailwind, and JavaScript with interactive playgrounds"
 permalink: /bigsix/frontend_lesson

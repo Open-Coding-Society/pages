@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "Data Visualization — All-in-One Interactive Lesson"
 description: "Compact lesson combining REST APIs, Spring Boot, CRUD, search, filtering, pagination, and data queries"
 permalink: /bigsix/dataviz_lesson

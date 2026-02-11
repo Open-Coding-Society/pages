@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "Backend Development — All-in-One Advanced Lesson"
 description: "A multi-step lesson on backend development, from fundamentals to advanced topics like serverless, IaC, and AI integration."
 permalink: /bigsix/backend_lesson

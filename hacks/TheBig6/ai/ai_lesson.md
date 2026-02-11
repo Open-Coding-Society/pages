@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "AI Development — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development."
 permalink: /bigsix/ai_lesson

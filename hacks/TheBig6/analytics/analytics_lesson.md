@@ -1,5 +1,5 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "Analytics — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson covering the admin dashboard, certificates, and mastery questions."
 permalink: /bigsix/analytics_lesson
