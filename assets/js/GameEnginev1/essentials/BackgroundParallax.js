@@ -24,6 +24,7 @@ export class BackgroundParallax extends Background {
         // Parallax-specific properties
         this.position = data.position || { x: 0, y: 0 };
         this.velocity = data.velocity || { x: 0, y: 0 };
+        this.tiles = data.tiles || null; // Optional: { x: num, y: num } to control tiling
         
         // Store reference to parent's onload to extend it
         const parentOnload = this.image.onload;
@@ -104,8 +105,18 @@ export class BackgroundParallax extends Background {
         }
    
         // Calculate the number of draws needed to fill the canvas, Tiling
-        const numHorizontalDraws = Math.ceil(canvasWidth / this.width) + 1;
-        const numVerticalDraws = Math.ceil(canvasHeight / this.height) + 1;
+        // For configured tiles, add +1 buffer for smooth scrolling (tiles wrap seamlessly)
+        // For auto-calculated tiles, already includes +1 to fill screen
+        let numHorizontalDraws, numVerticalDraws;
+        if (this.tiles) {
+            // User configured: add buffer tile for seamless wrapping
+            numHorizontalDraws = (this.velocity.x !== 0) ? this.tiles.x + 1 : this.tiles.x;
+            numVerticalDraws = (this.velocity.y !== 0) ? this.tiles.y + 1 : this.tiles.y;
+        } else {
+            // Auto-calculate to fill screen
+            numHorizontalDraws = Math.ceil(canvasWidth / this.width) + 1;
+            numVerticalDraws = Math.ceil(canvasHeight / this.height) + 1;
+        }
 
         // Clear the canvas
         this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);

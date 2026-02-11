@@ -24,7 +24,8 @@ class GameLevelBasicParallax {
         src: image_src_school_fish,
         pixels: {height: 472, width: 529},
         velocity: { x: 0.5, y: 0 },  // Move right (positive = left to right), no vertical movement
-        //opacity: "0.8",  // More visible
+        opacity: "0.8",  // More visible
+        tiles: { x: 6, y: 1 },  // 2 schools visible (buffer tile added automatically for scrolling)
         //zIndex: "2",  // Above the reef
     }; 
 
