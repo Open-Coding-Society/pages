@@ -90,7 +90,7 @@ Narrator:
 "Uncover the truth. End the murders."
 
 Narrator:
-"Good luck."
+"Take home the crown."
 
 ------------------------------
 
@@ -104,7 +104,7 @@ Narrator:
 a power not meant for mortal hands."
 
 Narrator:
-"The weapon now yours."
+"The weapon is now yours."
 
 Narrator:
 "The mystery is solved. The people are safe once more."
