@@ -558,6 +558,7 @@ comments: false
   }
 
   document.addEventListener('paste', function(event) {
+    if (document.getElementById('chatModal').classList.contains('hidden')) return;
     if (typeof window.handlePastedChatImage === 'function') {
       window.handlePastedChatImage(event);
     }
