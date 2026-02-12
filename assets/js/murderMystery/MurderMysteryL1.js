@@ -1,4 +1,3 @@
-
 import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
@@ -17,15 +16,16 @@ class MurderMysteryL1 {
         pixels: {height: 580, width: 1038},
         mode: 'contain',
     };
+    
 
     const sprite_data_boat = {
         id: 'Boat',
         src: path + "/images/murderMystery/archie_boat.png", // A simple boat sprite
-        SCALE_FACTOR: 3,
+        SCALE_FACTOR: 5,
         STEP_FACTOR: 1000, // Same speed as Archie
         ANIMATION_RATE: 0,
         INIT_POSITION: { x: 250, y: 350 }, // Positioned slightly under Archie
-        pixels: { height: 200, width: 400 }, // Adjust based on your boat image size
+        pixels: { height: 260, width: 100 }, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         downRight: {row: 0, start: 0, columns: 1},
@@ -52,7 +52,7 @@ class MurderMysteryL1 {
     STEP_FACTOR: 1000,
     ANIMATION_RATE: 0,
     // Position the suspect on the island, away from the boat 
-    INIT_POSITION: { x: 600, y: 300 }, 
+    INIT_POSITION: { x: 800, y: 300 }, 
     pixels: { height: 200, width: 200 },
     orientation: { rows: 1, columns: 1 },
     down: { row: 0, start: 0, columns: 1 },
@@ -67,7 +67,6 @@ class MurderMysteryL1 {
     }
 
    }; 
-
 
     this.classes = [
             { class: GameEnvBackground, data: image_data_background },
