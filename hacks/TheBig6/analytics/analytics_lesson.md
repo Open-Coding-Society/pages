@@ -1,9 +1,10 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "Analytics — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson covering the admin dashboard, certificates, and mastery questions."
 permalink: /bigsix/analytics_lesson
-parent: "Analytics/Admin"
+parent: "bigsix"
+lesson_number: 6
 team: "Curators"
 categories: [CSP, Analytics, Interactive]
 tags: [analytics, admin, interactive]
@@ -49,7 +50,7 @@ date: 2025-12-02
   .detail-row { border-top-color: var(--accent); }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Analytics — All-in-One</h1>
     <p>Interactive lesson covering the admin dashboard, certificates, and mastery questions.</p>
@@ -268,3 +269,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

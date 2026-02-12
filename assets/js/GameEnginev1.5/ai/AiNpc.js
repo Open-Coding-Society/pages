@@ -2,7 +2,7 @@
  * AINpc.js - BASE CLASS 
  */
 
-import DialogueSystem from '../../features/DialogueSystem.js';
+import DialogueSystem from '../DialogueSystem.js';
 import { pythonURI, javaURI, fetchOptions } from '../../api/config.js';
 
 class AINpc {

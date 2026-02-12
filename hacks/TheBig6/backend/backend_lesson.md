@@ -1,9 +1,10 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "Backend Development — All-in-One Advanced Lesson"
 description: "A multi-step lesson on backend development, from fundamentals to advanced topics like serverless, IaC, and AI integration."
 permalink: /bigsix/backend_lesson
-parent: "Backend Development"
+parent: "bigsix"
+lesson_number: 2
 team: "Encrypters"
 categories: [CSP, Backend, Interactive, Advanced]
 tags: [backend, flask, spring, serverless, ai, interactive]
@@ -40,7 +41,7 @@ date: 2025-12-02
   .code-snippet { background: #020617; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 1rem; font-family: Consolas, monospace; font-size: 12px; color: #cfe8ff; white-space: pre-wrap; word-wrap: break-word; }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Backend Development — All-in-One</h1>
     <p>An interactive lesson covering backend fundamentals, frameworks, and advanced topics.</p>
@@ -59,10 +60,13 @@ date: 2025-12-02
           <ol>
             <li>
               <div style="margin-bottom:6px">You see this frontend call:
-                <pre style="display:inline-block;margin:6px 0;padding:6px;border-radius:4px;background:#574e4eff">fetch(`${javaURI}/api/responses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Ana", response: "Here is my answer" }) });</pre>
+                <pre style="display:inline-block;margin:6px 0;padding:6px;border-radius:4px;background:#574e4eff; white-space: pre-wrap; word-wrap: break-word;">fetch(`${javaURI}/api/responses`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Ana", response: "Here is my answer" }) });</pre>
               </div>
               <div>What is the backend expected to do first when this request arrives?</div>
+              <div><label><input type="radio" name="q0" value="A"> A. Immediately save the data to the database</label></div>
+              <div><label><input type="radio" name="q0" value="B"> B. Return a success message to the frontend</label></div>
               <div><label><input type="radio" name="q0" value="C"> C. Validate the request format and required fields, then authenticate the user if needed</label></div>
+              <div><label><input type="radio" name="q0" value="D"> D. Start a background job</label></div>
             </li>
           </ol>
           <div style="margin-top:12px;">
@@ -103,7 +107,10 @@ date: 2025-12-02
         <form id="quiz-form-3">
           <ol>
             <li><div style="margin-bottom:6px">In Spring Boot's layered architecture, which layer should contain business logic?</div>
+              <div><label><input type="radio" name="q1" value="A"> A. Controller</label></div>
               <div><label><input type="radio" name="q1" value="B"> B. Service</label></div>
+              <div><label><input type="radio" name="q1" value="C"> C. Repository</label></div>
+              <div><label><input type="radio" name="q1" value="D"> D. Entity</label></div>
             </li>
           </ol>
           <div style="margin-top:12px;">
@@ -177,18 +184,44 @@ date: 2025-12-02
 let currentStep = 0;
 const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
 const STORAGE_KEY = 'backend_combined_v1';
+// ========== Big Six Lesson Metadata ==========
+const BIG_SIX_META = {
+  module: "backend_lesson",  // Matches the permalink /bigsix/backend_lesson
+  totalLessons: 6            // Matches the lesson count in questHome
+};
+
+function saveBigSixProgress(stepNumber) {
+  const key = `bigsix:${BIG_SIX_META.module}:lesson:${stepNumber}`;
+  if (localStorage.getItem(key) !== "done") {
+    localStorage.setItem(key, "done");
+    console.log(`✅ Big Six step completed: ${key}`);
+  }
+}
 
 function showStep(n) {
   currentStep = Math.max(0, Math.min(steps.length - 1, n));
   steps.forEach((s, i) => document.getElementById(s).classList.toggle('active', i === currentStep));
+
   const bar = document.getElementById('progressBar');
-  if(bar) bar.innerHTML = steps.map((_, i) => `<div class="step ${i <= currentStep ? 'active' : ''}" onclick="showStep(${i})"></div>`).join('');
+  if(bar) bar.innerHTML = steps
+    .map((_, i) => `<div class="step ${i <= currentStep ? 'active' : ''}" onclick="showStep(${i})"></div>`)
+    .join('');
+
   const indicator = document.getElementById('stepIndicator');
   if(indicator) indicator.textContent = `Step ${currentStep + 1} / ${steps.length}`;
+
   document.getElementById('prevBtn').disabled = currentStep === 0;
   document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
+
   persist();
+
+  // ✅ BIG SIX COMPLETION (FINAL STEP)
+  if (currentStep === steps.length - 1) {
+    completeBigSixLesson();
+  }
+  saveBigSixProgress(currentStep + 1);
 }
+
 window.showStep = showStep;
 function prevStep() { showStep(currentStep - 1); }
 window.prevStep = prevStep;
@@ -214,7 +247,7 @@ function restore() {
  if(!form) return;
  const resultSpan = document.getElementById('quiz-result');
  const resetBtn = document.getElementById('quiz-reset');
- const answers = ['C','C','B','B','B'];
+ const answers = ['C'];
  form.addEventListener('submit', (e) => {
    e.preventDefault();
    let score = 0;
@@ -253,12 +286,12 @@ function restore() {
   const form = document.getElementById('quiz-form-3');
   if(!form) return;
   const resultSpan = document.getElementById('quiz-result-3');
-  const answers = ['A','B','B','B','B'];
+  const answers = ['B'];
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     let score = 0;
     for (let i = 0; i < answers.length; i++) {
-      const selected = form.elements['q' + i] ? form.elements['q' + i].value : null;
+      const selected = form.elements['q' + (i+1)] ? form.elements['q' + (i+1)].value : null;
       if (selected === answers[i]) score += 1;
     }
     resultSpan.textContent = `You scored ${score} / ${answers.length}`;
@@ -338,3 +371,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

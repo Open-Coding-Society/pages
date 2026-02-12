@@ -110,6 +110,18 @@ class GameControl {
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
+        // If there's an existing level instance, destroy it before creating the next one.
+        // This ensures canvases and game objects from the previous level are removed
+        // and prevents leftover player canvases that can't be controlled.
+        if (this.currentLevel && typeof this.currentLevel.destroy === 'function') {
+            try {
+                this.currentLevel.destroy();
+            } catch (e) {
+                console.error('Error destroying previous level:', e);
+            }
+            this.currentLevel = null;
+        }
+
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);

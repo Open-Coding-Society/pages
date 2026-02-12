@@ -56,6 +56,8 @@ class GameEnv {
      * Sets the canvas element and its 2D rendering context.
      */
     setCanvas() {
+        // Prefer builder container if present
+        this.container = document.getElementById('gameContainer') || document.body;
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     }
@@ -64,6 +66,11 @@ class GameEnv {
      * Sets the top offset based on the height of the header element.
      */
     setTop() {
+        // In builder/embedded mode, align game space to container top (no header offset)
+        if (document.getElementById('gameContainer')) {
+            this.top = 0;
+            return;
+        }
         const header = document.querySelector('header');
         this.top = header ? header.offsetHeight : 0;
     }

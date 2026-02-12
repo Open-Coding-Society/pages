@@ -1,9 +1,10 @@
 ---
-layout: cs-portfolio-lesson
+layout: cs-bigsix-lesson
 title: "AI Development — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development."
 permalink: /bigsix/ai_lesson
-parent: "AI Usage"
+parent: "bigsix"
+lesson_number: 5
 team: "Thinkers"
 categories: [CSP, AI, Interactive]
 tags: [ai, prompt-engineering, interactive]
@@ -70,7 +71,7 @@ date: 2025-12-02
     .action-button:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px rgba(30, 132, 73, 0.5); }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>AI Development — All-in-One</h1>
     <p>A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development.</p>
@@ -202,6 +203,20 @@ date: 2025-12-02
 let currentStep = 0;
 const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
 const STORAGE_KEY = 'ai_combined_v1';
+// ========== Big Six Lesson Metadata ==========
+const BIG_SIX_META = {
+  module: "ai_lesson",
+  lesson: 5
+};
+
+function completeBigSixLesson() {
+  const key = `bigsix:${BIG_SIX_META.module}:lesson:${BIG_SIX_META.lesson}`;
+  if (localStorage.getItem(key) !== "done") {
+    localStorage.setItem(key, "done");
+    console.log(`✅ Big Six completed: ${key}`);
+  }
+}
+
 
 function showStep(n) {
   currentStep = Math.max(0, Math.min(steps.length - 1, n));
@@ -223,7 +238,13 @@ function showStep(n) {
   if (nextBtn) nextBtn.disabled = currentStep === steps.length - 1;
 
   persist();
+
+  // ✅ BIG SIX COMPLETION HOOK (FINAL STEP)
+  if (currentStep === steps.length - 1) {
+    completeBigSixLesson();
+  }
 }
+
 
 function prevStep() { showStep(currentStep - 1); }
 function nextStep() { showStep(currentStep + 1); }
@@ -346,3 +367,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

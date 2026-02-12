@@ -151,9 +151,26 @@ class Player extends Character {
      * @param {*} other - The object that the player is colliding with
      */
     handleCollisionReaction(other) {    
-        this.pressedKeys = {};
-        this.updateVelocity();
-        this.updateDirection();
+        // Do NOT clear pressed keys; keep walking animation active
+        // Halt movement by zeroing velocity along collision axis
+
+        // Avoid DOM-based push-out; rely on velocity zeroing only
+            // Do NOT clear pressed keys; keep walking animation active
+            // Halt movement by zeroing velocity along the touched axes; avoid DOM-based push-out
+            try {
+                const touchPoints = this.collisionData?.touchPoints?.this;
+                if (touchPoints) {
+                    // Horizontal block
+                    if (touchPoints.left || touchPoints.right) {
+                        this.velocity.x = 0;
+                    }
+                    // Vertical block
+                    if (touchPoints.top || touchPoints.bottom) {
+                        this.velocity.y = 0;
+                    }
+                }
+            } catch (_) {}
+
         super.handleCollisionReaction(other);
     }
 
