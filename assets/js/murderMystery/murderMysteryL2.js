@@ -4,6 +4,7 @@ import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
 
 class MurderMysteryL2 {
+    static friendlyName = "Level 2: The Pirate's Cove";
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
