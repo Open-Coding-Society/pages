@@ -3,7 +3,7 @@ Title: "Granolaa Capstone"
 Description: "A Research Through Design capstone for a local-first monitoring and live streaming tool that exposes screen and webcam streams over local HTTP URLs for classroom proctoring and supervision."
 
 Topics:
-  - title: "Granolaa — Local Monitoring & Live Streaming Tool"
+  - title: "Granolaa"
     image: "capstone/granolaa.png"
     link: "/capstone/granolaa/"
     alt: "Granolaa - Local-First Screen and Webcam Monitoring"

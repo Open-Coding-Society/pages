@@ -3,7 +3,7 @@ Title: "Bud-E Capstone"
 Description: "A design-research capstone for a browser extension that gamifies productivity through a virtual pet that grows when users stay focused on whitelisted websites and degrades when they navigate to distracting sites."
 
 Topics:
-  - title: "Bud-E — Productivity Pet Browser Extension"
+  - title: "Bud-E"
     image: "capstone/bud_e.png"
     link: "/capstone/bud-e/"
     alt: "Bud-E - Productivity Gamification Through Virtual Pet"
