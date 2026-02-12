@@ -1,0 +1,645 @@
+---
+title: Analytics Dashboard
+layout: aesthetihawk
+active_tab: analytics
+---
+
+<!-- Fonts loaded globally via head-custom.html -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
+<link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
+<div class="w-full">
+    <div class="space-y-4 sm:space-y-6">
+        <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
+            <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
+                <li class="me-2">
+                    <a href="#" id="tab-ocs-analytics"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300 active text-blue-500 border-blue-500" aria-current="page">
+                        OCS Analytics
+                    </a>
+                </li>
+                <li class="me-2">
+                    <a href="#" id="tab-github"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        GitHub Analytics
+                    </a>
+                </li>
+                <li class="me-2">
+                    <a href="#" id="tab-grade"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Grade Predictor
+                    </a>
+                </li>
+            </ul>
+            <!-- sliding underline indicator -->
+            <div id="tab-underline"
+                style="position:absolute;bottom:0;left:0;height:2px;width:0;background:#2563eb;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
+            </div>
+        </div>
+
+        <!-- tab content container -->
+        <div id="tab-content-container" class="relative min-h-[400px]">
+            
+            <!-- OCS Analytics tab content -->
+            <div id="tab-content-ocs-analytics" class="tab-content block px-6 py-4 text-neutral-200">
+                <div class="flex items-center justify-center min-h-[400px]">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p class="text-neutral-300">Loading OCS analytics...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GitHub Analytics tab content -->
+            <div id="tab-content-github" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <!-- Grid -->
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-4 lg:grid-rows-2 gap-4 sm:gap-6 text-neutral-200">
+                    <!-- Avatar Card -->
+                    <div class="row-span-2 col-start-1 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700">
+                        <div class="p-4 md:p-5 flex justify-center items-center">
+                            <img src="" alt="User Avatar" id="avatar" class="w-32 h-32 rounded-xl object-cover" />
+                        </div>
+                    </div>
+
+                    <!-- Profile Info Card -->
+                    <div class="row-span-2 col-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                        <p class="text-xs uppercase text-neutral-500 mb-2">GitHub Info (Trimester)</p>
+                        <h3 id="username" class="text-2xl font-medium mb-2">Loading...</h3>
+                        <p id="profile-url" class="text-sm mb-1">Profile URL: Loading...</p>
+                        <p id="repos-url" class="text-sm mb-1">Repos URL: Loading...</p>
+                        <p id="public-repos" class="text-sm mb-1">Public Repos: Loading...</p>
+                        <p id="public-gists" class="text-sm mb-1">Public Gists: Loading...</p>
+                        <p id="followers" class="text-sm mb-1">Followers: Loading...</p>
+                        <p id="following" class="text-sm mb-1">Following: Loading...</p>
+                    </div>
+
+                    <!-- Commits Card -->
+                    <div class="col-start-3 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                        <p class="text-xs uppercase text-neutral-500 mb-2 flex items-center gap-1">
+                            Commits
+                            <a href="#" class="info-link" id="commits-info" title="Click for details">
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </a>
+                        </p>
+                        <h3 id="commits-count" class="text-2xl font-medium">Loading...</h3>
+                    </div>
+
+                    <!-- Issues Card -->
+                    <div class="col-start-4 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                        <p class="text-xs uppercase text-neutral-500 mb-2 flex items-center gap-1">
+                            Issues
+                            <a href="#" class="info-link" id="issues-info" title="Click for details">
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </a>
+                        </p>
+                        <h3 id="issues-count" class="text-2xl font-medium">Loading...</h3>
+                    </div>
+
+                    <!-- Pull Requests Card -->
+                    <div class="col-start-3 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                        <p class="text-xs uppercase text-neutral-500 mb-2 flex items-center gap-1">
+                            Pull Requests
+                            <a href="#" class="info-link" id="prs-info" title="Click for details">
+                                <i class="fas fa-info-circle info-icon"></i>
+                            </a>
+                        </p>
+                        <h3 id="prs-count" class="text-2xl font-medium">Loading...</h3>
+                    </div>
+
+                    <!-- Lines Changed Card -->
+                    <div class="col-start-4 row-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-5">
+                        <p class="text-xs uppercase text-neutral-500 mb-2">Lines Changed</p>
+                        <h3 id="lines-changed" class="text-2xl font-medium">Loading...</h3>
+                    </div>
+                </div>
+
+                <!-- Commit Cards Container -->
+                <div id="commitCardsContainer" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Grade Predictor tab content -->
+            <div id="tab-content-grade" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <h2 class="text-xl font-semibold mb-4">Grade Predictor</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Left: Technical analytics -->
+                    <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 flex flex-col">
+                        <h3 class="text-lg font-semibold mb-2 text-blue-300">Technical Analytics</h3>
+                        <p class="mb-4 text-neutral-400 text-sm">
+                            Predict your grade based on your GitHub activity (commits, PRs, issues, code changes, etc).
+                        </p>
+                        <div class="mb-4">
+                            <p class="text-neutral-400 text-xs mb-2">
+                                <strong>How is this grade calculated?</strong><br>
+                                The technical grade uses a weighted formula based on your GitHub stats:
+                            </p>
+                            <pre class="bg-neutral-900 text-neutral-200 p-3 rounded text-xs overflow-x-auto mb-2" style="font-family: 'Source Code Pro', monospace;">
+score += commits * 2
+score += additions * 0.15
+score += deletions * 0.1
+score += prs * 3
+score += issues * 1.5
+score += repos * 1.2
+score += gists * 0.5
+                            </pre>
+                            <p class="text-neutral-400 text-xs">
+                                This formula rewards a mix of code contributions, collaboration, and repository activity.
+                            </p>
+                        </div>
+                        <button id="predictTechGradeBtn"
+                            class="mb-4 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 transition text-white font-semibold">
+                            Predict Grade
+                        </button>
+                        <p id="techGradeResult" class="text-xl font-semibold"></p>
+                    </div>
+                    
+                    <!-- Right: Evaluation matrix -->
+                    <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 flex flex-col">
+                        <h3 class="text-lg font-semibold mb-2 text-green-300">Evaluation Matrix</h3>
+                        <p class="mb-4 text-neutral-400 text-sm">
+                            Adjust each slider to reflect your self-assessment or teacher's assessment for each skill (1 = lowest, 5 = highest).
+                        </p>
+                        <form id="smart-grade-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label for="slider-attendance" class="block text-sm text-neutral-300 mb-1">Attendance</label>
+                                <input type="range" id="slider-attendance" name="attendance" min="1" max="5" value="4" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-attendance">4</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-work_habits" class="block text-sm text-neutral-300 mb-1">Work Habits</label>
+                                <input type="range" id="slider-work_habits" name="work_habits" min="1" max="5" value="5" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-work_habits">5</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-behavior" class="block text-sm text-neutral-300 mb-1">Behavior</label>
+                                <input type="range" id="slider-behavior" name="behavior" min="1" max="5" value="4" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-behavior">4</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-timeliness" class="block text-sm text-neutral-300 mb-1">Timeliness</label>
+                                <input type="range" id="slider-timeliness" name="timeliness" min="1" max="5" value="5" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-timeliness">5</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-tech_sense" class="block text-sm text-neutral-300 mb-1">Tech Sense</label>
+                                <input type="range" id="slider-tech_sense" name="tech_sense" min="1" max="5" value="4" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-tech_sense">4</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-tech_talk" class="block text-sm text-neutral-300 mb-1">Tech Talk</label>
+                                <input type="range" id="slider-tech_talk" name="tech_talk" min="1" max="5" value="4" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-tech_talk">4</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-tech_growth" class="block text-sm text-neutral-300 mb-1">Tech Growth</label>
+                                <input type="range" id="slider-tech_growth" name="tech_growth" min="1" max="5" value="5" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-tech_growth">5</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-advocacy" class="block text-sm text-neutral-300 mb-1">Advocacy</label>
+                                <input type="range" id="slider-advocacy" name="advocacy" min="1" max="5" value="4" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-advocacy">4</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-communication" class="block text-sm text-neutral-300 mb-1">Communication</label>
+                                <input type="range" id="slider-communication" name="communication" min="1" max="5" value="5" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-communication">5</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-integrity" class="block text-sm text-neutral-300 mb-1">Integrity</label>
+                                <input type="range" id="slider-integrity" name="integrity" min="1" max="5" value="5" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-integrity">5</span></span>
+                            </div>
+                            <div>
+                                <label for="slider-organization" class="block text-sm text-neutral-300 mb-1">Organization</label>
+                                <input type="range" id="slider-organization" name="organization" min="1" max="5" value="4" class="w-full" />
+                                <span class="text-xs text-neutral-400">Value: <span id="val-organization">4</span></span>
+                            </div>
+                        </form>
+                        <button id="smartPredictBtn"
+                            class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition text-white font-semibold">
+                            Smart Predict Grade
+                        </button>
+                        <p id="userGrade" class="text-xl font-semibold mt-4"></p>
+                    </div>
+                </div>
+
+                <!-- Help content -->
+                <div class="mt-8">
+                    <h2 class="text-2xl font-bold mb-4 text-blue-300">Analytics Help</h2>
+                    <details>
+                        <summary class="cursor-pointer text-lg font-semibold mb-2 text-blue-200">Click to expand help</summary>
+                        <div class="mb-6 p-4 rounded-lg bg-blue-900/40 border border-blue-700">
+                            <p class="mb-2">
+                                <strong>What is this dashboard?</strong>
+                                <br>
+                                <i>Making the portfolio easier to use with clickable contributions, better stats, and simple access to your profile so coders can show their work.</i>
+                                <br>
+                                This dashboard provides real-time analytics and grade predictions based on your GitHub activity. It uses a secure backend API to fetch your contributions, pull requests, issues, and more, then visualizes them for both students and admins.
+                            </p>
+                            <p>
+                                <strong>Why use it?</strong>
+                                <br>
+                                - Get accurate, up-to-date insights into your coding activity.<br>
+                                - Predict your grade based on real engagement.<br>
+                                - Admins can review and compare user contributions.
+                            </p>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mt-8 mb-2 text-blue-200">How It Works</h3>
+                        <ul class="list-disc list-inside mb-4">
+                            <li>All API endpoints are <span class="font-semibold text-blue-300">JWT-secured</span> using <code>@token_required</code>.</li>
+                            <li>Data is fetched from GitHub using both REST and GraphQL APIs for maximum detail.</li>
+                        </ul>
+
+                        <h3 class="text-xl font-semibold mt-8 mb-2 text-blue-200">Grade Prediction Logic</h3>
+                        <div class="mb-4">
+                            <p>The dashboard predicts your grade using two models:</p>
+                            <ul class="list-disc list-inside mb-2">
+                                <li><strong>Basic:</strong> Based only on commit count.</li>
+                                <li><strong>Smart:</strong> Uses a weighted formula including commits, additions, deletions, PRs, issues, repos, and gists.</li>
+                            </ul>
+                            <p>The final score is mapped to a letter grade (A, B, C, F) based on thresholds.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for info details -->
+<div id="dataModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-3xl relative">
+        <span class="close absolute top-3 right-3 text-neutral-400 hover:text-white text-2xl cursor-pointer" title="Close modal">&times;</span>
+        <pre id="modalData" class="text-neutral-200 overflow-auto max-h-96"></pre>
+    </div>
+</div>
+
+<!-- FontAwesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<!-- Required plugins -->
+<script src="https://cdn.jsdelivr.net/npm/preline/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash/lodash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/preline/dist/helper-apexcharts.js"></script>
+
+<!-- Analytics JS -->
+<script type="module">
+    import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { initOCSAnalyticsDashboard } from '{{ site.baseurl }}/assets/js/ocs-analytics-dashboard.js';
+
+    const profileLinksUrl = `${pythonURI}/api/analytics/github/user/profile_links`;
+    const userProfileUrl = `${pythonURI}/api/analytics/github/user`;
+    const commitsUrl = `${pythonURI}/api/analytics/github/user/commits`;
+    const prsUrl = `${pythonURI}/api/analytics/github/user/prs`;
+    const issuesUrl = `${pythonURI}/api/analytics/github/user/issues`;
+
+    let springUserId = null;
+    let hasExistingStudentEval = false;
+    
+    // Initialize OCS Analytics Dashboard
+    initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions).catch(e => {
+        console.warn('OCS Analytics dashboard failed to initialize:', e);
+    });
+
+    async function getUserIdSpring() {
+        if (springUserId) return springUserId;
+        try {
+            const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+            if (!pyRes.ok) throw new Error("Failed to fetch Python ID");
+            const pyData = await pyRes.json();
+            const uid = pyData.uid;
+
+            const javaRes = await fetch(`${javaURI}/api/person/uid/${uid}`, fetchOptions);
+            if (!javaRes.ok) throw new Error("Failed to fetch user from Spring");
+            const person = await javaRes.json();
+
+            if (!person || person.uid !== uid) throw new Error("User not found in Spring");
+            
+            springUserId = person.id;
+            return springUserId;
+        } catch (e) {
+            console.error("Error getting Spring User ID:", e);
+            return null;
+        }
+    }
+
+    async function loadStudentEvaluation() {
+        const id = await getUserIdSpring();
+        if (!id) return;
+
+        try {
+            const res = await fetch(`${javaURI}/api/student-evaluation/get/${id}`, fetchOptions);
+            if (res.ok) {
+                const json = await res.json();
+                const data = json.evaluation || json; 
+                if (data) {
+                    hasExistingStudentEval = true;
+                    
+                    const apiToSliderKey = {
+                        attendance: "attendance",
+                        workHabits: "work_habits",
+                        behavior: "behavior",
+                        timeliness: "timeliness",
+                        techSense: "tech_sense",
+                        techTalk: "tech_talk",
+                        techGrowth: "tech_growth",
+                        advocacy: "advocacy",
+                        communication: "communication",
+                        integrity: "integrity",
+                        organization: "organization"
+                    };
+
+                    Object.keys(apiToSliderKey).forEach(apiKey => {
+                        const sliderKey = apiToSliderKey[apiKey];
+                        let val = 4;
+                        if (typeof data[apiKey] !== "undefined") val = data[apiKey];
+                        else if (typeof data[sliderKey] !== "undefined") val = data[sliderKey];
+
+                        const slider = document.getElementById(`slider-${sliderKey}`);
+                        const label = document.getElementById(`val-${sliderKey}`);
+                        if (slider) {
+                            slider.value = val;
+                            if (label) label.textContent = val;
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.error("Error loading student evaluation:", e);
+        }
+    }
+
+    // Smart Predict Button Handler
+    const smartPredictBtn = document.getElementById("smartPredictBtn");
+    smartPredictBtn.onclick = async () => {
+        const userGradeEl = document.getElementById("userGrade");
+        userGradeEl.textContent = "Processing...";
+        
+        const id = await getUserIdSpring();
+        if (!id) {
+            userGradeEl.textContent = "Error: Could not identify user.";
+            return;
+        }
+
+        const fields = [
+            "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+            "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+        ];
+        const body = { "user_id": id };
+        fields.forEach(f => {
+            body[f] = Number(document.getElementById(`slider-${f}`).value);
+        });
+
+        try {
+            let res;
+            if (hasExistingStudentEval) {
+                res = await fetch(`${javaURI}/api/student-evaluation/update/${id}`, {
+                    ...fetchOptions,
+                    method: 'PUT',
+                    body: JSON.stringify(body)
+                });
+            } else {
+                res = await fetch(`${javaURI}/api/student-evaluation/post`, {
+                    ...fetchOptions,
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+            }
+            
+            if (res.ok) {
+                hasExistingStudentEval = true;
+                userGradeEl.textContent = "Evaluation saved. Predicting...";
+            } else {
+                console.error("Failed to save evaluation");
+            }
+        } catch (e) {
+            console.error("Error saving evaluation:", e);
+        }
+
+        try {
+            await fetch(`${javaURI}/api/grade-prediction/train`, fetchOptions);
+        } catch (error) {
+            console.error("Error with training:", error);
+        }
+        
+        try {
+            const predict = await fetch(`${javaURI}/api/grade-prediction/predict`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+            const data = await predict.json();
+            userGradeEl.textContent = `Saved & Smart Grade: ${data.predicted_final_grade || 'N/A'}`;
+        } catch (error) {
+            console.error("Error fetching prediction:", error);
+            userGradeEl.textContent = "Saved, but error predicting grade.";
+        }
+    };
+
+    // Update slider value labels live
+    document.addEventListener('DOMContentLoaded', function () {
+        [
+            "attendance", "work_habits", "behavior", "timeliness", "tech_sense",
+            "tech_talk", "tech_growth", "advocacy", "communication", "integrity", "organization"
+        ].forEach(f => {
+            const slider = document.getElementById(`slider-${f}`);
+            const label = document.getElementById(`val-${f}`);
+            if (slider && label) {
+                slider.addEventListener('input', () => { label.textContent = slider.value; });
+            }
+        });
+    });
+
+    async function fetchData() {
+        try {
+            const [profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes] = await Promise.all([
+                fetch(profileLinksUrl, fetchOptions),
+                fetch(userProfileUrl, fetchOptions),
+                fetch(commitsUrl, fetchOptions),
+                fetch(prsUrl, fetchOptions),
+                fetch(issuesUrl, fetchOptions),
+            ]);
+
+            if (![profileLinksRes, userProfileRes, commitsRes, prsRes, issuesRes].every((res) => res.ok)) {
+                throw new Error("One or more fetch requests failed.");
+            }
+
+            const profileLinks = await profileLinksRes.json();
+            const userProfile = await userProfileRes.json();
+            const commitsData = await commitsRes.json();
+            const prsData = await prsRes.json();
+            const issuesData = await issuesRes.json();
+
+            const commitsArray = commitsData.details_of_commits || [];
+            const commitsCount = commitsData.total_commit_contributions || 0;
+            const totalAdditions = commitsData.total_lines_added || 0;
+            const totalDeletions = commitsData.total_lines_deleted || 0;
+
+            const prsArray = prsData.pull_requests || [];
+            const issuesArray = issuesData.issues || [];
+
+            const username = userProfile.login || "N/A";
+            const avatarUrl = userProfile.avatar_url || "";
+            const profileUrl = profileLinks.profile_url || "#";
+            const reposUrl = profileLinks.repos_url || "#";
+
+            // Fill in profile info
+            document.getElementById("avatar").src = avatarUrl;
+            document.getElementById("username").textContent = `Username: ${username}`;
+            document.getElementById("profile-url").innerHTML = `Profile URL: <a href="${profileUrl}" target="_blank" class="text-blue-400 hover:underline">${profileUrl}</a>`;
+            document.getElementById("repos-url").innerHTML = `Repos URL: <a href="${reposUrl}" target="_blank" class="text-blue-400 hover:underline">${reposUrl}</a>`;
+            document.getElementById("public-repos").textContent = `Public Repos: ${userProfile.public_repos || 0}`;
+            document.getElementById("public-gists").textContent = `Public Gists: ${userProfile.public_gists || 0}`;
+            document.getElementById("followers").textContent = `Followers: ${userProfile.followers || 0}`;
+            document.getElementById("following").textContent = `Following: ${userProfile.following || 0}`;
+
+            document.getElementById("lines-changed").textContent = `+${totalAdditions} / -${totalDeletions}`;
+
+            document.getElementById("commits-count").textContent = commitsCount;
+            document.getElementById("issues-count").textContent = issuesArray.length;
+            document.getElementById("prs-count").textContent = prsArray.length;
+
+            // Clear commit cards container
+            const commitCardsContainer = document.getElementById("commitCardsContainer");
+            commitCardsContainer.innerHTML = "";
+
+            // Show the 15 most recent commits
+            commitsArray.slice(0, 15).forEach((commit) => {
+                const card = document.createElement("div");
+                card.className = "flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 p-4";
+
+                card.innerHTML = `
+                    <h4 class="text-sm font-medium mb-1">${commit.repository || "Unknown Repo"}</h4>
+                    <p class="text-xs mb-1">
+                        <strong>Message:</strong>
+                        <a href="${commit.url}" target="_blank" class="text-blue-400 hover:underline">
+                            ${commit.message || "No message"}
+                        </a>
+                    </p>
+                    <p class="text-xs mb-1"><strong>Date:</strong> ${new Date(commit.date).toLocaleString() || "Unknown"}</p>
+                    <p class="text-xs mb-1">
+                        <span class="text-green-400">+${commit.additions || 0}</span>
+                        /
+                        <span class="text-red-400">-${commit.deletions || 0}</span>
+                    </p>
+                `;
+                commitCardsContainer.appendChild(card);
+            });
+
+            // Tech Grade Prediction Button
+            const predictTechGradeBtn = document.getElementById("predictTechGradeBtn");
+            if (predictTechGradeBtn) {
+                predictTechGradeBtn.onclick = () => {
+                    const grade = calculateGradeFromCommits(commitsCount);
+                    const techResult = document.getElementById("techGradeResult");
+                    if (techResult) techResult.textContent = `Grade based on commits: ${grade}`;
+                };
+            }
+
+            // Info links to show modal details
+            setupInfoModal("commits-info", commitsData);
+            setupInfoModal("issues-info", issuesData);
+            setupInfoModal("prs-info", prsData);
+
+        } catch (error) {
+            console.error("Error fetching GitHub data:", error);
+            alert("Error loading GitHub analytics data. Please check console for details.");
+        }
+    }
+
+    function calculateGradeFromCommits(commitCount) {
+        if (commitCount > 20) return "90% (A)";
+        if (commitCount >= 10) return "85% (B)";
+        if (commitCount >= 5) return "75% (C)";
+        return "55% (F)";
+    }
+
+    // Modal code
+    const dataModal = document.getElementById("dataModal");
+    const modalData = document.getElementById("modalData");
+    const closeModal = dataModal.querySelector(".close");
+
+    function setupInfoModal(elementId, data) {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                modalData.textContent = JSON.stringify(data, null, 2);
+                dataModal.classList.remove("hidden");
+                dataModal.setAttribute("aria-hidden", "false");
+            });
+        }
+    }
+
+    closeModal.onclick = () => {
+        dataModal.classList.add("hidden");
+        dataModal.setAttribute("aria-hidden", "true");
+    };
+
+    window.onclick = (event) => {
+        if (event.target === dataModal) {
+            dataModal.classList.add("hidden");
+            dataModal.setAttribute("aria-hidden", "true");
+        }
+    };
+
+    // Tab switcher code with underline animation
+    const tabs = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+    const underline = document.getElementById("tab-underline");
+
+    function setUnderline(el) {
+        const rect = el.getBoundingClientRect();
+        const parentRect = el.parentElement.parentElement.getBoundingClientRect();
+        underline.style.width = `${rect.width}px`;
+        underline.style.left = `${rect.left - parentRect.left}px`;
+    }
+
+    tabs.forEach((tab) => {
+        tab.addEventListener("click", async (e) => {
+            e.preventDefault();
+            tabs.forEach(t => t.classList.remove("active", "text-blue-500", "border-blue-500"));
+            tabContents.forEach(c => c.classList.add("hidden"));
+            tabContents.forEach(c => c.classList.remove("block"));
+            const targetId = `tab-content-${tab.id.replace("tab-", "")}`;
+            document.getElementById(targetId).classList.remove("hidden");
+            document.getElementById(targetId).classList.add("block");
+            tab.classList.add("active", "text-blue-500", "border-blue-500");
+            setUnderline(tab);
+
+            if (targetId === "tab-content-ocs-analytics") {
+                if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
+                    await window.OCSAnalytics.loadAnalyticsSummary();
+                }
+            }
+        });
+    });
+
+    // Initialize on load
+    window.onload = async () => {
+        const activeTab = document.querySelector(".tab-btn.active");
+        if (activeTab) setUnderline(activeTab);
+
+        await fetchData();
+        await loadStudentEvaluation();
+        
+        // Load OCS Analytics if it's the active tab
+        if (window.OCSAnalytics && window.OCSAnalytics.loadAnalyticsSummary) {
+            await window.OCSAnalytics.loadAnalyticsSummary();
+        }
+    };
+</script>
+
+<style>
+    .info-icon {
+        font-size: 0.875rem;
+        color: #60a5fa;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .info-icon:hover {
+        color: #3b82f6;
+    }
+</style>

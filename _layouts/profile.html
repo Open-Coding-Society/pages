@@ -126,6 +126,104 @@ active_tab: profile
         </div>
     </div>
 
+    <!-- ============================= -->
+    <!-- FRONTEND-ONLY GROUPING AGENT  -->
+    <!-- Paste this block after Group Information, before Join a Group -->
+    <!-- ============================= -->
+
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">Grouping Agent (Frontend-Only)</h2>
+                <p class="text-sm text-gray-400">
+                    Learns from historical outcomes (student + teacher ratings) and recommends groups locally.
+                </p>
+            </div>
+            <div class="text-sm text-gray-300" id="gaStatus"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Task Type</label>
+                <select id="gaTaskType" class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
+                    <option value="CSA_FRQ">CSA_FRQ</option>
+                    <option value="WEB_APP">WEB_APP</option>
+                    <option value="DATA_SCI">DATA_SCI</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Difficulty (1-5)</label>
+                <input id="gaDifficulty" type="number" min="1" max="5" value="3"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Group Size</label>
+                <input id="gaGroupSize" type="number" min="2" max="6" value="4"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
+            </div>
+
+            <div class="flex items-end gap-2">
+                <button id="gaTrainBtn" class="w-1/2 px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600">
+                    Train
+                </button>
+                <button id="gaRecommendBtn"
+                    class="w-1/2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
+                    Recommend
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-200 mb-2">Recommendations</h3>
+            <div id="gaRecs" class="space-y-3">
+                <div class="text-gray-400 text-sm">No recommendations yet.</div>
+            </div>
+        </div>
+
+        <div class="mt-6 border-t border-gray-700 pt-4">
+            <h3 class="text-lg font-semibold text-gray-200 mb-2">Record Outcome</h3>
+            <p class="text-sm text-gray-400 mb-3">
+                Save ratings locally to improve future recommendations.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Group Members (comma-separated
+                        IDs)</label>
+                    <input id="gaOutcomeMembers" placeholder="u1,u2,u3,u4"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Student Avg (1-5)</label>
+                    <input id="gaStudentRating" type="number" min="1" max="5" value="4"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Teacher (1-5)</label>
+                    <input id="gaTeacherRating" type="number" min="1" max="5" value="4"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
+                </div>
+            </div>
+
+            <div class="mt-3 flex gap-2">
+                <button id="gaSaveOutcomeBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Save Outcome
+                </button>
+                <button id="gaResetLocalBtn"
+                    class="px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg hover:bg-neutral-600 border border-gray-600">
+                    Reset Local Model
+                </button>
+            </div>
+
+            <div class="mt-2 text-sm text-gray-400" id="gaOutcomeStatus"></div>
+        </div>
+    </div>
+
+
     <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <div class="flex items-start justify-between gap-4 mb-4">
             <div>
@@ -148,19 +246,43 @@ active_tab: profile
                     </button>
                 </div>
             </div>
-            <div id="groupResultsList"
-                class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+        </div>
+
+        <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-xl font-semibold">Join a Group</h2>
+                </div>
+                <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
+                        Groups</label>
+                    <div class="flex gap-2">
+                        <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                            class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            autocomplete="off">
+                        <button id="groupSearchBtn" type="button"
+                            class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                            Search
+                        </button>
+                    </div>
+                </div>
+                <div id="groupResultsList"
+                    class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-        <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
+        <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+            <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
 
-        <div id="personaSelectionContainer">
-            <p class="text-gray-400 text-center py-4">Loading personas...</p>
+            <div id="personaSelectionContainer">
+                <p class="text-gray-400 text-center py-4">Loading personas...</p>
+            </div>
         </div>
-    </div>
 
 
 </form>
@@ -461,9 +583,6 @@ active_tab: profile
 <script type="module">
     import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    document.addEventListener("DOMContentLoaded", () => {
-        loadPersonas();
-    });
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
@@ -474,37 +593,67 @@ active_tab: profile
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
 
-            // Get user's personas from the RIGHT endpoint
+            console.log('📦 All personas loaded:', personas);
+
+            // Get user's personas
             const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions);
 
+            let selectedPersonas = {};
+            let totalSelected = 0;
+
             if (!userPersonasResp.ok) {
-                console.log('No personas found for user or not authenticated');
+                console.log('⚠️ No personas found for user or not authenticated');
                 showPersonaSelectionCards(personas, {});
                 return;
             }
 
             const userPersonasData = await userPersonasResp.json();
-            const selectedPersonas = userPersonasData.personas || {};
-            const totalSelected = userPersonasData.total_selected || 0;
+            console.log('👤 User personas data:', userPersonasData);
+
+            selectedPersonas = userPersonasData.personas || {};
+            totalSelected = userPersonasData.total_selected || 0;
+
+            console.log('✅ Selected personas:', selectedPersonas);
+            console.log('📊 Total selected:', totalSelected);
+
+            // Store globally
+            window.allPersonasData = personas;
+            window.selectedPersonasData = selectedPersonas;
 
             // If user has selected all 4 categories, show the completed view
             if (totalSelected === 4) {
+                console.log('🎉 All 4 selected! Showing completed view');
                 showCompletedPersonas(selectedPersonas, personas);
             } else {
-                // Show selection interface with partial selections
+                console.log('📝 Showing selection interface (', totalSelected, '/4 selected)');
+                // Show selection interface - hide completed categories
                 showPersonaSelectionCards(personas, selectedPersonas);
             }
 
         } catch (error) {
-            console.error('Error loading personas:', error);
+            console.error('❌ Error loading personas:', error);
             container.innerHTML = `
                 <p class="text-red-400 text-center py-4">Error loading personas. Please try again later.</p>
+                <p class="text-gray-500 text-center text-sm">${error.message}</p>
             `;
         }
     }
+    function editProfile() {
+        console.log('📝 Edit profile clicked - showing all categories');
 
-    function showPersonaSelectionCards(allPersonas, selectedPersonas) {
+        if (window.allPersonasData && window.selectedPersonasData) {
+            showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData, true); // Pass true to force show all
+        } else {
+            loadPersonas();
+        }
+    }
+    function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
+
+        console.log('🎨 Rendering selection cards');
+        console.log('Total personas:', allPersonas.length);
+        console.log('Selected:', selectedPersonas);
+        console.log('Force show all:', forceShowAll);
 
         if (allPersonas.length === 0) {
             container.innerHTML = `
@@ -520,6 +669,8 @@ active_tab: profile
             acc[category].push(persona);
             return acc;
         }, {});
+
+        console.log('📂 Grouped by category:', grouped);
 
         const categoryLabels = {
             'student': 'Student Archetype',
@@ -538,103 +689,84 @@ active_tab: profile
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
         const totalSelected = Object.keys(selectedPersonas).length;
 
-        window.allPersonasData = allPersonas;
-        window.selectedPersonasData = selectedPersonas;
-
         container.innerHTML = `
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
                 <p class="text-gray-400">Select one persona from each category (${totalSelected}/4 selected)</p>
-                ${totalSelected > 0 ? `
-                    <div class="mt-4 flex justify-center gap-2">
-                        ${categoryOrder.map(cat => `
-                            <div class="w-3 h-3 rounded-full ${selectedPersonas[cat] ? 'bg-indigo-500' : 'bg-gray-700'}"></div>
-                        `).join('')}
-                    </div>
-                ` : ''}
+                <div class="mt-4 flex justify-center gap-2">
+                    ${categoryOrder.map(cat => `
+                        <div class="w-3 h-3 rounded-full ${selectedPersonas[cat] ? 'bg-indigo-500' : 'bg-gray-700'}"></div>
+                    `).join('')}
+                </div>
             </div>
             
-            ${categoryOrder.map(category => {
+            <div class="space-y-8">
+                ${categoryOrder.map(category => {
             const personas = grouped[category] || [];
             const selectedInCategory = selectedPersonas[category];
 
+            // CHANGED: Only hide if NOT forcing show all AND category is selected
+            if (!forceShowAll && selectedInCategory) {
+                console.log(`✓ Category ${category} already selected, hiding it`);
+                return '';
+            }
+
+            // Show the selection grid
+            console.log(`🎯 Showing selection grid for ${category}`);
+
             return `
-                    <div class="mb-8">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <h3 class="text-xl font-semibold ${selectedInCategory ? 'text-indigo-400' : 'text-gray-300'} flex items-center gap-2">
-                                    ${selectedInCategory ? '✓' : '○'} ${categoryLabels[category]}
-                                    ${selectedInCategory ? '<span class="text-sm font-normal text-gray-400">(Selected)</span>' : ''}
-                                </h3>
-                                <p class="text-sm text-gray-500">${categoryDescriptions[category]}</p>
+                        <div class="mb-8" id="category-${category}">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-300 flex items-center gap-2">
+                                        ${selectedInCategory ? '✓' : '○'} ${categoryLabels[category]}
+                                        ${selectedInCategory ? '<span class="text-sm text-green-400 ml-2">(Currently selected)</span>' : ''}
+                                    </h3>
+                                    <p class="text-sm text-gray-500">${categoryDescriptions[category]}</p>
+                                </div>
                             </div>
-                            ${selectedInCategory ? `
-                                <button 
-                                    onclick="changeCategory('${category}')"
-                                    class="px-3 py-1 text-sm bg-neutral-700 hover:bg-neutral-600 text-gray-300 rounded transition">
-                                    Change
-                                </button>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            ${personas.map(persona => {
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="category-grid-${category}">
+                                ${personas.map(persona => {
                 const title = persona.bio_map?.title || persona.alias || 'Unnamed';
                 const description = persona.bio_map?.description || 'No description';
-                const isSelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+                const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
 
                 return `
-                                    <div 
-                                        class="flex flex-col p-4 ${isSelected
-                        ? 'bg-indigo-900/30 border-2 border-indigo-500'
-                        : 'bg-neutral-800 hover:bg-neutral-700 border border-gray-700 hover:border-indigo-500'
-                    } rounded-lg ${!isSelected ? 'cursor-pointer' : ''} transition-all group h-full"
-                                        ${!isSelected ? `onclick="selectPersona(${persona.id}, '${category}')"` : ''}>
-                                        
-                                        ${isSelected ? `
-                                            <div class="flex items-center justify-between mb-2">
-                                                <span class="text-xs font-semibold text-indigo-400 uppercase">Selected</span>
-                                                <svg class="w-5 h-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        <div 
+                                            id="persona-card-${persona.id}"
+                                            class="flex flex-col p-4 ${isCurrentlySelected ? 'bg-indigo-900 border-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'} border ${isCurrentlySelected ? 'border-indigo-400' : 'border-gray-700 hover:border-indigo-500'} rounded-lg cursor-pointer transition-all group h-full relative"
+                                            onclick="selectPersona(${persona.id}, '${category}')">
+                                            
+                                            <div class="loading-overlay hidden absolute inset-0 bg-black/70 rounded-lg flex items-center justify-center z-10">
+                                                <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
                                             </div>
-                                        ` : ''}
-                                        
-                                        <h4 class="font-semibold ${isSelected ? 'text-indigo-200' : 'text-gray-200 group-hover:text-indigo-300'} mb-2">
-                                            ${title}
-                                        </h4>
-                                        <p class="text-sm text-gray-400 flex-1 line-clamp-3">${description}</p>
-                                        
-                                        ${!isSelected ? `
+                                            
+                                            ${isCurrentlySelected ? '<div class="absolute top-2 right-2 bg-indigo-500 text-white rounded-full p-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>' : ''}
+                                            
+                                            <h4 class="font-semibold ${isCurrentlySelected ? 'text-indigo-200' : 'text-gray-200 group-hover:text-indigo-300'} mb-2">
+                                                ${title}
+                                            </h4>
+                                            <p class="text-sm text-gray-400 flex-1 line-clamp-3">${description}</p>
+                                            
                                             <div class="mt-3 flex justify-end">
                                                 <svg class="w-6 h-6 text-gray-600 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                                 </svg>
                                             </div>
-                                        ` : ''}
-                                    </div>
-                                `;
+                                        </div>
+                                    `;
             }).join('')}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
         }).join('')}
-            
-            ${totalSelected === 4 ? `
-                <div class="text-center mt-8">
-                    <button 
-                        onclick="viewCompletedProfile()"
-                        class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition flex items-center gap-2 mx-auto">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        View Your Complete Profile
-                    </button>
-                </div>
-            ` : ''}
+            </div>
         `;
     }
-
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
 
@@ -654,11 +786,8 @@ active_tab: profile
 
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
 
-        window.allPersonasData = allPersonas;
-        window.selectedPersonasData = selectedPersonas;
-
         container.innerHTML = `
-            <div class="max-w-6xl mx-auto">
+            <div class="max-w-7xl mx-auto">
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -671,12 +800,12 @@ active_tab: profile
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
-                        Edit Profile
+                        Change Personas
                     </button>
                 </div>
                 
                 <!-- 2x2 Grid of Selected Personas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${categoryOrder.map(category => {
             const personaData = selectedPersonas[category];
             if (!personaData) return '';
@@ -690,8 +819,9 @@ active_tab: profile
 
             return `
                             <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
+                                
                                 <div class="flex items-start gap-4 mb-4">
-                                    <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
+                                    <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
                                         ${categoryEmojis[category]}
                                     </div>
                                     <div class="flex-1">
@@ -704,20 +834,34 @@ active_tab: profile
                                 
                                 <p class="text-gray-300 text-sm leading-relaxed mb-4">${description}</p>
                                 
-                                ${empathyMap.says?.[0] || empathyMap.thinks?.[0] ? `
-                                    <div class="border-t border-gray-700 pt-4 space-y-2">
-                                        ${empathyMap.says?.[0] ? `
-                                            <div class="flex items-start gap-2">
-                                                <span class="text-blue-400 text-xs font-medium mt-0.5">💬</span>
-                                                <p class="text-gray-400 text-xs italic">"${empathyMap.says[0]}"</p>
-                                            </div>
-                                        ` : ''}
-                                        ${empathyMap.thinks?.[0] ? `
-                                            <div class="flex items-start gap-2">
-                                                <span class="text-purple-400 text-xs font-medium mt-0.5">💭</span>
-                                                <p class="text-gray-400 text-xs">${empathyMap.thinks[0]}</p>
-                                            </div>
-                                        ` : ''}
+                                ${empathyMap.says?.length || empathyMap.thinks?.length ? `
+                                    <div class="border-t border-gray-700 pt-4">
+                                        <div class="space-y-3">
+                                            ${empathyMap.says?.[0] ? `
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-blue-400 text-xs font-medium mt-0.5">💬</span>
+                                                    <p class="text-gray-400 text-xs italic flex-1">"${empathyMap.says[0]}"</p>
+                                                </div>
+                                            ` : ''}
+                                            ${empathyMap.thinks?.[0] ? `
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-purple-400 text-xs font-medium mt-0.5">💭</span>
+                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.thinks[0]}</p>
+                                                </div>
+                                            ` : ''}
+                                            ${empathyMap.does?.[0] ? `
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-green-400 text-xs font-medium mt-0.5">✋</span>
+                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.does[0]}</p>
+                                                </div>
+                                            ` : ''}
+                                            ${empathyMap.feels?.[0] ? `
+                                                <div class="flex items-start gap-2">
+                                                    <span class="text-pink-400 text-xs font-medium mt-0.5">❤️</span>
+                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.feels[0]}</p>
+                                                </div>
+                                            ` : ''}
+                                        </div>
                                     </div>
                                 ` : ''}
                             </div>
@@ -727,87 +871,120 @@ active_tab: profile
             </div>
         `;
     }
-
     async function selectPersona(personaId, category) {
-        console.log('Selecting persona:', personaId, 'for category:', category);
+        console.log('🎯 SELECT PERSONA CALLED');
+        console.log('   Persona ID:', personaId);
+        console.log('   Category:', category);
+
+        // Show loading state on the clicked card
+        const card = document.getElementById(`persona-card-${personaId}`);
+        if (card) {
+            card.style.position = 'relative';
+            const overlay = card.querySelector('.loading-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                console.log('   ✅ Loading overlay shown');
+            }
+            card.style.pointerEvents = 'none';
+        }
 
         try {
-            const container = document.getElementById('personaSelectionContainer');
-            const tempHTML = container.innerHTML;
+            const url = `${pythonURI}/api/user/persona`;
+            const body = { persona_id: personaId };
 
-            container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-16">
-                    <svg class="animate-spin h-12 w-12 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-gray-300 font-medium">Saving your selection...</p>
-                </div>
-            `;
+            console.log('📤 Making POST request');
+            console.log('   URL:', url);
+            console.log('   Body:', body);
 
-            const response = await fetch(`${pythonURI}/api/user/persona`, {
+            const response = await fetch(url, {
                 ...fetchOptions,
                 method: 'POST',
-                body: JSON.stringify({
-                    persona_id: personaId
-                })
+                body: JSON.stringify(body)
             });
 
+            console.log('📥 Response received');
+            console.log('   Status:', response.status);
+            console.log('   OK:', response.ok);
+
+            const responseData = await response.json();
+            console.log('   Response Data:', responseData);
+
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to select persona');
+                throw new Error(responseData.message || `Server error: ${response.status}`);
             }
 
-            // Reload to show updated selections
-            loadPersonas();
+            console.log('✅ Selection successful!');
+
+            // Show success animation
+            if (card) {
+                const overlay = card.querySelector('.loading-overlay');
+                if (overlay) {
+                    overlay.innerHTML = `
+                        <svg class="h-12 w-12 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    `;
+                    console.log('   ✅ Success checkmark shown');
+                }
+            }
+
+            // Wait a moment then reload
+            console.log('   ⏳ Waiting 600ms before reload...');
+            setTimeout(() => {
+                console.log('   🔄 Reloading personas...');
+                loadPersonas();
+            }, 600);
 
         } catch (error) {
-            console.error('Error selecting persona:', error);
+            console.error('❌ ERROR in selectPersona:', error);
 
-            const container = document.getElementById('personaSelectionContainer');
-            container.innerHTML = `
-                <div class="text-center py-12">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-900/30 mb-4">
-                        <svg class="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                        </svg>
+            // Hide loading overlay and restore interactivity
+            if (card) {
+                const overlay = card.querySelector('.loading-overlay');
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                }
+                card.style.pointerEvents = 'auto';
+            }
+
+            // Show error message
+            const categorySection = document.getElementById(`category-${category}`);
+            if (categorySection) {
+                const existingError = categorySection.querySelector('.error-message');
+                if (existingError) existingError.remove();
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4 flex items-start gap-3';
+                errorDiv.innerHTML = `
+                    <svg class="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="flex-1">
+                        <h4 class="text-red-400 font-semibold mb-1">Selection Failed</h4>
+                        <p class="text-red-300 text-sm">${error.message}</p>
                     </div>
-                    <h3 class="text-xl font-semibold text-red-400 mb-2">Error</h3>
-                    <p class="text-gray-400 mb-6">${error.message}</p>
-                    <button 
-                        onclick="loadPersonas()"
-                        class="px-6 py-2 bg-neutral-700 hover:bg-neutral-600 text-gray-200 rounded-lg transition">
-                        Try Again
+                    <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
                     </button>
-                </div>
-            `;
+                `;
+                categorySection.insertBefore(errorDiv, categorySection.querySelector(`#category-grid-${category}`));
+
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
         }
     }
-
-    function changeCategory(category) {
-        // Just scroll to that category section
-        loadPersonas();
-    }
-
-    function editProfile() {
-        showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData);
-    }
-
-    function viewCompletedProfile() {
-        showCompletedPersonas(window.selectedPersonasData, window.allPersonasData);
-    }
-
     // Make functions globally accessible
     window.loadPersonas = loadPersonas;
     window.selectPersona = selectPersona;
-    window.changeCategory = changeCategory;
     window.editProfile = editProfile;
-    window.viewCompletedProfile = viewCompletedProfile;
     window.showPersonaSelectionCards = showPersonaSelectionCards;
     window.showCompletedPersonas = showCompletedPersonas;
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPersonas();
+    });
 </script>
-
-
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
@@ -1478,128 +1655,327 @@ active_tab: profile
     };
 </script>
 
+<!-- Inject YAML data into the page as JSON (Jekyll) -->
+<script id="gaDataset" type="application/json">
+  {{ site.data.grouping_agent_sample | jsonify }}
+</script>
+
 <script type="module">
-    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    // ============================
+    // Frontend-only Grouping Agent
+    // ============================
 
-    const webcamModal = document.getElementById('webcamModal');
-    const video = document.getElementById('webcamVideo');
-    const canvas = document.getElementById('webcamCanvas');
-    const captureBtn = document.getElementById('captureBtn');
-    const retakeBtn = document.getElementById('retakeBtn');
-    const saveBtn = document.getElementById('savePfpBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    let stream = null;
+    const LS_MODEL = "ga_model_v1";
+    const LS_HISTORY = "ga_history_v1"; // appended outcomes from UI
 
-    // Check if user has pfp
-    async function checkPfp() {
-        try {
-            const response = await fetch(`${pythonURI}/api/id/pfp`, fetchOptions);
-            if (response.status === 404) {
-                showModal();
-            }
-        } catch (error) {
-            console.error("Error checking PFP:", error);
+    const CATS = ["student", "social", "achievement", "fantasy"];
+
+    const statusEl = document.getElementById("gaStatus");
+    const outcomeStatusEl = document.getElementById("gaOutcomeStatus");
+    const recsEl = document.getElementById("gaRecs");
+
+    function readDataset() {
+        const raw = document.getElementById("gaDataset")?.textContent?.trim();
+        if (!raw) return { people: [], outcomes: [] };
+        try { return JSON.parse(raw); } catch { return { people: [], outcomes: [] }; }
+    }
+
+    function load(key, fallback) {
+        try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+        catch { return fallback; }
+    }
+    function save(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function defaultModel() {
+        return {
+            version: 1,
+            diversityWeights: { student: 1.0, social: 0.5, achievement: 1.0, fantasy: 0.2 },
+            pairWeights: { student: {}, social: {}, achievement: {}, fantasy: {} },
+            taskBias: { CSA_FRQ: 0.0, WEB_APP: 0.0, DATA_SCI: 0.0 },
+            difficultyWeight: -0.05
+        };
+    }
+
+    function pairKey(a, b) {
+        const lo = Math.min(a, b), hi = Math.max(a, b);
+        return `${lo}:${hi}`;
+    }
+
+    function diversity(personas, cat) {
+        const s = new Set();
+        for (const p of personas) {
+            const v = p?.[cat];
+            if (v !== undefined && v !== null) s.add(v);
         }
+        return s.size;
     }
 
-    function showModal() {
-        webcamModal.classList.remove('hidden');
-        startWebcam();
-    }
+    function scoreGroup(model, personas, taskType, difficulty) {
+        let s = 0;
 
-    function hideModal() {
-        webcamModal.classList.add('hidden');
-        stopWebcam();
-    }
-
-    async function startWebcam() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-        } catch (err) {
-            console.error("Error accessing webcam:", err);
-            alert("Could not access webcam. Please allow camera permissions.");
+        for (const cat of CATS) {
+            s += (model.diversityWeights[cat] ?? 0) * diversity(personas, cat);
         }
-    }
 
-    function stopWebcam() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-    }
-
-    if (captureBtn) {
-        captureBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // prevent form submission if any
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-
-            video.classList.add('hidden');
-            canvas.classList.remove('hidden');
-
-            captureBtn.classList.add('hidden');
-            retakeBtn.classList.remove('hidden');
-            saveBtn.classList.remove('hidden');
-        });
-    }
-
-    if (retakeBtn) {
-        retakeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            video.classList.remove('hidden');
-            canvas.classList.add('hidden');
-
-            captureBtn.classList.remove('hidden');
-            retakeBtn.classList.add('hidden');
-            saveBtn.classList.add('hidden');
-        });
-    }
-
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const dataUrl = canvas.toDataURL('image/png');
-            const base64Data = dataUrl.split(',')[1];
-
-            // Show loading state
-            saveBtn.innerText = "Saving...";
-            saveBtn.disabled = true;
-
-            try {
-                const response = await fetch(`${pythonURI}/api/id/pfp`, {
-                    ...fetchOptions,
-                    method: 'PUT',
-                    body: JSON.stringify({ pfp: base64Data })
-                });
-
-                if (response.ok) {
-                    alert("Profile picture saved!");
-                    hideModal();
-                    window.location.reload(); // Reload to show new PFP
-                } else {
-                    const error = await response.json();
-                    alert("Failed to save: " + (error.message || response.statusText));
-                    saveBtn.innerText = "Save Picture";
-                    saveBtn.disabled = false;
+        for (const cat of CATS) {
+            const w = model.pairWeights[cat] ?? {};
+            for (let i = 0; i < personas.length; i++) {
+                for (let j = i + 1; j < personas.length; j++) {
+                    const a = personas[i]?.[cat];
+                    const b = personas[j]?.[cat];
+                    if (a == null || b == null) continue;
+                    s += (w[pairKey(a, b)] ?? 0);
                 }
-            } catch (error) {
-                console.error("Error saving PFP:", error);
-                alert("Error saving profile picture.");
-                saveBtn.innerText = "Save Picture";
-                saveBtn.disabled = false;
             }
-        });
+        }
+
+        s += (model.taskBias[taskType] ?? 0);
+        s += (model.difficultyWeight ?? 0) * difficulty;
+        return s;
     }
 
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            hideModal();
-        });
+    function sigmoid(x) {
+        return 1 / (1 + Math.exp(-x));
     }
 
-    // Run check on load
-    document.addEventListener('DOMContentLoaded', checkPfp);
+    // Convert (student 1-5 + teacher 1-5) => single outcome score (0..100-ish)
+    function combinedOutcomeScore(student1to5, teacher1to5) {
+        // weight teacher a bit more (you can change)
+        const combined = (0.4 * student1to5 + 0.6 * teacher1to5);
+        // map 1..5 -> 20..100
+        return (combined / 5) * 100;
+    }
+
+    function updateModelFromOutcome(model, personas, taskType, difficulty, outcomeScore100) {
+        const lr = 0.01;
+        const goodThreshold = 70; // outcomeScore >= 70 treated as "good"
+        const y = outcomeScore100 >= goodThreshold ? 1 : 0;
+
+        const predRaw = scoreGroup(model, personas, taskType, difficulty);
+        const pred = sigmoid(predRaw);
+        const err = (y - pred);
+
+        for (const cat of CATS) {
+            const div = diversity(personas, cat);
+            model.diversityWeights[cat] = (model.diversityWeights[cat] ?? 0) + lr * err * div;
+        }
+
+        for (const cat of CATS) {
+            const w = model.pairWeights[cat] ?? (model.pairWeights[cat] = {});
+            for (let i = 0; i < personas.length; i++) {
+                for (let j = i + 1; j < personas.length; j++) {
+                    const a = personas[i]?.[cat];
+                    const b = personas[j]?.[cat];
+                    if (a == null || b == null) continue;
+                    const k = pairKey(a, b);
+                    w[k] = (w[k] ?? 0) + lr * err;
+                }
+            }
+        }
+
+        model.taskBias[taskType] = (model.taskBias[taskType] ?? 0) + lr * err;
+        model.difficultyWeight = (model.difficultyWeight ?? 0) + lr * err * difficulty;
+
+        model.version += 1;
+        return { predBefore: pred, err };
+    }
+
+    function recommendGroups(people, model, taskType, difficulty, groupSize) {
+        const remaining = [...people];
+        const recs = [];
+
+        // shuffle
+        for (let i = remaining.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+        }
+
+        while (remaining.length >= 2) {
+            const group = [remaining.shift()];
+
+            while (group.length < groupSize && remaining.length > 0) {
+                let bestIdx = -1;
+                let bestScore = -1e9;
+
+                for (let i = 0; i < remaining.length; i++) {
+                    const cand = remaining[i];
+                    const personas = [...group, cand].map(p => p.personas);
+                    const s = scoreGroup(model, personas, taskType, difficulty);
+                    if (s > bestScore) {
+                        bestScore = s;
+                        bestIdx = i;
+                    }
+                }
+
+                if (bestIdx === -1) break;
+                group.push(remaining.splice(bestIdx, 1)[0]);
+            }
+
+            const finalScore = scoreGroup(model, group.map(p => p.personas), taskType, difficulty);
+            recs.push({ members: group, score: finalScore });
+
+            if (remaining.length < 2) break;
+        }
+
+        return recs;
+    }
+
+    function renderRecs(recs) {
+        if (!recs.length) {
+            recsEl.innerHTML = `<div class="text-gray-400 text-sm">No recommendations (need at least 2 people).</div>`;
+            return;
+        }
+
+        recsEl.innerHTML = recs.map((g, idx) => `
+      <div class="p-4 bg-neutral-700 rounded-lg border border-gray-600">
+        <div class="flex items-center justify-between">
+          <div class="font-semibold text-gray-100">Group ${idx + 1}</div>
+          <div class="text-xs text-gray-300">Score: ${g.score.toFixed(3)}</div>
+        </div>
+        <div class="mt-2 text-sm text-gray-200">
+          ${g.members.map(m => `${m.name} <span class="text-gray-400">(${m.id})</span>`).join(", ")}
+        </div>
+        <div class="mt-2 text-xs text-gray-400">
+          Personas: ${g.members.map(m => `(${CATS.map(c => `${c}:${m.personas?.[c] ?? "?"}`).join(" | ")})`).join("  •  ")}
+        </div>
+      </div>
+    `).join("");
+    }
+
+    function getUIContext() {
+        return {
+            taskType: document.getElementById("gaTaskType").value,
+            difficulty: parseInt(document.getElementById("gaDifficulty").value || "3", 10),
+            groupSize: parseInt(document.getElementById("gaGroupSize").value || "4", 10),
+        };
+    }
+
+    // --------- Wire up buttons ---------
+
+    const dataset = readDataset();
+    const basePeople = Array.isArray(dataset.people) ? dataset.people : [];
+    const baseOutcomes = Array.isArray(dataset.outcomes) ? dataset.outcomes : [];
+
+    if (!localStorage.getItem(LS_MODEL)) save(LS_MODEL, defaultModel());
+    if (!localStorage.getItem(LS_HISTORY)) save(LS_HISTORY, []);
+
+    function trainFromDatasetAndLocal() {
+        const model = load(LS_MODEL, defaultModel());
+        const localHistory = load(LS_HISTORY, []);
+
+        const allRuns = [];
+
+        // dataset runs
+        for (const r of baseOutcomes) {
+            const taskType = r?.task?.type ?? "CSA_FRQ";
+            const difficulty = r?.task?.difficulty ?? 3;
+
+            const student = r?.student_assessment?.avg_rating_1to5 ?? 3;
+            const teacher = r?.teacher_assessment?.worked_rating_1to5 ?? 3;
+            const score100 = combinedOutcomeScore(student, teacher);
+
+            // personas snapshot is already present in YAML (best), but fallback to roster
+            const members = r?.group?.members ?? [];
+            const personasList = members.map(id => {
+                const snap = r?.group?.personas_snapshot?.[id];
+                if (snap) return snap;
+                const p = basePeople.find(x => x.id === id);
+                return p?.personas ?? null;
+            }).filter(Boolean);
+
+            if (personasList.length >= 2) {
+                allRuns.push({ personasList, taskType, difficulty, score100 });
+            }
+        }
+
+        // local history runs (saved from UI)
+        for (const r of localHistory) {
+            const taskType = r.taskType;
+            const difficulty = r.difficulty;
+            const score100 = r.score100;
+            const personasList = r.personasList;
+            if (Array.isArray(personasList) && personasList.length >= 2) {
+                allRuns.push({ personasList, taskType, difficulty, score100 });
+            }
+        }
+
+        // Train passes (single pass MVP)
+        for (const run of allRuns) {
+            updateModelFromOutcome(model, run.personasList, run.taskType, run.difficulty, run.score100);
+        }
+
+        save(LS_MODEL, model);
+        return model;
+    }
+
+    document.getElementById("gaTrainBtn").addEventListener("click", () => {
+        const model = trainFromDatasetAndLocal();
+        statusEl.textContent = `Trained ✓ (model v${model.version})`;
+    });
+
+    document.getElementById("gaRecommendBtn").addEventListener("click", () => {
+        const model = load(LS_MODEL, defaultModel());
+        const { taskType, difficulty, groupSize } = getUIContext();
+
+        // Recommend over the roster from YAML
+        const eligible = basePeople.filter(p => p?.personas && CATS.every(c => p.personas[c] != null));
+        const recs = recommendGroups(eligible, model, taskType, difficulty, groupSize);
+
+        statusEl.textContent = `Recommended ✓ (model v${model.version})`;
+        renderRecs(recs);
+    });
+
+    document.getElementById("gaSaveOutcomeBtn").addEventListener("click", () => {
+        const { taskType, difficulty } = getUIContext();
+        const membersRaw = document.getElementById("gaOutcomeMembers").value;
+        const studentRating = parseInt(document.getElementById("gaStudentRating").value || "3", 10);
+        const teacherRating = parseInt(document.getElementById("gaTeacherRating").value || "3", 10);
+
+        const members = membersRaw.split(",").map(s => s.trim()).filter(Boolean);
+        const people = basePeople;
+
+        const persons = members.map(id => people.find(p => p.id === id)).filter(Boolean);
+        if (persons.length < 2) {
+            outcomeStatusEl.textContent = "Need at least 2 valid member IDs from the YAML roster (e.g., u1,u2,u3).";
+            return;
+        }
+
+        const personasList = persons.map(p => p.personas);
+        const score100 = combinedOutcomeScore(studentRating, teacherRating);
+
+        const history = load(LS_HISTORY, []);
+        history.push({
+            ts: Date.now(),
+            taskType,
+            difficulty,
+            members,
+            studentRating,
+            teacherRating,
+            score100,
+            personasList
+        });
+        save(LS_HISTORY, history);
+
+        // update model immediately (so it feels like an agent)
+        const model = load(LS_MODEL, defaultModel());
+        const info = updateModelFromOutcome(model, personasList, taskType, difficulty, score100);
+        save(LS_MODEL, model);
+
+        outcomeStatusEl.textContent = `Saved ✓ Model updated to v${model.version} (pred before update: ${(info.predBefore * 100).toFixed(1)}%)`;
+        statusEl.textContent = `Model v${model.version}`;
+    });
+
+    document.getElementById("gaResetLocalBtn").addEventListener("click", () => {
+        save(LS_MODEL, defaultModel());
+        save(LS_HISTORY, []);
+        statusEl.textContent = "Reset ✓";
+        outcomeStatusEl.textContent = "Cleared local model + history.";
+        recsEl.innerHTML = `<div class="text-gray-400 text-sm">No recommendations yet.</div>`;
+    });
+
+    // Initial status
+    const model0 = load(LS_MODEL, defaultModel());
+    statusEl.textContent = `Ready (model v${model0.version})`;
 </script>

@@ -6,7 +6,6 @@ type: issues
 permalink: /student/groups
 comments: false
 ---
-
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
     <!-- Subtle Loading Indicator - inline badge style -->
@@ -201,6 +200,30 @@ comments: false
         </div>
       </div>
 
+    <div class="mb-6 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500/50 rounded-lg p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-white">AI-Powered Group Formation</h3>
+            <p class="text-sm text-gray-400">Create balanced groups based on student personas and team compatibility</p>
+          </div>
+        </div>
+        <button 
+          onclick="openSmartGroupFormation()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Form Smart Groups
+        </button>
+      </div>
+    </div>
+
       <!-- Groups List -->
       <div id="groupsContainer" class="space-y-3">
         <!-- Groups will be injected here -->
@@ -239,90 +262,197 @@ comments: false
       </button>
     </div>
 
-    <!-- Chat Messages Area -->
-    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
-      <!-- Sample Messages (Static - Non-functional) -->
-      <div class="space-y-4">
-        <div>
-          <div class="flex items-baseline gap-2 mb-1">
-            <span class="text-white font-semibold text-sm">Sarah Chen</span>
-            <span class="text-gray-500 text-xs">2h ago</span>
-          </div>
-          <p class="text-gray-200 text-sm">Hey everyone! Should we meet tomorrow to review the calculus problems?</p>
-        </div>
-
-        <div>
-          <div class="flex items-baseline gap-2 mb-1">
-            <span class="text-white font-semibold text-sm">Marcus Rodriguez</span>
-            <span class="text-gray-500 text-xs">1h ago</span>
-          </div>
-          <p class="text-gray-200 text-sm">That works for me! I'm free after 3pm.</p>
-          <p class="text-gray-200 text-sm mt-2">Also, did anyone finish problem set 7 yet?</p>
-        </div>
-
-        <div>
-          <div class="flex items-baseline gap-2 mb-1">
-            <span class="text-white font-semibold text-sm">Emily Watson</span>
-            <span class="text-gray-500 text-xs">1h ago</span>
-          </div>
-          <p class="text-gray-200 text-sm">I did! The last three questions were tough though.</p>
-        </div>
-
-        <div>
-          <div class="flex items-baseline gap-2 mb-1">
-            <span class="text-white font-semibold text-sm">James Park</span>
-            <span class="text-gray-500 text-xs">30m ago</span>
-          </div>
-          <p class="text-gray-200 text-sm">Same here. Let's definitely go over those together.</p>
-        </div>
-      </div>
+    <!-- Tabs -->
+    <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-700">
+      <button id="chatTabButton"
+        class="px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white"
+        onclick="showChatTab()">Chat</button>
+      <button id="filesTabButton"
+        class="px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700"
+        onclick="showFilesTab()">Shared Files</button>
     </div>
 
-    <!-- Message Input Area -->
-    <div class="p-4 border-t border-neutral-700 relative">
-      <!-- Slash Command Popup -->
-      <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
-        <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
-        <div id="slashCommandList">
-          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
-            <span class="text-lg">📅</span>
-            <div>
-              <div class="text-white text-sm font-medium">/calendar</div>
-              <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+    <div class="flex-1 flex flex-col min-h-0">
+      <!-- Chat Panel -->
+      <div id="chatPanel" class="flex-1 flex flex-col min-h-0">
+        <!-- Chat Messages Area -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+          <div id="chatEmptyState" class="text-center text-gray-500 text-sm py-6">No messages yet.</div>
+        </div>
+
+        <!-- Message Input Area -->
+        <div class="p-4 border-t border-neutral-700 relative">
+          <!-- Slash Command Popup -->
+          <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+            <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
+            <div id="slashCommandList">
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+                <span class="text-lg">📅</span>
+                <div>
+                  <div class="text-white text-sm font-medium">/calendar</div>
+                  <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+                </div>
+              </div>
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
+                <span class="text-lg">👤</span>
+                <div>
+                  <div class="text-white text-sm font-medium">/adduser</div>
+                  <div class="text-gray-400 text-xs">Add a user to the conversation</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
-            <span class="text-lg">👤</span>
-            <div>
-              <div class="text-white text-sm font-medium">/adduser</div>
-              <div class="text-gray-400 text-xs">Add a user to the conversation</div>
-            </div>
+
+          <div id="imageMessageBox" class="mt-4 mb-4"></div>
+          <div class="flex items-center gap-2">
+            <input
+              type="text"
+              id="chatInput"
+              placeholder="Message #group-name"
+              class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              onkeydown="handleChatInputKeydown(event)"
+              oninput="handleChatInputChange(event)"
+            />
+            <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="handleChatImageSelected(event)" />
+            <button
+              class="w-12 h-12 flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors"
+              title="Attach image"
+              onclick="triggerChatImagePicker()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9a4 4 0 10-5.657-5.657L6.343 9.343a6 6 0 108.485 8.485L20 12"></path>
+              </svg>
+            </button>
+            <button
+              class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+              title="Send message"
+              onclick="sendChatMessage()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
 
-      <div id="imageMessageBox" class="mt-4 mb-4"></div>
-      <div class="flex items-center gap-2">
-        <input
-          type="text"
-          id="chatInput"
-          placeholder="Message #group-name"
-          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          onkeydown="handleChatInputKeydown(event)"
-          oninput="handleChatInputChange(event)"
-        />
-        <button
-          class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
-          title="Send message"
-          onclick="sendChatMessage()">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-          </svg>
-        </button>
+      <!-- Shared Files Panel -->
+      <div id="filesPanel" class="hidden flex-1 flex flex-col min-h-0">
+        <div id="sharedFilesList" class="flex-1 overflow-y-auto p-4 space-y-3">
+          <div id="filesEmptyState" class="text-center text-gray-500 text-sm py-6">No files uploaded yet.</div>
+        </div>
+        <div class="p-4 border-t border-neutral-700">
+          <div class="flex items-center gap-2">
+            <input id="sharedFileInput" type="file"
+              class="flex-1 px-3 py-2 bg-neutral-700 text-white placeholder-gray-500 rounded-lg border border-neutral-600" />
+            <button
+              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+              onclick="uploadSharedFile()">Upload</button>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Uploads are shared with all group members.</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
+  <!-- Smart Group Formation Modal -->
+  <div id="smartGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeSmartGroupModal()"></div>
+  
+    <!-- Modal Content -->
+    <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-neutral-700">
+        <div>
+          <h3 class="text-2xl font-semibold text-white">AI-Powered Group Formation</h3>
+          <p class="text-sm text-gray-400 mt-1">Create balanced groups using persona compatibility</p>
+        </div>
+        <button onclick="closeSmartGroupModal()" class="text-gray-400 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+  
+      <!-- Form -->
+      <div class="p-6 space-y-6">
+        <!-- Period Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Select Period</label>
+          <select id="smartGroupPeriod" 
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Choose a period...</option>
+            <option value="1">Period 1</option>
+            <option value="2">Period 2</option>
+            <option value="3">Period 3</option>
+            <option value="4">Period 4</option>
+            <option value="5">Period 5</option>
+          </select>
+        </div>
+  
+        <!-- Class Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Select Class</label>
+          <select id="smartGroupClass"
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Choose a class...</option>
+            <option value="CSSE">CSSE</option>
+            <option value="CSP">CSP</option>
+            <option value="CSA">CSA</option>
+          </select>
+        </div>
+  
+        <!-- Group Size -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Group Size</label>
+          <input type="number" id="smartGroupSize" value="4" min="2" max="10"
+            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Recommended: 3-5 students per group</p>
+        </div>
+  
+        <!-- Group Name Prefix -->
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Group Name Prefix (Optional)</label>
+          <input type="text" id="smartGroupPrefix" placeholder="e.g., 'Team', 'Squad', 'Group'"
+            class="w-full px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
+        </div>
+  
+        <!-- Action Buttons -->
+        <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
+          <button onclick="closeSmartGroupModal()"
+            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button onclick="generateSmartGroups()"
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Generate Groups
+          </button>
+        </div>
+      </div>
+  
+      <!-- Results Section (hidden initially) -->
+      <div id="smartGroupResults" class="hidden p-6 border-t border-neutral-700 bg-neutral-900/50">
+        <h4 class="text-lg font-semibold text-white mb-4">Generated Groups Preview</h4>
+        <div id="smartGroupResultsContent" class="space-y-3 mb-6">
+          <!-- Results will be inserted here -->
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button onclick="closeSmartGroupModal()"
+            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Discard
+          </button>
+          <button onclick="saveSmartGroups()"
+            class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-semibold">
+            Save All Groups
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 <script>
   // Slash command handling
@@ -427,74 +557,9 @@ comments: false
     }
   }
 
-  // Send chat message function
-  function sendChatMessage() {
-    const chatInput = document.getElementById('chatInput');
-    const imageMessageBox = document.getElementById('imageMessageBox');
-    const chatMessages = document.getElementById('chatMessages');
-
-    const text = chatInput.value.trim();
-    const imageEl = imageMessageBox.querySelector('img');
-
-    // Don't send if both text and image are empty
-    if (!text && !imageEl) return;
-
-    // Create message element
-    const messageDiv = document.createElement('div');
-    messageDiv.innerHTML = `
-      <div class="flex items-baseline gap-2 mb-1">
-        <span class="text-white font-semibold text-sm">You</span>
-        <span class="text-gray-500 text-xs">Just now</span>
-      </div>
-      ${text ? `<p class="text-gray-200 text-sm">${text}</p>` : ''}
-      ${imageEl ? `<img src="${imageEl.src}" alt="Shared image" class="mt-2 max-w-xs rounded-lg" />` : ''}
-    `;
-
-    // Add to chat messages
-    chatMessages.appendChild(messageDiv);
-
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Clear input and image
-    chatInput.value = '';
-    imageMessageBox.innerHTML = '';
-  }
-
   document.addEventListener('paste', function(event) {
-    const items = (event.clipboardData || window.clipboardData).items;
-    let imageFile = null;
-
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.startsWith('image/')) {
-        imageFile = items[i].getAsFile();
-        break;
-      }
-    }
-
-    if (imageFile) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.style.width = '100px'; // Smaller version
-        img.alt = 'Copied Image';
-
-        // Show the image in a message box or a designated area
-        const messageBox = document.getElementById('imageMessageBox');
-        messageBox.innerHTML = '';
-        messageBox.appendChild(img);
-      };
-      reader.onerror = function() {
-        console.error('Image copy failed');
-        const messageBox = document.getElementById('imageMessageBox');
-        messageBox.innerHTML = '<span style="color: red;">Image copy failed</span>';
-      };
-      reader.readAsDataURL(imageFile);
-    } else {
-      console.error('No image found in clipboard');
-      const messageBox = document.getElementById('imageMessageBox');
-      messageBox.innerHTML = '<span style="color: red;">No image found in clipboard</span>';
+    if (typeof window.handlePastedChatImage === 'function') {
+      window.handlePastedChatImage(event);
     }
   });
 </script>
@@ -574,6 +639,13 @@ let loadingCount = 0;  // Track concurrent loading operations
 let isAdmin = false;   // Track if current user is an admin
 let selectedUsersForGroup = {}; // Track multi-select members per group
 let collapsedGroups = {}; // Track collapsed state per group ID
+let activeChatGroupId = null;
+let activeChatGroupName = '';
+let chatPollTimer = null;
+let currentUser = null;
+let currentUserDisplayName = 'You';
+let pendingChatImageBase64 = null;
+let pendingChatImageMime = 'image/png';
 
 /* ================================
    LOADING HELPERS
@@ -634,6 +706,8 @@ function initializeData() {
       allGroups = groups;
       peopleCache = people;
       isAdmin = user && user.role === "Admin";
+      currentUser = user || null;
+      currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
       renderGroups();
     })
     .catch(err => console.error("Failed to initialize data", err))
@@ -654,6 +728,336 @@ window.getPersonIdFromUID = function (uid) {
     throw new Error(`UID not found: ${uid}`);
   }
   return match.id;
+};
+
+/* ================================
+   CHAT + FILES HELPERS
+================================ */
+function formatTimestamp(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function setChatImagePreview(base64, mimeType = 'image/png') {
+  pendingChatImageBase64 = base64;
+  pendingChatImageMime = mimeType;
+  const messageBox = document.getElementById('imageMessageBox');
+  messageBox.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = `data:${mimeType};base64,${base64}`;
+  img.alt = 'Selected image';
+  img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+  messageBox.appendChild(img);
+}
+
+function clearChatImagePreview() {
+  pendingChatImageBase64 = null;
+  pendingChatImageMime = 'image/png';
+  const messageBox = document.getElementById('imageMessageBox');
+  messageBox.innerHTML = '';
+}
+
+window.triggerChatImagePicker = function () {
+  const input = document.getElementById('chatImageInput');
+  if (input) input.click();
+};
+
+window.handleChatImageSelected = async function (event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const base64 = await fileToBase64(file);
+    setChatImagePreview(base64, file.type || 'image/png');
+  } catch (err) {
+    console.error('Failed to read image', err);
+  }
+};
+
+window.handlePastedChatImage = async function (event) {
+  const items = (event.clipboardData || window.clipboardData)?.items || [];
+  const imageItem = Array.from(items).find(item => item.type.startsWith('image/'));
+  if (!imageItem) return;
+  const imageFile = imageItem.getAsFile();
+  if (!imageFile) return;
+  try {
+    const base64 = await fileToBase64(imageFile);
+    setChatImagePreview(base64, imageFile.type || 'image/png');
+  } catch (err) {
+    console.error('Image paste failed', err);
+  }
+};
+
+function renderChatMessages(messages) {
+  const chatMessages = document.getElementById('chatMessages');
+  let emptyState = document.getElementById('chatEmptyState');
+  chatMessages.innerHTML = '';
+
+  if (!emptyState) {
+    emptyState = document.createElement('div');
+    emptyState.id = 'chatEmptyState';
+    emptyState.className = 'text-center text-gray-500 text-sm py-6';
+    emptyState.textContent = 'No messages yet.';
+  }
+
+  if (!messages || messages.length === 0) {
+    chatMessages.appendChild(emptyState);
+    emptyState.classList.remove('hidden');
+    return;
+  }
+
+  emptyState.classList.add('hidden');
+  messages.forEach(msg => {
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'flex items-baseline gap-2 mb-1';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'text-white font-semibold text-sm';
+    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'text-gray-500 text-xs';
+    timeEl.textContent = formatTimestamp(msg.date);
+
+    header.appendChild(nameEl);
+    header.appendChild(timeEl);
+    wrapper.appendChild(header);
+
+    if (msg.message) {
+      const textEl = document.createElement('p');
+      textEl.className = 'text-gray-200 text-sm';
+      textEl.textContent = msg.message;
+      wrapper.appendChild(textEl);
+    }
+
+    if (msg.image) {
+      const img = document.createElement('img');
+      img.src = `data:image/png;base64,${msg.image}`;
+      img.alt = 'Shared image';
+      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+      wrapper.appendChild(img);
+    }
+
+    chatMessages.appendChild(wrapper);
+  });
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function fetchChatMessages() {
+  if (!activeChatGroupId) return;
+  try {
+    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, fetchOptions);
+    if (!res.ok) throw new Error('Failed to load chat messages');
+    const messages = await res.json();
+    renderChatMessages(messages);
+  } catch (err) {
+    console.error('Chat fetch failed', err);
+  }
+}
+
+window.sendChatMessage = async function () {
+  if (!activeChatGroupId) return;
+  const chatInput = document.getElementById('chatInput');
+  const text = chatInput.value.trim();
+  const image = pendingChatImageBase64 || null;
+
+  if (!text && !image) return;
+
+  const payload = {
+    name: currentUserDisplayName,
+    message: text,
+    date: new Date().toISOString(),
+    image: image
+  };
+
+  try {
+    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
+      ...fetchOptions,
+      method: 'POST',
+      headers: {
+        ...(fetchOptions.headers || {}),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('Failed to send message');
+    const messages = await res.json();
+    renderChatMessages(messages);
+    chatInput.value = '';
+    clearChatImagePreview();
+  } catch (err) {
+    console.error('Send message failed', err);
+  }
+};
+
+function startChatPolling() {
+  if (chatPollTimer) clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(fetchChatMessages, 4000);
+}
+
+function stopChatPolling() {
+  if (chatPollTimer) {
+    clearInterval(chatPollTimer);
+    chatPollTimer = null;
+  }
+}
+
+function downloadBase64File(filename, base64Data) {
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function isImageFile(filename) {
+  return /\.(png|jpe?g|gif)$/i.test(filename || '');
+}
+
+function getImageMimeType(filename) {
+  if (/\.jpe?g$/i.test(filename)) return 'image/jpeg';
+  if (/\.gif$/i.test(filename)) return 'image/gif';
+  return 'image/png';
+}
+
+function renderSharedFiles(files) {
+  const list = document.getElementById('sharedFilesList');
+  let emptyState = document.getElementById('filesEmptyState');
+  list.innerHTML = '';
+
+  if (!emptyState) {
+    emptyState = document.createElement('div');
+    emptyState.id = 'filesEmptyState';
+    emptyState.className = 'text-center text-gray-500 text-sm py-6';
+    emptyState.textContent = 'No files uploaded yet.';
+  }
+
+  if (!files || files.length === 0) {
+    list.appendChild(emptyState);
+    emptyState.classList.remove('hidden');
+    return;
+  }
+
+  emptyState.classList.add('hidden');
+  files.forEach(file => {
+    const card = document.createElement('div');
+    card.className = 'bg-neutral-700 border border-neutral-600 rounded-lg p-3 flex items-center gap-3';
+
+    if (isImageFile(file.filename)) {
+      const img = document.createElement('img');
+      const mime = getImageMimeType(file.filename);
+      img.src = `data:${mime};base64,${file.base64Data}`;
+      img.alt = file.filename;
+      img.className = 'w-12 h-12 object-cover rounded-md border border-neutral-600';
+      card.appendChild(img);
+    } else {
+      const icon = document.createElement('div');
+      icon.className = 'w-12 h-12 flex items-center justify-center bg-neutral-800 rounded-md text-gray-400 text-sm';
+      icon.textContent = 'FILE';
+      card.appendChild(icon);
+    }
+
+    const info = document.createElement('div');
+    info.className = 'flex-1';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'text-white text-sm font-medium';
+    nameEl.textContent = file.filename;
+    info.appendChild(nameEl);
+    card.appendChild(info);
+
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg';
+    downloadBtn.textContent = 'Download';
+    downloadBtn.addEventListener('click', () => downloadBase64File(file.filename, file.base64Data));
+    card.appendChild(downloadBtn);
+
+    list.appendChild(card);
+  });
+}
+
+async function fetchSharedFiles() {
+  if (!activeChatGroupId) return;
+  try {
+    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, fetchOptions);
+    if (!res.ok) throw new Error('Failed to load shared files');
+    const files = await res.json();
+    renderSharedFiles(files);
+  } catch (err) {
+    console.error('Shared files fetch failed', err);
+  }
+}
+
+window.uploadSharedFile = async function () {
+  if (!activeChatGroupId) return;
+  const input = document.getElementById('sharedFileInput');
+  const file = input.files?.[0];
+  if (!file) return;
+
+  try {
+    const base64Data = await fileToBase64(file);
+    const payload = { filename: file.name, base64Data };
+
+    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, {
+      ...fetchOptions,
+      method: 'POST',
+      headers: {
+        ...(fetchOptions.headers || {}),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('Failed to upload file');
+    input.value = '';
+    await fetchSharedFiles();
+  } catch (err) {
+    console.error('Upload failed', err);
+  }
+};
+
+window.showChatTab = function () {
+  document.getElementById('chatPanel').classList.remove('hidden');
+  document.getElementById('filesPanel').classList.add('hidden');
+  document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
+  document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
+};
+
+window.showFilesTab = function () {
+  document.getElementById('filesPanel').classList.remove('hidden');
+  document.getElementById('chatPanel').classList.add('hidden');
+  document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
+  document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
+  fetchSharedFiles();
 };
 
 // Get person object from cache by ID
@@ -851,6 +1255,9 @@ window.openGroupChat = function (groupId, groupName) {
     return;
   }
 
+  activeChatGroupId = groupId;
+  activeChatGroupName = groupName;
+
   const memberCount = (group.members || []).length;
 
   // Update modal header
@@ -867,6 +1274,12 @@ window.openGroupChat = function (groupId, groupName) {
   document.getElementById('chatModal').classList.remove('hidden');
   document.body.classList.add('modal-open');
 
+  showChatTab();
+  clearChatImagePreview();
+  fetchChatMessages();
+  fetchSharedFiles();
+  startChatPolling();
+
   // Log for debugging
   console.log(`Opening chat for group: ${groupName} (ID: ${groupId})`);
   console.log("Group members:", group.members);
@@ -876,6 +1289,10 @@ window.openGroupChat = function (groupId, groupName) {
 window.closeGroupChat = function () {
   document.getElementById('chatModal').classList.add('hidden');
   document.body.classList.remove('modal-open');
+  stopChatPolling();
+  activeChatGroupId = null;
+  activeChatGroupName = '';
+  clearChatImagePreview();
 }
 
 // Delete group with chaining - updates local state instead of refetching
@@ -1221,4 +1638,324 @@ window.onClassAllChange = function (cb) {
     renderGroups();
   }
 }
+
+/* ================================
+   SMART GROUP FORMATION
+================================ */
+let generatedGroups = []; // Store generated groups before saving
+
+window.openSmartGroupFormation = function() {
+  document.getElementById('smartGroupModal').classList.remove('hidden');
+  document.getElementById('smartGroupResults').classList.add('hidden');
+  document.body.classList.add('modal-open');
+}
+
+window.closeSmartGroupModal = function() {
+  document.getElementById('smartGroupModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  // Reset form
+  document.getElementById('smartGroupPeriod').value = '';
+  document.getElementById('smartGroupClass').value = '';
+  document.getElementById('smartGroupSize').value = '4';
+  document.getElementById('smartGroupPrefix').value = '';
+  generatedGroups = [];
+}
+window.generateSmartGroups = async function() {
+  const period = document.getElementById('smartGroupPeriod').value;
+  const course = document.getElementById('smartGroupClass').value;
+  const groupSize = parseInt(document.getElementById('smartGroupSize').value);
+
+  // Validation
+  if (!period || !course) {
+    alert('Please select both period and class');
+    return;
+  }
+
+  if (groupSize < 2 || groupSize > 10) {
+    alert('Group size must be between 2 and 10');
+    return;
+  }
+
+  showLoading('Finding students and analyzing personas...');
+
+  try {
+    // Step 1: Get all people from the selected period/class
+    const peopleResp = await fetch(`${javaURI}/api/people`, fetchOptions);
+    if (!peopleResp.ok) throw new Error('Failed to fetch people');
+    const allPeople = await peopleResp.json();
+
+    const studentsInClass = allPeople;
+
+    if (studentsInClass.length < groupSize) {
+      alert(`Not enough students in Period ${period} ${course}. Found ${studentsInClass.length}, need at least ${groupSize}.`);
+      hideLoading();
+      return;
+    }
+
+    const user_uids = studentsInClass.map(p => p.uid);
+    
+    // Step 2: Check how many students have personas
+    let studentsWithPersonas = 0;
+    let useAI = false;
+    
+    try {
+      const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ user_uids: user_uids })
+      });
+
+      if (checkResp.ok) {
+        const checkResult = await checkResp.json();
+        studentsWithPersonas = checkResult.members.filter(m => m.personas && m.personas.length > 0).length;
+        
+        // Minimum threshold: need at least 50% of students OR at least 2 groups worth
+        const minRequired = Math.max(groupSize * 2, Math.ceil(studentsInClass.length * 0.5));
+        useAI = studentsWithPersonas >= minRequired;
+      }
+    } catch (err) {
+      console.log('⚠️ Persona check failed, falling back to random:', err);
+      useAI = false;
+    }
+
+    let result;
+
+    if (useAI) {
+      // AI-POWERED GROUPING
+      console.log(`✨ Using AI grouping (${studentsWithPersonas} students have personas)`);
+      
+      showLoading('Using AI to create optimal groups...');
+      
+      const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({
+          user_uids: user_uids,
+          group_size: groupSize
+        })
+      });
+
+      if (!formGroupsResp.ok) {
+        const error = await formGroupsResp.json();
+        throw new Error(error.message || 'Failed to form groups');
+      }
+
+      result = await formGroupsResp.json();
+      console.log('✅ AI groups formed:', result);
+      
+    } else {
+      // RANDOM GROUPING FALLBACK
+      console.log(`🎲 Using random grouping (only ${studentsWithPersonas} students have personas)`);
+      
+      showLoading('Creating random groups...');
+      
+      // Fisher-Yates shuffle
+      const shuffled = [...studentsInClass].sort(() => Math.random() - 0.5);
+      const randomGroups = [];
+      
+      for (let i = 0; i < shuffled.length; i += groupSize) {
+        const groupMembers = shuffled.slice(i, i + groupSize);
+        randomGroups.push({
+          user_uids: groupMembers.map(p => p.uid),
+          team_score: null // null indicates random grouping
+        });
+      }
+      
+      result = {
+        groups: randomGroups,
+        average_score: null,
+        method: 'random' // Flag to show in UI
+      };
+      
+      console.log('✅ Random groups formed:', result);
+    }
+
+    // Step 3: Display results
+    displaySmartGroupResults(result, period, course, studentsInClass, useAI);
+
+  } catch (error) {
+    console.error('❌ Error generating groups:', error);
+    alert(`Failed to generate groups: ${error.message}`);
+  } finally {
+    hideLoading();
+  }
+} 
+
+  window.displaySmartGroupResults = function(result, period, course, allPeople, useAI = true) {
+    const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
+    const resultsContent = document.getElementById('smartGroupResultsContent');
+    
+    // Build groups with member details
+    generatedGroups = result.groups.map((group, index) => {
+      const letter = String.fromCharCode(65 + index);
+      const members = group.user_uids.map(uid => {
+        const person = allPeople.find(p => p.uid === uid);
+        return {
+          id: person?.id,
+          uid: uid,
+          name: person?.name || uid
+        };
+      });
+
+      return {
+        name: `${prefix} ${letter}`,
+        period: period,
+        course: course,
+        team_score: group.team_score,
+        memberIds: members.map(m => m.id),
+        members: members
+      };
+    });
+
+    // Display preview with method indicator
+    const methodBadge = useAI 
+      ? '<span class="px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
+      : '<span class="px-3 py-1 bg-gray-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+
+    resultsContent.innerHTML = `
+      <div class="mb-4 p-3 bg-neutral-700 rounded-lg border border-neutral-600">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-300">Grouping Method</p>
+            <p class="text-xs text-gray-500 mt-1">
+              ${useAI 
+                ? 'Groups optimized using persona compatibility analysis' 
+                : 'Random assignment (more students need to complete persona profiles for AI grouping)'}
+            </p>
+          </div>
+          ${methodBadge}
+        </div>
+      </div>
+      
+      ${generatedGroups.map((group, index) => `
+        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h5 class="text-white font-semibold">${group.name}</h5>
+              <p class="text-xs text-gray-400">Period ${group.period} · ${group.course} · ${group.members.length} members</p>
+            </div>
+            ${group.team_score !== null ? `
+              <div class="text-right">
+                <div class="text-sm font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">
+                  Score: ${group.team_score.toFixed(1)}
+                </div>
+                <div class="text-xs text-gray-500">
+                  ${group.team_score >= 80 ? 'Excellent' : group.team_score >= 70 ? 'Good' : group.team_score >= 60 ? 'Fair' : 'Needs Work'}
+                </div>
+              </div>
+            ` : `
+              <div class="text-right">
+                <div class="text-xs text-gray-500">Random</div>
+              </div>
+            `}
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${group.members.map(m => `
+              <span class="px-2 py-1 bg-neutral-700 text-xs text-gray-300 rounded">
+                ${m.name} <span class="text-gray-500">@${m.uid}</span>
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    `;
+
+    // Show results section
+    document.getElementById('smartGroupResults').classList.remove('hidden');
+    
+    // Scroll to results
+    document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  window.saveSmartGroups = async function() {
+    if (!generatedGroups.length) {
+      alert('No groups to save');
+      return;
+    }
+
+    showLoading(`Creating ${generatedGroups.length} groups...`);
+
+    const createdGroups = [];
+    const failedGroups = [];
+
+    try {
+      // Create groups one by one
+      for (let i = 0; i < generatedGroups.length; i++) {
+        const group = generatedGroups[i];
+        
+        try {
+          showLoading(`Creating group ${i + 1} of ${generatedGroups.length}...`);
+          
+          // Create the group first (without members)
+          const createResp = await fetch(`${javaURI}/api/groups`, {
+            ...fetchOptions,
+            method: 'POST',
+            body: JSON.stringify({
+              name: group.name,
+              period: group.period,
+              course: group.course
+            })
+          });
+
+          if (!createResp.ok) {
+            const error = await createResp.text();
+            console.error(`Failed to create ${group.name}:`, error);
+            failedGroups.push({ group: group.name, error: 'Creation failed' });
+            continue;
+          }
+
+          const createdGroup = await createResp.json();
+          console.log(`✅ Created group: ${group.name} (ID: ${createdGroup.id})`);
+
+          // Add members one by one
+          for (const memberId of group.memberIds) {
+            if (!memberId) continue;
+            
+            try {
+              const addMemberResp = await fetch(
+                `${javaURI}/api/groups/${createdGroup.id}/members/${memberId}`,
+                { ...fetchOptions, method: 'POST' }
+              );
+
+              if (!addMemberResp.ok) {
+                console.error(`Failed to add member ${memberId} to ${group.name}`);
+              }
+            } catch (err) {
+              console.error(`Error adding member ${memberId}:`, err);
+            }
+          }
+
+          createdGroups.push(createdGroup);
+
+        } catch (err) {
+          console.error(`Error creating group ${group.name}:`, err);
+          failedGroups.push({ group: group.name, error: err.message });
+        }
+      }
+
+      // Update local state
+      if (createdGroups.length > 0) {
+        allGroups.push(...createdGroups);
+      }
+
+      // Show results
+      if (failedGroups.length === 0) {
+        alert(`✅ Successfully created all ${createdGroups.length} groups!`);
+      } else {
+        alert(
+          `⚠️ Created ${createdGroups.length} groups.\n` +
+          `${failedGroups.length} failed.`
+        );
+      }
+
+      closeSmartGroupModal();
+      renderGroups();
+
+    } catch (error) {
+      console.error('❌ Error in saveSmartGroups:', error);
+      alert(`Failed to save groups: ${error.message}`);
+    } finally {
+      hideLoading();
+    }
+  }
 </script>
