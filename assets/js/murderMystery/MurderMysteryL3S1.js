@@ -48,11 +48,56 @@ class MurderMysteryL3 {
         keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
     };
 
+    const spike_data_top_1 = {
+        id: 'spike_top_1',
+        src: path + "",
+        SCALE_FACTOR: 4,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 0,
+        INIT_POSITION: { x: 150, y: -200 },
+        pixels: { height: 80, width: 100 },
+        velocity: { x: 0, y: 0.4 },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 }
+    };
+
+    const spike_data_bottom_1 = {
+        id: 'spike_bottom_1',
+        src: path + "",
+        SCALE_FACTOR: 4,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 0,
+        INIT_POSITION: { x: 600, y: -350 },
+        pixels: { height: 80, width: 100 },
+        velocity: { x: 0, y: 0.4 },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 }
+    };
+
+    const spike_data_top_2 = {
+        id: 'spike_top_2',
+        src: path + "",
+        SCALE_FACTOR: 4,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 0,
+        INIT_POSITION: { x: 300, y: -600 },
+        pixels: { height: 80, width: 100 },
+        velocity: { x: 0, y: 0.4 },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 }
+    };
+
     // Classes array - use ScrollingBackground instead of GameEnvBackground
     this.classes = [
       { class: GameEnvBackground, data: {} },
       { class: BackgroundParallax, data: image_data_stairs },
-      { class: Player, data: sprite_data_archie }
+      { class: Player, data: sprite_data_archie },
+      { class: Player, data: spike_data_top_1 },
+      { class: Player, data: spike_data_bottom_1 },
+      { class: Player, data: spike_data_top_2 }
     ];
   }
 }
