@@ -32,10 +32,17 @@ permalink: /
 <!-- ================= STYLES ================= -->
 
 <style>
-  body {
-    background-color: black;
-    touch-action: none;
-  }
+body {
+  background-color: black;
+}
+
+/* Prevent touch behavior only on game elements */
+#mario,
+#controls,
+#controls button {
+  touch-action: none;
+}
+
 
   .sprite {
     height: {{pixels}}px;
@@ -94,6 +101,16 @@ permalink: /
   #controls button:active {
     background: rgba(255, 255, 255, 0.35);
   }
+  #controls {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #controls {
+    display: block;
+  }
+}
+
 </style>
 
 <!-- ================= GAME SCRIPT ================= -->
