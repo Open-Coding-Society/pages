@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Murder Mystery Game 
-permalink: /gamify/murdermystery
+permalink: /gamify/murdermysteryL1S1
 ---
 
 <div id="gameContainer">
