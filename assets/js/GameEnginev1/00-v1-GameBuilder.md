@@ -423,7 +423,6 @@ iframe { width: 100%; height: 100%; border: none; }
                 <div class="panel-controls">
                     <span class="step-indicator" id="step-indicator-mini">Step 1/2</span>
                     <button id="btn-confirm" class="icon-btn" data-tooltip="Confirm Step">✓</button>
-                    <button id="btn-run" class="icon-btn" data-tooltip="Run Game">▶</button>
                     <button id="btn-export" class="icon-btn" data-tooltip="Export Code">⤓</button>
                     <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
                     <button id="btn-refresh-assets" class="icon-btn" data-tooltip="Refresh Assets">⟳</button>
@@ -2028,8 +2027,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
     function syncFromControlsIfFreestyle() {
         const current = steps[stepIndex];
-        // Allow control-driven updates in freestyle even after manual edits
-        if (state.userEdited && current === 'freestyle' && !state.lastEdited) return;
+        // Always stage builder changes, even after manual code edits
         const hasNPCs = ui.npcs.length > 0;
         const hasWalls = (ui.walls.length > 0) || (ui.drawShapes && ui.drawShapes.some(s => s.type === 'barrier'));
         const hasPlayer = !!ui.pSprite.value;
@@ -2040,7 +2038,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
         } else {
             stepToCompose = hasWalls ? 'walls' : (hasNPCs ? 'npc' : (hasPlayer ? 'player' : (hasBackground ? 'background' : null)));
         }
-        // Stage changes only; do not update editor or reload game until Confirm
         const oldCode = ui.editor.value;
         let composed = null;
         let composedStep = stepToCompose;
@@ -2054,21 +2051,11 @@ export const gameLevelClasses = [GameLevelCustom];`;
             composed = stepToCompose ? generateStepCode(stepToCompose) : generateBaselineCode();
         }
         if (composed) {
-            if (current === 'freestyle') {
-                const oldCode = ui.editor.value;
-                simulateTypingChange(oldCode, composed, () => {
-                    stagedCode = null; stagedStep = null;
-                    runInRunner();
-                    const btn = document.getElementById('btn-confirm');
-                    if (btn) btn.classList.remove('staged');
-                });
-            } else {
-                stagedCode = composed;
-                stagedStep = composedStep;
-                const btn = document.getElementById('btn-confirm');
-                if (btn) btn.classList.add('staged');
-                // Do not call simulateTypingChange here; wait for Confirm
-            }
+            // Always stage, do not apply immediately (confirm-only workflow)
+            stagedCode = composed;
+            stagedStep = composedStep;
+            const btn = document.getElementById('btn-confirm');
+            if (btn) btn.classList.add('staged');
         }
     }
 
@@ -2077,7 +2064,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
         const code = String(ui.editor?.value || '');
         const pdMatch = /const\s+playerData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
         const bdMatch = /const\s+bgData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
-        // Background src -> UI select
         try {
             if (bdMatch) {
                 const bdBlock = bdMatch[1];
@@ -2178,7 +2164,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
     /* SECTION: Typing animation (simulate code being typed, then persist highlight) */
     function simulateTypingChange(oldCode, newCode, onDone) {
         const { startLine, lineCount } = computeChangeRange(oldCode, newCode);
-        // If no visible change, just swap and persist
         if (!lineCount || lineCount < 1) {
             state.programmaticEdit = true;
             ui.editor.value = newCode;
@@ -2219,7 +2204,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
             if (idx < changed.length) {
                 window.setTimeout(typeStep, TICK_MS);
             } else {
-                // Finished typing; set final value to ensure exact match
                 ui.editor.value = newCode;
                 state.typing = null;
                 state.persistent = { startLine, lineCount: Math.max(1, lineCount) };
@@ -2258,7 +2242,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
     }
 
     function buildBarrierInsertText() {
-        // Include walls from the form inputs
         const includedWalls = ui.walls.slice();
         const classes = [];
         const defBlocks = includedWalls.map((w, idx) => {
@@ -2271,7 +2254,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
             return `\n        const barrierData${idx+1} = {\n            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }\n        };`;
         });
 
-        // Include overlay-drawn barriers (no scaling; use overlay pixel coords)
         const drawnBarriers = (ui.drawShapes || []).filter(s => s.type === 'barrier');
         drawnBarriers.forEach((b, bIdx) => {
             const id = `dbarrier_${bIdx+1}`;
@@ -2287,7 +2269,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
         return { defs, classes };
     }
 
-    // Insert-only builders for background and player (non-destructive merges)
     function buildBackgroundInsertText() {
         const bg = assets.bg[ui.bg.value];
         if (!bg) return { defs: '', classes: [] };
@@ -2380,7 +2361,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
     function mergeDefsAndClasses(oldCode, insertDefs, insertClasses) {
         let code = oldCode;
         try {
-            // Normalize any older export lines referencing a different class name
             const exportRe = /export\s+const\s+gameLevelClasses\s*=\s*\[GameLevelCustom\];/;
             const m = exportRe.exec(code);
             if (m) {
@@ -2390,7 +2370,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
         try {
             const scan = insertDefs || '';
-            // Remove previous NPC defs
             const npcDefs = [];
             let mm;
             const npcRe = /\bconst\s+(npcData\d+)\s*=\s*\{/g;
@@ -2400,7 +2379,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 code = code.replace(blockRe, '\n');
             });
 
-            // Remove previous barrier defs from form
             const barrierDefs = [];
             let bm;
             const bRe = /\bconst\s+(barrierData\d+)\s*=\s*\{/g;
@@ -2410,7 +2388,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 code = code.replace(blockRe, '\n');
             });
 
-            // Remove previous overlay barrier defs
             const dbarrierDefs = [];
             let dm;
             const dRe = /\bconst\s+(dbarrier_\d+)\s*=\s*\{/g;
@@ -2420,8 +2397,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 code = code.replace(blockRe, '\n');
             });
 
-            // Remove previous bgData/playerData blocks to avoid duplication
-            // Only remove if we are inserting new bgData/playerData in this merge
             const willInsertBg = /\bconst\s+bgData\s*=\s*\{/.test(scan);
             const willInsertPlayer = /\bconst\s+playerData\s*=\s*\{/.test(scan);
             if (willInsertBg) {
@@ -2432,7 +2407,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
             }
         } catch (_) {}
 
-        // Insert new definitions just before the classes array inside GameLevelCustom
         const ctorRe = /(class\s+GameLevelCustom[\s\S]*?constructor\s*\(gameEnv\)\s*\{[\s\S]*?)(this\.classes\s*=\s*\[)/;
         code = code.replace(ctorRe, (m, p1, p2) => p1 + (insertDefs || '') + '\n' + p2);
 
@@ -2458,13 +2432,11 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
     const mvEl = document.getElementById('movement-keys');
     const rerunPlayer = () => { syncFromControlsIfFreestyle(); };
-    // Directly apply player edits into existing playerData in code (robust fallback)
     function applyPlayerUIToCodeImmediate() {
         try {
             let code = String(ui.editor?.value || '');
             const pdBlockRe = /const\s+playerData\s*=\s*\{[\s\S]*?\};/i;
             if (!pdBlockRe.test(code)) { rerunPlayer(); return; }
-            // Numeric fields
             const numSet = (label, val) => {
                 if (val === null || val === undefined) return;
                 const v = parseInt(String(val), 10);
@@ -2507,7 +2479,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
         }
     }
     function updatePlayerPositionInEditor() {
-        // Stage player position changes; no live reload until Confirm
         state.lastEdited = 'player';
         rerunPlayer();
     }
@@ -2641,7 +2612,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             }
                         }
                     });
-                    // Stay in Freestyle after inserting NPCs
                     stepIndex = steps.indexOf('freestyle');
                     setIndicator();
                     updateStepUI();
@@ -2682,7 +2652,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 const ins = (current === 'player') ? buildPlayerInsertText() : buildBackgroundInsertText();
                 const merged = mergeDefsAndClasses(oldCode, ins.defs, ins.classes);
                 simulateTypingChange(oldCode, merged, () => {
-                    // Stay in Freestyle to preserve manual editing flow
                     stepIndex = steps.indexOf('freestyle');
                     setIndicator();
                     updateStepUI();
@@ -2692,7 +2661,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 });
                 return;
             }
-            // If not a recognized step, do nothing destructive
             return;
         }
 
@@ -2718,7 +2686,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             }
                         }
                     });
-                    // Stay in Freestyle after confirming NPCs
                     stepIndex = steps.indexOf('freestyle');
                     stagedCode = null; stagedStep = null;
                     if (btn) btn.classList.remove('staged');
@@ -2755,7 +2722,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 });
                 return;
             }
-            // If no staged code (common in Freestyle after code edits), compose from current UI
             let codeToApply = stagedCode;
             if (!codeToApply) {
                 let stepToCompose;
@@ -2838,7 +2804,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     }
                 });
 
-                // Stay in Freestyle after confirming NPCs
                 stepIndex = steps.indexOf('freestyle');
             } else {
                 if (current === 'walls') {
@@ -2867,16 +2832,13 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
     /* SECTION: Runtime + iframe comms */
     function safeCodeToRun() {
-        // Prefer staged for background/player, but not for npc/walls so live engine uses editor merges
         const preferStaged = (typeof stagedStep !== 'undefined' && !['npc','walls'].includes(stagedStep));
         const preferred = (preferStaged && typeof stagedCode === 'string' && stagedCode.length) ? stagedCode : (ui.editor.value || '');
         const hasLevels = /export\s+const\s+gameLevelClasses/.test(preferred);
         return hasLevels ? preferred : generateBaselineCode();
     }
 
-    // No iframe sync; barriers are included via code generation and runner reload.
 
-    // Local canvas-based runner (replaces iframe embed)
     let runnerGameControl = null;
     let runnerGameInstance = null;
     let runnerEscapeKeyHandler = null;
@@ -3005,7 +2967,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
         };
         document.addEventListener('keydown', runnerEscapeKeyHandler);
 
-        // Clear staged visual on play buttons after a run
         try {
             if (ui.codePlayBtn) ui.codePlayBtn.classList.remove('staged');
             const topRun = document.getElementById('btn-run');
@@ -3013,7 +2974,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
         } catch (_) {}
     }
 
-    document.getElementById('btn-run').addEventListener('click', runInRunner);
     if (ui.codePlayBtn) ui.codePlayBtn.addEventListener('click', runInRunner);
     if (ui.codeStopBtn) ui.codeStopBtn.addEventListener('click', stopRunner);
     if (ui.toggleWallsGameBtn) {
@@ -3025,7 +2985,6 @@ export const gameLevelClasses = [GameLevelCustom];`;
             ui.gameWallsVisible = !ui.gameWallsVisible;
             refreshToggleLabel();
             updateOverlayVisibility();
-            // Apply runtime visibility by adjusting canvas opacity (keeps collision boxes active)
             try {
                 const show = ui.gameWallsVisible;
                 const container = document.getElementById('gameContainer');
@@ -3108,20 +3067,5 @@ document.querySelector('.game-frame')?.addEventListener('click', () => {
 
 <!-- Removed iframe key forwarding; local runner handles input directly. -->
 
-
-
-
-        // Apply initial barrier visibility to canvases based on toggle state
-        try {
-            const show = ui.gameWallsVisible;
-            const container = document.getElementById('gameContainer');
-            const canvases = Array.from(container ? container.querySelectorAll('canvas') : []);
-            canvases.forEach(c => {
-                const id = c.id || '';
-                if (/^(wall_|dbarrier_|barrier_)/.test(id)) {
-                    c.style.opacity = show ? '1' : '0';
-                }
-            });
-        } catch (_) {}
 
 
