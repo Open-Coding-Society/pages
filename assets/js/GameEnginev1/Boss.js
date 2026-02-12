@@ -1,5 +1,5 @@
 import Enemy from '.Enemy.js';
-import Projectile from '../GameEnginev1/Projectile.js';
+import Projectile from './Projectile.js';
 import Player from './Player.js';
 
 class Boss extends Enemy {
