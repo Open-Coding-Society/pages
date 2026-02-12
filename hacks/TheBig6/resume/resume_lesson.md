@@ -1,9 +1,10 @@
----
-layout: cs-portfolio-lesson
+--- 
+layout: cs-bigsix-lesson
 title: "Resume — All-in-One Interactive Lesson"
 description: "Compact interactive lesson combining contact, skills, education, experiences, PDF export, LinkedIn builder and interview practice"
 permalink: /bigsix/resume_lesson
-parent: "Resume Building"
+parent: "bigsix"
+lesson_number: 4
 team: "Grinders"
 categories: [CSP, Resume]
 tags: [resume, interactive, skills]
@@ -14,119 +15,195 @@ date: 2025-12-01
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<div class="max-w-3xl mx-auto p-4">
-  <h1 class="text-2xl font-bold mb-2">Resume — All-in-One</h1>
-  <p class="text-gray-600 mb-4">Short, interactive steps. Autosaves locally.</p>
-  <a href="../" class="button back-btn">Back</a>
-  <div class="border rounded p-3 mb-4">
-    <div class="flex justify-between text-sm">
+<style>
+  :root {
+    --bg: #0a0e27;
+    --panel: #0f1729;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #e6eef8;
+    --muted: #9aa6bf;
+    --accent: #7c3aed;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; }
+  .header { margin-bottom: 32px; }
+  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px 0; }
+  .header p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .progress-bar-container {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 24px;
+  }
+
+  .progress-bar { display: flex; gap: 8px; justify-content: space-between; align-items: center; }
+  .progress-bar .step { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; transition: 0.2s; }
+  .progress-bar .step.active { background: var(--accent); height: 6px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card h2 { margin-top: 0; font-size: 20px; color: #a6c9ff; }
+  .card h3 { margin-top: 16px; font-size: 16px; color: #a6c9ff; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  input, textarea {
+    background: #051226;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: #dce9ff;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 14px;
+    width: 100%;
+  }
+  input:focus, textarea:focus { outline: none; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
+
+  .preview-box { background: #0f1729; border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 200px; overflow: auto; }
+
+  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
+
+  .tooltip { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  .exercise { background: rgba(124, 58, 237, 0.1); border-left: 3px solid var(--accent); padding: 12px; border-radius: 6px; margin: 8px 0; }
+
+</style>
+
+<div class="container page-content">
+  <div class="header">
+    <h1>Resume — All-in-One</h1>
+    <p>Short, interactive steps. Autosaves locally.</p>
+    <a href="../" class="button back-btn">Back</a>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="flex justify-between text-sm" style="color: var(--muted);">
       <span>Progress</span><span id="progressLabel">Step 1 / 6</span>
     </div>
-    <div class="w-full bg-gray-200 rounded h-2 mt-2">
-      <div id="progressBar" class="bg-blue-600 h-2 rounded" style="width:16.6667%"></div>
+    <div class="w-full bg-gray-200 rounded h-2 mt-2" style="background: rgba(255,255,255,0.1);">
+      <div id="progressBar" class="bg-blue-600 h-2 rounded" style="width:16.6667%; background: var(--accent);"></div>
     </div>
   </div>
 
   <!-- Steps -->
-  <section data-step="0" class="space-y-3">
-    <h2 class="text-xl font-semibold">1 — Contact</h2>
-    <div class="grid gap-2 md:grid-cols-2">
-      <input id="fullName" placeholder="Full name" class="border rounded px-3 py-2" />
-      <input id="email" placeholder="Email" class="border rounded px-3 py-2" />
-      <input id="phone" placeholder="Phone" class="border rounded px-3 py-2" />
-      <input id="location" placeholder="City, State" class="border rounded px-3 py-2" />
-    </div>
-    <div class="text-xs text-gray-600">Keep it short and professional. Use a real contact email.</div>
-  </section>
-
-  <section data-step="1" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">2 — Skills</h2>
-    <div class="grid md:grid-cols-2 gap-4">
-      <div>
-        <div class="font-medium mb-2">Hard Skills</div>
-        <div id="hardSkillsGrid" class="grid gap-2"></div>
-        <div class="flex gap-2 mt-2">
-          <input id="customHardSkill" placeholder="Add hard skill" class="flex-1 border rounded px-2 py-1" />
-          <button id="addHardSkillBtn" class="px-3 py-1 border rounded">Add</button>
-        </div>
-        <div id="hardSkillTags" class="flex flex-wrap gap-2 mt-2"></div>
+  <section data-step="0" class="section active">
+    <div class="card">
+      <h2>1 — Contact</h2>
+      <div class="grid">
+        <input id="fullName" placeholder="Full name" />
+        <input id="email" placeholder="Email" />
+        <input id="phone" placeholder="Phone" />
+        <input id="location" placeholder="City, State" />
       </div>
-      <div>
-        <div class="font-medium mb-2">Soft Skills</div>
-        <div id="softSkillsGrid" class="grid gap-2"></div>
-        <div class="flex gap-2 mt-2">
-          <input id="customSoftSkill" placeholder="Add soft skill" class="flex-1 border rounded px-2 py-1" />
-          <button id="addSoftSkillBtn" class="px-3 py-1 border rounded">Add</button>
-        </div>
-        <div id="softSkillTags" class="flex flex-wrap gap-2 mt-2"></div>
-      </div>
+      <div class="tooltip">Keep it short and professional. Use a real contact email.</div>
     </div>
   </section>
 
-  <section data-step="2" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">3 — Education</h2>
-    <input id="school" placeholder="School / Program" class="border rounded px-3 py-2 w-full" />
-    <input id="degree" placeholder="Degree / Dates" class="border rounded px-3 py-2 w-full" />
-    <textarea id="eduHighlights" rows="3" placeholder="Highlights (one per line)" class="border rounded px-3 py-2 w-full"></textarea>
-  </section>
-
-  <section data-step="3" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">4 — Experiences</h2>
-    <div class="flex justify-between items-center">
-      <div class="font-medium">Add Experiences (Action → Metric → Result)</div>
-      <button id="addExperienceBtn" class="px-3 py-1 border rounded">Add</button>
-    </div>
-    <div id="experienceContainer" class="space-y-3"></div>
-
-    <div class="border rounded p-3 mt-2">
-      <div class="font-medium mb-2">Drag & drop practice</div>
-      <div class="grid md:grid-cols-2 gap-3">
-        <div id="goodZone" class="min-h-24 p-2 border rounded">Good</div>
-        <div id="badZone" class="min-h-24 p-2 border rounded">Bad</div>
-      </div>
-      <div id="itemsPool" class="mt-2 flex flex-wrap gap-2"></div>
-    </div>
-  </section>
-
-  <section data-step="4" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">5 — Preview & PDF</h2>
-    <div class="border rounded p-3">
-      <div id="resumePreview" class="space-y-2 text-sm leading-6"></div>
-    </div>
-    <div class="flex gap-2 mt-2">
-      <button id="downloadPdfBtn" class="px-3 py-2 border rounded">Download PDF</button>
-      <button id="saveDraft" class="px-3 py-2 border rounded">Save Draft</button>
-      <p id="saveMessage" class="text-sm mt-2"></p>
-    </div>
-  </section>
-
-  <section data-step="5" class="space-y-3 hidden">
-    <h2 class="text-xl font-semibold">6 — LinkedIn & Interview</h2>
-    <div class="grid md:grid-cols-2 gap-4">
-      <div>
-        <div class="font-medium mb-2">LinkedIn Builder</div>
-        <textarea id="aboutPrompt" rows="3" placeholder="Short about text or paste summary" class="border rounded w-full px-3 py-2"></textarea>
-        <button id="generateLinkedInBtn" class="mt-2 px-3 py-2 border rounded">Generate (AI stub)</button>
-        <div id="linkedinPreview" class="mt-2 text-sm"></div>
-      </div>
-      <div>
-        <div class="font-medium mb-2">Interview Practice (ELIO)</div>
-        <div class="border rounded p-2">
-          <div id="elioQuestion" class="font-semibold mb-2">Press Start</div>
-          <div class="flex gap-2">
-            <button id="startInterviewBtn" class="px-3 py-1 border rounded">Start</button>
-            <button id="nextQuestionBtn" class="px-3 py-1 border rounded">Next</button>
-            <button id="endInterviewBtn" class="px-3 py-1 border rounded">End</button>
+  <section data-step="1" class="section hidden">
+    <div class="card">
+      <h2>2 — Skills</h2>
+      <div class="grid">
+        <div>
+          <h3>Hard Skills</h3>
+          <div id="hardSkillsGrid" class="grid gap-2"></div>
+          <div class="flex gap-2 mt-2">
+            <input id="customHardSkill" placeholder="Add hard skill" class="flex-1" />
+            <button id="addHardSkillBtn" class="px-3 py-1 border rounded">Add</button>
           </div>
-          <div class="mt-2 text-xs text-gray-600">Uses browser TTS. Try answering out loud and record below.</div>
-          <div class="mt-2">
-            <div class="video-container" style="height:160px; background:#111; display:flex; align-items:center; justify-content:center; color:#fff;">
-              <div id="recordingIndicator" class="hidden">● Recording</div>
+          <div id="hardSkillTags" class="flex flex-wrap gap-2 mt-2"></div>
+        </div>
+        <div>
+          <h3>Soft Skills</h3>
+          <div id="softSkillsGrid" class="grid gap-2"></div>
+          <div class="flex gap-2 mt-2">
+            <input id="customSoftSkill" placeholder="Add soft skill" class="flex-1" />
+            <button id="addSoftSkillBtn" class="px-3 py-1 border rounded">Add</button>
+          </div>
+          <div id="softSkillTags" class="flex flex-wrap gap-2 mt-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-step="2" class="section hidden">
+    <div class="card">
+      <h2>3 — Education</h2>
+      <input id="school" placeholder="School / Program" />
+      <input id="degree" placeholder="Degree / Dates" />
+      <textarea id="eduHighlights" rows="3" placeholder="Highlights (one per line)"></textarea>
+    </div>
+  </section>
+
+  <section data-step="3" class="section hidden">
+    <div class="card">
+      <h2>4 — Experiences</h2>
+      <div class="flex justify-between items-center">
+        <h3>Add Experiences (Action → Metric → Result)</h3>
+        <button id="addExperienceBtn" class="px-3 py-1 border rounded">Add</button>
+      </div>
+      <div id="experienceContainer" class="space-y-3"></div>
+
+      <div class="exercise mt-2">
+        <h3>Drag & drop practice</h3>
+        <div class="grid">
+          <div id="goodZone" class="min-h-24 p-2 border rounded">Good</div>
+          <div id="badZone" class="min-h-24 p-2 border rounded">Bad</div>
+        </div>
+        <div id="itemsPool" class="mt-2 flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-step="4" class="section hidden">
+    <div class="card">
+      <h2>5 — Preview & PDF</h2>
+      <div class="preview-box">
+        <div id="resumePreview" class="space-y-2 text-sm leading-6"></div>
+      </div>
+      <div class="flex gap-2 mt-2">
+        <button id="downloadPdfBtn" class="px-3 py-2 border rounded">Download PDF</button>
+        <button id="saveDraft" class="px-3 py-2 border rounded">Save Draft</button>
+        <p id="saveMessage" class="text-sm mt-2"></p>
+      </div>
+    </div>
+  </section>
+
+  <section data-step="5" class="section hidden">
+    <div class="card">
+      <h2>6 — LinkedIn & Interview</h2>
+      <div class="grid">
+        <div>
+          <h3>LinkedIn Builder</h3>
+          <textarea id="aboutPrompt" rows="3" placeholder="Short about text or paste summary"></textarea>
+          <button id="generateLinkedInBtn" class="mt-2 px-3 py-2 border rounded">Generate (AI stub)</button>
+          <div id="linkedinPreview" class="mt-2 text-sm"></div>
+        </div>
+        <div>
+          <h3>Interview Practice (ELIO)</h3>
+          <div class="border rounded p-2">
+            <div id="elioQuestion" class="font-semibold mb-2">Press Start</div>
+            <div class="flex gap-2">
+              <button id="startInterviewBtn" class="px-3 py-1 border rounded">Start</button>
+              <button id="nextQuestionBtn" class="px-3 py-1 border rounded">Next</button>
+              <button id="endInterviewBtn" class="px-3 py-1 border rounded">End</button>
             </div>
-            <div class="flex gap-2 mt-2">
-              <button id="startRecordingBtn" class="px-3 py-1 border rounded">Record</button>
-              <button id="stopRecordingBtn" class="px-3 py-1 border rounded">Stop</button>
-              <button id="downloadRecBtn" class="px-3 py-1 border rounded">Download</button>
+            <div class="tooltip">Uses browser TTS. Try answering out loud and record below.</div>
+            <div class="mt-2">
+              <div class="video-container" style="height:160px; background:#111; display:flex; align-items:center; justify-content:center; color:#fff;">
+                <div id="recordingIndicator" class="hidden">● Recording</div>
+              </div>
+              <div class="flex gap-2 mt-2">
+                <button id="startRecordingBtn" class="px-3 py-1 border rounded">Record</button>
+                <button id="stopRecordingBtn" class="px-3 py-1 border rounded">Stop</button>
+                <button id="downloadRecBtn" class="px-3 py-1 border rounded">Download</button>
+              </div>
             </div>
           </div>
         </div>
@@ -135,7 +212,7 @@ date: 2025-12-01
   </section>
 
   <!-- Bottom Nav -->
-  <div class="flex justify-between mt-4">
+  <div class="nav-buttons">
     <button id="prevBtn" class="px-3 py-2 border rounded" disabled>Previous</button>
     <div class="flex gap-2">
       <button id="nextBtn" class="px-3 py-2 border rounded">Next</button>
@@ -165,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // DOM
   const $ = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
+  const $$ = s => Array.from(document.querySelectorAll('section[data-step]'));
   const steps = $$('section[data-step]');
   const progressBar = $('#progressBar');
   const progressLabel = $('#progressLabel');
@@ -220,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showStep(i){
     state.step = Math.max(0, Math.min(steps.length-1, i));
     steps.forEach((el,idx)=> el.classList.toggle('hidden', idx !== state.step));
+    steps.forEach((el,idx)=> el.classList.toggle('active', idx === state.step));
     const pct = ((state.step+1)/steps.length)*100;
     progressBar.style.width = pct + '%';
     progressLabel.textContent = `Step ${state.step+1} / ${steps.length}`;
@@ -403,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Utilities
-  function escapeHtml(s){ return String(s||'').replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeHtml(s){ return String(s||'').replace(/[&<>'"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
   // Boot
   restore(); renderChecklist(hardSkillsGrid, state.hardSkills); renderChecklist(softSkillsGrid, state.softSkills); renderTags(); renderExperiences(); initDragPool(); showStep(0);
@@ -419,10 +497,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
         try{ if (document.referrer && new URL(document.referrer).origin === location.origin){ history.back(); return; } }catch(err){}
-        var p = location.pathname.replace(/\/$/,'').split('/');
+        var p = location.pathname.replace(///$/,'').split('/');
         if (p.length>1){ p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
       });
     });
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>

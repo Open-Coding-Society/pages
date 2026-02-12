@@ -1,9 +1,10 @@
----
-layout: cs-portfolio-lesson
+--- 
+layout: cs-bigsix-lesson
 title: "Data Visualization — All-in-One Interactive Lesson"
 description: "Compact lesson combining REST APIs, Spring Boot, CRUD, search, filtering, pagination, and data queries"
 permalink: /bigsix/dataviz_lesson
-parent: "Data Visualization"
+parent: "bigsix"
+lesson_number: 3
 team: "Applicators"
 categories: [CSP, DataVisualization, Interactive]
 tags: [spring-boot, rest, jpa, search, pagination, interactive]
@@ -12,219 +13,100 @@ date: 2025-12-02
 ---
 
 <style>
+  :root {
+    --bg: #0a0e27;
+    --panel: #0f1729;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #e6eef8;
+    --muted: #9aa6bf;
+    --accent: #7c3aed;
+  }
 
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; }
 
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; padding: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; }
+  .header { margin-bottom: 32px; }
+  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px 0; }
+  .header p { color: var(--muted); font-size: 14px; margin: 0; }
 
+  .progress-bar { display: flex; gap: 8px; margin: 20px 0; justify-content: space-between; align-items: center; }
+  .progress-bar .step { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; cursor: pointer; transition: 0.2s; }
+  .progress-bar .step.active { background: var(--accent); height: 6px; }
 
-h1, h2, h3 { color: var(--text); margin-top: 20px; }
-p, li, label, small { color: var(--muted); }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+  .section { display: none; }
+  .section.active { display: block; }
 
-.container { padding: 28px 0; }
-.header { margin-bottom: 32px; }
-.header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px 0; }
-.header p { color: var(--muted); font-size: 14px; margin: 0; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card h2 { margin-top: 0; font-size: 20px; color: #a6c9ff; }
+  .card h3 { margin-top: 16px; font-size: 16px; color: #a6c9ff; }
 
-.progress-bar { display: flex; gap: 8px; margin: 20px 0; justify-content: space-between; align-items: center; }
-.progress-bar .step { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; cursor: pointer; transition: 0.2s; }
-.progress-bar .step.active { background: var(--accent); height: 6px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
-.section { display: none; }
-.section.active { display: block; }
+  .editor-box, input, textarea, select {
+    background: #051226;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: #dce9ff;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 14px;
+    width: 100%;
+  }
+  .editor-box:focus, input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
 
-.card, .panel, .out {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  margin: 12px 0;
-  color: var(--text);
-}
+  .preview-box { background: #0f1729; border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 120px; overflow: auto; }
 
-.out, pre, code {
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: #f1f5f9;
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: ui-monospace, Consolas;
-  font-size: 13px;
-  padding: 10px;
-}
+  button { appearance: none; border: 1px solid var(--border); background: var(--accent); color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
+  button:hover { background: #6d28d9; transform: translateY(-1px); }
+  button.secondary { background: #334155; }
+  button.secondary:hover { background: #1e293b; }
 
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--panel-2);
-  color: var(--text);
-  font-family: ui-monospace;
-  font-size: 13px;
-  margin: 8px 0;
-}
+  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
 
-textarea { min-height: 110px; }
+  .tooltip { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
-button {
-  background: var(--panel-2);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-  margin: 6px 6px 6px 0;
-  transition: all 0.2s ease;
-}
-
-button:hover {
-  transform: translateY(-1px);
-  border-color: #555;
-  background: #1e1e1e;
-}
-
-.grid { display: grid; gap: 12px; }
-.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-@media (max-width: 920px) {
-  .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 640px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-}
-
-.badge {
-  display: inline-block;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 2px 8px;
-  color: #aaa;
-  font-size: 11px;
-  margin-left: 6px;
-}
-
-.pill {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  color: #ccc;
-}
-
-.ok { border-color: #22c55e; color: #22c55e; }
-.warn { border-color: #f59e0b; color: #f59e0b; }
-.err { border-color: #ef4444; color: #ef4444; }
-
-.quiz .opt {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px;
-  margin: 6px 0;
-  cursor: pointer;
-  color: #ddd;
-  background: var(--panel-2);
-  transition: all 0.2s ease;
-}
-
-.quiz .opt.sel { border-color: #777; background: #1a1a1a; }
-.quiz .opt.good { border-color: #22c55e; background: #0f2b1b; color: #b6f5c2; }
-.quiz .opt.bad { border-color: #ef4444; background: #2b0f0f; color: #fbbebe; }
-
-.block-desc {
-  background: linear-gradient(90deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.1));
-  border-left: 3px solid var(--accent);
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: #e2e8f0;
-  font-size: 14px;
-  margin: 6px 0 10px;
-}
-
-.nav {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 10px 0 14px;
-}
-
-.nav button {
-  position: relative;
-  background: var(--panel);
-  color: #eee;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 800;
-  transition: all 0.25s ease;
-  z-index: 0;
-}
-
-.nav button::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.nav button:hover {
-  color: #fff;
-}
-
-.nav button.active {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) inset;
-}
-
-.nav button.active::before {
-  background: linear-gradient(90deg, #60a5fa, #a78bfa, #34d399);
-  box-shadow: 0 0 10px rgba(96, 165, 250, 0.45);
-}
-
-.hidden { display: none; }
-.note { font-size: 12px; color: #aaa; }
-
-.nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
-
-.recap {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  align-items: stretch;
-}
-
-.recap-block {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--panel);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.recap-title { font-weight: 800; color: var(--text); }
-.recap-chip { font-size: 11px; color: #bbb; border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; background: #1e1e1e; }
-.recap-list { display: grid; gap: 8px; margin-top: 6px; }
-.recap-row { display: grid; grid-template-columns: max-content 1fr; gap: 10px; align-items: start; }
-.recap-key { color: #aaa; word-break: break-word; }
-.recap-val { color: #f3f4f6; min-width: 0; }
-.recap-val code { background: var(--panel-2); color: #f3f4f6; border-radius: 6px; padding: 2px 6px; font-size: 12px; word-break: break-word; }
+  .exercise { background: rgba(124, 58, 237, 0.1); border-left: 3px solid var(--accent); padding: 12px; border-radius: 6px; margin: 8px 0; }
+  
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .nav button {
+    position: relative;
+    background: var(--panel);
+    color: #eee;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 800;
+    transition: all 0.25s ease;
+    z-index: 0;
+  }
+  .nav button.active {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) inset;
+  }
+  .hidden { display: none; }
+  .note { font-size: 12px; color: #aaa; }
+  .recap { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: stretch; }
+  .recap-block { border: 1px solid var(--border); border-radius: 12px; background: var(--panel); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .recap-title { font-weight: 800; color: var(--text); }
+  .recap-list { display: grid; gap: 8px; margin-top: 6px; }
+  .recap-row { display: grid; grid-template-columns: max-content 1fr; gap: 10px; align-items: start; }
+  .recap-key { color: #aaa; word-break: break-word; }
+  .recap-val { color: #f3f4f6; min-width: 0; }
+  .recap-val code { background: var(--panel-2); color: #f3f4f6; border-radius: 6px; padding: 2px 6px; font-size: 12px; word-break: break-word; }
+  .block-desc {
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.1));
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 14px;
+    margin: 6px 0 10px;
+  }
 </style>
 
-<div class="container">
+<div class="container page-content">
   <div class="header">
     <h1>Data Visualization — All-in-One</h1>
     <p>Interactive lessons: REST APIs, Spring Boot CRUD, search, filtering, pagination, and data queries.</p>
@@ -246,7 +128,7 @@ button:hover {
         <button onclick="setApiTab('delete')">DELETE (Delete)</button>
       </div>
 
-      <div class="grid grid-2">
+      <div class="grid">
         <div>
           <label>Endpoint</label>
           <select id="ep" onchange="uiEP()">
@@ -283,10 +165,10 @@ button:hover {
       </div>
 
       <label style="margin-top: 12px;">Response <small id="status" class="note"></small></label>
-      <pre id="out" class="out">Try a request!</pre>
+      <pre id="out" class="preview-box">Try a request!</pre>
 
       <label style="margin-top: 12px;">Current Companies</label>
-      <div id="list" class="out" style="min-height: 120px;"></div>
+      <div id="list" class="preview-box" style="min-height: 120px;"></div>
     </div>
   </div>
 
@@ -296,7 +178,7 @@ button:hover {
       <h2>2 — Query Methods & Company Builder</h2>
       <p class="block-desc"><strong>What this shows:</strong> Practice Spring Data JPA derived queries, and build company records with sample data.</p>
 
-      <div class="grid grid-2">
+      <div class="grid">
         <div>
           <h3>Derived Query Practice</h3>
           <p style="font-size: 13px; color: var(--muted);">Write a method to find companies with size &gt; minSize:</p>
@@ -327,7 +209,7 @@ button:hover {
             <button onclick="cheatFill()">Cheat Fill</button>
             <button onclick="builderAdd()">Add Company</button>
           </div>
-          <pre id="bOut" class="out" style="min-height: 80px; font-size: 12px;"></pre>
+          <pre id="bOut" class="preview-box" style="min-height: 80px; font-size: 12px;"></pre>
         </div>
       </div>
     </div>
@@ -340,8 +222,8 @@ button:hover {
       <p class="block-desc"><strong>What this shows:</strong> Build query filters using derived queries, JPQL, and Specifications.</p>
 
       <h3>Query Builder</h3>
-      <div class="grid grid-2">
-        <div class="panel">
+      <div class="grid">
+        <div class="card">
           <label><input type="checkbox" id="qLoc"/> Filter by Location</label>
           <input id="vLoc" placeholder="e.g., NYC" disabled/>
 
@@ -361,11 +243,11 @@ button:hover {
           <button onclick="buildQuery()">Build</button>
         </div>
 
-        <div class="panel">
+        <div class="card">
           <label>JPQL Generated:</label>
-          <pre id="jpqlOut" class="out" style="min-height: 100px; font-size: 12px;">SELECT c FROM Company c</pre>
+          <pre id="jpqlOut" class="preview-box" style="min-height: 100px; font-size: 12px;">SELECT c FROM Company c</pre>
           <label>Specifications:</label>
-          <pre id="specOut" class="out" style="min-height: 100px; font-size: 12px;">where(null)</pre>
+          <pre id="specOut" class="preview-box" style="min-height: 100px; font-size: 12px;">where(null)</pre>
         </div>
       </div>
 
@@ -408,8 +290,8 @@ button:hover {
       <h2>4 — Pagination & Sorting</h2>
       <p class="block-desc"><strong>What this shows:</strong> See how Pageable works with sorting, limiting, and page navigation.</p>
 
-      <div class="grid grid-2">
-        <div class="panel">
+      <div class="grid">
+        <div class="card">
           <label>Page (0-indexed)</label>
           <input id="pg" type="number" min="0" value="0"/>
 
@@ -422,13 +304,13 @@ button:hover {
           <button onclick="runPaging()">Apply</button>
         </div>
 
-        <div class="panel">
-          <pre id="pageOut" class="out" style="min-height: 150px; font-size: 12px;">No results yet…</pre>
+        <div class="card">
+          <pre id="pageOut" class="preview-box" style="min-height: 150px; font-size: 12px;">No results yet…</pre>
         </div>
       </div>
 
       <h3>Pageable Example Code</h3>
-      <pre class="out" style="font-size: 12px;">// Repository
+      <pre class="preview-box" style="font-size: 12px;">// Repository
 Page&lt;Company&gt; findAll(Pageable pageable);
 
 // Service
@@ -453,8 +335,8 @@ Page&lt;Company&gt; page = repo.findAll(paging);
       <p class="block-desc"><strong>What this shows:</strong> Real-world scenarios and a quick knowledge check.</p>
 
       <h3>Capstone Scenario Checker</h3>
-      <div class="grid grid-2">
-        <div class="panel">
+      <div class="grid">
+        <div class="card">
           <label>Scenario</label>
           <select id="scenarioSel">
             <option value="1">Find companies in NYC with Java skill, sorted by size desc, top 20</option>
@@ -474,8 +356,8 @@ Page&lt;Company&gt; page = repo.findAll(paging);
           <button onclick="scoreScenario()">Check</button>
         </div>
 
-        <div class="panel">
-          <pre id="scenarioOut" class="out" style="min-height: 100px; font-size: 12px;">Select a scenario and approach, then "Check".</pre>
+        <div class="card">
+          <pre id="scenarioOut" class="preview-box" style="min-height: 100px; font-size: 12px;">Select a scenario and approach, then "Check".</pre>
         </div>
       </div>
 
@@ -492,8 +374,8 @@ Page&lt;Company&gt; page = repo.findAll(paging);
       <h2>6 — Completion Checklist & Export</h2>
       <p class="block-desc"><strong>What this shows:</strong> Self-assessment and exportable progress.</p>
 
-      <div class="grid grid-2">
-        <div class="panel">
+      <div class="grid">
+        <div class="card">
           <h3>Self-Assessment</h3>
           <label><input type="checkbox" class="ck" value="crud"/> I understand CRUD (Create, Read, Update, Delete)</label>
           <label><input type="checkbox" class="ck" value="derived"/> I can write derived query methods</label>
@@ -504,10 +386,10 @@ Page&lt;Company&gt; page = repo.findAll(paging);
           <button onclick="exportNotes()">Export</button>
         </div>
 
-        <div class="panel">
+        <div class="card">
           <h3>Notes</h3>
           <textarea id="notes" placeholder="Key takeaways, gotchas, next steps..."></textarea>
-          <pre id="exportOut" class="out" style="min-height: 120px; font-size: 11px;"></pre>
+          <pre id="exportOut" class="preview-box" style="min-height: 120px; font-size: 11px;"></pre>
         </div>
       </div>
     </div>
@@ -524,7 +406,7 @@ Page&lt;Company&gt; page = repo.findAll(paging);
 </div>
 
 <script>
-// ========== Navigation ==========
+// ========== Navigation ========== 
 let currentStep = 0;
 const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
 const STORAGE_KEY = 'dataviz_combined_v1';
@@ -546,7 +428,7 @@ function showStep(n) {
 function prevStep() { showStep(currentStep - 1); }
 function nextStep() { showStep(currentStep + 1); }
 
-// ========== API Simulator ==========
+// ========== API Simulator ========== 
 let db = [
   { id: 1, name: 'TechNova', industry: 'AI', location: 'San Diego', size: 1200, skills: ['Python', 'TensorFlow'] },
   { id: 2, name: 'HealthBridge', industry: 'Healthcare', location: 'Austin', size: 300, skills: ['Java', 'Spring'] }
@@ -634,7 +516,7 @@ function setApiTab(tab) {
   event.target.classList.add('active');
 }
 
-// ========== Kata & Builder ==========
+// ========== Kata & Builder ========== 
 function checkKata() {
   const v = ($('kataIn').value || '').trim().replace(/\s+/g, ' ');
   const ok = /^List<\s*Company\s*>\s*findBySizeGreaterThan\s*\(\s*Integer\s+\w+\s*\);\s*$/i.test(v);
@@ -667,7 +549,7 @@ function builderAdd() {
   renderList();
 }
 
-// ========== Query Builder ==========
+// ========== Query Builder ========== 
 function enableFilters() {
   [['qLoc', 'vLoc'], ['qInd', 'vInd'], ['qSize', 'vSize'], ['qSkill', 'vSkill']].forEach(([c, i]) => {
     $(i).disabled = !$(c).checked;
@@ -701,7 +583,7 @@ function buildQuery() {
   $('specOut').textContent = sc;
 }
 
-// ========== Pagination ==========
+// ========== Pagination ========== 
 let sampleData = [
   { id: 1, name: 'Alice', size: 100 },
   { id: 2, name: 'Bob', size: 200 },
@@ -736,7 +618,7 @@ function runPaging() {
     (rows.map(r => `${r.id}. ${r.name} — size ${r.size}`).join('\n') || 'No data');
 }
 
-// ========== Scenario Checker ==========
+// ========== Scenario Checker ========== 
 function scenarioAnswer(id) {
   switch (id) {
     case '1': return ['Specifications', 'Pageable', 'DTO Projection'];
@@ -754,7 +636,7 @@ function scoreScenario() {
   $('scenarioOut').textContent = (good ? '✅ Good choice.' : '❌ Prefer: ' + extra);
 }
 
-// ========== Quiz ==========
+// ========== Quiz ========== 
 const quizData = [
   { q: 'Which is best for optional, composable filters?', opts: ['Derived query', 'JPQL', 'Specifications', 'Native SQL'], a: 2 },
   { q: 'What does returning DTOs improve?', opts: ['Security', 'Performance (payload)', 'Authentication', 'Transactions'], a: 1 },
@@ -772,13 +654,19 @@ function renderQuiz() {
     it.opts.forEach((o, oi) => {
       const el = document.createElement('div');
       el.className = 'opt';
-      el.textContent = o;
+      el.innerHTML = `<span style="margin-right: 10px; display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--border);"></span>${o}`;
       el.dataset.i = i;
       el.dataset.oi = oi;
       el.onclick = () => {
         picks[i] = oi;
-        box.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => x.classList.remove('sel'));
+        box.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x => {
+            x.classList.remove('sel');
+            const span = x.querySelector('span');
+            if (span) span.style.background = 'transparent';
+        });
         el.classList.add('sel');
+        const span = el.querySelector('span');
+        if (span) span.style.background = 'var(--accent)';
       };
       wrap.appendChild(el);
     });
@@ -798,7 +686,7 @@ function gradeQuiz() {
   $('qScore').textContent = `Score: ${s}/${quizData.length}`;
 }
 
-// ========== Export ==========
+// ========== Export ========== 
 function exportNotes() {
   const checks = [...document.querySelectorAll('.ck')].filter(x => x.checked).map(x => x.value);
   const obj = {
@@ -812,7 +700,7 @@ function exportNotes() {
   $('exportOut').textContent = JSON.stringify(obj, null, 2);
 }
 
-// ========== Persistence ==========
+// ========== Persistence ========== 
 function persist() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ step: currentStep, notes: $('notes').value })); } catch (e) {}
 }
@@ -826,7 +714,7 @@ function restore() {
   } catch (e) {}
 }
 
-// ========== Boot ==========
+// ========== Boot ========== 
 document.addEventListener('DOMContentLoaded', () => {
   uiEP();
   renderList();
@@ -849,10 +737,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
         try{ if (document.referrer && new URL(document.referrer).origin === location.origin){ history.back(); return; } }catch(err){}
-        var p = location.pathname.replace(/\/$/,'').split('/');
+        var p = location.pathname.replace(///$/,'').split('/');
         if (p.length>1){ p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
       });
     });
   });
 })();
 </script>
+
+<script src="/assets/js/lesson-completion-bigsix.js"></script>
