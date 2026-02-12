@@ -1,0 +1,43 @@
+# Bud-E Capstone Infographic
+Title: "Bud-E Capstone"
+Description: "A design-research capstone for a browser extension that gamifies productivity through a virtual pet that grows when users stay focused on whitelisted websites and degrades when they navigate to distracting sites."
+
+Topics:
+  - title: "Bud-E"
+    image: "capstone/bud_e.png"
+    link: "/capstone/bud-e/"
+    alt: "Bud-E - Productivity Gamification Through Virtual Pet"
+    keyPoints:
+      - "Persistent virtual pet widget visible on all pages"
+      - "Real-time growth when on whitelisted productive sites"
+      - "Real-time degradation when navigating to distracting sites"
+      - "Visual evolution through distinct stages (seed → sprout → plant → flower → tree)"
+      - "Customizable website whitelist and blacklist"
+      - "Local storage of pet progress and settings"
+      - "Growth statistics and session tracking"
+      - "Positive reinforcement without guilt or anxiety"
+    subtitle: "Gamifying Focus With a Growing Virtual Companion"
+    description: "Bud-E is a browser extension that gamifies productivity through a persistent virtual pet. Students configure whitelisted productive websites (documentation, educational platforms, coding environments) and the pet grows in real-time while they stay focused. Clicking away to distracting sites causes the pet to degrade visually. Unlike punitive blockers, Bud-E provides positive reinforcement through an emotionally-engaging character. Design research revealed that character growth resonates more than blocking/restriction. The system progresses through distinct visual stages, creating satisfying visual feedback for sustained focus while maintaining low anxiety."
+    tech:
+      - "Manifest V3 Browser Extension"
+      - "Content Script for Widget Injection"
+      - "Background Service Worker for Tab Monitoring"
+      - "Chrome Storage API for Persistence"
+      - "CSS Animations for Growth/Degradation Transitions"
+      - "Cross-browser compatible (Chrome, Firefox, Edge)"
+      - "Figma for Prototyping"
+      - "User Interview Research (n=8-10)"
+    impact:
+      - "Positive, game-like approach to productivity without punishment"
+      - "Visual accountability and intrinsic motivation through progress systems"
+      - "30%+ increase in time spent on whitelisted sites"
+      - "60%+ daily active usage rate after 2 weeks"
+      - "40%+ user retention at 30 days"
+      - "Low anxiety/stress around the mechanic"
+      - "Users understand progress without checking stats"
+      - "Emotional attachment to bud-e through design"
+    status: "Research & Testing Phase"
+    team:
+      - "Aadi Bhat"
+      - "Pranav Santhosh"
+      - "Nolan Hightower"

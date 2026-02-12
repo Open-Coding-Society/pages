@@ -1,4 +1,6 @@
 import GameControl from './GameControl.js';
+import GameUI from './GameUI.js';
+
 class Game {
     constructor(environment) {
         this.environment = environment;
@@ -15,6 +17,13 @@ class Game {
         this.initUser();
         const gameLevelClasses = environment.gameLevelClasses;
         this.gameControl = new GameControl(this, gameLevelClasses);
+        
+        // Initialize GameUI if configuration is provided
+        if (environment.gameUI) {
+            this.gameUI = new GameUI(this, environment.gameUI);
+            this.gameUI.init();
+        }
+        
         this.gameControl.start();
     }
 

@@ -3,6 +3,8 @@ import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
 class MurderMysteryL4 {
+    static friendlyName = "Level 4: The Cave";
+    
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
