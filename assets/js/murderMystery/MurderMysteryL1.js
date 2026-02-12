@@ -47,7 +47,7 @@ class MurderMysteryL1 {
    // The suspect should be positioned away from the boat's initial position, so that the player has to navigate around the island to find them.
 
    const sprite_data_suspect = {
-    id: 'Suspect',
+    id: 'Suspect 1',
     src: path + "/images/mansionGame/skeleton_key.png", // placeholder sprite
     SCALE_FACTOR: 15,
     STEP_FACTOR: 1000,
@@ -57,17 +57,49 @@ class MurderMysteryL1 {
     pixels: { height: 200, width: 200 },
     orientation: { rows: 1, columns: 1 },
     down: { row: 0, start: 0, columns: 1 },
-    dialogue: "Who goes there? I thought I was alone on this island",
-    interact: function() {
-        // Simple interaction logic for the suspect
-        if (this.dialogueSystem) {
-            this.dialogueSystem.startDialogue();
-        } else {
-            alert(this.dialogue);
+    greeting: "Hey! Who are you? Press E to interact with me. ",
+    dialogues: ["Who goes there? I thought I was alone on this island...",
+        "Where was I? I've been stranded here for days after the storm hit.",
+        "My crew left me behind when I fell overboard. I barely made it to shore.",
+        "I've been trying to survive on fish and coconuts ever since.",
+        "If something happened on the ship, I wouldn't know. I've been here the whole time."
+    ],
+    
+        interact: function() {
+        if (!this.dialogueSystem || !this.spriteData.dialogues) return;
+        
+        const dialogues = this.spriteData.dialogues;
+        const npcName = this.spriteData?.id || "Suspect";
+        const npcAvatar = this.spriteData?.src || null;
+        
+        // Show current dialogue
+        const currentDialogue = dialogues[this.currentQuestionIndex];
+        this.dialogueSystem.showDialogue(currentDialogue, npcName, npcAvatar);
+        this.currentQuestionIndex++;
+        
+        // Add custom handler for advancing dialogue
+        if (!this._customHandler) {
+            this._customHandler = (e) => {
+                if ((e.key === 'e' || e.key === 'u') && this.dialogueSystem.isDialogueOpen()) {
+                    e.stopPropagation(); // Prevent Npc.js from handling it
+                    
+                    // Check if we've reached the end
+                    if (this.currentQuestionIndex >= dialogues.length) {
+                        // Close dialogue and reset
+                        this.dialogueSystem.closeDialogue();
+                        this.currentQuestionIndex = 0;
+                    } else {
+                        // Show next line
+                        const nextDialogue = dialogues[this.currentQuestionIndex];
+                        this.dialogueSystem.showDialogue(nextDialogue, npcName, npcAvatar);
+                        this.currentQuestionIndex++;
+                    }
+                }
+            };
+            document.addEventListener('keydown', this._customHandler, true); // Use capture phase
         }
     }
-
-   }; 
+};
 
     this.classes = [
             { class: GameEnvBackground, data: image_data_background },
