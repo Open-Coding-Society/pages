@@ -1569,11 +1569,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             const y = parseInt(w.wY?.value || 100, 10);
                             const wWidth = parseInt(w.wW?.value || 150, 10);
                             const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const visible = !!ui.gameWallsVisible; 
                             const id = `wall_${idx+1}`;
                             barrierDefsB.push(`
         const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${visible},
+            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
         };`);
                             classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
@@ -1588,7 +1587,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             const bh = Math.max(0, Math.round(b.height || 0));
                             barrierDefsB.push(`
         const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: ${ui.gameWallsVisible},
+            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };`);
@@ -1608,6 +1607,8 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
                         const pStepVal = parseInt(ui.pStep?.value || '1000', 10);
                         const pAnimVal = parseInt(ui.pAnim?.value || '50', 10);
+                        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
+                        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
                         const pRowsVal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
                         const pColsVal = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10));
                         const dirRowsTotal = pRowsVal;
@@ -1643,7 +1644,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
             SCALE_FACTOR: ${pScaleVal},
             STEP_FACTOR: ${pStepVal},
             ANIMATION_RATE: ${pAnimVal},
-            INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} },
+            INIT_POSITION: { x: ${initX}, y: ${initY} },
             pixels: { height: ${p.h}, width: ${p.w} },
             orientation: { rows: ${pRowsVal}, columns: ${pColsVal} },
             down: { row: ${dRow}, start: 0, columns: ${dirCols} },
@@ -1669,11 +1670,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             const y = parseInt(w.wY?.value || 100, 10);
                             const wWidth = parseInt(w.wW?.value || 150, 10);
                             const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const visible = !!ui.gameWallsVisible; 
                             const id = `wall_${idx+1}`;
                             barrierDefs.push(`
         const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${visible},
+            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
         };`);
                             classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
@@ -1689,7 +1689,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             const bh = Math.max(0, Math.round(b.height || 0));
                             barrierDefs.push(`
         const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: ${ui.gameWallsVisible},
+            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };`);
@@ -1714,6 +1714,8 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         const pAnimValN = parseInt(ui.pAnim?.value || '50', 10);
                         const pRowsValN = Math.max(1, parseInt(ui.pRows?.value || p.rows || 1, 10));
                         const pColsValN = Math.max(1, parseInt(ui.pCols?.value || p.cols || 1, 10));
+                        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
+                        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
                         const hbWN = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
                         const hbHN = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
                         
@@ -1729,7 +1731,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
             SCALE_FACTOR: ${pScaleValN},
             STEP_FACTOR: ${pStepValN},
             ANIMATION_RATE: ${pAnimValN},
-            INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} },
+            INIT_POSITION: { x: ${initX}, y: ${initY} },
             pixels: { height: ${p.h}, width: ${p.w} },
             orientation: { rows: ${pRowsValN}, columns: ${pColsValN} },
             down: { row: 0, start: 0, columns: 3 },
@@ -1824,7 +1826,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             const bh = Math.max(0, Math.round((b.height || 0) * scaleYN));
                             barrierDefsN.push(`
                             const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: ${ui.gameWallsVisible},
+            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };`);
@@ -1847,6 +1849,8 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     const pAnimValW = parseInt(ui.pAnim?.value || '50', 10);
                     const pRowsValW = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
                     const pColsValW = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10));
+                    const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
+                    const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
                     
                     const defsStart = `
         const bgData = {
@@ -1860,7 +1864,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
             SCALE_FACTOR: ${pScaleValW},
             STEP_FACTOR: ${pStepValW},
             ANIMATION_RATE: ${pAnimValW},
-            INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} },
+            INIT_POSITION: { x: ${initX}, y: ${initY} },
             pixels: { height: ${p.h}, width: ${p.w} },
             orientation: { rows: ${pRowsValW}, columns: ${pColsValW} },
             down: { row: 0, start: 0, columns: 3 },
@@ -1949,7 +1953,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         const bh = Math.max(0, Math.round((b.height || 0) * scaleYW));
                         barrierDefs.push(`
                             const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: ${ui.gameWallsVisible},
+            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };`);
@@ -2000,6 +2004,12 @@ export const gameLevelClasses = [GameLevelCustom];`;
             state.userEdited = true;
             const btn = document.getElementById('btn-confirm');
             if (btn) btn.classList.add('staged');
+            // Light up play button to indicate runnable changes
+            if (ui.codePlayBtn) ui.codePlayBtn.classList.add('staged');
+            const topRunBtn = document.getElementById('btn-run');
+            if (topRunBtn) topRunBtn.classList.add('staged');
+            // Keep UI controls in sync when user edits code directly
+            try { syncControlsFromEditor(); } catch (_) {}
         }
     });
 
@@ -2037,6 +2047,83 @@ export const gameLevelClasses = [GameLevelCustom];`;
             if (btn) btn.classList.add('staged');
             // Do not call simulateTypingChange here; wait for Confirm
         }
+    }
+
+    /* SECTION: Parse editor code -> update UI controls (two-way sync) */
+    function syncControlsFromEditor() {
+        const code = String(ui.editor?.value || '');
+        const pdMatch = /const\s+playerData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
+        if (!pdMatch) return;
+        const block = pdMatch[1];
+        const intFrom = (re) => {
+            const m = re.exec(block);
+            if (!m) return null;
+            const v = parseInt(m[1], 10);
+            return Number.isFinite(v) ? v : null;
+        };
+        const floatFrom = (re) => {
+            const m = re.exec(block);
+            if (!m) return null;
+            const v = parseFloat(m[1]);
+            return Number.isFinite(v) ? v : null;
+        };
+        const rowFor = (dir) => intFrom(new RegExp(dir + "\\s*:\\s*\\{[\\s\\S]*?row\\s*:\\s*(\\d+)", 'i'));
+        const colsFor = (dir) => intFrom(new RegExp(dir + "\\s*:\\s*\\{[\\s\\S]*?columns\\s*:\\s*(\\d+)", 'i'));
+        const oRows = intFrom(/orientation\s*:\s*\{[\s\S]*?rows\s*:\s*(\d+)/i);
+        const oCols = intFrom(/orientation\s*:\s*\{[\s\S]*?columns\s*:\s*(\d+)/i);
+        if (oRows !== null && ui.pRows) ui.pRows.value = String(Math.max(1, oRows));
+        if (oCols !== null && ui.pCols) ui.pCols.value = String(Math.max(1, oCols));
+        const scale = intFrom(/SCALE_FACTOR\s*:\s*(\d+)/i);
+        const step = intFrom(/STEP_FACTOR\s*:\s*(\d+)/i);
+        const anim = intFrom(/ANIMATION_RATE\s*:\s*(\d+)/i);
+        if (scale !== null && ui.pScale) ui.pScale.value = String(Math.max(1, scale));
+        if (step !== null && ui.pStep) ui.pStep.value = String(Math.max(1, step));
+        if (anim !== null && ui.pAnim) ui.pAnim.value = String(Math.max(1, anim));
+        let dirCols = colsFor('down');
+        dirCols = dirCols ?? colsFor('right');
+        dirCols = dirCols ?? colsFor('left');
+        dirCols = dirCols ?? colsFor('up');
+        if (dirCols !== null && ui.pDirCols) ui.pDirCols.value = String(Math.max(1, dirCols));
+        const clampToRows = (v) => {
+            const rows = Math.max(1, parseInt(ui.pRows?.value || '1', 10));
+            const maxIndex = Math.max(0, rows - 1);
+            return Math.max(0, Math.min(maxIndex, v|0));
+        };
+        const downRow = rowFor('down');
+        const rightRow = rowFor('right');
+        const leftRow = rowFor('left');
+        const upRow = rowFor('up');
+        const upRightRow = rowFor('upRight');
+        const downRightRow = rowFor('downRight');
+        const upLeftRow = rowFor('upLeft');
+        const downLeftRow = rowFor('downLeft');
+        if (downRow !== null && ui.pDownRow) ui.pDownRow.value = String(clampToRows(downRow));
+        if (rightRow !== null && ui.pRightRow) ui.pRightRow.value = String(clampToRows(rightRow));
+        if (leftRow !== null && ui.pLeftRow) ui.pLeftRow.value = String(clampToRows(leftRow));
+        if (upRow !== null && ui.pUpRow) ui.pUpRow.value = String(clampToRows(upRow));
+        if (upRightRow !== null && ui.pUpRightRow) ui.pUpRightRow.value = String(clampToRows(upRightRow));
+        if (downRightRow !== null && ui.pDownRightRow) ui.pDownRightRow.value = String(clampToRows(downRightRow));
+        if (upLeftRow !== null && ui.pUpLeftRow) ui.pUpLeftRow.value = String(clampToRows(upLeftRow));
+        if (downLeftRow !== null && ui.pDownLeftRow) ui.pDownLeftRow.value = String(clampToRows(downLeftRow));
+        const hbW = floatFrom(/hitbox\s*:\s*\{[\s\S]*?widthPercentage\s*:\s*([0-9.]+)/i);
+        const hbH = floatFrom(/hitbox\s*:\s*\{[\s\S]*?heightPercentage\s*:\s*([0-9.]+)/i);
+        if (hbW !== null && ui.pHitboxW) ui.pHitboxW.value = String(Math.max(0, Math.min(hbW, 0.9)));
+        if (hbH !== null && ui.pHitboxH) ui.pHitboxH.value = String(Math.max(0, Math.min(hbH, 0.9)));
+        const posMatch = /INIT_POSITION\s*:\s*\{[\s\S]*?x\s*:\s*(\d+)\s*,\s*y\s*:\s*(\d+)/i.exec(block);
+        if (posMatch) {
+            const x = parseInt(posMatch[1], 10);
+            const y = parseInt(posMatch[2], 10);
+            if (ui.pX && Number.isFinite(x)) ui.pX.value = String(Math.max(0, x));
+            if (ui.pY && Number.isFinite(y)) ui.pY.value = String(Math.max(0, y));
+        }
+        try {
+            const mvSel = document.getElementById('movement-keys');
+            const kpMatch = /keypress\s*:\s*\{[\s\S]*?up\s*:\s*(\d+)/i.exec(block);
+            if (mvSel && kpMatch) {
+                const upCode = parseInt(kpMatch[1], 10);
+                mvSel.value = (upCode === 38) ? 'arrows' : 'wasd';
+            }
+        } catch (_) {}
     }
 
     /* SECTION: Typing animation (simulate code being typed, then persist highlight) */
@@ -2132,7 +2219,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
             const wHeight = parseInt(w.wH?.value || 20, 10);
             const id = `wall_${idx+1}`;
             classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-            return `\n        const barrierData${idx+1} = {\n            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${ui.gameWallsVisible},\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }\n        };`;
+            return `\n        const barrierData${idx+1} = {\n            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }\n        };`;
         });
 
         // Include overlay-drawn barriers (no scaling; use overlay pixel coords)
@@ -2143,11 +2230,100 @@ export const gameLevelClasses = [GameLevelCustom];`;
             const by = Math.max(0, Math.round(b.y || 0));
             const bw = Math.max(0, Math.round(b.width || 0));
             const bh = Math.max(0, Math.round(b.height || 0));
-            defBlocks.push(`\n        const ${id} = {\n            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: ${ui.gameWallsVisible},\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },\n            fromOverlay: true\n        };`);
+            defBlocks.push(`\n        const ${id} = {\n            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },\n            fromOverlay: true\n        };`);
             classes.push(`      { class: Barrier, data: ${id} }`);
         });
 
         const defs = defBlocks.join('\n');
+        return { defs, classes };
+    }
+
+    // Insert-only builders for background and player (non-destructive merges)
+    function buildBackgroundInsertText() {
+        const bg = assets.bg[ui.bg.value];
+        if (!bg) return { defs: '', classes: [] };
+        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
+        const bgSrcVal = bgIsData ? `'${String(bg.src).replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
+        const defs = `
+        const bgData = {
+            name: 'custom_bg',
+            src: ${bgSrcVal},
+            pixels: { height: ${bg.h}, width: ${bg.w} }
+        };`;
+        const classes = [
+            "      { class: GameEnvBackground, data: bgData }"
+        ];
+        return { defs, classes };
+    }
+
+    function buildPlayerInsertText() {
+        const bg = assets.bg[ui.bg.value];
+        const p = assets.sprites[ui.pSprite.value];
+        if (!bg || !p) return { defs: '', classes: [] };
+        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
+        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
+        const bgSrcVal = bgIsData ? `'${String(bg.src).replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
+        const pIsData = p && p.src && p.src.startsWith('data:');
+        const pSrcVal = pIsData ? `'${String(p.src).replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
+        const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
+        const pStepVal = parseInt(ui.pStep?.value || '1000', 10);
+        const pAnimVal = parseInt(ui.pAnim?.value || '50', 10);
+        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
+        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
+        const pRowsVal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || String(p.rows || 1), 10));
+        const pColsVal = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || String(p.cols || 1), 10));
+        const dirRowsTotal = pRowsVal;
+        const clamp = (v) => {
+            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
+            return Math.max(0, Math.min(maxIndex, v|0));
+        };
+        const dirCols = Math.max(1, parseInt(ui.pDirCols?.value || 3, 10));
+        const dRow = clamp(parseInt(ui.pDownRow?.value ?? 0));
+        const rRow = clamp(parseInt(ui.pRightRow?.value ?? 1));
+        const lRow = clamp(parseInt(ui.pLeftRow?.value ?? 2));
+        const uRow = clamp(parseInt(ui.pUpRow?.value ?? 3));
+        const urRow = clamp(parseInt(ui.pUpRightRow?.value ?? uRow));
+        const drRow = clamp(parseInt(ui.pDownRightRow?.value ?? rRow));
+        const ulRow = clamp(parseInt(ui.pUpLeftRow?.value ?? lRow));
+        const dlRow = clamp(parseInt(ui.pDownLeftRow?.value ?? dRow));
+        const hbW = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
+        const hbH = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
+        const mvElGen = document.getElementById('movement-keys');
+        const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
+        const keypress = movement === 'arrows'
+            ? '{ up: 38, left: 37, down: 40, right: 39 }'
+            : '{ up: 87, left: 65, down: 83, right: 68 }';
+
+        const defs = `
+        const bgData = {
+            name: 'custom_bg',
+            src: ${bgSrcVal},
+            pixels: { height: ${bg.h}, width: ${bg.w} }
+        };
+        const playerData = {
+            id: '${name}',
+            src: ${pSrcVal},
+            SCALE_FACTOR: ${pScaleVal},
+            STEP_FACTOR: ${pStepVal},
+            ANIMATION_RATE: ${pAnimVal},
+            INIT_POSITION: { x: ${initX}, y: ${initY} },
+            pixels: { height: ${p.h}, width: ${p.w} },
+            orientation: { rows: ${pRowsVal}, columns: ${pColsVal} },
+            down: { row: ${dRow}, start: 0, columns: ${dirCols} },
+            downRight: { row: ${drRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
+            downLeft: { row: ${dlRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
+            left: { row: ${lRow}, start: 0, columns: ${dirCols} },
+            right: { row: ${rRow}, start: 0, columns: ${dirCols} },
+            up: { row: ${uRow}, start: 0, columns: ${dirCols} },
+            upLeft: { row: ${ulRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
+            upRight: { row: ${urRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
+            hitbox: { widthPercentage: ${hbW}, heightPercentage: ${hbH} },
+            keypress: ${keypress}
+        };`;
+        const classes = [
+            "      { class: GameEnvBackground, data: bgData }",
+            "      { class: Player, data: playerData }"
+        ];
         return { defs, classes };
     }
 
@@ -2194,6 +2370,17 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 const blockRe = new RegExp("\\n\\s*const\\s+" + vn + "\\s*=\\s*\\{[\\s\\S]*?\\};\\s*", 'g');
                 code = code.replace(blockRe, '\n');
             });
+
+            // Remove previous bgData/playerData blocks to avoid duplication
+            // Only remove if we are inserting new bgData/playerData in this merge
+            const willInsertBg = /\bconst\s+bgData\s*=\s*\{/.test(scan);
+            const willInsertPlayer = /\bconst\s+playerData\s*=\s*\{/.test(scan);
+            if (willInsertBg) {
+                code = code.replace(/\n\s*const\s+bgData\s*=\s*\{[\s\S]*?\};\s*/g, '\n');
+            }
+            if (willInsertPlayer) {
+                code = code.replace(/\n\s*const\s+playerData\s*=\s*\{[\s\S]*?\};\s*/g, '\n');
+            }
         } catch (_) {}
 
         // Insert new definitions just before the classes array inside GameLevelCustom
@@ -2394,7 +2581,21 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 });
                 return;
             }
-            alert('You have manual code edits. To avoid resetting them, configure background/player directly in code or clear edits before confirming.');
+            if (current === 'player' || current === 'background') {
+                const ins = (current === 'player') ? buildPlayerInsertText() : buildBackgroundInsertText();
+                const merged = mergeDefsAndClasses(oldCode, ins.defs, ins.classes);
+                simulateTypingChange(oldCode, merged, () => {
+                    // Stay in Freestyle to preserve manual editing flow
+                    stepIndex = steps.indexOf('freestyle');
+                    setIndicator();
+                    updateStepUI();
+                    runInRunner();
+                    const btnDone = document.getElementById('btn-confirm');
+                    if (btnDone) btnDone.classList.remove('staged');
+                });
+                return;
+            }
+            // If not a recognized step, do nothing destructive
             return;
         }
 
@@ -2683,6 +2884,13 @@ export const gameLevelClasses = [GameLevelCustom];`;
             else runnerGameControl.pause?.();
         };
         document.addEventListener('keydown', runnerEscapeKeyHandler);
+
+        // Clear staged visual on play buttons after a run
+        try {
+            if (ui.codePlayBtn) ui.codePlayBtn.classList.remove('staged');
+            const topRun = document.getElementById('btn-run');
+            if (topRun) topRun.classList.remove('staged');
+        } catch (_) {}
     }
 
     document.getElementById('btn-run').addEventListener('click', runInRunner);
@@ -2697,8 +2905,18 @@ export const gameLevelClasses = [GameLevelCustom];`;
             ui.gameWallsVisible = !ui.gameWallsVisible;
             refreshToggleLabel();
             updateOverlayVisibility();
-            // Re-run with updated visibility reflected in barrier code
-            try { runInRunner(); } catch (e) { /* ignore */ }
+            // Apply runtime visibility by adjusting canvas opacity (keeps collision boxes active)
+            try {
+                const show = ui.gameWallsVisible;
+                const container = document.getElementById('gameContainer');
+                const canvases = Array.from(container ? container.querySelectorAll('canvas') : []);
+                canvases.forEach(c => {
+                    const id = c.id || '';
+                    if (/^(wall_|dbarrier_|barrier_)/.test(id)) {
+                        c.style.opacity = show ? '1' : '0';
+                    }
+                });
+            } catch (_) {}
         });
     }
 
@@ -2769,5 +2987,21 @@ document.querySelector('.game-frame')?.addEventListener('click', () => {
 </script>
 
 <!-- Removed iframe key forwarding; local runner handles input directly. -->
+
+
+
+
+        // Apply initial barrier visibility to canvases based on toggle state
+        try {
+            const show = ui.gameWallsVisible;
+            const container = document.getElementById('gameContainer');
+            const canvases = Array.from(container ? container.querySelectorAll('canvas') : []);
+            canvases.forEach(c => {
+                const id = c.id || '';
+                if (/^(wall_|dbarrier_|barrier_)/.test(id)) {
+                    c.style.opacity = show ? '1' : '0';
+                }
+            });
+        } catch (_) {}
 
 
