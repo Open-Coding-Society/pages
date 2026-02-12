@@ -47,8 +47,8 @@ class MurderMysteryBossFight {
         SCALE_FACTOR: 2,
         STEP_FACTOR: 1000, // Same speed as Archie
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 850, y: 400 }, // Positioned slightly under Archie
-        pixels: { height: 200, width: 400 }, // Adjust based on your boat image size
+        INIT_POSITION: { x: 850, y: 400 }, 
+        pixels: { height: 200, width: 400 },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         downRight: {row: 0, start: 0, columns: 1},
@@ -59,14 +59,13 @@ class MurderMysteryBossFight {
         upLeft: {row: 0, start: 0, columns: 1},
         upRight: {row: 0, start: 0, columns: 1},
         hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 },
-        keypress: { left: 65, right: 68, up: 87, down: 83 } // Same keys as Archie
    };
 
 
     this.classes = [
             { class: GameEnvBackground, data: image_data_background },
-            { class: Player, data: sprite_data_boss },   // Boat spawns first
-            { class: Player, data: sprite_data_archie }, // Archie spawns on top
+            { class: Boss, data: sprite_data_boss },  
+            { class: Player, data: sprite_data_archie }, 
         ];
    
 }
