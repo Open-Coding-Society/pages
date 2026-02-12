@@ -45,13 +45,14 @@ class GameLevelSub1 {
         greeting: "Please...Help...",
         src: path + "/images/murderMystery/ghost.png", // An invisible or small target sprite
         SCALE_FACTOR: 4,
+        STEP_FACTOR: 1000,
         ANIMATION_RATE: 0,
         INIT_POSITION: { x: 1200, y: 300 }, // Placed at the right edge
         pixels: { height: 500, width: 500 },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
-        greeting: "Hey! Who are you? Press E to interact with me. ",
+        hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
+        currentQuestionIndex: 0,
         dialogues: ["Arrr… ye can see me, can ye? Good. Then ye has been chosen to hear me tale",
             "A blade took me in the dark, quiet as a whisper. No duel. No honor. Just a coward's strike while I dreamt",
             "But I can't stray far from where I died.",
