@@ -13,8 +13,8 @@ class MurderMysteryL2 {
             pixels: { height: 600, width: 1000 }
         };
         const playerData = {
-            id: 'Hero',
-            src: path + "/images/gamify/chillguy.png",
+            id: 'McArchie',
+            src: path + "/assets/images/mcarchie.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -33,9 +33,9 @@ class MurderMysteryL2 {
             keypress: { up: 87, left: 65, down: 83, right: 68 }
         };
         const npcData1 = {
-            id: 'NPC',
-            greeting: '',
-            src: path + "/images/gamify/r2_idle.png",
+            id: 'Captain Blackbeard',
+            greeting: 'Hoy matey, my name is Captain Blackbeard. I am the most feared pirate on the seven seas. I have a treasure map that leads to a hidden island, but I need someone to help me find it. Are you up for the adventure?',
+            src: path + "/assets/images/Pirate.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 457, y: 568 },
