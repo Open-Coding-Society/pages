@@ -18,7 +18,6 @@ class MurderMysteryL1 {
         mode: 'contain',
     };
 
-
     const sprite_data_boat = {
         id: 'Boat',
         src: path + "/images/murderMystery/archie_boat.png", // A simple boat sprite
