@@ -8,7 +8,7 @@ class GameLevelSub1 {
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
 
-    const image_background = path + "/images/mansionGame/bossFloorPattern.png"; // be sure to include the path
+    const image_background = path + "/images/murderMystery/ship.png"; // be sure to include the path
     const image_data_background = {
         name: 'background',
         greeting: "The story starts here, you will search for clues and solve the mystery.",
@@ -56,7 +56,8 @@ class GameLevelSub1 {
         dialogues: ["A blade took me in the dark, quiet as a whisper. No duel. No honor. Just a coward's strike while I dreamt",
             "But I can't stray far from where I died.",
             "If ye'd help a restless spirit, find the traitor who did this to me.",
-            "The first suspect will be on an island. Sail east until ye find them"
+            "The first suspect will be on an island. Sail east until ye find them",
+            "Press esc to begin ye search, and talk to the suspect when ye find them."
         ],
         interact: function() {
         if (!this.dialogueSystem || !this.spriteData.dialogues) return;
