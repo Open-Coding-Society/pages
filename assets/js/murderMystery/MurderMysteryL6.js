@@ -40,7 +40,7 @@ class MurderMysteryBossFight {
     const sprite_data_boss = {
       id: 'Boss',
       src: path + "/images/murderMystery/bossleft.png",
-      SCALE_FACTOR: 2,
+      SCALE_FACTOR: 2.1,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 0,
       INIT_POSITION: { x: 850, y: 400 },
@@ -67,6 +67,7 @@ class MurderMysteryBossFight {
 
 export default MurderMysteryBossFight;
 
+
 /*
 
 --- BEFORE THE FIGHT ---
@@ -88,7 +89,7 @@ Narrator:
 
 ------------------------------
 
---- AFTER THE REAPER IS DEFEATED ---
+--- AFTER THE BOSS IS DEFEATED ---
 
 Narrator:
 "The captain falls. Dissolving into the shadows."
