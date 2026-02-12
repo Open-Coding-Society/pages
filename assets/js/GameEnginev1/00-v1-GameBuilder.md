@@ -683,6 +683,32 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) { return null; }
     }
 
+    // Request v1 templates module (non-destructive) and provide simple fallbacks
+    (function ensureTemplatesV1() {
+        if (window.GameTemplatesV1) return;
+        if (document.getElementById('game-templates-v1-script')) return;
+        const s = document.createElement('script');
+        s.id = 'game-templates-v1-script';
+        s.src = '/assets/js/GameEnginev1/templates/templates.js';
+        s.async = false;
+        document.head.appendChild(s);
+        // Also provide simple fallback implementations so builder doesn't break
+        if (!window.GameTemplatesV1) {
+            window.GameTemplatesV1 = {
+                playerData: function (opts) {
+                    const name = opts.name || 'Hero';
+                    const p = opts.p || { src: '/images/gamify/tux.png', h: 32, w: 32, rows: 1, cols: 1 };
+                    const ui = opts.ui || { pX: { value: 0 }, pY: { value: 0 } };
+                    const keypress = opts.keypress || '{ up: 87, left: 65, down: 83, right: 68 }';
+                    return `const playerData = { id: '${name}', src: path + "${p.src}", SCALE_FACTOR: 5, STEP_FACTOR: 1000, ANIMATION_RATE: 50, INIT_POSITION: { x: ${ui.pX.value}, y: ${ui.pY.value} }, pixels: { height: ${p.h}, width: ${p.w} }, orientation: { rows: ${p.rows}, columns: ${p.cols} }, down: { row: 0, start: 0, columns: 3 }, hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }, keypress: ${keypress} };`;
+                },
+                npcData: function (opts) {
+                    return `const npcData${opts.index} = { id: '${opts.nId}', greeting: '${opts.nMsg}', src: path + "${opts.nSprite?.src || ''}", SCALE_FACTOR: 8, ANIMATION_RATE: 50, INIT_POSITION: { x: ${opts.nX || 0}, y: ${opts.nY || 0} }, pixels: { height: ${opts.nSprite?.h || 32}, width: ${opts.nSprite?.w || 32} }, orientation: { rows: ${opts.nSprite?.rows || 1}, columns: ${opts.nSprite?.cols || 1} }, down: { row: 0, start: 0, columns: 3 }, hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 }, dialogues: ['${opts.nMsg || ''}'] };`;
+                }
+            };
+        }
+    })();
+
     // label normalization
     function sanitizeKey(name) {
         return String(name || '')
