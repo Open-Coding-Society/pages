@@ -11,7 +11,7 @@ class MurderMysteryBossFight {
     const image_background = path + "/images/murderMystery/boss_map.png"; 
     const image_data_background = {
         name: 'background',
-        greeting: "The story starts here, you will search for clues and solve the mystery.",
+        greeting: "The story begins here, you will search for clues and solve the mystery of this murder.",
         src: image_background,
         pixels: {height: 580, width: 1038},
         mode: 'contain',
@@ -78,13 +78,13 @@ export default MurderMysteryBossFight;
 --- BEFORE THE FIGHT ---
 
 Narrator:
-"The air grows cold as you step forward. The trail ends here."
+"The air grows cold as you step forward. You can tell, the end is near."
 
 Narrator:
-"Beyond this chamber waits the perpetrator"
+"Beyond this chamber waits the perpetrator."
 
 Narrator:
-"Take this bow. You will need it"
+"Take this bow. You will need it."
 
 Narrator:
 "Uncover the truth. End the murders."
