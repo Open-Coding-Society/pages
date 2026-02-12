@@ -48,4 +48,3 @@ permalink: /gamify/murdermystery
     // Launch Adventure Game
     const game = Game.main(environment);
 </script>
-</script>
