@@ -17,7 +17,37 @@ class MurderMysteryL1 {
         pixels: {height: 580, width: 1038},
         mode: 'contain',
     };
-    
+
+    const musicPath = path + "/images/murderMystery/level1_music.wav";
+    this.levelMusic = new Audio(musicPath);
+    this.levelMusic.loop = true;
+    this.levelMusic.volume = 0.4;
+
+    // 2. Debugging logs to see if the file is actually found
+    this.levelMusic.oncanplaythrough = () => console.log("🎵 Music file loaded successfully!");
+    this.levelMusic.onerror = () => console.error("❌ Audio Error! Check if file exists at:", musicPath);
+
+    // 3. Robust Interaction Handler
+    const startAudio = () => {
+        this.levelMusic.play()
+            .then(() => {
+                console.log("▶️ Music started!");
+                // Remove listeners only after music actually starts
+                window.removeEventListener('keydown', startAudio);
+                window.removeEventListener('mousedown', startAudio);
+                window.removeEventListener('touchstart', startAudio);
+            })
+            .catch(err => {
+                // This catches the "Blocked" error and lets us try again on the next click/key
+                console.warn("User must interact with the game (click or move) to start music.");
+            });
+    };
+
+    // Listen for anything the user does
+    window.addEventListener('keydown', startAudio);
+    window.addEventListener('mousedown', startAudio);
+    window.addEventListener('touchstart', startAudio);
+
 
     const sprite_data_boat = {
         id: 'Boat',
