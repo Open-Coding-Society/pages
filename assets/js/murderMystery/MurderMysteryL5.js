@@ -72,32 +72,33 @@ class MurderMysteryL5 {
       } catch (e) { console.warn('sword reaction failed', e); }
     };
 
-    let sprite_data_mc = {
-    src: path + "/images/gamebuilder/mcarchie.png",
-    SCALE_FACTOR: 8,
-    STEP_FACTOR: 1000,
-    ANIMATION_RATE: 6.5,
-    INIT_POSITION: { x: 350, y: 400 },
-    pixels: { height: 256, width: 256 },
-    orientation: { rows: 4, columns: 4 },
-    down: { row: 0, start: 0, columns: 4 },
-    right: { row: Math.min(2, 4 - 1), start: 0, columns: 4 },
-    left: { row: Math.min(1, 4 - 1), start: 0, columns: 4 },
-    up: { row: Math.min(3, 4 - 1), start: 0, columns: 4 },
-    downRight: { row: Math.min(2, 4 - 1), start: 0, columns: 3, rotate: Math.PI/16 },
-    downLeft: { row: Math.min(1, 4 - 1), start: 0, columns: 3, rotate: -Math.PI/16 },
-    upRight: { row: Math.min(2, 4 - 1), start: 0, columns: 3, rotate: -Math.PI/16 },
-    upLeft: { row: Math.min(1, 4 - 1), start: 0, columns: 3, rotate: Math.PI/16 },
-    hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-    keypress: { up: 87, left: 65, down: 83, right: 68 }
-};
-
+    const sprite_data_archie = {
+        id: 'Archie',
+        greeting: "Hi, I am Archie.",
+        src: path + "/images/murderMystery/archie_left.png",
+        SCALE_FACTOR: 4,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 0,
+        INIT_POSITION: { x: 250, y: 350 },
+        pixels: {height: 150, width: 100},
+        orientation: {rows: 1, columns: 1},
+        down: {row: 0, start: 0, columns: 1},
+        downRight: {row: 0, start: 0, columns: 1},
+        downLeft: {row: 0, start: 0, columns: 1},
+        left: {row: 0, start: 0, columns: 1},
+        right: {row: 0, start: 0, columns: 1},
+        up: {row: 0, start: 0, columns: 1},
+        upLeft: {row: 0, start: 0, columns: 1},
+        upRight: {row: 0, start: 0, columns: 1},
+        hitbox: {widthPercentage: 0.5, heightPercentage: 0.5},
+        keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
+    };
 
     // List of objects definitions for this level
     this.classes = [
       { class: GameEnvBackground, data: image_data_background },
       { class: SwordNpc, data: sword_sprite_data },
-      { class: Player, data: sprite_data_mc }
+      { class: Player, data: sprite_data_archie }
     ];
   }
 
