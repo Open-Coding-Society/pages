@@ -1,7 +1,6 @@
 import GameEnvBackground from "../GameEnginev1/essentials/GameEnvBackground.js";
 import Player from "../GameEnginev1/essentials/Player.js";
 import Npc from "../GameEnginev1/essentials/Npc.js";
-import DialogueSystem from "../GameEnginev1/DialogueSystem.js";
 
 
 class MurderMysteryL5 {
@@ -12,7 +11,7 @@ class MurderMysteryL5 {
 
 
     // Background data
-    let image_background = path + "/images/room5images/BackgroundPrepLevel.png"; // be sure to include the path
+    let image_background = path + "/images/murderMystery/backgroundPrepLevel.png"; // be sure to include the path
     let image_data_background = {
         name: 'background',
         greeting: "This is the the study.",
@@ -38,7 +37,7 @@ class MurderMysteryL5 {
     let sword_sprite_data = {
         id: 'Sword',
         greeting: "A magical sword...",
-        src: path + "/images/room5images/swordprep.png", // Update this path to your sword image
+        src: path + "/images/murderMystery/swordprep.png", // Update this path to your sword image
         SCALE_FACTOR: 6,
         STEP_FACTOR: 0,
         ANIMATION_RATE: 0,
