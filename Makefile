@@ -6,6 +6,11 @@ PYTHON := venv/bin/python3
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
+# Determine number of parallel jobs (Linux/macOS fallback) and enable
+# parallel make by default to speed up multi-core machines.
+NUM_JOBS := $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
+MAKEFLAGS += -j$(NUM_JOBS)
+
 NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
@@ -148,7 +153,8 @@ clean-courses:
 convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
-	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+	@echo "Converting notebook: $< -> $@"
+	@$(PYTHON) scripts/convert_notebooks.py "$<"
 
 # Single notebook conversion (faster for development)
 convert-single:
