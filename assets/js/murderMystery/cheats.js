@@ -20,21 +20,13 @@ export function addLevelNavigationButtons(gameInstance) {
     const paragraphs = footer.querySelectorAll("p");
     paragraphs.forEach(p => p.remove());
     
-    // Make footer a flex container for full width and prevent button cutoff
-    footer.style.display = "flex";
-    footer.style.justifyContent = "space-between";
-    footer.style.alignItems = "center";
-    footer.style.flexWrap = "nowrap";
-    footer.style.width = "100vw";
-    footer.style.maxWidth = "100vw";
-    footer.style.boxSizing = "border-box";
-    footer.style.overflowX = "auto";
+    // Footer styling is now handled by game-engine.scss (#masterFooter)
 
     // Create Previous Level button (far left)
     const prevButton = document.createElement("button");
     prevButton.id = "prevLevelButton";
     prevButton.innerText = "Previous Level ↩";
-    prevButton.className = "medium filledHighlight primary";
+    // Styling handled by game-engine.scss (#prevLevelButton)
     prevButton.onclick = function() {
         console.log("Previous Level button clicked");
         console.log("Transitioning to the previous level...");
@@ -50,18 +42,12 @@ export function addLevelNavigationButtons(gameInstance) {
             console.error("gameInstance.gameControl not found");
         }
     };
-    prevButton.style.cssText = `
-        background-color: #f26767ff;
-        font-weight: bold;
-        font-size: 12px;
-        font: 'Press Start 2P', monospace;
-    `;
 
     // Create Next Level button (far right)
     const nextButton = document.createElement("button");
     nextButton.id = "nextLevelButton";
     nextButton.innerText = "Next Level ↪";
-    nextButton.className = "medium filledHighlight primary";
+    // Styling handled by game-engine.scss (#nextLevelButton)
     nextButton.onclick = function() {
         console.log("Next Level button clicked");
         console.log("Transitioning to the next level...");
@@ -78,60 +64,30 @@ export function addLevelNavigationButtons(gameInstance) {
             console.error("gameInstance.gameControl not found");
         }
     };
-    nextButton.style.cssText = `
-        background-color: #6ae378ff;
-        font-weight: bold;
-        font-size: 12px;
-        font: 'Press Start 2P', monospace;
-    `;
 
     // Create a center container for Home and Cheats Menu
     const centerContainer = document.createElement("div");
-    centerContainer.style.display = "flex";
-    centerContainer.style.justifyContent = "center";
-    centerContainer.style.alignItems = "center";
-    centerContainer.style.gap = "10px";
-    centerContainer.style.flex = "0 0 auto";
+    centerContainer.className = "game-footer-center";
+    // Styling handled by game-engine.scss (.game-footer-center)
 
     // Create Cheats Menu button (left of Home)
     const cheatsButton = document.createElement("button");
     cheatsButton.id = "cheatsMenuButton";
     cheatsButton.innerText = "Cheats Menu";
-    cheatsButton.className = "medium filledHighlight primary";
+    // Styling handled by game-engine.scss (#cheatsMenuButton)
     cheatsButton.onclick = function() {
         console.log("Cheats Menu button clicked");
         openCheatsMenu(gameInstance);
     };
-    cheatsButton.style.cssText = `
-        background-color: #a46ae3ff;
-        font-weight: bold;
-        font-size: 12px;
-        font: 'Press Start 2P', monospace;
-    `;
     
 
     // Create Home button (center)
-   const homeButton = document.createElement("button");
+    const homeButton = document.createElement("button");
     homeButton.id = "homeButton";
     homeButton.innerText = "🏠";
-    // Remove class-based styling so it's just the emoji; apply minimal styles to remove border/background
-    homeButton.className = "";
     homeButton.setAttribute("aria-label", "Home");
     homeButton.title = "Home";
-    homeButton.style.cssText = `
-        background: transparent;
-        border: none;
-        padding: 0;
-        margin: 0;
-        font-size: 40px;
-        line-height: 1;
-        cursor: pointer;
-        box-shadow: none;
-        outline: none;
-        -webkit-appearance: none;
-    `;
-    // Optional: prevent focus outline on click (keep keyboard accessibility if desired)
-    homeButton.onfocus = () => homeButton.style.outline = "none";
+    // Styling handled by game-engine.scss (#homeButton)
 
     homeButton.onclick = function() {
         console.log("Home button clicked");
@@ -143,17 +99,11 @@ export function addLevelNavigationButtons(gameInstance) {
     const infoButton = document.createElement("button");
     infoButton.id = "infoButton";
     infoButton.innerText = "Info";
-    infoButton.className = "medium filledHighlight primary";
+    // Styling handled by game-engine.scss (#infoButton)
     infoButton.onclick = function() {
         console.log("Info button clicked");
         openInfoMenu();
     };
-     infoButton.style.cssText = `
-        background-color: #e67e22;
-        font-weight: bold;
-        font-size: 12px;
-        font: 'Press Start 2P', monospace;
-    `;
 
     /**
      * Creates and opens the info menu popup
@@ -168,64 +118,28 @@ export function addLevelNavigationButtons(gameInstance) {
         // Create modal overlay
         const modal = document.createElement("div");
         modal.id = "infoModal";
-        modal.style.cssText = `
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            backdrop-filter: blur(5px);
-        `;
+        modal.style.display = "flex"; // Initially visible
+        // Styling handled by game-engine.scss (#infoModal)
 
         // Create modal content
         const modalContent = document.createElement("div");
-        modalContent.style.cssText = `
-            background: linear-gradient(145deg, #34495e, #2c3e50);
-            border: 4px solid #e67e22;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 0 30px rgba(230, 126, 34, 0.5);
-            font-family: 'Press Start 2P', monospace;
-            color: #ecf0f1;
-        `;
+        // Styling handled by game-engine.scss (#infoModal > div)
 
         // Modal title
         const title = document.createElement("h2");
+        title.className = "game-modal-title";
         title.innerText = "ℹ️ GAME INFO ℹ️";
-        title.style.cssText = `
-            text-align: center;
-            color: #e67e22;
-            margin-bottom: 25px;
-            font-size: 18px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        `;
+        // Styling handled by game-engine.scss (#infoModal .game-modal-title)
 
         // Info container
         const infoContainer = document.createElement("div");
-        infoContainer.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        `;
+        infoContainer.className = "game-modal-container";
+        // Styling handled by game-engine.scss (.game-modal-container)
 
         // Placeholder info values
         const infoSection = document.createElement("div");
-        infoSection.style.cssText = `
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid #e67e22;
-            text-align: left;
-            color: #e67e22;
-            font-size: 12px;
-        `;
+        infoSection.className = "game-info-section";
+        // Styling handled by game-engine.scss (.game-info-section)
         infoSection.innerHTML = `
             <strong>Game Title:</strong> Murder Mystery<br>
             <strong>Version:</strong> 1.0<br>
@@ -235,26 +149,9 @@ export function addLevelNavigationButtons(gameInstance) {
 
         // Close button
         const closeButton = document.createElement("button");
+        closeButton.className = "game-modal-close";
         closeButton.innerText = "✖ Close";
-        closeButton.style.cssText = `
-            margin-top: 20px;
-            padding: 12px 20px;
-            background: linear-gradient(145deg, #e67e22, #d35400);
-            color: white;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-family: 'Press Start 2P', monospace;
-            width: 100%;
-            transition: all 0.3s ease;
-        `;
-        closeButton.onmouseover = () => {
-            closeButton.style.transform = "scale(1.05)";
-        };
-        closeButton.onmouseout = () => {
-            closeButton.style.transform = "scale(1)";
-        };
+        // Styling handled by game-engine.scss (.game-modal-close)
         closeButton.onclick = () => {
             modal.style.display = "none";
         };
@@ -276,20 +173,15 @@ export function addLevelNavigationButtons(gameInstance) {
         console.log("Info menu opened");
     }
 
-    // Shift the center group slightly right to match desired layout
-    centerContainer.style.marginLeft = "40px";
-
     // Containers around the Home button
     const leftOfHome = document.createElement("div");
-    leftOfHome.style.display = "flex";
-    leftOfHome.style.alignItems = "center";
-    leftOfHome.style.gap = "10px";
+    leftOfHome.className = "game-controls-left";
     leftOfHome.id = "mansion-game-controls-container";
+    // Styling handled by game-engine.scss (.game-controls-left, #mansion-game-controls-container)
 
     const rightOfHome = document.createElement("div");
-    rightOfHome.style.display = "flex";
-    rightOfHome.style.alignItems = "center";
-    rightOfHome.style.gap = "10px";
+    rightOfHome.className = "game-controls-right";
+    // Styling handled by game-engine.scss (.game-controls-right)
 
     // Add controls around Home (Home centered in the group)
     centerContainer.appendChild(leftOfHome);
@@ -298,17 +190,12 @@ export function addLevelNavigationButtons(gameInstance) {
 
     // Create left and right containers for spacing
     const leftContainer = document.createElement("div");
-    leftContainer.style.display = "flex";
-    leftContainer.style.alignItems = "center";
-    leftContainer.style.gap = "10px";
-    leftContainer.style.flex = "1 1 0";
+    leftContainer.className = "game-footer-left";
+    // Styling handled by game-engine.scss (.game-footer-left)
 
     const rightContainer = document.createElement("div");
-    rightContainer.style.display = "flex";
-    rightContainer.style.alignItems = "center";
-    rightContainer.style.justifyContent = "flex-end";
-    rightContainer.style.gap = "10px";
-    rightContainer.style.flex = "1 1 0";
+    rightContainer.className = "game-footer-right";
+    // Styling handled by game-engine.scss (.game-footer-right)
 
     // Clear footer before adding new layout
     footer.innerHTML = "";
@@ -343,72 +230,33 @@ function openCheatsMenu(gameInstance) {
     // Create modal overlay
     const modal = document.createElement("div");
     modal.id = "cheatsModal";
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-        backdrop-filter: blur(5px);
-    `;
+    modal.style.display = "flex"; // Initially visible
+    // Styling handled by game-engine.scss (#cheatsModal)
     
     // Create modal content
     const modalContent = document.createElement("div");
-    modalContent.style.cssText = `
-        background: linear-gradient(145deg, #2c3e50, #34495e);
-        border: 4px solid #a46ae3ff;
-        border-radius: 15px;
-        padding: 30px;
-        max-width: 600px;
-        max-height: 80vh;
-        width: 90%;
-        overflow-y: auto;
-        box-shadow: 0 0 30px rgba(164, 106, 227, 0.5);
-        font-family: 'Press Start 2P', monospace;
-        color: #ecf0f1;
-    `;
+    // Styling handled by game-engine.scss (#cheatsModal > div)
     
     // Modal title
     const title = document.createElement("h2");
+    title.className = "game-modal-title";
     title.innerText = "🎮 CHEATS MENU 🎮";
-    title.style.cssText = `
-        text-align: center;
-        color: #a46ae3ff;
-        margin-bottom: 25px;
-        font-size: 18px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    `;
+    // Styling handled by game-engine.scss (#cheatsModal .game-modal-title)
     
     // Cheats container
     const cheatsContainer = document.createElement("div");
-    cheatsContainer.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    `;
+    cheatsContainer.className = "game-modal-container";
+    // Styling handled by game-engine.scss (.game-modal-container)
     
     // Level Select Section
     const levelSelectSection = document.createElement("div");
-    levelSelectSection.style.cssText = `
-        background: rgba(0, 0, 0, 0.3);
-        padding: 20px;
-        border-radius: 10px;
-        border: 2px solid #a46ae3ff;
-    `;
+    levelSelectSection.className = "game-level-select-section";
+    // Styling handled by game-engine.scss (.game-level-select-section)
     
     const levelTitle = document.createElement("h3");
+    levelTitle.className = "game-section-title";
     levelTitle.innerText = "🚪 LEVEL SELECT 🚪";
-    levelTitle.style.cssText = `
-        text-align: center;
-        color: #a46ae3ff;
-        margin-bottom: 15px;
-        font-size: 14px;
-    `;
+    // Styling handled by game-engine.scss (.game-level-select-section .game-section-title)
     levelSelectSection.appendChild(levelTitle);
     
     // Define your levels based on the file list
@@ -420,40 +268,15 @@ function openCheatsMenu(gameInstance) {
     
     // Create level buttons grid
     const levelGrid = document.createElement("div");
-    levelGrid.style.cssText = `
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-top: 15px;
-    `;
+    levelGrid.className = "game-level-grid";
+    // Styling handled by game-engine.scss (.game-level-grid)
     
     levels.forEach((level, index) => {
         const levelButton = document.createElement("button");
+        levelButton.className = "game-level-button";
         levelButton.innerText = level.name;
         levelButton.title = `Jump to ${level.name}`;
-        levelButton.style.cssText = `
-            padding: 15px 10px;
-            background: linear-gradient(145deg, #3498db, #2980b9);
-            color: white;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 10px;
-            font-family: 'Press Start 2P', monospace;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            text-align: center;
-            line-height: 1.3;
-        `;
-        
-        levelButton.onmouseover = () => {
-            levelButton.style.transform = "scale(1.05)";
-            levelButton.style.background = "linear-gradient(145deg, #2ecc71, #27ae60)";
-        };
-        levelButton.onmouseout = () => {
-            levelButton.style.transform = "scale(1)";
-            levelButton.style.background = "linear-gradient(145deg, #3498db, #2980b9)";
-        };
+        // Styling handled by game-engine.scss (.game-level-button)
         
         levelButton.onclick = () => {
             console.log(`Jumping to ${level.name} (${level.id})`);
@@ -500,37 +323,15 @@ function openCheatsMenu(gameInstance) {
     
     // Additional cheats placeholder
     const placeholderSection = document.createElement("div");
-    placeholderSection.style.cssText = `
-        background: rgba(0, 0, 0, 0.3);
-        padding: 15px;
-        border-radius: 10px;
-        border: 2px solid #95a5a6;
-        text-align: center;
-    `;
+    placeholderSection.className = "game-placeholder-section";
+    // Styling handled by game-engine.scss (.game-placeholder-section)
     
     
     // Close button
     const closeButton = document.createElement("button");
+    closeButton.className = "game-modal-close";
     closeButton.innerText = "✖ Close";
-    closeButton.style.cssText = `
-        margin-top: 20px;
-        padding: 12px 20px;
-        background: linear-gradient(145deg, #e74c3c, #c0392b);
-        color: white;
-        border: 2px solid #ecf0f1;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 12px;
-        font-family: 'Press Start 2P', monospace;
-        width: 100%;
-        transition: all 0.3s ease;
-    `;
-    closeButton.onmouseover = () => {
-        closeButton.style.transform = "scale(1.05)";
-    };
-    closeButton.onmouseout = () => {
-        closeButton.style.transform = "scale(1)";
-    };
+    // Styling handled by game-engine.scss (.game-modal-close)
     closeButton.onclick = () => {
         modal.style.display = "none";
     };
