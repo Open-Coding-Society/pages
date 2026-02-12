@@ -4,6 +4,7 @@ import Npc from "../GameEnginev1/essentials/Npc.js";
 
 
 class MurderMysteryL5 {
+  static friendlyName = "Level 5: The Duel"; 
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -38,11 +39,11 @@ class MurderMysteryL5 {
         id: 'Sword',
         greeting: "A magical sword...",
         src: path + "/images/murderMystery/swordprep.png", // Update this path to your sword image
-        SCALE_FACTOR: 6,
+        SCALE_FACTOR: 10,
         STEP_FACTOR: 0,
         ANIMATION_RATE: 0,
         INIT_POSITION: { x: width * 0.25, y: height * 0.6 },
-        pixels: { height: 256, width: 256 },
+        pixels: { height: 500, width: 500 },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.6, heightPercentage: 0.8 },
@@ -75,23 +76,25 @@ class MurderMysteryL5 {
     const sprite_data_archie = {
         id: 'Archie',
         greeting: "Hi, I am Archie.",
-        src: path + "/images/murderMystery/archie_left.png",
-        SCALE_FACTOR: 4,
+        src: path + "/images/murderMystery/mcarchie.png",
+        //src: path + "/images/gamebuilder/sprites/pew.png",
+        SCALE_FACTOR: 6,
         STEP_FACTOR: 1000,
-        ANIMATION_RATE: 0,
+        ANIMATION_RATE: 50,
         INIT_POSITION: { x: 250, y: 350 },
-        pixels: {height: 150, width: 100},
-        orientation: {rows: 1, columns: 1},
-        down: {row: 0, start: 0, columns: 1},
-        downRight: {row: 0, start: 0, columns: 1},
-        downLeft: {row: 0, start: 0, columns: 1},
-        left: {row: 0, start: 0, columns: 1},
-        right: {row: 0, start: 0, columns: 1},
-        up: {row: 0, start: 0, columns: 1},
-        upLeft: {row: 0, start: 0, columns: 1},
-        upRight: {row: 0, start: 0, columns: 1},
-        hitbox: {widthPercentage: 0.5, heightPercentage: 0.5},
-        keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
+        pixels: {height: 256, width: 256},
+        //pixels: {height: 320, width: 320},
+        orientation: { rows: 4, columns: 4 },
+        down: { row: 0, start: 0, columns: 3 },
+        downRight: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
+        downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
+        left: { row: 1, start: 0, columns: 3 },
+        right: { row: 2, start: 0, columns: 3 },
+        up: { row: 3, start: 0, columns: 3 },
+        upLeft: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
+        upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: 0, heightPercentage: 0 },
+        keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
     // List of objects definitions for this level
