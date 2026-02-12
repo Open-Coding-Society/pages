@@ -16,6 +16,7 @@ permalink: /gamify/murdermystery
     import MurderMysteryL1 from "/assets/js/murderMystery/MurderMysteryL1.js";
     import MurderMysteryL3 from "/assets/js/murderMystery/MurderMysteryL3.js";
     import MurderMysteryL4 from "/assets/js/murderMystery/MurderMysteryL4.js";
+    import MurderMysteryL5 from "/assets/js/murderMustery/MurderMysteryL5.js";
     import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
     import { initCheats } from "/assets/js/murderMystery/cheats.js";
 
