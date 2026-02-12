@@ -2,7 +2,7 @@ import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackgro
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
-class GameLevelSub1 {
+class MurderMysteryL0 {
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -106,4 +106,4 @@ class GameLevelSub1 {
 }
 }
 
-export default GameLevelSub1;
+export default MurderMysteryL0;
