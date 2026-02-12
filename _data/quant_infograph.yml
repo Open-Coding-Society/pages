@@ -1,0 +1,34 @@
+Title: "Capstone Brief - Quantitative Trading Bot"
+Description: "A CSA capstone project using machine learning, news sentiment analysis, database systems, and graph-based data structures to predict short-term stock market movement through an iterative DBR development process."
+
+Topics:
+  - title: "Quantitative Trading Bot"
+    subtitle: "ML + News Sentiment for short-term market prediction (DBR Capstone)"
+    link: "/capstone/quant-trading-bot/"
+    image: "quant-trading-bot.png"
+    alt: "Quantitative Trading Bot capstone infographic preview image"
+    status: "In Progress"
+    team:
+      - "Anvay"
+      - "Sai"
+      - "Aashray"
+    keyPoints:
+      - "Combines price data with real-time news sentiment"
+      - "Built using iterative Design-Based Research (DBR) cycles"
+      - "Uses ML + feature engineering for prediction"
+      - "Backtesting + paper trading planned for evaluation"
+    tech:
+      - "Python"
+      - "Machine Learning"
+      - "NLP Sentiment"
+      - "Web Scraping"
+      - "SQL Database"
+      - "Graphs"
+      - "Backtesting"
+      - "Alpaca API (planned)"
+    description: "We are developing a quantitative trading bot that predicts short-term stock movement using market indicators and real-time financial news sentiment. The project follows a DBR approach with repeated build-test-refine cycles to improve performance."
+    impact:
+      - "Makes professional-style quant workflows accessible to students"
+      - "Creates a structured dataset of price/news/sentiment/predictions"
+      - "Supports model evaluation through backtesting"
+      - "Designed for deployment through OCS capstone pages"
