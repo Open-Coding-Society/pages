@@ -151,47 +151,25 @@ class Player extends Character {
      * @param {*} other - The object that the player is colliding with
      */
     handleCollisionReaction(other) {    
-        // Stop current movement
-        this.pressedKeys = {};
-        this.updateVelocity();
-        this.updateDirection();
+        // Do NOT clear pressed keys; keep walking animation active
+        // Halt movement by zeroing velocity along collision axis
 
-        // Resolve collision against barriers by pushing the player out
-        try {
-            const otherEl = document.getElementById(other?.id || '');
-            const isBarrier = otherEl && (/^(wall_|dbarrier_|barrier_)/.test(other.id || ''));
-            if (isBarrier) {
-                const a = this.canvas.getBoundingClientRect();
-                const b = otherEl.getBoundingClientRect();
-
-                // Compute overlap distances
-                const centerAx = (a.left + a.right) / 2;
-                const centerAy = (a.top + a.bottom) / 2;
-                const centerBx = (b.left + b.right) / 2;
-                const centerBy = (b.top + b.bottom) / 2;
-
-                const overlapLeft = Math.max(0, a.right - b.left);
-                const overlapRight = Math.max(0, b.right - a.left);
-                const overlapTop = Math.max(0, a.bottom - b.top);
-                const overlapBottom = Math.max(0, b.bottom - a.top);
-
-                const resolveX = (centerAx < centerBx) ? overlapLeft : overlapRight; // push away horizontally
-                const resolveY = (centerAy < centerBy) ? overlapTop : overlapBottom;  // push away vertically
-
-                // Resolve along minimal axis to avoid diagonal teleport
-                if (resolveX < resolveY) {
-                    const dir = (centerAx < centerBx) ? -1 : 1; // -1: push left, 1: push right
-                    const delta = resolveX * dir;
-                    this.position.x = Math.max(0, Math.min(this.gameEnv.innerWidth - this.width, this.position.x + delta));
-                    this.velocity.x = 0;
-                } else {
-                    const dir = (centerAy < centerBy) ? -1 : 1; // -1: push up, 1: push down
-                    const delta = resolveY * dir;
-                    this.position.y = Math.max(0, Math.min(this.gameEnv.innerHeight - this.height, this.position.y + delta));
-                    this.velocity.y = 0;
+        // Avoid DOM-based push-out; rely on velocity zeroing only
+            // Do NOT clear pressed keys; keep walking animation active
+            // Halt movement by zeroing velocity along the touched axes; avoid DOM-based push-out
+            try {
+                const touchPoints = this.collisionData?.touchPoints?.this;
+                if (touchPoints) {
+                    // Horizontal block
+                    if (touchPoints.left || touchPoints.right) {
+                        this.velocity.x = 0;
+                    }
+                    // Vertical block
+                    if (touchPoints.top || touchPoints.bottom) {
+                        this.velocity.y = 0;
+                    }
                 }
-            }
-        } catch (_) {}
+            } catch (_) {}
 
         super.handleCollisionReaction(other);
     }
