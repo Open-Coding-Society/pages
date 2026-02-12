@@ -67,9 +67,6 @@ class MurderMysteryL2 {
             interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
         };
 
-
-
-
         this.classes = [
             { class: GameEnvBackground, data: bgData },
             { class: Player, data: playerData },
