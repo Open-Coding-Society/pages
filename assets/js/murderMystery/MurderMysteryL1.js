@@ -25,7 +25,7 @@ class MurderMysteryL1 {
         STEP_FACTOR: 1000, // Same speed as Archie
         ANIMATION_RATE: 0,
         INIT_POSITION: { x: 250, y: 350 }, // Positioned slightly under Archie
-        pixels: { height: 260, width: 100 }, // Adjust based on your boat image size
+        pixels: { height: 200, width: 150}, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         downRight: {row: 0, start: 0, columns: 1},
@@ -48,11 +48,11 @@ class MurderMysteryL1 {
    const sprite_data_suspect = {
     id: 'Suspect',
     src: path + "/images/mansionGame/skeleton_key.png", // placeholder sprite
-    SCALE_FACTOR: 20,
+    SCALE_FACTOR: 15,
     STEP_FACTOR: 1000,
     ANIMATION_RATE: 0,
     // Position the suspect on the island, away from the boat 
-    INIT_POSITION: { x: 800, y: 300 }, 
+    INIT_POSITION: { x: 1300, y: 300 }, 
     pixels: { height: 200, width: 200 },
     orientation: { rows: 1, columns: 1 },
     down: { row: 0, start: 0, columns: 1 },

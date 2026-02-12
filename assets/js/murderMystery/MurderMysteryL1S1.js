@@ -58,7 +58,7 @@ class MurderMysteryLevel1S1 {
         up: { row: 0, start: 0, columns: 1 },
         upLeft: {row: 0, start: 0, columns: 1},
         upRight: {row: 0, start: 0, columns: 1},
-        hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 },
+        hitbox: { widthPercentage: 0.5, heightPercentage: 0.5 },
         keypress: { left: 65, right: 68, up: 87, down: 83 } // Same keys as Archie
    };
 
