@@ -1419,6 +1419,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = !slot.locked; slot.deleteBtn.style.display = slot.locked ? '' : 'none'; }
             }
         });
+
+        // Always allow Player edits, even after confirmation or code edits
+        try {
+            const mv = document.getElementById('movement-keys');
+            [ui.pSprite, ui.pName, mv, ui.pScale, ui.pStep, ui.pAnim, ui.pRows, ui.pCols, ui.pX, ui.pY]
+                .forEach(el => unlockField(el));
+            [ui.pDownRow, ui.pRightRow, ui.pLeftRow, ui.pUpRow, ui.pUpRightRow, ui.pDownRightRow, ui.pUpLeftRow, ui.pDownLeftRow, ui.pDirCols, ui.pHitboxW, ui.pHitboxH]
+                .forEach(el => unlockField(el));
+        } catch (_) {}
     }
 
         /* code generation (baseline and steps) */
@@ -2002,14 +2011,18 @@ export const gameLevelClasses = [GameLevelCustom];`;
     ui.editor.addEventListener('input', () => {
         if (!state.programmaticEdit) {
             state.userEdited = true;
-            const btn = document.getElementById('btn-confirm');
-            if (btn) btn.classList.add('staged');
-            // Light up play button to indicate runnable changes
+            // Do NOT light the asset builder confirm button on code edits
+            // Light up only the code run buttons to indicate runnable changes
             if (ui.codePlayBtn) ui.codePlayBtn.classList.add('staged');
             const topRunBtn = document.getElementById('btn-run');
             if (topRunBtn) topRunBtn.classList.add('staged');
             // Keep UI controls in sync when user edits code directly
             try { syncControlsFromEditor(); } catch (_) {}
+            // Switch builder to Freestyle so all controls stay editable
+            try {
+                const fi = steps.indexOf('freestyle');
+                if (fi !== -1) { stepIndex = fi; setIndicator(); updateStepUI(); }
+            } catch (_) {}
         }
     });
 
@@ -2041,11 +2054,21 @@ export const gameLevelClasses = [GameLevelCustom];`;
             composed = stepToCompose ? generateStepCode(stepToCompose) : generateBaselineCode();
         }
         if (composed) {
-            stagedCode = composed;
-            stagedStep = composedStep;
-            const btn = document.getElementById('btn-confirm');
-            if (btn) btn.classList.add('staged');
-            // Do not call simulateTypingChange here; wait for Confirm
+            if (current === 'freestyle') {
+                const oldCode = ui.editor.value;
+                simulateTypingChange(oldCode, composed, () => {
+                    stagedCode = null; stagedStep = null;
+                    runInRunner();
+                    const btn = document.getElementById('btn-confirm');
+                    if (btn) btn.classList.remove('staged');
+                });
+            } else {
+                stagedCode = composed;
+                stagedStep = composedStep;
+                const btn = document.getElementById('btn-confirm');
+                if (btn) btn.classList.add('staged');
+                // Do not call simulateTypingChange here; wait for Confirm
+            }
         }
     }
 
@@ -2053,6 +2076,20 @@ export const gameLevelClasses = [GameLevelCustom];`;
     function syncControlsFromEditor() {
         const code = String(ui.editor?.value || '');
         const pdMatch = /const\s+playerData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
+        const bdMatch = /const\s+bgData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
+        // Background src -> UI select
+        try {
+            if (bdMatch) {
+                const bdBlock = bdMatch[1];
+                const m = /src\s*:\s*(?:path\s*\+\s*)?['"]([^'"]+)['"]/i.exec(bdBlock);
+                const srcRel = m ? m[1] : null;
+                if (srcRel && assets && assets.bg && ui.bg) {
+                    for (const key of Object.keys(assets.bg)) {
+                        if (assets.bg[key]?.src === srcRel) { ui.bg.value = key; break; }
+                    }
+                }
+            }
+        } catch (_) {}
         if (!pdMatch) return;
         const block = pdMatch[1];
         const intFrom = (re) => {
@@ -2123,6 +2160,18 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 const upCode = parseInt(kpMatch[1], 10);
                 mvSel.value = (upCode === 38) ? 'arrows' : 'wasd';
             }
+        } catch (_) {}
+        // Player src and name -> UI selects
+        try {
+            const srcMatch = /src\s*:\s*(?:path\s*\+\s*)?['"]([^'"]+)['"]/i.exec(block);
+            const idMatch = /id\s*:\s*['"]([^'"]+)['"]/i.exec(block);
+            const srcRel = srcMatch ? srcMatch[1] : null;
+            if (srcRel && assets && assets.sprites && ui.pSprite) {
+                for (const key of Object.keys(assets.sprites)) {
+                    if (assets.sprites[key]?.src === srcRel) { ui.pSprite.value = key; break; }
+                }
+            }
+            if (idMatch && ui.pName) ui.pName.value = idMatch[1];
         } catch (_) {}
     }
 
@@ -2409,6 +2458,54 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
     const mvEl = document.getElementById('movement-keys');
     const rerunPlayer = () => { syncFromControlsIfFreestyle(); };
+    // Directly apply player edits into existing playerData in code (robust fallback)
+    function applyPlayerUIToCodeImmediate() {
+        try {
+            let code = String(ui.editor?.value || '');
+            const pdBlockRe = /const\s+playerData\s*=\s*\{[\s\S]*?\};/i;
+            if (!pdBlockRe.test(code)) { rerunPlayer(); return; }
+            // Numeric fields
+            const numSet = (label, val) => {
+                if (val === null || val === undefined) return;
+                const v = parseInt(String(val), 10);
+                if (!Number.isFinite(v)) return;
+                const re = new RegExp(`(${label}\\s*:\\s*)(\\d+)`, 'i');
+                code = code.replace(re, `$1${v}`);
+            };
+            numSet('SCALE_FACTOR', ui.pScale?.value);
+            numSet('STEP_FACTOR', ui.pStep?.value);
+            numSet('ANIMATION_RATE', ui.pAnim?.value);
+
+            // INIT_POSITION x,y
+            try {
+                const x = parseInt(ui.pX?.value || '', 10);
+                const y = parseInt(ui.pY?.value || '', 10);
+                if (Number.isFinite(x) && Number.isFinite(y)) {
+                    code = code.replace(/(INIT_POSITION\s*:\s*\{[\s\S]*?x\s*:\s*)(\d+)([\s\S]*?y\s*:\s*)(\d+)/i, `$1${Math.max(0,x)}$3${Math.max(0,y)}`);
+                }
+            } catch (_) {}
+
+            // Movement keys mapping
+            try {
+                const mvSel = document.getElementById('movement-keys');
+                const useArrows = mvSel && mvSel.value === 'arrows';
+                const kpText = useArrows
+                    ? '{ up: 38, left: 37, down: 40, right: 39 }'
+                    : '{ up: 87, left: 65, down: 83, right: 68 }';
+                code = code.replace(/(keypress\s*:\s*)\{[\s\S]*?\}/i, `$1${kpText}`);
+            } catch (_) {}
+
+            // Write and run
+            state.programmaticEdit = true;
+            ui.editor.value = code;
+            state.programmaticEdit = false;
+            renderOverlay();
+            runInRunner();
+        } catch (_) {
+            // Fallback to existing path
+            rerunPlayer();
+        }
+    }
     function updatePlayerPositionInEditor() {
         // Stage player position changes; no live reload until Confirm
         state.lastEdited = 'player';
@@ -2443,9 +2540,9 @@ export const gameLevelClasses = [GameLevelCustom];`;
     if (ui.pY) ui.pY.addEventListener('input', updatePlayerPositionInEditor);
     if (ui.pName) ui.pName.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
     if (mvEl) mvEl.addEventListener('change', () => { state.lastEdited = 'player'; rerunPlayer(); });
-    if (ui.pScale) ui.pScale.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
-    if (ui.pStep) ui.pStep.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
-    if (ui.pAnim) ui.pAnim.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
+    if (ui.pScale) ui.pScale.addEventListener('input', () => { state.lastEdited = 'player'; applyPlayerUIToCodeImmediate(); });
+    if (ui.pStep) ui.pStep.addEventListener('input', () => { state.lastEdited = 'player'; applyPlayerUIToCodeImmediate(); });
+    if (ui.pAnim) ui.pAnim.addEventListener('input', () => { state.lastEdited = 'player'; applyPlayerUIToCodeImmediate(); });
     if (ui.pRows) ui.pRows.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
     if (ui.pCols) ui.pCols.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
     if (ui.pHitboxW) ui.pHitboxW.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
@@ -2658,7 +2755,30 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 });
                 return;
             }
-            const codeToApply = stagedCode;
+            // If no staged code (common in Freestyle after code edits), compose from current UI
+            let codeToApply = stagedCode;
+            if (!codeToApply) {
+                let stepToCompose;
+                const current = steps[stepIndex];
+                const hasNPCs = ui.npcs.length > 0;
+                const hasWalls = (ui.walls.length > 0) || (ui.drawShapes && ui.drawShapes.some(s => s.type === 'barrier'));
+                const hasPlayer = !!ui.pSprite.value;
+                const hasBackground = !!ui.bg.value;
+                if (current === 'freestyle') {
+                    stepToCompose = state.lastEdited || (hasWalls ? 'walls' : (hasNPCs ? 'npc' : (hasPlayer ? 'player' : (hasBackground ? 'background' : null))));
+                } else {
+                    stepToCompose = current;
+                }
+                if (stepToCompose === 'npc') {
+                    const ins = buildNpcInsertText();
+                    codeToApply = mergeDefsAndClasses(oldCode, ins.defs, ins.classes);
+                } else if (stepToCompose === 'walls') {
+                    const ins = buildBarrierInsertText();
+                    codeToApply = mergeDefsAndClasses(oldCode, ins.defs, ins.classes);
+                } else {
+                    codeToApply = stepToCompose ? generateStepCode(stepToCompose) : generateBaselineCode();
+                }
+            }
             simulateTypingChange(oldCode, codeToApply, () => {
                 if (applyingStep === 'background') { lockField(ui.bg); }
                 if (applyingStep === 'player') { lockField(ui.pSprite); lockField(ui.pX); lockField(ui.pY); lockField(ui.pName); lockField(document.getElementById('movement-keys')); }
