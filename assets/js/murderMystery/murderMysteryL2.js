@@ -4,6 +4,7 @@ import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
 
 class MurderMysteryL2 {
+    static friendlyName = "Level 2: The Pirate's Cove";
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -65,9 +66,6 @@ class MurderMysteryL2 {
             reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
             interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
         };
-
-
-
 
         this.classes = [
             { class: GameEnvBackground, data: bgData },

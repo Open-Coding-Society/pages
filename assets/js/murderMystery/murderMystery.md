@@ -11,7 +11,7 @@ permalink: /gamify/murdermystery
 
 <script type="module">
 
-    // Adnventure Game assets locations
+    // Adventure Game assets locations
     import Game from "/assets/js/GameEnginev1/essentials/Game.js";
     import MurderMysteryL0 from "/assets/js/murderMystery/MurderMysteryL0.js";
     import MurderMysteryL1 from "/assets/js/murderMystery/MurderMysteryL1.js";
@@ -19,24 +19,33 @@ permalink: /gamify/murdermystery
     import MurderMysteryL3 from "/assets/js/murderMystery/MurderMysteryL3.js";
     import MurderMysteryL4 from "/assets/js/murderMystery/MurderMysteryL4.js";
     import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
-    import { initCheats } from "/assets/js/murderMystery/cheats.js";
 
     const gameLevelClasses = [MurderMysteryL0, MurderMysteryL1, MurderMysteryL2, MurderMysteryL3, MurderMysteryL4];
 
     // Web Server Environment datas
     const environment = {
-        path:"{{site.baseurl}}",
+        path: "{{site.baseurl}}",
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: gameLevelClasses
-
+        gameLevelClasses: gameLevelClasses,
+        // Game UI configuration
+        gameUI: {
+            showNavigation: true,
+            showLevelSelect: true,
+            showInfo: true,
+            homeUrl: "/gamify/murdermystery",
+            gameInfo: {
+                title: "Murder Mystery Game",
+                version: "1.0",
+                developer: "DNHS CSSE Feb 2026",
+                controls: "Use WASD keys to move your character."
+            }
+        }
     }
-    // Launch Adventure Game and keep the returned Game instance
-    const game = Game.main(environment);
 
-    // Initialize cheats/debug features
-    initCheats(game);
+    // Launch Adventure Game
+    const game = Game.main(environment);
 </script>
