@@ -119,7 +119,7 @@ Narrator:
 "Thank you for playing."
 "Murder Mystery"
 
-Thank to our classmates, Mr. Mort and Anusha for guiding us through this trimester
+Thank to our classmates, Mr. Mort and Anusha for guiding us through this trimester!
 
 The End.
 */
