@@ -235,7 +235,7 @@
           Shared Files
         </h2>
         <div class="flex items-center gap-4">
-          <span class="text-sm text-gray-400">24 files</span>
+          <span id="sharedFileCount" class="text-sm text-gray-400">0 files</span>
           <button onclick="document.getElementById('sharedFileInputDashboard').click()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -248,69 +248,7 @@
       
       <div class="p-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="sharedFilesGrid">
-          <!-- Dummy file cards -->
-          <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 hover:bg-neutral-700 transition-colors cursor-pointer">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-white text-sm font-medium truncate">Project_Report.pdf</p>
-                <p class="text-gray-500 text-xs">2.4 MB · John Doe</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 hover:bg-neutral-700 transition-colors cursor-pointer">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-white text-sm font-medium truncate">screenshot_01.png</p>
-                <p class="text-gray-500 text-xs">856 KB · Jane Smith</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 hover:bg-neutral-700 transition-colors cursor-pointer">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-                </svg>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-white text-sm font-medium truncate">main.py</p>
-                <p class="text-gray-500 text-xs">12 KB · Mike Johnson</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 hover:bg-neutral-700 transition-colors cursor-pointer">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-              </div>
-              <div class="min-w-0 flex-1">
-                <p class="text-white text-sm font-medium truncate">data_analysis.xlsx</p>
-                <p class="text-gray-500 text-xs">1.1 MB · Emily Wilson</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- View All Files Link -->
-        <div class="mt-4 text-center">
-          <button class="text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors">
-            View all 24 files →
-          </button>
+          <!-- Populated by JavaScript -->
         </div>
       </div>
     </div>
@@ -622,6 +560,7 @@
     renderCalendar();
     updateTodayEvents();
     initializeChatUser();
+    fetchDashboardSharedFiles();
   });
 
   async function initializeChatUser() {
@@ -1319,6 +1258,15 @@
   window.handleChatInputChange = handleChatInputChange;
   window.handleChatInputKeydown = handleChatInputKeydown;
   window.selectSlashCommand = selectSlashCommand;
+  window.previousMonth = previousMonth;
+  window.nextMonth = nextMonth;
+  window.openAddEventModal = openAddEventModal;
+  window.closeEventModal = closeEventModal;
+  window.saveEvent = saveEvent;
+  window.deleteEvent = deleteEvent;
+  window.refreshDashboard = refreshDashboard;
+  window.downloadBase64File = downloadBase64File;
+  window.handleSharedFileUpload = handleSharedFileUpload;
 
   document.addEventListener('paste', function(event) {
     if (document.getElementById('chatModal').classList.contains('hidden')) return;
@@ -1326,6 +1274,79 @@
       window.handlePastedChatImage(event);
     }
   });
+
+  // ================================
+  // DASHBOARD SHARED FILES
+  // ================================
+  async function fetchDashboardSharedFiles() {
+    try {
+      const groupName = document.getElementById('dashboardGroupName').textContent || '';
+      if (!groupName) {
+        console.warn('Group name not found for shared files fetch');
+        return;
+      }
+
+      const groupId = await resolveActiveGroupId(groupName);
+      const res = await fetch(`${javaURI}/api/groups/chat/${groupId}/files`, fetchOptions);
+      if (!res.ok) throw new Error('Failed to load shared files');
+      const files = await res.json();
+      renderDashboardSharedFiles(files);
+    } catch (err) {
+      console.error('Shared files fetch failed', err);
+    }
+  }
+
+  function renderDashboardSharedFiles(files) {
+    const grid = document.getElementById('sharedFilesGrid');
+    const fileCount = document.getElementById('sharedFileCount');
+    
+    grid.innerHTML = '';
+
+    if (!files || files.length === 0) {
+      grid.innerHTML = '<p class="text-gray-500 text-sm col-span-full text-center py-6">No files shared yet</p>';
+      fileCount.textContent = '0 files';
+      return;
+    }
+
+    fileCount.textContent = `${files.length} file${files.length !== 1 ? 's' : ''}`;
+
+    files.forEach(file => {
+      const card = document.createElement('div');
+      card.className = 'bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 hover:bg-neutral-700 transition-colors';
+
+      const isImage = isImageFile(file.filename);
+      let html = '<div class="flex items-start gap-3">';
+
+      if (isImage) {
+        const mimeType = getImageMimeType(file.filename);
+        html += `<img src="data:${mimeType};base64,${file.base64Data}" alt="${file.filename}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-neutral-600" />`;
+      } else {
+        const colorClass = getFileIconColorClass(file.filename);
+        html += `<div class="w-10 h-10 bg-${colorClass}/20 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-${colorClass}-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>`;
+      }
+
+      const fileSizeKB = (file.base64Data.length / 4 * 3 / 1024).toFixed(1);
+      html += `<div class="min-w-0 flex-1 cursor-pointer" onclick="downloadBase64File('${file.filename}', '${file.base64Data}')">
+        <p class="text-white text-sm font-medium truncate hover:text-indigo-400 transition-colors">${file.filename}</p>
+        <p class="text-gray-500 text-xs">${fileSizeKB} KB</p>
+      </div></div>`;
+
+      card.innerHTML = html;
+      grid.appendChild(card);
+    });
+  }
+
+  function getFileIconColorClass(filename) {
+    if (/\.pdf$/i.test(filename)) return 'blue';
+    if (/\.(jpg|jpeg|png|gif)$/i.test(filename)) return 'green';
+    if (/\.(py|js|ts|java|cpp|c)$/i.test(filename)) return 'yellow';
+    if (/\.(xlsx|xls|csv)$/i.test(filename)) return 'purple';
+    return 'gray';
+  }
 
   function refreshDashboard() {
     // Refresh dashboard data - placeholder for now
@@ -1365,8 +1386,10 @@
       }
 
       const result = await res.json();
-      alert(`File "${result.filename}" uploaded successfully!`);
-      refreshDashboard();
+      console.log(`File "${result.filename}" uploaded successfully!`);
+      
+      // Refresh the shared files grid
+      await fetchDashboardSharedFiles();
     } catch (error) {
       console.error('File upload error:', error);
       alert(`Error uploading file: ${error.message}`);
