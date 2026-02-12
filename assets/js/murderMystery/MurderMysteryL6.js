@@ -78,10 +78,10 @@ export default MurderMysteryBossFight;
 --- BEFORE THE FIGHT ---
 
 Narrator:
-"The air grows cold as you step forward. You can tell, the end is near."
+"The air grows cold as you step forward. The frigid air makes you uneasy. You can tell, the end is near."
 
 Narrator:
-"Beyond this chamber waits the perpetrator."
+"Beyond this chamber waits the perpetrator. The one responsible for the string of murders that have plagued this town"
 
 Narrator:
 "Take this bow. You will need it."
