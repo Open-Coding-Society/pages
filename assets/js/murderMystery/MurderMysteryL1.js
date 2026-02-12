@@ -47,8 +47,8 @@ class MurderMysteryL1 {
 
    const sprite_data_suspect = {
     id: 'Suspect',
-    src: path + "/images/mansionGame/skeleton_lvl3.png", 
-    SCALE_FACTOR: 3,
+    src: path + "/images/mansionGame/skeleton_key.png", // placeholder sprite
+    SCALE_FACTOR: 20,
     STEP_FACTOR: 1000,
     ANIMATION_RATE: 0,
     // Position the suspect on the island, away from the boat 
