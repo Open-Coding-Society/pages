@@ -2,7 +2,7 @@ import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackgro
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
-class MurderMysteryLevel1S1 {
+class GameLevelSub1 {
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -40,55 +40,28 @@ class MurderMysteryLevel1S1 {
         keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
     };
 
-
-    const sprite_data_boat = {
-        id: 'Boat',
-        src: path + "/images/murderMystery/boat.png",
-        SCALE_FACTOR: 2,
-        STEP_FACTOR: 1000, // Same speed as Archie
-        ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 250, y: 400 }, // Positioned slightly under Archie
-        pixels: { height: 200, width: 400 }, // Adjust based on your boat image size
-        orientation: { rows: 1, columns: 1 },
-        down: { row: 0, start: 0, columns: 1 },
-        downRight: {row: 0, start: 0, columns: 1},
-        downLeft: {row: 0, start: 0, columns: 1},
-        left: { row: 0, start: 0, columns: 1 },
-        right: { row: 0, start: 0, columns: 1 },
-        up: { row: 0, start: 0, columns: 1 },
-        upLeft: {row: 0, start: 0, columns: 1},
-        upRight: {row: 0, start: 0, columns: 1},
-        hitbox: { widthPercentage: 0.8, heightPercentage: 0.8 },
-        keypress: { left: 65, right: 68, up: 87, down: 83 } // Same keys as Archie
-   };
-
-
-    const sprite_data_island = {
-        id: 'Island',
-        greeting: "You've reached the island! Press E to disembark.",
+    const sprite_data_ghost = {
+        id: 'ghost',
+        greeting: "Please...Help...",
         src: path + "/images/murderMystery/island_target.png", // An invisible or small target sprite
-        SCALE_FACTOR: 5,
+        SCALE_FACTOR: 4,
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: width - 200, y: 100 }, // Placed at the right edge
+        INIT_POSITION: { x: width - 200, y: height - 100 }, // Placed at the right edge
         pixels: { height: 100, width: 100 },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
-        interact: function() {
-            alert("Level 1 Complete! You are stepping onto the island.");
-            // Transition logic would go here
-        }
     };
+
 
 
     this.classes = [
             { class: GameEnvBackground, data: image_data_background },
-            { class: Player, data: sprite_data_boat },   // Boat spawns first
-            { class: Player, data: sprite_data_archie }, // Archie spawns on top
-            { class: Npc, data: sprite_data_island }    // The goal
+            { class: Player, data: sprite_data_archie }, // Archie sprite
+            { class: Npc, data: sprite_data_ghost }    // The ghost npc
         ];
    
 }
 }
 
-export default MurderMysteryLevel1S1;
+export default GameLevelSub1;

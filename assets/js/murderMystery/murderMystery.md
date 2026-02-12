@@ -14,12 +14,12 @@ permalink: /gamify/murdermystery
     // Adnventure Game assets locations
     import Game from "/assets/js/GameEnginev1/essentials/Game.js";
     import MurderMysteryL1 from "/assets/js/murderMystery/MurderMysteryL1.js";
-    import MurderMysteryL2 from "/assets/js/murderMystery/MurderMysteryL2.js";
     import MurderMysteryL3 from "/assets/js/murderMystery/MurderMysteryL3.js";
     import MurderMysteryL4 from "/assets/js/murderMystery/MurderMysteryL4.js";
     import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+    import { initCheats } from "/assets/js/murderMystery/cheats.js";
 
-    const gameLevelClasses = [MurderMysteryL1, MurderMysteryL2, MurderMysteryL3, MurderMysteryL4];
+    const gameLevelClasses = [MurderMysteryL1, MurderMysteryL3, MurderMysteryL4];
 
     // Web Server Environment data
     const environment = {
@@ -35,4 +35,6 @@ permalink: /gamify/murdermystery
     // Launch Adventure Game and keep the returned Game instance
     const game = Game.main(environment);
 
+    // Initialize cheats/debug features
+    initCheats(game);
 </script>
