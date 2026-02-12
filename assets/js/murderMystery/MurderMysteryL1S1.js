@@ -42,7 +42,7 @@ class GameLevelSub1 {
 
     const sprite_data_ghost = {
         id: 'ghost',
-        greeting: "Please...Help...",
+        greeting: "Arrr… ye can see me, can ye? Good. Press E to hear me tale",
         src: path + "/images/murderMystery/ghost.png", // An invisible or small target sprite
         SCALE_FACTOR: 4,
         STEP_FACTOR: 1000,
@@ -53,8 +53,7 @@ class GameLevelSub1 {
         down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
         currentQuestionIndex: 0,
-        dialogues: ["Arrr… ye can see me, can ye? Good. Then ye has been chosen to hear me tale",
-            "A blade took me in the dark, quiet as a whisper. No duel. No honor. Just a coward's strike while I dreamt",
+        dialogues: ["A blade took me in the dark, quiet as a whisper. No duel. No honor. Just a coward's strike while I dreamt",
             "But I can't stray far from where I died.",
             "If ye'd help a restless spirit, find the traitor who did this to me.",
             "The first suspect will be on an island. Sail east until ye find them"
