@@ -1,0 +1,430 @@
+<style>
+  /* ===== MEGA QUEST HUB PROGRESS BAR (Main Page) ===== */
+
+/* Overall progress container -  */
+#overall-progress-container .module-progress {
+  position: relative;
+  width: 100%;
+  height: 24px; /* Much thicker than mini-quest bars */
+  background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 2px 12px rgba(0, 0, 0, 0.5),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* The overall progress bar - with color transitions */
+#overall-progress {
+  height: 100%;
+  border-radius: 16px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.6s ease;
+  position: relative;
+  box-shadow: 0 0 30px rgba(255, 107, 107, 0.6);
+}
+
+/* Starting color - Red (0-16% = 0-1 modules) */
+#overall-progress[style*="width: 0"],
+#overall-progress[style*="width: 1"],
+#overall-progress[style*="width: 2"],
+#overall-progress[style*="width: 3"],
+#overall-progress[style*="width: 4"],
+#overall-progress[style*="width: 5"],
+#overall-progress[style*="width: 6"],
+#overall-progress[style*="width: 7"],
+#overall-progress[style*="width: 8"],
+#overall-progress[style*="width: 9"],
+#overall-progress[style*="width: 10"],
+#overall-progress[style*="width: 11"],
+#overall-progress[style*="width: 12"],
+#overall-progress[style*="width: 13"],
+#overall-progress[style*="width: 14"],
+#overall-progress[style*="width: 15"],
+#overall-progress[style*="width: 16"] {
+  background: linear-gradient(90deg, #ff6b6b 0%, #ee5a6f 100%);
+  box-shadow: 0 0 30px rgba(255, 107, 107, 0.6);
+}
+
+/* Orange (17-33% = 1-2 modules) */
+#overall-progress[style*="width: 17"],
+#overall-progress[style*="width: 18"],
+#overall-progress[style*="width: 19"],
+#overall-progress[style*="width: 20"],
+#overall-progress[style*="width: 21"],
+#overall-progress[style*="width: 22"],
+#overall-progress[style*="width: 23"],
+#overall-progress[style*="width: 24"],
+#overall-progress[style*="width: 25"],
+#overall-progress[style*="width: 26"],
+#overall-progress[style*="width: 27"],
+#overall-progress[style*="width: 28"],
+#overall-progress[style*="width: 29"],
+#overall-progress[style*="width: 30"],
+#overall-progress[style*="width: 31"],
+#overall-progress[style*="width: 32"],
+#overall-progress[style*="width: 33"] {
+  background: linear-gradient(90deg, #ffa45c 0%, #ff8c42 100%);
+  box-shadow: 0 0 30px rgba(255, 164, 92, 0.6);
+}
+
+/* Yellow (34-50% = 2-3 modules) */
+#overall-progress[style*="width: 34"],
+#overall-progress[style*="width: 35"],
+#overall-progress[style*="width: 36"],
+#overall-progress[style*="width: 37"],
+#overall-progress[style*="width: 38"],
+#overall-progress[style*="width: 39"],
+#overall-progress[style*="width: 40"],
+#overall-progress[style*="width: 41"],
+#overall-progress[style*="width: 42"],
+#overall-progress[style*="width: 43"],
+#overall-progress[style*="width: 44"],
+#overall-progress[style*="width: 45"],
+#overall-progress[style*="width: 46"],
+#overall-progress[style*="width: 47"],
+#overall-progress[style*="width: 48"],
+#overall-progress[style*="width: 49"],
+#overall-progress[style*="width: 50"] {
+  background: linear-gradient(90deg, #ffd93d 0%, #f9ca24 100%);
+  box-shadow: 0 0 30px rgba(255, 217, 61, 0.6);
+}
+
+/* Light Green (51-66% = 3-4 modules) */
+#overall-progress[style*="width: 51"],
+#overall-progress[style*="width: 52"],
+#overall-progress[style*="width: 53"],
+#overall-progress[style*="width: 54"],
+#overall-progress[style*="width: 55"],
+#overall-progress[style*="width: 56"],
+#overall-progress[style*="width: 57"],
+#overall-progress[style*="width: 58"],
+#overall-progress[style*="width: 59"],
+#overall-progress[style*="width: 60"],
+#overall-progress[style*="width: 61"],
+#overall-progress[style*="width: 62"],
+#overall-progress[style*="width: 63"],
+#overall-progress[style*="width: 64"],
+#overall-progress[style*="width: 65"],
+#overall-progress[style*="width: 66"] {
+  background: linear-gradient(90deg, #a8e063 0%, #7ed957 100%);
+  box-shadow: 0 0 30px rgba(168, 224, 99, 0.6);
+}
+
+/* Medium Green (67-83% = 4-5 modules) */
+#overall-progress[style*="width: 67"],
+#overall-progress[style*="width: 68"],
+#overall-progress[style*="width: 69"],
+#overall-progress[style*="width: 70"],
+#overall-progress[style*="width: 71"],
+#overall-progress[style*="width: 72"],
+#overall-progress[style*="width: 73"],
+#overall-progress[style*="width: 74"],
+#overall-progress[style*="width: 75"],
+#overall-progress[style*="width: 76"],
+#overall-progress[style*="width: 77"],
+#overall-progress[style*="width: 78"],
+#overall-progress[style*="width: 79"],
+#overall-progress[style*="width: 80"],
+#overall-progress[style*="width: 81"],
+#overall-progress[style*="width: 82"],
+#overall-progress[style*="width: 83"] {
+  background: linear-gradient(90deg, #56cc9d 0%, #3ebd93 100%);
+  box-shadow: 0 0 30px rgba(86, 204, 157, 0.6);
+}
+
+/* Full Green - COMPLETED! (84-100% = 5-6 modules) */
+#overall-progress[style*="width: 84"],
+#overall-progress[style*="width: 85"],
+#overall-progress[style*="width: 86"],
+#overall-progress[style*="width: 87"],
+#overall-progress[style*="width: 88"],
+#overall-progress[style*="width: 89"],
+#overall-progress[style*="width: 90"],
+#overall-progress[style*="width: 91"],
+#overall-progress[style*="width: 92"],
+#overall-progress[style*="width: 93"],
+#overall-progress[style*="width: 94"],
+#overall-progress[style*="width: 95"],
+#overall-progress[style*="width: 96"],
+#overall-progress[style*="width: 97"],
+#overall-progress[style*="width: 98"],
+#overall-progress[style*="width: 99"],
+#overall-progress[style*="width: 100"] {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.9);
+  animation: celebration-pulse 1.5s ease-in-out infinite;
+}
+
+/* Celebration pulse animation for 100% */
+@keyframes celebration-pulse {
+  0%, 100% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.9);
+    transform: scaleY(1);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(16, 185, 129, 1);
+    transform: scaleY(1.05);
+  }
+}
+
+/* Animated shimmer effect (works on all states) */
+#overall-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: mega-shimmer 2.5s infinite;
+}
+
+@keyframes mega-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Progress text styling */
+#progress-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+/* Completion celebration text */
+#progress-text.completed {
+  background: linear-gradient(90deg, #10b981, #059669, #10b981);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  #overall-progress-container .module-progress {
+    height: 20px;
+  }
+  
+  #progress-text {
+    font-size: 1rem;
+  }
+}
+</style>
+
+<!-- Prerequisites links (unchanged) -->
+{% if page.lxdData.Prequisites %}
+<div class="mb-8">
+  <ul class="flex flex-wrap gap-4 justify-center">
+    {% for prereq in page.lxdData.Prequisites %}
+      <li><a href="{{ site.baseurl}}{{ prereq.link }}" class="iridescent flex-1 text-white text-white text-center py-2 rounded-lg font-semibold transition">{{ prereq.title }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<!-- Progress Overview -->
+<div class="mb-8 text-center" id="overall-progress-container">
+  <div class="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
+    <h3 class="text-white font-semibold mb-3">Learning Progress</h3>
+    <div class="module-progress">
+      <div class="progress-bar" id="overall-progress"></div>
+    </div>
+    <p class="text-gray-300 text-sm" id="progress-text">Complete modules C1-C6 to earn your certificate</p>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-8 bg-black/5 backdrop-blur-sm rounded-xl relative">
+  <div class="absolute -inset-1 bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 rounded-xl opacity-40 blur-xl"></div>
+  <div class="relative z-10">
+
+    <!-- Title and Description (unchanged) -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">{{ page.lxdData.Title }}</h2>
+      <p class="text-xl text-gray-300 max-w-4xl mx-auto">{{ page.lxdData.Description }}</p>
+    </div>
+
+    <!-- Module Cards Grid (unchanged styling) -->
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-12">
+      {% for topic in page.lxdData.Topics %}
+        <div class="bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2 card-hover-effects"
+         data-module="c{{ topic.Level }}"
+         data-total="{{ topic.LessonCount | default: 6 }}">
+          
+          <!-- Module Status Badge -->
+          <div class="module-status">
+            <span class="status-badge status-locked module-badge">Locked</span>
+          </div>
+          
+          <!-- Image-->
+          <div class="relative h-40 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 mb-4">
+            <img src="{{ site.baseurl }}{{ topic.Image }}" alt="{{ topic.Alt }}" class="w-full h-full object-contain transition-all duration-300 group-hover:scale-110">
+          </div>
+
+          
+          <!-- Module Progress Bar -->
+          <div class="px-6">
+            <div class="module-progress">
+              <div class="progress-bar module-progress-bar"></div>
+            </div>
+          </div>
+          
+          <div class="p-6 pt-2">
+            <h3 class="text-xl font-bold text-white mb-1">{{ topic.Title }}</h3>
+            <p class="text-sm text-gray-400 mb-2">{{ topic.Genre }} | Level: {{ topic.Level }}</p>
+            <p class="text-gray-300 text-sm mb-4">{{ topic.Description }}</p>
+            <div class="mb-4">
+              <span class="text-sm font-semibold text-gray-200">Categories:</span>
+              <div class="flex flex-wrap gap-1 mt-1">
+                {% for cat in topic.Categories %}
+                  <span class="bg-blue-900 text-blue-200 text-xs px-2 py-1 rounded-full">{{ cat }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          <div class="flex gap-2">
+            <a href="{{ site.baseurl }}{{ topic.Lessons }}" class="iridescent flex-1 text-white text-center py-2 rounded-lg font-semibold transition lesson-link">Start Module</a>
+          </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Quest Hub Locking/Progress -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const NS = "bigsix";
+  const DEFAULT_TOTAL = 6;
+
+  // key helpers (unchanged idea)
+  const key = (slug,n) => `${NS}:${slug}:lesson:${n}`;
+  const lessonDone = (slug,n) => localStorage.getItem(key(slug,n)) === "done";
+
+  // derive slug from the lesson link (your original fallback)
+  function getSlugFromCard(card) {
+    const link = card.querySelector(".lesson-link");
+    if (!link) return null;
+    try {
+      const url = new URL(link.getAttribute("href"), window.location.origin);
+      const parts = url.pathname.split("/").filter(Boolean);
+      const i = parts.indexOf("bigsix");
+      return (i >= 0 && parts[i+1]) ? parts[i+1] : null;
+    } catch { return null; }
+  }
+
+  // per-card total: data-total if present, else 6
+  function getTotal(card) {
+    const t = Number(card.dataset.total);
+    return Number.isFinite(t) && t > 0 ? t : DEFAULT_TOTAL;
+  }
+
+  // count done up to a passed total
+  function moduleCountDone(moduleKey, lessonCount) {
+    let completed = 0;
+
+    for (let i = 1; i <= lessonCount; i++) {
+      if (localStorage.getItem(`bigsix:${moduleKey}:lesson:${i}`) === "done") {
+        completed++;
+      }
+    }
+
+    return completed; // ✅ return COUNT, not boolean
+  }
+
+
+
+  // collect modules in visual order
+  const cards = Array.from(document.querySelectorAll('[data-module]'));
+  const modules = cards.map(card => {
+    const slug = getSlugFromCard(card);
+    if (!slug) return null;
+    const total = getTotal(card);
+    return { card, slug, total };
+  }).filter(Boolean);
+
+  // render + gating
+  let completedModules = 0;
+
+  modules.forEach((m, idx) => {
+    const { card, slug, total } = m;
+    const badge = card.querySelector(".module-badge");
+    const bar   = card.querySelector(".module-progress-bar");
+    const link  = card.querySelector(".lesson-link");
+
+    const doneCnt   = moduleCountDone(slug, total);
+    const completed = doneCnt >= total;
+    const prevIsDone = idx === 0
+      ? true
+      : moduleCountDone(modules[idx-1].slug, modules[idx-1].total) >= modules[idx-1].total;
+
+    // progress bar
+    if (bar) {
+      const pct = Math.round((doneCnt / total) * 100);
+      bar.style.width = pct + "%";
+      bar.className = "progress-bar module-progress-bar" + (completed ? " completed" : doneCnt ? " partial" : "");
+    }
+
+    // badge
+    if (badge) {
+      if (completed) { badge.textContent = "Completed"; badge.className = "status-badge status-completed module-badge"; completedModules++; }
+      else if (prevIsDone) { badge.textContent = "Available"; badge.className = "status-badge status-current module-badge"; }
+      else { badge.textContent = "Locked"; badge.className = "status-badge status-locked module-badge"; }
+    }
+
+    // CTA
+    if (link) {
+      if (prevIsDone) {
+        link.textContent = completed ? "Review" : "Start Module";
+        link.style.opacity = "";
+        link.style.pointerEvents = "";
+        link.setAttribute("aria-disabled", "false");
+      } else {
+        link.textContent = "Locked";
+        link.style.opacity = "0.5";
+        link.style.pointerEvents = "none";
+        link.setAttribute("aria-disabled", "true");
+      }
+    }
+  });
+
+  // overall progress
+  const overall = document.getElementById("overall-progress");
+  const progressText = document.getElementById("progress-text");
+  if (overall) {
+    const pct = Math.round((completedModules / modules.length) * 100);
+    overall.style.width = pct + "%";
+
+    overall.className = ""; // reset
+    if (pct <= 16) overall.classList.add("p-red");
+    else if (pct <= 33) overall.classList.add("p-orange");
+    else if (pct <= 50) overall.classList.add("p-yellow");
+    else if (pct <= 66) overall.classList.add("p-lightgreen");
+    else if (pct <= 83) overall.classList.add("p-green");
+    else overall.classList.add("p-complete");
+  }
+
+  if (progressText) {
+    const allDone = modules.length > 0 && completedModules === modules.length;
+    progressText.textContent = allDone
+      ? "🎉 Congratulations! All modules completed!"
+      : `${completedModules}/${modules.length} modules completed`;
+    progressText.classList.toggle("completed", allDone);
+  }
+});
+</script>
