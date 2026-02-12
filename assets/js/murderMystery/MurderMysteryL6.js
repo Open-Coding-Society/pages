@@ -72,3 +72,54 @@ class MurderMysteryBossFight {
 }
 
 export default MurderMysteryBossFight;
+
+/*
+
+--- BEFORE THE FIGHT ---
+
+Narrator:
+"The air grows cold as you step forward. The trail ends here."
+
+Narrator:
+"Beyond this chamber waits the perpetrator"
+
+Narrator:
+"Take this bow. You will need it"
+
+Narrator:
+"Uncover the truth. End the murders."
+
+Narrator:
+"Good luck."
+
+------------------------------
+
+--- AFTER THE REAPER IS DEFEATED ---
+
+Narrator:
+"The captain falls. Dissolving into the shadows."
+
+Narrator:
+"From the ashes, an enchanted sword remains — humming with
+a power not meant for mortal hands."
+
+Narrator:
+"The weapon now yours."
+
+Narrator:
+"The mystery is solved. The people are safe once more."
+
+Narrator:
+"Congratulations."
+
+------------------------------
+
+--- CREDITS ---
+
+"Thank you for playing."
+"Murder Mystery"
+
+Thank to our classmates, Mr. Mort and Anusha for guiding us through this trimester
+
+The End.
+*/
