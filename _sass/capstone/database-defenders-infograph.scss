@@ -1,0 +1,334 @@
+// Database Defenders Infographic Styles
+// Located in _sass/capstone/
+
+// Variables - Dark security/terminal theme
+$dd-primary: #00e5ff;        // Cyan — data/monitoring accent
+$dd-secondary: #69f0ae;      // Green — healthy/safe state
+$dd-warning: #ff6e40;        // Orange-red — alert/anomaly state
+$dd-dark-bg: #050d1a;        // Deep navy black background
+$dd-card-bg: #0a1628;        // Slightly lighter navy for cards
+$dd-text-muted: #8fa3c0;
+$dd-text-light: #d0e4f7;
+
+// Main Container
+.dd-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+// Header Section
+.dd-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, $dd-dark-bg 0%, #071020 50%, #0a1628 100%);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($dd-primary, 0.3);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba($dd-primary, 0.02) 2px,
+      rgba($dd-primary, 0.02) 4px
+    );
+    pointer-events: none;
+  }
+}
+
+.dd-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $dd-primary, $dd-secondary);
+  color: #000;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+.dd-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, $dd-primary, $dd-secondary, $dd-primary);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: dd-gradient 3s ease infinite;
+  margin: 0 0 1rem 0;
+}
+
+@keyframes dd-gradient {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.dd-description {
+  color: $dd-text-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Card Section
+.dd-card {
+  background: linear-gradient(145deg, $dd-card-bg 0%, #0d1f3c 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($dd-primary, 0.25);
+  box-shadow: 0 20px 60px rgba($dd-primary, 0.1), 0 0 0 1px rgba($dd-secondary, 0.05);
+}
+
+.dd-card-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Visual Section
+.dd-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba($dd-primary, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba($dd-primary, 0.2);
+
+  @media (max-width: 1024px) {
+    grid-column: 1 / -1;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+.dd-image-link {
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba($dd-primary, 0.3);
+  width: 100%;
+
+  &:hover .dd-image {
+    transform: scale(1.05);
+  }
+
+  &:hover .dd-overlay {
+    opacity: 1;
+  }
+}
+
+.dd-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.dd-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba($dd-primary, 0.9), rgba($dd-secondary, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #000;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+}
+
+.dd-status {
+  background: linear-gradient(135deg, $dd-primary, $dd-secondary);
+  color: #000;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.dd-team {
+  text-align: center;
+  margin-top: auto;
+}
+
+.dd-team-label {
+  display: block;
+  color: $dd-text-muted;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.dd-team-name {
+  display: block;
+  color: $dd-primary;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+// Content Section
+.dd-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($dd-secondary, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba($dd-secondary, 0.2);
+}
+
+.dd-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $dd-text-light;
+  margin: 0 0 0.25rem 0;
+}
+
+.dd-subtitle {
+  color: $dd-secondary;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($dd-secondary, 0.25);
+}
+
+// Key Points
+.dd-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.dd-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: $dd-text-light;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.dd-check {
+  color: $dd-secondary;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+// Tech Stack
+.dd-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.dd-tech-tag {
+  background: rgba($dd-primary, 0.1);
+  color: $dd-primary;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba($dd-primary, 0.3);
+  font-family: 'Courier New', monospace;
+}
+
+// Details Section
+.dd-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($dd-warning, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba($dd-warning, 0.2);
+}
+
+.dd-section-title {
+  color: $dd-text-light;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($dd-primary, 0.35);
+}
+
+.dd-about {
+  color: $dd-text-muted;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+// Impact List
+.dd-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.dd-impact-item {
+  background: rgba($dd-secondary, 0.08);
+  color: $dd-text-light;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid $dd-secondary;
+}
+
+// Button
+.dd-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $dd-primary, $dd-secondary);
+  color: #000;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($dd-primary, 0.4);
+    color: #000;
+    text-decoration: none;
+  }
+}
