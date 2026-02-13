@@ -47,8 +47,8 @@ class MurderMysteryL0 {
         SCALE_FACTOR: 4,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 1200, y: 300 }, // Placed at the right edge
-        pixels: { height: 500, width: 500 },
+        INIT_POSITION: { x: 1200, y: 300 },
+        pixels: { height: 500, width: 120 },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.3, heightPercentage: 0.3 },
