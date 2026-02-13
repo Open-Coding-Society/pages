@@ -50,6 +50,18 @@ permalink: /rpg/gamebuilder
 <!-- title banner for the GameBuilder page -->
 <div class="gamebuilder-title">{{page.title}}</div>
 
+<!-- Ensure GameTemplatesV1 is available as a global by loading templates.js -->
+<script>
+    (function(){
+        try {
+            const s = document.createElement('script');
+            s.src = window.location.origin + '{{ site.baseurl }}/assets/js/GameEnginev1/templates/templates.js';
+            s.defer = true;
+            document.head.appendChild(s);
+        } catch (e) { console.warn('Could not load GameTemplatesV1', e); }
+    })();
+</script>
+
 <!-- main builder layout: left (assets) + right (code and game) -->
 <div class="creator-layout">
     <div class="col-asset">
