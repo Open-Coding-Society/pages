@@ -1,4 +1,5 @@
 import GameControl from './GameControl.js';
+import Leaderboard from '../Leaderboard.js';
 class Game {
     constructor(environment) {
         this.environment = environment;
@@ -16,6 +17,15 @@ class Game {
         const gameLevelClasses = environment.gameLevelClasses;
         this.gameControl = new GameControl(this, gameLevelClasses);
         this.gameControl.start();
+
+        // Instantiate leaderboard after game starts. Wrap in try/catch so failures
+        // (network or missing DOM) don't break game startup.
+        try {
+            const parentId = this.gameCanvas && this.gameCanvas.id ? this.gameCanvas.id : null;
+            this.leaderboard = new Leaderboard(this, { parentId, initiallyHidden: true });
+        } catch (e) {
+            console.error('Leaderboard init failed:', e);
+        }
     }
 
     static main(environment) {
