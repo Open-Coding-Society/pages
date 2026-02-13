@@ -250,7 +250,7 @@ permalink: /rpg/gamebuilder
             <button class="view-btn active" data-view="split">Split</button>
         </div>
         <div class="main-content">
-            <!-- game panel: iframe runner + drawing overlay -->
+            <!-- game panel + drawing overlay -->
             <div class="glass-panel panel-game">
                 <div class="panel-header">Game View</div>
                 <div class="game-frame">
@@ -534,13 +534,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let envTopOffset = 0;
     let envLeftOffset = 0;
-    // live game container dimensions (from iframe)
+    // live game container dimensions
     let envWidth = 0;
     let envHeight = 0;
     // track overlay size to rescale drawn shapes on container changes
     let overlayPrevW = 0;
     let overlayPrevH = 0;
-    // Initialize env metrics using local container (no iframe).
+    // Initialize env metrics using local container.
     try {
         const containerEl = document.getElementById('game-container-builder');
         const rect = containerEl?.getBoundingClientRect?.() || { width: 0, height: 0 };
@@ -2468,7 +2468,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
         });
     });
 
-    /* SECTION: Runtime + iframe comms */
+    /* SECTION: Runtime */
     function safeCodeToRun() {
         const preferStaged = (typeof stagedStep !== 'undefined' && !['npc','walls'].includes(stagedStep));
         const preferred = (preferStaged && typeof stagedCode === 'string' && stagedCode.length) ? stagedCode : (ui.editor.value || '');
@@ -2720,8 +2720,3 @@ document.querySelector('.game-frame')?.addEventListener('click', () => {
     try { canvas?.focus?.(); } catch (_) {}
 });
 </script>
-
-<!-- Removed iframe key forwarding; local runner handles input directly. -->
-
-
-

@@ -55,7 +55,7 @@ class MurderMysteryL1 {
         SCALE_FACTOR: 5,
         STEP_FACTOR: 1000, // Same speed as Archie
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 250, y: 350 }, // Positioned slightly under Archie
+        INIT_POSITION: { x: 128, y: 128 }, // Positioned slightly under Archie
         pixels: { height: 200, width: 150}, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
