@@ -1,40 +1,69 @@
-// Modal styles
+// ===========================
+// Calendar Styles
+// ===========================
+// Standardized styling for calendar modals and components
+// Uses CSS custom properties from user-preferences.js for theme consistency
+//
+// THEME INTEGRATION
+// -----------------
+// This file uses CSS custom properties from user-preferences.js:
+//   --pref-bg-color, --pref-text-color, --pref-font-family, --pref-font-size
+//   --pref-accent-color, --pref-selection-color
+//   --panel, --panel-mid, --bg-0, --bg-1, --bg-2, --bg-3
+//   --text, --text-muted, --accent
+//
+// ===========================
+
+@import "mixins/buttons";
+@import "mixins/modals";
+
+// ===========================
+// Calendar Color Palette
+// ===========================
+// Using CSS custom properties from user-preferences.js for theme consistency
+
+$calendar-accent: var(--pref-accent-color, #6ae378ff);
+$calendar-danger: var(--pref-accent-color, #dc2626);
+$calendar-border: var(--accent, #CCCCCC);
+
+// ===========================
+// Modal Styles
+// ===========================
+
 .modal {
-  display: none;
-  position: fixed;
+  @include modal-overlay;
   z-index: 9999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
   padding-top: 50px;
 }
+
 .modal-content {
-  background-color: #222222;
+  background: linear-gradient(145deg, var(--panel), var(--panel-mid));
   margin: -2% auto;
   padding: 25px;
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   width: 80%;
   max-width: 600px;
-  color: white;
-  font-family: Arial, sans-serif;
+  color: var(--text);
+  font-family: var(--pref-font-family);
+  border: 1px solid var(--bg-3);
 }
+
 .close {
-  color: #333333;
+  color: var(--text-muted);
   float: right;
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
   transition: color 0.3s ease;
+  
   &:hover,
   &:focus {
-    color: #FF0000;
+    color: $calendar-danger;
     text-decoration: none;
   }
 }
+
 .modal-content {
   input,
   textarea,
@@ -43,35 +72,40 @@
     padding: 12px;
     margin: 15px 0;
     border-radius: 12px;
-    border: 1px solid #CCCCCC;
-    font-size: 16px;
-    background-color: #222222;
-    color: white;
+    border: 1px solid $calendar-border;
+    font-size: var(--pref-font-size, 16px);
+    background-color: var(--bg-1);
+    color: var(--text);
+    font-family: var(--pref-font-family);
   }
+  
   button {
+    @include text-button;
     width: 100%;
     padding: 12px 20px;
-    background-color: #000000;
-    color: #FFFFFF;
-    border: none;
+    background-color: var(--pref-accent-color, var(--bg-2));
+    color: var(--text);
     border-radius: 12px;
-    font-size: 16px;
-    cursor: pointer;
+    font-size: var(--pref-font-size, 16px);
     font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    
     &:hover {
-      background-color: #444444;
+      background-color: var(--pref-selection-color, var(--bg-3));
       transform: scale(1.05);
     }
   }
 }
 
-// Header
+// ===========================
+// Header & Calendar Container
+// ===========================
+
 h1 {
   display: none;
 }
+
 h2 {
-  color: white;
+  color: var(--text);
 }
 
 #calendar {
@@ -102,7 +136,7 @@ header {
 }
 
 .fc-toolbar-title {
-  color: white !important;
+  color: var(--text) !important;
 }
 
 .fc-view.fc-dayGridDay-view {
@@ -127,11 +161,19 @@ header {
   padding: 12px;
   margin: 15px 0;
   border-radius: 12px;
-  border: 1px solid #CCCCCC;
-  font-size: 16px;
-  background-color: #222222;
-  color: white;
+  border: 1px solid $calendar-border;
+  font-size: var(--pref-font-size, 16px);
+  background-color: var(--bg-1);
+  color: var(--text);
+  font-family: var(--pref-font-family);
   box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: var(--bg-2);
+    border-color: var(--pref-accent-color);
+  }
 }
 
 // Remove rounded corners from FullCalendar grid
@@ -216,52 +258,52 @@ td:has(> img[src*="logo.png"]) {
 // ===========================
 
 .fc-event-break {
-  background-color: #2a2a2a !important;
+  background-color: var(--bg-2) !important;
   border-color: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
 .fc-daygrid-day.break-day {
-  background-color: #2a2a2a !important;
+  background-color: var(--bg-2) !important;
 }
 
 // ===========================
 // Priority-based Event Colors
 // ===========================
+// Using accent color variations from theme for priority levels
 
-// Priority color variables
-$priority-p0: #dc2626; // Red 600
-$priority-p0-border: #b91c1c;
-$priority-p1: #ea580c; // Orange 600
-$priority-p1-border: #c2410c;
-$priority-p2: #ca8a04; // Yellow 600
-$priority-p2-border: #a16207;
-$priority-p3: #16a34a; // Green 600
-$priority-p3-border: #15803d;
+$priority-p0: var(--pref-accent-color, #dc2626); // Red 600
+$priority-p0-border: color-mix(in srgb, var(--pref-accent-color, #dc2626) 80%, #000 20%);
+$priority-p1: var(--pref-accent-color, #ea580c); // Orange 600
+$priority-p1-border: color-mix(in srgb, var(--pref-accent-color, #ea580c) 80%, #000 20%);
+$priority-p2: var(--pref-accent-color, #ca8a04); // Yellow 600
+$priority-p2-border: color-mix(in srgb, var(--pref-accent-color, #ca8a04) 80%, #000 20%);
+$priority-p3: var(--pref-accent-color, #16a34a); // Green 600
+$priority-p3-border: color-mix(in srgb, var(--pref-accent-color, #16a34a) 80%, #000 20%);
 
 .fc-event.priority-p0 {
   background-color: $priority-p0 !important;
   border-color: $priority-p0-border !important;
-  color: white !important;
+  color: var(--text) !important;
 }
 
 .fc-event.priority-p1 {
   background-color: $priority-p1 !important;
   border-color: $priority-p1-border !important;
-  color: white !important;
+  color: var(--text) !important;
 }
 
 .fc-event.priority-p2 {
   background-color: $priority-p2 !important;
   border-color: $priority-p2-border !important;
-  color: white !important;
+  color: var(--text) !important;
 }
 
 .fc-event.priority-p3 {
   background-color: $priority-p3 !important;
   border-color: $priority-p3-border !important;
-  color: white !important;
+  color: var(--text) !important;
 }
 
 // Priority badge in event title
@@ -276,19 +318,19 @@ $priority-p3-border: #15803d;
 
   &.p0 {
     background: $priority-p0;
-    color: white;
+    color: var(--text);
   }
   &.p1 {
     background: $priority-p1;
-    color: white;
+    color: var(--text);
   }
   &.p2 {
     background: $priority-p2;
-    color: white;
+    color: var(--text);
   }
   &.p3 {
     background: $priority-p3;
-    color: white;
+    color: var(--text);
   }
 }
 
