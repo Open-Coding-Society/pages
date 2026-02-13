@@ -5,409 +5,54 @@ description: Helping programmers understand how to create a game
 permalink: /rpg/gamebuilder
 ---
 
-<!-- page-level styles and UI layout for the GameBuilder interface -->
-<style>
-.page-content .wrapper { max-width: 100% !important; padding: 0 !important; }
+<!-- 
+  All GameBuilder styles are now in _sass/open-coding/game-builder.scss
+  This uses the standardized three-panel layout system with reusable mixins.
+  _sass/open-coding/
+  ├── game-builder.scss (reusable!)
+  │   ├── Layout mixins
+  │   ├── Visual mixins
+  │   ├── Form mixins
+  │   └── GameBuilder implementation
+  └── _main.scss
+      └── @import "game-builder"
 
-/* Hide BetterGameEngine control buttons in gamebuilder iframe */
+┌────────────────────────────────────────────────────────┐
+│                    Page Title                          │
+├─────────────┬──────────────────────────────────────────┤
+│             │                                          │
+│   Asset/    │         Main Content Panel               │
+│   Config    │  ┌─────────────────────────────────┐     │
+│   Panel     │  │     View Mode Controls          │     │
+│             │  ├─────────────────────────────────┤     │
+│  ┌────────┐ │  │                                 │     │
+│  │Section │ │  │   Code Editor / Preview Split   │     │
+│  │        │ │  │                                 │     │
+│  │Forms   │ │  │   - View Code Only              │     │
+│  │        │ │  │   - View Preview Only           │     │
+│  │Controls│ │  │   - Split View (Side-by-Side)   │     │
+│  │        │ │  │                                 │     │
+│  └────────┘ │  └─────────────────────────────────┘     │
+│             │                                           │
+└─────────────┴──────────────────────────────────────────┘
+    20% width            80% width (flexible)
+-->
+
+<!-- Minimal page-specific overrides only -->
+<style>
+/* Remove default page wrapper constraints for full-width layout */
+.page-content .wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+/* Hide GameEngine control buttons when embedded in GameBuilder iframe */
 iframe .pause-button-bar,
 iframe button.pause-btn,
 iframe .leaderboard-widget {
-    display: none !important;
-    visibility: hidden !important;
+  display: none !important;
+  visibility: hidden !important;
 }
-
-.gamebuilder-title {
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.creator-layout {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    height: 92vh;
-    box-sizing: border-box;
-}
-
-.col-asset { 
-    flex: 0 0 20%; 
-    display: flex; 
-    flex-direction: column; 
-}
-
-.col-main { 
-    flex: 1; 
-    display: flex; 
-    flex-direction: column; 
-    min-width: 0;
-    position: relative;
-}
-
-.col-main.view-code .panel-game { display: none; }
-.col-main.view-game .panel-code { display: none; }
-
-.col-main.view-code .panel-code,
-.col-main.view-game .panel-game {
-    flex: 1;
-}
-
-/* Split view: side-by-side layout */
-.col-main.view-split .main-content {
-    flex-direction: row;
-}
-
-.col-main.view-split .panel-game {
-    flex: 0 0 55%;
-}
-
-.col-main.view-split .panel-code {
-    flex: 1;
-}
-
-.view-controls {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 10px;
-}
-
-.view-btn {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
-    background: rgba(0,0,0,0.3);
-    cursor: pointer;
-    font-size: 0.8em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-}
-
-.view-btn.active {
-    background: rgba(255,255,255,0.1);
-    border-color: var(--pref-accent-color);
-}
-
-.view-btn:hover:not(.active) {
-    background: rgba(255,255,255,0.05);
-}
-
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-height: 0;
-}
-
-.glass-panel {
-    background: rgba(0,0,0,0.3);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.panel-header {
-    padding: 16px;
-    background: rgba(0,0,0,0.3);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.9em;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.panel-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.icon-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    position: relative;
-}
-
-.icon-btn.staged {
-    box-shadow: 0 0 10px rgba(0,200,0,0.9);
-    border-color: rgba(0,200,0,0.9);
-}
-
-.icon-btn:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.9);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    white-space: nowrap;
-    z-index: 1000;
-    pointer-events: none;
-}
-
-.step-indicator {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-right: 4px;
-}
-
-.scroll-form { flex: 1; overflow-y: auto; padding: 15px; }
-.asset-group {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 15px;
-}
-.group-title { 
-    font-size: 0.8em; 
-    font-weight: bold; 
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.add-item-btn {
-    width: 24px;
-    height: 24px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    line-height: 1;
-    padding: 0;
-}
-
-label { display: block; font-size: 0.7em; margin-bottom: 5px; }
-select, input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    margin-bottom: 10px;
-    color: #fff;
-    background: #000;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-select { color: #fff; background: #000; }
-option { color: #fff; background: #000; }
-.asset-group select,
-.wall-fields select { color: #fff; }
-select:disabled, option[disabled] { color: #fff; }
-
-.btn {
-    padding: 12px;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    font-size: 0.85em;
-}
-.btn-sm {
-    padding: 6px;
-    border-radius: 4px;
-    font-size: 0.7em;
-}
-.btn-confirm { }
-.btn-run { }
-.btn-danger { }
-
-.help-panel {
-    display: none;
-    position: absolute;
-    top: 50px;
-    right: 16px;
-    background: rgba(0,0,0,0.95);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    padding: 12px;
-    max-width: 300px;
-    z-index: 100;
-    font-size: 0.85em;
-    line-height: 1.4;
-}
-
-.help-panel.active { display: block; }
-
-.code-panel { flex: 1; position: relative; }
-.editor-container {
-    position: relative;
-    flex: 1;
-    width: 100%;
-    overflow: hidden;
-}
-.code-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-    font-family: 'Fira Code', 'Courier New', monospace;
-    font-size: 13px;
-    line-height: 20px; 
-    border: none;
-    resize: none;
-    outline: none;
-    z-index: 2;
-    white-space: pre;
-    overflow: auto;
-}
-.highlight-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 20px; 
-    box-sizing: border-box;
-    pointer-events: none;
-    z-index: 1;
-}
-.highlight-box {
-    position: absolute;
-    background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
-    border-left: 4px solid var(--pref-accent-color);
-    left: 10px;
-    width: calc(100% - 20px);
-    display: block !important; 
-}
-
-.highlight-persistent-block {
-    position: absolute;
-    background: rgba(255, 230, 0, 0.6); /* Opaque yellow highlight for added code */
-    border: 2px solid #ffdd00;
-    border-left-width: 4px;
-    left: 10px;
-    width: calc(100% - 20px);
-}
-
-.typing-highlight {
-    position: absolute;
-    background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
-    border-left: 4px solid var(--pref-accent-color);
-    left: 10px;
-    width: calc(100% - 20px);
-}
-
-.game-frame { flex: 1; }
-iframe { width: 100%; height: 100%; border: none; }
-.wall-slot { margin-top:8px; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.08); }
-.wall-fields label { display:block; }
-
-/* drawing overlay for walls/pass zones */
-.game-frame {
-    position: relative;
-}
-.draw-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none; 
-    z-index: 50;
-}
-.draw-overlay.active { pointer-events: auto; }
-.draw-overlay.mode-barrier { cursor: crosshair; }
-.draw-rect {
-    position: absolute;
-    box-sizing: border-box;
-}
-.draw-rect.barrier {
-    border: 2px solid #ff2d2d; 
-    background: rgba(255,0,0,0.05);
-}
-.draw-toolbar {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-.draw-btn {
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(0,0,0,0.3);
-    cursor: pointer;
-    font-size: 0.8em;
-}
-.draw-btn.active {
-    border-color: var(--pref-accent-color);
-    background: rgba(255,255,255,0.08);
-}
-
-@media (max-width: 768px) {
-    .creator-layout {
-        flex-direction: column;
-        height: auto;
-    }
-    
-    .col-asset { 
-        flex: none; 
-        max-height: 300px; 
-    }
-    
-    .col-main {
-        flex: none;
-        min-height: 600px;
-    }
-    
-    .col-main.view-code,
-    .col-main.view-game {
-    }
-    
-    .col-main.view-code .panel-game,
-    .col-main.view-game .panel-code {
-        display: flex !important;
-    }
-    
-    .col-main .main-content {
-        flex-direction: column !important;
-    }
-    
-    .col-main .panel-game { 
-        flex: 0 0 45% !important;
-    }
-    
-    .col-main .panel-code { 
-        flex: 1 !important;
-    }
-    
-    .view-controls {
-        display: none;
-    }
-    
-    .gamebuilder-title {
-        font-size: 1.2em;
-    }
-}
-
 </style>
 
 <!-- title banner for the GameBuilder page -->
