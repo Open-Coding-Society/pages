@@ -3,6 +3,8 @@ import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
 class MurderMysteryL0 {
+    static friendlyName = "Level 0: The Boat";
+
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
