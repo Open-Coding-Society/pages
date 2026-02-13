@@ -252,8 +252,12 @@ class Character extends GameObject {
         this.canvas.style.width = `${this.width}px`;
         this.canvas.style.height = `${this.height}px`;
         this.canvas.style.position = 'absolute';
-        this.canvas.style.left = `${this.position.x}px`;
-        this.canvas.style.top = `${this.gameEnv.top + this.position.y}px`;
+        const offsetLeft = this.gameEnv?.canvasOffsetLeft || 0;
+        const offsetTop = this.gameEnv?.canvasOffsetTop || 0;
+        const scaleX = this.gameEnv?.canvasScaleX || 1;
+        const scaleY = this.gameEnv?.canvasScaleY || 1;
+        this.canvas.style.left = `${offsetLeft + (this.position.x * scaleX)}px`;
+        this.canvas.style.top = `${offsetTop + (this.position.y * scaleY)}px`;
         
         // Use the zIndex from data if provided, otherwise use a default of 10
         this.canvas.style.zIndex = (this.data && this.data.zIndex !== undefined) ? this.data.zIndex : "10";

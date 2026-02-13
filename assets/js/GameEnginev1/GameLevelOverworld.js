@@ -1,7 +1,7 @@
-import Background from './Background.js';
-import Player from './Player.js';
-import Npc from './Npc.js';
-import GameControl from './GameControl.js';
+import Background from './essentials/Background.js';
+import Player from './essentials/Player.js';
+import Npc from './essentials/Npc.js';
+import GameControl from './essentials/GameControl.js';
 import GameLevelDesert from './GameLevelDesert.js';
 import Creeper from './Creeper.js';
 
@@ -107,11 +107,9 @@ class GameLevelOverworld {
         if (creeperObject) {
           creeperObject.hasExploded = true;
           creeperObject.isExploding = true;
-          // Stop movement safely using transform velocities if available
-          if (creeperObject.transform) {
-            creeperObject.transform.xv = 0;
-            creeperObject.transform.yv = 0;
-          }
+          
+          creeperObject.velocity.x = 0;
+          creeperObject.velocity.y = 0;
           
           creeperObject.startSequentialExplosion();
         } else {
@@ -178,45 +176,63 @@ class GameLevelOverworld {
         if (now - this.lastCollisionCheck < 100) return false;
         this.lastCollisionCheck = now;
 
-        // Prefer transform-based positions for accurate proximity
-        const ptx = (player && player.transform) ? player.transform.x : (player && (player.position?.x ?? player.INIT_POSITION?.x) || 0);
-        const pty = (player && player.transform) ? player.transform.y : (player && (player.position?.y ?? player.INIT_POSITION?.y) || 0);
+        let playerPos = null;
+        let playerWidth = 0;
+        let playerHeight = 0;
+        
+        const playerElement = document.getElementById('Player');
+        if (playerElement) {
+          const rect = playerElement.getBoundingClientRect();
+          const gameCanvas = document.querySelector('canvas');
+          const canvasRect = gameCanvas ? gameCanvas.getBoundingClientRect() : { left: 0, top: 0 };
+          
+          playerPos = {
+            x: rect.left - canvasRect.left,
+            y: rect.top - canvasRect.top
+          };
+          playerWidth = rect.width;
+          playerHeight = rect.height;
+        } else {
+          playerPos = player.position || player.INIT_POSITION || { x: 0, y: 0 };
+          const playerPixels = player.pixels || { width: 600, height: 1500 };
+          const playerScale = player.SCALE_FACTOR || 5;
+          playerWidth = playerPixels.width / playerScale;
+          playerHeight = playerPixels.height / playerScale;
+        }
 
-        const playerPixels = player.pixels || { width: 600, height: 1500 };
-        const playerScale = player.SCALE_FACTOR || 5;
-        const playerWidth = playerPixels.width / playerScale;
-        const playerHeight = playerPixels.height / playerScale;
-
-        const ctx = this.transform ? this.transform.x : (this.INIT_POSITION?.x || 0);
-        const cty = this.transform ? this.transform.y : (this.INIT_POSITION?.y || 0);
         const creeperWidth = this.pixels.width / this.SCALE_FACTOR;
         const creeperHeight = this.pixels.height / this.SCALE_FACTOR;
-
-        // Compute center points
-        const pcx = ptx + playerWidth / 2;
-        const pcy = pty + playerHeight / 2;
-        const ccx = ctx + creeperWidth / 2;
-        const ccy = cty + creeperHeight / 2;
-
-        // Proximity threshold: sum of half-diagonals scaled down
-        const diagonalPlayer = Math.sqrt(playerWidth*playerWidth + playerHeight*playerHeight) / 2;
-        const diagonalCreeper = Math.sqrt(creeperWidth*creeperWidth + creeperHeight*creeperHeight) / 2;
-        const proximityThreshold = Math.max(30, (diagonalPlayer + diagonalCreeper) * 0.35);
-
-        const dx = pcx - ccx;
-        const dy = pcy - ccy;
-        const distance = Math.sqrt(dx*dx + dy*dy);
-
-        const isNear = distance <= proximityThreshold;
-
-        if (isNear && !this.isColliding) {
-          console.log("Creeper proximity collision: within threshold, exploding");
+        
+        const collisionMargin = 40;
+        const creeperLeft = this.INIT_POSITION.x + collisionMargin;
+        const creeperRight = this.INIT_POSITION.x + creeperWidth - collisionMargin;
+        const creeperTop = this.INIT_POSITION.y + collisionMargin;
+        const creeperBottom = this.INIT_POSITION.y + creeperHeight - collisionMargin;
+        
+        const playerLeft = playerPos.x;
+        const playerRight = playerPos.x + playerWidth;
+        const playerTop = playerPos.y;
+        const playerBottom = playerPos.y + playerHeight;
+        
+        const isOverlapping = (
+          creeperLeft < playerRight && 
+          creeperRight > playerLeft && 
+          creeperTop < playerBottom && 
+          creeperBottom > playerTop
+        );
+        
+        if (isOverlapping && !this.isColliding) {
+          console.log("NEW COLLISION DETECTED - STARTING SEQUENTIAL EXPLOSION!");
+          
           this.isColliding = true;
           this.explode();
           return true;
-        } else if (!isNear && this.isColliding) {
+        } 
+        else if (!isOverlapping && this.isColliding) {
+          console.log("Player moved away from creeper");
           this.isColliding = false;
         }
+        
         return false;
       },
 
@@ -262,18 +278,7 @@ class GameLevelOverworld {
           return;
         }
 
-        // Play sound only if supported and source exists
-        try {
-          if (this.sound && typeof this.sound.play === 'function') {
-            const can = (typeof this.sound.canPlayType === 'function') ? this.sound.canPlayType('audio/mpeg') : 'probably';
-            if (can && this.sound.src) {
-              const p = this.sound.play();
-              if (p && typeof p.catch === 'function') p.catch(() => {/* ignore autoplay errors */});
-            }
-          }
-        } catch (e) {
-          console.warn('Creeper sound play failed or unsupported');
-        }
+        this.sound.play();
 
         spriteElement.style.transition = 'filter 1s ease-in-out';
         spriteElement.style.filter = 'brightness(3) saturate(0)';

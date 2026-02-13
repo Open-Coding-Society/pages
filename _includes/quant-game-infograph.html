@@ -1,0 +1,74 @@
+{% assign data = site.data.quant_infographic %}
+
+<div class="wp-infograph">
+
+  <!-- Header Section -->
+  <div class="wp-header">
+    <div class="wp-badge">Design-Based Research Capstone</div>
+    <h1 class="wp-title">{{ data.Title }}</h1>
+    <p class="wp-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="wp-card">
+    <div class="wp-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="wp-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
+          <div class="wp-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+
+        <div class="wp-status">{{ topic.status }}</div>
+
+        <div class="wp-team">
+          <span class="wp-team-label">Project Leads</span>
+          <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="wp-content">
+        <h2 class="wp-project-title">{{ topic.title }}</h2>
+        <p class="wp-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="wp-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="wp-keypoint">
+            <span class="wp-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="wp-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="wp-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="wp-details">
+        <h3 class="wp-section-title">About</h3>
+        <p class="wp-about">{{ topic.description }}</p>
+
+        <h3 class="wp-section-title">Impact</h3>
+        <div class="wp-impact-list">
+          {% for item in topic.impact %}
+          <div class="wp-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
