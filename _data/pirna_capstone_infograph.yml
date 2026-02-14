@@ -1,0 +1,36 @@
+# Pirna Capstone Infographic
+Title: "Design-Based Research Project Brief: Groups Messaging System (OCS)"
+Logo: "capstone/pirna_logo.png"
+Description: "Improve group-level communication and engagement on OCS through an integrated messaging system, while generating practical design principles for scalable, analytics-informed collaborative tools in educational platforms."
+
+Topics:
+  - title: "Groups Messaging System (OCS)"
+    image: "capstone/pirna_visual.png"
+    link: "https://github.com/Open-Coding-Society/pages/pull/630"
+    alt: "Pirna Groups Messaging System Interface"
+    keyPoints:
+      - "Modal-based groups messaging"
+      - "Low-friction interaction design"
+      - "Frontend-only implementation"
+      - "Usability and flow validation"
+      - "Backend schema proposal"
+      - "Planned analytics integration"
+    subtitle: "Integrated Messaging for OCS"
+    description: "Student collaboration on OCS is fragmented and largely occurs off-platform (e.g., Discord, text, email). This reduces visibility into group participation, limits actionable feedback, and weakens learning-aligned collaboration. An initial groups feature lacked persistent messaging, backend structure, and analytics, resulting in limited adoption."
+    tech:
+      - "Figma Prototype"
+      - "Frontend Implementation"
+      - "UI/UX Design"
+      - "Backend Schema Design"
+      - "Data Architecture"
+    impact:
+      - "Intuitive and functional interface"
+      - "Validates usability independent of backend"
+      - "Identified need for persistent messaging"
+      - "Defined backend organization requirements"
+      - "Transferable design insights"
+    status: "Frontend Complete"
+    team:
+      - "Nikhil Maturi"
+      - "Rohan Bojja"
+      - "Adiya Katre"
