@@ -47,6 +47,7 @@ permalink: /rpg/gamebuilder
 }
 </style>
 
+
 <!-- title banner for the GameBuilder page -->
 <div class="gamebuilder-title">{{page.title}}</div>
 
@@ -1080,10 +1081,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* code generation (baseline and steps) */
         function generateBaselineCode() {
-                return `import GameEnvBackground from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-            import Player from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/Player.js';
-            import Npc from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/Npc.js';
-            import Barrier from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/Barrier.js';
+                return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+            import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+            import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+            import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
 
 class GameLevelCustom {
     constructor(gameEnv) {
@@ -1115,10 +1116,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         : '{ up: 87, left: 65, down: 83, right: 68 }';
 
                 function header() {
-                    return `import GameEnvBackground from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-        import Player from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/Player.js';
-        import Npc from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/Npc.js';
-        import Barrier from '{{ site.baseurl }}/assets/js/GameEnginev1/essentials/Barrier.js';
+                    return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+        import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+        import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+        import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
 
 class GameLevelCustom {
     constructor(gameEnv) {
@@ -2663,16 +2664,34 @@ export const gameLevelClasses = [GameLevelCustom];`;
         code = code.replace(/\/\* BUILDER_HOOKS_START \*\/[\s\S]*?\/\* BUILDER_HOOKS_END \*\//g, '');
         code = code.replace(/import\s+GameControl\s+from\s+[^\n]+\n/g, '');
         code = code.replace(/export\s*\{\s*GameControl\s*\};?/g, '');
-        code = code.replace(/export\s+const\s+gameLevelClasses\s*=\s*\[\s*GameLevelCustom\s*\];?/g, 'export default GameLevelCustom;');
-        const header = `// Adventure Game Custom Level\n// Exported from GameBuilder on ${(new Date()).toISOString()}\n// How to use this file:\n// 1) Save as assets/js/adventureGame/GameLevelCustom.js in your repo.\n// 2) Reference it in your runner or level selector. Examples:\n//    import GameLevelCustom from '/assets/js/adventureGame/GameLevelCustom.js';\n//    export const gameLevelClasses = [GameLevelBasic, GameLevelCustom];\n//    // or pass it directly to your GameControl as the only level.\n// 3) Ensure images exist and paths resolve via 'path' provided by the engine.\n// 4) You can add more objects to this.classes inside the constructor.\n`;
+        // Prompt for level name and convert to PascalCase
+        const rawName = (typeof window !== 'undefined' && window.prompt)
+            ? (window.prompt('Name your game level (e.g., Shark):', ui.pName?.value || '') || '')
+            : (ui.pName?.value || '');
+        const pascal = (s) => {
+            const parts = String(s || '').trim().split(/[^a-zA-Z0-9]+/).filter(Boolean);
+            const capped = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase());
+            const joined = capped.join('');
+            return joined.length ? joined : 'Custom';
+        };
+        const levelSuffix = pascal(rawName);
+        const newClassName = `GameLevel${levelSuffix}`;
+
+        // Rename class and exports to the chosen name
+        code = code.replace(/\bclass\s+GameLevelCustom\b/, `class ${newClassName}`);
+        code = code.replace(/export\s+default\s+GameLevelCustom\b/g, `export default ${newClassName}`);
+        code = code.replace(/export\s+const\s+gameLevelClasses\s*=\s*\[\s*GameLevelCustom\s*\];?/g, `export default ${newClassName};`);
+
+        // Header with usage instructions reflecting chosen name
+        const header = `// Adventure Game Custom Level\n// Exported from GameBuilder on ${(new Date()).toISOString()}\n// How to use this file:\n// 1) Save as assets/js/adventureGame/${newClassName}.js in your repo.\n// 2) Reference it in your runner or level selector. Examples:\n//    import GameLevelPlanets from '{{site.baseurl}}/assets/js/GameEnginev1/GameLevelPlanets.js';\n//    import ${newClassName} from '{{site.baseurl}}/assets/js/adventureGame/${newClassName}.js';\n//    export const gameLevelClasses = [GameLevelPlanets, ${newClassName}];\n//    // or pass it directly to your GameControl as the only level.\n// 3) Ensure images exist and paths resolve via 'path' provided by the engine.\n// 4) You can add more objects to this.classes inside the constructor.\n`;
         code = header + code;
+
+        // Download using the chosen class name
         const blob = new Blob([code], { type: 'text/javascript;charset=utf-8' });
         const a = document.createElement('a');
         const url = URL.createObjectURL(blob);
         a.href = url;
-        const suggestedName = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'GameLevelCustom')
-            .replace(/[^a-zA-Z0-9_-]+/g, '_') || 'GameLevelCustom';
-        a.download = `${suggestedName}.js`;
+        a.download = `${newClassName}.js`;
         document.body.appendChild(a);
         a.click();
         setTimeout(() => {

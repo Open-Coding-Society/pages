@@ -33,7 +33,9 @@ class GameLevel {
         this.gameLevel.initialize()
     }
 
-    window.addEventListener("resize", this.resize.bind(this))
+    // Bind and store resize handler so we can properly remove it on destroy
+    this._boundResize = this.resize.bind(this)
+    window.addEventListener("resize", this._boundResize)
   }
 
   destroy() {
@@ -49,8 +51,11 @@ class GameLevel {
 
     // Clear out the game objects array
     this.gameEnv.gameObjects = [];
-    
-    window.removeEventListener("resize", this.resize.bind(this))
+    // Properly remove the stored resize handler
+    if (this._boundResize) {
+      window.removeEventListener("resize", this._boundResize)
+      this._boundResize = null
+    }
   }
 
   update() {
