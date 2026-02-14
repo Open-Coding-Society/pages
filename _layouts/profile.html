@@ -109,159 +109,216 @@ active_tab: profile
                 Add Class
             </button>
         </div>
-    
+
         <div id="classesContainer">
             <!-- Classes will be loaded here dynamically -->
             <p class="text-gray-400 text-center py-4">Loading classes...</p>
         </div>
     </div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Group Information</h2>
 
-    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
-            Loading group information...
+        <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-1 md:col-span-2 text-center text-gray-400">
+                Loading group information...
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ============================= -->
-<!-- FRONTEND-ONLY GROUPING AGENT  -->
-<!-- Paste this block after Group Information, before Join a Group -->
-<!-- ============================= -->
+    <!-- ============================= -->
+    <!-- FRONTEND-ONLY GROUPING AGENT  -->
+    <!-- Paste this block after Group Information, before Join a Group -->
+    <!-- ============================= -->
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-  <div class="flex items-start justify-between gap-4 mb-4">
-    <div>
-      <h2 class="text-xl font-semibold">Grouping Agent (Frontend-Only)</h2>
-      <p class="text-sm text-gray-400">
-        Learns from historical outcomes (student + teacher ratings) and recommends groups locally.
-      </p>
-    </div>
-    <div class="text-sm text-gray-300" id="gaStatus"></div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-300 mb-1">Task Type</label>
-      <select id="gaTaskType" class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
-        <option value="CSA_FRQ">CSA_FRQ</option>
-        <option value="WEB_APP">WEB_APP</option>
-        <option value="DATA_SCI">DATA_SCI</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-300 mb-1">Difficulty (1-5)</label>
-      <input id="gaDifficulty" type="number" min="1" max="5" value="3"
-        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-300 mb-1">Group Size</label>
-      <input id="gaGroupSize" type="number" min="2" max="6" value="4"
-        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
-    </div>
-
-    <div class="flex items-end gap-2">
-      <button id="gaTrainBtn"
-        class="w-1/2 px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600">
-        Train
-      </button>
-      <button id="gaRecommendBtn"
-        class="w-1/2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
-        Recommend
-      </button>
-    </div>
-  </div>
-
-  <div class="mt-6">
-    <h3 class="text-lg font-semibold text-gray-200 mb-2">Recommendations</h3>
-    <div id="gaRecs" class="space-y-3">
-      <div class="text-gray-400 text-sm">No recommendations yet.</div>
-    </div>
-  </div>
-
-  <div class="mt-6 border-t border-gray-700 pt-4">
-    <h3 class="text-lg font-semibold text-gray-200 mb-2">Record Outcome</h3>
-    <p class="text-sm text-gray-400 mb-3">
-      Save ratings locally to improve future recommendations.
-    </p>
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-gray-300 mb-1">Group Members (comma-separated IDs)</label>
-        <input id="gaOutcomeMembers" placeholder="u1,u2,u3,u4"
-          class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-300 mb-1">Student Avg (1-5)</label>
-        <input id="gaStudentRating" type="number" min="1" max="5" value="4"
-          class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-300 mb-1">Teacher (1-5)</label>
-        <input id="gaTeacherRating" type="number" min="1" max="5" value="4"
-          class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
-      </div>
-    </div>
-
-    <div class="mt-3 flex gap-2">
-      <button id="gaSaveOutcomeBtn"
-        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-        Save Outcome
-      </button>
-      <button id="gaResetLocalBtn"
-        class="px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg hover:bg-neutral-600 border border-gray-600">
-        Reset Local Model
-      </button>
-    </div>
-
-    <div class="mt-2 text-sm text-gray-400" id="gaOutcomeStatus"></div>
-  </div>
-</div>
-
-
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <div class="flex items-start justify-between gap-4 mb-4">
-        <div>
-            <h2 class="text-xl font-semibold">Join a Group</h2>
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">Grouping Agent (Frontend-Only)</h2>
+                <p class="text-sm text-gray-400">
+                    Learns from historical outcomes (student + teacher ratings) and recommends groups locally.
+                </p>
+            </div>
+            <div class="text-sm text-gray-300" id="gaStatus"></div>
         </div>
-        <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
-    </div>
 
-    <div class="grid grid-cols-1 gap-4">
-        <div>
-            <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
-                Groups</label>
-            <div class="flex gap-2">
-                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    autocomplete="off">
-                <button id="groupSearchBtn" type="button"
-                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
-                    Search
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Task Type</label>
+                <select id="gaTaskType" class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
+                    <option value="CSA_FRQ">CSA_FRQ</option>
+                    <option value="WEB_APP">WEB_APP</option>
+                    <option value="DATA_SCI">DATA_SCI</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Difficulty (1-5)</label>
+                <input id="gaDifficulty" type="number" min="1" max="5" value="3"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Group Size</label>
+                <input id="gaGroupSize" type="number" min="2" max="6" value="4"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700">
+            </div>
+
+            <div class="flex items-end gap-2">
+                <button id="gaTrainBtn" class="w-1/2 px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600">
+                    Train
+                </button>
+                <button id="gaRecommendBtn"
+                    class="w-1/2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
+                    Recommend
                 </button>
             </div>
         </div>
-        <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-200 mb-2">Recommendations</h3>
+            <div id="gaRecs" class="space-y-3">
+                <div class="text-gray-400 text-sm">No recommendations yet.</div>
+            </div>
+        </div>
+
+        <div class="mt-6 border-t border-gray-700 pt-4">
+            <h3 class="text-lg font-semibold text-gray-200 mb-2">Record Outcome</h3>
+            <p class="text-sm text-gray-400 mb-3">
+                Save ratings locally to improve future recommendations.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Group Members (comma-separated
+                        IDs)</label>
+                    <input id="gaOutcomeMembers" placeholder="u1,u2,u3,u4"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Student Avg (1-5)</label>
+                    <input id="gaStudentRating" type="number" min="1" max="5" value="4"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Teacher (1-5)</label>
+                    <input id="gaTeacherRating" type="number" min="1" max="5" value="4"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700" />
+                </div>
+            </div>
+
+            <div class="mt-3 flex gap-2">
+                <button id="gaSaveOutcomeBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Save Outcome
+                </button>
+                <button id="gaResetLocalBtn"
+                    class="px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg hover:bg-neutral-600 border border-gray-600">
+                    Reset Local Model
+                </button>
+            </div>
+
+            <div class="mt-2 text-sm text-gray-400" id="gaOutcomeStatus"></div>
+        </div>
+    </div>
+
+
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">Join a Group</h2>
+            </div>
+            <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            <div>
+                <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
+                    Groups</label>
+                <div class="flex gap-2">
+                    <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                        class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        autocomplete="off">
+                    <button id="groupSearchBtn" type="button"
+                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+            <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-xl font-semibold">Join a Group</h2>
+                </div>
+                <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
+                        Groups</label>
+                    <div class="flex gap-2">
+                        <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                            class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            autocomplete="off">
+                        <button id="groupSearchBtn" type="button"
+                            class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                            Search
+                        </button>
+                    </div>
+                </div>
+                <div id="groupResultsList"
+                    class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+            <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
+
+            <div id="personaSelectionContainer">
+                <p class="text-gray-400 text-center py-4">Loading personas...</p>
+            </div>
+        </div>
+
+
+</form>
+
+<!-- Webcam Modal -->
+<div id="webcamModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 hidden">
+    <div class="bg-neutral-800 p-6 rounded-lg shadow-xl max-w-lg w-full border border-neutral-700">
+        <h2 class="text-xl font-bold text-white mb-4">Set Your Profile Picture</h2>
+        <p class="text-gray-300 mb-4">You haven't set a profile picture yet. Please take a photo to continue.</p>
+
+        <div class="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4 border border-neutral-600">
+            <video id="webcamVideo" class="w-full h-full object-cover" autoplay playsinline></video>
+            <canvas id="webcamCanvas" class="w-full h-full object-cover absolute top-0 left-0 hidden"></canvas>
+        </div>
+
+        <div class="flex justify-between gap-4">
+            <button id="retakeBtn"
+                class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 hidden transition-colors">
+                Retake
+            </button>
+            <button id="captureBtn"
+                class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex-1 transition-colors">
+                Take Picture
+            </button>
+            <button id="savePfpBtn"
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 hidden flex-1 transition-colors">
+                Save Picture
+            </button>
+            <button id="closeModalBtn"
+                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                Close
+            </button>
         </div>
     </div>
 </div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
-    
-    <div id="personaSelectionContainer">
-        <p class="text-gray-400 text-center py-4">Loading personas...</p>
-    </div>
-</div>
-
-
-</form>
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -284,7 +341,7 @@ active_tab: profile
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
-        
+
         // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
@@ -312,7 +369,7 @@ active_tab: profile
             })
             .then(personData => {
                 if (!personData) return null; // Chain was stopped
-                
+
                 // Cache user identity for reuse in join/leave operations
                 currentPersonId = personData.id;
                 currentUid = personData.uid;
@@ -326,10 +383,10 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
-           
+
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
-                
+
                 // Handle group fetch response
                 if (groupResp.ok) {
                     return groupResp.json();
@@ -351,7 +408,7 @@ active_tab: profile
             })
             .then(userGroups => {
                 if (!userGroups) return; // Chain was stopped
-                
+
                 const groups = Array.isArray(userGroups) ? userGroups : [];
 
                 // Build a Set of user's group IDs for O(1) lookup during search
@@ -404,7 +461,7 @@ active_tab: profile
             // Search function using server-side API
             const searchGroups = async (query) => {
                 const normalized = query.trim();
-                
+
                 if (!normalized) {
                     groupResultsList.classList.add('hidden');
                     return;
@@ -413,7 +470,7 @@ active_tab: profile
                 try {
                     const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
                     if (!searchResp.ok) throw new Error('Search failed');
-                    
+
                     const filtered = await searchResp.json();
 
                     if (filtered.length === 0) {
@@ -426,7 +483,7 @@ active_tab: profile
                         const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
                         const isAlreadyMember = userGroupIds.has(group.id);
                         const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                        const membersText = group.members?.length > 0 
+                        const membersText = group.members?.length > 0
                             ? group.members.map(m => m.name).join(', ')
                             : 'No members';
                         return `
@@ -475,20 +532,20 @@ active_tab: profile
                     ...fetchOptions,
                     method: 'POST',
                 })
-                .then(joinResp => {
-                    if (!joinResp.ok) {
-                        return joinResp.text().then(body => {
-                            throw new Error(body || 'Failed to join group');
-                        });
-                    }
-                    joinGroupStatus.textContent = 'Refreshing...';
-                    window.location.reload();
-                })
-                .catch(joinError => {
-                    console.error('Join group error:', joinError);
-                    joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
-                    groupSearchInput.disabled = false;
-                });
+                    .then(joinResp => {
+                        if (!joinResp.ok) {
+                            return joinResp.text().then(body => {
+                                throw new Error(body || 'Failed to join group');
+                            });
+                        }
+                        joinGroupStatus.textContent = 'Refreshing...';
+                        window.location.reload();
+                    })
+                    .catch(joinError => {
+                        console.error('Join group error:', joinError);
+                        joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
+                        groupSearchInput.disabled = false;
+                    });
             };
         }
     });
@@ -529,40 +586,40 @@ active_tab: profile
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         try {
             // Fetch all available personas
-            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions); 
+            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions);
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
-            
+
             console.log('📦 All personas loaded:', personas);
-            
+
             // Get user's personas
-            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
-            
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions);
+
             let selectedPersonas = {};
             let totalSelected = 0;
-            
+
             if (!userPersonasResp.ok) {
                 console.log('⚠️ No personas found for user or not authenticated');
                 showPersonaSelectionCards(personas, {});
                 return;
             }
-            
+
             const userPersonasData = await userPersonasResp.json();
             console.log('👤 User personas data:', userPersonasData);
-            
+
             selectedPersonas = userPersonasData.personas || {};
             totalSelected = userPersonasData.total_selected || 0;
-            
+
             console.log('✅ Selected personas:', selectedPersonas);
             console.log('📊 Total selected:', totalSelected);
-            
+
             // Store globally
             window.allPersonasData = personas;
             window.selectedPersonasData = selectedPersonas;
-            
+
             // If user has selected all 4 categories, show the completed view
             if (totalSelected === 4) {
                 console.log('🎉 All 4 selected! Showing completed view');
@@ -572,7 +629,7 @@ active_tab: profile
                 // Show selection interface - hide completed categories
                 showPersonaSelectionCards(personas, selectedPersonas);
             }
-            
+
         } catch (error) {
             console.error('❌ Error loading personas:', error);
             container.innerHTML = `
@@ -583,7 +640,7 @@ active_tab: profile
     }
     function editProfile() {
         console.log('📝 Edit profile clicked - showing all categories');
-        
+
         if (window.allPersonasData && window.selectedPersonasData) {
             showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData, true); // Pass true to force show all
         } else {
@@ -592,19 +649,19 @@ active_tab: profile
     }
     function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         console.log('🎨 Rendering selection cards');
         console.log('Total personas:', allPersonas.length);
         console.log('Selected:', selectedPersonas);
         console.log('Force show all:', forceShowAll);
-        
+
         if (allPersonas.length === 0) {
             container.innerHTML = `
                 <p class="text-gray-400 text-center py-4">No personas available.</p>
             `;
             return;
         }
-        
+
         // Group personas by category
         const grouped = allPersonas.reduce((acc, persona) => {
             const category = persona.category || 'other';
@@ -612,26 +669,26 @@ active_tab: profile
             acc[category].push(persona);
             return acc;
         }, {});
-        
+
         console.log('📂 Grouped by category:', grouped);
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryDescriptions = {
             'student': 'How you approach learning and teamwork',
             'social': 'Your hobbies and social interests',
             'achievement': 'What drives and motivates you',
             'fantasy': 'Your aspirational superpower'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
         const totalSelected = Object.keys(selectedPersonas).length;
-        
+
         container.innerHTML = `
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
@@ -645,19 +702,19 @@ active_tab: profile
             
             <div class="space-y-8">
                 ${categoryOrder.map(category => {
-                    const personas = grouped[category] || [];
-                    const selectedInCategory = selectedPersonas[category];
-                    
-                    // CHANGED: Only hide if NOT forcing show all AND category is selected
-                    if (!forceShowAll && selectedInCategory) {
-                        console.log(`✓ Category ${category} already selected, hiding it`);
-                        return '';
-                    }
-                    
-                    // Show the selection grid
-                    console.log(`🎯 Showing selection grid for ${category}`);
-                    
-                    return `
+            const personas = grouped[category] || [];
+            const selectedInCategory = selectedPersonas[category];
+
+            // CHANGED: Only hide if NOT forcing show all AND category is selected
+            if (!forceShowAll && selectedInCategory) {
+                console.log(`✓ Category ${category} already selected, hiding it`);
+                return '';
+            }
+
+            // Show the selection grid
+            console.log(`🎯 Showing selection grid for ${category}`);
+
+            return `
                         <div class="mb-8" id="category-${category}">
                             <div class="flex items-center justify-between mb-4">
                                 <div>
@@ -671,11 +728,11 @@ active_tab: profile
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="category-grid-${category}">
                                 ${personas.map(persona => {
-                                    const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                                    const description = persona.bio_map?.description || 'No description';
-                                    const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
-                                    
-                                    return `
+                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                const description = persona.bio_map?.description || 'No description';
+                const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+
+                return `
                                         <div 
                                             id="persona-card-${persona.id}"
                                             class="flex flex-col p-4 ${isCurrentlySelected ? 'bg-indigo-900 border-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'} border ${isCurrentlySelected ? 'border-indigo-400' : 'border-gray-700 hover:border-indigo-500'} rounded-lg cursor-pointer transition-all group h-full relative"
@@ -702,33 +759,33 @@ active_tab: profile
                                             </div>
                                         </div>
                                     `;
-                                }).join('')}
+            }).join('')}
                             </div>
                         </div>
                     `;
-                }).join('')}
+        }).join('')}
             </div>
         `;
     }
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryEmojis = {
             'student': '📚',
             'social': '🎉',
             'achievement': '🏆',
             'fantasy': '✨'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
-        
+
         container.innerHTML = `
             <div class="max-w-7xl mx-auto">
                 <!-- Header -->
@@ -750,17 +807,17 @@ active_tab: profile
                 <!-- 2x2 Grid of Selected Personas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${categoryOrder.map(category => {
-                        const personaData = selectedPersonas[category];
-                        if (!personaData) return '';
-                        
-                        const persona = allPersonas.find(p => p.id === personaData.persona_id);
-                        if (!persona) return '';
-                        
-                        const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                        const description = persona.bio_map?.description || 'No description';
-                        const empathyMap = persona.empathy_map || {};
-                        
-                        return `
+            const personaData = selectedPersonas[category];
+            if (!personaData) return '';
+
+            const persona = allPersonas.find(p => p.id === personaData.persona_id);
+            if (!persona) return '';
+
+            const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+            const description = persona.bio_map?.description || 'No description';
+            const empathyMap = persona.empathy_map || {};
+
+            return `
                             <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
                                 
                                 <div class="flex items-start gap-4 mb-4">
@@ -809,7 +866,7 @@ active_tab: profile
                                 ` : ''}
                             </div>
                         `;
-                    }).join('')}
+        }).join('')}
                 </div>
             </div>
         `;
@@ -818,7 +875,7 @@ active_tab: profile
         console.log('🎯 SELECT PERSONA CALLED');
         console.log('   Persona ID:', personaId);
         console.log('   Category:', category);
-        
+
         // Show loading state on the clicked card
         const card = document.getElementById(`persona-card-${personaId}`);
         if (card) {
@@ -830,34 +887,34 @@ active_tab: profile
             }
             card.style.pointerEvents = 'none';
         }
-        
+
         try {
             const url = `${pythonURI}/api/user/persona`;
             const body = { persona_id: personaId };
-            
+
             console.log('📤 Making POST request');
             console.log('   URL:', url);
             console.log('   Body:', body);
-            
+
             const response = await fetch(url, {
                 ...fetchOptions,
                 method: 'POST',
                 body: JSON.stringify(body)
             });
-            
+
             console.log('📥 Response received');
             console.log('   Status:', response.status);
             console.log('   OK:', response.ok);
-            
+
             const responseData = await response.json();
             console.log('   Response Data:', responseData);
-            
+
             if (!response.ok) {
                 throw new Error(responseData.message || `Server error: ${response.status}`);
             }
-            
+
             console.log('✅ Selection successful!');
-            
+
             // Show success animation
             if (card) {
                 const overlay = card.querySelector('.loading-overlay');
@@ -870,17 +927,17 @@ active_tab: profile
                     console.log('   ✅ Success checkmark shown');
                 }
             }
-            
+
             // Wait a moment then reload
             console.log('   ⏳ Waiting 600ms before reload...');
             setTimeout(() => {
                 console.log('   🔄 Reloading personas...');
                 loadPersonas();
             }, 600);
-            
+
         } catch (error) {
             console.error('❌ ERROR in selectPersona:', error);
-            
+
             // Hide loading overlay and restore interactivity
             if (card) {
                 const overlay = card.querySelector('.loading-overlay');
@@ -889,13 +946,13 @@ active_tab: profile
                 }
                 card.style.pointerEvents = 'auto';
             }
-            
+
             // Show error message
             const categorySection = document.getElementById(`category-${category}`);
             if (categorySection) {
                 const existingError = categorySection.querySelector('.error-message');
                 if (existingError) existingError.remove();
-                
+
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error-message bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4 flex items-start gap-3';
                 errorDiv.innerHTML = `
@@ -913,7 +970,7 @@ active_tab: profile
                     </button>
                 `;
                 categorySection.insertBefore(errorDiv, categorySection.querySelector(`#category-grid-${category}`));
-                
+
                 setTimeout(() => errorDiv.remove(), 5000);
             }
         }
@@ -1071,10 +1128,10 @@ active_tab: profile
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
         console.log('DOMContentLoaded fired'); // ADD THIS
-        
+
         // Store original values
         saveOriginalValues();
-        
+
         // Load user classes
         loadUserClasses();
 
@@ -1086,7 +1143,7 @@ active_tab: profile
         const addClassBtn = document.getElementById('addClassBtn');
         console.log('Add Class Button:', addClassBtn); // ADD THIS
         if (addClassBtn) {
-            addClassBtn.addEventListener('click', function() {
+            addClassBtn.addEventListener('click', function () {
                 console.log('Add Class button clicked!'); // ADD THIS
                 addClass();
             });
@@ -1108,7 +1165,7 @@ active_tab: profile
             }
         });
     });
-    
+
     // Save original form values
     function saveOriginalValues() {
         const form = document.getElementById('profileSettingsForm');
@@ -1175,10 +1232,10 @@ active_tab: profile
             saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
         }
     }
-    
+
     async function loadUserClasses() {
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
             if (!response.ok) {
                 console.error('Failed to load classes');
                 return;
@@ -1195,7 +1252,7 @@ active_tab: profile
     // Render classes in the UI
     function renderClasses(classes) {
         const container = document.getElementById('classesContainer');
-        
+
         if (!container) return;
 
         if (!classes || classes.length === 0) {
@@ -1267,9 +1324,9 @@ active_tab: profile
             const response = await fetch(`${pythonURI}/api/user/class`, {
                 ...fetchOptions,
                 method: 'POST',
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     action: 'remove',
-                    class: classToRemove 
+                    class: classToRemove
                 })
             });
 
@@ -1321,14 +1378,14 @@ active_tab: profile
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
             }
 
             const data = await response.json();
             console.log('Grade Prediction Data:', data);
-            
+
             // Process and display the grade prediction data
             if (data && data.prediction) {
                 displayGradePrediction(data);
@@ -1347,7 +1404,7 @@ active_tab: profile
     // Display grade prediction results
     function displayGradePrediction(data) {
         console.log('Displaying grade prediction:', data);
-        
+
         // You can add UI elements here to display the prediction
         // For now, just log to console
         if (data.prediction) {
@@ -1574,7 +1631,7 @@ active_tab: profile
     window.displayGradePrediction = displayGradePrediction;
 
     // Leave group function
-    window.leaveGroup = async function(groupId, personId) {
+    window.leaveGroup = async function (groupId, personId) {
         if (!confirm('Are you sure you want to leave this group?')) {
             return;
         }
@@ -1604,174 +1661,174 @@ active_tab: profile
 </script>
 
 <script type="module">
-  // ============================
-  // Frontend-only Grouping Agent
-  // ============================
+    // ============================
+    // Frontend-only Grouping Agent
+    // ============================
 
-  const LS_MODEL = "ga_model_v1";
-  const LS_HISTORY = "ga_history_v1"; // appended outcomes from UI
+    const LS_MODEL = "ga_model_v1";
+    const LS_HISTORY = "ga_history_v1"; // appended outcomes from UI
 
-  const CATS = ["student", "social", "achievement", "fantasy"];
+    const CATS = ["student", "social", "achievement", "fantasy"];
 
-  const statusEl = document.getElementById("gaStatus");
-  const outcomeStatusEl = document.getElementById("gaOutcomeStatus");
-  const recsEl = document.getElementById("gaRecs");
+    const statusEl = document.getElementById("gaStatus");
+    const outcomeStatusEl = document.getElementById("gaOutcomeStatus");
+    const recsEl = document.getElementById("gaRecs");
 
-  function readDataset() {
-    const raw = document.getElementById("gaDataset")?.textContent?.trim();
-    if (!raw) return { people: [], outcomes: [] };
-    try { return JSON.parse(raw); } catch { return { people: [], outcomes: [] }; }
-  }
-
-  function load(key, fallback) {
-    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-    catch { return fallback; }
-  }
-  function save(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
-
-  function defaultModel() {
-    return {
-      version: 1,
-      diversityWeights: { student: 1.0, social: 0.5, achievement: 1.0, fantasy: 0.2 },
-      pairWeights: { student: {}, social: {}, achievement: {}, fantasy: {} },
-      taskBias: { CSA_FRQ: 0.0, WEB_APP: 0.0, DATA_SCI: 0.0 },
-      difficultyWeight: -0.05
-    };
-  }
-
-  function pairKey(a, b) {
-    const lo = Math.min(a, b), hi = Math.max(a, b);
-    return `${lo}:${hi}`;
-  }
-
-  function diversity(personas, cat) {
-    const s = new Set();
-    for (const p of personas) {
-      const v = p?.[cat];
-      if (v !== undefined && v !== null) s.add(v);
-    }
-    return s.size;
-  }
-
-  function scoreGroup(model, personas, taskType, difficulty) {
-    let s = 0;
-
-    for (const cat of CATS) {
-      s += (model.diversityWeights[cat] ?? 0) * diversity(personas, cat);
+    function readDataset() {
+        const raw = document.getElementById("gaDataset")?.textContent?.trim();
+        if (!raw) return { people: [], outcomes: [] };
+        try { return JSON.parse(raw); } catch { return { people: [], outcomes: [] }; }
     }
 
-    for (const cat of CATS) {
-      const w = model.pairWeights[cat] ?? {};
-      for (let i = 0; i < personas.length; i++) {
-        for (let j = i + 1; j < personas.length; j++) {
-          const a = personas[i]?.[cat];
-          const b = personas[j]?.[cat];
-          if (a == null || b == null) continue;
-          s += (w[pairKey(a, b)] ?? 0);
+    function load(key, fallback) {
+        try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+        catch { return fallback; }
+    }
+    function save(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function defaultModel() {
+        return {
+            version: 1,
+            diversityWeights: { student: 1.0, social: 0.5, achievement: 1.0, fantasy: 0.2 },
+            pairWeights: { student: {}, social: {}, achievement: {}, fantasy: {} },
+            taskBias: { CSA_FRQ: 0.0, WEB_APP: 0.0, DATA_SCI: 0.0 },
+            difficultyWeight: -0.05
+        };
+    }
+
+    function pairKey(a, b) {
+        const lo = Math.min(a, b), hi = Math.max(a, b);
+        return `${lo}:${hi}`;
+    }
+
+    function diversity(personas, cat) {
+        const s = new Set();
+        for (const p of personas) {
+            const v = p?.[cat];
+            if (v !== undefined && v !== null) s.add(v);
         }
-      }
+        return s.size;
     }
 
-    s += (model.taskBias[taskType] ?? 0);
-    s += (model.difficultyWeight ?? 0) * difficulty;
-    return s;
-  }
+    function scoreGroup(model, personas, taskType, difficulty) {
+        let s = 0;
 
-  function sigmoid(x) {
-    return 1 / (1 + Math.exp(-x));
-  }
-
-  // Convert (student 1-5 + teacher 1-5) => single outcome score (0..100-ish)
-  function combinedOutcomeScore(student1to5, teacher1to5) {
-    // weight teacher a bit more (you can change)
-    const combined = (0.4 * student1to5 + 0.6 * teacher1to5);
-    // map 1..5 -> 20..100
-    return (combined / 5) * 100;
-  }
-
-  function updateModelFromOutcome(model, personas, taskType, difficulty, outcomeScore100) {
-    const lr = 0.01;
-    const goodThreshold = 70; // outcomeScore >= 70 treated as "good"
-    const y = outcomeScore100 >= goodThreshold ? 1 : 0;
-
-    const predRaw = scoreGroup(model, personas, taskType, difficulty);
-    const pred = sigmoid(predRaw);
-    const err = (y - pred);
-
-    for (const cat of CATS) {
-      const div = diversity(personas, cat);
-      model.diversityWeights[cat] = (model.diversityWeights[cat] ?? 0) + lr * err * div;
-    }
-
-    for (const cat of CATS) {
-      const w = model.pairWeights[cat] ?? (model.pairWeights[cat] = {});
-      for (let i = 0; i < personas.length; i++) {
-        for (let j = i + 1; j < personas.length; j++) {
-          const a = personas[i]?.[cat];
-          const b = personas[j]?.[cat];
-          if (a == null || b == null) continue;
-          const k = pairKey(a, b);
-          w[k] = (w[k] ?? 0) + lr * err;
-        }
-      }
-    }
-
-    model.taskBias[taskType] = (model.taskBias[taskType] ?? 0) + lr * err;
-    model.difficultyWeight = (model.difficultyWeight ?? 0) + lr * err * difficulty;
-
-    model.version += 1;
-    return { predBefore: pred, err };
-  }
-
-  function recommendGroups(people, model, taskType, difficulty, groupSize) {
-    const remaining = [...people];
-    const recs = [];
-
-    // shuffle
-    for (let i = remaining.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
-    }
-
-    while (remaining.length >= 2) {
-      const group = [remaining.shift()];
-
-      while (group.length < groupSize && remaining.length > 0) {
-        let bestIdx = -1;
-        let bestScore = -1e9;
-
-        for (let i = 0; i < remaining.length; i++) {
-          const cand = remaining[i];
-          const personas = [...group, cand].map(p => p.personas);
-          const s = scoreGroup(model, personas, taskType, difficulty);
-          if (s > bestScore) {
-            bestScore = s;
-            bestIdx = i;
-          }
+        for (const cat of CATS) {
+            s += (model.diversityWeights[cat] ?? 0) * diversity(personas, cat);
         }
 
-        if (bestIdx === -1) break;
-        group.push(remaining.splice(bestIdx, 1)[0]);
-      }
+        for (const cat of CATS) {
+            const w = model.pairWeights[cat] ?? {};
+            for (let i = 0; i < personas.length; i++) {
+                for (let j = i + 1; j < personas.length; j++) {
+                    const a = personas[i]?.[cat];
+                    const b = personas[j]?.[cat];
+                    if (a == null || b == null) continue;
+                    s += (w[pairKey(a, b)] ?? 0);
+                }
+            }
+        }
 
-      const finalScore = scoreGroup(model, group.map(p => p.personas), taskType, difficulty);
-      recs.push({ members: group, score: finalScore });
-
-      if (remaining.length < 2) break;
+        s += (model.taskBias[taskType] ?? 0);
+        s += (model.difficultyWeight ?? 0) * difficulty;
+        return s;
     }
 
-    return recs;
-  }
-
-  function renderRecs(recs) {
-    if (!recs.length) {
-      recsEl.innerHTML = `<div class="text-gray-400 text-sm">No recommendations (need at least 2 people).</div>`;
-      return;
+    function sigmoid(x) {
+        return 1 / (1 + Math.exp(-x));
     }
 
-    recsEl.innerHTML = recs.map((g, idx) => `
+    // Convert (student 1-5 + teacher 1-5) => single outcome score (0..100-ish)
+    function combinedOutcomeScore(student1to5, teacher1to5) {
+        // weight teacher a bit more (you can change)
+        const combined = (0.4 * student1to5 + 0.6 * teacher1to5);
+        // map 1..5 -> 20..100
+        return (combined / 5) * 100;
+    }
+
+    function updateModelFromOutcome(model, personas, taskType, difficulty, outcomeScore100) {
+        const lr = 0.01;
+        const goodThreshold = 70; // outcomeScore >= 70 treated as "good"
+        const y = outcomeScore100 >= goodThreshold ? 1 : 0;
+
+        const predRaw = scoreGroup(model, personas, taskType, difficulty);
+        const pred = sigmoid(predRaw);
+        const err = (y - pred);
+
+        for (const cat of CATS) {
+            const div = diversity(personas, cat);
+            model.diversityWeights[cat] = (model.diversityWeights[cat] ?? 0) + lr * err * div;
+        }
+
+        for (const cat of CATS) {
+            const w = model.pairWeights[cat] ?? (model.pairWeights[cat] = {});
+            for (let i = 0; i < personas.length; i++) {
+                for (let j = i + 1; j < personas.length; j++) {
+                    const a = personas[i]?.[cat];
+                    const b = personas[j]?.[cat];
+                    if (a == null || b == null) continue;
+                    const k = pairKey(a, b);
+                    w[k] = (w[k] ?? 0) + lr * err;
+                }
+            }
+        }
+
+        model.taskBias[taskType] = (model.taskBias[taskType] ?? 0) + lr * err;
+        model.difficultyWeight = (model.difficultyWeight ?? 0) + lr * err * difficulty;
+
+        model.version += 1;
+        return { predBefore: pred, err };
+    }
+
+    function recommendGroups(people, model, taskType, difficulty, groupSize) {
+        const remaining = [...people];
+        const recs = [];
+
+        // shuffle
+        for (let i = remaining.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+        }
+
+        while (remaining.length >= 2) {
+            const group = [remaining.shift()];
+
+            while (group.length < groupSize && remaining.length > 0) {
+                let bestIdx = -1;
+                let bestScore = -1e9;
+
+                for (let i = 0; i < remaining.length; i++) {
+                    const cand = remaining[i];
+                    const personas = [...group, cand].map(p => p.personas);
+                    const s = scoreGroup(model, personas, taskType, difficulty);
+                    if (s > bestScore) {
+                        bestScore = s;
+                        bestIdx = i;
+                    }
+                }
+
+                if (bestIdx === -1) break;
+                group.push(remaining.splice(bestIdx, 1)[0]);
+            }
+
+            const finalScore = scoreGroup(model, group.map(p => p.personas), taskType, difficulty);
+            recs.push({ members: group, score: finalScore });
+
+            if (remaining.length < 2) break;
+        }
+
+        return recs;
+    }
+
+    function renderRecs(recs) {
+        if (!recs.length) {
+            recsEl.innerHTML = `<div class="text-gray-400 text-sm">No recommendations (need at least 2 people).</div>`;
+            return;
+        }
+
+        recsEl.innerHTML = recs.map((g, idx) => `
       <div class="p-4 bg-neutral-700 rounded-lg border border-gray-600">
         <div class="flex items-center justify-between">
           <div class="font-semibold text-gray-100">Group ${idx + 1}</div>
@@ -1785,140 +1842,140 @@ active_tab: profile
         </div>
       </div>
     `).join("");
-  }
-
-  function getUIContext() {
-    return {
-      taskType: document.getElementById("gaTaskType").value,
-      difficulty: parseInt(document.getElementById("gaDifficulty").value || "3", 10),
-      groupSize: parseInt(document.getElementById("gaGroupSize").value || "4", 10),
-    };
-  }
-
-  // --------- Wire up buttons ---------
-
-  const dataset = readDataset();
-  const basePeople = Array.isArray(dataset.people) ? dataset.people : [];
-  const baseOutcomes = Array.isArray(dataset.outcomes) ? dataset.outcomes : [];
-
-  if (!localStorage.getItem(LS_MODEL)) save(LS_MODEL, defaultModel());
-  if (!localStorage.getItem(LS_HISTORY)) save(LS_HISTORY, []);
-
-  function trainFromDatasetAndLocal() {
-    const model = load(LS_MODEL, defaultModel());
-    const localHistory = load(LS_HISTORY, []);
-
-    const allRuns = [];
-
-    // dataset runs
-    for (const r of baseOutcomes) {
-      const taskType = r?.task?.type ?? "CSA_FRQ";
-      const difficulty = r?.task?.difficulty ?? 3;
-
-      const student = r?.student_assessment?.avg_rating_1to5 ?? 3;
-      const teacher = r?.teacher_assessment?.worked_rating_1to5 ?? 3;
-      const score100 = combinedOutcomeScore(student, teacher);
-
-      // personas snapshot is already present in YAML (best), but fallback to roster
-      const members = r?.group?.members ?? [];
-      const personasList = members.map(id => {
-        const snap = r?.group?.personas_snapshot?.[id];
-        if (snap) return snap;
-        const p = basePeople.find(x => x.id === id);
-        return p?.personas ?? null;
-      }).filter(Boolean);
-
-      if (personasList.length >= 2) {
-        allRuns.push({ personasList, taskType, difficulty, score100 });
-      }
     }
 
-    // local history runs (saved from UI)
-    for (const r of localHistory) {
-      const taskType = r.taskType;
-      const difficulty = r.difficulty;
-      const score100 = r.score100;
-      const personasList = r.personasList;
-      if (Array.isArray(personasList) && personasList.length >= 2) {
-        allRuns.push({ personasList, taskType, difficulty, score100 });
-      }
+    function getUIContext() {
+        return {
+            taskType: document.getElementById("gaTaskType").value,
+            difficulty: parseInt(document.getElementById("gaDifficulty").value || "3", 10),
+            groupSize: parseInt(document.getElementById("gaGroupSize").value || "4", 10),
+        };
     }
 
-    // Train passes (single pass MVP)
-    for (const run of allRuns) {
-      updateModelFromOutcome(model, run.personasList, run.taskType, run.difficulty, run.score100);
+    // --------- Wire up buttons ---------
+
+    const dataset = readDataset();
+    const basePeople = Array.isArray(dataset.people) ? dataset.people : [];
+    const baseOutcomes = Array.isArray(dataset.outcomes) ? dataset.outcomes : [];
+
+    if (!localStorage.getItem(LS_MODEL)) save(LS_MODEL, defaultModel());
+    if (!localStorage.getItem(LS_HISTORY)) save(LS_HISTORY, []);
+
+    function trainFromDatasetAndLocal() {
+        const model = load(LS_MODEL, defaultModel());
+        const localHistory = load(LS_HISTORY, []);
+
+        const allRuns = [];
+
+        // dataset runs
+        for (const r of baseOutcomes) {
+            const taskType = r?.task?.type ?? "CSA_FRQ";
+            const difficulty = r?.task?.difficulty ?? 3;
+
+            const student = r?.student_assessment?.avg_rating_1to5 ?? 3;
+            const teacher = r?.teacher_assessment?.worked_rating_1to5 ?? 3;
+            const score100 = combinedOutcomeScore(student, teacher);
+
+            // personas snapshot is already present in YAML (best), but fallback to roster
+            const members = r?.group?.members ?? [];
+            const personasList = members.map(id => {
+                const snap = r?.group?.personas_snapshot?.[id];
+                if (snap) return snap;
+                const p = basePeople.find(x => x.id === id);
+                return p?.personas ?? null;
+            }).filter(Boolean);
+
+            if (personasList.length >= 2) {
+                allRuns.push({ personasList, taskType, difficulty, score100 });
+            }
+        }
+
+        // local history runs (saved from UI)
+        for (const r of localHistory) {
+            const taskType = r.taskType;
+            const difficulty = r.difficulty;
+            const score100 = r.score100;
+            const personasList = r.personasList;
+            if (Array.isArray(personasList) && personasList.length >= 2) {
+                allRuns.push({ personasList, taskType, difficulty, score100 });
+            }
+        }
+
+        // Train passes (single pass MVP)
+        for (const run of allRuns) {
+            updateModelFromOutcome(model, run.personasList, run.taskType, run.difficulty, run.score100);
+        }
+
+        save(LS_MODEL, model);
+        return model;
     }
 
-    save(LS_MODEL, model);
-    return model;
-  }
-
-  document.getElementById("gaTrainBtn").addEventListener("click", () => {
-    const model = trainFromDatasetAndLocal();
-    statusEl.textContent = `Trained ✓ (model v${model.version})`;
-  });
-
-  document.getElementById("gaRecommendBtn").addEventListener("click", () => {
-    const model = load(LS_MODEL, defaultModel());
-    const { taskType, difficulty, groupSize } = getUIContext();
-
-    // Recommend over the roster from YAML
-    const eligible = basePeople.filter(p => p?.personas && CATS.every(c => p.personas[c] != null));
-    const recs = recommendGroups(eligible, model, taskType, difficulty, groupSize);
-
-    statusEl.textContent = `Recommended ✓ (model v${model.version})`;
-    renderRecs(recs);
-  });
-
-  document.getElementById("gaSaveOutcomeBtn").addEventListener("click", () => {
-    const { taskType, difficulty } = getUIContext();
-    const membersRaw = document.getElementById("gaOutcomeMembers").value;
-    const studentRating = parseInt(document.getElementById("gaStudentRating").value || "3", 10);
-    const teacherRating = parseInt(document.getElementById("gaTeacherRating").value || "3", 10);
-
-    const members = membersRaw.split(",").map(s => s.trim()).filter(Boolean);
-    const people = basePeople;
-
-    const persons = members.map(id => people.find(p => p.id === id)).filter(Boolean);
-    if (persons.length < 2) {
-      outcomeStatusEl.textContent = "Need at least 2 valid member IDs from the YAML roster (e.g., u1,u2,u3).";
-      return;
-    }
-
-    const personasList = persons.map(p => p.personas);
-    const score100 = combinedOutcomeScore(studentRating, teacherRating);
-
-    const history = load(LS_HISTORY, []);
-    history.push({
-      ts: Date.now(),
-      taskType,
-      difficulty,
-      members,
-      studentRating,
-      teacherRating,
-      score100,
-      personasList
+    document.getElementById("gaTrainBtn").addEventListener("click", () => {
+        const model = trainFromDatasetAndLocal();
+        statusEl.textContent = `Trained ✓ (model v${model.version})`;
     });
-    save(LS_HISTORY, history);
 
-    // update model immediately (so it feels like an agent)
-    const model = load(LS_MODEL, defaultModel());
-    const info = updateModelFromOutcome(model, personasList, taskType, difficulty, score100);
-    save(LS_MODEL, model);
+    document.getElementById("gaRecommendBtn").addEventListener("click", () => {
+        const model = load(LS_MODEL, defaultModel());
+        const { taskType, difficulty, groupSize } = getUIContext();
 
-    outcomeStatusEl.textContent = `Saved ✓ Model updated to v${model.version} (pred before update: ${(info.predBefore * 100).toFixed(1)}%)`;
-    statusEl.textContent = `Model v${model.version}`;
-  });
+        // Recommend over the roster from YAML
+        const eligible = basePeople.filter(p => p?.personas && CATS.every(c => p.personas[c] != null));
+        const recs = recommendGroups(eligible, model, taskType, difficulty, groupSize);
 
-  document.getElementById("gaResetLocalBtn").addEventListener("click", () => {
-    save(LS_MODEL, defaultModel());
-    save(LS_HISTORY, []);
-    statusEl.textContent = "Reset ✓";
-    outcomeStatusEl.textContent = "Cleared local model + history.";
-    recsEl.innerHTML = `<div class="text-gray-400 text-sm">No recommendations yet.</div>`;
-  });
+        statusEl.textContent = `Recommended ✓ (model v${model.version})`;
+        renderRecs(recs);
+    });
 
-  // Initial status
-  const model0 = load(LS_MODEL, defaultModel());
-  statusEl.textContent = `Ready (model v${model0.version})`;
+    document.getElementById("gaSaveOutcomeBtn").addEventListener("click", () => {
+        const { taskType, difficulty } = getUIContext();
+        const membersRaw = document.getElementById("gaOutcomeMembers").value;
+        const studentRating = parseInt(document.getElementById("gaStudentRating").value || "3", 10);
+        const teacherRating = parseInt(document.getElementById("gaTeacherRating").value || "3", 10);
+
+        const members = membersRaw.split(",").map(s => s.trim()).filter(Boolean);
+        const people = basePeople;
+
+        const persons = members.map(id => people.find(p => p.id === id)).filter(Boolean);
+        if (persons.length < 2) {
+            outcomeStatusEl.textContent = "Need at least 2 valid member IDs from the YAML roster (e.g., u1,u2,u3).";
+            return;
+        }
+
+        const personasList = persons.map(p => p.personas);
+        const score100 = combinedOutcomeScore(studentRating, teacherRating);
+
+        const history = load(LS_HISTORY, []);
+        history.push({
+            ts: Date.now(),
+            taskType,
+            difficulty,
+            members,
+            studentRating,
+            teacherRating,
+            score100,
+            personasList
+        });
+        save(LS_HISTORY, history);
+
+        // update model immediately (so it feels like an agent)
+        const model = load(LS_MODEL, defaultModel());
+        const info = updateModelFromOutcome(model, personasList, taskType, difficulty, score100);
+        save(LS_MODEL, model);
+
+        outcomeStatusEl.textContent = `Saved ✓ Model updated to v${model.version} (pred before update: ${(info.predBefore * 100).toFixed(1)}%)`;
+        statusEl.textContent = `Model v${model.version}`;
+    });
+
+    document.getElementById("gaResetLocalBtn").addEventListener("click", () => {
+        save(LS_MODEL, defaultModel());
+        save(LS_HISTORY, []);
+        statusEl.textContent = "Reset ✓";
+        outcomeStatusEl.textContent = "Cleared local model + history.";
+        recsEl.innerHTML = `<div class="text-gray-400 text-sm">No recommendations yet.</div>`;
+    });
+
+    // Initial status
+    const model0 = load(LS_MODEL, defaultModel());
+    statusEl.textContent = `Ready (model v${model0.version})`;
 </script>
