@@ -1,33 +1,23 @@
 // ===========================
 // Calendar Styles
 // ===========================
-// Standardized styling for calendar modals and components
-// Uses CSS custom properties from user-preferences.js for theme consistency
+// Uses CSS custom properties from user-preferences.js for theme consistency.
+// All colors are derived from the user's chosen theme so every preset
+// (dark, light, sepia, etc.) works without hard-coded values.
 //
-// THEME INTEGRATION
-// -----------------
-// This file uses CSS custom properties from user-preferences.js:
+// Available CSS custom properties (set by user-preferences.js):
 //   --pref-bg-color, --pref-text-color, --pref-font-family, --pref-font-size
 //   --pref-accent-color, --pref-selection-color
 //   --panel, --panel-mid, --bg-0, --bg-1, --bg-2, --bg-3
-//   --text, --text-muted, --accent
-//
+//   --text, --text-strong, --text-muted, --accent, --ui-border
 // ===========================
 
 @import "mixins/buttons";
 @import "mixins/modals";
+@import "mixins/panel";
 
 // ===========================
-// Calendar Color Palette
-// ===========================
-// Using CSS custom properties from user-preferences.js for theme consistency
-
-$calendar-accent: var(--pref-accent-color, #6ae378ff);
-$calendar-danger: var(--pref-accent-color, #dc2626);
-$calendar-border: var(--accent, #CCCCCC);
-
-// ===========================
-// Modal Styles
+// Modal Styles (using mixins)
 // ===========================
 
 .modal {
@@ -37,34 +27,11 @@ $calendar-border: var(--accent, #CCCCCC);
 }
 
 .modal-content {
+  @include modal-content;
   background: linear-gradient(145deg, var(--panel), var(--panel-mid));
-  margin: -2% auto;
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  width: 80%;
-  max-width: 600px;
   color: var(--text);
   font-family: var(--pref-font-family);
-  border: 1px solid var(--bg-3);
-}
 
-.close {
-  color: var(--text-muted);
-  float: right;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  
-  &:hover,
-  &:focus {
-    color: $calendar-danger;
-    text-decoration: none;
-  }
-}
-
-.modal-content {
   input,
   textarea,
   p {
@@ -72,28 +39,25 @@ $calendar-border: var(--accent, #CCCCCC);
     padding: 12px;
     margin: 15px 0;
     border-radius: 12px;
-    border: 1px solid $calendar-border;
+    border: 1px solid var(--ui-border);
     font-size: var(--pref-font-size, 16px);
     background-color: var(--bg-1);
     color: var(--text);
     font-family: var(--pref-font-family);
   }
-  
+
   button {
     @include text-button;
     width: 100%;
     padding: 12px 20px;
-    background-color: var(--pref-accent-color, var(--bg-2));
-    color: var(--text);
     border-radius: 12px;
     font-size: var(--pref-font-size, 16px);
     font-weight: bold;
-    
-    &:hover {
-      background-color: var(--pref-selection-color, var(--bg-3));
-      transform: scale(1.05);
-    }
   }
+}
+
+.close {
+  @include modal-close-btn;
 }
 
 // ===========================
@@ -157,23 +121,10 @@ header {
 }
 
 .styled-dropdown {
-  width: 100%;
+  @include select-control(100%);
   padding: 12px;
   margin: 15px 0;
   border-radius: 12px;
-  border: 1px solid $calendar-border;
-  font-size: var(--pref-font-size, 16px);
-  background-color: var(--bg-1);
-  color: var(--text);
-  font-family: var(--pref-font-family);
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  &:hover {
-    background-color: var(--bg-2);
-    border-color: var(--pref-accent-color);
-  }
 }
 
 // Remove rounded corners from FullCalendar grid
@@ -189,9 +140,7 @@ header {
   border-radius: 0 !important;
 }
 
-td > img[src*="logo.png"] {
-  display: none !important;
-}
+// Hide logo images leaked into calendar table cells
 td > img[src*="logo.png"] {
   display: none !important;
 }
@@ -202,8 +151,9 @@ td:has(> img[src*="logo.png"]) {
 // ===========================
 // FullCalendar Theme Overrides
 // ===========================
+// All backgrounds and text derive from the active user theme so
+// light, sepia, dark, and custom presets work without modification.
 
-// Override FullCalendar backgrounds with theme colors
 .fc {
   background-color: var(--bg-0);
 }
@@ -215,11 +165,11 @@ td:has(> img[src*="logo.png"]) {
 .fc-theme-standard td,
 .fc-theme-standard th {
   background-color: var(--bg-0);
-  border-color: var(--accent);
+  border-color: var(--ui-border);
 }
 
 .fc-theme-standard .fc-scrollgrid {
-  border-color: var(--accent);
+  border-color: var(--ui-border);
 }
 
 // Alternating row backgrounds
@@ -231,14 +181,14 @@ td:has(> img[src*="logo.png"]) {
   }
 }
 
-// Header styling
+// Column header
 .fc .fc-col-header-cell {
   background-color: var(--bg-2);
   color: var(--text);
   border-bottom: none;
 }
 
-// Day cells
+// Day numbers
 .fc .fc-daygrid-day-number {
   color: var(--text);
 }
@@ -248,9 +198,45 @@ td:has(> img[src*="logo.png"]) {
   border-top: none;
 }
 
-// Today highlighting
+// Today highlighting — uses accent at low opacity for all themes
 .fc .fc-day-today {
-  background-color: color-mix(in srgb, var(--accent) 20%, var(--bg-0) 80%) !important;
+  background-color: color-mix(in srgb, var(--pref-accent-color) 15%, var(--bg-0) 85%) !important;
+}
+
+// ===========================
+// FullCalendar Button Overrides
+// ===========================
+// FullCalendar ships its own button styles that ignore our theme.
+// Override them so prev/next/today/view buttons match the user palette.
+
+.fc .fc-button {
+  background-color: var(--bg-2) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--text) !important;
+  font-family: var(--pref-font-family);
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background-color: var(--bg-3) !important;
+    border-color: var(--pref-accent-color) !important;
+    color: var(--text-strong, var(--text)) !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pref-accent-color) 40%, transparent 60%) !important;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: var(--pref-accent-color) !important;
+  border-color: var(--pref-accent-color) !important;
+  color: var(--pref-bg-color) !important;
 }
 
 // ===========================
@@ -258,9 +244,9 @@ td:has(> img[src*="logo.png"]) {
 // ===========================
 
 .fc-event-break {
-  background-color: var(--bg-2) !important;
-  border-color: transparent !important;
-  border: none !important;
+  background-color: var(--bg-3) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--text-muted) !important;
   box-shadow: none !important;
 }
 
@@ -268,42 +254,47 @@ td:has(> img[src*="logo.png"]) {
   background-color: var(--bg-2) !important;
 }
 
+// School holidays get a subtle accent tint to differentiate from manual breaks
+.fc-school-holiday {
+  background-color: color-mix(in srgb, var(--pref-accent-color) 25%, var(--bg-2) 75%) !important;
+  border-color: color-mix(in srgb, var(--pref-accent-color) 40%, var(--ui-border) 60%) !important;
+  color: var(--text-strong, var(--text)) !important;
+}
+
 // ===========================
 // Priority-based Event Colors
 // ===========================
-// Using accent color variations from theme for priority levels
+// Each priority level uses a semantic hue (red/orange/yellow/green) softened
+// with color-mix against the theme background so they remain readable on
+// every theme including light and sepia.
+//
+// Text color uses --pref-bg-color (the page background) as contrast text
+// on the colored pill — white on dark themes, dark on light themes.
+// A subtle text-shadow adapts similarly for legibility.
 
-$priority-p0: var(--pref-accent-color, #dc2626); // Red 600
-$priority-p0-border: color-mix(in srgb, var(--pref-accent-color, #dc2626) 80%, #000 20%);
-$priority-p1: var(--pref-accent-color, #ea580c); // Orange 600
-$priority-p1-border: color-mix(in srgb, var(--pref-accent-color, #ea580c) 80%, #000 20%);
-$priority-p2: var(--pref-accent-color, #ca8a04); // Yellow 600
-$priority-p2-border: color-mix(in srgb, var(--pref-accent-color, #ca8a04) 80%, #000 20%);
-$priority-p3: var(--pref-accent-color, #16a34a); // Green 600
-$priority-p3-border: color-mix(in srgb, var(--pref-accent-color, #16a34a) 80%, #000 20%);
+// Mixin to avoid repeating the event-priority pattern
+@mixin priority-event($hue) {
+  background-color: color-mix(in srgb, $hue 85%, var(--bg-0) 15%) !important;
+  border-color: color-mix(in srgb, $hue 65%, var(--bg-0) 35%) !important;
+  // Use the page bg as contrast text — dark text on light themes, light text on dark
+  color: var(--pref-bg-color) !important;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--pref-bg-color) 30%, transparent 70%);
+}
 
 .fc-event.priority-p0 {
-  background-color: $priority-p0 !important;
-  border-color: $priority-p0-border !important;
-  color: var(--text) !important;
+  @include priority-event(#dc2626);
 }
 
 .fc-event.priority-p1 {
-  background-color: $priority-p1 !important;
-  border-color: $priority-p1-border !important;
-  color: var(--text) !important;
+  @include priority-event(#ea580c);
 }
 
 .fc-event.priority-p2 {
-  background-color: $priority-p2 !important;
-  border-color: $priority-p2-border !important;
-  color: var(--text) !important;
+  @include priority-event(#ca8a04);
 }
 
 .fc-event.priority-p3 {
-  background-color: $priority-p3 !important;
-  border-color: $priority-p3-border !important;
-  color: var(--text) !important;
+  @include priority-event(#16a34a);
 }
 
 // Priority badge in event title
@@ -315,23 +306,13 @@ $priority-p3-border: color-mix(in srgb, var(--pref-accent-color, #16a34a) 80%, #
   border-radius: 3px;
   margin-right: 4px;
   vertical-align: middle;
+  color: var(--pref-bg-color);
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--pref-bg-color) 30%, transparent 70%);
 
-  &.p0 {
-    background: $priority-p0;
-    color: var(--text);
-  }
-  &.p1 {
-    background: $priority-p1;
-    color: var(--text);
-  }
-  &.p2 {
-    background: $priority-p2;
-    color: var(--text);
-  }
-  &.p3 {
-    background: $priority-p3;
-    color: var(--text);
-  }
+  &.p0 { background: color-mix(in srgb, #dc2626 85%, var(--bg-0) 15%); }
+  &.p1 { background: color-mix(in srgb, #ea580c 85%, var(--bg-0) 15%); }
+  &.p2 { background: color-mix(in srgb, #ca8a04 85%, var(--bg-0) 15%); }
+  &.p3 { background: color-mix(in srgb, #16a34a 85%, var(--bg-0) 15%); }
 }
 
 // ===========================
@@ -339,18 +320,8 @@ $priority-p3-border: color-mix(in srgb, var(--pref-accent-color, #16a34a) 80%, #
 // ===========================
 
 #periodFilterDropdown {
-  padding: 6px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--accent, #666);
-  background-color: var(--bg-1, #fff);
-  color: var(--text, #333);
-  font-size: 14px;
-  cursor: pointer;
+  @include select-control(120px);
   margin-left: 8px;
-
-  &:hover {
-    background-color: var(--bg-2, #f0f0f0);
-  }
 }
 
 // ===========================
@@ -379,4 +350,19 @@ $priority-p3-border: color-mix(in srgb, var(--pref-accent-color, #16a34a) 80%, #
   font-size: 0.8em;
   font-style: italic;
   opacity: 0.85;
+}
+
+// ===========================
+// FullCalendar Event Text
+// ===========================
+// Ensure regular event titles (non-priority) inherit the theme text color
+// so they remain readable on light and sepia backgrounds.
+
+.fc-event {
+  color: var(--text);
+}
+
+.fc-event-title,
+.fc-event-time {
+  color: inherit;
 }
