@@ -287,10 +287,8 @@ export default class Leaderboard {
                 if (!isCanvas) {
                     embedded = true;
                     appendTarget = parent;
-                    const style = window.getComputedStyle(parent);
-                    if (style.position === 'static') {
-                        parent.style.position = 'relative';
-                    }
+                    // NOTE: We no longer change the parent's position to avoid shifting the game canvas
+                    // Instead, we'll use fixed positioning for the leaderboard
                 } else {
                     // Append to the canvas' parent so we don't change canvas layout
                     appendTarget = parent.parentElement || document.body;
@@ -303,9 +301,8 @@ export default class Leaderboard {
 
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
-        container.className = `leaderboard-widget ${
-            embedded ? 'leaderboard-embedded' : 'leaderboard-fixed'
-        }${this.initiallyHidden ? ' initially-hidden' : ''}`;
+        // Always use fixed positioning to avoid affecting game container layout
+        container.className = `leaderboard-widget leaderboard-fixed${this.initiallyHidden ? ' initially-hidden' : ''}`;
 
         container.innerHTML = `
             <div class="leaderboard-header">
