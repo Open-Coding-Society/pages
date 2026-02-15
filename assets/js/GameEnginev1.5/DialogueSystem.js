@@ -1,5 +1,5 @@
 // DialogueSystem.js - Enhanced with permanent default features
-// All NPCs get: voice, typewriter, neon glow, animations by default
+// All NPCs get: voice, typewriter, neon glow, animations by default h
 
 class DialogueSystem {
  constructor(options = {}) {
