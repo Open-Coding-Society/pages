@@ -297,49 +297,66 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     # Generate lesson_key from permalink (e.g., "/csa/frqs/2019/3" -> "csa-frqs-2019-3")
     lesson_key = permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
     
+    # Build list of UI runner cells with their IDs for detection
+    ui_runner_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
+    ui_runner_ids = []
+    for ui_cell in ui_runner_cells:
+        # Extract original IDs from the cell source to help detect its output
+        source = ui_cell.get('source', '')
+        ids = re.findall(r'id="([^"]+)"', source)
+        ui_runner_ids.append(ids)
+    
     lines = markdown.split('\n')
     result = []
     in_code_block = False
     code_block_content = []
-    cell_index = 0
     code_cell_count = 0
     code_runner_count = 0
     ui_runner_count = 0
+    in_ui_runner_output = False
+    ui_runner_depth = 0
     
     i = 0
     while i < len(lines):
         line = lines[i]
         
-        # Check for UI_RUNNER cells (raw cells converted to HTML blocks)
-        if line.strip().startswith('<div') or line.strip().startswith('<!--'):
-            # Look ahead to see if this is a UI runner cell
-            ui_cell = None
-            for cell in notebook.cells:
-                if 'ui_runner' in cell.get('metadata', {}):
-                    if ui_runner_count < len([c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]):
-                        # Find the nth ui_runner cell
-                        ui_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
-                        if ui_runner_count < len(ui_cells):
-                            ui_cell = ui_cells[ui_runner_count]
-                            ui_runner_count += 1
-                            break
-            
-            if ui_cell:
-                runner_data = ui_cell['metadata']['ui_runner']
-                result.append('<div class="ui-runner">')
-                result.append(runner_data['html'])
-                result.append('<script>')
-                result.append('(function() {')
-                result.append(runner_data['script'])
-                result.append('})();')
-                result.append('</script>')
-                result.append('</div>')
-                result.append('')
-                # Skip original HTML block
-                while i < len(lines) and not (lines[i].strip().startswith('</script>') or lines[i].strip() == ''):
-                    i += 1
-                i += 1
-                continue
+        # Check if we're starting a UI_RUNNER output section
+        if not in_ui_runner_output and ui_runner_count < len(ui_runner_cells):
+            # Look for HTML that matches UI runner IDs
+            if '<div' in line or '<script>' in line:
+                # Check if this line contains any of the expected IDs for the next UI runner
+                if ui_runner_count < len(ui_runner_ids):
+                    expected_ids = ui_runner_ids[ui_runner_count]
+                    if any(f'id="{id_name}"' in line for id_name in expected_ids):
+                        in_ui_runner_output = True
+                        ui_runner_depth = 0
+                        
+                        # Inject the processed UI runner
+                        ui_cell = ui_runner_cells[ui_runner_count]
+                        runner_data = ui_cell['metadata']['ui_runner']
+                        
+                        result.append('<div class="ui-runner">')
+                        result.append(runner_data['html'])
+                        result.append('<script>')
+                        result.append('(function() {')
+                        result.append(runner_data['script'])
+                        result.append('})();')
+                        result.append('</script>')
+                        result.append('</div>')
+                        result.append('')
+                        
+                        ui_runner_count += 1
+        
+        # If we're in UI runner output, track depth and skip until we're done
+        if in_ui_runner_output:
+            if '<div' in line or '<script>' in line:
+                ui_runner_depth += 1
+            if '</div>' in line or '</script>' in line:
+                ui_runner_depth -= 1
+                if ui_runner_depth <= 0:
+                    in_ui_runner_output = False
+            i += 1
+            continue
         
         # Detect code block start
         if line.startswith('```'):
