@@ -242,6 +242,10 @@ Check if this is a course lesson and determine which course context to use
             <span id="complete-text">Mark Complete</span>
           </button>
         </div>
+        <button class="btn btn-primary" onclick="prevLesson()">
+          Previous
+          <i class="fas fa-chevron-left"></i>
+        </button>
         <button class="btn btn-primary" onclick="nextLesson()">
           Next
           <i class="fas fa-chevron-right"></i>
@@ -416,6 +420,17 @@ Check if this is a course lesson and determine which course context to use
     if (document.getElementById('lesson-progress')) {
       const lessonProgress = total > 0 ? ((currentIndex + 1) / total) * 100 : 0;
       document.getElementById('lesson-progress').style.width = `${lessonProgress}%`;
+    }
+  }
+
+  window.prevLesson = function () {
+    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+
+    if (currentIndex > 0) {
+      window.location.href = lessonItems[currentIndex - 1].href;
+    } else {
+      alert('You are on the first lesson!');
     }
   }
 
