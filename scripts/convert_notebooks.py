@@ -26,6 +26,8 @@ CODE_RUNNER_PATTERNS = {
     'java': r'^//\s*CODE_RUNNER:\s*(.+)$',
 }
 
+# UI_RUNNER pattern for HTML cells
+UI_RUNNER_PATTERN = r'^<!--\s*UI_RUNNER:\s*(.+)\s*-->$'
 
 def error_cleanup(notebook_file):
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
@@ -193,6 +195,93 @@ def process_code_runner_cells(notebook, permalink):
     return notebook
 
 
+def extract_ui_runner_metadata(cell_source):
+    """Extract UI_RUNNER description from HTML cell comments"""
+    lines = cell_source.split('\n')
+    
+    for line in lines:
+        match = re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    
+    return None
+
+
+def clean_html_for_runner(cell_source, runner_index):
+    """Clean HTML cell and make IDs unique"""
+    lines = cell_source.split('\n')
+    cleaned_lines = []
+    in_script = False
+    html_lines = []
+    script_lines = []
+    
+    for line in lines:
+        # Skip %%html magic command
+        if line.strip().startswith('%%html'):
+            continue
+        # Skip UI_RUNNER comment
+        if re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
+            continue
+        # Track script sections
+        if '<script>' in line:
+            in_script = True
+            continue
+        elif '</script>' in line:
+            in_script = False
+            continue
+        
+        if in_script:
+            script_lines.append(line)
+        else:
+            html_lines.append(line)
+    
+    html_str = '\n'.join(html_lines)
+    script_str = '\n'.join(script_lines)
+    
+    # Make IDs unique by adding suffix
+    unique_suffix = f"-ui{runner_index}"
+    
+    # Find and replace all id attributes
+    id_pattern = r'id="([^"]+)"'
+    ids_found = re.findall(id_pattern, html_str)
+    
+    for old_id in ids_found:
+        new_id = old_id + unique_suffix
+        html_str = html_str.replace(f'id="{old_id}"', f'id="{new_id}"')
+        # Update getElementById references in JavaScript
+        script_str = script_str.replace(f"getElementById('{old_id}')", f"getElementById('{new_id}')")
+        script_str = script_str.replace(f'getElementById("{old_id}")', f'getElementById("{new_id}")')
+    
+    return html_str, script_str
+
+
+def process_ui_runner_cells(notebook, permalink):
+    """Process notebook cells and add ui-runner metadata"""
+    runner_index = 0
+    processed_cells = []
+    
+    for cell in notebook.cells:
+        if cell.cell_type == 'raw' or (cell.cell_type == 'code' and cell.source.strip().startswith('%%html')):
+            description = extract_ui_runner_metadata(cell.source)
+            
+            if description:
+                html_content, script_content = clean_html_for_runner(cell.source, runner_index)
+                
+                # Store metadata for later use
+                cell['metadata']['ui_runner'] = {
+                    'description': description,
+                    'runner_id': generate_runner_id(permalink, runner_index),
+                    'html': html_content,
+                    'script': script_content
+                }
+                runner_index += 1
+        
+        processed_cells.append(cell)
+    
+    notebook.cells = processed_cells
+    return notebook
+
+
 def inject_code_runners(markdown, notebook, front_matter=None):
     """Inject code-runner includes after code blocks with metadata
     
@@ -215,10 +304,42 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     cell_index = 0
     code_cell_count = 0
     code_runner_count = 0
+    ui_runner_count = 0
     
     i = 0
     while i < len(lines):
         line = lines[i]
+        
+        # Check for UI_RUNNER cells (raw cells converted to HTML blocks)
+        if line.strip().startswith('<div') or line.strip().startswith('<!--'):
+            # Look ahead to see if this is a UI runner cell
+            ui_cell = None
+            for cell in notebook.cells:
+                if 'ui_runner' in cell.get('metadata', {}):
+                    if ui_runner_count < len([c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]):
+                        # Find the nth ui_runner cell
+                        ui_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
+                        if ui_runner_count < len(ui_cells):
+                            ui_cell = ui_cells[ui_runner_count]
+                            ui_runner_count += 1
+                            break
+            
+            if ui_cell:
+                runner_data = ui_cell['metadata']['ui_runner']
+                result.append('<div class="ui-runner">')
+                result.append(runner_data['html'])
+                result.append('<script>')
+                result.append('(function() {')
+                result.append(runner_data['script'])
+                result.append('})();')
+                result.append('</script>')
+                result.append('</div>')
+                result.append('')
+                # Skip original HTML block
+                while i < len(lines) and not (lines[i].strip().startswith('</script>') or lines[i].strip() == ''):
+                    i += 1
+                i += 1
+                continue
         
         # Detect code block start
         if line.startswith('```'):
@@ -304,6 +425,9 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         
         # Process code runner cells before conversion
         notebook = process_code_runner_cells(notebook, permalink)
+        
+        # Process ui runner cells before conversion
+        notebook = process_ui_runner_cells(notebook, permalink)
         
         process_mermaid_cells(notebook)
         exporter = MarkdownExporter()
