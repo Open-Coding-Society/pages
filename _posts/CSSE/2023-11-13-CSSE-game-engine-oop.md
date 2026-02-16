@@ -2,9 +2,8 @@
 toc: false
 comments: false
 layout: post
-title: OOP game levels, Part 1 files
-description: This provides a synopsis of the platformer game.  Included is an overview of files, directories, javascript files, and an outline of the game objects, game levels, and game control.
-type: ccc
+title: OOP GameEngine essentials 
+description: This provides a synopsis of the rpg game.  Included is an overview of files, directories, javascript files, and an outline of the game objects, game levels, and game control.
 courses: { csse: {week: 13} }
 ---
 

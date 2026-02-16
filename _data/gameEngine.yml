@@ -1,0 +1,47 @@
+# course illustrations
+Title: "GameEngine Help"
+Description: "This is a guide to the OCS GameEngine, featuring GameBuilder, Backgrounds, Players, and other capabilities."
+Topics:
+  - title: "GameBuilder"
+    image: "/gamify/lessons/gamebuilder.png"
+    link: /rpg/gamebuilder
+    alt: "GameBuilder"
+    keyPoints:
+      - "Game Creation Tool"
+      - "Visual Coding"
+      - "Vidual Design"
+      - "Adding Assets"
+    subtitle: "Game Creation Tool"
+    description: "GameBuilder is a powerful tool that allows you to create your own games without needing to write code. It provides a visual interface for designing game mechanics, creating levels, and adding assets, making game development accessible to everyone."
+  - title: "Background"
+    image: "/gamify/lessons/background.jpg"
+    alt: "Background"
+    link: /gamify/topics/backgrounds
+    keyPoints:
+      - "Game Environment"
+      - "Top Down View"
+      - "Tile Based"
+      - "Parallax Scrolling"
+    subtitle: "Theme and Style"
+    description: "The background of a game establishes its theme and style, creating the foundation for the player's experience. This is your opportunity to get creative and make your game stand out."
+  - title: "Character"
+    image: "/gamify/lessons/character.png"
+    alt: "Character"
+    link: /gamify/topics/characters
+    keyPoints:
+      - "Player Character"
+      - "Movement"
+      - "Key Inputs"
+      - "Collision Detection"
+    subtitle: "Player and Movement"
+    description: "Characters are the heart of the game, driving the story, interactions, and adventures. They bring the game world to life and engage the player through their roles and actions."
+  - title: "NPC"
+    image: "/gamify/lessons/shark.png"
+    alt: "NPC"
+    keyPoints:
+      - "Movement"
+      - "Animation"
+      - "Collision Detection"
+      - "Game Logic"
+    subtitle: "NPC Animation and Movement"
+    description: "We created an area for the NPC to reside in. The NPC bounces off the invisible barriers of this area. Every few seconds, the NPC has an animation that creates a bubble affect around the NPC. When the player collides with the NPC, it has a death animation which consists of red particles around the player's sprite, making it seem as if the NPC killed player."
