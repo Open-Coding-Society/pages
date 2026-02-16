@@ -934,6 +934,7 @@
     try {
       const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
       const javaURI = configModule.javaURI;
+      const fetchOptions = configModule.fetchOptions;
       
       const events = [];
       
@@ -1315,9 +1316,10 @@
     try {
       const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
       const javaURI = configModule.javaURI;
+      const fetchOptions = configModule.fetchOptions;
       
       if (javaURI) {
-        const response = await fetch(`${javaURI}/api/calendar/events`, { credentials: 'include' });
+        const response = await fetch(`${javaURI}/api/calendar/events`, fetchOptions);
         if (response.ok) {
           const allEvents = await response.json();
           currentEvents = allEvents.filter(e => e.period === courseName);

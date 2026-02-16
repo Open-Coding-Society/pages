@@ -180,6 +180,21 @@
     }
     set('--text-muted', textMuted);
 
+    // Priority colors — semantic hues adjusted per theme so calendar events
+    // stay readable on every background. Light themes darken the hues slightly;
+    // dark themes keep them vibrant.
+    if (lightBg) {
+      set('--priority-p0', '#b91c1c'); // red-700
+      set('--priority-p1', '#c2410c'); // orange-700
+      set('--priority-p2', '#a16207'); // yellow-700
+      set('--priority-p3', '#15803d'); // green-700
+    } else {
+      set('--priority-p0', '#dc2626'); // red-600
+      set('--priority-p1', '#ea580c'); // orange-600
+      set('--priority-p2', '#eab308'); // yellow-500
+      set('--priority-p3', '#22c55e'); // green-500
+    }
+
     // Turn on the high-priority theme class on <html> so global CSS rules
     // can override other themes consistently (Minima, Tailwind, etc.).
     document.documentElement.classList.add('user-theme-active');

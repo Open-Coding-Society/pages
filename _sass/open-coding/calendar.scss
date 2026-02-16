@@ -17,6 +17,19 @@
 @import "mixins/panel";
 
 // ===========================
+// Priority Color Palette
+// ===========================
+// Semantic hues for each priority level. SASS variables provide compile-time
+// defaults; CSS custom properties (--priority-p0 … --priority-p3) are set
+// at runtime by user-preferences.js so each theme can supply its own hues.
+// The mixin uses var(--priority-pN, $fallback) so everything still works
+// even if the JS hasn't loaded yet.
+$priority-p0: #dc2626; // Red    — Critical  (fallback)
+$priority-p1: #ea580c; // Orange — High      (fallback)
+$priority-p2: #ca8a04; // Yellow — Medium    (fallback)
+$priority-p3: #16a34a; // Green  — Low       (fallback)
+
+// ===========================
 // Modal Styles (using mixins)
 // ===========================
 
@@ -268,33 +281,35 @@ td:has(> img[src*="logo.png"]) {
 // with color-mix against the theme background so they remain readable on
 // every theme including light and sepia.
 //
+// The hues come from CSS custom properties (--priority-p0 … --priority-p3)
+// which user-preferences.js sets per theme. SASS $priority-pN variables
+// serve as fallbacks when the JS hasn't loaded yet.
+//
 // Text color uses --pref-bg-color (the page background) as contrast text
 // on the colored pill — white on dark themes, dark on light themes.
-// A subtle text-shadow adapts similarly for legibility.
 
 // Mixin to avoid repeating the event-priority pattern
-@mixin priority-event($hue) {
-  background-color: color-mix(in srgb, $hue 85%, var(--bg-0) 15%) !important;
-  border-color: color-mix(in srgb, $hue 65%, var(--bg-0) 35%) !important;
-  // Use the page bg as contrast text — dark text on light themes, light text on dark
+@mixin priority-event($css-var, $fallback) {
+  background-color: color-mix(in srgb, var(#{$css-var}, #{$fallback}) 85%, var(--bg-0) 15%) !important;
+  border-color: color-mix(in srgb, var(#{$css-var}, #{$fallback}) 65%, var(--bg-0) 35%) !important;
   color: var(--pref-bg-color) !important;
   text-shadow: 0 1px 2px color-mix(in srgb, var(--pref-bg-color) 30%, transparent 70%);
 }
 
 .fc-event.priority-p0 {
-  @include priority-event(#dc2626);
+  @include priority-event(--priority-p0, $priority-p0);
 }
 
 .fc-event.priority-p1 {
-  @include priority-event(#ea580c);
+  @include priority-event(--priority-p1, $priority-p1);
 }
 
 .fc-event.priority-p2 {
-  @include priority-event(#ca8a04);
+  @include priority-event(--priority-p2, $priority-p2);
 }
 
 .fc-event.priority-p3 {
-  @include priority-event(#16a34a);
+  @include priority-event(--priority-p3, $priority-p3);
 }
 
 // Priority badge in event title
@@ -309,10 +324,10 @@ td:has(> img[src*="logo.png"]) {
   color: var(--pref-bg-color);
   text-shadow: 0 1px 2px color-mix(in srgb, var(--pref-bg-color) 30%, transparent 70%);
 
-  &.p0 { background: color-mix(in srgb, #dc2626 85%, var(--bg-0) 15%); }
-  &.p1 { background: color-mix(in srgb, #ea580c 85%, var(--bg-0) 15%); }
-  &.p2 { background: color-mix(in srgb, #ca8a04 85%, var(--bg-0) 15%); }
-  &.p3 { background: color-mix(in srgb, #16a34a 85%, var(--bg-0) 15%); }
+  &.p0 { background: color-mix(in srgb, var(--priority-p0, #{$priority-p0}) 85%, var(--bg-0) 15%); }
+  &.p1 { background: color-mix(in srgb, var(--priority-p1, #{$priority-p1}) 85%, var(--bg-0) 15%); }
+  &.p2 { background: color-mix(in srgb, var(--priority-p2, #{$priority-p2}) 85%, var(--bg-0) 15%); }
+  &.p3 { background: color-mix(in srgb, var(--priority-p3, #{$priority-p3}) 85%, var(--bg-0) 15%); }
 }
 
 // ===========================
