@@ -77,17 +77,19 @@ flowchart TD
     subgraph Objects
         Player
         NPC
-        Interact[Interact/Reaction Callback]
+        Interact
     end
 
     Update --> Objects
     Draw --> Objects
-    Interact -- reaction --> Player
+    Player -- interacts --> Interact
     NPC -- interacts --> Interact
+    Interact -- reaction --> Player
 ```
 
 Summary:
+This visual simplifies the key workflow performed by the GameEngine:
 
 * The GameLoop drives the update and draw cycle.
-* Player, NPC, and Background are examples of objects managed in each frame.
-* The interact/reaction callback definition is a core extension point for custom game logic
+* Player and NPC are examples of objects managed each frame.
+* The interact/reaction callback is a core feature for object-to-object interaction.
