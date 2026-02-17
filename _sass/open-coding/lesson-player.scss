@@ -569,16 +569,6 @@ body:has(.lesson-player) {
   gap: 12px;
 }
 
-.btn {
-  @include text-button;
-  font-size: 14px;
-  display: flex;
-
-  @media (max-width: 768px) {
-    flex: 1;
-  }
-}
-
 /* Floating Menu Button (Mobile) */
 .floating-menu-btn {
   @include icon-button(20px, 0);
@@ -591,7 +581,6 @@ body:has(.lesson-player) {
   border-radius: 50%;
   z-index: 1000;
 }
-
 
 /* Timeline Modal - applies to all screen sizes */
 .timeline-modal {
