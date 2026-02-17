@@ -48,14 +48,14 @@ export default class Leaderboard {
         /* Embedded inside game canvas */
         .leaderboard-embedded {
             position: absolute;
-            top: 20px;
+            top: 80px;
             right: 20px;
         }
 
         /* Fallback if no parent */
         .leaderboard-fixed {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
         }
 
@@ -273,36 +273,21 @@ export default class Leaderboard {
     mount() {
         if (this.mounted) return;
 
-        let parent = document.body;
-        let embedded = false;
-        let appendTarget = document.body;
-
-        if (this.parentId) {
-            const el = document.getElementById(this.parentId);
-            if (el) {
-                parent = el;
-
-                // If the parent element is a canvas, avoid mutating its styles
-                const isCanvas = parent.tagName === 'CANVAS';
-                if (!isCanvas) {
-                    embedded = true;
-                    appendTarget = parent;
-                    // NOTE: We no longer change the parent's position to avoid shifting the game canvas
-                    // Instead, we'll use fixed positioning for the leaderboard
-                } else {
-                    // Append to the canvas' parent so we don't change canvas layout
-                    appendTarget = parent.parentElement || document.body;
-                    embedded = false;
-                }
-            }
-        } else {
-            appendTarget = document.body;
-        }
-
+        // CRITICAL: Always append to body and use fixed positioning
+        // This ensures the leaderboard is not affected by game container position changes
+        const appendTarget = document.body;
+        
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
-        // Always use fixed positioning to avoid affecting game container layout
-        container.className = `leaderboard-widget leaderboard-fixed${this.initiallyHidden ? ' initially-hidden' : ''}`;
+        
+        // CRITICAL: Always use fixed positioning to avoid game container position affecting it
+        container.style.position = 'fixed';
+        container.style.top = '80px';
+        container.style.right = '20px';
+        container.style.zIndex = '1000';
+        
+        // Add the widget class for styling
+        container.className = 'leaderboard-widget' + (this.initiallyHidden ? ' initially-hidden' : '');
 
         container.innerHTML = `
             <div class="leaderboard-header">
