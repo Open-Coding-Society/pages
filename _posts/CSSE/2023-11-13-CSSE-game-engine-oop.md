@@ -2,88 +2,92 @@
 toc: false
 comments: false
 layout: post
-title: GameEngine essentials 
-description: This provides a synopsis of the rpg game.  Included is an overview of files, directories, javascript files, and an outline of the game objects, game levels, and game control.
 courses: { csse: {week: 13} }
+title: GameEngine essentials 
+description: A synopsis of the GameEngine environment. 
+permalink: /gamify/essentials
 ---
 
+## Overview
+
+GameEnginev1 is built around a central GameLoop that manages updates and rendering for all game objects.  The loop ensures smooth gameplay by repeatedly updating object states and drawing them to the screen.
+
 ## Files and Directories
+
 Review these locations in the project to understand the structure and purpose of different files in a project.
-- navigation/game2.html is the entry point of the project, containing the HTML and initialization JavaScript for the game.
-- _sass/dracula/platformer-styles.sccs is an SCSS file that defines the styles for the game, including elements like score display, game buttons, and input fields. It's noted that future updates should remove dependencies from Dracula.
-- images/platformer is a directory that contains sprite sheets and images for the characters and objects in the game.
-- assets/audio is a directory that contains audio assets, which are sounds synchronized with game events like collisions.
-- assets/js/platformer2x is the directory where the game's key logic is written in JavaScript without the use of third-party libraries.
-
-
-## OOP Conversion Outline
-
-The OOP hierarchy is designed to promote reusability, encapsulation, and a clear separation of entities.
-
-### Key JavaScript files
-- GameEnv.js: This overarching environment class holds the game levels, and game objects, and manages the overall game state.
-- SettingControl.js: This is the user interface for customizable game state variables such as difficulty level, and sound settings, and it also manages local storage for these settings.
-- LeaderBoard.js: This interface manages game data, specifically the leaderboard data. It handles local storage for the leaderboard and also communicates with a Node.js backend for global leaderboard functionality.
-- GameSetup.js: This class is responsible for creating objects for the Game Levels and loading the game assets
-- GameControl.js This class handles the transition between different Game Levels and drives the refresh rate of all GameObjects.
-- GameObject.js: This provides a common base for defining game entities. It includes common properties like position, size, and velocity, and common methods like update and draw.
-- GameLevel.js: This class holds level-specific assets and creates GameObjects for each level.
-
-### Conceptual overview
-The below visualization shows key elements of the Game.
-- GameSetup creates GameObjects, which are then used by GameControl to drive the game. 
-  - A new GameLevel in GameSetup creates Levels and new GameObjects from assets. 
-- GameControl contains the gameLoop and transitionToLevel methods.
-  - GameControl calls a method in GameEnv to update and draw each GameObject.
-  - Each GameObject has unique implementations of update, draw, collisions, etc.
 
 ```text
-GameSetup
+/assets/js/GameEnginev1
 │
-├── Attributes:
-│   ├── playerAssets
-│   ├── backgroundAssets
-│   ├── platformAssets
+├── essentials: (core files)
+│   ├── Background
+│   ├── BackgroundParallax
+│   ├── Barrier
 │   └── ...
-│
-└── Methods: 
-    ├── load
-    │   ├── Creates new GameObjects from assets:
-    │   │   ├── Player
-    │   │   ├── Background
-    │   │   ├── Platform
-    │   │   └── ...
-    │   └── Returns list of GameObjects
-    └── ...
-
-GameObject (Parent)
-│
-├── Player 
+├── platformer: (legacy code)
+│   ├── Config
+│   ├── Enemy
+│   └── ...
+├── templates: (GameBuilder support) 
 │   ├── Attributes: sprite animation, wasd
 │   └── Methods: ...
-│
-├── Background
-│   ├── Attributes: fit to screen, scrolling
-│   └── Methods: ...
-│
-├── Platform
-│   ├── Attributes: fixed to bottom, scrolling
-│   └── Methods: ...
-│
+├── 00-v1-Game.md (GameLevel loader)
+├── GameLevelDesert (example configuration)
+├── GameLevelSquare (default configuration)
 └── ...
-
-GameControl
-│
-├── Attributes: ...
-│
-└── Methods: 
-    ├── gameLoop
-    │   ├── Drives action of game level
-    │   ├── Updates and draws GameObjects
-    │   └── ...
-    ├── transitionToLevel
-    │   ├── Destroys current GameObjects
-    │   ├── Calls GameSetup.load to create new GameObjects for next level
-    │   └── ...
-    └── ...
 ```
+
+### GameLoop Logic
+
+1. Initialize game environment and objects.
+2. Update: Each frame, update all game objects (Player, NPCs, Barriers, Background, etc.).
+3. Draw: Render updated objects to the screen.
+4. Repeat: Continue until the game ends.
+
+### Primary Classes
+
+* GameObject: Base class for all entities.
+* Player: Controlled by the user.
+* NPC: Non-player characters with scripted behaviors.
+* Background: Visual environment, may include parallax effects.
+* GameControl: Handles input and game state.
+* GameEnv: Manages global environment settings.
+
+### Interact & Reaction Callbacks
+
+A key feature for customizing gameplay is the interact (or reaction) callback.
+Students often define these early when creating new assets or objects.
+This callback lets you specify what happens when the player interacts with an object—such as picking up an item, triggering dialogue, etc
+
+## Summary
+
+```mermaid
+flowchart TD
+    Start([Start])
+    Init[Initialize GameEnv & Objects]
+    Loop{GameLoop}
+    Update[Update Objects]
+    Draw[Draw Objects]
+    End([End])
+
+    Start --> Init --> Loop
+    Loop --> Update --> Draw --> Loop
+    Loop --> End
+
+    subgraph Objects
+        Player
+        NPC
+        Interact[Interact/Reaction Callback]
+    end
+
+    Update --> Objects
+    Draw --> Objects
+    Interact -- reaction --> Player
+    NPC -- interacts --> Interact
+```
+
+Summary:
+
+* The GameLoop drives the update and draw cycle.
+* Player, NPC, and Background are examples of objects managed in each frame.
+* The interact/reaction callback definition is a core extension point for custom game logic
