@@ -2,7 +2,7 @@
 toc: false
 comments: false
 layout: post
-title: OOP GameEngine essentials 
+title: GameEngine essentials 
 description: This provides a synopsis of the rpg game.  Included is an overview of files, directories, javascript files, and an outline of the game objects, game levels, and game control.
 courses: { csse: {week: 13} }
 ---
