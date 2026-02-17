@@ -74,8 +74,8 @@ Sprint3:
       - "Sprites and Animation"
       - "Player and NPCs"
 Sprint4:
-  title: Planning, Tinkering, Lessons, and OOP
-  description: Students, in twos or threes, will work on Game and study OOP. There will be a lot of code, some Tech Talks, and some Team Teaching assignments provided to learn the code.
+  title: Planning, Tinkering, Team Teaching, and OOP
+  description: Explore the OCS GameEngine—a platform designed to make learning computer science both fun and accesible. You will work collaboratively, build games, and apply key programming concepts in a creative, team-based environment.
   start: 13
   end: 16
 Sprint5:
