@@ -5,7 +5,7 @@ layout: post
 courses: { csse: {week: 13} }
 title: GameEngine essentials 
 description: A synopsis of the GameEngine environment. 
-permalink: /gamify/essentials
+permalink: /game/essentials
 ---
 
 ## Overview
