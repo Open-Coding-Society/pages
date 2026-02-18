@@ -47,9 +47,11 @@ permalink: /gamebuilder
 }
 </style>
 
-
 <!-- title banner for the GameBuilder page -->
-<div class="gamebuilder-title">{{page.title}}</div>
+<div class="gamebuilder-title">
+  {{page.title}}
+  <a href="{{sited.baseurl}}/gamebuilder/doc">📜</a>
+</div>
 
 <!-- Ensure GameTemplatesV1 is available as a global by loading templates.js -->
 <script>
