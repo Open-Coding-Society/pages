@@ -1081,6 +1081,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {}
     }
 
+/*********** Code Building Secton **********/
+
 /**
  * Extract and normalize background data from UI
  * @param {Object} bg - The ui.bg object from the form
@@ -1107,7 +1109,7 @@ function bg_extract(bg, name = "custom_bg") {
  * @param {Object} bg - Normalized background object
  * @returns {Object} bg_data_literal - Ready for GameEnvBackground
  */
-function bg_data(bg, name = "bgData") {
+function bg_code(bg, name = "bgData") {
 
   const bg_data_literal = `
 
@@ -1120,31 +1122,100 @@ function bg_data(bg, name = "bgData") {
   return bg_data_literal;
 }
 
-        /* code generation (baseline and steps) */
-        function generateBaselineCode() {
-                return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-            import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-            import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-            import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+function player_extract(ui, p) {
 
-class GameLevelCustom {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;
+    const dirRowsTotal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
+    const clamp = (v) => {
+            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
+            return Math.max(0, Math.min(maxIndex, v|0));
+    };
 
-        // Definitions will be added here per step
-
-        // Define objects for this level progressively via Confirm Step
-        this.classes = [
-            // Step 1: add GameEnvBackground
-            // Step 2: add Player
-            // Step 3: add Npc
-        ];
+    return {
+     name: (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'"),
+     pIsData: p && p.src && p.src.startsWith('data:'),
+     pSrcVal: p.pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`,
+     pScaleVal: parseInt(ui.pScale?.value || '5', 10),
+     pStepVal: parseInt(ui.pStep?.value || '1000', 10),
+     pAnimVal: parseInt(ui.pAnim?.value || '50', 10),
+     initX: Math.max(0, parseInt(ui.pX?.value || '0', 10)),
+     initY: Math.max(0, parseInt(ui.pY?.value || '0', 10)),
+     pRowsVal: dirRowsTotal,
+     pColsVal: Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10)),
+     dirRowsTotal: dirRowsTotal,
+     dirCols: Math.max(1, parseInt(ui.pDirCols?.value || 3, 10)),
+     dRow: clamp(parseInt(ui.pDownRow?.value ?? 0)),
+     dDefault: 0,
+     rDefault: 1,
+     lDefault: 2,
+     uDefault: 3,
+     rRow: clamp(parseInt(ui.pRightRow?.value ?? rDefault)),
+     lRow: clamp(parseInt(ui.pLeftRow?.value ?? lDefault)),
+     uRow: clamp(parseInt(ui.pUpRow?.value ?? uDefault)),
+     urRow: clamp(parseInt(ui.pUpRightRow?.value ?? uRow)),
+     drRow: clamp(parseInt(ui.pDownRightRow?.value ?? rRow)),
+     ulRow: clamp(parseInt(ui.pUpLeftRow?.value ?? lRow)),
+     dlRow: clamp(parseInt(ui.pDownLeftRow?.value ?? dRow)),
+     hbW: Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9)),
+     hbH: Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9)),
     }
 }
 
-export const gameLevelClasses = [GameLevelCustom];`;
+function player_code(px, name = "playerData" ) {
+
+    const player_data_literal = `
+
+    const playerData = {
+        id: '${name}',
+        src: ${px.pSrcVal},
+        SCALE_FACTOR: ${px.pScaleVal},
+        STEP_FACTOR: ${px.pStepVal},
+        ANIMATION_RATE: ${px.pAnimVal},
+        INIT_POSITION: { x: ${px.initX}, y: ${px.initY} },
+        orientation: { rows: ${px.pRowsVal}, columns: ${px.pColsVal} },
+        down: { row: ${px.dRow}, start: 0, columns: ${px.dirCols} },
+        downRight: { row: ${px.drRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
+        downLeft: { row: ${px.dlRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
+        left: { row: ${px.lRow}, start: 0, columns: ${px.dirCols} },
+        right: { row: ${px.rRow}, start: 0, columns: ${px.dirCols} },
+        up: { row: ${px.uRow}, start: 0, columns: ${px.dirCols} },
+        upLeft: { row: ${px.ulRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
+        upRight: { row: ${px.urRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: ${px.hbW}, heightPercentage: ${px.hbH} },
+        keypress: ${px.keypress}
+
+        };`;
+
+    return player_data_literal;
+
+}
+
+/* code generation (baseline and steps) */
+function generateBaselineCode() {
+    return `
+
+    import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+    import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+    import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+    import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+
+    class GameLevelCustom {
+        constructor(gameEnv) {
+            const path = gameEnv.path;
+            const width = gameEnv.innerWidth;
+            const height = gameEnv.innerHeight;
+
+            // Definitions will be added here per step
+
+            // Define objects for this level progressively via Confirm Step
+            this.classes = [
+                // Step 1: add GameEnvBackground
+                // Step 2: add Player
+                // Step 3: add Npc
+            ];
+        }
+    }
+
+    export const gameLevelClasses = [GameLevelCustom];`;
         }
 
         function generateStepCode(currentStep) {
@@ -1252,8 +1323,8 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         if (!ui.bg.value) return null;
 
                         let bgx = bg_extract(bg);
-                        let bgData = bg_data(bgx)
-                        let defs = `${bgData}`;
+                        let bgCode = bg_code(bgx)
+                        let defs = `${bgCode}`;
         const classes = [
             "      { class: GameEnvBackground, data: bgData }"
                         ];
@@ -1294,64 +1365,14 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
                 if (currentStep === 'player') {
                         if (!ui.bg.value || !ui.pSprite.value) return null;
-                        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
 
                         let bgx = bg_extract(bg);
-                        let bgData = bg_data(bgx)
+                        let bgCode = bg_code(bgx)
 
+                        let playerx = player_extract(ui,p);
+                        let playerCode = player_code(playerx);
 
-                        const pIsData = p && p.src && p.src.startsWith('data:');
-                        const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-                        const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
-                        const pStepVal = parseInt(ui.pStep?.value || '1000', 10);
-                        const pAnimVal = parseInt(ui.pAnim?.value || '50', 10);
-                        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-                        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-                        const pRowsVal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
-                        const pColsVal = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10));
-                        const dirRowsTotal = pRowsVal;
-                        const clamp = (v) => {
-                            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
-                            return Math.max(0, Math.min(maxIndex, v|0));
-                        };
-                        const dirCols = Math.max(1, parseInt(ui.pDirCols?.value || 3, 10));
-                        const dRow = clamp(parseInt(ui.pDownRow?.value ?? 0));
-                        const dDefault = 0;
-                        const rDefault = 1;
-                        const lDefault = 2;
-                        const uDefault = 3;
-                        const rRow = clamp(parseInt(ui.pRightRow?.value ?? rDefault));
-                        const lRow = clamp(parseInt(ui.pLeftRow?.value ?? lDefault));
-                        const uRow = clamp(parseInt(ui.pUpRow?.value ?? uDefault));
-                        const urRow = clamp(parseInt(ui.pUpRightRow?.value ?? uRow));
-                        const drRow = clamp(parseInt(ui.pDownRightRow?.value ?? rRow));
-                        const ulRow = clamp(parseInt(ui.pUpLeftRow?.value ?? lRow));
-                        const dlRow = clamp(parseInt(ui.pDownLeftRow?.value ?? dRow));
-                        const hbW = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
-                        const hbH = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
-
-                        const defs = `
-        ${bgData}
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleVal},
-            STEP_FACTOR: ${pStepVal},
-            ANIMATION_RATE: ${pAnimVal},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsVal}, columns: ${pColsVal} },
-            down: { row: ${dRow}, start: 0, columns: ${dirCols} },
-            downRight: { row: ${drRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            downLeft: { row: ${dlRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            left: { row: ${lRow}, start: 0, columns: ${dirCols} },
-            right: { row: ${rRow}, start: 0, columns: ${dirCols} },
-            up: { row: ${uRow}, start: 0, columns: ${dirCols} },
-            upLeft: { row: ${ulRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            upRight: { row: ${urRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${hbW}, heightPercentage: ${hbH} },
-            keypress: ${keypress}
-        };`;
+                        const defs = `${bgCode} ${playerCode}`;
                         const classes = [
             "      { class: GameEnvBackground, data: bgData }",
             "      { class: Player, data: playerData }"
@@ -1398,47 +1419,13 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     const includedSlots = ui.npcs.slice();
                     if (includedSlots.length === 0) return null;
 
-                        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-                        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                        const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-                        const pIsData = p && p.src && p.src.startsWith('data:');
-                        const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-                        const pScaleValN = parseInt(ui.pScale?.value || '5', 10);
-                        const pStepValN = parseInt(ui.pStep?.value || '1000', 10);
-                        const pAnimValN = parseInt(ui.pAnim?.value || '50', 10);
-                        const pRowsValN = Math.max(1, parseInt(ui.pRows?.value || p.rows || 1, 10));
-                        const pColsValN = Math.max(1, parseInt(ui.pCols?.value || p.cols || 1, 10));
-                        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-                        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-                        const hbWN = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
-                        const hbHN = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
-                        
-                        const defsStart = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleValN},
-            STEP_FACTOR: ${pStepValN},
-            ANIMATION_RATE: ${pAnimValN},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsValN}, columns: ${pColsValN} },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-            downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
-            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${hbWN}, heightPercentage: ${hbHN} },
-            keypress: ${keypress}
-        };`;
+                        let bgx = bg_extract(bg);
+                        let bgCode = bg_code(bgx)
+
+                        let playerx = player_extract(ui,p);
+                        let playerCode = player_code(playerx);
+
+                        const defsStart = `${bgCode} ${playerCode}`;
                         const npcDefs = [];
                         const classes = [
             "      { class: GameEnvBackground, data: bgData }",
@@ -1532,46 +1519,17 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 }
 
                 if (currentStep === 'walls') {
+
                     if (!ui.bg.value || !ui.pSprite.value) return null;
-                    const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-                    const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                    const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-                    const pIsData = p && p.src && p.src.startsWith('data:');
-                    const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-                    const pScaleValW = parseInt(ui.pScale?.value || '5', 10);
-                    const pStepValW = parseInt(ui.pStep?.value || '1000', 10);
-                    const pAnimValW = parseInt(ui.pAnim?.value || '50', 10);
-                    const pRowsValW = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
-                    const pColsValW = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10));
-                    const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-                    const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-                    
-                    const defsStart = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleValW},
-            STEP_FACTOR: ${pStepValW},
-            ANIMATION_RATE: ${pAnimValW},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsValW}, columns: ${pColsValW} },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-            downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
-            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9))}, heightPercentage: ${Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9))} },
-            keypress: ${keypress}
-        };`;
+
+                    let bgx = bg_extract(bg);
+                    let bgCode = bg_code(bgx)
+
+                    let playerx = player_extract(ui,p);
+                    let playerCode = player_code(playerx);
+
+                    const defsStart = `${bgCode} ${playerCode}`;
+
                     const classes = [
                         "      { class: GameEnvBackground, data: bgData }",
                         "      { class: Player, data: playerData }"
