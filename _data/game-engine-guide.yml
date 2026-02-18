@@ -2,6 +2,18 @@
 Title: "GameEngine Guide"
 Description: "This is a guide to the OCS GameEngine, featuring GameBuilder, Backgrounds, Characters, and other capabilities."
 Topics:
+  - title: "Intoduction"
+    image: "/gamify/lessons/game-engine-intro.png"
+    link: /game/guide/intro
+    alt: "Introduction"
+    keyPoints:
+      - "Files and Directories"
+      - "Game Loop logic"
+      - "Interact and React"
+      - "Update and Draw"
+    subtitle: "GameEngine Introduction"
+    description: "This section introduces the core concepts of the GameEngine, including the game loop, key objects, and how to interact and react within the game environment."
+
   - title: "GameBuilder"
     image: "/gamify/lessons/gamebuilder.png"
     link: /rpg/gamebuilder
@@ -13,10 +25,11 @@ Topics:
       - "Properties and Reactions"
     subtitle: "Game Creation Tool"
     description: "GameBuilder is a powerful tool that allows you to create your own games without needing to write code initially. It provides a visual interface for designing game levels, adding assets, and defining interactions"
+  
   - title: "Background"
     image: "/gamify/lessons/background.jpg"
     alt: "Background"
-    link: /gamify/topics/backgrounds
+    link: /game/guide/backgrounds
     keyPoints:
       - "Game Environment"
       - "Theme and Style"
@@ -24,10 +37,11 @@ Topics:
       - "Layering"
     subtitle: "Theme and Style"
     description: "The background of a game establishes its theme and style, creating the foundation for the player's experience. This is your opportunity to get creative and make your game stand out."
+  
   - title: "Character"
     image: "/gamify/lessons/character.png"
     alt: "Character"
-    link: /gamify/topics/characters
+    link: /game/guide/characters
     keyPoints:
       - "Movement"
       - "Animation"
