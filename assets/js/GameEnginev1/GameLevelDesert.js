@@ -873,8 +873,8 @@ class GameLevelDesert {
        scaleFactor: 0.5,
        animationRate: 10,
        randomPosition: false,  // ← Change this to false
-       posX: width * 0.3,      // ← Add specific X position (center)
-       posY: height * 0.5,
+       posX: width * 0.53,      // ← Add specific X position (center)
+       posY: height * 0.28,
        gameEnv: gameEnv,
 
 
