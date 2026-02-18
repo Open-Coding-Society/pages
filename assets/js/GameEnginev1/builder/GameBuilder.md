@@ -1081,6 +1081,29 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {}
     }
 
+/**
+ * Extract and normalize background data from UI
+ * @param {Object} bg - The ui.bg object from the form
+ * @param {String} name - Name for background environment
+ * @returns {Object} bg - Normalized background object with converted src
+ */
+function bg_extract(bg, name = "hero") {
+
+  const bgIsData = bg && bg.src && bg.src.startsWith('data:');
+  const bgSrcVal = bgIsData 
+    ? `'${bg.src.replace(/'/g, "\\'")}'` 
+    : `path + "${bg.src}"`;
+
+  return {
+    name: `"${name}"`,
+    src: bgSrcVal,
+    h: parseInt(bg.h) || 0,
+    w: parseInt(bg.w) || 0
+  };
+}
+
+
+
         /* code generation (baseline and steps) */
         function generateBaselineCode() {
                 return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
@@ -1211,13 +1234,13 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
                 if (currentStep === 'background') {
                         if (!ui.bg.value) return null;
-                        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                        const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
+
+                        let bgx = bg_extract(bg,'custom_bg');
                         let defs = `
         const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
+            name: ${bgx.name},
+            src: ${bgx.src},
+            pixels: { height: ${bgx.h}, width: ${bgx.w} }
         };`;
                         const classes = [
             "      { class: GameEnvBackground, data: bgData }"
