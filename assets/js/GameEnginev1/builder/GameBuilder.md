@@ -1087,11 +1087,11 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {String} name - Name for background environment
  * @returns {Object} bg - Normalized background object with converted src
  */
-function bg_extract(bg, name = "hero") {
-
+function bg_extract(bg, name = "custom_bg") {
+  // Extraction logic related to GameBuilder panels
   const bgIsData = bg && bg.src && bg.src.startsWith('data:');
   const bgSrcVal = bgIsData 
-    ? `'${bg.src.replace(/'/g, "\\'")}'` 
+    ? `'${bg.src.replace(/'/g, "\\'")}'`
     : `path + "${bg.src}"`;
 
   return {
@@ -1102,7 +1102,23 @@ function bg_extract(bg, name = "hero") {
   };
 }
 
+/**
+ * Build bgData object for GameEnvBackground
+ * @param {Object} bg - Normalized background object
+ * @returns {Object} bg_data_literal - Ready for GameEnvBackground
+ */
+function bg_data(bg, name = "bgData") {
 
+  const bg_data_literal = `
+
+    const ${name} = {
+        name: ${bg.name},
+        src: ${bg.src},
+        pixels: { height: ${bg.h}, width: ${bg.w} }
+    };`;
+
+  return bg_data_literal;
+}
 
         /* code generation (baseline and steps) */
         function generateBaselineCode() {
@@ -1235,14 +1251,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 if (currentStep === 'background') {
                         if (!ui.bg.value) return null;
 
-                        let bgx = bg_extract(bg,'custom_bg');
-                        let defs = `
-        const bgData = {
-            name: ${bgx.name},
-            src: ${bgx.src},
-            pixels: { height: ${bgx.h}, width: ${bgx.w} }
-        };`;
-                        const classes = [
+                        let bgx = bg_extract(bg);
+                        let bgData = bg_data(bgx)
+                        let defs = `${bgData}`;
+        const classes = [
             "      { class: GameEnvBackground, data: bgData }"
                         ];
                         const barrierDefsB = [];
@@ -1283,8 +1295,11 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 if (currentStep === 'player') {
                         if (!ui.bg.value || !ui.pSprite.value) return null;
                         const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-                        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                        const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
+
+                        let bgx = bg_extract(bg);
+                        let bgData = bg_data(bgx)
+
+
                         const pIsData = p && p.src && p.src.startsWith('data:');
                         const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
                         const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
@@ -1316,11 +1331,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         const hbH = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
 
                         const defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
+        ${bgData}
         const playerData = {
             id: '${name}',
             src: ${pSrcVal},
