@@ -1,0 +1,990 @@
+---
+title: Calendar
+permalink: /student/calendar
+tailwind: true
+layout: aesthetihawk
+active_tab: calendar
+---
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
+
+<!-- FullCalendar Container -->
+<div id="calendar" class="box-border z-0"></div>
+<!-- Modal -->
+<div id="eventModal" class="fixed z-[99999] inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm py-4 overflow-y-auto hidden">
+    <div class="relative mx-auto my-4 p-8 rounded-2xl shadow-2xl max-w-xl max-h-[90vh] overflow-y-auto w-full font-sans modal-content">
+        <span class="text-gray-400 absolute right-8 top-6 text-3xl font-bold cursor-pointer transition-colors duration-300 hover:text-red-600" id="closeModal">&times;</span>
+        <div class="modal-body">
+            <h2 id="eventTitle" class="text-4xl font-bold mb-6"></h2>
+            <label for="editEventType" class="block mt-2 mb-1 text-lg font-semibold">Type:</label>
+            <select id="editEventType" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+                <option value="event">Event</option>
+                <option value="appointment">Appointment</option>
+            </select>
+            <label for="editDate" class="block mt-2 mb-1 text-lg font-semibold">Date:</label>
+            <p id="editDateDisplay" contentEditable='false' class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4"></p>
+            <input type="date" id="editDate" style="display: none;" class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+            <label for="editTitle" class="block mt-2 mb-1 text-lg font-semibold">Title:</label>
+            <p id="editTitle" contentEditable='false' class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4"></p>
+            <label for="editDescription" class="block mt-2 mb-1 text-lg font-semibold">Description:</label>
+            <p id="editDescription" contentEditable='false' class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4 whitespace-pre-wrap"></p>
+            <label for="editPriority" class="block mt-2 mb-1 text-lg font-semibold">Priority:</label>
+            <select id="editPriority" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+                <option value="P0" class="bg-red-200 text-red-900">P0 - Critical</option>
+                <option value="P1" class="bg-orange-200 text-orange-900">P1 - High</option>
+                <option value="P2" class="bg-yellow-200 text-yellow-900" selected>P2 - Medium</option>
+                <option value="P3" class="bg-green-200 text-green-900">P3 - Low</option>
+            </select>
+            <label for="editClassPeriod" class="block mt-2 mb-1 text-lg font-semibold">Class Period:</label>
+            <select id="editClassPeriod" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+                <option value="">-- Select Period --</option>
+                <!-- Options populated dynamically from user's groups -->
+            </select>
+            <label for="editGroupName" class="block mt-2 mb-1 text-lg font-semibold">Group:</label>
+            <select id="editGroupName" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+                <option value="">-- Select Group (optional) --</option>
+                <!-- Options populated dynamically from user's groups -->
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button id="saveButton" class="w-full p-3 bg-red-700 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-red-900 mt-2 hidden">Save Changes</button>
+            <button id="makeBreakButton" class="w-full p-3 bg-yellow-600 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-yellow-800 mt-2 hidden">Make Break</button>
+            <button id="deleteButton" class="w-full p-3 bg-red-700 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-red-900 mt-2">Delete Event</button>
+            <button id="editButton" class="w-full p-3 bg-red-700 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-red-900 mt-2">Edit Event</button>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script type="module">
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    let allEvents = []; // Global array to store all events
+    let currentFilter = null; // Track the current filter
+    let showAppointments = true; // Toggle for Course View (false) vs All View (true)
+    let currentPeriodFilter = null; // Track the class period filter
+    let userGroups = []; // Store user's groups from API
+    let currentPersonId = null; // Store current user's person ID
+
+    // School holidays loaded from _data/school_calendar.yml via Liquid
+    const schoolHolidays = [
+        {% for entry in site.data.school_calendar.weeks %}
+        {% assign week = entry[1] %}
+        {% if week.holidays %}
+            {% if week.skip_week %}
+                {% comment %} Full-week break: generate an event for each weekday Mon-Fri {% endcomment %}
+                {
+                    title: "{{ week.holidays | join: ' / ' }}",
+                    start: "{{ week.monday }}",
+                    end: "{{ week.friday | date: '%Y-%m-%d' }}",
+                    notes: "{{ week.notes | default: '' }}"
+                },
+            {% else %}
+                {% comment %} Single-day holiday on the Monday {% endcomment %}
+                {
+                    title: "{{ week.holidays | join: ' / ' }}",
+                    start: "{{ week.monday }}",
+                    notes: "{{ week.notes | default: '' }}"
+                },
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+    ];
+
+    // Fetch current user's groups from API
+    async function fetchUserGroups() {
+        try {
+            // First get the current user's person ID
+            const personResponse = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (!personResponse.ok) {
+                console.warn('Could not fetch user info, user may not be logged in');
+                return [];
+            }
+            const personData = await personResponse.json();
+            currentPersonId = personData.id;
+
+            if (!currentPersonId) {
+                console.warn('No person ID found');
+                return [];
+            }
+
+            // Then fetch groups for this person
+            const groupsResponse = await fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
+            if (!groupsResponse.ok) {
+                // Fallback: try fetching all groups and filter
+                console.warn('Person groups endpoint not available, using fallback');
+                const fallbackResponse = await fetch(`${javaURI}/api/groups`, fetchOptions);
+                if (!fallbackResponse.ok) return [];
+                const allGroups = await fallbackResponse.json();
+                // Filter to only groups this user is a member of
+                return (Array.isArray(allGroups) ? allGroups : []).filter(group =>
+                    Array.isArray(group.members) && group.members.some(m => m.id === currentPersonId)
+                );
+            }
+            return await groupsResponse.json();
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            return [];
+        }
+    }
+
+    // Populate group-related dropdowns with user's groups
+    function populateGroupDropdowns() {
+        const editClassPeriodSelect = document.getElementById('editClassPeriod');
+        const editGroupNameSelect = document.getElementById('editGroupName');
+
+        // Get unique periods from user's groups
+        const uniquePeriods = [...new Set(userGroups.map(g => g.period).filter(p => p != null))].sort();
+
+        // Populate editClassPeriod dropdown with periods from user's groups
+        if (editClassPeriodSelect) {
+            editClassPeriodSelect.innerHTML = '<option value="">-- Select Period --</option>';
+            uniquePeriods.forEach(period => {
+                const option = document.createElement('option');
+                option.value = `P${period}`;
+                option.textContent = `Period ${period}`;
+                editClassPeriodSelect.appendChild(option);
+            });
+        }
+
+        // Populate editGroupName dropdown with user's groups
+        if (editGroupNameSelect) {
+            editGroupNameSelect.innerHTML = '<option value="">-- Select Group (optional) --</option>';
+            userGroups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.name;
+                option.textContent = `${group.name}${group.period ? ` (Period ${group.period})` : ''}`;
+                editGroupNameSelect.appendChild(option);
+            });
+        }
+    }
+
+    // Build period filter dropdown HTML from user's groups
+    function buildPeriodFilterDropdownHTML() {
+        const uniquePeriods = [...new Set(userGroups.map(g => g.period).filter(p => p != null))].sort();
+        let html = '<option value="">All Periods</option>';
+        uniquePeriods.forEach(period => {
+            html += `<option value="P${period}">Period ${period}</option>`;
+        });
+        return html;
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        // Fetch user's groups first
+        userGroups = await fetchUserGroups();
+        populateGroupDropdowns();
+
+        let currentEvent = null;
+        let isAddingNewEvent = false;
+        let calendar;
+        function isBreakDay(dateString) {
+            // Check if the given date is a break day by looking at allEvents
+            const breakEvent = allEvents.find(event => {
+                const isBreak = (event.extendedProps && event.extendedProps.isBreak === true) || event.isBreak === true;
+                const dateMatch = formatDate(event.start) === dateString;
+                return isBreak && dateMatch;
+            });
+            return !!breakEvent;
+        }
+        function getBreakName(dateString) {
+            // Get the break name for a given date (robust for either top-level or extendedProps storage)
+            const breakEvent = allEvents.find(event => {
+                const isBreak = (event.extendedProps && event.extendedProps.isBreak === true) || event.isBreak === true;
+                return isBreak && formatDate(event.start) === dateString;
+            });
+            if (!breakEvent) return null;
+            return (breakEvent.extendedProps && breakEvent.extendedProps.breakName) || breakEvent.breakName || breakEvent.title || null;
+        }
+        function request() {
+            return fetch(`${javaURI}/api/calendar/events`, fetchOptions)
+                .then(response => {
+                    if (response.status !== 200) {
+                        console.error("HTTP status code: " + response.status);
+                        return null;
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error("Fetch error: ", error);
+                    return null;
+                });
+        }
+        // getAssignments removed - assignments are no longer fetched here
+        function getBreaks() {
+            // Try primary endpoint, then fallback to trailing slash if 404 (some servers require it)
+            return fetch(`${javaURI}/api/calendar/breaks`, fetchOptions)
+                .then(response => {
+                    if (response.status === 404) {
+                        console.warn('Breaks endpoint returned 404, retrying with trailing slash');
+                        return fetch(`${javaURI}/api/calendar/breaks/`, fetchOptions);
+                    }
+                    return response;
+                })
+                .then(response => {
+                    if (!response || response.status !== 200) {
+                        console.error("HTTP status code for breaks: " + (response && response.status));
+                        return [];
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error("Fetch error for breaks: ", error);
+                    return [];
+                });
+        }
+        function handleRequest() {
+            Promise.all([request(), getBreaks()])
+                .then(([calendarEvents, breaks]) => {
+                    console.log("handleRequest - All data loaded. Breaks:", breaks);
+                    allEvents = []; // Reset allEvents
+                    if (calendarEvents !== null) {
+                        calendarEvents.forEach(event => {
+                            try {
+                                // Extract priority from title if present (format: [P0], [P1], [P2], [P3])
+                                let priority = event.priority || 'P2';
+                                let displayTitle = event.title || '';
+                                // Check if title starts with priority tag like [P0], [P1], etc.
+                                const priorityMatch = displayTitle.match(/^\[(P[0-3])\]\s*/);
+                                if (priorityMatch) {
+                                    priority = priorityMatch[1];
+                                    displayTitle = displayTitle.replace(/^\[(P[0-3])\]\s*/, ''); // Remove priority tag from display
+                                }
+                                // Colors are handled by CSS classes (priority-p0 through priority-p3)
+                                // so we don't set inline color here
+                                allEvents.push({
+                                    id: event.id,
+                                    priority: priority,
+                                    title: displayTitle.replace(/\(P[13]\)/gi, ""),
+                                    description: event.description,
+                                    // Normalize stored start to YYYY-MM-DD to avoid timezone parsing as UTC
+                                    start: formatDate(event.date),
+                                    isBreak: false,
+                                    classNames: [`priority-${priority.toLowerCase()}`],
+                                    extendedProps: {
+                                        type: event.type || 'event',
+                                        classPeriod: event.classPeriod || '',
+                                        groupName: event.groupName || '',
+                                        individual: event.individual || '',
+                                        description: event.description,
+                                        period: event.period || null,
+                                        priority: priority
+                                    }
+                                });
+                            } catch (err) {
+                                console.error("Error loading calendar event:", event, err);
+                            }
+                        });
+                    }
+                    // assignments removed from frontend; no processing here
+                    if (breaks && breaks.length > 0) {
+                        console.log("Breaks loaded:", breaks);
+                        breaks.forEach(breakItem => {
+                            try {
+                                const breakEvent = {
+                                    id: breakItem.id,
+                                    // Title kept for compatibility but primary name stored in extendedProps.breakName
+                                    title: `Break: ${breakItem.name || 'Break'}`,
+                                    description: breakItem.description || breakItem.name || 'Break',
+                                    // Normalize break date to YYYY-MM-DD local representation
+                                    start: formatDate(breakItem.date),
+                                    // Mark consistently on both extendedProps and top-level for different code paths
+                                    isBreak: true,
+                                    breakName: breakItem.name || 'Break',
+                                    extendedProps: {
+                                        isBreak: true,
+                                        breakName: breakItem.name || 'Break',
+                                        description: breakItem.description || ''
+                                    },
+                                    classNames: ['fc-event-break']
+                                };
+                                console.log("Adding break event:", breakEvent);
+                                allEvents.push(breakEvent);
+                            } catch (err) {
+                                console.error("Error loading break:", breakItem, err);
+                            }
+                        });
+                    } else {
+                        console.log("No breaks found");
+                    }
+
+                    // Add school holidays from school_calendar.yml
+                    schoolHolidays.forEach(holiday => {
+                        if (!holiday.start) return;
+                        if (holiday.end) {
+                            // Multi-day break: create an event for each weekday
+                            const startDate = new Date(holiday.start + 'T00:00:00');
+                            const endDate = new Date(holiday.end + 'T00:00:00');
+                            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                                const dayOfWeek = d.getDay();
+                                if (dayOfWeek === 0 || dayOfWeek === 6) continue; // Skip weekends
+                                const dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                                // Skip if a backend break already exists on this date
+                                if (allEvents.some(e => (e.isBreak || (e.extendedProps && e.extendedProps.isBreak)) && formatDate(e.start) === dateStr)) continue;
+                                allEvents.push({
+                                    id: `school-holiday-${dateStr}`,
+                                    title: `${holiday.title}`,
+                                    description: holiday.notes || holiday.title,
+                                    start: dateStr,
+                                    isBreak: true,
+                                    breakName: holiday.title,
+                                    editable: false,
+                                    extendedProps: {
+                                        isBreak: true,
+                                        breakName: holiday.title,
+                                        description: holiday.notes || holiday.title,
+                                        isSchoolHoliday: true
+                                    },
+                                    classNames: ['fc-event-break', 'fc-school-holiday']
+                                });
+                            }
+                        } else {
+                            // Single-day holiday
+                            const dateStr = holiday.start;
+                            if (allEvents.some(e => (e.isBreak || (e.extendedProps && e.extendedProps.isBreak)) && formatDate(e.start) === dateStr)) return;
+                            allEvents.push({
+                                id: `school-holiday-${dateStr}`,
+                                title: `${holiday.title}`,
+                                description: holiday.notes || holiday.title,
+                                start: dateStr,
+                                isBreak: true,
+                                breakName: holiday.title,
+                                editable: false,
+                                extendedProps: {
+                                    isBreak: true,
+                                    breakName: holiday.title,
+                                    description: holiday.notes || holiday.title,
+                                    isSchoolHoliday: true
+                                },
+                                classNames: ['fc-event-break', 'fc-school-holiday']
+                            });
+                        }
+                    });
+
+                    displayCalendar(filterEventsByClass(currentFilter)); // Display filtered events
+                });
+        }
+        function displayCalendar(events) {
+            const calendarEl = document.getElementById('calendar');
+            if (calendar) {
+                calendar.destroy(); // Destroy the existing calendar instance
+            }
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today viewToggle',
+                    center: 'title',
+                    right: 'dayGridMonth,dayGridWeek,dayGridDay'
+                },
+                customButtons: {
+                    viewToggle: {
+                        text: showAppointments ? 'All View' : 'Course View',
+                        click: function () {
+                            showAppointments = !showAppointments;
+                            displayCalendar(filterEventsByClass(currentFilter));
+                        }
+                    }
+                },
+                views: {
+                    dayGridMonth: { buttonText: 'Month' },
+                    dayGridWeek: { buttonText: 'Week' },
+                    dayGridDay: { buttonText: 'Day' }
+                },
+                // Highlight break days (no text in the cell; the break event shows the name)
+                dayCellDidMount: function(arg) {
+                    try {
+                        const dateStr = formatDate(arg.date);
+                        if (isBreakDay(dateStr)) {
+                            arg.el.classList.add('break-day');
+                        } else {
+                            arg.el.classList.remove('break-day');
+                        }
+                    } catch (e) {
+                        console.error('dayCellDidMount error:', e);
+                    }
+                },
+                events: events,
+                eventContent: function(arg) {
+                    // Custom rendering for appointments to show Individual, Title, Group Name
+                    const event = arg.event;
+                    const extProps = event.extendedProps || {};
+                    const isAppointment = extProps.type === 'appointment';
+                    const isBreak = extProps.isBreak === true;
+                    
+                    if (isAppointment && !isBreak) {
+                        const individual = extProps.individual || '';
+                        const title = event.title || '';
+                        const groupName = extProps.groupName || '';
+                        
+                        let html = '<div class="fc-event-appointment">';
+                        if (individual) {
+                            html += '<div class="fc-event-individual">' + individual + '</div>';
+                        }
+                        html += '<div class="fc-event-title-custom">' + title + '</div>';
+                        if (groupName) {
+                            html += '<div class="fc-event-group">' + groupName + '</div>';
+                        }
+                        html += '</div>';
+                        return { html: html };
+                    }
+                    // Default rendering for regular events and breaks
+                },
+                eventClick: function (info) {
+                    document.getElementById("saveButton").style.display = "none";
+                    document.getElementById("makeBreakButton").style.display = "none";
+                    currentEvent = info.event;
+                    // When an existing event is clicked, this is not an 'add' flow
+                    isAddingNewEvent = false;
+                    const isBreak = (currentEvent.extendedProps && currentEvent.extendedProps.isBreak === true) || currentEvent.isBreak === true;
+                    console.log("Event clicked:", currentEvent.title, "isBreak:", isBreak);
+                    document.getElementById('eventTitle').textContent = currentEvent.title;
+                    document.getElementById('editTitle').innerHTML = isBreak ? ((currentEvent.extendedProps && currentEvent.extendedProps.breakName) || currentEvent.breakName || currentEvent.title) : currentEvent.title;
+                    document.getElementById('editDescription').innerHTML = slackToHtml(currentEvent.extendedProps.description || "");
+                    document.getElementById('editDateDisplay').textContent = formatDisplayDate(currentEvent.start);
+                    document.getElementById('editDate').value = formatDate(currentEvent.start);
+                    document.getElementById("editPriority").value = currentEvent.extendedProps.priority || "P2";
+                    document.getElementById("editPriority").disabled = true;
+                    document.getElementById("editEventType").value = currentEvent.extendedProps.type || "event";
+                    document.getElementById("editEventType").disabled = true;
+                    document.getElementById("editClassPeriod").value = currentEvent.extendedProps.classPeriod || "";
+                    document.getElementById("editClassPeriod").disabled = true;
+                    document.getElementById("editGroupName").value = currentEvent.extendedProps.groupName || "";
+                    document.getElementById("editGroupName").disabled = true;
+                    document.getElementById("eventModal").style.display = "block";
+                    // Check if this is a break event
+                    const isSchoolHoliday = currentEvent.extendedProps && currentEvent.extendedProps.isSchoolHoliday === true;
+                    if (isBreak) {
+                        document.getElementById("makeBreakButton").style.display = "none";
+                        document.getElementById("eventModal").dataset.isBreak = "true";
+                        if (isSchoolHoliday) {
+                            // School holidays from YAML are read-only — no edit/delete
+                            document.getElementById("deleteButton").style.display = "none";
+                            document.getElementById("editButton").style.display = "none";
+                        } else {
+                            // Backend break events can be edited/deleted
+                            document.getElementById("deleteButton").style.display = "inline-block";
+                            document.getElementById("editButton").style.display = "inline-block";
+                        }
+                    } else {
+                        // For regular events, show edit and delete buttons
+                        document.getElementById("deleteButton").style.display = "inline-block";
+                        document.getElementById("editButton").style.display = "inline-block";
+                        document.getElementById("eventModal").dataset.isBreak = "false";
+                    }
+                },
+                dateClick: function (info) {
+                    // Login required to create events
+                    if (!window.user || !window.user.uid) {
+                        alert('You must be logged in to create events. Please log in and try again.');
+                        return;
+                    }
+                    const selectedDate = formatDate(info.date);
+                    // Check if this date is a break day
+                    if (isBreakDay(selectedDate)) {
+                        alert(`There is already a break on ${formatDisplayDate(info.date)}`);
+                        return;
+                    }
+                    isAddingNewEvent = true;
+                    document.getElementById("eventTitle").textContent = "Add New Event";
+                    document.getElementById("editTitle").innerHTML = "";
+                    document.getElementById("editDescription").innerHTML = "";
+                    document.getElementById("editDescription").contentEditable = true;
+                    document.getElementById("editTitle").contentEditable = true;
+                    document.getElementById("editPriority").disabled = false; // Enable priority dropdown for new events
+                    document.getElementById("editPriority").value = "P2"; // Default to medium priority
+                    document.getElementById("editEventType").disabled = false; // Enable event type for new events
+                    document.getElementById("editEventType").value = "event"; // Default to event
+                    document.getElementById("editClassPeriod").disabled = false; // Enable class period for new events
+                    document.getElementById("editClassPeriod").value = ""; // Reset class period
+                    document.getElementById("editGroupName").disabled = false; // Enable group name for new events
+                    document.getElementById("editGroupName").value = ""; // Reset group name
+                    document.getElementById('editDateDisplay').textContent = formatDisplayDate(info.date);
+                    document.getElementById('editDate').value = selectedDate;
+                    document.getElementById("eventModal").style.display = "block";
+                    document.getElementById("deleteButton").style.display = "none";
+                    document.getElementById("editButton").style.display = "none";
+                    document.getElementById("saveButton").style.display = "inline-block";
+                    document.getElementById("makeBreakButton").style.display = "inline-block";
+                    document.getElementById("saveButton").onclick = function () {
+                        const updatedTitle = document.getElementById("editTitle").innerHTML.trim();
+                        const updatedDescription = document.getElementById("editDescription").innerHTML;
+                        const updatedDate = document.getElementById("editDate").value;
+                        const updatedPriority = document.getElementById("editPriority").value;
+                        const selectedType = document.getElementById("editEventType").value;
+                        const selectedClassPeriod = document.getElementById("editClassPeriod").value;
+                        
+                        if (!updatedTitle || !updatedDescription || !updatedDate) {
+                            alert("Title, Description, and Date cannot be empty!");
+                            return;
+                        }
+                        
+                        // 4-appointment limit per period check
+                        if (selectedType === 'appointment' && selectedClassPeriod) {
+                            const appointmentsInPeriod = allEvents.filter(e => 
+                                e.extendedProps?.type === 'appointment' &&
+                                e.extendedProps?.classPeriod === selectedClassPeriod &&
+                                (e.start === updatedDate || formatDate(new Date(e.start)) === updatedDate)
+                            );
+                            if (appointmentsInPeriod.length >= 4) {
+                                alert(`Cannot create appointment: Period ${selectedClassPeriod} already has 4 appointments on ${updatedDate}. Please choose a different period.`);
+                                return;
+                            }
+                        }
+                        // Get current user name for appointments
+                        const currentUserName = (window.user && window.user.name) ? window.user.name : '';
+                        const newEventPayload = {
+                            title: updatedTitle,
+                            description: updatedDescription,
+                            date: updatedDate,
+                            priority: updatedPriority,
+                            classPeriod: selectedClassPeriod,
+                            groupName: document.getElementById("editGroupName").value,
+                            type: selectedType,
+                            individual: selectedType === 'appointment' ? currentUserName : ''
+                        };
+                        const newEvent = {
+                            id: Date.now().toString(), // Generate a unique ID
+                            title: updatedTitle,
+                            description: updatedDescription,
+                            start: updatedDate,
+                            priority: updatedPriority,
+                            classNames: [`priority-${updatedPriority.toLowerCase()}`],
+                            type: selectedType,
+                            classPeriod: selectedClassPeriod,
+                            groupName: document.getElementById("editGroupName").value,
+                            extendedProps: {
+                                type: selectedType,
+                                classPeriod: selectedClassPeriod,
+                                groupName: document.getElementById("editGroupName").value,
+                                individual: selectedType === 'appointment' ? currentUserName : ''
+                            }
+                        };
+                        allEvents.push(newEvent); // Add to allEvents
+                        displayCalendar(filterEventsByClass(currentFilter)); // Refresh calendar
+                        document.getElementById("eventModal").style.display = "none";
+                        fetch(`${javaURI}/api/calendar/add_event`, {
+                            ...fetchOptions,
+                            method: "POST",
+                            body: JSON.stringify(newEventPayload),
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Failed to add new event: ${response.status} ${response.statusText}`);
+                            }
+                            return response.json();
+                        })
+                        .then(() => {
+                            // Re-fetch events from the backend to ensure the calendar is up-to-date
+                            handleRequest();
+                            document.getElementById("eventModal").style.display = "none";
+                        })
+                        .catch(error => {
+                            console.error("Error adding event:", error);
+                        });
+                    };
+                },
+                // eventMouseEnter: function (info) {
+                //     const tooltip = document.createElement('div');
+                //     tooltip.className = 'event-tooltip';
+                //     tooltip.innerHTML = `<strong>${info.event.title}</strong><br>${info.event.extendedProps.description || ''}`;
+                //     document.body.appendChild(tooltip);
+                //     tooltip.style.left = info.jsEvent.pageX + 'px';
+                //     tooltip.style.top = info.jsEvent.pageY + 'px';
+                // },
+                // eventMouseLeave: function () {
+                //     const tooltips = document.querySelectorAll('.event-tooltip');
+                //     tooltips.forEach(tooltip => tooltip.remove());
+                // }
+            });
+            calendar.render();
+            
+            // Inject period filter dropdown into toolbar after render
+            const toolbarLeft = document.querySelector('.fc-toolbar-chunk:first-child');
+            if (toolbarLeft && !document.getElementById('periodFilterDropdown')) {
+                const dropdown = document.createElement('select');
+                dropdown.id = 'periodFilterDropdown';
+                dropdown.innerHTML = buildPeriodFilterDropdownHTML();
+                dropdown.value = currentPeriodFilter || '';
+                dropdown.addEventListener('change', function() {
+                    currentPeriodFilter = this.value || null;
+                    displayCalendar(filterEventsByClass(currentFilter));
+                });
+                toolbarLeft.appendChild(dropdown);
+            }
+        }
+        function filterEventsByClass(className) {
+            let filtered = allEvents;
+            
+            // Filter by course if specified
+            if (className) {
+                // Include break events regardless of filter, plus filtered regular events
+                filtered = filtered.filter(event => {
+                    const isBreak = event.extendedProps && event.extendedProps.isBreak === true;
+                    return isBreak || event.period === className;
+                });
+            }
+            
+            // Filter out appointments if in Course View mode
+            if (!showAppointments) {
+                filtered = filtered.filter(event => {
+                    const isBreak = event.extendedProps && event.extendedProps.isBreak === true;
+                    const isAppointment = event.type === 'appointment' || (event.extendedProps && event.extendedProps.type === 'appointment');
+                    // Keep breaks and non-appointments
+                    return isBreak || !isAppointment;
+                });
+            }
+            
+            // Filter by class period if specified
+            if (currentPeriodFilter) {
+                filtered = filtered.filter(event => {
+                    const isBreak = event.extendedProps && event.extendedProps.isBreak === true;
+                    const eventPeriod = event.classPeriod || (event.extendedProps && event.extendedProps.classPeriod);
+                    // Keep breaks and events matching the period filter
+                    return isBreak || eventPeriod === currentPeriodFilter;
+                });
+            }
+            // Sort by priority (P0 first, then P1, P2, P3), breaks are not prioritized
+            return filtered.sort((a, b) => {
+                // Breaks always come first
+                const aIsBreak = a.extendedProps && a.extendedProps.isBreak === true;
+                const bIsBreak = b.extendedProps && b.extendedProps.isBreak === true;
+                if (aIsBreak && !bIsBreak) return -1;
+                if (!aIsBreak && bIsBreak) return 1;
+                if (aIsBreak && bIsBreak) return 0;
+                // For non-break events, sort by priority
+                const priorityOrder = { 'P0': 0, 'P1': 1, 'P2': 2, 'P3': 3 };
+                const aPriority = priorityOrder[a.priority] ?? 2;
+                const bPriority = priorityOrder[b.priority] ?? 2;
+                return aPriority - bPriority;
+            });
+        }
+        function formatDate(dateInput) {
+            // If already a YYYY-MM-DD string, return as-is to avoid UTC parsing issues
+            if (!dateInput && dateInput !== 0) return '';
+            if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) return dateInput;
+            const d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        document.getElementById("closeModal").onclick = function () {
+            document.getElementById('editDateDisplay').style.display = 'block';
+            document.getElementById('editDateDisplay').style.display = 'block';
+            document.getElementById('editDate').style.display = 'none';
+            document.getElementById("saveButton").style.display = "none";
+            document.getElementById("eventModal").style.display = "none";
+            document.getElementById("editTitle").contentEditable = false;
+            document.getElementById("editDescription").contentEditable = false;
+            document.getElementById("editPriority").disabled = true;
+            document.getElementById("editEventType").disabled = true;
+            document.getElementById("editClassPeriod").disabled = true;
+            document.getElementById("editGroupName").disabled = true;
+            document.getElementById("eventModal").style.display = "none";
+        };
+        document.getElementById("saveButton").onclick = function () {
+            const isBreak = document.getElementById("eventModal").dataset.isBreak === "true";
+            const updatedTitle = document.getElementById("editTitle").innerHTML.trim();
+            const updatedDescription = document.getElementById("editDescription").innerHTML;          
+            // Reset UI state
+            document.getElementById("saveButton").style.display = "none";
+            document.getElementById('editDateDisplay').style.display = 'block';
+            document.getElementById('editDate').style.display = 'none';
+            document.getElementById("editDescription").contentEditable = false;
+            document.getElementById("editTitle").contentEditable = false;
+            document.getElementById("editPriority").disabled = true;
+            document.getElementById("editEventType").disabled = true;
+            document.getElementById("editClassPeriod").disabled = true;
+            document.getElementById("editGroupName").disabled = true;      
+            if (!updatedTitle || !updatedDescription) {
+                alert("Title and Description cannot be empty!");
+                return;
+            }     
+            if (isBreak) {
+                // Handle break editing
+                const id = currentEvent.id;
+                const breakPayload = {
+                    name: updatedTitle,
+                    description: updatedDescription
+                };                
+                fetch(`${javaURI}/api/calendar/breaks/${id}`, {
+                    ...fetchOptions,
+                    method: "PUT",
+                    body: JSON.stringify(breakPayload),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to update break: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    document.getElementById("eventModal").style.display = "none";
+                    handleRequest();
+                })
+                .catch(error => {
+                    console.error("Error updating break:", error);
+                    alert("Failed to update break. Please try again.\n\nError: " + error.message);
+                });
+            } else {
+                // Handle regular event editing
+                const updatedPriority = document.getElementById("editPriority").value;
+                const updatedDate = document.getElementById("editDate").value;
+                document.getElementById('editDateDisplay').textContent = formatDisplayDate(new Date(updatedDate));
+                if (!updatedDate) {
+                    alert("Date cannot be empty!");
+                    return;
+                }
+                if (isAddingNewEvent) {
+                    const newEventPayload = {
+                        title: updatedTitle,
+                        description: updatedDescription,
+                        date: updatedDate,
+                        priority: updatedPriority
+                    }; 
+                    fetch(`${javaURI}/api/calendar/add_event`, {
+                        ...fetchOptions,
+                        method: "POST",
+                        body: JSON.stringify(newEventPayload),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to add new event: ${response.status} ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(() => {
+                        document.getElementById("eventModal").style.display = "none";
+                        handleRequest();
+                    })
+                    .catch(error => {
+                        console.error("Error adding event:", error);
+                        alert("Failed to add event. Please try again.\n\nError: " + error.message);
+                    });
+                } else {
+                    const payload = { 
+                        newTitle: updatedTitle, 
+                        description: updatedDescription, 
+                        date: updatedDate, 
+                        priority: updatedPriority,
+                        type: document.getElementById("editEventType").value,
+                        classPeriod: document.getElementById("editClassPeriod").value,
+                        groupName: document.getElementById("editGroupName").value,
+                        individual: currentEvent.extendedProps?.individual || ''
+                    };
+                    const id = currentEvent.id;
+                    fetch(`${javaURI}/api/calendar/edit/${id}`, {
+                        ...fetchOptions,
+                        method: "PUT",
+                        body: JSON.stringify(payload),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to update event: ${response.status} ${response.statusText}`);
+                        }
+                        return response.text();
+                    })
+                    .then(() => {
+                        document.getElementById("eventModal").style.display = "none";
+                        handleRequest();
+                    })
+                    .catch(error => {
+                        console.error("Error updating event:", error);
+                        alert("Failed to update event. Please try again.\n\nError: " + error.message);
+                    });
+                }
+            }
+        };
+        document.getElementById("editButton").onclick = function () {
+            const isBreak = document.getElementById("eventModal").dataset.isBreak === "true";
+            document.getElementById('editDateDisplay').style.display = 'none';
+            document.getElementById('editDate').style.display = isBreak ? 'none' : 'block';
+            document.getElementById("deleteButton").style.display = 'none';
+            document.getElementById("saveButton").style.display = 'inline-block';
+            document.getElementById("editDescription").contentEditable = true;
+            document.getElementById("editTitle").contentEditable = true;
+            // Editing an existing event should not create a new one
+            isAddingNewEvent = false;
+            if (!isBreak) {
+                document.getElementById("editPriority").disabled = false;
+                document.getElementById("editEventType").disabled = false;
+                document.getElementById("editClassPeriod").disabled = false;
+                document.getElementById("editGroupName").disabled = false;
+            }
+            document.getElementById("editDescription").innerHTML = currentEvent.extendedProps.description || "";
+        };
+        document.getElementById("deleteButton").onclick = function () {
+            if (!currentEvent) return;
+            const isBreak = document.getElementById("eventModal").dataset.isBreak === "true";
+            const id = currentEvent.id;
+            const confirmation = confirm(`Are you sure you want to delete "${currentEvent.title}"?`);
+            if (!confirmation) return;
+            const endpoint = isBreak ? `${javaURI}/api/calendar/breaks/${id}` : `${javaURI}/api/calendar/delete/${id}`;
+            fetch(endpoint, {
+                ...fetchOptions,
+                method: "DELETE"
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to delete: ${response.status} ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(() => {
+                currentEvent.remove();
+                document.getElementById("eventModal").style.display = "none";
+                handleRequest();
+            })
+            .catch(error => {
+                console.error("Error deleting:", error);
+                alert("Failed to delete. Please try again.\n\nError: " + error.message);
+            });
+        };
+        document.getElementById("makeBreakButton").onclick = function () {
+            const breakDate = document.getElementById("editDate").value;
+            const breakTitle = document.getElementById("editTitle").innerHTML.trim();
+            const breakDescription = document.getElementById("editDescription").innerHTML;
+            console.log("Break creation - Title:", breakTitle, "Date:", breakDate, "Description:", breakDescription);
+            if (!breakDate) {
+                alert("Please select a date for the break!");
+                return;
+            }
+            if (!breakTitle) {
+                alert("Please enter a name for the break!");
+                return;
+            }
+            // Check if a break already exists on this date
+            if (isBreakDay(breakDate)) {
+                alert(`There is already a break on ${formatDisplayDate(new Date(breakDate.split('-').map(Number)[0], breakDate.split('-').map(Number)[1] - 1, breakDate.split('-').map(Number)[2]))}`);
+                return;
+            }
+            // Parse date string safely to avoid timezone issues
+            const [year, month, day] = breakDate.split('-').map(Number);
+            const localDate = new Date(year, month - 1, day);
+            const confirmation = confirm(`Are you sure you want to make ${formatDisplayDate(localDate)} a break day with the name "${breakTitle}"? Events on this day will be moved to the next non-break day.`);
+            if (!confirmation) return;
+            const breakPayload = {
+                date: breakDate,
+                name: breakTitle,
+                description: breakDescription,
+                moveToNextNonBreakDay: true
+            };
+            console.log("Sending break payload:", breakPayload);
+            fetch(`${javaURI}/api/calendar/breaks/create`, {
+                ...fetchOptions,
+                method: "POST",
+                body: JSON.stringify(breakPayload),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Failed to create break: ${response.status} ${response.statusText} - ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then((result) => {
+                console.log("Break creation response:", result);
+                alert("Break day created successfully. Events on this day have been moved to the next non-break day.");
+                document.getElementById("eventModal").style.display = "none";
+                handleRequest(); // Refresh the calendar
+            })
+            .catch(error => {
+                console.error("Error creating break:", error);
+                alert("Failed to create break day. Please try again.\n\nError: " + error.message);
+            });
+        };
+        handleRequest();
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            document.getElementById('editDateDisplay').style.display = 'block';
+            document.getElementById('editDate').style.display = 'none';
+            document.getElementById("saveButton").style.display = "none";
+            document.getElementById("eventModal").style.display = "none";
+            document.getElementById("editTitle").contentEditable = false;
+            document.getElementById("editDescription").contentEditable = false;
+            document.getElementById("editPriority").disabled = true;
+            document.getElementById("editEventType").disabled = true;
+            document.getElementById("editClassPeriod").disabled = true;
+            document.getElementById("editGroupName").disabled = true;
+        }
+    });
+    window.onclick = function (event) {
+        const modal = document.getElementById("eventModal");
+        if (event.target === modal) {
+            document.getElementById('editDateDisplay').style.display = 'block';
+            document.getElementById('editDate').style.display = 'none';
+            document.getElementById("saveButton").style.display = "none";
+            document.getElementById("eventModal").style.display = "none";
+            document.getElementById("editTitle").contentEditable = false;
+            document.getElementById("editDescription").contentEditable = false;
+            document.getElementById("editPriority").disabled = true;
+            document.getElementById("editEventType").disabled = true;
+            document.getElementById("editClassPeriod").disabled = true;
+            document.getElementById("editGroupName").disabled = true;
+            modal.style.display = "none";
+        }
+    };
+    function slackToHtml(text) {
+        if (!text) return '';
+        // First pass - handle code blocks to prevent their content from being processed
+        let processed = text;
+        const codeBlocks = [];
+        processed = processed.replace(/```([\s\S]*?)```/g, (match, content) => {
+            codeBlocks.push(content);
+            return `%%CODEBLOCK${codeBlocks.length-1}%%`;
+        });
+        // Second pass - handle inline code
+        const inlineCodes = [];
+        processed = processed.replace(/`([^`]+)`/g, (match, content) => {
+            inlineCodes.push(content);
+            return `%%INLINECODE${inlineCodes.length-1}%%`;
+        })
+        // Third pass - handle links
+        const links = [];
+        processed = processed.replace(/<((https?|ftp|mailto):[^|>]+)(?:\|([^>]+))?>/g, (match, url, protocol, text) => {
+            const linkText = text || url;
+            links.push({url, linkText});
+            return `%%LINK${links.length-1}%%`;
+        });
+        // Process formatting (bold, italic, strikethrough) with nesting support
+        processed = processed
+            .replace(/(\*)([^*]+)\1/g, '<strong>$2</strong>')
+            .replace(/(_)([^_]+)\1/g, '<em>$2</em>')
+            .replace(/(~)([^~]+)\1/g, '<del>$2</del>');
+        // Restore code blocks
+        processed = processed.replace(/%%CODEBLOCK(\d+)%%/g, (match, index) => {
+            return `<pre><code>${escapeHtml(codeBlocks[index])}</code></pre>`;
+        });
+        // Restore inline code
+        processed = processed.replace(/%%INLINECODE(\d+)%%/g, (match, index) => {
+            return `<code>${escapeHtml(inlineCodes[index])}</code>`;
+        });
+        // Restore links
+        processed = processed.replace(/%%LINK(\d+)%%/g, (match, index) => {
+            const {url, linkText} = links[index];
+            return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(linkText)}</a>`;
+        });
+        // Convert newlines to <br> and preserve multiple newlines
+        processed = processed.replace(/\n/g, '<br>');
+        return processed;
+    }
+    // Helper function to escape HTML special characters
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    function formatDisplayDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+</script>

@@ -1,0 +1,70 @@
+{% assign data = site.data.granolaa_infograph %}
+
+<div class="g-infograph">
+  <!-- Header Section -->
+  <div class="g-header">
+    <div class="g-badge">Design-Based Research Capstone</div>
+    <h1 class="g-title">{{ data.Title }}</h1>
+    <p class="g-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="g-card">
+    <div class="g-card-grid">
+      
+      <!-- Left: Image & Status -->
+      <div class="g-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="g-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="g-image">
+          <div class="g-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="g-status">{{ topic.status }}</div>
+        <div class="g-team">
+          <span class="g-team-label">Project Leads</span>
+          <span class="g-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="g-content">
+        <h2 class="g-project-title">{{ topic.title }}</h2>
+        <p class="g-subtitle">{{ topic.subtitle }}</p>
+        
+        <div class="g-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="g-keypoint">
+            <span class="g-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="g-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="g-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="g-details">
+        <h3 class="g-section-title">About</h3>
+        <p class="g-about">{{ topic.description }}</p>
+        
+        <h3 class="g-section-title">Impact</h3>
+        <div class="g-impact-list">
+          {% for item in topic.impact %}
+          <div class="g-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="g-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>

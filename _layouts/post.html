@@ -112,18 +112,20 @@ Check if this is a course lesson and determine which course context to use
   <!-- MAIN CONTENT -->
   <div class="lesson-main">
     <!-- Top Bar -->
-    <div class="lesson-topbar">
-      <div class="topbar-actions">
-        <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" class="back-btn">
-          <i class="fas fa-arrow-left"></i>
-          Sprint View
-        </a>
+    <div class="topbar-lesson">
+      <div class="topbar-left">
         <div class="breadcrumbs">
-          <i class="fas fa-home"></i>
+          <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}">
+            <i class="fas fa-home"></i>
+          </a>
           <i class="fas fa-chevron-right"></i>
           <span>Week {{ current_week }}</span>
           <i class="fas fa-chevron-right"></i>
           <span class="current">{{ page.title }}</span>
+          <button id="topbar-complete-btn" onclick="toggleComplete()">
+            <i class="fas fa-circle" id="complete-icon-topbar"></i>
+            <span id="complete-text-topbar">Burndown</span>
+          </button>
         </div>
       </div>
       <div class="topbar-progress">
@@ -226,29 +228,6 @@ Check if this is a course lesson and determine which course context to use
         {%- endif -%}
       </div>
     </div>
-
-    <!-- Bottom Navigation -->
-    <div class="lesson-bottom">
-      <div class="lesson-bottom-inner">
-        <div class="bottom-actions">
-          {% if page.challenge_submit %}
-          <button class="btn btn-outline" id="submit-lesson-btn" type="button">
-            <i class="fas fa-upload"></i>
-            <span>Submit Lesson</span>
-          </button>
-          {% endif %}
-          <button class="btn btn-outline" id="complete-btn" onclick="toggleComplete()">
-            <i class="fas fa-circle" id="complete-icon"></i>
-            <span id="complete-text">Mark Complete</span>
-          </button>
-        </div>
-        <button class="btn btn-primary" onclick="nextLesson()">
-          Next
-          <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 
 {% if page.challenge_submit %}
@@ -365,22 +344,30 @@ Check if this is a course lesson and determine which course context to use
     const completionData = loadCompletionData();
     const isCompleted = completionData[currentLessonId] || false;
 
-    const icon = document.getElementById('complete-icon');
-    const text = document.getElementById('complete-text');
+    // Helper to update specific button elements
+    const updateBtnElements = (iconId, textId) => {
+        const icon = document.getElementById(iconId);
+        const text = document.getElementById(textId);
+        
+        if (icon && text) {
+            if (isCompleted) {
+                icon.classList.remove('fa-circle');
+                icon.classList.add('fa-circle-check');
+                text.textContent = 'Completed';
+            } else {
+                icon.classList.remove('fa-circle-check');
+                icon.classList.add('fa-circle');
+                text.textContent = 'Burndown';
+            }
+        }
+    };
 
-    if (icon && text) {
-      if (isCompleted) {
-        icon.classList.remove('fa-circle');
-        icon.classList.add('fa-circle-check');
-        text.textContent = 'Completed';
-      } else {
-        icon.classList.remove('fa-circle-check');
-        icon.classList.add('fa-circle');
-        text.textContent = 'Burndown';
-      }
-    }
+    // Update bottom button (legacy/mobile if kept)
+    updateBtnElements('complete-icon', 'complete-text');
+    
+    // Update topbar button
+    updateBtnElements('complete-icon-topbar', 'complete-text-topbar');
   }
-
   // Update UI based on completion data
   function updateUI() {
     const completionData = loadCompletionData();
@@ -416,6 +403,17 @@ Check if this is a course lesson and determine which course context to use
     if (document.getElementById('lesson-progress')) {
       const lessonProgress = total > 0 ? ((currentIndex + 1) / total) * 100 : 0;
       document.getElementById('lesson-progress').style.width = `${lessonProgress}%`;
+    }
+  }
+
+  window.prevLesson = function () {
+    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+
+    if (currentIndex > 0) {
+      window.location.href = lessonItems[currentIndex - 1].href;
+    } else {
+      alert('You are on the first lesson!');
     }
   }
 

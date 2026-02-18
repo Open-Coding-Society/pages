@@ -5,6 +5,7 @@ import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 console.log("🎮 mansionLevel3.js loaded!");
 
 class MurderMysteryL3 {
+  static friendlyName = "Level 3: The Stairs";
   constructor(gameEnv) {
     console.log("🎮 MurderMysteryL3 constructor started");
     console.log("gameEnv:", gameEnv);
