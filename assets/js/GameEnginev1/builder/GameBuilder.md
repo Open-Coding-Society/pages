@@ -1087,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * Extract and normalize background data from UI
  * @param {Object} bg - The ui.bg object from the form
  * @param {String} name - Name for background environment
- * @returns {Object} bg - Normalized background object with converted src
+ * @returns {Object} bg - Normalized background object
  */
 function bg_extract(bg, name = "custom_bg") {
   // Extraction logic related to GameBuilder panels
@@ -1105,9 +1105,9 @@ function bg_extract(bg, name = "custom_bg") {
 }
 
 /**
- * Build bgData object for GameEnvBackground
+ * Build background literal text/code that is ready for GameEngine
  * @param {Object} bg - Normalized background object
- * @returns {Object} bg_data_literal - Ready for GameEnvBackground
+ * @returns {Object} bg_data_literal - code
  */
 function bg_code(bg, name = "bgData") {
 
@@ -1122,8 +1122,14 @@ function bg_code(bg, name = "bgData") {
   return bg_data_literal;
 }
 
+/**
+ * Extract and normalize player data from GameBuilder Panel
+ * @param {Object} ui - The ui object/data from the form
+ * @param {Object} p - The player object/data from the form
+ * @returns {Object} p - Normalized player object
+ */
 function player_extract(ui, p) {
-
+    // Extraction logic related to rows in sprite?
     const dirRowsTotal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
     const clamp = (v) => {
             const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
@@ -1160,6 +1166,11 @@ function player_extract(ui, p) {
     }
 }
 
+/**
+ * Build player literal text/code that is ready for GameEngine
+ * @param {Object} px - Normalized player object
+ * @returns {Object} player_data_literal - code
+ */
 function player_code(px, name = "playerData" ) {
 
     const player_data_literal = `
