@@ -1,4 +1,3 @@
-// Updated GameLevel.js
 import GameEnv from "./GameEnv.js"
 
 class GameLevel {
@@ -33,9 +32,7 @@ class GameLevel {
         this.gameLevel.initialize()
     }
 
-    // Bind and store resize handler so we can properly remove it on destroy
-    this._boundResize = this.resize.bind(this)
-    window.addEventListener("resize", this._boundResize)
+    window.addEventListener("resize", this.resize.bind(this))
   }
 
   destroy() {
@@ -51,11 +48,8 @@ class GameLevel {
 
     // Clear out the game objects array
     this.gameEnv.gameObjects = [];
-    // Properly remove the stored resize handler
-    if (this._boundResize) {
-      window.removeEventListener("resize", this._boundResize)
-      this._boundResize = null
-    }
+    
+    window.removeEventListener("resize", this.resize.bind(this))
   }
 
   update() {

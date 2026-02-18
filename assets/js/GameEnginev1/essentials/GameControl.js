@@ -26,7 +26,6 @@ class GameControl {
         this.globalInteractionHandlers = new Set();
         // Save interaction handlers for game-in-game restore functionality
         this.savedInteractionHandlers = new Set();
-        this._transitioning = false; // Guard against re-entrant transitions
     }
 
     
@@ -123,21 +122,6 @@ class GameControl {
             this.currentLevel = null;
         }
 
-        // Purge any non-main canvases left in the container
-        try {
-            const container = document.getElementById('gameContainer') || this.gameContainer;
-            if (container) {
-                const canvases = container.querySelectorAll('canvas');
-                canvases.forEach(c => {
-                    if (c.id !== 'gameCanvas') {
-                        c.parentNode?.removeChild(c);
-                    }
-                });
-            }
-        } catch (purgeErr) {
-            console.warn('Canvas purge during transition failed:', purgeErr);
-        }
-
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
@@ -184,52 +168,24 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
-        if (this._transitioning) return;
-        this._transitioning = true;
-
-        try {
-            // Notify user
-            if (this.currentLevelIndex < this.levelClasses.length - 1) {
-                alert("Level ended.");
-            } else {
-                alert("All levels completed.");
-            }
-
-            // Clean up any lingering interaction handlers
-            this.cleanupInteractionHandlers();
-
-            // Destroy current level safely
-            try { this.currentLevel?.destroy?.(); } catch (e) { console.error('Error destroying level:', e); }
-
-            // Ensure any leftover non-main canvases are removed before advancing
-            try {
-                const container = document.getElementById('gameContainer') || this.gameContainer;
-                if (container) {
-                    const canvases = container.querySelectorAll('canvas');
-                    canvases.forEach(c => {
-                        if (c.id !== 'gameCanvas') {
-                            c.parentNode?.removeChild(c);
-                        }
-                    });
-                }
-            } catch (purgeErr) {
-                console.warn('Canvas purge at level end failed:', purgeErr);
-            }
-
-            // Invoke optional callback, but do not block advancing
-            try { if (this.gameOver) { this.gameOver(); } } catch (e) { console.warn('gameOver callback error:', e); }
-            this.gameOver = null;
-
-            // Advance to next level if available
-            if (this.currentLevelIndex < this.levelClasses.length - 1) {
-                this.currentLevelIndex++;
-                this.transitionToLevel();
-            } else {
-                // No more levels; stop listening for exit key
-                this.removeExitKeyListener();
-            }
-        } finally {
-            this._transitioning = false;
+        // Alert the user that the level has ended
+        if (this.currentLevelIndex < this.levelClasses.length - 1) {
+            alert("Level ended.");
+        } else {
+            alert("All levels completed.");
+        }
+        
+        // Clean up any lingering interaction handlers
+        this.cleanupInteractionHandlers();
+        
+        this.currentLevel.destroy();
+        
+        // Call the gameOver callback if it exists
+        if (this.gameOver) {
+            this.gameOver();
+        } else {
+            this.currentLevelIndex++;
+            this.transitionToLevel();
         }
     }
 
@@ -240,8 +196,6 @@ class GameControl {
     handleExitKey(event) {
         if (event.key === 'Escape') {
             this.currentLevel.continue = false;
-            // Immediately handle end to avoid waiting for the next loop tick
-            this.handleLevelEnd();
         }
     }
     
