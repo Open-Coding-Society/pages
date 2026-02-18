@@ -56,7 +56,7 @@ permalink: /gamebuilder
     (function(){
         try {
             const s = document.createElement('script');
-            s.src = window.location.origin + '{{ site.baseurl }}/assets/js/GameEnginev1/templates/templates.js';
+            s.src = window.location.origin + './templates.js';
             s.defer = true;
             document.head.appendChild(s);
         } catch (e) { console.warn('Could not load GameTemplatesV1', e); }

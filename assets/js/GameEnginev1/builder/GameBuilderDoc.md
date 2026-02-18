@@ -87,22 +87,22 @@ Not all spritesheets use the same row order for movement directions. The mapping
 
 This mapping is specific to Chillguy and should not be hard-coded for other sheets:
 
-```json
-down:      { row: 0, start: 0, columns: 3 },
-right:     { row: 1, start: 0, columns: 3 },
-left:      { row: 2, start: 0, columns: 3 },
-up:        { row: 2, start: 0, columns: 3 },
-downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-downLeft:  { row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
-upRight:   { row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
-upLeft:    { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
+```text
+ down:      { row: 0, start: 0, columns: 3 },
+ right:     { row: 1, start: 0, columns: 3 },
+ left:      { row: 2, start: 0, columns: 3 },
+ up:        { row: 2, start: 0, columns: 3 },
+ downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
+ downLeft:  { row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
+ upRight:   { row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
+ upLeft:    { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
 ```
 
 #### Typical 4-row sheets (rows = 4, cols varies)
 
 Many sheets use rows: 0=down, 1=right, 2=left, 3=up:
 
-```json
+```text
 down:  { row: 0, start: 0, columns: 3 },
 right: { row: 1, start: 0, columns: 3 },
 left:  { row: 2, start: 0, columns: 3 },
@@ -113,7 +113,7 @@ up:    { row: 3, start: 0, columns: 3 }
 
 For single-row sprites (e.g., idle only), use the same row and frame counts for all directions, or keep only `down`:
 
-```json
+```text
 down:  { row: 0, start: 0, columns: 1 }
 ```
 
