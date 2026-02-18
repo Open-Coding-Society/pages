@@ -16,7 +16,7 @@ Topics:
 
   - title: "GameBuilder"
     image: "/gamify/lessons/gamebuilder.png"
-    link: /rpg/gamebuilder
+    link: /gamebuilder
     alt: "GameBuilder"
     keyPoints:
       - "Assets and Sprites"
