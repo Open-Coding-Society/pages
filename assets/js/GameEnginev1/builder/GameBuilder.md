@@ -1544,21 +1544,29 @@ function builder_code() {
  * @returns {String} - Complete game level class code ready for execution
  */
 function gamelevel_code(defs = '', classes = []) {
-    const importsSection = `
+/* Do not change formattting
+ * This organization illustrates the look of intended output
+ * Literals are defined at left edge to comply with Code Generation .
+*/
+const importsSection = `
 import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';`;
+import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+`; // end of importSection
 
-    const classStart = `
+const gameLevelStart = `
 class GameLevelCustom {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;`;
+        const height = gameEnv.innerHeight;`
+ ; // end of GameLevelStart
+
+    const defsSection = defs;
 
     const classesArray = classes.length > 0
-        ? `
+        ? `\n
 
         this.classes = [
             ${classes.join(',\n            ')}
@@ -1573,13 +1581,15 @@ class GameLevelCustom {
 
     const builderSection = builder_code();
 
-    const classEnd = `
+    const gameLevelEnd = `
     }
 }
 
-export const gameLevelClasses = [GameLevelCustom];`;
+export const gameLevelClasses = [GameLevelCustom];`
+; // end of gameLevelEnd
 
-    return importsSection + '\n' + classStart + (defs ? '\n' + defs : '\n        // Definitions will be added here per step') + classesArray + builderSection + classEnd;
+// Actual formatting of code returned here
+return importsSection + gameLevelStart + defsSection + classesArray + builderSection + gameLevelEnd;
 }
 
 /**
