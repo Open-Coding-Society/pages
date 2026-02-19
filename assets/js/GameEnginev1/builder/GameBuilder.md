@@ -1563,7 +1563,8 @@ class GameLevelCustom {
         const height = gameEnv.innerHeight;`
  ; // end of GameLevelStart
 
-    const defsSection = defs;
+    // Each definition already includes leading blank line (\n\n)
+    const defsSection = defs || '\n\n        // Definitions will be added here per step';
 
     const classesArray = classes.length > 0
         ? `\n
