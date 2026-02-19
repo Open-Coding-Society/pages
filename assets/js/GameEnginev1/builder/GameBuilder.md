@@ -1136,6 +1136,13 @@ function player_extract(ui, p) {
             return Math.max(0, Math.min(maxIndex, v|0));
     };
 
+    // Extract keypress/movement keys
+    const mvElGen = document.getElementById('movement-keys');
+    const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
+    const keypress = movement === 'arrows'
+        ? '{ up: 38, left: 37, down: 40, right: 39 }'
+        : '{ up: 87, left: 65, down: 83, right: 68 }';
+
     return {
      name: (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'"),
      pIsData: p && p.src && p.src.startsWith('data:'),
@@ -1147,6 +1154,8 @@ function player_extract(ui, p) {
      initY: Math.max(0, parseInt(ui.pY?.value || '0', 10)),
      pRowsVal: dirRowsTotal,
      pColsVal: Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10)),
+     pixelsH: p.h,
+     pixelsW: p.w,
      dirRowsTotal: dirRowsTotal,
      dirCols: Math.max(1, parseInt(ui.pDirCols?.value || 3, 10)),
      dRow: clamp(parseInt(ui.pDownRow?.value ?? 0)),
@@ -1163,6 +1172,7 @@ function player_extract(ui, p) {
      dlRow: clamp(parseInt(ui.pDownLeftRow?.value ?? dRow)),
      hbW: Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9)),
      hbH: Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9)),
+     keypress: keypress
     }
 }
 
@@ -1182,6 +1192,7 @@ function player_code(px, name = "playerData" ) {
         STEP_FACTOR: ${px.pStepVal},
         ANIMATION_RATE: ${px.pAnimVal},
         INIT_POSITION: { x: ${px.initX}, y: ${px.initY} },
+        pixels: { height: ${px.pixelsH}, width: ${px.pixelsW} },
         orientation: { rows: ${px.pRowsVal}, columns: ${px.pColsVal} },
         down: { row: ${px.dRow}, start: 0, columns: ${px.dirCols} },
         downRight: { row: ${px.drRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
@@ -1929,14 +1940,9 @@ export const gameLevelClasses = [GameLevelCustom];`;
     function buildBackgroundInsertText() {
         const bg = assets.bg[ui.bg.value];
         if (!bg) return { defs: '', classes: [] };
-        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-        const bgSrcVal = bgIsData ? `'${String(bg.src).replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-        const defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };`;
+        
+        const bgx = bg_extract(bg);
+        const defs = bg_code(bgx);
         const classes = [
             "      { class: GameEnvBackground, data: bgData }"
         ];
@@ -1947,66 +1953,14 @@ export const gameLevelClasses = [GameLevelCustom];`;
         const bg = assets.bg[ui.bg.value];
         const p = assets.sprites[ui.pSprite.value];
         if (!bg || !p) return { defs: '', classes: [] };
-        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-        const bgSrcVal = bgIsData ? `'${String(bg.src).replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-        const pIsData = p && p.src && p.src.startsWith('data:');
-        const pSrcVal = pIsData ? `'${String(p.src).replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-        const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
-        const pStepVal = parseInt(ui.pStep?.value || '1000', 10);
-        const pAnimVal = parseInt(ui.pAnim?.value || '50', 10);
-        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-        const pRowsVal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || String(p.rows || 1), 10));
-        const pColsVal = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || String(p.cols || 1), 10));
-        const dirRowsTotal = pRowsVal;
-        const clamp = (v) => {
-            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
-            return Math.max(0, Math.min(maxIndex, v|0));
-        };
-        const dirCols = Math.max(1, parseInt(ui.pDirCols?.value || 3, 10));
-        const dRow = clamp(parseInt(ui.pDownRow?.value ?? 0));
-        const rRow = clamp(parseInt(ui.pRightRow?.value ?? 1));
-        const lRow = clamp(parseInt(ui.pLeftRow?.value ?? 2));
-        const uRow = clamp(parseInt(ui.pUpRow?.value ?? 3));
-        const urRow = clamp(parseInt(ui.pUpRightRow?.value ?? uRow));
-        const drRow = clamp(parseInt(ui.pDownRightRow?.value ?? rRow));
-        const ulRow = clamp(parseInt(ui.pUpLeftRow?.value ?? lRow));
-        const dlRow = clamp(parseInt(ui.pDownLeftRow?.value ?? dRow));
-        const hbW = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
-        const hbH = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
-        const mvElGen = document.getElementById('movement-keys');
-        const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
-        const keypress = movement === 'arrows'
-            ? '{ up: 38, left: 37, down: 40, right: 39 }'
-            : '{ up: 87, left: 65, down: 83, right: 68 }';
-
-        const defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleVal},
-            STEP_FACTOR: ${pStepVal},
-            ANIMATION_RATE: ${pAnimVal},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsVal}, columns: ${pColsVal} },
-            down: { row: ${dRow}, start: 0, columns: ${dirCols} },
-            downRight: { row: ${drRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            downLeft: { row: ${dlRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            left: { row: ${lRow}, start: 0, columns: ${dirCols} },
-            right: { row: ${rRow}, start: 0, columns: ${dirCols} },
-            up: { row: ${uRow}, start: 0, columns: ${dirCols} },
-            upLeft: { row: ${ulRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            upRight: { row: ${urRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${hbW}, heightPercentage: ${hbH} },
-            keypress: ${keypress}
-        };`;
+        
+        const bgx = bg_extract(bg);
+        const bgCode = bg_code(bgx);
+        
+        const playerx = player_extract(ui, p);
+        const playerCode = player_code(playerx);
+        
+        const defs = `${bgCode}${playerCode}`;
         const classes = [
             "      { class: GameEnvBackground, data: bgData }",
             "      { class: Player, data: playerData }"
