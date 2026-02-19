@@ -1123,11 +1123,11 @@ function bg_code(bg, name = "bgData") {
 
   const def = `
 
-    const ${name} = {
-        name: ${bg.name},
-        src: ${bg.src},
-        pixels: { height: ${bg.h}, width: ${bg.w} }
-    };`;
+        const ${name} = {
+            name: ${bg.name},
+            src: ${bg.src},
+            pixels: { height: ${bg.h}, width: ${bg.w} }
+        };`;
 
   const classEntry = `{ class: GameEnvBackground, data: ${name} }`;
 
@@ -1198,27 +1198,27 @@ function player_code(px, name = "playerData" ) {
 
     const def = `
 
-    const ${name} = {
-        id: '${name}',
-        src: ${px.pSrcVal},
-        SCALE_FACTOR: ${px.pScaleVal},
-        STEP_FACTOR: ${px.pStepVal},
-        ANIMATION_RATE: ${px.pAnimVal},
-        INIT_POSITION: { x: ${px.initX}, y: ${px.initY} },
-        pixels: { height: ${px.pixelsH}, width: ${px.pixelsW} },
-        orientation: { rows: ${px.pRowsVal}, columns: ${px.pColsVal} },
-        down: { row: ${px.dRow}, start: 0, columns: ${px.dirCols} },
-        downRight: { row: ${px.drRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
-        downLeft: { row: ${px.dlRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
-        left: { row: ${px.lRow}, start: 0, columns: ${px.dirCols} },
-        right: { row: ${px.rRow}, start: 0, columns: ${px.dirCols} },
-        up: { row: ${px.uRow}, start: 0, columns: ${px.dirCols} },
-        upLeft: { row: ${px.ulRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
-        upRight: { row: ${px.urRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
-        hitbox: { widthPercentage: ${px.hbW}, heightPercentage: ${px.hbH} },
-        keypress: ${px.keypress}
+        const ${name} = {
+            id: '${name}',
+            src: ${px.pSrcVal},
+            SCALE_FACTOR: ${px.pScaleVal},
+            STEP_FACTOR: ${px.pStepVal},
+            ANIMATION_RATE: ${px.pAnimVal},
+            INIT_POSITION: { x: ${px.initX}, y: ${px.initY} },
+            pixels: { height: ${px.pixelsH}, width: ${px.pixelsW} },
+            orientation: { rows: ${px.pRowsVal}, columns: ${px.pColsVal} },
+            down: { row: ${px.dRow}, start: 0, columns: ${px.dirCols} },
+            downRight: { row: ${px.drRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
+            downLeft: { row: ${px.dlRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
+            left: { row: ${px.lRow}, start: 0, columns: ${px.dirCols} },
+            right: { row: ${px.rRow}, start: 0, columns: ${px.dirCols} },
+            up: { row: ${px.uRow}, start: 0, columns: ${px.dirCols} },
+            upLeft: { row: ${px.ulRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
+            upRight: { row: ${px.urRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
+            hitbox: { widthPercentage: ${px.hbW}, heightPercentage: ${px.hbH} },
+            keypress: ${px.keypress}
 
-        };`;
+            };`;
 
     const classEntry = `{ class: Player, data: ${name} }`;
 
@@ -1285,28 +1285,28 @@ function npc_code(nx, index, includeAlert = false) {
 
     const def = `
 
-    const ${varName} = {
-        id: '${nx.id}',
-        greeting: '${nx.greeting}',
-        src: ${nx.srcVal},
-        SCALE_FACTOR: ${nx.scaleFactor},
-        ANIMATION_RATE: ${nx.animRate},
-        INIT_POSITION: { x: ${nx.initX}, y: ${nx.initY} },
-        pixels: { height: ${nx.pixelsH}, width: ${nx.pixelsW} },
-        orientation: { rows: ${nx.rows}, columns: ${nx.cols} },
-        down: { row: 0, start: 0, columns: 3 },
-        right: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
-        left: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
-        up: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
-        upRight: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
-        downRight: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
-        upLeft: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
-        downLeft: { row: 0, start: 0, columns: 3 },
-        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-        dialogues: ['${nx.greeting}'],
-        reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-        interact: ${interactFunc}
-    };`;
+        const ${varName} = {
+            id: '${nx.id}',
+            greeting: '${nx.greeting}',
+            src: ${nx.srcVal},
+            SCALE_FACTOR: ${nx.scaleFactor},
+            ANIMATION_RATE: ${nx.animRate},
+            INIT_POSITION: { x: ${nx.initX}, y: ${nx.initY} },
+            pixels: { height: ${nx.pixelsH}, width: ${nx.pixelsW} },
+            orientation: { rows: ${nx.rows}, columns: ${nx.cols} },
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+            left: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+            up: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+            upRight: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+            downRight: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+            upLeft: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            dialogues: ['${nx.greeting}'],
+            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            interact: ${interactFunc}
+        };`;
 
     const classEntry = `{ class: Npc, data: ${varName} }`;
 
@@ -1357,14 +1357,14 @@ function barrier_extract(source, type, idx, options = {}) {
 function barrier_code(barrierData) {
     const { varName, id, x, y, width, height, visible, fromOverlay } = barrierData;
     const comment = fromOverlay ? ' /* BUILDER_DEFAULT */' : '';
-    const overlayPart = fromOverlay ? ',\n        fromOverlay: true' : '';
+    const overlayPart = fromOverlay ? ',\n            fromOverlay: true' : '';
 
     const def = `
 
-    const ${varName} = {
-        id: '${id}', x: ${x}, y: ${y}, width: ${width}, height: ${height}, visible: ${visible}${comment},
-        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }${overlayPart}
-    };`;
+        const ${varName} = {
+            id: '${id}', x: ${x}, y: ${y}, width: ${width}, height: ${height}, visible: ${visible}${comment},
+            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }${overlayPart}
+        };`;
 
     const classEntry = `{ class: Barrier, data: ${varName} }`;
 
