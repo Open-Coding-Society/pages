@@ -102,9 +102,9 @@ permalink: /gamebuilder
                     </select>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="bg-instructions-btn" class="btn btn-sm">Upload Instructions ▸</button>
-                        <div id="bg-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; color: var(--text-muted); margin-top:6px;">
-                            To add your own backgrounds, place files under <code>images/gamebuilder/bg</code> and then press the Refresh Assets button. See <a href="{{ site.baseurl }}/gamebuilder/doc">upload instructions</a>.
-                            <div style="margin-top:4px;">Backgrounds json: <a href="{{ site.baseurl }}/images/gamebuilder/bg/index.json">images/gamebuilder/bg/index.json</a></div>
+                        <div id="bg-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; margin-top:6px;">
+                            To add your own backgrounds, place files under <code>images/gamebuilder/bg</code> and then press the Refresh Assets button. See <a href="{{ site.baseurl }}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">upload instructions</a>.
+                            <div style="margin-top:4px;">Backgrounds json: <a href="{{ site.baseurl }}/images/gamebuilder/bg/index.json" target="_blank" rel="noopener noreferrer">images/gamebuilder/bg/index.json</a></div>
                         </div>
                     </div>
                 </div>
@@ -121,9 +121,9 @@ permalink: /gamebuilder
                     </select>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="sprite-instructions-btn" class="btn btn-sm">Upload Instructions ▸</button>
-                        <div id="sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; color: var(--text-muted); margin-top:6px;">
-                            To add your own spritesheets, place files under <code>images/gamebuilder/sprites</code> (and set rows/cols in index.json). Then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder/doc">upload instructions</a>.
-                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json">images/gamebuilder/sprites/index.json</a></div>
+                        <div id="sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; margin-top:6px;">
+                            To add your own spritesheets, place files under <code>images/gamebuilder/sprites</code> (and set rows/cols in index.json). Then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">upload instructions</a>.
+                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json" target="_blank" rel="noopener noreferrer">images/gamebuilder/sprites/index.json</a></div>
                         </div>
                     </div>
                     <label>X Position</label>
@@ -138,7 +138,7 @@ permalink: /gamebuilder
                     </select>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="player-advanced-btn" class="btn btn-sm">Advanced ▸</button>
-                        <div id="player-advanced-panel" class="instructions-panel" style="display:none; font-size:0.85em; color: var(--text-muted); margin-top:6px;">
+                        <div id="player-advanced-panel" class="instructions-panel" style="display:none; font-size:0.85em; margin-top:6px;">
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; align-items:end;">
                                 <div>
                                     <label>Scale Factor</label>
@@ -215,7 +215,7 @@ permalink: /gamebuilder
                                             <input type="number" id="player-hitbox-height" min="0" max="0.9" step="0.01" value="0.00">
                                         </div>
                                     </div>
-                                    <div style="margin-top:6px; font-size:0.75em; color: var(--text-muted);">
+                                    <div style="margin-top:6px; font-size:0.75em;">
                                         Smaller values mean a larger collision box (closer to sprite edges). Larger values trim the box inward symmetrically.
                                     </div>
                                 </div>
@@ -231,9 +231,9 @@ permalink: /gamebuilder
                     </div>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="npc-sprite-instructions-btn" class="btn btn-sm">Upload Instructions ▸</button>
-                        <div id="npc-sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; color: var(--text-muted); margin-top:6px;">
-                            NPCs use the same spritesheet system as the Player. Place files under <code>images/gamebuilder/sprites</code> and set <code>rows</code>/<code>cols</code> in index.json, then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder/doc">upload instructions</a>.
-                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json">images/gamebuilder/sprites/index.json</a></div>
+                        <div id="npc-sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; margin-top:6px;">
+                            NPCs use the same spritesheet system as the Player. Place files under <code>images/gamebuilder/sprites</code> and set <code>rows</code>/<code>cols</code> in index.json, then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">upload instructions</a>.
+                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json" target="_blank" rel="noopener noreferrer">images/gamebuilder/sprites/index.json</a></div>
                             <div style="margin-top:6px;">
                                 Interaction: Walk up to an NPC and press <strong>E</strong> to open their dialogue. Interactions trigger on collision or close proximity. Ensure the NPC has either a <code>greeting</code> or <code>dialogues</code> set for text to appear.
                             </div>
