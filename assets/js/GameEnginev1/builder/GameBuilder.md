@@ -1461,62 +1461,16 @@ function barriers_generate(walls, drawShapes, options = {}) {
     return { defs: barrierDefs.length ? barrierDefs.join('\n') : '', classes };
 }
 
-/* code generation (baseline and steps) */
-function generateBaselineCode() {
+/* SECTION: Game Level Template Code Generation */
+
+/**
+ * Generate builder-only code section for postMessage communication and event listeners
+ * This code enables real-time sync between builder UI and running game
+ * @returns {String} - Builder-only code block with BUILDER_ONLY_START/END markers
+ */
+function builder_code() {
     return `
 
-    import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-    import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-    import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-    import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
-
-    class GameLevelCustom {
-        constructor(gameEnv) {
-            const path = gameEnv.path;
-            const width = gameEnv.innerWidth;
-            const height = gameEnv.innerHeight;
-
-            // Definitions will be added here per step
-
-            // Define objects for this level progressively via Confirm Step
-            this.classes = [
-                // Step 1: add GameEnvBackground
-                // Step 2: add Player
-                // Step 3: add Npc
-            ];
-        }
-    }
-
-    export const gameLevelClasses = [GameLevelCustom];`;
-        }
-
-        function generateStepCode(currentStep) {
-            const bg = assets.bg[ui.bg.value];
-            const p = assets.sprites[ui.pSprite.value];
-            const mvElGen = document.getElementById('movement-keys');
-            const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
-                const keypress = movement === 'arrows'
-                        ? '{ up: 38, left: 37, down: 40, right: 39 }'
-                        : '{ up: 87, left: 65, down: 83, right: 68 }';
-
-                function header() {
-                    return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-        import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-        import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-        import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
-
-class GameLevelCustom {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;`;
-                }
-                function footer(classesArray) {
-                        return `
-
-        this.classes = [
-            ${classesArray.join(',\n            ')}
-        ];
         /* BUILDER_ONLY_START */
         // Post object summary to builder (debugging visibility of NPCs/walls)
         try {
@@ -1584,82 +1538,150 @@ class GameLevelCustom {
                 }
             });
         } catch (_) {}
-        /* BUILDER_ONLY_END */
+        /* BUILDER_ONLY_END */`;
+}
+
+/**
+ * Generate complete GameLevelCustom class template code
+ * Composes imports, class structure, entity definitions, and class array
+ * @param {String} defs - Entity data definitions (bgData, playerData, npcData, etc.)
+ * @param {Array} classes - Array of class entry strings for this.classes array
+ * @returns {String} - Complete game level class code ready for execution
+ */
+function gamelevel_code(defs = '', classes = []) {
+    const importsSection = `
+import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';`;
+
+    const classStart = `
+class GameLevelCustom {
+    constructor(gameEnv) {
+        const path = gameEnv.path;
+        const width = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;`;
+
+    const classesArray = classes.length > 0
+        ? `\n        this.classes = [\n            ${classes.join(',\n            ')}\n        ];`
+        : `\n        this.classes = [\n            // Step 1: add GameEnvBackground\n            // Step 2: add Player\n            // Step 3: add Npc\n        ];`;
+
+    const builderSection = builder_code();
+
+    const classEnd = `
     }
 }
 
 export const gameLevelClasses = [GameLevelCustom];`;
-                }
 
-                if (currentStep === 'background') {
-                    if (!ui.bg.value) return null;
+    return importsSection + '\n' + classStart + (defs || '\n        // Definitions will be added here per step') + classesArray + builderSection + classEnd;
+}
 
-                    const bgGen = background_generate(bg);
-                    const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
+/**
+ * Generate baseline/empty game level template
+ * Used when no entities have been configured yet
+ * @returns {String} - Baseline template with placeholder comments
+ */
+function base_generate() {
+    return gamelevel_code('', []);
+}
 
-                    const defs = bgGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
-                    const classes = [...bgGen.classes, ...barriersGen.classes];
+/**
+ * Generate game level code for a specific workflow step
+ * Composes all relevant entities for the current step and generates complete code
+ * @param {String} currentStep - Current workflow step ('background', 'player', 'npc', 'walls', 'freestyle')
+ * @returns {String|null} - Complete game level code for the step, or null if prerequisites not met
+ */
+function step_generate(currentStep) {
+    const bg = assets.bg[ui.bg.value];
+    const p = assets.sprites[ui.pSprite.value];
 
-                    return header() + defs + footer(classes);
-                }
+    if (currentStep === 'background') {
+        if (!ui.bg.value) return null;
 
-                if (currentStep === 'player') {
-                    if (!ui.bg.value || !ui.pSprite.value) return null;
+        const bgGen = background_generate(bg);
+        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
 
-                    const bgGen = background_generate(bg);
-                    const playerGen = player_generate(ui, p);
-                    const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
+        const defs = bgGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const classes = [...bgGen.classes, ...barriersGen.classes];
 
-                    const defs = bgGen.defs + playerGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
-                    const classes = [...bgGen.classes, ...playerGen.classes, ...barriersGen.classes];
+        return gamelevel_code(defs, classes);
+    }
 
-                    return header() + defs + footer(classes);
-                }
+    if (currentStep === 'player') {
+        if (!ui.bg.value || !ui.pSprite.value) return null;
 
-                if (currentStep === 'npc') {
-                    const includedSlots = ui.npcs.slice();
-                    if (includedSlots.length === 0) return null;
+        const bgGen = background_generate(bg);
+        const playerGen = player_generate(ui, p);
+        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
 
-                    const bgGen = background_generate(bg);
-                    const playerGen = player_generate(ui, p);
-                    const npcsGen = npcs_generate(includedSlots, assets, true);
+        const defs = bgGen.defs + playerGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const classes = [...bgGen.classes, ...playerGen.classes, ...barriersGen.classes];
 
-                    const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-                    const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
-                    const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
-                    const visible = !!ui.gameWallsVisible;
-                    const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXN, scaleY: scaleYN });
+        return gamelevel_code(defs, classes);
+    }
 
-                    const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
-                    const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
+    if (currentStep === 'npc') {
+        const includedSlots = ui.npcs.slice();
+        if (includedSlots.length === 0) return null;
 
-                    return header() + defs + footer(classes);
-                }
+        const bgGen = background_generate(bg);
+        const playerGen = player_generate(ui, p);
+        const npcsGen = npcs_generate(includedSlots, assets, true);
 
-                if (currentStep === 'walls') {
-                    if (!ui.bg.value || !ui.pSprite.value) return null;
+        const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
+        const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
+        const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
+        const visible = !!ui.gameWallsVisible;
+        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXN, scaleY: scaleYN });
 
-                    const bgGen = background_generate(bg);
-                    const playerGen = player_generate(ui, p);
-                    const npcsGen = npcs_generate(ui.npcs.slice(), assets, false);
+        const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
 
-                    const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-                    const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
-                    const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
-                    const visible = !!ui.gameWallsVisible;
-                    const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXW, scaleY: scaleYW });
+        return gamelevel_code(defs, classes);
+    }
 
-                    const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
-                    const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
+    if (currentStep === 'walls') {
+        if (!ui.bg.value || !ui.pSprite.value) return null;
 
-                    return header() + defs + footer(classes);
-                }
+        const bgGen = background_generate(bg);
+        const playerGen = player_generate(ui, p);
+        const npcsGen = npcs_generate(ui.npcs.slice(), assets, false);
 
-                return ui.editor.value;
-        }
+        const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
+        const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
+        const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
+        const visible = !!ui.gameWallsVisible;
+        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXW, scaleY: scaleYW });
+
+        const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
+
+        return gamelevel_code(defs, classes);
+    }
+
+    return ui.editor.value;
+}
+
+/**
+ * Wrapper for legacy generateBaselineCode calls
+ * @returns {String} - Baseline game level template
+ */
+function generateBaselineCode() {
+    return base_generate();
+}
+
+/**
+ * Wrapper for legacy generateStepCode calls
+ * @param {String} currentStep - Current workflow step
+ * @returns {String|null} - Generated code for step or null
+ */
+function generateStepCode(currentStep) {
+    return step_generate(currentStep);
+}
 
     /* SECTION: Code Editor Diff and Highlight Overlay Management */
-    
+
     /**
      * Compute the range of lines that changed between two code strings
      * Used to determine which lines to highlight during typing animations
@@ -1762,7 +1784,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     }
 
     /* SECTION: Two-Way Code and UI Panel Synchronization */
-    
+
     /**
      * Parse code from editor and update UI controls to match (two-way sync)
      * Extracts player, background, and entity data from code and populates form fields
@@ -1870,7 +1892,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     }
 
     /* SECTION: Code Typing Animation and Visual Feedback */
-    
+
     /**
      * Simulate code being typed into editor with character-by-character animation
      * Provides visual feedback when code is generated or modified by the builder
@@ -1936,7 +1958,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     }
 
     /* SECTION: Entity Code Generation for Confirm Workflow */
-    
+
     /**
      * Build NPC definition code and class entries for insertion into existing code
      * Used by confirm workflow to merge NPC entities into the editor
@@ -1985,7 +2007,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     }
 
     /* SECTION: Code Merge and Class Array Management */
-    
+
     /**
      * Merge new entity definitions and class entries into existing editor code
      * Intelligently removes old definitions before inserting new ones to avoid duplicates
@@ -2068,14 +2090,14 @@ export const gameLevelClasses = [GameLevelCustom];`;
     }
 
     /* SECTION: Player Control Event Handlers and Live Code Updates */
-    
+
     const mvEl = document.getElementById('movement-keys');
-    
+
     /**
      * Trigger code regeneration from controls if in freestyle mode
      */
     const rerunPlayer = () => { syncFromControlsIfFreestyle(); };
-    
+
     /**
      * Apply player UI control changes directly to code without full regeneration
      * Used for slider controls (scale, step, animation) to provide immediate feedback
@@ -2135,7 +2157,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
         state.lastEdited = 'player';
         rerunPlayer();
     }
-    
+
     // Background change event handler
     if (ui.bg) ui.bg.addEventListener('change', () => { state.lastEdited = 'background'; rerunPlayer(); });
     if (ui.pSprite) ui.pSprite.addEventListener('change', () => {
@@ -2194,7 +2216,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     });
 
     /* SECTION: Confirm Button Handler - Apply Staged Changes with Animation */
-    
+
     /**
      * Main confirm button click handler
      * Applies staged code changes to editor with typing animation
