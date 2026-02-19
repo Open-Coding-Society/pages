@@ -1122,7 +1122,6 @@ function bg_extract(bg, name = "custom_bg") {
 function bg_code(bg, name = "bgData") {
 
   const def = `
-
         const ${name} = {
             name: ${bg.name},
             src: ${bg.src},
@@ -1197,7 +1196,6 @@ function player_extract(ui, p) {
 function player_code(px, name = "playerData" ) {
 
     const def = `
-
         const ${name} = {
             id: '${name}',
             src: ${px.pSrcVal},
@@ -1217,7 +1215,6 @@ function player_code(px, name = "playerData" ) {
             upRight: { row: ${px.urRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
             hitbox: { widthPercentage: ${px.hbW}, heightPercentage: ${px.hbH} },
             keypress: ${px.keypress}
-
             };`;
 
     const classEntry = `{ class: Player, data: ${name} }`;
@@ -1284,7 +1281,6 @@ function npc_code(nx, index, includeAlert = false) {
         : `function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }`;
 
     const def = `
-
         const ${varName} = {
             id: '${nx.id}',
             greeting: '${nx.greeting}',
@@ -1360,7 +1356,6 @@ function barrier_code(barrierData) {
     const overlayPart = fromOverlay ? ',\n            fromOverlay: true' : '';
 
     const def = `
-
         const ${varName} = {
             id: '${id}', x: ${x}, y: ${y}, width: ${width}, height: ${height}, visible: ${visible}${comment},
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }${overlayPart}
@@ -1424,7 +1419,7 @@ function npcs_generate(npcs, assets, includeAlert = false) {
         classes.push(npcCode.classEntry);
     });
 
-    return { defs: npcDefs.join('\n'), classes };
+    return { defs: npcDefs.join(''), classes };
 }
 
 /**
@@ -1458,7 +1453,7 @@ function barriers_generate(walls, drawShapes, options = {}) {
         classes.push(barrierCode.classEntry);
     });
 
-    return { defs: barrierDefs.length ? barrierDefs.join('\n') : '', classes };
+    return { defs: barrierDefs.length ? barrierDefs.join('') : '', classes };
 }
 
 /* SECTION: Game Level Template Code Generation */
@@ -1563,8 +1558,18 @@ class GameLevelCustom {
         const height = gameEnv.innerHeight;`;
 
     const classesArray = classes.length > 0
-        ? `\n\n        this.classes = [\n            ${classes.join(',\n            ')}\n        ];`
-        : `\n\n        this.classes = [\n            // Step 1: add GameEnvBackground\n            // Step 2: add Player\n            // Step 3: add Npc\n        ];`;
+        ? `
+
+        this.classes = [
+            ${classes.join(',\n            ')}
+        ];`
+        : `
+
+        this.classes = [
+            // Step 1: add GameEnvBackground
+            // Step 2: add Player
+            // Step 3: add Npc
+        ];`;
 
     const builderSection = builder_code();
 
@@ -1574,7 +1579,7 @@ class GameLevelCustom {
 
 export const gameLevelClasses = [GameLevelCustom];`;
 
-    return importsSection + '\n' + classStart + (defs || '\n        // Definitions will be added here per step') + classesArray + builderSection + classEnd;
+    return importsSection + '\n' + classStart + (defs ? '\n' + defs : '\n        // Definitions will be added here per step') + classesArray + builderSection + classEnd;
 }
 
 /**
