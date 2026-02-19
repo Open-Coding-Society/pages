@@ -1658,7 +1658,15 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 return ui.editor.value;
         }
 
-    /* SECTION: Diff computation for typed highlights */
+    /* SECTION: Code Editor Diff and Highlight Overlay Management */
+    
+    /**
+     * Compute the range of lines that changed between two code strings
+     * Used to determine which lines to highlight during typing animations
+     * @param {String} oldCode - The original code before changes
+     * @param {String} newCode - The new code after changes
+     * @returns {Object} { startLine: number, lineCount: number } - Changed line range
+     */
     function computeChangeRange(oldCode, newCode) {
         const oldLines = oldCode.split('\n');
         const newLines = newCode.split('\n');
@@ -1671,9 +1679,15 @@ export const gameLevelClasses = [GameLevelCustom];`;
         return { startLine: start, lineCount };
     }
 
+    /**
+     * Clear all highlight overlays from the editor
+     */
     function clearOverlay() { ui.hLayer.innerHTML = ''; }
 
-    // Render highlight overlay for typing and persistent blocks
+    /**
+     * Render highlight overlay boxes for typing animations and persistent code blocks
+     * Positions overlay boxes based on line numbers and editor scroll position
+     */
     function renderOverlay() {
         clearOverlay();
         ui.hLayer.style.transform = `translateY(${-ui.editor.scrollTop}px)`;
@@ -1708,6 +1722,11 @@ export const gameLevelClasses = [GameLevelCustom];`;
         }
     });
 
+    /**
+     * Synchronize code generation from UI controls when in freestyle mode
+     * Stages changes for confirmation rather than applying immediately
+     * Detects which entity type was last edited and generates appropriate code
+     */
     function syncFromControlsIfFreestyle() {
         const current = steps[stepIndex];
         // Always stage builder changes, even after manual code edits
@@ -1742,7 +1761,13 @@ export const gameLevelClasses = [GameLevelCustom];`;
         }
     }
 
-    /* SECTION: Parse editor code -> update UI controls (two-way sync) */
+    /* SECTION: Two-Way Code and UI Panel Synchronization */
+    
+    /**
+     * Parse code from editor and update UI controls to match (two-way sync)
+     * Extracts player, background, and entity data from code and populates form fields
+     * Enables users to edit code directly while keeping UI controls synchronized
+     */
     function syncControlsFromEditor() {
         const code = String(ui.editor?.value || '');
         const pdMatch = /const\s+playerData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
@@ -1844,7 +1869,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
         } catch (_) {}
     }
 
-    /* SECTION: Typing animation (simulate code being typed, then persist highlight) */
+    /* SECTION: Code Typing Animation and Visual Feedback */
+    
+    /**
+     * Simulate code being typed into editor with character-by-character animation
+     * Provides visual feedback when code is generated or modified by the builder
+     * Highlights changed region during typing, then persists highlight when complete
+     * @param {String} oldCode - The current editor code before changes
+     * @param {String} newCode - The new code to type into the editor
+     * @param {Function} onDone - Callback function to execute when typing animation completes
+     */
     function simulateTypingChange(oldCode, newCode, onDone) {
         const { startLine, lineCount } = computeChangeRange(oldCode, newCode);
         if (!lineCount || lineCount < 1) {
@@ -1901,23 +1935,43 @@ export const gameLevelClasses = [GameLevelCustom];`;
         window.setTimeout(typeStep, TICK_MS);
     }
 
-    /* SECTION: NPC and Barrier code inserts for confirm merges */
+    /* SECTION: Entity Code Generation for Confirm Workflow */
+    
+    /**
+     * Build NPC definition code and class entries for insertion into existing code
+     * Used by confirm workflow to merge NPC entities into the editor
+     * @returns {Object} { defs: string, classes: array } - NPC definitions and class entries
+     */
     function buildNpcInsertText() {
         const includedSlots = ui.npcs.slice();
         if (!includedSlots.length) return { defs: '', classes: [] };
         return npcs_generate(includedSlots, assets, false);
     }
 
+    /**
+     * Build barrier/wall definition code and class entries for insertion
+     * Includes both manually placed walls and drawn collision barriers
+     * @returns {Object} { defs: string, classes: array } - Barrier definitions and class entries
+     */
     function buildBarrierInsertText() {
         return barriers_generate(ui.walls, ui.drawShapes, { visible: true });
     }
 
+    /**
+     * Build background definition code and class entry for insertion
+     * @returns {Object} { defs: string, classes: array } - Background definition and class entry
+     */
     function buildBackgroundInsertText() {
         const bg = assets.bg[ui.bg.value];
         if (!bg) return { defs: '', classes: [] };
         return background_generate(bg);
     }
 
+    /**
+     * Build player and background definition code for insertion
+     * Combines both background and player since player requires background context
+     * @returns {Object} { defs: string, classes: array } - Combined definitions and class entries
+     */
     function buildPlayerInsertText() {
         const bg = assets.bg[ui.bg.value];
         const p = assets.sprites[ui.pSprite.value];
@@ -1930,7 +1984,17 @@ export const gameLevelClasses = [GameLevelCustom];`;
         return { defs, classes };
     }
 
-    /* SECTION: Code merge utilities (defs + classes into editor content) */
+    /* SECTION: Code Merge and Class Array Management */
+    
+    /**
+     * Merge new entity definitions and class entries into existing editor code
+     * Intelligently removes old definitions before inserting new ones to avoid duplicates
+     * Updates constructor definitions and this.classes array while preserving other code
+     * @param {String} oldCode - The current editor code
+     * @param {String} insertDefs - New entity definitions to insert (e.g., const npcData1 = {...})
+     * @param {Array} insertClasses - New class entries to add to this.classes array
+     * @returns {String} - Merged code with new definitions and updated class array
+     */
     function mergeDefsAndClasses(oldCode, insertDefs, insertClasses) {
         let code = oldCode;
         try {
@@ -2003,8 +2067,20 @@ export const gameLevelClasses = [GameLevelCustom];`;
         return code;
     }
 
+    /* SECTION: Player Control Event Handlers and Live Code Updates */
+    
     const mvEl = document.getElementById('movement-keys');
+    
+    /**
+     * Trigger code regeneration from controls if in freestyle mode
+     */
     const rerunPlayer = () => { syncFromControlsIfFreestyle(); };
+    
+    /**
+     * Apply player UI control changes directly to code without full regeneration
+     * Used for slider controls (scale, step, animation) to provide immediate feedback
+     * Performs in-place code replacement for numeric values and position updates
+     */
     function applyPlayerUIToCodeImmediate() {
         try {
             let code = String(ui.editor?.value || '');
@@ -2051,10 +2127,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
             rerunPlayer();
         }
     }
+    /**
+     * Update player position in code when X/Y input fields change
+     * Marks player as last edited entity for correct code generation
+     */
     function updatePlayerPositionInEditor() {
         state.lastEdited = 'player';
         rerunPlayer();
     }
+    
+    // Background change event handler
     if (ui.bg) ui.bg.addEventListener('change', () => { state.lastEdited = 'background'; rerunPlayer(); });
     if (ui.pSprite) ui.pSprite.addEventListener('change', () => {
         try {
@@ -2111,7 +2193,18 @@ export const gameLevelClasses = [GameLevelCustom];`;
         if (slot.nY) slot.nY.addEventListener('input', () => { state.lastEdited = 'npc'; syncFromControlsIfFreestyle(); });
     });
 
-    /* SECTION: Confirm handler (apply staged code via typing, then lock fields) */
+    /* SECTION: Confirm Button Handler - Apply Staged Changes with Animation */
+    
+    /**
+     * Main confirm button click handler
+     * Applies staged code changes to editor with typing animation
+     * Locks confirmed fields and advances workflow step
+     * Handles multiple scenarios:
+     * - Freestyle mode with NPCs/Walls to merge
+     * - User-edited code with entities to insert
+     * - Step-based workflow progression
+     * - Staged code from UI control changes
+     */
     document.getElementById('btn-confirm').addEventListener('click', () => {
         const btn = document.getElementById('btn-confirm');
         const oldCode = ui.editor.value;
