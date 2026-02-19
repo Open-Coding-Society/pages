@@ -1200,6 +1200,89 @@ function player_code(px, name = "playerData" ) {
 
 }
 
+/**
+ * Extract and normalize NPC data from GameBuilder Panel slot
+ * @param {Object} slot - The NPC slot object from the form
+ * @param {Object} assets - The assets object containing sprites
+ * @returns {Object} nx - Normalized NPC object
+ */
+function npc_extract(slot, assets) {
+    const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
+    const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'");
+    const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
+    const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
+    const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
+    const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
+    const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
+    const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
+    const nSrcVal = nIsData ? `'${(nSprite.src||'').replace(/'/g, "\\'")}'` : `path + "${nSprite.src}"`;
+    const nRows = Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10));
+    const nCols = Math.max(1, parseInt(slot.nCols?.value || nSprite.cols || 1, 10));
+    const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
+    const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
+
+    return {
+        id: nId,
+        greeting: nMsgSafe,
+        srcVal: nSrcVal,
+        scaleFactor: nScale,
+        animRate: nAnim,
+        initX: nX,
+        initY: nY,
+        pixelsH: nSprite.h,
+        pixelsW: nSprite.w,
+        rows: nRows,
+        cols: nCols
+    };
+}
+
+/**
+ * Build NPC literal text/code that is ready for GameEngine
+ * @param {Object} nx - Normalized NPC object
+ * @param {Number} index - The NPC index for naming
+ * @param {Boolean} includeAlert - Whether to include alert fallback in interact function
+ * @returns {String} npc_data_literal - code
+ */
+function npc_code(nx, index, includeAlert = false) {
+    const interactFunc = includeAlert
+        ? `function() {
+                if (this.dialogueSystem) {
+                    this.showRandomDialogue();
+                } else if (this.greeting) {
+                    alert(this.greeting);
+                } else {
+                    alert('Hello!');
+                }
+            }`
+        : `function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }`;
+
+    const npc_data_literal = `
+        const npcData${index} = {
+            id: '${nx.id}',
+            greeting: '${nx.greeting}',
+            src: ${nx.srcVal},
+            SCALE_FACTOR: ${nx.scaleFactor},
+            ANIMATION_RATE: ${nx.animRate},
+            INIT_POSITION: { x: ${nx.initX}, y: ${nx.initY} },
+            pixels: { height: ${nx.pixelsH}, width: ${nx.pixelsW} },
+            orientation: { rows: ${nx.rows}, columns: ${nx.cols} },
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+            left: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+            up: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+            upRight: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+            downRight: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+            upLeft: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            dialogues: ['${nx.greeting}'],
+            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            interact: ${interactFunc}
+        };`;
+
+    return npc_data_literal;
+}
+
 /* code generation (baseline and steps) */
 function generateBaselineCode() {
     return `
@@ -1443,52 +1526,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
             "      { class: Player, data: playerData }"
                         ];
                         includedSlots.forEach((slot) => {
-                            const index = slot.index;
-                            const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
-                            const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'");
-                            const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
-                            const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
-                            const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
-                            const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
-                            const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
-                            const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
-                            const nSrcVal = nIsData ? `'${(nSprite.src||'').replace(/'/g, "\\'")}'` : `path + "${nSprite.src}"`;
-                            const nRows = Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10));
-                            const nCols = Math.max(1, parseInt(slot.nCols?.value || nSprite.cols || 1, 10));
-                            const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
-                            const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
-                            npcDefs.push(`
-        const npcData${index} = {
-            id: '${nId}',
-            greeting: '${nMsgSafe}',
-            src: ${nSrcVal},
-            SCALE_FACTOR: ${nScale},
-            ANIMATION_RATE: ${nAnim},
-            INIT_POSITION: { x: ${nX}, y: ${nY} },
-            pixels: { height: ${nSprite.h}, width: ${nSprite.w} },
-            orientation: { rows: ${nRows}, columns: ${nCols} },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, ${nRows} - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, ${nRows} - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, ${nRows} - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, ${nRows} - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, ${nRows} - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, ${nRows} - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['${nMsgSafe}'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() {
-                if (this.dialogueSystem) {
-                    this.showRandomDialogue();
-                } else if (this.greeting) {
-                    alert(this.greeting);
-                } else {
-                    alert('Hello!');
-                }
-            }
-        };`);
-                            classes.push(`      { class: Npc, data: npcData${index} }`);
+                            const nx = npc_extract(slot, assets);
+                            const npcCodeLiteral = npc_code(nx, slot.index, true);
+                            npcDefs.push(npcCodeLiteral);
+                            classes.push(`      { class: Npc, data: npcData${slot.index} }`);
                         });
                         const barrierDefsN = [];
                         const includedWallsN = ui.walls.slice();
@@ -1548,42 +1589,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     const includedNPCs = ui.npcs.slice();
                     const npcDefs = [];
                     includedNPCs.forEach((slot) => {
-                        const index = slot.index;
-                        const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
-                        const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'");
-                        const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
-                        const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
-                        const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
-                        const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
-                        const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
-                        const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
-                        const nSrcVal = nIsData ? `'${(nSprite.src||'').replace(/'/g, "\\'")}'` : `path + "${nSprite.src}"`;
-                        const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
-                        const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
-                        npcDefs.push(`
-        const npcData${index} = {
-            id: '${nId}',
-            greeting: '${nMsgSafe}',
-            src: ${nSrcVal},
-            SCALE_FACTOR: ${nScale},
-            ANIMATION_RATE: ${nAnim},
-            INIT_POSITION: { x: ${nX}, y: ${nY} },
-            pixels: { height: ${nSprite.h}, width: ${nSprite.w} },
-            orientation: { rows: ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))}, columns: ${Math.max(1, parseInt(slot.nCols?.value || nSprite.cols || 1, 10))} },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['${nMsgSafe}'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
-        };`);
-                        classes.push(`      { class: Npc, data: npcData${index} }`);
+                        const nx = npc_extract(slot, assets);
+                        const npcCodeLiteral = npc_code(nx, slot.index, false);
+                        npcDefs.push(npcCodeLiteral);
+                        classes.push(`      { class: Npc, data: npcData${slot.index} }`);
                     });
 
                     const barrierDefs = [];
@@ -1877,22 +1886,15 @@ export const gameLevelClasses = [GameLevelCustom];`;
     function buildNpcInsertText() {
         const includedSlots = ui.npcs.slice();
         if (!includedSlots.length) return { defs: '', classes: [] };
+        
         const classes = [];
         const defs = includedSlots.map((slot) => {
-            const index = slot.index;
-            const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
-            const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'") || 'Hello!';
-            const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
-            const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
-            const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
-            const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
-            const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
-            const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
-            return `\n        const npcData${index} = {\n            id: '${nId}',\n            greeting: '${nMsg}',\n            src: path + "${nSprite.src}",\n            SCALE_FACTOR: ${nScale},\n            ANIMATION_RATE: ${nAnim},\n            INIT_POSITION: { x: ${nX}, y: ${nY} },\n            pixels: { height: ${nSprite.h}, width: ${nSprite.w} },\n            orientation: { rows: ${nSprite.rows}, columns: ${nSprite.cols} },\n            down: { row: 0, start: 0, columns: 3 },\n            right: { row: Math.min(1, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            left: { row: Math.min(2, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            up: { row: Math.min(3, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            upRight: { row: Math.min(3, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            downRight: { row: Math.min(1, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            upLeft: { row: Math.min(2, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            downLeft: { row: 0, start: 0, columns: 3 },\n            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },\n            zIndex: 12,\n            dialogues: ['${nMsg}'],\n            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },\n            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }\n        };`;
-        }).join('\n');
-        includedSlots.forEach((slot) => {
+            const nx = npc_extract(slot, assets);
+            const npcCodeLiteral = npc_code(nx, slot.index);
             classes.push(`      { class: Npc, data: npcData${slot.index} }`);
-        });
+            return npcCodeLiteral;
+        }).join('\n');
+        
         return { defs, classes };
     }
 
