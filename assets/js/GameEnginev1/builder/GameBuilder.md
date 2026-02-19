@@ -992,6 +992,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const mv = document.getElementById('movement-keys');
         [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = true; });
         if (ui.addWallBtn) ui.addWallBtn.disabled = true;
+        
+        // Disable draw buttons by default (only enable in freestyle)
+        if (ui.drawBarrierBtn) ui.drawBarrierBtn.disabled = true;
+        if (ui.drawClearBtn) ui.drawClearBtn.disabled = true;
+        
         ui.walls.forEach(slot => {
             const fields = [slot.wX, slot.wY, slot.wW, slot.wH, slot.deleteBtn];
             if (slot.addBtn) slot.addBtn.disabled = true;
@@ -1056,6 +1061,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 [slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
+            
+            // Enable draw buttons in freestyle mode
+            if (ui.drawBarrierBtn) ui.drawBarrierBtn.disabled = false;
+            if (ui.drawClearBtn) ui.drawClearBtn.disabled = false;
 
         }
 
@@ -1351,6 +1360,38 @@ function barrier_code(barrierData) {
     return barrier_data_literal;
 }
 
+/**
+ * Generate barrier code for both wall and drawn barriers
+ * @param {Array} walls - Array of wall UI elements
+ * @param {Array} drawShapes - Array of drawn shapes (barriers)
+ * @param {Array} classes - Classes array to push barrier class entries to
+ * @param {Object} options - Options for barrier generation (visible, scaleX, scaleY)
+ * @returns {String} Combined barrier definitions code
+ */
+function barriers_generate(walls, drawShapes, classes, options = {}) {
+    const barrierDefs = [];
+    const visible = options.visible !== undefined ? options.visible : true;
+    const scaleX = options.scaleX || 1;
+    const scaleY = options.scaleY || 1;
+    
+    // Process walls (manual panel entries)
+    walls.forEach((w, idx) => {
+        const bData = barrier_extract(w, 'wall', idx, { visible: visible });
+        barrierDefs.push(barrier_code(bData));
+        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
+    });
+    
+    // Process drawn barriers (from Draw Collision Wall button)
+    const drawnBarriers = (drawShapes || []).filter(s => s.type === 'barrier');
+    drawnBarriers.forEach((b, bIdx) => {
+        const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleX, scaleY: scaleY });
+        barrierDefs.push(barrier_code(bData));
+        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
+    });
+    
+    return barrierDefs.length ? barrierDefs.join('\n') : '';
+}
+
 /* code generation (baseline and steps) */
 function generateBaselineCode() {
     return `
@@ -1482,116 +1523,75 @@ export const gameLevelClasses = [GameLevelCustom];`;
                 }
 
                 if (currentStep === 'background') {
-                        if (!ui.bg.value) return null;
+                    if (!ui.bg.value) return null;
 
-                        let bgx = bg_extract(bg);
-                        let bgCode = bg_code(bgx)
-                        let defs = `${bgCode}`;
-        const classes = [
-            "      { class: GameEnvBackground, data: bgData }"
-                        ];
+                    let bgx = bg_extract(bg);
+                    let bgCode = bg_code(bgx)
+                    let defs = `${bgCode}`;
+                    const classes = [
+                    "      { class: GameEnvBackground, data: bgData }"
+                    ];
 
-                        const barrierDefsB = [];
-                        const includedWallsB = ui.walls.slice();
-                        includedWallsB.forEach((w, idx) => {
-                            const bData = barrier_extract(w, 'wall', idx, { visible: true });
-                            barrierDefsB.push(barrier_code(bData));
-                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                        });
-                        const drawnBarriersB = ui.drawShapes.filter(s => s.type === 'barrier');
-                        // Use overlay pixel coordinates directly (no scaling)
-                        drawnBarriersB.forEach((b, bIdx) => {
-                            const bData = barrier_extract(b, 'drawn', bIdx);
-                            barrierDefsB.push(barrier_code(bData));
-                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                        });
-                        if (barrierDefsB.length) defs += ('\n' + barrierDefsB.join('\n'));
-                        return header() + defs + footer(classes);
+                    const barrierCode = barriers_generate(ui.walls.slice(), ui.drawShapes, classes, { visible: true });
+                    if (barrierCode) defs += ('\n' + barrierCode);
+                    return header() + defs + footer(classes);
                 }
 
                 if (currentStep === 'player') {
-                        if (!ui.bg.value || !ui.pSprite.value) return null;
+                    if (!ui.bg.value || !ui.pSprite.value) return null;
 
-                        let bgx = bg_extract(bg);
-                        let bgCode = bg_code(bgx)
+                    let bgx = bg_extract(bg);
+                    let bgCode = bg_code(bgx)
 
-                        let playerx = player_extract(ui,p);
-                        let playerCode = player_code(playerx);
+                    let playerx = player_extract(ui,p);
+                    let playerCode = player_code(playerx);
 
-                        const defs = `${bgCode} ${playerCode}`;
-                        const classes = [
-            "      { class: GameEnvBackground, data: bgData }",
-            "      { class: Player, data: playerData }"
-                        ];
+                    const defs = `${bgCode} ${playerCode}`;
+                    const classes = [
+                    "      { class: GameEnvBackground, data: bgData }",
+                    "      { class: Player, data: playerData }"
+                    ];
 
-                        const barrierDefs = [];
-                        const includedWallsP = ui.walls.slice();
-                        includedWallsP.forEach((w, idx) => {
-                            const bData = barrier_extract(w, 'wall', idx, { visible: true });
-                            barrierDefs.push(barrier_code(bData));
-                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                        });
-
-                        const drawnBarriersP = ui.drawShapes.filter(s => s.type === 'barrier');
-                        // Use overlay pixel coordinates directly (no scaling)
-                        drawnBarriersP.forEach((b, bIdx) => {
-                            const bData = barrier_extract(b, 'drawn', bIdx);
-                            barrierDefs.push(barrier_code(bData));
-                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                        });
-
-                        const fullDefs = defs + (barrierDefs.length ? ('\n' + barrierDefs.join('\n')) : '');
-                        return header() + fullDefs + footer(classes);
+                    const barrierCode = barriers_generate(ui.walls.slice(), ui.drawShapes, classes, { visible: true });
+                    const fullDefs = defs + (barrierCode ? ('\n' + barrierCode) : '');
+                    return header() + fullDefs + footer(classes);
                 }
 
                 if (currentStep === 'npc') {
                     const includedSlots = ui.npcs.slice();
                     if (includedSlots.length === 0) return null;
 
-                        let bgx = bg_extract(bg);
-                        let bgCode = bg_code(bgx)
+                    let bgx = bg_extract(bg);
+                    let bgCode = bg_code(bgx)
 
-                        let playerx = player_extract(ui,p);
-                        let playerCode = player_code(playerx);
+                    let playerx = player_extract(ui,p);
+                    let playerCode = player_code(playerx);
 
-                        const defsStart = `${bgCode} ${playerCode}`;
-                        const npcDefs = [];
-                        const classes = [
-            "      { class: GameEnvBackground, data: bgData }",
-            "      { class: Player, data: playerData }"
-                        ];
-                        includedSlots.forEach((slot) => {
-                            const nx = npc_extract(slot, assets);
-                            const npcCodeLiteral = npc_code(nx, slot.index, true);
-                            npcDefs.push(npcCodeLiteral);
-                            classes.push(`      { class: Npc, data: npcData${slot.index} }`);
-                        });
+                    const defsStart = `${bgCode} ${playerCode}`;
+                    const npcDefs = [];
+                    const classes = [
+                    "      { class: GameEnvBackground, data: bgData }",
+                    "      { class: Player, data: playerData }"
+                    ];
+                    includedSlots.forEach((slot) => {
+                        const nx = npc_extract(slot, assets);
+                        const npcCodeLiteral = npc_code(nx, slot.index, true);
+                        npcDefs.push(npcCodeLiteral);
+                        classes.push(`      { class: Npc, data: npcData${slot.index} }`);
+                    });
 
-                        const barrierDefsN = [];
-                        const includedWallsN = ui.walls.slice();
-                        includedWallsN.forEach((w, idx) => {
-                            const visible = !!ui.gameWallsVisible;
-                            const bData = barrier_extract(w, 'wall', idx, { visible: visible });
-                            barrierDefsN.push(barrier_code(bData));
-                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                        });
+                    const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
+                    const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
+                    const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
+                    const visible = !!ui.gameWallsVisible;
 
-                        const drawnBarriersN = ui.drawShapes.filter(s => s.type === 'barrier');
-                        const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-                        const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
-                        const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
-                        drawnBarriersN.forEach((b, bIdx) => {
-                            const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleXN, scaleY: scaleYN });
-                            barrierDefsN.push(barrier_code(bData));
-                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                        });
+                    const barrierCode = barriers_generate(ui.walls.slice(), ui.drawShapes, classes, { visible: visible, scaleX: scaleXN, scaleY: scaleYN });
 
-                        const defs = defsStart + npcDefs.join('\n') + (barrierDefsN.length ? ('\n' + barrierDefsN.join('\n')) : '');
-                        return header() + defs + footer(classes);
+                    const defs = defsStart + npcDefs.join('\n') + (barrierCode ? ('\n' + barrierCode) : '');
+                    return header() + defs + footer(classes);
                 }
 
                 if (currentStep === 'walls') {
-
                     if (!ui.bg.value || !ui.pSprite.value) return null;
 
                     let bgx = bg_extract(bg);
@@ -1615,26 +1615,14 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         classes.push(`      { class: Npc, data: npcData${slot.index} }`);
                     });
 
-                    const barrierDefs = [];
-                    const includedWalls = ui.walls.slice();
-                    includedWalls.forEach((w, idx) => {
-                        const visible = !!ui.gameWallsVisible;
-                        const bData = barrier_extract(w, 'wall', idx, { visible: visible });
-                        barrierDefs.push(barrier_code(bData));
-                        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                    });
-
-                    const drawnBarriers = ui.drawShapes.filter(s => s.type === 'barrier');
                     const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
                     const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
                     const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
-                    drawnBarriers.forEach((b, bIdx) => {
-                        const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleXW, scaleY: scaleYW });
-                        barrierDefs.push(barrier_code(bData));
-                        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
-                    });
+                    const visible = !!ui.gameWallsVisible;
 
-                    const defs = defsStart + (npcDefs.length ? ('\n' + npcDefs.join('\n')) : '') + (barrierDefs.length ? ('\n' + barrierDefs.join('\n')) : '');
+                    const barrierCode = barriers_generate(ui.walls.slice(), ui.drawShapes, classes, { visible: visible, scaleX: scaleXW, scaleY: scaleYW });
+
+                    const defs = defsStart + (npcDefs.length ? ('\n' + npcDefs.join('\n')) : '') + (barrierCode ? ('\n' + barrierCode) : '');
                     return header() + defs + footer(classes);
                 }
 
