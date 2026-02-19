@@ -1268,30 +1268,87 @@ function npc_code(nx, index, includeAlert = false) {
         : `function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }`;
 
     const npc_data_literal = `
-        const npcData${index} = {
-            id: '${nx.id}',
-            greeting: '${nx.greeting}',
-            src: ${nx.srcVal},
-            SCALE_FACTOR: ${nx.scaleFactor},
-            ANIMATION_RATE: ${nx.animRate},
-            INIT_POSITION: { x: ${nx.initX}, y: ${nx.initY} },
-            pixels: { height: ${nx.pixelsH}, width: ${nx.pixelsW} },
-            orientation: { rows: ${nx.rows}, columns: ${nx.cols} },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['${nx.greeting}'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: ${interactFunc}
-        };`;
+
+    const npcData${index} = {
+        id: '${nx.id}',
+        greeting: '${nx.greeting}',
+        src: ${nx.srcVal},
+        SCALE_FACTOR: ${nx.scaleFactor},
+        ANIMATION_RATE: ${nx.animRate},
+        INIT_POSITION: { x: ${nx.initX}, y: ${nx.initY} },
+        pixels: { height: ${nx.pixelsH}, width: ${nx.pixelsW} },
+        orientation: { rows: ${nx.rows}, columns: ${nx.cols} },
+        down: { row: 0, start: 0, columns: 3 },
+        right: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+        left: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+        up: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+        upRight: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+        downRight: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+        upLeft: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+        downLeft: { row: 0, start: 0, columns: 3 },
+        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        dialogues: ['${nx.greeting}'],
+        reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+        interact: ${interactFunc}
+    };`;
 
     return npc_data_literal;
+}
+
+/**
+ * Extract and normalize barrier data from wall UI element or drawn shape
+ * @param {Object} source - The wall object or drawn shape object
+ * @param {String} type - 'wall' or 'drawn'
+ * @param {Number} idx - The barrier index for naming
+ * @param {Object} options - Optional parameters (visible, scaleX, scaleY)
+ * @returns {Object} barrier - Normalized barrier object
+ */
+function barrier_extract(source, type, idx, options = {}) {
+    if (type === 'wall') {
+        return {
+            id: `wall_${idx+1}`,
+            varName: `barrierData${idx+1}`,
+            x: parseInt(source.wX?.value || 100, 10),
+            y: parseInt(source.wY?.value || 100, 10),
+            width: parseInt(source.wW?.value || 150, 10),
+            height: parseInt(source.wH?.value || 20, 10),
+            visible: options.visible !== undefined ? !!options.visible : true,
+            fromOverlay: false
+        };
+    } else if (type === 'drawn') {
+        const scaleX = options.scaleX || 1;
+        const scaleY = options.scaleY || 1;
+        return {
+            id: `dbarrier_${idx+1}`,
+            varName: `dbarrier_${idx+1}`,
+            x: Math.max(0, Math.round((source.x || 0) * scaleX)),
+            y: Math.max(0, Math.round((source.y || 0) * scaleY)),
+            width: Math.max(0, Math.round((source.width || 0) * scaleX)),
+            height: Math.max(0, Math.round((source.height || 0) * scaleY)),
+            visible: true,
+            fromOverlay: true
+        };
+    }
+}
+
+/**
+ * Build barrier literal text/code that is ready for GameEngine
+ * @param {Object} barrierData - Normalized barrier object
+ * @returns {String} barrier_data_literal - code
+ */
+function barrier_code(barrierData) {
+    const { varName, id, x, y, width, height, visible, fromOverlay } = barrierData;
+    const comment = fromOverlay ? ' /* BUILDER_DEFAULT */' : '';
+    const overlayPart = fromOverlay ? ',\n        fromOverlay: true' : '';
+
+    const barrier_data_literal = `
+
+    const ${varName} = {
+        id: '${id}', x: ${x}, y: ${y}, width: ${width}, height: ${height}, visible: ${visible}${comment},
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }${overlayPart}
+    };`;
+
+    return barrier_data_literal;
 }
 
 /* code generation (baseline and steps) */
@@ -1433,36 +1490,20 @@ export const gameLevelClasses = [GameLevelCustom];`;
         const classes = [
             "      { class: GameEnvBackground, data: bgData }"
                         ];
+
                         const barrierDefsB = [];
                         const includedWallsB = ui.walls.slice();
                         includedWallsB.forEach((w, idx) => {
-                            const x = parseInt(w.wX?.value || 100, 10);
-                            const y = parseInt(w.wY?.value || 100, 10);
-                            const wWidth = parseInt(w.wW?.value || 150, 10);
-                            const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const id = `wall_${idx+1}`;
-                            barrierDefsB.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
+                            const bData = barrier_extract(w, 'wall', idx, { visible: true });
+                            barrierDefsB.push(barrier_code(bData));
+                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                         });
                         const drawnBarriersB = ui.drawShapes.filter(s => s.type === 'barrier');
                         // Use overlay pixel coordinates directly (no scaling)
                         drawnBarriersB.forEach((b, bIdx) => {
-                            const id = `dbarrier_${bIdx+1}`;
-                            const bx = Math.max(0, Math.round(b.x || 0));
-                            const by = Math.max(0, Math.round(b.y || 0));
-                            const bw = Math.max(0, Math.round(b.width || 0));
-                            const bh = Math.max(0, Math.round(b.height || 0));
-                            barrierDefsB.push(`
-        const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                            classes.push(`      { class: Barrier, data: ${id} }`);
+                            const bData = barrier_extract(b, 'drawn', bIdx);
+                            barrierDefsB.push(barrier_code(bData));
+                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                         });
                         if (barrierDefsB.length) defs += ('\n' + barrierDefsB.join('\n'));
                         return header() + defs + footer(classes);
@@ -1486,34 +1527,17 @@ export const gameLevelClasses = [GameLevelCustom];`;
                         const barrierDefs = [];
                         const includedWallsP = ui.walls.slice();
                         includedWallsP.forEach((w, idx) => {
-                            const x = parseInt(w.wX?.value || 100, 10);
-                            const y = parseInt(w.wY?.value || 100, 10);
-                            const wWidth = parseInt(w.wW?.value || 150, 10);
-                            const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const id = `wall_${idx+1}`;
-                            barrierDefs.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
+                            const bData = barrier_extract(w, 'wall', idx, { visible: true });
+                            barrierDefs.push(barrier_code(bData));
+                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                         });
 
                         const drawnBarriersP = ui.drawShapes.filter(s => s.type === 'barrier');
                         // Use overlay pixel coordinates directly (no scaling)
                         drawnBarriersP.forEach((b, bIdx) => {
-                            const id = `dbarrier_${bIdx+1}`;
-                            const bx = Math.max(0, Math.round(b.x || 0));
-                            const by = Math.max(0, Math.round(b.y || 0));
-                            const bw = Math.max(0, Math.round(b.width || 0));
-                            const bh = Math.max(0, Math.round(b.height || 0));
-                            barrierDefs.push(`
-        const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                            classes.push(`      { class: Barrier, data: ${id} }`);
+                            const bData = barrier_extract(b, 'drawn', bIdx);
+                            barrierDefs.push(barrier_code(bData));
+                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                         });
 
                         const fullDefs = defs + (barrierDefs.length ? ('\n' + barrierDefs.join('\n')) : '');
@@ -1542,39 +1566,24 @@ export const gameLevelClasses = [GameLevelCustom];`;
                             npcDefs.push(npcCodeLiteral);
                             classes.push(`      { class: Npc, data: npcData${slot.index} }`);
                         });
+
                         const barrierDefsN = [];
                         const includedWallsN = ui.walls.slice();
                         includedWallsN.forEach((w, idx) => {
-                            const x = parseInt(w.wX?.value || 100, 10);
-                            const y = parseInt(w.wY?.value || 100, 10);
-                            const wWidth = parseInt(w.wW?.value || 150, 10);
-                            const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const visible = !!ui.gameWallsVisible; 
-                            const id = `wall_${idx+1}`;
-                            barrierDefsN.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${visible},
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
+                            const visible = !!ui.gameWallsVisible;
+                            const bData = barrier_extract(w, 'wall', idx, { visible: visible });
+                            barrierDefsN.push(barrier_code(bData));
+                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                         });
+
                         const drawnBarriersN = ui.drawShapes.filter(s => s.type === 'barrier');
                         const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
                         const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
                         const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
                         drawnBarriersN.forEach((b, bIdx) => {
-                            const id = `dbarrier_${bIdx+1}`;
-                            const bx = Math.max(0, Math.round((b.x || 0) * scaleXN));
-                            const by = Math.max(0, Math.round((b.y || 0) * scaleYN));
-                            const bw = Math.max(0, Math.round((b.width || 0) * scaleXN));
-                            const bh = Math.max(0, Math.round((b.height || 0) * scaleYN));
-                            barrierDefsN.push(`
-                            const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                            classes.push(`      { class: Barrier, data: ${id} }`);
+                            const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleXN, scaleY: scaleYN });
+                            barrierDefsN.push(barrier_code(bData));
+                            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                         });
 
                         const defs = defsStart + npcDefs.join('\n') + (barrierDefsN.length ? ('\n' + barrierDefsN.join('\n')) : '');
@@ -1607,40 +1616,22 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     });
 
                     const barrierDefs = [];
-
                     const includedWalls = ui.walls.slice();
                     includedWalls.forEach((w, idx) => {
-                        const x = parseInt(w.wX?.value || 100, 10);
-                        const y = parseInt(w.wY?.value || 100, 10);
-                        const wWidth = parseInt(w.wW?.value || 150, 10);
-                        const wHeight = parseInt(w.wH?.value || 20, 10);
                         const visible = !!ui.gameWallsVisible;
-                        const id = `wall_${idx+1}`;
-                        barrierDefs.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${visible},
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                        classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
+                        const bData = barrier_extract(w, 'wall', idx, { visible: visible });
+                        barrierDefs.push(barrier_code(bData));
+                        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                     });
-                    
+
                     const drawnBarriers = ui.drawShapes.filter(s => s.type === 'barrier');
                     const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
                     const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
                     const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
                     drawnBarriers.forEach((b, bIdx) => {
-                        const id = `dbarrier_${bIdx+1}`;
-                        const bx = Math.max(0, Math.round((b.x || 0) * scaleXW));
-                        const by = Math.max(0, Math.round((b.y || 0) * scaleYW));
-                        const bw = Math.max(0, Math.round((b.width || 0) * scaleXW));
-                        const bh = Math.max(0, Math.round((b.height || 0) * scaleYW));
-                        barrierDefs.push(`
-                            const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                        classes.push(`      { class: Barrier, data: ${id} }`);
+                        const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleXW, scaleY: scaleYW });
+                        barrierDefs.push(barrier_code(bData));
+                        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
                     });
 
                     const defs = defsStart + (npcDefs.length ? ('\n' + npcDefs.join('\n')) : '') + (barrierDefs.length ? ('\n' + barrierDefs.join('\n')) : '');
@@ -1913,24 +1904,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
         const includedWalls = ui.walls.slice();
         const classes = [];
         const defBlocks = includedWalls.map((w, idx) => {
-            const x = parseInt(w.wX?.value || 100, 10);
-            const y = parseInt(w.wY?.value || 100, 10);
-            const wWidth = parseInt(w.wW?.value || 150, 10);
-            const wHeight = parseInt(w.wH?.value || 20, 10);
-            const id = `wall_${idx+1}`;
-            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-            return `\n        const barrierData${idx+1} = {\n            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }\n        };`;
+            const bData = barrier_extract(w, 'wall', idx, { visible: true });
+            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
+            return barrier_code(bData);
         });
 
         const drawnBarriers = (ui.drawShapes || []).filter(s => s.type === 'barrier');
         drawnBarriers.forEach((b, bIdx) => {
-            const id = `dbarrier_${bIdx+1}`;
-            const bx = Math.max(0, Math.round(b.x || 0));
-            const by = Math.max(0, Math.round(b.y || 0));
-            const bw = Math.max(0, Math.round(b.width || 0));
-            const bh = Math.max(0, Math.round(b.height || 0));
-            defBlocks.push(`\n        const ${id} = {\n            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },\n            fromOverlay: true\n        };`);
-            classes.push(`      { class: Barrier, data: ${id} }`);
+            const bData = barrier_extract(b, 'drawn', bIdx);
+            defBlocks.push(barrier_code(bData));
+            classes.push(`      { class: Barrier, data: ${bData.varName} }`);
         });
 
         const defs = defBlocks.join('\n');
