@@ -268,7 +268,7 @@ permalink: /gamebuilder
             <div class="glass-panel panel-game">
                 <div class="panel-header">Game View</div>
                 <div class="game-frame">
-                    <div class="game-output" 
+                    <div class="game-output"
                         id="game-output-builder">
                         <div id="game-container-builder" class="gameContainer">
                             <canvas id="game-canvas-builder"></canvas>
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = item.name || item.key || item.src;
                     const key = sanitizeKey(name);
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
-                    const src = srcRel; 
+                    const src = srcRel;
                     const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(src);
                     if (!assets.bg[key]) assets.bg[key] = { src, h: dims.h, w: dims.w };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.bg.appendChild(opt);
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = item.name || item.key || item.src;
                     const key = sanitizeKey(name);
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
-                    const src = srcRel; 
+                    const src = srcRel;
                     const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(src);
                     const rows = item.rows || 4; const cols = item.cols || 3;
                     if (!assets.sprites[key]) assets.sprites[key] = { src, h: dims.h, w: dims.w, rows, cols };
@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (assets.sprites[key]) continue;
                     const relSrc = src.replace(SITE_BASE, '');
                     const dims = await ensureImageDims(relSrc);
-                    const rows = 4, cols = 3; 
+                    const rows = 4, cols = 3;
                     assets.sprites[key] = { src: relSrc, h: dims.h, w: dims.w, rows, cols };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.pSprite.appendChild(opt);
                     document.querySelectorAll('.npc-sprite').forEach(sel => {
@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pUpLeftRow: document.getElementById('player-dir-upleft-row'),
         pDownLeftRow: document.getElementById('player-dir-downleft-row'),
         pDirCols: document.getElementById('player-dir-columns'),
-        
+
         playerAdvancedBtn: document.getElementById('player-advanced-btn'),
         playerAdvancedPanel: document.getElementById('player-advanced-panel'),
         npcSpriteInstructionsBtn: document.getElementById('npc-sprite-instructions-btn'),
@@ -506,13 +506,13 @@ document.addEventListener('DOMContentLoaded', () => {
         pX: document.getElementById('player-x'),
         pY: document.getElementById('player-y'),
         pName: document.getElementById('player-name'),
-        
-        // NPCs UI 
+
+        // NPCs UI
         addNpcBtn: document.getElementById('add-npc'),
         npcsContainer: document.getElementById('npcs-container'),
         npcs: [],
 
-        // Walls UI 
+        // Walls UI
         addWallBtn: document.getElementById('add-wall'),
         wallsContainer: document.getElementById('walls-container'),
         walls: [],
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas: document.getElementById('game-canvas-builder'),
         codePlayBtn: document.getElementById('btn-code-play'),
         codeStopBtn: document.getElementById('btn-code-stop'),
-        
+
         colMain: document.querySelector('.col-main'),
         viewBtns: document.querySelectorAll('.view-btn')
     };
@@ -953,7 +953,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let stagedCode = null;
     let stagedStep = null;
     const steps = ['background','player','freestyle'];
-    let stepIndex = 0; 
+    let stepIndex = 0;
     const stepIndicatorMini = document.getElementById('step-indicator-mini');
     const helpBtn = document.getElementById('btn-help');
     const helpPanel = document.getElementById('help-panel');
@@ -992,11 +992,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const mv = document.getElementById('movement-keys');
         [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = true; });
         if (ui.addWallBtn) ui.addWallBtn.disabled = true;
-        
+
         // Disable draw buttons by default (only enable in freestyle)
         if (ui.drawBarrierBtn) ui.drawBarrierBtn.disabled = true;
         if (ui.drawClearBtn) ui.drawClearBtn.disabled = true;
-        
+
         ui.walls.forEach(slot => {
             const fields = [slot.wX, slot.wY, slot.wW, slot.wH, slot.deleteBtn];
             if (slot.addBtn) slot.addBtn.disabled = true;
@@ -1061,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 [slot.wX, slot.wY, slot.wW, slot.wH].forEach(el => unlockField(el));
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
-            
+
             // Enable draw buttons in freestyle mode
             if (ui.drawBarrierBtn) ui.drawBarrierBtn.disabled = false;
             if (ui.drawClearBtn) ui.drawClearBtn.disabled = false;
@@ -1101,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function bg_extract(bg, name = "custom_bg") {
   // Extraction logic related to GameBuilder panels
   const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-  const bgSrcVal = bgIsData 
+  const bgSrcVal = bgIsData
     ? `'${bg.src.replace(/'/g, "\\'")}'`
     : `path + "${bg.src}"`;
 
@@ -1116,11 +1116,12 @@ function bg_extract(bg, name = "custom_bg") {
 /**
  * Build background literal text/code that is ready for GameEngine
  * @param {Object} bg - Normalized background object
- * @returns {Object} bg_data_literal - code
+ * @param {String} name - Variable name for the background data
+ * @returns {Object} { def: string, classEntry: string } - Background definition and class entry
  */
 function bg_code(bg, name = "bgData") {
 
-  const bg_data_literal = `
+  const def = `
 
     const ${name} = {
         name: ${bg.name},
@@ -1128,7 +1129,9 @@ function bg_code(bg, name = "bgData") {
         pixels: { height: ${bg.h}, width: ${bg.w} }
     };`;
 
-  return bg_data_literal;
+  const classEntry = `{ class: GameEnvBackground, data: ${name} }`;
+
+  return { def, classEntry };
 }
 
 /**
@@ -1188,13 +1191,14 @@ function player_extract(ui, p) {
 /**
  * Build player literal text/code that is ready for GameEngine
  * @param {Object} px - Normalized player object
- * @returns {Object} player_data_literal - code
+ * @param {String} name - Variable name for the player data
+ * @returns {Object} { def: string, classEntry: string } - Player definition and class entry
  */
 function player_code(px, name = "playerData" ) {
 
-    const player_data_literal = `
+    const def = `
 
-    const playerData = {
+    const ${name} = {
         id: '${name}',
         src: ${px.pSrcVal},
         SCALE_FACTOR: ${px.pScaleVal},
@@ -1216,7 +1220,9 @@ function player_code(px, name = "playerData" ) {
 
         };`;
 
-    return player_data_literal;
+    const classEntry = `{ class: Player, data: ${name} }`;
+
+    return { def, classEntry };
 
 }
 
@@ -1261,9 +1267,10 @@ function npc_extract(slot, assets) {
  * @param {Object} nx - Normalized NPC object
  * @param {Number} index - The NPC index for naming
  * @param {Boolean} includeAlert - Whether to include alert fallback in interact function
- * @returns {String} npc_data_literal - code
+ * @returns {Object} { def: string, classEntry: string } - NPC definition and class entry
  */
 function npc_code(nx, index, includeAlert = false) {
+    const varName = `npcData${index}`;
     const interactFunc = includeAlert
         ? `function() {
                 if (this.dialogueSystem) {
@@ -1276,9 +1283,9 @@ function npc_code(nx, index, includeAlert = false) {
             }`
         : `function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }`;
 
-    const npc_data_literal = `
+    const def = `
 
-    const npcData${index} = {
+    const ${varName} = {
         id: '${nx.id}',
         greeting: '${nx.greeting}',
         src: ${nx.srcVal},
@@ -1301,7 +1308,9 @@ function npc_code(nx, index, includeAlert = false) {
         interact: ${interactFunc}
     };`;
 
-    return npc_data_literal;
+    const classEntry = `{ class: Npc, data: ${varName} }`;
+
+    return { def, classEntry };
 }
 
 /**
@@ -1343,21 +1352,23 @@ function barrier_extract(source, type, idx, options = {}) {
 /**
  * Build barrier literal text/code that is ready for GameEngine
  * @param {Object} barrierData - Normalized barrier object
- * @returns {String} barrier_data_literal - code
+ * @returns {Object} { def: string, classEntry: string } - Barrier definition and class entry
  */
 function barrier_code(barrierData) {
     const { varName, id, x, y, width, height, visible, fromOverlay } = barrierData;
     const comment = fromOverlay ? ' /* BUILDER_DEFAULT */' : '';
     const overlayPart = fromOverlay ? ',\n        fromOverlay: true' : '';
 
-    const barrier_data_literal = `
+    const def = `
 
     const ${varName} = {
         id: '${id}', x: ${x}, y: ${y}, width: ${width}, height: ${height}, visible: ${visible}${comment},
         hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }${overlayPart}
     };`;
 
-    return barrier_data_literal;
+    const classEntry = `{ class: Barrier, data: ${varName} }`;
+
+    return { def, classEntry };
 }
 
 /**
@@ -1367,11 +1378,12 @@ function barrier_code(barrierData) {
  */
 function background_generate(bg) {
     if (!bg) return { defs: '', classes: [] };
-    
+
     const bgx = bg_extract(bg);
-    const defs = bg_code(bgx);
-    const classes = ["      { class: GameEnvBackground, data: bgData }"];
-    
+    const bgCode = bg_code(bgx);
+    const defs = bgCode.def;
+    const classes = [bgCode.classEntry];
+
     return { defs, classes };
 }
 
@@ -1383,11 +1395,12 @@ function background_generate(bg) {
  */
 function player_generate(ui, p) {
     if (!p) return { defs: '', classes: [] };
-    
+
     const playerx = player_extract(ui, p);
-    const defs = player_code(playerx);
-    const classes = ["      { class: Player, data: playerData }"];
-    
+    const playerCode = player_code(playerx);
+    const defs = playerCode.def;
+    const classes = [playerCode.classEntry];
+
     return { defs, classes };
 }
 
@@ -1400,17 +1413,17 @@ function player_generate(ui, p) {
  */
 function npcs_generate(npcs, assets, includeAlert = false) {
     if (!npcs || npcs.length === 0) return { defs: '', classes: [] };
-    
+
     const npcDefs = [];
     const classes = [];
-    
+
     npcs.forEach((slot) => {
         const nx = npc_extract(slot, assets);
-        const npcCodeLiteral = npc_code(nx, slot.index, includeAlert);
-        npcDefs.push(npcCodeLiteral);
-        classes.push(`      { class: Npc, data: npcData${slot.index} }`);
+        const npcCode = npc_code(nx, slot.index, includeAlert);
+        npcDefs.push(npcCode.def);
+        classes.push(npcCode.classEntry);
     });
-    
+
     return { defs: npcDefs.join('\n'), classes };
 }
 
@@ -1431,16 +1444,18 @@ function barriers_generate(walls, drawShapes, options = {}) {
     // Process walls (manual panel entries)
     walls.forEach((w, idx) => {
         const bData = barrier_extract(w, 'wall', idx, { visible: visible });
-        barrierDefs.push(barrier_code(bData));
-        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
+        const barrierCode = barrier_code(bData);
+        barrierDefs.push(barrierCode.def);
+        classes.push(barrierCode.classEntry);
     });
 
     // Process drawn barriers (from Draw Collision Wall button)
     const drawnBarriers = (drawShapes || []).filter(s => s.type === 'barrier');
     drawnBarriers.forEach((b, bIdx) => {
         const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleX, scaleY: scaleY });
-        barrierDefs.push(barrier_code(bData));
-        classes.push(`      { class: Barrier, data: ${bData.varName} }`);
+        const barrierCode = barrier_code(bData);
+        barrierDefs.push(barrierCode.def);
+        classes.push(barrierCode.classEntry);
     });
 
     return { defs: barrierDefs.length ? barrierDefs.join('\n') : '', classes };
@@ -1500,7 +1515,7 @@ class GameLevelCustom {
                         return `
 
         this.classes = [
-            ${classesArray.join(',\n')}
+            ${classesArray.join(',\n            ')}
         ];
         /* BUILDER_ONLY_START */
         // Post object summary to builder (debugging visibility of NPCs/walls)
@@ -1581,10 +1596,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
 
                     const bgGen = background_generate(bg);
                     const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
-                    
+
                     const defs = bgGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
                     const classes = [...bgGen.classes, ...barriersGen.classes];
-                    
+
                     return header() + defs + footer(classes);
                 }
 
@@ -1594,10 +1609,10 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     const bgGen = background_generate(bg);
                     const playerGen = player_generate(ui, p);
                     const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
-                    
+
                     const defs = bgGen.defs + playerGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
                     const classes = [...bgGen.classes, ...playerGen.classes, ...barriersGen.classes];
-                    
+
                     return header() + defs + footer(classes);
                 }
 
@@ -1608,16 +1623,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     const bgGen = background_generate(bg);
                     const playerGen = player_generate(ui, p);
                     const npcsGen = npcs_generate(includedSlots, assets, true);
-                    
+
                     const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
                     const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
                     const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
                     const visible = !!ui.gameWallsVisible;
                     const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXN, scaleY: scaleYN });
-                    
+
                     const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
                     const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
-                    
+
                     return header() + defs + footer(classes);
                 }
 
@@ -1627,16 +1642,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
                     const bgGen = background_generate(bg);
                     const playerGen = player_generate(ui, p);
                     const npcsGen = npcs_generate(ui.npcs.slice(), assets, false);
-                    
+
                     const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
                     const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
                     const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
                     const visible = !!ui.gameWallsVisible;
                     const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXW, scaleY: scaleYW });
-                    
+
                     const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
                     const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
-                    
+
                     return header() + defs + footer(classes);
                 }
 
@@ -2078,7 +2093,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     if (ui.pHitboxH) ui.pHitboxH.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
     [ui.pDownRow, ui.pRightRow, ui.pLeftRow, ui.pUpRow, ui.pUpRightRow, ui.pDownRightRow, ui.pUpLeftRow, ui.pDownLeftRow, ui.pDirCols]
         .forEach(el => { if (el) el.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); }); });
-    
+
     ui.npcs.forEach(slot => {
         if (slot.nId) slot.nId.addEventListener('input', () => { state.lastEdited = 'npc'; syncFromControlsIfFreestyle(); });
         if (slot.nId) slot.nId.addEventListener('input', () => {
