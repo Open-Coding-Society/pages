@@ -1563,8 +1563,8 @@ class GameLevelCustom {
         const height = gameEnv.innerHeight;`;
 
     const classesArray = classes.length > 0
-        ? `\n        this.classes = [\n            ${classes.join(',\n            ')}\n        ];`
-        : `\n        this.classes = [\n            // Step 1: add GameEnvBackground\n            // Step 2: add Player\n            // Step 3: add Npc\n        ];`;
+        ? `\n\n        this.classes = [\n            ${classes.join(',\n            ')}\n        ];`
+        : `\n\n        this.classes = [\n            // Step 1: add GameEnvBackground\n            // Step 2: add Player\n            // Step 3: add Npc\n        ];`;
 
     const builderSection = builder_code();
 
@@ -1602,7 +1602,7 @@ function step_generate(currentStep) {
         const bgGen = background_generate(bg);
         const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
 
-        const defs = bgGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const defs = bgGen.defs + (barriersGen.defs || '');
         const classes = [...bgGen.classes, ...barriersGen.classes];
 
         return gamelevel_code(defs, classes);
@@ -1615,7 +1615,7 @@ function step_generate(currentStep) {
         const playerGen = player_generate(ui, p);
         const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
 
-        const defs = bgGen.defs + playerGen.defs + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const defs = bgGen.defs + playerGen.defs + (barriersGen.defs || '');
         const classes = [...bgGen.classes, ...playerGen.classes, ...barriersGen.classes];
 
         return gamelevel_code(defs, classes);
@@ -1635,7 +1635,7 @@ function step_generate(currentStep) {
         const visible = !!ui.gameWallsVisible;
         const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXN, scaleY: scaleYN });
 
-        const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const defs = bgGen.defs + playerGen.defs + (npcsGen.defs || '') + (barriersGen.defs || '');
         const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
 
         return gamelevel_code(defs, classes);
@@ -1654,7 +1654,7 @@ function step_generate(currentStep) {
         const visible = !!ui.gameWallsVisible;
         const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXW, scaleY: scaleYW });
 
-        const defs = bgGen.defs + playerGen.defs + (npcsGen.defs ? ('\n' + npcsGen.defs) : '') + (barriersGen.defs ? ('\n' + barriersGen.defs) : '');
+        const defs = bgGen.defs + playerGen.defs + (npcsGen.defs || '') + (barriersGen.defs || '');
         const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
 
         return gamelevel_code(defs, classes);
