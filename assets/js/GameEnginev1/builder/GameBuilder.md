@@ -1622,80 +1622,62 @@ function base_generate() {
 }
 
 /**
- * Generate game level code for a specific workflow step
- * Composes all relevant entities for the current step and generates complete code
- * @param {String} currentStep - Current workflow step ('background', 'player', 'npc', 'walls', 'freestyle')
- * @returns {String|null} - Complete game level code for the step, or null if prerequisites not met
+ * Generate game level code based on what's currently configured in UI
+ * This compositional approach generates code for ALL configured elements,
+ * regardless of workflow step, avoiding false dependencies between entities
+ * @param {String} currentStep - Current workflow step ('background', 'player', or 'freestyle')
+ * @returns {String} - Complete game level code for all configured elements
  */
-function step_generate(currentStep) {
-    const bg = assets.bg[ui.bg.value];
-    const p = assets.sprites[ui.pSprite.value];
+function step_generate(currentStep = 'background') {
+    // Safe logic does not use currentStep, but
+    //   checks what's actually configured in the UI
+    const hasBackground = !!ui.bg.value; // The !! forces boolean result vs assignment
+    const hasPlayer = !!ui.pSprite.value;
+    const hasNPCs = ui.npcs && ui.npcs.length > 0;
+    const hasWalls = (ui.walls && ui.walls.length > 0) ||
+                     (ui.drawShapes && ui.drawShapes.some(s => s.type === 'barrier'));
 
-    if (currentStep === 'background') {
-        if (!ui.bg.value) return null;
+    // Generate code for ALL configured elements (compositional approach)
+    // Button controls should determine when it's appropriate to call this function
+    const defs = [];
+    const classes = [];
 
+    // Add background if configured
+    if (hasBackground) {
+        const bg = assets.bg[ui.bg.value];
         const bgGen = background_generate(bg);
-        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
-
-        const defs = [...bgGen.defs, ...barriersGen.defs];
-        const classes = [...bgGen.classes, ...barriersGen.classes];
-
-        return gamelevel_code(defs, classes);
+        defs.push(...bgGen.defs);
+        classes.push(...bgGen.classes);
     }
 
-    if (currentStep === 'player') {
-        if (!ui.bg.value || !ui.pSprite.value) return null;
-
-        const bgGen = background_generate(bg);
+    // Add player if configured
+    if (hasPlayer) {
+        const p = assets.sprites[ui.pSprite.value];
         const playerGen = player_generate(ui, p);
-        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
-
-        const defs = [...bgGen.defs, ...playerGen.defs, ...barriersGen.defs];
-        const classes = [...bgGen.classes, ...playerGen.classes, ...barriersGen.classes];
-
-        return gamelevel_code(defs, classes);
+        defs.push(...playerGen.defs);
+        classes.push(...playerGen.classes);
     }
 
-    if (currentStep === 'npc') {
-        const includedSlots = ui.npcs.slice();
-        if (includedSlots.length === 0) return null;
-
-        const bgGen = background_generate(bg);
-        const playerGen = player_generate(ui, p);
-        const npcsGen = npcs_generate(includedSlots, assets, true);
-
-        const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-        const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
-        const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
-        const visible = !!ui.gameWallsVisible;
-        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXN, scaleY: scaleYN });
-
-        const defs = [...bgGen.defs, ...playerGen.defs, ...npcsGen.defs, ...barriersGen.defs];
-        const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
-
-        return gamelevel_code(defs, classes);
-    }
-
-    if (currentStep === 'walls') {
-        if (!ui.bg.value || !ui.pSprite.value) return null;
-
-        const bgGen = background_generate(bg);
-        const playerGen = player_generate(ui, p);
+    // Add NPCs if configured
+    if (hasNPCs) {
         const npcsGen = npcs_generate(ui.npcs.slice(), assets, false);
-
-        const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-        const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
-        const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
-        const visible = !!ui.gameWallsVisible;
-        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: visible, scaleX: scaleXW, scaleY: scaleYW });
-
-        const defs = [...bgGen.defs, ...playerGen.defs, ...npcsGen.defs, ...barriersGen.defs];
-        const classes = [...bgGen.classes, ...playerGen.classes, ...npcsGen.classes, ...barriersGen.classes];
-
-        return gamelevel_code(defs, classes);
+        defs.push(...npcsGen.defs);
+        classes.push(...npcsGen.classes);
     }
 
-    return ui.editor.value;
+    // Add barriers/walls if configured
+    if (hasWalls) {
+        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
+        defs.push(...barriersGen.defs);
+        classes.push(...barriersGen.classes);
+    }
+
+    // If nothing configured, return baseline template
+    if (defs.length === 0) {
+        return base_generate();
+    }
+
+    return gamelevel_code(defs, classes);
 }
 
 /**
