@@ -1090,7 +1090,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {}
     }
 
-/*********** Code Building Secton **********/
+/*
+=====================================
+SECTION: Code Building and Generation
+=====================================
+*/
 
 /**
  * Extract and normalize background data from UI
@@ -1235,12 +1239,12 @@ function npc_extract(slot, assets) {
     const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
     const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
     const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'] || { src: '', h: 0, w: 0, rows: 1, cols: 1 };
-    
+
     // If no valid sprite found, log warning
     if (!nSprite.src) {
         console.warn(`NPC sprite not found: ${nSpriteKey}, using placeholder values`);
     }
-    
+
     const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
     const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
     const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
@@ -1425,7 +1429,7 @@ function npcs_generate(npcs, assets, includeAlert = false) {
     npcs.forEach((slot, idx) => {
         // Ensure slot has index property, fallback to array index + 1
         const slotIndex = slot.index !== undefined ? slot.index : (idx + 1);
-        
+
         try {
             const nx = npc_extract(slot, assets);
             const npcCode = npc_code(nx, slotIndex, includeAlert);
@@ -1618,6 +1622,7 @@ return importsSection + gameLevelStart + defsSection + classesArray + builderSec
  * @returns {String} - Baseline template with placeholder comments
  */
 function base_generate() {
+    // Empty lists returns placeholder code
     return gamelevel_code([], []);
 }
 
@@ -1642,7 +1647,7 @@ function step_generate(currentStep = 'background') {
     const defs = [];
     const classes = [];
 
-    // Add background if configured
+    // Add background code if configured
     if (hasBackground) {
         const bg = assets.bg[ui.bg.value];
         const bgGen = background_generate(bg);
@@ -1650,7 +1655,7 @@ function step_generate(currentStep = 'background') {
         classes.push(...bgGen.classes);
     }
 
-    // Add player if configured
+    // Add player code if configured
     if (hasPlayer) {
         const p = assets.sprites[ui.pSprite.value];
         const playerGen = player_generate(ui, p);
@@ -1658,14 +1663,14 @@ function step_generate(currentStep = 'background') {
         classes.push(...playerGen.classes);
     }
 
-    // Add NPCs if configured
+    // Add NPCs code if configured
     if (hasNPCs) {
         const npcsGen = npcs_generate(ui.npcs.slice(), assets, false);
         defs.push(...npcsGen.defs);
         classes.push(...npcsGen.classes);
     }
 
-    // Add barriers/walls if configured
+    // Add barriers/walls code if configured
     if (hasWalls) {
         const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
         defs.push(...barriersGen.defs);
@@ -1677,6 +1682,7 @@ function step_generate(currentStep = 'background') {
         return base_generate();
     }
 
+    // Builds Level Code using composition of defs and classes
     return gamelevel_code(defs, classes);
 }
 
@@ -1697,7 +1703,8 @@ function generateStepCode(currentStep) {
     return step_generate(currentStep);
 }
 
-    /* SECTION: Code Editor Diff and Highlight Overlay Management */
+
+/* SECTION: Code Editor Diff and Highlight Overlay Management */
 
     /**
      * Compute the range of lines that changed between two code strings
