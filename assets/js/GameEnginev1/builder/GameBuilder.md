@@ -75,9 +75,8 @@ permalink: /gamebuilder
                 <div class="panel-controls">
                     <span class="step-indicator" id="step-indicator-mini">Step 1/2</span>
                     <button id="btn-confirm" class="icon-btn" data-tooltip="Confirm Step">✓</button>
-                    <button id="btn-export" class="icon-btn" data-tooltip="Export Code">⤓</button>
-                    <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
                     <button id="btn-refresh-assets" class="icon-btn" data-tooltip="Refresh Assets">⟳</button>
+                    <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
                 </div>
             </div>
             <!-- help panel: shows step-by-step guidance and tips -->
@@ -259,14 +258,14 @@ permalink: /gamebuilder
     <div class="col-main view-split">
         <!-- view controls: switch between code, game, or split view -->
         <div class="view-controls">
-            <button class="view-btn" data-view="code">Code</button>
             <button class="view-btn" data-view="game">Game</button>
+            <button class="view-btn" data-view="code">Code</button>
             <button class="view-btn active" data-view="split">Split</button>
         </div>
         <div class="main-content">
             <!-- game panel + drawing overlay -->
             <div class="glass-panel panel-game">
-                <div class="panel-header">Game View</div>
+                <div class="panel-header">Game Viewer</div>
                 <div class="game-frame">
                     <div class="game-output"
                         id="game-output-builder">
@@ -280,10 +279,11 @@ permalink: /gamebuilder
             <!-- code panel: live JS editor with highlight -->
             <div class="glass-panel code-panel panel-code">
                 <div class="panel-header">
-                    <span>Code View (JS)</span>
+                    <span>Code Runner</span>
                     <div class="panel-controls">
                         <button id="btn-code-play" class="icon-btn" data-tooltip="Run Code">▶</button>
                         <button id="btn-code-stop" class="icon-btn" data-tooltip="Stop Game">■</button>
+                        <button id="btn-export" class="icon-btn" data-tooltip="Export Code">⤓</button>
                     </div>
                 </div>
                 <div class="editor-container" id="editor-container">
