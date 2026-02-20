@@ -2,7 +2,7 @@
 layout: opencs 
 title: GameBuilder
 description: Helping programmers understand how to create a game
-permalink: /rpg/gamebuilder
+permalink: /gamebuilder
 ---
 
 <!-- 
@@ -47,16 +47,18 @@ permalink: /rpg/gamebuilder
 }
 </style>
 
-
 <!-- title banner for the GameBuilder page -->
-<div class="gamebuilder-title">{{page.title}}</div>
+<div class="gamebuilder-title">
+  {{page.title}}
+  <a href="{{site.baseurl}}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">📜</a>
+</div>
 
 <!-- Ensure GameTemplatesV1 is available as a global by loading templates.js -->
 <script>
     (function(){
         try {
             const s = document.createElement('script');
-            s.src = window.location.origin + '{{ site.baseurl }}/assets/js/GameEnginev1/templates/templates.js';
+            s.src = window.location.origin + './templates.js';
             s.defer = true;
             document.head.appendChild(s);
         } catch (e) { console.warn('Could not load GameTemplatesV1', e); }
@@ -73,9 +75,8 @@ permalink: /rpg/gamebuilder
                 <div class="panel-controls">
                     <span class="step-indicator" id="step-indicator-mini">Step 1/2</span>
                     <button id="btn-confirm" class="icon-btn" data-tooltip="Confirm Step">✓</button>
-                    <button id="btn-export" class="icon-btn" data-tooltip="Export Code">⤓</button>
-                    <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
                     <button id="btn-refresh-assets" class="icon-btn" data-tooltip="Refresh Assets">⟳</button>
+                    <button id="btn-help" class="icon-btn" data-tooltip="Help">?</button>
                 </div>
             </div>
             <!-- help panel: shows step-by-step guidance and tips -->
@@ -100,9 +101,9 @@ permalink: /rpg/gamebuilder
                     </select>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="bg-instructions-btn" class="btn btn-sm">Upload Instructions ▸</button>
-                        <div id="bg-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; color: var(--text-muted); margin-top:6px;">
-                            To add your own backgrounds, place files under <code>images/gamebuilder/bg</code> and then press the Refresh Assets button. See <a href="{{ site.baseurl }}/gamebuilder-upload-instructions">upload instructions</a>.
-                            <div style="margin-top:4px;">Backgrounds json: <a href="{{ site.baseurl }}/images/gamebuilder/bg/index.json">images/gamebuilder/bg/index.json</a></div>
+                        <div id="bg-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; margin-top:6px;">
+                            To add your own backgrounds, place files under <code>images/gamebuilder/bg</code> and then press the Refresh Assets button. See <a href="{{ site.baseurl }}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">upload instructions</a>.
+                            <div style="margin-top:4px;">Backgrounds json: <a href="{{ site.baseurl }}/images/gamebuilder/bg/index.json" target="_blank" rel="noopener noreferrer">images/gamebuilder/bg/index.json</a></div>
                         </div>
                     </div>
                 </div>
@@ -119,9 +120,9 @@ permalink: /rpg/gamebuilder
                     </select>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="sprite-instructions-btn" class="btn btn-sm">Upload Instructions ▸</button>
-                        <div id="sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; color: var(--text-muted); margin-top:6px;">
-                            To add your own spritesheets, place files under <code>images/gamebuilder/sprites</code> (and set rows/cols in index.json). Then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder-upload-instructions">upload instructions</a>.
-                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json">images/gamebuilder/sprites/index.json</a></div>
+                        <div id="sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; margin-top:6px;">
+                            To add your own spritesheets, place files under <code>images/gamebuilder/sprites</code> (and set rows/cols in index.json). Then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">upload instructions</a>.
+                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json" target="_blank" rel="noopener noreferrer">images/gamebuilder/sprites/index.json</a></div>
                         </div>
                     </div>
                     <label>X Position</label>
@@ -136,7 +137,7 @@ permalink: /rpg/gamebuilder
                     </select>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="player-advanced-btn" class="btn btn-sm">Advanced ▸</button>
-                        <div id="player-advanced-panel" class="instructions-panel" style="display:none; font-size:0.85em; color: var(--text-muted); margin-top:6px;">
+                        <div id="player-advanced-panel" class="instructions-panel" style="display:none; font-size:0.85em; margin-top:6px;">
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; align-items:end;">
                                 <div>
                                     <label>Scale Factor</label>
@@ -213,7 +214,7 @@ permalink: /rpg/gamebuilder
                                             <input type="number" id="player-hitbox-height" min="0" max="0.9" step="0.01" value="0.00">
                                         </div>
                                     </div>
-                                    <div style="margin-top:6px; font-size:0.75em; color: var(--text-muted);">
+                                    <div style="margin-top:6px; font-size:0.75em;">
                                         Smaller values mean a larger collision box (closer to sprite edges). Larger values trim the box inward symmetrically.
                                     </div>
                                 </div>
@@ -229,9 +230,9 @@ permalink: /rpg/gamebuilder
                     </div>
                     <div class="upload-instructions" style="margin-top:6px;">
                         <button id="npc-sprite-instructions-btn" class="btn btn-sm">Upload Instructions ▸</button>
-                        <div id="npc-sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; color: var(--text-muted); margin-top:6px;">
-                            NPCs use the same spritesheet system as the Player. Place files under <code>images/gamebuilder/sprites</code> and set <code>rows</code>/<code>cols</code> in index.json, then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder-upload-instructions">upload instructions</a>.
-                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json">images/gamebuilder/sprites/index.json</a></div>
+                        <div id="npc-sprite-instructions-panel" class="instructions-panel" style="display:none; font-size:0.75em; margin-top:6px;">
+                            NPCs use the same spritesheet system as the Player. Place files under <code>images/gamebuilder/sprites</code> and set <code>rows</code>/<code>cols</code> in index.json, then press Refresh Assets. See <a href="{{ site.baseurl }}/gamebuilder/doc" target="_blank" rel="noopener noreferrer">upload instructions</a>.
+                            <div style="margin-top:4px;">Sprites json: <a href="{{ site.baseurl }}/images/gamebuilder/sprites/index.json" target="_blank" rel="noopener noreferrer">images/gamebuilder/sprites/index.json</a></div>
                             <div style="margin-top:6px;">
                                 Interaction: Walk up to an NPC and press <strong>E</strong> to open their dialogue. Interactions trigger on collision or close proximity. Ensure the NPC has either a <code>greeting</code> or <code>dialogues</code> set for text to appear.
                             </div>
@@ -257,16 +258,16 @@ permalink: /rpg/gamebuilder
     <div class="col-main view-split">
         <!-- view controls: switch between code, game, or split view -->
         <div class="view-controls">
-            <button class="view-btn" data-view="code">Code</button>
             <button class="view-btn" data-view="game">Game</button>
+            <button class="view-btn" data-view="code">Code</button>
             <button class="view-btn active" data-view="split">Split</button>
         </div>
         <div class="main-content">
             <!-- game panel + drawing overlay -->
             <div class="glass-panel panel-game">
-                <div class="panel-header">Game View</div>
+                <div class="panel-header">Game Viewer</div>
                 <div class="game-frame">
-                    <div class="game-output" 
+                    <div class="game-output"
                         id="game-output-builder">
                         <div id="game-container-builder" class="gameContainer">
                             <canvas id="game-canvas-builder"></canvas>
@@ -278,10 +279,11 @@ permalink: /rpg/gamebuilder
             <!-- code panel: live JS editor with highlight -->
             <div class="glass-panel code-panel panel-code">
                 <div class="panel-header">
-                    <span>Code View (JS)</span>
+                    <span>Code Runner</span>
                     <div class="panel-controls">
                         <button id="btn-code-play" class="icon-btn" data-tooltip="Run Code">▶</button>
                         <button id="btn-code-stop" class="icon-btn" data-tooltip="Stop Game">■</button>
+                        <button id="btn-export" class="icon-btn" data-tooltip="Export Code">⤓</button>
                     </div>
                 </div>
                 <div class="editor-container" id="editor-container">
@@ -409,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = item.name || item.key || item.src;
                     const key = sanitizeKey(name);
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
-                    const src = srcRel; 
+                    const src = srcRel;
                     const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(src);
                     if (!assets.bg[key]) assets.bg[key] = { src, h: dims.h, w: dims.w };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.bg.appendChild(opt);
@@ -440,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = item.name || item.key || item.src;
                     const key = sanitizeKey(name);
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
-                    const src = srcRel; 
+                    const src = srcRel;
                     const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(src);
                     const rows = item.rows || 4; const cols = item.cols || 3;
                     if (!assets.sprites[key]) assets.sprites[key] = { src, h: dims.h, w: dims.w, rows, cols };
@@ -458,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (assets.sprites[key]) continue;
                     const relSrc = src.replace(SITE_BASE, '');
                     const dims = await ensureImageDims(relSrc);
-                    const rows = 4, cols = 3; 
+                    const rows = 4, cols = 3;
                     assets.sprites[key] = { src: relSrc, h: dims.h, w: dims.w, rows, cols };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.pSprite.appendChild(opt);
                     document.querySelectorAll('.npc-sprite').forEach(sel => {
@@ -496,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pUpLeftRow: document.getElementById('player-dir-upleft-row'),
         pDownLeftRow: document.getElementById('player-dir-downleft-row'),
         pDirCols: document.getElementById('player-dir-columns'),
-        
+
         playerAdvancedBtn: document.getElementById('player-advanced-btn'),
         playerAdvancedPanel: document.getElementById('player-advanced-panel'),
         npcSpriteInstructionsBtn: document.getElementById('npc-sprite-instructions-btn'),
@@ -504,13 +506,13 @@ document.addEventListener('DOMContentLoaded', () => {
         pX: document.getElementById('player-x'),
         pY: document.getElementById('player-y'),
         pName: document.getElementById('player-name'),
-        
-        // NPCs UI 
+
+        // NPCs UI
         addNpcBtn: document.getElementById('add-npc'),
         npcsContainer: document.getElementById('npcs-container'),
         npcs: [],
 
-        // Walls UI 
+        // Walls UI
         addWallBtn: document.getElementById('add-wall'),
         wallsContainer: document.getElementById('walls-container'),
         walls: [],
@@ -529,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas: document.getElementById('game-canvas-builder'),
         codePlayBtn: document.getElementById('btn-code-play'),
         codeStopBtn: document.getElementById('btn-code-stop'),
-        
+
         colMain: document.querySelector('.col-main'),
         viewBtns: document.querySelectorAll('.view-btn')
     };
@@ -951,7 +953,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let stagedCode = null;
     let stagedStep = null;
     const steps = ['background','player','freestyle'];
-    let stepIndex = 0; 
+    let stepIndex = 0;
     const stepIndicatorMini = document.getElementById('step-indicator-mini');
     const helpBtn = document.getElementById('btn-help');
     const helpPanel = document.getElementById('help-panel');
@@ -990,6 +992,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const mv = document.getElementById('movement-keys');
         [ui.bg, ui.pSprite, ui.pX, ui.pY, ui.pName, mv].forEach(el => { if (el) el.disabled = true; });
         if (ui.addWallBtn) ui.addWallBtn.disabled = true;
+
+        // Disable draw buttons by default (only enable in freestyle)
+        if (ui.drawBarrierBtn) ui.drawBarrierBtn.disabled = true;
+        if (ui.drawClearBtn) ui.drawClearBtn.disabled = true;
+
         ui.walls.forEach(slot => {
             const fields = [slot.wX, slot.wY, slot.wW, slot.wH, slot.deleteBtn];
             if (slot.addBtn) slot.addBtn.disabled = true;
@@ -1055,6 +1062,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (slot.deleteBtn) { slot.deleteBtn.disabled = false; slot.deleteBtn.style.display = ''; }
             });
 
+            // Enable draw buttons in freestyle mode
+            if (ui.drawBarrierBtn) ui.drawBarrierBtn.disabled = false;
+            if (ui.drawClearBtn) ui.drawClearBtn.disabled = false;
+
         }
 
         // Always allow NPC edits, even after confirmation
@@ -1079,60 +1090,403 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {}
     }
 
-        /* code generation (baseline and steps) */
-        function generateBaselineCode() {
-                return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-            import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-            import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-            import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+/*
+=====================================
+SECTION: Code Building and Generation
+=====================================
+*/
 
-class GameLevelCustom {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;
+/**
+ * Extract and normalize background data from UI
+ * @param {Object} bg - The ui.bg object from the form
+ * @param {String} name - Name for background environment
+ * @returns {Object} bg - Normalized background object
+ */
+function bg_extract(bg, name = "custom_bg") {
+  // Extraction logic related to GameBuilder panels
+  const bgIsData = bg && bg.src && bg.src.startsWith('data:');
+  const bgSrcVal = bgIsData
+    ? `'${bg.src.replace(/'/g, "\\'")}'`
+    : `path + "${bg.src}"`;
 
-        // Definitions will be added here per step
+  return {
+    name: `"${name}"`,
+    src: bgSrcVal,
+    h: parseInt(bg.h) || 0,
+    w: parseInt(bg.w) || 0
+  };
+}
 
-        // Define objects for this level progressively via Confirm Step
-        this.classes = [
-            // Step 1: add GameEnvBackground
-            // Step 2: add Player
-            // Step 3: add Npc
-        ];
+/**
+ * Build background literal text/code that is ready for GameEngine
+ * @param {Object} bg - Normalized background object
+ * @param {String} name - Variable name for the background data
+ * @returns {Object} { def: string, classEntry: string } - Background definition and class entry
+ */
+function bg_code(bg, name = "bgData") {
+
+  const def = `
+        const ${name} = {
+            name: ${bg.name},
+            src: ${bg.src},
+            pixels: { height: ${bg.h}, width: ${bg.w} }
+        };`;
+
+  const classEntry = `{ class: GameEnvBackground, data: ${name} }`;
+
+  return { def, classEntry };
+}
+
+/**
+ * Extract and normalize player data from GameBuilder Panel
+ * @param {Object} ui - The ui object/data from the form
+ * @param {Object} p - The player object/data from the form
+ * @returns {Object} p - Normalized player object
+ */
+function player_extract(ui, p) {
+    // Extraction logic related to rows in sprite?
+    const dirRowsTotal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
+    const clamp = (v) => {
+            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
+            return Math.max(0, Math.min(maxIndex, v|0));
+    };
+
+    // Extract keypress/movement keys
+    const mvElGen = document.getElementById('movement-keys');
+    const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
+    const keypress = movement === 'arrows'
+        ? '{ up: 38, left: 37, down: 40, right: 39 }'
+        : '{ up: 87, left: 65, down: 83, right: 68 }';
+
+    return {
+     name: (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'"),
+     pIsData: p && p.src && p.src.startsWith('data:'),
+     pSrcVal: p.pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`,
+     pScaleVal: parseInt(ui.pScale?.value || '5', 10),
+     pStepVal: parseInt(ui.pStep?.value || '1000', 10),
+     pAnimVal: parseInt(ui.pAnim?.value || '50', 10),
+     initX: Math.max(0, parseInt(ui.pX?.value || '0', 10)),
+     initY: Math.max(0, parseInt(ui.pY?.value || '0', 10)),
+     pRowsVal: dirRowsTotal,
+     pColsVal: Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10)),
+     pixelsH: p.h,
+     pixelsW: p.w,
+     dirRowsTotal: dirRowsTotal,
+     dirCols: Math.max(1, parseInt(ui.pDirCols?.value || 3, 10)),
+     dRow: clamp(parseInt(ui.pDownRow?.value ?? 0)),
+     dDefault: 0,
+     rDefault: 1,
+     lDefault: 2,
+     uDefault: 3,
+     rRow: clamp(parseInt(ui.pRightRow?.value ?? rDefault)),
+     lRow: clamp(parseInt(ui.pLeftRow?.value ?? lDefault)),
+     uRow: clamp(parseInt(ui.pUpRow?.value ?? uDefault)),
+     urRow: clamp(parseInt(ui.pUpRightRow?.value ?? uRow)),
+     drRow: clamp(parseInt(ui.pDownRightRow?.value ?? rRow)),
+     ulRow: clamp(parseInt(ui.pUpLeftRow?.value ?? lRow)),
+     dlRow: clamp(parseInt(ui.pDownLeftRow?.value ?? dRow)),
+     hbW: Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9)),
+     hbH: Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9)),
+     keypress: keypress
     }
 }
 
-export const gameLevelClasses = [GameLevelCustom];`;
-        }
+/**
+ * Build player literal text/code that is ready for GameEngine
+ * @param {Object} px - Normalized player object
+ * @param {String} name - Variable name for the player data
+ * @returns {Object} { def: string, classEntry: string } - Player definition and class entry
+ */
+function player_code(px, name = "playerData" ) {
 
-        function generateStepCode(currentStep) {
-            const bg = assets.bg[ui.bg.value];
-            const p = assets.sprites[ui.pSprite.value];
-            const mvElGen = document.getElementById('movement-keys');
-            const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
-                const keypress = movement === 'arrows'
-                        ? '{ up: 38, left: 37, down: 40, right: 39 }'
-                        : '{ up: 87, left: 65, down: 83, right: 68 }';
+    const def = `
+        const ${name} = {
+            id: '${name}',
+            src: ${px.pSrcVal},
+            SCALE_FACTOR: ${px.pScaleVal},
+            STEP_FACTOR: ${px.pStepVal},
+            ANIMATION_RATE: ${px.pAnimVal},
+            INIT_POSITION: { x: ${px.initX}, y: ${px.initY} },
+            pixels: { height: ${px.pixelsH}, width: ${px.pixelsW} },
+            orientation: { rows: ${px.pRowsVal}, columns: ${px.pColsVal} },
+            down: { row: ${px.dRow}, start: 0, columns: ${px.dirCols} },
+            downRight: { row: ${px.drRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
+            downLeft: { row: ${px.dlRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
+            left: { row: ${px.lRow}, start: 0, columns: ${px.dirCols} },
+            right: { row: ${px.rRow}, start: 0, columns: ${px.dirCols} },
+            up: { row: ${px.uRow}, start: 0, columns: ${px.dirCols} },
+            upLeft: { row: ${px.ulRow}, start: 0, columns: ${px.dirCols}, rotate: Math.PI/16 },
+            upRight: { row: ${px.urRow}, start: 0, columns: ${px.dirCols}, rotate: -Math.PI/16 },
+            hitbox: { widthPercentage: ${px.hbW}, heightPercentage: ${px.hbH} },
+            keypress: ${px.keypress}
+            };`;
 
-                function header() {
-                    return `import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-        import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-        import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-        import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+    const classEntry = `{ class: Player, data: ${name} }`;
 
-class GameLevelCustom {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;`;
+    return { def, classEntry };
+
+}
+
+/**
+ * Extract and normalize NPC data from GameBuilder Panel slot
+ * @param {Object} slot - The NPC slot object from the form
+ * @param {Object} assets - The assets object containing sprites
+ * @returns {Object} nx - Normalized NPC object
+ */
+function npc_extract(slot, assets) {
+    const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
+    const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'");
+    const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
+    const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
+    const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'] || { src: '', h: 0, w: 0, rows: 1, cols: 1 };
+
+    // If no valid sprite found, log warning
+    if (!nSprite.src) {
+        console.warn(`NPC sprite not found: ${nSpriteKey}, using placeholder values`);
+    }
+
+    const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
+    const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
+    const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
+    const nSrcVal = nIsData ? `'${(nSprite.src||'').replace(/'/g, "\\'")}'` : `path + "${nSprite.src || ''}"`;
+    const nRows = Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10));
+    const nCols = Math.max(1, parseInt(slot.nCols?.value || nSprite.cols || 1, 10));
+    const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
+    const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
+
+    return {
+        id: nId,
+        greeting: nMsgSafe,
+        srcVal: nSrcVal,
+        scaleFactor: nScale,
+        animRate: nAnim,
+        initX: nX,
+        initY: nY,
+        pixelsH: nSprite.h || 0,
+        pixelsW: nSprite.w || 0,
+        rows: nRows,
+        cols: nCols
+    };
+}
+
+/**
+ * Build NPC literal text/code that is ready for GameEngine
+ * @param {Object} nx - Normalized NPC object
+ * @param {Number} index - The NPC index for naming
+ * @param {Boolean} includeAlert - Whether to include alert fallback in interact function
+ * @returns {Object} { def: string, classEntry: string } - NPC definition and class entry
+ */
+function npc_code(nx, index, includeAlert = false) {
+    const varName = `npcData${index}`;
+    const interactFunc = includeAlert
+        ? `function() {
+                if (this.dialogueSystem) {
+                    this.showRandomDialogue();
+                } else if (this.greeting) {
+                    alert(this.greeting);
+                } else {
+                    alert('Hello!');
                 }
-                function footer(classesArray) {
-                        return `
+            }`
+        : `function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }`;
 
-        this.classes = [
-            ${classesArray.join(',\n')}
-        ];
+    const def = `
+        const ${varName} = {
+            id: '${nx.id}',
+            greeting: '${nx.greeting}',
+            src: ${nx.srcVal},
+            SCALE_FACTOR: ${nx.scaleFactor},
+            ANIMATION_RATE: ${nx.animRate},
+            INIT_POSITION: { x: ${nx.initX}, y: ${nx.initY} },
+            pixels: { height: ${nx.pixelsH}, width: ${nx.pixelsW} },
+            orientation: { rows: ${nx.rows}, columns: ${nx.cols} },
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+            left: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+            up: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+            upRight: { row: Math.min(3, ${nx.rows} - 1), start: 0, columns: 3 },
+            downRight: { row: Math.min(1, ${nx.rows} - 1), start: 0, columns: 3 },
+            upLeft: { row: Math.min(2, ${nx.rows} - 1), start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            dialogues: ['${nx.greeting}'],
+            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            interact: ${interactFunc}
+        };`;
+
+    const classEntry = `{ class: Npc, data: ${varName} }`;
+
+    return { def, classEntry };
+}
+
+/**
+ * Extract and normalize barrier data from wall UI element or drawn shape
+ * @param {Object} source - The wall object or drawn shape object
+ * @param {String} type - 'wall' or 'drawn'
+ * @param {Number} idx - The barrier index for naming
+ * @param {Object} options - Optional parameters (visible, scaleX, scaleY)
+ * @returns {Object} barrier - Normalized barrier object
+ */
+function barrier_extract(source, type, idx, options = {}) {
+    if (type === 'wall') {
+        return {
+            id: `wall_${idx+1}`,
+            varName: `barrierData${idx+1}`,
+            x: parseInt(source.wX?.value || 100, 10),
+            y: parseInt(source.wY?.value || 100, 10),
+            width: parseInt(source.wW?.value || 150, 10),
+            height: parseInt(source.wH?.value || 20, 10),
+            visible: options.visible !== undefined ? !!options.visible : true,
+            fromOverlay: false
+        };
+    } else if (type === 'drawn') {
+        const scaleX = options.scaleX || 1;
+        const scaleY = options.scaleY || 1;
+        return {
+            id: `dbarrier_${idx+1}`,
+            varName: `dbarrier_${idx+1}`,
+            x: Math.max(0, Math.round((source.x || 0) * scaleX)),
+            y: Math.max(0, Math.round((source.y || 0) * scaleY)),
+            width: Math.max(0, Math.round((source.width || 0) * scaleX)),
+            height: Math.max(0, Math.round((source.height || 0) * scaleY)),
+            visible: true,
+            fromOverlay: true
+        };
+    }
+}
+
+/**
+ * Build barrier literal text/code that is ready for GameEngine
+ * @param {Object} barrierData - Normalized barrier object
+ * @returns {Object} { def: string, classEntry: string } - Barrier definition and class entry
+ */
+function barrier_code(barrierData) {
+    const { varName, id, x, y, width, height, visible, fromOverlay } = barrierData;
+    const comment = fromOverlay ? ' /* BUILDER_DEFAULT */' : '';
+    const overlayPart = fromOverlay ? ',\n            fromOverlay: true' : '';
+
+    const def = `
+        const ${varName} = {
+            id: '${id}', x: ${x}, y: ${y}, width: ${width}, height: ${height}, visible: ${visible}${comment},
+            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }${overlayPart}
+        };`;
+
+    const classEntry = `{ class: Barrier, data: ${varName} }`;
+
+    return { def, classEntry };
+}
+
+/**
+ * Generate background code with defs and classes
+ * @param {Object} bg - Background asset object
+ * @returns {Object} { defs: array, classes: array }
+ */
+function background_generate(bg) {
+    if (!bg) return { defs: [], classes: [] };
+
+    const bgx = bg_extract(bg);
+    const bgCode = bg_code(bgx);
+    const defs = [bgCode.def];
+    const classes = [bgCode.classEntry];
+
+    return { defs, classes };
+}
+
+/**
+ * Generate player code with defs and classes
+ * @param {Object} ui - UI object with player controls
+ * @param {Object} p - Player sprite asset object
+ * @returns {Object} { defs: array, classes: array }
+ */
+function player_generate(ui, p) {
+    if (!p) return { defs: [], classes: [] };
+
+    const playerx = player_extract(ui, p);
+    const playerCode = player_code(playerx);
+    const defs = [playerCode.def];
+    const classes = [playerCode.classEntry];
+
+    return { defs, classes };
+}
+
+/**
+ * Generate NPC code for all NPCs with defs and classes
+ * @param {Array} npcs - Array of NPC slot objects
+ * @param {Object} assets - Assets object containing sprites
+ * @param {Boolean} includeAlert - Whether to include alert fallback in interact function
+ * @returns {Object} { defs: array, classes: array }
+ */
+function npcs_generate(npcs, assets, includeAlert = false) {
+    if (!npcs || npcs.length === 0) return { defs: [], classes: [] };
+    if (!assets || !assets.sprites) {
+        console.warn('npcs_generate: assets or assets.sprites is undefined');
+        return { defs: [], classes: [] };
+    }
+
+    const defs = [];
+    const classes = [];
+
+    npcs.forEach((slot, idx) => {
+        // Ensure slot has index property, fallback to array index + 1
+        const slotIndex = slot.index !== undefined ? slot.index : (idx + 1);
+
+        try {
+            const nx = npc_extract(slot, assets);
+            const npcCode = npc_code(nx, slotIndex, includeAlert);
+            defs.push(npcCode.def);
+            classes.push(npcCode.classEntry);
+        } catch (e) {
+            console.error('Error generating NPC code for slot', slotIndex, e);
+        }
+    });
+
+    return { defs, classes };
+}
+
+/**
+ * Generate barrier code for both wall and drawn barriers
+ * @param {Array} walls - Array of wall UI elements
+ * @param {Array} drawShapes - Array of drawn shapes (barriers)
+ * @param {Object} options - Options for barrier generation (visible, scaleX, scaleY)
+ * @returns {Object} { defs: array, classes: array }
+ */
+function barriers_generate(walls, drawShapes, options = {}) {
+    const defs = [];
+    const classes = [];
+    const visible = options.visible !== undefined ? options.visible : true;
+    const scaleX = options.scaleX || 1;
+    const scaleY = options.scaleY || 1;
+
+    // Process walls (manual panel entries)
+    walls.forEach((w, idx) => {
+        const bData = barrier_extract(w, 'wall', idx, { visible: visible });
+        const barrierCode = barrier_code(bData);
+        defs.push(barrierCode.def);
+        classes.push(barrierCode.classEntry);
+    });
+
+    // Process drawn barriers (from Draw Collision Wall button)
+    const drawnBarriers = (drawShapes || []).filter(s => s.type === 'barrier');
+    drawnBarriers.forEach((b, bIdx) => {
+        const bData = barrier_extract(b, 'drawn', bIdx, { scaleX: scaleX, scaleY: scaleY });
+        const barrierCode = barrier_code(bData);
+        defs.push(barrierCode.def);
+        classes.push(barrierCode.classEntry);
+    });
+
+    return { defs, classes };
+}
+
+/* SECTION: Game Level Template Code Generation */
+
+/**
+ * Generate builder-only code section for postMessage communication and event listeners
+ * This code enables real-time sync between builder UI and running game
+ * @returns {String} - Builder-only code block with BUILDER_ONLY_START/END markers
+ */
+function builder_code() {
+    return `
+
         /* BUILDER_ONLY_START */
         // Post object summary to builder (debugging visibility of NPCs/walls)
         try {
@@ -1200,432 +1554,165 @@ class GameLevelCustom {
                 }
             });
         } catch (_) {}
-        /* BUILDER_ONLY_END */
+        /* BUILDER_ONLY_END */`;
+}
+
+/**
+ * Generate complete GameLevelCustom class template code
+ * Composes imports, class structure, entity definitions, and class array
+ * @param {Array} defs - Array of entity data definitions (bgData, playerData, npcData, etc.)
+ * @param {Array} classes - Array of class entry strings for this.classes array
+ * @returns {String} - Complete game level class code ready for execution
+ */
+function gamelevel_code(defs = [], classes = []) {
+/* Do not change formattting
+ * This organization illustrates the look of intended output
+ * Literals are defined at left edge to comply with Code Generation .
+*/
+const importsSection = `
+import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+`; // end of importSection
+
+const gameLevelStart = `
+class GameLevelCustom {
+    constructor(gameEnv) {
+        const path = gameEnv.path;
+        const width = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;`
+ ; // end of GameLevelStart
+
+    // Format definitions: each def starts with \n, join with \n for blank lines between
+    const defsSection = defs.length > 0
+        ? '\n' + defs.join('\n')
+        : '\n\n        // Definitions will be added here per step';
+
+    const classesArray = classes.length > 0
+        ? `\n
+
+        this.classes = [
+            ${classes.join(',\n            ')}
+        ];`
+        : `
+
+        this.classes = [
+            // Step 1: add GameEnvBackground
+            // Step 2: add Player
+            // Step 3: add Npc
+        ];`;
+
+    const builderSection = builder_code();
+
+    const gameLevelEnd = `
     }
 }
 
-export const gameLevelClasses = [GameLevelCustom];`;
-                }
+export const gameLevelClasses = [GameLevelCustom];`
+; // end of gameLevelEnd
 
-                if (currentStep === 'background') {
-                        if (!ui.bg.value) return null;
-                        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                        const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-                        let defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };`;
-                        const classes = [
-            "      { class: GameEnvBackground, data: bgData }"
-                        ];
-                        const barrierDefsB = [];
-                        const includedWallsB = ui.walls.slice();
-                        includedWallsB.forEach((w, idx) => {
-                            const x = parseInt(w.wX?.value || 100, 10);
-                            const y = parseInt(w.wY?.value || 100, 10);
-                            const wWidth = parseInt(w.wW?.value || 150, 10);
-                            const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const id = `wall_${idx+1}`;
-                            barrierDefsB.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-                        });
-                        const drawnBarriersB = ui.drawShapes.filter(s => s.type === 'barrier');
-                        // Use overlay pixel coordinates directly (no scaling)
-                        drawnBarriersB.forEach((b, bIdx) => {
-                            const id = `dbarrier_${bIdx+1}`;
-                            const bx = Math.max(0, Math.round(b.x || 0));
-                            const by = Math.max(0, Math.round(b.y || 0));
-                            const bw = Math.max(0, Math.round(b.width || 0));
-                            const bh = Math.max(0, Math.round(b.height || 0));
-                            barrierDefsB.push(`
-        const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                            classes.push(`      { class: Barrier, data: ${id} }`);
-                        });
-                        if (barrierDefsB.length) defs += ('\n' + barrierDefsB.join('\n'));
-                        return header() + defs + footer(classes);
-                }
+// Actual formatting of code returned here
+return importsSection + gameLevelStart + defsSection + classesArray + builderSection + gameLevelEnd;
+}
 
-                if (currentStep === 'player') {
-                        if (!ui.bg.value || !ui.pSprite.value) return null;
-                        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-                        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                        const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-                        const pIsData = p && p.src && p.src.startsWith('data:');
-                        const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-                        const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
-                        const pStepVal = parseInt(ui.pStep?.value || '1000', 10);
-                        const pAnimVal = parseInt(ui.pAnim?.value || '50', 10);
-                        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-                        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-                        const pRowsVal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
-                        const pColsVal = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10));
-                        const dirRowsTotal = pRowsVal;
-                        const clamp = (v) => {
-                            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
-                            return Math.max(0, Math.min(maxIndex, v|0));
-                        };
-                        const dirCols = Math.max(1, parseInt(ui.pDirCols?.value || 3, 10));
-                        const dRow = clamp(parseInt(ui.pDownRow?.value ?? 0));
-                        const dDefault = 0;
-                        const rDefault = 1;
-                        const lDefault = 2;
-                        const uDefault = 3;
-                        const rRow = clamp(parseInt(ui.pRightRow?.value ?? rDefault));
-                        const lRow = clamp(parseInt(ui.pLeftRow?.value ?? lDefault));
-                        const uRow = clamp(parseInt(ui.pUpRow?.value ?? uDefault));
-                        const urRow = clamp(parseInt(ui.pUpRightRow?.value ?? uRow));
-                        const drRow = clamp(parseInt(ui.pDownRightRow?.value ?? rRow));
-                        const ulRow = clamp(parseInt(ui.pUpLeftRow?.value ?? lRow));
-                        const dlRow = clamp(parseInt(ui.pDownLeftRow?.value ?? dRow));
-                        const hbW = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
-                        const hbH = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
+/**
+ * Generate baseline/empty game level template
+ * Used when no entities have been configured yet
+ * @returns {String} - Baseline template with placeholder comments
+ */
+function base_generate() {
+    // Empty lists returns placeholder code
+    return gamelevel_code([], []);
+}
 
-                        const defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleVal},
-            STEP_FACTOR: ${pStepVal},
-            ANIMATION_RATE: ${pAnimVal},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsVal}, columns: ${pColsVal} },
-            down: { row: ${dRow}, start: 0, columns: ${dirCols} },
-            downRight: { row: ${drRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            downLeft: { row: ${dlRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            left: { row: ${lRow}, start: 0, columns: ${dirCols} },
-            right: { row: ${rRow}, start: 0, columns: ${dirCols} },
-            up: { row: ${uRow}, start: 0, columns: ${dirCols} },
-            upLeft: { row: ${ulRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            upRight: { row: ${urRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${hbW}, heightPercentage: ${hbH} },
-            keypress: ${keypress}
-        };`;
-                        const classes = [
-            "      { class: GameEnvBackground, data: bgData }",
-            "      { class: Player, data: playerData }"
-                        ];
+/**
+ * Generate game level code based on what's currently configured in UI
+ * This compositional approach generates code for ALL configured elements,
+ * regardless of workflow step, avoiding false dependencies between entities
+ * @param {String} currentStep - Current workflow step ('background', 'player', or 'freestyle')
+ * @returns {String} - Complete game level code for all configured elements
+ */
+function step_generate(currentStep = 'background') {
+    // Safe logic does not use currentStep, but
+    //   checks what's actually configured in the UI
+    const hasBackground = !!ui.bg.value; // The !! forces boolean result vs assignment
+    const hasPlayer = !!ui.pSprite.value;
+    const hasNPCs = ui.npcs && ui.npcs.length > 0;
+    const hasWalls = (ui.walls && ui.walls.length > 0) ||
+                     (ui.drawShapes && ui.drawShapes.some(s => s.type === 'barrier'));
 
-                        const barrierDefs = [];
-                        const includedWallsP = ui.walls.slice();
-                        includedWallsP.forEach((w, idx) => {
-                            const x = parseInt(w.wX?.value || 100, 10);
-                            const y = parseInt(w.wY?.value || 100, 10);
-                            const wWidth = parseInt(w.wW?.value || 150, 10);
-                            const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const id = `wall_${idx+1}`;
-                            barrierDefs.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-                        });
+    // Generate code for ALL configured elements (compositional approach)
+    // Button controls should determine when it's appropriate to call this function
+    const defs = [];
+    const classes = [];
 
-                        const drawnBarriersP = ui.drawShapes.filter(s => s.type === 'barrier');
-                        // Use overlay pixel coordinates directly (no scaling)
-                        drawnBarriersP.forEach((b, bIdx) => {
-                            const id = `dbarrier_${bIdx+1}`;
-                            const bx = Math.max(0, Math.round(b.x || 0));
-                            const by = Math.max(0, Math.round(b.y || 0));
-                            const bw = Math.max(0, Math.round(b.width || 0));
-                            const bh = Math.max(0, Math.round(b.height || 0));
-                            barrierDefs.push(`
-        const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                            classes.push(`      { class: Barrier, data: ${id} }`);
-                        });
+    // Add background code if configured
+    if (hasBackground) {
+        const bg = assets.bg[ui.bg.value];
+        const bgGen = background_generate(bg);
+        defs.push(...bgGen.defs);
+        classes.push(...bgGen.classes);
+    }
 
-                        const fullDefs = defs + (barrierDefs.length ? ('\n' + barrierDefs.join('\n')) : '');
-                        return header() + fullDefs + footer(classes);
-                }
+    // Add player code if configured
+    if (hasPlayer) {
+        const p = assets.sprites[ui.pSprite.value];
+        const playerGen = player_generate(ui, p);
+        defs.push(...playerGen.defs);
+        classes.push(...playerGen.classes);
+    }
 
-                if (currentStep === 'npc') {
-                    const includedSlots = ui.npcs.slice();
-                    if (includedSlots.length === 0) return null;
+    // Add NPCs code if configured
+    if (hasNPCs) {
+        const npcsGen = npcs_generate(ui.npcs.slice(), assets, false);
+        defs.push(...npcsGen.defs);
+        classes.push(...npcsGen.classes);
+    }
 
-                        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-                        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                        const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-                        const pIsData = p && p.src && p.src.startsWith('data:');
-                        const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-                        const pScaleValN = parseInt(ui.pScale?.value || '5', 10);
-                        const pStepValN = parseInt(ui.pStep?.value || '1000', 10);
-                        const pAnimValN = parseInt(ui.pAnim?.value || '50', 10);
-                        const pRowsValN = Math.max(1, parseInt(ui.pRows?.value || p.rows || 1, 10));
-                        const pColsValN = Math.max(1, parseInt(ui.pCols?.value || p.cols || 1, 10));
-                        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-                        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-                        const hbWN = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
-                        const hbHN = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
-                        
-                        const defsStart = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleValN},
-            STEP_FACTOR: ${pStepValN},
-            ANIMATION_RATE: ${pAnimValN},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsValN}, columns: ${pColsValN} },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-            downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
-            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${hbWN}, heightPercentage: ${hbHN} },
-            keypress: ${keypress}
-        };`;
-                        const npcDefs = [];
-                        const classes = [
-            "      { class: GameEnvBackground, data: bgData }",
-            "      { class: Player, data: playerData }"
-                        ];
-                        includedSlots.forEach((slot) => {
-                            const index = slot.index;
-                            const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
-                            const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'");
-                            const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
-                            const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
-                            const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
-                            const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
-                            const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
-                            const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
-                            const nSrcVal = nIsData ? `'${(nSprite.src||'').replace(/'/g, "\\'")}'` : `path + "${nSprite.src}"`;
-                            const nRows = Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10));
-                            const nCols = Math.max(1, parseInt(slot.nCols?.value || nSprite.cols || 1, 10));
-                            const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
-                            const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
-                            npcDefs.push(`
-        const npcData${index} = {
-            id: '${nId}',
-            greeting: '${nMsgSafe}',
-            src: ${nSrcVal},
-            SCALE_FACTOR: ${nScale},
-            ANIMATION_RATE: ${nAnim},
-            INIT_POSITION: { x: ${nX}, y: ${nY} },
-            pixels: { height: ${nSprite.h}, width: ${nSprite.w} },
-            orientation: { rows: ${nRows}, columns: ${nCols} },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, ${nRows} - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, ${nRows} - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, ${nRows} - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, ${nRows} - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, ${nRows} - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, ${nRows} - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['${nMsgSafe}'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() {
-                if (this.dialogueSystem) {
-                    this.showRandomDialogue();
-                } else if (this.greeting) {
-                    alert(this.greeting);
-                } else {
-                    alert('Hello!');
-                }
-            }
-        };`);
-                            classes.push(`      { class: Npc, data: npcData${index} }`);
-                        });
-                        const barrierDefsN = [];
-                        const includedWallsN = ui.walls.slice();
-                        includedWallsN.forEach((w, idx) => {
-                            const x = parseInt(w.wX?.value || 100, 10);
-                            const y = parseInt(w.wY?.value || 100, 10);
-                            const wWidth = parseInt(w.wW?.value || 150, 10);
-                            const wHeight = parseInt(w.wH?.value || 20, 10);
-                            const visible = !!ui.gameWallsVisible; 
-                            const id = `wall_${idx+1}`;
-                            barrierDefsN.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${visible},
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-                        });
-                        const drawnBarriersN = ui.drawShapes.filter(s => s.type === 'barrier');
-                        const rectN = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-                        const scaleXN = (envWidth && rectN.width) ? (envWidth / rectN.width) : 1;
-                        const scaleYN = (envHeight && rectN.height) ? (envHeight / rectN.height) : 1;
-                        drawnBarriersN.forEach((b, bIdx) => {
-                            const id = `dbarrier_${bIdx+1}`;
-                            const bx = Math.max(0, Math.round((b.x || 0) * scaleXN));
-                            const by = Math.max(0, Math.round((b.y || 0) * scaleYN));
-                            const bw = Math.max(0, Math.round((b.width || 0) * scaleXN));
-                            const bh = Math.max(0, Math.round((b.height || 0) * scaleYN));
-                            barrierDefsN.push(`
-                            const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                            classes.push(`      { class: Barrier, data: ${id} }`);
-                        });
+    // Add barriers/walls code if configured
+    if (hasWalls) {
+        const barriersGen = barriers_generate(ui.walls.slice(), ui.drawShapes, { visible: true });
+        defs.push(...barriersGen.defs);
+        classes.push(...barriersGen.classes);
+    }
 
-                        const defs = defsStart + npcDefs.join('\n') + (barrierDefsN.length ? ('\n' + barrierDefsN.join('\n')) : '');
-                        return header() + defs + footer(classes);
-                }
+    // If nothing configured, return baseline template
+    if (defs.length === 0) {
+        return base_generate();
+    }
 
-                if (currentStep === 'walls') {
-                    if (!ui.bg.value || !ui.pSprite.value) return null;
-                    const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-                    const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-                    const bgSrcVal = bgIsData ? `'${bg.src.replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-                    const pIsData = p && p.src && p.src.startsWith('data:');
-                    const pSrcVal = pIsData ? `'${p.src.replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-                    const pScaleValW = parseInt(ui.pScale?.value || '5', 10);
-                    const pStepValW = parseInt(ui.pStep?.value || '1000', 10);
-                    const pAnimValW = parseInt(ui.pAnim?.value || '50', 10);
-                    const pRowsValW = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || '3', 10));
-                    const pColsValW = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || '4', 10));
-                    const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-                    const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-                    
-                    const defsStart = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleValW},
-            STEP_FACTOR: ${pStepValW},
-            ANIMATION_RATE: ${pAnimValW},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsValW}, columns: ${pColsValW} },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-            downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
-            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9))}, heightPercentage: ${Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9))} },
-            keypress: ${keypress}
-        };`;
-                    const classes = [
-                        "      { class: GameEnvBackground, data: bgData }",
-                        "      { class: Player, data: playerData }"
-                    ];
-                    const includedNPCs = ui.npcs.slice();
-                    const npcDefs = [];
-                    includedNPCs.forEach((slot) => {
-                        const index = slot.index;
-                        const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
-                        const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'");
-                        const nMsgSafe = nMsg && nMsg.length ? nMsg : 'Hello!';
-                        const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
-                        const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
-                        const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
-                        const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
-                        const nIsData = nSprite && nSprite.src && nSprite.src.startsWith('data:');
-                        const nSrcVal = nIsData ? `'${(nSprite.src||'').replace(/'/g, "\\'")}'` : `path + "${nSprite.src}"`;
-                        const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
-                        const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
-                        npcDefs.push(`
-        const npcData${index} = {
-            id: '${nId}',
-            greeting: '${nMsgSafe}',
-            src: ${nSrcVal},
-            SCALE_FACTOR: ${nScale},
-            ANIMATION_RATE: ${nAnim},
-            INIT_POSITION: { x: ${nX}, y: ${nY} },
-            pixels: { height: ${nSprite.h}, width: ${nSprite.w} },
-            orientation: { rows: ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))}, columns: ${Math.max(1, parseInt(slot.nCols?.value || nSprite.cols || 1, 10))} },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, ${Math.max(1, parseInt(slot.nRows?.value || nSprite.rows || 1, 10))} - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['${nMsgSafe}'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
-        };`);
-                        classes.push(`      { class: Npc, data: npcData${index} }`);
-                    });
+    // Builds Level Code using composition of defs and classes
+    return gamelevel_code(defs, classes);
+}
 
-                    const barrierDefs = [];
+/**
+ * Wrapper for legacy generateBaselineCode calls
+ * @returns {String} - Baseline game level template
+ */
+function generateBaselineCode() {
+    return base_generate();
+}
 
-                    const includedWalls = ui.walls.slice();
-                    includedWalls.forEach((w, idx) => {
-                        const x = parseInt(w.wX?.value || 100, 10);
-                        const y = parseInt(w.wY?.value || 100, 10);
-                        const wWidth = parseInt(w.wW?.value || 150, 10);
-                        const wHeight = parseInt(w.wH?.value || 20, 10);
-                        const visible = !!ui.gameWallsVisible;
-                        const id = `wall_${idx+1}`;
-                        barrierDefs.push(`
-        const barrierData${idx+1} = {
-            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: ${visible},
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
-        };`);
-                        classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-                    });
-                    
-                    const drawnBarriers = ui.drawShapes.filter(s => s.type === 'barrier');
-                    const rectW = ui.drawOverlay?.getBoundingClientRect?.() || { width: 0, height: 0 };
-                    const scaleXW = (envWidth && rectW.width) ? (envWidth / rectW.width) : 1;
-                    const scaleYW = (envHeight && rectW.height) ? (envHeight / rectW.height) : 1;
-                    drawnBarriers.forEach((b, bIdx) => {
-                        const id = `dbarrier_${bIdx+1}`;
-                        const bx = Math.max(0, Math.round((b.x || 0) * scaleXW));
-                        const by = Math.max(0, Math.round((b.y || 0) * scaleYW));
-                        const bw = Math.max(0, Math.round((b.width || 0) * scaleXW));
-                        const bh = Math.max(0, Math.round((b.height || 0) * scaleYW));
-                        barrierDefs.push(`
-                            const ${id} = {
-            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };`);
-                        classes.push(`      { class: Barrier, data: ${id} }`);
-                    });
+/**
+ * Wrapper for legacy generateStepCode calls
+ * @param {String} currentStep - Current workflow step
+ * @returns {String|null} - Generated code for step or null
+ */
+function generateStepCode(currentStep) {
+    return step_generate(currentStep);
+}
 
-                    const defs = defsStart + (npcDefs.length ? ('\n' + npcDefs.join('\n')) : '') + (barrierDefs.length ? ('\n' + barrierDefs.join('\n')) : '');
-                    return header() + defs + footer(classes);
-                }
 
-                return ui.editor.value;
-        }
+/* SECTION: Code Editor Diff and Highlight Overlay Management */
 
-    /* SECTION: Diff computation for typed highlights */
+    /**
+     * Compute the range of lines that changed between two code strings
+     * Used to determine which lines to highlight during typing animations
+     * @param {String} oldCode - The original code before changes
+     * @param {String} newCode - The new code after changes
+     * @returns {Object} { startLine: number, lineCount: number } - Changed line range
+     */
     function computeChangeRange(oldCode, newCode) {
         const oldLines = oldCode.split('\n');
         const newLines = newCode.split('\n');
@@ -1638,9 +1725,15 @@ export const gameLevelClasses = [GameLevelCustom];`;
         return { startLine: start, lineCount };
     }
 
+    /**
+     * Clear all highlight overlays from the editor
+     */
     function clearOverlay() { ui.hLayer.innerHTML = ''; }
 
-    // Render highlight overlay for typing and persistent blocks
+    /**
+     * Render highlight overlay boxes for typing animations and persistent code blocks
+     * Positions overlay boxes based on line numbers and editor scroll position
+     */
     function renderOverlay() {
         clearOverlay();
         ui.hLayer.style.transform = `translateY(${-ui.editor.scrollTop}px)`;
@@ -1675,6 +1768,11 @@ export const gameLevelClasses = [GameLevelCustom];`;
         }
     });
 
+    /**
+     * Synchronize code generation from UI controls when in freestyle mode
+     * Stages changes for confirmation rather than applying immediately
+     * Detects which entity type was last edited and generates appropriate code
+     */
     function syncFromControlsIfFreestyle() {
         const current = steps[stepIndex];
         // Always stage builder changes, even after manual code edits
@@ -1709,7 +1807,13 @@ export const gameLevelClasses = [GameLevelCustom];`;
         }
     }
 
-    /* SECTION: Parse editor code -> update UI controls (two-way sync) */
+    /* SECTION: Two-Way Code and UI Panel Synchronization */
+
+    /**
+     * Parse code from editor and update UI controls to match (two-way sync)
+     * Extracts player, background, and entity data from code and populates form fields
+     * Enables users to edit code directly while keeping UI controls synchronized
+     */
     function syncControlsFromEditor() {
         const code = String(ui.editor?.value || '');
         const pdMatch = /const\s+playerData\s*=\s*\{([\s\S]*?)\}\s*;/.exec(code);
@@ -1811,7 +1915,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
         } catch (_) {}
     }
 
-    /* SECTION: Typing animation (simulate code being typed, then persist highlight) */
+    /* SECTION: Code Typing Animation and Visual Feedback */
+
+    /**
+     * Simulate code being typed into editor with character-by-character animation
+     * Provides visual feedback when code is generated or modified by the builder
+     * Highlights changed region during typing, then persists highlight when complete
+     * @param {String} oldCode - The current editor code before changes
+     * @param {String} newCode - The new code to type into the editor
+     * @param {Function} onDone - Callback function to execute when typing animation completes
+     */
     function simulateTypingChange(oldCode, newCode, onDone) {
         const { startLine, lineCount } = computeChangeRange(oldCode, newCode);
         if (!lineCount || lineCount < 1) {
@@ -1868,146 +1981,69 @@ export const gameLevelClasses = [GameLevelCustom];`;
         window.setTimeout(typeStep, TICK_MS);
     }
 
-    /* SECTION: NPC and Barrier code inserts for confirm merges */
+    /* SECTION: Entity Code Generation for Confirm Workflow */
+
+    /**
+     * Build NPC definition code and class entries for insertion into existing code
+     * Used by confirm workflow to merge NPC entities into the editor
+     * @returns {Object} { defs: string, classes: array } - NPC definitions and class entries
+     */
     function buildNpcInsertText() {
         const includedSlots = ui.npcs.slice();
         if (!includedSlots.length) return { defs: '', classes: [] };
-        const classes = [];
-        const defs = includedSlots.map((slot) => {
-            const index = slot.index;
-            const nId = (slot.nId && slot.nId.value ? slot.nId.value.trim() : 'NPC').replace(/'/g, "\\'");
-            const nMsg = (slot.nMsg && slot.nMsg.value ? slot.nMsg.value.trim() : '').replace(/'/g, "\\'") || 'Hello!';
-            const nSpriteKey = (slot.nSprite && slot.nSprite.value) ? slot.nSprite.value : 'chillguy';
-            const nSprite = assets.sprites[nSpriteKey] || assets.sprites['chillguy'];
-            const nX = (slot.nX && slot.nX.value) ? parseInt(slot.nX.value, 10) : 500;
-            const nY = (slot.nY && slot.nY.value) ? parseInt(slot.nY.value, 10) : 300;
-            const nScale = Math.max(1, parseInt(slot.nScale?.value || 8, 10));
-            const nAnim = Math.max(1, parseInt(slot.nAnim?.value || 50, 10));
-            return `\n        const npcData${index} = {\n            id: '${nId}',\n            greeting: '${nMsg}',\n            src: path + "${nSprite.src}",\n            SCALE_FACTOR: ${nScale},\n            ANIMATION_RATE: ${nAnim},\n            INIT_POSITION: { x: ${nX}, y: ${nY} },\n            pixels: { height: ${nSprite.h}, width: ${nSprite.w} },\n            orientation: { rows: ${nSprite.rows}, columns: ${nSprite.cols} },\n            down: { row: 0, start: 0, columns: 3 },\n            right: { row: Math.min(1, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            left: { row: Math.min(2, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            up: { row: Math.min(3, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            upRight: { row: Math.min(3, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            downRight: { row: Math.min(1, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            upLeft: { row: Math.min(2, ${nSprite.rows} - 1), start: 0, columns: 3 },\n            downLeft: { row: 0, start: 0, columns: 3 },\n            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },\n            zIndex: 12,\n            dialogues: ['${nMsg}'],\n            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },\n            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }\n        };`;
-        }).join('\n');
-        includedSlots.forEach((slot) => {
-            classes.push(`      { class: Npc, data: npcData${slot.index} }`);
-        });
-        return { defs, classes };
+        const generated = npcs_generate(includedSlots, assets, false);
+        return { defs: generated.defs.join('\n'), classes: generated.classes };
     }
 
+    /**
+     * Build barrier/wall definition code and class entries for insertion
+     * Includes both manually placed walls and drawn collision barriers
+     * @returns {Object} { defs: string, classes: array } - Barrier definitions and class entries
+     */
     function buildBarrierInsertText() {
-        const includedWalls = ui.walls.slice();
-        const classes = [];
-        const defBlocks = includedWalls.map((w, idx) => {
-            const x = parseInt(w.wX?.value || 100, 10);
-            const y = parseInt(w.wY?.value || 100, 10);
-            const wWidth = parseInt(w.wW?.value || 150, 10);
-            const wHeight = parseInt(w.wH?.value || 20, 10);
-            const id = `wall_${idx+1}`;
-            classes.push(`      { class: Barrier, data: barrierData${idx+1} }`);
-            return `\n        const barrierData${idx+1} = {\n            id: '${id}', x: ${x}, y: ${y}, width: ${wWidth}, height: ${wHeight}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }\n        };`;
-        });
-
-        const drawnBarriers = (ui.drawShapes || []).filter(s => s.type === 'barrier');
-        drawnBarriers.forEach((b, bIdx) => {
-            const id = `dbarrier_${bIdx+1}`;
-            const bx = Math.max(0, Math.round(b.x || 0));
-            const by = Math.max(0, Math.round(b.y || 0));
-            const bw = Math.max(0, Math.round(b.width || 0));
-            const bh = Math.max(0, Math.round(b.height || 0));
-            defBlocks.push(`\n        const ${id} = {\n            id: '${id}', x: ${bx}, y: ${by}, width: ${bw}, height: ${bh}, visible: true /* BUILDER_DEFAULT */,\n            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },\n            fromOverlay: true\n        };`);
-            classes.push(`      { class: Barrier, data: ${id} }`);
-        });
-
-        const defs = defBlocks.join('\n');
-        return { defs, classes };
+        const generated = barriers_generate(ui.walls, ui.drawShapes, { visible: true });
+        return { defs: generated.defs.join('\n'), classes: generated.classes };
     }
 
+    /**
+     * Build background definition code and class entry for insertion
+     * @returns {Object} { defs: string, classes: array } - Background definition and class entry
+     */
     function buildBackgroundInsertText() {
         const bg = assets.bg[ui.bg.value];
         if (!bg) return { defs: '', classes: [] };
-        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-        const bgSrcVal = bgIsData ? `'${String(bg.src).replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-        const defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };`;
-        const classes = [
-            "      { class: GameEnvBackground, data: bgData }"
-        ];
-        return { defs, classes };
+        const generated = background_generate(bg);
+        return { defs: generated.defs.join('\n'), classes: generated.classes };
     }
 
+    /**
+     * Build player and background definition code for insertion
+     * Combines both background and player since player requires background context
+     * @returns {Object} { defs: string, classes: array } - Combined definitions and class entries
+     */
     function buildPlayerInsertText() {
         const bg = assets.bg[ui.bg.value];
         const p = assets.sprites[ui.pSprite.value];
         if (!bg || !p) return { defs: '', classes: [] };
-        const name = (ui.pName && ui.pName.value ? ui.pName.value.trim() : 'Hero').replace(/'/g, "\\'");
-        const bgIsData = bg && bg.src && bg.src.startsWith('data:');
-        const bgSrcVal = bgIsData ? `'${String(bg.src).replace(/'/g, "\\'")}'` : `path + "${bg.src}"`;
-        const pIsData = p && p.src && p.src.startsWith('data:');
-        const pSrcVal = pIsData ? `'${String(p.src).replace(/'/g, "\\'")}'` : `path + "${p.src}"`;
-        const pScaleVal = parseInt(ui.pScale?.value || '5', 10);
-        const pStepVal = parseInt(ui.pStep?.value || '1000', 10);
-        const pAnimVal = parseInt(ui.pAnim?.value || '50', 10);
-        const initX = Math.max(0, parseInt(ui.pX?.value || '0', 10));
-        const initY = Math.max(0, parseInt(ui.pY?.value || '0', 10));
-        const pRowsVal = Math.max(1, parseInt((ui.pRows?.value ?? '').trim() || String(p.rows || 1), 10));
-        const pColsVal = Math.max(1, parseInt((ui.pCols?.value ?? '').trim() || String(p.cols || 1), 10));
-        const dirRowsTotal = pRowsVal;
-        const clamp = (v) => {
-            const maxIndex = Math.max(0, (dirRowsTotal|0) - 1);
-            return Math.max(0, Math.min(maxIndex, v|0));
-        };
-        const dirCols = Math.max(1, parseInt(ui.pDirCols?.value || 3, 10));
-        const dRow = clamp(parseInt(ui.pDownRow?.value ?? 0));
-        const rRow = clamp(parseInt(ui.pRightRow?.value ?? 1));
-        const lRow = clamp(parseInt(ui.pLeftRow?.value ?? 2));
-        const uRow = clamp(parseInt(ui.pUpRow?.value ?? 3));
-        const urRow = clamp(parseInt(ui.pUpRightRow?.value ?? uRow));
-        const drRow = clamp(parseInt(ui.pDownRightRow?.value ?? rRow));
-        const ulRow = clamp(parseInt(ui.pUpLeftRow?.value ?? lRow));
-        const dlRow = clamp(parseInt(ui.pDownLeftRow?.value ?? dRow));
-        const hbW = Math.max(0, Math.min(parseFloat(ui.pHitboxW?.value || '0'), 0.9));
-        const hbH = Math.max(0, Math.min(parseFloat(ui.pHitboxH?.value || '0'), 0.9));
-        const mvElGen = document.getElementById('movement-keys');
-        const movement = (mvElGen && mvElGen.value) ? mvElGen.value : 'wasd';
-        const keypress = movement === 'arrows'
-            ? '{ up: 38, left: 37, down: 40, right: 39 }'
-            : '{ up: 87, left: 65, down: 83, right: 68 }';
 
-        const defs = `
-        const bgData = {
-            name: 'custom_bg',
-            src: ${bgSrcVal},
-            pixels: { height: ${bg.h}, width: ${bg.w} }
-        };
-        const playerData = {
-            id: '${name}',
-            src: ${pSrcVal},
-            SCALE_FACTOR: ${pScaleVal},
-            STEP_FACTOR: ${pStepVal},
-            ANIMATION_RATE: ${pAnimVal},
-            INIT_POSITION: { x: ${initX}, y: ${initY} },
-            pixels: { height: ${p.h}, width: ${p.w} },
-            orientation: { rows: ${pRowsVal}, columns: ${pColsVal} },
-            down: { row: ${dRow}, start: 0, columns: ${dirCols} },
-            downRight: { row: ${drRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            downLeft: { row: ${dlRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            left: { row: ${lRow}, start: 0, columns: ${dirCols} },
-            right: { row: ${rRow}, start: 0, columns: ${dirCols} },
-            up: { row: ${uRow}, start: 0, columns: ${dirCols} },
-            upLeft: { row: ${ulRow}, start: 0, columns: ${dirCols}, rotate: Math.PI/16 },
-            upRight: { row: ${urRow}, start: 0, columns: ${dirCols}, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: ${hbW}, heightPercentage: ${hbH} },
-            keypress: ${keypress}
-        };`;
-        const classes = [
-            "      { class: GameEnvBackground, data: bgData }",
-            "      { class: Player, data: playerData }"
-        ];
+        const bgGen = background_generate(bg);
+        const playerGen = player_generate(ui, p);
+        const defs = [...bgGen.defs, ...playerGen.defs].join('\n');
+        const classes = [...bgGen.classes, ...playerGen.classes];
         return { defs, classes };
     }
 
-    /* SECTION: Code merge utilities (defs + classes into editor content) */
+    /* SECTION: Code Merge and Class Array Management */
+
+    /**
+     * Merge new entity definitions and class entries into existing editor code
+     * Intelligently removes old definitions before inserting new ones to avoid duplicates
+     * Updates constructor definitions and this.classes array while preserving other code
+     * @param {String} oldCode - The current editor code
+     * @param {String} insertDefs - New entity definitions to insert (e.g., const npcData1 = {...})
+     * @param {Array} insertClasses - New class entries to add to this.classes array
+     * @returns {String} - Merged code with new definitions and updated class array
+     */
     function mergeDefsAndClasses(oldCode, insertDefs, insertClasses) {
         let code = oldCode;
         try {
@@ -2080,8 +2116,20 @@ export const gameLevelClasses = [GameLevelCustom];`;
         return code;
     }
 
+    /* SECTION: Player Control Event Handlers and Live Code Updates */
+
     const mvEl = document.getElementById('movement-keys');
+
+    /**
+     * Trigger code regeneration from controls if in freestyle mode
+     */
     const rerunPlayer = () => { syncFromControlsIfFreestyle(); };
+
+    /**
+     * Apply player UI control changes directly to code without full regeneration
+     * Used for slider controls (scale, step, animation) to provide immediate feedback
+     * Performs in-place code replacement for numeric values and position updates
+     */
     function applyPlayerUIToCodeImmediate() {
         try {
             let code = String(ui.editor?.value || '');
@@ -2128,10 +2176,16 @@ export const gameLevelClasses = [GameLevelCustom];`;
             rerunPlayer();
         }
     }
+    /**
+     * Update player position in code when X/Y input fields change
+     * Marks player as last edited entity for correct code generation
+     */
     function updatePlayerPositionInEditor() {
         state.lastEdited = 'player';
         rerunPlayer();
     }
+
+    // Background change event handler
     if (ui.bg) ui.bg.addEventListener('change', () => { state.lastEdited = 'background'; rerunPlayer(); });
     if (ui.pSprite) ui.pSprite.addEventListener('change', () => {
         try {
@@ -2170,7 +2224,7 @@ export const gameLevelClasses = [GameLevelCustom];`;
     if (ui.pHitboxH) ui.pHitboxH.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); });
     [ui.pDownRow, ui.pRightRow, ui.pLeftRow, ui.pUpRow, ui.pUpRightRow, ui.pDownRightRow, ui.pUpLeftRow, ui.pDownLeftRow, ui.pDirCols]
         .forEach(el => { if (el) el.addEventListener('input', () => { state.lastEdited = 'player'; rerunPlayer(); }); });
-    
+
     ui.npcs.forEach(slot => {
         if (slot.nId) slot.nId.addEventListener('input', () => { state.lastEdited = 'npc'; syncFromControlsIfFreestyle(); });
         if (slot.nId) slot.nId.addEventListener('input', () => {
@@ -2188,7 +2242,18 @@ export const gameLevelClasses = [GameLevelCustom];`;
         if (slot.nY) slot.nY.addEventListener('input', () => { state.lastEdited = 'npc'; syncFromControlsIfFreestyle(); });
     });
 
-    /* SECTION: Confirm handler (apply staged code via typing, then lock fields) */
+    /* SECTION: Confirm Button Handler - Apply Staged Changes with Animation */
+
+    /**
+     * Main confirm button click handler
+     * Applies staged code changes to editor with typing animation
+     * Locks confirmed fields and advances workflow step
+     * Handles multiple scenarios:
+     * - Freestyle mode with NPCs/Walls to merge
+     * - User-edited code with entities to insert
+     * - Step-based workflow progression
+     * - Staged code from UI control changes
+     */
     document.getElementById('btn-confirm').addEventListener('click', () => {
         const btn = document.getElementById('btn-confirm');
         const oldCode = ui.editor.value;
