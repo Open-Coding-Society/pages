@@ -1,29 +1,47 @@
-# course illustrations
-Title: "GameEngine Guide"
-Description: "This is a guide to the OCS GameEngine, featuring GameBuilder, Backgrounds, Characters, and other capabilities."
+# module illustrations
+Title: "Applying Object-Based Game Mechanics"
+Description: "This module introduces the OCS GameEngine and its core mechanics using GameBuilder. Learners explore key objects including Backgrounds, Characters, and Barriers while developing foundational understanding of object properties, interactions, and system behavior. This lesson prepares students to begin designing and implementing their own interactive games within the GameEngine environment."
+
 Topics:
-  - title: "Intoduction"
+  - title: "GameEngine Introduction"
     image: "/gamify/lessons/game-engine-intro.png"
     link: /game/guide/intro
-    alt: "Introduction"
+    alt: "GameEngine Introduction"
     keyPoints:
+      - "Game Loop Logic"
+      - "Game Objects"
+      - "Properties and Updates"
+      - "Interactions and Reactions"
       - "Files and Directories"
-      - "Game Loop logic"
-      - "Interact and React"
-      - "Update and Draw"
-    subtitle: "GameEngine Introduction"
-    description: "This section introduces the core concepts of the GameEngine, including the game loop, key objects, and how to interact and react within the game environment."
+    subtitle: "Engine Architecture and Mechanics"
+    description: "This guide introduces the core architecture of the GameEngine, including the game loop, object lifecycle, interactions, and reaction behaviors. It provides a system-level overview of how objects update, respond, and interact within the engine runtime environment."
 
   - title: "GameBuilder"
     image: "/gamify/lessons/gamebuilder.png"
     link: /gamebuilder
-    alt: "GameBuilder"
+    alt: "GameBuilder Interface"
     keyPoints:
-      - "Assets and Sprites"
-      - "Objects and Interactions"
       - "Visual Design"
-      - "Properties and Reactions"
-    subtitle: "Game Creation Tool"
-    description: "GameBuilder is a powerful tool that allows you to create your own games without needing to write code initially. It provides a visual interface for designing game levels, adding assets, and defining interactions"
+      - "Backgrounds and Characters"
+      - "Objects and Interactions"
+      - "Property Configuration and Editing"
+    subtitle: "Interactive Game Creation Tool"
+    description: "GameBuilder provides a visual interface for configuring game assets and object properties. Learners begin with an asset panel, generate a structured game environment, and incrementally refine mechanics and execute the game using CodeRunner to observe system behavior in real time."
   
+  - title: "Work and Submission Guide"
+    image: "/gamify/lessons/github-game-engine.png"
+    link: /game/guide/files
+    alt: "GameEngine File Structure, Work, and Submission"
+    keyPoints:
+      - "12-Week Template/Group Repository"
+      - "Daily Game Development Workflow"
+      - "GameBuilder Asset Configuration"
+      - "Issue Tracking and Kanban"
+      - "Instructor Fork Repository"
+      - "Instructor-Directed Pull Requests"
+    subtitle: "Structured Development and Selective PR(s)"
+    description: "Students develop their game within a shared template/group repository used throughout the 12-week course. Daily commits, feature development, and asset updates occur within this primary repository. When instructor review or integration is required, students maintain a separate fork repository containing only selected artifacts. Pull Requests are submitted from this fork to support structured, instructor-directed integration of GameBuilder configuration files and assets for this module."
+
+
+ 
 
