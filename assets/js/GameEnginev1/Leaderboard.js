@@ -550,7 +550,10 @@ export default class Leaderboard {
             await this.fetchElementaryLeaderboard();
         } catch (error) {
             console.error('Error adding score:', error);
-            if (error.message && error.message.includes('Failed to fetch')) {
+            // Check for authentication errors (401 or 403 status)
+            if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                alert('Please login to access this feature.');
+            } else if (error.message && error.message.includes('Failed to fetch')) {
                 alert('Network error: Unable to connect to server. Please check if the backend is running.');
             } else {
                 alert(`Failed to save score: ${error.message}`);
@@ -646,7 +649,7 @@ export default class Leaderboard {
                 }
             );
 
-            if (!res.ok) throw new Error(res.status);
+            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             const data = await res.json();
             
             console.log('Received data:', data);
@@ -670,6 +673,14 @@ export default class Leaderboard {
             this.displayElementaryLeaderboard();
         } catch (error) {
             console.error('Error fetching leaderboard:', error);
+            // Check for authentication errors (401 or 403 status)
+            if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                const list = document.getElementById('leaderboard-list');
+                if (list) {
+                    list.innerHTML = '<p class="error">Please login to access this feature.</p>';
+                }
+                return;
+            }
             // Fallback to local data if fetch fails
             const storageKey = `elementary_leaderboard_${this.gameName}`;
             const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -805,12 +816,17 @@ export default class Leaderboard {
                 }
             );
 
-            if (!res.ok) throw new Error(res.status);
+            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             const data = await res.json();
             this.displayLeaderboard(data);
         } catch (err) {
             console.error('Error fetching dynamic leaderboard:', err);
-            list.innerHTML = `<p class="error">Failed to load leaderboard</p>`;
+            // Check for authentication errors (401 or 403 status)
+            if (err.message && (err.message.includes('401') || err.message.includes('403'))) {
+                list.innerHTML = `<p class="error">Please login to access this feature.</p>`;
+            } else {
+                list.innerHTML = `<p class="error">Failed to load leaderboard</p>`;
+            }
         }
     }
 

@@ -362,9 +362,17 @@ export default class ScoreFeature {
                     }
                 } catch (e) {
                     console.error('ScoreFeature: save to backend failed', e);
-                    alert('Save failed!');
-                    if (this.pauseMenu._saveStatusNode) {
-                        this.pauseMenu._saveStatusNode.innerText = 'Backend save failed';
+                    // Check for authentication errors (401 or 403 status)
+                    if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
+                        alert('Please login to access this feature.');
+                        if (this.pauseMenu._saveStatusNode) {
+                            this.pauseMenu._saveStatusNode.innerText = 'Please login to access this feature.';
+                        }
+                    } else {
+                        alert('Save failed!');
+                        if (this.pauseMenu._saveStatusNode) {
+                            this.pauseMenu._saveStatusNode.innerText = 'Backend save failed';
+                        }
                     }
                 }
             } else {
@@ -376,9 +384,17 @@ export default class ScoreFeature {
             }
         } catch (e) {
             console.error('ScoreFeature: save failed', e);
-            alert('Save failed!');
-            if (this.pauseMenu._saveStatusNode) {
-                this.pauseMenu._saveStatusNode.innerText = 'Save failed';
+            // Check for authentication errors (401 or 403 status)
+            if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
+                alert('Please login to access this feature.');
+                if (this.pauseMenu._saveStatusNode) {
+                    this.pauseMenu._saveStatusNode.innerText = 'Please login to access this feature.';
+                }
+            } else {
+                alert('Save failed!');
+                if (this.pauseMenu._saveStatusNode) {
+                    this.pauseMenu._saveStatusNode.innerText = 'Save failed';
+                }
             }
         }
 

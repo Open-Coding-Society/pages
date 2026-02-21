@@ -62,10 +62,12 @@ class GameControl {
         if (saveForRestore) {
             // Save current handlers before cleaning up
             this.savedInteractionHandlers = new Set(this.globalInteractionHandlers);
+            console.log('Saved interaction handlers:', this.savedInteractionHandlers.size);
         }
         
+        console.log('Cleaning up handlers:', this.globalInteractionHandlers.size);
         this.globalInteractionHandlers.forEach(handler => {
-            if (handler.removeInteractKeyListeners) {
+            if (handler && handler.removeInteractKeyListeners && typeof handler.removeInteractKeyListeners === 'function') {
                 handler.removeInteractKeyListeners();
             }
         });
@@ -76,21 +78,39 @@ class GameControl {
      * Restore previously saved interaction handlers (for game-in-game functionality)
      */
     restoreInteractionHandlers() {
+        // Ensure savedInteractionHandlers is initialized
+        if (!this.savedInteractionHandlers) {
+            console.warn('No saved interaction handlers');
+            this.savedInteractionHandlers = new Set();
+            return;
+        }
+        
+        console.log('Restoring interaction handlers:', this.savedInteractionHandlers.size);
+        
         this.savedInteractionHandlers.forEach(handler => {
+            if (!handler) {
+                console.warn('Handler is null/undefined');
+                return;
+            }
             
             // Try multiple possible method names for adding listeners
-            if (handler.bindInteractKeyListeners) {
+            if (handler.bindInteractKeyListeners && typeof handler.bindInteractKeyListeners === 'function') {
+                console.log('Binding interact key listeners');
                 handler.bindInteractKeyListeners();
-            } else if (handler.addInteractKeyListeners) {
+            } else if (handler.addInteractKeyListeners && typeof handler.addInteractKeyListeners === 'function') {
+                console.log('Adding interact key listeners');
                 handler.addInteractKeyListeners();
-            } else if (handler.setupEventListeners) {
+            } else if (handler.setupEventListeners && typeof handler.setupEventListeners === 'function') {
+                console.log('Setting up event listeners');
                 handler.setupEventListeners();
-            } else if (handler.addEventListener) {
+            } else if (handler.addEventListener && typeof handler.addEventListener === 'function') {
+                console.log('Adding event listener');
                 handler.addEventListener();
-            } else if (handler.init) {
+            } else if (handler.init && typeof handler.init === 'function') {
+                console.log('Initializing handler');
                 handler.init();
             } else {
-                console.log("No suitable add method found for handler");
+                console.warn("Handler missing add method:", handler.constructor?.name || 'Unknown');
             }
             
             // Re-register the handler
@@ -98,6 +118,7 @@ class GameControl {
         });
         // Clear saved handlers after restoration
         this.savedInteractionHandlers.clear();
+        console.log('Restored. Global handlers count:', this.globalInteractionHandlers.size);
     }
 
     /**
@@ -264,14 +285,18 @@ class GameControl {
      * Game level in Game Level helper method to pause the underlying game level
      * 1. Set the current game level to paused
      * 2. Remove the exit key listener
-     * 3. Save the current canvas game containers state
-     * 4. Hide the current canvas game containers
+     * Keeps the canvas visible - characters remain on screen
      */
     pause() {
+        // Don't save handlers twice - only save on the first pause
+        if (this.isPaused) {
+            console.log('Already paused, skipping duplicate pause');
+            return;
+        }
+        
+        console.log('Pause called');
         this.isPaused = true;
         this.removeExitKeyListener();
-        this.saveCanvasState();
-        this.hideCanvasState();
         
         // Save interaction handlers before cleaning up for game-in-game
         this.cleanupInteractionHandlers(true);
@@ -281,13 +306,12 @@ class GameControl {
       * Game level in Game Level helper method to resume the underlying game level
       * 1. Set the current game level to not be paused
       * 2. Add the exit key listener
-      * 3. Show the current canvas game containers
-      * 4. Start the game loop
+      * 3. Start the game loop
       */
     resume() {
+        console.log('Resume called - restoring handlers');
         this.isPaused = false;
         this.addExitKeyListener();
-        this.showCanvasState();
         this.gameLoop();
 
         // Restore interaction handlers for outer game
