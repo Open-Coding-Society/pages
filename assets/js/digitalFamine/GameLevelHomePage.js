@@ -2,6 +2,7 @@
 import GameEnvBackground from '../GameEnginev1.5/GameEnvBackground.js';
 import Player from '../GameEnginev1.5/Player.js';
 import Npc from '../GameEnginev1.5/Npc.js';
+import Coin from '../GameEnginev1.5/Coin.js';
 import DialogueSystem from '../GameEnginev2/features/DialogueSystem.js';
 import { initPlanetNavigation } from './planetNavigation.js';
 
@@ -211,6 +212,22 @@ class GameLevelHomePage {
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.1 },
         zIndex: 20
     };
+
+      const sprite_src_coin = path + "/images/platformer/obstacles/coin.png";
+      const sprite_data_coin = {
+        id: 'coin',
+        greeting: false,
+        src: sprite_src_coin,
+        SCALE_FACTOR: 18,
+        ANIMATION_RATE: 1,
+        pixels: { height: 128, width: 128 },
+        INIT_POSITION: { x: width * 0.55, y: height * 0.6 },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+        hitbox: { widthPercentage: 0.25, heightPercentage: 0.25 },
+        zIndex: 12,
+        value: 1
+      };
 
     const dialogueSystem = this.dialogueSystem;
     this.planetData = [];
@@ -491,6 +508,7 @@ class GameLevelHomePage {
     this.classes = [
       { class: GameEnvBackground, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
+      { class: Coin, data: sprite_data_coin },
       { class: Npc, data: sprite_data_cyberplanet },
       { class: Npc, data: sprite_data_medialit },
       { class: Npc, data: sprite_data_ai },

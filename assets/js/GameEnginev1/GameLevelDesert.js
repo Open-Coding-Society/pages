@@ -11,6 +11,7 @@ import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
 import AINpc from '../GameEnginev1.5/ai/AiNpc.js'
+import Coin from '../GameEnginev1.5/Coin.js';
 
 class GameLevelDesert {
  constructor(gameEnv) {
@@ -54,6 +55,18 @@ class GameLevelDesert {
        upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
        hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
        keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
+   };
+
+   const sprite_data_coin = {
+       id: 'coin',
+       greeting: false,
+       INIT_POSITION: { x: (width * 0.6), y: (height * 0.6) },
+    width: 40,
+    height: 70,
+       color: '#FFD700',
+       hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+       zIndex: 12,
+       value: 1
    };
 
 
@@ -924,6 +937,7 @@ class GameLevelDesert {
    this.classes = [
      { class: GamEnvBackground, data: image_data_desert },
      { class: Player, data: sprite_data_chillguy },
+         { class: Coin, data: sprite_data_coin },
      { class: Npc, data: sprite_data_tux },
      { class: Npc, data: sprite_data_octocat },
      { class: Npc, data: sprite_data_robot },
