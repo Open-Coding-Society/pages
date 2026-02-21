@@ -28,20 +28,17 @@ Topics:
     subtitle: "Interactive Game Creation Tool"
     description: "GameBuilder provides a visual interface for configuring game assets and object properties. Learners begin with an asset panel, generate a structured game environment, and incrementally refine mechanics and execute the game using CodeRunner to observe system behavior in real time."
   
-  - title: "Work and Submission Guide"
+  - title: "Logistics and Submission Guide"
     image: "/gamify/lessons/github-game-engine.png"
     link: /game/guide/files
-    alt: "GameEngine File Structure, Work, and Submission"
+    alt: "Logistics and Submission Guide"
     keyPoints:
-      - "12-Week Template/Group Repository"
-      - "Daily Game Development Workflow"
-      - "GameBuilder Asset Configuration"
+      - "12-Week Template/Group Repository (Primary Repo)"
       - "Issue Tracking and Kanban"
-      - "Instructor Fork Repository"
+      - "Individual and Team Code Commits
+      - "Additional 2-hour Mini Sprint logistics"
+      - "Instructor Fork Repository (2nd Repo)"
       - "Instructor-Directed Pull Requests"
     subtitle: "Structured Development and Selective PR(s)"
-    description: "Students develop their game within a shared template/group repository used throughout the 12-week course. Daily commits, feature development, and asset updates occur within this primary repository. When instructor review or integration is required, students maintain a separate fork repository containing only selected artifacts. Pull Requests are submitted from this fork to support structured, instructor-directed integration of GameBuilder configuration files and assets for this module."
-
-
+    description: "Students develop their game within a shared template/group repository used throughout the 12-week course. Daily commits, feature development, and asset updates occur within their primary repository. Pull Requests are submitted from secondary repo (fork) to support structured, instructor-directed integration of GameBuilder configuration files and assets."
  
-
