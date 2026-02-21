@@ -1,28 +1,23 @@
-// To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
+// Copied from GameEnginev1/GameLevelDesert.js and adjusted imports for v1.5
+import GamEnvBackground from './GameEnvBackground.js';
+import Player from './Player.js';
+import Npc from './Npc.js';
 import Quiz from './Quiz.js';
-// Using v1.5 DialogueSystem for improved ID sanitization
-import DialogueSystem from '../GameEnginev1.5/DialogueSystem.js';
-import GameControl from './essentials/GameControl.js';
+import DialogueSystem from './DialogueSystem.js';
+import GameControl from './GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
-import AINpc from '../GameEnginev1.5/ai/AiNpc.js'
-import Coin from '../GameEnginev1.5/Coin.js';
-
-// Import Background for PlatformerMini
-import Background from './essentials/Background.js';
+import AINpc from './ai/AiNpc.js'
+import Coin from './Coin.js';
 
 class GameLevelDesert {
  constructor(gameEnv) {
    let width = gameEnv.innerWidth;
    let height = gameEnv.innerHeight;
    let path = gameEnv.path;
-
 
    // Background data
    const image_src_desert = path + "/images/gamify/desert.png"; // be sure to include the path
@@ -32,9 +27,6 @@ class GameLevelDesert {
        src: image_src_desert,
        pixels: {height: 580, width: 1038}
    };
-
-
-
 
    // Player data for Chillguy
    const sprite_src_chillguy = path + "/images/gamify/chillguy.png"; // be sure to include the path
@@ -73,12 +65,6 @@ class GameLevelDesert {
        value: 1
    };
 
-
-  
-
-
-
-
    // NPC data for Tux
    const sprite_src_tux = path + "/images/gamify/tux.png";
    const sprite_greet_tux = "Hi I am Tux, the Linux mascot. I am very happy to spend some linux shell time with you!";
@@ -104,7 +90,6 @@ class GameLevelDesert {
            "Linux was created by Linus Torvalds in 1991 while he was a student."
        ],
        reaction: function() {
-           // Use dialogue system instead of alert
            if (this.dialogueSystem) {
                this.showReactionDialogue();
            } else {
@@ -112,17 +97,11 @@ class GameLevelDesert {
            }
        },
        interact: function() {
-           // Show random dialogue message
            if (this.dialogueSystem) {
                this.showRandomDialogue();
            }
        }
    };
-
-
-
-
-
 
      const sprite_src_octocat = path + "/images/gamify/octocat.png";
      const sprite_greet_octocat = "Hi I am Octocat! I am the GitHub code code code collaboration mascot";
@@ -137,7 +116,6 @@ class GameLevelDesert {
          orientation: {rows: 1, columns: 4 },
          down: {row: 0, start: 0, columns: 3 },
          hitbox: { widthPercentage: 0.1, heightPercentage: 0.1 },
-         // Add dialogues array for random messages
          dialogues: [
              "GitHub helps millions of developers collaborate on code.",
              "Pull requests are how we suggest changes to repositories.",
@@ -149,7 +127,6 @@ class GameLevelDesert {
              "Collaboration is at the heart of open source development."
          ],
          reaction: function() {
-             // Use dialogue system instead of alert
              if (this.dialogueSystem) {
                  this.showReactionDialogue();
              } else {
@@ -157,7 +134,6 @@ class GameLevelDesert {
              }
          },
          interact: function() {
-             // Show random dialogue message
              if (this.dialogueSystem) {
                  this.showRandomDialogue();
              }
@@ -177,7 +153,6 @@ class GameLevelDesert {
          orientation: {rows: 1, columns: 1 },
          down: {row: 0, start: 0, columns: 1 },
          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-         // Add dialogues array for random messages
          dialogues: [
              "The End dimension awaits brave explorers.",
              "Through this portal lies a realm of floating islands and strange creatures.",
@@ -189,28 +164,22 @@ class GameLevelDesert {
              "Prepare yourself. The journey beyond won't be easy."
          ],
          reaction: function() {
-             // Don't show any reaction dialogue - this prevents the first alert
-             // The interact function will handle all dialogue instead
          },
          interact: function() {
-             // Clear any existing dialogue first to prevent duplicates
              if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
                  this.dialogueSystem.closeDialogue();
              }
             
-             // Create a new dialogue system if needed
              if (!this.dialogueSystem) {
                  this.dialogueSystem = new DialogueSystem();
              }
             
-             // Show portal dialogue with buttons
              this.dialogueSystem.showDialogue(
                  "Do you wish to enter The End dimension?",
                  "End Portal",
                  this.spriteData.src
              );
             
-             // Add buttons directly to the dialogue
              this.dialogueSystem.addButtons([
                  {
                      text: "Enter Portal",
@@ -218,12 +187,9 @@ class GameLevelDesert {
                      action: () => {
                          this.dialogueSystem.closeDialogue();
                         
-                         // Clean up the current game state
                          if (gameEnv && gameEnv.gameControl) {
-                             // Store reference to the current game control
                              const gameControl = gameEnv.gameControl;
                             
-                             // Create fade overlay for transition
                              const fadeOverlay = document.createElement('div');
                              Object.assign(fadeOverlay.style, {
                                  position: 'fixed',
@@ -240,19 +206,14 @@ class GameLevelDesert {
                             
                              console.log("Starting End level transition...");
                             
-                             // Fade in
                              requestAnimationFrame(() => {
                                  fadeOverlay.style.opacity = '1';
                                 
-                                 // After fade in, transition to End level
                                  setTimeout(() => {
-                                     // Clean up current level properly
                                      if (gameControl.currentLevel) {
-                                         // Properly destroy the current level
                                          console.log("Destroying current level...");
                                          gameControl.currentLevel.destroy();
                                         
-                                         // Force cleanup of any remaining canvases
                                          const gameContainer = document.getElementById('gameContainer');
                                          const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
                                          oldCanvases.forEach(canvas => {
@@ -263,21 +224,16 @@ class GameLevelDesert {
                                     
                                      console.log("Setting up End level...");
                                     
-                                     // IMPORTANT: Store the original level classes for return journey
                                      gameControl._originalLevelClasses = gameControl.levelClasses;
                                     
-                                     // Change the level classes to GameLevelEnd
                                      gameControl.levelClasses = [GameLevelEnd];
                                      gameControl.currentLevelIndex = 0;
                                     
-                                     // Make sure game is not paused
                                      gameControl.isPaused = false;
                                     
-                                     // Start the End level with the same control
                                      console.log("Transitioning to End level...");
                                      gameControl.transitionToLevel();
                                     
-                                     // Fade out overlay
                                      setTimeout(() => {
                                          fadeOverlay.style.opacity = '0';
                                          setTimeout(() => {
@@ -298,7 +254,6 @@ class GameLevelDesert {
              ]);
          }
      }
-
 
      const sprite_src_chickenj = path + "/images/gamify/chickenj.png";
      const sprite_greet_chickenj = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
@@ -313,7 +268,6 @@ class GameLevelDesert {
          orientation: {rows: 1, columns: 1 },
          down: {row: 0, start: 0, columns: 1 },
          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-         // Add dialogues array for random messages
          dialogues: [
              "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
              "GRRRRRRRR!!",
@@ -323,116 +277,134 @@ class GameLevelDesert {
              "CHICKEN JOCKEEEYYYY"
          ],
          reaction: function() {
-             // Don't show any reaction dialogue - this prevents the first alert
-             // The interact function will handle all dialogue instead
          },
          interact: function() {
-             // Clear any existing dialogue first to prevent duplicates
              if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
                  this.dialogueSystem.closeDialogue();
              }
             
-             // Create a new dialogue system if needed
              if (!this.dialogueSystem) {
                  this.dialogueSystem = new DialogueSystem();
              }
             
-             // Show portal dialogue with buttons
              this.dialogueSystem.showDialogue(
-                 "Do you follow the Chicken Jockey?",
-                 "Chicken Jockey",
-                 this.spriteData.src
-             );
+                 "Do you wish to enter the plains?",
+                "Chicken Jockey",
+                this.spriteData.src
+            );
             
-             // Add buttons directly to the dialogue
-             this.dialogueSystem.addButtons([
-                 {
-                     text: "Sure!",
-                     primary: true,
-                     action: () => {
-                         this.dialogueSystem.closeDialogue();
-                        
-                         // Clean up the current game state
-                         if (gameEnv && gameEnv.gameControl) {
-                             // Store reference to the current game control
-                             const gameControl = gameEnv.gameControl;
-                            
-                             // Create fade overlay for transition
-                             const fadeOverlay = document.createElement('div');
-                             Object.assign(fadeOverlay.style, {
-                                 position: 'fixed',
-                                 top: '0',
-                                 left: '0',
-                                 width: '100%',
-                                 height: '100%',
-                                 backgroundColor: '#000',
-                                 opacity: '0',
-                                 transition: 'opacity 1s ease-in-out',
-                                 zIndex: '9999'
-                             });
-                             document.body.appendChild(fadeOverlay);
-                            
-                             console.log("You walk after the Chicken Jockey...");
-                            
-                             // Fade in
-                             requestAnimationFrame(() => {
-                                 fadeOverlay.style.opacity = '1';
-                                
-                                 // After fade in, transition to End level
-                                 setTimeout(() => {
-                                     // Clean up current level properly
-                                     if (gameControl.currentLevel) {
-                                         // Properly destroy the current level
-                                         console.log("Destroying current level...");
-                                         gameControl.currentLevel.destroy();
-                                        
-                                         // Force cleanup of any remaining canvases
-                                         const gameContainer = document.getElementById('gameContainer');
-                                         const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
-                                         oldCanvases.forEach(canvas => {
-                                             console.log("Removing old canvas:", canvas.id);
-                                             canvas.parentNode.removeChild(canvas);
-                                         });
-                                     }
-                                    
-                                     console.log("You walk after the Chicken Jockey...");
-                                    
-                                     // IMPORTANT: Store the original level classes for return journey
-                                     gameControl._originalLevelClasses = gameControl.levelClasses;
-                                    
-                                    
-                                     gameControl.levelClasses = [GameLevelOverworld];
-                                     gameControl.currentLevelIndex = 0;
-                                    
-                                     // Make sure game is not paused
-                                     gameControl.isPaused = false;
-                                    
-                                     // Start the End level with the same control
-                                     console.log("You walk after the Chicken Jockey...");
-                                     gameControl.transitionToLevel();
-                                    
-                                     // Fade out overlay
-                                     setTimeout(() => {
-                                         fadeOverlay.style.opacity = '0';
-                                         setTimeout(() => {
-                                             document.body.removeChild(fadeOverlay);
-                                         }, 1000);
-                                     }, 500);
-                                 }, 1000);
-                             });
-                         }
-                     }
-                 },
-                 {
-                     text: "Not Ready",
-                     action: () => {
-                         this.dialogueSystem.closeDialogue();
-                     }
-                 }
-             ]);
+            // Define the action for following the Chicken Jockey so it can be
+            // triggered from a button OR by pressing the 'E' key while nearby.
+            const doFollowChicken = () => {
+                try { localStorage.setItem('autoStartPlatformer', 'true'); } catch (e) { console.warn('localStorage unavailable', e); }
+
+                if (gameEnv && gameEnv.gameControl) {
+                    const gameControl = gameEnv.gameControl;
+
+                    const fadeOverlay = document.createElement('div');
+                    Object.assign(fadeOverlay.style, {
+                        position: 'fixed',
+                        top: '0',
+                        left: '0',
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: '#000',
+                        opacity: '0',
+                        transition: 'opacity 1s ease-in-out',
+                        zIndex: '9999'
+                    });
+                    document.body.appendChild(fadeOverlay);
+
+                    console.log("You walk after the Chicken Jockey...");
+
+                    requestAnimationFrame(() => {
+                        fadeOverlay.style.opacity = '1';
+
+                        setTimeout(() => {
+                            if (gameControl.currentLevel) {
+                                console.log("Destroying current level...");
+                                try { gameControl.currentLevel.destroy(); } catch (e) { console.warn('destroy failed', e); }
+
+                                const gameContainer = document.getElementById('gameContainer');
+                                if (gameContainer) {
+                                    const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                    oldCanvases.forEach(canvas => {
+                                        try { canvas.parentNode.removeChild(canvas); } catch (e) { /* noop */ }
+                                    });
+                                }
+                            }
+
+                            gameControl._originalLevelClasses = gameControl.levelClasses;
+                            gameControl.levelClasses = [GameLevelOverworld];
+                            gameControl.currentLevelIndex = 0;
+                            gameControl.isPaused = false;
+                            gameControl.transitionToLevel();
+
+                            setTimeout(() => {
+                                fadeOverlay.style.opacity = '0';
+                                setTimeout(() => {
+                                    try { document.body.removeChild(fadeOverlay); } catch (e) { /* noop */ }
+                                }, 1000);
+                            }, 500);
+                        }, 1000);
+                    });
+                }
+            };
+
+            // Add buttons (use the shared action)
+            this.dialogueSystem.addButtons([
+                {
+                    text: "Sure!",
+                    primary: true,
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                        doFollowChicken();
+                    }
+                },
+                {
+                    text: "Not Ready",
+                    action: () => {
+                        this.dialogueSystem.closeDialogue();
+                    }
+                }
+            ]);
+
+            // Keyboard shortcut: allow pressing 'E' to choose the primary action
+            const chickenKeyHandler = (event) => {
+                if (!event || typeof event.key !== 'string') return;
+                if (event.key.toLowerCase() !== 'e') return;
+
+                try {
+                    // Ensure the player is near enough to interact
+                    const players = (gameEnv && gameEnv.gameObjects) ? gameEnv.gameObjects.filter(o => o.constructor && o.constructor.name === 'Player') : [];
+                    const dialogueBox = document.getElementById('custom-dialogue-box-' + this.dialogueSystem.id);
+                    let playerNearby = false;
+                    for (const player of players) {
+                        if (!player || !player.canvas) continue;
+                        const pRect = player.canvas.getBoundingClientRect();
+                        const npcRect = (this.canvas && this.canvas.getBoundingClientRect) ? this.canvas.getBoundingClientRect() : null;
+                        if (!npcRect) { playerNearby = true; break; }
+                        const overlap = !(pRect.right < npcRect.left || pRect.left > npcRect.right || pRect.bottom < npcRect.top || pRect.top > npcRect.bottom);
+                        if (overlap) { playerNearby = true; break; }
+                    }
+
+                    if (playerNearby && dialogueBox && this.dialogueSystem.isDialogueOpen()) {
+                        // Close dialogue and perform primary action
+                        this.dialogueSystem.closeDialogue();
+                        doFollowChicken();
+                        document.removeEventListener('keydown', chickenKeyHandler);
+                    }
+                } catch (err) {
+                    console.warn('Chicken Jockey key handler error', err);
+                }
+            };
+
+            // Listen for the key while this dialogue is open; remove after 10s as a safety
+            document.addEventListener('keydown', chickenKeyHandler);
+            setTimeout(() => { document.removeEventListener('keydown', chickenKeyHandler); }, 10000);
          }
      }
-        
+
      const sprite_src_stocks = path + "/images/gamify/stockguy.png";
      const sprite_greet_stocks = "Darn it, I lost some money on the stock market.. come with me to help me out?";
      const sprite_data_stocks = {
@@ -446,7 +418,6 @@ class GameLevelDesert {
          orientation: {rows: 1, columns: 1},
          down: {row: 0, start: 0, columns: 1 },
          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-         // Add dialogues array for random messages
          dialogues: [
              "The stock market is full of opportunities and risks.",
              "Buy low, sell high! That's the golden rule of investing.",
@@ -458,7 +429,6 @@ class GameLevelDesert {
              "Long-term investing beats day trading for most people."
          ],
          reaction: function() {
-             // Use dialogue system instead of alert
              if (this.dialogueSystem) {
                  this.showReactionDialogue();
              } else {
@@ -466,14 +436,11 @@ class GameLevelDesert {
              }
          },
          interact: function() {
-             // Clear any existing dialogue first
              if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
                  this.dialogueSystem.closeDialogue();
              }
             
-             // Show a dialogue with buttons immediately
              if (this.dialogueSystem) {
-                 // Get a random dialogue message if available
                  let message = "I need help analyzing some stocks. Want to check out the market with me?";
                  if (this.spriteData.dialogues && this.spriteData.dialogues.length > 0) {
                      const randomIndex = Math.floor(Math.random() * this.spriteData.dialogues.length);
@@ -486,13 +453,11 @@ class GameLevelDesert {
                      this.spriteData.src
                  );
                 
-                 // Create the buttons container
                  const buttonContainer = document.createElement('div');
                  buttonContainer.style.display = 'flex';
                  buttonContainer.style.justifyContent = 'space-between';
                  buttonContainer.style.marginTop = '10px';
                 
-                 // Create the Yes button
                  const yesButton = document.createElement('button');
                  yesButton.textContent = "Stocks";
                  yesButton.style.padding = '8px 15px';
@@ -503,7 +468,6 @@ class GameLevelDesert {
                  yesButton.style.cursor = 'pointer';
                  yesButton.style.marginRight = '10px';
                 
-                 // Create the No button
                  const noButton = document.createElement('button');
                  noButton.textContent = "Not now";
                  noButton.style.padding = '8px 15px';
@@ -513,7 +477,6 @@ class GameLevelDesert {
                  noButton.style.borderRadius = '5px';
                  noButton.style.cursor = 'pointer';
                 
-                 // Add button functionality
                  yesButton.onclick = () => {
                      window.location.href = "https://pages.opencodingsociety.com/stocks/home";
                  };
@@ -524,14 +487,11 @@ class GameLevelDesert {
                      }
                  };
                 
-                 // Add buttons to container
                  buttonContainer.appendChild(yesButton);
                  buttonContainer.appendChild(noButton);
                 
-                 // Add buttons to dialogue box RIGHT AWAY (no setTimeout)
                  const dialogueBox = document.getElementById('custom-dialogue-box-' + this.dialogueSystem.id);
                  if (dialogueBox) {
-                     // Find the close button to insert before it
                      const closeBtn = dialogueBox.querySelector('button');
                      if (closeBtn) {
                          dialogueBox.insertBefore(buttonContainer, closeBtn);
@@ -540,7 +500,6 @@ class GameLevelDesert {
                      }
                  }
              } else {
-                 // Original functionality as fallback
                  const confirmTeleport = window.confirm("Teleport to the stock market?");
                  if (confirmTeleport) {
                      window.location.href = "https://pages.opencodingsociety.com/stocks/home";
@@ -548,7 +507,6 @@ class GameLevelDesert {
              }
          }
      };
-
 
    const sprite_src_crypto = path + "/images/gamify/bitcoin.png";
    const sprite_greet_crypto = "*cha-ching*";
@@ -563,7 +521,6 @@ class GameLevelDesert {
        orientation: {rows: 1, columns: 1},
        down: {row: 0, start: 0, columns: 1 },
        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-       // Add dialogues array for random messages
        dialogues: [
            "To the moon! 🚀 Crypto prices are always on a wild ride.",
            "Have you heard of blockchain? It's the technology behind cryptocurrencies.",
@@ -575,7 +532,6 @@ class GameLevelDesert {
            "Always do your own research before investing in crypto."
        ],
        reaction: function() {
-           // Use dialogue system instead of alert
            if (this.dialogueSystem) {
                this.showReactionDialogue();
            } else {
@@ -583,14 +539,11 @@ class GameLevelDesert {
            }
        },
        interact: function() {
-           // Clear any existing dialogue first
            if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
                this.dialogueSystem.closeDialogue();
            }
           
-           // Show a dialogue with buttons immediately
            if (this.dialogueSystem) {
-               // Get a random dialogue message if available
                let message = "Feeling lucky? The casino awaits with games of chance and fortune!";
                if (this.spriteData.dialogues && this.spriteData.dialogues.length > 0) {
                    const randomIndex = Math.floor(Math.random() * this.spriteData.dialogues.length);
@@ -603,13 +556,11 @@ class GameLevelDesert {
                    this.spriteData.src
                );
               
-               // Create the buttons container
                const buttonContainer = document.createElement('div');
                buttonContainer.style.display = 'flex';
                buttonContainer.style.justifyContent = 'space-between';
                buttonContainer.style.marginTop = '10px';
               
-               // Create the Yes button
                const yesButton = document.createElement('button');
                yesButton.textContent = "GAMBA !";
                yesButton.style.padding = '8px 15px';
@@ -620,7 +571,6 @@ class GameLevelDesert {
                yesButton.style.cursor = 'pointer';
                yesButton.style.marginRight = '10px';
               
-               // Create the No button
                const noButton = document.createElement('button');
                noButton.textContent = "Not today";
                noButton.style.padding = '8px 15px';
@@ -630,7 +580,6 @@ class GameLevelDesert {
                noButton.style.borderRadius = '5px';
                noButton.style.cursor = 'pointer';
               
-               // Add button functionality
                yesButton.onclick = () => {
                    window.location.href = "https://pages.opencodingsociety.com/gamify/casinohomepage";
                };
@@ -641,14 +590,11 @@ class GameLevelDesert {
                    }
                };
               
-               // Add buttons to container
                buttonContainer.appendChild(yesButton);
                buttonContainer.appendChild(noButton);
               
-               // Add buttons to dialogue box RIGHT AWAY (no setTimeout)
                const dialogueBox = document.getElementById('custom-dialogue-box-' + this.dialogueSystem.id);
                if (dialogueBox) {
-                   // Find the close button to insert before it
                    const closeBtn = dialogueBox.querySelector('button');
                    if (closeBtn) {
                        dialogueBox.insertBefore(buttonContainer, closeBtn);
@@ -657,17 +603,13 @@ class GameLevelDesert {
                    }
                }
            } else {
-               // Original functionality as fallback
                const confirmTeleport = window.confirm("Teleport to gambling hub?");
                if (confirmTeleport) {
                    window.location.href = "https://pages.opencodingsociety.com/gamify/casinohomepage";
                }
            }
        }
-
-
    };
-
 
    const sprite_src_robot = path + "/images/gamify/robot.png";
    const sprite_greet_robot = "Hi I am Robot, the Jupyter Notebook mascot. I am very happy to spend some linux shell time with you!";
@@ -682,7 +624,6 @@ class GameLevelDesert {
        orientation: {rows: 3, columns: 6 },
        down: {row: 1, start: 0, columns: 6 },
        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-       // Add dialogues array for random messages
        dialogues: [
            "Jupyter Notebooks let you mix code, text, and visualizations.",
            "The name Jupyter comes from Julia, Python, and R - popular data science languages.",
@@ -694,7 +635,6 @@ class GameLevelDesert {
            "You can export notebooks to many formats, like HTML and PDF."
        ],
        reaction: function() {
-           // Use dialogue system instead of alert
            if (this.dialogueSystem) {
                this.showReactionDialogue();
            } else {
@@ -702,25 +642,16 @@ class GameLevelDesert {
            }
        },
        interact: function() {
-           // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
-           // Set a primary game reference from the game environment
            let primaryGame = gameEnv.gameControl;
-           // Define the game in game level
            let levelArray = [GameLevelMeteorBlaster];
-           // Define a new GameControl instance with the MeteorBlaster level
            let gameInGame = new GameControl(gameEnv.game, levelArray);
-           // Pause the primary game
            primaryGame.pause();
-           // Start the game in game
            gameInGame.start();
-           // Setup "callback" function to allow transition from game in game to the underlying game
            gameInGame.gameOver = function() {
-               // Call .resume on primary game
                primaryGame.resume();
            }
        }
    };
-
 
      const sprite_src_r2d2 = path + "/images/gamify/r2_idle.png";
      const sprite_greet_r2d2 = "Hi I am R2D2. Leave this planet and help defend the rebel base on Hoth!";
@@ -735,7 +666,6 @@ class GameLevelDesert {
          orientation: {rows: 1, columns: 3 },
          down: {row: 0, start: 0, columns: 3 },
          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-         // Add dialogues array for random messages
          dialogues: [
              "Beep boop! I have important data about the Death Star plans.",
              "The rebels need your help on Hoth. The Empire is approaching!",
@@ -747,7 +677,6 @@ class GameLevelDesert {
              "Imperial forces are on high alert. We must be cautious."
          ],
          reaction: function() {
-             // Use dialogue system instead of alert
              if (this.dialogueSystem) {
                  this.showReactionDialogue();
              } else {
@@ -755,14 +684,11 @@ class GameLevelDesert {
              }
          },
          interact: function() {
-             // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
-             // Set a primary game reference from the game environment
              let primaryGame = gameEnv.gameControl;
              let levelArray = [GameLevelStarWars];
              let gameInGame = new GameControl(gameEnv.game, levelArray);
              primaryGame.pause();
         
-             // Create and style the fade overlay
              const fadeOverlay = document.createElement('div');
              Object.assign(fadeOverlay.style, {
                  position: 'absolute',
@@ -782,30 +708,28 @@ class GameLevelDesert {
                  fontSize: '18px',
                  zIndex: '9999'
              });
-        
+
              const loadingText = document.createElement('div');
              loadingText.textContent = 'Loading...';
              fadeOverlay.appendChild(loadingText);
-        
+
              const loadingBar = document.createElement('div');
              loadingBar.style.marginTop = '10px';
              loadingBar.style.fontFamily = 'monospace';
              loadingBar.textContent = '';
              fadeOverlay.appendChild(loadingBar);
-        
+
              document.body.appendChild(fadeOverlay);
-        
-             // Fade in
+
              requestAnimationFrame(() => {
                  fadeOverlay.style.opacity = '1';
              });
-        
-             // Simulate loading bar
+
              const totalDuration = 1000; // 1 second
              const interval = 100;
              const totalSteps = totalDuration / interval;
              let currentStep = 0;
-        
+
              const loadingInterval = setInterval(() => {
                  currentStep++;
                  loadingBar.textContent += '|';
@@ -813,27 +737,22 @@ class GameLevelDesert {
                      clearInterval(loadingInterval);
                  }
              }, interval);
-        
-             // After loading and fade-in, start the mini-game
+
              setTimeout(() => {
-                 // Start the new game
                  gameInGame.start();
-        
-                 // Setup return to main game after mini-game ends
+
                  gameInGame.gameOver = function() {
                      primaryGame.resume();
                  };
-        
-                 // Fade out
+
                  fadeOverlay.style.opacity = '0';
                  setTimeout(() => {
                      document.body.removeChild(fadeOverlay);
-                 }, 1000); // Wait for fade-out to finish
-        
-             }, totalDuration + 200); // Delay a bit after loading bar finishes
+                 }, 1000);
+
+             }, totalDuration + 200);
          }
      };
-
 
    const sprite_src_minesweeper = path + "/images/gamify/robot.png";
    const sprite_greet_minesweeper = "Want to play a game of Minesweeper? Right-click to flag mines!";
@@ -848,7 +767,6 @@ class GameLevelDesert {
        orientation: {rows: 3, columns: 6},
        down: {row: 1, start: 0, columns: 6},
        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-       // Add dialogues array for random messages
        dialogues: [
            "Minesweeper is all about logic and probability.",
            "The numbers tell you how many mines are adjacent to that square.",
@@ -860,7 +778,6 @@ class GameLevelDesert {
            "Sometimes you have to make an educated guess - that's part of the game."
        ],
        reaction: function() {
-           // Use dialogue system instead of alert
            if (this.dialogueSystem) {
                this.showReactionDialogue();
            } else {
@@ -868,7 +785,6 @@ class GameLevelDesert {
            }
        },
        interact: function() {
-           // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
            let primaryGame = gameEnv.gameControl;
            let levelArray = [GameLevelMinesweeper];
            let gameInGame = new GameControl(gameEnv.game, levelArray);
@@ -893,13 +809,7 @@ class GameLevelDesert {
        posX: width * 0.53,      // ← Add specific X position (center)
        posY: height * 0.28,
        gameEnv: gameEnv,
-
-
-       // Sprite sheet layout
        orientation: { rows: 4, columns: 9 },
-
-
-       // LOCK: use ONLY the 4th row (index 3) for every direction/state
        down:      { row: 3, start: 0, columns: 9 },
        up:        { row: 3, start: 0, columns: 9 },
        left:      { row: 3, start: 0, columns: 9 },
@@ -908,8 +818,6 @@ class GameLevelDesert {
        downRight: { row: 3, start: 0, columns: 9 },
        upLeft:    { row: 3, start: 0, columns: 9 },
        upRight:   { row: 3, start: 0, columns: 9 },
-
-
        knowledgeBase: {
            history: [
            {
@@ -936,7 +844,6 @@ class GameLevelDesert {
        }
        }).getData();
 
-
    // List of objects defnitions for this level
    this.classes = [
      { class: GamEnvBackground, data: image_data_desert },
@@ -955,9 +862,6 @@ class GameLevelDesert {
    ];
  }
 
-
 }
 
-
 export default GameLevelDesert;
-

@@ -1,6 +1,7 @@
 // Npc.js with DialogueSystem integration
 import Character from "./Character.js";
-import DialogueSystem from "../DialogueSystem.js";
+// Using v1.5 DialogueSystem for improved ID sanitization
+import DialogueSystem from "../../GameEnginev1.5/DialogueSystem.js";
 
 class Npc extends Character {
     constructor(data = null, gameEnv = null) {

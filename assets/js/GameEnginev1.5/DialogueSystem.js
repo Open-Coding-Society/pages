@@ -10,7 +10,20 @@ class DialogueSystem {
      "Retrieve the elytra and embrace your destiny!"
    ];
   
-   this.id = options.id || "dialogue_" + Math.random().toString(36).substr(2, 9);
+  // Normalize the provided id to ensure it is a valid DOM token (no spaces or illegal characters)
+  const rawId = options.id || "dialogue_" + Math.random().toString(36).substr(2, 9);
+  // CRITICAL: Always sanitize id - replace spaces with underscores and remove invalid chars
+  this.id = String(rawId)
+    .toLowerCase()
+    .replace(/\s+/g, '_')           // Replace all whitespace with underscore
+    .replace(/[^\w-]/g, '')         // Remove all non-word chars except hyphen
+    .replace(/_+/g, '_')            // Collapse multiple underscores
+    .replace(/^_+|_+$/g, '');       // Trim leading/trailing underscores
+  
+  // Fallback if sanitization resulted in empty string
+  if (!this.id) {
+    this.id = "dialogue_" + Math.random().toString(36).substr(2, 9);
+  }
   
    this.lastShownIndex = -1;
   

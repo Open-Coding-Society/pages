@@ -1286,7 +1286,7 @@ class GameLevelOverworld {
     this.isRunning = false;
 
     window.removeEventListener('keydown', this.keyDownHandler);
-    window.removeEventListener('keyup', this.keyDownHandler);
+    window.removeEventListener('keyup', this.keyUpHandler);
 
     if (this.canvas?.parentNode) {
       this.canvas.parentNode.removeChild(this.canvas);
