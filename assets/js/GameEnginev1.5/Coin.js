@@ -68,6 +68,12 @@ class Coin extends GameObject {
 		this.collected = true;
 		this.collectCooldownUntil = performance.now() + 200;
 		this.collectCount += 1;
+		const gameControl = this.gameEnv?.gameControl;
+		if (gameControl) {
+			gameControl.coinsCollected = (gameControl.coinsCollected || 0) + this.value;
+			if (!gameControl.stats) gameControl.stats = {};
+			gameControl.stats.coinsCollected = (gameControl.stats.coinsCollected || 0) + this.value;
+		}
 		console.log(`Coin collected: ${this.collectCount}`);
 		this.randomizePosition();
 		this.collected = false;

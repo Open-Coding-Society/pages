@@ -21,19 +21,27 @@ export default class ScoreFeature {
         try {
             // Try mansion game settings
             if (window.location.pathname.includes('mansion')) {
-                import('../../../assets/js/mansionGame/scoreSettings.js')
+                import('../mansionGame/scoreSettings.js')
                     .then(mod => {
                         this.scoreSettings = mod.default || mod.scoreSettings;
                         console.log('ScoreFeature: loaded mansion game settings');
+                        if (this._scoreLabel) {
+                            this._scoreLabel.innerText = this._getCounterLabel();
+                        }
+                        this._syncScoreDisplay();
                     })
                     .catch(e => console.debug('Mansion settings not found:', e));
             }
             // Try adventure game settings
             else if (window.location.pathname.includes('adventure') || window.location.pathname.includes('gamify')) {
-                import('../../adventureGame/scoreSettings.js')
+                import('../adventureGame/scoreSettings.js')
                     .then(mod => {
                         this.scoreSettings = mod.default || mod.scoreSettings;
                         console.log('ScoreFeature: loaded adventure game settings');
+                        if (this._scoreLabel) {
+                            this._scoreLabel.innerText = this._getCounterLabel();
+                        }
+                        this._syncScoreDisplay();
                     })
                     .catch(e => console.debug('Adventure settings not found:', e));
             }
