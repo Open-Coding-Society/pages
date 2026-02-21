@@ -29,13 +29,13 @@ Topics:
     description: "GameBuilder provides a visual interface for configuring game assets and object properties. Learners begin with an asset panel, generate a structured game environment, and incrementally refine mechanics and execute the game using CodeRunner to observe system behavior in real time."
   
   - title: "Logistics and Submission Guide"
-    image: "/gamify/lessons/github-game-engine.png"
-    link: /game/guide/files
+    image: "/gamify/lessons/github-kanban.png"
+    link: /game/guide/logistics
     alt: "Logistics and Submission Guide"
     keyPoints:
       - "12-Week Template/Group Repository (Primary Repo)"
       - "Issue Tracking and Kanban"
-      - "Individual and Team Code Commits
+      - "Individual and Team Code Commits"
       - "Additional 2-hour Mini Sprint logistics"
       - "Instructor Fork Repository (2nd Repo)"
       - "Instructor-Directed Pull Requests"
