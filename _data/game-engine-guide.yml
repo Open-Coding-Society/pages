@@ -13,7 +13,7 @@ Topics:
       - "Properties and Updates"
       - "Interactions and Reactions"
     subtitle: "Engine Architecture and Mechanics"
-    description: "**The GameEngine is where students apply object-based mechanics in a larger system.** This guide introduces the core architecture of the GameEngine, including the game loop, object lifecycle, interactions, and reaction behaviors. It provides a system-level overview of how objects update, respond, and interact within the engine runtime environment."
+    description: "<strong>The GameEngine is where students apply object-based mechanics in a larger system.</strong> This guide introduces the core architecture of the GameEngine, including the game loop, object lifecycle, interactions, and reaction behaviors. It provides a system-level overview of how objects update, respond, and interact within the engine runtime environment."
 
   - title: "GameBuilder Visual Interface"
     image: "/gamify/lessons/gamebuilder.png"
@@ -25,7 +25,7 @@ Topics:
       - "Objects and Interactions"
       - "Properties and Tuning"
     subtitle: "Interactive Game Creation Tool"
-    description: "**GameBuilder is the interactive environment that reduces cognitive load when implementing object-based mechanics.** GameBuilder provides a visual interface for configuring game assets and object properties. Learners select assets, generate structured game code, incrementally refine mechanics, and test the game in real time to observe system behavior—all without manual syntax coding."
+    description: "<strong>GameBuilder is the interactive environment that reduces cognitive load when implementing object-based mechanics.</strong> GameBuilder provides a visual interface for configuring game assets and object properties. Learners select assets, generate structured game code, incrementally refine mechanics, and test the game in real time to observe system behavior—all without manual syntax coding."
   
   - title: "Logistics and Submission Guide"
     image: "/gamify/lessons/github-kanban.png"
@@ -38,5 +38,5 @@ Topics:
       - "Instructor Fork Repository"
       - "Selective Pull Requests"
     subtitle: "Structured Development and Assessment Workflow"
-    description: "**GitHub serves as the instructional management and assessment tracking tool.** Students develop their game within a shared team repository used throughout the 12-week course. Daily commits, feature development, and asset updates occur within their primary team repository. Selective Pull Requests are submitted to an instructor's fork repository to support structured, instructor-directed integration and assessment of GameBuilder files and assets."
+    description: "<strong>GitHub serves as the instructional management and assessment tracking tool.</strong> Students develop their game within a shared team repository used throughout the 12-week course. Daily commits, feature development, and asset updates occur within their primary team repository. Selective Pull Requests are submitted to an instructor's fork repository to support structured, instructor-directed integration and assessment of GameBuilder files and assets."
  
