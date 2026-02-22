@@ -223,81 +223,81 @@ class GameCore {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 2px solid #4a9eff;
-            border-radius: 16px;
-            padding: 30px;
+            background: #000;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 24px;
             z-index: 10000;
             min-width: 300px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: none;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         `;
         
         modal.innerHTML = `
-            <h2 style="margin: 0 0 20px 0; color: #fff; text-align: center; font-size: 24px;">
-                ⏸️ Pause Menu
+            <h2 style="margin: 0 0 16px 0; color: #fff; text-align: center; font-size: 22px;">
+                Pause Menu
             </h2>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button id="pause-toggle-score" class="pause-menu-btn" style="
-                    padding: 15px 20px;
-                    background: #2d2d4a;
-                    border: 2px solid #4a9eff;
+                    padding: 12px 16px;
+                    background: #111;
+                    border: 1px solid #333;
                     color: #fff;
                     border-radius: 8px;
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: all 0.2s;
-                ">📊 Toggle Score</button>
+                    transition: all 0.15s;
+                ">Toggle Score</button>
                 
                 <button id="pause-save-score" class="pause-menu-btn" style="
-                    padding: 15px 20px;
-                    background: #2d2d4a;
-                    border: 2px solid #4caf50;
+                    padding: 12px 16px;
+                    background: #111;
+                    border: 1px solid #333;
                     color: #fff;
                     border-radius: 8px;
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: all 0.2s;
-                ">💾 Save Score</button>
+                    transition: all 0.15s;
+                ">Save Score</button>
                 
                 <button id="pause-skip-level" class="pause-menu-btn" style="
-                    padding: 15px 20px;
-                    background: #2d2d4a;
-                    border: 2px solid #ff9800;
+                    padding: 12px 16px;
+                    background: #111;
+                    border: 1px solid #333;
                     color: #fff;
                     border-radius: 8px;
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: all 0.2s;
-                ">⏭️ Skip Level</button>
+                    transition: all 0.15s;
+                ">Skip Level</button>
                 
                 <button id="pause-toggle-leaderboard" class="pause-menu-btn" style="
-                    padding: 15px 20px;
-                    background: #2d2d4a;
-                    border: 2px solid #e91e63;
+                    padding: 12px 16px;
+                    background: #111;
+                    border: 1px solid #333;
                     color: #fff;
                     border-radius: 8px;
-                    font-size: 16px;
+                    font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: all 0.2s;
-                ">🏆 Toggle Leaderboard</button>
+                    transition: all 0.15s;
+                ">Toggle Leaderboard</button>
                 
-                <button id="pause-resume" class="pause-menu-btn" style="
-                    padding: 15px 20px;
-                    background: #4a9eff;
-                    border: 2px solid #4a9eff;
-                    color: #fff;
+                <button id="pause-resume" class="pause-menu-btn primary" style="
+                    padding: 12px 16px;
+                    background: #fff;
+                    border: 1px solid #ddd;
+                    color: #000;
                     border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 600;
+                    font-size: 15px;
+                    font-weight: 700;
                     cursor: pointer;
-                    transition: all 0.2s;
-                    margin-top: 10px;
-                ">▶️ Resume</button>
+                    transition: all 0.15s;
+                    margin-top: 8px;
+                ">Resume</button>
             </div>
         `;
         
@@ -307,7 +307,7 @@ class GameCore {
             buttons.forEach(btn => {
                 btn.addEventListener('mouseenter', () => {
                     btn.style.transform = 'translateY(-2px)';
-                    btn.style.boxShadow = '0 4px 12px rgba(74, 158, 255, 0.3)';
+                    btn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.35)';
                 });
                 btn.addEventListener('mouseleave', () => {
                     btn.style.transform = 'translateY(0)';
