@@ -153,21 +153,20 @@ class GameControl {
      * The main game loop 
      */
     gameLoop() {
-        // If the level is not set to continue, handle the level end condition 
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
             return;
         }
-        // If the game level is paused, stop the game loop
-        if (this.isPaused) {
-            return;
+
+        if (!this.isPaused) {
+            this.currentLevel.update();
+            this.handleInLevelLogic();
         }
-        // Level updates
-        this.currentLevel.update();
-        this.handleInLevelLogic();
-        // Recurse at frame rate speed
+
+        // Always continue loop
         requestAnimationFrame(this.gameLoop.bind(this));
     }
+
 
     /**
      * This method is a placeholder for future logic that needs to be executed during the game loop.
@@ -231,7 +230,7 @@ class GameControl {
             if (this.isPaused) {
                 this.resume();
             } else {
-                this.pause();
+                this.pauseMenu();
             }
         }
     }
@@ -300,7 +299,7 @@ class GameControl {
         
         // Save interaction handlers before cleaning up for game-in-game
         this.cleanupInteractionHandlers(true);
-     }
+    }
 
      /**
       * Game level in Game Level helper method to resume the underlying game level

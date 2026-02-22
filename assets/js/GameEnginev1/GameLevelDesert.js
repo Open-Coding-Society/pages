@@ -708,7 +708,7 @@ class GameLevelDesert {
            // Define a new GameControl instance with the MeteorBlaster level
            let gameInGame = new GameControl(gameEnv.game, levelArray);
            // Pause the primary game
-           primaryGame.pause();
+           primaryGame.pauseGame();
            // Start the game in game
            gameInGame.start();
            // Setup "callback" function to allow transition from game in game to the underlying game
@@ -890,7 +890,7 @@ class GameLevelDesert {
            let primaryGame = gameEnv.gameControl;
            let levelArray = [GameLevelMinesweeper];
            let gameInGame = new GameControl(gameEnv.game, levelArray);
-           primaryGame.pause();
+           primaryGame.pauseGame();
            gameInGame.start();
            gameInGame.gameOver = function() {
                primaryGame.resume();
