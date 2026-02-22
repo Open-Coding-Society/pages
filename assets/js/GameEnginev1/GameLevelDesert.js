@@ -4,15 +4,15 @@ import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 import Quiz from './Quiz.js';
 // Using v1.5 DialogueSystem for improved ID sanitization
-import DialogueSystem from '../GameEnginev1.5/DialogueSystem.js';
+import DialogueSystem from '../GameEnginev1.1/DialogueSystem.js';
 import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import GameLevelOverworld from './GameLevelOverworld.js';
-import AINpc from '../GameEnginev1.5/ai/AiNpc.js'
-import Coin from '../GameEnginev1.5/Coin.js';
+import AINpc from '../GameEnginev1.1/ai/AiNpc.js'
+import Coin from '../GameEnginev1.1/Coin.js';
 
 // Import Background for PlatformerMini
 import Background from './essentials/Background.js';

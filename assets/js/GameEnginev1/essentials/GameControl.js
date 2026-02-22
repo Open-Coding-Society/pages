@@ -288,14 +288,16 @@ class GameControl {
      */
     pause() {
         // Don't save handlers twice - only save on the first pause
-        if (this.isPaused) {
-            console.log('Already paused, skipping duplicate pause');
-            return;
-        }
+        // if (this.isPaused) {
+        //     console.log('Already paused, skipping duplicate pause');
+        //     return;
+        // }
         
         console.log('Pause called');
         this.isPaused = true;
         this.removeExitKeyListener();
+        this.saveCanvasState();
+        //this.hideCanvasState();
         
         // Save interaction handlers before cleaning up for game-in-game
         this.cleanupInteractionHandlers(true);
@@ -311,6 +313,7 @@ class GameControl {
         console.log('Resume called - restoring handlers');
         this.isPaused = false;
         this.addExitKeyListener();
+        this.showCanvasState();
         this.gameLoop();
 
         // Restore interaction handlers for outer game
