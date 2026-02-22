@@ -122,8 +122,6 @@ class GameLevelDesert {
 
 
 
-
-
      const sprite_src_octocat = path + "/images/gamify/octocat.png";
      const sprite_greet_octocat = "Hi I am Octocat! I am the GitHub code code code collaboration mascot";
      const sprite_data_octocat = {
@@ -755,21 +753,17 @@ class GameLevelDesert {
              }
          },
          interact: function() {
-             // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
-             // Set a primary game reference from the game environment
+             // FIXED: Properly clean up the desert level before starting Star Wars game
              let primaryGame = gameEnv.gameControl;
-             let levelArray = [GameLevelStarWars];
-             let gameInGame = new GameControl(gameEnv.game, levelArray);
-             primaryGame.pause();
-        
+            
              // Create and style the fade overlay
              const fadeOverlay = document.createElement('div');
              Object.assign(fadeOverlay.style, {
-                 position: 'absolute',
+                 position: 'fixed',
                  top: '0px',
                  left: '0px',
-                 width: width + 'px',
-                 height: height + 'px',
+                 width: '100%',
+                 height: '100%',
                  backgroundColor: '#0a0a1a',
                  opacity: '0',
                  transition: 'opacity 1s ease-in-out',
@@ -816,9 +810,33 @@ class GameLevelDesert {
         
              // After loading and fade-in, start the mini-game
              setTimeout(() => {
-                 // Start the new game
+                 // FIXED: Properly destroy the current level BEFORE creating the new game
+                 console.log("Destroying current desert level...");
+                 if (primaryGame.currentLevel && primaryGame.currentLevel.destroy) {
+                     primaryGame.currentLevel.destroy();
+                 }
+                
+                 // FIXED: Clear all canvas elements from the DOM
+                 const gameContainer = document.getElementById('gameContainer');
+                 if (gameContainer) {
+                     // Remove all canvases except the main gameCanvas
+                     const canvases = gameContainer.querySelectorAll('canvas');
+                     canvases.forEach(canvas => {
+                         if (canvas.id !== 'gameCanvas') {
+                             console.log("Removing canvas:", canvas.id);
+                             canvas.remove();
+                         }
+                     });
+                 }
+                
+                 // Pause the primary game
+                 primaryGame.pause();
+                
+                 // Now create and start the new game
+                 let levelArray = [GameLevelStarWars];
+                 let gameInGame = new GameControl(gameEnv.game, levelArray);
                  gameInGame.start();
-        
+                
                  // Setup return to main game after mini-game ends
                  gameInGame.gameOver = function() {
                      primaryGame.resume();
@@ -960,4 +978,3 @@ class GameLevelDesert {
 
 
 export default GameLevelDesert;
-
