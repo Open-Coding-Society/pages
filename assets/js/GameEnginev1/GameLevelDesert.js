@@ -902,7 +902,7 @@ class GameLevelDesert {
        id: "ProfessorHistory", 
        greeting: "Hello! I'm an expert in history!",
        expertise: "history",
-       sprite: path + "/assets/js/GameEnginev1.5/ai/HistoryProf.png",
+       sprite: path + "/assets/js/GameEnginev1.1/ai/HistoryProf.png",
        spriteWidth: 559,
        spriteHeight: 263,
        scaleFactor: 0.5,
