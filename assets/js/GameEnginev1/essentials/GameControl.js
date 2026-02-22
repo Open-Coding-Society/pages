@@ -249,12 +249,25 @@ class GameControl {
     saveCanvasState() {
         const gameContainer = document.getElementById('gameContainer');
         const canvasElements = gameContainer.querySelectorAll('canvas');
-        this.savedCanvasState = Array.from(canvasElements).map(canvas => {
-            return {
-                id: canvas.id,
-                imageData: canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
-            };
-        });
+        // Only save non-background canvases to avoid overwriting dynamic background
+        // layers which redraw themselves on resume.
+        this.savedCanvasState = Array.from(canvasElements)
+            .filter(canvas => {
+                const id = canvas.id || '';
+                // Exclude canvases with ids that indicate background layers
+                return !/background/i.test(id);
+            })
+            .map(canvas => {
+                try {
+                    return {
+                        id: canvas.id,
+                        imageData: canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
+                    };
+                } catch (e) {
+                    console.warn('Could not capture canvas imageData for', canvas.id, e);
+                    return { id: canvas.id, imageData: null };
+                }
+            });
     }
 
     // Helper method to hide the current canvas state in the game container
@@ -275,7 +288,13 @@ class GameControl {
             const canvas = document.getElementById(hidden_canvas.id);
             if (canvas) {
                 canvas.style.display = 'block';
-                canvas.getContext('2d').putImageData(hidden_canvas.imageData, 0, 0);
+                if (hidden_canvas.imageData) {
+                    try {
+                        canvas.getContext('2d').putImageData(hidden_canvas.imageData, 0, 0);
+                    } catch (e) {
+                        console.warn('Failed to restore canvas imageData for', hidden_canvas.id, e);
+                    }
+                }
             }
         });
     }
@@ -314,7 +333,9 @@ class GameControl {
         this.isPaused = false;
         this.addExitKeyListener();
         this.showCanvasState();
-        this.gameLoop();
+        // Do NOT call gameLoop() here. The main loop continues to run while
+        // paused (it skips updates when `isPaused` is true). Restarting the
+        // loop here can create duplicate loops and speed up game objects.
 
         // Restore interaction handlers for outer game
         this.restoreInteractionHandlers();
