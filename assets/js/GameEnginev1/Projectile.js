@@ -15,6 +15,8 @@ class Projectile extends Character {
         this.endScaleFactor = data.TRANSLATE_SCALE_FACTOR;
         this.randomDelay = 0;
         this.delayStartTime = null;
+        this._pausedAt = null;
+        this._pausedAccum = 0;
     }
 
     /**
@@ -42,8 +44,20 @@ class Projectile extends Character {
      * Restart the projectile if the animation reaches the end
      */
     update() {
+        // If the game is paused, track pause time and skip updating
+        if (this.gameEnv && this.gameEnv.gameControl && this.gameEnv.gameControl.isPaused) {
+            if (this._pausedAt === null) this._pausedAt = Date.now();
+            return;
+        }
+
+        // If we were paused, accumulate the paused duration so animation doesn't jump
+        if (this._pausedAt !== null) {
+            this._pausedAccum += Date.now() - this._pausedAt;
+            this._pausedAt = null;
+        }
+
         // Calculate the progress of the animation
-        const elapsedTime = Date.now() - this.startTime;
+        const elapsedTime = Date.now() - this.startTime - this._pausedAccum;
         const progress = Math.min(elapsedTime / this.duration, 1);
 
         // If the animation reaches the end, trigger explosion and set delay
@@ -52,8 +66,13 @@ class Projectile extends Character {
                 this.triggerExplosion();
                 this.randomDelay = Math.random() * this.data.TRANSLATE_SIMULATION.miliseconds * 5;
                 this.delayStartTime = Date.now();
-            } else if (Date.now() - this.delayStartTime >= this.randomDelay) {
-                this.restart();
+            } else {
+                // If paused, don't advance the delay timer
+                const now = Date.now();
+                const effectiveDelayStart = this.delayStartTime + (this._pausedAccum || 0);
+                if (now - effectiveDelayStart >= this.randomDelay) {
+                    this.restart();
+                }
             }
             return; // Exit the update method to prevent further updates until restart
         }
@@ -101,6 +120,9 @@ class Projectile extends Character {
         this.position = { ...this.startPosition };
         this.scaleFactor = this.startScaleFactor;
         this.canvas.style.display = "block";
+        // reset pause tracking when restarting
+        this._pausedAt = null;
+        this._pausedAccum = 0;
     }
 
     /**

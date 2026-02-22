@@ -30,6 +30,10 @@ class GameControl {
 
     
     start() {
+        // Mark this GameControl as the currently active control on the Game host
+        try {
+            if (this.game) this.game.activeGameControl = this;
+        } catch (e) {}
         this.addExitKeyListener();
         this.transitionToLevel();
     }
@@ -201,6 +205,13 @@ class GameControl {
         this.currentLevel.destroy();
         
         // Call the gameOver callback if it exists
+        // If this control was registered as the active game on the host, unset it
+        try {
+            if (this.game && this.game.activeGameControl === this) {
+                this.game.activeGameControl = null;
+            }
+        } catch (e) {}
+
         if (this.gameOver) {
             this.gameOver();
         } else {

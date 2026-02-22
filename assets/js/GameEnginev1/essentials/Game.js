@@ -192,6 +192,11 @@ class GameCore {
         }
     }
 
+    // Return the currently active GameControl (mini-game may set activeGameControl)
+    getActiveControl() {
+        return (this.activeGameControl && this.activeGameControl !== null) ? this.activeGameControl : this.gameControl;
+    }
+
     /**
      * Show the pause menu modal with 4 options:
      * - Show Score: displays the score counter
@@ -200,7 +205,7 @@ class GameCore {
      * - Toggle Leaderboard: shows/hides the leaderboard
      */
     showPauseModal() {
-        if (!this.gameControl) return;
+        if (!this.getActiveControl()) return;
         
         // Remove existing modal if any
         const existingModal = document.getElementById('pauseModal');
@@ -209,10 +214,11 @@ class GameCore {
         }
         
         // Pause the game - MUST call gameControl.pause() to properly save handlers
-        if (this.gameControl.pause) {
-            this.gameControl.pause();
-        } else if (this.gameControl.pauseFeature) {
-            this.gameControl.pauseFeature.show();
+        const ctrl = this.getActiveControl();
+        if (ctrl.pause) {
+            ctrl.pause();
+        } else if (ctrl.pauseFeature) {
+            ctrl.pauseFeature.show();
         }
         
         // Create the modal
@@ -338,34 +344,34 @@ class GameCore {
         }
         
         // Resume the game - MUST call gameControl.resume() to properly restore handlers
-        if (this.gameControl) {
-            this.gameControl.isPaused = false;
-            if (typeof this.gameControl.resume === 'function') {
-                this.gameControl.resume();
+        const ctrl = this.getActiveControl();
+        if (ctrl) {
+            ctrl.isPaused = false;
+            if (typeof ctrl.resume === 'function') {
+                ctrl.resume();
             } else {
-                // Fallback: manually restore handlers if resume doesn't exist
-                if (typeof this.gameControl.restoreInteractionHandlers === 'function') {
-                    this.gameControl.restoreInteractionHandlers();
+                if (typeof ctrl.restoreInteractionHandlers === 'function') {
+                    ctrl.restoreInteractionHandlers();
                 }
-                // Restart the game loop
-                if (typeof this.gameControl.gameLoop === 'function') {
-                    this.gameControl.gameLoop();
+                if (typeof ctrl.gameLoop === 'function') {
+                    ctrl.gameLoop();
                 }
             }
         }
         
-        // If scoreFeature exists, toggle the score counter
-        if (this.gameControl && this.gameControl.scoreFeature) {
+        // If scoreFeature exists on the active control, toggle the score counter
+        const scoreCtrl = this.getActiveControl();
+        if (scoreCtrl && scoreCtrl.scoreFeature) {
             const scoreCounter = document.querySelector('.pause-score-counter');
             if (scoreCounter) {
                 const isVisible = scoreCounter.style.display !== 'none';
                 scoreCounter.style.display = isVisible ? 'none' : 'block';
             }
-            if (typeof this.gameControl.toggleScoreDisplay === 'function') {
-                this.gameControl.toggleScoreDisplay();
+            if (typeof scoreCtrl.toggleScoreDisplay === 'function') {
+                scoreCtrl.toggleScoreDisplay();
             }
         } else {
-            console.warn('ScoreFeature not initialized');
+            console.warn('ScoreFeature not initialized on active control');
         }
     }
 
@@ -380,34 +386,33 @@ class GameCore {
         }
         
         // Resume the game first - MUST call gameControl.resume() to properly restore handlers
-        if (this.gameControl) {
-            this.gameControl.isPaused = false;
-            if (typeof this.gameControl.resume === 'function') {
-                this.gameControl.resume();
+        const ctrl = this.getActiveControl();
+        if (ctrl) {
+            ctrl.isPaused = false;
+            if (typeof ctrl.resume === 'function') {
+                ctrl.resume();
             } else {
-                // Fallback: manually restore handlers if resume doesn't exist
-                if (typeof this.gameControl.restoreInteractionHandlers === 'function') {
-                    this.gameControl.restoreInteractionHandlers();
+                if (typeof ctrl.restoreInteractionHandlers === 'function') {
+                    ctrl.restoreInteractionHandlers();
                 }
-                // Restart the game loop
-                if (typeof this.gameControl.gameLoop === 'function') {
-                    this.gameControl.gameLoop();
+                if (typeof ctrl.gameLoop === 'function') {
+                    ctrl.gameLoop();
                 }
             }
         }
         
-        // If scoreFeature exists, save the score
-        if (this.gameControl && this.gameControl.scoreFeature) {
+        // If scoreFeature exists on the active control, save the score
+        const scoreCtrl = this.getActiveControl();
+        if (scoreCtrl && scoreCtrl.scoreFeature) {
             try {
-                // Get the button element if available, otherwise create a temporary one
                 const buttonEl = document.createElement('button');
-                await this.gameControl.scoreFeature.saveScore(buttonEl);
+                await scoreCtrl.scoreFeature.saveScore(buttonEl);
             } catch (error) {
                 console.error('Failed to save score:', error);
                 alert('Failed to save score. Please try again.');
             }
         } else {
-            console.warn('ScoreFeature not initialized');
+            console.warn('ScoreFeature not initialized on active control');
             alert('Score feature not available');
         }
     }
@@ -422,47 +427,43 @@ class GameCore {
             modal.remove();
         }
         
-        // Unpause the game first - MUST call gameControl.resume() to properly restore handlers
-        if (this.gameControl) {
-            this.gameControl.isPaused = false;
-            
-            // Call resume first to ensure game is running
-            if (typeof this.gameControl.resume === 'function') {
-                this.gameControl.resume();
+        // Unpause the active control first - MUST call resume() to properly restore handlers
+        const ctrl = this.getActiveControl();
+        if (ctrl) {
+            ctrl.isPaused = false;
+
+            if (typeof ctrl.resume === 'function') {
+                ctrl.resume();
             } else {
-                // Fallback: manually restore handlers if resume doesn't exist
-                if (typeof this.gameControl.restoreInteractionHandlers === 'function') {
-                    this.gameControl.restoreInteractionHandlers();
+                if (typeof ctrl.restoreInteractionHandlers === 'function') {
+                    ctrl.restoreInteractionHandlers();
                 }
-                // Restart the game loop
-                if (typeof this.gameControl.gameLoop === 'function') {
-                    this.gameControl.gameLoop();
+                if (typeof ctrl.gameLoop === 'function') {
+                    ctrl.gameLoop();
                 }
             }
-            
-            // Try to find and call the correct method to skip level
-            // Common method names for skipping level - try in order
-            if (typeof this.gameControl.nextLevel === 'function') {
-                this.gameControl.nextLevel();
-                console.log('Skipped level via nextLevel()');
-            } else if (typeof this.gameControl.loadNextLevel === 'function') {
-                this.gameControl.loadNextLevel();
-                console.log('Skipped level via loadNextLevel()');
-            } else if (typeof this.gameControl.goToNextLevel === 'function') {
-                this.gameControl.goToNextLevel();
-                console.log('Skipped level via goToNextLevel()');
-            } else if (typeof this.gameControl.endLevel === 'function') {
-                this.gameControl.endLevel();
-                console.log('Skipped level via endLevel()');
-            } else if (typeof this.gameControl.transitionToLevel === 'function') {
-                // Try to advance to next level index
-                if (typeof this.gameControl.currentLevelIndex !== 'undefined') {
-                    this.gameControl.currentLevelIndex++;
+
+            // Try to find and call the correct method to skip level on the active control
+            if (typeof ctrl.nextLevel === 'function') {
+                ctrl.nextLevel();
+                console.log('Skipped level via nextLevel() on active control');
+            } else if (typeof ctrl.loadNextLevel === 'function') {
+                ctrl.loadNextLevel();
+                console.log('Skipped level via loadNextLevel() on active control');
+            } else if (typeof ctrl.goToNextLevel === 'function') {
+                ctrl.goToNextLevel();
+                console.log('Skipped level via goToNextLevel() on active control');
+            } else if (typeof ctrl.endLevel === 'function') {
+                ctrl.endLevel();
+                console.log('Skipped level via endLevel() on active control');
+            } else if (typeof ctrl.transitionToLevel === 'function') {
+                if (typeof ctrl.currentLevelIndex !== 'undefined') {
+                    ctrl.currentLevelIndex++;
                 }
-                this.gameControl.transitionToLevel();
-                console.log('Skipped level via transitionToLevel()');
+                ctrl.transitionToLevel();
+                console.log('Skipped level via transitionToLevel() on active control');
             } else {
-                console.warn('No skip level method found on gameControl');
+                console.warn('No skip level method found on active control');
             }
         }
     }
@@ -477,19 +478,18 @@ class GameCore {
             modal.remove();
         }
         
-        // Resume game first - MUST call gameControl.resume() to properly restore handlers
-        if (this.gameControl) {
-            this.gameControl.isPaused = false;
-            if (typeof this.gameControl.resume === 'function') {
-                this.gameControl.resume();
+        // Resume the active control first - MUST call resume() to properly restore handlers
+        const ctrl = this.getActiveControl();
+        if (ctrl) {
+            ctrl.isPaused = false;
+            if (typeof ctrl.resume === 'function') {
+                ctrl.resume();
             } else {
-                // Fallback: manually restore handlers if resume doesn't exist
-                if (typeof this.gameControl.restoreInteractionHandlers === 'function') {
-                    this.gameControl.restoreInteractionHandlers();
+                if (typeof ctrl.restoreInteractionHandlers === 'function') {
+                    ctrl.restoreInteractionHandlers();
                 }
-                // Restart the game loop
-                if (typeof this.gameControl.gameLoop === 'function') {
-                    this.gameControl.gameLoop();
+                if (typeof ctrl.gameLoop === 'function') {
+                    ctrl.gameLoop();
                 }
             }
         }
@@ -521,42 +521,40 @@ class GameCore {
             // Leaderboard container not found - create it
             console.log('Leaderboard container not found, creating new...');
             
-            if (this.gameControl) {
-                import('../Leaderboard.js')
-                    .then(mod => {
-                        // Determine parent - use gameContainer if available
-                        let parentId = 'gameContainer';
-                        if (typeof this.gameContainer === 'string') {
-                            parentId = this.gameContainer;
-                        } else if (this.gameContainer instanceof HTMLElement) {
-                            parentId = this.gameContainer.id || 'gameContainer';
-                        }
-                        
-                        this.leaderboardInstance = new mod.default(this.gameControl, { 
-                            gameName: 'AdventureGame',
-                            parentId: parentId,
-                            initiallyHidden: false
-                        });
-                        
-                        // Force positioning after creation - use fixed positioning
-                        setTimeout(() => {
-                            const container = document.getElementById('leaderboard-container');
-                            if (container) {
-                                // CRITICAL: Always use fixed positioning
-                                container.style.position = 'fixed';
-                                container.style.top = '80px';
-                                container.style.right = '20px';
-                                container.style.left = 'auto';
-                                container.style.zIndex = '1000';
-                            }
-                        }, 100);
-                        
-                        console.log('Leaderboard created and shown with fixed positioning');
-                    })
-                    .catch(err => {
-                        console.warn('Failed to create leaderboard:', err);
+            const ctrlForLeaderboard = this.getActiveControl();
+            import('../Leaderboard.js')
+                .then(mod => {
+                    // Determine parent - use gameContainer if available
+                    let parentId = 'gameContainer';
+                    if (typeof this.gameContainer === 'string') {
+                        parentId = this.gameContainer;
+                    } else if (this.gameContainer instanceof HTMLElement) {
+                        parentId = this.gameContainer.id || 'gameContainer';
+                    }
+
+                    this.leaderboardInstance = new mod.default(ctrlForLeaderboard || this.gameControl, { 
+                        gameName: 'AdventureGame',
+                        parentId: parentId,
+                        initiallyHidden: false
                     });
-            }
+
+                    // Force positioning after creation - use fixed positioning
+                    setTimeout(() => {
+                        const container = document.getElementById('leaderboard-container');
+                        if (container) {
+                            container.style.position = 'fixed';
+                            container.style.top = '80px';
+                            container.style.right = '20px';
+                            container.style.left = 'auto';
+                            container.style.zIndex = '1000';
+                        }
+                    }, 100);
+
+                    console.log('Leaderboard created and shown with fixed positioning');
+                })
+                .catch(err => {
+                    console.warn('Failed to create leaderboard:', err);
+                });
         }
     }
 
@@ -569,28 +567,25 @@ class GameCore {
             modal.remove();
         }
         
-        // Resume the game - use gameControl methods directly
-        if (this.gameControl) {
-            this.gameControl.isPaused = false;
-            
-            // Call resume on gameControl if available (this handles restoring handlers)
-            if (typeof this.gameControl.resume === 'function') {
-                this.gameControl.resume();
+        // Resume the active control - use its methods if available
+        const ctrl = this.getActiveControl();
+        if (ctrl) {
+            ctrl.isPaused = false;
+
+            if (typeof ctrl.resume === 'function') {
+                ctrl.resume();
             } else {
-                // Fallback: manually restore handlers if resume doesn't exist
-                if (typeof this.gameControl.restoreInteractionHandlers === 'function') {
-                    this.gameControl.restoreInteractionHandlers();
+                if (typeof ctrl.restoreInteractionHandlers === 'function') {
+                    ctrl.restoreInteractionHandlers();
                 }
-                // Restart the game loop
-                if (typeof this.gameControl.gameLoop === 'function') {
-                    this.gameControl.gameLoop();
+                if (typeof ctrl.gameLoop === 'function') {
+                    ctrl.gameLoop();
                 }
             }
-            
-            // Also try pauseFeature.hide() if it exists
-            if (this.gameControl.pauseFeature && typeof this.gameControl.pauseFeature.hide === 'function') {
+
+            if (ctrl.pauseFeature && typeof ctrl.pauseFeature.hide === 'function') {
                 try {
-                    this.gameControl.pauseFeature.hide();
+                    ctrl.pauseFeature.hide();
                 } catch (e) {
                     console.warn('pauseFeature.hide() failed:', e);
                 }
@@ -614,30 +609,32 @@ class GameCore {
                 
                 // If there's already a pause modal open, close it and resume
                 const existingModal = document.getElementById('pauseModal');
-                if (existingModal) {
-                    existingModal.remove();
-                    // Resume the game - MUST call gameControl.resume() to properly restore handlers
-                    if (this.gameControl) {
-                        this.gameControl.isPaused = false;
-                        if (typeof this.gameControl.resume === 'function') {
-                            this.gameControl.resume();
+                    if (existingModal) {
+                        existingModal.remove();
+                        // Resume the active control - MUST call resume() to properly restore handlers
+                        const ctrl = this.getActiveControl();
+                        if (ctrl) {
+                            ctrl.isPaused = false;
+                            if (typeof ctrl.resume === 'function') {
+                                ctrl.resume();
+                            }
                         }
-                    }
                     return;
                 }
                 
                 // Show pause modal if method exists (adventure game)
-                if (typeof this.showPauseModal === 'function') {
+                    if (typeof this.showPauseModal === 'function') {
                     this.showPauseModal();
                 } else {
-                    // Fallback: simple pause/resume toggle
-                    if (this.gameControl && this.gameControl.isPaused) {
-                        this.gameControl.isPaused = false;
-                        if (typeof this.gameControl.resume === 'function') {
-                            this.gameControl.resume();
+                    // Fallback: simple pause/resume toggle on active control
+                    const ctrl = this.getActiveControl();
+                    if (ctrl && ctrl.isPaused) {
+                        ctrl.isPaused = false;
+                        if (typeof ctrl.resume === 'function') {
+                            ctrl.resume();
                         }
-                    } else if (this.gameControl && this.gameControl.pause) {
-                        this.gameControl.pause();
+                    } else if (ctrl && ctrl.pause) {
+                        ctrl.pause();
                     }
                 }
             }

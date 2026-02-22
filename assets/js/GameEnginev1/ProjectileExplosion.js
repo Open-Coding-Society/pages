@@ -12,14 +12,28 @@ class ProjectileExplosion extends Character {
         this.drop = this.position.y;
         this.startScaleFactor = data.SCALE_FACTOR;
         this.endScaleFactor = data.EXPLOSION_SCALE_FACTOR;
+        this._pausedAt = null;
+        this._pausedAccum = 0;
     }
 
     /**
      * Update the explosion's position and size based on the animation progress
      */
     update() {
+        // If game paused, track pause time and skip updates
+        if (this.gameEnv && this.gameEnv.gameControl && this.gameEnv.gameControl.isPaused) {
+            if (this._pausedAt === null) this._pausedAt = Date.now();
+            return;
+        }
+
+        // If unpausing, accumulate paused duration
+        if (this._pausedAt !== null) {
+            this._pausedAccum += Date.now() - this._pausedAt;
+            this._pausedAt = null;
+        }
+
         // Calculate the progress of the animation
-        const elapsedTime = Date.now() - this.startTime;
+        const elapsedTime = Date.now() - this.startTime - this._pausedAccum;
         const progress = Math.min(elapsedTime / this.duration, 1);
 
         // Apply a non-linear drop speed (ease-in effect)
