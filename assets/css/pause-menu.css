@@ -4,43 +4,61 @@
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.85);
   z-index: 2000;
 }
 
 .pause-panel {
-  background: #111;
+  background: #000;
   color: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  min-width: 260px;
+  padding: 20px;
+  border: 8px solid #fff;
+  border-radius: 0;
+  min-width: 400px;
   text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.9);
+  font-family: 'Courier New', monospace;
 }
 
 .pause-title {
-  margin: 0 0 12px 0;
-  font-size: 1.4rem;
+  margin: 0 0 20px 0;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Courier New', monospace;
 }
 
 .pause-btn {
   display: block;
   width: 100%;
-  margin: 8px 0;
-  padding: 10px 12px;
-  background: #222;
+  margin: 16px 0;
+  padding: 16px 12px;
+  background: #000;
   color: #fff;
-  border: 1px solid #333;
-  border-radius: 6px;
+  border: 3px solid #fff;
+  border-radius: 0;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+  transition: all 0.1s ease;
 }
 
-.pause-btn:hover { background: #2a2a2a; }
-.pause-btn:active { transform: translateY(1px); }
-.pause-btn.resume { background: linear-gradient(180deg,#3a8ef7,#1266d8); border: none; }
-.pause-btn.restart { background: linear-gradient(180deg,#e86b6b,#d43b3b); border: none; }
-.pause-btn.exit { background: linear-gradient(180deg,#666,#444); border: none; }
+.pause-btn:hover { 
+  background: #fff; 
+  color: #000;
+  transform: scale(1.02);
+}
+.pause-btn:active { transform: scale(0.98); }
+.pause-btn.resume { background: #000; border-color: #fff; color: #fff; }
+.pause-btn.resume:hover { background: #fff; color: #000; }
+.pause-btn.restart { background: #000; border-color: #fff; color: #fff; }
+.pause-btn.restart:hover { background: #fff; color: #000; }
+.pause-btn.exit { background: #000; border-color: #fff; color: #fff; }
+.pause-btn.exit:hover { background: #fff; color: #000; }
 
 /* Top control bar (Settings/Leaderboard) */
 .pause-button-bar {
@@ -64,13 +82,14 @@
   position: fixed;
   top: 100px;
   left: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  background: #000;
+  border: 3px solid #fff;
+  border-radius: 0;
   padding: 10px;
   display: none;
   gap: 10px;
   z-index: 9998;
+  font-family: 'Courier New', monospace;
 }
 
 .pause-controls-dropdown.is-open {
@@ -92,20 +111,24 @@
   justify-content: center;
   gap: 12px;
   margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
 }
 .pause-counter-label {
-  color: #bbb;
+  color: #fff;
   font-size: 0.9rem;
+  text-transform: uppercase;
 }
 .pause-counter-number {
-  background: linear-gradient(180deg,#ffd166,#f7b733);
-  color: #111;
+  background: #fff;
+  color: #000;
   font-weight: 700;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 0;
+  border: 2px solid #fff;
   min-width: 40px;
   text-align: center;
   font-size: 1.1rem;
+  font-family: 'Courier New', monospace;
 }
 
 /* Stats area inside the panel */
@@ -116,11 +139,14 @@
   margin: 8px 0 12px 0;
 }
 .pause-stat {
-  background: rgba(255,255,255,0.04);
+  background: #000;
   padding: 6px 10px;
-  border-radius: 6px;
-  color: #ddd;
+  border: 2px solid #fff;
+  border-radius: 0;
+  color: #fff;
   font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
 }
 
 /* Make skip and exit buttons sit together */
