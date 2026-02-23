@@ -36,7 +36,11 @@ class Coin extends GameObject {
 		if (!this.ctx) return;
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.ctx.fillStyle = this.color;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		// Draw a circle instead of a rectangle
+		const radius = Math.min(this.canvas.width, this.canvas.height) / 2;
+		this.ctx.beginPath();
+		this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, radius, 0, Math.PI * 2);
+		this.ctx.fill();
 	}
 
 	resize() {
