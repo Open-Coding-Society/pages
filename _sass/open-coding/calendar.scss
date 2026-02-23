@@ -1,41 +1,50 @@
-// Modal styles
+// ===========================
+// Calendar Styles
+// ===========================
+// Uses CSS custom properties from user-preferences.js for theme consistency.
+// All colors are derived from the user's chosen theme so every preset
+// (dark, light, sepia, etc.) works without hard-coded values.
+//
+// Available CSS custom properties (set by user-preferences.js):
+//   --pref-bg-color, --pref-text-color, --pref-font-family, --pref-font-size
+//   --pref-accent-color, --pref-selection-color
+//   --panel, --panel-mid, --bg-0, --bg-1, --bg-2, --bg-3
+//   --text, --text-strong, --text-muted, --accent, --ui-border
+// ===========================
+
+@import "mixins/buttons";
+@import "mixins/modals";
+@import "mixins/panel";
+
+// ===========================
+// Priority Color Palette
+// ===========================
+// Semantic hues for each priority level. SASS variables provide compile-time
+// defaults; CSS custom properties (--priority-p0 … --priority-p3) are set
+// at runtime by user-preferences.js so each theme can supply its own hues.
+// The mixin uses var(--priority-pN, $fallback) so everything still works
+// even if the JS hasn't loaded yet.
+$priority-p0: #dc2626; // Red    — Critical  (fallback)
+$priority-p1: #ea580c; // Orange — High      (fallback)
+$priority-p2: #ca8a04; // Yellow — Medium    (fallback)
+$priority-p3: #16a34a; // Green  — Low       (fallback)
+
+// ===========================
+// Modal Styles (using mixins)
+// ===========================
+
 .modal {
-  display: none;
-  position: fixed;
+  @include modal-overlay;
   z-index: 9999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
   padding-top: 50px;
 }
+
 .modal-content {
-  background-color: #222222;
-  margin: -2% auto;
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  width: 80%;
-  max-width: 600px;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-.close {
-  color: #333333;
-  float: right;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  &:hover,
-  &:focus {
-    color: #FF0000;
-    text-decoration: none;
-  }
-}
-.modal-content {
+  @include modal-content;
+  background: linear-gradient(145deg, var(--panel), var(--panel-mid));
+  color: var(--text);
+  font-family: var(--pref-font-family);
+
   input,
   textarea,
   p {
@@ -43,35 +52,37 @@
     padding: 12px;
     margin: 15px 0;
     border-radius: 12px;
-    border: 1px solid #CCCCCC;
-    font-size: 16px;
-    background-color: #222222;
-    color: white;
+    border: 1px solid var(--ui-border);
+    font-size: var(--pref-font-size, 16px);
+    background-color: var(--bg-1);
+    color: var(--text);
+    font-family: var(--pref-font-family);
   }
+
   button {
+    @include text-button;
     width: 100%;
     padding: 12px 20px;
-    background-color: #000000;
-    color: #FFFFFF;
-    border: none;
     border-radius: 12px;
-    font-size: 16px;
-    cursor: pointer;
+    font-size: var(--pref-font-size, 16px);
     font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    &:hover {
-      background-color: #444444;
-      transform: scale(1.05);
-    }
   }
 }
 
-// Header
+.close {
+  @include modal-close-btn;
+}
+
+// ===========================
+// Header & Calendar Container
+// ===========================
+
 h1 {
   display: none;
 }
+
 h2 {
-  color: white;
+  color: var(--text);
 }
 
 #calendar {
@@ -102,7 +113,7 @@ header {
 }
 
 .fc-toolbar-title {
-  color: white !important;
+  color: var(--text) !important;
 }
 
 .fc-view.fc-dayGridDay-view {
@@ -123,15 +134,10 @@ header {
 }
 
 .styled-dropdown {
-  width: 100%;
+  @include select-control(100%);
   padding: 12px;
   margin: 15px 0;
   border-radius: 12px;
-  border: 1px solid #CCCCCC;
-  font-size: 16px;
-  background-color: #222222;
-  color: white;
-  box-sizing: border-box;
 }
 
 // Remove rounded corners from FullCalendar grid
@@ -147,9 +153,7 @@ header {
   border-radius: 0 !important;
 }
 
-td > img[src*="logo.png"] {
-  display: none !important;
-}
+// Hide logo images leaked into calendar table cells
 td > img[src*="logo.png"] {
   display: none !important;
 }
@@ -160,8 +164,9 @@ td:has(> img[src*="logo.png"]) {
 // ===========================
 // FullCalendar Theme Overrides
 // ===========================
+// All backgrounds and text derive from the active user theme so
+// light, sepia, dark, and custom presets work without modification.
 
-// Override FullCalendar backgrounds with theme colors
 .fc {
   background-color: var(--bg-0);
 }
@@ -173,11 +178,11 @@ td:has(> img[src*="logo.png"]) {
 .fc-theme-standard td,
 .fc-theme-standard th {
   background-color: var(--bg-0);
-  border-color: var(--accent);
+  border-color: var(--ui-border);
 }
 
 .fc-theme-standard .fc-scrollgrid {
-  border-color: var(--accent);
+  border-color: var(--ui-border);
 }
 
 // Alternating row backgrounds
@@ -189,14 +194,14 @@ td:has(> img[src*="logo.png"]) {
   }
 }
 
-// Header styling
+// Column header
 .fc .fc-col-header-cell {
   background-color: var(--bg-2);
   color: var(--text);
   border-bottom: none;
 }
 
-// Day cells
+// Day numbers
 .fc .fc-daygrid-day-number {
   color: var(--text);
 }
@@ -206,9 +211,45 @@ td:has(> img[src*="logo.png"]) {
   border-top: none;
 }
 
-// Today highlighting
+// Today highlighting — uses accent at low opacity for all themes
 .fc .fc-day-today {
-  background-color: color-mix(in srgb, var(--accent) 20%, var(--bg-0) 80%) !important;
+  background-color: color-mix(in srgb, var(--pref-accent-color) 15%, var(--bg-0) 85%) !important;
+}
+
+// ===========================
+// FullCalendar Button Overrides
+// ===========================
+// FullCalendar ships its own button styles that ignore our theme.
+// Override them so prev/next/today/view buttons match the user palette.
+
+.fc .fc-button {
+  background-color: var(--bg-2) !important;
+  border-color: var(--ui-border) !important;
+  color: var(--text) !important;
+  font-family: var(--pref-font-family);
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background-color: var(--bg-3) !important;
+    border-color: var(--pref-accent-color) !important;
+    color: var(--text-strong, var(--text)) !important;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pref-accent-color) 40%, transparent 60%) !important;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: var(--pref-accent-color) !important;
+  border-color: var(--pref-accent-color) !important;
+  color: var(--pref-bg-color) !important;
 }
 
 // ===========================
@@ -216,52 +257,59 @@ td:has(> img[src*="logo.png"]) {
 // ===========================
 
 .fc-event-break {
-  background-color: #2a2a2a !important;
-  border-color: transparent !important;
-  border: none !important;
+  background-color: var(--bg-3) !important;
+  border: 1px solid var(--ui-border) !important;
+  color: var(--text-muted) !important;
   box-shadow: none !important;
 }
 
 .fc-daygrid-day.break-day {
-  background-color: #2a2a2a !important;
+  background-color: var(--bg-2) !important;
+}
+
+// School holidays get a subtle accent tint to differentiate from manual breaks
+.fc-school-holiday {
+  background-color: color-mix(in srgb, var(--pref-accent-color) 25%, var(--bg-2) 75%) !important;
+  border-color: color-mix(in srgb, var(--pref-accent-color) 40%, var(--ui-border) 60%) !important;
+  color: var(--text-strong, var(--text)) !important;
 }
 
 // ===========================
 // Priority-based Event Colors
 // ===========================
+// Each priority level uses a semantic hue (red/orange/yellow/green) softened
+// with color-mix against the theme background so they remain readable on
+// every theme including light and sepia.
+//
+// The hues come from CSS custom properties (--priority-p0 … --priority-p3)
+// which user-preferences.js sets per theme. SASS $priority-pN variables
+// serve as fallbacks when the JS hasn't loaded yet.
+//
+// Text color uses --pref-bg-color (the page background) as contrast text
+// on the colored pill — white on dark themes, dark on light themes.
 
-// Priority color variables
-$priority-p0: #dc2626; // Red 600
-$priority-p0-border: #b91c1c;
-$priority-p1: #ea580c; // Orange 600
-$priority-p1-border: #c2410c;
-$priority-p2: #ca8a04; // Yellow 600
-$priority-p2-border: #a16207;
-$priority-p3: #16a34a; // Green 600
-$priority-p3-border: #15803d;
+// Mixin to avoid repeating the event-priority pattern
+@mixin priority-event($css-var, $fallback) {
+  background-color: color-mix(in srgb, var(#{$css-var}, #{$fallback}) 85%, var(--bg-0) 15%) !important;
+  border-color: color-mix(in srgb, var(#{$css-var}, #{$fallback}) 65%, var(--bg-0) 35%) !important;
+  color: var(--pref-bg-color) !important;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--pref-bg-color) 30%, transparent 70%);
+}
 
 .fc-event.priority-p0 {
-  background-color: $priority-p0 !important;
-  border-color: $priority-p0-border !important;
-  color: white !important;
+  @include priority-event(--priority-p0, $priority-p0);
 }
 
 .fc-event.priority-p1 {
-  background-color: $priority-p1 !important;
-  border-color: $priority-p1-border !important;
-  color: white !important;
+  @include priority-event(--priority-p1, $priority-p1);
 }
 
 .fc-event.priority-p2 {
-  background-color: $priority-p2 !important;
-  border-color: $priority-p2-border !important;
-  color: white !important;
+  @include priority-event(--priority-p2, $priority-p2);
 }
 
 .fc-event.priority-p3 {
-  background-color: $priority-p3 !important;
-  border-color: $priority-p3-border !important;
-  color: white !important;
+  @include priority-event(--priority-p3, $priority-p3);
 }
 
 // Priority badge in event title
@@ -273,23 +321,13 @@ $priority-p3-border: #15803d;
   border-radius: 3px;
   margin-right: 4px;
   vertical-align: middle;
+  color: var(--pref-bg-color);
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--pref-bg-color) 30%, transparent 70%);
 
-  &.p0 {
-    background: $priority-p0;
-    color: white;
-  }
-  &.p1 {
-    background: $priority-p1;
-    color: white;
-  }
-  &.p2 {
-    background: $priority-p2;
-    color: white;
-  }
-  &.p3 {
-    background: $priority-p3;
-    color: white;
-  }
+  &.p0 { background: color-mix(in srgb, var(--priority-p0, #{$priority-p0}) 85%, var(--bg-0) 15%); }
+  &.p1 { background: color-mix(in srgb, var(--priority-p1, #{$priority-p1}) 85%, var(--bg-0) 15%); }
+  &.p2 { background: color-mix(in srgb, var(--priority-p2, #{$priority-p2}) 85%, var(--bg-0) 15%); }
+  &.p3 { background: color-mix(in srgb, var(--priority-p3, #{$priority-p3}) 85%, var(--bg-0) 15%); }
 }
 
 // ===========================
@@ -297,18 +335,8 @@ $priority-p3-border: #15803d;
 // ===========================
 
 #periodFilterDropdown {
-  padding: 6px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--accent, #666);
-  background-color: var(--bg-1, #fff);
-  color: var(--text, #333);
-  font-size: 14px;
-  cursor: pointer;
+  @include select-control(120px);
   margin-left: 8px;
-
-  &:hover {
-    background-color: var(--bg-2, #f0f0f0);
-  }
 }
 
 // ===========================
@@ -337,4 +365,19 @@ $priority-p3-border: #15803d;
   font-size: 0.8em;
   font-style: italic;
   opacity: 0.85;
+}
+
+// ===========================
+// FullCalendar Event Text
+// ===========================
+// Ensure regular event titles (non-priority) inherit the theme text color
+// so they remain readable on light and sepia backgrounds.
+
+.fc-event {
+  color: var(--text);
+}
+
+.fc-event-title,
+.fc-event-time {
+  color: inherit;
 }

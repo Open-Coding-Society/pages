@@ -1,4 +1,3 @@
-// Updated GameLevel.js
 import GameEnv from "./GameEnv.js"
 
 class GameLevel {
