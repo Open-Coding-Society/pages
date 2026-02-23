@@ -378,6 +378,15 @@ class GameControl {
         
         // Save interaction handlers before cleaning up for game-in-game
         this.cleanupInteractionHandlers(true);
+
+        // Notify current level (if it provides an onPause handler)
+        try {
+            if (this.currentLevel && this.currentLevel.gameLevel && typeof this.currentLevel.gameLevel.onPause === 'function') {
+                this.currentLevel.gameLevel.onPause();
+            }
+        } catch (e) {
+            console.warn('Error calling level onPause:', e);
+        }
     }
 
      /**
@@ -397,6 +406,15 @@ class GameControl {
 
         // Restore interaction handlers for outer game
         this.restoreInteractionHandlers();
+
+        // Notify current level (if it provides an onResume handler)
+        try {
+            if (this.currentLevel && this.currentLevel.gameLevel && typeof this.currentLevel.gameLevel.onResume === 'function') {
+                this.currentLevel.gameLevel.onResume();
+            }
+        } catch (e) {
+            console.warn('Error calling level onResume:', e);
+        }
     }
 }
 

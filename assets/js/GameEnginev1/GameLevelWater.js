@@ -191,13 +191,42 @@ class GameLevelWater {
           }, 1000);
         }
       };
-      // Set intervals to update position and play animation  
-      setInterval(() => {
+      // Store intervals on the level instance so they can be paused/resumed
+      this._sharkMovementInterval = setInterval(() => {
         sprite_data_shark.updatePosition();
       }, 100);
-      setInterval(() => {
+      this._sharkAnimInterval = setInterval(() => {
         sprite_data_shark.playAnimation();
       }, 1000);
+
+      // Provide hooks for pause/resume so GameControl can call them
+      this.onPause = () => {
+        try {
+          if (this._sharkMovementInterval) {
+            clearInterval(this._sharkMovementInterval);
+            this._sharkMovementInterval = null;
+          }
+          if (this._sharkAnimInterval) {
+            clearInterval(this._sharkAnimInterval);
+            this._sharkAnimInterval = null;
+          }
+        } catch (e) { console.warn('onPause error in GameLevelWater:', e); }
+      };
+
+      this.onResume = () => {
+        try {
+          if (!this._sharkMovementInterval) {
+            this._sharkMovementInterval = setInterval(() => {
+              sprite_data_shark.updatePosition();
+            }, 100);
+          }
+          if (!this._sharkAnimInterval) {
+            this._sharkAnimInterval = setInterval(() => {
+              sprite_data_shark.playAnimation();
+            }, 1000);
+          }
+        } catch (e) { console.warn('onResume error in GameLevelWater:', e); }
+      };
 
     // Nezuko NPC sprite data
     const sprite_src_nezuko = path + "/images/gamify/nezuko.png"; // be sure to include the path
