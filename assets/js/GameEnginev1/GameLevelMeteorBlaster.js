@@ -4,6 +4,28 @@ import Meteor from "./Meteor.js"
 import Character from "./essentials/Character.js";
 import Quiz from "./Quiz.js"
 
+// Ensure required images are preloaded for this mini-game. Some older
+// code referenced a global `checkGameImages` helper which isn't present
+// in every build environment — provide a local fallback here.
+function checkGameImages(path) {
+  try {
+    const imgs = [
+      path + '/images/gamify/space.png',
+      path + '/images/gamify/ufo.png',
+      path + '/images/gamify/laser_bolt.png',
+      path + '/images/gamify/meteor.png'
+    ];
+    imgs.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => console.log('Preloaded image:', src);
+      img.onerror = () => console.warn('Failed to preload image:', src);
+    });
+  } catch (e) {
+    console.warn('checkGameImages fallback failed', e);
+  }
+}
+
 class GameLevelMeteorBlaster {
   constructor(gameEnv) {
     this.gameEnv = gameEnv

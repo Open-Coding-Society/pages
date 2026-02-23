@@ -641,6 +641,14 @@ class GameLevelDesert {
            } else if (typeof primaryGame.pauseGame === 'function') {
                primaryGame.pauseGame();
            }
+             // Hide parent canvases so the nested mini-game renders cleanly
+             try {
+               if (typeof primaryGame.hideCanvasState === 'function') {
+                 primaryGame.hideCanvasState();
+               }
+             } catch (e) {
+               console.warn('Could not hide parent canvas state for nested MeteorBlaster', e);
+             }
            // Start the game in game
            gameInGame.start();
            // Setup "callback" function to allow transition from game in game to the underlying game
@@ -767,7 +775,15 @@ class GameLevelDesert {
                  // Now create and start the new game
                  let levelArray = [GameLevelStarWars];
                  let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
-                 gameInGame.start();
+                // Hide parent canvases so the nested StarWars mini-game doesn't show underlying NPCs
+                try {
+                  if (typeof primaryGame.hideCanvasState === 'function') {
+                    primaryGame.hideCanvasState();
+                  }
+                } catch (e) {
+                  console.warn('Could not hide parent canvas state for nested StarWars', e);
+                }
+                gameInGame.start();
                 
                  // Setup return to main game after mini-game ends
                  gameInGame.gameOver = function() {
