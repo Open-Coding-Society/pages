@@ -634,9 +634,13 @@ class GameLevelDesert {
            // Define the game in game level
            let levelArray = [GameLevelMeteorBlaster];
            // Define a new GameControl instance with the MeteorBlaster level
-           let gameInGame = new GameControl(gameEnv.game, levelArray);
+           let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
            // Pause the primary game
-           primaryGame.pauseGame();
+           if (typeof primaryGame.pause === 'function') {
+               primaryGame.pause();
+           } else if (typeof primaryGame.pauseGame === 'function') {
+               primaryGame.pauseGame();
+           }
            // Start the game in game
            gameInGame.start();
            // Setup "callback" function to allow transition from game in game to the underlying game
@@ -762,7 +766,7 @@ class GameLevelDesert {
                 
                  // Now create and start the new game
                  let levelArray = [GameLevelStarWars];
-                 let gameInGame = new GameControl(gameEnv.game, levelArray);
+                 let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
                  gameInGame.start();
                 
                  // Setup return to main game after mini-game ends
@@ -817,8 +821,12 @@ class GameLevelDesert {
            // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
            let primaryGame = gameEnv.gameControl;
            let levelArray = [GameLevelMinesweeper];
-           let gameInGame = new GameControl(gameEnv.game, levelArray);
-           primaryGame.pauseGame();
+           let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
+                             if (typeof primaryGame.pause === 'function') {
+                                 primaryGame.pause();
+                             } else if (typeof primaryGame.pauseGame === 'function') {
+                                 primaryGame.pauseGame();
+                             }
            gameInGame.start();
            gameInGame.gameOver = function() {
                primaryGame.resume();

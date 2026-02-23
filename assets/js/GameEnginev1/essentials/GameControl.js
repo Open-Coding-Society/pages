@@ -7,7 +7,7 @@ class GameControl {
      * @param {*} path - The path to the game assets
      * @param {*} levelClasses - The classes of for each game level
      */
-    constructor(game, levelClasses) {
+    constructor(game, levelClasses, options = {}) {
         // GameControl properties
         this.game = game; // Reference required for game-in-game logic
         this.path = game.path;
@@ -26,6 +26,21 @@ class GameControl {
         this.globalInteractionHandlers = new Set();
         // Save interaction handlers for game-in-game restore functionality
         this.savedInteractionHandlers = new Set();
+        // Parent control when this is a nested "game-in-game" control
+        this.parentControl = options.parentControl || null;
+        this.isNested = !!this.parentControl;
+
+        // If nested, snapshot parent level state so we can restore it later
+        if (this.isNested) {
+            try {
+                this.parentControl._savedLevelClasses = Array.isArray(this.parentControl.levelClasses) ? [...this.parentControl.levelClasses] : this.parentControl.levelClasses;
+                this.parentControl._savedCurrentLevelIndex = typeof this.parentControl.currentLevelIndex !== 'undefined' ? this.parentControl.currentLevelIndex : 0;
+            } catch (e) {
+                console.warn('Could not snapshot parent control state for nested game:', e);
+            }
+        }
+        // Track whether the animation loop is currently running to avoid duplicates
+        this._loopRunning = false;
     }
 
     
@@ -150,13 +165,18 @@ class GameControl {
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
-        this.gameLoop();
+        // Only start the game loop if it's not already running to avoid duplicate loops
+        if (!this._loopRunning) {
+            this.gameLoop();
+        }
     }
 
     /**
      * The main game loop 
      */
     gameLoop() {
+        // Mark loop as running so transitionToLevel won't start another one
+        this._loopRunning = true;
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
             return;
@@ -192,6 +212,9 @@ class GameControl {
      * 3. Transitioning to the next level
      */
     handleLevelEnd() {
+        // Ensure the running-loop flag is cleared so new transitions can start the loop
+        this._loopRunning = false;
+
         // Alert the user that the level has ended
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
             alert("Level ended.");
@@ -212,9 +235,33 @@ class GameControl {
             }
         } catch (e) {}
 
+        // If this is a nested game (game-in-game), attempt to restore the parent control
+        if (this.isNested && this.parentControl) {
+            try {
+                // Restore parent's level classes and index if we saved them
+                if (this.parentControl._savedLevelClasses) {
+                    this.parentControl.levelClasses = Array.isArray(this.parentControl._savedLevelClasses) ? [...this.parentControl._savedLevelClasses] : this.parentControl._savedLevelClasses;
+                }
+                this.parentControl.currentLevelIndex = typeof this.parentControl._savedCurrentLevelIndex !== 'undefined' ? this.parentControl._savedCurrentLevelIndex : 0;
+
+                // Mark parent as active control and restart its level
+                if (this.game) this.game.activeGameControl = this.parentControl;
+                this.parentControl.isPaused = false;
+                if (typeof this.parentControl.transitionToLevel === 'function') {
+                    this.parentControl.transitionToLevel();
+                }
+                // Restore parent interaction handlers if available
+                if (typeof this.parentControl.restoreInteractionHandlers === 'function') {
+                    this.parentControl.restoreInteractionHandlers();
+                }
+            } catch (e) {
+                console.warn('Failed to restore parent control after nested game ended:', e);
+            }
+        }
+
         if (this.gameOver) {
             this.gameOver();
-        } else {
+        } else if (!this.isNested) {
             this.currentLevelIndex++;
             this.transitionToLevel();
         }
@@ -331,6 +378,15 @@ class GameControl {
         
         // Save interaction handlers before cleaning up for game-in-game
         this.cleanupInteractionHandlers(true);
+
+        // Notify current level (if it provides an onPause handler)
+        try {
+            if (this.currentLevel && this.currentLevel.gameLevel && typeof this.currentLevel.gameLevel.onPause === 'function') {
+                this.currentLevel.gameLevel.onPause();
+            }
+        } catch (e) {
+            console.warn('Error calling level onPause:', e);
+        }
     }
 
      /**
@@ -350,6 +406,15 @@ class GameControl {
 
         // Restore interaction handlers for outer game
         this.restoreInteractionHandlers();
+
+        // Notify current level (if it provides an onResume handler)
+        try {
+            if (this.currentLevel && this.currentLevel.gameLevel && typeof this.currentLevel.gameLevel.onResume === 'function') {
+                this.currentLevel.gameLevel.onResume();
+            }
+        } catch (e) {
+            console.warn('Error calling level onResume:', e);
+        }
     }
 }
 

@@ -1176,6 +1176,10 @@ class GameLevelOverworld {
       }, 5000);
     };
 
+    // Expose pause/resume hooks on the level instance so GameControl can call them
+    this.onPause = pauseRpg;
+    this.onResume = resumeRpg;
+
     creeperMovementInterval = setInterval(() => {
       sprite_data_creeper.updatePosition();
     }, 100);
