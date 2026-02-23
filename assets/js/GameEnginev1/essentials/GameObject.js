@@ -158,6 +158,18 @@ class GameObject {
         if (!this.state.collisionEvents.includes(objectOther.id)) {
             // add the collisionType to the collisions array, making it the current collision
             this.state.collisionEvents.push(objectOther.id);
+            // Clear any stale pressed key state on player-like objects before running
+            // collision reactions. This avoids cases where a blocking dialog
+            // (for example `alert()`) steals focus and prevents keyup events
+            // from firing, leaving movement keys stuck.
+            try {
+                for (const obj of this.gameEnv.gameObjects) {
+                    if (obj && typeof obj === 'object' && obj.pressedKeys && typeof obj.pressedKeys === 'object') {
+                        obj.pressedKeys = {};
+                    }
+                }
+            } catch (_) {}
+
             this.handleCollisionReaction(objectOther);
         }
         this.handleCollisionState();
