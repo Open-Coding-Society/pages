@@ -444,6 +444,36 @@ class GameCore {
             }
 
             // Try to find and call the correct method to skip level on the active control
+            // If this control temporarily replaced its level list (for example
+            // when entering the End portal the desert level stashes the original
+            // levelClasses to `._originalLevelClasses`), restore the original
+            // levelClasses and advance to the logical next level. This prevents
+            // transitionToLevel from running into an out-of-bounds index and
+            // producing a black screen.
+            if (ctrl._originalLevelClasses && Array.isArray(ctrl._originalLevelClasses)) {
+                try {
+                    const orig = Array.isArray(ctrl._originalLevelClasses) ? [...ctrl._originalLevelClasses] : ctrl._originalLevelClasses;
+                    // Try to find where the End level was in the original ordering
+                    let endIndex = orig.findIndex(c => c && c.name && /End/i.test(c.name));
+                    // If we couldn't find an explicit End class, fallback to current index
+                    if (endIndex === -1 && typeof ctrl.currentLevelIndex === 'number') {
+                        endIndex = ctrl.currentLevelIndex;
+                    }
+                    const nextIndex = endIndex >= 0 ? Math.min(endIndex + 1, orig.length - 1) : 0;
+                    ctrl.levelClasses = orig;
+                    ctrl.currentLevelIndex = nextIndex;
+                    // cleanup temporary storage
+                    try { delete ctrl._originalLevelClasses; } catch (e) { ctrl._originalLevelClasses = undefined; }
+                    console.log('Restored original levelClasses and advancing to index', ctrl.currentLevelIndex);
+                    if (typeof ctrl.transitionToLevel === 'function') {
+                        ctrl.transitionToLevel();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Failed to restore original levelClasses during skip:', e);
+                }
+            }
+
             if (typeof ctrl.nextLevel === 'function') {
                 ctrl.nextLevel();
                 console.log('Skipped level via nextLevel() on active control');
