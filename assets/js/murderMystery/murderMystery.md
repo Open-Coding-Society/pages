@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Murder Mystery Game 
-permalink: /gamify/murdermystery
+permalink: /gamify/murderMystery
 ---
 
 <div id="gameContainer">
@@ -37,7 +37,7 @@ permalink: /gamify/murdermystery
             showNavigation: true,
             showLevelSelect: true,
             showInfo: true,
-            homeUrl: "/gamify/murdermystery",
+            homeUrl: "/gamify/murderMystery",
             gameInfo: {
                 title: "Murder Mystery Game",
                 version: "1.0",
