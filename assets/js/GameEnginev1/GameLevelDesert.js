@@ -821,12 +821,21 @@ class GameLevelDesert {
            // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
            let primaryGame = gameEnv.gameControl;
            let levelArray = [GameLevelMinesweeper];
-           let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
-                             if (typeof primaryGame.pause === 'function') {
-                                 primaryGame.pause();
-                             } else if (typeof primaryGame.pauseGame === 'function') {
-                                 primaryGame.pauseGame();
-                             }
+             let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
+                     if (typeof primaryGame.pause === 'function') {
+                       primaryGame.pause();
+                     } else if (typeof primaryGame.pauseGame === 'function') {
+                       primaryGame.pauseGame();
+                     }
+                    // Hide the parent canvases so the nested Minesweeper can draw
+                    // cleanly on the main canvas without showing underlying NPCs.
+                    try {
+                      if (typeof primaryGame.hideCanvasState === 'function') {
+                        primaryGame.hideCanvasState();
+                      }
+                    } catch (e) {
+                      console.warn('Could not hide parent canvas state for nested Minesweeper', e);
+                    }
            gameInGame.start();
            gameInGame.gameOver = function() {
                primaryGame.resume();
