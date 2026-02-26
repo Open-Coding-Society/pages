@@ -10,8 +10,10 @@ constructor(options = {}) {
     "The End holds secrets only the brave dare uncover.",
     "Retrieve the elytra and embrace your destiny!"
   ];
-   this.id = options.id || "dialogue_" + Math.random().toString(36).substr(2, 9);
-   this.lastShownIndex = -1;
+  this.id = options.id || "dialogue_" + Math.random().toString(36).substr(2, 9);
+  // Make a CSS-safe id for use in element ids and class names
+  this.safeId = String(this.id).replace(/\s+/g, '-').replace(/[^A-Za-z0-9\-_]/g, '');
+  this.lastShownIndex = -1;
    this.dialogueBox = null;
   this.dialogueText = null;
   this.closeBtn = null;
@@ -85,11 +87,11 @@ speakText(text) {
 
 createDialogueBox() {
   // Create style element for animations if not already created
-  if (!document.getElementById('dialogue-animations-' + this.id)) {
+  if (!document.getElementById('dialogue-animations-' + this.safeId)) {
     const styleSheet = document.createElement('style');
-    styleSheet.id = 'dialogue-animations-' + this.id;
+    styleSheet.id = 'dialogue-animations-' + this.safeId;
     styleSheet.textContent = `
-      @keyframes glow-pulse-${this.id} {
+      @keyframes glow-pulse-${this.safeId} {
         0%, 100% {
           box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), inset 0 0 20px rgba(0, 255, 255, 0.2);
         }
@@ -98,7 +100,7 @@ createDialogueBox() {
         }
       }
     
-      @keyframes text-glow-${this.id} {
+      @keyframes text-glow-${this.safeId} {
         0%, 100% {
           text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(74, 134, 232, 0.3);
         }
@@ -107,7 +109,7 @@ createDialogueBox() {
         }
       }
     
-      @keyframes char-pop-${this.id} {
+      @keyframes char-pop-${this.safeId} {
         0% {
           opacity: 0;
           transform: scale(0.5) translateY(-10px);
@@ -121,20 +123,20 @@ createDialogueBox() {
         }
       }
     
-      .dialogue-text-animated-${this.id} {
-        animation: text-glow-${this.id} 2s ease-in-out infinite;
+      .dialogue-text-animated-${this.safeId} {
+        animation: text-glow-${this.safeId} 2s ease-in-out infinite;
       }
     
-      .dialogue-char-${this.id} {
+      .dialogue-char-${this.safeId} {
         display: inline-block;
-        animation: char-pop-${this.id} 0.3s ease-out;
+        animation: char-pop-${this.safeId} 0.3s ease-out;
       }
     `;
     document.head.appendChild(styleSheet);
   }
    // Create the main dialogue container with unique ID
   this.dialogueBox = document.createElement("div");
-  this.dialogueBox.id = "custom-dialogue-box-" + this.id;
+  this.dialogueBox.id = "custom-dialogue-box-" + this.safeId;
    // Set styles for the dialogue box
   Object.assign(this.dialogueBox.style, {
     position: "fixed",
@@ -151,7 +153,7 @@ createDialogueBox() {
     border: "2px solid #4a86e8",
     borderRadius: "12px",
     zIndex: "9999",
-    animation: `glow-pulse-${this.id} 2s ease-in-out infinite`,
+    animation: `glow-pulse-${this.safeId} 2s ease-in-out infinite`,
     display: "none"
   });
 
@@ -160,7 +162,7 @@ createDialogueBox() {
 
   // Create the avatar container for character portraits
   const avatarContainer = document.createElement("div");
-  avatarContainer.id = "dialogue-avatar-" + this.id;
+  avatarContainer.id = "dialogue-avatar-" + this.safeId;
   Object.assign(avatarContainer.style, {
     width: "50px",
     height: "50px",
@@ -176,7 +178,7 @@ createDialogueBox() {
 
   // Create the header with character name
   const speakerName = document.createElement("div");
-  speakerName.id = "dialogue-speaker-" + this.id;
+  speakerName.id = "dialogue-speaker-" + this.safeId;
   Object.assign(speakerName.style, {
     fontWeight: "bold",
     color: "#4a86e8",
@@ -189,7 +191,7 @@ createDialogueBox() {
 
   // Create the text content area
   this.dialogueText = document.createElement("div");
-  this.dialogueText.id = "dialogue-text-" + this.id;
+  this.dialogueText.id = "dialogue-text-" + this.safeId;
   Object.assign(this.dialogueText.style, {
     marginBottom: "15px",
     lineHeight: "1.5",
@@ -266,7 +268,7 @@ typewriteText(element, text, speed = this.typewriterSpeed) {
         element.appendChild(document.createTextNode(' '));
       } else {
         const charSpan = document.createElement('span');
-        charSpan.className = `dialogue-char-${this.id}`;
+        charSpan.className = `dialogue-char-${this.safeId}`;
         charSpan.textContent = char;
         element.appendChild(charSpan);
       }
@@ -275,7 +277,7 @@ typewriteText(element, text, speed = this.typewriterSpeed) {
       this.typewriterTimeoutId = setTimeout(typeNextChar, speed);
     } else {
       // Add glow animation to the complete text
-      element.classList.add(`dialogue-text-animated-${this.id}`);
+      element.classList.add(`dialogue-text-animated-${this.safeId}`);
     }
   };
    typeNextChar();
@@ -291,13 +293,13 @@ showDialogue(message, speaker = "", avatarSrc = null) {
     clearTimeout(this.typewriterTimeoutId);
   }
    // Set the content (with unique element IDs)
-  const speakerElement = document.getElementById("dialogue-speaker-" + this.id);
+  const speakerElement = document.getElementById("dialogue-speaker-" + this.safeId);
   if (speakerElement) {
     speakerElement.textContent = speaker;
     speakerElement.style.display = speaker ? "block" : "none";
   }
    // Set avatar if provided
-  const avatarElement = document.getElementById("dialogue-avatar-" + this.id);
+  const avatarElement = document.getElementById("dialogue-avatar-" + this.safeId);
   if (avatarElement) {
     if (avatarSrc) {
       avatarElement.style.backgroundImage = `url('${avatarSrc}')`;
@@ -308,11 +310,11 @@ showDialogue(message, speaker = "", avatarSrc = null) {
   }
    // Apply typewriter effect or set text directly
   if (this.enableTypewriter) {
-    this.dialogueText.classList.remove(`dialogue-text-animated-${this.id}`);
+    this.dialogueText.classList.remove(`dialogue-text-animated-${this.safeId}`);
     this.typewriteText(this.dialogueText, message, this.typewriterSpeed);
   } else {
     this.dialogueText.textContent = message;
-    this.dialogueText.classList.add(`dialogue-text-animated-${this.id}`);
+    this.dialogueText.classList.add(`dialogue-text-animated-${this.safeId}`);
   }
    // Show the dialogue box
   this.dialogueBox.style.display = "block";
@@ -386,7 +388,7 @@ closeDialogue() {
   const buttonContainers = this.dialogueBox.querySelectorAll('div[style*="display: flex"]');
   buttonContainers.forEach(container => {
     // Skip the main content container
-    if (container.contains(document.getElementById("dialogue-avatar-" + this.id))) {
+    if (container.contains(document.getElementById("dialogue-avatar-" + this.safeId))) {
       return;
     }
     container.remove();
