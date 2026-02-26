@@ -18,38 +18,41 @@ class MurderMysteryBossFight {
         mode: 'contain',
     };
 
-      const sprite_data_archie = {
-        id: 'Archie',
-        src: path + "/assets/images/mcarchie.png",
-        SCALE_FACTOR: 4,
-        STEP_FACTOR: 0,
-        ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 250, y: 350 },
-        pixels: {height: 150, width: 100},
-        orientation: {rows: 1, columns: 1},
-        down: {row: 0, start: 0, columns: 1},
-        downRight: {row: 0, start: 0, columns: 1},
-        downLeft: {row: 0, start: 0, columns: 1},
-        left: {row: 0, start: 0, columns: 1},
-        right: {row: 0, start: 0, columns: 1},
-        up: {row: 0, start: 0, columns: 1},
-        upLeft: {row: 0, start: 0, columns: 1},
-        upRight: {row: 0, start: 0, columns: 1},
-        hitbox: {widthPercentage: 0.5, heightPercentage: 0.5},
-        keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
-    };
+            const sprite_data_archie = {
+                id: 'Archie',
+                greeting: "Hi, I am Archie.",
+                src: path + "/assets/images/mcarchie.png",
+                SCALE_FACTOR: 6,
+                STEP_FACTOR: 1000,
+                ANIMATION_RATE: 50,
+                INIT_POSITION: { x: 720, y: 800 },
+                pixels: {height: 256, width: 256},
+                orientation: { rows: 4, columns: 4 },
+                down: { row: 0, start: 0, columns: 3 },
+                downRight: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
+                downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
+                left: { row: 1, start: 0, columns: 3 },
+                right: { row: 2, start: 0, columns: 3 },
+                up: { row: 3, start: 0, columns: 3 },
+                upLeft: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
+                upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
+                hitbox: { widthPercentage: 0, heightPercentage: 0 },
+                keypress: { up: 87, left: 65, down: 83, right: 68 }
+        };
 
-   const sprite_data_boss = {
-    id: 'Boss',
-    src: path + "/assets/images/Bossright.png",
-    SCALE_FACTOR: 15,
-    STEP_FACTOR: 1000,
-    ANIMATION_RATE: 0,
-    INIT_POSITION: { x: 1300, y: 300 }, 
-    pixels: { height: 200, width: 200 },
-    orientation: { rows: 1, columns: 1 },
-    down: { row: 0, start: 0, columns: 1 },
-    greeting: "Well, well well. Press E to interact with me. ",
+     const sprite_data_boss = {
+        id: 'Boss',
+        src: path + "/assets/images/boss.png",
+        archie_src: path + "/assets/images/archie_single.png",
+        // Make boss exactly 2x Archie's scale
+        SCALE_FACTOR:1.25,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 0,
+        INIT_POSITION: { x: 700, y: 60 }, 
+        pixels: { height: 1024, width: 1024 },
+        orientation: { rows: 1, columns: 1 },
+        down: { row: 0, start: 0, columns: 1 },
+    greeting: "Well played \"hero\". Press E to fight me if you dare!",
     dialogues: [
         { speaker: 'Archie', text: "I have received this sword. It is the only thing capable of slaying you." },
         { speaker: 'Boss', text: "From the shadows, I emerge. Your fate has been sealed." },
@@ -66,11 +69,14 @@ class MurderMysteryBossFight {
         const dialogues = this.spriteData.dialogues;
         const npcName = this.spriteData?.id || "Boss";
         const npcAvatar = this.spriteData?.src || null;
+        const archieAvatar = this.spriteData?.archie_src || null;
         
-        // Show current dialogue
+        // Show current dialogue and choose avatar based on the speaker
         const currentDialogueObj = dialogues[this.currentQuestionIndex];
         const displayName = currentDialogueObj.speaker || npcName;
-        this.dialogueSystem.showDialogue(currentDialogueObj.text, displayName, npcAvatar);
+        // If the speaker is Archie, use Archie's sprite; otherwise use this NPC's sprite
+        const speakerAvatar = (displayName === 'Archie') ? archieAvatar : npcAvatar;
+        this.dialogueSystem.showDialogue(currentDialogueObj.text, displayName, speakerAvatar);
         this.currentQuestionIndex++;
         
         // Add custom handler for advancing dialogue
@@ -85,10 +91,11 @@ class MurderMysteryBossFight {
                         this.dialogueSystem.closeDialogue();
                         this.currentQuestionIndex = 0;
                     } else {
-                        // Show next line
+                        // Show next line and update avatar per speaker
                         const nextDialogueObj = dialogues[this.currentQuestionIndex];
                         const displayName = nextDialogueObj.speaker || npcName;
-                        this.dialogueSystem.showDialogue(nextDialogueObj.text, displayName, npcAvatar);
+                        const nextAvatar = (displayName === 'Archie') ? archieAvatar : npcAvatar;
+                        this.dialogueSystem.showDialogue(nextDialogueObj.text, displayName, nextAvatar);
                         this.currentQuestionIndex++;
                     }
                 }

@@ -1,61 +1,135 @@
 import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-import BackgroundParallax from '/assets/js/GameEnginev1/essentials/BackgroundParallax.js';
-import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-
-console.log("🎮 mansionLevel3.js loaded!");
+        import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+        import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+        import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
 
 class MurderMysteryL3 {
-  static friendlyName = "Level 3: The Stairs";
-  constructor(gameEnv) {
-    console.log("🎮 MurderMysteryL3 constructor started");
-    console.log("gameEnv:", gameEnv);
-    
-    let width = gameEnv.innerWidth;
-    let height = gameEnv.innerHeight;
-    let path = gameEnv.path;
-    let gameControl = gameEnv.gameControl;
+    constructor(gameEnv) {
+        const path = gameEnv.path;
+        const width = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;
+        const bgData = {
+            name: 'custom_bg',
+            src: path + "/images/murderMystery/L3Enterance.png",
+            pixels: { height: 772, width: 1134 }
+        };
+        const playerData = {
+            id: 'Archie',
+            src: path + "/images/murderMystery/mcarchie.png",
+            SCALE_FACTOR: 8,
+            STEP_FACTOR: 1000,
+            ANIMATION_RATE: 6.5,
+            INIT_POSITION: { x: 350, y: 400 },
+            pixels: { height: 256, width: 256 },
+            orientation: { rows: 4, columns: 4 },
+            down: { row: 0, start: 0, columns: 4 },
+            right: { row: Math.min(2, 4 - 1), start: 0, columns: 4 },
+            left: { row: Math.min(1, 4 - 1), start: 0, columns: 4 },
+            up: { row: Math.min(3, 4 - 1), start: 0, columns: 4 },
+            downRight: { row: Math.min(2, 4 - 1), start: 0, columns: 3, rotate: Math.PI/16 },
+            downLeft: { row: Math.min(1, 4 - 1), start: 0, columns: 3, rotate: -Math.PI/16 },
+            upRight: { row: Math.min(2, 4 - 1), start: 0, columns: 3, rotate: -Math.PI/16 },
+            upLeft: { row: Math.min(1, 4 - 1), start: 0, columns: 3, rotate: Math.PI/16 },
+            hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
+            keypress: { up: 87, left: 65, down: 83, right: 68 }
+        };
 
-    console.log("✅ Game environment:", { width, height, path });
-
-    const image_src_stairs = path + "/images/mansionGame/stairs_lvl3.png";
-    const image_data_stairs = {
-        name: 'stairs',
-        greeting: "Never ending stairs, leading to unknown depths.",
-        src: image_src_stairs,
-        velocity: { x: 0, y: 0.4 },  // Vertical scrolling downward
-        opacity: "0.3",  // Increated opacity for better visibility of stairs 
-        scaleToFit: 'width',  // Scale image to fit screen width, tile vertically for scrolling
-    }; 
-
-    const sprite_data_archie = {
-        id: 'Archie',
-        greeting: "Hi, I am Archie.",
-        src: path + "/images/murderMystery/archie_left.png",
-        SCALE_FACTOR: 4,
-        STEP_FACTOR: 1000,
-        ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 250, y: 350 },
-        pixels: {height: 150, width: 100},
-        orientation: {rows: 1, columns: 1},
-        down: {row: 0, start: 0, columns: 1},
-        downRight: {row: 0, start: 0, columns: 1},
-        downLeft: {row: 0, start: 0, columns: 1},
-        left: {row: 0, start: 0, columns: 1},
-        right: {row: 0, start: 0, columns: 1},
-        up: {row: 0, start: 0, columns: 1},
-        upLeft: {row: 0, start: 0, columns: 1},
-        upRight: {row: 0, start: 0, columns: 1},
-        hitbox: {widthPercentage: 0.5, heightPercentage: 0.5},
-        keypress: {left: 65, right:68, up: 87, down: 83} // A, D, W, S
-    };
-
-    // Classes array - use ScrollingBackground instead of GameEnvBackground
-    this.classes = [
-      { class: GameEnvBackground, data: {} },
-      { class: BackgroundParallax, data: image_data_stairs },
-      { class: Player, data: sprite_data_archie }
-    ];
-  }
+        const npcData1 = {
+            id: 'Monk',
+            greeting: 'This maze is so fun and the end is beautiful.  Your going to love it!',
+            src: path + "/images/murderMystery/monk.png",
+            SCALE_FACTOR: 8,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 500, y: 300 },
+            pixels: { height: 225, width: 225 },
+            orientation: { rows: 4, columns: 4 },
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
+            left: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
+            up: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
+            upRight: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
+            downRight: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
+            upLeft: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            zIndex: 12,
+            dialogues: ['This maze is so fun and the end is beautiful.  Your going to love it!'],
+            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
+        };
+this.classes = [      { class: GameEnvBackground, data: bgData },
+      { class: Player, data: playerData },
+      { class: Npc, data: npcData1 }
+];
+        /* BUILDER_ONLY_START */
+        // Post object summary to builder (debugging visibility of NPCs/walls)
+        try {
+            setTimeout(() => {
+                try {
+                    const objs = Array.isArray(gameEnv?.gameObjects) ? gameEnv.gameObjects : [];
+                    const summary = objs.map(o => ({ cls: o?.constructor?.name || 'Unknown', id: o?.canvas?.id || '', z: o?.canvas?.style?.zIndex || '' }));
+                    if (window && window.parent) window.parent.postMessage({ type: 'rpg:objects', summary }, '*');
+                } catch (_) {}
+            }, 250);
+        } catch (_) {}
+        // Report environment metrics (like top offset) to builder
+        try {
+            if (window && window.parent) {
+                try {
+                    const rect = (gameEnv && gameEnv.container && gameEnv.container.getBoundingClientRect) ? gameEnv.container.getBoundingClientRect() : { top: gameEnv.top || 0, left: 0 };
+                    window.parent.postMessage({ type: 'rpg:env-metrics', top: rect.top, left: rect.left }, '*');
+                } catch (_) {
+                    try { window.parent.postMessage({ type: 'rpg:env-metrics', top: gameEnv.top, left: 0 }, '*'); } catch (__){ }
+                }
+            }
+        } catch (_) {}
+        // Listen for in-game wall visibility toggles from builder
+        try {
+            window.addEventListener('message', (e) => {
+                if (!e || !e.data) return;
+                if (e.data.type === 'rpg:toggle-walls') {
+                    const show = !!e.data.visible;
+                    if (Array.isArray(gameEnv?.gameObjects)) {
+                        for (const obj of gameEnv.gameObjects) {
+                            if (obj instanceof Barrier) {
+                                obj.visible = show;
+                            }
+                        }
+                    }
+                } else if (e.data.type === 'rpg:set-drawn-barriers') {
+                    const arr = Array.isArray(e.data.barriers) ? e.data.barriers : [];
+                    // Track overlay barriers locally so we can remove/replace
+                    window.__overlayBarriers = window.__overlayBarriers || [];
+                    // Remove previous overlay barriers
+                    try {
+                        for (const ob of window.__overlayBarriers) {
+                            if (ob && typeof ob.destroy === 'function') ob.destroy();
+                        }
+                    } catch (_) {}
+                    window.__overlayBarriers = [];
+                    // Add new overlay barriers
+                    for (const bd of arr) {
+                        try {
+                            const data = {
+                                id: bd.id,
+                                x: bd.x,
+                                y: bd.y,
+                                width: bd.width,
+                                height: bd.height,
+                                visible: !!bd.visible,
+                                hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+                                fromOverlay: true
+                            };
+                            const bobj = new Barrier(data, gameEnv);
+                            gameEnv.gameObjects.push(bobj);
+                            window.__overlayBarriers.push(bobj);
+                        } catch (_) {}
+                    }
+                }
+            });
+        } catch (_) {}
+        /* BUILDER_ONLY_END */
+    }
 }
 
 export default MurderMysteryL3;
