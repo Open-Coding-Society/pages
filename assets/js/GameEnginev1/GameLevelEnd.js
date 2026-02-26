@@ -7,7 +7,7 @@ import Quiz from './Quiz.js';
 import Game from './essentials/Game.js';
 import Enemy from './essentials/Enemy.js';
 // Using v1.5 DialogueSystem for improved ID sanitization
-import DialogueSystem from '../GameEnginev1.1/DialogueSystem.js';
+import DialogueSystem from './DialogueSystem.js';
 
 class GameLevelEnd {
   constructor(gameEnv) {
