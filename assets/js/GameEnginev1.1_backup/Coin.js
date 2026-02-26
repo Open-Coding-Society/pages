@@ -1,5 +1,5 @@
 import GameObject from './GameObject.js';
-import Player from './essentials/Player.js';
+import Player from '../GameEnginev1/essentials/Player.js';
 
 class Coin extends GameObject {
 	constructor(data = null, gameEnv = null) {

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>End Ship Platformer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="player-info player1-info">
+                    <h3 id="player1-name">Player 1</h3>
+                    <div class="health-bar">
+                        <div class="health-fill" id="player1-health"></div>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button id="pause-btn">Pause</button>
+                </div>
+            </div>
+            
+            <canvas id="game-canvas"></canvas>
+            
+            <div class="controls-hint">
+                <p>Move: WASD (W to jump) | Shoot: Spacebar | Pause: P/ESC</p>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="screen hidden">
+            <h2>Game Paused</h2>
+            <button id="resume-btn" class="menu-btn">Resume</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen hidden">
+            <h2>Game Over</h2>
+            <button id="retry-btn" class="menu-btn">Try Again</button>
+        </div>
+    </div>
+
+    <!-- Load scripts in the correct order -->
+    <script src="Config.js"></script>
+    <script src="Utils.js"></script>
+    <script src="Player.js"></script>
+    <script src="Enemy.js"></script>
+    <script src="Projectile.js"></script>
+    <script src="Input.js"></script>
+    <script src="Ui.js"></script>
+    <script src="Game.js"></script>
+    <script src="Main.js"></script>
+</body>
+</html>
