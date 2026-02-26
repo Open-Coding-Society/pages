@@ -15,7 +15,9 @@ class Npc extends Character {
         this.bindInteractKeyListeners();
         
         // IMPORTANT: Create a unique ID for each NPC to avoid conflicts
-        this.uniqueId = data?.id + "_" + Math.random().toString(36).substr(2, 9);
+        // Sanitize id to remove/replace spaces (spaces are not valid in DOM tokens)
+        const sanitizedId = (data?.id || "").replace(/\s+/g, "_");
+        this.uniqueId = sanitizedId + "_" + Math.random().toString(36).substr(2, 9);
         
         // IMPORTANT: Create a local dialogue system for this NPC specifically
         if (data?.dialogues) {
