@@ -11,9 +11,9 @@ permalink: /gamify/end
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "/assets/js/GameEnginev1/essentials/Game.js";
-    import GameControl from "/assets/js/GameEnginev1/essentials/GameControl.js";
-    import GameLevelEnd from "/assets/js/GameEnginev1/GameLevelEnd.js";
+    import Core from "/assets/js/GameEnginev1.1/essentials/Game.js";
+    import GameControl from "/assets/js/GameEnginev1.1/essentials/GameControl.js";
+    import GameLevelEnd from "/assets/js/GameEnginev1.1/GameLevelEnd.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     const gameLevelClasses = [GameLevelEnd];
