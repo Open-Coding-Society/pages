@@ -528,7 +528,6 @@ class GameLevelAirport {
                 { label: "Review Analytics", action: () => dialogFunctions.analyticsIntro(), keepOpen: true },
                 { label: "Financial Tip", action: () => dialogFunctions.financialTip(), keepOpen: true },
                 { label: "Loans", action: () => openInModal(`${pagesURI}/gamify/loan`)},
-                { label: "Overall Leaderboard", action: () => openInModal(`${pagesURI}/leaderboard/overall-leaderboard`) },
                 { label: "Thank you, Ms. Yellen", action: () => {
                   // Give NPC cookie for completing the dialogue
                   if (gameEnv.game && gameEnv.game.giveNpcCookie) {
