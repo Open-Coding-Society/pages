@@ -277,19 +277,13 @@ class GameControl {
     }
 
     /**
-     * Exit key handler to toggle pause menu if available, otherwise toggle pause/resume
+     * Exit key handler to skip the current level
      * @param {*} event - The keydown event object
      */
     handleExitKey(event) {
         if (event.key === 'Escape') {
             event.preventDefault();
-            // If pause menu exists (in GameEngine v1), let it handle the escape key
-            // Otherwise fall back to direct pause/resume toggle
-            if (this.isPaused) {
-                this.resume();
-            } else {
-                this.pauseMenu();
-            }
+            this.endLevel();
         }
     }
     
