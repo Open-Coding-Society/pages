@@ -1,24 +1,25 @@
 ---
 layout: post
-title: Profile
-description: Full Stack Development with Flask explained by terms and examples.
-permalink: /flask-code-full-stack
-author: Isabel Marilla
-menu: nav/flask.html
 toc: True
+categories: [CSP Big Idea 2]
+title: Data | Profile Page Remix
+description: Profile Page and PFP 
+author: Isabel Marilla
+courses: { csp: {week: 26} }
 ---
 
- # Introduction
+## Introduction
+
 In a web application, the **profile page** plays a crucial role in providing users with a personalized experience. It allows users to view and manage their personal information, update their credentials, and customize their account settings. In this tutorial, we'll explore how to create a dynamic and user-friendly profile page using Flask, a lightweight and versatile Python web framework.
 
 > Before the Lesson:
 
 Before you start, try logging in  and playing around with the profile page features. How do you add a section? What happens when you change your uid and password? This will help you understand **what** the goal of the application is.
 
-
 ### What You'll Learn
 
 In this step-by-step guide, you'll learn how to:
+
 - Create and use a Flask application.
 - Design and implement a user profile page.
 - Integrate a profile picture upload feature.
@@ -29,22 +30,18 @@ In this step-by-step guide, you'll learn how to:
 
 We'll begin by setting up the basic UI layout for the profile page. Next, we'll dive into creating editable fields for user information, including a profile picture upload feature. We'll then integrate these components with the back-end, specifically focusing on handling API calls and data validation. Finally, we'll ensure the page is responsive and user-friendly, providing a seamless experience for users managing their profiles.
 
-
-For our frontend,  we need a basic outline for our UI. For example, here is the  basic html profile code I created for this site. 
+For our frontend,  we need a basic outline for our UI. For example, here is the  basic html profile code I created for this site.
 
 As I mentioned in the Ideation page, users have these attributes:
 
 - Name of Student
-- Github ID of Student 
+- Github ID of Student
 - Classes Student
-- KASM Server 
 - uid (Github ID)
 - password
 - pfp
 
 In the profile, users should be able to change and update ALL of their information. So I includes all of these attributes as fields in the form.
-
-
 
 ```python
 <div class="profile-container">
@@ -103,18 +100,16 @@ In the profile, users should be able to change and update ALL of their informati
 ```
 
 Since users are updating MANY fields, we need to make MANY HTTP requests.
-The methods we will be using are: 
+The methods we will be using are:
 
 - PUT (update uid, name, password, profile picture)
 - DELETE (delete sections,  log out (delete JWT) after updating uid/password)
 
-
-Making multiple requests with the same method for different field is a lot of redundant code! 
+Making multiple requests with the same method for different field is a lot of redundant code!
 
 Let's take a look at the original code for profile:
 
-
-```js 
+```js
   import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 
@@ -798,16 +793,11 @@ window.toggleKasmServerNeeded = async function() {
   }); 
   ```
 
-
-
-
-
-
 It's a lot of repeating code, isn't it? We need to <strong> optimize </strong> our code. But....how?
 
-Remember config.js from the Login tab? We exported a function called login that set up a request template for us, so all we had to do was fill in the appropriate parameters. 
+Remember config.js from the Login tab? We exported a function called login that set up a request template for us, so all we had to do was fill in the appropriate parameters.
 
-We can do the same thing here by creating a new javascript file, called profile.js, write functions with different methods that can be exported. 
+We can do the same thing here by creating a new javascript file, called profile.js, write functions with different methods that can be exported.
 
 ```js
 
@@ -943,13 +933,7 @@ export async function logoutUser() {
 
 What we did is called <strong> modularization </strong>. Modularization is a practice of organizing a codebase into loosely coupled and self contained parts. Each part is a module. Each module is independent and serves a clear purpose.
 
-
 For example, the putUpdate is a module! Every time we use a put request to update a field, we can use putUpdate!
-
-
-
-
-
 
 <strong> We can include code from profile.js and config.js in our profile.md file using these import statements. This is so we can use the variables and functions provided in config.js and profile.js! </strong>
 
@@ -965,9 +949,9 @@ import { putUpdate, postUpdate, deleteData, logoutUser } from "{{site.baseurl}}/
 
 ```
 
-# **Name, UID, Password, Kasm Server**
+## **Name, UID, Password, Kasm Server**
 
-# UPDATE
+## UPDATE
 
 Let's talk about the backend code for  updating the name, uid, password, and kasm_server_needed field first. Since the user updates fields one a time, we need to make similar HTTP requests multiple times, with different request payloads.
 
@@ -1023,13 +1007,12 @@ The following code is from the user.py file under model, which helps update name
 
 ```
 
-###  Updating Name in Frontend API Service Layer
-
+### Updating Name in Frontend API Service Layer
 
 Since the backend code is done for us, all we need is the frontend API layer to send the request to the backend to update the name. We don't have buttons to click for 'Change Name' so we have to check whether the input field is filled using event listeners to know when to update name.
 
-
 - Checks if Name Field is filled
+
 ```js
 
 // Event listener to trigger updateName function when Name field is changed
@@ -1041,7 +1024,8 @@ document.getElementById('newName').addEventListener('change', function() {
 });
 ```
 
-- Changes Name 
+- Changes Name
+
 ```js
 
 window.changeName = async function(name) {
@@ -1067,14 +1051,9 @@ window.changeName = async function(name) {
 
 ```
 
+### Updating UID in Frontend API Service Layer
 
-
-
-
-###  Updating UID in Frontend API Service Layer
-
-We make a similar request for the uid. We don't have buttons to click for 'Change UID' so we have to check whether the input field is filled using event listeners to know when to update  uid. 
-
+We make a similar request for the uid. We don't have buttons to click for 'Change UID' so we have to check whether the input field is filled using event listeners to know when to update  uid.
 
 Changing uid logs user out immediately, so we can simply redirect them to the login page.
 
@@ -1109,8 +1088,7 @@ window.changeUid = async function(uid) {
 
 ```
 
-###  Updating Password in Frontend API Service Layer
-
+### Updating Password in Frontend API Service Layer
 
 We make a similar request for password. However, changing the password, doesn't logout the user immediately, so we need to use the logoutUser function exported from profile.js
 
@@ -1147,11 +1125,9 @@ window.changePassword = async function(password) {
 
 ```
 
-
-###  Updating KASM  in Frontend API Service Layer
+### Updating KASM  in Frontend API Service Layer
 
 This is similar to the code blocks above, but we instead of an string in an input field, we are using a value of checkbox  for KASM server needed(check or unchecked). So, we need to approach the request in a slightly  different way.
-
 
 ```js
 
@@ -1179,7 +1155,7 @@ window.toggleKasmServerNeeded = async function() {
 
 
 
-# READ
+## READ
 
 Let's talk about the backend code for  reading the name, uid, and kasm_server_needed data from the backend so the user can check the  verify the attributes of their profile. This also reads the sections/pfp data! This data we get from the server is called response data!
 
@@ -1201,7 +1177,7 @@ This code is from user.py file under the api directory,  which processes the HTT
 
 Typically, you would use GET function under the _CRUD class, which has the `api/user` endpoint. You could use this endpoint as well-I just used `api/id` for my frontend requests.
 
-```python 
+```python
  @token_required()
         def get(self):
             # retrieve the current user from the token_required authentication check  
@@ -1223,13 +1199,11 @@ Typically, you would use GET function under the _CRUD class, which has the `api/
             return jsonify(json_ready)
 ```
 
-
 Here is the code for user.py file  under model that returns the data from the database. This function is from user.py in model directory, appropriately under the User class because it handles returning data for a user.
-
 
  Did you notice how password isn't included in the returned data? Hence,  we can't 'fetch' the password data from the backend because it is not provided to us.
 
-```python 
+```python
   def read(self):
         data = {
             "id": self.id,
@@ -1244,11 +1218,9 @@ Here is the code for user.py file  under model that returns the data from the da
         return data 
 ```
 
-
 ### Reading Name/UID
 
 With the backend API code done for us, we can start with the frontend API service layer. For name and uid, the frontend fetches the data from the backend and fills in the input fields with 'placeholders', or prefilled fields, which have the data from the database.
-
 
 - Let's take a look at the code for fetching the name data :
 
@@ -1277,10 +1249,7 @@ window.fetchName = async function() {
 
 ```
 
-
-
 - Let's take a look at the code for fetching the uid data :
-
 
 ```js
 
@@ -1306,7 +1275,6 @@ window.fetchName = async function() {
 
 
 ```
-
 
 - Let's take a look at the code that sets placeholders for both fields:
 
@@ -1339,10 +1307,9 @@ window.setPlaceholders = async function() {
 
 ```
 
-
 ### Reading KASM
 
-This is similar to the other 'fetch' codes, but it also includes the boolean logic with the checkbox and doesn't need a separate function to handle formatting the JSON response data  into HTML. 
+This is similar to the other 'fetch' codes, but it also includes the boolean logic with the checkbox and doesn't need a separate function to handle formatting the JSON response data  into HTML.
 
 ```js
 
@@ -1369,15 +1336,6 @@ window.fetchKasmServerNeeded = async function() {
 
 ```
 
-
-
-
-
-
-
-
-
-
 # **Sections**
 
 # ADDING SECTIONS FOR USER
@@ -1387,7 +1345,6 @@ Let's talk about adding sections for a user. This code might look different from
 ## Backend Code
 
 Let's talk about the backend code for adding sections. The following code block is from user.py under the api directory. Since sections is a part of a different database, this code is appropriately  under the Section class and not under the CRUD class. It imports functions from the user.py under the model directory such as add_sections.
-
 
 ```python
         @token_required() 
@@ -1411,8 +1368,7 @@ Let's talk about the backend code for adding sections. The following code block 
 ```
 
 This function is from user.py in model directory, appropriately under the User class because it handles adding sections for a user.
-Even the function below has  code for adding multiple sections at a time, but I didn't need utilize it fully  because users select sections one at a time from the dropdown menu. Maybe you can try experimenting with multiselect features with your own user profile! 
-
+Even the function below has  code for adding multiple sections at a time, but I didn't need utilize it fully  because users select sections one at a time from the dropdown menu. Maybe you can try experimenting with multiselect features with your own user profile!
 
 ```python
 
@@ -1440,8 +1396,7 @@ Even the function below has  code for adding multiple sections at a time, but I 
 
 ```
 
-
-## Frontend API Service Layer 
+## Frontend API Service Layer
 
 For adding sections, I had a plus icon trigger the addSections functions when clicked, which allowed the user's selected section
 to be added to the table and updated to the database using two helper functions.
@@ -1451,8 +1406,6 @@ to be added to the table and updated to the database using two helper functions.
 ```js  
 let userSections = [];
 ```
-
-
 
 - Let's take a look at the global function addSections
 
@@ -1499,10 +1452,8 @@ window.addSection = async function () {
 
 ```
 
-
-
-
 - Let's take a look at the function that adds the sections to the table.
+
 ```js
 // Function to display added sections in the table
 function displayProfileSections() {
@@ -1540,8 +1491,6 @@ function displayProfileSections() {
 
 ```
 
-
-
 - Let's take a look at the function that sends HTTP request to add sections
 
 ```js
@@ -1577,7 +1526,7 @@ async function saveSections() {
 }
 ```
 
-# READ 
+# READ
 
 You might be wondering why we need to talk about the the 'READ' function for sections. After all, we already covered the backend function for reading sections for a specific user, so why are we still talking about backend code below?
 
@@ -1585,7 +1534,7 @@ This is because I needed to fetch all the sections <strong> available </strong> 
 
 You might think that this sounds like a lot of work. Why couldn't I  use a more <strong> static </strong> just input the sections into the code directly rather than fetching them to the backend?
 
-It's because static code is just that: static. Rigid and inflexible. 
+It's because static code is just that: static. Rigid and inflexible.
 
 Think about this situation. What if an admin user decided to add a Section like 'ART' in the backend? Users wouldn't have that relevant section available to them if we input the previous sections statically. We would have to keep updating the code all the time, and it would be tedious!
 
@@ -1642,7 +1591,7 @@ let predefinedSections = [];
 
 - Let's take a look at the function with the HTTP request to fetch  sections from the backend.
 
-```js 
+```js
 async function fetchPredefinedSections() {
     const URL = pythonURI + "/api/section";
 
@@ -1662,9 +1611,10 @@ async function fetchPredefinedSections() {
 }
 
 ```
+
 - Let's take a look at the function that populates the dropdown menu. Remember, we covered displayProfileSections earlier, and we already know what it does
 
-```js 
+```js
 // Function to populate section dropdown menu
 function populateSectionDropdown(predefinedSections) {
     const sectionDropdown = document.getElementById('sectionDropdown');
@@ -1686,18 +1636,18 @@ function populateSectionDropdown(predefinedSections) {
 ```
 
  > Exercise
- - An important note. I didn't cover the frontend API layer for fetching sections data for a user in the backend(basically, populating the sections table for the user profile.) Why? This is an exercise meant for you! Try looking through the profile page and figuring out which functions fetch the data and which functions format the response into the table. Hint (Is it multiple functions or one specific function?...)
 
+- An important note. I didn't cover the frontend API layer for fetching sections data for a user in the backend(basically, populating the sections table for the user profile.) Why? This is an exercise meant for you! Try looking through the profile page and figuring out which functions fetch the data and which functions format the response into the table. Hint (Is it multiple functions or one specific function?...)
 
 # UPDATE YEAR
 
 Now that we've talked about adding sections and populating the dropdown menu, let's talk about updating the year for each section for each user. (Keep in mind, all of the sections default to the year we are in. Check out the code for that in user.py file under the model directory, under the Section class. Hint: we use the datetime library.)
 
 ## Backend Code
- 
+
  Let's talk about the backend code for updating  section year. The following code block is from user.py under the api directory. Since sections is a part of a different database, this code is appropriately  under the Section class and not under the CRUD class. It imports functions from the user.py under the model directory such as update_sections.
 
-```python 
+```python
 
   @token_required()
         def put(self):
@@ -1727,10 +1677,10 @@ Now that we've talked about adding sections and populating the dropdown menu, le
 
 
 ```
+
 Here is the update_section function in user.py,in the model directory,  under the Section class.
 
-
-```python 
+```python
 
     
     def update_section(self, section_data):
@@ -1759,18 +1709,13 @@ Here is the update_section function in user.py,in the model directory,  under th
 
 ```
 
-
-
-
-
 # DELETE
 
 Before we dive in the frontend for updating year, let's talk about the code for deleting sections!
 
+## Backend Code
 
-## Backend Code 
 Here is delete code under user.py in the api directory. It is under the section class because it has to do with user sections.
-
 
 ```python
 
@@ -1796,7 +1741,6 @@ Here is delete code under user.py in the api directory. It is under the section 
 
 
 ```
-
 
 Here is the remove_sections code under user.py in the model directory, under the User class, which is appropriate because it removes sections for a user.
 
@@ -1834,10 +1778,9 @@ Here is the remove_sections code under user.py in the model directory, under the
             return False
 ```
 
-
 ## Frontend API Service Layer for Update Year and Delete Section
 
-For the frontend, I have a function that allows a year cell for each section, where  each cell has a pencil icon near it, indicating the cell is editable. Once the cell is clicked, the input field is open, where you enter the correct year. Then it is  saved in the table and  updated in the backend. The function also has a trash can icon for each section. When icon is clicked for a section , the table row is deleted and the  appropriate section data is deleted in the backend. 
+For the frontend, I have a function that allows a year cell for each section, where  each cell has a pencil icon near it, indicating the cell is editable. Once the cell is clicked, the input field is open, where you enter the correct year. Then it is  saved in the table and  updated in the backend. The function also has a trash can icon for each section. When icon is clicked for a section , the table row is deleted and the  appropriate section data is deleted in the backend.
 
 ```js
 
@@ -1969,18 +1912,14 @@ function updateTableWithData(data) {
 ```
 
 > What does that function mean...?
+
 - By the way, what is the fetch data/populate table function for? Think back to our exercise earlier and check out the code!
 
+## **Profile Picture**
 
+## UPDATE
 
-
-# **Profile Picture**
-
-# UPDATE
-
-Updating the profile will look a little different than updating the name, uid, and other fields because pfp has it's own api file with different methods. It's also stored  as a base64 string in the backend-so there are a couple extra steps. 
-
-
+Updating the profile will look a little different than updating the name, uid, and other fields because pfp has it's own api file with different methods. It's also stored  as a base64 string in the backend-so there are a couple extra steps.
 
 ## Backend Code
 
@@ -2027,18 +1966,13 @@ This code is under the PFP class in the pfp.py file under the api directory. Sin
         except Exception as e:
             return {'message': f'A database error occurred while assigning profile picture: {str(e)}'}, 500
         
-
-
-
-
-
-
-
 ```
+
 We won't be referencing the methods in the model, because that handles images on the server(making a directory for images for each user, etc.) If you want to check it out, check out both pfp.py files  under your flask_2025 repository.
 
 ## Frontend API Service Layer
-On the frontend, we have a global function that calls other functions. Once the picture is uploaded, it is converted into a base64string and sent to the backend. 
+
+On the frontend, we have a global function that calls other functions. Once the picture is uploaded, it is converted into a base64string and sent to the backend.
 
 - This function is the global function.
 
@@ -2078,7 +2012,6 @@ window.saveProfilePicture = async function () {
 
 ```
 
-
 - This function converts the data into a base64 string
 
 ```js
@@ -2095,8 +2028,8 @@ async function convertToBase64(file) {
 
 ```
 
+- This function makes the HTTP request to update the profile picture.
 
-- This function makes the HTTP request to update the profile picture. 
 ```js
 async function sendProfilePicture(base64String) {
    const URL = pythonURI + "/api/id/pfp"; // Adjust endpoint as needed
@@ -2125,19 +2058,16 @@ async function sendProfilePicture(base64String) {
 
 ```
 
-
-
-
-
 # READ
 
-We covered the read backend code for pfp already, so let's jump straight into the frontend API layer. 
+We covered the read backend code for pfp already, so let's jump straight into the frontend API layer.
 
 ## Frontend API Layer
+
 For the frontend API, we have to remember that the image is stored as a base64 string, so we have to make some modifications to how we format the data in HTML. We have a function that displays the user profile with the image data from the backend.
 
-
 - Here is the function that makes the request and calls displayUserProfile, passing in the fetched data.
+
 ```js
 
 
@@ -2165,9 +2095,10 @@ async function fetchUserProfile() {
 
 
 ```
-- Here is the function that displays the user profile data correctly. The function set the source of the image using the base64 string from the profile data in the HTML element meant for the image. 
 
-```js 
+- Here is the function that displays the user profile data correctly. The function set the source of the image using the base64 string from the profile data in the HTML element meant for the image.
+
+```js
 // Function to display user profile data
 function displayUserProfile(profileData) {
     const profileImageBox = document.getElementById('profileImageBox');
@@ -2187,7 +2118,6 @@ function displayUserProfile(profileData) {
 }
 ```
 
-
 ### Conclusion
 
 In this tutorial, we walked through the process of creating a dynamic and functional profile page using Flask. We started by setting up the foundational UI elements, then implemented key features like editable fields for user information and a profile picture upload option. By connecting the front-end with the back-end using Flask APIs, we ensured that users could seamlessly update their personal information and credentials.
@@ -2197,7 +2127,3 @@ Through this guide, you’ve learned not only how to design a user-friendly prof
 Remember, the concepts covered here are just the beginning. You can expand on this foundation by adding more advanced features, such as multi-step forms and enhanced security measures. Keep experimenting and building, and soon you'll have a profile page that's tailored to the specific needs of your application and users.
 
 Happy coding!
-
-
-
-
