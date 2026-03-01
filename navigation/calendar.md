@@ -514,8 +514,13 @@ active_tab: calendar
                         let derivedPeriod = '';
                         const matchedGroup = userGroups.find(g => g.name === selectedGroup);
                         if (matchedGroup && matchedGroup.course) derivedPeriod = matchedGroup.course.toUpperCase();
+                        // Embed priority prefix in title for persistence
+                        let titleToSave = updatedTitle;
+                        if (updatedPriority && !/^\[P[0-3]\]/.test(titleToSave)) {
+                            titleToSave = `[${updatedPriority}] ${titleToSave}`;
+                        }
                         const newEventPayload = {
-                            title: updatedTitle,
+                            title: titleToSave,
                             description: updatedDescription,
                             date: updatedDate,
                             priority: updatedPriority,
@@ -611,7 +616,12 @@ active_tab: calendar
                         const mg = userGroups.find(g => g.name === addGroupVal);
                         if (mg && mg.course) addPeriod = mg.course.toUpperCase();
                     }
-                    const payload = { title: updatedTitle, description: updatedDescription, date: updatedDate, priority: updatedPriority, groupName: addGroupVal, period: addPeriod };
+                    // Embed priority prefix in title for persistence
+                    let addTitle = updatedTitle;
+                    if (updatedPriority && !/^\[P[0-3]\]/.test(addTitle)) {
+                        addTitle = `[${updatedPriority}] ${addTitle}`;
+                    }
+                    const payload = { title: addTitle, description: updatedDescription, date: updatedDate, priority: updatedPriority, groupName: addGroupVal, period: addPeriod };
                     fetch(`${javaURI}/api/calendar/add_event`, {
                         ...fetchOptions, method: "POST", body: JSON.stringify(payload),
                     })
@@ -626,8 +636,15 @@ active_tab: calendar
                         const matchedGroup = userGroups.find(g => g.name === editGroupVal);
                         if (matchedGroup && matchedGroup.course) derivedPeriod = matchedGroup.course.toUpperCase();
                     }
+                    // Re-embed priority prefix in title so it persists even if backend
+                    // doesn't store priority as a separate field (sprint-synced events
+                    // carry priority in the title like "[P1] 📚 Title - CSA").
+                    let titleToSave = updatedTitle;
+                    if (updatedPriority && !/^\[P[0-3]\]/.test(titleToSave)) {
+                        titleToSave = `[${updatedPriority}] ${titleToSave}`;
+                    }
                     const payload = {
-                        newTitle: updatedTitle, description: updatedDescription, date: updatedDate,
+                        newTitle: titleToSave, description: updatedDescription, date: updatedDate,
                         priority: updatedPriority, type: document.getElementById("editEventType").value,
                         groupName: editGroupVal,
                         period: derivedPeriod,
