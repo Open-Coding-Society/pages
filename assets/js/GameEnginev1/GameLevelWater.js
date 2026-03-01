@@ -17,7 +17,7 @@ class GameLevelWater {
     let path = gameEnv.path;
 
     // Background data
-    const image_src_water = path + "/images/gamify/deepseadungeon.jpeg";
+    const image_src_water = path + "/images/gamify/water/deepseadungeon.jpeg";
     const image_data_water = {
         id: 'Water',
         src: image_src_water,
@@ -25,7 +25,7 @@ class GameLevelWater {
     };
 
     // Player Data for Octopus
-    const sprite_src_octopus = path + "/images/gamify/octopus.png"; // be sure to include the path
+    const sprite_src_octopus = path + "/images/gamify/water/octopus.png"; // be sure to include the path
     const OCTOPUS_SCALE_FACTOR = 5;
     const sprite_data_octopus = {
         id: 'Octopus',
@@ -51,7 +51,7 @@ class GameLevelWater {
     };
 
     // NPC Data for Byte Nomad (Smaller Version)
-    const sprite_src_nomad = path + "/images/gamify/animwizard.png"; // be sure to include the path
+    const sprite_src_nomad = path + "/images/gamify/water/animwizard.png"; // be sure to include the path
     const sprite_data_nomad = {
         id: 'JavaWorld',
         greeting: "Hi I am Java Portal.  Leave this world and go on a Java adventure!",
@@ -59,7 +59,7 @@ class GameLevelWater {
         SCALE_FACTOR: 10,  // Adjust this based on your scaling needs
         ANIMATION_RATE: 100,
         pixels: {height: 307, width: 813},
-        INIT_POSITION: { x: (width * 3 / 4), y: (height * 3 / 4)},
+        INIT_POSITION: { x: (width * 3 / 4), y: (height * 1 / 4)},
         orientation: {rows: 3, columns: 7 },
         down: {row: 1, start: 0, columns: 6 },  // This is the stationary npc, down is default 
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -87,7 +87,7 @@ class GameLevelWater {
       };
 
      // Shark Data
-    const sprite_src_shark = path + "/images/gamify/shark.png"; // be sure to include the path
+    const sprite_src_shark = path + "/images/gamify/water/shark.png"; // be sure to include the path
     const sprite_data_shark = {
         id: 'Shark',
         greeting: "Enemy Shark",
@@ -200,7 +200,7 @@ class GameLevelWater {
       }, 1000);
 
     // Nezuko NPC sprite data
-    const sprite_src_nezuko = path + "/images/gamify/nezuko.png"; // be sure to include the path
+    const sprite_src_nezuko = path + "/images/gamify/water/nezuko.png"; // be sure to include the path
     const sprite_greet_nezuko = "I've never seen you before. Are you lost? Well, even if you are.. I don't think I'm going to help you get out of here.";
     const platformerLink = "https://pages.opencodingsociety.com/navigation/game.html"; // Replace this with your actual platformer game link
 
@@ -221,27 +221,28 @@ class GameLevelWater {
       }
     };
 
-const sprite_src_puffer = path + "/images/gamify/puffer.png";
+const sprite_src_puffer = path + "/images/gamify/water/puffer.png";
     const sprite_data_puffer = {
       id: 'Pufferfish',
       greeting: "Enemy Pufferfish",
       src: sprite_src_puffer,
       SCALE_FACTOR: 5,
-      ANIMATION_RATE: 10,
-      pixels: { height: 100, width: 200 },
-      orientation: { rows: 1, columns: 2 },
-      down: { row: 0, start: 0, columns: 2 },
+      ANIMATION_RATE: 50,
+      INIT_POSITION: { x: (width * 1 / 4), y: (height * 2 / 4)},
+      pixels: { width: 304, height: 200  },
+      orientation: { rows: 3, columns: 6 },
+      down: { row: 1, start: 0, columns: 6 },
       hitbox: { widthPercentage: 0.25, heightPercentage: 0.55 }
     };
 
-    const sprite_src_gold = path + "/images/gamify/gold.png";
+    const sprite_src_gold = path + "/images/gamify/water/gold.png";
     const sprite_data_gold = {
       id: 'Goldfish',
       greeting: "Enemy Goldfish",
       src: sprite_src_gold,
-      SCALE_FACTOR: 4,
+      SCALE_FACTOR: 8,
       ANIMATION_RATE: 15,
-      pixels: { height: 120, width: 240 },
+      pixels: { width: 200, height: 100 },
       INIT_POSITION: { x: width / 2, y: height / 2 },
       orientation: { rows: 1, columns: 2 },
       down: { row: 0, start: 0, columns: 2 },
@@ -252,8 +253,9 @@ const sprite_src_puffer = path + "/images/gamify/puffer.png";
       { class: GameEnvBackground, data: image_data_water },
       { class: Player, data: sprite_data_octopus },
       { class: Npc, data: sprite_data_nomad },
-      { class: Shark, data: sprite_data_shark },
       { class: Npc, data: sprite_data_nezuko },
+      { class: Shark, data: sprite_data_shark },
+      { class: Npc, data: sprite_data_gold }
     ];
   }
 }

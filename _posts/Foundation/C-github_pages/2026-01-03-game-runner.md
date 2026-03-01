@@ -68,7 +68,7 @@ export const gameLevelClasses = [GameLevelBasic];
 
 ---
 
-## Basic Game: Copied from GameBuilder
+## Basic Game: Background, Custom Player
 
 {% capture challenge1 %}
 Run the basic game. Use WASD or arrow keys to move Chill Guy around the desert. Walk up to R2D2 to trigger an interaction!
@@ -128,6 +128,26 @@ export { GameControl };
    challenge=challenge1
    code=code1
    height="150px"
+%}
+
+## Combine Game Levels: Connected levels via ESC key
+
+{% capture challenge2 %}
+Run the basic game. Use WASD or arrow keys to move Chill Guy around the desert. Walk up to R2D2 to trigger an interaction!
+{% endcapture %}
+
+{% capture code2 %}
+import GameControl from "/assets/js/GameEnginev1/essentials/GameControl.js";
+import GameLevelWater from "/assets/js/GameEnginev1/GameLevelWater.js";
+import GameLevelParallaxFish from "/assets/js/GameEnginev1/GameLevelParallaxFish.js";
+export const gameLevelClasses = [GameLevelWater, GameLevelParallaxFish];
+export { GameControl };
+{% endcapture %}
+
+{% include game-runner.html
+   runner_id="game2"
+   challenge=challenge2
+   code=code2
 %}
 
 ## Best Practices
