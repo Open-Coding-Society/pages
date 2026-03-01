@@ -183,8 +183,8 @@ class GameControl {
         }
 
         if (!this.isPaused) {
-            this.currentLevel.update();
-            this.handleInLevelLogic();
+        this.currentLevel.update();
+        this.handleInLevelLogic();
         }
 
         // Always continue loop
@@ -305,7 +305,7 @@ class GameControl {
 
     // Helper method to save the current canvas id and image data in the game container
     saveCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
+        const gameContainer = this.gameContainer;
         const canvasElements = gameContainer.querySelectorAll('canvas');
         // Only save non-background canvases to avoid overwriting dynamic background
         // layers which redraw themselves on resume.
@@ -317,20 +317,20 @@ class GameControl {
             })
             .map(canvas => {
                 try {
-                    return {
-                        id: canvas.id,
-                        imageData: canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
-                    };
+            return {
+                id: canvas.id,
+                imageData: canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
+            };
                 } catch (e) {
                     console.warn('Could not capture canvas imageData for', canvas.id, e);
                     return { id: canvas.id, imageData: null };
                 }
-            });
+        });
     }
 
     // Helper method to hide the current canvas state in the game container
     hideCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
+        const gameContainer = this.gameContainer;
         const canvasElements = gameContainer.querySelectorAll('canvas');
         canvasElements.forEach(canvas => {
             if (canvas.id !== 'gameCanvas') {
@@ -341,14 +341,14 @@ class GameControl {
 
     // Helper method to restore the hidden canvas item to be visible
     showCanvasState() {
-        const gameContainer = document.getElementById('gameContainer');
+        const gameContainer = this.gameContainer;
         this.savedCanvasState.forEach(hidden_canvas => {
             const canvas = document.getElementById(hidden_canvas.id);
             if (canvas) {
                 canvas.style.display = 'block';
                 if (hidden_canvas.imageData) {
                     try {
-                        canvas.getContext('2d').putImageData(hidden_canvas.imageData, 0, 0);
+                canvas.getContext('2d').putImageData(hidden_canvas.imageData, 0, 0);
                     } catch (e) {
                         console.warn('Failed to restore canvas imageData for', hidden_canvas.id, e);
                     }
@@ -387,7 +387,7 @@ class GameControl {
         } catch (e) {
             console.warn('Error calling level onPause:', e);
         }
-    }
+     }
 
      /**
       * Game level in Game Level helper method to resume the underlying game level

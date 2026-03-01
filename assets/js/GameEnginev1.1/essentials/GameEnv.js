@@ -18,12 +18,16 @@
  * @property {number} innerHeight - The inner height of the game area.
  * @property {number} top - The top offset of the game area.
  * @property {number} bottom - The bottom offset of the game area.
+ * @property {string} canvasId - The unique ID of the canvas element for this instance.
  */
 class GameEnv {
+    static canvasCounter = 0; // Static counter for unique canvas IDs
+    
     constructor() {
         this.container = null;
         this.canvas = null;
         this.ctx = null;
+        this.canvasId = null;
         this.innerWidth = 0;
         this.innerHeight = 0;
         this.top = 0;
@@ -47,18 +51,38 @@ class GameEnv {
         this.setCanvas();
         this.setTop();
         this.setBottom();
-        this.innerWidth = window.innerWidth;
-        this.innerHeight = window.innerHeight - this.top - this.bottom;
+        
+        // Check if dimensions are overridden in environment (for game-runner/builder)
+        // Otherwise use window dimensions
+        if (this.game?.environment?.innerWidth !== undefined) {
+            this.innerWidth = this.game.environment.innerWidth;
+        } else {
+            this.innerWidth = window.innerWidth;
+        }
+        
+        if (this.game?.environment?.innerHeight !== undefined) {
+            this.innerHeight = this.game.environment.innerHeight;
+        } else {
+            this.innerHeight = window.innerHeight - this.top - this.bottom;
+        }
+        
         this.size();
     }
 
     /**
      * Sets the canvas element and its 2D rendering context.
+     * Creates a new canvas dynamically with a unique ID to avoid conflicts.
+     * Uses the container reference passed from environment, or searches for 'gameContainer' as fallback.
      */
     setCanvas() {
-        // Prefer builder container if present
-        this.container = document.getElementById('gameContainer') || document.body;
-        this.canvas = document.getElementById('gameCanvas');
+        // Use the container reference if provided (from environment), otherwise search by ID
+        this.container = this.gameContainer || document.getElementById('gameContainer') || document.body;
+        
+        // Create canvas dynamically with unique ID
+        this.canvasId = `gameCanvas-${GameEnv.canvasCounter++}`;
+        this.canvas = document.createElement('canvas');
+        this.canvas.id = this.canvasId;
+        this.container.appendChild(this.canvas);
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     }
 
@@ -67,7 +91,8 @@ class GameEnv {
      */
     setTop() {
         // In builder/embedded mode, align game space to container top (no header offset)
-        if (document.getElementById('gameContainer')) {
+        // Check if container was set (after setCanvas) or if gameContainer was provided
+        if (this.container || this.gameContainer) {
             this.top = 0;
             return;
         }
@@ -104,6 +129,22 @@ class GameEnv {
  
     clear() {
         this.ctx.clearRect(0, 0, this.innerWidth, this.innerHeight);
+    }
+
+    /**
+     * Destroy the game environment and clean up the canvas.
+     * Removes the canvas element from the DOM.
+     */
+    destroy() {
+        // Remove canvas from DOM
+        if (this.canvas && this.canvas.parentNode) {
+            this.canvas.parentNode.removeChild(this.canvas);
+        }
+        
+        // Clear references
+        this.canvas = null;
+        this.ctx = null;
+        this.canvasId = null;
     }
 }
 

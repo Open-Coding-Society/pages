@@ -12,7 +12,7 @@ class GameLevelMinesweeper {
         // This method is called by GameLevel.js after creating game objects
         this.width = this.gameEnv.innerWidth;
         this.height = this.gameEnv.innerHeight;
-        this.canvas = this.gameEnv.gameCanvas;
+        this.canvas = this.gameEnv.canvas; // Use canvas created by GameEnv
         this.ctx = this.canvas.getContext('2d');
 
         // Game settings
