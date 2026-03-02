@@ -18,7 +18,7 @@ class Barrier extends GameObject {
         this.canvas.width = Math.max(1, this.width);
         this.canvas.height = Math.max(1, this.height);
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-        const container = document.getElementById('gameContainer') || this.gameEnv?.gameContainer;
+        const container = this.gameEnv?.container;
         if (container) container.appendChild(this.canvas);
         this.canvas.style.imageRendering = 'pixelated';
         this.canvas.style.zIndex = (data.zIndex !== undefined) ? String(data.zIndex) : '11';

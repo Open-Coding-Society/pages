@@ -171,3 +171,56 @@ Before finalizing your team, take a moment to consider:
 > **"What unique perspective do I bring to a team?"**
 
 **Action Item:** Each of you should write your answers in your GitHub Issues as your first individual contribution to the team.  Move comments to Done as you complete the task.  Link the comment as soon as you start it to utterance location below.
+
+---
+
+## Proof of Reading: Your Team & Persona Assignment
+
+To show you've read through this page and are ready to collaborate, you need to complete **two tasks** in your Profile Settings before your next class session.
+
+---
+
+### Task 1: Select Your Four Personas
+
+Still in [Profile Settings]({{site.baseurl}}/profile), scroll to **"Select Your Persona"** and pick one persona from each of the four categories:
+
+| Category | What It Reflects |
+|---|---|
+| **Student Archetype** | How you approach learning and teamwork |
+| **Social Interest** | Your hobbies and social interests |
+| **Achievement Oriented** | What drives and motivates you |
+| **Fantasy Persona** | Your aspirational superpower |
+
+Read the descriptions carefully — choose the ones that genuinely reflect you, not just what sounds impressive. Your teammates will see these, and they're a starting point for real conversations about how your team works best together.
+
+Once all four are selected, your **Persona Profile** card will appear with your completed identity.
+
+> **Connection to this lesson:** Re-read the *"Ask Yourself"* section above. Think about which persona you selected for **Student Archetype** — does it align with the role you want to play on your Scrum team (Planner, Technologist, Scrummer, or Closer)?
+
+---
+
+### Task 2: Join Your Scrum Team
+
+Head to your [Profile Settings]({{site.baseurl}}/profile) and find the **"Join a Group"** section.
+
+1. Search for your assigned team by name (your instructor will share team names).
+2. Click your team in the results to join it.
+3. Confirm your team appears under **"Group Information"** — you should see your team name, period, and fellow members listed.
+
+> **Why this matters:** Your group assignment connects you to your Scrum team in the system. Daily standups, Kanban boards, and sprint reviews all depend on your team being set correctly.
+
+```text
+Profile → Join a Group → Search → Select Your Team → Confirm in Group Information
+```
+
+---
+
+### Checklist Before You're Done
+
+Before your next standup, verify both items are complete:
+
+- [ ] I appear in a group under **Group Information** on my Profile page
+- [ ] I have selected all **4 personas** and my Persona Profile card is visible
+- [ ] I can answer: *"What unique perspective do I bring to my team?"*
+
+> **Action Item:** Once complete, create a GitHub Issue titled `"Team & Persona Setup"`, briefly describe your team and your Student Archetype choice, and link it in the utterance comments below. Move the issue to **Done** when finished.
