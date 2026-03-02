@@ -1,4 +1,4 @@
-import GameObject from './GameObject.js';
+import GameObject from './essentials/GameObject.js';
 import Player from './essentials/Player.js';
 
 class Coin extends GameObject {

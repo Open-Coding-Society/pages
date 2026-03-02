@@ -1,4 +1,4 @@
-import showDialogBox from './DialogBox.js';
+import showDialogBox from './essentials/DialogBox.js';
 
 class NpcProgressSystem {
     constructor() {

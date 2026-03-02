@@ -1,4 +1,3 @@
-import Game from "./essentials/Game.js";
 class Quiz {
     constructor(game = null) {
         this.game = game;

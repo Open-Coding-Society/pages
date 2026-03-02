@@ -2,17 +2,15 @@
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
-import Quiz from './Quiz.js';
-// Using v1.5 DialogueSystem for improved ID sanitization
-import DialogueSystem from '../GameEnginev1.1/DialogueSystem.js';
+// Using v1.1 DialogueSystem for improved ID sanitization
+import DialogueSystem from './essentials/DialogueSystem.js';
 import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
-import GameLevelOverworld from './GameLevelOverworld.js';
-import AINpc from '../GameEnginev1.1/ai/AiNpc.js'
-import Coin from '../GameEnginev1.1/Coin.js';
+import AINpc from './essentials/AiNpc.js'
+import Coin from './Coin.js';
 
 // Import Background for PlatformerMini
 import Background from './essentials/Background.js';
@@ -863,7 +861,7 @@ class GameLevelDesert {
        id: "ProfessorHistory", 
        greeting: "Hello! I'm an expert in history!",
        expertise: "history",
-       sprite: path + "/assets/js/GameEnginev1.1/ai/HistoryProf.png",
+       sprite: path + "/images/gamify/historyProf.png",
        spriteWidth: 559,
        spriteHeight: 263,
        scaleFactor: 0.5,

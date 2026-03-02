@@ -1,5 +1,5 @@
-import Character from './Character.js';
-import TouchControls from './TouchControls.js';
+import Character from './essentials/Character.js';
+import TouchControls from './essentials/TouchControls.js';
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
