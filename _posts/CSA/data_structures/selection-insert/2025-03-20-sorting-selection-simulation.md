@@ -3,6 +3,7 @@ layout: post
 title: Student Toolkit - Selection Sort Simulation
 description: Selection Sort animation to help visualize the sorting algorithm; meant to pair with student_toolkit sorting part 1 team teach lesson
 permalink: /toolkit-sorting-selection-simulation
+ourses: { csa: {week: 25} }
 author: Anusha Khobare, Eshaan Kumar, Matthew Wang
 ---
 
