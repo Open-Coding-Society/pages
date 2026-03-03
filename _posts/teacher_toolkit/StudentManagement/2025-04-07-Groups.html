@@ -262,93 +262,86 @@ comments: false
       </button>
     </div>
 
-    <!-- Tabs -->
-    <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-700">
-      <button id="chatTabButton"
-        class="px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white"
-        onclick="showChatTab()">Chat</button>
-      <button id="filesTabButton"
-        class="px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700"
-        onclick="showFilesTab()">Shared Files</button>
-    </div>
-
-    <div class="flex-1 flex flex-col min-h-0">
-      <!-- Chat Panel -->
-      <div id="chatPanel" class="flex-1 flex flex-col min-h-0">
-        <!-- Chat Messages Area -->
-        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
-          <div id="chatEmptyState" class="text-center text-gray-500 text-sm py-6">No messages yet.</div>
+    <!-- Chat Messages Area -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <!-- Sample Messages (Static - Non-functional) -->
+      <div class="space-y-4">
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Sarah Chen</span>
+            <span class="text-gray-500 text-xs">2h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Hey everyone! Should we meet tomorrow to review the calculus problems?</p>
         </div>
 
-        <!-- Message Input Area -->
-        <div class="p-4 border-t border-neutral-700 relative">
-          <!-- Slash Command Popup -->
-          <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
-            <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
-            <div id="slashCommandList">
-              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
-                <span class="text-lg">📅</span>
-                <div>
-                  <div class="text-white text-sm font-medium">/calendar</div>
-                  <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
-                </div>
-              </div>
-              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
-                <span class="text-lg">👤</span>
-                <div>
-                  <div class="text-white text-sm font-medium">/adduser</div>
-                  <div class="text-gray-400 text-xs">Add a user to the conversation</div>
-                </div>
-              </div>
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Marcus Rodriguez</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">That works for me! I'm free after 3pm.</p>
+          <p class="text-gray-200 text-sm mt-2">Also, did anyone finish problem set 7 yet?</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">Emily Watson</span>
+            <span class="text-gray-500 text-xs">1h ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">I did! The last three questions were tough though.</p>
+        </div>
+
+        <div>
+          <div class="flex items-baseline gap-2 mb-1">
+            <span class="text-white font-semibold text-sm">James Park</span>
+            <span class="text-gray-500 text-xs">30m ago</span>
+          </div>
+          <p class="text-gray-200 text-sm">Same here. Let's definitely go over those together.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input Area -->
+    <div class="p-4 border-t border-neutral-700 relative">
+      <!-- Slash Command Popup -->
+      <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
+        <div id="slashCommandList">
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+            <span class="text-lg">📅</span>
+            <div>
+              <div class="text-white text-sm font-medium">/calendar</div>
+              <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
             </div>
           </div>
-
-          <div id="imageMessageBox" class="mt-4 mb-4"></div>
-          <div class="flex items-center gap-2">
-            <input
-              type="text"
-              id="chatInput"
-              placeholder="Message #group-name"
-              class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              onkeydown="handleChatInputKeydown(event)"
-              oninput="handleChatInputChange(event)"
-            />
-            <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="handleChatImageSelected(event)" />
-            <button
-              class="w-12 h-12 flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors"
-              title="Attach image"
-              onclick="triggerChatImagePicker()">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9a4 4 0 10-5.657-5.657L6.343 9.343a6 6 0 108.485 8.485L20 12"></path>
-              </svg>
-            </button>
-            <button
-              class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
-              title="Send message"
-              onclick="sendChatMessage()">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-            </button>
+          <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
+            <span class="text-lg">👤</span>
+            <div>
+              <div class="text-white text-sm font-medium">/adduser</div>
+              <div class="text-gray-400 text-xs">Add a user to the conversation</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Shared Files Panel -->
-      <div id="filesPanel" class="hidden flex-1 flex flex-col min-h-0">
-        <div id="sharedFilesList" class="flex-1 overflow-y-auto p-4 space-y-3">
-          <div id="filesEmptyState" class="text-center text-gray-500 text-sm py-6">No files uploaded yet.</div>
-        </div>
-        <div class="p-4 border-t border-neutral-700">
-          <div class="flex items-center gap-2">
-            <input id="sharedFileInput" type="file"
-              class="flex-1 px-3 py-2 bg-neutral-700 text-white placeholder-gray-500 rounded-lg border border-neutral-600" />
-            <button
-              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
-              onclick="uploadSharedFile()">Upload</button>
-          </div>
-          <p class="text-xs text-gray-400 mt-2">Uploads are shared with all group members.</p>
-        </div>
+      <div id="imageMessageBox" class="mt-4 mb-4"></div>
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Message #group-name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          onkeydown="handleChatInputKeydown(event)"
+          oninput="handleChatInputChange(event)"
+        />
+        <button
+          class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+          title="Send message"
+          onclick="sendChatMessage()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -417,6 +410,82 @@ comments: false
           <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
         </div>
   
+        <!-- Prior Experiences Toggle -->
+        <div class="bg-neutral-700/60 border border-neutral-600 rounded-lg p-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-100">
+                Would you like to incorporate your prior experiences?
+              </label>
+              <p class="text-xs text-gray-400 mt-1">
+                If yes, we’ll use your past group outcomes (ratings + persona mix) to bias future team formation.
+              </p>
+            </div>
+
+            <label class="inline-flex items-center cursor-pointer select-none">
+              <input id="usePriorExpToggle" type="checkbox" class="sr-only" onchange="togglePriorExperience()" />
+              <div class="w-11 h-6 bg-neutral-600 rounded-full relative transition-colors">
+                <div id="usePriorExpKnob"
+                    class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"></div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Prior Experience Form (hidden until toggle on) -->
+          <div id="priorExperienceForm" class="hidden mt-4 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-200 mb-2">How many members were in your previous group?</label>
+                <input id="priorGroupSize" type="number" min="2" max="10" value="4"
+                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+                  <input id="priorStudentRating" type="number" min="1" max="5" value="4"
+                    class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+                  <input id="priorTeacherRating" type="number" min="1" max="5" value="4"
+                    class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">
+                Personas of members in that group (select all that applied)
+              </label>
+              <div id="priorPersonaChoices" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+              <p class="text-xs text-gray-400 mt-2">
+                Tip: choose the persona mix that best matches the group you’re describing.
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">One-line note (optional)</label>
+              <input id="priorNote" type="text" maxlength="160"
+                placeholder="e.g., Great role balance, clear communication"
+                class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-gray-400">
+                We’ll also include any saved group feedback already stored locally on this device.
+              </p>
+              <button type="button"
+                class="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-gray-200 rounded-lg text-xs border border-neutral-600"
+                onclick="previewPriorFeedbackCount()">
+                Preview stored feedback
+              </button>
+            </div>
+
+            <div id="priorFeedbackStatus" class="text-xs text-gray-300"></div>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
           <button onclick="closeSmartGroupModal()"
@@ -453,6 +522,84 @@ comments: false
     </div>
   </div>
   
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeFeedbackModal()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <div>
+        <h3 id="feedbackModalTitle" class="text-xl font-semibold text-white">Group Feedback</h3>
+        <p id="feedbackModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+      </div>
+      <button type="button" onclick="closeFeedbackModal()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4 space-y-4">
+      <!-- Course Category (CSA/CSP/CSSE) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Course Category</label>
+        <select id="fbCourse"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="CSA">CSA</option>
+          <option value="CSP">CSP</option>
+          <option value="CSSE">CSSE</option>
+        </select>
+      </div>
+
+      <!-- Student feedback -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+          <input id="fbStudentRating" type="number" min="1" max="5" value="4"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">How well did the group work together?</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+          <input id="fbTeacherRating" type="number" min="1" max="5" value="4"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Teacher assessment of effectiveness.</p>
+        </div>
+      </div>
+
+      <!-- One-line explanation -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">One-line explanation</label>
+        <input id="fbNote" type="text" maxlength="160"
+          placeholder="e.g., Clear roles + everyone contributed"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+
+      <!-- Status -->
+      <div id="fbStatus" class="text-sm text-gray-300"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+      <button type="button" onclick="closeFeedbackModal()"
+        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+        Cancel
+      </button>
+      <button type="button" onclick="submitGroupFeedback()"
+        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+        Submit Feedback
+      </button>
+    </div>
+  </div>
+</div>
+
+
 
 <script>
   // Slash command handling
@@ -557,10 +704,74 @@ comments: false
     }
   }
 
+  // Send chat message function
+  function sendChatMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const imageMessageBox = document.getElementById('imageMessageBox');
+    const chatMessages = document.getElementById('chatMessages');
+
+    const text = chatInput.value.trim();
+    const imageEl = imageMessageBox.querySelector('img');
+
+    // Don't send if both text and image are empty
+    if (!text && !imageEl) return;
+
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = `
+      <div class="flex items-baseline gap-2 mb-1">
+        <span class="text-white font-semibold text-sm">You</span>
+        <span class="text-gray-500 text-xs">Just now</span>
+      </div>
+      ${text ? `<p class="text-gray-200 text-sm">${text}</p>` : ''}
+      ${imageEl ? `<img src="${imageEl.src}" alt="Shared image" class="mt-2 max-w-xs rounded-lg" />` : ''}
+    `;
+
+    // Add to chat messages
+    chatMessages.appendChild(messageDiv);
+
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Clear input and image
+    chatInput.value = '';
+    imageMessageBox.innerHTML = '';
+  }
+
   document.addEventListener('paste', function(event) {
-    if (document.getElementById('chatModal').classList.contains('hidden')) return;
-    if (typeof window.handlePastedChatImage === 'function') {
-      window.handlePastedChatImage(event);
+    const items = (event.clipboardData || window.clipboardData).items;
+    let imageFile = null;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        imageFile = items[i].getAsFile();
+        break;
+      }
+    }
+
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '100px'; // Smaller version
+        img.alt = 'Copied Image';
+
+        // Show the image in a message box or a designated area
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '';
+        messageBox.appendChild(img);
+      };
+      reader.onerror = function() {
+        console.error('Image copy failed');
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '<span style="color: red;">Image copy failed</span>';
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      console.error('No image found in clipboard');
+      const messageBox = document.getElementById('imageMessageBox');
+      messageBox.innerHTML = '<span style="color: red;">No image found in clipboard</span>';
     }
   });
 </script>
@@ -640,13 +851,6 @@ let loadingCount = 0;  // Track concurrent loading operations
 let isAdmin = false;   // Track if current user is an admin
 let selectedUsersForGroup = {}; // Track multi-select members per group
 let collapsedGroups = {}; // Track collapsed state per group ID
-let activeChatGroupId = null;
-let activeChatGroupName = '';
-let chatPollTimer = null;
-let currentUser = null;
-let currentUserDisplayName = 'You';
-let pendingChatImageBase64 = null;
-let pendingChatImageMime = 'image/png';
 
 /* ================================
    LOADING HELPERS
@@ -707,8 +911,6 @@ function initializeData() {
       allGroups = groups;
       peopleCache = people;
       isAdmin = user && user.role === "Admin";
-      currentUser = user || null;
-      currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
       renderGroups();
     })
     .catch(err => console.error("Failed to initialize data", err))
@@ -729,336 +931,6 @@ window.getPersonIdFromUID = function (uid) {
     throw new Error(`UID not found: ${uid}`);
   }
   return match.id;
-};
-
-/* ================================
-   CHAT + FILES HELPERS
-================================ */
-function formatTimestamp(isoString) {
-  if (!isoString) return '';
-  const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  });
-}
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result.split(',')[1];
-      resolve(base64);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function setChatImagePreview(base64, mimeType = 'image/png') {
-  pendingChatImageBase64 = base64;
-  pendingChatImageMime = mimeType;
-  const messageBox = document.getElementById('imageMessageBox');
-  messageBox.innerHTML = '';
-  const img = document.createElement('img');
-  img.src = `data:${mimeType};base64,${base64}`;
-  img.alt = 'Selected image';
-  img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-  messageBox.appendChild(img);
-}
-
-function clearChatImagePreview() {
-  pendingChatImageBase64 = null;
-  pendingChatImageMime = 'image/png';
-  const messageBox = document.getElementById('imageMessageBox');
-  messageBox.innerHTML = '';
-}
-
-window.triggerChatImagePicker = function () {
-  const input = document.getElementById('chatImageInput');
-  if (input) input.click();
-};
-
-window.handleChatImageSelected = async function (event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const base64 = await fileToBase64(file);
-    setChatImagePreview(base64, file.type || 'image/png');
-  } catch (err) {
-    console.error('Failed to read image', err);
-  }
-};
-
-window.handlePastedChatImage = async function (event) {
-  const items = (event.clipboardData || window.clipboardData)?.items || [];
-  const imageItem = Array.from(items).find(item => item.type.startsWith('image/'));
-  if (!imageItem) return;
-  const imageFile = imageItem.getAsFile();
-  if (!imageFile) return;
-  try {
-    const base64 = await fileToBase64(imageFile);
-    setChatImagePreview(base64, imageFile.type || 'image/png');
-  } catch (err) {
-    console.error('Image paste failed', err);
-  }
-};
-
-function renderChatMessages(messages) {
-  const chatMessages = document.getElementById('chatMessages');
-  let emptyState = document.getElementById('chatEmptyState');
-  chatMessages.innerHTML = '';
-
-  if (!emptyState) {
-    emptyState = document.createElement('div');
-    emptyState.id = 'chatEmptyState';
-    emptyState.className = 'text-center text-gray-500 text-sm py-6';
-    emptyState.textContent = 'No messages yet.';
-  }
-
-  if (!messages || messages.length === 0) {
-    chatMessages.appendChild(emptyState);
-    emptyState.classList.remove('hidden');
-    return;
-  }
-
-  emptyState.classList.add('hidden');
-  messages.forEach(msg => {
-    const wrapper = document.createElement('div');
-
-    const header = document.createElement('div');
-    header.className = 'flex items-baseline gap-2 mb-1';
-
-    const nameEl = document.createElement('span');
-    nameEl.className = 'text-white font-semibold text-sm';
-    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-    const timeEl = document.createElement('span');
-    timeEl.className = 'text-gray-500 text-xs';
-    timeEl.textContent = formatTimestamp(msg.date);
-
-    header.appendChild(nameEl);
-    header.appendChild(timeEl);
-    wrapper.appendChild(header);
-
-    if (msg.message) {
-      const textEl = document.createElement('p');
-      textEl.className = 'text-gray-200 text-sm';
-      textEl.textContent = msg.message;
-      wrapper.appendChild(textEl);
-    }
-
-    if (msg.image) {
-      const img = document.createElement('img');
-      img.src = `data:image/png;base64,${msg.image}`;
-      img.alt = 'Shared image';
-      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-      wrapper.appendChild(img);
-    }
-
-    chatMessages.appendChild(wrapper);
-  });
-
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-async function fetchChatMessages() {
-  if (!activeChatGroupId) return;
-  try {
-    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, fetchOptions);
-    if (!res.ok) throw new Error('Failed to load chat messages');
-    const messages = await res.json();
-    renderChatMessages(messages);
-  } catch (err) {
-    console.error('Chat fetch failed', err);
-  }
-}
-
-window.sendChatMessage = async function () {
-  if (!activeChatGroupId) return;
-  const chatInput = document.getElementById('chatInput');
-  const text = chatInput.value.trim();
-  const image = pendingChatImageBase64 || null;
-
-  if (!text && !image) return;
-
-  const payload = {
-    name: currentUserDisplayName,
-    message: text,
-    date: new Date().toISOString(),
-    image: image
-  };
-
-  try {
-    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
-      ...fetchOptions,
-      method: 'POST',
-      headers: {
-        ...(fetchOptions.headers || {}),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error('Failed to send message');
-    const messages = await res.json();
-    renderChatMessages(messages);
-    chatInput.value = '';
-    clearChatImagePreview();
-  } catch (err) {
-    console.error('Send message failed', err);
-  }
-};
-
-function startChatPolling() {
-  if (chatPollTimer) clearInterval(chatPollTimer);
-  chatPollTimer = setInterval(fetchChatMessages, 4000);
-}
-
-function stopChatPolling() {
-  if (chatPollTimer) {
-    clearInterval(chatPollTimer);
-    chatPollTimer = null;
-  }
-}
-
-function downloadBase64File(filename, base64Data) {
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: 'application/octet-stream' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function isImageFile(filename) {
-  return /\.(png|jpe?g|gif)$/i.test(filename || '');
-}
-
-function getImageMimeType(filename) {
-  if (/\.jpe?g$/i.test(filename)) return 'image/jpeg';
-  if (/\.gif$/i.test(filename)) return 'image/gif';
-  return 'image/png';
-}
-
-function renderSharedFiles(files) {
-  const list = document.getElementById('sharedFilesList');
-  let emptyState = document.getElementById('filesEmptyState');
-  list.innerHTML = '';
-
-  if (!emptyState) {
-    emptyState = document.createElement('div');
-    emptyState.id = 'filesEmptyState';
-    emptyState.className = 'text-center text-gray-500 text-sm py-6';
-    emptyState.textContent = 'No files uploaded yet.';
-  }
-
-  if (!files || files.length === 0) {
-    list.appendChild(emptyState);
-    emptyState.classList.remove('hidden');
-    return;
-  }
-
-  emptyState.classList.add('hidden');
-  files.forEach(file => {
-    const card = document.createElement('div');
-    card.className = 'bg-neutral-700 border border-neutral-600 rounded-lg p-3 flex items-center gap-3';
-
-    if (isImageFile(file.filename)) {
-      const img = document.createElement('img');
-      const mime = getImageMimeType(file.filename);
-      img.src = `data:${mime};base64,${file.base64Data}`;
-      img.alt = file.filename;
-      img.className = 'w-12 h-12 object-cover rounded-md border border-neutral-600';
-      card.appendChild(img);
-    } else {
-      const icon = document.createElement('div');
-      icon.className = 'w-12 h-12 flex items-center justify-center bg-neutral-800 rounded-md text-gray-400 text-sm';
-      icon.textContent = 'FILE';
-      card.appendChild(icon);
-    }
-
-    const info = document.createElement('div');
-    info.className = 'flex-1';
-    const nameEl = document.createElement('div');
-    nameEl.className = 'text-white text-sm font-medium';
-    nameEl.textContent = file.filename;
-    info.appendChild(nameEl);
-    card.appendChild(info);
-
-    const downloadBtn = document.createElement('button');
-    downloadBtn.className = 'px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg';
-    downloadBtn.textContent = 'Download';
-    downloadBtn.addEventListener('click', () => downloadBase64File(file.filename, file.base64Data));
-    card.appendChild(downloadBtn);
-
-    list.appendChild(card);
-  });
-}
-
-async function fetchSharedFiles() {
-  if (!activeChatGroupId) return;
-  try {
-    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, fetchOptions);
-    if (!res.ok) throw new Error('Failed to load shared files');
-    const files = await res.json();
-    renderSharedFiles(files);
-  } catch (err) {
-    console.error('Shared files fetch failed', err);
-  }
-}
-
-window.uploadSharedFile = async function () {
-  if (!activeChatGroupId) return;
-  const input = document.getElementById('sharedFileInput');
-  const file = input.files?.[0];
-  if (!file) return;
-
-  try {
-    const base64Data = await fileToBase64(file);
-    const payload = { filename: file.name, base64Data };
-
-    const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, {
-      ...fetchOptions,
-      method: 'POST',
-      headers: {
-        ...(fetchOptions.headers || {}),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error('Failed to upload file');
-    input.value = '';
-    await fetchSharedFiles();
-  } catch (err) {
-    console.error('Upload failed', err);
-  }
-};
-
-window.showChatTab = function () {
-  document.getElementById('chatPanel').classList.remove('hidden');
-  document.getElementById('filesPanel').classList.add('hidden');
-  document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
-  document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
-};
-
-window.showFilesTab = function () {
-  document.getElementById('filesPanel').classList.remove('hidden');
-  document.getElementById('chatPanel').classList.add('hidden');
-  document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
-  document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
-  fetchSharedFiles();
 };
 
 // Get person object from cache by ID
@@ -1256,9 +1128,6 @@ window.openGroupChat = function (groupId, groupName) {
     return;
   }
 
-  activeChatGroupId = groupId;
-  activeChatGroupName = groupName;
-
   const memberCount = (group.members || []).length;
 
   // Update modal header
@@ -1275,12 +1144,6 @@ window.openGroupChat = function (groupId, groupName) {
   document.getElementById('chatModal').classList.remove('hidden');
   document.body.classList.add('modal-open');
 
-  showChatTab();
-  clearChatImagePreview();
-  fetchChatMessages();
-  fetchSharedFiles();
-  startChatPolling();
-
   // Log for debugging
   console.log(`Opening chat for group: ${groupName} (ID: ${groupId})`);
   console.log("Group members:", group.members);
@@ -1290,10 +1153,6 @@ window.openGroupChat = function (groupId, groupName) {
 window.closeGroupChat = function () {
   document.getElementById('chatModal').classList.add('hidden');
   document.body.classList.remove('modal-open');
-  stopChatPolling();
-  activeChatGroupId = null;
-  activeChatGroupName = '';
-  clearChatImagePreview();
 }
 
 // Delete group with chaining - updates local state instead of refetching
@@ -1474,6 +1333,14 @@ window.renderGroups = function () {
             💬
           </button>
 
+          <!-- Feedback button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
+            title="Submit feedback for this group"
+            onclick="openFeedbackModal(${group.id})">
+            📝
+          </button>
+
           <!-- Trash (admin only) -->
           ${isAdmin ? `
           <button
@@ -1587,6 +1454,102 @@ window.cancelAddGroup = function () {
   document.getElementById("newGroupName").value = "";
   document.getElementById("newGroupPeriod").value = "";
   document.getElementById("newGroupClass").value = "";
+}
+
+/* ================================
+   PRIOR EXPERIENCE (Smart Groups)
+================================ */
+
+const PERSONA_OPTIONS = [
+  "Technologist","Scrummer", "Planner", "Closer"
+];
+
+function renderPriorPersonaChoices() {
+  const wrap = document.getElementById("priorPersonaChoices");
+  if (!wrap) return;
+
+  wrap.innerHTML = PERSONA_OPTIONS.map(p => `
+    <label class="flex items-center gap-2 px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg cursor-pointer hover:bg-neutral-700">
+      <input type="checkbox" class="accent-indigo-500 prior-persona-checkbox" value="${p}">
+      <span class="text-sm text-gray-200">${p}</span>
+    </label>
+  `).join("");
+}
+
+window.togglePriorExperience = function () {
+  const toggle = document.getElementById("usePriorExpToggle");
+  const knob = document.getElementById("usePriorExpKnob");
+  const form = document.getElementById("priorExperienceForm");
+
+  if (!toggle || !knob || !form) return;
+
+  const on = toggle.checked;
+  form.classList.toggle("hidden", !on);
+
+  // tiny visual toggle effect
+  knob.style.transform = on ? "translateX(20px)" : "translateX(0px)";
+  toggle.parentElement.querySelector("div").style.backgroundColor = on ? "#4f46e5" : "#525252";
+
+  if (on) renderPriorPersonaChoices();
+};
+
+window.previewPriorFeedbackCount = function () {
+  const status = document.getElementById("priorFeedbackStatus");
+  if (!status) return;
+
+  const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
+  status.textContent = `Stored feedback rows on this device: ${stored.length}`;
+};
+
+// Builds one feedback row from the inline “prior experiences” form
+function readInlinePriorExperienceRow() {
+  const enabled = document.getElementById("usePriorExpToggle")?.checked;
+  if (!enabled) return null;
+
+  const prevSize = parseInt(document.getElementById("priorGroupSize")?.value || "0", 10);
+  const studentRating = parseInt(document.getElementById("priorStudentRating")?.value || "0", 10);
+  const teacherRating = parseInt(document.getElementById("priorTeacherRating")?.value || "0", 10);
+  const note = (document.getElementById("priorNote")?.value || "").trim();
+
+  if (!(prevSize >= 2 && prevSize <= 10)) throw new Error("Prior group size must be 2–10.");
+  if (!(studentRating >= 1 && studentRating <= 5)) throw new Error("Prior student rating must be 1–5.");
+  if (!(teacherRating >= 1 && teacherRating <= 5)) throw new Error("Prior teacher rating must be 1–5.");
+
+  const personas = [...document.querySelectorAll(".prior-persona-checkbox:checked")].map(cb => cb.value);
+  if (!personas.length) throw new Error("Select at least 1 persona for the prior group.");
+
+  return {
+    ts: Date.now(),
+    source: "inline_prior_experience",
+    prev_group_size: prevSize,
+    personas: personas,
+    student_rating_1to5: studentRating,
+    teacher_rating_1to5: teacherRating,
+    note
+  };
+}
+
+// Collects feedback rows that will be sent to Flask:
+// - localStorage saved feedback (your existing modal submissions)
+// - + the inline prior experience row (if enabled)
+function collectFeedbackRowsForTraining() {
+  const toggleOn = document.getElementById("usePriorExpToggle")?.checked;
+  if (!toggleOn) return [];
+
+  const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
+  const normalizedStored = stored.map(r => ({
+    ts: r.ts,
+    source: "stored_group_feedback",
+    prev_group_size: (r.members?.length ? r.members.length : null),
+    // if you later add personas snapshot to stored feedback, include it here:
+    personas: r.personas || null,
+    student_rating_1to5: r.student_rating_1to5,
+    teacher_rating_1to5: r.teacher_rating_1to5,
+    note: r.note
+  }));
+
+  const inlineRow = readInlinePriorExperienceRow(); // can throw
+  return inlineRow ? [...normalizedStored, inlineRow] : normalizedStored;
 }
 
 /* ================================
@@ -1727,12 +1690,23 @@ window.generateSmartGroups = async function() {
       
       showLoading('Using AI to create optimal groups...');
       
+      let feedbackRows = [];
+      try {
+        feedbackRows = collectFeedbackRowsForTraining(); // only non-empty if toggle ON
+      } catch (e) {
+        alert(`Prior experience input error: ${e.message}`);
+        hideLoading();
+        return;
+      }
+
       const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
         ...fetchOptions,
         method: 'POST',
         body: JSON.stringify({
           user_uids: user_uids,
-          group_size: groupSize
+          group_size: groupSize,
+          incorporate_prior_experiences: (feedbackRows.length > 0),
+          feedback_rows: feedbackRows
         })
       });
 

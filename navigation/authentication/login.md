@@ -136,7 +136,7 @@ show_reading_time: false
 
         // Set new timeout for 1.5 seconds
         validationTimeout = setTimeout(() => {
-            validatePasswords();
+            validateForm();
         }, 1500);
     }
 

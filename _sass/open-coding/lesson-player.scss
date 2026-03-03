@@ -190,9 +190,9 @@ body:has(.lesson-player) {
 }
 
 /* Top Bar */
-.lesson-topbar {
+.topbar-lesson {
   border-bottom: 1px solid $bg-3;
-  padding: 8px 24px;
+  padding: 6px 24px;
 }
 
 .topbar-actions {
@@ -200,13 +200,6 @@ body:has(.lesson-player) {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
-}
-
-.back-btn {
-  @include text-button;
-  display: flex;
-  align-items: center;
-  border: none;
 }
 
 .breadcrumbs {
@@ -236,21 +229,16 @@ body:has(.lesson-player) {
 }
 
 /* Lesson Content */
-.lesson-content {
+.lesson-content,
+.lesson-content-inner,
+.lesson-header {
   flex: 1;
   overflow-y: auto;
-  padding: 48px 64px;
-}
-
-.lesson-content-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.lesson-header h1 {
-  color: $text;
-  font-size: 2rem;
-  margin: 0 0 12px 0;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  padding: 6px 24px;
+  box-sizing: border-box; // This is important!
 }
 
 .lesson-meta {
@@ -259,8 +247,9 @@ body:has(.lesson-player) {
   gap: 16px;
   color: $text;
   font-size: 14px;
-  margin-bottom: 32px;
+  margin-bottom: 6px;
 }
+
 
 .lesson-body {
   color: $text-muted;
@@ -270,7 +259,7 @@ body:has(.lesson-player) {
 .lesson-body h2 {
   color: $text;
   font-size: 1.5rem;
-  margin: 32px 0 16px 0;
+  margin: 0;
 }
 
 .lesson-body h3 {
@@ -580,37 +569,6 @@ body:has(.lesson-player) {
   gap: 12px;
 }
 
-.btn {
-  @include text-button;
-  font-size: 14px;
-  display: flex;
-
-  @media (max-width: 768px) {
-    flex: 1;
-  }
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--pref-accent-color);
-  color: $text;
-}
-
-.btn-outline:hover {
-  background: rgba($accent, 0.08);
-  color: var(--pref-text-color, $text);
-}
-
-.btn-primary {
-
-  background: $accent;
-  color: $bg-0;
-}
-
-.btn-primary:hover {
-  background: $accent-700;
-}
-
 /* Floating Menu Button (Mobile) */
 .floating-menu-btn {
   @include icon-button(20px, 0);
@@ -623,7 +581,6 @@ body:has(.lesson-player) {
   border-radius: 50%;
   z-index: 1000;
 }
-
 
 /* Timeline Modal - applies to all screen sizes */
 .timeline-modal {
@@ -817,10 +774,6 @@ body:has(.lesson-player) {
     display: flex;
   }
 
-  .lesson-topbar {
-    padding: 12px 16px;
-  }
-
   .topbar-actions {
     flex-direction: column;
     align-items: flex-start;
@@ -829,20 +782,6 @@ body:has(.lesson-player) {
 
   .breadcrumbs {
     font-size: 12px;
-  }
-
-  .lesson-content {
-    padding: 16px;
-    overflow-y: visible; /* ADD THIS - was auto, causing issues */
-    height: auto; /* ADD THIS */
-  }
-
-  .lesson-content-inner {
-    max-width: 100%; /* ADD THIS */
-  }
-
-  .lesson-header h1 {
-    font-size: 1.5rem;
   }
 
   .lesson-meta {

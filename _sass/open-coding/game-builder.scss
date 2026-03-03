@@ -1,0 +1,775 @@
+// ===========================
+// GameBuilder Styles
+// ===========================
+// Standardized three-panel layout system for interactive builder interfaces
+// This file demonstrates reusable patterns for: asset panels, code editors, and preview areas
+//
+// ARCHITECTURE PATTERN
+// --------------------
+// The GameBuilder uses a flexible three-column layout:
+//   1. LEFT PANEL (Asset/Config): Form inputs, asset selection, configuration
+//   2. CENTER PANEL (Main): Split-view supporting code editor and/or preview
+//   3. Responsive: Stacks vertically on mobile, maintains usability
+//
+// THEME INTEGRATION
+// -----------------
+// Uses CSS custom properties from user-preferences.js:
+//   --pref-bg-color, --pref-text-color, --pref-font-family, --pref-font-size
+//   --pref-accent-color, --pref-selection-color
+//   --panel, --panel-mid, --ui-bg, --ui-border
+//   --text-muted, --background
+//
+// REUSABILITY GUIDE
+// -----------------
+// This file defines mixins in the "Three-Panel Layout Mixins" section that can be
+// reused in other builder interfaces. Import this file and use these mixins:
+//
+//   @import "open-coding/game-builder";
+//
+//   .my-custom-builder {
+//     @include three-panel-layout;
+//     
+//     .my-left-panel {
+//       @include asset-panel;
+//     }
+//     
+//     .my-main-panel {
+//       @include main-content-panel;
+//     }
+//   }
+//
+// MIXINS AVAILABLE FOR REUSE
+// ---------------------------
+// - three-panel-layout: Base layout container
+// - asset-panel: Left/config panel styling
+// - main-content-panel: Center/main panel styling
+// - glass-panel: Glassmorphic panel effect
+// - panel-header-bar: Consistent header with controls
+// - view-mode-controls: Toggle buttons for view modes
+// - code-editor-container: Syntax-highlighted code area
+// - preview-frame: iframe/game preview area
+// - form-section: Grouped form inputs
+//
+// ===========================
+
+@import "mixins/buttons";
+@import "mixins/panel";
+@import "mixins/modals";
+@import "mixins/container";
+
+// ===========================
+// Three-Panel Layout Mixins
+// ===========================
+// These mixins provide the foundation for builder interfaces
+// and can be reused across different builder pages
+
+/**
+ * Three-Panel Layout Container
+ * Creates a flexible three-column layout with gap spacing
+ * Automatically stacks on mobile devices
+ *
+ * @param {Number} $gap - Space between panels (default: 10px)
+ * @param {Number} $padding - Container padding (default: 10px)
+ * @param {Number} $height - Viewport height (default: 92vh)
+ *
+ * @example
+ *   .my-builder-layout {
+ *     @include three-panel-layout;
+ *   }
+ */
+@mixin three-panel-layout($gap: 10px, $padding: 10px, $height: 92vh) {
+  display: flex;
+  gap: $gap;
+  padding: $padding;
+  height: $height;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+  }
+}
+
+/**
+ * Asset/Config Panel (Left Panel)
+ * Fixed-width panel for controls, forms, and asset selection
+ *
+ * @param {Number} $flex-basis - Width percentage (default: 20%)
+ *
+ * @example
+ *   .config-panel {
+ *     @include asset-panel;
+ *   }
+ */
+@mixin asset-panel($flex-basis: 20%) {
+  flex: 0 0 $flex-basis;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 768px) {
+    flex: none;
+    max-height: 300px;
+  }
+}
+
+/**
+ * Main Content Panel (Center/Right Panel)
+ * Flexible panel for primary content, supports split views
+ *
+ * @example
+ *   .main-panel {
+ *     @include main-content-panel;
+ *   }
+ */
+@mixin main-content-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  position: relative;
+
+  @media (max-width: 768px) {
+    flex: none;
+    min-height: 600px;
+  }
+}
+
+/**
+ * Glass Panel Effect
+ * Modern glassmorphic panel with backdrop blur
+ *
+ * @param {Color} $bg - Background color (default: rgba(0,0,0,0.3))
+ * @param {Number} $blur - Backdrop blur amount (default: 20px)
+ * @param {Number} $border-radius - Corner radius (default: 12px)
+ *
+ * @example
+ *   .glass-panel {
+ *     @include glass-panel-effect;
+ *   }
+ */
+@mixin glass-panel-effect($bg: rgba(0,0,0,0.3), $blur: 20px, $border-radius: 12px) {
+  background: $bg;
+  backdrop-filter: blur($blur);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: $border-radius;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/**
+ * Panel Header Bar
+ * Consistent header with title and control buttons
+ *
+ * @param {Number} $padding - Inner padding (default: 16px)
+ *
+ * @example
+ *   .panel-header {
+ *     @include panel-header-bar;
+ *   }
+ */
+@mixin panel-header-bar($padding: 16px) {
+  padding: $padding;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/**
+ * View Mode Toggle Controls
+ * Buttons to switch between different view modes (code/game/split)
+ *
+ * @example
+ *   .view-controls {
+ *     @include view-mode-controls;
+ *   }
+ */
+@mixin view-mode-controls {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+/**
+ * View Mode Button
+ * Individual toggle button for view switching
+ *
+ * @example
+ *   .view-btn {
+ *     @include view-toggle-button;
+ *   }
+ */
+@mixin view-toggle-button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  background: rgba(0,0,0,0.3);
+  cursor: pointer;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+
+  &.active {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--pref-accent-color);
+  }
+
+  &:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+  }
+}
+
+/**
+ * Code Editor Container
+ * Dual-layer container for syntax highlighting
+ * Supports both textarea editing and visual highlights
+ *
+ * @example
+ *   .editor-container {
+ *     @include code-editor-container;
+ *   }
+ */
+@mixin code-editor-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+/**
+ * Code Layer (Editable Text)
+ * Transparent textarea for code input
+ *
+ * @example
+ *   .code-layer {
+ *     @include code-text-layer;
+ *   }
+ */
+@mixin code-text-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 20px;
+  border: none;
+  resize: none;
+  outline: none;
+  z-index: 2;
+  white-space: pre;
+  overflow: auto;
+}
+
+/**
+ * Highlight Layer (Visual Overlay)
+ * Non-interactive layer for syntax highlighting
+ *
+ * @example
+ *   .highlight-layer {
+ *     @include code-highlight-layer;
+ *   }
+ */
+@mixin code-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/**
+ * Preview/Game Frame
+ * Container for iframe or canvas preview
+ *
+ * @example
+ *   .game-frame {
+ *     @include preview-frame;
+ *   }
+ */
+@mixin preview-frame {
+  flex: 1;
+  position: relative;
+
+  iframe, canvas {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+}
+
+/**
+ * Scrollable Form Container
+ * Scrollable area for form inputs
+ *
+ * @param {Number} $padding - Inner padding (default: 15px)
+ *
+ * @example
+ *   .scroll-form {
+ *     @include scrollable-form;
+ *   }
+ */
+@mixin scrollable-form($padding: 15px) {
+  flex: 1;
+  overflow-y: auto;
+  padding: $padding;
+}
+
+/**
+ * Form Section Group
+ * Grouped section for related form fields
+ *
+ * @param {Number} $padding - Inner padding (default: 14px)
+ * @param {Number} $margin-bottom - Bottom margin (default: 15px)
+ *
+ * @example
+ *   .asset-group {
+ *     @include form-section-group;
+ *   }
+ */
+@mixin form-section-group($padding: 14px, $margin-bottom: 15px) {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: $padding;
+  margin-bottom: $margin-bottom;
+}
+
+/**
+ * Section Group Title
+ * Title header for form sections
+ *
+ * @example
+ *   .group-title {
+ *     @include section-group-title;
+ *   }
+ */
+@mixin section-group-title {
+  font-size: 0.8em;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/**
+ * Icon Button with Tooltip
+ * Small icon button with hover tooltip
+ *
+ * @param {Number} $size - Button size (default: 32px)
+ *
+ * @example
+ *   .icon-btn {
+ *     @include icon-button-tooltip;
+ *   }
+ */
+@mixin icon-button-tooltip($size: 32px) {
+  @include icon-button($size, 0);
+  position: relative;
+
+  &:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+  }
+}
+
+// ===========================
+// GameBuilder Specific Styles
+// ===========================
+// Applying the mixins to actual GameBuilder classes
+
+// Page title
+.gamebuilder-title {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  letter-spacing: 2px;
+
+  @media (max-width: 768px) {
+    font-size: 1.2em;
+  }
+}
+
+// Main layout container
+.creator-layout {
+  @include three-panel-layout;
+}
+
+// Left panel (assets/config)
+.col-asset {
+  @include asset-panel;
+}
+
+// Main panel (code + game)
+.col-main {
+  @include main-content-panel;
+
+  // View mode states
+  &.view-code .panel-game { display: none; }
+  &.view-game .panel-code { display: none; }
+
+  &.view-code .panel-code,
+  &.view-game .panel-game {
+    flex: 1;
+  }
+
+  // Split view: side-by-side layout
+  &.view-split .main-content {
+    flex-direction: row;
+  }
+
+  &.view-split .panel-game {
+    flex: 0 0 55%;
+  }
+
+  &.view-split .panel-code {
+    flex: 1;
+  }
+
+  // Mobile: always show both panels stacked
+  @media (max-width: 768px) {
+    &.view-code .panel-game,
+    &.view-game .panel-code {
+      display: flex !important;
+    }
+
+    .main-content {
+      flex-direction: column !important;
+    }
+
+    .panel-game {
+      flex: 0 0 45% !important;
+    }
+
+    .panel-code {
+      flex: 1 !important;
+    }
+  }
+}
+
+// View mode controls
+.view-controls {
+  @include view-mode-controls;
+}
+
+.view-btn {
+  @include view-toggle-button;
+}
+
+// Main content container
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+// Glass panels
+.glass-panel {
+  @include glass-panel-effect;
+}
+
+// Panel headers
+.panel-header {
+  @include panel-header-bar;
+}
+
+.panel-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+// Icon buttons with tooltips
+.icon-btn {
+  @include icon-button-tooltip;
+
+  &.staged {
+    box-shadow: 0 0 10px rgba(0,200,0,0.9);
+    border-color: rgba(0,200,0,0.9);
+  }
+}
+
+.step-indicator {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+// Add item button (smaller variant)
+.add-item-btn {
+  @include icon-button-tooltip(24px);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+}
+
+// Scrollable form
+.scroll-form {
+  @include scrollable-form;
+}
+
+// Form sections
+.asset-group {
+  @include form-section-group;
+}
+
+.group-title {
+  @include section-group-title;
+}
+
+// Form elements - scoped to GameBuilder to override global input styles
+.creator-layout {
+  label {
+    display: block;
+    font-size: 0.7em;
+    margin-bottom: 5px;
+  }
+
+  select, 
+  input {
+    width: 100%;
+    padding: 8px !important; // Override global 15px padding
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin-bottom: 10px;
+    color: var(--pref-text-color, #fff);
+    background: var(--pref-bg-color, #000);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-sizing: border-box; // Ensure padding doesn't cause overflow
+  }
+
+  select {
+    color: var(--pref-text-color, #fff);
+    background: var(--pref-bg-color, #000);
+
+    option {
+      color: var(--pref-text-color, #fff);
+      background: var(--pref-bg-color, #000);
+    }
+
+    &:disabled,
+    option[disabled] {
+      color: var(--text-muted, rgba(255,255,255,0.5));
+    }
+  }
+}
+
+// Standard buttons - scoped to GameBuilder to override global .btn styles
+.creator-layout {
+  .btn {
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    background: var(--pref-bg-color);
+    color: var(--pref-text-color);
+    font-family: var(--pref-font-family);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0; // Override global margin
+
+    &:hover {
+      background: var(--panel-mid);
+      opacity: 0.9;
+    }
+  }
+
+  .btn-sm {
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 0.7em;
+  }
+
+  .btn-confirm {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+  }
+
+  .btn-run {
+    @include emphasized-icon-button;
+  }
+
+  .btn-danger {
+    background: #e74c3c;
+    border-color: #e74c3c;
+  }
+}
+
+// Help panel
+.help-panel {
+  display: none;
+  position: absolute;
+  top: 50px;
+  right: 16px;
+  background: rgba(0,0,0,0.95);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 300px;
+  z-index: 100;
+  font-size: 0.85em;
+  line-height: 1.4;
+
+  &.active {
+    display: block;
+  }
+}
+
+// Code editor
+.code-panel {
+  flex: 1;
+  position: relative;
+}
+
+.editor-container {
+  @include code-editor-container;
+}
+
+.code-layer {
+  @include code-text-layer;
+}
+
+.highlight-layer {
+  @include code-highlight-layer;
+}
+
+// Highlight boxes
+.highlight-box {
+  position: absolute;
+  background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
+  border-left: 4px solid var(--pref-accent-color);
+  left: 10px;
+  width: calc(100% - 20px);
+  display: block !important;
+}
+
+.highlight-persistent-block {
+  position: absolute;
+  background: rgba(255, 230, 0, 0.6);
+  border: 2px solid #ffdd00;
+  border-left-width: 4px;
+  left: 10px;
+  width: calc(100% - 20px);
+}
+
+.typing-highlight {
+  position: absolute;
+  background: color-mix(in srgb, var(--pref-accent-color) 25%, transparent);
+  border-left: 4px solid var(--pref-accent-color);
+  left: 10px;
+  width: calc(100% - 20px);
+}
+
+// Game preview frame
+.game-frame {
+  @include preview-frame;
+}
+
+// Wall/barrier drawing overlay
+.draw-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+
+  &.active {
+    pointer-events: auto;
+  }
+
+  &.mode-barrier {
+    cursor: crosshair;
+  }
+}
+
+.draw-rect {
+  position: absolute;
+  box-sizing: border-box;
+
+  &.barrier {
+    border: 2px solid #ff2d2d;
+    background: rgba(255,0,0,0.05);
+  }
+}
+
+.draw-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.draw-btn {
+  @include text-button;
+  padding: 8px;
+  font-size: 0.8em;
+
+  &.active {
+    border-color: var(--pref-accent-color);
+    background: rgba(255,255,255,0.08);
+  }
+}
+
+// Wall configuration slots
+.wall-slot {
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.08);
+}
+
+.wall-fields {
+  label {
+    display: block;
+  }
+
+  select {
+    color: var(--pref-text-color, #fff);
+  }
+}
+
+// Hide BetterGameEngine controls in iframe
+iframe {
+  .pause-button-bar,
+  button.pause-btn,
+  .leaderboard-widget {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}

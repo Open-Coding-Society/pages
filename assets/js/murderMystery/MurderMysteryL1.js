@@ -2,8 +2,8 @@ import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackgro
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 
-
 class MurderMysteryL1 {
+  static friendlyName = "Level 1: The Docks";
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -55,7 +55,7 @@ class MurderMysteryL1 {
         SCALE_FACTOR: 5,
         STEP_FACTOR: 1000, // Same speed as Archie
         ANIMATION_RATE: 0,
-        INIT_POSITION: { x: 250, y: 350 }, // Positioned slightly under Archie
+        INIT_POSITION: { x: 128, y: 128 }, // Positioned slightly under Archie
         pixels: { height: 200, width: 150}, // Adjust based on your boat image size
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },

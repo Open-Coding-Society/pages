@@ -74,13 +74,13 @@ Sprint3:
       - "Sprites and Animation"
       - "Player and NPCs"
 Sprint4:
-  title: Planning, Tinkering, and OOP
-  description: Students, in trios, will work on Game and study OOP. There will be a lot of code, some Tech Talks, and some Teaching assignments provided to learn the code.
+  title: Ideating, Tinkering, Building and OOP
+  description: Explore the OCS GameEngine—a platform designed to make learning computer science both fun and accesible. You will work collaboratively, build games, and apply key programming concepts in a creative, team-based environment.
   start: 13
   end: 16
 Sprint5:
-  title: Building a Help System 
-  description: The Teacher will be providing topics.  All teams will be building a help system covering the key topics in the platformer game.  The task of forming a help system will help your team become expert in a topic and prepare you for final sprint.  For now, don't try to code in the Platformer game, but try to make Jupyter Notebooks with help and hacks suggestions on your topic.
+  title: Advanced Features
+  description: The Teacher will be providing topics such as local storage, leaderboard APIs, websockets, platformer and more to add to the game.  Students will be expected to learn these topics and implement them in their game.  
   start: 17
   end: 18
 Sprint6:

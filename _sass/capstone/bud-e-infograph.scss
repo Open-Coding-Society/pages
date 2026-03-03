@@ -1,0 +1,317 @@
+// Bud-E Pages Infographic Styles
+// Located in _sass/capstone/
+
+// Variables - Updated to greenish color scheme
+$wp-primary: #2ecc71;        // Emerald green
+$wp-secondary: #27ae60;      // Darker green
+$wp-accent: #ffffff;         // White
+$wp-dark-bg: #000000;        // Pure black background
+$wp-card-bg: #0a0a0a;        // Slightly lighter black for cards
+$wp-text-muted: #b0b0b0;
+$wp-text-light: #e8e8e8;
+
+// Main Container
+.be-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+// Header Section
+.be-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, $wp-dark-bg 0%, #1a1a1a 50%, #0d0d0d 100%);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($wp-primary, 0.3);
+}
+
+.be-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $wp-primary, $wp-secondary);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+.be-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, $wp-primary, $wp-secondary, $wp-accent, $wp-primary);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wp-gradient 3s ease infinite;
+  margin: 0 0 1rem 0;
+}
+
+@keyframes wp-gradient {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.be-description {
+  color: $wp-text-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Card Section
+.be-card {
+  background: linear-gradient(145deg, $wp-card-bg 0%, #151515 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($wp-primary, 0.3);
+  box-shadow: 0 20px 60px rgba($wp-primary, 0.2);
+}
+
+.be-card-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Visual Section
+.be-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba($wp-secondary, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba($wp-secondary, 0.3);
+
+  @media (max-width: 1024px) {
+    grid-column: 1 / -1;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+.be-image-link {
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba($wp-primary, 0.4);
+  width: 100%;
+
+  &:hover .be-image {
+    transform: scale(1.05);
+  }
+
+  &:hover .be-overlay {
+    opacity: 1;
+  }
+}
+
+.be-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.be-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba($wp-primary, 0.9), rgba($wp-secondary, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+}
+
+.be-status {
+  background: linear-gradient(135deg, $wp-primary, $wp-secondary);
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.be-team {
+  text-align: center;
+  margin-top: auto;
+}
+
+.be-team-label {
+  display: block;
+  color: $wp-text-muted;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.be-team-name {
+  display: block;
+  color: $wp-primary;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+// Content Section
+.be-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($wp-secondary, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba($wp-secondary, 0.3);
+}
+
+.be-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $wp-accent;
+  margin: 0 0 0.25rem 0;
+}
+
+.be-subtitle {
+  color: $wp-secondary;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($wp-secondary, 0.3);
+}
+
+// Key Points
+.be-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.be-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: $wp-text-light;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.be-check {
+  color: $wp-primary;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+// Tech Stack
+.be-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.be-tech-tag {
+  background: rgba($wp-secondary, 0.15);
+  color: $wp-secondary;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba($wp-secondary, 0.4);
+}
+
+// Details Section
+.be-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($wp-primary, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba($wp-primary, 0.3);
+}
+
+.be-section-title {
+  color: $wp-accent;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($wp-primary, 0.4);
+}
+
+.be-about {
+  color: $wp-text-muted;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+// Impact List
+.be-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.be-impact-item {
+  background: rgba($wp-primary, 0.1);
+  color: $wp-text-light;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid $wp-primary;
+}
+
+// Button
+.be-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $wp-primary, $wp-secondary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($wp-primary, 0.5);
+    color: #fff;
+    text-decoration: none;
+  }
+}
