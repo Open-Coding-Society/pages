@@ -268,9 +268,14 @@ score += gists * 0.5
 
 <!-- Modal for info details -->
 <div id="dataModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-3xl relative">
+    <div class="bg-neutral-900 border border-neutral-700 rounded-xl p-6 w-full max-w-3xl relative max-h-96 flex flex-col">
         <span class="close absolute top-3 right-3 text-neutral-400 hover:text-white text-2xl cursor-pointer" title="Close modal">&times;</span>
-        <pre id="modalData" class="text-neutral-200 overflow-auto max-h-96"></pre>
+        <div class="flex-1 overflow-y-auto mb-4">
+            <pre id="modalData" class="text-neutral-200 text-sm whitespace-pre-wrap break-words"></pre>
+        </div>
+        <button id="modal-load-more" class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold self-start" style="display:none;">
+            Load More
+        </button>
     </div>
 </div>
 
@@ -560,27 +565,91 @@ score += gists * 0.5
     const modalData = document.getElementById("modalData");
     const closeModal = dataModal.querySelector(".close");
 
+    let currentModalData = null;
+    let currentItemsDisplayed = 0;
+    const ITEMS_PER_PAGE = 20;
+
     function setupInfoModal(elementId, data) {
         const el = document.getElementById(elementId);
         if (el) {
             el.addEventListener("click", (e) => {
                 e.preventDefault();
-                modalData.textContent = JSON.stringify(data, null, 2);
-                dataModal.classList.remove("hidden");
-                dataModal.setAttribute("aria-hidden", "false");
+                currentModalData = data;
+                currentItemsDisplayed = 0;
+                displayModalData();
             });
         }
+    }
+
+    function displayModalData() {
+        if (!currentModalData) return;
+
+        // Determine which array to use (commits, issues, pull_requests, etc)
+        let items = [];
+        if (currentModalData.details_of_commits) items = currentModalData.details_of_commits;
+        else if (currentModalData.issues) items = currentModalData.issues;
+        else if (currentModalData.pull_requests) items = currentModalData.pull_requests;
+        else {
+            // Fallback: show entire object as JSON
+            modalData.textContent = JSON.stringify(currentModalData, null, 2);
+            dataModal.classList.remove("hidden");
+            dataModal.setAttribute("aria-hidden", "false");
+            return;
+        }
+
+        // Calculate which items to show
+        const nextBatch = currentItemsDisplayed + ITEMS_PER_PAGE;
+        const itemsToShow = items.slice(0, nextBatch);
+        const hasMore = nextBatch < items.length;
+
+        // Format items as readable list
+        let content = `Found ${items.length} total items\n\n`;
+        content += `Showing ${itemsToShow.length} of ${items.length}\n`;
+        content += `${'='.repeat(50)}\n\n`;
+
+        itemsToShow.forEach((item, index) => {
+            content += `--- Item ${index + 1} ---\n`;
+            content += JSON.stringify(item, null, 2) + '\n\n';
+        });
+
+        if (hasMore) {
+            content += `${'='.repeat(50)}\n`;
+            content += `[Click "Load More" to see next ${Math.min(ITEMS_PER_PAGE, items.length - nextBatch)} items]`;
+        }
+
+        modalData.textContent = content;
+
+        // Update button visibility
+        const loadMoreBtn = document.getElementById("modal-load-more");
+        if (loadMoreBtn) {
+            if (hasMore) {
+                loadMoreBtn.style.display = "block";
+                loadMoreBtn.onclick = () => {
+                    currentItemsDisplayed = nextBatch;
+                    displayModalData();
+                };
+            } else {
+                loadMoreBtn.style.display = "none";
+            }
+        }
+
+        dataModal.classList.remove("hidden");
+        dataModal.setAttribute("aria-hidden", "false");
     }
 
     closeModal.onclick = () => {
         dataModal.classList.add("hidden");
         dataModal.setAttribute("aria-hidden", "true");
+        currentModalData = null;
+        currentItemsDisplayed = 0;
     };
 
     window.onclick = (event) => {
         if (event.target === dataModal) {
             dataModal.classList.add("hidden");
             dataModal.setAttribute("aria-hidden", "true");
+            currentModalData = null;
+            currentItemsDisplayed = 0;
         }
     };
 
