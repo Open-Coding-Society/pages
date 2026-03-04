@@ -177,6 +177,10 @@ class GameControl {
     gameLoop() {
         // Mark loop as running so transitionToLevel won't start another one
         this._loopRunning = true;
+        if (!this.currentLevel) {
+            this._loopRunning = false;
+            return;
+        }
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
             return;
@@ -226,6 +230,7 @@ class GameControl {
         this.cleanupInteractionHandlers();
         
         this.currentLevel.destroy();
+        this.currentLevel = null;
         
         // Call the gameOver callback if it exists
         // If this control was registered as the active game on the host, unset it
@@ -244,19 +249,18 @@ class GameControl {
                 }
                 this.parentControl.currentLevelIndex = typeof this.parentControl._savedCurrentLevelIndex !== 'undefined' ? this.parentControl._savedCurrentLevelIndex : 0;
 
-                // Mark parent as active control and restart its level
+                // Mark parent as active control and resume its paused level
                 if (this.game) this.game.activeGameControl = this.parentControl;
-                this.parentControl.isPaused = false;
-                if (typeof this.parentControl.transitionToLevel === 'function') {
-                    this.parentControl.transitionToLevel();
-                }
-                // Restore parent interaction handlers if available
-                if (typeof this.parentControl.restoreInteractionHandlers === 'function') {
-                    this.parentControl.restoreInteractionHandlers();
+                // Use resume() instead of transitionToLevel() to preserve the paused level state
+                // transitionToLevel() would destroy and recreate the level, resetting player position
+                if (typeof this.parentControl.resume === 'function') {
+                    this.parentControl.resume();
                 }
             } catch (e) {
                 console.warn('Failed to restore parent control after nested game ended:', e);
             }
+            // Return here so we don't call gameOver callback which could interfere with parent restoration
+            return;
         }
 
         if (this.gameOver) {
