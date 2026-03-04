@@ -141,6 +141,391 @@ These commands are used to build and manage a localhost version of the website. 
 
 * `make convert`: Converts Jupyter Notebook files. Run this if your `.ipynb` files are not updating on the server; it may assist in finding the error.
 
+---
+
+#### Make Debug Lab — Interactive Practice
+
+Got errors? This interactive lab covers the most common `make` errors and how to fix them. Use the **Learn** tab for a quick reference, then test yourself in **Practice** by solving errors to reveal pixel art.
+
+<details>
+<summary><strong>Click to open the Make Debug Lab</strong></summary>
+
+<div style="margin-top: 1rem;">
+
+<style>
+  .mdb * { margin: 0; padding: 0; box-sizing: border-box; }
+  .mdb { background: #0a0e14; color: #e6e6e6; line-height: 1.6; padding: 1.5rem; border-radius: 8px; font-family: sans-serif; }
+  .mdb h2 { font-size: 1.8rem; color: #00ff9f; margin-bottom: 0.25rem; }
+  .mdb .subtitle { color: #8f93a2; margin-bottom: 1.5rem; }
+  .mdb .os-selector { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .mdb .os-btn { background: #151921; border: 1px solid #2d3340; padding: 0.5rem 1.25rem; color: #8f93a2; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; border-radius: 4px; }
+  .mdb .os-btn.active { background: #1f2430; border-color: #00ff9f; color: #00ff9f; }
+  .mdb .tabs { display: flex; gap: 1.5rem; border-bottom: 1px solid #2d3340; margin-bottom: 1.5rem; }
+  .mdb .tab { background: none; border: none; padding: 0.75rem 0; color: #8f93a2; cursor: pointer; font-size: 0.95rem; border-bottom: 2px solid transparent; transition: all 0.3s; }
+  .mdb .tab.active { color: #00ff9f; border-bottom-color: #00ff9f; }
+  .mdb .tab-content { display: none; }
+  .mdb .tab-content.active { display: block; }
+  .mdb .error-grid { display: grid; gap: 1.25rem; }
+  .mdb .error-card { background: #151921; border: 1px solid #2d3340; padding: 1.25rem; border-radius: 6px; transition: all 0.3s; }
+  .mdb .error-card:hover { border-color: #00ff9f; }
+  .mdb .error-title { font-size: 1rem; color: #00ccff; margin-bottom: 0.75rem; }
+  .mdb .error-msg { background: #0a0e14; border-left: 3px solid #ff3366; padding: 0.6rem 0.75rem; margin: 0.75rem 0; color: #ff3366; font-size: 0.8rem; overflow-x: auto; font-family: monospace; border-radius: 2px; }
+  .mdb .step { background: #1f2430; padding: 0.6rem 0.75rem; margin: 0.4rem 0; border-left: 2px solid #00ccff; font-size: 0.85rem; border-radius: 2px; }
+  .mdb .cmd { background: #0a0e14; padding: 0.4rem 0.75rem; margin: 0.4rem 0; font-size: 0.8rem; color: #39ff14; font-family: monospace; border-radius: 2px; }
+  .mdb .cmd::before { content: '$ '; color: #00ff9f; }
+  .mdb .os-sp { display: none; }
+  .mdb .os-sp.active { display: block; }
+  .mdb .game-container { background: #0d1117; border: 2px solid #00ff9f; padding: 1.5rem; border-radius: 6px; }
+  .mdb .game-title { font-size: 1.5rem; color: #00ff9f; text-align: center; margin-bottom: 0.25rem; }
+  .mdb .game-subtitle { color: #8f93a2; font-size: 0.85rem; text-align: center; margin-bottom: 1.5rem; }
+  .mdb .stats { display: flex; justify-content: space-around; padding: 0.75rem; background: rgba(0,255,159,0.05); border: 1px solid #2d3340; margin-bottom: 1.5rem; border-radius: 4px; }
+  .mdb .stat-label { font-size: 0.75rem; color: #8f93a2; text-transform: uppercase; text-align: center; }
+  .mdb .stat-value { font-size: 1.5rem; color: #00ff9f; font-weight: bold; text-align: center; }
+  .mdb .canvas-area { background: #000; border: 2px solid #2d3340; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; }
+  .mdb .canvas-title { color: #00ccff; margin-bottom: 1rem; text-align: center; font-size: 1rem; }
+  .mdb .pixel-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 320px; margin: 0 auto; background: #1a1f2e; padding: 16px; border-radius: 8px; }
+  .mdb .pixel { aspect-ratio: 1; background: #0a0e14; border: 2px solid #2d3340; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #8f93a2; font-weight: bold; border-radius: 4px; }
+  .mdb .pixel:hover { border-color: #00ff9f; transform: scale(1.08); }
+  .mdb .pixel.filled { cursor: default; border-color: transparent; }
+  .mdb .pixel.filled:hover { transform: scale(1); }
+  .mdb .clue-section { background: #151921; border: 2px solid #2d3340; padding: 1.25rem; border-radius: 8px; }
+  .mdb .clue-title { color: #00ccff; font-size: 1rem; margin-bottom: 0.75rem; }
+  .mdb .color-legend { background: #1f2430; padding: 0.75rem 1rem; border-radius: 4px; display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .mdb .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
+  .mdb .legend-color { width: 18px; height: 18px; border: 1px solid #2d3340; border-radius: 3px; flex-shrink: 0; }
+  .mdb .current-clue { background: #1f2430; border: 2px solid #00ff9f; padding: 1.25rem; border-radius: 8px; }
+  .mdb .clue-error { background: #0a0e14; border-left: 4px solid #ff3366; padding: 0.75rem; margin-bottom: 1rem; color: #ff3366; font-size: 0.85rem; font-family: monospace; border-radius: 2px; }
+  .mdb .clue-question { color: #e6e6e6; margin-bottom: 1rem; font-size: 0.95rem; }
+  .mdb .answer-options { display: grid; gap: 0.75rem; }
+  .mdb .answer-btn { background: #0a0e14; border: 2px solid #2d3340; padding: 1rem; color: #e6e6e6; cursor: pointer; text-align: left; transition: all 0.3s; font-size: 0.9rem; border-radius: 4px; width: 100%; }
+  .mdb .answer-btn:hover { border-color: #00ff9f; background: #151921; transform: translateX(4px); }
+  .mdb .answer-btn.correct { border-color: #00ff9f; background: rgba(0,255,159,0.1); }
+  .mdb .answer-btn.incorrect { border-color: #ff3366; background: rgba(255,51,102,0.1); }
+  .mdb .completion { text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(0,255,159,0.1), rgba(0,204,255,0.1)); border: 2px solid #00ff9f; display: none; border-radius: 8px; margin-top: 1rem; }
+  .mdb .completion.show { display: block; }
+  .mdb .completion-title { font-size: 2rem; color: #00ff9f; margin-bottom: 0.5rem; }
+  .mdb .completion-message { color: #8f93a2; margin-bottom: 1.5rem; }
+  .mdb .final-art { max-width: 320px; margin: 1rem auto; padding: 1.25rem; background: #000; border: 3px solid #00ff9f; border-radius: 8px; }
+  .mdb .restart-btn { background: #151921; border: 2px solid #00ff9f; padding: 0.75rem 1.75rem; color: #00ff9f; cursor: pointer; font-size: 0.95rem; margin-top: 1rem; transition: all 0.3s; border-radius: 4px; }
+  .mdb .restart-btn:hover { background: #1f2430; }
+</style>
+
+<div class="mdb">
+  <h2>Make Debug Lab</h2>
+  <p class="subtitle">Learn to resolve common make errors</p>
+
+  <div class="os-selector">
+    <button class="os-btn active" data-os="mac" onclick="mdbSwitchOS('mac')">macOS</button>
+    <button class="os-btn" data-os="windows" onclick="mdbSwitchOS('windows')">Windows</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="mdbSwitchTab('learn', event)">Learn</button>
+    <button class="tab" onclick="mdbSwitchTab('practice', event)">Practice</button>
+  </div>
+
+  <div id="mdb-learn" class="tab-content active">
+    <div class="error-grid">
+      <div class="error-card">
+        <h3 class="error-title">Make Not Found</h3>
+        <div class="error-msg os-sp active" id="mdb-mac-err1">make: command not found</div>
+        <div class="error-msg os-sp" id="mdb-win-err1">'make' is not recognized as an internal or external command</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">Your system does not have make installed.</p>
+        <div class="os-sp active" id="mdb-mac-sol1">
+          <div class="step">Install Xcode Command Line Tools</div>
+          <div class="cmd">xcode-select --install</div>
+          <div class="step">Verify installation</div>
+          <div class="cmd">make --version</div>
+        </div>
+        <div class="os-sp" id="mdb-win-sol1">
+          <div class="step">Install WSL</div>
+          <div class="cmd">wsl --install</div>
+          <div class="step">Install make in WSL</div>
+          <div class="cmd">sudo apt update && sudo apt install make</div>
+        </div>
+      </div>
+      <div class="error-card">
+        <h3 class="error-title">No Makefile Found</h3>
+        <div class="error-msg">make: *** No targets specified and no makefile found. Stop.</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">Make cannot find the Makefile. You are probably in the wrong directory.</p>
+        <div class="step">Check current directory</div>
+        <div class="cmd">pwd</div>
+        <div class="step">List files to confirm Makefile exists</div>
+        <div class="cmd os-sp active" id="mdb-mac-ls">ls -la</div>
+        <div class="cmd os-sp" id="mdb-win-ls">dir</div>
+        <div class="step">Navigate to project directory</div>
+        <div class="cmd">cd /path/to/project</div>
+      </div>
+      <div class="error-card">
+        <h3 class="error-title">No Rule to Make Target</h3>
+        <div class="error-msg">make: *** No rule to make target 'sever'. Stop.</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">The target you specified does not exist. Check for typos.</p>
+        <div class="step">List available targets</div>
+        <div class="cmd os-sp active" id="mdb-mac-grep">grep "^[a-zA-Z]" Makefile</div>
+        <div class="cmd os-sp" id="mdb-win-grep">findstr /B /R "^[a-zA-Z]" Makefile</div>
+        <div class="step">Fix the typo in your command</div>
+        <div class="cmd">make server</div>
+      </div>
+      <div class="error-card">
+        <h3 class="error-title">Missing Separator</h3>
+        <div class="error-msg">Makefile:5: *** missing separator. Stop.</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">Commands in Makefiles must be indented with TAB characters, not spaces.</p>
+        <div class="step">Open Makefile and go to the indicated line</div>
+        <div class="step">Delete any spaces at the beginning of command lines</div>
+        <div class="step">Press TAB key once before each command</div>
+      </div>
+      <div class="error-card">
+        <h3 class="error-title">Permission Denied</h3>
+        <div class="error-msg">make: ./script.sh: Permission denied</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">The script does not have execute permissions.</p>
+        <div class="step">Add execute permission</div>
+        <div class="cmd">chmod +x script.sh</div>
+        <div class="step">Run make again</div>
+      </div>
+      <div class="error-card">
+        <h3 class="error-title">Command Not Found in Makefile</h3>
+        <div class="error-msg">make: *** [server] Error 127<br>/bin/sh: python3: command not found</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">The Makefile is trying to run a command that is not installed.</p>
+        <div class="step">Check if command exists</div>
+        <div class="cmd os-sp active" id="mdb-mac-which">which python3</div>
+        <div class="cmd os-sp" id="mdb-win-which">where python3</div>
+        <div class="step">Install the missing tool</div>
+        <div class="cmd os-sp active" id="mdb-mac-install">brew install python3</div>
+        <div class="cmd os-sp" id="mdb-win-install">winget install Python.Python.3</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdb-practice" class="tab-content">
+    <div class="game-container">
+      <h2 class="game-title">Debug Art Challenge</h2>
+      <p class="game-subtitle">Answer error clues correctly to reveal the hidden pixel art</p>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Progress</div><div class="stat-value" id="mdb-progress">0/13</div></div>
+        <div class="stat"><div class="stat-label">Correct</div><div class="stat-value" id="mdb-correct">0</div></div>
+        <div class="stat"><div class="stat-label">Errors</div><div class="stat-value" id="mdb-errors">0</div></div>
+      </div>
+      <div class="canvas-area">
+        <h3 class="canvas-title">Click a number to solve its error</h3>
+        <div class="pixel-grid" id="mdb-pixelGrid"></div>
+      </div>
+      <div class="clue-section">
+        <h3 class="clue-title">Current Clue</h3>
+        <div class="color-legend">
+          <div class="legend-item"><div class="legend-color" style="background:#ff6b6b;"></div><span>1 - Not Found</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#4ecdc4;"></div><span>2 - No File</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#ffe66d;"></div><span>3 - Typo</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#a8e6cf;"></div><span>4 - Tab</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#ff8b94;"></div><span>5 - Permission</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#c7ceea;"></div><span>6 - Tool</span></div>
+        </div>
+        <div class="current-clue">
+          <div class="clue-error" id="mdb-clueError">Click a numbered pixel above to start!</div>
+          <div class="clue-question" id="mdb-clueQuestion">Select any pixel with a number to see its error.</div>
+          <div class="answer-options" id="mdb-answerOptions"></div>
+        </div>
+      </div>
+      <div class="completion" id="mdb-completion">
+        <div class="completion-title">Build Successful!</div>
+        <p class="completion-message">You have mastered make debugging</p>
+        <div class="final-art"><div class="pixel-grid" id="mdb-finalImage" style="max-width:100%;"></div></div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Accuracy</div><div class="stat-value" id="mdb-accuracy">0%</div></div>
+        </div>
+        <button class="restart-btn" onclick="mdbRestart()">Build Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var mdbOS = 'mac';
+  var mdbCorrect = 0, mdbErrors = 0, mdbFilled = 0, mdbCurrentPixel = null;
+
+  var mdbColors = { 1:'#ff6b6b', 2:'#4ecdc4', 3:'#ffe66d', 4:'#a8e6cf', 5:'#ff8b94', 6:'#c7ceea' };
+  var mdbPattern = [
+    [1,1,1,1,1],
+    [2,4,4,4,3],
+    [2,5,5,5,3],
+    [0,0,6,0,0],
+    [0,6,6,6,0]
+  ];
+  var mdbClues = [
+    { type:1, error:"make: command not found", question:"What is the solution?", answers:[
+      { text:"Install make using xcode-select --install or package manager", correct:true },
+      { text:"Delete the project", correct:false },
+      { text:"Rename the Makefile", correct:false }
+    ]},
+    { type:2, error:"make: *** No targets specified and no makefile found. Stop.", question:"What should you do?", answers:[
+      { text:"Navigate to the correct directory with cd", correct:true },
+      { text:"Reinstall make", correct:false },
+      { text:"Run sudo make", correct:false }
+    ]},
+    { type:3, error:"make: *** No rule to make target 'sever'. Stop.", question:"How do you fix this?", answers:[
+      { text:"Fix the typo - use 'server' instead of 'sever'", correct:true },
+      { text:"Add a new sever target", correct:false },
+      { text:"Delete the Makefile", correct:false }
+    ]},
+    { type:4, error:"Makefile:5: *** missing separator. Stop.", question:"What is the problem?", answers:[
+      { text:"Replace spaces with TAB character before commands", correct:true },
+      { text:"Add more spaces", correct:false },
+      { text:"Add semicolons", correct:false }
+    ]},
+    { type:5, error:"make: ./script.sh: Permission denied", question:"How do you fix this?", answers:[
+      { text:"Run chmod +x script.sh to add execute permission", correct:true },
+      { text:"Delete and recreate the file", correct:false },
+      { text:"Always use sudo", correct:false }
+    ]},
+    { type:6, error:"make: *** [test] Error 127 - /bin/sh: python3: command not found", question:"What is the solution?", answers:[
+      { text:"Install python3 using brew or apt", correct:true },
+      { text:"Remove python from Makefile", correct:false },
+      { text:"Create a symbolic link", correct:false }
+    ]}
+  ];
+
+  window.mdbSwitchOS = function(os) {
+    mdbOS = os;
+    document.querySelectorAll('.mdb .os-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelector('.mdb [data-os="'+os+'"]').classList.add('active');
+    document.querySelectorAll('.mdb .os-sp').forEach(function(el){ el.classList.remove('active'); });
+    var prefix = os === 'mac' ? 'mdb-mac-' : 'mdb-win-';
+    document.querySelectorAll('[id^="'+prefix+'"]').forEach(function(el){ el.classList.add('active'); });
+  };
+
+  window.mdbSwitchTab = function(tab, e) {
+    document.querySelectorAll('.mdb .tab').forEach(function(t){ t.classList.remove('active'); });
+    e.target.classList.add('active');
+    document.querySelectorAll('.mdb .tab-content').forEach(function(c){ c.classList.remove('active'); });
+    document.getElementById('mdb-'+tab).classList.add('active');
+    if (tab === 'practice') mdbInit();
+  };
+
+  function mdbInit() {
+    mdbCorrect = 0; mdbErrors = 0; mdbFilled = 0; mdbCurrentPixel = null;
+    mdbUpdateStats();
+    var grid = document.getElementById('mdb-pixelGrid');
+    grid.innerHTML = '';
+    for (var r = 0; r < 5; r++) {
+      for (var c = 0; c < 5; c++) {
+        (function(row, col) {
+          var p = document.createElement('div');
+          p.className = 'pixel';
+          p.dataset.row = row; p.dataset.col = col; p.dataset.color = mdbPattern[row][col];
+          if (mdbPattern[row][col] !== 0) {
+            p.textContent = mdbPattern[row][col];
+            p.onclick = function() { mdbSelectPixel(row, col); };
+          } else {
+            p.style.background = '#000';
+            p.classList.add('filled');
+          }
+          grid.appendChild(p);
+        })(r, c);
+      }
+    }
+    document.getElementById('mdb-completion').classList.remove('show');
+    document.getElementById('mdb-clueError').textContent = 'Click a numbered pixel above to start!';
+    document.getElementById('mdb-clueQuestion').textContent = 'Select any pixel with a number to see its error.';
+    document.getElementById('mdb-answerOptions').innerHTML = '';
+  }
+
+  function mdbSelectPixel(row, col) {
+    var pixel = document.querySelector('.mdb [data-row="'+row+'"][data-col="'+col+'"]');
+    if (pixel.classList.contains('filled')) return;
+    mdbCurrentPixel = { row:row, col:col, color:mdbPattern[row][col] };
+    document.querySelectorAll('.mdb .pixel').forEach(function(p){ p.style.boxShadow = ''; });
+    pixel.style.boxShadow = '0 0 16px #00ff9f';
+    mdbLoadClue(mdbPattern[row][col]);
+  }
+
+  function mdbLoadClue(type) {
+    var clue = mdbClues.find(function(c){ return c.type === type; });
+    if (!clue) return;
+    document.getElementById('mdb-clueError').textContent = clue.error;
+    document.getElementById('mdb-clueQuestion').textContent = clue.question;
+    var opts = document.getElementById('mdb-answerOptions');
+    opts.innerHTML = '';
+    clue.answers.slice().sort(function(){ return Math.random()-0.5; }).forEach(function(answer) {
+      var btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = answer.text;
+      btn.onclick = function(e) { mdbCheckAnswer(answer.correct, type, e); };
+      opts.appendChild(btn);
+    });
+  }
+
+  function mdbCheckAnswer(correct, colorType, e) {
+    var buttons = document.querySelectorAll('.mdb .answer-btn');
+    buttons.forEach(function(b){ b.disabled = true; });
+    if (correct && mdbCurrentPixel) {
+      mdbCorrect++;
+      var pixel = document.querySelector('.mdb [data-row="'+mdbCurrentPixel.row+'"][data-col="'+mdbCurrentPixel.col+'"]');
+      pixel.style.background = mdbColors[colorType];
+      pixel.classList.add('filled');
+      pixel.textContent = '';
+      pixel.style.boxShadow = '';
+      mdbFilled++;
+      e.target.classList.add('correct');
+      setTimeout(function() {
+        mdbCurrentPixel = null;
+        document.getElementById('mdb-clueError').textContent = 'Great! Click another number.';
+        document.getElementById('mdb-clueQuestion').textContent = 'Keep going to reveal the image!';
+        document.getElementById('mdb-answerOptions').innerHTML = '';
+        mdbCheckCompletion();
+      }, 1000);
+    } else {
+      mdbErrors++;
+      e.target.classList.add('incorrect');
+      setTimeout(function() {
+        buttons.forEach(function(b){ b.disabled = false; b.classList.remove('incorrect'); });
+      }, 600);
+    }
+    mdbUpdateStats();
+  }
+
+  function mdbUpdateStats() {
+    var total = mdbPattern.flat().filter(function(p){ return p !== 0; }).length;
+    document.getElementById('mdb-progress').textContent = mdbFilled+'/'+total;
+    document.getElementById('mdb-correct').textContent = mdbCorrect;
+    document.getElementById('mdb-errors').textContent = mdbErrors;
+  }
+
+  function mdbCheckCompletion() {
+    var total = mdbPattern.flat().filter(function(p){ return p !== 0; }).length;
+    if (mdbFilled >= total) setTimeout(mdbShowCompletion, 600);
+  }
+
+  function mdbShowCompletion() {
+    var acc = Math.round((mdbCorrect/(mdbCorrect+mdbErrors))*100);
+    document.getElementById('mdb-accuracy').textContent = acc+'%';
+    var fg = document.getElementById('mdb-finalImage');
+    fg.innerHTML = '';
+    for (var r = 0; r < 5; r++) {
+      for (var c = 0; c < 5; c++) {
+        var p = document.createElement('div');
+        p.className = 'pixel filled';
+        p.style.background = mdbPattern[r][c] !== 0 ? mdbColors[mdbPattern[r][c]] : '#000';
+        fg.appendChild(p);
+      }
+    }
+    document.getElementById('mdb-completion').classList.add('show');
+  }
+
+  window.mdbRestart = function() {
+    document.getElementById('mdb-completion').classList.remove('show');
+    mdbInit();
+  };
+
+  mdbInit();
+})();
+</script>
+
+</div>
+</details>
+
+---
+
+
 ### VSCode Commit and Sync Workflow
 
 All students will be writing and changing code.  These steps allow you to change the website, first locally and then on public location.
