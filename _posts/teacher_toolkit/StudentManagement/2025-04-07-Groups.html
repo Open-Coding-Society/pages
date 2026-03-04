@@ -884,7 +884,14 @@ window.searchGroups = function () {
   
   showLoading("Searching...");
   
-  fetch(url, fetchOptions)
+  fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
     .then(data => {
       allGroups = data;
@@ -899,11 +906,32 @@ function initializeData() {
   showLoading("Loading groups...");
   
   Promise.all([
-    fetch(`${javaURI}/api/groups`, fetchOptions)
+    fetch(`${javaURI}/api/groups`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions
+      },
+      credentials: 'include'
+    })
       .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
-    fetch(`${javaURI}/api/people`, fetchOptions)
+    fetch(`${javaURI}/api/people`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions
+      },
+      credentials: 'include'
+    })
       .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people"))),
-    fetch(`${pythonURI}/api/id`, fetchOptions)
+    fetch(`${pythonURI}/api/id`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions
+      },
+      credentials: 'include'
+    })
       .then(res => res.ok ? res.json() : null)
       .catch(() => null)  // Don't fail if user check fails
   ])
@@ -961,7 +989,14 @@ window.searchPeopleForGroup = function (groupId) {
   
   showLoading("Searching users...");
   
-  fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions)
+  fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
     .then(results => displaySearchResults(groupId, results))
     .catch(err => {
@@ -1037,7 +1072,14 @@ window.addSelectedMembersToGroup = async function (groupId) {
 
   for (const person of selected) {
     try {
-      const res = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, { ...fetchOptions, method: "POST" });
+      const res = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...fetchOptions
+        },
+        credentials: 'include'
+      });
       if (!res.ok) {
         const text = await res.text();
         console.error("ADD MEMBER ERROR:", text);
@@ -1076,7 +1118,14 @@ window.addMemberToGroup = function (groupId, uid) {
   const personId = getPersonIdFromUID(uid);
   const person = getPersonById(personId);
   
-  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "POST" })
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => {
       if (!res.ok) {
         return res.text().then(text => {
@@ -1106,7 +1155,14 @@ window.addMemberToGroup = function (groupId, uid) {
 window.removeMemberFromGroup = function (groupId, personId) {
   showLoading("Removing member...");
   
-  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "DELETE" })
+  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => res.ok ? res : Promise.reject(new Error("Failed to remove member")))
     .then(() => {
       // Update local state instead of refetching all groups
@@ -1165,7 +1221,14 @@ window.deleteGroup = function (groupId) {
 
   showLoading("Deleting group...");
   
-  fetch(`${javaURI}/api/groups/${groupId}`, { ...fetchOptions, method: "DELETE" })
+  fetch(`${javaURI}/api/groups/${groupId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => {
       if (!res.ok) {
         return res.text().then(text => {
@@ -1197,7 +1260,14 @@ window.navigateToGroupDashboard = function (groupName) {
 ================================ */
 // Manual refresh function with chaining - only call when absolutely needed
 window.loadGroups = function () {
-  fetch(`${javaURI}/api/groups`, fetchOptions)
+  fetch(`${javaURI}/api/groups`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups")))
     .then(data => {
       allGroups = data;
@@ -1208,7 +1278,14 @@ window.loadGroups = function () {
 
 // Refresh people cache with chaining if needed (e.g., new user registered)
 window.refreshPeopleCache = function () {
-  fetch(`${javaURI}/api/people`, fetchOptions)
+  fetch(`${javaURI}/api/people`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    credentials: 'include'
+  })
     .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to refresh people")))
     .then(data => { peopleCache = data; })
     .catch(err => console.error("Failed to refresh people cache", err));
@@ -1230,9 +1307,13 @@ window.saveNewGroup = function () {
   showLoading("Creating group...");
   
   fetch(`${javaURI}/api/groups`, {
-    ...fetchOptions,
-    method: "POST",
-    body: JSON.stringify({ name, period: String(period), course })
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...fetchOptions
+    },
+    body: JSON.stringify({ name, period: String(period), course }),
+    credentials: 'include'
   })
     .then(res => {
       if (!res.ok) {
@@ -1644,7 +1725,14 @@ window.generateSmartGroups = async function() {
 
   try {
     // Step 1: Get all people from the selected period/class
-    const peopleResp = await fetch(`${javaURI}/api/people`, fetchOptions);
+    const peopleResp = await fetch(`${javaURI}/api/people`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...fetchOptions
+      },
+      credentials: 'include'
+    });
     if (!peopleResp.ok) throw new Error('Failed to fetch people');
     const allPeople = await peopleResp.json();
 
@@ -1664,9 +1752,13 @@ window.generateSmartGroups = async function() {
     
     try {
       const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
-        ...fetchOptions,
         method: 'POST',
-        body: JSON.stringify({ user_uids: user_uids })
+        headers: {
+          'Content-Type': 'application/json',
+          ...fetchOptions
+        },
+        body: JSON.stringify({ user_uids: user_uids }),
+        credentials: 'include'
       });
 
       if (checkResp.ok) {
@@ -1700,14 +1792,18 @@ window.generateSmartGroups = async function() {
       }
 
       const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
-        ...fetchOptions,
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...fetchOptions
+        },
         body: JSON.stringify({
           user_uids: user_uids,
           group_size: groupSize,
           incorporate_prior_experiences: (feedbackRows.length > 0),
           feedback_rows: feedbackRows
-        })
+        }),
+        credentials: 'include'
       });
 
       if (!formGroupsResp.ok) {
@@ -1863,13 +1959,18 @@ window.generateSmartGroups = async function() {
           
           // Create the group first (without members)
           const createResp = await fetch(`${javaURI}/api/groups`, {
-            ...fetchOptions,
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+        
+              ...fetchOptions
+            },
             body: JSON.stringify({
               name: group.name,
               period: group.period,
               course: group.course
-            })
+            }),
+            credentials: 'include'
           });
 
           if (!createResp.ok) {
@@ -1889,7 +1990,15 @@ window.generateSmartGroups = async function() {
             try {
               const addMemberResp = await fetch(
                 `${javaURI}/api/groups/${createdGroup.id}/members/${memberId}`,
-                { ...fetchOptions, method: 'POST' }
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+              
+                    ...fetchOptions
+                  },
+                  credentials: 'include'
+                }
               );
 
               if (!addMemberResp.ok) {

@@ -185,6 +185,9 @@ active_tab: profile
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
+
+        console.log('groupSearchInput element:', groupSearchInput);
+        console.log('groupSearchInput.disabled:', groupSearchInput?.disabled);
         
         // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
@@ -203,7 +206,6 @@ active_tab: profile
                 // Handle authentication errors
                 if (response.status === 401) {
                     springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
-                    groupSearchInput.disabled = true;
                     return null; // Stop the chain
                 }
                 if (!response.ok) {
@@ -294,7 +296,6 @@ active_tab: profile
             .catch(error => {
                 console.error("Error in API chain:", error);
                 springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
-                groupSearchInput.disabled = true;
             });
 
         /**
