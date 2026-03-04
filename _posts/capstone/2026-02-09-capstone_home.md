@@ -65,7 +65,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    <!-- Quant Game -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg">
        <a href="{% post_url 2026-02-06-quant-game-capstone %}">
-           <img src="/images/capstone/quant-trading-bot.png" alt="Quantitative Trading Bot capstone infographic preview image" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/quant-trading-game.png" alt="Quantitative Trading Bot capstone infographic preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-quant-game-capstone %}">Quantitative Trading Bot</a></h3>
