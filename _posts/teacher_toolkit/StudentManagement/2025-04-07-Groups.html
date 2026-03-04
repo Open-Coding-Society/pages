@@ -1169,7 +1169,7 @@ window.renderGroups = function () {
           <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
             <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
             <p class="text-sm text-gray-400">
-              Period ${group.period} · ${group.course}${isCollapsed ? ` · ${(group.members || []).length} members` : ''}
+              Period ${group.period} · ${group.course}${isCollapsed ? ` · ${(group.members || []).map(m => m.name).join(', ') || 'No members'}` : ''}
             </p>
           </div>
         </div>
