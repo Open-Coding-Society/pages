@@ -107,7 +107,6 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="text-neutral-300 font-medium">Total Time Spent</h3>
-                            <span class="text-blue-400">⏱️</span>
                         </div>
                         <div class="text-3xl font-bold text-white">${summary.totalTimeFormatted || '0h'}</div>
                         <p class="text-xs text-neutral-500 mt-2">${summary.totalTimeSpentSeconds || 0} seconds total</p>
@@ -117,7 +116,6 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="text-neutral-300 font-medium">Lessons Viewed</h3>
-                            <span class="text-green-400">📚</span>
                         </div>
                         <div class="text-3xl font-bold text-white">${summary.totalLessonsViewed || 0}</div>
                         <p class="text-xs text-neutral-500 mt-2">unique lessons</p>
@@ -127,7 +125,6 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="text-neutral-300 font-medium">Lessons Completed</h3>
-                            <span class="text-green-400">✅</span>
                         </div>
                         <div class="text-3xl font-bold text-white">${summary.totalLessonsCompleted || 0}</div>
                         <p class="text-xs text-neutral-500 mt-2">marked as complete</p>
@@ -137,7 +134,6 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="text-neutral-300 font-medium">Code Executions</h3>
-                            <span class="text-cyan-400">⚙️</span>
                         </div>
                         <div class="text-3xl font-bold text-white">${summary.totalCodeExecutions || 0}</div>
                         <p class="text-xs text-neutral-500 mt-2">code runs</p>
@@ -147,7 +143,6 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="text-neutral-300 font-medium">Interaction Rate</h3>
-                            <span class="text-indigo-400">👆</span>
                         </div>
                         <div class="text-3xl font-bold text-white">${(summary.interactionPercentage || 0).toFixed(1)}%</div>
                         <p class="text-xs text-neutral-500 mt-2">active engagement</p>
@@ -157,7 +152,6 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <div class="flex items-start justify-between mb-2">
                             <h3 class="text-neutral-300 font-medium">Scroll Depth</h3>
-                            <span class="text-pink-400">📜</span>
                         </div>
                         <div class="text-3xl font-bold text-white">${(summary.averageScrollDepth || 0).toFixed(0)}%</div>
                         <p class="text-xs text-neutral-500 mt-2">average per lesson</p>
@@ -168,9 +162,9 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                 <!-- Detailed Lesson Analytics Dropdown -->
                 <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6 mt-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-white">📊 Detailed Lesson Analytics</h3>
+                        <h3 class="text-lg font-semibold text-white">Detailed Lesson Analytics</h3>
                         <button id="toggleDetailedAnalytics" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
-                            ▼ Show Details
+                            Show Details
                         </button>
                     </div>
                     
@@ -185,7 +179,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
 
                 <!-- Help Section -->
                 <div class="bg-blue-900/20 border border-blue-700/50 rounded-lg p-6 mt-6">
-                    <h3 class="text-lg font-semibold text-blue-300 mb-2">📊 Understanding Your Analytics</h3>
+                    <h3 class="text-lg font-semibold text-blue-300 mb-2">Understanding Your Analytics</h3>
                     <ul class="text-sm text-neutral-300 space-y-2">
                         <li>• <strong>Time Spent:</strong> Total hours/minutes spent on the platform</li>
                         <li>• <strong>Lessons Viewed:</strong> Number of unique lessons you've accessed</li>
@@ -208,11 +202,11 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                 const detailedContainer = document.getElementById('detailedAnalyticsContainer');
                 if (detailedContainer.classList.contains('hidden')) {
                     detailedContainer.classList.remove('hidden');
-                    toggleBtn.textContent = '▲ Hide Details';
+                    toggleBtn.textContent = 'Hide Details';
                     loadDetailedAnalytics();
                 } else {
                     detailedContainer.classList.add('hidden');
-                    toggleBtn.textContent = '▼ Show Details';
+                    toggleBtn.textContent = 'Show Details';
                 }
             });
         }
@@ -262,7 +256,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                             <div class="text-sm text-neutral-400">
                                 ${formatDuration(session.sessionDurationSeconds)}
                             </div>
-                            <span class="ml-4 text-neutral-500">▼</span>
+                            <span class="ml-4 text-neutral-500"></span>
                         </button>
                         <div class="session-details hidden bg-neutral-950 px-4 py-3 border-t border-neutral-700 space-y-2 text-sm">
                             <div class="grid grid-cols-2 gap-3">
@@ -356,10 +350,10 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
      */
     function formatQuestName(questName) {
         const names = {
-            'cs-portfolio-quest': '💻 CS Portfolio Quest',
-            'digital-famine': '🎬 Digital Famine',
-            'west-coast': '🌴 West Coast Adventure',
-            'plagiarism': '📋 Plagiarism Detective'
+            'cs-portfolio-quest': 'CS Portfolio Quest',
+            'digital-famine': 'Digital Famine',
+            'west-coast': 'West Coast Adventure',
+            'plagiarism': 'Plagiarism Detective'
         };
         return names[questName] || questName;
     }
@@ -403,7 +397,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
             <div class="space-y-6">
                 <!-- Back Button -->
                 <button onclick="window.OCSAnalytics.loadAnalyticsSummary()" class="text-blue-400 hover:text-blue-300 flex items-center gap-2">
-                    ← Back to Summary
+                    Back to Summary
                 </button>
 
                 <!-- Quest Header -->
@@ -429,14 +423,14 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
                         <h3 class="text-neutral-300 text-sm font-medium mb-2">Status</h3>
                         <div class="text-xl font-bold ${questData.questCompleted ? 'text-green-400' : 'text-yellow-400'}">
-                            ${questData.questCompleted ? '✓ Completed' : 'In Progress'}
+                            ${questData.questCompleted ? 'Completed' : 'In Progress'}
                         </div>
                     </div>
                 </div>
 
                 <!-- Copy-Paste Analysis -->
                 <div class="bg-orange-900/20 border border-orange-700/50 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-orange-300 mb-2">📋 Copy-Paste Activity</h3>
+                    <h3 class="text-lg font-semibold text-orange-300 mb-2">Copy-Paste Activity</h3>
                     <p class="text-neutral-300 text-2xl font-bold">${questData.totalCopyPasteAttempts || 0} attempts</p>
                     <p class="text-xs text-neutral-400 mt-2">
                         Copy-paste attempts are tracked to understand your coding approach. 
