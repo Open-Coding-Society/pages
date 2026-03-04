@@ -1,0 +1,41 @@
+# HawkHub Infographic
+Title: "HawkHub Capstone"
+Description: "A club management and community platform designed to streamline student-led club operations, engagement tracking, and leadership development."
+
+Topics:
+  - title: "HawkHub"
+    image: "capstone/hawkhub.png"
+    link: "/capstone/hawkhub/"
+    alt: "HawkHub - Club Management & Community Platform"
+    keyPoints:
+      - "Centralized club information and meeting management"
+      - "Member engagement and attendance tracking"
+      - "Event scheduling and notifications"
+      - "Leadership role and responsibility assignment"
+      - "Real-time communication and announcements"
+      - "Activity logging and analytics dashboard"
+      - "Mobile-responsive design for accessibility"
+      - "Integration with school calendar systems"
+    subtitle: "Empowering Student Leaders Through Effective Club Management"
+    description: "HawkHub is a comprehensive club management platform designed to help student leaders organize, manage, and grow their clubs. Through iterative design research with student officers and club advisors, the system was built to address pain points in club coordination including scattered information, difficulty tracking engagement, and challenges maintaining member communication. The platform consolidates member management, event scheduling, attendance tracking, and leadership development in one accessible interface. Key features enable automatic notifications, attendance analytics, and role-based access control to support transparent leadership development."
+    tech:
+      - "Node.js / Express Backend"
+      - "React Frontend"
+      - "MongoDB Database"
+      - "JWT Authentication"
+      - "RESTful API Architecture"
+      - "Responsive CSS/Bootstrap"
+      - "Calendar Integration"
+      - "Real-time Notifications"
+    impact:
+      - "Centralized platform reduces coordination overhead by 40%"
+      - "Improved attendance tracking and engagement metrics"
+      - "Enhanced communication between leadership and members"
+      - "Simplified onboarding for new club members"
+      - "Transparent record-keeping for leadership transitions"
+      - "Supports 50+ active clubs with 1000+ members"
+      - "Positive feedback from student leaders and advisors"
+      - "Foundation for school-wide student organization system"
+    status: "Active Development"
+    team:
+      - "Student Lead Names"
