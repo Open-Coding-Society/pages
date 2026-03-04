@@ -410,6 +410,82 @@ comments: false
           <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
         </div>
   
+        <!-- Prior Experiences Toggle -->
+        <div class="bg-neutral-700/60 border border-neutral-600 rounded-lg p-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-100">
+                Would you like to incorporate your prior experiences?
+              </label>
+              <p class="text-xs text-gray-400 mt-1">
+                If yes, we’ll use your past group outcomes (ratings + persona mix) to bias future team formation.
+              </p>
+            </div>
+
+            <label class="inline-flex items-center cursor-pointer select-none">
+              <input id="usePriorExpToggle" type="checkbox" class="sr-only" onchange="togglePriorExperience()" />
+              <div class="w-11 h-6 bg-neutral-600 rounded-full relative transition-colors">
+                <div id="usePriorExpKnob"
+                    class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"></div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Prior Experience Form (hidden until toggle on) -->
+          <div id="priorExperienceForm" class="hidden mt-4 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-200 mb-2">How many members were in your previous group?</label>
+                <input id="priorGroupSize" type="number" min="2" max="10" value="4"
+                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+                  <input id="priorStudentRating" type="number" min="1" max="5" value="4"
+                    class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+                  <input id="priorTeacherRating" type="number" min="1" max="5" value="4"
+                    class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">
+                Personas of members in that group (select all that applied)
+              </label>
+              <div id="priorPersonaChoices" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+              <p class="text-xs text-gray-400 mt-2">
+                Tip: choose the persona mix that best matches the group you’re describing.
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">One-line note (optional)</label>
+              <input id="priorNote" type="text" maxlength="160"
+                placeholder="e.g., Great role balance, clear communication"
+                class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-gray-400">
+                We’ll also include any saved group feedback already stored locally on this device.
+              </p>
+              <button type="button"
+                class="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-gray-200 rounded-lg text-xs border border-neutral-600"
+                onclick="previewPriorFeedbackCount()">
+                Preview stored feedback
+              </button>
+            </div>
+
+            <div id="priorFeedbackStatus" class="text-xs text-gray-300"></div>
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
           <button onclick="closeSmartGroupModal()"
@@ -446,6 +522,84 @@ comments: false
     </div>
   </div>
   
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeFeedbackModal()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <div>
+        <h3 id="feedbackModalTitle" class="text-xl font-semibold text-white">Group Feedback</h3>
+        <p id="feedbackModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+      </div>
+      <button type="button" onclick="closeFeedbackModal()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4 space-y-4">
+      <!-- Course Category (CSA/CSP/CSSE) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Course Category</label>
+        <select id="fbCourse"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="CSA">CSA</option>
+          <option value="CSP">CSP</option>
+          <option value="CSSE">CSSE</option>
+        </select>
+      </div>
+
+      <!-- Student feedback -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+          <input id="fbStudentRating" type="number" min="1" max="5" value="4"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">How well did the group work together?</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+          <input id="fbTeacherRating" type="number" min="1" max="5" value="4"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-xs text-gray-400 mt-1">Teacher assessment of effectiveness.</p>
+        </div>
+      </div>
+
+      <!-- One-line explanation -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">One-line explanation</label>
+        <input id="fbNote" type="text" maxlength="160"
+          placeholder="e.g., Clear roles + everyone contributed"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+
+      <!-- Status -->
+      <div id="fbStatus" class="text-sm text-gray-300"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+      <button type="button" onclick="closeFeedbackModal()"
+        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+        Cancel
+      </button>
+      <button type="button" onclick="submitGroupFeedback()"
+        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+        Submit Feedback
+      </button>
+    </div>
+  </div>
+</div>
+
+
 
 <script>
   // Slash command handling
@@ -1179,6 +1333,14 @@ window.renderGroups = function () {
             💬
           </button>
 
+          <!-- Feedback button -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
+            title="Submit feedback for this group"
+            onclick="openFeedbackModal(${group.id})">
+            📝
+          </button>
+
           <!-- Trash (admin only) -->
           ${isAdmin ? `
           <button
@@ -1292,6 +1454,102 @@ window.cancelAddGroup = function () {
   document.getElementById("newGroupName").value = "";
   document.getElementById("newGroupPeriod").value = "";
   document.getElementById("newGroupClass").value = "";
+}
+
+/* ================================
+   PRIOR EXPERIENCE (Smart Groups)
+================================ */
+
+const PERSONA_OPTIONS = [
+  "Technologist","Scrummer", "Planner", "Closer"
+];
+
+function renderPriorPersonaChoices() {
+  const wrap = document.getElementById("priorPersonaChoices");
+  if (!wrap) return;
+
+  wrap.innerHTML = PERSONA_OPTIONS.map(p => `
+    <label class="flex items-center gap-2 px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg cursor-pointer hover:bg-neutral-700">
+      <input type="checkbox" class="accent-indigo-500 prior-persona-checkbox" value="${p}">
+      <span class="text-sm text-gray-200">${p}</span>
+    </label>
+  `).join("");
+}
+
+window.togglePriorExperience = function () {
+  const toggle = document.getElementById("usePriorExpToggle");
+  const knob = document.getElementById("usePriorExpKnob");
+  const form = document.getElementById("priorExperienceForm");
+
+  if (!toggle || !knob || !form) return;
+
+  const on = toggle.checked;
+  form.classList.toggle("hidden", !on);
+
+  // tiny visual toggle effect
+  knob.style.transform = on ? "translateX(20px)" : "translateX(0px)";
+  toggle.parentElement.querySelector("div").style.backgroundColor = on ? "#4f46e5" : "#525252";
+
+  if (on) renderPriorPersonaChoices();
+};
+
+window.previewPriorFeedbackCount = function () {
+  const status = document.getElementById("priorFeedbackStatus");
+  if (!status) return;
+
+  const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
+  status.textContent = `Stored feedback rows on this device: ${stored.length}`;
+};
+
+// Builds one feedback row from the inline “prior experiences” form
+function readInlinePriorExperienceRow() {
+  const enabled = document.getElementById("usePriorExpToggle")?.checked;
+  if (!enabled) return null;
+
+  const prevSize = parseInt(document.getElementById("priorGroupSize")?.value || "0", 10);
+  const studentRating = parseInt(document.getElementById("priorStudentRating")?.value || "0", 10);
+  const teacherRating = parseInt(document.getElementById("priorTeacherRating")?.value || "0", 10);
+  const note = (document.getElementById("priorNote")?.value || "").trim();
+
+  if (!(prevSize >= 2 && prevSize <= 10)) throw new Error("Prior group size must be 2–10.");
+  if (!(studentRating >= 1 && studentRating <= 5)) throw new Error("Prior student rating must be 1–5.");
+  if (!(teacherRating >= 1 && teacherRating <= 5)) throw new Error("Prior teacher rating must be 1–5.");
+
+  const personas = [...document.querySelectorAll(".prior-persona-checkbox:checked")].map(cb => cb.value);
+  if (!personas.length) throw new Error("Select at least 1 persona for the prior group.");
+
+  return {
+    ts: Date.now(),
+    source: "inline_prior_experience",
+    prev_group_size: prevSize,
+    personas: personas,
+    student_rating_1to5: studentRating,
+    teacher_rating_1to5: teacherRating,
+    note
+  };
+}
+
+// Collects feedback rows that will be sent to Flask:
+// - localStorage saved feedback (your existing modal submissions)
+// - + the inline prior experience row (if enabled)
+function collectFeedbackRowsForTraining() {
+  const toggleOn = document.getElementById("usePriorExpToggle")?.checked;
+  if (!toggleOn) return [];
+
+  const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
+  const normalizedStored = stored.map(r => ({
+    ts: r.ts,
+    source: "stored_group_feedback",
+    prev_group_size: (r.members?.length ? r.members.length : null),
+    // if you later add personas snapshot to stored feedback, include it here:
+    personas: r.personas || null,
+    student_rating_1to5: r.student_rating_1to5,
+    teacher_rating_1to5: r.teacher_rating_1to5,
+    note: r.note
+  }));
+
+  const inlineRow = readInlinePriorExperienceRow(); // can throw
+  return inlineRow ? [...normalizedStored, inlineRow] : normalizedStored;
 }
 
 /* ================================
@@ -1432,12 +1690,23 @@ window.generateSmartGroups = async function() {
       
       showLoading('Using AI to create optimal groups...');
       
+      let feedbackRows = [];
+      try {
+        feedbackRows = collectFeedbackRowsForTraining(); // only non-empty if toggle ON
+      } catch (e) {
+        alert(`Prior experience input error: ${e.message}`);
+        hideLoading();
+        return;
+      }
+
       const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
         ...fetchOptions,
         method: 'POST',
         body: JSON.stringify({
           user_uids: user_uids,
-          group_size: groupSize
+          group_size: groupSize,
+          incorporate_prior_experiences: (feedbackRows.length > 0),
+          feedback_rows: feedbackRows
         })
       });
 
