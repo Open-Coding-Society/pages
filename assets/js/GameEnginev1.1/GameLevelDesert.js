@@ -748,26 +748,8 @@ class GameLevelDesert {
         
              // After loading and fade-in, start the mini-game
              setTimeout(() => {
-                 // FIXED: Properly destroy the current level BEFORE creating the new game
-                 console.log("Destroying current desert level...");
-                 if (primaryGame.currentLevel && primaryGame.currentLevel.destroy) {
-                     primaryGame.currentLevel.destroy();
-                 }
-                
-                 // FIXED: Clear all canvas elements from the DOM
-                 const gameContainer = document.getElementById('gameContainer');
-                 if (gameContainer) {
-                     // Remove all canvases except the main gameCanvas
-                     const canvases = gameContainer.querySelectorAll('canvas');
-                     canvases.forEach(canvas => {
-                         if (canvas.id !== 'gameCanvas') {
-                             console.log("Removing canvas:", canvas.id);
-                             canvas.remove();
-                         }
-                     });
-                 }
-                
-                 // Pause the primary game
+               // Pause the primary game without destroying the current level
+               // so player position/state can be restored after mini-game skip/end.
                  primaryGame.pause();
                 
                  // Now create and start the new game
