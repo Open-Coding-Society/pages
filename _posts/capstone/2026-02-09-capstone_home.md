@@ -125,6 +125,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- Pirna Pages -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{% post_url 2026-02-13-pirna-capstone %}">
+           <img src="/images/capstone/pirna_logo.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-13-pirna-capstone %}">Pirna</a></h3>
+           <p class="text-sm text-gray-700">Improve group-level communication and engagement on OCS through an integrated messaging system, while generating practical design principles for scalable, analytics-informed collaborative tools in educational platforms.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Nikhil, Rohan, Adi</p>
+       </div>
+   </div>
+   
+
 
 </div>
 
