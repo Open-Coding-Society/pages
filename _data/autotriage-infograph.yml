@@ -1,0 +1,40 @@
+# AutoTriage Capstone Infographic
+Title: "AutoTriage Pages Capstone"
+Description: "A GitHub-native dev companion that builds issues for you, keeps your team aligned, and gives teachers a 30-second pulse on every group — without feeling like surveillance."
+
+
+Topics:
+ - title: "AutoTriage"
+   image: "capstone/autotriage_logo.png"
+   link: "/capstone/autotriage/"
+   alt: "AutoTriage — GitHub-Native Dev Companion for CS Classrooms"
+   keyPoints:
+     - "Live coding buddy overlay with context-aware issue prompts"
+     - "One-click SCRUM-formatted issue generation from real activity"
+     - "Claude-powered soft skills scorer that nudges, never grades"
+     - "Issue-to-commit alignment that surfaces drift before standup"
+     - "/pulse Slack command for 30-second team health snapshots"
+     - "Student-first privacy: scores are private, nothing posts without consent"
+   subtitle: "Making Issue Tracking Feel Like a Teammate, Not a Chore"
+   description: "A system that transforms GitHub issue management from a tedious overhead task into an intelligent, student-friendly workflow. A Chrome extension watches what files students are touching and proactively suggests issue tracking in context. When students hit Generate, Claude builds a fully-formatted issue — user story, DBR design rationale, acceptance criteria, and labels — based on what they actually built. A soft skills scorer privately evaluates issue clarity and design-first thinking before posting, offering nudges rather than grades. Issue-to-commit alignment maps what issues claim against what diffs show, surfacing drift before standups. Teachers access everything through a single /pulse Slack command that delivers a 30-second evoke transcription of every team's last activity, issue health, and alignment score."
+   tech:
+     - "Chrome Extension (Activity Watcher + Buddy Overlay)"
+     - "Claude API Integration"
+     - "GitHub App with Webhook Listener"
+     - "Issue Engine with Activity Ingestor"
+     - "Slack Bot (/pulse Command)"
+     - "Issue↔Commit Alignment Mapper"
+   impact:
+     - "Reduces friction in writing well-structured GitHub issues"
+     - "Teaches SCRUM and DBR formatting through guided generation"
+     - "Gives instructors a real-time pulse without invasive monitoring"
+     - "Helps students self-correct drift between issues and commits"
+     - "Builds professional dev habits in a classroom-safe environment"
+   status: "In Development"
+   team:
+     - "Neil"
+     - "Shriya"
+     - "Nikhil"
+
+
+

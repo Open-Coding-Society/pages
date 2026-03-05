@@ -128,6 +128,9 @@ class GameEnv {
 
  
     clear() {
+        if (!this.ctx) {
+            return;
+        }
         this.ctx.clearRect(0, 0, this.innerWidth, this.innerHeight);
     }
 
