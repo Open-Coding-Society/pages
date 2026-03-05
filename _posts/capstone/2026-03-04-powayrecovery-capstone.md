@@ -6,7 +6,7 @@ description: An AP CSP outreach project focused on improving access to recovery 
 permalink: /capstone/poway-recovery/
 ---
 
-{% include poway-recovery-infograph.html %}
+{% include powayrecovery-infographic.html %}
 
 <br>
 
