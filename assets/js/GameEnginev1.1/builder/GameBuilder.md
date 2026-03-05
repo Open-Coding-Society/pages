@@ -49,6 +49,7 @@ permalink: /gamebuilderv1-1
 <div class="gamebuilder-title">
   {{page.title}}
   <a href="{{site.baseurl}}/gamebuilderv1-1/doc" target="_blank" rel="noopener noreferrer">📜</a>
+  <a href="{{site.baseurl}}/rpg/game" target="_blank" rel="noopener noreferrer">🕹️</a>
 </div>
 
 <!-- Ensure GameTemplatesV1_1 is available as a global by loading templates.js -->
