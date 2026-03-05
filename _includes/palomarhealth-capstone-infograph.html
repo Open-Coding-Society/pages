@@ -1,0 +1,66 @@
+{% assign data = site.data.palomar_health %}
+
+<div class="palomar-foundation">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>{{ data.title }}</h1>
+      <p>{{ data.description }}</p>
+      <a href="{{ data.donate_link | relative_url }}" class="btn-primary">Donate Now</a>
+    </div>
+  </section>
+
+  <!-- PROGRAMS -->
+  <section class="programs">
+    <h2>Our Programs</h2>
+
+    <div class="program-grid">
+      {% for program in data.programs %}
+      <div class="program-card">
+
+        {% if program.image and program.image != "" %}
+        <img src="{{ site.baseurl }}/images/{{ program.image }}" alt="{{ program.alt }}">
+        {% endif %}
+
+        <div class="program-content">
+          <h3>{{ program.title }}</h3>
+          <p>{{ program.description }}</p>
+
+          <ul class="program-points">
+            {% for point in program.points %}
+            <li>{{ point }}</li>
+            {% endfor %}
+          </ul>
+
+          <a href="{{ program.link | relative_url }}" class="btn-secondary">Learn More</a>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- WAYS TO HELP -->
+  <section class="help">
+    <h2>Ways You Can Help</h2>
+
+    <div class="help-grid">
+      {% for help in data.help %}
+      <div class="help-card">
+        <h3>{{ help.title }}</h3>
+        <p>{{ help.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact">
+    <h2>Contact Us</h2>
+    <p>{{ data.contact.address }}</p>
+    <p>{{ data.contact.email }}</p>
+    <p>{{ data.contact.phone }}</p>
+  </section>
+
+</div>

@@ -1,0 +1,41 @@
+title: Community Health Foundation
+description: Supporting healthcare programs that improve lives across our community.
+donate_link: /donate
+
+programs:
+
+  - title: Camp Hope
+    image: toolkit-nav-buttons/studentmanagement.png
+    alt: Camp Hope
+    description: A program supporting children who have experienced trauma.
+    link: /camp-hope
+    points:
+      - Mentorship
+      - Summer camps
+      - Family support
+
+  - title: Student Medical Program
+    image: toolkit-nav-buttons/studentgrader.png
+    alt: Student program
+    description: Connecting students with careers in healthcare.
+    link: /student-program
+    points:
+      - Career exposure
+      - Mentorship
+      - Hospital experiences
+
+help:
+
+  - title: Donate
+    description: Your gifts fund healthcare programs and services.
+
+  - title: Volunteer
+    description: Join events and support community programs.
+
+  - title: Corporate Partnerships
+    description: Businesses can help expand healthcare access.
+
+contact:
+  address: 123 Health Ave, San Diego CA
+  email: info@foundation.org
+  phone: (000) 000-0000

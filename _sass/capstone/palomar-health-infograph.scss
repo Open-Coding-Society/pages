@@ -1,0 +1,233 @@
+// Foundation Page Styles
+// Located in _sass/capstone/
+
+// Color Variables
+$foundation-primary: #2b7bbb;
+$foundation-secondary: #1f4f74;
+$foundation-accent: #f3f8ff;
+$foundation-dark: #0b1220;
+$foundation-bg: #0d1728;
+$foundation-text: #e5edf7;
+$foundation-muted: #b8c5d6;
+$foundation-card-bg: #142338;
+
+
+// Main Container
+.palomar-foundation {
+  width: 80vw;
+  max-width: none;
+  margin-left: calc(50% - 40vw);
+  margin-right: calc(50% - 40vw);
+  padding: 2rem;
+  background: $foundation-bg;
+  border-radius: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: $foundation-text;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+
+// HERO SECTION
+.palomar-foundation .hero {
+  background: linear-gradient(135deg, $foundation-primary, $foundation-secondary);
+  color: $foundation-accent;
+  border-radius: 20px;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+
+  h1 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    max-width: 700px;
+    margin: 0 auto 2rem auto;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+}
+
+
+// Buttons
+.palomar-foundation .btn-primary {
+  display: inline-block;
+  background: #163a5d;
+  color: #ffffff;
+  padding: 0.75rem 1.6rem;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: #1d4c78;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.palomar-foundation .btn-secondary {
+  display: inline-block;
+  margin-top: 1rem;
+  background: #22557f;
+  color: white;
+  padding: 0.55rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: #1b4568;
+  }
+}
+
+
+// SECTION HEADERS
+.palomar-foundation .programs,
+.palomar-foundation .help,
+.palomar-foundation .contact {
+  margin-bottom: 3rem;
+  background: #101d2f;
+  border-radius: 16px;
+  padding: 2rem;
+
+  h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: $foundation-text;
+  }
+}
+
+
+// PROGRAM GRID
+.palomar-foundation .program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+
+// PROGRAM CARD
+.palomar-foundation .program-card {
+  background: $foundation-card-bg;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: 0.25s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  }
+
+  img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+}
+
+
+.palomar-foundation .program-content {
+  padding: 1.5rem;
+
+  h3 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    color: #7fc4f4;
+  }
+
+  p {
+    color: $foundation-muted;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}
+
+
+// Bullet Points
+.palomar-foundation .program-points {
+  margin: 0.75rem 0 0.5rem 1rem;
+  color: $foundation-text;
+  font-size: 0.98rem;
+  line-height: 1.6;
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+}
+
+
+// HELP SECTION
+.palomar-foundation .help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+
+.palomar-foundation .help-card {
+  background: $foundation-card-bg;
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: center;
+  border-top: 4px solid $foundation-primary;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+
+  h3 {
+    margin-top: 0;
+    color: #7fc4f4;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: $foundation-muted;
+  }
+}
+
+
+// CONTACT SECTION
+.palomar-foundation .contact {
+  background: $foundation-dark;
+  color: $foundation-accent;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+
+  h2,
+  h3,
+  p,
+  a {
+    color: #ffffff;
+  }
+
+  p {
+    margin: 0.5rem 0;
+    color: #ffffff;
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+}
+
+
+// RESPONSIVE
+@media (max-width: 768px) {
+
+  .palomar-foundation .hero h1 {
+    font-size: 2rem;
+  }
+
+  .palomar-foundation {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 1rem;
+  }
+
+}
