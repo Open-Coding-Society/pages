@@ -1169,7 +1169,11 @@ window.renderGroups = function () {
           <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
             <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
             <p class="text-sm text-gray-400">
-              Period ${group.period} · ${group.course}${isCollapsed ? ` · ${(group.members || []).map(m => m.name).join(', ') || 'No members'}` : ''}
+              Period ${group.period} · ${group.course}${isCollapsed ? ` · ${((members) => {
+                if (!members.length) return 'No members';
+                const shown = members.slice(0, 3).map(m => m.name).join(', ');
+                return members.length > 3 ? shown + ` +${members.length - 3} more` : shown;
+              })(group.members || [])}` : ''}
             </p>
           </div>
         </div>
@@ -1213,7 +1217,7 @@ window.renderGroups = function () {
 
       ${!isCollapsed ? `
       <!-- Members row -->
-      <div class="mt-3 flex flex-wrap gap-2">
+      <div class="mt-3 flex flex-wrap gap-2 max-h-40 overflow-y-auto">
         ${(group.members || []).map(m => `
           <span
             class="group px-3 py-1 bg-neutral-600 hover:bg-red-600 text-sm text-gray-200 rounded-full cursor-pointer transition-colors"
