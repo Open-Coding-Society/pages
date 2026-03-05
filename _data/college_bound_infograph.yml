@@ -4,7 +4,7 @@ Description: "A website designed to provide a comprehensive guide to helping stu
 
 Topics:
   - title: "College Bound"
-    image: "capstone/college_bound.png"
+    image: "capstone/college_bound.jpeg"
     link: "/capstone/college-bound/"
     alt: "College Bound - Preparing Students for College Applications"
     keyPoints:
