@@ -20,7 +20,8 @@ description: "Class of 2026"
 owner_name: Binary Beasts 
 github_username: whitelunarium 
 github_repo: "BB_Frontend" 
-baseurl: "" 
+url: "https://whitelunarium.github.io"
+baseurl: "/BB_Frontend" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
