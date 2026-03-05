@@ -1,16 +1,22 @@
 // HawkHub Infographic Styles
 // Located in _sass/capstone/
 
-// Variables - Green and Blue Color Scheme
-$hh-primary: #1D4ED8;      // Blue
-$hh-secondary: #10B981;    // Green
-$hh-dark-bg: #1a1a2e;
-$hh-card-bg: #1e1e2e;
-$hh-text-muted: #b0bec5;
-$hh-text-light: #e0e0e0;
+// Import mixins
+@import "../open-coding/mixins/container";
+@import "../open-coding/mixins/panel";
+@import "../open-coding/mixins/buttons";
+
+// Variables - Navy Blue and Dark Green Color Scheme
+$hh-primary: #001F3F;      // Navy Blue
+$hh-secondary: #1B5E20;    // Dark Green
+$hh-dark-bg: #0a0a1a;
+$hh-card-bg: #12122a;
+$hh-text-muted: #90a4ae;
+$hh-text-light: #e8e8e8;
 
 // Main Container
 .hh-infograph {
+  @include main-container(2rem);
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
@@ -21,10 +27,10 @@ $hh-text-light: #e0e0e0;
 .hh-header {
   text-align: center;
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, $hh-dark-bg 0%, $hh-primary 50%, darken($hh-primary, 10%) 100%);
   border-radius: 24px;
   margin-bottom: 2rem;
-  border: 1px solid rgba($hh-primary, 0.3);
+  border: 1px solid rgba($hh-primary, 0.5);
 }
 
 .hh-badge {
@@ -66,14 +72,17 @@ $hh-text-light: #e0e0e0;
   margin: 0 auto;
 }
 
-// Card Section
+// Card Section - Using info-panel mixin
 .hh-card {
-  background: linear-gradient(145deg, $hh-card-bg 0%, #252540 100%);
+  @include info-panel(2.5rem, 2px, 2rem);
+  background: linear-gradient(145deg, $hh-card-bg 0%, #1a1a3a 100%);
   border-radius: 24px;
-  padding: 2.5rem;
-  margin-bottom: 2rem;
-  border: 2px solid rgba($hh-primary, 0.3);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border-color: rgba($hh-primary, 0.4);
+  
+  h3 {
+    color: $hh-text-light;
+  }
 }
 
 .hh-card-grid {
@@ -91,8 +100,9 @@ $hh-text-light: #e0e0e0;
   }
 }
 
-// Visual Section
+// Visual Section - Using sub-container mixin
 .hh-visual {
+  @include sub-container(1rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,7 +110,7 @@ $hh-text-light: #e0e0e0;
   padding: 1.5rem;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
-  border: 1px solid rgba($hh-primary, 0.2);
+  border: 1px solid rgba($hh-primary, 0.3);
 
   @media (max-width: 1024px) {
     grid-column: 1 / -1;
@@ -114,7 +124,7 @@ $hh-text-light: #e0e0e0;
   display: block;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba($hh-primary, 0.3);
+  box-shadow: 0 10px 30px rgba($hh-primary, 0.4);
   width: 100%;
 
   &:hover .hh-image {
@@ -136,7 +146,7 @@ $hh-text-light: #e0e0e0;
 .hh-overlay {
   position: absolute;
   inset: 0;
-  background: rgba($hh-primary, 0.85);
+  background: rgba($hh-primary, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,14 +192,15 @@ $hh-text-light: #e0e0e0;
   font-size: 1rem;
 }
 
-// Content Section
+// Content Section - Using sub-container mixin
 .hh-content {
+  @include sub-container(1rem);
   display: flex;
   flex-direction: column;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
-  border: 1px solid rgba($hh-primary, 0.2);
+  border: 1px solid rgba($hh-primary, 0.3);
 }
 
 .hh-project-title {
@@ -205,7 +216,7 @@ $hh-text-light: #e0e0e0;
   font-weight: 600;
   margin: 0 0 1.25rem 0;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba($hh-secondary, 0.2);
+  border-bottom: 1px solid rgba($hh-secondary, 0.3);
 }
 
 // Key Points
@@ -232,32 +243,32 @@ $hh-text-light: #e0e0e0;
   flex-shrink: 0;
 }
 
-// Tech Stack
+// Tech Stack - Using inline-container mixin
 .hh-tech-stack {
-  display: flex;
+  @include inline-container(flex, 0.5rem);
   flex-wrap: wrap;
-  gap: 0.5rem;
   margin-top: auto;
 }
 
 .hh-tech-tag {
-  background: rgba($hh-secondary, 0.15);
+  background: rgba($hh-secondary, 0.2);
   color: $hh-secondary;
   padding: 0.35rem 0.7rem;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid rgba($hh-secondary, 0.3);
+  border: 1px solid rgba($hh-secondary, 0.4);
 }
 
-// Details Section
+// Details Section - Using sub-container mixin
 .hh-details {
+  @include sub-container(1rem);
   display: flex;
   flex-direction: column;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
-  border: 1px solid rgba($hh-primary, 0.2);
+  border: 1px solid rgba($hh-primary, 0.3);
 }
 
 .hh-section-title {
@@ -266,7 +277,7 @@ $hh-text-light: #e0e0e0;
   font-weight: 700;
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba($hh-secondary, 0.3);
+  border-bottom: 2px solid rgba($hh-secondary, 0.4);
 }
 
 .hh-about {
@@ -286,7 +297,7 @@ $hh-text-light: #e0e0e0;
 }
 
 .hh-impact-item {
-  background: rgba($hh-secondary, 0.1);
+  background: rgba($hh-secondary, 0.15);
   color: $hh-text-light;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -294,9 +305,9 @@ $hh-text-light: #e0e0e0;
   border-left: 3px solid $hh-secondary;
 }
 
-// Button
+// Button - Using text-button mixin with custom styling
 .hh-btn {
-  display: inline-block;
+  @include text-button;
   background: linear-gradient(135deg, $hh-secondary, $hh-primary);
   color: #fff;
   padding: 0.75rem 1.5rem;
@@ -306,11 +317,14 @@ $hh-text-light: #e0e0e0;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
   margin-top: auto;
+  border: none;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba($hh-secondary, 0.4);
+    box-shadow: 0 8px 25px rgba($hh-secondary, 0.5);
     color: #fff;
     text-decoration: none;
+    opacity: 0.95;
   }
 }
+
