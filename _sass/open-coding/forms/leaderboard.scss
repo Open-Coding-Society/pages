@@ -1,0 +1,231 @@
+// ===========================
+// Leaderboard Widget Styles
+// ===========================
+// Uses standard mixins for consistent styling with forms and widgets
+
+@import "../mixins/buttons";
+@import "../mixins/panel";
+@import "../mixins/forms";
+
+/**
+ * Leaderboard Widget Container
+ * Fixed-position widget for displaying game leaderboards
+ */
+.leaderboard-widget {
+  @include widget-container(350px, 2px);
+
+  &.initially-hidden {
+    display: none;
+  }
+}
+
+/**
+ * Positioning Classes
+ */
+.leaderboard-embedded {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+}
+
+.leaderboard-fixed {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+}
+
+/**
+ * Leaderboard Header
+ */
+.leaderboard-header {
+  @include header-bar(16px, 20px);
+}
+
+/**
+ * Toggle Button
+ */
+.toggle-btn {
+  @include icon-button(32px, 0);
+  border-radius: 50%;
+  font-size: 22px;
+  
+  &:hover {
+    background: var(--panel-mid, #4a4a4a);
+    border-color: var(--ui-border, #666);
+  }
+
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+}
+
+/**
+ * Leaderboard Content Area
+ */
+.leaderboard-content {
+  @include content-area(400px);
+
+  &.hidden {
+    display: none !important;
+  }
+}
+
+/**
+ * Leaderboard Table
+ */
+.leaderboard-table {
+  @include themed-table;
+}
+
+/**
+ * Table Cell Types
+ */
+.rank {
+  font-weight: 800;
+  color: #ffd700;
+}
+
+.username {
+  font-weight: 600;
+  color: var(--pref-text-color, #fff);
+}
+
+.score {
+  font-weight: 800;
+  color: var(--pref-accent-color, #4a9eff);
+}
+
+/**
+ * Type Selection Screen
+ */
+.type-selection {
+  padding: 24px;
+  text-align: center;
+
+  h3 {
+    margin: 0 0 20px 0;
+    color: var(--pref-text-color, #fff);
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+}
+
+.type-buttons {
+  @include button-container(column, 12px);
+}
+
+.type-btn {
+  @include text-button;
+  width: 100%;
+  padding: 14px 20px;
+  border: 2px solid var(--pref-accent-color, #4a9eff);
+  background: var(--panel-mid, #2d2d2d);
+  color: var(--pref-accent-color, #4a9eff);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+
+  &:hover {
+    background: var(--pref-accent-color, #4a9eff);
+    color: var(--panel, #1a1a1a);
+    border-color: var(--pref-accent-color, #5aafff);
+    transform: scale(1.02);
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+}
+
+/**
+ * Elementary Form
+ */
+.elementary-form {
+  padding: 20px;
+  background: var(--panel, #1a1a1a);
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}
+
+.form-group {
+  @include form-group(16px);
+}
+
+/**
+ * Submit Button
+ */
+.submit-btn {
+  @include submit-button(12px);
+}
+
+/**
+ * Loading and Error States
+ */
+.loading,
+.error {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted, #aaa);
+  font-size: 14px;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/**
+ * Back Button
+ */
+.back-btn {
+  @include text-button;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 10px;
+
+  &:hover {
+    background: var(--panel-mid, #4a4a4a);
+    border-color: var(--ui-border, #666);
+  }
+
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/**
+ * Delete Button
+ */
+.delete-btn {
+  @include text-button;
+  background: #ff6b6b;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &:hover {
+    background: #ff5252;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}

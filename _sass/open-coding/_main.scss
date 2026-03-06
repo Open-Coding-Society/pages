@@ -7,6 +7,8 @@
 @import "forms/code-runner";
 @import "forms/ui-runner";
 @import "forms/game-runner";
+@import "forms/pause-modal";
+@import "forms/leaderboard";
 @import "hacks";
 @import "hacks_lxd";
 @import "hallpass";
@@ -16,8 +18,6 @@
 @import "platformer-game";
 @import "game-engine";
 @import "game-builder";
-@import "pause-modal";
-@import "leaderboard";
 @import "quiz";
 @import "rps_lesson";
 @import "search";
