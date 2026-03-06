@@ -1,0 +1,36 @@
+# PYBL Capstone Infographic
+Title: "PYBL Capstone"
+Description: "A Design-Based Research capstone focused on improving youth basketball operations through clearer registration flows, scheduling visibility, and family communication on pybl.com."
+
+Topics:
+  - title: "PYBL Platform"
+    image: "capstone/pybl.png"
+    link: "https://pybl.com/"
+    alt: "PYBL platform preview"
+    keyPoints:
+      - "Modernized registration and player onboarding flow"
+      - "Improved season schedule and program discoverability"
+      - "Clear role-based pathways for families, coaches, and admins"
+      - "Reduced friction for finding events, forms, and updates"
+      - "Mobile-friendly information architecture for game-day use"
+      - "Structured content model for faster updates"
+    subtitle: "Youth Sports Operations, Simplified"
+    description: "PYBL provides community basketball information and logistics that must remain simple and fast for families. This capstone focuses on reducing navigation ambiguity, improving page hierarchy, and making registration and schedule workflows easier to complete from phones and school devices."
+    tech:
+      - "Jekyll"
+      - "Markdown Content System"
+      - "SCSS"
+      - "Responsive Layouts"
+      - "Content Architecture"
+      - "Accessibility Checks"
+    impact:
+      - "Fewer clicks to reach registration and league details"
+      - "Faster access to schedules and announcements"
+      - "Improved readability and mobile usability"
+      - "Cleaner content governance for annual season updates"
+      - "More predictable UX for families and staff"
+    status: "In Development"
+    team:
+      - "Aneesh"
+      - "Ethan"
+      - "Samarth"

@@ -1,0 +1,153 @@
+$pybl-primary: #f5b200;
+$pybl-secondary: #123a91;
+$pybl-bg: #0e1b3f;
+$pybl-card: #162a5f;
+$pybl-text: #eef3ff;
+$pybl-muted: #bfcae6;
+
+.pybl-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.pybl-header {
+  text-align: center;
+  padding: 2.75rem 2rem;
+  background: linear-gradient(130deg, $pybl-bg 0%, #1d3f8f 65%, #2a4ea5 100%);
+  border-radius: 22px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($pybl-primary, 0.35);
+}
+
+.pybl-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $pybl-primary, #ffd86a);
+  color: #222;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.pybl-title {
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.pybl-description {
+  color: $pybl-muted;
+  margin: 1rem auto 0;
+  max-width: 860px;
+  line-height: 1.65;
+}
+
+.pybl-card {
+  background: linear-gradient(150deg, $pybl-card, #10214b);
+  border-radius: 22px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($pybl-primary, 0.25);
+}
+
+.pybl-card-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pybl-visual,
+.pybl-content,
+.pybl-details {
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.pybl-visual {
+  background: rgba($pybl-primary, 0.08);
+  border: 1px solid rgba($pybl-primary, 0.2);
+}
+
+.pybl-image-link {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.pybl-image { width: 100%; display: block; }
+
+.pybl-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.pybl-image-link:hover .pybl-overlay { opacity: 1; }
+
+.pybl-status {
+  margin-top: 0.8rem;
+  background: linear-gradient(135deg, $pybl-primary, #ffdc75);
+  color: #1f2432;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+}
+
+.pybl-team { margin-top: 0.8rem; text-align: center; }
+.pybl-team-label { display: block; color: $pybl-muted; font-size: 0.72rem; text-transform: uppercase; }
+.pybl-team-name { color: $pybl-primary; font-weight: 700; font-size: 0.95rem; }
+
+.pybl-content { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+.pybl-project-title { color: $pybl-text; font-size: 1.55rem; margin: 0; }
+.pybl-subtitle { color: #8fb5ff; margin: 0.25rem 0 1rem; font-weight: 600; }
+
+.pybl-keypoints { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1rem; }
+.pybl-keypoint { color: $pybl-text; font-size: 0.92rem; line-height: 1.4; display: flex; gap: 0.45rem; }
+.pybl-check { color: $pybl-primary; font-weight: 800; }
+
+.pybl-tech-stack { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.pybl-tech-tag {
+  background: rgba($pybl-primary, 0.14);
+  color: #ffe29a;
+  border: 1px solid rgba($pybl-primary, 0.3);
+  border-radius: 6px;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.pybl-details { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+.pybl-section-title { color: $pybl-text; font-size: 0.98rem; margin: 0 0 0.55rem; }
+.pybl-about { color: $pybl-muted; font-size: 0.88rem; line-height: 1.55; margin: 0 0 1rem; }
+.pybl-impact-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+.pybl-impact-item { color: #d8e4ff; font-size: 0.84rem; border-left: 3px solid rgba($pybl-primary, 0.5); padding-left: 0.55rem; }
+
+.pybl-btn {
+  display: inline-block;
+  text-decoration: none;
+  background: linear-gradient(135deg, $pybl-primary, #ffd86a);
+  color: #1f2432;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 0.58rem 0.95rem;
+}

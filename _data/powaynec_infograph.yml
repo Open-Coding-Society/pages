@@ -1,0 +1,36 @@
+# Poway NEC Capstone Infographic
+Title: "Poway NEC Capstone"
+Description: "A Design-Based Research capstone that strengthens community preparedness workflows on powaynec.com, with clearer volunteer pathways, operational pages, and emergency information access."
+
+Topics:
+  - title: "Poway Neighborhood Emergency Corps"
+    image: "capstone/powaynec.png"
+    link: "https://powaynec.com/"
+    alt: "Poway NEC website preview"
+    keyPoints:
+      - "Clear volunteer onboarding and role discovery"
+      - "Simplified navigation for preparedness resources"
+      - "Improved page structure for operations and events"
+      - "Action-first design for high-stress information retrieval"
+      - "Consistent visual hierarchy across critical sections"
+      - "Maintainable content patterns for ongoing updates"
+    subtitle: "Preparedness Information That Stays Usable Under Pressure"
+    description: "Poway NEC supports emergency-readiness communication where clarity and speed matter. This capstone focuses on reducing information overload, improving findability of key resources, and shaping a maintainable structure for volunteers, coordinators, and residents."
+    tech:
+      - "Jekyll"
+      - "Structured Content Blocks"
+      - "SCSS Components"
+      - "Responsive Design"
+      - "Navigation Refactoring"
+      - "Accessibility Passes"
+    impact:
+      - "Quicker access to preparedness resources"
+      - "Better orientation for new volunteers"
+      - "Reduced navigation confusion across key pages"
+      - "Improved consistency in updates and announcements"
+      - "Higher confidence in public-facing emergency content"
+    status: "In Development"
+    team:
+      - "Aneesh"
+      - "Ethan"
+      - "Samarth"
