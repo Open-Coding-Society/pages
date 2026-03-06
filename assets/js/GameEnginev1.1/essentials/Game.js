@@ -219,96 +219,22 @@ class GameCore {
             ctrl.pauseFeature.show();
         }
         
-        // Create the modal
+        // Create the modal using CSS classes from pause-modal.scss
         const modal = document.createElement('div');
         modal.id = 'pauseModal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--panel, #000);
-            border: 1px solid var(--pref-accent-color, #FFF);
-            border-radius: 12px;
-            padding: 24px;
-            z-index: 10000;
-            min-width: 300px;
-            box-shadow: none;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        `;
         
         modal.innerHTML = `
-            <h2 style="margin: 0 0 16px 0;  text-align: center; font-size: 22px;">
-                Pause Menu
-            </h2>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button id="pause-toggle-score" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    border: 1px solid #333;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Toggle Score</button>
-                
-                <button id="pause-save-score" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    border: 1px solid #333;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Save Score</button>
-                
-                <button id="pause-skip-level" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    border: 1px solid #333;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Exit Level</button>
-                
-                <button id="pause-toggle-leaderboard" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    border: 1px solid #333;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Toggle Leaderboard</button>
-                
-                <button id="pause-resume" class="pause-menu-btn primary" style="
-                    padding: 12px 16px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 700;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                    margin-top: 8px;
-                ">Resume</button>
+            <div class="pause-modal-content">
+                <h2 class="pause-modal-header">Pause Menu</h2>
+                <div class="pause-modal-buttons">
+                    <button id="pause-toggle-score" class="pause-menu-btn">Toggle Score</button>
+                    <button id="pause-save-score" class="pause-menu-btn">Save Score</button>
+                    <button id="pause-skip-level" class="pause-menu-btn">Exit Level</button>
+                    <button id="pause-toggle-leaderboard" class="pause-menu-btn">Toggle Leaderboard</button>
+                    <button id="pause-resume" class="pause-menu-btn primary">Resume</button>
+                </div>
             </div>
         `;
-        
-        // Add hover effects via JavaScript
-        setTimeout(() => {
-            const buttons = modal.querySelectorAll('.pause-menu-btn');
-            buttons.forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    btn.style.transform = 'translateY(-2px)';
-                    btn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.35)';
-                });
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.transform = 'translateY(0)';
-                    btn.style.boxShadow = 'none';
-                });
-            });
-        }, 0);
         
         // Add to document
         document.body.appendChild(modal);
