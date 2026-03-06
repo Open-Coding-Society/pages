@@ -7,8 +7,6 @@ show_reading_time: false
 ---
 <br>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <div class="login-container">
     <!-- Python Login Form -->
     <div class="login-card">
@@ -30,33 +28,6 @@ show_reading_time: false
     <div class="signup-card">
         <h1 id="signupTitle">Sign Up</h1>
         <hr>
-        <!-- Google OAuth Section (initially hidden) -->
-        <div id="oauth-verification" style="display: none; text-align: center; margin-bottom: 2rem;">
-            <h3 style="color: #6366f1; margin-bottom: 1rem;">🎓 School Email Verification</h3>
-            <p style="margin-bottom: 1.5rem; color: #d1d5db;">
-                Please sign in with your school Google account to verify you're a Poway USD student or teacher.
-                <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
-            </p>
-            <div id="g_id_onload"
-                 data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
-                 data-callback="handleGoogleSignIn"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin" 
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="filled_blue"
-                 data-text="signin_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left"
-                 style="margin-bottom: 1rem;">
-            </div>
-            <button type="button" class="large secondary" onclick="showSignupForm()" 
-                    style="background-color: #6b7280;">
-                ← Back to Form
-            </button>
-            <div id="oauth-status" style="margin-top: 1rem;"></div>
-        </div>
         <!-- Signup Form -->
         <form id="signupForm" onsubmit="handleSignupSubmit(event);">
             <div class="form-group">
@@ -92,15 +63,6 @@ show_reading_time: false
                 <div id="password-validation-message" class="validation-message"></div>
             </div>
             <p>
-                <label class="switch">
-                    <span class="toggle">
-                        <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
-                        <span class="slider"></span>
-                    </span>
-                    <span class="label-text">Kasm Server Needed</span>
-                </label>
-            </p>
-            <p>
                 <button type="submit" class="large primary submit-button">Sign Up</button>
             </p>
             <!-- Backend Status Display -->
@@ -123,9 +85,7 @@ show_reading_time: false
     import { login, pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     let signupFormData = {};
-    let verifiedSchoolEmail = null;
     let validationTimeout = null;
-    const GOOGLE_CLIENT_ID = "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com";
 
     // Password validation with debouncing (1.5 second delay)
     function validatePasswordsDebounced() {
@@ -267,75 +227,17 @@ show_reading_time: false
         }
 
         // Store form data
-        signupFormData = {
-            name: document.getElementById("name").value,
-            uid: document.getElementById("signupUid").value,
-            sid: document.getElementById("signupSid").value,
-            school: document.getElementById("signupSchool").value,
-            email: document.getElementById("signupEmail").value,
-            password: document.getElementById("signupPassword").value,
-            kasm_server_needed: document.getElementById("kasmNeeded").checked,
-        };
+            signupFormData = {
+                name: document.getElementById("name").value,
+                uid: document.getElementById("signupUid").value,
+                sid: document.getElementById("signupSid").value,
+                school: document.getElementById("signupSchool").value,
+                email: document.getElementById("signupEmail").value,
+                password: document.getElementById("signupPassword").value,
+                kasm_server_needed: false,
+            };
 
-        // Show OAuth verification
-        showOAuthVerification();
-    }
-
-    function showOAuthVerification() {
-        document.getElementById('signupForm').style.display = 'none';
-        document.getElementById('oauth-verification').style.display = 'block';
-    }
-
-    window.showSignupForm = function() {
-        document.getElementById('oauth-verification').style.display = 'none';
-        document.getElementById('signupForm').style.display = 'block';
-        clearOAuthStatus();
-    }
-
-    function clearOAuthStatus() {
-        document.getElementById('oauth-status').innerHTML = '';
-    }
-
-    function showOAuthStatus(message, isError = false) {
-        const statusDiv = document.getElementById('oauth-status');
-        statusDiv.innerHTML = `<div class="${isError ? 'oauth-error' : 'oauth-success'}">${message}</div>`;
-    }
-
-    window.handleGoogleSignIn = function(response) {
-        try {
-            const userInfo = parseJwt(response.credential);
-            const email = userInfo.email;
-            if (!email.endsWith('@stu.powayusd.com') && !email.endsWith('@powayusd.com')) {
-                showOAuthStatus('❌ You must use your school email address ending with @stu.powayusd.com or @powayusd.com', true);
-                return;
-            }
-            verifiedSchoolEmail = email;
-            showOAuthStatus(`✅ School email verified: ${email}`);
-
-            setTimeout(() => {
-                document.getElementById('oauth-verification').style.display = 'none';
-                document.getElementById('signupForm').style.display = 'block';
-
-                console.log("About to call signup() with stored data:", signupFormData);
-                console.log("pythonURI:", pythonURI);
-
-
-                signup();
-            }, 1500);
-
-        } catch (error) {
-            console.error("Error handling Google Sign-In:", error);
-            showOAuthStatus('❌ Error processing Google Sign-In. Please try again.', true);
-        }
-    }
-
-    function parseJwt(token) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
+        signup();
     }
 
     // Initialize password validation when page loads
@@ -349,12 +251,6 @@ show_reading_time: false
             confirmPasswordField.addEventListener('input', validatePasswordsDebounced);
         }
 
-        if (window.google && window.google.accounts) {
-            window.google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
-                callback: handleGoogleSignIn
-            });
-        }
     });
 
     // Function to handle both Python and Java login simultaneously
@@ -513,7 +409,7 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasm_server_needed: document.getElementById("kasmNeeded").checked,
+            kasm_server_needed: false,
         };
 
         const signupDataJava = {
@@ -525,10 +421,6 @@ show_reading_time: false
             password: data.password,
             kasmServerNeeded: data.kasm_server_needed,
         };
-
-        if (verifiedSchoolEmail) {
-            console.log("Account created with verified school email:", verifiedSchoolEmail);
-        }
 
         console.log("Sending this data to Flask:", JSON.stringify(data, null, 2));
         console.log("Request URL:", `${pythonURI}/api/user`);
