@@ -32,21 +32,14 @@
     }
   }
 
-  // Additional buttons specific to UI runner
+  // Additional buttons specific to UI runner - using element classes
   .stopBtn,
   .resetBtn {
     @include icon-button(38px, 0);
   }
 
-  // Stop button - red emphasis for immediate attention
+  // Stop button - danger color (red) for immediate attention
   .stopBtn {
-    background: #dc2626;
-    border-color: #dc2626;
-    color: $panel-bg;
-
-    &:hover {
-      background: #dc2626;
-      opacity: 0.85;
-    }
+    @extend .danger-button;
   }
 }
