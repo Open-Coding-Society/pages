@@ -124,7 +124,7 @@ top_navigation:
       - label: Annual Reports
         link: /about/annual-reports
   - label: Patient Sign In
-    link: /patient-sign-in
+    link: /patient-sign-in/
     variant: primary
     nav_class: nav-patient-portal
     allow_navigation: true
