@@ -5,8 +5,8 @@ Description: "An interactive human-body diagram that consolidates the American C
 
 Topics:
  - title: "ACS Cancer Infograph"
-   image: "capstone/acs-cancer-infograph.png"
-   link: "/capstone/acs-cancer-infograph/"
+   image: "capstone/acs_logo.png"
+   link: "/capstone/acscancer/"
    alt: "ACS Cancer Infograph — Interactive Body Map for Cancer Information"
    keyPoints:
      - "Interactive human-body diagram with labeled cancer sites"
