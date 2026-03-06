@@ -1,27 +1,112 @@
 {% assign data = site.data.palomar_health %}
 
 <div class="palomar-foundation">
+  <div class="palomar-topbar">
+    <button type="button" class="palomar-home-trigger" aria-label="Go to home view">
+      <img src="{{ site.baseurl }}/images/capstone/palomar.png" alt="Palomar Health home">
+      <span class="home-trigger-label">Home</span>
+    </button>
+    <div class="palomar-topbar-actions">
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Donate Now</a>
+      <a href="#impact" class="btn-secondary cta-reveal" data-reveal="impact,community-gallery,programs,help">Support Local Healthcare</a>
+    </div>
+  </div>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero" id="home">
     <div class="hero-content">
       <h1>{{ data.title }}</h1>
+
+      {% assign hero_photo = data.homepage_gallery | first %}
+      {% if hero_photo %}
+      <figure class="hero-building-image">
+        <img src="{{ site.baseurl }}/images/capstone/{{ hero_photo.file }}" alt="{{ hero_photo.alt }}">
+      </figure>
+      {% endif %}
+
+      <p class="mission-statement">{{ data.mission_statement }}</p>
       <p>{{ data.description }}</p>
-      <a href="{{ data.donate_link | relative_url }}" class="btn-primary">Donate Now</a>
+
+      <div class="home-snapshot" aria-label="Palomar Health system snapshot">
+        <p class="snapshot-overview">{{ data.homepage_spotlight.overview }}</p>
+
+        <div class="snapshot-grid">
+          {% for metric in data.homepage_spotlight.metrics %}
+          <div class="snapshot-card">
+            <p class="snapshot-value">{{ metric.value }}</p>
+            <p class="snapshot-label">{{ metric.label }}</p>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="snapshot-expansion">
+          <h3>{{ data.homepage_spotlight.expansion_title }}</h3>
+          <p>{{ data.homepage_spotlight.expansion_description }}</p>
+        </div>
+      </div>
+
+      <div class="home-gallery" aria-label="Palomar Health photo highlights">
+        {% for photo in data.homepage_gallery offset:1 %}
+        <figure class="home-gallery-card">
+          <img src="{{ site.baseurl }}/images/capstone/{{ photo.file }}" alt="{{ photo.alt }}">
+          <figcaption>{{ photo.caption }}</figcaption>
+        </figure>
+        {% endfor %}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- IMPACT SNAPSHOT -->
+  <section class="impact reveal-topic is-hidden" id="impact">
+    <h2>Our Impact</h2>
+    <div class="impact-grid">
+      {% for stat in data.impact_stats %}
+      <div class="impact-card">
+        <p class="impact-value">{{ stat.value }}</p>
+        <p class="impact-label">{{ stat.label }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="section-cta-row">
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Donate to Expand Impact</a>
+    </div>
+  </section>
+
+  <!-- DONATION IMPACT -->
+  <section class="donation-impact reveal-topic is-hidden" id="donation-impact">
+    <h2>How Your Donation Helps</h2>
+    <p class="donation-summary">{{ data.donation_summary }}</p>
+
+    <div class="donation-tiers" aria-label="Suggested donation tiers">
+      {% for tier in data.donation_tiers %}
+      <div class="donation-tier-card">
+        <p class="donation-tier-amount">{{ tier.amount }}</p>
+        <p class="donation-tier-label">{{ tier.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="donation-impact-grid">
+      {% for item in data.donation_impact %}
+      <div class="donation-impact-card">
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="section-cta-row">
+      <a href="{{ data.donate_link | relative_url }}" class="btn-primary">Proceed to Donation Page</a>
     </div>
   </section>
 
   <!-- PROGRAMS -->
-  <section class="programs">
+  <section class="programs reveal-topic is-hidden" id="programs">
     <h2>Our Programs</h2>
 
     <div class="program-grid">
       {% for program in data.programs %}
       <div class="program-card">
-
-        {% if program.image and program.image != "" %}
-        <img src="{{ site.baseurl }}/images/{{ program.image }}" alt="{{ program.alt }}">
-        {% endif %}
 
         <div class="program-content">
           <h3>{{ program.title }}</h3>
@@ -39,10 +124,35 @@
       </div>
       {% endfor %}
     </div>
+    <div class="section-cta-row">
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Support These Programs</a>
+    </div>
+  </section>
+
+  <!-- COMMUNITY GALLERY -->
+  <section class="community-gallery reveal-topic is-hidden" id="community-gallery">
+    <h2>Community In Action</h2>
+    <p class="section-intro">Stories of students, staff, and local families coming together through healthcare education and service.</p>
+
+    <div class="community-gallery-grid">
+      {% for photo in data.photo_highlights %}
+      <article class="community-photo-card">
+        <img src="{{ site.baseurl }}/images/capstone/{{ photo.file }}" alt="{{ photo.alt }}">
+        <div class="community-photo-content">
+          <h3>{{ photo.title }}</h3>
+          <p>{{ photo.description }}</p>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="section-cta-row">
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Fund More Community Programs</a>
+    </div>
   </section>
 
   <!-- WAYS TO HELP -->
-  <section class="help">
+  <section class="help reveal-topic is-hidden" id="help">
     <h2>Ways You Can Help</h2>
 
     <div class="help-grid">
@@ -53,10 +163,13 @@
       </div>
       {% endfor %}
     </div>
+    <div class="section-cta-row">
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Donate Today</a>
+    </div>
   </section>
 
   <!-- CONTACT -->
-  <section class="contact">
+  <section class="contact reveal-topic is-hidden" id="contact">
     <h2>Contact Us</h2>
     <p>{{ data.contact.address }}</p>
     <p>{{ data.contact.email }}</p>
@@ -64,3 +177,74 @@
   </section>
 
 </div>
+
+<script>
+  (function () {
+    var root = document.querySelector('.palomar-foundation');
+    if (!root) return;
+
+    var homeSection = root.querySelector('#home');
+    var homeButton = root.querySelector('.palomar-home-trigger');
+    var topicSections = root.querySelectorAll('.reveal-topic');
+    var ctaButtons = root.querySelectorAll('.cta-reveal');
+
+    function hideAllTopics() {
+      topicSections.forEach(function (section) {
+        section.classList.add('is-hidden');
+      });
+    }
+
+    function showHome() {
+      hideAllTopics();
+      if (homeSection) {
+        homeSection.classList.remove('is-hidden');
+        homeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function showTopics(ids) {
+      hideAllTopics();
+      if (homeSection) {
+        homeSection.classList.add('is-hidden');
+      }
+
+      ids.forEach(function (id) {
+        var section = root.querySelector('#' + id.trim());
+        if (section) {
+          section.classList.remove('is-hidden');
+        }
+      });
+
+      var firstTarget = ids.length ? root.querySelector('#' + ids[0].trim()) : null;
+      if (firstTarget) {
+        firstTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    ctaButtons.forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        var targets = (button.dataset.reveal || '').split(',').filter(Boolean);
+        showTopics(targets);
+      });
+    });
+
+    if (homeButton) {
+      homeButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        showHome();
+      });
+    }
+
+    var hash = window.location.hash ? window.location.hash.replace('#', '') : '';
+    if (hash) {
+      var matchingButton = root.querySelector('.cta-reveal[href="#' + hash + '"]');
+      if (matchingButton) {
+        var targets = (matchingButton.dataset.reveal || '').split(',').filter(Boolean);
+        showTopics(targets);
+      }
+    } else {
+      showHome();
+    }
+  })();
+</script>

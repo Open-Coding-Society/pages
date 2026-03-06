@@ -1,6 +1,74 @@
 title: Community Health Foundation
 description: Supporting healthcare programs that improve lives across our community.
+mission_statement: We expand access to quality healthcare by funding local programs, prevention services, and patient support across our region.
 donate_link: /donate
+support_link: /donate
+impact_link: /capstone/palomarhealth/#impact
+
+homepage_spotlight:
+  overview: Palomar Health is the largest public healthcare district in California, serving North San Diego County through multiple hospitals and healthcare facilities.
+  metrics:
+    - value: "280-300"
+      label: Emergency department patients per day
+    - value: "70-90"
+      label: Ambulance arrivals each day
+    - value: "1,400"
+      label: Patients treated yearly at the rehabilitation institute
+    - value: "120"
+      label: Beds planned in the new behavioral health center
+  expansion_title: Growth in Progress
+  expansion_description: The system continues expanding its care footprint with a new 120-bed behavioral health center to support rising regional demand.
+
+homepage_gallery:
+  - file: palomarbuilding.jpg
+    alt: Palomar Health hospital exterior building view at dusk
+    caption: Regional care across multiple hospitals and healthcare facilities in North San Diego County.
+  - file: palomarstudents.jpg
+    alt: Students participating in a Palomar Health event indoors
+    caption: Student pathways and community engagement programs build the next generation of healthcare talent.
+  - file: palomarevents.jpg
+    alt: Youth participants in white coats at a healthcare learning activity
+    caption: Hands-on health education events connect young learners to real-world medical skills.
+
+photo_highlights:
+  - file: palomarstudents.jpg
+    alt: Students welcomed by Palomar Health team members at a community event
+    title: Community Welcome Events
+    description: Staff and volunteers engage students in healthcare pathways through mentorship, outreach, and campus experiences.
+  - file: palomarevents.jpg
+    alt: Youth participants practicing medical skills in a guided learning activity
+    title: Hands-On Learning Programs
+    description: Community workshops introduce real medical tools and preventive care concepts in interactive environments.
+  - file: palomarbuilding.jpg
+    alt: Exterior of a major Palomar Health facility serving North San Diego County
+    title: Regional Care Access
+    description: Modern facilities support emergency, rehabilitation, and behavioral health services for families across the region.
+
+impact_stats:
+  - value: "12,500+"
+    label: Patients helped through community-funded services
+  - value: "$2.4M"
+    label: Raised for local healthcare programs and outreach
+  - value: "18"
+    label: Programs supported for prevention, recovery, and education
+
+donation_summary: Every contribution stays local and directly supports families, students, and patients who need timely access to care.
+
+donation_tiers:
+  - amount: "$25"
+    description: Supports patient care supplies
+  - amount: "$100"
+    description: Supports community health programs
+  - amount: "$500"
+    description: Supports medical equipment
+
+donation_impact:
+  - title: Expand Preventive Care
+    description: Donations fund screenings, wellness education, and early intervention services that reduce long-term health risks.
+  - title: Strengthen Youth Programs
+    description: Community support keeps mentorship and healthcare career pathways available to students across our schools.
+  - title: Support Families in Crisis
+    description: Gifts help provide trauma-informed support, care coordination, and recovery resources when families need them most.
 
 programs:
 

@@ -18,13 +18,77 @@ $foundation-card-bg: #142338;
   max-width: none;
   margin-left: calc(50% - 40vw);
   margin-right: calc(50% - 40vw);
-  padding: 2rem;
+  padding: 0 2rem 2rem 2rem;
   background: $foundation-bg;
   border-radius: 20px;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", sans-serif;
   color: $foundation-text;
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.palomar-foundation .palomar-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  margin: 0 -2rem 1.25rem -2rem;
+  padding: 0.35rem 1.1rem;
+  background: rgba(9, 37, 61, 0.97);
+  border-bottom: 1px solid #f59e0b;
+  backdrop-filter: blur(6px);
+}
+
+.palomar-foundation .palomar-home-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: auto;
+  max-width: 36%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  img {
+    width: auto;
+    height: 44px;
+    display: block;
+    border-radius: 4px;
+  }
+}
+
+.palomar-foundation .home-trigger-label {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #e9f4ff;
+  text-transform: uppercase;
+}
+
+.palomar-foundation .palomar-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.palomar-foundation .palomar-topbar-actions .btn-primary,
+.palomar-foundation .palomar-topbar-actions .btn-secondary {
+  margin-top: 0;
+  padding: 0.42rem 0.8rem;
+  border-radius: 7px;
+  font-size: 0.86rem;
+  line-height: 1.1;
+}
+
+
+.palomar-foundation .is-hidden {
+  display: none;
 }
 
 
@@ -33,9 +97,9 @@ $foundation-card-bg: #142338;
   background: linear-gradient(135deg, $foundation-primary, $foundation-secondary);
   color: $foundation-accent;
   border-radius: 20px;
-  padding: 4rem 2rem;
+  padding: 4.5rem 2.5rem 3.5rem 2.5rem;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 3.25rem;
 
   h1 {
     font-size: 2.75rem;
@@ -46,38 +110,200 @@ $foundation-card-bg: #142338;
   p {
     max-width: 700px;
     margin: 0 auto 2rem auto;
-    font-size: 1.1rem;
-    line-height: 1.6;
+    font-size: 1.12rem;
+    line-height: 1.72;
   }
+}
+
+.palomar-foundation .mission-statement {
+  max-width: 860px;
+  margin: 0 auto 1.15rem auto;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.35;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+.palomar-foundation .hero-building-image {
+  margin: -4rem -2rem 1.25rem -2rem;
+  width: calc(100% + 4rem);
+  border-radius: 0;
+  overflow: hidden;
+  border: 0;
+  box-shadow: none;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    object-position: center 58%;
+  }
+}
+
+.palomar-foundation .home-snapshot {
+  margin: 1.5rem auto 0 auto;
+  max-width: 980px;
+  padding: 1.25rem;
+  border: 1px solid #5a86ad;
+  border-radius: 16px;
+  background: rgba(10, 29, 47, 0.72);
+}
+
+.palomar-foundation .snapshot-overview {
+  margin: 0 0 1rem 0;
+  font-size: 1.03rem;
+  line-height: 1.7;
+  color: #eaf5ff;
+}
+
+.palomar-foundation .snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.75rem;
+}
+
+.palomar-foundation .snapshot-card {
+  background: rgba(20, 38, 60, 0.95);
+  border: 1px solid #3e6b96;
+  border-radius: 12px;
+  padding: 0.8rem;
+  text-align: left;
+}
+
+.palomar-foundation .snapshot-value {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.palomar-foundation .snapshot-label {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  color: #c8dbef;
+  line-height: 1.45;
+}
+
+.palomar-foundation .snapshot-expansion {
+  margin-top: 0.95rem;
+  padding: 0.8rem;
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+  background: rgba(12, 23, 40, 0.82);
+
+  h3 {
+    margin: 0 0 0.3rem 0;
+    color: #ffd48a;
+    font-size: 1.02rem;
+  }
+
+  p {
+    margin: 0;
+    color: #f0f6ff;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+}
+
+.palomar-foundation .home-gallery {
+  margin-top: 1.6rem;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+.palomar-foundation .home-gallery-card {
+  position: relative;
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #3a5d84;
+  background: #102136;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 235px;
+    object-fit: cover;
+  }
+
+  figcaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #ffffff;
+    background: linear-gradient(180deg, rgba(10, 23, 40, 0.02), rgba(10, 23, 40, 0.92));
+  }
+}
+
+.palomar-foundation .home-gallery-featured {
+  grid-column: 1 / -1;
+
+  img {
+    height: 330px;
+    object-position: center 58%;
+  }
+}
+
+.palomar-foundation .home-gallery-card:not(.home-gallery-featured) {
+  grid-column: span 6;
+}
+
+.palomar-foundation .hero-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.palomar-foundation .hero-cta-group .btn-secondary,
+.palomar-foundation .hero-cta-group .btn-primary {
+  margin-top: 0;
+}
+
+.palomar-foundation .reveal-topic.is-hidden {
+  display: none;
 }
 
 
 // Buttons
 .palomar-foundation .btn-primary {
   display: inline-block;
-  background: #163a5d;
+  background: linear-gradient(135deg, #2d6ea3, #1d4f78);
   color: #ffffff;
-  padding: 0.75rem 1.6rem;
-  border-radius: 10px;
-  font-weight: 700;
+  padding: 0.78rem 1.5rem;
+  border-radius: 11px;
+  border: 1px solid #5f95c2;
+  font-weight: 750;
+  letter-spacing: 0.01em;
   text-decoration: none;
   transition: 0.2s;
 
   &:hover {
-    transform: translateY(-2px);
-    background: #1d4c78;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.32);
   }
 }
 
 .palomar-foundation .btn-secondary {
   display: inline-block;
   margin-top: 1rem;
-  background: #22557f;
+  background: #204f76;
   color: white;
-  padding: 0.55rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 0.65rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid #4c7faa;
+  font-weight: 680;
   text-decoration: none;
 
   &:hover {
@@ -85,21 +311,177 @@ $foundation-card-bg: #142338;
   }
 }
 
+.palomar-foundation .btn-outline {
+  background: transparent;
+  border: 1px solid #85b9e0;
+  color: #e8f3ff;
+
+  &:hover {
+    background: #18354f;
+  }
+}
+
+
 
 // SECTION HEADERS
 .palomar-foundation .programs,
+.palomar-foundation .impact,
+.palomar-foundation .donation-impact,
+.palomar-foundation .community-gallery,
 .palomar-foundation .help,
 .palomar-foundation .contact {
-  margin-bottom: 3rem;
-  background: #101d2f;
-  border-radius: 16px;
-  padding: 2rem;
+  margin-bottom: 3.1rem;
+  background: #101f33;
+  border: 1px solid #2f4d6c;
+  border-radius: 18px;
+  padding: 2.2rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 
   h2 {
     text-align: center;
     font-size: 2rem;
     margin-bottom: 2rem;
     color: $foundation-text;
+  }
+}
+
+.palomar-foundation .section-intro {
+  max-width: 860px;
+  margin: -0.9rem auto 1.5rem auto;
+  text-align: center;
+  color: #c9d9ea;
+  font-size: 1.02rem;
+}
+
+.palomar-foundation .community-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .community-photo-card {
+  background: #13253b;
+  border: 1px solid #3b5f85;
+  border-radius: 14px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.palomar-foundation .community-photo-content {
+  padding: 0.9rem 1rem 1rem 1rem;
+
+  h3 {
+    margin: 0 0 0.4rem 0;
+    font-size: 1.08rem;
+    color: #9ed4ff;
+  }
+
+  p {
+    margin: 0;
+    color: #cfdeee;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+}
+
+// IMPACT SECTION
+.palomar-foundation .impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .impact-card {
+  background: #14263c;
+  border: 1px solid #2b4565;
+  border-radius: 14px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.palomar-foundation .impact-value {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.palomar-foundation .impact-label {
+  margin: 0.5rem 0 0 0;
+  color: $foundation-muted;
+  font-size: 0.98rem;
+}
+
+// DONATION IMPACT SECTION
+.palomar-foundation .donation-summary {
+  max-width: 860px;
+  margin: 0 auto 1.5rem auto;
+  color: $foundation-text;
+  text-align: center;
+}
+
+.palomar-foundation .donation-tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.1rem;
+}
+
+.palomar-foundation .donation-tier-card {
+  background: #17283f;
+  border: 1px solid #335174;
+  border-radius: 12px;
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.palomar-foundation .donation-tier-amount {
+  margin: 0;
+  color: #f8c86f;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.palomar-foundation .donation-tier-label {
+  margin: 0.3rem 0 0 0;
+  color: #e6eef9;
+  font-size: 0.92rem;
+}
+
+.palomar-foundation .section-cta-row {
+  margin-top: 1.1rem;
+  text-align: center;
+}
+
+.palomar-foundation .donation-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+
+.palomar-foundation .donation-impact-card {
+  background: #132133;
+  border-left: 4px solid #5aa5dd;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+
+  h3 {
+    margin: 0 0 0.45rem 0;
+    color: #8dcdfa;
+    font-size: 1.08rem;
+  }
+
+  p {
+    margin: 0;
+    color: $foundation-muted;
+    font-size: 0.98rem;
   }
 }
 
@@ -227,7 +609,82 @@ $foundation-card-bg: #142338;
     width: 100%;
     margin-left: 0;
     margin-right: 0;
-    padding: 1rem;
+    padding: 0 1rem 1rem 1rem;
+  }
+
+  .palomar-foundation .palomar-topbar {
+    min-height: 50px;
+    margin: 0 -1rem 1rem -1rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .palomar-foundation .hero {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .palomar-foundation .home-snapshot {
+    padding: 0.95rem;
+  }
+
+  .palomar-foundation .hero-building-image img {
+    height: 230px;
+  }
+
+  .palomar-foundation .hero-building-image {
+    margin: -2.5rem -1.25rem 1rem -1.25rem;
+    width: calc(100% + 2.5rem);
+  }
+
+  .palomar-foundation .snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .palomar-foundation .home-gallery {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .palomar-foundation .home-gallery-featured {
+    grid-column: span 1;
+
+    img {
+      height: 240px;
+    }
+  }
+
+  .palomar-foundation .home-gallery-card:not(.home-gallery-featured) {
+    grid-column: span 1;
+  }
+
+  .palomar-foundation .palomar-home-trigger {
+    max-width: 44%;
+
+    img {
+      height: 34px;
+    }
+  }
+
+  .palomar-foundation .home-trigger-label {
+    font-size: 0.78rem;
+  }
+
+  .palomar-foundation .palomar-topbar-actions {
+    gap: 0.35rem;
+  }
+
+  .palomar-foundation .palomar-topbar-actions .btn-primary,
+  .palomar-foundation .palomar-topbar-actions .btn-secondary {
+    padding: 0.38rem 0.55rem;
+    font-size: 0.76rem;
+  }
+
+  .palomar-foundation .hero-cta-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .palomar-foundation .hero-cta-group a {
+    text-align: center;
   }
 
 }
