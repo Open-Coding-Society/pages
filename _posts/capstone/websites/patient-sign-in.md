@@ -7,7 +7,7 @@ show_reading_time: false
 published: false
 ---
 
-{% assign data = site.data.palomar_health %}
+{% assign data = site.data.capstones.palomar_health %}
 
 <div class="palomar-foundation patient-signin-shell">
   <div class="palomar-topbar">
@@ -62,7 +62,6 @@ published: false
           <input id="patient-remember" name="remember" type="checkbox" value="1">
           Remember me
         </label>
-        <a href="#" aria-disabled="true">Forgot password?</a>
       </div>
 
       <button type="submit">Sign In</button>

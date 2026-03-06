@@ -6,7 +6,7 @@ search_exclude: true
 show_reading_time: false
 ---
 
-{% assign data = site.data.palomar_health %}
+{% assign data = site.data.capstones.palomar_health %}
 
 <div class="palomar-foundation patient-signin-shell">
   <div class="palomar-topbar">
@@ -46,28 +46,65 @@ show_reading_time: false
       <p>Palomar Health</p>
     </div>
 
-    <h1>Patient Sign In</h1>
-    <p class="signin-intro">Sign in to access appointments, test results, and medical records.</p>
+    <div id="signin-panel">
+      <h1>Patient Sign In</h1>
+      <p class="signin-intro">Sign in to access appointments, test results, and medical records.</p>
+      <p id="signup-success" class="signup-success is-hidden-local">Account created. Please sign in.</p>
 
-    <form class="patient-signin-form" method="post" action="/api/patient/auth/signin">
-      <label for="patient-email">Email</label>
-      <input id="patient-email" name="email" type="email" required>
+      <form class="patient-signin-form" method="post" action="/api/patient/auth/signin">
+        <label for="patient-email">Email</label>
+        <input id="patient-email" name="email" type="email" required>
 
-      <label for="patient-password">Password</label>
-      <input id="patient-password" name="password" type="password" required>
+        <label for="patient-password">Password</label>
+        <input id="patient-password" name="password" type="password" required>
 
-      <div class="patient-signin-row">
-        <label class="remember-label" for="patient-remember">
-          <input id="patient-remember" name="remember" type="checkbox" value="1">
-          Remember me
-        </label>
-        <a href="#" aria-disabled="true">Forgot password?</a>
-      </div>
+        <div class="patient-signin-row">
+          <label class="remember-label" for="patient-remember">
+            <input id="patient-remember" name="remember" type="checkbox" value="1">
+            Remember me
+          </label>
+        </div>
 
-      <button type="submit">Sign In</button>
-    </form>
+        <button type="submit">Sign In</button>
+      </form>
 
-    <p class="signup-hint">New patient? <a href="{{ '/patient-sign-up/' | relative_url }}">Create an account</a></p>
+      <p class="signup-hint">New patient? <a href="#create-account" id="show-create-account">Create an account</a></p>
+    </div>
+
+    <div id="create-account-panel" class="is-hidden-local">
+      <hr class="patient-signin-divider">
+
+      <section id="create-account" class="signup-block" aria-label="Create patient account">
+        <h2>Create Patient Account</h2>
+        <p class="signin-intro">Create your account to manage appointments, records, and care communication.</p>
+
+        <form class="patient-signin-form" id="patient-signup-form" method="post" action="/api/patient/auth/signup">
+          <label for="patient-full-name">Full Name</label>
+          <input id="patient-full-name" name="full_name" type="text" required>
+
+          <label for="patient-signup-email">Email</label>
+          <input id="patient-signup-email" name="email" type="email" required>
+
+          <label for="patient-dob">Date of Birth</label>
+          <input id="patient-dob" name="date_of_birth" type="date" required>
+
+          <label for="patient-signup-password">Password</label>
+          <input id="patient-signup-password" name="password" type="password" minlength="8" required>
+
+          <label for="patient-confirm-password">Confirm Password</label>
+          <input id="patient-confirm-password" name="confirm_password" type="password" minlength="8" required>
+
+          <label class="remember-label" for="patient-agree">
+            <input id="patient-agree" name="agree_terms" type="checkbox" value="1" required>
+            I agree to the terms and privacy policy.
+          </label>
+
+          <button type="submit">Create Account</button>
+        </form>
+
+        <p class="signup-hint">Already have an account? <a href="#" id="show-signin">Sign in</a></p>
+      </section>
+    </div>
 
     <p class="integration-note">Backend integration note: update the form <code>action</code> URL and auth flow when your API is ready.</p>
   </section>
@@ -125,6 +162,18 @@ show_reading_time: false
     margin-bottom: 1rem;
   }
 
+  .patient-signin-divider {
+    border: 0;
+    border-top: 1px solid #3a5d84;
+    margin: 1.1rem 0;
+  }
+
+  .signup-block h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #ffffff;
+  }
+
   .patient-signin-form {
     display: grid;
     gap: 0.65rem;
@@ -137,6 +186,8 @@ show_reading_time: false
   }
 
   .patient-signin-form input[type="email"],
+  .patient-signin-form input[type="text"],
+  .patient-signin-form input[type="date"],
   .patient-signin-form input[type="password"] {
     padding: 0.6rem 0.7rem;
     border: 1px solid #3e6b96;
@@ -147,6 +198,8 @@ show_reading_time: false
   }
 
   .patient-signin-form input[type="email"]:focus,
+  .patient-signin-form input[type="text"]:focus,
+  .patient-signin-form input[type="date"]:focus,
   .patient-signin-form input[type="password"]:focus {
     outline: none;
     border-color: #6ea5d4;
@@ -203,6 +256,20 @@ show_reading_time: false
     font-size: 0.92rem;
   }
 
+  .signup-success {
+    margin: 0.3rem 0 0.8rem 0;
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid #5f95c2;
+    background: rgba(39, 90, 134, 0.28);
+    color: #d9ecff;
+    font-size: 0.9rem;
+  }
+
+  .is-hidden-local {
+    display: none;
+  }
+
   .integration-note {
     color: #9fb2c8;
   }
@@ -222,3 +289,59 @@ show_reading_time: false
     }
   }
 </style>
+
+<script>
+  (function () {
+    var signinPanel = document.getElementById('signin-panel');
+    var createPanel = document.getElementById('create-account-panel');
+    var showCreateLink = document.getElementById('show-create-account');
+    var showSigninLink = document.getElementById('show-signin');
+    var signupForm = document.getElementById('patient-signup-form');
+    var successNote = document.getElementById('signup-success');
+
+    if (!signinPanel || !createPanel) return;
+
+    function showSignIn() {
+      signinPanel.classList.remove('is-hidden-local');
+      createPanel.classList.add('is-hidden-local');
+    }
+
+    function showCreate() {
+      signinPanel.classList.add('is-hidden-local');
+      createPanel.classList.remove('is-hidden-local');
+      createPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    showSignIn();
+
+    if (window.location.hash === '#create-account') {
+      showCreate();
+    }
+
+    if (window.location.search.indexOf('created=1') !== -1 && successNote) {
+      successNote.classList.remove('is-hidden-local');
+    }
+
+    if (showCreateLink) {
+      showCreateLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        showCreate();
+      });
+    }
+
+    if (showSigninLink) {
+      showSigninLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        showSignIn();
+      });
+    }
+
+    if (signupForm) {
+      signupForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var next = '{{ '/patient-sign-in/' | relative_url }}?created=1';
+        window.location.assign(next);
+      });
+    }
+  })();
+</script>

@@ -1,4 +1,4 @@
-{% assign data = site.data.palomar_health %}
+{% assign data = site.data.capstones.palomar_health %}
 
 <div class="palomar-foundation">
   <div class="palomar-topbar">
@@ -316,6 +316,13 @@
       }
     }
 
+    function showHomeAndScrollTo(target) {
+      showHome();
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
     ctaButtons.forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.preventDefault();
@@ -345,8 +352,10 @@
           var target = targetId ? root.querySelector('#' + targetId) : null;
           if (target && target.classList.contains('reveal-topic')) {
             showTopics([targetId]);
+          } else if (target) {
+            showHomeAndScrollTo(target);
           } else {
-            showBlank();
+            showHome();
           }
           return;
         }
@@ -376,8 +385,10 @@
       if (matchingButton) {
         var targets = (matchingButton.dataset.reveal || '').split(',').filter(Boolean);
         showTopics(targets);
+      } else if (directTopic) {
+        showHomeAndScrollTo(directTopic);
       } else {
-        showBlank();
+        showHome();
       }
     } else {
       showHome();
