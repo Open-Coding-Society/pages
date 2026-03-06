@@ -303,3 +303,141 @@
     }
   }
 }
+
+// ===========================
+// Game-Specific Modal Mixins
+// ===========================
+
+/**
+ * Game Modal Content
+ * Modal styling optimized for game interfaces with backdrop blur and gradients
+ *
+ * @param {Color} $border-color - Border accent color (default: var(--pref-accent-color))
+ * @param {Number} $max-width - Maximum width (default: 600px)
+ * @param {Number} $padding - Inner padding (default: 30px)
+ *
+ * @example
+ *   #cheatsModal .modal-content {
+ *     @include game-modal-content;
+ *   }
+ */
+@mixin game-modal-content($border-color: var(--pref-accent-color), $max-width: 600px, $padding: 30px) {
+  background: var(--panel, rgba(18, 18, 18, 0.95));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid $border-color;
+  border-radius: 15px;
+  padding: $padding;
+  max-width: $max-width;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  font-family: var(--pref-font-family, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  color: var(--pref-text-color, #ddd);
+  position: relative;
+  animation: modalSlideIn 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: $padding - 10px;
+    max-width: 95%;
+    border-radius: 12px;
+  }
+}
+
+/**
+ * Game Modal Header
+ * Header section for game modals with gradient accents
+ *
+ * @param {Color} $accent-color - Accent color for gradient (default: var(--pref-accent-color))
+ * @param {Number} $padding-bottom - Bottom spacing (default: 20px)
+ *
+ * @example
+ *   .modal-header {
+ *     @include game-modal-header;
+ *   }
+ */
+@mixin game-modal-header($accent-color: var(--pref-accent-color), $padding-bottom: 20px) {
+  margin-bottom: $padding-bottom;
+  padding-bottom: 15px;
+  border-bottom: 2px solid $accent-color;
+  background: linear-gradient(90deg, 
+    rgba($accent-color, 0.1) 0%, 
+    rgba($accent-color, 0.05) 100%
+  );
+  border-radius: 8px 8px 0 0;
+
+  h2 {
+    margin: 0;
+    color: $accent-color;
+    font-size: 28px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 22px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: $padding-bottom - 5px;
+    padding-bottom: 10px;
+  }
+}
+
+/**
+ * Game Modal Body
+ * Content area for game modals with auto-scrolling
+ *
+ * @param {Number} $max-height - Maximum height before scrolling (default: 400px)
+ * @param {Number} $padding - Inner padding (default: 20px)
+ *
+ * @example
+ *   .modal-body {
+ *     @include game-modal-body;
+ *   }
+ */
+@mixin game-modal-body($max-height: 400px, $padding: 20px) {
+  max-height: $max-height;
+  overflow-y: auto;
+  padding: $padding;
+  color: var(--pref-text-color, #ddd);
+  line-height: 1.6;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--panel-mid, rgba(255, 255, 255, 0.05));
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--pref-accent-color, #888);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--pref-selection-color, #555);
+    }
+  }
+
+  @media (max-width: 768px) {
+    max-height: 300px;
+    padding: $padding - 5px;
+  }
+}
+
+/**
+ * Game Modal Animation Keyframes
+ * Slide-in animation for game modals
+ */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
