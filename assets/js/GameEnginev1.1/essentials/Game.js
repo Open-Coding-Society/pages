@@ -21,7 +21,7 @@
  * };
  * ```
  * 
- * Control buttons (Save Score, Skip Level, Toggle Leaderboard) appear by default.
+ * Control buttons (Save Score, Exit Level, Toggle Leaderboard) appear by default.
  * Press Escape key to pause/resume the game.
  */
 class GameCore {
@@ -238,15 +238,13 @@ class GameCore {
         `;
         
         modal.innerHTML = `
-            <h2 style="margin: 0 0 16px 0; color: #fff; text-align: center; font-size: 22px;">
+            <h2 style="margin: 0 0 16px 0;  text-align: center; font-size: 22px;">
                 Pause Menu
             </h2>
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button id="pause-toggle-score" class="pause-menu-btn" style="
                     padding: 12px 16px;
-                    background: #111;
                     border: 1px solid #333;
-                    color: #fff;
                     border-radius: 8px;
                     font-size: 15px;
                     font-weight: 600;
@@ -256,9 +254,7 @@ class GameCore {
                 
                 <button id="pause-save-score" class="pause-menu-btn" style="
                     padding: 12px 16px;
-                    background: #111;
                     border: 1px solid #333;
-                    color: #fff;
                     border-radius: 8px;
                     font-size: 15px;
                     font-weight: 600;
@@ -268,21 +264,17 @@ class GameCore {
                 
                 <button id="pause-skip-level" class="pause-menu-btn" style="
                     padding: 12px 16px;
-                    background: #111;
                     border: 1px solid #333;
-                    color: #fff;
                     border-radius: 8px;
                     font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.15s;
-                ">Skip Level</button>
+                ">Exit Level</button>
                 
                 <button id="pause-toggle-leaderboard" class="pause-menu-btn" style="
                     padding: 12px 16px;
-                    background: #111;
                     border: 1px solid #333;
-                    color: #fff;
                     border-radius: 8px;
                     font-size: 15px;
                     font-weight: 600;
@@ -292,9 +284,7 @@ class GameCore {
                 
                 <button id="pause-resume" class="pause-menu-btn primary" style="
                     padding: 12px 16px;
-                    background: #fff;
                     border: 1px solid #ddd;
-                    color: #000;
                     border-radius: 8px;
                     font-size: 15px;
                     font-weight: 700;
@@ -439,7 +429,7 @@ class GameCore {
     }
 
     /**
-     * Handle Skip Level option - skips to the next level
+     * Handle Exit Level option - skips to the next level
      */
     _handleSkipLevel() {
         // Remove modal first
@@ -695,7 +685,7 @@ class GameCore {
     }
 
     /**
-     * Creates the pause control buttons (Save Score, Skip Level, Toggle Leaderboard).
+     * Creates the pause control buttons (Save Score, Exit Level, Toggle Leaderboard).
      * 
      * These buttons appear by default in the top-left corner.
      * Pause/Resume functionality is handled by the Escape key.
@@ -714,7 +704,7 @@ class GameCore {
      * 
      * The button bar will appear in the top-left corner with:
      * - Save Score button: Saves current score to backend
-     * - Skip Level button: Advances to the next level
+     * - Exit Level button: Advances to the next level
      * - Toggle Leaderboard button: Shows/hides the leaderboard
      * 
     /**
