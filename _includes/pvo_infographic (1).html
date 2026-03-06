@@ -1,0 +1,115 @@
+<!-- _includes/pvo_infographic.html -->
+<!-- Usage: {% include pvo_infographic.html %} -->
+<!-- Requires: _data/pvo_infographic.yml and _sass/capstone/pvo-infographic.scss -->
+
+<section class="pvo-infographic" aria-label="PVO Website Redesign Infographic">
+
+  <!-- HEADER -->
+  <header class="pvo-header">
+    <div class="pvo-header__flag">
+      <span class="flag-stripe flag-stripe--red"></span>
+      <span class="flag-stripe flag-stripe--white"></span>
+      <span class="flag-stripe flag-stripe--blue"></span>
+    </div>
+    <div class="pvo-header__content">
+      <p class="pvo-header__eyebrow">Website Redesign Analysis</p>
+      <h1 class="pvo-header__title">{{ site.data.pvo_infographic.title }}</h1>
+      <p class="pvo-header__sub">{{ site.data.pvo_infographic.subtitle }}</p>
+      <a class="pvo-header__url" href="https://{{ site.data.pvo_infographic.url }}" target="_blank">
+        {{ site.data.pvo_infographic.url }}
+      </a>
+    </div>
+  </header>
+
+  <!-- STATS ROW -->
+  <div class="pvo-stats">
+    {% for stat in site.data.pvo_infographic.stats %}
+    <div class="pvo-stat">
+      <span class="pvo-stat__value">{{ stat.value }}</span>
+      <span class="pvo-stat__label">{{ stat.label }}</span>
+      <span class="pvo-stat__note">{{ stat.note }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- STRATEGIC DIRECTION CALLOUT -->
+  <div class="pvo-callout">
+    <span class="pvo-callout__icon">⭐</span>
+    <blockquote class="pvo-callout__text">{{ site.data.pvo_infographic.strategic_direction }}</blockquote>
+  </div>
+
+  <!-- TWO-COLUMN MIDDLE -->
+  <div class="pvo-grid-two">
+
+    <!-- AUDIENCES -->
+    <div class="pvo-card pvo-card--audiences">
+      <h2 class="pvo-card__heading">Who Uses the Site</h2>
+      <ul class="pvo-audience-list">
+        {% for audience in site.data.pvo_infographic.audiences %}
+        <li class="pvo-audience-item">
+          <span class="pvo-audience-item__icon">{{ audience.icon }}</span>
+          <div>
+            <strong class="pvo-audience-item__name">{{ audience.name }}</strong>
+            <p class="pvo-audience-item__pain">{{ audience.pain }}</p>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- GAPS -->
+    <div class="pvo-card pvo-card--gaps">
+      <h2 class="pvo-card__heading">Current Site Gaps</h2>
+      <ul class="pvo-gap-list">
+        {% for gap in site.data.pvo_infographic.gaps %}
+        <li class="pvo-gap-item">
+          <span class="pvo-gap-item__bullet">✕</span>
+          {{ gap }}
+        </li>
+        {% endfor %}
+      </ul>
+
+      <h2 class="pvo-card__heading pvo-card__heading--mt">Support Types PVO Offers</h2>
+      <div class="pvo-tags">
+        {% for type in site.data.pvo_infographic.support_types %}
+        <span class="pvo-tag">{{ type }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASES TIMELINE -->
+  <div class="pvo-phases">
+    <h2 class="pvo-phases__heading">7-Phase Redesign Roadmap</h2>
+    <div class="pvo-phases__track">
+      {% for phase in site.data.pvo_infographic.phases %}
+      <div class="pvo-phase pvo-phase--{{ phase.priority | downcase | replace: ' ', '-' }}">
+        <div class="pvo-phase__num">{{ phase.number }}</div>
+        <div class="pvo-phase__body">
+          <strong class="pvo-phase__title">{{ phase.title }}</strong>
+          <p class="pvo-phase__desc">{{ phase.desc }}</p>
+          <span class="pvo-phase__priority pvo-phase__priority--{{ phase.priority | downcase | replace: ' ', '-' }}">{{ phase.priority }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- NEW NAVIGATION -->
+  <div class="pvo-nav-preview">
+    <h2 class="pvo-nav-preview__heading">Proposed Navigation</h2>
+    <nav class="pvo-nav-preview__bar" aria-label="Proposed site navigation">
+      {% for item in site.data.pvo_infographic.new_nav %}
+      <span class="pvo-nav-preview__item {% if forloop.first %}pvo-nav-preview__item--active{% endif %}">{{ item }}</span>
+      {% endfor %}
+    </nav>
+    <p class="pvo-nav-preview__caption">Organized by user intent, not site category</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="pvo-footer">
+    <p>Analysis conducted March 2026 &nbsp;·&nbsp; powayveterans.org &nbsp;·&nbsp; Capstone Project</p>
+  </footer>
+
+</section>
