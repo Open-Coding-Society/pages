@@ -227,8 +227,8 @@ class GameCore {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #000;
-            border: 1px solid #222;
+            background: var(--panel, #000);
+            border: 1px solid var(--pref-accent-color, #FFF);
             border-radius: 12px;
             padding: 24px;
             z-index: 10000;
