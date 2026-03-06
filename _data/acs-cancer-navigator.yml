@@ -1,13 +1,13 @@
-# ACS Cancer Navigator Capstone Infographic
-Title: "ACS Cancer Navigator"
+# ACS Cancer Capstone Infographic
+Title: "ACS Cancer Infograph"
 Description: "An interactive human-body diagram that consolidates the American Cancer Society's cancer information into one visual interface — so patients and families find what they need in seconds, not clicks."
 
 
 Topics:
- - title: "ACS Cancer Navigator"
-   image: "capstone/acs-cancer-navigator.png"
-   link: "/capstone/acs-cancer-navigator/"
-   alt: "ACS Cancer Navigator — Interactive Body Map for Cancer Information"
+ - title: "ACS Cancer Infograph"
+   image: "capstone/acs-cancer-infograph.png"
+   link: "/capstone/acs-cancer-infograph/"
+   alt: "ACS Cancer Infograph — Interactive Body Map for Cancer Information"
    keyPoints:
      - "Interactive human-body diagram with labeled cancer sites"
      - "Click any body region to navigate directly to ACS cancer information"
