@@ -11,6 +11,28 @@ $foundation-text: #e5edf7;
 $foundation-muted: #b8c5d6;
 $foundation-card-bg: #142338;
 
+@keyframes palomar-rise-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes palomar-hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 
 // Main Container
 .palomar-foundation {
@@ -25,6 +47,7 @@ $foundation-card-bg: #142338;
   color: $foundation-text;
   font-size: 1.04rem;
   line-height: 1.7;
+  animation: palomar-rise-fade 0.45s ease-out both;
 }
 
 .palomar-foundation .palomar-topbar {
@@ -95,15 +118,6 @@ $foundation-card-bg: #142338;
   flex: 0 0 auto;
 }
 
-.palomar-foundation .top-nav-item.has-submenu::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 0.45rem;
-}
-
 .palomar-foundation .top-nav-link {
   display: inline-block;
 }
@@ -118,7 +132,7 @@ $foundation-card-bg: #142338;
 
 .palomar-foundation .top-nav-dropdown {
   position: absolute;
-  top: calc(100% + 0.35rem);
+  top: 100%;
   left: 0;
   min-width: 280px;
   padding: 0.45rem;
@@ -203,6 +217,7 @@ $foundation-card-bg: #142338;
   padding: 4.5rem 2.5rem 3.5rem 2.5rem;
   text-align: center;
   margin-bottom: 3.25rem;
+  animation: palomar-hero-fade 0.65s ease-out both;
 
   h1 {
     font-size: 2.75rem;
@@ -231,8 +246,17 @@ $foundation-card-bg: #142338;
 }
 
 .palomar-foundation .hero-support {
-  max-width: 860px;
+  max-width: 880px;
   margin: 0 auto 1.25rem auto;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid #fbbf24;
+  border-radius: 10px;
+  background: rgba(10, 29, 47, 0.72);
+  color: #f3f8ff;
+  font-size: clamp(1.06rem, 1.25vw, 1.2rem);
+  font-weight: 650;
+  line-height: 1.6;
+  text-wrap: balance;
 }
 
 .palomar-foundation .hero-main-actions {
@@ -393,6 +417,13 @@ $foundation-card-bg: #142338;
   }
 }
 
+.palomar-foundation .home-gallery-card:nth-child(1) { animation-delay: 0.06s; }
+.palomar-foundation .home-gallery-card:nth-child(2) { animation-delay: 0.12s; }
+.palomar-foundation .home-gallery-card:nth-child(3) { animation-delay: 0.18s; }
+.palomar-foundation .home-gallery-card {
+  animation: palomar-rise-fade 0.5s ease-out both;
+}
+
 .palomar-foundation .home-gallery-featured {
   grid-column: 1 / -1;
 
@@ -533,8 +564,14 @@ $foundation-card-bg: #142338;
 
 .palomar-foundation .community-impact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
+}
+
+@media (max-width: 980px) {
+  .palomar-foundation .community-impact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .palomar-foundation .community-impact-card {
@@ -617,6 +654,45 @@ $foundation-card-bg: #142338;
     object-fit: cover;
     display: block;
   }
+}
+
+.palomar-foundation .community-impact-card,
+.palomar-foundation .program-card,
+.palomar-foundation .story-card,
+.palomar-foundation .voice-card,
+.palomar-foundation .program-impact-card-detail,
+.palomar-foundation .annual-report-card,
+.palomar-foundation .news-card,
+.palomar-foundation .help-card,
+.palomar-foundation .donation-tier-card,
+.palomar-foundation .donation-impact-card,
+.palomar-foundation .quick-tool-card,
+.palomar-foundation .community-photo-card {
+  animation: palomar-rise-fade 0.5s ease-out both;
+}
+
+.palomar-foundation .community-impact-card:nth-child(1),
+.palomar-foundation .program-card:nth-child(1),
+.palomar-foundation .story-card:nth-child(1),
+.palomar-foundation .news-card:nth-child(1),
+.palomar-foundation .program-impact-card-detail:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.palomar-foundation .community-impact-card:nth-child(2),
+.palomar-foundation .program-card:nth-child(2),
+.palomar-foundation .story-card:nth-child(2),
+.palomar-foundation .news-card:nth-child(2),
+.palomar-foundation .program-impact-card-detail:nth-child(2) {
+  animation-delay: 0.11s;
+}
+
+.palomar-foundation .community-impact-card:nth-child(3),
+.palomar-foundation .program-card:nth-child(3),
+.palomar-foundation .story-card:nth-child(3),
+.palomar-foundation .news-card:nth-child(3),
+.palomar-foundation .program-impact-card-detail:nth-child(3) {
+  animation-delay: 0.17s;
 }
 
 .palomar-foundation .community-photo-content {
@@ -917,6 +993,87 @@ $foundation-card-bg: #142338;
   gap: 2rem;
 }
 
+.palomar-foundation .services-search-wrap {
+  max-width: 860px;
+  margin: 0 auto 1.25rem auto;
+  padding: 0.9rem;
+  border: 1px solid #3b6186;
+  border-radius: 12px;
+  background: #13253b;
+}
+
+.palomar-foundation .services-search-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #eaf5ff;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.palomar-foundation .services-search-input {
+  width: 100%;
+  padding: 0.58rem 0.65rem;
+  border: 1px solid #4f7aa4;
+  border-radius: 9px;
+  background: #0f1e30;
+  color: #e5edf7;
+  font-size: 0.95rem;
+}
+
+.palomar-foundation .services-search-input:focus {
+  outline: none;
+  border-color: #74add9;
+  box-shadow: 0 0 0 2px rgba(116, 173, 217, 0.22);
+}
+
+.palomar-foundation .services-search-status {
+  margin: 0.45rem 0 0 0;
+  color: #cfe0f2;
+  font-size: 0.86rem;
+}
+
+.palomar-foundation .services-az {
+  margin-top: 1.35rem;
+  padding-top: 1rem;
+  border-top: 1px solid #305274;
+
+  h3 {
+    margin: 0 0 0.55rem 0;
+    color: #9ed4ff;
+    font-size: 1.16rem;
+    text-align: left;
+  }
+}
+
+.palomar-foundation .services-az-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem 0.8rem;
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    color: #d7e8f8;
+    text-decoration: none;
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+
+  a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+}
+
+.palomar-foundation .is-filtered-out {
+  display: none !important;
+}
+
 
 // PROGRAM CARD
 .palomar-foundation .program-card {
@@ -1130,4 +1287,29 @@ $foundation-card-bg: #142338;
     grid-template-columns: 1fr;
   }
 
+  .palomar-foundation .services-az-list {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palomar-foundation,
+  .palomar-foundation .hero,
+  .palomar-foundation .home-gallery-card,
+  .palomar-foundation .community-impact-card,
+  .palomar-foundation .program-card,
+  .palomar-foundation .story-card,
+  .palomar-foundation .voice-card,
+  .palomar-foundation .program-impact-card-detail,
+  .palomar-foundation .annual-report-card,
+  .palomar-foundation .news-card,
+  .palomar-foundation .help-card,
+  .palomar-foundation .donation-tier-card,
+  .palomar-foundation .donation-impact-card,
+  .palomar-foundation .quick-tool-card,
+  .palomar-foundation .community-photo-card {
+    animation: none !important;
+    transition: none !important;
+  }
 }

@@ -3,7 +3,7 @@
 <div class="palomar-foundation">
   <div class="palomar-topbar">
     <button type="button" class="palomar-home-trigger" aria-label="Go to home view">
-      <img src="{{ site.baseurl }}/images/capstone/palomar.png" alt="Palomar Health home">
+      <img src="{{ site.baseurl }}/images/capstone/website_projects/palomar.png" alt="Palomar Health home">
       <span class="home-trigger-label">Home</span>
     </button>
     <div class="palomar-topbar-actions">
@@ -30,11 +30,10 @@
       {% assign hero_photo = data.homepage_gallery | first %}
       {% if hero_photo %}
       <figure class="hero-building-image">
-        <img src="{{ site.baseurl }}/images/capstone/{{ hero_photo.file }}" alt="{{ hero_photo.alt }}">
+        <img src="{{ site.baseurl }}/images/capstone/website_projects/{{ hero_photo.file }}" alt="{{ hero_photo.alt }}">
       </figure>
       {% endif %}
 
-      <p class="mission-statement">{{ data.mission_statement }}</p>
       <p class="hero-support">{{ data.hero.support_text | default: data.description }}</p>
 
       <div class="hero-main-actions" aria-label="Primary patient actions">
@@ -43,28 +42,10 @@
         {% endfor %}
       </div>
 
-      <div class="home-snapshot" aria-label="Palomar Health system snapshot">
-        <p class="snapshot-overview">{{ data.homepage_spotlight.overview }}</p>
-
-        <div class="snapshot-grid">
-          {% for metric in data.homepage_spotlight.metrics %}
-          <div class="snapshot-card">
-            <p class="snapshot-value">{{ metric.value }}</p>
-            <p class="snapshot-label">{{ metric.label }}</p>
-          </div>
-          {% endfor %}
-        </div>
-
-        <div class="snapshot-expansion">
-          <h3>{{ data.homepage_spotlight.expansion_title }}</h3>
-          <p>{{ data.homepage_spotlight.expansion_description }}</p>
-        </div>
-      </div>
-
       <div class="home-gallery" aria-label="Palomar Health photo highlights">
         {% for photo in data.homepage_gallery offset:1 %}
         <figure class="home-gallery-card">
-          <img src="{{ site.baseurl }}/images/capstone/{{ photo.file }}" alt="{{ photo.alt }}">
+          <img src="{{ site.baseurl }}/images/capstone/website_projects/{{ photo.file }}" alt="{{ photo.alt }}">
           <figcaption>{{ photo.caption }}</figcaption>
         </figure>
         {% endfor %}
@@ -120,9 +101,19 @@
     <h2>Featured Medical Services</h2>
     <p class="section-intro">Explore key specialties and services available across Palomar Health facilities.</p>
 
+    <div class="services-search-wrap">
+      <label for="services-search" class="services-search-label">Search All Services</label>
+      <input id="services-search" class="services-search-input" type="search" placeholder="Search by service name or keyword" autocomplete="off">
+      <p id="services-search-status" class="services-search-status">Showing all services.</p>
+    </div>
+
     <div class="program-grid">
       {% for program in data.programs %}
-      <div class="program-card">
+      {% capture program_search_text %}{{ program.title }} {{ program.description }} {% for point in program.points %}{{ point }} {% endfor %}{% endcapture %}
+      <div class="program-card" data-search-text="{{ program_search_text | strip | downcase }}">
+        {% if program.image %}
+        <img src="{{ site.baseurl }}/images/capstone/website_projects/{{ program.image }}" alt="{{ program.alt | default: program.title }}">
+        {% endif %}
 
         <div class="program-content">
           <h3>{{ program.title }}</h3>
@@ -140,10 +131,16 @@
       </div>
       {% endfor %}
     </div>
-    <div class="section-cta-row">
-      <a href="#patient-stories" class="btn-secondary">Read Patient Stories</a>
-      <a href="#community-programs" class="btn-secondary">See Community Programs</a>
-      <a href="#news-updates" class="btn-secondary">See Latest Updates</a>
+    <div class="services-az" aria-label="All services A to Z">
+      <h3>All Services A-Z</h3>
+      <ul class="services-az-list">
+        {% assign sorted_services = data.services_directory | sort: "title" %}
+        {% for service in sorted_services %}
+        <li data-service-name="{{ service.title | downcase }}">
+          <a href="{{ service.link | relative_url }}">{{ service.title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
     </div>
   </section>
 
@@ -172,8 +169,9 @@
     </div>
 
     <div class="section-cta-row">
-      <a href="#community-programs" class="btn-secondary">Explore Community Programs</a>
-      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Help Fund More Recoveries</a>
+      <a href="#patient-stories" class="btn-secondary">Read Patient Stories</a>
+      <a href="#community-programs" class="btn-secondary">See Community Programs</a>
+      <a href="#news-updates" class="btn-secondary">See Latest Updates</a>
     </div>
   </section>
 
@@ -269,6 +267,7 @@
     }
 
     function showHome() {
+      clearServicesFilter();
       hideAllTopics();
       homeOnlySections.forEach(function (section) {
         section.classList.remove('is-hidden');
@@ -280,6 +279,13 @@
     }
 
     function showTopics(ids) {
+      var showingPrograms = (ids || []).some(function (id) {
+        return (id || '').trim() === 'programs';
+      });
+      if (!showingPrograms) {
+        clearServicesFilter();
+      }
+
       hideAllTopics();
       homeOnlySections.forEach(function (section) {
         section.classList.add('is-hidden');
@@ -302,6 +308,7 @@
     }
 
     function showBlank() {
+      clearServicesFilter();
       hideAllTopics();
       homeOnlySections.forEach(function (section) {
         section.classList.add('is-hidden');
@@ -330,6 +337,51 @@
         showTopics(targets);
       });
     });
+
+    var servicesSearchInput = root.querySelector('#services-search');
+    var servicesSearchStatus = root.querySelector('#services-search-status');
+    var serviceCards = root.querySelectorAll('#programs .program-card');
+    var serviceAZItems = root.querySelectorAll('#programs .services-az-list li');
+
+    function applyServicesFilter() {
+      if (!servicesSearchInput) return;
+      var query = (servicesSearchInput.value || '').toLowerCase().trim();
+      var visibleCardCount = 0;
+      var visibleAZCount = 0;
+
+      serviceCards.forEach(function (card) {
+        var haystack = (card.dataset.searchText || '').toLowerCase();
+        var isMatch = !query || haystack.indexOf(query) !== -1;
+        card.classList.toggle('is-filtered-out', !isMatch);
+        if (isMatch) visibleCardCount += 1;
+      });
+
+      serviceAZItems.forEach(function (item) {
+        var name = (item.dataset.serviceName || '').toLowerCase();
+        var isMatch = !query || name.indexOf(query) !== -1;
+        item.classList.toggle('is-filtered-out', !isMatch);
+        if (isMatch) visibleAZCount += 1;
+      });
+
+      if (servicesSearchStatus) {
+        if (!query) {
+          servicesSearchStatus.textContent = 'Showing all services.';
+        } else {
+          servicesSearchStatus.textContent = 'Showing ' + visibleAZCount + ' matching service' + (visibleAZCount === 1 ? '' : 's') + '.';
+        }
+      }
+    }
+
+    function clearServicesFilter() {
+      if (!servicesSearchInput) return;
+      if (!servicesSearchInput.value) return;
+      servicesSearchInput.value = '';
+      applyServicesFilter();
+    }
+
+    if (servicesSearchInput) {
+      servicesSearchInput.addEventListener('input', applyServicesFilter);
+    }
 
     root.querySelectorAll('a:not(.cta-reveal)').forEach(function (link) {
       link.addEventListener('click', function (event) {

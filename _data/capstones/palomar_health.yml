@@ -1,7 +1,7 @@
 title: Community Health Foundation
 hero:
   headline: Exceptional Care for North San Diego County.
-  support_text: Palomar Health provides advanced medical care, emergency services, and community health programs to support the well-being of families across the region.
+  support_text: Palomar Health provides advanced medical care, emergency services, and community health programs supporting families across North San Diego County.
 
 description: Supporting healthcare programs that improve lives across our community.
 mission_statement: We expand access to quality healthcare by funding local programs, prevention services, and patient support across our region.
@@ -183,6 +183,10 @@ community_impact_statistics:
     label: Residents served in North San Diego County
   - value: "900+"
     label: Physicians and healthcare providers
+  - value: "280-300"
+    label: Emergency patients served daily
+  - value: "70-90"
+    label: Ambulance arrivals each day
   - value: "2"
     label: Major medical centers
   - value: "75+"
@@ -295,7 +299,7 @@ donation_impact:
 
 programs:
   - title: Emergency and Trauma Care
-    image: toolkit-nav-buttons/studentmanagement.png
+    image: palomaremergency.jpg
     alt: Emergency and trauma care
     description: 24/7 emergency response and trauma services for life-threatening conditions.
     link: /services/emergency-trauma
@@ -305,7 +309,7 @@ programs:
       - Integrated emergency diagnostics
 
   - title: Heart and Cardiovascular Care
-    image: toolkit-nav-buttons/studentgrader.png
+    image: palomarcard.jpg
     alt: Heart and cardiovascular care
     description: Comprehensive heart care including prevention, intervention, and recovery.
     link: /services/heart-cardiovascular
@@ -315,7 +319,7 @@ programs:
       - Ongoing heart health management
 
   - title: Cancer Treatment
-    image: toolkit-nav-buttons/studentmanagement.png
+    image: palomarcancer.jpg
     alt: Cancer treatment
     description: Personalized oncology support with multidisciplinary care planning.
     link: /services/cancer-care
@@ -325,7 +329,7 @@ programs:
       - Recovery and survivorship resources
 
   - title: Orthopedic Surgery
-    image: toolkit-nav-buttons/studentgrader.png
+    image: palomarsurgical.jpg
     alt: Orthopedic surgery
     description: Surgical and non-surgical care for joint, bone, and mobility conditions.
     link: /services/orthopedic-surgery
@@ -335,7 +339,7 @@ programs:
       - Mobility-focused rehabilitation
 
   - title: Women's Health
-    image: toolkit-nav-buttons/studentmanagement.png
+    image: palomarwomen.jpg
     alt: Women's health
     description: Care across every stage of life, from preventive screenings to specialized treatment.
     link: /services/womens-health
@@ -345,7 +349,7 @@ programs:
       - Breast and gynecologic support
 
   - title: Rehabilitation Services
-    image: toolkit-nav-buttons/studentgrader.png
+    image: palomarrehab.jpg
     alt: Rehabilitation services
     description: Physical, occupational, and speech therapy for recovery and long-term function.
     link: /services/rehabilitation
@@ -353,6 +357,22 @@ programs:
       - Inpatient and outpatient therapy
       - Personalized recovery plans
       - Functional independence goals
+
+services_directory:
+  - title: Behavioral Health
+    link: /services/behavioral-health
+  - title: Cancer Treatment
+    link: /services/cancer-care
+  - title: Emergency and Trauma Care
+    link: /services/emergency-trauma
+  - title: Heart and Cardiovascular Care
+    link: /services/heart-cardiovascular
+  - title: Orthopedic Surgery
+    link: /services/orthopedic-surgery
+  - title: Rehabilitation Services
+    link: /services/rehabilitation
+  - title: Women's Health
+    link: /services/womens-health
 
 news_updates:
   - date: March 2026

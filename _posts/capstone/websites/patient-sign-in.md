@@ -12,7 +12,7 @@ published: false
 <div class="palomar-foundation patient-signin-shell">
   <div class="palomar-topbar">
     <a href="{{ '/capstone/palomarhealth/' | relative_url }}" class="palomar-home-trigger" aria-label="Go to home view">
-      <img src="{{ site.baseurl }}/images/capstone/palomar.png" alt="Palomar Health home">
+      <img src="{{ site.baseurl }}/images/capstone/website_projects/palomar.png" alt="Palomar Health home">
       <span class="home-trigger-label">Home</span>
     </a>
     <div class="palomar-topbar-actions">
@@ -43,7 +43,7 @@ published: false
 
   <section class="patient-signin-wrap">
     <div class="patient-signin-brand">
-      <img src="{{ site.baseurl }}/images/capstone/palomar.png" alt="Palomar Health">
+      <img src="{{ site.baseurl }}/images/capstone/website_projects/palomar.png" alt="Palomar Health">
       <p>Palomar Health</p>
     </div>
 
