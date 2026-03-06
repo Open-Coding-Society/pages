@@ -161,6 +161,11 @@ Check if this is a course lesson and determine which course context to use
 
           {{ content }}
 
+          {% if page.show_gist_export %}
+          {% comment %} Only show the export button when the notebook explicitly requests it {% endcomment %}
+          {% include gist-export-button.html %}
+          {% endif %}
+
           {% if page.assignment %}
           <div class="assignment-submission">
             <h3>
