@@ -1,0 +1,99 @@
+title: "Poway Veterans Organization — Website Redesign Plan"
+subtitle: "From Information Site to Guided Support Portal"
+org: "Poway Veterans Organization"
+url: "powayveterans.org"
+tagline: "Assisting Poway's Veterans since 2014"
+
+stats:
+  - label: "Staff"
+    value: "0"
+    note: "100% volunteer-run"
+  - label: "Funds to Veterans"
+    value: "95%+"
+    note: "of all donations"
+  - label: "Founded"
+    value: "2014"
+    note: "Poway, CA"
+  - label: "Service Areas"
+    value: "3+"
+    note: "Poway, Ramona & surrounding"
+
+audiences:
+  - name: "Veterans in Need"
+    icon: "🎖️"
+    pain: "No guided help pathway — unclear eligibility, process, or timelines"
+  - name: "Families & Dependents"
+    icon: "👨‍👩‍👧"
+    pain: "No family-facing guide despite explicit mission inclusion"
+  - name: "Volunteers"
+    icon: "🤝"
+    pain: "Form-only page — no role types, time expectations, or examples"
+  - name: "Donors & Sponsors"
+    icon: "💛"
+    pain: "Impact is buried — no current stories or campaign options"
+  - name: "Student Veterans"
+    icon: "🎓"
+    pain: "Scholarship details exist but eligibility/deadlines unclear"
+  - name: "Community Partners"
+    icon: "🏘️"
+    pain: "Golf/event info isolated from broader partnerships story"
+
+gaps:
+  - "Site organized by pages, not user needs"
+  - "Help pathway is not step-by-step"
+  - "Volunteers lack role context before the form"
+  - "No upcoming events visible (as of March 2026)"
+  - "Impact data is long-form archive, not scannable summary"
+  - "Newsletter frequency mismatch (monthly vs quarterly)"
+
+phases:
+  - number: 1
+    title: "Get Help Hub"
+    desc: "Build 'Need Help? Start Here' with eligibility, process steps, documents, and urgent resources"
+    priority: "Highest"
+  - number: 2
+    title: "Homepage Restructure"
+    desc: "Reorder homepage around 5 jobs: who we help → actions → impact → activity → trust"
+    priority: "High"
+  - number: 3
+    title: "Local Resource Map"
+    desc: "Directory of VA, housing, food, legal, transport, and education resources in Poway/Ramona"
+    priority: "High"
+  - number: 4
+    title: "Volunteer Redesign"
+    desc: "Add role types, time commitment, project examples, and post-signup expectations"
+    priority: "Medium"
+  - number: 5
+    title: "Impact Page"
+    desc: "Clean summary of veterans helped, dollars deployed, categories, and recent stories"
+    priority: "Medium"
+  - number: 6
+    title: "Freshness Updates"
+    desc: "Events, blog, newsletter archive, and recent impact snapshots"
+    priority: "Medium"
+  - number: 7
+    title: "Form Simplification"
+    desc: "Shorter screens, document checklist, privacy reassurance, conditional logic"
+    priority: "Lower"
+
+new_nav:
+  - "Get Help"
+  - "For Families"
+  - "Volunteer"
+  - "Donate"
+  - "Events"
+  - "Impact"
+  - "About / Contact"
+
+support_types:
+  - "Rent & Utilities"
+  - "Food Assistance"
+  - "Transportation"
+  - "Home Repair"
+  - "Emergency Hardship"
+  - "Student Support"
+  - "Housing Transition"
+
+strategic_direction: >
+  Poway Veterans Organization should redesign its website from an information site
+  into a guided local support portal for veterans, families, volunteers, and donors.
