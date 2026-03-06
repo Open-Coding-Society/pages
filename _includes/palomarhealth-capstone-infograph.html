@@ -7,15 +7,25 @@
       <span class="home-trigger-label">Home</span>
     </button>
     <div class="palomar-topbar-actions">
-      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Donate Now</a>
-      <a href="#impact" class="btn-secondary cta-reveal" data-reveal="impact,community-gallery,programs,help">Support Local Healthcare</a>
+      {% for item in data.top_navigation %}
+      <div class="top-nav-item{% if item.submenu %} has-submenu{% endif %}">
+        <a href="{{ item.link | relative_url }}" class="btn-{{ item.variant | default: 'secondary' }} top-nav-link{% if item.nav_class %} {{ item.nav_class }}{% endif %}{% if item.reveal %} cta-reveal{% endif %}"{% if item.reveal %} data-reveal="{{ item.reveal }}"{% endif %}{% if item.allow_navigation %} data-allow-navigation="true"{% endif %}>{{ item.label }}{% if item.submenu %}<span class="top-nav-caret" aria-hidden="true">&#9662;</span>{% endif %}</a>
+        {% if item.submenu %}
+        <div class="top-nav-dropdown" role="menu" aria-label="{{ item.label }} submenu">
+          {% for subitem in item.submenu %}
+          <a href="{{ subitem.link | relative_url }}" class="top-nav-dropdown-link{% if subitem.reveal %} cta-reveal{% endif %}"{% if subitem.reveal %} data-reveal="{{ subitem.reveal }}"{% endif %} role="menuitem">{{ subitem.label }}</a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
   </div>
 
   <!-- HERO -->
   <section class="hero" id="home">
     <div class="hero-content">
-      <h1>{{ data.title }}</h1>
+      <h1>{{ data.hero.headline | default: data.title }}</h1>
 
       {% assign hero_photo = data.homepage_gallery | first %}
       {% if hero_photo %}
@@ -25,7 +35,13 @@
       {% endif %}
 
       <p class="mission-statement">{{ data.mission_statement }}</p>
-      <p>{{ data.description }}</p>
+      <p class="hero-support">{{ data.hero.support_text | default: data.description }}</p>
+
+      <div class="hero-main-actions" aria-label="Primary patient actions">
+        {% for action in data.hero_actions %}
+        <a href="{{ action.link | relative_url }}" class="btn-main-action">{{ action.label }}</a>
+        {% endfor %}
+      </div>
 
       <div class="home-snapshot" aria-label="Palomar Health system snapshot">
         <p class="snapshot-overview">{{ data.homepage_spotlight.overview }}</p>
@@ -57,19 +73,18 @@
     </div>
   </section>
 
-  <!-- IMPACT SNAPSHOT -->
-  <section class="impact reveal-topic is-hidden" id="impact">
-    <h2>Our Impact</h2>
-    <div class="impact-grid">
-      {% for stat in data.impact_stats %}
-      <div class="impact-card">
-        <p class="impact-value">{{ stat.value }}</p>
-        <p class="impact-label">{{ stat.label }}</p>
-      </div>
+  <section class="blank-view reveal-topic is-hidden" id="blank-view" aria-label="Blank content view"></section>
+
+  <!-- COMMUNITY IMPACT STATISTICS -->
+  <section class="community-impact-stats home-only" id="community-impact-stats">
+    <h2>Serving Our Community</h2>
+    <div class="community-impact-grid">
+      {% for stat in data.community_impact_statistics %}
+      <article class="community-impact-card">
+        <p class="community-impact-value">{{ stat.value }}</p>
+        <p class="community-impact-label">{{ stat.label }}</p>
+      </article>
       {% endfor %}
-    </div>
-    <div class="section-cta-row">
-      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Donate to Expand Impact</a>
     </div>
   </section>
 
@@ -102,7 +117,8 @@
 
   <!-- PROGRAMS -->
   <section class="programs reveal-topic is-hidden" id="programs">
-    <h2>Our Programs</h2>
+    <h2>Featured Medical Services</h2>
+    <p class="section-intro">Explore key specialties and services available across Palomar Health facilities.</p>
 
     <div class="program-grid">
       {% for program in data.programs %}
@@ -125,29 +141,86 @@
       {% endfor %}
     </div>
     <div class="section-cta-row">
-      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Support These Programs</a>
+      <a href="#patient-stories" class="btn-secondary">Read Patient Stories</a>
+      <a href="#community-programs" class="btn-secondary">See Community Programs</a>
+      <a href="#news-updates" class="btn-secondary">See Latest Updates</a>
     </div>
   </section>
 
-  <!-- COMMUNITY GALLERY -->
-  <section class="community-gallery reveal-topic is-hidden" id="community-gallery">
-    <h2>Community In Action</h2>
-    <p class="section-intro">Stories of students, staff, and local families coming together through healthcare education and service.</p>
+  <!-- PATIENT STORIES -->
+  <section class="patient-stories reveal-topic is-hidden" id="patient-stories">
+    <h2>Real Stories of Healing</h2>
+    <p class="section-intro">Personal recovery journeys that show the life-changing impact of timely, coordinated care.</p>
 
-    <div class="community-gallery-grid">
-      {% for photo in data.photo_highlights %}
-      <article class="community-photo-card">
-        <img src="{{ site.baseurl }}/images/capstone/{{ photo.file }}" alt="{{ photo.alt }}">
-        <div class="community-photo-content">
-          <h3>{{ photo.title }}</h3>
-          <p>{{ photo.description }}</p>
-        </div>
+    <div class="story-grid">
+      {% for story in data.patient_stories %}
+      <article class="story-card">
+        <h3>{{ story.title }}</h3>
+        <p>{{ story.summary }}</p>
+        <ul class="story-results">
+          {% for item in story.results %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+        <p class="story-impact-label">Impact:</p>
+        <p class="story-impact-copy">{{ story.impact }}</p>
+        {% if story.link %}
+        <a href="{{ story.link | relative_url }}" class="btn-secondary">Read Full Story</a>
+        {% endif %}
       </article>
       {% endfor %}
     </div>
 
     <div class="section-cta-row">
-      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Fund More Community Programs</a>
+      <a href="#community-programs" class="btn-secondary">Explore Community Programs</a>
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Help Fund More Recoveries</a>
+    </div>
+  </section>
+
+  <!-- COMMUNITY PROGRAMS -->
+  <section class="program-impact reveal-topic is-hidden" id="community-programs">
+    <h2>Community Programs</h2>
+    <p class="section-intro">Outreach and education initiatives that strengthen health outcomes across local neighborhoods.</p>
+
+    <div class="program-impact-grid">
+      {% for item in data.program_impact %}
+      <article class="program-impact-card-detail">
+        <h3>{{ item.title }}</h3>
+        <p class="program-impact-audience">{{ item.audience }}</p>
+        <ul class="program-impact-list">
+          {% for point in item.highlights %}
+          <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+        <p class="program-impact-outcome">{{ item.outcome }}</p>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="section-cta-row">
+      <a href="#news-updates" class="btn-secondary">View News and Updates</a>
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Support Community Programs</a>
+    </div>
+  </section>
+
+  <!-- NEWS AND UPDATES -->
+  <section class="news-updates reveal-topic is-hidden" id="news-updates">
+    <h2>News and Updates</h2>
+    <p class="section-intro">Latest announcements, technology updates, events, and regional care developments.</p>
+
+    <div class="news-grid">
+      {% for item in data.news_updates %}
+      <article class="news-card">
+        <p class="news-date">{{ item.date }}</p>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.summary }}</p>
+        <a href="{{ item.link | relative_url }}" class="btn-secondary">Read Update</a>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="section-cta-row">
+      <a href="#donation-impact" class="btn-primary cta-reveal" data-reveal="donation-impact,contact">Support Future Improvements</a>
     </div>
   </section>
 
@@ -184,6 +257,7 @@
     if (!root) return;
 
     var homeSection = root.querySelector('#home');
+    var homeOnlySections = root.querySelectorAll('.home-only');
     var homeButton = root.querySelector('.palomar-home-trigger');
     var topicSections = root.querySelectorAll('.reveal-topic');
     var ctaButtons = root.querySelectorAll('.cta-reveal');
@@ -196,6 +270,9 @@
 
     function showHome() {
       hideAllTopics();
+      homeOnlySections.forEach(function (section) {
+        section.classList.remove('is-hidden');
+      });
       if (homeSection) {
         homeSection.classList.remove('is-hidden');
         homeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -204,6 +281,9 @@
 
     function showTopics(ids) {
       hideAllTopics();
+      homeOnlySections.forEach(function (section) {
+        section.classList.add('is-hidden');
+      });
       if (homeSection) {
         homeSection.classList.add('is-hidden');
       }
@@ -221,11 +301,60 @@
       }
     }
 
+    function showBlank() {
+      hideAllTopics();
+      homeOnlySections.forEach(function (section) {
+        section.classList.add('is-hidden');
+      });
+      if (homeSection) {
+        homeSection.classList.add('is-hidden');
+      }
+      var blankSection = root.querySelector('#blank-view');
+      if (blankSection) {
+        blankSection.classList.remove('is-hidden');
+        blankSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
     ctaButtons.forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.preventDefault();
         var targets = (button.dataset.reveal || '').split(',').filter(Boolean);
         showTopics(targets);
+      });
+    });
+
+    root.querySelectorAll('a:not(.cta-reveal)').forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        if (link.dataset.allowNavigation === 'true') {
+          return;
+        }
+
+        var href = (link.getAttribute('href') || '').trim();
+        if (!href) return;
+
+        if (href === '#home') {
+          event.preventDefault();
+          showHome();
+          return;
+        }
+
+        if (href.charAt(0) === '#') {
+          event.preventDefault();
+          var targetId = href.slice(1);
+          var target = targetId ? root.querySelector('#' + targetId) : null;
+          if (target && target.classList.contains('reveal-topic')) {
+            showTopics([targetId]);
+          } else {
+            showBlank();
+          }
+          return;
+        }
+
+        if (href.charAt(0) === '/' || /^https?:/i.test(href)) {
+          event.preventDefault();
+          showBlank();
+        }
       });
     });
 
@@ -238,10 +367,17 @@
 
     var hash = window.location.hash ? window.location.hash.replace('#', '') : '';
     if (hash) {
+      var directTopic = root.querySelector('#' + hash);
+      if (directTopic && directTopic.classList.contains('reveal-topic')) {
+        showTopics([hash]);
+        return;
+      }
       var matchingButton = root.querySelector('.cta-reveal[href="#' + hash + '"]');
       if (matchingButton) {
         var targets = (matchingButton.dataset.reveal || '').split(',').filter(Boolean);
         showTopics(targets);
+      } else {
+        showBlank();
       }
     } else {
       showHome();

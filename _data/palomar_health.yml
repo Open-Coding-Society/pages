@@ -1,9 +1,137 @@
 title: Community Health Foundation
+hero:
+  headline: Exceptional Care for North San Diego County.
+  support_text: Palomar Health provides advanced medical care, emergency services, and community health programs to support the well-being of families across the region.
+
 description: Supporting healthcare programs that improve lives across our community.
 mission_statement: We expand access to quality healthcare by funding local programs, prevention services, and patient support across our region.
 donate_link: /donate
 support_link: /donate
 impact_link: /capstone/palomarhealth/#impact
+
+hero_actions:
+  - label: Find a Doctor
+    link: /find-a-doctor
+    variant: primary
+  - label: ER Wait Times / Check-In
+    link: /er-check-in
+    variant: secondary
+  - label: Our Locations
+    link: /locations
+    variant: secondary
+  - label: Patient Portal
+    link: /patient-portal
+    variant: secondary
+
+top_navigation:
+  - label: Services
+    link: "#programs"
+    variant: secondary
+    reveal: programs
+    submenu:
+      - label: Emergency and Trauma Care
+        link: /services/emergency-trauma
+      - label: Heart and Cardiovascular Care
+        link: /services/heart-cardiovascular
+      - label: Cancer Treatment
+        link: /services/cancer-care
+      - label: Orthopedic Surgery
+        link: /services/orthopedic-surgery
+      - label: Women's Health
+        link: /services/womens-health
+      - label: Rehabilitation Services
+        link: /services/rehabilitation
+      - label: Behavioral Health
+        link: /services/behavioral-health
+      - label: All Medical Services
+        link: /services
+        reveal: programs
+  - label: Locations
+    link: /locations
+    variant: secondary
+    submenu:
+      - label: Palomar Medical Center Escondido
+        link: /locations/escondido
+      - label: Palomar Medical Center Poway
+        link: /locations/poway
+      - label: Outpatient Centers
+        link: /locations/outpatient-centers
+      - label: Emergency Departments
+        link: /locations/emergency-departments
+      - label: Rehabilitation Institute
+        link: /locations/rehabilitation-institute
+      - label: Find a Location (Map)
+        link: /locations/map
+  - label: Patients & Visitors
+    link: "#patient-stories"
+    variant: secondary
+    reveal: patient-stories
+    submenu:
+      - label: ER Wait Times / Check-In
+        link: /er-check-in
+      - label: Schedule an Appointment
+        link: /appointments
+      - label: Pay Your Bill
+        link: /billing
+      - label: Insurance Information
+        link: /insurance
+      - label: Visiting Hours
+        link: /visiting-hours
+      - label: Medical Records
+        link: /medical-records
+      - label: Patient Stories
+        link: /stories
+        reveal: patient-stories
+  - label: Community
+    link: "#community-programs"
+    variant: secondary
+    reveal: community-programs
+    submenu:
+      - label: Community Programs
+        link: /community/programs
+        reveal: community-programs
+      - label: Camp HOPE
+        link: /community/camp-hope
+        reveal: community-programs
+      - label: Middle School M.D.
+        link: /community/middle-school-md
+        reveal: community-programs
+      - label: Community Events
+        link: /community/events
+        reveal: community-programs
+      - label: Health Education
+        link: /community/health-education
+        reveal: community-programs
+      - label: Community Impact
+        link: /community/impact
+        reveal: community-programs
+  - label: About
+    link: "#news-updates"
+    variant: secondary
+    reveal: news-updates
+    submenu:
+      - label: About Palomar Health
+        link: /about
+      - label: Leadership
+        link: /about/leadership
+      - label: News and Updates
+        link: /news
+        reveal: news-updates
+      - label: Careers
+        link: /careers
+      - label: Awards and Recognition
+        link: /about/awards
+      - label: Annual Reports
+        link: /about/annual-reports
+  - label: Patient Sign In
+    link: /patient-sign-in
+    variant: primary
+    nav_class: nav-patient-portal
+    allow_navigation: true
+  - label: Find a Doctor
+    link: /find-a-doctor
+    variant: primary
+    nav_class: nav-find-doctor
 
 homepage_spotlight:
   overview: Palomar Health is the largest public healthcare district in California, serving North San Diego County through multiple hospitals and healthcare facilities.
@@ -30,6 +158,36 @@ homepage_gallery:
     alt: Youth participants in white coats at a healthcare learning activity
     caption: Hands-on health education events connect young learners to real-world medical skills.
 
+quick_patient_tools:
+  - title: Find a Doctor
+    description: Search providers by specialty, location, and care needs.
+    link: /find-a-doctor
+  - title: Schedule an Appointment
+    description: Request or manage appointments online in minutes.
+    link: /appointments
+  - title: ER Online Check-In
+    description: Start your emergency room check-in before arrival.
+    link: /er-check-in
+  - title: Pay Your Bill
+    description: Pay hospital and clinic bills securely online.
+    link: /billing
+  - title: Locations
+    description: Find hospitals, clinics, and care centers across the region.
+    link: /locations
+  - title: Patient Portal Login
+    description: Access appointments, records, and secure care communication.
+    link: /patient-portal
+
+community_impact_statistics:
+  - value: "500,000+"
+    label: Residents served in North San Diego County
+  - value: "900+"
+    label: Physicians and healthcare providers
+  - value: "2"
+    label: Major medical centers
+  - value: "75+"
+    label: Years serving the community
+
 photo_highlights:
   - file: palomarstudents.jpg
     alt: Students welcomed by Palomar Health team members at a community event
@@ -52,6 +210,71 @@ impact_stats:
   - value: "18"
     label: Programs supported for prevention, recovery, and education
 
+patient_stories:
+  - title: Weight Loss Surgery Success - Charlene Patterson
+    summary: Charlene faced serious health challenges and low confidence before receiving gastric bypass surgery through Palomar Health.
+    results:
+      - Lost about 100 pounds after surgery and follow-up support
+      - Completed a triathlon with swimming, biking, and running
+      - Built long-term habits through staff guidance and support groups
+    impact: This journey shows how coordinated care and recovery support can improve both physical health and emotional well-being.
+    link: /stories/charlene-patterson
+  - title: Advanced Wound Care Recovery - Cecilia DeFabio
+    summary: After surviving breast cancer, Cecilia developed a severe wound that required specialized intervention and close medical coordination.
+    results:
+      - Received hyperbaric oxygen therapy to support tissue healing
+      - Restored blood flow that enabled a successful skin graft
+      - Benefited from a team-based care model focused on whole-patient recovery
+    impact: This case demonstrates how advanced technology and multidisciplinary care can help patients recover from complex complications.
+    link: /stories/cecilia-defabio
+  - title: Stroke Rehabilitation Recovery - David M.
+    summary: Following a stroke, David entered a multidisciplinary rehabilitation program focused on mobility, speech, and independence.
+    results:
+      - Completed intensive physical and occupational therapy milestones
+      - Regained confidence with daily movement and communication
+      - Returned to family activities with improved independence
+    impact: Rehabilitation services helped restore function and quality of life during a critical recovery period.
+    link: /stories/david-stroke-recovery
+
+community_voices:
+  - title: Camp HOPE Parent Reflection
+    story: A parent shared that Camp HOPE gave their child a rare sense of safety and belonging after prolonged family trauma. Through mentorship, team activities, and consistent follow-up events, the child became more confident at school and more engaged at home.
+    impact: Donor-funded trauma-informed programs can create stability for entire families, not only individual participants.
+  - title: Student Healthcare Pathway Story
+    story: A local middle school student entered the Middle School M.D. program uncertain about future goals, then discovered a passion for emergency care after CPR and first-aid simulations with clinical staff.
+    impact: Early exposure to healthcare careers helps students build purpose, practical skills, and long-term community commitment.
+  - title: Community Mentor Perspective
+    story: A volunteer mentor described how year-round outreach events connect youth with trusted adults and healthy peer networks, helping participants stay supported long after a single workshop or camp session ends.
+    impact: Sustained support models strengthen resilience and improve long-term outcomes across neighborhoods.
+
+program_impact:
+  - title: Camp HOPE
+    audience: Children and teens who have experienced abuse or trauma
+    highlights:
+      - Week-long therapeutic summer camp experiences
+      - Mentorship and positive role-model relationships
+      - Confidence-building activities and year-round support events
+    outcome: Participants gain safety, confidence, and community support that help them move forward with hope.
+  - title: Middle School M.D.
+    audience: Local middle school students exploring healthcare careers
+    highlights:
+      - Hands-on medical workshops and first-aid training
+      - CPR and defibrillator practice with guided instruction
+      - Direct interaction with doctors, nurses, and healthcare staff
+    outcome: Students build practical skills and interest in healthcare careers that strengthen the future regional workforce.
+
+annual_impact_report:
+  period: 2025 Impact Highlights
+  funds_raised: "$2.4M raised from donors, events, and community partnerships"
+  programs_funded:
+    - Trauma-informed youth programs and mentorship
+    - Preventive care outreach and screenings
+    - Patient recovery support and specialty treatment assistance
+  community_outcomes:
+    - 12,500+ patients supported through funded programs and services
+    - Expanded student healthcare pathway participation across local schools
+    - Increased access to coordinated care for families facing medical crises
+
 donation_summary: Every contribution stays local and directly supports families, students, and patients who need timely access to care.
 
 donation_tiers:
@@ -71,26 +294,79 @@ donation_impact:
     description: Gifts help provide trauma-informed support, care coordination, and recovery resources when families need them most.
 
 programs:
-
-  - title: Camp Hope
+  - title: Emergency and Trauma Care
     image: toolkit-nav-buttons/studentmanagement.png
-    alt: Camp Hope
-    description: A program supporting children who have experienced trauma.
-    link: /camp-hope
+    alt: Emergency and trauma care
+    description: 24/7 emergency response and trauma services for life-threatening conditions.
+    link: /services/emergency-trauma
     points:
-      - Mentorship
-      - Summer camps
-      - Family support
+      - Rapid triage and stabilization
+      - Specialized trauma teams
+      - Integrated emergency diagnostics
 
-  - title: Student Medical Program
+  - title: Heart and Cardiovascular Care
     image: toolkit-nav-buttons/studentgrader.png
-    alt: Student program
-    description: Connecting students with careers in healthcare.
-    link: /student-program
+    alt: Heart and cardiovascular care
+    description: Comprehensive heart care including prevention, intervention, and recovery.
+    link: /services/heart-cardiovascular
     points:
-      - Career exposure
-      - Mentorship
-      - Hospital experiences
+      - Cardiac diagnostics and imaging
+      - Interventional procedures
+      - Ongoing heart health management
+
+  - title: Cancer Treatment
+    image: toolkit-nav-buttons/studentmanagement.png
+    alt: Cancer treatment
+    description: Personalized oncology support with multidisciplinary care planning.
+    link: /services/cancer-care
+    points:
+      - Coordinated oncology specialists
+      - Treatment navigation support
+      - Recovery and survivorship resources
+
+  - title: Orthopedic Surgery
+    image: toolkit-nav-buttons/studentgrader.png
+    alt: Orthopedic surgery
+    description: Surgical and non-surgical care for joint, bone, and mobility conditions.
+    link: /services/orthopedic-surgery
+    points:
+      - Joint and sports injury care
+      - Advanced surgical techniques
+      - Mobility-focused rehabilitation
+
+  - title: Women's Health
+    image: toolkit-nav-buttons/studentmanagement.png
+    alt: Women's health
+    description: Care across every stage of life, from preventive screenings to specialized treatment.
+    link: /services/womens-health
+    points:
+      - Preventive and reproductive care
+      - Maternity and postpartum services
+      - Breast and gynecologic support
+
+  - title: Rehabilitation Services
+    image: toolkit-nav-buttons/studentgrader.png
+    alt: Rehabilitation services
+    description: Physical, occupational, and speech therapy for recovery and long-term function.
+    link: /services/rehabilitation
+    points:
+      - Inpatient and outpatient therapy
+      - Personalized recovery plans
+      - Functional independence goals
+
+news_updates:
+  - date: March 2026
+    title: Palomar Health Opens New Behavioral Health Facility
+    summary: Expanded behavioral health capacity improves timely access to specialized mental health services in the region.
+    link: /news/behavioral-health-facility
+  - date: February 2026
+    title: New Robotic Surgery Technology Introduced
+    summary: Advanced robotic-assisted capabilities enhance precision and support faster recovery in selected procedures.
+    link: /news/robotic-surgery-technology
+  - date: January 2026
+    title: Community Health Fair Supports Hundreds of Residents
+    summary: Free screenings, education, and wellness resources helped families access preventive care and local services.
+    link: /news/community-health-fair
 
 help:
 

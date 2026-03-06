@@ -75,20 +75,123 @@ $foundation-card-bg: #142338;
   display: flex;
   align-items: center;
   gap: 0.45rem;
+  flex-wrap: nowrap;
+  overflow: visible;
 }
 
 .palomar-foundation .palomar-topbar-actions .btn-primary,
 .palomar-foundation .palomar-topbar-actions .btn-secondary {
+  flex: 0 0 auto;
+  white-space: nowrap;
   margin-top: 0;
-  padding: 0.42rem 0.8rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 7px;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   line-height: 1.1;
+}
+
+.palomar-foundation .top-nav-item {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.palomar-foundation .top-nav-item.has-submenu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 0.45rem;
+}
+
+.palomar-foundation .top-nav-link {
+  display: inline-block;
+}
+
+.palomar-foundation .top-nav-caret {
+  display: inline-block;
+  margin-left: 0.32rem;
+  font-size: 0.68em;
+  vertical-align: middle;
+  opacity: 0.9;
+}
+
+.palomar-foundation .top-nav-dropdown {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  min-width: 280px;
+  padding: 0.45rem;
+  background: #102136;
+  border: 1px solid #3a5d84;
+  border-radius: 10px;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+  display: none;
+  pointer-events: auto;
+}
+
+.palomar-foundation .top-nav-dropdown-link {
+  display: block;
+  padding: 0.5rem 0.55rem;
+  border-radius: 7px;
+  color: #eaf5ff;
+  font-size: 0.88rem;
+  text-decoration: none;
+  line-height: 1.35;
+
+  &:hover,
+  &:focus {
+    background: #1f3a58;
+    color: #ffffff;
+  }
+}
+
+.palomar-foundation .top-nav-item.has-submenu:hover .top-nav-dropdown,
+.palomar-foundation .top-nav-item.has-submenu:focus-within .top-nav-dropdown {
+  display: block;
+}
+
+.palomar-foundation .top-nav-item.has-submenu:hover .top-nav-caret,
+.palomar-foundation .top-nav-item.has-submenu:focus-within .top-nav-caret {
+  opacity: 1;
+}
+
+.palomar-foundation .palomar-topbar-actions .btn-donate {
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+  border-color: #f59e0b;
+  color: #1f2937;
+  font-weight: 800;
+
+  &:hover {
+    background: linear-gradient(135deg, #fcd34d, #fb923c);
+    border-color: #f59e0b;
+    color: #111827;
+  }
+}
+
+.palomar-foundation .palomar-topbar-actions .nav-patient-portal,
+.palomar-foundation .palomar-topbar-actions .nav-find-doctor {
+  background: linear-gradient(135deg, #123865, #0d2c50);
+  border-color: #2b5688;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  &:hover {
+    background: linear-gradient(135deg, #18497f, #12375f);
+    border-color: #3a6ba3;
+    color: #ffffff;
+  }
 }
 
 
 .palomar-foundation .is-hidden {
   display: none;
+}
+
+.palomar-foundation .blank-view {
+  min-height: 60vh;
+  margin-bottom: 3rem;
 }
 
 
@@ -125,6 +228,51 @@ $foundation-card-bg: #142338;
   letter-spacing: 0.01em;
   text-wrap: balance;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+.palomar-foundation .hero-support {
+  max-width: 860px;
+  margin: 0 auto 1.25rem auto;
+}
+
+.palomar-foundation .hero-main-actions {
+  max-width: 980px;
+  margin: 0 auto 1.35rem auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.palomar-foundation .btn-main-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 68px;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #d57a16;
+  background: linear-gradient(135deg, #e8ac45, #cf6e27);
+  color: #ffffff !important;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 760;
+  line-height: 1.25;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  transition: 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #f0b95a, #d97a34);
+    color: #ffffff !important;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+  }
+}
+
+.palomar-foundation .btn-main-action:visited,
+.palomar-foundation .btn-main-action:focus,
+.palomar-foundation .btn-main-action:active {
+  color: #ffffff !important;
 }
 
 .palomar-foundation .hero-building-image {
@@ -258,18 +406,6 @@ $foundation-card-bg: #142338;
   grid-column: span 6;
 }
 
-.palomar-foundation .hero-cta-group {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
-}
-
-.palomar-foundation .hero-cta-group .btn-secondary,
-.palomar-foundation .hero-cta-group .btn-primary {
-  margin-top: 0;
-}
-
 .palomar-foundation .reveal-topic.is-hidden {
   display: none;
 }
@@ -326,6 +462,13 @@ $foundation-card-bg: #142338;
 // SECTION HEADERS
 .palomar-foundation .programs,
 .palomar-foundation .impact,
+.palomar-foundation .quick-tools,
+.palomar-foundation .community-impact-stats,
+.palomar-foundation .patient-stories,
+.palomar-foundation .news-updates,
+.palomar-foundation .community-voices,
+.palomar-foundation .program-impact,
+.palomar-foundation .annual-impact-report,
 .palomar-foundation .donation-impact,
 .palomar-foundation .community-gallery,
 .palomar-foundation .help,
@@ -351,6 +494,109 @@ $foundation-card-bg: #142338;
   text-align: center;
   color: #c9d9ea;
   font-size: 1.02rem;
+}
+
+.palomar-foundation .quick-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .quick-tool-card {
+  display: block;
+  text-decoration: none;
+  background: #13253b;
+  border: 1px solid #3b6186;
+  border-radius: 14px;
+  padding: 1rem;
+  transition: 0.2s;
+
+  h3 {
+    margin: 0 0 0.35rem 0;
+    color: #9ed4ff;
+    font-size: 1.08rem;
+  }
+
+  p {
+    margin: 0;
+    color: #d9e7f6;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: #5f90bf;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  }
+}
+
+.palomar-foundation .community-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .community-impact-card {
+  background: #14263c;
+  border: 1px solid #2f4f71;
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.palomar-foundation .community-impact-value {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.palomar-foundation .community-impact-label {
+  margin: 0.35rem 0 0 0;
+  color: #cfe0f2;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.palomar-foundation .news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .news-card {
+  background: #13253b;
+  border: 1px solid #3b6186;
+  border-radius: 14px;
+  padding: 1rem;
+
+  h3 {
+    margin: 0 0 0.4rem 0;
+    color: #9ed4ff;
+    font-size: 1.08rem;
+    line-height: 1.45;
+  }
+
+  p {
+    margin: 0;
+    color: #d9e7f6;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .btn-secondary {
+    margin-top: 0.8rem;
+  }
+}
+
+.palomar-foundation .news-date {
+  margin: 0 0 0.35rem 0;
+  color: #ffd48a;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
 }
 
 .palomar-foundation .community-gallery-grid {
@@ -416,6 +662,184 @@ $foundation-card-bg: #142338;
   margin: 0.5rem 0 0 0;
   color: $foundation-muted;
   font-size: 0.98rem;
+}
+
+
+// PATIENT STORIES
+.palomar-foundation .story-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .story-card {
+  background: #13253b;
+  border: 1px solid #3f648a;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+
+  h3 {
+    margin: 0 0 0.55rem 0;
+    color: #9ed4ff;
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  p {
+    margin: 0;
+    color: #d9e7f6;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+}
+
+.palomar-foundation .story-results {
+  margin: 0.7rem 0;
+  padding-left: 1rem;
+  color: #cfe0f2;
+  font-size: 0.95rem;
+  line-height: 1.55;
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+}
+
+.palomar-foundation .story-impact-label {
+  margin-top: 0.2rem;
+  color: #ffd48a;
+  font-weight: 750;
+}
+
+.palomar-foundation .story-impact-copy {
+  margin-top: 0.3rem;
+}
+
+
+// COMMUNITY VOICES
+.palomar-foundation .voice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .voice-card {
+  background: #13253b;
+  border: 1px solid #3f648a;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+
+  h3 {
+    margin: 0 0 0.55rem 0;
+    color: #a9dcff;
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  p {
+    margin: 0;
+    color: #d9e7f6;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+}
+
+.palomar-foundation .voice-impact-label {
+  margin-top: 0.65rem;
+  color: #ffd48a;
+  font-weight: 750;
+}
+
+.palomar-foundation .voice-impact-copy {
+  margin-top: 0.3rem;
+}
+
+
+// PROGRAM IMPACT
+.palomar-foundation .program-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .program-impact-card-detail {
+  background: #13253b;
+  border: 1px solid #3b6186;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+
+  h3 {
+    margin: 0 0 0.35rem 0;
+    color: #8dcdfa;
+    font-size: 1.12rem;
+  }
+}
+
+.palomar-foundation .program-impact-audience {
+  margin: 0 0 0.65rem 0;
+  color: #ffd48a;
+  font-size: 0.92rem;
+}
+
+.palomar-foundation .program-impact-list {
+  margin: 0;
+  padding-left: 1rem;
+  color: #cfdeee;
+  font-size: 0.95rem;
+  line-height: 1.55;
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+}
+
+.palomar-foundation .program-impact-outcome {
+  margin: 0.7rem 0 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px dashed #476a8f;
+  color: #e6eff8;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+
+// ANNUAL REPORT
+.palomar-foundation .annual-report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.palomar-foundation .annual-report-card {
+  background: #13253b;
+  border: 1px solid #3b6186;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+
+  h3 {
+    margin: 0 0 0.55rem 0;
+    color: #9ed4ff;
+    font-size: 1.08rem;
+  }
+
+  p {
+    margin: 0;
+    color: #d9e7f6;
+    font-size: 0.96rem;
+    line-height: 1.6;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1rem;
+    color: #cfdeee;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  li {
+    margin-bottom: 0.35rem;
+  }
 }
 
 // DONATION IMPACT SECTION
@@ -622,6 +1046,17 @@ $foundation-card-bg: #142338;
     padding: 2.5rem 1.25rem;
   }
 
+  .palomar-foundation .hero-main-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .palomar-foundation .btn-main-action {
+    min-height: 60px;
+    font-size: 0.92rem;
+    padding: 0.72rem 0.7rem;
+  }
+
   .palomar-foundation .home-snapshot {
     padding: 0.95rem;
   }
@@ -670,21 +1105,29 @@ $foundation-card-bg: #142338;
 
   .palomar-foundation .palomar-topbar-actions {
     gap: 0.35rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
   }
 
   .palomar-foundation .palomar-topbar-actions .btn-primary,
   .palomar-foundation .palomar-topbar-actions .btn-secondary {
-    padding: 0.38rem 0.55rem;
-    font-size: 0.76rem;
+    padding: 0.34rem 0.5rem;
+    font-size: 0.72rem;
   }
 
-  .palomar-foundation .hero-cta-group {
-    flex-direction: column;
-    align-items: stretch;
+  .palomar-foundation .top-nav-dropdown {
+    min-width: 230px;
   }
 
-  .palomar-foundation .hero-cta-group a {
-    text-align: center;
+  .palomar-foundation .story-grid,
+  .palomar-foundation .quick-tools-grid,
+  .palomar-foundation .community-impact-grid,
+  .palomar-foundation .news-grid,
+  .palomar-foundation .voice-grid,
+  .palomar-foundation .program-impact-grid,
+  .palomar-foundation .annual-report-grid {
+    grid-template-columns: 1fr;
   }
 
 }
