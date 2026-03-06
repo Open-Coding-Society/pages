@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Poway Veterans Organization — Website Redesign Infographic"
-description: "n analysis of powayveterans.org and a 7-phase roadmap to transform it from an information site into a guided local support portal for veterans, families, volunteers, and donors."
+description: "An analysis of powayveterans.org and a 7-phase roadmap to transform it from an information site into a guided local support portal for veterans, families, volunteers, and donors."
 date: 2026-03-06
 author: "Capstone Student"
 categories: [capstone, web-analysis, nonprofit, veterans]
