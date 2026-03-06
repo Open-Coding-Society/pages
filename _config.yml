@@ -18,10 +18,10 @@
 title: Open Coding 
 description: "Class of 2026"
 owner_name: Binary Beasts 
-github_username: whitelunarium 
-github_repo: "BB_Frontend" 
-url: "https://whitelunarium.github.io"
-baseurl: "/BB_Frontend" 
+github_username: svaka2000 
+github_repo: "BB_Frontend2" 
+url: "https://svaka2000.github.io"
+baseurl: "/BB_Frontend2" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
