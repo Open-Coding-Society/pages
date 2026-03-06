@@ -2,12 +2,12 @@
 // Located in _sass/capstone/
 
 
-// Variables - Updated to match logo colors
-$wp-primary: #c680ff;        // Coral/salmon pink from "WAY"
-$wp-secondary: #497dee;      // Blue from "FINDING"
-$wp-accent: #ffffff;         // White from "PAGES"
-$wp-dark-bg: #000000;        // Pure black background
-$wp-card-bg: #0a0a0a;        // Slightly lighter black for cards
+// Variables - Updated to match Palomar Health Foundation logo colors
+$wp-primary: #e8614a;        // Coral/salmon red from "Palomar" text and heart
+$wp-secondary: #5dcfcf;      // Teal/cyan from "Health" text
+$wp-accent: #ffffff;         // White
+$wp-dark-bg: #0a0a1a;        // Deep dark navy from logo background
+$wp-card-bg: #0f0f2a;        // Slightly lighter navy for cards
 $wp-text-muted: #b0b0b0;
 $wp-text-light: #e8e8e8;
 
@@ -25,7 +25,7 @@ $wp-text-light: #e8e8e8;
 .wp-header {
  text-align: center;
  padding: 3rem 2rem;
- background: linear-gradient(135deg, $wp-dark-bg 0%, #1a1a1a 50%, #0d0d0d 100%);
+ background: linear-gradient(135deg, $wp-dark-bg 0%, #1a1a3a 50%, #0d0d20 100%);
  border-radius: 24px;
  margin-bottom: 2rem;
  border: 1px solid rgba($wp-primary, 0.3);
@@ -77,7 +77,7 @@ $wp-text-light: #e8e8e8;
 
 // Card Section
 .wp-card {
- background: linear-gradient(145deg, $wp-card-bg 0%, #151515 100%);
+ background: linear-gradient(145deg, $wp-card-bg 0%, #151530 100%);
  border-radius: 24px;
  padding: 2.5rem;
  margin-bottom: 2rem;
