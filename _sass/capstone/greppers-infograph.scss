@@ -1,0 +1,318 @@
+// Greppers (SFI) Infographic Styles
+
+$sfi-red: #c0392b;
+$sfi-orange: #e67e22;
+$sfi-dark: #0d0d0f;
+$sfi-card: #141418;
+$sfi-border: rgba(192, 57, 43, 0.3);
+$sfi-muted: #8a8a9a;
+$sfi-light: #dcdce8;
+
+.sfi-infograph {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 2rem 1rem;
+	color: $sfi-light;
+	font-family: "Barlow", sans-serif;
+}
+
+.sfi-header {
+	text-align: center;
+	padding: 3.5rem 2rem;
+	background: linear-gradient(135deg, #0d0d0f 0%, #1a0a08 50%, #0d0d0f 100%);
+	border-radius: 20px;
+	border: 1px solid $sfi-border;
+	margin-bottom: 2.5rem;
+	position: relative;
+	overflow: hidden;
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: repeating-linear-gradient(
+			-45deg,
+			transparent,
+			transparent 18px,
+			rgba(192, 57, 43, 0.03) 18px,
+			rgba(192, 57, 43, 0.03) 19px
+		);
+		pointer-events: none;
+	}
+}
+
+.sfi-badge {
+	display: inline-block;
+	background: linear-gradient(135deg, $sfi-red, $sfi-orange);
+	color: #fff;
+	padding: 0.45rem 1.4rem;
+	border-radius: 50px;
+	font-family: "Barlow Condensed", sans-serif;
+	font-weight: 700;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	margin-bottom: 1.5rem;
+}
+
+.sfi-title {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 3rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	background: linear-gradient(90deg, $sfi-red, $sfi-orange, $sfi-red);
+	background-size: 200% auto;
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: sfi-gradient 4s ease infinite;
+	margin-bottom: 1rem;
+}
+
+@keyframes sfi-gradient {
+	0% {
+		background-position: 0% center;
+	}
+	50% {
+		background-position: 100% center;
+	}
+	100% {
+		background-position: 0% center;
+	}
+}
+
+.sfi-desc {
+	color: $sfi-muted;
+	font-size: 1.05rem;
+	line-height: 1.75;
+	max-width: 850px;
+	margin: 0 auto;
+}
+
+.sfi-card {
+	background: linear-gradient(145deg, $sfi-card 0%, #1a1a22 100%);
+	border-radius: 20px;
+	padding: 2.5rem;
+	margin-bottom: 2rem;
+	border: 2px solid $sfi-border;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.sfi-card-grid {
+	display: grid;
+	grid-template-columns: 230px 1fr 1fr;
+	gap: 1.75rem;
+	align-items: stretch;
+
+	@media (max-width: 1024px) {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	@media (max-width: 700px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.sfi-visual {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.5rem;
+	background: rgba(0, 0, 0, 0.25);
+	border-radius: 14px;
+	border: 1px solid $sfi-border;
+}
+
+.sfi-icon-wrap {
+	width: 100%;
+	aspect-ratio: 1;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 5rem;
+	background: rgba(192, 57, 43, 0.1);
+	border: 1px solid $sfi-border;
+}
+
+.sfi-status {
+	background: linear-gradient(135deg, $sfi-red, $sfi-orange);
+	color: #fff;
+	padding: 0.4rem 1.1rem;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-family: "Barlow Condensed", sans-serif;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-align: center;
+}
+
+.sfi-team {
+	text-align: center;
+	margin-top: auto;
+}
+
+.sfi-team-label {
+	display: block;
+	color: #666;
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin-bottom: 0.2rem;
+}
+
+.sfi-team-name {
+	display: block;
+	color: $sfi-red;
+	font-weight: 700;
+	font-size: 0.95rem;
+}
+
+.sfi-content {
+	display: flex;
+	flex-direction: column;
+	padding: 1.25rem;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 14px;
+	border: 1px solid $sfi-border;
+}
+
+.sfi-project-title {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 1.65rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	color: #fff;
+	margin-bottom: 0.2rem;
+}
+
+.sfi-subtitle {
+	color: $sfi-red;
+	font-size: 0.9rem;
+	font-weight: 600;
+	margin-bottom: 1.1rem;
+	padding-bottom: 0.9rem;
+	border-bottom: 1px solid $sfi-border;
+}
+
+.sfi-keypoints {
+	display: flex;
+	flex-direction: column;
+	gap: 0.55rem;
+	margin-bottom: 1.1rem;
+	flex-grow: 1;
+}
+
+.sfi-keypoint {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	color: $sfi-light;
+	font-size: 0.88rem;
+	line-height: 1.4;
+}
+
+.sfi-check {
+	color: $sfi-red;
+	font-weight: 900;
+	flex-shrink: 0;
+}
+
+.sfi-tech-stack {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+	margin-top: auto;
+}
+
+.sfi-tech-tag {
+	background: rgba(192, 57, 43, 0.12);
+	color: $sfi-orange;
+	padding: 0.3rem 0.65rem;
+	border-radius: 6px;
+	font-size: 0.72rem;
+	font-weight: 600;
+	border: 1px solid rgba(192, 57, 43, 0.25);
+	font-family: "Barlow Condensed", sans-serif;
+	letter-spacing: 0.5px;
+}
+
+.sfi-details {
+	display: flex;
+	flex-direction: column;
+	padding: 1.25rem;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 14px;
+	border: 1px solid $sfi-border;
+}
+
+.sfi-section-title {
+	color: #fff;
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 0.95rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin: 0 0 0.7rem;
+	padding-bottom: 0.45rem;
+	border-bottom: 2px solid $sfi-border;
+}
+
+.sfi-about {
+	color: $sfi-muted;
+	font-size: 0.85rem;
+	line-height: 1.65;
+	margin: 0 0 1.2rem;
+}
+
+.sfi-impact-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	margin-bottom: 1.25rem;
+	flex-grow: 1;
+}
+
+.sfi-impact-item {
+	background: rgba(192, 57, 43, 0.08);
+	color: $sfi-light;
+	padding: 0.45rem 0.7rem;
+	border-radius: 6px;
+	font-size: 0.8rem;
+	border-left: 3px solid $sfi-red;
+}
+
+.sfi-btn {
+	display: inline-block;
+	background: linear-gradient(135deg, $sfi-red, $sfi-orange);
+	color: #fff;
+	padding: 0.7rem 1.4rem;
+	border-radius: 10px;
+	font-family: "Barlow Condensed", sans-serif;
+	font-weight: 700;
+	font-size: 0.95rem;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-decoration: none;
+	text-align: center;
+	transition: transform 0.2s, box-shadow 0.2s;
+	margin-top: auto;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba(192, 57, 43, 0.45);
+		color: #fff;
+		text-decoration: none;
+	}
+}
+
+.sfi-divider {
+	text-align: center;
+	padding: 1rem 0 2rem;
+	color: rgba(192, 57, 43, 0.4);
+	font-size: 1.5rem;
+	letter-spacing: 0.5rem;
+}
