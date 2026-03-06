@@ -7,4 +7,4 @@ permalink: /capstone/palomarhealth/
 sticky_rank: 1
 ---
 
-{% include palomarhealth-capstone-infograph.html %}
+{% include capstones/palomarhealth-capstone-infograph.html %}

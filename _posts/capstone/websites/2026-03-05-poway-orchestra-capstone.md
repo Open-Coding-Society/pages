@@ -7,4 +7,4 @@ permalink: /capstone/powayorchestra/
 sticky_rank: 1
 ---
 
-{% include powayorchestra-capstone-infograph.html %}
+{% include capstones/powayorchestra-capstone-infograph.html %}
