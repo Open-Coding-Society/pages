@@ -82,7 +82,7 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { login, pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     let signupFormData = {};
     let validationTimeout = null;
@@ -254,41 +254,62 @@ show_reading_time: false
     });
 
     // Function to handle both Python and Java login simultaneously
-    window.loginBoth = function () {
-        // Wrap both logins in Promises and only redirect after both finish
-        let javaPromise = new Promise((resolve) => {
-            window.javaLogin(resolve);
-        });
-        let pythonPromise = new Promise((resolve) => {
-            window.pythonLogin(resolve);
-        });
-        Promise.allSettled([javaPromise, pythonPromise]).then(() => {
-            // Only redirect after both have completed (success or fail)
+    window.loginBoth = async function () {
+        const [javaResult, pythonResult] = await Promise.allSettled([
+            window.javaLogin(),
+            window.pythonLogin()
+        ]);
+
+        const javaOk = javaResult.status === "fulfilled" && javaResult.value === true;
+        const pythonOk = pythonResult.status === "fulfilled" && pythonResult.value === true;
+
+        if (javaOk || pythonOk) {
             window.location.href = '{{site.baseurl}}/profile';
-        });
+            return;
+        }
+
+        if (!document.getElementById("message").textContent) {
+            document.getElementById("message").textContent = "Login failed. Check credentials and try again.";
+        }
     };
     // Function to handle Python login
-    window.pythonLogin = function (done) {
-        const options = {
-            URL: `${pythonURI}/api/authenticate`,
-            callback: function() {
-                pythonDatabase();
-                if (done) done();
-            },
-            message: "message",
-            method: "POST",
-            cache: "no-cache",
-            body: {
-                uid: document.getElementById("uid").value,
-                password: document.getElementById("password").value,
+    window.pythonLogin = async function () {
+        const uid = document.getElementById("uid").value;
+        const password = document.getElementById("password").value;
+        const endpoints = [`${pythonURI}/api/authenticate`, `${pythonURI}/authenticate`];
+        let lastError = "Unable to reach Flask authentication service.";
+
+        for (const endpoint of endpoints) {
+            try {
+                const response = await fetch(endpoint, {
+                    ...fetchOptions,
+                    method: "POST",
+                    cache: "no-cache",
+                    body: JSON.stringify({ uid, password })
+                });
+
+                if (response.ok) {
+                    await pythonDatabase();
+                    return true;
+                }
+
+                const errorText = await response.text();
+                lastError = `Flask login failed (${response.status})${errorText ? `: ${errorText}` : ""}`;
+
+                // Fallback endpoint only helps if the route is missing.
+                if (response.status !== 404 && response.status !== 405) {
+                    break;
+                }
+            } catch (error) {
+                lastError = `Flask login error: ${error.message}`;
             }
-        };
-        login(options);
-        // If login() is not async, call done() immediately
-        // if (done) done();
+        }
+
+        document.getElementById("message").textContent = lastError;
+        return false;
     }
     // Function to handle Java login
-    window.javaLogin = function (done) {
+    window.javaLogin = function () {
         const loginURL = `${javaURI}/authenticate`;
         const databaseURL = `${javaURI}/api/person/get`;
         const signupURL = `${javaURI}/api/person/create`;
@@ -302,7 +323,7 @@ show_reading_time: false
             body: userCredentials,
         };
         console.log("Attempting Java login...");
-        fetch(loginURL, loginOptions)
+        return fetch(loginURL, loginOptions)
             .then(response => {
                 if (!response.ok) {
                     throw new Error("Invalid login");
@@ -323,7 +344,7 @@ show_reading_time: false
             })
             .then(data => {
                 console.log("Java database response:", data);
-                if (done) done();
+                return true;
             })
             .catch(error => {
                 console.error("Login failed:", error.message);
@@ -343,7 +364,7 @@ show_reading_time: false
                         method: "POST",
                         body: signupData,
                     };
-                    fetch(signupURL, signupOptions)
+                    return fetch(signupURL, signupOptions)
                         .then(signupResponse => {
                             if (!signupResponse.ok) {
                                 throw new Error("Account creation failed!");
@@ -371,26 +392,32 @@ show_reading_time: false
                         })
                         .then(data => {
                             console.log("Java database response:", data);
-                            if (done) done();
+                            return true;
                         })
                         .catch(newLoginError => {
                             console.error("Error after account creation:", newLoginError.message);
-                            if (done) done();
+                            return false;
                         });
                 } else {
                     console.log("Logged in!");
-                    if (done) done();
+                    return false;
                 }
             });
     };
     // Function to fetch and display Python data
     function pythonDatabase() {
-        // Skip the /api/id fetch due to CORS restrictions with credentials mode.
-        // The user is already authenticated (token in cookie), so just redirect to profile.
-        console.log("Authentication successful, redirecting to profile...");
-        setTimeout(() => {
-            window.location.href = '{{site.baseurl}}/profile';
-        }, 1000);
+        const URL = `${pythonURI}/api/id`;
+        return fetch(URL, fetchOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Flask server response: ${response.status}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                document.getElementById("message").textContent = `Error: ${error.message}`;
+                throw error;
+            });
     }  
     window.signup = function () {
         const signupButton = document.querySelector(".signup-card button");
