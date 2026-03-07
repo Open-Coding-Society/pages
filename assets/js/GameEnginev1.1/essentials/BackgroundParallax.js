@@ -1,4 +1,5 @@
 import Background from './Background.js';
+import { Transform } from './Transform.js';
 
 /** Parallax Background GameObject
  * - Tiling: draw multiple of the image to fill the gameCanvas extents
@@ -26,6 +27,14 @@ export class BackgroundParallax extends Background {
         this.velocity = data.velocity || { x: 0, y: 0 };
         this.tiles = data.tiles || null; // Optional: { x: num, y: num } to control tiling
         this.scaleToFit = data.scaleToFit || null; // Optional: 'width' or 'height' to scale image instead of tile
+        
+        // Create Transform instance for position management
+        this.transform = new Transform(this.position.x, this.position.y);
+        this.transform.xv = this.velocity.x;
+        this.transform.yv = this.velocity.y;
+        if (data.speed !== undefined) {
+            this.transform.speed = data.speed;
+        }
         
         // Store reference to parent's onload to extend it
         const parentOnload = this.image.onload;
@@ -80,6 +89,25 @@ export class BackgroundParallax extends Background {
 
         // Draw the background image
         this.draw();
+    }
+
+    /**
+     * Update position based on velocity with friction (from Transform.js).
+     * This method applies a friction/damping factor to the velocity and updates the position.
+     */
+    updatePosition() {
+        // Sync velocity to transform
+        this.transform.xv = this.velocity.x;
+        this.transform.yv = this.velocity.y;
+        
+        // Use Transform's updatePosition method
+        this.transform.updatePosition();
+        
+        // Sync position and velocity back from transform
+        this.position.x = this.transform.x;
+        this.position.y = this.transform.y;
+        this.velocity.x = this.transform.xv;
+        this.velocity.y = this.transform.yv;
     }
 
     /**

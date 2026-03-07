@@ -1,4 +1,5 @@
 import GameObject from './GameObject.js';
+import { Transform } from './Transform.js';
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
@@ -75,6 +76,12 @@ class Character extends GameObject {
         this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
         this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
         this.position = data.INIT_POSITION || INIT_POSITION;
+        
+        // Create Transform instance for position management
+        this.transform = new Transform(this.position.x, this.position.y);
+        if (data.SPEED !== undefined) {
+            this.transform.speed = data.SPEED;
+        }
         
         // Always set spriteData, even if there's no sprite sheet
         this.spriteData = data;
@@ -383,6 +390,25 @@ class Character extends GameObject {
         this.height = this.size;
     }
     
+
+    /**
+     * Update position based on velocity with friction (from Transform.js).
+     * This method applies a friction/damping factor to the velocity and updates the position.
+     */
+    updatePosition() {
+        // Sync velocity to transform
+        this.transform.xv = this.velocity.x;
+        this.transform.yv = this.velocity.y;
+        
+        // Use Transform's updatePosition method
+        this.transform.updatePosition();
+        
+        // Sync position back from transform
+        this.position.x = this.transform.x;
+        this.position.y = this.transform.y;
+        this.velocity.x = this.transform.xv;
+        this.velocity.y = this.transform.yv;
+    }
 
     /* Destroy Game Object
      * remove canvas element of object

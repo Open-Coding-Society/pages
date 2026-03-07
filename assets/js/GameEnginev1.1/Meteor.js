@@ -21,6 +21,17 @@ class Meteor extends Character {
       y: 1.5 + Math.random() * 1,
     }
 
+    // Update Transform instance with new position
+    this.transform.x = this.position.x;
+    this.transform.y = this.position.y;
+    this.transform.spawnX = this.position.x;
+    this.transform.spawnY = this.position.y;
+    this.transform.xv = this.velocity.x;
+    this.transform.yv = this.velocity.y;
+    if (data.SPEED !== undefined) {
+      this.transform.speed = data.SPEED;
+    }
+
     this.isHit = false
 
     console.log(`Created meteor at position (${this.position.x}, ${this.position.y})`)
