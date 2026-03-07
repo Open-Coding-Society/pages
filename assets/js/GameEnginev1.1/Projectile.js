@@ -17,6 +17,15 @@ class Projectile extends Character {
         this.delayStartTime = null;
         this._pausedAt = null;
         this._pausedAccum = 0;
+        
+        // Update Transform instance with calculated start position
+        this.transform.x = this.startPosition.x;
+        this.transform.y = this.startPosition.y;
+        this.transform.spawnX = this.startPosition.x;
+        this.transform.spawnY = this.startPosition.y;
+        if (data.SPEED !== undefined) {
+            this.transform.speed = data.SPEED;
+        }
     }
 
     /**

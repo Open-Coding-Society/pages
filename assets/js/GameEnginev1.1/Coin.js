@@ -1,5 +1,6 @@
 import GameObject from './essentials/GameObject.js';
 import Player from './essentials/Player.js';
+import { Transform } from './essentials/Transform.js';
 
 class Coin extends GameObject {
 	constructor(data = null, gameEnv = null) {
@@ -16,6 +17,12 @@ class Coin extends GameObject {
 		this.y = Number(data?.INIT_POSITION?.y ?? 0);
 		this.hitbox = data?.hitbox || { widthPercentage: 0.0, heightPercentage: 0.0 };
 		this.spriteData = { id: data?.id || 'coin', greeting: false, reaction: null };
+
+		// Create Transform instance for position management
+		this.transform = new Transform(this.x, this.y);
+		if (data?.speed !== undefined) {
+			this.transform.speed = data.speed;
+		}
 
 		this.canvas = document.createElement('canvas');
 		this.canvas.id = this.spriteData.id;

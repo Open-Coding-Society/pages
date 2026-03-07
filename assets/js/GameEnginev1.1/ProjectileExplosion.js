@@ -14,6 +14,15 @@ class ProjectileExplosion extends Character {
         this.endScaleFactor = data.EXPLOSION_SCALE_FACTOR;
         this._pausedAt = null;
         this._pausedAccum = 0;
+        
+        // Update Transform instance with explosion position
+        this.transform.x = this.position.x;
+        this.transform.y = this.position.y;
+        this.transform.spawnX = this.position.x;
+        this.transform.spawnY = this.position.y;
+        if (data.SPEED !== undefined) {
+            this.transform.speed = data.SPEED;
+        }
     }
 
     /**
