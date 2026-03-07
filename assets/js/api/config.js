@@ -45,8 +45,7 @@ export const fetchOptions = {
     cache: 'default', // Default caching behavior
     credentials: 'include', // Include credentials (cookies, etc.)
     headers: {
-        'Content-Type': 'application/json',
-        'X-Origin': 'client' // Custom header to identify source
+        'Content-Type': 'application/json'
     },
 };
 
