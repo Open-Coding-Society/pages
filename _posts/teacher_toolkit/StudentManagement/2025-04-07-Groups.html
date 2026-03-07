@@ -1510,7 +1510,21 @@ window.generateSmartGroups = async function() {
     if (!peopleResp.ok) throw new Error('Failed to fetch people');
     const allPeople = await peopleResp.json();
 
-    const studentsInClass = allPeople;
+    const groupsInPeriod = allGroups.filter(g =>
+      String(g.period) === String(period) && g.course === course
+    );
+
+    const seenIds = new Set();
+    const studentsInClass = [];
+
+    groupsInPeriod.forEach(g => {
+      (g.members || []).forEach(m => {
+        if (!seenIds.has(m.id)) {
+          seenIds.add(m.id);
+          studentsInClass.push(m);
+        }
+      });
+    });
 
     if (studentsInClass.length < groupSize) {
       alert(`Not enough students in Period ${period} ${course}. Found ${studentsInClass.length}, need at least ${groupSize}.`);
