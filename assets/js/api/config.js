@@ -4,13 +4,31 @@
 // ^^ Do not remove the above front matter, it is required for Jekyll processing
 
 export const baseurl = "{{ site.baseurl }}";
+const configuredPythonURI = "{{ site.python_uri | default: 'https://flask.opencodingsociety.com' }}";
+const configuredJavaURI = "{{ site.java_uri | default: 'https://spring.opencodingsociety.com' }}";
+
+function getOverrideURI(paramName, storageKey) {
+    const fromWindow = typeof window !== "undefined" ? window[paramName] : null;
+    if (fromWindow && typeof fromWindow === "string") return fromWindow;
+
+    const fromQuery = new URLSearchParams(window.location.search).get(storageKey);
+    if (fromQuery) return fromQuery;
+
+    try {
+        const fromStorage = window.localStorage.getItem(storageKey);
+        if (fromStorage) return fromStorage;
+    } catch (e) {
+        // Ignore storage access errors and use defaults.
+    }
+
+    return null;
+}
 
 export var pythonURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     pythonURI = "http://localhost:8587";  // Same URI for localhost or 127.0.0.1
 } else {
-    pythonURI = "https://flask.opencodingsociety.com";
-
+    pythonURI = getOverrideURI("PYTHON_URI", "pythonURI") || configuredPythonURI;
 }
 
 export var javaURI;
@@ -18,7 +36,7 @@ export var javaURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         javaURI = "http://localhost:8585";
 } else {
-    javaURI = "https://spring.opencodingsociety.com";
+    javaURI = getOverrideURI("JAVA_URI", "javaURI") || configuredJavaURI;
 }
 
 export const fetchOptions = {

@@ -22,6 +22,8 @@ github_username: svaka2000
 github_repo: "BB_Frontend2" 
 url: "https://svaka2000.github.io"
 baseurl: "/BB_Frontend2" 
+python_uri: "https://flask.opencodingsociety.com"
+java_uri: "https://spring.opencodingsociety.com"
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
