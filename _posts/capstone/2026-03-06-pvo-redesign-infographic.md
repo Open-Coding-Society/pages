@@ -10,9 +10,6 @@ image: /images/capstone/pvo_redesign_infographic.png
 permalink: /capstone/pvo-redesign-infographic/
 ---
 
-{% include pvo_infographic.html %}
-
----
 
 ## About This Analysis
 
