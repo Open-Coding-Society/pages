@@ -260,16 +260,21 @@ show_reading_time: false
             window.pythonLogin()
         ]);
 
-        const javaOk = javaResult.status === "fulfilled" && javaResult.value === true;
         const pythonOk = pythonResult.status === "fulfilled" && pythonResult.value === true;
 
-        if (javaOk || pythonOk) {
+        if (pythonOk) {
             window.location.href = '{{site.baseurl}}/profile';
             return;
         }
 
+        const javaOk = javaResult.status === "fulfilled" && javaResult.value === true;
+        if (javaOk) {
+            document.getElementById("message").textContent = "Spring login succeeded, but Flask login failed. Use Sign Up to create/save your Flask account.";
+            return;
+        }
+
         if (!document.getElementById("message").textContent) {
-            document.getElementById("message").textContent = "Login failed. Check credentials and try again.";
+            document.getElementById("message").textContent = "Login failed on Flask. Check credentials or use Sign Up.";
         }
     };
     // Function to handle Python login
@@ -452,7 +457,7 @@ show_reading_time: false
         console.log("Sending this data to Flask:", JSON.stringify(data, null, 2));
         console.log("Request URL:", `${pythonURI}/api/user`);
 
-        // Flask Backend Request
+        // Flask Backend Request: primary route with guest fallback if GitHub validation fails
         const flaskPromise = fetch(`${pythonURI}/api/user`, {
             method: "POST",
             headers: {
@@ -460,16 +465,43 @@ show_reading_time: false
             },
             body: JSON.stringify(data)
         })
-        .then(response => {
+        .then(async response => {
             if (response.ok) {
                 updateBackendStatus('flask', 'success');
                 return response.json();
-            } else {
-                return response.text().then(errorText => {
-                    console.log("Flask error details:", errorText);
-                    throw new Error(`Flask: ${response.status} - ${errorText}`);
-                });
             }
+
+            const errorText = await response.text();
+            console.log("Flask primary signup error details:", errorText);
+
+            const shouldFallbackToGuest =
+                response.status === 404 ||
+                (errorText && errorText.toLowerCase().includes("not a valid github account"));
+
+            if (!shouldFallbackToGuest) {
+                throw new Error(`Flask: ${response.status} - ${errorText}`);
+            }
+
+            console.log("Falling back to guest signup endpoint...");
+            const guestPayload = {
+                uid: data.uid,
+                password: data.password
+            };
+            const guestResponse = await fetch(`${pythonURI}/api/user/guest`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(guestPayload)
+            });
+
+            if (!guestResponse.ok) {
+                const guestError = await guestResponse.text();
+                throw new Error(`Flask guest: ${guestResponse.status} - ${guestError}`);
+            }
+
+            updateBackendStatus('flask', 'success');
+            return guestResponse.json();
         })
         .catch(error => {
             console.error("Flask signup error:", error);
