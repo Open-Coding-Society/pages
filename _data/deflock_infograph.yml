@@ -21,8 +21,9 @@ Topics:
     impact:
       - "Currently, there is a massive bipartisan push to implement surveillance systems to track people and stifle dissent (e.g., ID verification, ALPRs, etc.)."
       - "The City of San Diego was one of the first adopters of the Flock surveillance system, despite massive backlash. They still continue to use the surveillance system to violate civil liberties."
-      - "Both Flock and the City of San Diego openly collaborates with ICE and other external agencies, sharing tracking data."
+      - "Both Flock and the City of San Diego openly collaborate with ICE and other external agencies, sharing tracking data without consent."
       - "Flock was contracted to skirt constitutional protections which would have otherwise prevented the systems from being implemented. There has been a plethora of abuses (e.g. tracking women who have had abortions over state lines, stalking, etc.) and an even larger repertoire of security vulnerabilities which allow people to simply log in and watch cameras."
+      - "Flock has been known to outright lie about their surveillance. For example, they previously made a claim that they don't track pedestrians, yet security researchers found that the cameras would intentionally pan towards people walking by and even zoom in on their phone screens to snoop."
     status: "Active"
     team:
       - "TheFlockers (Adhav, Lucas, Perry)"
