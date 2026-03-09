@@ -1,6 +1,7 @@
 title: Community Health Foundation
 hero:
   headline: Exceptional Care for North San Diego County.
+  brand_promise: Connect with a doctor who understands you.
   support_text: Palomar Health provides advanced medical care, emergency services, and community health programs supporting families across North San Diego County.
 
 description: Supporting healthcare programs that improve lives across our community.
@@ -82,7 +83,7 @@ top_navigation:
       - label: Patient Stories
         link: /stories
         reveal: patient-stories
-  - label: Community
+  - label: Community Impact
     link: "#community-programs"
     variant: secondary
     reveal: community-programs
@@ -213,6 +214,17 @@ impact_stats:
     label: Raised for local healthcare programs and outreach
   - value: "18"
     label: Programs supported for prevention, recovery, and education
+
+recognition_awards:
+  - badge: Patient Safety
+    title: Strong Hospital Safety Recognition
+    description: Palomar Health highlights recognized safety performance and quality-focused care practices that help patients feel more confident when choosing where to receive treatment.
+  - badge: National Quality
+    title: Award-Winning Clinical Programs
+    description: National and regional recognitions reinforce Palomar Health's reputation for high standards in specialized care, patient outcomes, and operational excellence.
+  - badge: Trusted Care
+    title: Community Confidence and Reliability
+    description: Recognition and public accountability help demonstrate that the system delivers reliable care across emergency, specialty, and community health services.
 
 patient_stories:
   - title: Weight Loss Surgery Success - Charlene Patterson

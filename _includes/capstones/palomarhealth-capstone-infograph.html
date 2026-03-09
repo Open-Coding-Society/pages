@@ -26,6 +26,9 @@
   <section class="hero" id="home">
     <div class="hero-content">
       <h1>{{ data.hero.headline | default: data.title }}</h1>
+      {% if data.hero.brand_promise %}
+      <p class="mission-statement">{{ data.hero.brand_promise }}</p>
+      {% endif %}
 
       {% assign hero_photo = data.homepage_gallery | first %}
       {% if hero_photo %}
@@ -56,9 +59,24 @@
 
   <section class="blank-view reveal-topic is-hidden" id="blank-view" aria-label="Blank content view"></section>
 
+  <!-- QUICK PATIENT TOOLS -->
+  <section class="quick-tools home-only" id="quick-tools">
+    <h2>Quick Patient Actions</h2>
+    <p class="section-intro">The fastest way to reach the tools patients use most for appointments, records, care teams, and urgent visits.</p>
+    <div class="quick-tools-grid">
+      {% for tool in data.quick_patient_tools %}
+      <a href="{{ tool.link | relative_url }}" class="quick-tool-card">
+        <h3>{{ tool.title }}</h3>
+        <p>{{ tool.description }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
   <!-- COMMUNITY IMPACT STATISTICS -->
   <section class="community-impact-stats home-only" id="community-impact-stats">
     <h2>Serving Our Community</h2>
+    <p class="section-intro">Palomar Health combines broad regional reach with everyday access to providers, emergency response, and specialized care.</p>
     <div class="community-impact-grid">
       {% for stat in data.community_impact_statistics %}
       <article class="community-impact-card">
@@ -142,6 +160,22 @@
         {% endfor %}
       </ul>
     </div>
+
+    <div class="subsection-block community-gallery-inline">
+      <h3 class="subsection-heading">Care in Action</h3>
+      <p class="subsection-intro">Visual stories help patients understand services, programs, and the people behind the care experience.</p>
+      <div class="community-gallery-grid">
+        {% for photo in data.photo_highlights %}
+        <article class="community-photo-card">
+          <img src="{{ site.baseurl }}/images/capstone/website_projects/{{ photo.file }}" alt="{{ photo.alt }}">
+          <div class="community-photo-content">
+            <h3>{{ photo.title }}</h3>
+            <p>{{ photo.description }}</p>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
   </section>
 
   <!-- PATIENT STORIES -->
@@ -205,6 +239,20 @@
   <section class="news-updates reveal-topic is-hidden" id="news-updates">
     <h2>News and Updates</h2>
     <p class="section-intro">Latest announcements, technology updates, events, and regional care developments.</p>
+
+    <div class="subsection-block recognition-inline">
+      <h3 class="subsection-heading">Recognition and Awards</h3>
+      <p class="subsection-intro">Quality ratings and national recognition help patients see the standards behind Palomar Health care.</p>
+      <div class="recognition-grid">
+        {% for item in data.recognition_awards %}
+        <article class="recognition-card">
+          <p class="recognition-tag">{{ item.badge }}</p>
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
 
     <div class="news-grid">
       {% for item in data.news_updates %}
