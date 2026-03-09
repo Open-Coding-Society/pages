@@ -188,6 +188,12 @@ comments: false
         // Show error state
         tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
       }
+    } else {
+      // No members in group - show empty state and reset stats
+      const tbody = document.getElementById('memberAnalyticsBody');
+      tbody.innerHTML = '<tr><td colspan="2" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
+      document.getElementById('statTotalMessages').textContent = 0;
+      document.getElementById('statTotalFiles').textContent = 0;
     }
 
     // Store group data for chat functionality
