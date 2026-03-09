@@ -5,7 +5,7 @@ Topics:
   - title: "Quantitative Trading Bot"
     subtitle: "ML + News Sentiment for short-term market prediction (DBR Capstone)"
     link: "/capstone/quant-trading-bot/"
-    image: "quant-trading-bot.png"
+    image: "/capstone/quant-trading-game.png"
     alt: "Quantitative Trading Bot capstone infographic preview image"
     status: "In Progress"
     team:
