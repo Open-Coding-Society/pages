@@ -74,7 +74,20 @@ class Character extends GameObject {
         this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
         this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
         this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
-        this.position = data.INIT_POSITION || INIT_POSITION;
+        
+        // Handle INIT_POSITION with percentage support (0.0-1.0 decimal)
+        const initPos = data.INIT_POSITION || INIT_POSITION;
+        // If values are between 0-1, treat as percentages; otherwise use as pixels
+        if (initPos.x >= 0 && initPos.x <= 1 && initPos.y >= 0 && initPos.y <= 1) {
+            // Convert decimal percentages to pixel positions
+            this.position = {
+                x: initPos.x * this.gameEnv.innerWidth,
+                y: initPos.y * this.gameEnv.innerHeight
+            };
+        } else {
+            // Use as pixel values (backward compatibility)
+            this.position = { ...initPos };
+        }
         
         // Always set spriteData, even if there's no sprite sheet
         this.spriteData = data;
@@ -369,6 +382,21 @@ class Character extends GameObject {
         // Set the object's width and height to the new size (object is a square)
         this.width = this.size;
         this.height = this.size;
+
+        // Ensure the object stays fully on screen after resize
+        // Clamp position to keep character visible
+        if (this.position.x + this.width > this.gameEnv.innerWidth) {
+            this.position.x = this.gameEnv.innerWidth - this.width;
+        }
+        if (this.position.y + this.height > this.gameEnv.innerHeight) {
+            this.position.y = this.gameEnv.innerHeight - this.height;
+        }
+        if (this.position.x < 0) {
+            this.position.x = 0;
+        }
+        if (this.position.y < 0) {
+            this.position.y = 0;
+        }
     }
     
 
