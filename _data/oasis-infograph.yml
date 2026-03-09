@@ -1,0 +1,39 @@
+# AutoTriage Capstone Infographic
+Title: "Oasis Pages Capstone"
+Description: "A community building game focused on growing individual relationships and creating a community from that. This project is in relation to the non profit San Diego Oasis"
+
+
+Topics:
+ - title: "Oasis Pages Capstone"
+   image: "capstone/oasis_logo.png"
+   link: "/capstone/oasis/"
+   alt: "Oasis Pages — Community Building Game for San Diego Oasis"
+   keyPoints:
+     - "Interactive community building game focused on relationship growth"
+     - "Individual relationship tracking and development mechanics"
+     - "Integration with San Diego Oasis non-profit mission"
+     - "Progressive community building from individual connections"
+     - "Engaging gameplay designed for older adult learners"
+     - "Web-based platform accessible to all community members"
+   subtitle: "Building Communities One Connection at a Time"
+   description: "A web-based community building game designed in partnership with the San Diego Oasis non-profit. The game centers on growing individual relationships as the foundation for creating a vibrant community. Players engage with various community members, developing connections through meaningful interactions and shared experiences. As individual relationships strengthen, the broader community flourishes, reflecting the real-world impact of personal connections in building strong communities. The game serves as both an educational tool and an interactive platform that aligns with Oasis's mission of promoting healthy aging through lifelong learning and community engagement."
+   tech:
+     - "JavaScript/HTML5 Game Engine"
+     - "Web-based Platform (Browser Compatible)"
+     - "Responsive Design for Accessibility"
+     - "Database for Relationship Tracking"
+     - "Progressive Web App (PWA) Support"
+     - "User Authentication and Progress Saving"
+   impact:
+     - "Promotes social connection among older adults"
+     - "Teaches community building principles through gameplay"
+     - "Supports San Diego Oasis's healthy aging mission"
+     - "Provides accessible digital engagement for diverse users"
+     - "Creates meaningful learning experiences through play"
+   status: "In Development"
+   team:
+     - "Spencer"
+     - "Nora"
+
+
+
