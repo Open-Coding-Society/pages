@@ -382,6 +382,21 @@ class Character extends GameObject {
         // Set the object's width and height to the new size (object is a square)
         this.width = this.size;
         this.height = this.size;
+
+        // Ensure the object stays fully on screen after resize
+        // Clamp position to keep character visible
+        if (this.position.x + this.width > this.gameEnv.innerWidth) {
+            this.position.x = this.gameEnv.innerWidth - this.width;
+        }
+        if (this.position.y + this.height > this.gameEnv.innerHeight) {
+            this.position.y = this.gameEnv.innerHeight - this.height;
+        }
+        if (this.position.x < 0) {
+            this.position.x = 0;
+        }
+        if (this.position.y < 0) {
+            this.position.y = 0;
+        }
     }
     
 
