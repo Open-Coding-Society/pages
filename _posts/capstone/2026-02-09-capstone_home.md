@@ -240,7 +240,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    <!-- Oasis Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url 2026-03-04-oasis-community-capstone %}">
-           <img src="/images/capstone/oasis.png" alt="Oasis Capstone" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/oasis-logo.png" alt="Oasis Capstone" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-oasis-community-capstone %}">Oasis</a></h3>
