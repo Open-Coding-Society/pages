@@ -18,8 +18,8 @@ sticky_rank: 1
 
 <div class="mb-4">
   <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
-  <button id="show-csa" class="px-3 py-1 bg-gray-200 rounded mr-2">CSA</button>
-  <button id="show-csp" class="px-3 py-1 bg-gray-200 rounded">CSP</button>
+  <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
+  <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded">CSP</button>
 </div>
 
 <script>
