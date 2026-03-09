@@ -1,10 +1,10 @@
-{% assign data = site.data.oasis-infograph %}
+{% assign data = site.data.acs-cancer-infograph %}
 
 
 <div class="wp-infograph">
  <!-- Header Section -->
  <div class="wp-header">
-   <div class="wp-badge">Oasis Community Capstone</div>
+   <div class="wp-badge">Design-Based Research Capstone</div>
    <h1 class="wp-title">{{ data.Title }}</h1>
    <p class="wp-description">{{ data.Description }}</p>
  </div>
@@ -18,7 +18,7 @@
      <!-- Left: Image & Status -->
      <div class="wp-visual">
        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
-         <img src="{{ site.baseurl }}/images/Oasis.png" alt="{{ topic.alt }}" class="wp-image">
+         <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
          <div class="wp-overlay">
            <span>View Project</span>
          </div>
@@ -75,8 +75,3 @@
  </div>
  {% endfor %}
 </div>
-
-
-
-
-
