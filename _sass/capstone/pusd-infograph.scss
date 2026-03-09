@@ -308,3 +308,169 @@ $pusd-text-light: #e2e8f0;
     text-decoration: none;
   }
 }
+
+// ── Section Cards (Problems / Ideas / Tech / Issues) ──────
+.pusd-section-card {
+  background: $pusd-card-bg;
+  border: 1px solid $pusd-border;
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.pusd-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $pusd-secondary;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid $pusd-border;
+}
+
+// Problems
+.pusd-problems-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.pusd-problem-item {
+  background: rgba($pusd-primary, 0.07);
+  border: 1px solid rgba($pusd-primary, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $pusd-text-light;
+    line-height: 1.6;
+  }
+}
+
+.pusd-problem-num {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: rgba($pusd-secondary, 0.4);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+// Ideas
+.pusd-ideas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.pusd-idea-item {
+  background: rgba($pusd-secondary, 0.05);
+  border: 1px solid rgba($pusd-secondary, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.pusd-idea-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.pusd-idea-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, $pusd-primary, darken($pusd-secondary, 5%));
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pusd-idea-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $pusd-text-light;
+  margin: 0;
+}
+
+.pusd-idea-desc {
+  font-size: 0.825rem;
+  color: $pusd-text-muted;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// Tech table
+.pusd-tech-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pusd-tech-row {
+  display: grid;
+  grid-template-columns: 220px 24px 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba($pusd-border, 0.5);
+
+  &:last-child { border-bottom: none; }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
+.pusd-tech-arrow {
+  color: $pusd-secondary;
+  font-weight: 700;
+  text-align: center;
+
+  @media (max-width: 768px) { display: none; }
+}
+
+.pusd-tech-solve {
+  font-size: 0.875rem;
+  color: $pusd-text-muted;
+  line-height: 1.5;
+}
+
+// Weekly Issues
+.pusd-issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pusd-issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: $pusd-text-light;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  background: rgba($pusd-primary, 0.05);
+  border-radius: 6px;
+}
+
+.pusd-issue-icon {
+  color: $pusd-secondary;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
