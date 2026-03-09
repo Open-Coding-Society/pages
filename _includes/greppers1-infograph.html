@@ -1,0 +1,56 @@
+{% assign data = site.data["greppers1-infograph"] %}
+
+<div class="pnec-infograph">
+
+  <div class="pnec-header">
+    <div class="pnec-badge">{{ data.Badge }}</div>
+    <div class="pnec-org">{{ data.Organization }}</div>
+    <h1 class="pnec-title">{{ data.Title }}</h1>
+    <p class="pnec-subtitle">{{ data.Subtitle }}</p>
+    <p class="pnec-desc">{{ data.Description }}</p>
+  </div>
+
+  <div class="pnec-body">
+
+    <div class="pnec-features-card">
+      <div class="pnec-card-label">Technical Features</div>
+      <div class="pnec-feature-list">
+        {% for feature in data.Features %}
+        <div class="pnec-feature">
+          <span class="pnec-check">✓</span>
+          <span class="pnec-feature-text">{{ feature }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="pnec-side">
+
+      <div class="pnec-stack-card">
+        <div class="pnec-card-label">Our Ingredients</div>
+        <div class="pnec-tech-row">
+          {% for tech in data.Tech %}
+          <div class="pnec-tech-item">
+            <span class="pnec-tech-icon">{{ tech.icon }}</span>
+            <span class="pnec-tech-name">{{ tech.name }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="pnec-metrics-card">
+        <div class="pnec-card-label">Community Impact</div>
+        <div class="pnec-metric-list">
+          {% for metric in data.Metrics %}
+          <div class="pnec-metric pnec-metric--{{ metric.color }}">
+            <div class="pnec-metric-value">{{ metric.value }}</div>
+            <div class="pnec-metric-label">{{ metric.label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

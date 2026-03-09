@@ -7,3 +7,5 @@ permalink: /capstone/greppers/
 ---
 
 {% include greppers-infograph.html %}
+
+{% include greppers1-infograph.html %}

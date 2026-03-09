@@ -1,0 +1,307 @@
+// PNEC Infographic Styles
+
+$pnec-purple: #7c3aed;
+$pnec-blue: #2563eb;
+$pnec-pink: #ec4899;
+$pnec-dark: #07070f;
+$pnec-card: #0e0e1c;
+$pnec-border: rgba(124, 58, 237, 0.3);
+$pnec-muted: #8a8aaa;
+$pnec-light: #e0ddf5;
+$pnec-green: #22c55e;
+$pnec-orange: #f97316;
+
+// Break out of the 800px .wrapper container
+.pnec-infograph {
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	padding: 2rem clamp(1rem, 5vw, 4rem);
+	box-sizing: border-box;
+	color: $pnec-light;
+	font-family: "Barlow", sans-serif;
+}
+
+// ── Header ──────────────────────────────────────────
+
+.pnec-header {
+	max-width: 1100px;
+	margin: 0 auto 2rem;
+	text-align: center;
+	padding: 3.5rem 2rem;
+	background: linear-gradient(135deg, #07070f 0%, #10083a 50%, #07070f 100%);
+	border-radius: 20px;
+	border: 1px solid $pnec-border;
+	position: relative;
+	overflow: hidden;
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: repeating-linear-gradient(
+			-45deg,
+			transparent,
+			transparent 18px,
+			rgba(124, 58, 237, 0.04) 18px,
+			rgba(124, 58, 237, 0.04) 19px
+		);
+		pointer-events: none;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: linear-gradient(90deg, transparent, $pnec-pink, $pnec-purple, $pnec-blue, transparent);
+	}
+}
+
+.pnec-badge {
+	display: inline-block;
+	background: linear-gradient(135deg, $pnec-purple, $pnec-blue);
+	color: #fff;
+	padding: 0.4rem 1.3rem;
+	border-radius: 50px;
+	font-family: "Barlow Condensed", sans-serif;
+	font-weight: 700;
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	margin-bottom: 1rem;
+}
+
+.pnec-org {
+	color: $pnec-pink;
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 0.85rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 3px;
+	margin-bottom: 0.75rem;
+}
+
+.pnec-title {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 3.2rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	background: linear-gradient(90deg, $pnec-pink, $pnec-purple, $pnec-blue, $pnec-pink);
+	background-size: 300% auto;
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: pnec-gradient 5s ease infinite;
+	margin-bottom: 0.5rem;
+	line-height: 1.1;
+}
+
+@keyframes pnec-gradient {
+	0% { background-position: 0% center; }
+	50% { background-position: 100% center; }
+	100% { background-position: 0% center; }
+}
+
+.pnec-subtitle {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 1.1rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 4px;
+	color: $pnec-muted;
+	margin-bottom: 1.25rem;
+}
+
+.pnec-desc {
+	color: $pnec-muted;
+	font-size: 1rem;
+	line-height: 1.7;
+	max-width: 680px;
+	margin: 0 auto;
+}
+
+// ── Body grid ───────────────────────────────────────
+
+.pnec-body {
+	max-width: 1100px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 1fr 340px;
+	gap: 1.5rem;
+	align-items: start;
+
+	@media (max-width: 900px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+// ── Shared card base ─────────────────────────────────
+
+.pnec-card-label {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	color: $pnec-purple;
+	margin-bottom: 1.1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid $pnec-border;
+}
+
+// ── Features card ────────────────────────────────────
+
+.pnec-features-card {
+	background: linear-gradient(145deg, $pnec-card 0%, #0d0d20 100%);
+	border-radius: 18px;
+	padding: 2rem;
+	border: 1px solid $pnec-border;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pnec-feature-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+}
+
+.pnec-feature {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.9rem 1.1rem;
+	background: rgba(124, 58, 237, 0.07);
+	border-radius: 10px;
+	border: 1px solid rgba(124, 58, 237, 0.18);
+	transition: border-color 0.2s, background 0.2s;
+
+	&:hover {
+		background: rgba(124, 58, 237, 0.14);
+		border-color: rgba(236, 72, 153, 0.35);
+	}
+}
+
+.pnec-check {
+	width: 26px;
+	height: 26px;
+	border-radius: 6px;
+	background: linear-gradient(135deg, $pnec-purple, $pnec-pink);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.75rem;
+	font-weight: 900;
+	color: #fff;
+	flex-shrink: 0;
+}
+
+.pnec-feature-text {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 1.05rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	color: $pnec-light;
+}
+
+// ── Side column ──────────────────────────────────────
+
+.pnec-side {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+// ── Tech stack card ──────────────────────────────────
+
+.pnec-stack-card {
+	background: linear-gradient(145deg, $pnec-card 0%, #0d0d20 100%);
+	border-radius: 18px;
+	padding: 1.75rem;
+	border: 1px solid $pnec-border;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pnec-tech-row {
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem;
+}
+
+.pnec-tech-item {
+	display: flex;
+	align-items: center;
+	gap: 0.8rem;
+	padding: 0.65rem 0.9rem;
+	background: rgba(37, 99, 235, 0.1);
+	border-radius: 8px;
+	border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.pnec-tech-icon {
+	font-size: 1.3rem;
+}
+
+.pnec-tech-name {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 0.95rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: $pnec-light;
+}
+
+// ── Metrics card ─────────────────────────────────────
+
+.pnec-metrics-card {
+	background: linear-gradient(145deg, $pnec-card 0%, #0d0d20 100%);
+	border-radius: 18px;
+	padding: 1.75rem;
+	border: 1px solid $pnec-border;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.pnec-metric-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+}
+
+.pnec-metric {
+	border-radius: 10px;
+	padding: 1rem 1.1rem;
+	border-left: 4px solid transparent;
+
+	&--green {
+		background: rgba(34, 197, 94, 0.1);
+		border-left-color: $pnec-green;
+	}
+
+	&--orange {
+		background: rgba(249, 115, 22, 0.1);
+		border-left-color: $pnec-orange;
+	}
+}
+
+.pnec-metric-value {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 1.8rem;
+	font-weight: 900;
+	line-height: 1;
+	margin-bottom: 0.2rem;
+
+	.pnec-metric--green & { color: $pnec-green; }
+	.pnec-metric--orange & { color: $pnec-orange; }
+}
+
+.pnec-metric-label {
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+	color: $pnec-muted;
+}
