@@ -37,7 +37,7 @@ class GameLevelDesert {
         SCALE_FACTOR: CHILLGUY_SCALE_FACTOR,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
-        INIT_POSITION: { x: 0, y: height - (height/CHILLGUY_SCALE_FACTOR) }, 
+        INIT_POSITION: { x: 0.0, y: 0.9 },  // 0% from left, 90% from top (near bottom)
         pixels: {height: 384, width: 512},
         orientation: {rows: 3, columns: 4 },
         down: {row: 0, start: 0, columns: 3 },
@@ -65,7 +65,7 @@ class GameLevelDesert {
         SCALE_FACTOR: 8,
         ANIMATION_RATE: 50,
         pixels: {height: 256, width: 352},
-        INIT_POSITION: { x: (width * 1/2), y: (height * 1/2)},
+        INIT_POSITION: { x: 0.5, y: 0.5 },  // Center of screen
         orientation: {rows: 8, columns: 11 },
         down: {row: 5, start: 0, columns: 3 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -106,7 +106,7 @@ class GameLevelDesert {
           SCALE_FACTOR: 10,
           ANIMATION_RATE: 50,
           pixels: {height: 301, width: 801},
-          INIT_POSITION: { x: (width * 1/4), y: (height * 1/4)},
+          INIT_POSITION: { x: 0.25, y: 0.25 },  // 25% from left, 25% from top
           orientation: {rows: 1, columns: 4 },
           down: {row: 0, start: 0, columns: 3 },
           hitbox: { widthPercentage: 0.1, heightPercentage: 0.1 },
@@ -146,7 +146,7 @@ class GameLevelDesert {
           SCALE_FACTOR: 6,
           ANIMATION_RATE: 100,
           pixels: {width: 2029, height: 2025},
-          INIT_POSITION: { x: (width * 2/5), y: (height * 1/10)},
+          INIT_POSITION: { x: 0.4, y: 0.1 },  // 40% from left, 10% from top
           orientation: {rows: 1, columns: 1 },
           down: {row: 0, start: 0, columns: 1 },
           hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -281,7 +281,7 @@ class GameLevelDesert {
           SCALE_FACTOR: 9,
           ANIMATION_RATE: 100,
           pixels: {width: 150, height: 255},
-          INIT_POSITION: { x: (width * 4/6), y: (height * 1/10)},
+          INIT_POSITION: { x: 0.67, y: 0.1 },  // 67% from left, 10% from top
           orientation: {rows: 1, columns: 1 },
           down: {row: 0, start: 0, columns: 1 },
           hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -414,7 +414,7 @@ class GameLevelDesert {
           SCALE_FACTOR: 10,
           ANIMATION_RATE: 50,
           pixels: {height: 441, width: 339},
-          INIT_POSITION: { x: width * 0.75, y: height * 0.6 },
+          INIT_POSITION: { x: 0.75, y: 0.6 },  // 75% from left, 60% from top
           orientation: {rows: 1, columns: 1},
           down: {row: 0, start: 0, columns: 1 },
           hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -530,7 +530,7 @@ class GameLevelDesert {
         SCALE_FACTOR: 10,
         ANIMATION_RATE: 50,
         pixels: {height: 600, width: 600},
-        INIT_POSITION: { x: width * 1/3, y: height * 1/3 },
+        INIT_POSITION: { x: 0.33, y: 0.33 },  // 33% from left, 33% from top
         orientation: {rows: 1, columns: 1},
         down: {row: 0, start: 0, columns: 1 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -647,7 +647,7 @@ class GameLevelDesert {
         SCALE_FACTOR: 10,
         ANIMATION_RATE: 100,
         pixels: {height: 316, width: 627},
-        INIT_POSITION: { x: (width * 3/4), y: (height * 1/4)},
+        INIT_POSITION: { x: 0.75, y: 0.25 },  // 75% from left, 25% from top
         orientation: {rows: 3, columns: 6 },
         down: {row: 1, start: 0, columns: 6 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -699,7 +699,7 @@ class GameLevelDesert {
           SCALE_FACTOR: 8,
           ANIMATION_RATE: 100,
           pixels: {width: 505, height: 223},
-          INIT_POSITION: { x: (width * 1/4), y: (height * 3/4)},
+          INIT_POSITION: { x: 0.25, y: 0.75 },  // 25% from left, 75% from top
           orientation: {rows: 1, columns: 3 },
           down: {row: 0, start: 0, columns: 3 },
           hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -811,7 +811,7 @@ class GameLevelDesert {
         SCALE_FACTOR: 10,
         ANIMATION_RATE: 100,
         pixels: {height: 316, width: 627},
-        INIT_POSITION: { x: (width * 2/3), y: (height * 2/3)},
+        INIT_POSITION: { x: 0.67, y: 0.67 },  // 67% from left, 67% from top
         orientation: {rows: 3, columns: 6},
         down: {row: 1, start: 0, columns: 6},
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },

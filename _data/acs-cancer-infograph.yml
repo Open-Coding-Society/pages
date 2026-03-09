@@ -1,0 +1,37 @@
+# ACS Cancer Capstone Infographic
+Title: "ACS Cancer Infograph"
+Description: "An interactive human-body diagram that consolidates the American Cancer Society's cancer information into one visual interface — so patients and families find what they need in seconds, not clicks."
+
+
+Topics:
+ - title: "ACS Cancer Infograph"
+   image: "capstone/acs_logo.png"
+   link: "/capstone/acscancer/"
+   alt: "ACS Cancer Infograph — Interactive Body Map for Cancer Information"
+   keyPoints:
+     - "Interactive human-body diagram with labeled cancer sites"
+     - "Click any body region to navigate directly to ACS cancer information"
+     - "Replaces 30+ scattered text links with one spatial visual interface"
+     - "Cancers mapped anatomically (e.g. pancreatic cancer → pancreas)"
+     - "Accessible design with keyboard navigation and screen-reader support"
+     - "Embeds on ACS homepage for immediate discoverability"
+   subtitle: "One Diagram. Every Cancer. Instantly."
+   description: "A design-based research capstone that reimagines the American Cancer Society's 'All About Cancer' page. Instead of scrolling through dozens of text links, users interact with an annotated diagram of the human body — each labeled region links directly to the relevant ACS cancer information page. Cancers are positioned anatomically with clear visual callouts (e.g. pancreatic cancer mapped to the pancreas, lung cancer to the lungs). The diagram is designed to live both on the dedicated 'All About Cancer' page and as an accessible widget on the ACS homepage, dramatically reducing the number of clicks needed to reach life-saving information."
+   tech:
+     - "Interactive SVG Body Diagram"
+     - "JavaScript Click Routing"
+     - "ACS Design System (CSS)"
+     - "ARIA Accessibility Layer"
+     - "Responsive / Mobile Layout"
+     - "GitHub Pages Deployment"
+   impact:
+     - "Reduces cancer information lookup from 5+ clicks to a single interaction"
+     - "Lowers cognitive load for patients, caregivers, and first-time visitors"
+     - "Improves ACS accessibility for users unfamiliar with cancer terminology"
+     - "Consolidates 30+ standalone cancer links into one cohesive visual entry point"
+     - "Supports early detection by making cancer resources faster to discover"
+   status: "In Development"
+   team:
+     - "Aashika"
+     - "Anwita"
+     - "Varada"
