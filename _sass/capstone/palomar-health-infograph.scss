@@ -222,6 +222,23 @@ $foundation-card-bg: #142338;
   border-left: 3px solid #f59e0b;
 }
 
+.palomar-foundation .palomar-intro-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.palomar-foundation .palomar-intro-tech-tag {
+  background: rgba(28, 118, 188, 0.15);
+  color: #9ed4ff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(28, 118, 188, 0.3);
+}
+
 .palomar-foundation .palomar-intro-btn {
   display: inline-block;
   background: linear-gradient(135deg, #1c76bc, #f59e0b);
@@ -307,6 +324,11 @@ $foundation-card-bg: #142338;
   border-radius: 7px;
   font-size: 0.82rem;
   line-height: 1.1;
+}
+
+.palomar-foundation .palomar-overview-trigger {
+  margin-top: 0;
+  cursor: pointer;
 }
 
 .palomar-foundation .top-nav-item {

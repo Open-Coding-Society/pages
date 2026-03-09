@@ -23,6 +23,13 @@ intro:
     - Balances trust-building content with practical navigation by introducing stories, community programs, and current health system updates in one overview
     - Creates a more approachable first impression for families, patients, and community members who may otherwise feel overwhelmed by a full healthcare homepage
     - Leads directly into the actual website experience through a single Learn More action, preserving depth without crowding the first screen
+  tech:
+    - Python Flask Backend
+    - JavaScript Frontend
+    - RESTful API Authentication
+    - SQLite Database
+    - YAML-Driven Jekyll Templates
+    - Client-Side Search and Section Reveal
   reveal: home
 
 hero:

@@ -31,6 +31,12 @@
             {% endfor %}
           </div>
 
+          <div class="palomar-intro-tech-stack">
+            {% for tech in data.intro.tech %}
+            <span class="palomar-intro-tech-tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+
           <a href="#{{ data.intro.reveal }}" class="palomar-intro-btn cta-entry" data-target="{{ data.intro.reveal }}">Learn More</a>
         </div>
       </div>
@@ -44,6 +50,7 @@
       <span class="home-trigger-label">Home</span>
     </button>
     <div class="palomar-topbar-actions">
+      <button type="button" class="btn-secondary top-nav-link palomar-overview-trigger">Capstone Overview</button>
       {% for item in data.top_navigation %}
       <div class="top-nav-item{% if item.submenu %} has-submenu{% endif %}">
         <a href="{{ item.link | relative_url }}" class="btn-{{ item.variant | default: 'secondary' }} top-nav-link{% if item.nav_class %} {{ item.nav_class }}{% endif %}{% if item.reveal %} cta-reveal{% endif %}"{% if item.reveal %} data-reveal="{{ item.reveal }}"{% endif %}{% if item.allow_navigation %} data-allow-navigation="true"{% endif %}>{{ item.label }}{% if item.submenu %}<span class="top-nav-caret" aria-hidden="true">&#9662;</span>{% endif %}</a>
@@ -345,6 +352,7 @@
     var homeSection = root.querySelector('#home');
     var homeOnlySections = root.querySelectorAll('.home-only');
     var homeButton = root.querySelector('.palomar-home-trigger');
+    var overviewButton = root.querySelector('.palomar-overview-trigger');
     var topicSections = root.querySelectorAll('.reveal-topic');
     var ctaButtons = root.querySelectorAll('.cta-reveal');
     var entryButtons = root.querySelectorAll('.cta-entry');
@@ -554,6 +562,13 @@
       homeButton.addEventListener('click', function (event) {
         event.preventDefault();
         showHome();
+      });
+    }
+
+    if (overviewButton) {
+      overviewButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        showIntro();
       });
     }
 
