@@ -15,7 +15,7 @@ import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 import Barrier from './essentials/Barrier.js';
 
-class GameLevelBspace {
+class GameLevelBSpace {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -178,4 +178,4 @@ this.classes = [
     }
 }
 
-export default GameLevelBspace;
+export default GameLevelBSpace;
