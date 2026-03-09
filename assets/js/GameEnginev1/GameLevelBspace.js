@@ -44,7 +44,7 @@ class GameLevelBspace {
             up: { row: 3, start: 0, columns: 3 },
             upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
             upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: 0, heightPercentage: 0 },
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
             keypress: { up: 87, left: 65, down: 83, right: 68 }
             };
 
@@ -54,7 +54,7 @@ class GameLevelBspace {
             src: path + "/images/gamebuilder/sprites/astro.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 500, y: 300 },
+            INIT_POSITION: { x: 0.7, y: 0.2 },
             pixels: { height: 770, width: 513 },
             orientation: { rows: 4, columns: 4 },
             down: { row: 0, start: 0, columns: 3 },
@@ -71,51 +71,6 @@ class GameLevelBspace {
             interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
         };
 
-        const npcData2 = {
-            id: 'NPC',
-            greeting: 'Hello!',
-            src: path + "/images/gamify/chillguy.png",
-            SCALE_FACTOR: 8,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 500, y: 300 },
-            pixels: { height: 512, width: 384 },
-            orientation: { rows: 1, columns: 1 },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, 1 - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, 1 - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, 1 - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, 1 - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, 1 - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, 1 - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['Hello!'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
-        };
-
-        const npcData3 = {
-            id: 'NPC',
-            greeting: 'Hello!',
-            src: path + "/images/gamify/chillguy.png",
-            SCALE_FACTOR: 8,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 500, y: 300 },
-            pixels: { height: 512, width: 384 },
-            orientation: { rows: 1, columns: 1 },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, 1 - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, 1 - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, 1 - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, 1 - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, 1 - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, 1 - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['Hello!'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
-        };
         // Simple maze barriers using relative positioning (0-1 values)
         // Maze is offset from center, creating a playable area
         
@@ -136,9 +91,18 @@ class GameLevelBspace {
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
         };
         
-        const mazeLeft = {
-            id: 'maze_left',
-            x: 0.2, y: 0.15, width: 0.02, height: 0.7,
+        // Split left wall into two parts with an entrance gap
+        const mazeLeftTop = {
+            id: 'maze_left_top',
+            x: 0.2, y: 0.15, width: 0.02, height: 0.20,  // Top section
+            color: 'rgba(100, 50, 200, 0.5)',
+            visible: true,
+            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
+        };
+        
+        const mazeLeftBottom = {
+            id: 'maze_left_bottom',
+            x: 0.2, y: 0.55, width: 0.02, height: 0.30,  // Bottom section (gap at 0.40-0.55)
             color: 'rgba(100, 50, 200, 0.5)',
             visible: true,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
@@ -197,12 +161,11 @@ this.classes = [
       { class: GameEnvBackground, data: bgData },
       { class: Player, data: playerData },
       { class: Npc, data: npcData1 },
-      { class: Npc, data: npcData2 },
-      { class: Npc, data: npcData3 },
       // Maze barriers
       { class: Barrier, data: mazeTop },
       { class: Barrier, data: mazeBottom },
-      { class: Barrier, data: mazeLeft },
+      { class: Barrier, data: mazeLeftTop },      // Split left wall
+      { class: Barrier, data: mazeLeftBottom },   // with entrance gap
       { class: Barrier, data: mazeRight },
       { class: Barrier, data: mazeWall1 },
       { class: Barrier, data: mazeWall2 },
