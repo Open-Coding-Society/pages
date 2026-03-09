@@ -110,6 +110,9 @@ comments: false
     document.getElementById('dashboardGroupName').textContent = group.name;
     document.getElementById('dashboardGroupMeta').textContent = 
       `Period ${group.period || 'N/A'} · ${group.course || 'N/A'} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+    
+    // Set global group ID for shared files and chat functionality
+    window.currentDashboardGroupId = group.id;
 
     // Update stats
     document.getElementById('statTotalMembers').textContent = memberCount;
@@ -198,6 +201,11 @@ comments: false
 
     // Store group data for chat functionality
     window.currentGroupData = group;
+    
+    // Fetch and display shared files for this group
+    if (typeof window.fetchDashboardSharedFiles === 'function') {
+      await window.fetchDashboardSharedFiles();
+    }
   }
 
   // Helper to get initials from name
