@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "start:flask-proxy": "node flask_proxy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
