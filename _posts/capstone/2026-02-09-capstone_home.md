@@ -249,6 +249,30 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- Poway Symphony Orchestra (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-05-pso-infographic %}">
+           <img src="/images/pso_logo.png" alt="Poway Symphony Orchestra - Site Analysis" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pso-infographic %}">Poway Symphony Orchestra</a></h3>
+           <p class="text-sm text-gray-700">We analyzed the Poway Symphony Orchestra website to identify UX gaps and design improvements that better serve concertgoers, donors, and prospective musicians.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+       </div>
+   </div>
+
+   <!-- Soroptimist International of Poway (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-08-sip-infograph %}">
+           <img src="/images/sip/sip_logo.png" alt="Soroptimist International of Poway - Site Analysis" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-sip-infograph %}">Soroptimist International of Poway</a></h3>
+           <p class="text-sm text-gray-700">We analyzed sipoway.com to document the organization's programs and recommend UI improvements that help donors, volunteers, and program applicants take action.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+       </div>
+   </div>
+
 </div>
 
 
