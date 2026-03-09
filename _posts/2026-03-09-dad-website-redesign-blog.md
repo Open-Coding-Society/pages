@@ -266,7 +266,7 @@ The current D.A.D. homepage has several UX and design issues:
 - **Small, hard-to-read fonts** throughout the page
 - **Navigation bar** is cramped with small text and a bright red/orange background that overwhelms the content
 - **No clear visual hierarchy** — the "About Us," "Exceptional Projects," "Donate," and "Get Involved" buttons are presented equally without guiding the user's journey
-- **Mission section** is a wall of text with no visual breaks, icons, or imagery to support readability
+- **Mission section** is a wall of text with no visual breaks, icons, or imagery to support readability.
 - **No impact metrics** visible above the fold (number of youth served, programs offered, etc.)
 - **Footer is minimal** with just address and copyright — no social proof or calls to action
 
