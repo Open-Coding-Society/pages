@@ -129,11 +129,13 @@ Configuration file: /Users/johnmortensen/opencs/pages/_config.yml
     Server address: http://localhost:4500/
 ```
 
-#### Make workflow (local build: make, make clean, make stop, make convert)
+#### Make workflow (local build: make, make dev, make clean, make stop, make convert)
 
 These commands are used to build and manage a localhost version of the website. The purpose of this is to verify and test code changes prior to pushing changes to GitHub Pages.
 
-* `make`: Runs the local server.
+* `make`: Runs the full local server with all features and document overhead.
+
+* `make dev`: Runs a **minimal, faster build** intended for developers actively coding. Skips heavy document processing so the server starts and regenerates quickly. Use this when you are iterating on game logic, layouts, or interactive features and want rapid feedback.
 
 * `make clean`: Stops the local server and cleans the build files. Try this after rename as it could cause duplicates in build.
 
@@ -145,7 +147,7 @@ These commands are used to build and manage a localhost version of the website. 
 
 #### Make Debug Lab — Interactive Practice
 
-Got errors? This interactive lab covers the most common `make` errors and how to fix them. Use the **Learn** tab for a quick reference, then test yourself in **Practice** by solving errors to reveal pixel art.
+Got errors? This interactive lab covers common `make` errors **and browser DevTools debugging** scenarios. Use the **Learn** tab for a quick reference, then test yourself in **Practice** by solving errors to reveal pixel art.
 
 <details>
 <summary><strong>Click to open the Make Debug Lab</strong></summary>
@@ -170,11 +172,16 @@ Got errors? This interactive lab covers the most common `make` errors and how to
   .mdb .error-card:hover { border-color: #00ff9f; }
   .mdb .error-title { font-size: 1rem; color: #00ccff; margin-bottom: 0.75rem; }
   .mdb .error-msg { background: #0a0e14; border-left: 3px solid #ff3366; padding: 0.6rem 0.75rem; margin: 0.75rem 0; color: #ff3366; font-size: 0.8rem; overflow-x: auto; font-family: monospace; border-radius: 2px; }
+  .mdb .info-msg { background: #0a0e14; border-left: 3px solid #ffe66d; padding: 0.6rem 0.75rem; margin: 0.75rem 0; color: #ffe66d; font-size: 0.8rem; overflow-x: auto; font-family: monospace; border-radius: 2px; }
   .mdb .step { background: #1f2430; padding: 0.6rem 0.75rem; margin: 0.4rem 0; border-left: 2px solid #00ccff; font-size: 0.85rem; border-radius: 2px; }
   .mdb .cmd { background: #0a0e14; padding: 0.4rem 0.75rem; margin: 0.4rem 0; font-size: 0.8rem; color: #39ff14; font-family: monospace; border-radius: 2px; }
   .mdb .cmd::before { content: '$ '; color: #00ff9f; }
   .mdb .os-sp { display: none; }
   .mdb .os-sp.active { display: block; }
+  .mdb .section-header { font-size: 1.1rem; color: #00ff9f; margin: 1.5rem 0 0.75rem 0; padding-bottom: 0.4rem; border-bottom: 1px solid #2d3340; }
+  .mdb .badge { display: inline-block; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 3px; margin-left: 0.5rem; vertical-align: middle; font-weight: bold; }
+  .mdb .badge-make { background: #1f2430; color: #00ccff; border: 1px solid #00ccff; }
+  .mdb .badge-devtools { background: #1f2430; color: #ffe66d; border: 1px solid #ffe66d; }
   .mdb .game-container { background: #0d1117; border: 2px solid #00ff9f; padding: 1.5rem; border-radius: 6px; }
   .mdb .game-title { font-size: 1.5rem; color: #00ff9f; text-align: center; margin-bottom: 0.25rem; }
   .mdb .game-subtitle { color: #8f93a2; font-size: 0.85rem; text-align: center; margin-bottom: 1.5rem; }
@@ -183,18 +190,19 @@ Got errors? This interactive lab covers the most common `make` errors and how to
   .mdb .stat-value { font-size: 1.5rem; color: #00ff9f; font-weight: bold; text-align: center; }
   .mdb .canvas-area { background: #000; border: 2px solid #2d3340; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; }
   .mdb .canvas-title { color: #00ccff; margin-bottom: 1rem; text-align: center; font-size: 1rem; }
-  .mdb .pixel-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 320px; margin: 0 auto; background: #1a1f2e; padding: 16px; border-radius: 8px; }
-  .mdb .pixel { aspect-ratio: 1; background: #0a0e14; border: 2px solid #2d3340; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #8f93a2; font-weight: bold; border-radius: 4px; }
+  .mdb .pixel-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; max-width: 420px; margin: 0 auto; background: #1a1f2e; padding: 14px; border-radius: 8px; }
+  .mdb .pixel { aspect-ratio: 1; background: #0a0e14; border: 2px solid #2d3340; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #8f93a2; font-weight: bold; border-radius: 4px; }
   .mdb .pixel:hover { border-color: #00ff9f; transform: scale(1.08); }
   .mdb .pixel.filled { cursor: default; border-color: transparent; }
   .mdb .pixel.filled:hover { transform: scale(1); }
   .mdb .clue-section { background: #151921; border: 2px solid #2d3340; padding: 1.25rem; border-radius: 8px; }
   .mdb .clue-title { color: #00ccff; font-size: 1rem; margin-bottom: 0.75rem; }
-  .mdb .color-legend { background: #1f2430; padding: 0.75rem 1rem; border-radius: 4px; display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
-  .mdb .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
-  .mdb .legend-color { width: 18px; height: 18px; border: 1px solid #2d3340; border-radius: 3px; flex-shrink: 0; }
+  .mdb .color-legend { background: #1f2430; padding: 0.75rem 1rem; border-radius: 4px; display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .mdb .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; }
+  .mdb .legend-color { width: 16px; height: 16px; border: 1px solid #2d3340; border-radius: 3px; flex-shrink: 0; }
   .mdb .current-clue { background: #1f2430; border: 2px solid #00ff9f; padding: 1.25rem; border-radius: 8px; }
   .mdb .clue-error { background: #0a0e14; border-left: 4px solid #ff3366; padding: 0.75rem; margin-bottom: 1rem; color: #ff3366; font-size: 0.85rem; font-family: monospace; border-radius: 2px; }
+  .mdb .clue-devtools { background: #0a0e14; border-left: 4px solid #ffe66d; padding: 0.75rem; margin-bottom: 1rem; color: #ffe66d; font-size: 0.85rem; font-family: monospace; border-radius: 2px; }
   .mdb .clue-question { color: #e6e6e6; margin-bottom: 1rem; font-size: 0.95rem; }
   .mdb .answer-options { display: grid; gap: 0.75rem; }
   .mdb .answer-btn { background: #0a0e14; border: 2px solid #2d3340; padding: 1rem; color: #e6e6e6; cursor: pointer; text-align: left; transition: all 0.3s; font-size: 0.9rem; border-radius: 4px; width: 100%; }
@@ -205,14 +213,14 @@ Got errors? This interactive lab covers the most common `make` errors and how to
   .mdb .completion.show { display: block; }
   .mdb .completion-title { font-size: 2rem; color: #00ff9f; margin-bottom: 0.5rem; }
   .mdb .completion-message { color: #8f93a2; margin-bottom: 1.5rem; }
-  .mdb .final-art { max-width: 320px; margin: 1rem auto; padding: 1.25rem; background: #000; border: 3px solid #00ff9f; border-radius: 8px; }
+  .mdb .final-art { max-width: 420px; margin: 1rem auto; padding: 1.25rem; background: #000; border: 3px solid #00ff9f; border-radius: 8px; }
   .mdb .restart-btn { background: #151921; border: 2px solid #00ff9f; padding: 0.75rem 1.75rem; color: #00ff9f; cursor: pointer; font-size: 0.95rem; margin-top: 1rem; transition: all 0.3s; border-radius: 4px; }
   .mdb .restart-btn:hover { background: #1f2430; }
 </style>
 
 <div class="mdb">
-  <h2>Make Debug Lab</h2>
-  <p class="subtitle">Learn to resolve common make errors</p>
+  <h2>Make &amp; DevTools Debug Lab</h2>
+  <p class="subtitle">Learn to resolve common make errors and use browser DevTools to debug game issues</p>
 
   <div class="os-selector">
     <button class="os-btn active" data-os="mac" onclick="mdbSwitchOS('mac')">macOS</button>
@@ -226,6 +234,9 @@ Got errors? This interactive lab covers the most common `make` errors and how to
 
   <div id="mdb-learn" class="tab-content active">
     <div class="error-grid">
+
+      <h3 class="section-header">Make Errors <span class="badge badge-make">Terminal</span></h3>
+
       <div class="error-card">
         <h3 class="error-title">Make Not Found</h3>
         <div class="error-msg os-sp active" id="mdb-mac-err1">make: command not found</div>
@@ -244,6 +255,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
           <div class="cmd">sudo apt update && sudo apt install make</div>
         </div>
       </div>
+
       <div class="error-card">
         <h3 class="error-title">No Makefile Found</h3>
         <div class="error-msg">make: *** No targets specified and no makefile found. Stop.</div>
@@ -256,6 +268,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
         <div class="step">Navigate to project directory</div>
         <div class="cmd">cd /path/to/project</div>
       </div>
+
       <div class="error-card">
         <h3 class="error-title">No Rule to Make Target</h3>
         <div class="error-msg">make: *** No rule to make target 'sever'. Stop.</div>
@@ -263,9 +276,11 @@ Got errors? This interactive lab covers the most common `make` errors and how to
         <div class="step">List available targets</div>
         <div class="cmd os-sp active" id="mdb-mac-grep">grep "^[a-zA-Z]" Makefile</div>
         <div class="cmd os-sp" id="mdb-win-grep">findstr /B /R "^[a-zA-Z]" Makefile</div>
-        <div class="step">Fix the typo in your command</div>
+        <div class="step">Fix the typo in your command — or use make dev for a faster build</div>
         <div class="cmd">make server</div>
+        <div class="cmd">make dev</div>
       </div>
+
       <div class="error-card">
         <h3 class="error-title">Missing Separator</h3>
         <div class="error-msg">Makefile:5: *** missing separator. Stop.</div>
@@ -274,6 +289,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
         <div class="step">Delete any spaces at the beginning of command lines</div>
         <div class="step">Press TAB key once before each command</div>
       </div>
+
       <div class="error-card">
         <h3 class="error-title">Permission Denied</h3>
         <div class="error-msg">make: ./script.sh: Permission denied</div>
@@ -282,6 +298,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
         <div class="cmd">chmod +x script.sh</div>
         <div class="step">Run make again</div>
       </div>
+
       <div class="error-card">
         <h3 class="error-title">Command Not Found in Makefile</h3>
         <div class="error-msg">make: *** [server] Error 127<br>/bin/sh: python3: command not found</div>
@@ -293,15 +310,73 @@ Got errors? This interactive lab covers the most common `make` errors and how to
         <div class="cmd os-sp active" id="mdb-mac-install">brew install python3</div>
         <div class="cmd os-sp" id="mdb-win-install">winget install Python.Python.3</div>
       </div>
+
+      <h3 class="section-header">Game / Browser DevTools Errors <span class="badge badge-devtools">DevTools</span></h3>
+      <p style="font-size:0.875rem; color:#8f93a2; margin-bottom:1rem;">When building or debugging a game in your GitHub Pages project, use browser DevTools (F12 or Cmd+Option+I) to diagnose these common issues. Run <code style="color:#39ff14;font-size:0.8rem;">make dev</code> for a fast local server while iterating on game code.</p>
+
+      <div class="error-card">
+        <h3 class="error-title">Collision Bug — Elements View</h3>
+        <div class="info-msg">Player passes through wall / hitbox looks wrong in the game</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">The collision box does not match the visible sprite. Inspect the element to see its real size and position.</p>
+        <div class="step">Open DevTools → Elements tab (Cmd+Option+I → Elements)</div>
+        <div class="step">Hover over the player or wall element in the DOM — the browser highlights its bounding box on screen</div>
+        <div class="step">Check that width, height, and position CSS match your expected hitbox dimensions</div>
+        <div class="step">Fix the discrepancy in your CSS or JavaScript collision logic</div>
+        <div class="cmd">// Example: log element bounds in console
+const box = player.getBoundingClientRect();
+console.log(box.width, box.height, box.x, box.y);</div>
+      </div>
+
+      <div class="error-card">
+        <h3 class="error-title">Style Bug — CSS View</h3>
+        <div class="info-msg">Sprite is invisible, wrong color, or in the wrong position</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">A style rule is overriding your intended CSS. Use the Styles panel to find the conflict.</p>
+        <div class="step">Open DevTools → Elements → Styles panel</div>
+        <div class="step">Select the game element — look for strikethrough rules, which means a rule is being overridden</div>
+        <div class="step">Identify the conflicting selector with higher specificity and either increase your specificity or remove the conflict</div>
+        <div class="step">Toggle rules on/off live in the Styles panel to test fixes before changing code</div>
+        <div class="cmd">/* Example: use a more specific selector to override */
+#game-canvas .player-sprite { display: block; visibility: visible; }</div>
+      </div>
+
+      <div class="error-card">
+        <h3 class="error-title">CORS Error — Network View</h3>
+        <div class="error-msg">Access to fetch at 'https://api.example.com/npc-data' from origin 'http://localhost:4500' has been blocked by CORS policy</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">Your game is fetching data (NPC configs, maps, scores) from a server that has not allowed your origin. Check the Network tab to diagnose.</p>
+        <div class="step">Open DevTools → Network tab, then reload or trigger the fetch</div>
+        <div class="step">Find the failing request (shown in red) and click it to see Response Headers</div>
+        <div class="step">Look for <code>Access-Control-Allow-Origin</code> — if missing or wrong, the server must add it</div>
+        <div class="step">As a local workaround during <code>make dev</code>, proxy the request through your Jekyll server or use a CORS-friendly test API</div>
+        <div class="cmd">// Example: catch CORS errors explicitly
+fetch('https://api.example.com/npc-data')
+  .catch(err => console.error('CORS or network error:', err));</div>
+      </div>
+
+      <div class="error-card">
+        <h3 class="error-title">Logic Bug — Player / NPC Interaction</h3>
+        <div class="info-msg">NPC does not react to player / interaction triggers at wrong time</div>
+        <p style="font-size:0.9rem; color:#8f93a2; margin: 0.5rem 0;">The interaction condition in your game logic has a bug. Use the Console and Sources tabs to step through the code.</p>
+        <div class="step">Open DevTools → Console — look for errors or add <code>console.log</code> calls inside your interaction handler</div>
+        <div class="step">Open DevTools → Sources → find your game JS file and set a breakpoint on the interaction function</div>
+        <div class="step">Trigger the interaction in the game — execution pauses at the breakpoint so you can inspect variable values</div>
+        <div class="step">Check distance/overlap calculations, event listener binding, and state flags (e.g., <code>isNearNPC</code>)</div>
+        <div class="cmd">// Example: debug interaction check
+function checkInteraction(player, npc) {
+  const dist = Math.hypot(player.x - npc.x, player.y - npc.y);
+  console.log('distance to NPC:', dist, '| threshold:', npc.triggerRadius);
+  if (dist < npc.triggerRadius) npc.interact();
+}</div>
+      </div>
+
     </div>
   </div>
 
   <div id="mdb-practice" class="tab-content">
     <div class="game-container">
       <h2 class="game-title">Debug Art Challenge</h2>
-      <p class="game-subtitle">Answer error clues correctly to reveal the hidden pixel art</p>
+      <p class="game-subtitle">Answer error clues correctly to reveal the hidden pixel art — now with DevTools challenges!</p>
       <div class="stats">
-        <div class="stat"><div class="stat-label">Progress</div><div class="stat-value" id="mdb-progress">0/13</div></div>
+        <div class="stat"><div class="stat-label">Progress</div><div class="stat-value" id="mdb-progress">0/21</div></div>
         <div class="stat"><div class="stat-label">Correct</div><div class="stat-value" id="mdb-correct">0</div></div>
         <div class="stat"><div class="stat-label">Errors</div><div class="stat-value" id="mdb-errors">0</div></div>
       </div>
@@ -318,6 +393,10 @@ Got errors? This interactive lab covers the most common `make` errors and how to
           <div class="legend-item"><div class="legend-color" style="background:#a8e6cf;"></div><span>4 - Tab</span></div>
           <div class="legend-item"><div class="legend-color" style="background:#ff8b94;"></div><span>5 - Permission</span></div>
           <div class="legend-item"><div class="legend-color" style="background:#c7ceea;"></div><span>6 - Tool</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#f7b731;"></div><span>7 - Collision</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#a29bfe;"></div><span>8 - Style</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#fd79a8;"></div><span>9 - CORS</span></div>
+          <div class="legend-item"><div class="legend-color" style="background:#55efc4;"></div><span>10 - Logic</span></div>
         </div>
         <div class="current-clue">
           <div class="clue-error" id="mdb-clueError">Click a numbered pixel above to start!</div>
@@ -327,7 +406,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
       </div>
       <div class="completion" id="mdb-completion">
         <div class="completion-title">Build Successful!</div>
-        <p class="completion-message">You have mastered make debugging</p>
+        <p class="completion-message">You have mastered make and DevTools debugging</p>
         <div class="final-art"><div class="pixel-grid" id="mdb-finalImage" style="max-width:100%;"></div></div>
         <div class="stats">
           <div class="stat"><div class="stat-label">Accuracy</div><div class="stat-value" id="mdb-accuracy">0%</div></div>
@@ -343,14 +422,21 @@ Got errors? This interactive lab covers the most common `make` errors and how to
   var mdbOS = 'mac';
   var mdbCorrect = 0, mdbErrors = 0, mdbFilled = 0, mdbCurrentPixel = null;
 
-  var mdbColors = { 1:'#ff6b6b', 2:'#4ecdc4', 3:'#ffe66d', 4:'#a8e6cf', 5:'#ff8b94', 6:'#c7ceea' };
+  var mdbColors = {
+    1:'#ff6b6b', 2:'#4ecdc4', 3:'#ffe66d', 4:'#a8e6cf',
+    5:'#ff8b94', 6:'#c7ceea', 7:'#f7b731', 8:'#a29bfe',
+    9:'#fd79a8', 10:'#55efc4'
+  };
+
+  // 7x5 grid — 0 = black (no clue), numbers = color type
   var mdbPattern = [
-    [1,1,1,1,1],
-    [2,4,4,4,3],
-    [2,5,5,5,3],
-    [0,0,6,0,0],
-    [0,6,6,6,0]
+    [1, 1, 0, 7, 0, 9, 9],
+    [2, 4, 4, 7, 8, 8, 3],
+    [2, 5, 5,10, 8, 3, 3],
+    [0, 0, 6,10, 0, 0, 0],
+    [0, 6, 6, 0,10, 0, 0]
   ];
+
   var mdbClues = [
     { type:1, error:"make: command not found", question:"What is the solution?", answers:[
       { text:"Install make using xcode-select --install or package manager", correct:true },
@@ -363,7 +449,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
       { text:"Run sudo make", correct:false }
     ]},
     { type:3, error:"make: *** No rule to make target 'sever'. Stop.", question:"How do you fix this?", answers:[
-      { text:"Fix the typo - use 'server' instead of 'sever'", correct:true },
+      { text:"Fix the typo — use 'make server' or 'make dev' for a faster build", correct:true },
       { text:"Add a new sever target", correct:false },
       { text:"Delete the Makefile", correct:false }
     ]},
@@ -381,6 +467,26 @@ Got errors? This interactive lab covers the most common `make` errors and how to
       { text:"Install python3 using brew or apt", correct:true },
       { text:"Remove python from Makefile", correct:false },
       { text:"Create a symbolic link", correct:false }
+    ]},
+    { type:7, error:"[Game] Player passes through walls — collision not working", question:"Which DevTools panel helps you debug a collision hitbox mismatch?", answers:[
+      { text:"Elements tab — hover over the DOM element to see its real bounding box on screen", correct:true },
+      { text:"Network tab — check if wall data loaded correctly", correct:false },
+      { text:"Application tab — clear localStorage and retry", correct:false }
+    ]},
+    { type:8, error:"[Game] Sprite is invisible on screen despite being in the DOM", question:"How do you find the CSS rule that is hiding the sprite?", answers:[
+      { text:"Elements → Styles panel — look for strikethrough rules being overridden by a higher-specificity selector", correct:true },
+      { text:"Network tab — the image must have failed to load", correct:false },
+      { text:"Console — run location.reload()", correct:false }
+    ]},
+    { type:9, error:"Access to fetch at 'https://api.example.com/npc-data' blocked by CORS policy", question:"Where in DevTools do you find the missing Access-Control-Allow-Origin header?", answers:[
+      { text:"Network tab — click the failing request (red) and inspect Response Headers", correct:true },
+      { text:"Console tab — the full header list is printed there automatically", correct:false },
+      { text:"Elements tab — check the meta tags in <head>", correct:false }
+    ]},
+    { type:10, error:"[Game] NPC does not react when player walks into trigger zone", question:"What is the best first step to debug the player/NPC interaction logic?", answers:[
+      { text:"Sources tab — set a breakpoint in the interaction function and step through variable values when triggered", correct:true },
+      { text:"Network tab — the NPC config file probably did not load", correct:false },
+      { text:"Application tab — the interaction state is stored in a cookie", correct:false }
     ]}
   ];
 
@@ -407,7 +513,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
     var grid = document.getElementById('mdb-pixelGrid');
     grid.innerHTML = '';
     for (var r = 0; r < 5; r++) {
-      for (var c = 0; c < 5; c++) {
+      for (var c = 0; c < 7; c++) {
         (function(row, col) {
           var p = document.createElement('div');
           p.className = 'pixel';
@@ -427,6 +533,8 @@ Got errors? This interactive lab covers the most common `make` errors and how to
     document.getElementById('mdb-clueError').textContent = 'Click a numbered pixel above to start!';
     document.getElementById('mdb-clueQuestion').textContent = 'Select any pixel with a number to see its error.';
     document.getElementById('mdb-answerOptions').innerHTML = '';
+    var total = mdbPattern.flat().filter(function(p){ return p !== 0; }).length;
+    document.getElementById('mdb-progress').textContent = '0/' + total;
   }
 
   function mdbSelectPixel(row, col) {
@@ -441,7 +549,9 @@ Got errors? This interactive lab covers the most common `make` errors and how to
   function mdbLoadClue(type) {
     var clue = mdbClues.find(function(c){ return c.type === type; });
     if (!clue) return;
-    document.getElementById('mdb-clueError').textContent = clue.error;
+    var errorEl = document.getElementById('mdb-clueError');
+    errorEl.textContent = clue.error;
+    errorEl.className = (type >= 7) ? 'clue-devtools' : 'clue-error';
     document.getElementById('mdb-clueQuestion').textContent = clue.question;
     var opts = document.getElementById('mdb-answerOptions');
     opts.innerHTML = '';
@@ -501,7 +611,7 @@ Got errors? This interactive lab covers the most common `make` errors and how to
     var fg = document.getElementById('mdb-finalImage');
     fg.innerHTML = '';
     for (var r = 0; r < 5; r++) {
-      for (var c = 0; c < 5; c++) {
+      for (var c = 0; c < 7; c++) {
         var p = document.createElement('div');
         p.className = 'pixel filled';
         p.style.background = mdbPattern[r][c] !== 0 ? mdbColors[mdbPattern[r][c]] : '#000';
@@ -565,6 +675,7 @@ The SDLC adds the important steps of Make and Test to the workflow. This ensures
    * Open Terminal.
    * Be sure the "(venv)" prefix is in the prompt.
    * Type `make` in the prompt (run `make`).
+   * If you are actively developing a game or interactive feature, use `make dev` instead — it skips heavy document processing for a faster build cycle.
    * If successful, you will see log output in the prompt:
 
    ```text
