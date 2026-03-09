@@ -1,0 +1,41 @@
+# Big6 Capstone Infographic
+Title: "Big Six"
+Description: "Six interactive CS modules that take students from frontend to full-stack, through data visualization, resume building, AI usage, and a final mastery certificate — building real career-ready skills at every level."
+
+Topics:
+  - title: "Big Six"
+    image: "capstone/backend.png"
+    link: "/capstone/big6/"
+    alt: "Big Six — Interactive CS Learning Modules by Open Coding Society"
+    keyPoints:
+      - "C1: Build visually compelling blogs and projects with HTML, CSS, and JavaScript"
+      - "C2: Learn full-stack integration with Flask, Spring, and real database structures"
+      - "C3: Visualize and collate data from diverse sources for ML-ready representation"
+      - "C4: Write about CS projects for resumes in both technical and non-technical terms"
+      - "C5: Prompt AI tools to accelerate frontend, backend, data, and resume work"
+      - "C6: Integrate all modules and earn a verifiable Open Coding Society certificate"
+    subtitle: "From First Commit to Career-Ready — One Module at a Time"
+    description: "A six-module interactive curriculum designed to give CS students end-to-end project fluency. Each module unlocks sequentially, building on the last. C1 and C2 cover the full stack — frontend design and backend integration. C3 introduces data visualization and machine learning foundations. C4 bridges the gap between building and communicating, teaching students to write about their work for real career applications. C5 teaches intelligent AI usage across every prior module — prompting strategies for code, data, and writing. C6 synthesizes everything into a capstone analytics project and awards a mastery certificate upon completion."
+    tech:
+      - "HTML"
+      - "CSS"
+      - "JavaScript"
+      - "HTML / CSS / JavaScript (C1)"
+      - "Flask + Spring + Databases (C2)"
+      - "Data Visualization + ML Collation (C3)"
+      - "Resume Writing + Blogging (C4)"
+      - "ChatGPT + Claude Prompting / Vibe Coding (C5)"
+      - "Analytics + Certificate Integration (C6)"
+    impact:
+      - "Gives students a complete mental model of frontend and backend development"
+      - "Bridges technical skills with career communication (resume + blogging)"
+      - "Teaches responsible and effective AI usage across all project layers"
+      - "Provides a verifiable mastery certificate upon completing all six modules"
+      - "Interactive, hands-on modules build real portfolio artifacts at every level"
+    status: "Live"
+    team:
+      - "Alex"
+      - "Travis"
+      - "Kush"
+
+
