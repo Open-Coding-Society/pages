@@ -1,0 +1,310 @@
+// ============================================================
+// UESL Foundation Infographic Styles
+// Color theme: Purple (#7c3aed) + Cyan (#06b6d4) — gaming/inclusivity
+// Prefix: uesl-
+// ============================================================
+
+$uesl-primary:   #7c3aed;
+$uesl-secondary: #06b6d4;
+$uesl-dark-bg:   #0f0a1e;
+$uesl-card-bg:   #1a1033;
+$uesl-border:    rgba(124, 58, 237, 0.25);
+$uesl-text-muted: #94a3b8;
+$uesl-text-light: #e2e8f0;
+
+.uesl-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+// ── Header ──────────────────────────────────────────────────
+.uesl-header {
+  text-align: center;
+  padding: 3rem 2rem 2.5rem;
+  background: linear-gradient(135deg, $uesl-dark-bg 0%, #160d2e 50%, #0d1a2e 100%);
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  border: 1px solid $uesl-border;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba($uesl-primary, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba($uesl-secondary, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.uesl-badge {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  background: linear-gradient(135deg, $uesl-primary, $uesl-secondary);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.uesl-title {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  background: linear-gradient(90deg, $uesl-primary, $uesl-secondary, $uesl-primary);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: uesl-gradient 4s ease infinite;
+}
+
+@keyframes uesl-gradient {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.uesl-description {
+  font-size: 1rem;
+  color: $uesl-text-muted;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+// ── Card ────────────────────────────────────────────────────
+.uesl-card {
+  background: $uesl-card-bg;
+  border: 1px solid $uesl-border;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    border-color: rgba($uesl-primary, 0.5);
+    box-shadow: 0 8px 32px rgba($uesl-primary, 0.12);
+  }
+}
+
+.uesl-card-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Visual / Image Column ─────────────────────────────────
+.uesl-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.uesl-image-link {
+  display: block;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid $uesl-border;
+  transition: border-color 0.3s ease;
+  text-decoration: none;
+
+  &:hover {
+    border-color: $uesl-primary;
+
+    .uesl-image { transform: scale(1.04); }
+    .uesl-overlay { opacity: 1; }
+  }
+}
+
+.uesl-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  background: $uesl-dark-bg;
+  display: block;
+  transition: transform 0.3s ease;
+  padding: 1rem;
+}
+
+.uesl-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba($uesl-primary, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+}
+
+.uesl-status {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: rgba($uesl-secondary, 0.12);
+  color: $uesl-secondary;
+  border: 1px solid rgba($uesl-secondary, 0.3);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.uesl-team {
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.uesl-team-label {
+  display: block;
+  color: $uesl-text-muted;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+
+.uesl-team-name {
+  color: $uesl-text-light;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+// ── Content / Key Points Column ───────────────────────────
+.uesl-content { }
+
+.uesl-project-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: $uesl-text-light;
+  margin: 0 0 0.4rem;
+}
+
+.uesl-subtitle {
+  font-size: 0.9rem;
+  color: $uesl-primary;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+  font-style: italic;
+}
+
+.uesl-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.uesl-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: $uesl-text-light;
+  line-height: 1.5;
+}
+
+.uesl-check {
+  color: $uesl-secondary;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.05em;
+}
+
+.uesl-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.uesl-tech-tag {
+  padding: 0.3rem 0.75rem;
+  background: rgba($uesl-primary, 0.12);
+  color: $uesl-primary;
+  border: 1px solid rgba($uesl-primary, 0.3);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+// ── Details / Impact Column ───────────────────────────────
+.uesl-details { }
+
+.uesl-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $uesl-primary;
+  margin: 0 0 0.75rem;
+}
+
+.uesl-about {
+  font-size: 0.9rem;
+  color: $uesl-text-muted;
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+}
+
+.uesl-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.uesl-impact-item {
+  font-size: 0.85rem;
+  color: $uesl-text-light;
+  padding: 0.5rem 0.75rem;
+  background: rgba($uesl-secondary, 0.06);
+  border-left: 3px solid $uesl-secondary;
+  border-radius: 0 6px 6px 0;
+  line-height: 1.5;
+}
+
+.uesl-btn {
+  display: inline-block;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(135deg, $uesl-primary, $uesl-secondary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba($uesl-primary, 0.4);
+    color: #fff;
+    text-decoration: none;
+  }
+}

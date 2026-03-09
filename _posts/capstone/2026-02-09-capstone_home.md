@@ -65,7 +65,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    <!-- Quant Game -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg">
        <a href="{% post_url 2026-02-06-quant-game-capstone %}">
-           <img src="/images/capstone/quant-trading-bot.png" alt="Quantitative Trading Bot capstone infographic preview image" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/quant-trading-game.png" alt="Quantitative Trading Bot capstone infographic preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-quant-game-capstone %}">Quantitative Trading Bot</a></h3>
@@ -124,6 +124,43 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Neil, Nikhil, Shriya</p>
        </div>
    </div>
+
+   <!-- Pirna Pages -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{% post_url 2026-02-13-pirna-capstone %}">
+           <img src="/images/capstone/pirna_logo.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-13-pirna-capstone %}">Pirna</a></h3>
+           <p class="text-sm text-gray-700">Improve group-level communication and engagement on OCS through an integrated messaging system, while generating practical design principles for scalable, analytics-informed collaborative tools in educational platforms.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Nikhil, Rohan, Adi</p>
+       </div>
+   </div>
+
+   <!-- College Bound Capstone -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{% post_url 2026-02-06-college-bound-capstone %}">
+           <img src="/images/capstone/college_bound.jpeg" alt="College Bound Capstone" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-college-bound-capstone %}">College Bound</a></h3>
+           <p class="text-sm text-gray-700">A website designed to provide a comprehensive guide to helping students prepare for college and effectively go through high school in preparation for the next stage of their educational career.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Xavier, Aranya, Trevor</p>
+       </div>
+   </div>
+
+   <!-- HawkHub -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{% post_url 2026-02-06-hawkhub %}">
+           <img src="/images/capstone/hawkhub.png" alt="HawkHub" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-hawkhub %}">HawkHub</a></h3>
+           <p class="text-sm text-gray-700">A club management and community platform designed to streamline student-led club operations, engagement tracking, and leadership development.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Avika, Soni, Samhita</p>
+       </div>
+   </div>
+   
 
 
 </div>
