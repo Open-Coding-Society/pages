@@ -1,4 +1,30 @@
 title: Community Health Foundation
+intro:
+  badge: Palomar Health Capstone
+  title: Palomar Health Digital Experience
+  description: Explore Palomar Health the same way a patient would first encounter it, then step into the full website experience for services, stories, community impact, and current updates.
+  overview_title: Patient-Centered Website Preview
+  image: capstone/website_projects/palomarbuilding.jpg
+  alt: Palomar Health hospital exterior building view at dusk
+  about: >-
+    This opening view is designed as a concise entry point into the full Palomar
+    Health website experience, showing how a large regional healthcare system can
+    welcome patients with clarity instead of overload. Rather than sending users
+    immediately into a dense hospital homepage, the overview frames the website
+    around the information people are most likely to need first: access to
+    doctors, appointments, emergency services, patient tools, trusted stories,
+    community programs, and timely updates. From there, the full site expands
+    into a more complete experience with service directories, patient-centered
+    navigation, local impact content, and recognition that reinforces trust in
+    the health system.
+  impact:
+    - Gives first-time visitors a clearer mental model of what the Palomar website offers before they navigate deeper
+    - Reduces friction for patients who need immediate next steps such as finding care, locating services, or accessing online tools
+    - Balances trust-building content with practical navigation by introducing stories, community programs, and current health system updates in one overview
+    - Creates a more approachable first impression for families, patients, and community members who may otherwise feel overwhelmed by a full healthcare homepage
+    - Leads directly into the actual website experience through a single Learn More action, preserving depth without crowding the first screen
+  reveal: home
+
 hero:
   headline: Exceptional Care for North San Diego County.
   brand_promise: Connect with a doctor who understands you.

@@ -33,6 +33,12 @@ $foundation-card-bg: #142338;
   }
 }
 
+@keyframes palomar-intro-gradient {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
 
 // Main Container
 .palomar-foundation {
@@ -48,6 +54,196 @@ $foundation-card-bg: #142338;
   font-size: 1.04rem;
   line-height: 1.7;
   animation: palomar-rise-fade 0.45s ease-out both;
+}
+
+.palomar-foundation .palomar-intro {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.palomar-foundation .palomar-intro-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #091a2d 0%, #102642 52%, #0a1320 100%);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(108, 174, 224, 0.35);
+}
+
+.palomar-foundation .palomar-intro-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #1c76bc, #f59e0b);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+.palomar-foundation .palomar-intro-title {
+  margin: 0 0 1rem 0;
+  font-size: 2.75rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #a9dafd, #ffffff, #ffd48a, #a9dafd);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: palomar-intro-gradient 3s ease infinite;
+}
+
+.palomar-foundation .palomar-intro-description {
+  color: #c9d9ea;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.palomar-foundation .palomar-intro-card {
+  background: linear-gradient(145deg, #0b1726 0%, #13243a 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba(108, 174, 224, 0.26);
+  box-shadow: 0 20px 60px rgba(19, 73, 120, 0.22);
+}
+
+.palomar-foundation .palomar-intro-card-grid {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.palomar-foundation .palomar-intro-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(27, 91, 147, 0.08);
+  border-radius: 16px;
+  border: 1px solid rgba(108, 174, 224, 0.3);
+}
+
+.palomar-foundation .palomar-intro-image-link {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(27, 91, 147, 0.4);
+  text-decoration: none;
+
+  &:hover .palomar-intro-image {
+    transform: scale(1.05);
+  }
+
+  &:hover .palomar-intro-overlay {
+    opacity: 1;
+  }
+}
+
+.palomar-foundation .palomar-intro-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.palomar-foundation .palomar-intro-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(27, 118, 188, 0.9), rgba(245, 158, 11, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+}
+
+.palomar-foundation .palomar-intro-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+}
+
+.palomar-foundation .palomar-intro-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba(245, 158, 11, 0.07);
+  border-radius: 16px;
+  border: 1px solid rgba(245, 158, 11, 0.24);
+}
+
+.palomar-foundation .palomar-intro-section-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(245, 158, 11, 0.35);
+}
+
+.palomar-foundation .palomar-intro-about {
+  color: #c9d9ea;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+.palomar-foundation .palomar-intro-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.palomar-foundation .palomar-intro-impact-item {
+  background: rgba(245, 158, 11, 0.1);
+  color: #e5edf7;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid #f59e0b;
+}
+
+.palomar-foundation .palomar-intro-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #1c76bc, #f59e0b);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(28, 118, 188, 0.38);
+    color: #fff;
+    text-decoration: none;
+  }
+}
+
+.palomar-foundation .palomar-website-shell.is-hidden {
+  display: none;
 }
 
 .palomar-foundation .palomar-topbar {
@@ -439,6 +635,23 @@ $foundation-card-bg: #142338;
 
 .palomar-foundation .reveal-topic.is-hidden {
   display: none;
+}
+
+@media (max-width: 1024px) {
+  .palomar-foundation .palomar-intro-card-grid {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .palomar-foundation .palomar-intro-visual {
+    max-width: none;
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .palomar-foundation .palomar-intro-card-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 

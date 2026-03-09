@@ -1,6 +1,43 @@
 {% assign data = site.data.capstones.palomar_health %}
 
 <div class="palomar-foundation">
+  <section class="palomar-intro" id="intro-home">
+    <div class="palomar-intro-header">
+      <div class="palomar-intro-badge">{{ data.intro.badge }}</div>
+      <h1 class="palomar-intro-title">{{ data.intro.title }}</h1>
+      <p class="palomar-intro-description">{{ data.intro.description }}</p>
+    </div>
+
+    <div class="palomar-intro-card">
+      <div class="palomar-intro-card-grid">
+        <div class="palomar-intro-visual">
+          <a href="#{{ data.intro.reveal }}" class="palomar-intro-image-link cta-entry" data-target="{{ data.intro.reveal }}">
+            <img src="{{ site.baseurl }}/images/{{ data.intro.image }}" alt="{{ data.intro.alt }}" class="palomar-intro-image">
+            <div class="palomar-intro-overlay">
+              <span>View Website</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="palomar-intro-details">
+          <h2 class="palomar-intro-project-title">{{ data.intro.overview_title }}</h2>
+          <h3 class="palomar-intro-section-title">About</h3>
+          <p class="palomar-intro-about">{{ data.intro.about }}</p>
+
+          <h3 class="palomar-intro-section-title">Impact</h3>
+          <div class="palomar-intro-impact-list">
+            {% for item in data.intro.impact %}
+            <div class="palomar-intro-impact-item">{{ item }}</div>
+            {% endfor %}
+          </div>
+
+          <a href="#{{ data.intro.reveal }}" class="palomar-intro-btn cta-entry" data-target="{{ data.intro.reveal }}">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="palomar-website-shell is-hidden">
   <div class="palomar-topbar">
     <button type="button" class="palomar-home-trigger" aria-label="Go to home view">
       <img src="{{ site.baseurl }}/images/capstone/website_projects/palomar.png" alt="Palomar Health home">
@@ -294,6 +331,7 @@
     <p>{{ data.contact.email }}</p>
     <p>{{ data.contact.phone }}</p>
   </section>
+  </div>
 
 </div>
 
@@ -302,11 +340,41 @@
     var root = document.querySelector('.palomar-foundation');
     if (!root) return;
 
+    var introSection = root.querySelector('#intro-home');
+    var websiteShell = root.querySelector('.palomar-website-shell');
     var homeSection = root.querySelector('#home');
     var homeOnlySections = root.querySelectorAll('.home-only');
     var homeButton = root.querySelector('.palomar-home-trigger');
     var topicSections = root.querySelectorAll('.reveal-topic');
     var ctaButtons = root.querySelectorAll('.cta-reveal');
+    var entryButtons = root.querySelectorAll('.cta-entry');
+
+    function showWebsiteShell() {
+      if (websiteShell) {
+        websiteShell.classList.remove('is-hidden');
+      }
+      if (introSection) {
+        introSection.classList.add('is-hidden');
+      }
+    }
+
+    function showIntro() {
+      clearServicesFilter();
+      hideAllTopics();
+      if (websiteShell) {
+        websiteShell.classList.add('is-hidden');
+      }
+      if (introSection) {
+        introSection.classList.remove('is-hidden');
+        introSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      homeOnlySections.forEach(function (section) {
+        section.classList.remove('is-hidden');
+      });
+      if (homeSection) {
+        homeSection.classList.remove('is-hidden');
+      }
+    }
 
     function hideAllTopics() {
       topicSections.forEach(function (section) {
@@ -316,6 +384,7 @@
 
     function showHome() {
       clearServicesFilter();
+      showWebsiteShell();
       hideAllTopics();
       homeOnlySections.forEach(function (section) {
         section.classList.remove('is-hidden');
@@ -334,6 +403,7 @@
         clearServicesFilter();
       }
 
+      showWebsiteShell();
       hideAllTopics();
       homeOnlySections.forEach(function (section) {
         section.classList.add('is-hidden');
@@ -357,6 +427,7 @@
 
     function showBlank() {
       clearServicesFilter();
+      showWebsiteShell();
       hideAllTopics();
       homeOnlySections.forEach(function (section) {
         section.classList.add('is-hidden');
@@ -383,6 +454,18 @@
         event.preventDefault();
         var targets = (button.dataset.reveal || '').split(',').filter(Boolean);
         showTopics(targets);
+      });
+    });
+
+    entryButtons.forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        var target = (button.dataset.target || '').trim();
+        if (!target || target === 'home') {
+          showHome();
+          return;
+        }
+        showTopics([target]);
       });
     });
 
@@ -431,7 +514,7 @@
       servicesSearchInput.addEventListener('input', applyServicesFilter);
     }
 
-    root.querySelectorAll('a:not(.cta-reveal)').forEach(function (link) {
+    root.querySelectorAll('a:not(.cta-reveal):not(.cta-entry)').forEach(function (link) {
       link.addEventListener('click', function (event) {
         if (link.dataset.allowNavigation === 'true') {
           return;
@@ -476,6 +559,10 @@
 
     var hash = window.location.hash ? window.location.hash.replace('#', '') : '';
     if (hash) {
+      if (hash === 'intro-home') {
+        showIntro();
+        return;
+      }
       var directTopic = root.querySelector('#' + hash);
       if (directTopic && directTopic.classList.contains('reveal-topic')) {
         showTopics([hash]);
@@ -491,7 +578,7 @@
         showHome();
       }
     } else {
-      showHome();
+      showIntro();
     }
   })();
 </script>
