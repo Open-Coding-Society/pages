@@ -509,26 +509,41 @@ comments: false
         </div>
       </div>
   
-      <!-- Results Section (hidden initially) -->
-      <div id="smartGroupResults" class="hidden p-6 border-t border-neutral-700 bg-neutral-900/50">
-        <h4 class="text-lg font-semibold text-white mb-4">Generated Groups Preview</h4>
-        <div id="smartGroupResultsContent" class="space-y-3 mb-6">
-          <!-- Results will be inserted here -->
-        </div>
-        <div class="flex gap-3 justify-end">
-          <button onclick="closeSmartGroupModal()"
-            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
-            Discard
-          </button>
-          <button onclick="saveSmartGroups()"
-            class="px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-semibold">
-            Save All Groups
-          </button>
-        </div>
-      </div>
+<!-- Results Section (hidden initially) -->
+<div id="smartGroupResults" class="hidden border-t border-neutral-700 bg-neutral-900/50">
+  <!-- Staging toolbar -->
+  <div class="flex items-center justify-between px-6 pt-5 pb-3">
+    <div>
+      <h4 class="text-lg font-semibold text-white">Staging Area</h4>
+      <p class="text-xs text-gray-400 mt-0.5">Lock groups you're happy with · Drag students between groups · Regenerate the rest</p>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="regenerateUnlocked()"
+        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Regenerate Unlocked
+      </button>
+      <button onclick="saveSmartGroups()"
+        class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg transition-colors font-semibold">
+        Save All Groups
+      </button>
+      <button onclick="closeSmartGroupModal()"
+        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white text-sm rounded-lg transition-colors">
+        Discard
+      </button>
     </div>
   </div>
-  
+
+  <!-- Method badge -->
+  <div id="stagingMethodBadge" class="px-6 pb-3"></div>
+
+  <!-- Groups grid -->
+  <div id="smartGroupResultsContent" class="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    <!-- Group cards injected here -->
+  </div>
+</div>  
 
 <!-- Feedback Modal -->
 <div id="feedbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
@@ -665,6 +680,14 @@ comments: false
       opacity: 1;
       transform: translateY(0);
     }
+  }
+  .staging-group.drag-over {
+    border-color: #6366f1 !important;
+    background-color: rgba(99, 102, 241, 0.08) !important;
+  }
+
+  .staging-member:active {
+    transform: scale(0.97);
   }
 </style>
 
@@ -1479,12 +1502,12 @@ window.openSmartGroupFormation = function() {
 window.closeSmartGroupModal = function() {
   document.getElementById('smartGroupModal').classList.add('hidden');
   document.body.classList.remove('modal-open');
-  // Reset form
   document.getElementById('smartGroupPeriod').value = '';
   document.getElementById('smartGroupClass').value = '';
   document.getElementById('smartGroupSize').value = '4';
   document.getElementById('smartGroupPrefix').value = '';
   generatedGroups = [];
+  lockedGroups = new Set(); // ← add this line
 }
 window.generateSmartGroups = async function() {
   const period = document.getElementById('smartGroupPeriod').value;
@@ -1631,184 +1654,334 @@ window.generateSmartGroups = async function() {
     hideLoading();
   }
 } 
+/* ================================
+   STAGING STATE
+================================ */
+let lockedGroups = new Set(); // indices of locked groups
+let dragSrc = null; // { groupIndex, memberIndex }
 
-  window.displaySmartGroupResults = function(result, period, course, allPeople, useAI = true) {
-    const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
-    const resultsContent = document.getElementById('smartGroupResultsContent');
-    
-    // Build groups with member details
-    generatedGroups = result.groups.map((group, index) => {
-      const letter = String.fromCharCode(65 + index);
-      const members = group.user_uids.map(uid => {
-        const person = allPeople.find(p => p.uid === uid);
-        return {
-          id: person?.id,
-          uid: uid,
-          name: person?.name || uid
-        };
-      });
+window.displaySmartGroupResults = function(result, period, course, allPeople, useAI = true) {
+  const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
+  lockedGroups = new Set();
 
-      return {
-        name: `${prefix} ${letter}`,
-        period: period,
-        course: course,
-        team_score: group.team_score,
-        memberIds: members.map(m => m.id),
-        members: members
-      };
+  // Build groups with member details
+  generatedGroups = result.groups.map((group, index) => {
+    const letter = String.fromCharCode(65 + index);
+    const members = group.user_uids.map(uid => {
+      const person = allPeople.find(p => p.uid === uid);
+      return { id: person?.id, uid, name: person?.name || uid };
     });
+    return {
+      name: `${prefix} ${letter}`,
+      period, course,
+      team_score: group.team_score,
+      memberIds: members.map(m => m.id),
+      members
+    };
+  });
 
-    // Display preview with method indicator
-    const methodBadge = useAI 
-      ? '<span class="px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
-      : '<span class="px-3 py-1 bg-gray-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+  // Method badge
+  const methodBadge = useAI
+    ? '<span class="inline-flex px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
+    : '<span class="inline-flex px-3 py-1 bg-neutral-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+  document.getElementById('stagingMethodBadge').innerHTML = methodBadge;
 
-    resultsContent.innerHTML = `
-      <div class="mb-4 p-3 bg-neutral-700 rounded-lg border border-neutral-600">
-        <div class="flex items-center justify-between">
+  renderStagingGroups();
+
+  document.getElementById('smartGroupResults').classList.remove('hidden');
+  document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderStagingGroups() {
+  const container = document.getElementById('smartGroupResultsContent');
+
+  container.innerHTML = generatedGroups.map((group, gi) => {
+    const locked = lockedGroups.has(gi);
+    const scoreHtml = group.team_score !== null
+      ? `<span class="text-xs font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">${group.team_score.toFixed(1)}</span>`
+      : `<span class="text-xs text-gray-500">Random</span>`;
+
+    const membersHtml = group.members.map((m, mi) => `
+      <div
+        class="staging-member flex items-center gap-2 px-2 py-1.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg cursor-grab active:cursor-grabbing transition-colors text-xs"
+        draggable="true"
+        data-group="${gi}"
+        data-member="${mi}"
+        ondragstart="onDragStart(event, ${gi}, ${mi})"
+        ondragend="onDragEnd(event)">
+        <svg class="w-3 h-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+        </svg>
+        <span class="text-white font-medium truncate">${m.name}</span>
+        <span class="text-gray-400 truncate">@${m.uid}</span>
+      </div>
+    `).join('');
+
+    return `
+      <div
+        class="staging-group rounded-xl border-2 ${locked ? 'border-green-500/60 bg-green-950/20' : 'border-neutral-600 bg-neutral-800'} transition-all duration-200 flex flex-col"
+        data-group="${gi}"
+        ondragover="onDragOver(event)"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event, ${gi})">
+
+        <!-- Card header -->
+        <div class="flex items-center justify-between px-3 pt-3 pb-2">
           <div>
-            <p class="text-sm text-gray-300">Grouping Method</p>
-            <p class="text-xs text-gray-500 mt-1">
-              ${useAI 
-                ? 'Groups optimized using persona compatibility analysis' 
-                : 'Random assignment (more students need to complete persona profiles for AI grouping)'}
-            </p>
+            <div class="flex items-center gap-2">
+              <span class="text-white font-semibold text-sm">${group.name}</span>
+              ${locked ? '<span class="text-xs text-green-400 font-medium">Locked</span>' : ''}
+            </div>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-xs text-gray-400">${group.members.length} members</span>
+              ${scoreHtml}
+            </div>
           </div>
-          ${methodBadge}
+          <button
+            onclick="toggleLock(${gi})"
+            title="${locked ? 'Unlock group' : 'Lock group'}"
+            class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${locked ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-neutral-700 hover:bg-neutral-600 text-gray-300 hover:text-white'}">
+            ${locked
+              ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>`
+              : `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>`
+            }
+          </button>
+        </div>
+
+        <!-- Drop zone -->
+        <div class="flex flex-col gap-1.5 px-3 pb-3 min-h-[60px]">
+          ${membersHtml}
+          <div class="drop-hint hidden text-xs text-center text-gray-500 py-2 border border-dashed border-neutral-600 rounded-lg mt-1">
+            Drop here
+          </div>
         </div>
       </div>
-      
-      ${generatedGroups.map((group, index) => `
-        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <h5 class="text-white font-semibold">${group.name}</h5>
-              <p class="text-xs text-gray-400">Period ${group.period} · ${group.course} · ${group.members.length} members</p>
-            </div>
-            ${group.team_score !== null ? `
-              <div class="text-right">
-                <div class="text-sm font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">
-                  Score: ${group.team_score.toFixed(1)}
-                </div>
-                <div class="text-xs text-gray-500">
-                  ${group.team_score >= 80 ? 'Excellent' : group.team_score >= 70 ? 'Good' : group.team_score >= 60 ? 'Fair' : 'Needs Work'}
-                </div>
-              </div>
-            ` : `
-              <div class="text-right">
-                <div class="text-xs text-gray-500">Random</div>
-              </div>
-            `}
-          </div>
-          <div class="flex flex-wrap gap-2">
-            ${group.members.map(m => `
-              <span class="px-2 py-1 bg-neutral-700 text-xs text-gray-300 rounded">
-                ${m.name} <span class="text-gray-500">@${m.uid}</span>
-              </span>
-            `).join('')}
-          </div>
-        </div>
-      `).join('')}
     `;
+  }).join('');
+}
 
-    // Show results section
-    document.getElementById('smartGroupResults').classList.remove('hidden');
-    
-    // Scroll to results
-    document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+/* ================================
+   DRAG AND DROP
+================================ */
+window.onDragStart = function(e, groupIndex, memberIndex) {
+  dragSrc = { groupIndex, memberIndex };
+  e.dataTransfer.effectAllowed = 'move';
+  e.target.classList.add('opacity-40');
+
+  // Show drop hints on all other groups
+  document.querySelectorAll('.staging-group').forEach((card, i) => {
+    if (i !== groupIndex) {
+      card.querySelector('.drop-hint')?.classList.remove('hidden');
+    }
+  });
+}
+
+window.onDragEnd = function(e) {
+  e.target.classList.remove('opacity-40');
+  document.querySelectorAll('.drop-hint').forEach(h => h.classList.add('hidden'));
+  document.querySelectorAll('.staging-group').forEach(c => c.classList.remove('drag-over'));
+}
+
+window.onDragOver = function(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+window.onDragLeave = function(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+window.onDrop = function(e, targetGroupIndex) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+
+  if (dragSrc === null) return;
+  if (dragSrc.groupIndex === targetGroupIndex) return;
+
+  const { groupIndex: srcGi, memberIndex: srcMi } = dragSrc;
+
+  // Move the member
+  const member = generatedGroups[srcGi].members[srcMi];
+  generatedGroups[srcGi].members.splice(srcMi, 1);
+  generatedGroups[srcGi].memberIds = generatedGroups[srcGi].members.map(m => m.id);
+  generatedGroups[targetGroupIndex].members.push(member);
+  generatedGroups[targetGroupIndex].memberIds = generatedGroups[targetGroupIndex].members.map(m => m.id);
+
+  // Auto-unlock source group if it was locked
+  if (lockedGroups.has(srcGi)) {
+    lockedGroups.delete(srcGi);
   }
 
-  window.saveSmartGroups = async function() {
-    if (!generatedGroups.length) {
-      alert('No groups to save');
-      return;
-    }
+  dragSrc = null;
+  renderStagingGroups();
+}
 
-    showLoading(`Creating ${generatedGroups.length} groups...`);
+/* ================================
+   LOCK TOGGLE
+================================ */
+window.toggleLock = function(groupIndex) {
+  if (lockedGroups.has(groupIndex)) {
+    lockedGroups.delete(groupIndex);
+  } else {
+    lockedGroups.add(groupIndex);
+  }
+  renderStagingGroups();
+}
 
-    const createdGroups = [];
-    const failedGroups = [];
+/* ================================
+   REGENERATE UNLOCKED
+================================ */
+window.regenerateUnlocked = async function() {
+  const unlockedIndices = generatedGroups
+    .map((_, i) => i)
+    .filter(i => !lockedGroups.has(i));
 
+  if (unlockedIndices.length === 0) {
+    alert('All groups are locked. Unlock at least one group to regenerate.');
+    return;
+  }
+
+  // Collect students from unlocked groups only
+  const unlockedStudents = [];
+  const seenIds = new Set();
+  unlockedIndices.forEach(i => {
+    generatedGroups[i].members.forEach(m => {
+      if (!seenIds.has(m.id)) {
+        seenIds.add(m.id);
+        unlockedStudents.push(m);
+      }
+    });
+  });
+
+  const groupSize = parseInt(document.getElementById('smartGroupSize').value);
+  const period = document.getElementById('smartGroupPeriod').value;
+  const course = document.getElementById('smartGroupClass').value;
+
+  showLoading('Regenerating unlocked groups...');
+
+  try {
+    const user_uids = unlockedStudents.map(s => s.uid);
+
+    // Try AI, fall back to random
+    let newGroups = [];
     try {
-      // Create groups one by one
-      for (let i = 0; i < generatedGroups.length; i++) {
-        const group = generatedGroups[i];
-        
-        try {
-          showLoading(`Creating group ${i + 1} of ${generatedGroups.length}...`);
-          
-          // Create the group first (without members)
-          const createResp = await fetch(`${javaURI}/api/groups`, {
-            ...fetchOptions,
-            method: 'POST',
-            body: JSON.stringify({
-              name: group.name,
-              period: group.period,
-              course: group.course
-            })
-          });
-
-          if (!createResp.ok) {
-            const error = await createResp.text();
-            console.error(`Failed to create ${group.name}:`, error);
-            failedGroups.push({ group: group.name, error: 'Creation failed' });
-            continue;
-          }
-
-          const createdGroup = await createResp.json();
-          console.log(`✅ Created group: ${group.name} (ID: ${createdGroup.id})`);
-
-          // Add members one by one
-          for (const memberId of group.memberIds) {
-            if (!memberId) continue;
-            
-            try {
-              const addMemberResp = await fetch(
-                `${javaURI}/api/groups/${createdGroup.id}/members/${memberId}`,
-                { ...fetchOptions, method: 'POST' }
-              );
-
-              if (!addMemberResp.ok) {
-                console.error(`Failed to add member ${memberId} to ${group.name}`);
-              }
-            } catch (err) {
-              console.error(`Error adding member ${memberId}:`, err);
-            }
-          }
-
-          createdGroups.push(createdGroup);
-
-        } catch (err) {
-          console.error(`Error creating group ${group.name}:`, err);
-          failedGroups.push({ group: group.name, error: err.message });
-        }
-      }
-
-      // Update local state
-      if (createdGroups.length > 0) {
-        allGroups.push(...createdGroups);
-      }
-
-      // Show results
-      if (failedGroups.length === 0) {
-        alert(`✅ Successfully created all ${createdGroups.length} groups!`);
+      const resp = await fetch(`${pythonURI}/api/persona/form-groups`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ user_uids, group_size: groupSize })
+      });
+      if (resp.ok) {
+        const result = await resp.json();
+        const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
+        newGroups = result.groups.map(g => {
+          const members = g.user_uids.map(uid => unlockedStudents.find(s => s.uid === uid)).filter(Boolean);
+          return { members, memberIds: members.map(m => m.id), team_score: g.team_score };
+        });
       } else {
-        alert(
-          `⚠️ Created ${createdGroups.length} groups.\n` +
-          `${failedGroups.length} failed.`
-        );
+        throw new Error('AI failed');
       }
-
-      closeSmartGroupModal();
-      renderGroups();
-
-    } catch (error) {
-      console.error('❌ Error in saveSmartGroups:', error);
-      alert(`Failed to save groups: ${error.message}`);
-    } finally {
-      hideLoading();
+    } catch {
+      // Random fallback
+      const shuffled = [...unlockedStudents].sort(() => Math.random() - 0.5);
+      for (let i = 0; i < shuffled.length; i += groupSize) {
+        const members = shuffled.slice(i, i + groupSize);
+        newGroups.push({ members, memberIds: members.map(m => m.id), team_score: null });
+      }
     }
+
+    // Replace unlocked groups with new ones, keeping names and period/course
+    let newGroupIdx = 0;
+    unlockedIndices.forEach(i => {
+      if (newGroupIdx < newGroups.length) {
+        generatedGroups[i].members = newGroups[newGroupIdx].members;
+        generatedGroups[i].memberIds = newGroups[newGroupIdx].memberIds;
+        generatedGroups[i].team_score = newGroups[newGroupIdx].team_score;
+        newGroupIdx++;
+      } else {
+        // No more new groups - empty this slot
+        generatedGroups[i].members = [];
+        generatedGroups[i].memberIds = [];
+      }
+    });
+
+    // Remove empty groups
+    generatedGroups = generatedGroups.filter(g => g.members.length > 0);
+
+    renderStagingGroups();
+  } catch (err) {
+    console.error('Regeneration failed:', err);
+    alert('Failed to regenerate groups');
+  } finally {
+    hideLoading();
   }
+}
+
+/* ================================
+   SAVE
+================================ */
+window.saveSmartGroups = async function() {
+  if (!generatedGroups.length) {
+    alert('No groups to save');
+    return;
+  }
+
+  showLoading(`Creating ${generatedGroups.length} groups...`);
+  const createdGroups = [];
+  const failedGroups = [];
+
+  try {
+    for (let i = 0; i < generatedGroups.length; i++) {
+      const group = generatedGroups[i];
+      showLoading(`Creating group ${i + 1} of ${generatedGroups.length}...`);
+
+      try {
+        const createResp = await fetch(`${javaURI}/api/groups`, {
+          ...fetchOptions,
+          method: 'POST',
+          body: JSON.stringify({ name: group.name, period: group.period, course: group.course })
+        });
+
+        if (!createResp.ok) {
+          failedGroups.push(group.name);
+          continue;
+        }
+
+        const createdGroup = await createResp.json();
+
+        for (const memberId of group.memberIds) {
+          if (!memberId) continue;
+          try {
+            await fetch(`${javaURI}/api/groups/${createdGroup.id}/members/${memberId}`, {
+              ...fetchOptions, method: 'POST'
+            });
+          } catch (err) {
+            console.error(`Failed to add member ${memberId}`, err);
+          }
+        }
+
+        createdGroups.push(createdGroup);
+      } catch (err) {
+        failedGroups.push(group.name);
+      }
+    }
+
+    allGroups.push(...createdGroups);
+
+    if (failedGroups.length === 0) {
+      alert(`✅ Successfully created all ${createdGroups.length} groups!`);
+    } else {
+      alert(`⚠️ Created ${createdGroups.length} groups. ${failedGroups.length} failed.`);
+    }
+
+    closeSmartGroupModal();
+    renderGroups();
+  } catch (err) {
+    alert(`Failed to save groups: ${err.message}`);
+  } finally {
+    hideLoading();
+  }
+}
 
   // ================================
   // CHAT FUNCTIONALITY
