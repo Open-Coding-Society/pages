@@ -137,26 +137,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- PYBL -->
+   <!-- Binary Beasts -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg">
        <a href="{% post_url 2026-03-06-pybl-capstone %}">
            <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">PYBL</a></h3>
-           <p class="text-sm text-gray-700">A capstone focused on improving youth basketball operations through clearer registration, schedules, and mobile-first parent communication.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
-       </div>
-   </div>
-
-   <!-- Poway NEC -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
-       <a href="{% post_url 2026-03-06-powaynec-capstone %}">
-           <img src="/images/capstone/powaynec.png" alt="Poway NEC capstone preview image" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway NEC</a></h3>
-           <p class="text-sm text-gray-700">A capstone improving emergency preparedness communication through clearer volunteer pathways and faster access to critical information.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Binary Beasts</a></h3>
+           <p class="text-sm text-gray-700">Combined PYBL + Poway NEC capstone infographics on one page: youth basketball operations and emergency preparedness information architecture improvements.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
        </div>
    </div>
@@ -164,5 +152,4 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
 
 </div>
-
 

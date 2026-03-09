@@ -1,10 +1,17 @@
 ---
 toc: false
 layout: post
-title: Poway NEC Capstone
-description: A Design-Based Research capstone that improves emergency preparedness communication through clearer volunteer workflows and faster access to critical information.
+title: Binary Beasts Capstone
+description: Binary Beasts combines Poway NEC and PYBL into one shared Design-Based Research capstone page.
 permalink: /capstone/powaynec/
 sticky_rank: 1
 ---
 
+## Binary Beasts
+This route now shows both Binary Beasts infographics together.
+
+### PYBL
+{% include pybl-infograph.html %}
+
+### Poway NEC
 {% include powaynec-infograph.html %}
