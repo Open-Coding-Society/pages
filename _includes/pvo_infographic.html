@@ -1,608 +1,70 @@
+{% assign data = site.data.pvo_infograph %}
 
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PVO Website Redesign Infographic</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Sans+3:wght@300;400;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --navy:   #1a2744;
-    --navy2:  #243060;
-    --red:    #b91c1c;
-    --red2:   #dc2626;
-    --gold:   #d4a017;
-    --gold2:  #f0c040;
-    --cream:  #f5f0e8;
-    --white:  #ffffff;
-    --gray1:  #f0ece2;
-    --gray2:  #d6cfc0;
-    --gray3:  #8a8070;
-    --ink:    #1a1610;
-  }
-
-  body {
-    background: var(--cream);
-    font-family: 'Source Sans 3', sans-serif;
-    color: var(--ink);
-    line-height: 1.5;
-  }
-
-  .infographic {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 0 60px;
-  }
-
-  .pvo-header {
-    background: var(--navy);
-    color: var(--white);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .pvo-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(-45deg, transparent, transparent 18px, rgba(255,255,255,0.03) 18px, rgba(255,255,255,0.03) 36px);
-    pointer-events: none;
-  }
-
-  .flag-bar { display: flex; height: 10px; }
-  .flag-bar span { flex: 1; }
-  .flag-bar .r { background: var(--red); }
-  .flag-bar .w { background: var(--white); }
-  .flag-bar .b { background: #2563eb; }
-
-  .pvo-header__inner {
-    padding: 44px 52px 40px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .pvo-header__eyebrow {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold2);
-    margin-bottom: 12px;
-  }
-
-  .pvo-header__title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(24px, 4vw, 36px);
-    font-weight: 900;
-    line-height: 1.15;
-    color: var(--white);
-    max-width: 680px;
-    margin-bottom: 10px;
-  }
-
-  .pvo-header__title em { color: var(--gold2); font-style: normal; }
-
-  .pvo-header__sub {
-    font-size: 16px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.72);
-    margin-bottom: 18px;
-  }
-
-  .pvo-header__meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-
-  .pvo-header__url {
-    font-family: 'Courier Prime', monospace;
-    font-size: 12px;
-    color: var(--gold2);
-    text-decoration: none;
-    border: 1px solid rgba(212,160,23,0.4);
-    padding: 4px 10px;
-    border-radius: 2px;
-  }
-
-  .pvo-header__tagline { font-size: 12px; color: rgba(255,255,255,0.45); font-style: italic; }
-
-  .header-star {
-    position: absolute;
-    right: 48px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.07;
-    font-size: 100px;
-    line-height: 1;
-    user-select: none;
-    letter-spacing: -8px;
-  }
-
-  /* STATS */
-  .pvo-stats { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--red); }
-
-  .pvo-stat {
-    padding: 24px 20px;
-    text-align: center;
-    border-right: 1px solid rgba(255,255,255,0.15);
-    color: var(--white);
-  }
-  .pvo-stat:last-child { border-right: none; }
-
-  .pvo-stat__value {
-    display: block;
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--white);
-  }
-
-  .pvo-stat__label {
-    display: block;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.75);
-    margin: 5px 0 3px;
-    font-weight: 600;
-  }
-
-  .pvo-stat__note { display: block; font-size: 11px; color: rgba(255,255,255,0.55); font-style: italic; }
-
-  /* CALLOUT */
-  .pvo-callout {
-    background: var(--navy2);
-    padding: 28px 52px;
-    display: flex;
-    align-items: flex-start;
-    gap: 18px;
-    border-left: 6px solid var(--gold);
-  }
-
-  .pvo-callout__icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
-
-  .pvo-callout__text {
-    font-family: 'Playfair Display', serif;
-    font-size: 17px;
-    font-style: italic;
-    color: rgba(255,255,255,0.9);
-    line-height: 1.6;
-    quotes: none;
-  }
-
-  /* BODY */
-  .pvo-body {
-    padding: 36px 52px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 28px;
-  }
-
-  .pvo-card {
-    background: var(--white);
-    border: 1px solid var(--gray2);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .pvo-card__heading {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--white);
-    background: var(--navy);
-    padding: 9px 18px;
-    font-weight: 700;
-  }
-
-  .pvo-card__heading--red { background: var(--red); }
-
-  /* AUDIENCES */
-  .pvo-audience-list { list-style: none; }
-
-  .pvo-audience-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 11px 18px;
-    border-bottom: 1px solid var(--gray1);
-  }
-  .pvo-audience-item:last-child { border-bottom: none; }
-
-  .pvo-audience-item__icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-
-  .pvo-audience-item__name {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--navy);
-    display: block;
-    margin-bottom: 2px;
-  }
-
-  .pvo-audience-item__pain { font-size: 12px; color: var(--ink) !important; line-height: 1.4; }
-
-  /* GAPS */
-  .pvo-gap-list { list-style: none; padding: 10px 18px; border-bottom: 1px solid var(--gray1); }
-
-  .pvo-gap-item {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font-size: 12.5px;
-    color: var(--ink) !important;
-    padding: 6px 0;
-    border-bottom: 1px dashed var(--gray1);
-  }
-  .pvo-gap-item:last-child { border-bottom: none; }
-
-  .pvo-gap-item__x { color: var(--red); font-weight: 700; font-size: 14px; flex-shrink: 0; }
-
-  .pvo-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 18px; }
-
-  .pvo-tag {
-    background: var(--gray1);
-    border: 1px solid var(--gray2);
-    color: var(--navy);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 2px;
-    font-family: 'Courier Prime', monospace;
-  }
-
-  /* PHASES */
-  .pvo-phases { padding: 0 52px 36px; }
-
-  .pvo-phases__heading {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--navy);
-    background: var(--gold);
-    display: inline-block;
-    padding: 7px 18px;
-    margin-bottom: 16px;
-    font-weight: 700;
-  }
-
-  .pvo-phases__track {
-    border: 1px solid var(--gray2);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .pvo-phase {
-    display: grid;
-    grid-template-columns: 52px 1fr;
-    border-bottom: 1px solid var(--gray2);
-    background: var(--white);
-  }
-  .pvo-phase:last-child { border-bottom: none; }
-
-  .pvo-phase__num {
-    background: var(--navy);
-    color: var(--gold2);
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .pvo-phase--highest .pvo-phase__num { background: var(--red); }
-  .pvo-phase--high    .pvo-phase__num { background: var(--navy2); }
-  .pvo-phase--medium  .pvo-phase__num { background: #374151; }
-  .pvo-phase--lower   .pvo-phase__num { background: #6b7280; }
-
-  .pvo-phase__body {
-    padding: 11px 18px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .pvo-phase__title { font-size: 13.5px; font-weight: 700; color: var(--navy); min-width: 140px; }
-
-  .pvo-phase__desc { font-size: 12px; color: var(--ink) !important; flex: 1; min-width: 180px; line-height: 1.4; }
-
-  .pvo-phase__badge {
-    font-family: 'Courier Prime', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 2px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .pvo-phase__badge--highest { background: #fef2f2; color: var(--red); border: 1px solid #fca5a5; }
-  .pvo-phase__badge--high    { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
-  .pvo-phase__badge--medium  { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
-  .pvo-phase__badge--lower   { background: var(--gray1); color: var(--gray3); border: 1px solid var(--gray2); }
-
-  /* NAV */
-  .pvo-nav {
-    margin: 0 52px 36px;
-    background: var(--white);
-    border: 1px solid var(--gray2);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .pvo-nav__label {
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--white);
-    background: var(--navy);
-    padding: 9px 18px;
-    font-weight: 700;
-  }
-
-  .pvo-nav__bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0;
-    padding: 16px 20px;
-    align-items: center;
-    border-bottom: 1px solid var(--gray1);
-  }
-
-  .pvo-nav__item { font-size: 13px; font-weight: 600; color: var(--navy); padding: 7px 14px; border-radius: 3px; }
-  .pvo-nav__item--active { background: var(--navy); color: var(--white); }
-  .pvo-nav__divider { color: var(--gray2); font-size: 18px; padding: 0 2px; }
-
-  .pvo-nav__caption { padding: 10px 24px; font-size: 11.5px; color: var(--gray3); font-style: italic; }
-
-  /* FOOTER */
-  .pvo-footer {
-    margin: 0 52px;
-    padding: 20px 0 0;
-    border-top: 1px solid var(--gray2);
-    font-family: 'Courier Prime', monospace;
-    font-size: 11px;
-    color: var(--gray3);
-    text-align: center;
-    letter-spacing: 0.05em;
-  }
-
-  @media (max-width: 680px) {
-    .pvo-stats { grid-template-columns: 1fr 1fr; }
-    .pvo-body { grid-template-columns: 1fr; padding: 24px 20px; }
-    .pvo-callout { padding: 20px 24px; }
-    .pvo-phases { padding: 0 20px 28px; }
-    .pvo-nav { margin: 0 20px 28px; }
-    .pvo-footer { margin: 0 20px; }
-    .pvo-header__inner { padding: 28px 24px 24px; }
-    .header-star { display: none; }
-  }
-</style>
-</head>
-<body>
-<div class="infographic">
-
-  <header class="pvo-header">
-    <div class="flag-bar">
-      <span class="r"></span><span class="r"></span><span class="r"></span>
-      <span class="w"></span><span class="w"></span><span class="w"></span>
-      <span class="b"></span><span class="b"></span><span class="b"></span>
-    </div>
-    <div class="pvo-header__inner">
-      <p class="pvo-header__eyebrow">Website Redesign Analysis · March 2026</p>
-      <h1 class="pvo-header__title">Poway Veterans Organization — <em>Website Redesign Plan</em></h1>
-      <p class="pvo-header__sub">From Information Site to Guided Support Portal</p>
-      <div class="pvo-header__meta">
-        <a class="pvo-header__url" href="https://powayveterans.org" target="_blank">powayveterans.org</a>
-        <span class="pvo-header__tagline">Assisting Poway's Veterans since 2014</span>
-      </div>
-      <div class="header-star" aria-hidden="true">★★★</div>
-    </div>
-  </header>
-
-  <div class="pvo-stats">
-    <div class="pvo-stat">
-      <span class="pvo-stat__value">0</span>
-      <span class="pvo-stat__label">Staff</span>
-      <span class="pvo-stat__note">100% volunteer-run</span>
-    </div>
-    <div class="pvo-stat">
-      <span class="pvo-stat__value">95%+</span>
-      <span class="pvo-stat__label">Funds to Veterans</span>
-      <span class="pvo-stat__note">of all donations</span>
-    </div>
-    <div class="pvo-stat">
-      <span class="pvo-stat__value">2014</span>
-      <span class="pvo-stat__label">Founded</span>
-      <span class="pvo-stat__note">Poway, CA</span>
-    </div>
-    <div class="pvo-stat">
-      <span class="pvo-stat__value">3+</span>
-      <span class="pvo-stat__label">Service Areas</span>
-      <span class="pvo-stat__note">Poway, Ramona &amp; surrounding</span>
-    </div>
+<div class="pv-infograph">
+  <!-- Header Section -->
+  <div class="pv-header">
+    <div class="pv-badge">Nonprofit Website Analysis & Redesign Strategy</div>
+    <h1 class="pv-title">{{ data.Title }}</h1>
+    <p class="pv-description">{{ data.Description }}</p>
   </div>
 
-  <div class="pvo-callout">
-    <span class="pvo-callout__icon">⭐</span>
-    <blockquote class="pvo-callout__text">
-      Poway Veterans Organization should redesign its website from an information site into a guided local support portal for veterans, families, volunteers, and donors.
-    </blockquote>
-  </div>
-
-  <div class="pvo-body">
-
-    <div class="pvo-card">
-      <h2 class="pvo-card__heading">Who Uses the Site</h2>
-      <ul class="pvo-audience-list">
-        <li class="pvo-audience-item">
-          <span class="pvo-audience-item__icon">🎖️</span>
-          <div>
-            <strong class="pvo-audience-item__name">Veterans in Need</strong>
-            <p class="pvo-audience-item__pain" style="color:#1a1610 !important">No guided help pathway — unclear eligibility, process, or timelines</p>
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="pv-card">
+    <div class="pv-card-grid">
+      
+      <!-- Left: Image & Status -->
+      <div class="pv-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="pv-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-image">
+          <div class="pv-overlay">
+            <span>View Project</span>
           </div>
-        </li>
-        <li class="pvo-audience-item">
-          <span class="pvo-audience-item__icon">👨‍👩‍👧</span>
-          <div>
-            <strong class="pvo-audience-item__name">Families &amp; Dependents</strong>
-            <p class="pvo-audience-item__pain" style="color:#1a1610 !important">No family-facing guide despite explicit mission inclusion</p>
+        </a>
+        <div class="pv-status">{{ topic.status }}</div>
+        <div class="pv-team">
+          <span class="pv-team-label">Project Leads</span>
+          <span class="pv-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="pv-content">
+        <h2 class="pv-project-title">{{ topic.title }}</h2>
+        <p class="pv-subtitle">{{ topic.subtitle }}</p>
+        
+        <div class="pv-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="pv-keypoint">
+            <span class="pv-check">✓</span>
+            <span>{{ point }}</span>
           </div>
-        </li>
-        <li class="pvo-audience-item">
-          <span class="pvo-audience-item__icon">🤝</span>
-          <div>
-            <strong class="pvo-audience-item__name">Volunteers</strong>
-            <p class="pvo-audience-item__pain" style="color:#1a1610 !important">Form-only page — no role types, time expectations, or examples</p>
-          </div>
-        </li>
-        <li class="pvo-audience-item">
-          <span class="pvo-audience-item__icon">💛</span>
-          <div>
-            <strong class="pvo-audience-item__name">Donors &amp; Sponsors</strong>
-            <p class="pvo-audience-item__pain" style="color:#1a1610 !important">Impact is buried — no current stories or campaign options</p>
-          </div>
-        </li>
-        <li class="pvo-audience-item">
-          <span class="pvo-audience-item__icon">🎓</span>
-          <div>
-            <strong class="pvo-audience-item__name">Student Veterans</strong>
-            <p class="pvo-audience-item__pain" style="color:#1a1610 !important">Scholarship details exist but eligibility/deadlines unclear</p>
-          </div>
-        </li>
-        <li class="pvo-audience-item">
-          <span class="pvo-audience-item__icon">🏘️</span>
-          <div>
-            <strong class="pvo-audience-item__name">Community Partners</strong>
-            <p class="pvo-audience-item__pain" style="color:#1a1610 !important">Golf/event info isolated from broader partnerships story</p>
-          </div>
-        </li>
-      </ul>
-    </div>
+          {% endfor %}
+        </div>
 
-    <div class="pvo-card">
-      <h2 class="pvo-card__heading pvo-card__heading--red">Current Site Gaps</h2>
-      <ul class="pvo-gap-list">
-        <li class="pvo-gap-item"><span class="pvo-gap-item__x">✕</span><span style="color:#1a1610 !important">Site organized by pages, not user needs</span></li>
-        <li class="pvo-gap-item"><span class="pvo-gap-item__x">✕</span><span style="color:#1a1610 !important">Help pathway is not step-by-step</span></li>
-        <li class="pvo-gap-item"><span class="pvo-gap-item__x">✕</span><span style="color:#1a1610 !important">Volunteers lack role context before the form</span></li>
-        <li class="pvo-gap-item"><span class="pvo-gap-item__x">✕</span><span style="color:#1a1610 !important">No upcoming events visible (as of March 2026)</span></li>
-        <li class="pvo-gap-item"><span class="pvo-gap-item__x">✕</span><span style="color:#1a1610 !important">Impact data is long-form archive, not scannable summary</span></li>
-        <li class="pvo-gap-item"><span class="pvo-gap-item__x">✕</span><span style="color:#1a1610 !important">Newsletter frequency mismatch (monthly vs quarterly)</span></li>
-      </ul>
-      <h2 class="pvo-card__heading">Support Types PVO Offers</h2>
-      <div class="pvo-tags">
-        <span class="pvo-tag">Rent &amp; Utilities</span>
-        <span class="pvo-tag">Food Assistance</span>
-        <span class="pvo-tag">Transportation</span>
-        <span class="pvo-tag">Home Repair</span>
-        <span class="pvo-tag">Emergency Hardship</span>
-        <span class="pvo-tag">Student Support</span>
-        <span class="pvo-tag">Housing Transition</span>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="pvo-phases">
-    <h2 class="pvo-phases__heading">7-Phase Redesign Roadmap</h2>
-    <div class="pvo-phases__track">
-
-      <div class="pvo-phase pvo-phase--highest">
-        <div class="pvo-phase__num">1</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Get Help Hub</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Build 'Need Help? Start Here' with eligibility, process steps, documents, and urgent resources</p>
-          <span class="pvo-phase__badge pvo-phase__badge--highest">Highest</span>
+        <div class="pv-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="pv-tech-tag">{{ tech }}</span>
+          {% endfor %}
         </div>
       </div>
 
-      <div class="pvo-phase pvo-phase--high">
-        <div class="pvo-phase__num">2</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Homepage Restructure</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Reorder homepage around 5 jobs: who we help → actions → impact → activity → trust</p>
-          <span class="pvo-phase__badge pvo-phase__badge--high">High</span>
+      <!-- Right: Description & Impact -->
+      <div class="pv-details">
+        <h3 class="pv-section-title">About</h3>
+        <p class="pv-about">{{ topic.description }}</p>
+        
+        <h3 class="pv-section-title">Impact</h3>
+        <div class="pv-impact-list">
+          {% for item in topic.impact %}
+          <div class="pv-impact-item">{{ item }}</div>
+          {% endfor %}
         </div>
-      </div>
 
-      <div class="pvo-phase pvo-phase--high">
-        <div class="pvo-phase__num">3</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Local Resource Map</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Directory of VA, housing, food, legal, transport, and education resources in Poway/Ramona</p>
-          <span class="pvo-phase__badge pvo-phase__badge--high">High</span>
-        </div>
-      </div>
-
-      <div class="pvo-phase pvo-phase--medium">
-        <div class="pvo-phase__num">4</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Volunteer Redesign</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Add role types, time commitment, project examples, and post-signup expectations</p>
-          <span class="pvo-phase__badge pvo-phase__badge--medium">Medium</span>
-        </div>
-      </div>
-
-      <div class="pvo-phase pvo-phase--medium">
-        <div class="pvo-phase__num">5</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Impact Page</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Clean summary of veterans helped, dollars deployed, categories, and recent stories</p>
-          <span class="pvo-phase__badge pvo-phase__badge--medium">Medium</span>
-        </div>
-      </div>
-
-      <div class="pvo-phase pvo-phase--medium">
-        <div class="pvo-phase__num">6</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Freshness Updates</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Events, blog, newsletter archive, and recent impact snapshots</p>
-          <span class="pvo-phase__badge pvo-phase__badge--medium">Medium</span>
-        </div>
-      </div>
-
-      <div class="pvo-phase pvo-phase--lower">
-        <div class="pvo-phase__num">7</div>
-        <div class="pvo-phase__body">
-          <strong class="pvo-phase__title">Form Simplification</strong>
-          <p class="pvo-phase__desc" style="color:#1a1610 !important">Shorter screens, document checklist, privacy reassurance, conditional logic</p>
-          <span class="pvo-phase__badge pvo-phase__badge--lower">Lower</span>
-        </div>
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="pv-btn">Learn More</a>
       </div>
 
     </div>
   </div>
-
-  <div class="pvo-nav">
-    <div class="pvo-nav__label">Proposed Navigation</div>
-    <nav class="pvo-nav__bar" aria-label="Proposed site navigation">
-      <span class="pvo-nav__item pvo-nav__item--active">Get Help</span>
-      <span class="pvo-nav__divider">·</span>
-      <span class="pvo-nav__item">For Families</span>
-      <span class="pvo-nav__divider">·</span>
-      <span class="pvo-nav__item">Volunteer</span>
-      <span class="pvo-nav__divider">·</span>
-      <span class="pvo-nav__item">Donate</span>
-      <span class="pvo-nav__divider">·</span>
-      <span class="pvo-nav__item">Events</span>
-      <span class="pvo-nav__divider">·</span>
-      <span class="pvo-nav__item">Impact</span>
-      <span class="pvo-nav__divider">·</span>
-      <span class="pvo-nav__item">About / Contact</span>
-    </nav>
-    <p class="pvo-nav__caption">Organized by user intent, not site category</p>
-  </div>
-
-  <footer class="pvo-footer">
-    Analysis conducted March 2026 &nbsp;·&nbsp; powayveterans.org &nbsp;·&nbsp; Capstone Project
-  </footer>
-
+  {% endfor %}
 </div>
-</body>
-</html>

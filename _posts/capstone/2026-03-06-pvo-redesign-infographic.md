@@ -10,13 +10,4 @@ image: /images/capstone/pvo_redesign_infographic.png
 permalink: /capstone/pvo-redesign-infographic/
 ---
 
-<style>
-  .post-header h1,
-  .post-header h2,
-  .post-header h3,
-  .post-header p {
-    color: #1a1610 !important;
-  }
-</style>
-
 {% include pvo_infographic.html %}
