@@ -140,6 +140,31 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Neil, Nikhil, Shriya</p>
        </div>
    </div>
+ <!-- Oasis Capstone -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+      <a href="{% post_url 2026-03-04-oasis-community-capstone %}">
+          <img src="/images/capstone/oasis-logo.png" alt="Oasis Capstone" class="w-28 h-28 object-cover rounded" />
+      </a>
+      <div>
+          <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-oasis-community-capstone %}">Oasis</a></h3>
+          <p class="text-sm text-gray-700">A community building game focused on growing individual relationships and creating a community from that. This project is in relation to the non profit San Diego Oasis</p>
+          <p class="text-xs text-gray-500 mt-2">Team: Spencer, Nora</p>
+      </div>
+  </div>
+
+
+  <!-- Kora Capstone -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+      <a href="{% post_url 2026-02-06-kora-capstone %}">
+          <img src="/images/capstone/kora.png" alt="Kora Capstone" class="w-28 h-28 object-cover rounded" />
+      </a>
+      <div>
+          <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-kora-capstone %}">Kora Capstone</a></h3>
+          <p class="text-sm text-gray-700">An AI-native property maintenance operating system that automates tenant requests, triages problems, matches vendors, and keeps operations moving without manual coordination.</p>
+          <p class="text-xs text-gray-500 mt-2">Team: Manas, Akshay</p>
+      </div>
+  </div>
+
 
    <!-- Pirna Pages -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
