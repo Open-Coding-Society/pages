@@ -285,17 +285,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Friends of the Poway Library (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-09-poway-library %}">
-           <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library - Community Engagement Redesign" class="w-28 h-28 object-cover rounded" />
+   <!-- Demander (CSA) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url 2026-03-10-demander-capstone %}">
+           <img src="/images/capstone/demander_logo.png" alt="Demander - Real Estate Demand Intelligence Platform" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
-           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, donation flow, and impact dashboard to match the quality of their community mission.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-10-demander-capstone %}">Demander</a></h3>
+           <p class="text-sm text-gray-700">A demand intelligence platform for real estate professionals using behavioral simulation with synthetic buyer agents to analyze listings and generate actionable ROI insights.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Yuva, Yash, Ansh</p>
        </div>
    </div>
+
 </div>
 
 
