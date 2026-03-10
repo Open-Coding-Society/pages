@@ -1,0 +1,38 @@
+# Friends of the Poway Library Capstone Infographic
+Title: "Friends of the Poway Library"
+Description: "Rebuilding the Friends of the Poway Library website to actually reflect the community it serves — replacing placeholder content and dead history pages with real impact metrics, a volunteer portal, and a live events calendar for concerts, storytime, and fitness programs."
+
+Topics:
+  - title: "Friends of the Poway Library"
+    subtitle: "Nonprofit Website Redesign & Community Engagement Hub"
+    link: "/capstone/poway-library/"
+    image: "capstone/poway_library.png"
+    alt: "Friends of the Poway Library — capstone project infographic"
+    status: "In Development"
+    team:
+      - "Shayan Bhatti"
+      - "Arnav Pallapotu"
+      - "Tanay Paranjpe"
+    description: "The Friends of the Poway Library is a volunteer-run nonprofit that funds library programs, operates a used bookstore on Poway Rd, and hosts community events ranging from Second Saturday Concerts to Zumba and Chess Club. Despite an active, community-serving mission, their website has a history page with no actual history, placeholder images throughout, no donation CTA beyond a buried membership form, and content warnings like 'things change a lot' — signaling an organization whose digital presence has fallen far behind its real-world impact. This capstone rebuilds the site with a proper events calendar, volunteer portal, membership/donation flow, and an impact dashboard."
+    keyPoints:
+      - "Analyzed powayfriends.org and identified: 'Watch this space for activity updates for 2025' still live in 2026, 'Things change a lot' disclaimer on the events section, events link redirects entirely to the San Diego County Library system instead of being embedded on the Friends site, volunteer CTA is just 'email us' with no form, hours section labeled 'As of February 2025', and History page in the nav with no actual content"
+      - "Planning to embed events from the San Diego County Library system directly on the Friends site, so visitors don't have to leave to find Storytime, Tai Chi, Chess Club, and 417+ other Poway library events"
+      - "Designing a Volunteer Portal so community members can sign up for bookstore and event shifts"
+      - "Redesigning membership and donation flow with a clear CTA visible from the homepage"
+      - "Creating an About / History page with actual organizational narrative and founding context"
+      - "Planning an Impact Dashboard showing books sold, programs funded, and volunteer hours contributed"
+    tech:
+      - "GitHub Pages"
+      - "JavaScript"
+      - "HTML / CSS"
+      - "Gemini API (Library Assistant)"
+      - "Chart.js (Impact Dashboard)"
+      - "ARIA Accessibility Layer"
+      - "Event Calendar System"
+    impact:
+      - "Visitors can find and register for library events in one place instead of hunting through vague pages"
+      - "Clear donation and membership CTA converts passive visitors into active supporters"
+      - "Volunteer portal reduces friction for community members who want to help but don't know how"
+      - "Real history and About content builds credibility and trust with new donors"
+      - "Impact metrics give the community visible proof that their support is funding real programs"
+      - "Accessible design opens the site to seniors and families — the library's core audience"
