@@ -2,7 +2,7 @@
 toc: true
 layout: post
 title: "D.A.D. Website Redesign Proposal"
-description: "A detailed analysis and redesign plan for the Doing Exceptional Deeds (D.A.D.) nonprofit website — featuring 3 key improvements with mockups, implementation plans, and team work splits."
+description: "A detailed analysis and redesign plan for the Doing Exceptional Deeds (D.A.D.) nonprofit website — featuring 3 key improvements with mockups, implementation plans, and team work splits"
 courses: {'csp': {'week': 0}}
 type: human
 categories: [Capstone]
