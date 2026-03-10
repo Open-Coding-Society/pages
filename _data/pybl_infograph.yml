@@ -8,12 +8,12 @@ Topics:
     link: "https://pybl.com/"
     alt: "PYBL platform preview"
     keyPoints:
-      - "Idea 1: Simplify registration so families can complete sign-up with fewer steps."
-      - "Idea 2: Prioritize schedules/locations so game-day information is found fast."
+      - "Idea 1: Improve rules readability using a good UI that makes it better."
+      - "Idea 2: Have season schedule with backend database that stores wins and losses for each team."
       - "Idea 3: Build clear role paths for parents, coaches, and administrators."
       - "Problem solved: Too much navigation friction during common seasonal tasks."
-      - "Problem solved: Important announcements/forms are hard to find on mobile."
-      - "Problem solved: Content updates are inconsistent across pages."
+      - "Problem solved: Easier to see best teams."
+      - "Problem solved: Have everyone know what to do."
     subtitle: "Youth Sports Operations, Simplified"
     description: "PYBL provides community basketball information and logistics that must remain simple and fast for families. This capstone focuses on reducing navigation ambiguity, improving page hierarchy, and making registration and schedule workflows easier to complete from phones and school devices."
     tech:
