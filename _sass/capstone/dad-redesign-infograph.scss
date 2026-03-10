@@ -1,0 +1,460 @@
+// D.A.D. Website Redesign Infographic Styles
+$dad-primary: #e85d3a;
+$dad-secondary: #f39c12;
+$dad-highlight: #ff7b5a;
+$dad-dark-bg: #0a0a0a;
+$dad-card-bg: #141414;
+$dad-text-muted: #9aa0a8;
+$dad-text-light: #e0e2e6;
+
+.dad-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.dad-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, $dad-dark-bg 0%, #1a0f0a 50%, $dad-card-bg 100%);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($dad-primary, 0.3);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba($dad-primary, 0.02) 2px, rgba($dad-primary, 0.02) 4px);
+    pointer-events: none;
+  }
+}
+
+.dad-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $dad-primary, $dad-secondary);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+.dad-team-badge {
+  display: inline-block;
+  color: $dad-primary;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
+}
+
+.dad-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, $dad-primary, $dad-secondary, $dad-primary);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: dad-gradient 3s ease infinite;
+  margin: 0 0 1rem 0;
+}
+
+@keyframes dad-gradient {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.dad-description {
+  color: $dad-text-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dad-card {
+  background: linear-gradient(145deg, $dad-card-bg 0%, #1c1410 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($dad-primary, 0.25);
+  box-shadow: 0 20px 60px rgba($dad-primary, 0.1), 0 0 0 1px rgba($dad-secondary, 0.05);
+}
+
+.dad-card-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 768px)  { grid-template-columns: 1fr; }
+}
+
+.dad-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba($dad-primary, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba($dad-primary, 0.2);
+
+  @media (max-width: 1024px) {
+    grid-column: 1 / -1;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+.dad-image-link {
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba($dad-primary, 0.3);
+  width: 100%;
+
+  &:hover .dad-image  { transform: scale(1.05); }
+  &:hover .dad-overlay { opacity: 1; }
+}
+
+.dad-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.dad-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba($dad-primary, 0.9), rgba($dad-secondary, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span { color: #fff; font-weight: 700; font-size: 1.1rem; }
+}
+
+.dad-status {
+  background: linear-gradient(135deg, $dad-text-muted, lighten($dad-text-muted, 10%));
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.dad-status-main {
+  background: linear-gradient(135deg, $dad-primary, $dad-secondary);
+  color: #fff;
+}
+
+.dad-team { text-align: center; margin-top: auto; }
+
+.dad-team-label {
+  display: block;
+  color: $dad-text-muted;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.dad-team-member {
+  display: block;
+  color: $dad-primary;
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+
+.dad-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($dad-secondary, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba($dad-secondary, 0.15);
+}
+
+.dad-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $dad-text-light;
+  margin: 0 0 0.25rem 0;
+}
+
+.dad-subtitle {
+  color: $dad-primary;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($dad-primary, 0.25);
+}
+
+.dad-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.dad-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: $dad-text-light;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.dad-check { color: $dad-primary; font-weight: bold; flex-shrink: 0; }
+
+.dad-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.dad-tech-tag {
+  background: rgba($dad-primary, 0.1);
+  color: $dad-primary;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba($dad-primary, 0.3);
+  font-family: 'Courier New', monospace;
+}
+
+.dad-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($dad-primary, 0.04);
+  border-radius: 16px;
+  border: 1px solid rgba($dad-primary, 0.2);
+}
+
+.dad-section-title {
+  color: $dad-text-light;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($dad-primary, 0.35);
+}
+
+.dad-about {
+  color: $dad-text-muted;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+.dad-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.dad-impact-item {
+  background: rgba($dad-primary, 0.08);
+  color: $dad-text-light;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid $dad-primary;
+}
+
+.dad-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $dad-primary, $dad-secondary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($dad-primary, 0.4);
+    color: #fff;
+    text-decoration: none;
+  }
+}
+
+.dad-additional {
+  background: linear-gradient(145deg, $dad-card-bg 0%, #1c1410 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-top: 2rem;
+  border: 2px solid rgba($dad-primary, 0.15);
+  text-align: center;
+}
+
+.dad-additional-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $dad-primary;
+  margin: 0 0 0.5rem 0;
+}
+
+.dad-additional-desc {
+  color: $dad-text-muted;
+  font-size: 0.9rem;
+  margin: 0 auto 1.5rem;
+  max-width: 700px;
+}
+
+.dad-distribution {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.dad-member-card {
+  background: rgba($dad-primary, 0.06);
+  border: 1px solid rgba($dad-primary, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.dad-member-name {
+  color: $dad-primary;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.dad-member-roles { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.dad-role-tag {
+  background: rgba($dad-secondary, 0.1);
+  color: $dad-text-light;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  border-left: 3px solid $dad-secondary;
+}
+
+// About the Organization section
+.dad-about-org {
+  background: linear-gradient(145deg, $dad-card-bg 0%, #1c1410 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($dad-primary, 0.2);
+}
+
+.dad-about-org-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $dad-primary;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($dad-primary, 0.3);
+}
+
+.dad-about-org-body {
+  color: $dad-text-muted;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 0 0.75rem 0;
+
+  strong { color: $dad-text-light; }
+}
+
+.dad-about-org-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.dad-about-org-detail {
+  color: $dad-text-muted;
+  font-size: 0.85rem;
+}
+
+.dad-about-org-link {
+  display: inline-block;
+  background: rgba($dad-primary, 0.1);
+  color: $dad-primary;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid rgba($dad-primary, 0.3);
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba($dad-primary, 0.2);
+    transform: translateY(-1px);
+    color: $dad-primary;
+    text-decoration: none;
+  }
+}
+
+// Website link footer
+.dad-website-link {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.dad-website-label {
+  display: block;
+  color: $dad-text-muted;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.75rem;
+}
+
+.dad-website-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $dad-primary, $dad-secondary);
+  color: #fff;
+  padding: 0.85rem 2rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba($dad-primary, 0.4);
+    color: #fff;
+    text-decoration: none;
+  }
+}
