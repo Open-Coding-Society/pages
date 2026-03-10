@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Murder Mystery Game 
-permalink: /gamify/murdermystery
+permalink: /gamify/murderMystery
 ---
 
 <div id="gameContainer">
@@ -19,9 +19,10 @@ permalink: /gamify/murdermystery
     import MurderMysteryL3 from "/assets/js/murderMystery/MurderMysteryL3.js";
     import MurderMysteryL4 from "/assets/js/murderMystery/MurderMysteryL4.js";
     import MurderMysteryL5 from "/assets/js/murderMystery/MurderMysteryL5.js";
+    import MurderMysteryL6 from "/assets/js/murderMystery/MurderMysteryL6.js";
     import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
-    const gameLevelClasses = [MurderMysteryL0, MurderMysteryL1, MurderMysteryL2, MurderMysteryL3, MurderMysteryL4, MurderMysteryL5];
+    const gameLevelClasses = [MurderMysteryL0, MurderMysteryL1, MurderMysteryL2, MurderMysteryL3, MurderMysteryL4, MurderMysteryL5, MurderMysteryL6];
 
     // Web Server Environment datas
     const environment = {
@@ -37,7 +38,7 @@ permalink: /gamify/murdermystery
             showNavigation: true,
             showLevelSelect: true,
             showInfo: true,
-            homeUrl: "/gamify/murdermystery",
+            homeUrl: "/gamify/murderMystery",
             gameInfo: {
                 title: "Murder Mystery Game",
                 version: "1.0",

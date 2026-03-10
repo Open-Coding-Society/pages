@@ -1,0 +1,70 @@
+{% assign data = site.data.hackathon_planners_infograph %}
+
+<div class="hp-infograph">
+  <!-- Header Section -->
+  <div class="hp-header">
+    <div class="hp-badge">Design-Based Project Capstone</div>
+    <h1 class="hp-title">{{ data.Title }}</h1>
+    <p class="hp-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="hp-card">
+    <div class="hp-card-grid">
+      
+      <!-- Left: Image & Status -->
+      <div class="hp-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="hp-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="hp-image">
+          <div class="hp-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="hp-status">{{ topic.status }}</div>
+        <div class="hp-team">
+          <span class="hp-team-label">Project Leads</span>
+          <span class="hp-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="hp-content">
+        <h2 class="hp-project-title">{{ topic.title }}</h2>
+        <p class="hp-subtitle">{{ topic.subtitle }}</p>
+        
+        <div class="hp-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="hp-keypoint">
+            <span class="hp-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="hp-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="hp-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="hp-details">
+        <h3 class="hp-section-title">About</h3>
+        <p class="hp-about">{{ topic.description }}</p>
+        
+        <h3 class="hp-section-title">Impact</h3>
+        <div class="hp-impact-list">
+          {% for item in topic.impact %}
+          <div class="hp-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="hp-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>

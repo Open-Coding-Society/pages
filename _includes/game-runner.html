@@ -30,7 +30,7 @@
     </div>
     <div class="game-output" id="game-output-{{ include.runner_id }}">
       <div id="game-container-{{ include.runner_id }}" class="gameContainer">
-        <canvas id="game-canvas-{{ include.runner_id }}"></canvas>
+        <!-- GameEnv will create canvas dynamically -->
       </div>
     </div>
   </div>
@@ -83,8 +83,6 @@
   let gameInstance = null;
   let currentLevelIndex = 0;
   let escapeKeyHandler = null;
-  let originalCanvasId = null;
-  let originalContainerId = null;
 
   // Disable game controls initially
   stopBtn.disabled = true;
@@ -157,31 +155,12 @@
       gameInstance = null;
     }
     
-    // Clear canvas
-    const canvas = document.getElementById('gameCanvas') || document.getElementById('game-canvas-{{ include.runner_id }}');
-    const container = document.getElementById('gameContainer') || document.getElementById('game-container-{{ include.runner_id }}');
+    // Get the game container and clear all remaining canvases
+    const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
     
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    }
-    
-    // Remove character canvases
-    if (container) {
-      const canvases = container.querySelectorAll('canvas:not(#game-canvas-{{ include.runner_id }})');
+    if (gameContainer) {
+      const canvases = gameContainer.querySelectorAll('canvas');
       canvases.forEach(c => c.remove());
-    }
-
-    if (canvas && originalCanvasId !== null) {
-      canvas.id = originalCanvasId;
-      originalCanvasId = null;
-    }
-
-    if (container && originalContainerId !== null) {
-      container.id = originalContainerId;
-      originalContainerId = null;
     }
     
     updateStatus('Stopped');
@@ -250,19 +229,8 @@
       };
       document.addEventListener('keydown', escapeKeyHandler);
 
-      // Get canvas and container
+      // Get container (GameEnv will use this reference directly)
       const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
-      const gameCanvas = document.getElementById('game-canvas-{{ include.runner_id }}');
-
-      if (gameCanvas) {
-        originalCanvasId = gameCanvas.id;
-        gameCanvas.id = 'gameCanvas';
-      }
-
-      if (gameContainer) {
-        originalContainerId = gameContainer.id;
-        gameContainer.id = 'gameContainer';
-      }
       
       // Setup game environment
       const path = '{{ site.baseurl }}';
@@ -300,17 +268,14 @@
           throw new Error('Code must export gameLevelClasses');
         }
 
-        // Initialize canvas dimensions before game starts
+        // Get container dimensions for environment
         const containerWidth = gameContainer.parentElement.clientWidth || 800;
         const containerHeight = 580;
-        gameCanvas.width = containerWidth;
-        gameCanvas.height = containerHeight;
 
-        // Create environment object with explicit dimensions and references
+        // Create environment object (GameEnv will create canvas dynamically)
         const environment = {
           path: path,
           gameContainer: gameContainer,
-          gameCanvas: gameCanvas,
           gameLevelClasses: gameLevelClasses,
           innerWidth: containerWidth,   // Override window.innerWidth
           innerHeight: containerHeight,  // Override window.innerHeight

@@ -1,0 +1,32 @@
+# College Bound Capstone Infographic
+Title: "College Bound Capstone"
+Description: "A website designed to provide a comprehensive guide to helping students prepare for college and effectively go through high school in preparation for the next stage of their educational career."
+
+Topics:
+  - title: "College Bound"
+    image: "capstone/college_bound.jpeg"
+    link: "/capstone/college-bound/"
+    alt: "College Bound - Preparing Students for College Applications"
+    keyPoints:
+      - "Collection of past College Bound presentations"
+      - "Access to various scholarship & academic opportunities"
+      - "Information and ways to contact school officials"
+      - "Pre-migration automatic snapshots and dry-run validation"
+      - "Comprehensive audit logging for all data-modifying operations"
+      - "Operator KSA framework for human-in-the-loop safety"
+    subtitle: "Giving Students What They Need"
+    description: "This website serves as a comprehensive capsule for all things offered by the College Bound organization and more. There will be clear and accessible links to various scholarships, ways to contact school officials, certain requirements for applying to certain colleges, and more."
+    tech:
+      - "HTML / CSS"
+      - "JavaScript"
+      - "Gemini API"
+      - "GitHub Actions CI/CD"
+    impact:
+      - "Teaches students the process of applying to college"
+      - "Allows students to proactively find scholarship opportunities"
+      - "OCS is able to further its outreach to a completely new group"
+    status: "In Development"
+    team:
+      - "Xavier Thompson"
+      - "Aranya Bhattacharya"
+      - "Trevor Vick"

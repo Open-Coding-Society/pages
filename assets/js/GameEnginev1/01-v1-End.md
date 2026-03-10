@@ -6,7 +6,7 @@ permalink: /gamify/end
 
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
-    <canvas id='gameCanvas'></canvas>
+    <!-- GameEnv will create canvas dynamically --> 
 </div>
 
 <script type="module">
@@ -25,7 +25,6 @@ permalink: /gamify/end
         javaURI: javaURI,
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
-        gameCanvas: document.getElementById("gameCanvas"),
         gameLevelClasses: gameLevelClasses
     }
 

@@ -1,0 +1,162 @@
+<!-- _includes/gist-export-button.html -->
+<!-- Improved version: better multi-runner support, delay for init, runner_id filenames, debug logs -->
+ <!-- To Include Put in Front Matter of Notebook:
+  show_gist_export: true
+-->
+
+<button 
+  id="export-to-gist-btn" 
+  class="export-btn"
+  data-gist-token="{{ site.gist_token | default: '' }}"
+  data-gist-description="Exported AP CSA FRQs / Challenges from Open Coding Society"
+>
+  Export All Solutions to Gist
+</button>
+
+<style>
+  .export-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 30px auto;
+    display: block;
+    min-width: 220px;
+  }
+  .export-btn:hover {
+    background-color: #45a049;
+  }
+  .export-btn:disabled {
+    background-color: #aaaaaa;
+    cursor: not-allowed;
+  }
+</style>
+
+<script>
+  (function() {
+    const btn = document.getElementById('export-to-gist-btn');
+    if (!btn) {
+      console.warn('Export button not found');
+      return;
+    }
+
+    const token = btn.dataset.gistToken?.trim();
+    if (!token) {
+      console.error('GitHub token missing');
+      btn.textContent = 'Token Missing';
+      btn.disabled = true;
+      return;
+    }
+
+    btn.onclick = async function() {
+      btn.textContent = 'Exporting...';
+      btn.disabled = true;
+
+      // Wait for editors to be ready
+      await new Promise(r => setTimeout(r, 1500));
+
+      const containers = document.querySelectorAll('.code-runner-container');
+      console.log(`Found ${containers.length} code runners`);
+
+      if (containers.length === 0) {
+        alert('No code runners found on page.');
+        reset();
+        return;
+      }
+
+      const files = {};
+
+      containers.forEach((container, index) => {
+        const runnerId = container.dataset.runnerId || `runner_${index + 1}`;
+
+        const challengeBox = container.querySelector('.challenge-box');
+        const challengeTitle = challengeBox?.querySelector('h3')?.textContent.trim() || `Part ${index + 1}`;
+        const challengeDesc  = challengeBox?.querySelector('p')?.textContent.trim() || 'No description';
+
+        const langSelect = container.querySelector('.languageSelect');
+        const lang = langSelect?.value || 'java';
+        const ext = { python: 'py', java: 'java', javascript: 'js' }[lang] || 'txt';
+
+        const cmWrapper = container.querySelector('.CodeMirror');
+        if (!cmWrapper || !cmWrapper.CodeMirror) {
+          console.warn(`No CodeMirror for ${runnerId}`);
+          return;
+        }
+
+        const code = cmWrapper.CodeMirror.getValue().trim();
+
+        // Only skip if completely empty (allow default stubs)
+        if (!code) {
+          console.log(`Skipping ${runnerId} – completely empty`);
+          return;
+        }
+
+        const content = 
+`Question: ${challengeTitle}
+${challengeDesc}
+
+Answer (runner: ${runnerId}):
+
+${code}`;
+
+        const safeId = runnerId.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+        const filename = `${safeId}.${ext}`;
+
+        files[filename] = { content };
+        console.log(`Added: ${filename} (${code.length} chars)`);
+      });
+
+      if (Object.keys(files).length === 0) {
+        alert('No code runners had any content (all empty).');
+        reset();
+        return;
+      }
+
+      const payload = {
+        description: btn.dataset.gistDescription || 'Exported code from Open Coding Society',
+        public: true,
+        files
+      };
+
+      try {
+        const res = await fetch('https://api.github.com/gists', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/vnd.github+json',
+            'Authorization': `Bearer ${token}`,
+            'X-GitHub-Api-Version': '2022-11-28',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`API error ${res.status}: ${errText}`);
+        }
+
+        const data = await res.json();
+        const url = data.html_url;
+
+        await navigator.clipboard.writeText(url);
+        alert(`Gist created!\nURL copied:\n${url}\n\n(${Object.keys(files).length} files)`);
+        console.log('Gist URL:', url);
+      } catch (err) {
+        console.error('Failed:', err);
+        alert('Error creating Gist:\n' + err.message);
+      } finally {
+        btn.textContent = 'Export All Solutions to Gist';
+        btn.disabled = false;
+      }
+
+      function reset() {
+        btn.textContent = 'Export All Solutions to Gist';
+        btn.disabled = false;
+      }
+    };
+  })();
+</script>

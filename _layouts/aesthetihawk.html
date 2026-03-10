@@ -10,6 +10,9 @@
     <!-- User preferences CSS (must come after Tailwind to override) and JS -->
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
     <script src="{{ site.baseurl }}/assets/js/user-preferences.js"></script>
+    <!--Keyboard Shortcuts (Alt+Shift+key navigation)-->
+    <script>window.baseurl = "{{ site.baseurl }}";</script>
+    <script src="{{ site.baseurl }}/assets/js/keyboard-shortcuts.js" defer></script>
 </head>
 
 
