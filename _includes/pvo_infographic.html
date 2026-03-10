@@ -15,7 +15,7 @@
       
       <!-- Left: Image & Status -->
       <div class="pv-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="pv-image-link">
+        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-image-link">
           <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-image">
           <div class="pv-overlay">
             <span>View Project</span>
@@ -61,7 +61,7 @@
           {% endfor %}
         </div>
 
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="pv-btn">Learn More</a>
+       <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-btn">
       </div>
 
     </div>
