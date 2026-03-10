@@ -4,8 +4,8 @@ Description: "A comprehensive redesign proposal for the Deputy Sheriffs' Associa
 
 Topics:
   - title: "Interactive Member Dashboard"
-    image: "capstone/dsa_dashboard.png"
-    link: "/blogs/dsa-redesign/"
+    image: "capstone/dsa_dashboard.svg"
+    link: "/capstone/dsa-redesign/"
     alt: "DSA Interactive Member Dashboard - Consolidated Resource Hub"
     keyPoints:
       - "Quick-access tiles for benefits, forms, events, and store"
@@ -36,8 +36,8 @@ Topics:
       - "Moiz — Calendar & Notifications"
 
   - title: "Smart FAQ Hub"
-    image: "capstone/dsa_faq.png"
-    link: "/blogs/dsa-redesign/"
+    image: "capstone/dsa_faq.svg"
+    link: "/capstone/dsa-redesign/"
     alt: "DSA Modernized FAQ with Smart Search and Live Chat"
     keyPoints:
       - "Instant fuzzy search filtering questions as user types"
@@ -64,8 +64,8 @@ Topics:
       - "Akhil — Live Chat Widget"
 
   - title: "Mega Menu Navigation"
-    image: "capstone/dsa_nav.png"
-    link: "/blogs/dsa-redesign/"
+    image: "capstone/dsa_nav.svg"
+    link: "/capstone/dsa-redesign/"
     alt: "DSA Enhanced Navigation with Mega Menu and Mobile Optimization"
     keyPoints:
       - "Grouped sub-navigation panels with descriptions and icons"
