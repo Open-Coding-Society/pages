@@ -115,7 +115,7 @@ homepage_spotlight:
   metrics:
     - value: "3"
       label: "Symphonic concerts presented each year"
-    - value: "65"
+    - value: "67"
       label: "Musicians performing in the orchestra"
     - value: "20+"
       label: "Years of cultural enrichment in the region"
@@ -160,7 +160,7 @@ community_impact_statistics:
     label: "Year the orchestra was formed"
   - value: "2015"
     label: "Year the foundation was established"
-  - value: "65"
+  - value: "67"
     label: "Musicians on stage at a high artistic level"
   - value: "501(c)(3)"
     label: "Non-profit foundation supporting the orchestra"
@@ -182,7 +182,7 @@ photo_highlights:
 impact_stats:
   - value: "3"
     label: "Major concerts scheduled each season"
-  - value: "65"
+  - value: "67"
     label: "Musicians contributing to each orchestral performance"
   - value: "20+"
     label: "Years serving Poway and surrounding communities"
