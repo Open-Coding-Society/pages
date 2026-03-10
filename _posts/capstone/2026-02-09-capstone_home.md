@@ -39,14 +39,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 my-6">
 
 
-   <!-- Database Defenders -->
+   <!-- Slack Messaging Platform -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-database-defenders-capstone %}">
-           <img src="/images/capstone/database_defenders.png" alt="Database Defenders - Automated Data Loss Prevention System" class="w-28 h-28 object-cover rounded" />
+       <a href="{% post_url 2026-02-06-slack-messaging-capstone %}">
+           <img src="/images/capstone/database_defenders.png" alt="Slack Messaging Platform - Real-Time Collaborative Chat" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-database-defenders-capstone %}">Database Defenders</a></h3>
-           <p class="text-sm text-gray-700">A multi-layer protection system built on top of Flask and Amazon Aurora to prevent, detect, and recover from data loss incidents.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-slack-messaging-capstone %}">Slack Messaging Platform</a></h3>
+           <p class="text-sm text-gray-700">A full-stack Slack-style messaging platform with real-time channels, message threading, AI-powered task extraction, and admin moderation — deployed to messaging.opencodingsociety.com.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
        </div>
    </div>
@@ -177,6 +177,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
    
+   <!-- Doing Exceptional Deeds -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">
+           <img src="/images/capstone/doing_exceptional_deeds.png" alt="Doing Exceptional Deeds - D.A.D. Non-profit Extension" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">Doing Exceptional Deeds</a></h3>
+           <p class="text-sm text-gray-700">An extension for the Doing Exceptional Deeds non-profit website, uplifting individuals and strengthening communities through education-first programs.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: William Windle, Ethan Wong, Nicolas Diaz</p>
+       </div>
+   </div>
+   
    <!-- Palomar Capstone (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2025-03-05-palomar %}">
@@ -209,7 +221,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pusd-capstone %}">PUSD Foundation</a></h3>
            <p class="text-sm text-gray-700">Funding, resources, and opportunities that expand and enrich the educational experiences of PUSD students across northern San Diego County.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: PUSD Foundation Board of Directors, Poway Unified School District Partners</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
        </div>
    </div>
 
@@ -233,7 +245,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
            <p class="text-sm text-gray-700">Empowering individuals with intellectual and developmental disabilities through year-round esports and community programs across San Diego and Imperial Counties.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: UESL Foundation Board of Directors, San Diego &amp; Imperial County Community Partners</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
        </div>
    </div>
 
@@ -249,6 +261,41 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- Poway Symphony Orchestra (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-05-pso-infographic %}">
+           <img src="/images/pso_logo.png" alt="Poway Symphony Orchestra - Site Analysis" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pso-infographic %}">Poway Symphony Orchestra</a></h3>
+           <p class="text-sm text-gray-700">We analyzed the Poway Symphony Orchestra website to identify UX gaps and design improvements that better serve concertgoers, donors, and prospective musicians.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+       </div>
+   </div>
+
+   <!-- Soroptimist International of Poway (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-08-sip-infograph %}">
+           <img src="/images/sip/sip_logo.png" alt="Soroptimist International of Poway - Site Analysis" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-sip-infograph %}">Soroptimist International of Poway</a></h3>
+           <p class="text-sm text-gray-700">We analyzed sipoway.com to document the organization's programs and recommend UI improvements that help donors, volunteers, and program applicants take action.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+       </div>
+   </div>
+
+   <!-- Friends of the Poway Library (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-poway-library %}">
+           <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library - Community Engagement Redesign" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
+           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, donation flow, and impact dashboard to match the quality of their community mission.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
+       </div>
+   </div>
 </div>
 
 

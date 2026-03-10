@@ -1,0 +1,72 @@
+# Poway Symphony Orchestra Website Analysis Infographic
+Title: "Poway Symphony Orchestra Website Analysis"
+Description: "A UI and process analysis of the Poway Symphony Orchestra website identifying core messaging, audience targeting, and actionable improvements to help the site better serve concertgoers, donors, and prospective musicians."
+
+Topics:
+  - title: "Core Messaging Analysis"
+    image: "pso/pso_messaging.png"
+    link: "/capstone/pso-website/"
+    alt: "Poway Symphony Orchestra"
+    keyPoints:
+      - "Site built on Google Sites, a free platform with significant UI limitations"
+      - "Core message: credibility, community belonging, and open invitation"
+      - "20+ year history and named conductor used to establish legitimacy"
+      - "Local identity anchored to Poway Center for the Performing Arts"
+      - "501(c)(3) nonprofit status reinforces community service mission"
+      - "Three audiences addressed at once with no prioritization"
+    subtitle: "What the Site Is Trying to Say"
+    description: "The Poway Symphony Orchestra website carries one core message: we are a serious, long-standing, community-rooted orchestra that deserves your attendance, support, and participation. It backs this up with 20+ years of history, a named conductor and music director in John LoPiccolo, approximately 65 semi-professional musicians, and strong geographic ties to San Diego's North County Inland region. The site simultaneously targets three distinct audiences: concertgoers, donors, and prospective musicians. The intent is clear and the content is solid, but all three messages compete for space on a single homepage with no designed user journey."
+    tech:
+      - "Google Sites (current platform)"
+      - "PayPal Donate Integration"
+      - "YouTube Channel Link"
+      - "Facebook Page Link"
+      - "Instagram Profile Link"
+      - "Poway Center for the Performing Arts Ticketing"
+    impact:
+      - "Established credibility: 20+ year history clearly communicated"
+      - "Community identity: San Diego North County region explicitly named"
+      - "Donor pipeline: matching gift banner and PayPal donate button present"
+      - "Musician recruitment: rehearsal schedule and contact info included"
+      - "Nonprofit status: 501(c)(3) foundation mentioned for donor trust"
+      - "Season invite: 2025-2026 concert season linked from homepage"
+    status: "Analysis Complete"
+    team:
+      - "Michelle Ji, Anishka Sanghvi, Krishna Visvanath"
+      - "Audience: Concertgoers"
+      - "Audience: Donors"
+      - "Audience: Prospective Musicians"
+
+  - title: "UI and Process Improvements"
+    image: "pso/pso_improvements.png"
+    link: "/capstone/pso-website/"
+    alt: "Poway Symphony Orchestra"
+    keyPoints:
+      - "No upcoming concert card above the fold with date and buy tickets button"
+      - "Ticket purchase redirects off-site with no warning or context"
+      - "Donate banner has no visual separation from the navigation"
+      - "Musician recruitment section targets a different audience than homepage visitors"
+      - "Social media links are oversized banner images instead of icons"
+      - "No clear user journey from arrival to action"
+    subtitle: "Where the Site Falls Short and How to Fix It"
+    description: "The homepage tries to serve three audiences simultaneously with no prioritization, so none of the three messages land as effectively as they should. The most urgent fix is surfacing a Next Concert card above the fold with a date and direct ticket link. Ticket flow currently sends users off-site without context, which increases abandonment. The donate banner blends into the navigation with no visual hierarchy. Musician recruitment content belongs on a dedicated Musicians page rather than the homepage. Social links should be replaced with small clean icons. A platform migration from Google Sites to Squarespace, Wix, or WordPress would resolve most of these issues structurally."
+    tech:
+      - "Inline Email Capture Form"
+      - "Next Concert Hero Card"
+      - "Direct Ticket Deep-Link"
+      - "Dismissible Alert Banner"
+      - "Dedicated Musicians Page"
+    impact:
+      - "Surfacing next concert date reduces ticket purchase friction"
+      - "Inline email capture replaces hidden subscribe page"
+      - "Visible contact card replaces phone number buried in paragraph text"
+      - "Rehearsal info moved off homepage reduces audience confusion"
+      - "3-concert season calendar gives concertgoers at-a-glance planning"
+      - "Platform migration unlocks proper hero sections and mobile layouts"
+    status: "Recommendations Pending"
+    team:
+      - "Michelle Ji, Anishka Sanghvi, Krishna Visvanath"
+      - "Priority: Concertgoer Journey"
+      - "Priority: Donor Conversion"
+      - "Priority: Musician Recruitment Flow"
+      
