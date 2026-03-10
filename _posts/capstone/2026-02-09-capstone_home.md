@@ -189,18 +189,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- D.A.D. Website Redesign Proposal -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">
-           <img src="/images/capstone/doing_exceptional_deeds.png" alt="D.A.D. Website Redesign Proposal preview" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">D.A.D. Website Redesign</a></h3>
-           <p class="text-sm text-gray-700">A comprehensive redesign proposal for the Doing Exceptional Deeds nonprofit website, featuring impact storytelling, a streamlined donation flow, and dedicated program pages.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Neil, Moiz, Akhil</p>
-       </div>
-   </div>
-   
    <!-- Palomar Capstone (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2025-03-05-palomar %}">
@@ -297,6 +285,17 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-</div>
+   <!-- D.A.D. Website Redesign Proposal -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">
+           <img src="/images/capstone/doing_exceptional_deeds.png" alt="D.A.D. Website Redesign Proposal preview" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">D.A.D. Website Redesign</a></h3>
+           <p class="text-sm text-gray-700">A comprehensive redesign proposal for the Doing Exceptional Deeds nonprofit website, featuring impact storytelling, a streamlined donation flow, and dedicated program pages.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Neil, Moiz, Akhil</p>
+       </div>
+   </div>
 
+</div>
 
