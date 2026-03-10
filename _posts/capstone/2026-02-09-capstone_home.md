@@ -296,6 +296,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
        </div>
    </div>
+   
 </div>
 
 
