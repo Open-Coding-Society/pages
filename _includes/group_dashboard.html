@@ -126,6 +126,18 @@
               </tbody>
             </table>
           </div>
+
+          <div class="mt-4 flex flex-col gap-3 border-t border-neutral-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p id="memberAnalyticsPaginationInfo" class="text-sm text-gray-400">Showing 0-0 of 0</p>
+            <div class="flex items-center gap-2">
+              <button id="memberAnalyticsPrevButton" onclick="previousMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Previous
+              </button>
+              <button id="memberAnalyticsNextButton" onclick="nextMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
