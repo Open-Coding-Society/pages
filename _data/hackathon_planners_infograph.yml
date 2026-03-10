@@ -1,0 +1,35 @@
+# Hackathon Planners Capstone Infographic
+Title: "Hackathon Planners Capstone"
+Description: "An Education Technology capstone project building student resumes through participation in Hackathons. This full-stack platform uses JavaScript, Python, and Flask to connect students with hackathon opportunities, resources, and a community of fellow hackers, empowering them to build skills, gain experience, and enhance their resumes for future careers in tech."
+
+Topics:
+  - title: "Hackathon Planners"
+    image: "capstone/hackathon_planners.svg"
+    
+    link: "/capstone/hackathon-planners"
+    alt: "Hackathon Planners - Student Resume and Hackathon Building Platform"
+    keyPoints:
+      - "Host Hackathons with a Calendar"
+      - "Python Flask REST API backend"
+      - "JavaScript interactive frontend"
+      - "SQLite/PostgreSQL database integration"
+      - "Real-time hackathon events"
+      - "Effective team building"
+    subtitle: "Projects built by community for community"
+    description: "A community-driven platform connecting students with hackathons, resources, and fellow hackers. Features a calendar for hosting events and tools to build student resumes."
+    tech:
+      - "Java Spring Backend"
+      - "JavaScript Frontend"
+      - "RESTful API Design"
+      - "Graph Data Structures"
+      - "SQLite/PostgreSQL Database"
+    impact:
+      - "Connects students to hackathon opportunities"
+      - "Allows students to plan hackathons"
+    status: "In Development"
+    team:
+      - "Aranya"
+      - "Trevor"
+      - "Elliot"
+
+  

@@ -1,0 +1,619 @@
+// RPN Calculator Lesson — Interactive Element Styles
+// Uses project theme variables & mixins. No hard-coded colors.
+
+@import "open-coding/mixins/buttons";
+@import "open-coding/mixins/panel";
+@import "open-coding/mixins/container";
+
+// ===========================
+// Shared animation
+// ===========================
+@keyframes rpnSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ===========================
+// Local reusable patterns
+// ===========================
+
+// Card wrapper used by every interactive section
+@mixin rpn-card {
+  @include main-container;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+// Accent-colored header bar shared across all cards
+@mixin rpn-card-header {
+  background: var(--pref-accent-color);
+  padding: 20px;
+
+  h3 {
+    margin: 0;
+    color: var(--pref-bg-color);
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: var(--pref-bg-color);
+    opacity: 0.85;
+    font-size: 14px;
+  }
+}
+
+// Body region beneath the header
+@mixin rpn-card-body {
+  background: var(--pref-bg-color);
+  border: 1px solid var(--ui-border);
+  border-top: none;
+  padding: 25px;
+  border-radius: 0 0 12px 12px;
+}
+
+// Feedback block (correct / incorrect)
+@mixin rpn-feedback {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--pref-text-color);
+
+  &--correct {
+    display: block;
+    background: rgba($green, 0.1);
+    border-left: 4px solid $green;
+  }
+
+  &--incorrect {
+    display: block;
+    background: rgba($red, 0.1);
+    border-left: 4px solid $red;
+  }
+}
+
+// MCQ-style option button
+@mixin rpn-option-btn {
+  @include base-button;
+  text-align: left;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-family: $mono-font;
+
+  &--correct {
+    border-color: $green !important;
+    background: rgba($green, 0.1) !important;
+  }
+
+  &--incorrect {
+    border-color: $red !important;
+    background: rgba($red, 0.1) !important;
+  }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+// ===========================
+// 1. Popcorn Hack (MCQ Cards)
+// ===========================
+.rpn-popcorn {
+  @include rpn-card;
+
+  &__header { @include rpn-card-header; }
+  &__body   { @include rpn-card-body; }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__option { @include rpn-option-btn; }
+
+  // Two-column card layout variant
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+  }
+
+  &__grid-card {
+    background: var(--panel-mid);
+    border: 2px solid var(--ui-border);
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    code { color: var(--pref-text-color); font-size: 13px; }
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: $green;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    &--correct {
+      border-color: $green !important;
+      background: rgba($green, 0.1) !important;
+    }
+
+    &--incorrect {
+      border-color: $red !important;
+      background: rgba($red, 0.1) !important;
+    }
+  }
+
+  &__feedback { @include rpn-feedback; }
+}
+
+// ===========================
+// 2. Show / Hide Answer Toggle
+// ===========================
+.rpn-reveal {
+  @include rpn-card;
+
+  &__header { @include rpn-card-header; }
+  &__body   { @include rpn-card-body; }
+
+  &__code-block {
+    @include output-panel(auto, none);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    pre {
+      margin: 0;
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+  }
+
+  &__toggle-btn {
+    @include text-button;
+    display: block;
+    margin: 0 auto 20px;
+    background: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+    border-color: var(--pref-accent-color);
+    font-weight: 600;
+    font-size: 15px;
+
+    &:hover { opacity: 0.85; transform: scale(1.05); }
+  }
+
+  &__answer {
+    display: none;
+    background: var(--pref-bg-color);
+    border-left: 4px solid var(--pref-accent-color);
+    border-radius: 8px;
+    padding: 20px;
+    animation: rpnSlideDown 0.3s ease;
+
+    h4 {
+      color: var(--pref-accent-color);
+      margin: 0 0 15px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+
+  &__step {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: var(--panel-mid);
+    border-radius: 6px;
+
+    .step-label {
+      color: var(--pref-accent-color);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .step-detail {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.6;
+
+      code {
+        background: var(--pref-bg-color);
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: var(--pref-text-color);
+      }
+    }
+  }
+
+  &__key-point {
+    @include info-panel(15px, 0, 0);
+    border: none;
+    border-left: 4px solid $teal;
+    margin-top: 15px;
+    box-shadow: none;
+
+    .key-title {
+      color: $teal;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .key-detail {
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+  }
+}
+
+// ===========================
+// 3. Drag & Drop Ordering
+// ===========================
+.rpn-dragdrop {
+  max-width: 750px;
+  margin: 20px auto 2rem;
+  background: var(--pref-accent-color);
+  padding: 3px;
+  border-radius: 15px;
+
+  &__inner {
+    background: var(--pref-bg-color);
+    border-radius: 13px;
+    padding: 25px;
+  }
+
+  &__title {
+    color: var(--pref-text-color);
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 1.4em;
+  }
+
+  &__subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  &__area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+  }
+
+  &__column {
+    background: var(--panel-mid);
+    border-radius: 10px;
+    padding: 15px;
+    border: 2px solid var(--ui-border);
+
+    h4 {
+      color: var(--pref-accent-color);
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__item {
+    background: var(--pref-bg-color);
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid var(--pref-accent-color);
+    cursor: grab;
+    transition: all 0.3s ease;
+    user-select: none;
+    color: var(--pref-text-color);
+    font-family: $mono-font;
+    font-size: 15px;
+    text-align: center;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    &.dragging { opacity: 0.4; cursor: grabbing; }
+  }
+
+  &__slot {
+    margin-bottom: 10px;
+
+    .slot-label {
+      font-weight: bold;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  &__dropzone {
+    background: var(--pref-bg-color);
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px dashed var(--ui-border);
+    min-height: 42px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pref-text-color);
+    font-family: $mono-font;
+    font-size: 15px;
+
+    .placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 13px;
+    }
+
+    &.drag-over {
+      background: rgba(0, 0, 0, 0.15);
+      border-color: var(--pref-accent-color);
+      border-style: solid;
+    }
+
+    &.filled {
+      border-style: solid;
+      border-color: var(--pref-accent-color);
+    }
+  }
+
+  &__controls {
+    @include inline-container(flex, 12px);
+    justify-content: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  &__btn {
+    @include text-button;
+    padding: 10px 24px;
+    font-weight: 600;
+
+    &--check {
+      background: $green;
+      border-color: $green;
+      color: var(--pref-bg-color);
+      &:hover { opacity: 0.85; }
+    }
+
+    &--reset {
+      background: $orange;
+      border-color: $orange;
+      color: var(--pref-bg-color);
+      &:hover { opacity: 0.85; }
+    }
+
+    &--clear {
+      background: $red;
+      border-color: $red;
+      color: var(--pref-bg-color);
+      &:hover { opacity: 0.85; }
+    }
+  }
+
+  &__feedback { @include rpn-feedback; }
+}
+
+// ===========================
+// 4. Knowledge Check Quiz
+// ===========================
+.rpn-quiz {
+  @include rpn-card;
+  border: 1px solid var(--ui-border);
+
+  &__header { @include rpn-card-header; }
+  &__body   { padding: 25px; }
+
+  &__question {
+    @include info-panel(20px, 1px, 25px);
+    box-shadow: none;
+
+    .q-number {
+      color: var(--pref-accent-color);
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .q-text {
+      color: var(--pref-text-color);
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+  }
+
+  &__choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__choice  { @include rpn-option-btn; }
+  &__explanation { @include rpn-feedback; }
+
+  &__score {
+    text-align: center;
+    padding: 20px;
+    background: var(--panel-mid);
+    border-radius: 10px;
+    margin-top: 10px;
+
+    .score-label { color: var(--text-muted); font-size: 14px; margin-bottom: 5px; }
+    .score-value { color: var(--pref-text-color); font-size: 32px; font-weight: 700; }
+
+    .score-bar {
+      margin-top: 10px;
+      height: 8px;
+      background: var(--ui-border);
+      border-radius: 4px;
+      overflow: hidden;
+
+      .score-fill {
+        height: 100%;
+        background: var(--pref-accent-color);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+    }
+  }
+}
+
+// ===========================
+// 5. Stack Visualization
+// ===========================
+.rpn-stack-viz {
+  @include rpn-card;
+
+  &__header { @include rpn-card-header; }
+  &__body   { @include rpn-card-body; }
+
+  &__controls {
+    @include inline-container(flex, 10px);
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__step-btn {
+    @include text-button;
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+    font-weight: 600;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    &--reset {
+      background: var(--panel-mid);
+      border-color: var(--ui-border);
+      color: var(--pref-text-color);
+    }
+  }
+
+  &__display {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &__token-stream {
+    flex: 1;
+    min-width: 200px;
+
+    h5 {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 8px;
+    }
+  }
+
+  &__token {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 3px;
+    border-radius: 4px;
+    font-family: $mono-font;
+    font-size: 14px;
+    background: var(--panel-mid);
+    color: var(--pref-text-color);
+    border: 1px solid var(--ui-border);
+    transition: all 0.3s;
+
+    &--active {
+      background: var(--pref-accent-color);
+      border-color: var(--pref-accent-color);
+      color: var(--pref-bg-color);
+      transform: scale(1.1);
+    }
+
+    &--processed { opacity: 0.3; }
+  }
+
+  &__stack-container {
+    min-width: 120px;
+
+    h5 {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+  }
+
+  &__stack {
+    border: 2px solid var(--pref-accent-color);
+    border-radius: 0 0 8px 8px;
+    border-top: none;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 5px;
+    gap: 4px;
+  }
+
+  &__stack-item {
+    background: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-align: center;
+    font-family: $mono-font;
+    font-size: 14px;
+    animation: rpnSlideDown 0.3s ease;
+  }
+
+  &__narration {
+    margin-top: 15px;
+    padding: 12px;
+    background: var(--panel-mid);
+    border-radius: 8px;
+    border-left: 3px solid var(--pref-accent-color);
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 40px;
+
+    strong { color: var(--pref-accent-color); }
+  }
+}

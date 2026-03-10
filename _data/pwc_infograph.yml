@@ -1,0 +1,42 @@
+# Poway Woman's Club Capstone Infographic
+Title: "Poway Woman's Club — Website Refurbishment"
+Description: "Modernizing a 65-year-old community nonprofit's web presence with member portals, online payments, and a fresh UI — while preserving the heart of the original site."
+
+
+Topics:
+  - title: "Poway Woman's Club"
+    image: "capstone/pwc_logo.png"
+    link: "/capstone/poway-womans-club/"
+    alt: "Poway Woman's Club — Website Refurbishment Capstone"
+    keyPoints:
+      - "Fix broken email button — replace with a working contact form"
+      - "Full UI redesign with softer, cohesive color palette"
+      - "Clarify the club's purpose with better visual hierarchy and messaging"
+      - "Member login system with user profiles and personal dashboards"
+      - "Interactive event calendar with RSVP functionality"
+      - "Online membership payment portal"
+      - "Admin panel for managing content, members, and events"
+      - "Comment system / mini-blog for member interaction"
+      - "Member activity and engagement tracking"
+    subtitle: "Bringing a Legacy Nonprofit Into the Modern Web"
+    description: "A design-based research capstone that rebuilds the Poway Woman's Club website from the ground up. The club is a 501(c)(3) nonprofit founded in 1960 and affiliated with the General Federation of Women's Clubs International. For over six decades it has served Poway through scholarships, art exhibits, library support, and youth leadership programs — but its current site is a table-based layout with clashing colors, a broken email link, and no clear communication of its mission. This project delivers a modern, welcoming interface that makes the club's purpose obvious at a glance, lets new members sign up and pay dues online, gives existing members a space to interact through comments and calendars, and provides administrators with a dashboard to manage everything without touching code."
+    tech:
+      - "Modern Responsive Frontend"
+      - "User Authentication & Profiles"
+      - "Event Calendar System"
+      - "Payment Integration"
+      - "Admin Dashboard"
+      - "Messaging / Comment Engine"
+      - "Data Tracking"
+    impact:
+      - "Makes the club's purpose and community work immediately clear to visitors"
+      - "Removes friction from joining — members can sign up and pay online"
+      - "Gives members a space to interact, comment, and stay connected between meetings"
+      - "Provides administrators with a dashboard to manage events, members, and content"
+      - "Modernizes a 65-year-old organization's digital presence while respecting its legacy"
+      - "Preserves existing strengths: working navigation, meeting schedule, and contact info"
+    status: "In Development"
+    team:
+      - "Evan S"
+      - "Maya D"
+      - "Cyrus Z"

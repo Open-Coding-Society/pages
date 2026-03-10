@@ -1,0 +1,25 @@
+Title: "Doing Exceptional Deeds (D.A.D.)"
+Description: "Uplifting youth and communities through education-first programs"
+
+Topics:
+  - title: "Exceptional Deeds"
+    subtitle: "Community Support"
+    link: "https://www.doingexceptionaldeeds.org/"
+    image: "capstone/doing_exceptional_deeds.png"
+    alt: "Program image"
+    status: "Active"
+    team:
+      - "William Windle"
+      - "Ethan Wong"
+      - "Nicolas Diaz"
+    description: "An extention for the Doing Exceptional Deeds non-profit website"
+    keyPoints:
+      - "AI Community Assistant"
+      - "Public Submissions"
+      - "Fix-up Website"
+    tech:
+      - "AI"
+      - "Frontend"
+    impact:
+      - "Impact point 1"
+      - "Impact point 2"

@@ -1,0 +1,33 @@
+# HawkHub Infographic
+Title: "HawkHub Capstone"
+Description: "A club management and community platform designed to streamline student-led club operations, engagement tracking, and leadership development."
+
+Topics:
+  - title: "HawkHub"
+    image: "capstone/hawkhub.png"
+    link: "/capstone/hawkhub/"
+    alt: "HawkHub - Club Management & Community Platform"
+    keyPoints:
+      - "Centralized club information and meeting management"
+      - "Member engagement and attendance tracking"
+      - "Event scheduling and notifications"
+      - "Leadership role and admin assignment"
+      - "Chat system for member communication"
+      - "Mobile-responsive design for accessibility"
+    subtitle: "Empowering Student Leaders Through Effective Club Management"
+    description: "HawkHub is a comprehensive club management platform designed to help student leaders organize, manage, and grow their clubs. Through iterative design research with student officers and club advisors, the system was built to address pain points in club coordination including scattered information, difficulty tracking engagement, and challenges maintaining member communication. The platform consolidates member management, event scheduling, attendance tracking, and leadership development in one accessible interface. Key features enable automatic notifications, attendance analytics, and role-based access control to support transparent leadership development."
+    tech:
+      - "JWT Authentication"
+      - "RESTful API Architecture"
+      - "Responsive UI/UX"
+      - "Sorting Feature"
+      - "Club Recommendation System"
+      - "Real-time Notifications"
+    impact:
+      - "Centralized platform and easy to read hub for displaying clubs"
+      - "Allows students to easily find clubs and events that interest them"
+      - "Clubs can showcase their events and activities to attract new members"
+      - "Provides a streamlined experience for club leaders to manage their clubs and events"
+    status: "Active Development"
+    team:
+      - "Avika Prasad, Soni Dhenuva, Samhita Lagisetti"
