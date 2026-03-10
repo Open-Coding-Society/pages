@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: RPG Water Example 
-permalink: /gamify/gamebgame
+permalink: /gamify/gamegb
 ---
 
 <div id="gameContainer">
@@ -13,8 +13,8 @@ permalink: /gamify/gamebgame
     // Adnventure Game assets locations
     import Core from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/GameControl.js";
-    import GameLevelBSpace from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelBSpace.js";
-    import GameLevelBSlimey from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelBSlimey.js";
+    import GameLevelBSpace from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelGBSpace.js";
+    import GameLevelBSlimey from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelGBSlimey.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     const gameLevelClasses = [GameLevelBSpace, GameLevelBSlimey];

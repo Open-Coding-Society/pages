@@ -188,7 +188,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: William Windle, Ethan Wong, Nicolas Diaz</p>
        </div>
    </div>
-   
+
    <!-- Palomar Capstone (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2025-03-05-palomar %}">
@@ -312,4 +312,5 @@ Below are the capstone infographic pages created by student groups. Click an ima
 </div>
 
 
+</div>
 
