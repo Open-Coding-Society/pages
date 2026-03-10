@@ -21,7 +21,7 @@ class Meteor extends Character {
       y: 1.5 + Math.random() * 1,
     }
 
-    // Update Transform instance with new position
+    // Update inherited Transform instance with new position
     this.transform.x = this.position.x;
     this.transform.y = this.position.y;
     this.transform.spawnX = this.position.x;

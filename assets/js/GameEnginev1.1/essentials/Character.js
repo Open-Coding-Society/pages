@@ -1,5 +1,4 @@
 import GameObject from './GameObject.js';
-import { Transform } from './Transform.js';
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
@@ -77,8 +76,11 @@ class Character extends GameObject {
         this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
         this.position = data.INIT_POSITION || INIT_POSITION;
         
-        // Create Transform instance for position management
-        this.transform = new Transform(this.position.x, this.position.y);
+        // Update inherited Transform instance
+        this.transform.x = this.position.x;
+        this.transform.y = this.position.y;
+        this.transform.spawnX = this.position.x;
+        this.transform.spawnY = this.position.y;
         if (data.SPEED !== undefined) {
             this.transform.speed = data.SPEED;
         }

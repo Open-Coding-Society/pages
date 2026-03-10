@@ -1,6 +1,5 @@
 import GameObject from './essentials/GameObject.js';
 import Player from './essentials/Player.js';
-import { Transform } from './essentials/Transform.js';
 
 class Coin extends GameObject {
 	constructor(data = null, gameEnv = null) {
@@ -18,8 +17,11 @@ class Coin extends GameObject {
 		this.hitbox = data?.hitbox || { widthPercentage: 0.0, heightPercentage: 0.0 };
 		this.spriteData = { id: data?.id || 'coin', greeting: false, reaction: null };
 
-		// Create Transform instance for position management
-		this.transform = new Transform(this.x, this.y);
+		// Update inherited Transform instance
+		this.transform.x = this.x;
+		this.transform.y = this.y;
+		this.transform.spawnX = this.x;
+		this.transform.spawnY = this.y;
 		if (data?.speed !== undefined) {
 			this.transform.speed = data.speed;
 		}

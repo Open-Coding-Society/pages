@@ -14,6 +14,8 @@
  * @method handleCollisionEvent - Updates the collisions array when player is touching the object.
  * @method handleReaction - Handles player reaction / state updates to the collision.
  */
+import { Transform } from './Transform.js';
+
 class GameObject {
     
     constructor(gameEnv = null) {
@@ -29,6 +31,9 @@ class GameObject {
             collisionEvents: [],
             movement: { up: true, down: true, left: true, right: true },
         };
+        
+        // Initialize Transform instance for all game objects
+        this.transform = new Transform(0, 0);
     }
 
     /**

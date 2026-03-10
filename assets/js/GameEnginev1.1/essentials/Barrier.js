@@ -1,5 +1,4 @@
 import GameObject from './GameObject.js';
-import { Transform } from './Transform.js';
 
 class Barrier extends GameObject {
     constructor(data, gameEnv) {
@@ -13,8 +12,11 @@ class Barrier extends GameObject {
         this.visible = data.visible !== undefined ? data.visible : true;
         this.hitbox = data.hitbox || { widthPercentage: 0.0, heightPercentage: 0.0 };
 
-        // Create Transform instance for position management
-        this.transform = new Transform(this.x, this.y);
+        // Update inherited Transform instance
+        this.transform.x = this.x;
+        this.transform.y = this.y;
+        this.transform.spawnX = this.x;
+        this.transform.spawnY = this.y;
         if (data.speed !== undefined) {
             this.transform.speed = data.speed;
         }

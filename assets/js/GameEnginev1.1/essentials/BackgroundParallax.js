@@ -1,5 +1,4 @@
 import Background from './Background.js';
-import { Transform } from './Transform.js';
 
 /** Parallax Background GameObject
  * - Tiling: draw multiple of the image to fill the gameCanvas extents
@@ -28,8 +27,11 @@ export class BackgroundParallax extends Background {
         this.tiles = data.tiles || null; // Optional: { x: num, y: num } to control tiling
         this.scaleToFit = data.scaleToFit || null; // Optional: 'width' or 'height' to scale image instead of tile
         
-        // Create Transform instance for position management
-        this.transform = new Transform(this.position.x, this.position.y);
+        // Update inherited Transform instance
+        this.transform.x = this.position.x;
+        this.transform.y = this.position.y;
+        this.transform.spawnX = this.position.x;
+        this.transform.spawnY = this.position.y;
         this.transform.xv = this.velocity.x;
         this.transform.yv = this.velocity.y;
         if (data.speed !== undefined) {
