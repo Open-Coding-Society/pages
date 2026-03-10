@@ -137,7 +137,7 @@ comments: false
     const tbody = document.getElementById('memberAnalyticsBody');
 
     if (!membersWithAnalytics.length) {
-      tbody.innerHTML = '<tr><td colspan="2" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
       return;
     }
 
@@ -154,6 +154,8 @@ comments: false
             </div>
           </td>
           <td class="py-3">${analytics.messagesSent}</td>
+          <td class="py-3">${analytics.messagesWithImages}</td>
+          <td class="py-3">${analytics.sharedFilesCount}</td>
         </tr>
       `;
     }).join('');
@@ -208,7 +210,7 @@ comments: false
       return;
     }
 
-    tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
 
     const startIndex = (safePage - 1) * MEMBER_ANALYTICS_PAGE_SIZE;
     const pageMembers = members.slice(startIndex, startIndex + MEMBER_ANALYTICS_PAGE_SIZE);
@@ -230,7 +232,7 @@ comments: false
       updateMemberAnalyticsPagination(totalMembers, safePage);
     } catch (error) {
       console.error('Failed to load member analytics page:', error);
-      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
     }
   }
 
@@ -255,7 +257,7 @@ comments: false
 
     // Update member analytics table if we have real members
     if (group.members && group.members.length > 0) {
-      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
       
       try {
         await loadDashboardSummaryStats(group);
@@ -263,11 +265,11 @@ comments: false
       } catch (error) {
         console.error('Failed to load member analytics:', error);
         // Show error state
-        tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
       }
     } else {
       // No members in group - show empty state and reset stats
-      tbody.innerHTML = '<tr><td colspan="2" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
       document.getElementById('statTotalMessages').textContent = 0;
       document.getElementById('statTotalFiles').textContent = 0;
     }
