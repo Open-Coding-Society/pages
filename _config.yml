@@ -20,7 +20,7 @@ description: "Class of 2026"
 owner_name: TheGreppers
 github_username: TheGreppers
 github_repo: "greppers" 
-baseurl: "/greppers" 
+baseurl: "" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts

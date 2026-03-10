@@ -148,7 +148,7 @@ clean-courses:
 convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
-	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+	@$(PYTHON) scripts/convert_notebooks.py "$<"
 
 # Single notebook conversion (faster for development)
 convert-single:
