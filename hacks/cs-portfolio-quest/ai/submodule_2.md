@@ -6,7 +6,6 @@ permalink: /cs-portfolio-quest/ai/submodule_2/
 parent: "AI Usage"
 team: "Thinkers"
 submodule: 2
-categories: [CSP, Submodule, AIUsage]
 tags: [ai, submodule, thinkers]
 author: "Thinkers Team"
 date: 2025-10-21
