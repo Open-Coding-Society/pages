@@ -1,0 +1,456 @@
+// Doing Exceptional Deeds Infographic Styles
+// D.A.D. - Modern Minimalistic Theme
+// Located in _sass/capstone/
+
+// Variables
+$ded-primary: #3b82f6;
+$ded-secondary: #60a5fa;
+$ded-accent: #ec4899;
+$ded-bg: #0f172a;
+$ded-card-bg: #1e293b;
+$ded-text-dark: #f1f5f9;
+$ded-text-muted: #cbd5e1;
+$ded-border: #334155;
+
+// Main Container
+.ded-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1a234a 100%);
+  min-height: 100vh;
+}
+
+// Header Section
+.ded-header {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #1a2847 0%, #1e3a5f 100%);
+  border-radius: 20px;
+  margin-bottom: 3rem;
+  border: 1px solid $ded-border;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.ded-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $ded-primary, $ded-secondary);
+  color: #fff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba($ded-primary, 0.4);
+}
+
+.ded-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: $ded-text-dark;
+  margin: 0 0 1rem 0;
+  letter-spacing: -1px;
+}
+
+.ded-description {
+  color: $ded-text-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 800px;
+  margin: 0 auto;
+  font-weight: 400;
+}
+
+// Mission Section
+.ded-mission {
+  background: $ded-card-bg;
+  border-radius: 16px;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  border: 1px solid $ded-border;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ded-mission-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $ded-text-dark;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.ded-mission-text {
+  color: $ded-text-muted;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 0 0 1.25rem 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Card Section
+.ded-card {
+  background: $ded-card-bg;
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  border: 1px solid $ded-border;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+  }
+}
+
+.ded-card-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr;
+  gap: 2.5rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Visual Section
+.ded-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #151f32;
+  border-radius: 12px;
+  border: 1px solid $ded-border;
+
+  @media (max-width: 1024px) {
+    grid-column: 1 / -1;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+}
+
+.ded-image-link {
+  position: relative;
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  width: 100%;
+
+  &:hover .ded-image {
+    transform: scale(1.08);
+  }
+
+  &:hover .ded-overlay {
+    opacity: 1;
+  }
+}
+
+.ded-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+  background: #2a3a52;
+}
+
+.ded-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba($ded-primary, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+}
+
+.ded-status {
+  background: linear-gradient(135deg, $ded-primary, $ded-secondary);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.ded-team {
+  text-align: center;
+  margin-top: auto;
+  width: 100%;
+}
+
+.ded-team-label {
+  display: block;
+  color: $ded-text-muted;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.ded-team-name {
+  display: block;
+  color: $ded-primary;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+// Content Section
+.ded-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background: #151f32;
+  border-radius: 12px;
+  border: 1px solid $ded-border;
+}
+
+.ded-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $ded-text-dark;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.ded-subtitle {
+  color: $ded-primary;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba($ded-primary, 0.15);
+}
+
+// Key Points
+.ded-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.ded-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: $ded-text-dark;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ded-check {
+  color: $ded-primary;
+  font-weight: 800;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+// Tech Stack
+.ded-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+.ded-tech-tag {
+  background: rgba($ded-primary, 0.08);
+  color: $ded-primary;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba($ded-primary, 0.2);
+}
+
+// Details Section
+.ded-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background: #151f32;
+  border-radius: 12px;
+  border: 1px solid $ded-border;
+}
+
+.ded-section-title {
+  color: $ded-text-dark;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba($ded-primary, 0.15);
+  letter-spacing: -0.3px;
+}
+
+.ded-about {
+  color: $ded-text-muted;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+// Impact List
+.ded-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.ded-impact-item {
+  background: rgba($ded-primary, 0.05);
+  color: $ded-text-dark;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border-left: 3px solid $ded-primary;
+  font-weight: 500;
+}
+
+// Button
+.ded-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $ded-primary, $ded-secondary);
+  color: #fff;
+  padding: 0.85rem 1.75rem;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  margin-top: auto;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba($ded-primary, 0.3);
+    color: #fff;
+    text-decoration: none;
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+
+  &.ded-btn-primary {
+    margin-top: 1.5rem;
+  }
+}
+
+// Core Values Section
+.ded-values {
+  background: $ded-card-bg;
+  border-radius: 16px;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  border: 1px solid $ded-border;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ded-values-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $ded-text-dark;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.ded-values-text {
+  color: $ded-text-muted;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 0 0 2.5rem 0;
+  text-align: center;
+}
+
+.ded-values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ded-value-item {
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba($ded-primary, 0.15) 0%, rgba($ded-secondary, 0.1) 100%);
+  border-radius: 12px;
+  border: 1px solid $ded-border;
+  text-align: center;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $ded-primary;
+    margin: 0 0 0.75rem 0;
+    letter-spacing: -0.3px;
+  }
+
+  p {
+    color: $ded-text-muted;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// Advisory Section
+.ded-advisory {
+  background: linear-gradient(135deg, rgba($ded-primary, 0.15) 0%, rgba($ded-secondary, 0.1) 100%);
+  border-radius: 16px;
+  padding: 3rem;
+  border: 1px solid $ded-border;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ded-advisory-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $ded-text-dark;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.ded-advisory-text {
+  color: $ded-text-muted;
+  font-size: 1rem;
+  line-height: 1.8;
+  margin: 0 0 1.25rem 0;
+
+  &:last-of-type {
+    margin-bottom: 2rem;
+  }
+}
