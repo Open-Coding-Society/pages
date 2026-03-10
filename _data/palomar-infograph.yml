@@ -1,0 +1,36 @@
+# Palomar Health Foundation Capstone Infographic
+Title: "Palomar Health Foundation Capstone"
+Description: "A donor-facing impact platform that connects philanthropic giving to real patient outcomes, keeps the foundation aligned with community needs, and gives healthcare supporters a 30-second pulse on every program — without feeling like a fundraising pitch."
+
+
+Topics:
+ - title: "DonorConnect"
+   image: "capstone/palomar_logo.png"
+   link: "/capstone/palomar/"
+   alt: "DonorConnect — Palomar Health Foundation Donor Engagement Platform"
+   keyPoints:
+     - "Personalized donor dashboard with real-time program impact tracking"
+     - "One-click recurring donation setup with flexible giving tiers"
+     - "Claude-powered impact summaries that connect dollars to patient stories"
+     - "Live funding meters so donors see progress toward campaign goals"
+     - "Automated stewardship workflows with meaningful milestone recognition"
+     - "Donor-first privacy: no data sold, all communications opt-in"
+   subtitle: "Making Giving Feel Like Partnership, Not a Transaction"
+   description: "A system that transforms the Palomar Health Foundation giving experience from a one-time checkout into an ongoing relationship. A personalized dashboard shows each donor exactly where their money went — which program, which patient population, which equipment purchase. Claude generates warm, specific impact summaries based on real program data, so donors feel genuinely connected to outcomes. Live funding meters let supporters rally around campaigns in real time. Automated but personal milestone messages celebrate donor anniversaries, match moments, and program completions. Foundation staff access everything through a single dashboard that delivers a 30-second snapshot of every campaign's momentum, donor health, and program alignment."
+   tech:
+     - "Donor Dashboard (Personalized Impact View)"
+     - "Claude API Integration"
+     - "Recurring Giving Engine"
+     - "Live Funding Meter"
+     - "Automated Stewardship Workflows"
+     - "Impact Story Generator"
+   impact:
+     - "Increases donor retention by making impact tangible and personal"
+     - "Teaches donors about programs through story-driven summaries"
+     - "Gives foundation staff a real-time view of campaign momentum"
+     - "Helps donors self-direct gifts toward causes they care about most"
+     - "Builds long-term philanthropic relationships in a trust-first environment"
+   status: "In Development"
+   team:
+     - "Palomar Health Foundation"
+     - "Development Team"

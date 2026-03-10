@@ -155,3 +155,147 @@
     font-size: 0.85rem;
   }
 }
+
+// ===========================
+// Game-Specific Button Mixins
+// ===========================
+
+/**
+ * Game Navigation Button
+ * Circular button with emoji/icon for game navigation
+ *
+ * @param {Color} $color - Button accent color (default: var(--pref-accent-color))
+ * @param {Number} $size - Button diameter (default: 50px)
+ *
+ * @example
+ *   .prevButton {
+ *     @include game-nav-button;
+ *   }
+ *
+ *   .customNavBtn {
+ *     @include game-nav-button(#FF5733, 60px);
+ *   }
+ */
+@mixin game-nav-button($color: var(--pref-accent-color), $size: 50px) {
+  width: $size;
+  height: $size;
+  background-color: var(--panel);
+  border: 2px solid $color;
+  border-radius: 50%;
+  color: var(--pref-text-color);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  font-family: var(--pref-font-family);
+
+  &:hover {
+    background-color: $color;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media (max-width: 768px) {
+    width: $size * 0.8;
+    height: $size * 0.8;
+    font-size: 20px;
+    border-width: 1.5px;
+  }
+}
+
+/**
+ * Game Level Button
+ * Button for level selection grids
+ *
+ * @param {Number} $size - Button size (default: 50px)
+ *
+ * @example
+ *   .levelButton {
+ *     @include game-level-button;
+ *   }
+ */
+@mixin game-level-button($size: 50px) {
+  width: $size;
+  height: $size;
+  background-color: var(--panel);
+  border: 2px solid var(--pref-accent-color);
+  border-radius: 8px;
+  color: var(--pref-text-color);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-family: var(--pref-font-family);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: var(--pref-accent-color);
+    color: var(--panel);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    width: $size * 0.8;
+    height: $size * 0.8;
+    font-size: 14px;
+  }
+}
+
+/**
+ * Emoji Button
+ * Button optimized for large emoji display
+ *
+ * @param {Number} $size - Button size (default: 60px)
+ * @param {Number} $emoji-size - Emoji font size (default: 30px)
+ *
+ * @example
+ *   .emojiBtn {
+ *     @include emoji-button;
+ *   }
+ */
+@mixin emoji-button($size: 60px, $emoji-size: 30px) {
+  width: $size;
+  height: $size;
+  background-color: var(--panel);
+  border: 2px solid var(--ui-border);
+  border-radius: 12px;
+  font-size: $emoji-size;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+    transform: scale(1.05);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media (max-width: 768px) {
+    width: $size * 0.8;
+    height: $size * 0.8;
+    font-size: $emoji-size * 0.8;
+  }
+}

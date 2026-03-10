@@ -1,0 +1,76 @@
+// ===========================
+// Pause Modal Styles
+// ===========================
+// Uses standard mixins for consistent styling with forms and widgets
+
+@import "../mixins/buttons";
+@import "../mixins/panel";
+@import "../mixins/modals";
+@import "../mixins/forms";
+
+/**
+ * Pause Modal Overlay
+ * Centered modal for game pause menu
+ */
+#pauseModal {
+  @include modal-overlay;
+  
+  // Override default modal-overlay behavior - show when created
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+/**
+ * Pause Modal Content
+ * Container for pause menu buttons and options
+ */
+.pause-modal-content {
+  @include modal-container(300px, 400px, 24px);
+}
+
+/**
+ * Modal Header
+ */
+.pause-modal-header {
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--pref-text-color, #FFF);
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+}
+
+/**
+ * Button Container
+ */
+.pause-modal-buttons {
+  @include button-container(column, 10px);
+}
+
+/**
+ * Pause Menu Button
+ * Uses action-button mixin with text-button base
+ */
+.pause-menu-btn {
+  @include text-button;
+  @include action-button(12px, 16px);
+
+  // Primary action button (Resume)
+  &.primary {
+    margin-top: 8px;
+    font-weight: 700;
+    background: var(--pref-accent-color, #3b82f6);
+    color: var(--pref-text-color, #FFF);
+    border-color: var(--pref-accent-color, #3b82f6);
+
+    &:hover {
+      opacity: 0.9;
+      background: var(--pref-accent-color, #3b82f6);
+    }
+  }
+}
