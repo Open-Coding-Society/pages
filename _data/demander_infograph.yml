@@ -1,0 +1,34 @@
+# Demander Capstone Infographic
+Title: "Demander Capstone"
+Description: "A demand intelligence platform for real estate professionals. DEMANDER uses behavioral simulation with synthetic buyer agents to analyze property listings and generate actionable insights about buyer demand — so you know your property's ROI before you buy."
+
+Topics:
+  - title: "Demander"
+    image: "capstone/demander_logo.png"
+    link: "https://demander-mocha.vercel.app"
+    alt: "Demander - Real Estate Demand Intelligence Platform"
+    keyPoints:
+      - "Demand Score (0–100) measuring overall buyer interest"
+      - "Monte Carlo simulation with 500–2,000 synthetic buyer agents"
+      - "Buyer Funnel Analysis tracking impressions → clicks → saves → tours → offers"
+      - "Demand Blockers ranked with actionable recommendations"
+      - "ROI Analysis with cap rate, cash-on-cash, and appreciation forecasts"
+      - "Instant analysis from a Zillow/Redfin/Realtor.com URL"
+    subtitle: "Know Your Property's ROI Before You Buy"
+    description: "DEMANDER is a demand intelligence platform that uses behavioral simulation to analyze real estate listings. Instead of relying on gut feelings and generic comps, it runs Monte Carlo simulations with synthetic buyer archetypes — Starter Couples, Growing Families, Relocation Pros, Downsizers, and Investors — to identify exactly where buyer interest drops off and what's blocking sales. From a single listing URL, it generates full demand reports with sale probability forecasts, neighborhood intelligence, market comparables, and client-ready PDFs with investment grading (A–F)."
+    tech:
+      - "Monte Carlo Simulation"
+      - "Synthetic Buyer Agents"
+      - "Behavioral Modeling"
+      - "RESTful API"
+      - "PDF Report Generation"
+    impact:
+      - "Replaces gut-feeling pricing with data-driven demand analysis"
+      - "Identifies specific blockers preventing sales (e.g., HOA 40% above comps)"
+      - "Delivers instant analysis in minutes instead of days"
+      - "Combines ROI + market research + demand simulation in one platform"
+    status: "Beta"
+    team:
+      - "Yuva"
+      - "Yash"
+      - "Ansh"

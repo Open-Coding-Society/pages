@@ -1,0 +1,70 @@
+{% assign data = site.data.demander_infograph %}
+
+<div class="dm-infograph">
+  <!-- Header Section -->
+  <div class="dm-header">
+    <div class="dm-badge">Design-Based Research Capstone</div>
+    <h1 class="dm-title">{{ data.Title }}</h1>
+    <p class="dm-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="dm-card">
+    <div class="dm-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="dm-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dm-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dm-image">
+          <div class="dm-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="dm-status">{{ topic.status }}</div>
+        <div class="dm-team">
+          <span class="dm-team-label">Project Leads</span>
+          <span class="dm-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="dm-content">
+        <h2 class="dm-project-title">{{ topic.title }}</h2>
+        <p class="dm-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="dm-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="dm-keypoint">
+            <span class="dm-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="dm-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="dm-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="dm-details">
+        <h3 class="dm-section-title">About</h3>
+        <p class="dm-about">{{ topic.description }}</p>
+
+        <h3 class="dm-section-title">Impact</h3>
+        <div class="dm-impact-list">
+          {% for item in topic.impact %}
+          <div class="dm-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dm-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
