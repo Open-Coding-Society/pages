@@ -364,3 +364,97 @@ $dsa-text-light: #e0e4ea;
   font-size: 0.75rem;
   border-left: 3px solid $dsa-secondary;
 }
+
+// About the Organization section
+.dsa-about-org {
+  background: linear-gradient(145deg, $dsa-card-bg 0%, #161640 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($dsa-primary, 0.2);
+}
+
+.dsa-about-org-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $dsa-primary;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($dsa-primary, 0.3);
+}
+
+.dsa-about-org-body {
+  color: $dsa-text-muted;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 0 0.75rem 0;
+
+  strong { color: $dsa-text-light; }
+}
+
+.dsa-about-org-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.dsa-about-org-detail {
+  color: $dsa-text-muted;
+  font-size: 0.85rem;
+}
+
+.dsa-about-org-link {
+  display: inline-block;
+  background: rgba($dsa-primary, 0.1);
+  color: $dsa-primary;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid rgba($dsa-primary, 0.3);
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba($dsa-primary, 0.2);
+    transform: translateY(-1px);
+    color: $dsa-primary;
+    text-decoration: none;
+  }
+}
+
+// Website link footer
+.dsa-website-link {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.dsa-website-label {
+  display: block;
+  color: $dsa-text-muted;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.75rem;
+}
+
+.dsa-website-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $dsa-primary, $dsa-highlight);
+  color: #000;
+  padding: 0.85rem 2rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba($dsa-primary, 0.4);
+    color: #000;
+    text-decoration: none;
+  }
+}

@@ -9,6 +9,22 @@
     <p class="dad-description">{{ data.Description }}</p>
   </div>
 
+  <!-- About the Organization -->
+  <div class="dad-about-org">
+    <div class="dad-about-org-grid">
+      <div class="dad-about-org-text">
+        <h2 class="dad-about-org-title">About the Organization</h2>
+        <p class="dad-about-org-body"><strong>Doing Exceptional Deeds (D.A.D.)</strong> is a 501(c)(3) nonprofit organization based in San Marcos, CA. Their mission is to <strong>uplift individuals and strengthen communities across generations</strong> through character-first programs that build confidence, character, accountability, and purpose.</p>
+        <p class="dad-about-org-body">D.A.D. serves youth, young adults, student-athletes, and seniors through thoughtfully designed initiatives including youth athletics, mentorship, life-skills development, and community engagement. They also offer a <strong>community-based Student Success Advisory model</strong> for students from middle school through high school.</p>
+        <div class="dad-about-org-details">
+          <span class="dad-about-org-detail">📍 420 Station Road, San Marcos, CA 92078</span>
+          <span class="dad-about-org-detail">🏛 501(c)(3) Nonprofit — EIN #3302138</span>
+        </div>
+        <a href="https://www.doingexceptionaldeeds.org/" class="dad-about-org-link" target="_blank" rel="noopener noreferrer">Visit D.A.D. Website ↗</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Project Cards -->
   {% for topic in data.Topics %}
   <div class="dad-card">
@@ -101,5 +117,13 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- External Website Link -->
+  <div class="dad-website-link">
+    <span class="dad-website-label">Official Website</span>
+    <a href="https://www.doingexceptionaldeeds.org/" class="dad-website-btn" target="_blank" rel="noopener noreferrer">
+      Visit doingexceptionaldeeds.org ↗
+    </a>
   </div>
 </div>

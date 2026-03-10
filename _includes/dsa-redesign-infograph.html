@@ -9,6 +9,23 @@
     <p class="dsa-description">{{ data.Description }}</p>
   </div>
 
+  <!-- About the Organization -->
+  <div class="dsa-about-org">
+    <div class="dsa-about-org-grid">
+      <div class="dsa-about-org-text">
+        <h2 class="dsa-about-org-title">About the Organization</h2>
+        <p class="dsa-about-org-body">The <strong>Deputy Sheriffs' Association of San Diego County (DSA)</strong> is the labor union representing the dedicated officers of the San Diego Sheriff's Department. With <strong>70 years</strong> of service and over <strong>4,229 members</strong>, the DSA provides essential benefits, organizes events, and advocates for deputies of all ranks.</p>
+        <p class="dsa-about-org-body">As the collective bargaining unit, the DSA negotiates contracts, provides legal defense, supports political action, and offers member benefits and wellness programs. Their website serves as the primary digital hub for member resources, news, the DSA store, and community engagement.</p>
+        <div class="dsa-about-org-details">
+          <span class="dsa-about-org-detail">📍 13881 Danielson Street, Poway, CA 92064</span>
+          <span class="dsa-about-org-detail">📞 (858) 486-9009</span>
+          <span class="dsa-about-org-detail">📧 info@dsasd.org</span>
+        </div>
+        <a href="https://dsasd.org/" class="dsa-about-org-link" target="_blank" rel="noopener noreferrer">Visit DSA Website ↗</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Project Cards -->
   {% for topic in data.Topics %}
   <div class="dsa-card">
@@ -101,5 +118,13 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- External Website Link -->
+  <div class="dsa-website-link">
+    <span class="dsa-website-label">Official Website</span>
+    <a href="https://dsasd.org/" class="dsa-website-btn" target="_blank" rel="noopener noreferrer">
+      Visit dsasd.org ↗
+    </a>
   </div>
 </div>
