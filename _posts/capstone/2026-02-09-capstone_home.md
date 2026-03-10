@@ -39,14 +39,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 my-6">
 
 
-   <!-- Database Defenders -->
+   <!-- Slack Messaging Platform -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-database-defenders-capstone %}">
-           <img src="/images/capstone/database_defenders.png" alt="Database Defenders - Automated Data Loss Prevention System" class="w-28 h-28 object-cover rounded" />
+       <a href="{% post_url 2026-02-06-slack-messaging-capstone %}">
+           <img src="/images/capstone/database_defenders.png" alt="Slack Messaging Platform - Real-Time Collaborative Chat" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-database-defenders-capstone %}">Database Defenders</a></h3>
-           <p class="text-sm text-gray-700">A multi-layer protection system built on top of Flask and Amazon Aurora to prevent, detect, and recover from data loss incidents.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-slack-messaging-capstone %}">Slack Messaging Platform</a></h3>
+           <p class="text-sm text-gray-700">A full-stack Slack-style messaging platform with real-time channels, message threading, AI-powered task extraction, and admin moderation — deployed to messaging.opencodingsociety.com.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
        </div>
    </div>
