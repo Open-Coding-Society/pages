@@ -1,0 +1,8 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#152418"/>
+  <circle cx="100" cy="80" r="40" fill="#5aab64" opacity="0.2"/>
+  <path d="M100 120 L130 170 L70 170 L100 120" fill="#c4993a" opacity="0.8"/>
+  <path d="M100 50 L115 80 L100 110 L85 80 L100 50" fill="#a8c4ab"/>
+  <text x="100" y="140" font-family="Arial" font-size="14" fill="#e8f2e9" text-anchor="middle">Friends of</text>
+  <text x="100" y="160" font-family="Arial" font-size="14" fill="#e8f2e9" text-anchor="middle">Poway Seniors</text>
+</svg>

@@ -1,0 +1,37 @@
+# Food Connection Capstone Infographic
+Title: "Food Connection Capstone"
+Description: "A Design-Based Research (DBR) capstone project addressing food security and community connection through real-time food sharing insights. This full-stack platform uses JavaScript, Python, and Flask to enable anonymous food availability check-ins, identify surplus and need trends, and help coordinators connect food donors with community members."
+
+Topics:
+  - title: " Community Food Connection"
+    image: "capstone/food-connection.png"
+    link: "/capstone/food-connection/"
+    alt: "Food Connection - Real-Time Food Sharing & Community Support Platform"
+    keyPoints:
+      - "Anonymous food availability check-ins from donors and recipients"
+      - "AI identifies trends in food surplus, shortage, or dietary needs"
+      - "Alerts for coordinators when food resources are low or expiring"
+      - "Community meal and food sharing event coordination"
+      - "Data dashboard for food program leaders"
+      - "Privacy-first system with anonymized tracking"
+    subtitle: "Real-Time Food Sharing & Community Support"
+    description: "Food Connection gives coordinators insight into how food resources flow through the community. Donors can share surplus food availability, while those in need can request support through simple prompts, helping identify food security trends early. Through iterative Design-Based Research cycles with food pantry staff and community members, the platform evolved to prioritize dignity and privacy while delivering actionable insights. Coordinators can then connect donors with recipients, organize food distribution, and reduce waste. The system uses machine learning to detect patterns in food availability and needs while maintaining complete anonymity, ensuring all users feel respected and supported."
+    tech:
+      - "Python Flask Backend"
+      - "JavaScript Frontend with Chart.js"
+      - "Machine Learning (Scikit-learn)"
+      - "PostgreSQL Database"
+      - "RESTful API Design"
+      - "Privacy-Preserving Analytics"
+    impact:
+      - "Reduced food waste through surplus redistribution"
+      - "Better matching of food resources with community needs"
+      - "Improved food security through targeted interventions"
+      - "Data-informed food purchasing and donation planning"
+      - "Stronger community connections through shared meals"
+      - "Dignity-preserving approach to food assistance"
+    status: "In Development / Pilot Phase"
+    team:
+      - "Virginia"
+      - "Vivian"
+      - "Nitya"

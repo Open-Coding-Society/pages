@@ -1,0 +1,36 @@
+# ClubPulse Capstone Infographic
+Title: "ClubPulse Capstone"
+Description: "A Design-Based Research (DBR) capstone project addressing youth wellbeing through real-time emotional insights. This full-stack platform uses JavaScript, Python, and Flask to enable anonymous mood check-ins, identify wellbeing trends, and help staff provide targeted support for club members."
+
+Topics:
+  - title: "ClubPulse"
+    image: "capstone/clubpulse.png"
+    link: "/capstone/clubpulse/"
+    alt: "ClubPulse - Real-Time Youth Wellbeing Insights Platform"
+    keyPoints:
+      - "Anonymous mood check-ins for students"
+      - "AI identifies trends in stress, loneliness, or confidence"
+      - "Alerts for staff when students may need extra support"
+      - "Wellness resources and activities for members"
+      - "Data dashboard for program leaders"
+      - "Privacy-first data system with anonymized tracking"
+    subtitle: "Real-Time Youth Wellbeing Insights"
+    description: "ClubPulse gives staff insight into how members are doing emotionally. Students can check in with simple prompts, helping identify trends early. Through iterative Design-Based Research cycles with Boys & Girls Club staff and youth, the platform evolved to prioritize privacy while delivering actionable insights. Staff can then provide targeted support programs like tutoring, mentoring, or mental wellness activities. The system uses machine learning to detect patterns in wellbeing data while maintaining complete anonymity, ensuring youth feel safe sharing their emotions."
+    tech:
+      - "Python Flask Backend"
+      - "JavaScript Frontend with Chart.js"
+      - "Machine Learning (Scikit-learn)"
+      - "PostgreSQL Database"
+      - "RESTful API Design"
+      - "Privacy-Preserving Analytics"
+    impact:
+      - "Earlier support for struggling youth"
+      - "Better program planning based on wellbeing trends"
+      - "Healthier club environment through targeted interventions"
+      - "Data-informed resource allocation"
+      - "Improved staff-youth relationships"
+    status: "In Development / Pilot Phase"
+    team:
+      - "Virginia"
+      - "Vivian"
+      - "Nitya"
