@@ -310,6 +310,16 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- Sentri (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-04-sentri-capstone %}">
+           <img src="/images/capstone/sentri.png" alt="Sentri" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Sentri</a></h3>
+           <p class="text-sm text-gray-700">A sobriety tracker that analyzes daily biometric and mood data to predict a user's relapse risk and proactively deliver personalized interventions before a crisis occurs</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
+   <!-- Friends of the Poway Library (CSP) -->
    <!-- DSA Website Redesign (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
