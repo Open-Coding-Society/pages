@@ -1,0 +1,181 @@
+/**
+ * Runner Control Buttons
+ * Standardized button styles for code/UI/game runner interfaces
+ * These classes provide semantic, theme-aware buttons for common runner actions
+ * 
+ * Uses colors from root-color-map.scss - single source of truth
+ */
+
+@import "../../../root-color-map";
+@import "../../materials/main.scss";
+@import "common.scss";
+@import "states.scss";
+
+// ===========================
+// Semantic Color References
+// ===========================
+// These are imported from root-color-map.scss:
+// - $status-indicator-error-color: #dc3545 (danger/red)
+// - $warn: #FBBF24 (warning/yellow)
+// - $validation-success-color: #10b981 (success/green)
+// - $blue: #3182CE (info/blue)
+
+// ===========================
+// Danger Button (Stop/Exit)
+// ===========================
+
+.danger-button {
+  @extend .medium;
+  @extend .primary;
+  
+  background-color: $status-indicator-error-color !important;
+  border-color: $status-indicator-error-color !important;
+  color: $white1 !important;
+  
+  &:hover {
+    background-color: darken($status-indicator-error-color, 8%) !important;
+    border-color: darken($status-indicator-error-color, 8%) !important;
+    opacity: 0.95;
+  }
+  
+  &:active {
+    background-color: darken($status-indicator-error-color, 15%) !important;
+  }
+  
+  &:disabled {
+    background-color: $status-indicator-error-bg !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// ===========================
+// Warning Button (Pause/Caution)
+// ===========================
+
+.warning-button {
+  @extend .medium;
+  @extend .primary;
+  
+  background-color: $warn !important;
+  border-color: $warn !important;
+  color: #000 !important; // Dark text for better contrast on yellow
+  
+  &:hover {
+    background-color: darken($warn, 8%) !important;
+    border-color: darken($warn, 8%) !important;
+    opacity: 0.95;
+  }
+  
+  &:active {
+    background-color: darken($warn, 15%) !important;
+  }
+  
+  &:disabled {
+    background-color: $warn-bg !important;
+    color: rgba(#000, 0.5) !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// ===========================
+// Success Button (Run/Execute)
+// ===========================
+
+.success-button {
+  @extend .medium;
+  @extend .primary;
+  
+  background-color: $validation-success-color !important;
+  border-color: $validation-success-color !important;
+  color: $white1 !important;
+  
+  &:hover {
+    background-color: darken($validation-success-color, 8%) !important;
+    border-color: darken($validation-success-color, 8%) !important;
+    opacity: 0.95;
+  }
+  
+  &:active {
+    background-color: darken($validation-success-color, 15%) !important;
+  }
+  
+  &:disabled {
+    background-color: $status-indicator-success-bg !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// ===========================
+// Info Button (Info/Help)
+// ===========================
+
+.info-button {
+  @extend .medium;
+  @extend .primary;
+  
+  background-color: $blue !important;
+  border-color: $blue !important;
+  color: $white1 !important;
+  
+  &:hover {
+    background-color: darken($blue, 8%) !important;
+    border-color: darken($blue, 8%) !important;
+    opacity: 0.95;
+  }
+  
+  &:active {
+    background-color: darken($blue, 15%) !important;
+  }
+  
+  &:disabled {
+    background-color: rgba($blue, 0.2) !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// ===========================
+// Icon-Only Variants
+// ===========================
+
+.danger-button.icon-only,
+.warning-button.icon-only,
+.success-button.icon-only,
+.info-button.icon-only {
+  width: 38px;
+  min-width: 38px;
+  padding: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: 768px) {
+    width: 44px;
+    min-width: 44px;
+  }
+}
+
+// ===========================
+// Small Size Variants
+// ===========================
+
+.danger-button.small,
+.warning-button.small,
+.success-button.small,
+.info-button.small {
+  @extend .small;
+}
+
+// ===========================
+// Large Size Variants
+// ===========================
+
+.danger-button.large,
+.warning-button.large,
+.success-button.large,
+.info-button.large {
+  @extend .large;
+}

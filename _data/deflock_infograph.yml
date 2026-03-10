@@ -1,0 +1,29 @@
+Title: "DeFlock SD"
+Description: "An extension of deflock.org; open, crowd sourced system to map out Automatic License Plate Readers (ALPRs), educate, and provide tools to *resist* the bipartisan push to implement a technofascist surveillance state."
+
+Topics:
+  - title: "DeFlock SD"
+    image: "capstone/deflock-sd.png"
+    link: "/capstone/deflock-sd/"
+    alt: "DeFlock SD - Fighting Mass Surveillance"
+    keyPoints:
+      - "Crowdsourced map of ALPR cameras across San Diego"
+      - "Tools for community reporting, verification, and transparency around surveillance infrastructure"
+      - "Resources explaining ALPR technology, risks, and policies"
+      - "Open source platform for local resistance to mass surveillance"
+    subtitle: "Community Mapping to Resist ALPR Surveillance"
+    description: "DeFlock Sd is regional chapter of deflock.org focused on documenting and exposing the spread of ALPRs in San Diego. The platform allows community members to report camera locations, visualize surveillance infrastructure, and access resources to understand the privacy and civil liberties risks of ALPR systems."
+    tech:
+      - "Backend: Flask RESTful API"
+      - "Frontend: Vue.js"
+      - "Geospatial data and map analysis"
+      - "Path routing using above data"
+    impact:
+      - "Currently, there is a massive bipartisan push to implement surveillance systems to track people and stifle dissent (e.g., ID verification, ALPRs, etc.)."
+      - "The City of San Diego was one of the first adopters of the Flock surveillance system, despite massive backlash. They still continue to use the surveillance system to violate civil liberties."
+      - "Both Flock and the City of San Diego openly collaborate with ICE and other external agencies, sharing tracking data without consent."
+      - "Flock was contracted to skirt constitutional protections which would have otherwise prevented the systems from being implemented. There has been a plethora of abuses (e.g. tracking women who have had abortions over state lines, stalking, etc.) and an even larger repertoire of security vulnerabilities which allow people to simply log in and watch cameras."
+      - "Flock has been known to outright lie about their surveillance. For example, they previously made a claim that they don't track pedestrians, yet security researchers found that the cameras would intentionally pan towards people walking by and even zoom in on their phone screens to snoop."
+    status: "Active"
+    team:
+      - "TheFlockers (Adhav, Lucas, Perry)"
