@@ -6,6 +6,16 @@
 export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions) {
     
     let currentUser = null;
+    let adminFilters = {
+        startDate: null,
+        endDate: null,
+        minSessions: 0,
+        maxSessions: Infinity,
+        minTimeSpent: 0,
+        maxTimeSpent: Infinity,
+        sortBy: 'time', // 'time', 'engagement', 'sessions', 'lessons'
+        sortOrder: 'desc' // 'asc', 'desc'
+    };
     
     // Get current user's Spring ID
     async function getUserIdSpring() {
@@ -655,6 +665,162 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
     }
 
     /**
+     * Render filter panel for admin analytics
+     */
+    function renderFilterPanel() {
+        const today = new Date().toISOString().split('T')[0];
+        const thirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+        
+        return `
+            <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold text-white mb-4">Advanced Filters</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Date Range Start -->
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">From Date</label>
+                        <input type="date" id="filter-start-date" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm" value="${thirtyDaysAgo}" />
+                    </div>
+                    
+                    <!-- Date Range End -->
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">To Date</label>
+                        <input type="date" id="filter-end-date" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm" value="${today}" />
+                    </div>
+                    
+                    <!-- Min Sessions -->
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">Min Sessions</label>
+                        <input type="number" id="filter-min-sessions" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm" value="0" min="0" />
+                    </div>
+                    
+                    <!-- Sort By -->
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">Sort By</label>
+                        <select id="filter-sort-by" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm">
+                            <option value="time">Time Spent</option>
+                            <option value="engagement">Engagement</option>
+                            <option value="sessions">Sessions</option>
+                            <option value="lessons">Lessons</option>
+                            <option value="accuracy">Accuracy</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sort Order -->
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">Order</label>
+                        <select id="filter-sort-order" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm">
+                            <option value="desc">Highest First</option>
+                            <option value="asc">Lowest First</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex gap-2">
+                    <button id="apply-filters-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
+                        Apply Filters
+                    </button>
+                    <button id="reset-filters-btn" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Apply filters to users data
+     */
+    function applyUserFilters(users) {
+        if (!users) return [];
+        
+        let filtered = [...users];
+        
+        // Filter by sessions
+        filtered = filtered.filter(u => {
+            const sessions = u.totalSessions || 0;
+            return sessions >= adminFilters.minSessions && sessions <= adminFilters.maxSessions;
+        });
+        
+        // Sort
+        filtered.sort((a, b) => {
+            let aVal, bVal;
+            
+            switch(adminFilters.sortBy) {
+                case 'time':
+                    aVal = a.totalTimeSpentSeconds || 0;
+                    bVal = b.totalTimeSpentSeconds || 0;
+                    break;
+                case 'engagement':
+                    aVal = a.interactionPercentage || 0;
+                    bVal = b.interactionPercentage || 0;
+                    break;
+                case 'sessions':
+                    aVal = a.totalSessions || 0;
+                    bVal = b.totalSessions || 0;
+                    break;
+                case 'lessons':
+                    aVal = a.totalLessonsViewed || 0;
+                    bVal = b.totalLessonsViewed || 0;
+                    break;
+                case 'accuracy':
+                    aVal = a.averageAccuracyPercentage || 0;
+                    bVal = b.averageAccuracyPercentage || 0;
+                    break;
+                default:
+                    aVal = a.totalTimeSpentSeconds || 0;
+                    bVal = b.totalTimeSpentSeconds || 0;
+            }
+            
+            return adminFilters.sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+        });
+        
+        return filtered;
+    }
+
+    /**
+     * Setup filter event listeners
+     */
+    function setupFilterListeners(onApply) {
+        const applyBtn = document.getElementById('apply-filters-btn');
+        const resetBtn = document.getElementById('reset-filters-btn');
+        
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                adminFilters.startDate = document.getElementById('filter-start-date').value;
+                adminFilters.endDate = document.getElementById('filter-end-date').value;
+                adminFilters.minSessions = parseInt(document.getElementById('filter-min-sessions').value) || 0;
+                adminFilters.sortBy = document.getElementById('filter-sort-by').value;
+                adminFilters.sortOrder = document.getElementById('filter-sort-order').value;
+                onApply();
+            });
+        }
+        
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                adminFilters = {
+                    startDate: null,
+                    endDate: null,
+                    minSessions: 0,
+                    maxSessions: Infinity,
+                    minTimeSpent: 0,
+                    maxTimeSpent: Infinity,
+                    sortBy: 'time',
+                    sortOrder: 'desc'
+                };
+                const today = new Date().toISOString().split('T')[0];
+                const thirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+                document.getElementById('filter-start-date').value = thirtyDaysAgo;
+                document.getElementById('filter-end-date').value = today;
+                document.getElementById('filter-min-sessions').value = '0';
+                document.getElementById('filter-sort-by').value = 'time';
+                document.getElementById('filter-sort-order').value = 'desc';
+                onApply();
+            });
+        }
+    }
+
+    /**
      * Render admin overview
      */
     async function renderAdminOverview(container, stats) {
@@ -854,48 +1020,78 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
             return;
         }
 
-        users.sort((a, b) => (b.totalTimeSpentSeconds || 0) - (a.totalTimeSpentSeconds || 0));
+        // Apply filters
+        const filteredUsers = applyUserFilters(users);
 
         const html = `
-            <div class="space-y-4">
-                <h2 class="text-2xl font-bold text-white">All Users Analytics</h2>
-                <div class="bg-neutral-800 border border-neutral-700 rounded-lg overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-neutral-700 bg-neutral-900/50">
-                                    <th class="px-6 py-4 text-left text-neutral-300 font-semibold">User</th>
-                                    <th class="px-6 py-4 text-left text-neutral-300 font-semibold">Email</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Time Spent</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Lessons</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Code Runs</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Sessions</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Engagement</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${users.map(user => `
-                                    <tr class="border-b border-neutral-700 hover:bg-neutral-700/30 transition">
-                                        <td class="px-6 py-4 text-white font-medium">${user.name}</td>
-                                        <td class="px-6 py-4 text-neutral-400">${user.email}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalTimeFormatted || '0m'}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalLessonsViewed || 0}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalCodeExecutions || 0}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalSessions || 0}</td>
-                                        <td class="px-6 py-4 text-center">
-                                            <div class="w-20 bg-neutral-700 rounded-full h-2 mx-auto">
-                                                <div class="bg-blue-500 h-full rounded-full" style="width: ${Math.min(user.interactionPercentage || 0, 100)}%"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="space-y-6">
+                ${renderFilterPanel()}
+                
+                <div class="bg-neutral-900 rounded-lg p-4 mb-4">
+                    <p class="text-neutral-400 text-sm">Showing <span class="text-white font-semibold">${filteredUsers.length}</span> of <span class="text-white font-semibold">${users.length}</span> users</p>
                 </div>
+
+                ${filteredUsers.length === 0 ? ' 
+                    <p class="text-neutral-400">No users match the current filters</p>
+                ' : `
+                    <div class="bg-neutral-800 border border-neutral-700 rounded-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-neutral-700 bg-neutral-900/50">
+                                        <th class="px-6 py-4 text-left text-neutral-300 font-semibold">User</th>
+                                        <th class="px-6 py-4 text-left text-neutral-300 font-semibold">Email</th>
+                                        <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Time Spent</th>
+                                        <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Lessons</th>
+                                        <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Code Runs</th>
+                                        <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Sessions</th>
+                                        <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Engagement</th>
+                                        <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Accuracy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filteredUsers.map(user => `
+                                        <tr class="border-b border-neutral-700 hover:bg-neutral-700/30 transition">
+                                            <td class="px-6 py-4 text-white font-medium">${user.name || 'N/A'}</td>
+                                            <td class="px-6 py-4 text-neutral-400 text-xs">${user.email || 'N/A'}</td>
+                                            <td class="px-6 py-4 text-center text-white">${user.totalTimeFormatted || '0m'}</td>
+                                            <td class="px-6 py-4 text-center text-white">${user.totalLessonsViewed || 0}</td>
+                                            <td class="px-6 py-4 text-center text-white">${user.totalCodeExecutions || 0}</td>
+                                            <td class="px-6 py-4 text-center text-white font-semibold">${user.totalSessions || 0}</td>
+                                            <td class="px-6 py-4 text-center">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-16 bg-neutral-700 rounded-full h-2">
+                                                        <div class="bg-blue-500 h-full rounded-full" style="width: ${Math.min(user.interactionPercentage || 0, 100)}%"></div>
+                                                    </div>
+                                                    <span class="text-xs text-neutral-300">${(user.interactionPercentage || 0).toFixed(0)}%</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <span class="px-2 py-1 rounded text-xs font-semibold" style="background: ${getAccuracyColor(user.averageAccuracyPercentage || 0)}20; color: ${getAccuracyColor(user.averageAccuracyPercentage || 0)}">
+                                                    ${(user.averageAccuracyPercentage || 0).toFixed(1)}%
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `}
             </div>
         `;
         container.innerHTML = html;
+        setupFilterListeners(() => renderAdminUsersTable(container, users));
+    }
+    
+    /**
+     * Get color based on accuracy percentage
+     */
+    function getAccuracyColor(accuracy) {
+        if (accuracy >= 80) return '#10b981'; // green
+        if (accuracy >= 60) return '#3b82f6'; // blue
+        if (accuracy >= 40) return '#f59e0b'; // amber
+        return '#ef4444'; // red
     }
 
     /**
@@ -907,38 +1103,86 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
             return;
         }
 
-        const questList = Object.entries(quests);
+        let questList = Object.entries(quests);
+        
+        // Sort quests by total sessions (descending)
+        questList.sort((a, b) => {
+            const aSessions = a[1].totalSessions || 0;
+            const bSessions = b[1].totalSessions || 0;
+            return bSessions - aSessions;
+        });
+
+        const totalSessions = questList.reduce((sum, [_, data]) => sum + (data.totalSessions || 0), 0);
+        const totalCompletions = questList.reduce((sum, [_, data]) => sum + (data.totalCompletions || 0), 0);
+        
         const html = `
             <div class="space-y-6">
-                <h2 class="text-2xl font-bold text-white">Quest Analytics</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Total Quests</h4>
+                        <div class="text-2xl font-bold text-blue-300">${questList.length}</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Total Sessions</h4>
+                        <div class="text-2xl font-bold text-green-300">${totalSessions}</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-900/40 to-purple-800/20 border border-purple-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Completions</h4>
+                        <div class="text-2xl font-bold text-purple-300">${totalCompletions}</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-900/40 to-orange-800/20 border border-orange-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Avg Completion Rate</h4>
+                        <div class="text-2xl font-bold text-orange-300">${totalSessions > 0 ? ((totalCompletions / totalSessions) * 100).toFixed(1) : 0}%</div>
+                    </div>
+                </div>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    ${questList.map(([name, data]) => `
-                        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-white mb-4">${name}</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Sessions:</span>
-                                    <span class="text-white font-semibold">${data.totalSessions || 0}</span>
+                    ${questList.map(([name, data]) => {
+                        const completionRate = (data.totalSessions || 0) > 0 ? ((data.totalCompletions || 0) / (data.totalSessions || 0)) * 100 : 0;
+                        return `
+                            <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:border-neutral-600/50 transition">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-white">${name}</h3>
+                                        <p class="text-xs text-neutral-400 mt-1">Quest Analytics</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-2xl font-bold text-green-400">${completionRate.toFixed(1)}%</div>
+                                        <p class="text-xs text-neutral-400">completion</p>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Users:</span>
-                                    <span class="text-white font-semibold">${data.uniqueUsers || 0}</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Time Spent:</span>
-                                    <span class="text-white font-semibold">${data.totalTimeSpent || '0h'}</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Lessons:</span>
-                                    <span class="text-white font-semibold">${data.totalLessonsViewed || 0}</span>
-                                </div>
-                                <div class="flex items-center justify-between pt-3 border-t border-neutral-700">
-                                    <span class="text-neutral-400">Completions:</span>
-                                    <span class="text-green-400 font-semibold">${data.totalCompletions || 0}</span>
+                                
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Sessions:</span>
+                                        <span class="text-white font-semibold">${data.totalSessions || 0}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Unique Users:</span>
+                                        <span class="text-white font-semibold">${data.uniqueUsers || 0}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Total Time:</span>
+                                        <span class="text-white font-semibold">${data.totalTimeSpent || '0h'}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Lessons Viewed:</span>
+                                        <span class="text-white font-semibold">${data.totalLessonsViewed || 0}</span>
+                                    </div>
+                                    
+                                    <div class="pt-3 border-t border-neutral-700">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-neutral-400 text-sm">Completion Progress</span>
+                                            <span class="text-green-400 text-sm font-semibold">${data.totalCompletions || 0} / ${data.totalSessions || 0}</span>
+                                        </div>
+                                        <div class="w-full bg-neutral-700/50 rounded-full h-2">
+                                            <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-full rounded-full" style="width: ${Math.min(completionRate, 100)}%"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
