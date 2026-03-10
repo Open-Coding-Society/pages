@@ -209,7 +209,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pusd-capstone %}">PUSD Foundation</a></h3>
            <p class="text-sm text-gray-700">Funding, resources, and opportunities that expand and enrich the educational experiences of PUSD students across northern San Diego County.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: PUSD Foundation Board of Directors, Poway Unified School District Partners</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
        </div>
    </div>
 
@@ -233,7 +233,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
            <p class="text-sm text-gray-700">Empowering individuals with intellectual and developmental disabilities through year-round esports and community programs across San Diego and Imperial Counties.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: UESL Foundation Board of Directors, San Diego &amp; Imperial County Community Partners</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
        </div>
    </div>
 
