@@ -46,6 +46,16 @@ $dsa-text-light: #e0e4ea;
   margin-bottom: 1.5rem;
 }
 
+.dsa-team-badge {
+  display: inline-block;
+  color: $dsa-primary;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  opacity: 0.9;
+}
+
 .dsa-title {
   font-size: 2.75rem;
   font-weight: 800;

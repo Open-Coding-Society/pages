@@ -4,8 +4,8 @@ Description: "A comprehensive redesign proposal for the Doing Exceptional Deeds 
 
 Topics:
   - title: "Impact-Driven Homepage"
-    image: "capstone/dad_homepage.png"
-    link: "/blogs/dad-redesign/"
+    image: "capstone/dad_homepage.svg"
+    link: "/capstone/dad-redesign/"
     alt: "D.A.D. Complete Homepage Redesign with Impact Storytelling"
     keyPoints:
       - "Full-width hero with bold tagline and dual CTAs"
@@ -36,8 +36,8 @@ Topics:
       - "Akhil — UI/UX Design & Components"
 
   - title: "Donation Flow Redesign"
-    image: "capstone/dad_donate.png"
-    link: "/blogs/dad-redesign/"
+    image: "capstone/dad_donate.svg"
+    link: "/capstone/dad-redesign/"
     alt: "D.A.D. Donation Flow with Impact Visualization"
     keyPoints:
       - "Impact tiers showing what $25, $50, $100, $250, $500 accomplishes"
@@ -65,8 +65,8 @@ Topics:
       - "Moiz — UI Design & Frontend Build"
 
   - title: "Program Pages & Registration"
-    image: "capstone/dad_programs.png"
-    link: "/blogs/dad-redesign/"
+    image: "capstone/dad_programs.svg"
+    link: "/capstone/dad-redesign/"
     alt: "D.A.D. Dedicated Program Pages with Registration and Gallery"
     keyPoints:
       - "Hero banner with program-specific photo and title"
