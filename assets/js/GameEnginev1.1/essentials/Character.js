@@ -168,9 +168,9 @@ class Character extends GameObject {
             return;
         }
 
-        this.draw();
-        this.collisionChecks();
         this.move();
+        this.collisionChecks();
+        this.draw();
     }
 
 
