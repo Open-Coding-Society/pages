@@ -1,0 +1,36 @@
+# Poway NEC Capstone Infographic
+Title: "Binary Beasts: Poway NEC"
+Description: "Binary Beasts capstone track for powaynec.com, focused on clearer preparedness workflows and faster emergency information access."
+
+Topics:
+  - title: "Poway Neighborhood Emergency Corps"
+    image: "capstone/powaynec.png"
+    link: "https://powaynec.com/"
+    alt: "Poway NEC website preview"
+    keyPoints:
+      - "Idea 1: Streamline volunteer onboarding so new members can start quickly."
+      - "Idea 2: Elevate emergency resources to top-level, action-first navigation."
+      - "Idea 3: Standardize operational pages for events, drills, and contacts."
+      - "Problem solved: Users struggle to find urgent preparedness actions."
+      - "Problem solved: Volunteer journey is unclear across disconnected pages."
+      - "Problem solved: Content structure is inconsistent during updates."
+    subtitle: "Preparedness Information That Stays Usable Under Pressure"
+    description: "Poway NEC supports emergency-readiness communication where clarity and speed matter. This capstone focuses on reducing information overload, improving findability of key resources, and shaping a maintainable structure for volunteers, coordinators, and residents."
+    tech:
+      - "Jekyll for structured, maintainable static delivery"
+      - "SCSS components for consistent urgency-focused hierarchy"
+      - "Structured content blocks for reusable emergency templates"
+      - "Responsive design tuned for quick mobile lookup"
+      - "Navigation refactoring for reduced path ambiguity"
+      - "Accessibility passes for scanability under stress"
+    impact:
+      - "Individual issue (Aneesh): finalize volunteer-start pathway and CTA wording this week."
+      - "Individual issue (Ethan): map top emergency tasks to first-click destinations this week."
+      - "Individual issue (Samarth): clean up page-template consistency for announcements this week."
+      - "Shared issue: reduce duplicate pages that fragment key preparedness info."
+      - "Shared issue: test high-priority routes for speed and clarity."
+    status: "In Development"
+    team:
+      - "Aneesh"
+      - "Ethan"
+      - "Samarth"

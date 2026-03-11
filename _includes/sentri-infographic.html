@@ -1,0 +1,250 @@
+<style>
+.sentri-container {
+    background-color: #020617; /* Deep Midnight */
+    color: #f1f5f9;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 20px;
+}
+
+.sentri-info-box {
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+    border: 1px solid #00f2ff33; /* Faded Cyan */
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Scanning Line Animation */
+.sentri-info-box::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00f2ff, transparent);
+    animation: scan 6s linear infinite;
+}
+
+@keyframes scan {
+    0% { top: 0%; opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.sentri-badge {
+    background-color: rgba(0, 242, 255, 0.1);
+    color: #00f2ff;
+    border: 1px solid #00f2ff;
+    padding: 8px 25px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.top-description {
+    font-size: 1.15em;
+    line-height: 1.6;
+    max-width: 850px;
+    margin: 0 auto;
+    color: #94a3b8;
+}
+
+.sentri-grid {
+    display: grid;
+    /* Changed from 280px to 180px to make the image column much thinner */
+    grid-template-columns: 180px 1fr 1fr; 
+    gap: 25px;
+    background-color: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 24px;
+    padding: 30px; /* Slightly tighter padding */
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.col-left {
+    text-align: center;
+    border-right: 1px solid #1e293b;
+    padding-right: 20px;
+}
+
+.col-mid {
+    padding: 0 10px;
+    border-right: 1px solid #1e293b;
+}
+
+.col-right {
+    padding-left: 10px;
+}
+
+.sentri-logo-box {
+    background: #020617;
+    border: 2px solid #00f2ff22;
+    border-radius: 16px;
+    /* Reduced padding and set a specific height to keep it compact */
+    padding: 15px; 
+    height: 120px; 
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.05);
+}
+
+.sentri-header-image {
+    max-width: 100%; /* Slightly larger relative to the smaller box */
+    max-height: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 242, 255, 0.3));
+}
+
+.ml-status-badge {
+    background-color: #7000ff33;
+    color: #bc8aff;
+    border: 1px solid #7000ff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.proj-title {
+    font-size: 2.8em;
+    font-weight: 900;
+    margin: 0 0 5px 0;
+    letter-spacing: -1px;
+    color: #fff;
+}
+
+.proj-subtitle {
+    color: #00f2ff;
+    font-size: 0.95em;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-header {
+    font-size: 1.2em;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-left: 4px solid #00f2ff;
+    padding-left: 15px;
+}
+
+.feature-item {
+    margin-bottom: 15px;
+    font-size: 0.92em;
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.5;
+    color: #cbd5e1;
+}
+
+.ai-icon {
+    color: #00f2ff;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.about-text {
+    font-size: 0.88em;
+    line-height: 1.8;
+    color: #94a3b8;
+    margin-bottom: 30px;
+}
+
+.alert-card {
+    background-color: rgba(255, 61, 0, 0.05);
+    border: 1px solid #ff3d00;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    line-height: 1.6;
+    color: #ff3d00;
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .sentri-grid { grid-template-columns: 1fr; }
+    .col-left, .col-mid {
+        border-right: none;
+        border-bottom: 1px solid #1e293b;
+        padding-bottom: 30px;
+        padding-right: 0;
+    }
+}
+</style>
+
+<div class="sentri-container">
+
+    <div class="sentri-info-box">
+        <div class="sentri-badge">AI-Predictive Vigilance Tool</div>
+        <p class="top-description">
+            Sentri is a specialized machine-learning platform for the <strong>Poway Recovery Center</strong>. 
+            By analyzing 14-day data vectors of sleep, stress, and mood, Sentri 
+            <strong>foresees relapse windows</strong> before they occur and 
+            <strong>automates intervention strategies</strong> to protect long-term sobriety.
+        </p>
+    </div>
+
+    <div class="sentri-grid">
+
+        <div class="col-left">
+            <div class="sentri-logo-box">
+                <img src="{{site.baseurl}}/images/capstone/sentri.png" alt="Sentri Logo" class="sentri-header-image">
+            </div>
+            <div class="ml-status-badge">
+                ML Neural Network Active
+            </div>
+            <p style="font-size: 11px; color: #64748b; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;">
+                Random Forest Classifier v1.0
+            </p>
+        </div>
+
+        <div class="col-mid">
+            <h1 class="proj-title">SENTRI</h1>
+            <p class="proj-subtitle">Predictive Sobriety Guard</p>
+
+            <div class="feature-item"><span class="ai-icon">◈</span><span><strong>Relapse Risk Model:</strong> ML algorithm analyzing historical logs to generate a real-time risk percentage.</span></div>
+
+            <div class="feature-item"><span class="ai-icon">◈</span><span><strong>Mood-Biometric Dashboard:</strong> High-speed entry for tracking sleep quality, stress levels, and craving intensity.</span></div>
+
+            <div class="feature-item"><span class="ai-icon">◈</span><span><strong>Automated Alert System:</strong> Triggers immediate "Intervention Protocol" notifications when risk thresholds are met.</span></div>
+
+            <div class="feature-item"><span class="ai-icon">◈</span><span><strong>Dynamic Roadmap:</strong> Milestone visualization that adjusts "Difficulty Ratings" based on your personal data.</span></div>
+
+            <div class="feature-item"><span class="ai-icon">◈</span><span><strong>NLP Sentiment Triage:</strong> Analyzes raw text input to identify and route medical emergencies instantly.</span></div>
+        </div>
+
+        <div class="col-right">
+            <div class="section-header">CSP Architecture</div>
+            <p class="about-text">
+                Sentri utilizes a <strong>Recurrent Neural Network (RNN)</strong> architecture to process a <strong>List</strong> of user inputs. 
+                <br><br>
+                The <strong>Procedure</strong> iterates through the user's historical data, using <strong>Selection</strong> logic to determine which intervention resource from the database best matches the current risk level.
+            </p>
+
+            <div class="section-header">Vigilance Impact</div>
+            <div class="alert-card">
+                Eliminates the "Blind Spot" in recovery by providing a functional diagnostic tool that warns users 48-72 hours before a potential relapse occurs.
+            </div>
+        </div>
+
+    </div>
+</div>
