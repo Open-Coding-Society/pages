@@ -1,14 +1,15 @@
-// Database Defenders Infographic Styles
+// Slack Messaging Platform Infographic Styles
 // Located in _sass/capstone/
 
-// Variables - Dark security/terminal theme
-$dd-primary: #00e5ff;        // Cyan — data/monitoring accent
-$dd-secondary: #69f0ae;      // Green — healthy/safe state
-$dd-warning: #ff6e40;        // Orange-red — alert/anomaly state
-$dd-dark-bg: #050d1a;        // Deep navy black background
-$dd-card-bg: #0a1628;        // Slightly lighter navy for cards
-$dd-text-muted: #8fa3c0;
-$dd-text-light: #d0e4f7;
+// Variables - Slack-inspired purple/green messaging theme
+$dd-primary: #4a154b;        // Slack purple — brand accent
+$dd-accent: #36c5f0;         // Slack blue — interactive elements
+$dd-secondary: #2eb67d;      // Slack green — success/active state
+$dd-warning: #ecb22e;        // Slack yellow — notifications/alerts
+$dd-dark-bg: #1a1d21;        // Slack dark sidebar background
+$dd-card-bg: #222529;        // Slightly lighter for cards
+$dd-text-muted: #ababad;
+$dd-text-light: #d1d2d3;
 
 // Main Container
 .dd-infograph {
@@ -22,10 +23,10 @@ $dd-text-light: #d0e4f7;
 .dd-header {
   text-align: center;
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, $dd-dark-bg 0%, #071020 50%, #0a1628 100%);
+  background: linear-gradient(135deg, $dd-primary 0%, #3c1144 50%, #1a1d21 100%);
   border-radius: 24px;
   margin-bottom: 2rem;
-  border: 1px solid rgba($dd-primary, 0.3);
+  border: 1px solid rgba($dd-accent, 0.3);
   position: relative;
   overflow: hidden;
 
@@ -37,8 +38,8 @@ $dd-text-light: #d0e4f7;
       0deg,
       transparent,
       transparent 2px,
-      rgba($dd-primary, 0.02) 2px,
-      rgba($dd-primary, 0.02) 4px
+      rgba($dd-accent, 0.02) 2px,
+      rgba($dd-accent, 0.02) 4px
     );
     pointer-events: none;
   }
@@ -46,7 +47,7 @@ $dd-text-light: #d0e4f7;
 
 .dd-badge {
   display: inline-block;
-  background: linear-gradient(135deg, $dd-primary, $dd-secondary);
+  background: linear-gradient(135deg, $dd-accent, $dd-secondary);
   color: #000;
   padding: 0.5rem 1.5rem;
   border-radius: 50px;
@@ -60,7 +61,7 @@ $dd-text-light: #d0e4f7;
 .dd-title {
   font-size: 2.75rem;
   font-weight: 800;
-  background: linear-gradient(90deg, $dd-primary, $dd-secondary, $dd-primary);
+  background: linear-gradient(90deg, $dd-accent, $dd-secondary, $dd-accent);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
@@ -85,12 +86,12 @@ $dd-text-light: #d0e4f7;
 
 // Card Section
 .dd-card {
-  background: linear-gradient(145deg, $dd-card-bg 0%, #0d1f3c 100%);
+  background: linear-gradient(145deg, $dd-card-bg 0%, #1a1d21 100%);
   border-radius: 24px;
   padding: 2.5rem;
   margin-bottom: 2rem;
-  border: 2px solid rgba($dd-primary, 0.25);
-  box-shadow: 0 20px 60px rgba($dd-primary, 0.1), 0 0 0 1px rgba($dd-secondary, 0.05);
+  border: 2px solid rgba($dd-accent, 0.25);
+  box-shadow: 0 20px 60px rgba($dd-primary, 0.2), 0 0 0 1px rgba($dd-secondary, 0.05);
 }
 
 .dd-card-grid {
@@ -115,9 +116,9 @@ $dd-text-light: #d0e4f7;
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba($dd-primary, 0.04);
+  background: rgba($dd-accent, 0.04);
   border-radius: 16px;
-  border: 1px solid rgba($dd-primary, 0.2);
+  border: 1px solid rgba($dd-accent, 0.2);
 
   @media (max-width: 1024px) {
     grid-column: 1 / -1;
@@ -131,7 +132,7 @@ $dd-text-light: #d0e4f7;
   display: block;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba($dd-primary, 0.3);
+  box-shadow: 0 10px 30px rgba($dd-accent, 0.3);
   width: 100%;
 
   &:hover .dd-image {
@@ -153,7 +154,7 @@ $dd-text-light: #d0e4f7;
 .dd-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba($dd-primary, 0.9), rgba($dd-secondary, 0.9));
+  background: linear-gradient(135deg, rgba($dd-accent, 0.9), rgba($dd-secondary, 0.9));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,7 +169,7 @@ $dd-text-light: #d0e4f7;
 }
 
 .dd-status {
-  background: linear-gradient(135deg, $dd-primary, $dd-secondary);
+  background: linear-gradient(135deg, $dd-accent, $dd-secondary);
   color: #000;
   padding: 0.5rem 1.2rem;
   border-radius: 20px;
@@ -194,7 +195,7 @@ $dd-text-light: #d0e4f7;
 
 .dd-team-name {
   display: block;
-  color: $dd-primary;
+  color: $dd-accent;
   font-weight: 700;
   font-size: 0.95rem;
 }
@@ -258,13 +259,13 @@ $dd-text-light: #d0e4f7;
 }
 
 .dd-tech-tag {
-  background: rgba($dd-primary, 0.1);
-  color: $dd-primary;
+  background: rgba($dd-accent, 0.1);
+  color: $dd-accent;
   padding: 0.35rem 0.7rem;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid rgba($dd-primary, 0.3);
+  border: 1px solid rgba($dd-accent, 0.3);
   font-family: 'Courier New', monospace;
 }
 
@@ -284,7 +285,7 @@ $dd-text-light: #d0e4f7;
   font-weight: 700;
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba($dd-primary, 0.35);
+  border-bottom: 2px solid rgba($dd-accent, 0.35);
 }
 
 .dd-about {
@@ -315,7 +316,7 @@ $dd-text-light: #d0e4f7;
 // Button
 .dd-btn {
   display: inline-block;
-  background: linear-gradient(135deg, $dd-primary, $dd-secondary);
+  background: linear-gradient(135deg, $dd-accent, $dd-secondary);
   color: #000;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
@@ -327,7 +328,7 @@ $dd-text-light: #d0e4f7;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba($dd-primary, 0.4);
+    box-shadow: 0 8px 25px rgba($dd-accent, 0.4);
     color: #000;
     text-decoration: none;
   }

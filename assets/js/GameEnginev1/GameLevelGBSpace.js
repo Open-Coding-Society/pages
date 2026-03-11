@@ -15,7 +15,7 @@ import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 import Barrier from './essentials/Barrier.js';
 
-class GameLevelBSpace {
+class GameLevelGBSpace {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -30,7 +30,7 @@ class GameLevelBSpace {
         const playerData = {
             id: 'playerData',
             src: path + "/images/gamebuilder/sprites/ufos.png",
-            SCALE_FACTOR: 5,
+            SCALE_FACTOR: 6,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 100, y: 300 },
@@ -44,7 +44,7 @@ class GameLevelBSpace {
             up: { row: 3, start: 0, columns: 3 },
             upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
             upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.4 },
             keypress: { up: 87, left: 65, down: 83, right: 68 }
             };
 
@@ -52,7 +52,7 @@ class GameLevelBSpace {
             id: 'NPC',
             greeting: 'Hello!',
             src: path + "/images/gamebuilder/sprites/astro.png",
-            SCALE_FACTOR: 8,
+            SCALE_FACTOR: 9,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 0.7, y: 0.2 },
             pixels: { height: 770, width: 513 },
@@ -178,4 +178,4 @@ this.classes = [
     }
 }
 
-export default GameLevelBSpace;
+export default GameLevelGBSpace;

@@ -1,7 +1,6 @@
 ---
 layout: post
 toc: True
-categories: [CSP Big Idea 2]
 title: Data | Profile Page Remix
 description: Profile Page and PFP 
 author: Isabel Marilla

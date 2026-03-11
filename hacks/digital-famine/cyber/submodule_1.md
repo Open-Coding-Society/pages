@@ -6,7 +6,6 @@ permalink: /digital-famine/cybersecurity-game/submodule_1/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 1
-categories: [CSP, Submodule, Frontend]
 tags: [frontend, purpose, fundamentals]
 author: "Aaryav, Dhyan, Aditya, Aarnav, Saathwik, West"
 date: 2025-10-21
