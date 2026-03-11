@@ -1,62 +1,54 @@
 {% assign data = site.data["greppers-infograph"] %}
 
-<div class="sfi-infograph">
+<div class="sfi-infograph sfi-infograph--warm">
   <div class="sfi-header">
     <div class="sfi-badge">{{ data.Badge }}</div>
     <h1 class="sfi-title">{{ data.Title }}</h1>
     <p class="sfi-desc">{{ data.Description }}</p>
   </div>
 
-  {% for topic in data.Topics %}
   <div class="sfi-card">
     <div class="sfi-card-grid">
       <div class="sfi-visual">
-        <div class="sfi-icon-wrap">{{ topic.icon }}</div>
-        <div class="sfi-status">{{ topic.status }}</div>
+        <div class="sfi-icon-wrap">🏁</div>
+        <div class="sfi-status">Motorsport Safety</div>
         <div class="sfi-team">
-          <span class="sfi-team-label">Feature Area</span>
-          <span class="sfi-team-name">{{ topic.featureArea }}</span>
+          <span class="sfi-team-label">Organization</span>
+          <span class="sfi-team-name">{{ data.Organization }}</span>
         </div>
       </div>
 
       <div class="sfi-content">
-        <h2 class="sfi-project-title">{{ topic.title }}</h2>
-        <p class="sfi-subtitle">{{ topic.subtitle }}</p>
+        <h2 class="sfi-project-title">{{ data.Subtitle }}</h2>
+        <p class="sfi-subtitle">Web Modernization Platform</p>
 
         <div class="sfi-keypoints">
-          {% for point in topic.keyPoints %}
+          {% for feature in data.Features %}
           <div class="sfi-keypoint">
             <span class="sfi-check">✓</span>
-            <span>{{ point }}</span>
+            <span>{{ feature }}</span>
           </div>
           {% endfor %}
         </div>
 
         <div class="sfi-tech-stack">
-          {% for tech in topic.tech %}
-          <span class="sfi-tech-tag">{{ tech }}</span>
+          {% for tech in data.Tech %}
+          <span class="sfi-tech-tag">{{ tech.icon }} {{ tech.name }}</span>
           {% endfor %}
         </div>
       </div>
 
       <div class="sfi-details">
-        <h3 class="sfi-section-title">About</h3>
-        <p class="sfi-about">{{ topic.description }}</p>
-
         <h3 class="sfi-section-title">Impact</h3>
         <div class="sfi-impact-list">
-          {% for item in topic.impact %}
-          <div class="sfi-impact-item">{{ item }}</div>
+          {% for metric in data.Metrics %}
+          <div class="sfi-impact-item">{{ metric.value }} — {{ metric.label }}</div>
           {% endfor %}
         </div>
-
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="sfi-btn">{{ topic.buttonLabel }}</a>
+        <a href="https://github.com/TheGreppers/greppers/issues/1" target="_blank" class="sfi-issue-link">
+          📋 Week 1 Sprint Plan
+        </a>
       </div>
     </div>
   </div>
-
-  {% unless forloop.last %}
-  <div class="sfi-divider">— — —</div>
-  {% endunless %}
-  {% endfor %}
 </div>

@@ -1,66 +1,26 @@
 Badge: "Design-Based Research Capstone"
 Title: "SFI Foundation — Web Modernization"
-Description: "SFI Foundation certifies motorsports safety gear used at tracks worldwide — but their website makes it nearly impossible to find specs or verify certified products."
+Subtitle: "Safety Made Searchable"
+Organization: "SFI Foundation"
+Description: "SFI certifies the safety gear that protects motorsports drivers worldwide — but outdated tools force inspectors to dig through static pages and staff to update HTML by hand. We're rebuilding their digital experience so the people keeping racers safe can do their jobs faster."
 
-Authors:
-  - "Aditya Srivastava"
-  - "Dhyan Soni"
-  - "Aaryav Lal"
+Features:
+  - "Instant Spec Search — ML-powered lookup replaces 8 static pages so inspectors find what they need in seconds"
+  - "QR Certification Scan — scan a product tag trackside to verify it's SFI-certified and not expired"
+  - "Manufacturer Self-Service — vendors manage their own listings, eliminating hours of manual staff updates"
+  - "Mobile-First Redesign — accessible, responsive site that actually works on pit-lane devices"
+  - "Counterfeit Prevention — live certification records replace outdated static lists that put drivers at risk"
 
-Topics:
-  - title: "Smart Spec Search"
-    subtitle: "ML-Powered Specification Lookup"
-    icon: "🔍"
-    status: "Proposed"
-    featureArea: "Frontend + ML"
-    link: "#"
-    buttonLabel: "View Concept"
-    keyPoints:
-      - "8 separate static pages — no search, no filtering"
-      - "Semantic ML model maps plain-English queries to exact specs"
-    tech:
-      - "Sentence Transformers"
-      - "Python / Flask"
-      - "React"
-    description: "We parse all SFI spec PDFs into a dataset and add a semantic ML layer so a tech inspector can type 'fire suit' and get the right result instantly."
-    impact:
-      - "Lookup time: minutes to seconds"
-      - "Usable trackside on mobile"
+Tech:
+  - name: "Python / Flask"
+    icon: "🐍"
+  - name: "React + Next.js"
+    icon: "⚛️"
+  - name: "PostgreSQL"
+    icon: "🗄️"
 
-  - title: "Manufacturer Verification"
-    subtitle: "QR-Based Live Certification Lookup"
-    icon: "🏷️"
-    status: "Proposed"
-    featureArea: "Backend + UX"
-    link: "#"
-    buttonLabel: "View Concept"
-    keyPoints:
-      - "Manufacturer lists are static HTML — updated manually"
-      - "QR code on each product links to live cert record"
-    tech:
-      - "PostgreSQL"
-      - "Next.js / SSR"
-      - "JWT Auth"
-    description: "Manufacturers self-manage their certified products through a real portal. Scan a tag at the track and instantly confirm the gear is SFI-certified and not expired."
-    impact:
-      - "Cuts counterfeit gear at races"
-      - "No more manual staff updates"
-
-  - title: "UI Redesign"
-    subtitle: "Mobile-First Visual Overhaul"
-    icon: "🎨"
-    status: "Proposed"
-    featureArea: "UI / Frontend"
-    link: "#"
-    buttonLabel: "View Concept"
-    keyPoints:
-      - "Broken image slider, inconsistent fonts, unusable on mobile"
-      - "Clean responsive redesign with a real design system"
-    tech:
-      - "Tailwind CSS"
-      - "HTML / CSS / JS"
-      - "WCAG 2.1 AA"
-    description: "The current site reflects poorly on an organization that sets global safety standards. A fast, accessible, mobile-first redesign fixes that without changing any content."
-    impact:
-      - "60%+ faster page loads"
-      - "Works on pit-lane devices"
+Metrics:
+  - label: "Spec Lookup Time"
+    value: "< 5 sec"
+  - label: "Mobile Accessible"
+    value: "100%"

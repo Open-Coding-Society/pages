@@ -307,6 +307,32 @@ $sfi-light: #dce0f0;
 	}
 }
 
+.sfi-issue-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	background: linear-gradient(135deg, $sfi-blue, $sfi-blue-light);
+	color: #fff;
+	padding: 0.6rem 1.2rem;
+	border-radius: 10px;
+	font-family: "Barlow Condensed", sans-serif;
+	font-weight: 700;
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-decoration: none;
+	text-align: center;
+	transition: transform 0.2s, box-shadow 0.2s;
+	margin-top: auto;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba(29, 78, 216, 0.45);
+		color: #fff;
+		text-decoration: none;
+	}
+}
+
 .sfi-divider {
 	max-width: 1100px;
 	margin: 0 auto;
@@ -315,4 +341,105 @@ $sfi-light: #dce0f0;
 	color: rgba(29, 78, 216, 0.4);
 	font-size: 1.5rem;
 	letter-spacing: 0.5rem;
+}
+
+// ── Warm amber variant for SFI Foundation ───────────
+
+$sfi-amber: #d97706;
+$sfi-amber-light: #fbbf24;
+$sfi-amber-border: rgba(217, 119, 6, 0.3);
+
+.sfi-infograph--warm {
+
+	.sfi-header {
+		background: linear-gradient(135deg, #0a0d14 0%, #1a1408 50%, #0a0d14 100%);
+		border-color: $sfi-amber-border;
+
+		&::before {
+			background: repeating-linear-gradient(
+				-45deg,
+				transparent,
+				transparent 18px,
+				rgba(217, 119, 6, 0.03) 18px,
+				rgba(217, 119, 6, 0.03) 19px
+			);
+		}
+	}
+
+	.sfi-badge {
+		background: linear-gradient(135deg, $sfi-amber, $sfi-amber-light);
+		color: #1a1408;
+	}
+
+	.sfi-title {
+		background: linear-gradient(90deg, $sfi-amber, $sfi-amber-light, $sfi-amber);
+		background-size: 200% auto;
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.sfi-card {
+		border-color: $sfi-amber-border;
+	}
+
+	.sfi-visual {
+		border-color: $sfi-amber-border;
+	}
+
+	.sfi-icon-wrap {
+		background: rgba(217, 119, 6, 0.1);
+		border-color: $sfi-amber-border;
+	}
+
+	.sfi-status {
+		background: linear-gradient(135deg, $sfi-amber, $sfi-amber-light);
+		color: #1a1408;
+	}
+
+	.sfi-team-name {
+		color: $sfi-amber-light;
+	}
+
+	.sfi-content {
+		border-color: $sfi-amber-border;
+	}
+
+	.sfi-subtitle {
+		color: $sfi-amber-light;
+		border-bottom-color: $sfi-amber-border;
+	}
+
+	.sfi-check {
+		color: $sfi-amber-light;
+	}
+
+	.sfi-tech-tag {
+		background: rgba(217, 119, 6, 0.12);
+		color: $sfi-amber-light;
+		border-color: rgba(217, 119, 6, 0.25);
+	}
+
+	.sfi-details {
+		border-color: $sfi-amber-border;
+	}
+
+	.sfi-section-title {
+		border-bottom-color: $sfi-amber-border;
+	}
+
+	.sfi-impact-item {
+		background: rgba(217, 119, 6, 0.08);
+		border-left-color: $sfi-amber;
+	}
+
+	.sfi-issue-link {
+		background: linear-gradient(135deg, $sfi-amber, $sfi-amber-light);
+		color: #1a1408;
+
+		&:hover {
+			box-shadow: 0 8px 25px rgba(217, 119, 6, 0.45);
+			color: #1a1408;
+		}
+	}
 }
