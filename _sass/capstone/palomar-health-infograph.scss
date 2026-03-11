@@ -326,6 +326,38 @@ $foundation-card-bg: #142338;
   line-height: 1.1;
 }
 
+.palomar-capstone-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 1rem;
+}
+
+.palomar-capstone-controls .palomar-overview-trigger {
+  appearance: none;
+  border: 1px solid #9ab7d9;
+  border-radius: 999px;
+  background: #f7fbff;
+  color: #14385f;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  padding: 0.7rem 1.1rem;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.palomar-capstone-controls .palomar-overview-trigger:hover,
+.palomar-capstone-controls .palomar-overview-trigger:focus-visible {
+  background: #14385f;
+  border-color: #14385f;
+  color: #ffffff;
+}
+
+.palomar-capstone-controls .palomar-overview-trigger:focus-visible {
+  outline: 2px solid #9ab7d9;
+  outline-offset: 2px;
+}
+
 .palomar-foundation .palomar-overview-trigger {
   margin-top: 0;
   cursor: pointer;
