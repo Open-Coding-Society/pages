@@ -6,7 +6,6 @@ permalink: /digital-famine/cybersecurity-game/submodule_2/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 2
-categories: [CSP, Submodule, HTML]
 tags: [markdown, html, conversion]
 author: "Aaryav, Dhyan, Aditya, Aarnav, Saathwik, West"
 date: 2025-10-21

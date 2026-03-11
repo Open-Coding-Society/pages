@@ -6,7 +6,6 @@ permalink: /cs-portfolio-quest/ai/submodule_3/
 parent: "AI Usage"
 team: "Thinkers"
 submodule: 3
-categories: [CSP, Submodule, AIUsage]
 is_last_submodule: true
 tags: [ai, submodule, thinkers]
 author: "Thinkers Team"

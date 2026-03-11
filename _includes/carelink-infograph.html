@@ -1,0 +1,201 @@
+<style>
+    /* Main container styling to match Bud-E */
+    .capstone-container {
+        background-color: #0d1117;
+        color: #e6edf3;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        padding: 10px;
+    }
+
+    /* Top Header Box */
+    .top-info-box {
+        background-color: #0b0e14;
+        border: 1px solid #238636;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .capstone-badge {
+        background-color: #569f5e; /* Matching the Bud-E green */
+        color: white;
+        padding: 8px 25px;
+        border-radius: 25px;
+        font-size: 13px;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .top-description {
+        font-size: 1.1em;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        color: #c9d1d9;
+    }
+
+    /* Main Content Grid */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        background-color: #0b0e14;
+        border: 1px solid #30363d;
+        border-radius: 20px;
+        padding: 40px;
+    }
+
+    /* Column Styles */
+    .col-left {
+        text-align: center;
+        border-right: 1px solid #30363d;
+        padding-right: 20px;
+    }
+
+    .col-mid {
+        padding: 0 20px;
+        border-right: 1px solid #30363d;
+    }
+
+    .col-right {
+        padding-left: 20px;
+    }
+
+    /* Pixel Art Box */
+    .art-container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+
+    .phase-badge {
+        background-color: #569f5e;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        display: inline-block;
+        text-transform: uppercase;
+    }
+
+    /* Typography */
+    .proj-title {
+        font-size: 2.2em;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+    }
+
+    .proj-subtitle {
+        color: #8b949e;
+        font-size: 0.95em;
+        font-weight: 600;
+        margin-bottom: 25px;
+        line-height: 1.4;
+    }
+
+    .section-header {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #30363d;
+        padding-bottom: 10px;
+    }
+
+    /* List Items */
+    .feature-item {
+        margin-bottom: 12px;
+        font-size: 0.9em;
+        display: flex;
+        align-items: flex-start;
+        line-height: 1.4;
+    }
+
+    .checkmark {
+        color: #569f5e;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .about-text {
+        font-size: 0.85em;
+        line-height: 1.7;
+        color: #8b949e;
+        margin-bottom: 25px;
+    }
+
+    .impact-card {
+        background-color: #0d1117;
+        border: 1px solid #238636;
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 0.85em;
+        line-height: 1.5;
+        color: #238636;
+        font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .main-grid { grid-template-columns: 1fr; }
+        .col-left, .col-mid { border-right: none; border-bottom: 1px solid #30363d; padding-bottom: 20px; padding-right: 0; }
+    }
+</style>
+
+<div class="capstone-container">
+    <!-- Top Box -->
+    <div class="top-info-box">
+        <div class="capstone-badge">Design-Based Research Capstone</div>
+        <p class="top-description">
+            A patient-centric resource hub developed for the <strong>American Cancer Society</strong> that utilizes algorithmic filtering to connect families with vital support services and screenings based on personalized risk factors.
+        </p>
+    </div>
+
+    <!-- Triple Column Box -->
+    <div class="main-grid">
+        
+        <!-- Left Column: Image -->
+        <div class="col-left">
+            <div class="art-container">
+                <!-- Using an emoji icon for the placeholder like Bud-E's plant -->
+                <span style="font-size: 100px;">🩺</span>
+            </div>
+            <br>
+            <div class="phase-badge">Research & Testing Phase</div>
+        </div>
+
+        <!-- Middle Column: Features -->
+        <div class="col-mid">
+            <h1 class="proj-title">CareLink</h1>
+            <p class="proj-subtitle">Bridging the Gap Between<br>Diagnosis and Support</p>
+            
+            <div class="feature-item"><span class="checkmark">✓</span> <span>Dynamic Resource Finder: Filter local ACS services by category.</span></div>
+            <div class="feature-item"><span class="checkmark">✓</span> <span>Screening Scheduler: Intelligent reminders based on risk factors.</span></div>
+            <div class="feature-item"><span class="checkmark">✓</span> <span>Data Abstraction: Centralized database of transportation partners.</span></div>
+            <div class="feature-item"><span class="checkmark">✓</span> <span>Algorithmic Sorting: Prioritizes results based on urgency.</span></div>
+            <div class="feature-item"><span class="checkmark">✓</span> <span>Privacy Focused: Local storage for personal health logs.</span></div>
+            <div class="feature-item"><span class="checkmark">✓</span> <span>Impact Tracking: Visualized metrics for resource utilization.</span></div>
+        </div>
+
+        <!-- Right Column: About -->
+        <div class="col-right">
+            <div class="section-header">About</div>
+            <p class="about-text">
+                CareLink is a digital tool designed to simplify the search for oncology support. Unlike generic search engines, CareLink provides a curated, high-impact interface for ACS resources. 
+                <br><br>
+                Design research revealed that patients often feel overwhelmed by "information overload." CareLink uses algorithmic logic to deliver only the most relevant support options, maintaining low user anxiety.
+            </p>
+
+            <div class="section-header">Impact</div>
+            <div class="impact-card">
+                Positive, data-driven approach to health equity and local resource accessibility without the stress of manual searching.
+            </div>
+        </div>
+
+    </div>
+</div>
