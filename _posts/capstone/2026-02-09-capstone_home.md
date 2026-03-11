@@ -5,6 +5,7 @@ tailwind: True
 infoGraph: capstone_infograph
 title: Capstone Projects
 description: Design-Based Research (DBR) capstone projects solving real-world problems through iterative design, implementation, and analysis. Each project features ML, database work, and advanced data structures (e.g., graphs). Projects must be deployed and accessible through this infographic.
+courses: {'csse': {'week': 25}}
 type: capstone
 categories: [Capstone]
 permalink: /capstone/
@@ -136,6 +137,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+<<<<<<< HEAD
  <!-- Community Food Connection -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg">
         <a href="{% post_url 2026-03-05-food %}">
@@ -172,3 +174,184 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
  </div>
 
+=======
+   <!-- Binary Beasts -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url 2026-03-06-pybl-capstone %}">
+           <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Binary Beasts</a></h3>
+           <p class="text-sm text-gray-700">Combined PYBL + Poway NEC capstone infographics on one page: youth basketball operations and emergency preparedness information architecture improvements.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
+       </div>
+   </div>
+   <!-- College Bound Capstone -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url 2026-02-06-college-bound-capstone %}">
+           <img src="/images/capstone/college_bound.jpeg" alt="College Bound Capstone" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-college-bound-capstone %}">College Bound</a></h3>
+           <p class="text-sm text-gray-700">A website designed to provide a comprehensive guide to helping students prepare for college and effectively go through high school in preparation for the next stage of their educational career.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Xavier, Aranya, Trevor</p>
+       </div>
+   </div>
+
+   <!-- HawkHub -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url 2026-02-06-hawkhub %}">
+           <img src="/images/capstone/hawkhub.png" alt="HawkHub" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-hawkhub %}">HawkHub</a></h3>
+           <p class="text-sm text-gray-700">A club management and community platform designed to streamline student-led club operations, engagement tracking, and leadership development.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Avika, Soni, Samhita</p>
+       </div>
+   </div>
+   
+   <!-- Doing Exceptional Deeds -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">
+           <img src="/images/capstone/doing_exceptional_deeds.png" alt="Doing Exceptional Deeds - D.A.D. Non-profit Extension" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">Doing Exceptional Deeds</a></h3>
+           <p class="text-sm text-gray-700">An extension for the Doing Exceptional Deeds non-profit website, uplifting individuals and strengthening communities through education-first programs.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: William Windle, Ethan Wong, Nicolas Diaz</p>
+       </div>
+   </div>
+
+   <!-- Palomar Capstone (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2025-03-05-palomar %}">
+           <img src="/images/capstone/palomar_logo.png" alt="Palomar" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2025-03-05-palomar %}">Palomar</a></h3>
+           <p class="text-sm text-gray-700">A donor-facing impact platform that connects philanthropic giving to real patient outcomes, keeps the foundation aligned with community needs, and gives healthcare supporters a 30-second pulse on every program — without feeling like a fundraising pitch.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Palomar Health Foundation</p>
+       </div>
+   </div>
+
+   <!-- ACS Cancer Infograph (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-05-acs-cancer-infograph %}">
+           <img src="/images/capstone/acs_logo.png" alt="ACS Cancer Infograph — Interactive Body Map for Cancer Information" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-acs-cancer-infograph %}">ACS Cancer Infograph</a></h3>
+           <p class="text-sm text-gray-700">Interactive human-body diagram consolidating ACS cancer information into one visual interface, letting users navigate by body region.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Aashika, Anwita, Varada</p>
+       </div>
+   </div>
+
+   <!-- PUSD Foundation Capstone (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-05-pusd-capstone %}">
+           <img src="/images/capstone/pusd_foundation.svg" alt="PUSD Foundation logo — school building with graduation cap" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pusd-capstone %}">PUSD Foundation</a></h3>
+           <p class="text-sm text-gray-700">Funding, resources, and opportunities that expand and enrich the educational experiences of PUSD students across northern San Diego County.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
+       </div>
+   </div>
+
+   <!-- Poway Woman's Club Capstone (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-poway-womans-club %}">
+           <img src="/images/capstone/pwc_logo.png" alt="Poway Woman's Club — Website Refurbishment" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-womans-club %}">Poway Woman's Club</a></h3>
+           <p class="text-sm text-gray-700">Modernizing a 65-year-old community nonprofit's web presence with member portals, online payments, and a fresh UI — while preserving the heart of the original site.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Evan S, Maya D, Cyrus Z</p>
+       </div>
+   </div>
+
+   <!-- UESL Foundation Capstone (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-05-uesl-capstone %}">
+           <img src="/images/capstone/uesl_foundation.svg" alt="Unified Esports League Foundation logo — shield with game controller" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
+           <p class="text-sm text-gray-700">Empowering individuals with intellectual and developmental disabilities through year-round esports and community programs across San Diego and Imperial Counties.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
+       </div>
+   </div>
+
+   <!-- DeFlock SD Capstone (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-06-deflock-sd %}">
+           <img src="/images/capstone/deflock-sd.png" alt="DeFlock SD - Fighting Mass Surveillance" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-deflock-sd %}">DeFlock SD</a></h3>
+           <p class="text-sm text-gray-700">Crowdsourced map and tools to document ALPR surveillance in San Diego and support community resistance.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: TheFlockers (Adhav, Lucas, Perry)</p>
+       </div>
+   </div>
+
+   <!-- Poway Symphony Orchestra (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-05-pso-infographic %}">
+           <img src="/images/pso_logo.png" alt="Poway Symphony Orchestra - Site Analysis" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pso-infographic %}">Poway Symphony Orchestra</a></h3>
+           <p class="text-sm text-gray-700">We analyzed the Poway Symphony Orchestra website to identify UX gaps and design improvements that better serve concertgoers, donors, and prospective musicians.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+       </div>
+   </div>
+
+   <!-- Soroptimist International of Poway (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-08-sip-infograph %}">
+           <img src="/images/sip/sip_logo.png" alt="Soroptimist International of Poway - Site Analysis" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-sip-infograph %}">Soroptimist International of Poway</a></h3>
+           <p class="text-sm text-gray-700">We analyzed sipoway.com to document the organization's programs and recommend UI improvements that help donors, volunteers, and program applicants take action.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+       </div>
+   </div>
+
+   <!-- Sentri (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-04-sentri-capstone %}">
+           <img src="/images/capstone/sentri.png" alt="Sentri" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Sentri</a></h3>
+           <p class="text-sm text-gray-700">A sobriety tracker that analyzes daily biometric and mood data to predict a user's relapse risk and proactively deliver personalized interventions before a crisis occurs</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
+        </div>
+    </div>
+   <!-- Friends of the Poway Library (CSP) -->
+   <!-- DSA Website Redesign (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
+           <img src="/images/capstone/dsa_redesign.svg" alt="DSA Website Redesign — Deputy Sheriffs' Association of San Diego County" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">DSA Website Redesign</a></h3>
+           <p class="text-sm text-gray-700">Redesign proposal for the Deputy Sheriffs' Association of San Diego County website — interactive dashboard, smart FAQ hub, and mega menu navigation.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
+       </div>
+   </div>
+
+   <!-- D.A.D. Website Redesign (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">
+           <img src="/images/capstone/dad_redesign.svg" alt="D.A.D. Website Redesign — Doing Exceptional Deeds Nonprofit" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">D.A.D. Website Redesign</a></h3>
+           <p class="text-sm text-gray-700">Redesign proposal for the Doing Exceptional Deeds nonprofit — impact-driven homepage, donation flow with impact visualization, and dedicated program pages with registration.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
+       </div>
+   </div>
+</div>
+>>>>>>> upstream/main
