@@ -2,7 +2,6 @@
 layout: post
 title: Big Idea 1.4 - Correcting errors
 description: Practice with identifying and correcting code blocks
-categories: ['Python']
 author: Sean Yeung
 ---
 

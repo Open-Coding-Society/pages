@@ -1,0 +1,60 @@
+{% assign data = site.data.poway-orchsym-infographic %}
+
+<div class="sip-infograph pso-infograph">
+  <!-- Header -->
+  <div class="sip-header">
+    {% if data.HeaderImage %}
+    <div class="sip-header-image-wrap">
+      <img src="{{ site.baseurl }}/images/{{ data.HeaderImage }}" alt="{{ data.Title }}" class="sip-header-image">
+    </div>
+    {% endif %}
+    <div class="sip-badge">Nonprofit Site Analysis</div>
+    <h1 class="sip-title">{{ data.Title }}</h1>
+    <p class="sip-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Cards -->
+  {% for topic in data.Topics %}
+  <div class="sip-card">
+    <div class="sip-card-grid">
+
+      <!-- Center: Key Points & Tags -->
+      <div class="sip-content">
+        <h2 class="sip-project-title">{{ topic.title }}</h2>
+        <p class="sip-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="sip-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="sip-keypoint">
+            <span class="sip-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="sip-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="sip-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: About & Impact -->
+      <div class="sip-details">
+        <h3 class="sip-section-title">About</h3>
+        <p class="sip-about">{{ topic.description }}</p>
+
+        <h3 class="sip-section-title">Impact</h3>
+        <div class="sip-impact-list">
+          {% for item in topic.impact %}
+          <div class="sip-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ topic.link }}" class="sip-btn" target="_blank" rel="noopener">Visit Site</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>

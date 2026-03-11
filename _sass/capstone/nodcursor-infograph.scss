@@ -1,17 +1,17 @@
-// Quant Trading Bot Infographic Styles
+// NodCursor Pages Infographic Styles
 // Located in _sass/capstone/
+// Variables - Updated to purple and blue color scheme
 
-// Variables - finance/quant theme (teal + cyan + lime)
-$qt-primary: #22c55e;        // green (profit)
-$qt-secondary: #06b6d4;      // cyan (data)
-$qt-accent: #ffffff;         // white
-$qt-dark-bg: #000000;        // pure black background
-$qt-card-bg: #0a0f14;        // deep blue-black for cards
-$qt-text-muted: #9ca3af;
-$qt-text-light: #e5e7eb;
+$wp-primary: #7EE8A2;        // Mint green
+$wp-secondary: #80D0C7;      // Teal
+$wp-accent: #ffffff;         // White
+$wp-dark-bg: #000000;        // Pure black background
+$wp-card-bg: #0a0a0f;        // Slightly lighter black for cards
+$wp-text-muted: #b0b0b0;
+$wp-text-light: #e8e8f0;
 
 // Main Container
-.quant-infograph {
+.nc-infograph {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
@@ -19,48 +19,48 @@ $qt-text-light: #e5e7eb;
 }
 
 // Header Section
-.quant-header {
+.nc-header {
   text-align: center;
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, $qt-dark-bg 0%, #071018 50%, #04080d 100%);
+  background: linear-gradient(135deg, $wp-dark-bg 0%, #1a1a1a 50%, #0d0d0d 100%);
   border-radius: 24px;
   margin-bottom: 2rem;
-  border: 1px solid rgba($qt-secondary, 0.35);
+  border: 1px solid rgba($wp-primary, 0.3);
 }
 
-.quant-badge {
+.nc-badge {
   display: inline-block;
-  background: linear-gradient(135deg, $qt-primary, $qt-secondary);
+  background: linear-gradient(135deg, $wp-primary, $wp-secondary);
   color: #fff;
   padding: 0.5rem 1.5rem;
   border-radius: 50px;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1.5rem;
 }
 
-.quant-title {
+.nc-title {
   font-size: 2.75rem;
-  font-weight: 900;
-  background: linear-gradient(90deg, $qt-secondary, $qt-primary, $qt-accent, $qt-secondary);
+  font-weight: 800;
+  background: linear-gradient(90deg, $wp-primary, $wp-secondary, $wp-accent, $wp-primary);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: qt-gradient 3s ease infinite;
+  animation: wp-gradient 3s ease infinite;
   margin: 0 0 1rem 0;
 }
 
-@keyframes qt-gradient {
+@keyframes wp-gradient {
   0% { background-position: 0% center; }
   50% { background-position: 100% center; }
   100% { background-position: 0% center; }
 }
 
-.quant-description {
-  color: $qt-text-muted;
+.nc-description {
+  color: $wp-text-muted;
   font-size: 1.1rem;
   line-height: 1.7;
   max-width: 900px;
@@ -68,16 +68,16 @@ $qt-text-light: #e5e7eb;
 }
 
 // Card Section
-.quant-card {
-  background: linear-gradient(145deg, $qt-card-bg 0%, #0f1a24 100%);
+.nc-card {
+  background: linear-gradient(145deg, $wp-card-bg 0%, #151515 100%);
   border-radius: 24px;
   padding: 2.5rem;
   margin-bottom: 2rem;
-  border: 2px solid rgba($qt-secondary, 0.28);
-  box-shadow: 0 20px 60px rgba($qt-secondary, 0.15);
+  border: 2px solid rgba($wp-primary, 0.3);
+  box-shadow: 0 20px 60px rgba($wp-primary, 0.2);
 }
 
-.quant-card-grid {
+.nc-card-grid {
   display: grid;
   grid-template-columns: 250px 1fr 1fr;
   gap: 2rem;
@@ -93,15 +93,15 @@ $qt-text-light: #e5e7eb;
 }
 
 // Visual Section
-.quant-visual {
+.nc-visual {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba($qt-secondary, 0.06);
+  background: rgba($wp-secondary, 0.05);
   border-radius: 16px;
-  border: 1px solid rgba($qt-secondary, 0.3);
+  border: 1px solid rgba($wp-secondary, 0.3);
 
   @media (max-width: 1024px) {
     grid-column: 1 / -1;
@@ -110,38 +110,34 @@ $qt-text-light: #e5e7eb;
   }
 }
 
-.quant-image-link {
+.nc-image-link {
   position: relative;
   display: block;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba($qt-secondary, 0.35);
+  box-shadow: 0 10px 30px rgba($wp-primary, 0.4);
   width: 100%;
 
-  &:hover .quant-image {
+  &:hover .nc-image {
     transform: scale(1.05);
   }
 
-  &:hover .quant-overlay {
+  &:hover .nc-overlay {
     opacity: 1;
   }
 }
 
-.quant-image {
+.nc-image {
   width: 100%;
   height: auto;
   display: block;
   transition: transform 0.3s ease;
 }
 
-.quant-overlay {
+.nc-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba($qt-secondary, 0.92),
-    rgba($qt-primary, 0.85)
-  );
+  background: linear-gradient(135deg, rgba($wp-primary, 0.9), rgba($wp-secondary, 0.9));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,73 +146,71 @@ $qt-text-light: #e5e7eb;
 
   span {
     color: #fff;
-    font-weight: 800;
-    font-size: 1.05rem;
-    letter-spacing: 0.2px;
+    font-weight: 700;
+    font-size: 1.1rem;
   }
 }
 
-.quant-status {
-  background: linear-gradient(135deg, $qt-secondary, $qt-primary);
+.nc-status {
+  background: linear-gradient(135deg, $wp-primary, $wp-secondary);
   color: #fff;
   padding: 0.5rem 1.2rem;
   border-radius: 20px;
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   text-align: center;
-  width: 100%;
 }
 
-.quant-team {
+.nc-team {
   text-align: center;
   margin-top: auto;
 }
 
-.quant-team-label {
+.nc-team-label {
   display: block;
-  color: $qt-text-muted;
+  color: $wp-text-muted;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.25rem;
 }
 
-.quant-team-name {
+.nc-team-name {
   display: block;
-  color: $qt-primary;
-  font-weight: 800;
+  color: $wp-primary;
+  font-weight: 700;
   font-size: 1rem;
 }
 
 // Content Section
-.quant-content {
+.nc-content {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: rgba($qt-secondary, 0.06);
+  background: rgba($wp-secondary, 0.05);
   border-radius: 16px;
-  border: 1px solid rgba($qt-secondary, 0.3);
+  border: 1px solid rgba($wp-secondary, 0.3);
 }
 
-.quant-project-title {
+.nc-project-title {
   font-size: 1.75rem;
-  font-weight: 900;
-  color: $qt-accent;
+  font-weight: 800;
+  color: $wp-accent;
   margin: 0 0 0.25rem 0;
 }
 
-.quant-subtitle {
-  color: $qt-secondary;
+.nc-subtitle {
+  color: $wp-secondary;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0 0 1.25rem 0;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba($qt-secondary, 0.3);
+  border-bottom: 1px solid rgba($wp-secondary, 0.3);
 }
 
 // Key Points
-.quant-keypoints {
+.nc-keypoints {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -224,67 +218,67 @@ $qt-text-light: #e5e7eb;
   flex-grow: 1;
 }
 
-.quant-keypoint {
+.nc-keypoint {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  color: $qt-text-light;
+  color: $wp-text-light;
   font-size: 0.9rem;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
-.quant-check {
-  color: $qt-primary;
-  font-weight: 900;
+.nc-check {
+  color: $wp-primary;
+  font-weight: bold;
   flex-shrink: 0;
 }
 
 // Tech Stack
-.quant-tech-stack {
+.nc-tech-stack {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: auto;
 }
 
-.quant-tech-tag {
-  background: rgba($qt-primary, 0.14);
-  color: $qt-primary;
+.nc-tech-tag {
+  background: rgba($wp-secondary, 0.15);
+  color: $wp-secondary;
   padding: 0.35rem 0.7rem;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid rgba($qt-primary, 0.35);
+  font-weight: 600;
+  border: 1px solid rgba($wp-secondary, 0.4);
 }
 
 // Details Section
-.quant-details {
+.nc-details {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: rgba($qt-primary, 0.05);
+  background: rgba($wp-primary, 0.05);
   border-radius: 16px;
-  border: 1px solid rgba($qt-primary, 0.28);
+  border: 1px solid rgba($wp-primary, 0.3);
 }
 
-.quant-section-title {
-  color: $qt-accent;
+.nc-section-title {
+  color: $wp-accent;
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0 0 0.75rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba($qt-primary, 0.38);
+  border-bottom: 2px solid rgba($wp-primary, 0.4);
 }
 
-.quant-about {
-  color: $qt-text-muted;
+.nc-about {
+  color: $wp-text-muted;
   font-size: 0.85rem;
-  line-height: 1.65;
+  line-height: 1.6;
   margin: 0 0 1.25rem 0;
 }
 
 // Impact List
-.quant-impact-list {
+.nc-impact-list {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -292,23 +286,23 @@ $qt-text-light: #e5e7eb;
   flex-grow: 1;
 }
 
-.quant-impact-item {
-  background: rgba($qt-secondary, 0.12);
-  color: $qt-text-light;
+.nc-impact-item {
+  background: rgba($wp-primary, 0.1);
+  color: $wp-text-light;
   padding: 0.5rem 0.75rem;
-  border-radius: 10px;
+  border-radius: 6px;
   font-size: 0.8rem;
-  border-left: 3px solid $qt-secondary;
+  border-left: 3px solid $wp-primary;
 }
 
 // Button
-.quant-btn {
+.nc-btn {
   display: inline-block;
-  background: linear-gradient(135deg, $qt-secondary, $qt-primary);
+  background: linear-gradient(135deg, $wp-primary, $wp-secondary);
   color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -316,7 +310,7 @@ $qt-text-light: #e5e7eb;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba($qt-secondary, 0.45);
+    box-shadow: 0 8px 25px rgba($wp-primary, 0.5);
     color: #fff;
     text-decoration: none;
   }
