@@ -356,4 +356,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
        </div>
    </div>
+
+
+   <!-- RCR: Poway-Midland Railroad Project - ADD THIS ENTIRE BLOCK -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">
+           <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg" alt="RCR Poway-Midland Railroad Digital Experience" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">RCR: Poway-Midland Railroad</a></h3>
+           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with interactive features, real-time train schedules, virtual tours, GPS tracking, educational coding games, and volunteer management tools.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rebecca, Cyrus, Rishabh</p>
+       </div>
+   </div>
+
+   
 </div>
