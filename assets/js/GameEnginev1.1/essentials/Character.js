@@ -168,9 +168,13 @@ class Character extends GameObject {
             return;
         }
 
-        this.move();
-        this.collisionChecks();
-        this.draw();
+        // this.applyPhysics();     // gravity, friction
+        this.move();                // integrate velocity → position
+        this.collisionChecks();     // resolve collisions
+        //this.interactReact();     // triggers, state changes, callbacks
+        //this.updateAnimation();   // update sprite frames based on state
+        this.draw();                // render final state
+
     }
 
 
