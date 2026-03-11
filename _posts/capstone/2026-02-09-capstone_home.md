@@ -5,6 +5,7 @@ tailwind: True
 infoGraph: capstone_infograph
 title: Capstone Projects
 description: Design-Based Research (DBR) capstone projects solving real-world problems through iterative design, implementation, and analysis. Each project features ML, database work, and advanced data structures (e.g., graphs). Projects must be deployed and accessible through this infographic.
+courses: {'csse': {'week': 25}}
 type: capstone
 categories: [Capstone]
 permalink: /capstone/
@@ -177,6 +178,17 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- Binary Beasts -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url 2026-03-06-pybl-capstone %}">
+           <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Binary Beasts</a></h3>
+           <p class="text-sm text-gray-700">Combined PYBL + Poway NEC capstone infographics on one page: youth basketball operations and emergency preparedness information architecture improvements.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
+       </div>
+   </div>
    <!-- College Bound Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url 2026-02-06-college-bound-capstone %}">
@@ -345,4 +357,3 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 </div>
-
