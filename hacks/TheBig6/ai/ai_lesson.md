@@ -346,6 +346,12 @@ date: 2025-12-02
 </div>
 
 <script>
+// ── Config ────────────────────────────────────────────────────────────────────
+// Uses the existing /api/gemini endpoint on the Flask backend.
+// Local dev: change to http://localhost:8587
+const BACKEND_URL = 'https://flask.opencodingsociety.com';
+const GEMINI_ENDPOINT = `${BACKEND_URL}/api/gemini`;
+
 // ── State & Navigation ────────────────────────────────────────────────────────
 let currentStep = 0;
 const steps = ['step1','step2','step3','step4','step5','step6'];
@@ -394,7 +400,7 @@ window.prevStep = prevStep;
 window.nextStep = nextStep;
 window.showStep = showStep;
 
-// ── Resume Transformer (AI-powered) ──────────────────────────────────────────
+// ── Resume Transformer (AI-powered via /api/gemini) ──────────────────────────
 async function generateVersions() {
   const weakBullet = document.getElementById('weak-bullet').value.trim();
   if (!weakBullet) { alert('Please enter a resume bullet point first!'); return; }
@@ -403,7 +409,6 @@ async function generateVersions() {
   const container = document.getElementById('versions-container');
   const ids = ['version-conservative', 'version-balanced', 'version-bold'];
 
-  // Show loading state
   btn.disabled = true;
   btn.textContent = 'Generating…';
   container.style.display = 'block';
@@ -411,22 +416,17 @@ async function generateVersions() {
     document.getElementById(id).innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>Thinking…</div>';
   });
 
-  // Remove any previous error
   const prev = document.getElementById('transformer-error');
   if (prev) prev.remove();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(GEMINI_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `You are a professional resume coach. Transform this weak resume bullet point into 3 STAR-format versions.
-
-Weak bullet: "${weakBullet}"
+        text: weakBullet,
+        prompt: `You are a professional resume coach. Transform this weak resume bullet point into 3 STAR-format versions.
 
 Respond ONLY with valid JSON — no markdown, no backticks, no extra text. Use this exact structure:
 {
@@ -442,20 +442,24 @@ Rules:
 - Do NOT invent specific company names or technologies not mentioned
 - Conservative: stay close to the original, just strengthen the language
 - Balanced: add one plausible metric (e.g. 20%, 5 features, 3-person team)
-- Bold: make it sound impressive with 1-2 quantified results`
-        }]
+- Bold: make it sound impressive with 1-2 quantified results
+- The bullet to transform is`
       })
     });
 
-    if (!res.ok) throw new Error(`API error ${res.status}`);
+    if (!res.ok) throw new Error(`Server error ${res.status} — are you logged in?`);
     const data = await res.json();
-    const text = data.content?.find(b => b.type === 'text')?.text || '';
+    if (!data.success) throw new Error(data.message || 'Gemini request failed');
 
+    const text = data.text || '';
     let parsed;
     try {
       parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
     } catch {
-      throw new Error('Could not parse AI response. Try again.');
+      // Gemini sometimes returns plain text — show it in all three cards
+      const fallback = text.trim() || '—';
+      ids.forEach(id => { document.getElementById(id).textContent = fallback; });
+      return;
     }
 
     document.getElementById('version-conservative').textContent = parsed.conservative || '—';
@@ -473,7 +477,7 @@ Rules:
 }
 window.generateVersions = generateVersions;
 
-// ── Interview Analyzer (AI-powered) ──────────────────────────────────────────
+// ── Interview Analyzer (AI-powered via /api/gemini) ──────────────────────────
 async function analyzeInterview() {
   const answer   = document.getElementById('interview-answer').value.trim();
   const qChoice  = document.getElementById('question-choice').value;
@@ -499,19 +503,13 @@ async function analyzeInterview() {
   if (prev) prev.remove();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(GEMINI_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `You are an experienced technical interviewer and career coach. Analyze this interview answer.
-
-Interview question: "${question}"
-
-Candidate's answer: "${answer}"
+        text: answer,
+        prompt: `You are an experienced technical interviewer and career coach. The candidate was asked: "${question}". Analyze their answer below.
 
 Respond ONLY with valid JSON — no markdown, no backticks, no preamble. Use exactly this structure:
 {
@@ -524,14 +522,17 @@ Respond ONLY with valid JSON — no markdown, no backticks, no preamble. Use exa
   },
   "overallFeedback": "2-3 sentences of actionable coaching advice",
   "improvedOpener": "Rewrite just the first sentence of their answer to be stronger"
-}`
-        }]
+}
+
+The candidate's answer is`
       })
     });
 
-    if (!res.ok) throw new Error(`API error ${res.status}`);
+    if (!res.ok) throw new Error(`Server error ${res.status} — are you logged in?`);
     const data = await res.json();
-    const text = data.content?.find(b => b.type === 'text')?.text || '';
+    if (!data.success) throw new Error(data.message || 'Gemini request failed');
+
+    const text = data.text || '';
 
     let parsed;
     try {
