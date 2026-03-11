@@ -197,6 +197,31 @@ date: 2025-12-02
 
   /* Flex row helper */
   .flex-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* AI loading state */
+  .ai-loading {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 13px; padding: 12px 0;
+  }
+  .ai-spinner {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* AI error state */
+  .ai-error {
+    background: var(--bad); border: 1px solid var(--bad-border);
+    border-radius: 8px; padding: 10px 14px;
+    color: #f87171; font-size: 13px; margin-top: 8px;
+  }
+
+  /* Streamed text fade-in */
+  .version-card p { white-space: pre-wrap; line-height: 1.7; }
+  .analysis-result { white-space: pre-wrap; }
 </style>
 
 <div class="container page-content">
@@ -369,39 +394,199 @@ window.prevStep = prevStep;
 window.nextStep = nextStep;
 window.showStep = showStep;
 
-// ── Resume Transformer ────────────────────────────────────────────────────────
-function generateVersions() {
+// ── Resume Transformer (AI-powered) ──────────────────────────────────────────
+async function generateVersions() {
   const weakBullet = document.getElementById('weak-bullet').value.trim();
   if (!weakBullet) { alert('Please enter a resume bullet point first!'); return; }
 
-  document.getElementById('version-conservative').textContent =
-    'Contributed to team project using web technologies, implementing core features and collaborating with 3–4 team members to meet project deadlines.';
-  document.getElementById('version-balanced').textContent =
-    'Developed web application as part of a 4-person team, implementing 5+ key features and improving system performance by 25% through code optimization.';
-  document.getElementById('version-bold').textContent =
-    'Led development of a web platform serving 5,000+ monthly users, architecting scalable backend infrastructure and reducing load times by 40%.';
+  const btn = document.querySelector('[onclick="generateVersions()"]');
+  const container = document.getElementById('versions-container');
+  const ids = ['version-conservative', 'version-balanced', 'version-bold'];
 
-  document.getElementById('versions-container').style.display = 'block';
+  // Show loading state
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  container.style.display = 'block';
+  ids.forEach(id => {
+    document.getElementById(id).innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>Thinking…</div>';
+  });
+
+  // Remove any previous error
+  const prev = document.getElementById('transformer-error');
+  if (prev) prev.remove();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `You are a professional resume coach. Transform this weak resume bullet point into 3 STAR-format versions.
+
+Weak bullet: "${weakBullet}"
+
+Respond ONLY with valid JSON — no markdown, no backticks, no extra text. Use this exact structure:
+{
+  "conservative": "one sentence, modest tone, no invented metrics",
+  "balanced": "one sentence, moderate achievements, 1 realistic metric",
+  "bold": "one sentence, strong action verb, 1-2 impactful metrics"
+}
+
+Rules:
+- Each version must be a single polished resume bullet (one sentence)
+- Start with a strong past-tense action verb
+- Use STAR structure: imply Situation/Task, show Action, hint at Result
+- Do NOT invent specific company names or technologies not mentioned
+- Conservative: stay close to the original, just strengthen the language
+- Balanced: add one plausible metric (e.g. 20%, 5 features, 3-person team)
+- Bold: make it sound impressive with 1-2 quantified results`
+        }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch {
+      throw new Error('Could not parse AI response. Try again.');
+    }
+
+    document.getElementById('version-conservative').textContent = parsed.conservative || '—';
+    document.getElementById('version-balanced').textContent     = parsed.balanced     || '—';
+    document.getElementById('version-bold').textContent         = parsed.bold         || '—';
+
+  } catch (err) {
+    ids.forEach(id => { document.getElementById(id).textContent = ''; });
+    container.insertAdjacentHTML('beforebegin',
+      `<div class="ai-error" id="transformer-error">⚠ ${err.message}</div>`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✦ Transform to STAR Format';
+  }
 }
 window.generateVersions = generateVersions;
 
-// ── Interview Analyzer ────────────────────────────────────────────────────────
-function analyzeInterview() {
-  const answer = document.getElementById('interview-answer').value.trim();
+// ── Interview Analyzer (AI-powered) ──────────────────────────────────────────
+async function analyzeInterview() {
+  const answer   = document.getElementById('interview-answer').value.trim();
+  const qChoice  = document.getElementById('question-choice').value;
   if (!answer) { alert('Please write your interview answer first!'); return; }
 
-  const wordCount = answer.split(/\s+/).filter(Boolean).length;
-  const hasMetrics = /\d+/.test(answer);
-  const hasSTAR = /(situation|task|action|result|because|led|built|improved|reduced|increased)/i.test(answer);
-  const tooLong = wordCount > 250;
+  const questionMap = {
+    '1': 'Tell me about a time you failed.',
+    '2': 'Walk me through your project architecture.',
+    '3': 'Why do you want to work at this company?'
+  };
+  const question = questionMap[qChoice];
 
-  let html = '';
-  html += `<div><span class="score-badge ${tooLong ? 'bad' : 'good'}">Length: ${wordCount} words ${tooLong ? '(too long — trim to 250)' : '✓'}</span></div>`;
-  html += `<div><span class="score-badge ${hasMetrics ? 'good' : 'bad'}">Metrics: ${hasMetrics ? 'Present ✓' : 'Missing — add numbers!'}</span></div>`;
-  html += `<div><span class="score-badge ${hasSTAR ? 'good' : 'bad'}">STAR structure: ${hasSTAR ? 'Detected ✓' : 'Not detected — add context & result'}</span></div>`;
+  const btn        = document.querySelector('[onclick="analyzeInterview()"]');
+  const resultBox  = document.getElementById('analysis-result');
+  const contentEl  = document.getElementById('analysis-content');
 
-  document.getElementById('analysis-content').innerHTML = html;
-  document.getElementById('analysis-result').style.display = 'block';
+  btn.disabled = true;
+  btn.textContent = 'Analyzing…';
+  resultBox.style.display = 'block';
+  contentEl.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>Analyzing your answer…</div>';
+
+  const prev = document.getElementById('interview-error');
+  if (prev) prev.remove();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `You are an experienced technical interviewer and career coach. Analyze this interview answer.
+
+Interview question: "${question}"
+
+Candidate's answer: "${answer}"
+
+Respond ONLY with valid JSON — no markdown, no backticks, no preamble. Use exactly this structure:
+{
+  "wordCount": <number>,
+  "scores": {
+    "structure": { "rating": "good|ok|poor", "feedback": "one sentence" },
+    "specificity": { "rating": "good|ok|poor", "feedback": "one sentence" },
+    "metrics": { "rating": "good|ok|poor", "feedback": "one sentence" },
+    "relevance": { "rating": "good|ok|poor", "feedback": "one sentence" }
+  },
+  "overallFeedback": "2-3 sentences of actionable coaching advice",
+  "improvedOpener": "Rewrite just the first sentence of their answer to be stronger"
+}`
+        }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch {
+      throw new Error('Could not parse AI response. Try again.');
+    }
+
+    const ratingColor = r => r === 'good' ? 'good' : r === 'ok' ? '' : 'bad';
+    const ratingLabel = r => r === 'good' ? '✓ Good' : r === 'ok' ? '~ OK' : '✗ Needs work';
+
+    const badgeStyle = r => {
+      if (r === 'good') return 'background:var(--good);border:1px solid var(--good-border);color:#4ade80;';
+      if (r === 'ok')   return 'background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.4);color:#fbbf24;';
+      return 'background:var(--bad);border:1px solid var(--bad-border);color:#f87171;';
+    };
+
+    const scores = parsed.scores || {};
+    const labels = { structure: 'STAR Structure', specificity: 'Specificity', metrics: 'Metrics/Numbers', relevance: 'Relevance to Question' };
+
+    let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${parsed.wordCount || '?'} words</div>`;
+
+    html += '<div style="display:grid;gap:8px;margin-bottom:16px;">';
+    for (const [key, label] of Object.entries(labels)) {
+      const s = scores[key] || {};
+      html += `<div style="display:flex;gap:10px;align-items:flex-start;">
+        <span style="flex-shrink:0;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;${badgeStyle(s.rating)}">${ratingLabel(s.rating)}</span>
+        <span style="font-size:13px;"><strong style="color:#a6c9ff;">${label}:</strong> ${s.feedback || ''}</span>
+      </div>`;
+    }
+    html += '</div>';
+
+    if (parsed.overallFeedback) {
+      html += `<div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.7;">
+        <strong style="color:var(--blue);display:block;margin-bottom:4px;">Coach Feedback</strong>
+        ${parsed.overallFeedback}
+      </div>`;
+    }
+    if (parsed.improvedOpener) {
+      html += `<div style="background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:8px;padding:12px;font-size:13px;line-height:1.7;">
+        <strong style="color:#c4b5fd;display:block;margin-bottom:4px;">Stronger Opening</strong>
+        "${parsed.improvedOpener}"
+      </div>`;
+    }
+
+    contentEl.innerHTML = html;
+
+  } catch (err) {
+    contentEl.innerHTML = '';
+    resultBox.insertAdjacentHTML('beforebegin',
+      `<div class="ai-error" id="interview-error">⚠ ${err.message}</div>`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze My Answer';
+  }
 }
 window.analyzeInterview = analyzeInterview;
 
