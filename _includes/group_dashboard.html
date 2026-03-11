@@ -448,6 +448,9 @@
   }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   // Calendar state
@@ -459,11 +462,12 @@
   const dashboardGroupId = "{{ include.groupId | default: '' }}";
   let activeChatGroupId = dashboardGroupId ? Number(dashboardGroupId) : null;
   let activeChatGroupName = '';
-  let chatPollTimer = null;
+  let stompClient = null;
   let currentUser = null;
   let currentUserDisplayName = 'You';
   let pendingChatImageBase64 = null;
   let pendingChatImageMime = 'image/png';
+  let renderedChatMessageKeys = new Set();
   
   // Initialize calendar
   document.addEventListener('DOMContentLoaded', () => {
@@ -755,10 +759,81 @@
     }
   };
 
+  function getChatMessageKey(msg) {
+    return JSON.stringify([
+      msg?.name || '',
+      msg?.date || '',
+      msg?.message || '',
+      msg?.image || ''
+    ]);
+  }
+
+  function getChatImageSrc(image) {
+    if (!image) return null;
+    if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
+    return `data:image/png;base64,${image}`;
+  }
+
+  function appendSingleMessage(msg) {
+    const chatMessages = document.getElementById('chatMessages');
+    let emptyState = document.getElementById('chatEmptyState');
+    const messageKey = getChatMessageKey(msg);
+
+    if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
+      return;
+    }
+
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.id = 'chatEmptyState';
+      emptyState.className = 'text-center text-gray-500 text-sm py-6';
+      emptyState.textContent = 'No messages yet.';
+    }
+
+    emptyState.classList.add('hidden');
+
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'flex items-baseline gap-2 mb-1';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'text-white font-semibold text-sm';
+    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'text-gray-500 text-xs';
+    timeEl.textContent = formatTimestamp(msg.date);
+
+    header.appendChild(nameEl);
+    header.appendChild(timeEl);
+    wrapper.appendChild(header);
+
+    if (msg.message) {
+      const textEl = document.createElement('p');
+      textEl.className = 'text-gray-200 text-sm';
+      textEl.textContent = msg.message;
+      wrapper.appendChild(textEl);
+    }
+
+    if (msg.image) {
+      const img = document.createElement('img');
+      img.src = getChatImageSrc(msg.image);
+      img.alt = 'Shared image';
+      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+      wrapper.appendChild(img);
+    }
+
+    chatMessages.appendChild(wrapper);
+    renderedChatMessageKeys.add(messageKey);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
   function renderChatMessages(messages) {
     const chatMessages = document.getElementById('chatMessages');
     let emptyState = document.getElementById('chatEmptyState');
     chatMessages.innerHTML = '';
+    renderedChatMessageKeys = new Set();
 
     if (!emptyState) {
       emptyState = document.createElement('div');
@@ -773,44 +848,7 @@
       return;
     }
 
-    emptyState.classList.add('hidden');
-    messages.forEach(msg => {
-      const wrapper = document.createElement('div');
-
-      const header = document.createElement('div');
-      header.className = 'flex items-baseline gap-2 mb-1';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'text-white font-semibold text-sm';
-      nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-      const timeEl = document.createElement('span');
-      timeEl.className = 'text-gray-500 text-xs';
-      timeEl.textContent = formatTimestamp(msg.date);
-
-      header.appendChild(nameEl);
-      header.appendChild(timeEl);
-      wrapper.appendChild(header);
-
-      if (msg.message) {
-        const textEl = document.createElement('p');
-        textEl.className = 'text-gray-200 text-sm';
-        textEl.textContent = msg.message;
-        wrapper.appendChild(textEl);
-      }
-
-      if (msg.image) {
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64,${msg.image}`;
-        img.alt = 'Shared image';
-        img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-        wrapper.appendChild(img);
-      }
-
-      chatMessages.appendChild(wrapper);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    messages.forEach(appendSingleMessage);
   }
 
   async function fetchChatMessages() {
@@ -865,14 +903,42 @@
   };
 
   function startChatPolling() {
-    if (chatPollTimer) clearInterval(chatPollTimer);
-    chatPollTimer = setInterval(fetchChatMessages, 4000);
+    if (!activeChatGroupId) return;
+
+    if (stompClient) {
+      stopChatPolling();
+    }
+
+    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+      console.error('SockJS/STOMP dependencies are not available');
+      return;
+    }
+
+    const socket = new SockJS(`${javaURI}/ws-chat`);
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+
+    stompClient.connect({}, () => {
+      if (!stompClient || !activeChatGroupId) return;
+
+      stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (message) => {
+        try {
+          const payload = JSON.parse(message.body);
+          appendSingleMessage(payload);
+        } catch (err) {
+          console.error('Failed to parse incoming chat message', err);
+        }
+      });
+    }, (err) => {
+      console.error('WebSocket connection failed', err);
+    });
   }
 
   function stopChatPolling() {
-    if (chatPollTimer) {
-      clearInterval(chatPollTimer);
-      chatPollTimer = null;
+    if (stompClient) {
+      const clientToDisconnect = stompClient;
+      stompClient = null;
+      clientToDisconnect.disconnect(() => {});
     }
   }
 
