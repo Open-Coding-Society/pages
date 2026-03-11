@@ -107,7 +107,7 @@ class Projectile extends Character {
         };
         const explosion = newProjectileExplosion(explosionData, this.gameEnv);
         this.canvas.style.display = "none";
-        this.gameEnv.gameObjects.push(explosion); 
+        this.gameEnv.addGameObject(explosion);
     }
 
     /**

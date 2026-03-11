@@ -24,7 +24,7 @@ class GameLevel {
     for (let gameObjectClass of this.gameObjectClasses) {
         if (!gameObjectClass.data) gameObjectClass.data = {}
         let gameObject = new gameObjectClass.class(gameObjectClass.data, this.gameEnv)
-        this.gameEnv.gameObjects.push(gameObject)
+      this.gameEnv.addGameObject(gameObject)
     }
 
     if (typeof this.gameLevel.initialize === "function") {
@@ -60,6 +60,10 @@ class GameLevel {
     this.gameEnv.clear()
 
     for (let gameObject of this.gameEnv.gameObjects) {
+      if (gameObject && typeof gameObject.advanceTransform === 'function') {
+        gameObject.advanceTransform()
+      }
+
       // Check if gameObject has an update method before calling it
       if (gameObject && typeof gameObject.update === 'function') {
         gameObject.update()

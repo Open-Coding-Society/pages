@@ -374,7 +374,7 @@ class GameLevelMeteorBlaster {
     try {
       const meteor = new Meteor(meteorData, this.gameEnv)
       this.meteors.push(meteor)
-      this.gameEnv.gameObjects.push(meteor)
+      this.gameEnv.addGameObject(meteor)
       console.log(`Successfully created meteor ${meteorId}, total meteors: ${this.meteors.length}`)
     } catch (error) {
       console.error("Error creating meteor:", error)
@@ -435,7 +435,7 @@ class GameLevelMeteorBlaster {
     }
 
     this.lasers.push(laser)
-    this.gameEnv.gameObjects.push(laser)
+    this.gameEnv.addGameObject(laser)
   }
 
   createScoreDisplay() {

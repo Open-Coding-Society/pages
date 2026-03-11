@@ -1,3 +1,5 @@
+import GameObject from './GameObject.js';
+
 /**
  * GameEnv manages the game environment.
  * 
@@ -132,6 +134,19 @@ class GameEnv {
             return;
         }
         this.ctx.clearRect(0, 0, this.innerWidth, this.innerHeight);
+    }
+
+    addGameObject(gameObject) {
+        if (!gameObject) {
+            return null;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(gameObject, 'transform') && !(gameObject instanceof GameObject)) {
+            throw new TypeError('Objects with transform must inherit from GameObject before being added to gameEnv.gameObjects');
+        }
+
+        this.gameObjects.push(gameObject);
+        return gameObject;
     }
 
     /**

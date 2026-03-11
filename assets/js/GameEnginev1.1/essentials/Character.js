@@ -74,6 +74,8 @@ class Character extends GameObject {
         this.scaleFactor = data.SCALE_FACTOR || SCALE_FACTOR;
         this.stepFactor = data.STEP_FACTOR || STEP_FACTOR;
         this.animationRate = data.ANIMATION_RATE || ANIMATION_RATE;
+        this.autoAdvanceTransform = true;
+        this.transformFriction = 1;
         
         // Handle INIT_POSITION with percentage support (0.0-1.0 decimal)
         const initPos = data.INIT_POSITION || INIT_POSITION;
@@ -170,7 +172,7 @@ class Character extends GameObject {
 
         this.draw();
         this.collisionChecks();
-        this.move();
+        this.stayWithinCanvas();
     }
 
 
@@ -335,14 +337,14 @@ class Character extends GameObject {
         if(x != undefined){
             this.position.x = x;
         }
-        if(x != undefined){
+        if(y != undefined){
             this.position.y = y;
         }
-        
-        // Update or change position according to velocity events
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
 
+        this.stayWithinCanvas();
+    }
+
+    stayWithinCanvas() {
         // Ensure the object stays within the canvas boundaries
         // Bottom of the canvas
         if (this.position.y + this.height > this.gameEnv.innerHeight) {

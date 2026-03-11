@@ -1,3 +1,5 @@
+import { Transform } from './Transform.js';
+
 /**
  * The GameObject class serves as a base class for all game objects.
  * It mimics an interface by defining abstract methods that must be implemented
@@ -20,7 +22,88 @@ class GameObject {
         if (new.target === GameObject) {
             throw new TypeError("Cannot construct GameObject instances directly");
         }
-        this.gameEnv = gameEnv; 
+        this.gameEnv = gameEnv;
+        this.transform = new Transform();
+        this._positionProxy = {};
+        this._velocityProxy = {};
+
+        Object.defineProperties(this._positionProxy, {
+            x: {
+                enumerable: true,
+                get: () => this.transform.x,
+                set: (value) => {
+                    this.transform.x = Number.isFinite(value) ? value : this.transform.x;
+                },
+            },
+            y: {
+                enumerable: true,
+                get: () => this.transform.y,
+                set: (value) => {
+                    this.transform.y = Number.isFinite(value) ? value : this.transform.y;
+                },
+            },
+        });
+
+        Object.defineProperties(this._velocityProxy, {
+            x: {
+                enumerable: true,
+                get: () => this.transform.xv,
+                set: (value) => {
+                    this.transform.xv = Number.isFinite(value) ? value : this.transform.xv;
+                },
+            },
+            y: {
+                enumerable: true,
+                get: () => this.transform.yv,
+                set: (value) => {
+                    this.transform.yv = Number.isFinite(value) ? value : this.transform.yv;
+                },
+            },
+        });
+
+        Object.defineProperties(this, {
+            position: {
+                enumerable: true,
+                get: () => this._positionProxy,
+                set: (value) => {
+                    if (!value || typeof value !== 'object') return;
+                    if (Number.isFinite(value.x)) {
+                        this.transform.x = value.x;
+                    }
+                    if (Number.isFinite(value.y)) {
+                        this.transform.y = value.y;
+                    }
+                },
+            },
+            velocity: {
+                enumerable: true,
+                get: () => this._velocityProxy,
+                set: (value) => {
+                    if (!value || typeof value !== 'object') return;
+                    if (Number.isFinite(value.x)) {
+                        this.transform.xv = value.x;
+                    }
+                    if (Number.isFinite(value.y)) {
+                        this.transform.yv = value.y;
+                    }
+                },
+            },
+            x: {
+                enumerable: true,
+                get: () => this.transform.x,
+                set: (value) => {
+                    this.transform.x = Number.isFinite(value) ? value : this.transform.x;
+                },
+            },
+            y: {
+                enumerable: true,
+                get: () => this.transform.y,
+                set: (value) => {
+                    this.transform.y = Number.isFinite(value) ? value : this.transform.y;
+                },
+            },
+        });
+
         this.collisionWidth = 0;
         this.collisionHeight = 0;
         this.collisionData = {};
@@ -29,6 +112,21 @@ class GameObject {
             collisionEvents: [],
             movement: { up: true, down: true, left: true, right: true },
         };
+    }
+
+    syncTransform(spawnX = this.transform.spawnX, spawnY = this.transform.spawnY) {
+        this.transform.spawnX = spawnX;
+        this.transform.spawnY = spawnY;
+        this.transform.setPosition(this.transform.x, this.transform.y);
+        this.transform.setVelocity(this.transform.xv, this.transform.yv);
+    }
+
+    advanceTransform() {
+        if (!this.autoAdvanceTransform || !this.transform) {
+            return;
+        }
+
+        this.transform.updatePosition(this.transformFriction ?? 1);
     }
 
     /**
