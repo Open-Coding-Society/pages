@@ -46,13 +46,16 @@ comments: false
       
       if (response.ok) {
         const groups = await response.json();
-        const group = groups.find(g => g.name.toLowerCase() === groupName.toLowerCase());
+        const group = Array.isArray(groups) 
+          ? groups.find(g => g.name.toLowerCase() === groupName.toLowerCase()) || groups[0]
+          : groups;
         
-        if (group) {
+        if (group && group.id) {
+          console.log('Loading dashboard for group:', group.name, 'ID:', group.id);
           populateDashboard(group);
         } else {
           // Group not found - show placeholder data
-          console.log('Group not found, showing placeholder data');
+          console.log('Group not found or missing ID:', group);
           document.getElementById('dashboardGroupMeta').textContent = 'Group data not available';
         }
       }
@@ -63,14 +66,53 @@ comments: false
     }
   }
 
+  // Fetch analytics data for a specific member in a specific group
+  async function fetchMemberAnalytics(personId, groupId) {
+    try {
+      const response = await fetch(`${javaURI}/api/groups/chat/analytics/${personId}`, fetchOptions);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Person has no analytics data yet
+          return { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
+        }
+        throw new Error(`Failed to fetch analytics: ${response.status}`);
+      }
+      
+      const analytics = await response.json();
+      
+      // Find the specific group's analytics from the groupAnalytics array
+      const groupData = analytics.groupAnalytics?.find(g => g.groupId === groupId);
+      
+      if (groupData) {
+        return {
+          messagesSent: groupData.messagesSent || 0,
+          messagesWithImages: groupData.messagesWithImages || 0,
+          sharedFilesCount: groupData.sharedFilesCount || 0
+        };
+      }
+      
+      // Member is in group but has no activity yet
+      console.log(`No activity found for person ${personId} in group ${groupId}`);
+      return { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
+      
+    } catch (error) {
+      console.warn(`Failed to fetch analytics for person ${personId}:`, error);
+      return { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
+    }
+  }
+
   // Populate dashboard with group data
-  function populateDashboard(group) {
+  async function populateDashboard(group) {
     const memberCount = (group.members || []).length;
     
     // Update header
     document.getElementById('dashboardGroupName').textContent = group.name;
     document.getElementById('dashboardGroupMeta').textContent = 
       `Period ${group.period || 'N/A'} · ${group.course || 'N/A'} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+    
+    // Set global group ID for shared files and chat functionality
+    window.currentDashboardGroupId = group.id;
 
     // Update stats
     document.getElementById('statTotalMembers').textContent = memberCount;
@@ -78,28 +120,92 @@ comments: false
     // Update member analytics table if we have real members
     if (group.members && group.members.length > 0) {
       const tbody = document.getElementById('memberAnalyticsBody');
-      tbody.innerHTML = group.members.map(member => {
-        const initials = getInitials(member.name || member.uid);
-        const color = getRandomColor(member.id);
-        return `
-          <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
-            <td class="py-3">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
-                <span>${member.name || member.uid}</span>
-              </div>
-            </td>
-            <td class="py-3">--</td>
-            <td class="py-3">--</td>
-            <td class="py-3">--</td>
-            <td class="py-3"><span class="px-2 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Unknown</span></td>
-          </tr>
-        `;
-      }).join('');
+      
+      // Show loading state
+      tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
+      
+      try {
+        // Fetch analytics for first member only to get group-level stats
+        const firstMember = group.members[0];
+        console.log('Fetching analytics for member:', firstMember.id, 'in group:', group.id);
+        const response = await fetch(`${javaURI}/api/groups/chat/analytics/${firstMember.id}`, fetchOptions);
+        
+        if (response.ok) {
+          const analytics = await response.json();
+          console.log('Analytics response:', analytics);
+          
+          // Find this group's data in the groupAnalytics array
+          const groupData = analytics.groupAnalytics?.find(g => g.groupId === group.id);
+          console.log('Found group data:', groupData, 'for group ID:', group.id);
+          
+          if (groupData) {
+            // Update sidebar stats directly from API response (no calculations)
+            document.getElementById('statTotalFiles').textContent = groupData.sharedFilesCount || 0;
+          } else {
+            console.warn('No analytics found for group ID:', group.id, 'Available groups:', analytics.groupAnalytics?.map(g => g.groupId));
+            document.getElementById('statTotalFiles').textContent = 0;
+          }
+        } else {
+          console.warn('Analytics API returned status:', response.status);
+          document.getElementById('statTotalFiles').textContent = 0;
+        }
+        
+        // Fetch analytics for all members to show individual message counts
+        const analyticsPromises = group.members.map(member => 
+          fetchMemberAnalytics(member.id, group.id).then(analytics => ({
+            member,
+            analytics
+          }))
+        );
+        
+        const membersWithAnalytics = await Promise.all(analyticsPromises);
+        
+        // Calculate total messages for sidebar
+        let totalMessages = 0;
+        
+        // Render table with real analytics data
+        tbody.innerHTML = membersWithAnalytics.map(({ member, analytics }) => {
+          const initials = getInitials(member.name || member.uid);
+          const color = getRandomColor(member.id);
+          
+          totalMessages += analytics.messagesSent;
+          
+          return `
+            <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
+              <td class="py-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
+                  <span>${member.name || member.uid}</span>
+                </div>
+              </td>
+              <td class="py-3">${analytics.messagesSent}</td>
+            </tr>
+          `;
+        }).join('');
+        
+        // Update total messages in sidebar
+        document.getElementById('statTotalMessages').textContent = totalMessages;
+        
+      } catch (error) {
+        console.error('Failed to load member analytics:', error);
+        // Show error state
+        tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
+      }
+    } else {
+      // No members in group - show empty state and reset stats
+      const tbody = document.getElementById('memberAnalyticsBody');
+      tbody.innerHTML = '<tr><td colspan="2" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
+      document.getElementById('statTotalMessages').textContent = 0;
+      document.getElementById('statTotalFiles').textContent = 0;
     }
 
     // Store group data for chat functionality
     window.currentGroupData = group;
+    
+    // Fetch and display shared files for this group
+    if (typeof window.fetchDashboardSharedFiles === 'function') {
+      await window.fetchDashboardSharedFiles();
+    }
   }
 
   // Helper to get initials from name

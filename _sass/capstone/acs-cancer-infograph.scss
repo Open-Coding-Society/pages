@@ -1,0 +1,348 @@
+// ACS Cancer Infographic Styles
+// Located in _sass/capstone/
+
+
+// Variables - ACS brand colors
+$acs-primary: #e8192c;        // ACS red
+$acs-secondary: #005a9c;      // ACS blue
+$acs-accent: #ffffff;         // White
+$acs-dark-bg: #000000;        // Pure black background
+$acs-card-bg: #0a0a0a;        // Slightly lighter black for cards
+$acs-text-muted: #b0b0b0;
+$acs-text-light: #e8e8e8;
+
+
+// Main Container
+.acs-infograph {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+
+// Header Section
+.acs-header {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, $acs-dark-bg 0%, #1a1a1a 50%, #0d0d0d 100%);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid rgba($acs-primary, 0.3);
+}
+
+
+.acs-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, $acs-primary, $acs-secondary);
+  color: #fff;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+
+.acs-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, $acs-primary, $acs-secondary, $acs-accent, $acs-primary);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: acs-gradient 3s ease infinite;
+  margin: 0 0 1rem 0;
+}
+
+
+@keyframes acs-gradient {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+
+.acs-description {
+  color: $acs-text-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+
+// Card Section
+.acs-card {
+  background: linear-gradient(145deg, $acs-card-bg 0%, #151515 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba($acs-primary, 0.3);
+  box-shadow: 0 20px 60px rgba($acs-primary, 0.2);
+}
+
+
+.acs-card-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+// Visual Section
+.acs-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba($acs-secondary, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba($acs-secondary, 0.3);
+
+  @media (max-width: 1024px) {
+    grid-column: 1 / -1;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+}
+
+
+.acs-image-link {
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba($acs-primary, 0.4);
+  width: 100%;
+
+  &:hover .acs-image {
+    transform: scale(1.05);
+  }
+
+  &:hover .acs-overlay {
+    opacity: 1;
+  }
+}
+
+
+.acs-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+
+.acs-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba($acs-primary, 0.9), rgba($acs-secondary, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  span {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+}
+
+
+.acs-status {
+  background: linear-gradient(135deg, $acs-primary, $acs-secondary);
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+
+.acs-team {
+  text-align: center;
+  margin-top: auto;
+}
+
+
+.acs-team-label {
+  display: block;
+  color: $acs-text-muted;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+
+.acs-team-name {
+  display: block;
+  color: $acs-primary;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+
+// Content Section
+.acs-content {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($acs-secondary, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba($acs-secondary, 0.3);
+}
+
+
+.acs-project-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $acs-accent;
+  margin: 0 0 0.25rem 0;
+}
+
+
+.acs-subtitle {
+  color: $acs-secondary;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($acs-secondary, 0.3);
+}
+
+
+// Key Points
+.acs-keypoints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+
+.acs-keypoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: $acs-text-light;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+
+.acs-check {
+  color: $acs-primary;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+
+// Tech Stack
+.acs-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+
+.acs-tech-tag {
+  background: rgba($acs-secondary, 0.15);
+  color: $acs-secondary;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba($acs-secondary, 0.4);
+}
+
+
+// Details Section
+.acs-details {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba($acs-primary, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba($acs-primary, 0.3);
+}
+
+
+.acs-section-title {
+  color: $acs-accent;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($acs-primary, 0.4);
+}
+
+
+.acs-about {
+  color: $acs-text-muted;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+}
+
+
+// Impact List
+.acs-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+
+.acs-impact-item {
+  background: rgba($acs-primary, 0.1);
+  color: $acs-text-light;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid $acs-primary;
+}
+
+
+// Button
+.acs-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, $acs-primary, $acs-secondary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba($acs-primary, 0.5);
+    color: #fff;
+    text-decoration: none;
+  }
+}
