@@ -137,18 +137,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Palomar Health Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
-       <a href="{{ '/capstone/palomarhealth/' | relative_url }}">
-           <img src="{{ '/images/capstone/website_projects/palomar.png' | relative_url }}" alt="Palomar Health capstone project" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/palomarhealth/' | relative_url }}">Palomar Health</a></h3>
-           <p class="text-sm text-gray-700">A healthcare-focused capstone experience showcasing services, patient stories, community impact, and donor support pathways for Palomar Health.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Wi-Fighters</p>
-       </div>
-   </div>
-
    <!-- Poway Symphonic Orchestra Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg">
        <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
