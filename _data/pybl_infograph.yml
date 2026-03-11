@@ -1,0 +1,36 @@
+# PYBL Capstone Infographic
+Title: "Binary Beasts: PYBL"
+Description: "Binary Beasts capstone track for pybl.com, focused on clearer youth basketball operations and faster family access to key tasks."
+
+Topics:
+  - title: "PYBL Platform"
+    image: "capstone/pybl.png"
+    link: "https://pybl.com/"
+    alt: "PYBL platform preview"
+    keyPoints:
+      - "Idea 1: Improve rules readability using a good UI that makes it better."
+      - "Idea 2: Have season schedule with backend database that stores wins and losses for each team."
+      - "Idea 3: Build clear role paths for parents, coaches, and administrators."
+      - "Problem solved: Too much navigation friction during common seasonal tasks."
+      - "Problem solved: Easier to see best teams."
+      - "Problem solved: Have everyone know what to do."
+    subtitle: "Youth Sports Operations, Simplified"
+    description: "PYBL provides community basketball information and logistics that must remain simple and fast for families. This capstone focuses on reducing navigation ambiguity, improving page hierarchy, and making registration and schedule workflows easier to complete from phones and school devices."
+    tech:
+      - "Jekyll templates for consistent page structures"
+      - "YAML + Markdown content model for repeatable updates"
+      - "SCSS components for visual hierarchy and readability"
+      - "Responsive layouts for parent mobile usage"
+      - "Navigation refactor patterns to reduce click depth"
+      - "Accessibility checks to improve clarity and scan speed"
+    impact:
+      - "Individual issue (Aneesh): tighten registration flow copy and button hierarchy this week."
+      - "Individual issue (Ethan): audit schedule page pathways and eliminate redundant routes this week."
+      - "Individual issue (Samarth): validate mobile readability for forms/announcements this week."
+      - "Shared issue: align update ownership so season changes publish consistently."
+      - "Shared issue: verify final IA decisions with quick user walkthrough checks."
+    status: "In Development"
+    team:
+      - "Aneesh"
+      - "Ethan"
+      - "Samarth"
