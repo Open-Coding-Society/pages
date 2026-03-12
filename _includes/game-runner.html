@@ -1,5 +1,6 @@
 <!-- Reusable Game Runner Component -->
-<div class="game-runner-container" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+<div class="game-runner-container{% if include.hide_edit == 'true' %} hide-editor{% endif %}" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% if include.hide_edit != 'true' %}
   <div class="challenge-box">
     <h3>Challenge</h3>
     <p>{{ include.challenge }}</p>
@@ -23,6 +24,17 @@
       <button class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
     </div>
   </div>
+  {% else %}
+  <!-- Compact controls for hide_edit mode -->
+  <div class="compact-controls">
+    <button class="runBtn" title="Start Game">▶ Play</button>
+    <button class="stopBtn" title="Stop Game">■ Stop</button>
+    <button class="resetBtn" title="Reset Game">↻ Reset</button>
+    <select class="levelSelect" title="Select Level">
+      <option value="">Select Level...</option>
+    </select>
+  </div>
+  {% endif %}
 
   <div class="output-container">
     <div class="control-panel">
@@ -41,6 +53,7 @@
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
   if (!container) return;
   
+  const hideEdit = {{ include.hide_edit | default: 'false' }};
   const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.height }}";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
@@ -50,23 +63,28 @@
   const savedCode = localStorage.getItem(storageKey);
   const initialCode = savedCode !== null ? savedCode : defaultCode;
   
-  // Set CodeMirror height dynamically
-  const style = document.createElement('style');
-  if (editorHeight && editorHeight !== "") {
-    style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
-  } else {
-    style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
-  }
-  document.head.appendChild(style);
+  let editor = null;
+  
+  // Initialize CodeMirror only if not in hide_edit mode
+  if (!hideEdit) {
+    // Set CodeMirror height dynamically
+    const style = document.createElement('style');
+    if (editorHeight && editorHeight !== "") {
+      style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
+    } else {
+      style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
+    }
+    document.head.appendChild(style);
 
-  // Initialize CodeMirror
-  const editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
-    mode: 'javascript',
-    theme: 'darcula',
-    lineNumbers: true,
-    value: initialCode
-  });
-  editor.setValue(initialCode);
+    // Initialize CodeMirror
+    editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
+      mode: 'javascript',
+      theme: 'darcula',
+      lineNumbers: true,
+      value: initialCode
+    });
+    editor.setValue(initialCode);
+  }
 
   // Get UI elements
   const runBtn = container.querySelector('.runBtn');
@@ -87,59 +105,74 @@
   // Disable game controls initially
   stopBtn.disabled = true;
 
-  // Update stats
+  // Update stats (only if editor exists)
   function updateStats() {
+    if (!editor || hideEdit) return;
     const code = editor.getValue();
     const lines = code.split('\n').length;
     const chars = code.length;
-    lineCountSpan.textContent = `Lines: ${lines}`;
-    charCountSpan.textContent = `Characters: ${chars}`;
+    if (lineCountSpan) lineCountSpan.textContent = `Lines: ${lines}`;
+    if (charCountSpan) charCountSpan.textContent = `Characters: ${chars}`;
   }
-  editor.on('change', updateStats);
-  updateStats();
+  
+  if (editor) {
+    editor.on('change', updateStats);
+    updateStats();
+  }
 
   // Update status
   function updateStatus(status) {
-    statusText.textContent = status;
+    if (statusText) statusText.textContent = status;
   }
 
   // Clear storage button - removes localStorage and resets to default code
-  container.querySelector('.clearStorageBtn').onclick = () => {
-    localStorage.removeItem(storageKey);
-    editor.setValue(defaultCode);
-    stopGame();
-    const btn = container.querySelector('.clearStorageBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✔ Cleared';
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-    }, 2000);
-  };
+  const clearStorageBtn = container.querySelector('.clearStorageBtn');
+  if (clearStorageBtn) {
+    clearStorageBtn.onclick = () => {
+      localStorage.removeItem(storageKey);
+      if (editor) editor.setValue(defaultCode || "");
+      if (gameOutput) gameOutput.textContent = 'Storage cleared. Code reset to default.';
+      updateStatus('Reset');
+      const originalText = clearStorageBtn.textContent;
+      clearStorageBtn.textContent = '✔';
+      setTimeout(() => {
+        clearStorageBtn.textContent = originalText;
+      }, 2000);
+    };
+  }
 
   // Save code button - saves to localStorage
-  container.querySelector('.saveBtn').onclick = () => {
-    const code = editor.getValue();
-    localStorage.setItem(storageKey, code);
-    const btn = container.querySelector('.saveBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✔ Saved';
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-    }, 2000);
-  };
+  const saveBtn = container.querySelector('.saveBtn');
+  if (saveBtn) {
+    saveBtn.onclick = () => {
+      if (editor) {
+        const code = editor.getValue();
+        localStorage.setItem(storageKey, code);
+      }
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '✔ Saved';
+      setTimeout(() => {
+        saveBtn.innerHTML = originalText;
+      }, 2000);
+    };
+  }
 
   // Copy code button
-  container.querySelector('.copyBtn').onclick = () => {
-    const code = editor.getValue();
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = container.querySelector('.copyBtn');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '✔ Copied';
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-      }, 2000);
-    });
-  };
+  const copyBtn = container.querySelector('.copyBtn');
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      if (editor) {
+        const code = editor.getValue();
+        navigator.clipboard.writeText(code).then(() => {
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = '✔ Copied';
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        });
+      }
+    };
+  }
 
   // Stop game
   function stopGame() {
@@ -194,7 +227,9 @@
   // Reset game (resets to current session code, not storage)
   function resetGame() {
     stopGame();
-    editor.setValue(defaultCode);
+    if (editor) {
+      editor.setValue(defaultCode);
+    }
     updateStatus('Reset');
   }
 
@@ -203,7 +238,8 @@
     try {
       stopGame(); // Stop any existing game
       
-      let code = editor.getValue();
+      // Get code from editor or use default code (for hide_edit mode)
+      let code = editor ? editor.getValue() : defaultCode;
       if (!code.trim()) {
         updateStatus('Error: No code to run');
         return;
@@ -338,11 +374,13 @@
     }
   });
 
-  // Keyboard shortcuts
-  editor.setOption("extraKeys", {
-    "Ctrl-Enter": runGame,
-    "Cmd-Enter": runGame
-  });
+  // Keyboard shortcuts (only if editor exists)
+  if (editor) {
+    editor.setOption("extraKeys", {
+      "Ctrl-Enter": runGame,
+      "Cmd-Enter": runGame
+    });
+  }
 
 })();
 </script>
