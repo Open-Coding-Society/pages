@@ -31,6 +31,13 @@
     line-height: 1.7;
   }
 
+  .pso-foundation {
+    width: 92vw;
+    max-width: none;
+    margin-left: calc(50% - 46vw);
+    margin-right: calc(50% - 46vw);
+  }
+
   /* ── TOPBAR ─────────────────────────────────────── */
   .pso-topbar {
     position: sticky;
@@ -209,7 +216,7 @@
   }
 
   .hero-description {
-    max-width: 640px;
+    max-width: 860px;
     margin: 0 auto 2.5rem;
     font-size: 1.1rem;
     color: rgba(250,246,239,0.8);
@@ -283,7 +290,7 @@
   /* ── SECTIONS ─────────────────────────────────────── */
   .section {
     padding: 4.5rem 2rem;
-    max-width: 1100px;
+    max-width: 1380px;
     margin: 0 auto;
   }
 
@@ -338,7 +345,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 2rem;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     text-align: center;
   }
@@ -746,6 +753,12 @@
 
   /* ── RESPONSIVE ─────────────────────────────────── */
   @media (max-width: 700px) {
+    .pso-foundation {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
     .pso-topbar { padding: 0 1rem; }
     .pso-topbar-nav { gap: 0.1rem; }
     .top-nav-link { padding: 0.4rem 0.5rem; font-size: 0.7rem; }
@@ -811,6 +824,10 @@
       </div>
 
       <div class="top-nav-item">
+        <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="top-nav-link" data-allow-navigation="true">Sign In</a>
+      </div>
+
+      <div class="top-nav-item">
         <a href="#donate" class="top-nav-link btn-primary cta-reveal" data-reveal="donate,contact">Donate</a>
       </div>
 
@@ -838,6 +855,7 @@
     <div class="hero-actions">
       <a href="#concerts" class="btn btn-primary">2025–2026 Season</a>
       <a href="#tickets"  class="btn btn-secondary">Buy Tickets</a>
+      <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="btn btn-secondary" data-allow-navigation="true">Member Sign In</a>
       <a href="#donate"   class="btn btn-secondary cta-reveal" data-reveal="donate,contact">Donate</a>
     </div>
   </section>
