@@ -17,9 +17,22 @@ comments: false
   import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
   const MEMBER_ANALYTICS_PAGE_SIZE = 5;
+  const MEMBER_ANALYTICS_COLUMN_COUNT = 9;
   let memberAnalyticsCurrentPage = 1;
   let activeDashboardGroup = null;
   const memberAnalyticsCache = new Map();
+  const memberSummaryCache = new Map();
+
+  function getDefaultMemberSummary() {
+    return {
+      totalTimeFormatted: '0m',
+      totalLessonsViewed: 0,
+      totalLessonsCompleted: 0,
+      totalCodeExecutions: 0,
+      interactionPercentage: 0,
+      averageScrollDepth: 0
+    };
+  }
 
   // Extract group name from URL query parameter
   function getGroupNameFromURL() {
@@ -107,8 +120,38 @@ comments: false
     }
   }
 
+  async function fetchMemberSummary(personId) {
+    try {
+      const response = await fetch(`${javaURI}/api/ocs-analytics/admin/user/${personId}/summary`, fetchOptions);
+
+      if (!response.ok) {
+        if ([401, 403, 404].includes(response.status)) {
+          return getDefaultMemberSummary();
+        }
+        throw new Error(`Failed to fetch member summary: ${response.status}`);
+      }
+
+      const summary = await response.json();
+      return {
+        totalTimeFormatted: summary?.totalTimeFormatted || '0m',
+        totalLessonsViewed: summary?.totalLessonsViewed || 0,
+        totalLessonsCompleted: summary?.totalLessonsCompleted || 0,
+        totalCodeExecutions: summary?.totalCodeExecutions || 0,
+        interactionPercentage: summary?.interactionPercentage || 0,
+        averageScrollDepth: summary?.averageScrollDepth || 0
+      };
+    } catch (error) {
+      console.warn(`Failed to fetch OCS summary for person ${personId}:`, error);
+      return getDefaultMemberSummary();
+    }
+  }
+
   function getMemberAnalyticsCacheKey(groupId, personId) {
     return `${groupId}:${personId}`;
+  }
+
+  function getMemberSummaryCacheKey(personId) {
+    return `${personId}`;
   }
 
   function getMemberAnalyticsPageRange(totalMembers, page) {
@@ -137,27 +180,41 @@ comments: false
     const tbody = document.getElementById('memberAnalyticsBody');
 
     if (!membersWithAnalytics.length) {
-      tbody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = membersWithAnalytics.map(({ member, analytics }) => {
+    tbody.innerHTML = membersWithAnalytics.map(({ member, analytics, summary }) => {
       const initials = getInitials(member.name || member.uid);
       const color = getRandomColor(member.id);
 
       return `
         <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
-          <td class="py-3">
+          <td class="py-3 pr-4 whitespace-nowrap">
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
               <span>${member.name || member.uid}</span>
             </div>
           </td>
-          <td class="py-3">${analytics.messagesSent}</td>
-          <td class="py-3">${analytics.messagesWithImages}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesSent}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesWithImages}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalTimeFormatted}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsViewed}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsCompleted}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalCodeExecutions}</td>
+          <td class="py-3 pr-4 whitespace-nowrap">${formatPercent(summary.interactionPercentage)}</td>
+          <td class="py-3 whitespace-nowrap">${formatPercent(summary.averageScrollDepth)}</td>
         </tr>
       `;
     }).join('');
+  }
+
+  function formatPercent(value) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) {
+      return '0.0%';
+    }
+    return `${numericValue.toFixed(1)}%`;
   }
 
   async function loadDashboardSummaryStats(group) {
@@ -209,29 +266,38 @@ comments: false
       return;
     }
 
-    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>`;
 
     const startIndex = (safePage - 1) * MEMBER_ANALYTICS_PAGE_SIZE;
     const pageMembers = members.slice(startIndex, startIndex + MEMBER_ANALYTICS_PAGE_SIZE);
 
     try {
       const membersWithAnalytics = await Promise.all(pageMembers.map(async member => {
-        const cacheKey = getMemberAnalyticsCacheKey(activeDashboardGroup.id, member.id);
-        let analytics = memberAnalyticsCache.get(cacheKey);
+        const analyticsCacheKey = getMemberAnalyticsCacheKey(activeDashboardGroup.id, member.id);
+        const summaryCacheKey = getMemberSummaryCacheKey(member.id);
+        let analytics = memberAnalyticsCache.get(analyticsCacheKey);
+        let summary = memberSummaryCache.get(summaryCacheKey);
 
-        if (!analytics) {
-          analytics = await fetchMemberAnalytics(member.id, activeDashboardGroup.id);
-          memberAnalyticsCache.set(cacheKey, analytics);
+        if (!analytics || !summary) {
+          const requests = [
+            analytics ? Promise.resolve(analytics) : fetchMemberAnalytics(member.id, activeDashboardGroup.id),
+            summary ? Promise.resolve(summary) : fetchMemberSummary(member.id)
+          ];
+          const [resolvedAnalytics, resolvedSummary] = await Promise.all(requests);
+          analytics = resolvedAnalytics;
+          summary = resolvedSummary;
+          memberAnalyticsCache.set(analyticsCacheKey, analytics);
+          memberSummaryCache.set(summaryCacheKey, summary);
         }
 
-        return { member, analytics };
+        return { member, analytics, summary };
       }));
 
       renderMemberAnalyticsRows(membersWithAnalytics);
       updateMemberAnalyticsPagination(totalMembers, safePage);
     } catch (error) {
       console.error('Failed to load member analytics page:', error);
-      tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>`;
     }
   }
 
@@ -256,7 +322,7 @@ comments: false
 
     // Update member analytics table if we have real members
     if (group.members && group.members.length > 0) {
-      tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>`;
       
       try {
         await loadDashboardSummaryStats(group);
@@ -264,11 +330,11 @@ comments: false
       } catch (error) {
         console.error('Failed to load member analytics:', error);
         // Show error state
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>`;
       }
     } else {
       // No members in group - show empty state and reset stats
-      tbody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-gray-400">No members in this group</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
       document.getElementById('statTotalMessages').textContent = 0;
       document.getElementById('statTotalFiles').textContent = 0;
     }
