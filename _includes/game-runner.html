@@ -11,6 +11,10 @@
       <button class="runBtn" title="Start Game">▶ Start</button>
       <button class="stopBtn" title="Stop Game">■ Stop</button>
       <button class="resetBtn" title="Reset Game">↻ Reset</button>
+      <select class="engineVersionSelect" title="Select Game Engine Version">
+        <option value="GameEnginev1">Engine v1</option>
+        <option value="GameEnginev1.1">Engine v1.1</option>
+      </select>
       <select class="levelSelect" title="Select Level">
         <option value="">Select Level...</option>
       </select>
@@ -30,6 +34,10 @@
     <button class="runBtn" title="Start Game">▶ Play</button>
     <button class="stopBtn" title="Stop Game">■ Stop</button>
     <button class="resetBtn" title="Reset Game">↻ Reset</button>
+    <select class="engineVersionSelect" title="Select Game Engine Version">
+      <option value="GameEnginev1">Engine v1</option>
+      <option value="GameEnginev1.1">Engine v1.1</option>
+    </select>
     <select class="levelSelect" title="Select Level">
       <option value="">Select Level...</option>
     </select>
@@ -90,6 +98,7 @@
   const runBtn = container.querySelector('.runBtn');
   const stopBtn = container.querySelector('.stopBtn');
   const resetBtn = container.querySelector('.resetBtn');
+  const engineVersionSelect = container.querySelector('.engineVersionSelect');
   const levelSelect = container.querySelector('.levelSelect');
   const gameOutput = container.querySelector('.game-output');
   const statusText = container.querySelector('.status-text');
@@ -272,6 +281,12 @@
       const path = '{{ site.baseurl }}';
       const baseUrl = window.location.origin + path;
       
+      // Get selected engine version
+      const selectedVersion = engineVersionSelect ? engineVersionSelect.value : 'GameEnginev1';
+      
+      // Replace engine version in import paths (GameEnginev1 -> selected version)
+      code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
+      
       // Replace relative import paths with absolute URLs
       // Match import statements and convert paths starting with / or relative paths to absolute URLs
       code = code.replace(/from\s+['"](\/?[^'"]+)['"]/g, (match, importPath) => {
@@ -284,8 +299,8 @@
         return match; // Already absolute
       });
       
-      // Import core Game engine
-      const GameModule = await import(baseUrl + '/assets/js/GameEnginev1/essentials/Game.js');
+      // Import core Game engine (using selected version)
+      const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');
       const Game = GameModule.default;
       
       // Create a blob URL to execute user code as a module
