@@ -211,13 +211,42 @@ def extract_ui_runner_metadata(cell_source):
 
 
 def extract_game_runner_metadata(cell_source):
-    """Extract GAME_RUNNER challenge from JavaScript cell comments"""
+    """Extract GAME_RUNNER challenge and options from JavaScript cell comments
+    
+    Format: // GAME_RUNNER: challenge text | hide_edit: true
+    Returns: (challenge, options_dict)
+    """
     lines = cell_source.split('\n')
     
     for line in lines:
         match = re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
         if match:
-            return match.group(1).strip()
+            content = match.group(1).strip()
+            
+            # Parse options after pipe separator
+            if '|' in content:
+                parts = content.split('|', 1)
+                challenge = parts[0].strip()
+                options_str = parts[1].strip()
+                
+                # Parse options (format: key: value, key2: value2)
+                options = {}
+                for option in options_str.split(','):
+                    if ':' in option:
+                        key, value = option.split(':', 1)
+                        key = key.strip()
+                        value = value.strip().lower()
+                        # Convert string booleans to actual booleans
+                        if value == 'true':
+                            options[key] = True
+                        elif value == 'false':
+                            options[key] = False
+                        else:
+                            options[key] = value
+                
+                return (challenge, options)
+            else:
+                return (content, {})
     
     return None
 
@@ -334,14 +363,17 @@ def process_game_runner_cells(notebook, permalink):
             # Check if it's a JavaScript cell with GAME_RUNNER
             source = cell.get('source', '')
             if source.strip().startswith('%%js'):
-                challenge = extract_game_runner_metadata(source)
+                result = extract_game_runner_metadata(source)
                 
-                if challenge:
+                if result:
+                    challenge, options = result
+                    
                     # Store metadata for later use
                     cell['metadata']['game_runner'] = {
                         'challenge': challenge,
                         'runner_id': generate_runner_id(permalink, runner_index),
-                        'code': clean_game_code(source)
+                        'code': clean_game_code(source),
+                        'options': options
                     }
                     runner_index += 1
                     
@@ -497,6 +529,12 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     result.append('   runner_id="' + runner_data['runner_id'] + '"')
                     result.append('   challenge=challenge' + str(code_runner_count))
                     result.append('   code=code' + str(code_runner_count))
+                    
+                    # Add optional parameters
+                    options = runner_data.get('options', {})
+                    if options.get('hide_edit'):
+                        result.append('   hide_edit="true"')
+                    
                     result.append('%}')                
                     result.append('')
                     code_runner_count += 1
