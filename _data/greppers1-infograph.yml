@@ -1,8 +1,8 @@
-Badge: "Community Technology Capstone"
+Badge: "Backup — Community Technology Capstone"
 Title: "PNEC Emergency Response Hub"
 Subtitle: "Neighbors Helping Neighbors"
 Organization: "Poway Neighborhood Emergency Corps"
-Description: "When wildfires or earthquakes hit Poway, communication breaks down — vulnerable residents on paper lists go unchecked, cell towers fail, and volunteers can't coordinate. We're building a digital dashboard that automates neighbor-to-neighbor check-ins and maps emergency resources in real time."
+Description: "This is our backup project in case our primary (SFI Foundation) falls through. When wildfires or earthquakes hit Poway, communication breaks down — vulnerable residents on paper lists go unchecked, cell towers fail, and volunteers can't coordinate. We would build a digital dashboard that automates neighbor-to-neighbor check-ins and maps emergency resources in real time."
 
 Features:
   - "Neighborhood Call Tree Automation — trigger phone/text chains to check every house on a block"
@@ -22,7 +22,13 @@ Tech:
 Metrics:
   - label: "Alert Delivery"
     value: "< 60 sec"
-    color: "green"
   - label: "Communities Mapped"
+    value: "57+"
+  - label: "Paper Call Trees Replaced"
     value: "100%"
-    color: "orange"
+  - label: "Volunteer Coordination"
+    value: "Real-Time"
+  - label: "Offline Data Sync"
+    value: "Automatic"
+  - label: "Resource Directory"
+    value: "Searchable"
