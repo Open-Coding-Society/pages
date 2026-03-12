@@ -6,7 +6,6 @@ permalink: /digital-famine/end/submodule_1/
 parent: "End Quest"
 team: "CodeMaxxers"
 submodule: 1
-categories: [CSP, Submodule, Backend]
 tags: [end, submodule, codemaxxers]
 author: "William Windle"
 microblog: true
