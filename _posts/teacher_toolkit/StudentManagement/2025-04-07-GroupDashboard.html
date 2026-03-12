@@ -17,7 +17,7 @@ comments: false
   import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
   const MEMBER_ANALYTICS_PAGE_SIZE = 5;
-  const MEMBER_ANALYTICS_COLUMN_COUNT = 9;
+  const MEMBER_ANALYTICS_COLUMN_COUNT = 8;
   let memberAnalyticsCurrentPage = 1;
   let activeDashboardGroup = null;
   const memberAnalyticsCache = new Map();
@@ -199,7 +199,6 @@ comments: false
           <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesSent}</td>
           <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesWithImages}</td>
           <td class="py-3 pr-4 whitespace-nowrap">${summary.totalTimeFormatted}</td>
-          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsViewed}</td>
           <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsCompleted}</td>
           <td class="py-3 pr-4 whitespace-nowrap">${summary.totalCodeExecutions}</td>
           <td class="py-3 pr-4 whitespace-nowrap">${formatPercent(summary.interactionPercentage)}</td>

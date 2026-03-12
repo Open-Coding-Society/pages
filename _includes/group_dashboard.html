@@ -92,62 +92,8 @@
       </div>
     </div>
 
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Member Analytics Section (2 columns) -->
-      <div class="lg:col-span-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
-        <div class="p-4 border-b border-neutral-700">
-          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            Member Analytics
-          </h2>
-        </div>
-        
-        <div class="p-4">
-          <!-- Members Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-gray-400 border-b border-neutral-700">
-                  <th class="pb-3 font-medium whitespace-nowrap">Member</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Messages</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Images</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Time Spent</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Lessons Viewed</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Lessons Completed</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Code Runs</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Interaction %</th>
-                  <th class="pb-3 font-medium whitespace-nowrap">Scroll Depth %</th>
-                </tr>
-              </thead>
-              <tbody id="memberAnalyticsBody" class="text-gray-300">
-                <!-- Will be populated dynamically -->
-                <tr>
-                  <td colspan="9" class="py-8 text-center text-gray-400">
-                    No members in this group
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="mt-4 flex flex-col gap-3 border-t border-neutral-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <p id="memberAnalyticsPaginationInfo" class="text-sm text-gray-400">Showing 0-0 of 0</p>
-            <div class="flex items-center gap-2">
-              <button id="memberAnalyticsPrevButton" onclick="previousMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
-                Previous
-              </button>
-              <button id="memberAnalyticsNextButton" onclick="nextMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <!-- Dashboard Summary Row -->
+    <div class="grid grid-cols-1 gap-6">
       <!-- Quick Stats Sidebar -->
       <div class="space-y-6">
         <!-- Group Stats Card -->
@@ -168,31 +114,60 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Activity Chart Placeholder -->
-        <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Weekly Activity</h3>
-          <div class="h-32 flex items-end justify-between gap-1 px-2">
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 40%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 65%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 45%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 80%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 55%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 90%"></div>
-            <div class="flex-1 bg-indigo-600 rounded-t" style="height: 70%"></div>
+    <!-- Member Analytics Section -->
+    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
+        <div class="p-4 border-b border-neutral-700">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Member Analytics
+          </h2>
+        </div>
+        
+        <div class="p-4">
+          <!-- Members Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-400 border-b border-neutral-700">
+                  <th class="pb-3 font-medium whitespace-nowrap">Member</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Messages</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Images</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Time Spent</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Lessons Completed</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Code Runs</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Interaction %</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Scroll Depth %</th>
+                </tr>
+              </thead>
+              <tbody id="memberAnalyticsBody" class="text-gray-300">
+                <!-- Will be populated dynamically -->
+                <tr>
+                  <td colspan="8" class="py-8 text-center text-gray-400">
+                    No members in this group
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="flex justify-between text-xs text-gray-500 mt-2 px-1">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
+
+          <div class="mt-4 flex flex-col gap-3 border-t border-neutral-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p id="memberAnalyticsPaginationInfo" class="text-sm text-gray-400">Showing 0-0 of 0</p>
+            <div class="flex items-center gap-2">
+              <button id="memberAnalyticsPrevButton" onclick="previousMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Previous
+              </button>
+              <button id="memberAnalyticsNextButton" onclick="nextMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
     <!-- Shared Files Section -->
     <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
