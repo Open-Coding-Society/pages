@@ -347,10 +347,46 @@ date: 2025-12-02
 
 <script>
 // ── Config ────────────────────────────────────────────────────────────────────
-// Uses the existing /api/gemini endpoint on the Flask backend.
-// Local dev: change to http://localhost:8587
-const BACKEND_URL = 'https://flask.opencodingsociety.com';
-const GEMINI_ENDPOINT = `${BACKEND_URL}/api/gemini`;
+// Primary: Flask /api/gemini (requires login cookie).
+// Fallback: Spring /api/chatbot/chat (no auth required).
+const FLASK_URL  = 'https://flask.opencodingsociety.com';
+const SPRING_URL = 'https://spring.opencodingsociety.com';
+const GEMINI_ENDPOINT        = `${FLASK_URL}/api/gemini`;
+const SPRING_CHAT_ENDPOINT   = `${SPRING_URL}/api/chatbot/chat`;
+
+// ── Shared AI helper — tries Flask first, falls back to Spring ────────────────
+// Returns { text: <string> } on success, throws on total failure.
+async function callGemini(promptText, fullPrompt) {
+  // 1️⃣ Try Flask (works when user is logged in via cookie)
+  try {
+    const res = await fetch(GEMINI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ text: promptText, prompt: fullPrompt })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.text) return { text: data.text };
+    }
+    // Non-ok or success:false → fall through to Spring
+  } catch (_) { /* network error → fall through */ }
+
+  // 2️⃣ Fallback: Spring /api/chatbot/chat (no auth required)
+  const springRes = await fetch(SPRING_CHAT_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId: 'lesson-guest',
+      message: `${fullPrompt}: ${promptText}`
+    })
+  });
+  if (!springRes.ok) throw new Error(`AI service error ${springRes.status}. Please try again.`);
+  const springData = await springRes.json();
+  const text = springData.response || springData.text || '';
+  if (!text) throw new Error('No response from AI service.');
+  return { text };
+}
 
 // ── State & Navigation ────────────────────────────────────────────────────────
 let currentStep = 0;
@@ -400,7 +436,7 @@ window.prevStep = prevStep;
 window.nextStep = nextStep;
 window.showStep = showStep;
 
-// ── Resume Transformer (AI-powered via /api/gemini) ──────────────────────────
+// ── Resume Transformer (AI-powered — Flask first, Spring fallback) ───────────
 async function generateVersions() {
   const weakBullet = document.getElementById('weak-bullet').value.trim();
   if (!weakBullet) { alert('Please enter a resume bullet point first!'); return; }
@@ -419,14 +455,7 @@ async function generateVersions() {
   const prev = document.getElementById('transformer-error');
   if (prev) prev.remove();
 
-  try {
-    const res = await fetch(GEMINI_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        text: weakBullet,
-        prompt: `You are a professional resume coach. Transform this weak resume bullet point into 3 STAR-format versions.
+  const resumePrompt = `You are a professional resume coach. Transform this weak resume bullet point into 3 STAR-format versions.
 
 Respond ONLY with valid JSON — no markdown, no backticks, no extra text. Use this exact structure:
 {
@@ -443,15 +472,11 @@ Rules:
 - Conservative: stay close to the original, just strengthen the language
 - Balanced: add one plausible metric (e.g. 20%, 5 features, 3-person team)
 - Bold: make it sound impressive with 1-2 quantified results
-- The bullet to transform is`
-      })
-    });
+- The bullet to transform is`;
 
-    if (!res.ok) throw new Error(`Server error ${res.status} — are you logged in?`);
-    const data = await res.json();
-    if (!data.success) throw new Error(data.message || 'Gemini request failed');
+  try {
+    const { text } = await callGemini(weakBullet, resumePrompt);
 
-    const text = data.text || '';
     let parsed;
     try {
       parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
@@ -477,7 +502,7 @@ Rules:
 }
 window.generateVersions = generateVersions;
 
-// ── Interview Analyzer (AI-powered via /api/gemini) ──────────────────────────
+// ── Interview Analyzer (AI-powered — Flask first, Spring fallback) ───────────
 async function analyzeInterview() {
   const answer   = document.getElementById('interview-answer').value.trim();
   const qChoice  = document.getElementById('question-choice').value;
@@ -502,14 +527,7 @@ async function analyzeInterview() {
   const prev = document.getElementById('interview-error');
   if (prev) prev.remove();
 
-  try {
-    const res = await fetch(GEMINI_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        text: answer,
-        prompt: `You are an experienced technical interviewer and career coach. The candidate was asked: "${question}". Analyze their answer below.
+  const interviewPrompt = `You are an experienced technical interviewer and career coach. The candidate was asked: "${question}". Analyze their answer below.
 
 Respond ONLY with valid JSON — no markdown, no backticks, no preamble. Use exactly this structure:
 {
@@ -524,15 +542,10 @@ Respond ONLY with valid JSON — no markdown, no backticks, no preamble. Use exa
   "improvedOpener": "Rewrite just the first sentence of their answer to be stronger"
 }
 
-The candidate's answer is`
-      })
-    });
+The candidate's answer is`;
 
-    if (!res.ok) throw new Error(`Server error ${res.status} — are you logged in?`);
-    const data = await res.json();
-    if (!data.success) throw new Error(data.message || 'Gemini request failed');
-
-    const text = data.text || '';
+  try {
+    const { text } = await callGemini(answer, interviewPrompt);
 
     let parsed;
     try {
