@@ -7,4 +7,3 @@ permalink: /capstone/dynamic-event-calendar/
 sticky_rank: 2
 ---
 
-{% include dynamic-event-calendar-infograph.html %}
