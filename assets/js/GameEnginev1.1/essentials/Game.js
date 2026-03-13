@@ -65,8 +65,10 @@ class GameCore {
         this._createTopControls();
     }
 
-    // Add margin to game container to avoid collision with top menu
-    this._adjustGameContainerPosition();
+    // Add margin to game container to avoid collision with top menu (unless disabled for embedded contexts)
+    if (!this.environment.disableContainerAdjustment) {
+        this._adjustGameContainerPosition();
+    }
 
     // Try to dynamically load Scoreboard (for adventure game stats syncing)
     import('../../adventureGame/Scoreboard.js')
@@ -103,8 +105,10 @@ class GameCore {
                 this._createTopControls();
             }
 
-            // Add margin to game container to avoid collision with top menu
-            this._adjustGameContainerPosition();
+            // Add margin to game container to avoid collision with top menu (unless disabled for embedded contexts)
+            if (!this.environment.disableContainerAdjustment) {
+                this._adjustGameContainerPosition();
+            }
 
             // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
             // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu

@@ -1,0 +1,34 @@
+Badge: "Design-Based Research Capstone"
+Title: "SFI Foundation — Web Modernization"
+Subtitle: "Safety Made Searchable"
+Organization: "SFI Foundation"
+Description: "SFI certifies the safety gear that protects motorsports drivers worldwide — but outdated tools force inspectors to dig through static pages and staff to update HTML by hand. We're rebuilding their digital experience so the people keeping racers safe can do their jobs faster."
+
+Features:
+  - "Instant Spec Search — ML-powered lookup replaces 8 static pages so inspectors find what they need in seconds"
+  - "QR Certification Scan — scan a product tag trackside to verify it's SFI-certified and not expired"
+  - "Manufacturer Self-Service — vendors manage their own listings, eliminating hours of manual staff updates"
+  - "Mobile-First Redesign — accessible, responsive site that actually works on pit-lane devices"
+  - "Counterfeit Prevention — live certification records replace outdated static lists that put drivers at risk"
+
+Tech:
+  - name: "Python / Flask"
+    icon: "🐍"
+  - name: "React + Next.js"
+    icon: "⚛️"
+  - name: "PostgreSQL"
+    icon: "🗄️"
+
+Metrics:
+  - label: "Spec Lookup Time"
+    value: "< 5 sec"
+  - label: "Mobile Accessible"
+    value: "100%"
+  - label: "Staff Update Hours Saved"
+    value: "~20 hrs/wk"
+  - label: "Static Pages Replaced"
+    value: "8 → 1"
+  - label: "QR Cert Verification"
+    value: "Instant"
+  - label: "WCAG 2.1 AA Compliance"
+    value: "Full"

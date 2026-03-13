@@ -92,43 +92,8 @@
       </div>
     </div>
 
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Member Analytics Section (2 columns) -->
-      <div class="lg:col-span-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
-        <div class="p-4 border-b border-neutral-700">
-          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            Member Analytics
-          </h2>
-        </div>
-        
-        <div class="p-4">
-          <!-- Members Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-gray-400 border-b border-neutral-700">
-                  <th class="pb-3 font-medium">Member</th>
-                  <th class="pb-3 font-medium">Messages</th>
-                </tr>
-              </thead>
-              <tbody id="memberAnalyticsBody" class="text-gray-300">
-                <!-- Will be populated dynamically -->
-                <tr>
-                  <td colspan="2" class="py-8 text-center text-gray-400">
-                    No members in this group
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
+    <!-- Dashboard Summary Row -->
+    <div class="grid grid-cols-1 gap-6">
       <!-- Quick Stats Sidebar -->
       <div class="space-y-6">
         <!-- Group Stats Card -->
@@ -149,31 +114,60 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Activity Chart Placeholder -->
-        <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Weekly Activity</h3>
-          <div class="h-32 flex items-end justify-between gap-1 px-2">
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 40%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 65%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 45%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 80%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 55%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 90%"></div>
-            <div class="flex-1 bg-indigo-600 rounded-t" style="height: 70%"></div>
+    <!-- Member Analytics Section -->
+    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
+        <div class="p-4 border-b border-neutral-700">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Member Analytics
+          </h2>
+        </div>
+        
+        <div class="p-4">
+          <!-- Members Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-400 border-b border-neutral-700">
+                  <th class="pb-3 font-medium whitespace-nowrap">Member</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Messages</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Images</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Time Spent</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Lessons Completed</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Code Runs</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Interaction %</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Scroll Depth %</th>
+                </tr>
+              </thead>
+              <tbody id="memberAnalyticsBody" class="text-gray-300">
+                <!-- Will be populated dynamically -->
+                <tr>
+                  <td colspan="8" class="py-8 text-center text-gray-400">
+                    No members in this group
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="flex justify-between text-xs text-gray-500 mt-2 px-1">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
+
+          <div class="mt-4 flex flex-col gap-3 border-t border-neutral-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p id="memberAnalyticsPaginationInfo" class="text-sm text-gray-400">Showing 0-0 of 0</p>
+            <div class="flex items-center gap-2">
+              <button id="memberAnalyticsPrevButton" onclick="previousMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Previous
+              </button>
+              <button id="memberAnalyticsNextButton" onclick="nextMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
     <!-- Shared Files Section -->
     <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
@@ -435,6 +429,9 @@
   }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   // Calendar state
@@ -446,11 +443,12 @@
   const dashboardGroupId = "{{ include.groupId | default: '' }}";
   let activeChatGroupId = dashboardGroupId ? Number(dashboardGroupId) : null;
   let activeChatGroupName = '';
-  let chatPollTimer = null;
+  let stompClient = null;
   let currentUser = null;
   let currentUserDisplayName = 'You';
   let pendingChatImageBase64 = null;
   let pendingChatImageMime = 'image/png';
+  let renderedChatMessageKeys = new Set();
   
   // Initialize calendar
   document.addEventListener('DOMContentLoaded', () => {
@@ -742,10 +740,81 @@
     }
   };
 
+  function getChatMessageKey(msg) {
+    return JSON.stringify([
+      msg?.name || '',
+      msg?.date || '',
+      msg?.message || '',
+      msg?.image || ''
+    ]);
+  }
+
+  function getChatImageSrc(image) {
+    if (!image) return null;
+    if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
+    return `data:image/png;base64,${image}`;
+  }
+
+  function appendSingleMessage(msg) {
+    const chatMessages = document.getElementById('chatMessages');
+    let emptyState = document.getElementById('chatEmptyState');
+    const messageKey = getChatMessageKey(msg);
+
+    if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
+      return;
+    }
+
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.id = 'chatEmptyState';
+      emptyState.className = 'text-center text-gray-500 text-sm py-6';
+      emptyState.textContent = 'No messages yet.';
+    }
+
+    emptyState.classList.add('hidden');
+
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'flex items-baseline gap-2 mb-1';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'text-white font-semibold text-sm';
+    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'text-gray-500 text-xs';
+    timeEl.textContent = formatTimestamp(msg.date);
+
+    header.appendChild(nameEl);
+    header.appendChild(timeEl);
+    wrapper.appendChild(header);
+
+    if (msg.message) {
+      const textEl = document.createElement('p');
+      textEl.className = 'text-gray-200 text-sm';
+      textEl.textContent = msg.message;
+      wrapper.appendChild(textEl);
+    }
+
+    if (msg.image) {
+      const img = document.createElement('img');
+      img.src = getChatImageSrc(msg.image);
+      img.alt = 'Shared image';
+      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+      wrapper.appendChild(img);
+    }
+
+    chatMessages.appendChild(wrapper);
+    renderedChatMessageKeys.add(messageKey);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
   function renderChatMessages(messages) {
     const chatMessages = document.getElementById('chatMessages');
     let emptyState = document.getElementById('chatEmptyState');
     chatMessages.innerHTML = '';
+    renderedChatMessageKeys = new Set();
 
     if (!emptyState) {
       emptyState = document.createElement('div');
@@ -760,44 +829,7 @@
       return;
     }
 
-    emptyState.classList.add('hidden');
-    messages.forEach(msg => {
-      const wrapper = document.createElement('div');
-
-      const header = document.createElement('div');
-      header.className = 'flex items-baseline gap-2 mb-1';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'text-white font-semibold text-sm';
-      nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-      const timeEl = document.createElement('span');
-      timeEl.className = 'text-gray-500 text-xs';
-      timeEl.textContent = formatTimestamp(msg.date);
-
-      header.appendChild(nameEl);
-      header.appendChild(timeEl);
-      wrapper.appendChild(header);
-
-      if (msg.message) {
-        const textEl = document.createElement('p');
-        textEl.className = 'text-gray-200 text-sm';
-        textEl.textContent = msg.message;
-        wrapper.appendChild(textEl);
-      }
-
-      if (msg.image) {
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64,${msg.image}`;
-        img.alt = 'Shared image';
-        img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-        wrapper.appendChild(img);
-      }
-
-      chatMessages.appendChild(wrapper);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    messages.forEach(appendSingleMessage);
   }
 
   async function fetchChatMessages() {
@@ -852,14 +884,42 @@
   };
 
   function startChatPolling() {
-    if (chatPollTimer) clearInterval(chatPollTimer);
-    chatPollTimer = setInterval(fetchChatMessages, 4000);
+    if (!activeChatGroupId) return;
+
+    if (stompClient) {
+      stopChatPolling();
+    }
+
+    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+      console.error('SockJS/STOMP dependencies are not available');
+      return;
+    }
+
+    const socket = new SockJS(`${javaURI}/ws-chat`);
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+
+    stompClient.connect({}, () => {
+      if (!stompClient || !activeChatGroupId) return;
+
+      stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (message) => {
+        try {
+          const payload = JSON.parse(message.body);
+          appendSingleMessage(payload);
+        } catch (err) {
+          console.error('Failed to parse incoming chat message', err);
+        }
+      });
+    }, (err) => {
+      console.error('WebSocket connection failed', err);
+    });
   }
 
   function stopChatPolling() {
-    if (chatPollTimer) {
-      clearInterval(chatPollTimer);
-      chatPollTimer = null;
+    if (stompClient) {
+      const clientToDisconnect = stompClient;
+      stompClient = null;
+      clientToDisconnect.disconnect(() => {});
     }
   }
 
