@@ -1186,9 +1186,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     </div>
                 </div>
 
-                ${filteredUsers.length === 0 ? ' 
-                    <p class="text-neutral-400">No users match the current filters</p>
-                ' : (adminFilters.viewMode === 'table' ? renderUsersTableView(filteredUsers, avgEngagement) : renderUsersCardView(filteredUsers, avgEngagement))}
+                ${filteredUsers.length === 0 ? `<p class="text-neutral-400">No users match the current filters</p>` : (adminFilters.viewMode === 'table' ? renderUsersTableView(filteredUsers, avgEngagement) : renderUsersCardView(filteredUsers, avgEngagement))}
             </div>
         `;
         container.innerHTML = html;
