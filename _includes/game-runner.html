@@ -109,6 +109,7 @@
   let gameCore = null;  // Return value from Game.main()
   let gameControl = null;  // The actual GameControl instance with pause/resume
   let currentLevelIndex = 0;
+  let gameStateMonitor = null;  // Interval to monitor game state
 
   // Disable game controls initially
   pauseBtn.disabled = true;
@@ -197,6 +198,12 @@
       gameControl = null;
     }
     
+    // Stop monitoring game state
+    if (gameStateMonitor) {
+      clearInterval(gameStateMonitor);
+      gameStateMonitor = null;
+    }
+    
     // Get the game container and clear all remaining canvases
     const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
     
@@ -222,23 +229,19 @@
     if (currentlyPaused) {
       // Resume - use pauseFeature if available, otherwise call resume directly
       if (gameControl.pauseFeature && typeof gameControl.pauseFeature.hide === 'function') {
-        gameControl.pauseFeature.hide(); // This will call resume() internally
+        gameControl.pauseFeature.hide(); // This will call resume() internally and hide overlay
       } else if (gameControl.resume) {
         gameControl.resume();
       }
       updateStatus('Running');
-      pauseBtn.textContent = '⏸ Pause';
-      pauseBtn.title = 'Pause Game';
     } else {
       // Pause - use pauseFeature to show menu if available, otherwise call pause directly
       if (gameControl.pauseFeature && typeof gameControl.pauseFeature.show === 'function') {
-        gameControl.pauseFeature.show(); // This will call pause() internally and show menu UI
+        gameControl.pauseFeature.show(); // This will call pause() internally and show menu overlay
       } else if (gameControl.pause) {
         gameControl.pause();
       }
       updateStatus('Paused');
-      pauseBtn.textContent = '▶ Resume';
-      pauseBtn.title = 'Resume Game';
     }
   }
 
@@ -341,6 +344,15 @@
         
         updateStatus('Running');
         
+        // Monitor game state to keep UI in sync (e.g., when PauseMenu's Resume button is clicked)
+        gameStateMonitor = setInterval(() => {
+          if (gameControl && gameControl.isPaused) {
+            updateStatus('Paused');
+          } else if (gameControl) {
+            updateStatus('Running');
+          }
+        }, 200);
+        
       } finally {
         // Clean up blob URL
         URL.revokeObjectURL(blobUrl);
@@ -353,6 +365,12 @@
       pauseBtn.disabled = true;
       stopBtn.disabled = true;
       levelSelect.disabled = false;
+      
+      // Stop monitoring if error occurs
+      if (gameStateMonitor) {
+        clearInterval(gameStateMonitor);
+        gameStateMonitor = null;
+      }
     }
   }
 
