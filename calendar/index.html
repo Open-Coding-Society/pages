@@ -14,25 +14,43 @@ permalink: /events/calendar/
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
     var calendarEl = document.getElementById('calendar');
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
+
         initialView: 'dayGridMonth',
 
-        // Toolbar buttons
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
 
-        navLinks: true,       // click day/week names to navigate
-        selectable: true,     // allow selecting dates
+        navLinks: true,
+        selectable: true,
         selectMirror: true,
-        dayMaxEvents: true    // show "more" link when too many events
+        dayMaxEvents: true,
+
+        // CONNECTS TO FLASK API
+        events: "http://localhost:5001/api/events",
+
+        eventClick: function(info) {
+
+            const e = info.event.extendedProps;
+
+            alert(
+                info.event.title + "\n\n" +
+                e.writeup + "\n\n" +
+                "Location: " + e.location
+            );
+
+        }
+
     });
 
     calendar.render();
+
 });
 </script>
 
