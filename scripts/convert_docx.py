@@ -168,8 +168,44 @@ class DocxConverter:
             
         return images_found
 
+    def fix_toc_links(self, markdown_text):
+        """Fix Table of Contents links from Word bookmark IDs to markdown anchors"""
+        
+        def text_to_anchor(text):
+            """Convert heading text to markdown anchor ID"""
+            # Remove markdown formatting and extra whitespace
+            text = re.sub(r'\*+', '', text)  # Remove bold/italic markers
+            text = text.strip()
+            
+            # Convert to lowercase and replace spaces/special chars with hyphens
+            anchor = text.lower()
+            anchor = re.sub(r'[^\w\s-]', '', anchor)  # Remove special chars except spaces and hyphens
+            anchor = re.sub(r'[\s]+', '-', anchor)    # Replace spaces with hyphens
+            anchor = re.sub(r'-+', '-', anchor)       # Collapse multiple hyphens
+            anchor = anchor.strip('-')                # Remove leading/trailing hyphens
+            
+            return anchor
+        
+        # Pattern to match Word bookmark-style TOC links: [text](#_Toc123456789)
+        # Captures the link text (including any page numbers)
+        toc_pattern = r'\[([^\]]+?)\s*\d*\]\(#_Toc\d+\)'
+        
+        def replace_toc_link(match):
+            link_text = match.group(1).strip()
+            # Generate anchor from the link text (removing page numbers if present)
+            anchor = text_to_anchor(link_text)
+            return f'[{link_text}](#{anchor})'
+        
+        # Replace all TOC links
+        markdown_text = re.sub(toc_pattern, replace_toc_link, markdown_text)
+        
+        return markdown_text
+    
     def clean_markdown(self, markdown_text):
         """Clean and format markdown text"""
+        # Fix TOC links first (before other processing)
+        markdown_text = self.fix_toc_links(markdown_text)
+        
         # Remove extra whitespace
         markdown_text = re.sub(r'\n\s*\n\s*\n', '\n\n', markdown_text)
         
