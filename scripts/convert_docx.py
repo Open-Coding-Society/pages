@@ -201,15 +201,133 @@ class DocxConverter:
         
         return markdown_text
     
+    def format_table_of_contents(self, markdown_text):
+        """
+        Format Table of Contents with proper heading and indentation.
+        - Makes "Table of Contents" an H2 heading
+        - Uses list syntax with proper nesting for hierarchy
+        """
+        lines = markdown_text.split('\n')
+        formatted_lines = []
+        in_toc = False
+        toc_start_line = -1
+        
+        for i, line in enumerate(lines):
+            # Check if this is the Table of Contents title
+            if re.match(r'^\*\*Table of Contents\*\*\s*$', line):
+                formatted_lines.append('## Table of Contents')
+                formatted_lines.append('')  # Blank line after heading
+                in_toc = True
+                toc_start_line = i
+                continue
+            
+            # Process TOC entries (markdown links)
+            if in_toc and line.strip():
+                # Check if it's a TOC link
+                link_match = re.match(r'^\[(.+?)\]\((#.+?)\)$', line.strip())
+                if link_match:
+                    link_text = link_match.group(1)
+                    link_anchor = link_match.group(2)
+                    
+                    # Determine list prefix based on heading level
+                    # Look ahead to find the actual heading and determine its level
+                    list_prefix = self._get_toc_list_prefix(link_text, lines)
+                    
+                    formatted_lines.append(f'{list_prefix}[{link_text}]({link_anchor})')
+                    continue
+                elif not line.strip().startswith('['):
+                    # End of TOC section
+                    in_toc = False
+            
+            formatted_lines.append(line)
+        
+        return '\n'.join(formatted_lines)
+    
+    def _get_toc_list_prefix(self, heading_text, all_lines):
+        """
+        Determine TOC list prefix based on heading level.
+        Uses markdown list syntax with proper nesting.
+        """
+        # Clean heading text for comparison (remove bold markers)
+        clean_text = re.sub(r'\*+', '', heading_text).strip()
+        
+        # Search for the heading in the document
+        for line in all_lines:
+            if line.strip().startswith('#'):
+                heading_match = re.match(r'^(#{2,6})\s+\*{0,2}(.+?)\*{0,2}\s*$', line)
+                if heading_match:
+                    level = len(heading_match.group(1))
+                    heading_content = heading_match.group(2).strip()
+                    
+                    # Compare with cleaned text
+                    if heading_content.lower() == clean_text.lower():
+                        # Map heading levels to list indentation
+                        # H2 = top level (- ), H3 = 1 indent (  - ), H4 = 2 indents (    - ), H5 = 3 indents (      - )
+                        prefix_map = {
+                            2: '- ',        # H2 - top level list
+                            3: '  - ',      # H3 - nested 1 level
+                            4: '    - ',    # H4 - nested 2 levels
+                            5: '      - '   # H5 - nested 3 levels
+                        }
+                        return prefix_map.get(level, '- ')
+        
+        # Default: top level if not found
+        return '- '
+    
+    def adjust_heading_levels(self, markdown_text):
+        """
+        Adjust heading levels for Jekyll/GitHub Pages compatibility.
+        - H5+ (##### or more) → Bold text (deepest levels)
+        - H4 (####) → H5 (#####)
+        - H3 (###) → H4 (####)
+        - H2 (##) → H3 (###)
+        - H1 (#) → H2 (##)
+        
+        This shifts all headings down by one level, reserving H1 for the page title
+        from front matter, and converts the deepest levels (H5+) to bold text.
+        Process from deepest to shallowest to avoid double-processing.
+        """
+        lines = markdown_text.split('\n')
+        adjusted_lines = []
+        
+        for line in lines:
+            # Check if line is a heading
+            heading_match = re.match(r'^(#{1,9})\s+(.+)$', line)
+            if heading_match:
+                hashes = heading_match.group(1)
+                content = heading_match.group(2)
+                level = len(hashes)
+                
+                if level >= 5:
+                    # H5 and deeper → Bold text
+                    adjusted_lines.append(f'**{content}**')
+                elif level <= 4:
+                    # H1→H2, H2→H3, H3→H4, H4→H5
+                    new_hashes = '#' * (level + 1)
+                    adjusted_lines.append(f'{new_hashes} {content}')
+                else:
+                    # Shouldn't reach here, but keep as fallback
+                    adjusted_lines.append(line)
+            else:
+                adjusted_lines.append(line)
+        
+        return '\n'.join(adjusted_lines)
+    
     def clean_markdown(self, markdown_text):
         """Clean and format markdown text"""
         # Fix TOC links first (before other processing)
         markdown_text = self.fix_toc_links(markdown_text)
         
+        # Adjust heading levels for Jekyll compatibility (H1→H2, H2→H3, H3→H4, H4→H5, H5+→bold)
+        markdown_text = self.adjust_heading_levels(markdown_text)
+        
+        # Format Table of Contents with proper heading and indentation
+        markdown_text = self.format_table_of_contents(markdown_text)
+        
         # Remove extra whitespace
         markdown_text = re.sub(r'\n\s*\n\s*\n', '\n\n', markdown_text)
         
-        # Fix heading spacing
+        # Fix heading spacing (now handles H2-H6)
         markdown_text = re.sub(r'\n(#{1,6})', r'\n\n\1', markdown_text)
         markdown_text = re.sub(r'(#{1,6}.*?)\n([^\n#])', r'\1\n\n\2', markdown_text)
         
