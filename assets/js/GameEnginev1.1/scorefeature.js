@@ -9,60 +9,64 @@
  * RESPONSIBILITIES:
  * - Display real-time score counter overlay during gameplay
  * - Sync score display with game state every 100ms
- * - Save game statistics to backend server
- * - Authenticate and retrieve logged-in user information
- * - Load game-specific score settings dynamically
+ * - Save game statistics to backend server with user authentication
+ * - Build standardized DTOs for backend persistence
  * 
  * MAIN COMPONENTS:
  * ┌─────────────────────────────────────────────────────────────┐
  * │ Constructor                                                  │
  * │  - Initializes with PauseMenu reference                     │
- * │  - Loads game-specific settings (mansion, adventure, etc.)  │
+ * │  - Optionally accepts scoreSettings for customization       │
  * │  - Creates UI counter element                               │
  * │  - Starts auto-update interval                              │
  * └─────────────────────────────────────────────────────────────┘
  * 
  * PUBLIC METHODS:
- * ├─ toggleScoreDisplay()     - Show/hide score counter
+ * ├─ toggleScoreDisplay()      - Show/hide score counter
  * ├─ updateScoreDisplay(value) - Update displayed score value
- * ├─ saveScore(buttonEl)      - Save current score to backend
- * └─ destroy()                - Clean up intervals and resources
+ * ├─ saveScore(buttonEl)       - Save current score to backend
+ * └─ destroy()                 - Clean up intervals and resources
  * 
  * PRIVATE METHODS (Internal):
- * ├─ _loadScoreSettings()     - Load game-specific configuration
- * ├─ _createScoreCounter()    - Build UI elements for score display
- * ├─ _setupAutoUpdate()       - Initialize 100ms sync interval
- * ├─ _syncScoreDisplay()      - Sync display with game stats
- * ├─ _getCounterLabel()       - Get display label text
- * ├─ _getCounterVar()         - Get stat variable name (e.g., 'coinsCollected')
- * ├─ _getBackendBase()        - Determine backend URL
- * ├─ _getFetchOptions()       - Build fetch request options
- * ├─ _extractGameName()       - Extract game name from URL or instance
- * ├─ _getLoggedInUser()       - Fetch authenticated user from API
- * ├─ _buildServerDto()        - Build data payload for backend
- * └─ _saveStatsToServer()     - POST stats to backend API
+ * ├─ _createScoreCounter()     - Build UI elements for score display
+ * ├─ _setupAutoUpdate()        - Initialize 100ms sync interval
+ * ├─ _syncScoreDisplay()       - Sync display with game stats
+ * ├─ _getCounterLabel()        - Get display label text
+ * ├─ _getCounterVar()          - Get stat variable name (e.g., 'coinsCollected')
+ * ├─ _extractGameName()        - Extract game name from URL or instance
+ * ├─ _getLoggedInUser()        - Fetch authenticated user from API
+ * ├─ _buildServerDto()         - Build data payload for backend
+ * └─ _saveStatsToServer()      - POST stats to backend API
  * 
  * BACKEND INTEGRATION:
  * - Endpoint: /api/person/get (GET user info)
  * - Endpoint: /api/events/SCORE_COUNTER (POST score data)
- * - Uses JWT authentication via cookies
- * - Supports both localhost and production environments
+ * - Uses shared javaURI and fetchOptions from /assets/js/api/config.js
+ * - JWT authentication via cookies (handled by fetchOptions)
+ * - Always fetches user before saving (no anonymous saves)
  * 
  * DATA FLOW:
- * Game Stats → gameControl.stats → _syncScoreDisplay() → UI Counter
- *                                ↓
- *                         _buildServerDto() → Backend API
+ * gameControl.stats → _syncScoreDisplay() → UI Counter (every 100ms)
+ *                   ↓
+ *              saveScore() → _getLoggedInUser() → _buildServerDto() → Backend API
  * 
  * DEPENDENCIES:
- * - PauseMenu instance (provides game state access)
- * - GameControl instance (contains stats object)
+ * - PauseMenu instance (trigger for save actions)
+ * - GameControl instance (contains stats object with game data)
+ * - /assets/js/api/config.js (provides javaURI and fetchOptions)
  * - Backend API (Java Spring server)
- * - Optional: Game-specific scoreSettings.js module
  * 
  * USAGE:
- * const scoreFeature = new ScoreFeature(pauseMenu, optionalSettings);
+ * // Basic usage - works for any game
+ * const scoreFeature = new ScoreFeature(pauseMenu);
  * scoreFeature.toggleScoreDisplay(); // Show counter
  * await scoreFeature.saveScore(buttonElement); // Save to backend
+ * 
+ * // Custom settings (optional)
+ * const scoreFeature = new ScoreFeature(pauseMenu, {
+ *   counterLabel: 'Coins Collected',
+ *   counterVar: 'coinsCollected'
+ * });
  */
 
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
@@ -200,46 +204,6 @@ export default class ScoreFeature {
     }
 
     /**
-     * Get the backend base URL with proper priority
-     */
-    _getBackendBase() {
-        const opt = (this.pauseMenu.options && this.pauseMenu.options.backendUrl) 
-            || (this.pauseMenu.gameControl && this.pauseMenu.gameControl.pauseMenuOptions && this.pauseMenu.gameControl.pauseMenuOptions.backendUrl);
-        if (opt) return opt;
-        
-        try {
-            if (typeof window !== 'undefined') {
-                if (window.javaBackendUrl) return String(window.javaBackendUrl);
-                if (window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-                    return 'http://localhost:8585';
-                }
-            }
-            if (javaURI) return String(javaURI);
-            if (typeof window !== 'undefined' && window.location && window.location.origin) return String(window.location.origin);
-        } catch (e) { /* ignore */ }
-        return null;
-    }
-
-    /**
-     * Build fetch options with proper headers and authentication
-     */
-    _getFetchOptions(method = 'GET', body = null) {
-        const options = {
-            ...fetchOptions,
-            method,
-            headers: {
-                ...fetchOptions?.headers,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        };
-        if (body) {
-            options.body = JSON.stringify(body);
-        }
-        return options;
-    }
-
-    /**
      * Extract game name from URL or game instance
      */
     _extractGameName() {
@@ -258,14 +222,13 @@ export default class ScoreFeature {
      */
     async _getLoggedInUser() {
         try {
-            const backend = this._getBackendBase();
-            if (!backend) {
+            if (!javaURI) {
                 console.debug('No backend configured for user fetch');
                 return null;
             }
             
-            const url = `${backend}/api/person/get`;
-            const resp = await fetch(url, this._getFetchOptions('GET'));
+            const url = `${javaURI}/api/person/get`;
+            const resp = await fetch(url, fetchOptions);
             
             if (resp.ok) {
                 const person = await resp.json();
@@ -322,18 +285,16 @@ export default class ScoreFeature {
      * Save stats to the Java backend server
      */
     async _saveStatsToServer() {
-        const base = this._getBackendBase();
-        if (!base) return Promise.reject(new Error('No backend configured'));
+        if (!javaURI) return Promise.reject(new Error('No backend configured'));
 
-        const apiBase = base.replace(/\/$/, '') + '/api/events/SCORE_COUNTER';
+        const url = `${javaURI}/api/events/SCORE_COUNTER`;
         const dto = await this._buildServerDto();
 
         try {
             // For events API, we always POST (no PUT/update)
             // The GenericEventController only has POST and GET endpoints
-            const url = `${apiBase}`;
             console.debug('ScoreFeature: POST', url, dto);
-            const options = this._getFetchOptions('POST', dto);
+            const options = { ...fetchOptions, method: 'POST', body: JSON.stringify(dto) };
             const resp = await fetch(url, options);
             const text = await resp.text();
             let body;
@@ -384,8 +345,7 @@ export default class ScoreFeature {
             this.pauseMenu.stats[cv] = Number(currentScore);
 
             // Attempt server save
-            const backend = this._getBackendBase();
-            if (backend) {
+            if (javaURI) {
                 try {
                     const resp = await this._saveStatsToServer();
                     console.log('ScoreFeature: saved to backend', resp);
