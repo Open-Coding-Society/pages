@@ -155,7 +155,7 @@ export default class Leaderboard {
     setupDynamicMode() {
         const list = document.getElementById('leaderboard-list');
         // If no backend is configured, show an offline message instead of fetching
-        if (!this.hasBackend && !window.javaBackendUrl) {
+        if (!this.hasBackend) {
             list.innerHTML = '<p class="error">Dynamic leaderboard unavailable (no backend).</p>';
             const backBtn = document.getElementById('back-btn');
             if (backBtn) backBtn.style.display = 'inline-block';
@@ -244,7 +244,7 @@ export default class Leaderboard {
         console.log('POST endpoint:', endpoint);
 
         // If backend is unavailable, save locally in localStorage and update UI
-        if (!this.hasBackend && !window.javaBackendUrl) {
+        if (!this.hasBackend) {
             const storageKey = `elementary_leaderboard_${this.gameName}`;
             const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
             const entry = {
@@ -263,11 +263,7 @@ export default class Leaderboard {
         }
 
         try {
-            const base =
-                window.javaBackendUrl ||
-                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
-
-            const url = `${base.replace(/\/$/, '')}${endpoint}`;
+            const url = `${javaURI}${endpoint}`;
             console.log('Full URL:', url);
 
             // Create payload matching Java backend AlgorithmicEvent structure
@@ -286,10 +282,6 @@ export default class Leaderboard {
                 {
                     ...fetchOptions,
                     method: 'POST',
-                    headers: {
-                        ...fetchOptions?.headers,
-                        'Content-Type': 'application/json',
-                    },
                     body: JSON.stringify(requestBody)
                 }
             );
@@ -332,7 +324,7 @@ export default class Leaderboard {
 
         try {
             // If backend unavailable, delete from localStorage
-            if (!this.hasBackend && !window.javaBackendUrl) {
+            if (!this.hasBackend) {
                 const storageKey = `elementary_leaderboard_${this.gameName}`;
                 const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
                 const filtered = stored.filter(e => e.id !== id);
@@ -341,11 +333,7 @@ export default class Leaderboard {
                 return;
             }
 
-            const base =
-                window.javaBackendUrl ||
-                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
-
-            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
+            const url = `${javaURI}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
             console.log('DELETE URL:', url);
 
             // DELETE from backend - using fetchOptions for proper authentication
@@ -378,7 +366,7 @@ export default class Leaderboard {
         console.log('=== FETCHING ELEMENTARY LEADERBOARD ===');
         try {
             // If backend unavailable, load from localStorage
-            if (!this.hasBackend && !window.javaBackendUrl) {
+            if (!this.hasBackend) {
                 const storageKey = `elementary_leaderboard_${this.gameName}`;
                 const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
                 this.elementaryEntries = stored
@@ -395,20 +383,10 @@ export default class Leaderboard {
                 return;
             }
 
-            const base =
-                window.javaBackendUrl ||
-                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
-
-            const url = `${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD`;
+            const url = `${javaURI}/api/events/ELEMENTARY_LEADERBOARD`;
             console.log('Fetching from:', url);
 
-            const res = await fetch(
-                url,
-                { 
-                    ...fetchOptions,
-                    method: 'GET'
-                }
-            );
+            const res = await fetch(url, fetchOptions);
 
             if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             const data = await res.json();
@@ -553,7 +531,7 @@ export default class Leaderboard {
         if (!list) return;
         try {
             // If backend unavailable, load local scores
-            if (!this.hasBackend && !window.javaBackendUrl) {
+            if (!this.hasBackend) {
                 const storageKey = `score_counter_${this.gameName}`;
                 const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
                 const transformed = stored.map(e => ({
@@ -565,17 +543,7 @@ export default class Leaderboard {
                 return;
             }
 
-            const base =
-                window.javaBackendUrl ||
-                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
-
-            const res = await fetch(
-                `${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`,
-                { 
-                    ...fetchOptions, 
-                    method: 'GET'
-                }
-            );
+            const res = await fetch(`${javaURI}/api/events/SCORE_COUNTER`, fetchOptions);
 
             if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
             const data = await res.json();
@@ -610,7 +578,7 @@ export default class Leaderboard {
 
         try {
             // If backend unavailable, store locally and update display
-            if (!this.hasBackend && !window.javaBackendUrl) {
+            if (!this.hasBackend) {
                 const storageKey = `score_counter_${gameName || this.gameName}`;
                 const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
                 const entry = {
@@ -625,11 +593,7 @@ export default class Leaderboard {
                 return entry;
             }
 
-            const base =
-                window.javaBackendUrl ||
-                (location.hostname === 'localhost' ? 'http://localhost:8585' : javaURI);
-
-            const url = `${base.replace(/\/$/, '')}${endpoint}`;
+            const url = `${javaURI}${endpoint}`;
             console.log('Full URL:', url);
 
             // Create payload matching Java backend AlgorithmicEvent structure
@@ -648,10 +612,6 @@ export default class Leaderboard {
                 {
                     ...fetchOptions,
                     method: 'POST',
-                    headers: {
-                        ...fetchOptions?.headers,
-                        'Content-Type': 'application/json',
-                    },
                     body: JSON.stringify(requestBody)
                 }
             );

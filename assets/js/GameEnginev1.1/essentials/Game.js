@@ -71,7 +71,7 @@ class GameCore {
     }
 
     // Try to dynamically load Scoreboard (for adventure game stats syncing)
-    import('../../adventureGame/Scoreboard.js')
+    import('./Scoreboard.js')
         .then(mod => {
             try {
                 const Scoreboard = mod.default || mod.Scoreboard;
@@ -494,7 +494,7 @@ class GameCore {
             console.log('Leaderboard container not found, creating new...');
             
             const ctrlForLeaderboard = this.getActiveControl();
-            import('../Leaderboard.js')
+            import('./Leaderboard.js')
                 .then(mod => {
                     // Determine parent - use gameContainer if available
                     let parentId = 'gameContainer';
