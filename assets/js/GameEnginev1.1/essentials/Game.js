@@ -70,21 +70,6 @@ class GameCore {
         this._adjustGameContainerPosition();
     }
 
-    // Try to dynamically load Scoreboard (for adventure game stats syncing)
-    import('./Scoreboard.js')
-        .then(mod => {
-            try {
-                const Scoreboard = mod.default || mod.Scoreboard;
-                // Set gameControl reference so Scoreboard can update stats
-                Scoreboard.gameControl = this.gameControl;
-                console.log('Scoreboard gameControl reference set');
-            }
-            catch (e) { console.debug('Scoreboard init (optional):', e); }
-        })
-        .catch(() => {
-            // no-op: Scoreboard is optional
-        });
-
     // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
     // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
     }
@@ -494,7 +479,7 @@ class GameCore {
             console.log('Leaderboard container not found, creating new...');
             
             const ctrlForLeaderboard = this.getActiveControl();
-            import('./Leaderboard.js')
+            import('../Leaderboard.js')
                 .then(mod => {
                     // Determine parent - use gameContainer if available
                     let parentId = 'gameContainer';
