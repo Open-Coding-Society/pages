@@ -228,60 +228,46 @@ export default class ScoreFeature {
     }
 
     /**
-     * Get the logged-in user's username from JWT token
-     * Returns the username if authenticated, otherwise 'guest'
+     * Get the logged-in user's information from the backend API
+     * Returns the person data if authenticated, otherwise null
      */
-    _getLoggedInUser() {
+    async _getLoggedInUser() {
         try {
-            // Get JWT token from cookie
-            const cookieName = 'jwt_java_spring';
-            const cookies = document.cookie.split(';');
-            let jwtToken = null;
-            
-            for (let cookie of cookies) {
-                const [name, value] = cookie.trim().split('=');
-                if (name === cookieName) {
-                    jwtToken = value;
-                    break;
-                }
+            const backend = this._getBackendBase();
+            if (!backend) {
+                console.debug('No backend configured for user fetch');
+                return null;
             }
             
-            if (!jwtToken) {
-                return 'guest';
+            const url = `${backend}/api/person/get`;
+            const resp = await fetch(url, this._getFetchOptions('GET'));
+            
+            if (resp.ok) {
+                const person = await resp.json();
+                console.log('ScoreFeature: logged-in user', person);
+                return person;
+            } else {
+                console.debug('User not authenticated, status:', resp.status);
+                return null;
             }
-            
-            // Decode JWT token (it's base64 encoded)
-            // JWT format: header.payload.signature
-            const parts = jwtToken.split('.');
-            if (parts.length !== 3) {
-                return 'guest';
-            }
-            
-            // Decode the payload (second part)
-            const payload = parts[1];
-            const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-            const payloadObj = JSON.parse(decodedPayload);
-            
-            // The username is stored in the 'sub' (subject) field of the JWT
-            return payloadObj.sub || 'guest';
-            
         } catch (error) {
             console.error('Error getting logged-in user:', error);
-            return 'guest';
+            return null;
         }
     }
 
     /**
      * Build the DTO for backend save - matches AlgorithmicEvent payload structure
      */
-    _buildServerDto() {
+    async _buildServerDto() {
         // Use custom DTO builder if scoreSettings provided it
         if (this.scoreSettings && typeof this.scoreSettings.buildDto === 'function') {
             return this.scoreSettings.buildDto(this.pauseMenu);
         }
         
-        // Build DTO matching AlgorithmicEvent structure
-        const uid = this._getLoggedInUser(); // Get actual logged-in user or 'guest'
+        // Get logged-in user information from API
+        const person = await this._getLoggedInUser();
+        const uid = person ? person.uid : 'guest';
         const varName = this._getCounterVar();
         
         // Always ensure stats is synced with gameControl.stats
@@ -318,7 +304,7 @@ export default class ScoreFeature {
         if (!base) return Promise.reject(new Error('No backend configured'));
 
         const apiBase = base.replace(/\/$/, '') + '/api/events/SCORE_COUNTER';
-        const dto = this._buildServerDto();
+        const dto = await this._buildServerDto();
 
         try {
             // For events API, we always POST (no PUT/update)
@@ -369,10 +355,11 @@ export default class ScoreFeature {
             // Always sync pauseMenu.stats to gameControl.stats (they should be the same object)
             this.pauseMenu.stats = this.pauseMenu.gameControl.stats;
             
-            // Update the counter variable with current score
-            const currentScore = this.pauseMenu.score;
-            console.log(`ScoreFeature: setting ${cv} to ${currentScore}`);
-            this.pauseMenu.stats[cv] = Number(currentScore || 0);
+            // Get current score from stats using the counter variable name
+            const stats = this.pauseMenu.gameControl.stats || this.pauseMenu.gameControl;
+            const currentScore = stats[cv] || this.pauseMenu.gameControl[cv] || 0;
+            console.log(`ScoreFeature: ${cv} = ${currentScore}`, stats);
+            this.pauseMenu.stats[cv] = Number(currentScore);
 
             // Attempt server save
             const backend = this._getBackendBase();
