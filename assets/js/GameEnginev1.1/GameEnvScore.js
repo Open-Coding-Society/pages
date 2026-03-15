@@ -250,7 +250,8 @@ export default class GameEnvScore {
     async _buildServerDto() {
         // Always fetch logged-in user information
         const person = await this._getLoggedInUser();
-        const uid = person ? person.uid : 'guest';
+        // Use person.name for display, fallback to uid, then 'guest'
+        const username = person ? (person.name || person.uid) : 'guest';
         const counterVar = this._getCounterVar();
         
         // Get scoreVar - may be different from counterVar
@@ -266,7 +267,7 @@ export default class GameEnvScore {
         // Create payload matching AlgorithmicEvent structure
         const dto = {
             payload: {
-                user: uid,
+                user: username,
                 score: score,
                 levelsCompleted: levelsCompleted,
                 sessionTime: Number(sessionTime) || 0,

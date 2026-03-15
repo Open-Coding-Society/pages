@@ -342,6 +342,12 @@ class GameCore {
                 try {
                     const buttonEl = document.createElement('button');
                     await gameEnv.scoreManager.saveScore(buttonEl);
+                    
+                    // Refresh leaderboard to show the new score
+                    if (this.leaderboardInstance && typeof this.leaderboardInstance.fetchLeaderboard === 'function') {
+                        console.log('Game: Refreshing leaderboard after save');
+                        await this.leaderboardInstance.fetchLeaderboard();
+                    }
                 } catch (error) {
                     console.error('Failed to save score:', error);
                     alert('Failed to save score. Please try again.');
