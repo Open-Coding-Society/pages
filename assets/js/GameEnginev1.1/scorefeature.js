@@ -3,8 +3,13 @@
  * ============================================================
  * 
  * PURPOSE:
- * Manages game score display, tracking, and persistence for game sessions.
- * Integrates with backend API to save player progress and retrieve user information.
+ * Generic, reusable score tracking component that works for any game.
+ * Reads configuration from PauseMenu properties (set by each game).
+ * Integrates with backend API to save player progress with authentication.
+ * 
+ * ARCHITECTURE:
+ * - ScoreFeature: Generic engine component (DO NOT modify per game)
+ * - PauseMenu: Game-specific configuration (override/customize per game)
  * 
  * RESPONSIBILITIES:
  * - Display real-time score counter overlay during gameplay
@@ -15,8 +20,7 @@
  * MAIN COMPONENTS:
  * ┌─────────────────────────────────────────────────────────────┐
  * │ Constructor                                                  │
- * │  - Initializes with PauseMenu reference                     │
- * │  - Optionally accepts scoreSettings for customization       │
+ * │  - Accepts PauseMenu reference (contains game config)       │
  * │  - Creates UI counter element                               │
  * │  - Starts auto-update interval                              │
  * └─────────────────────────────────────────────────────────────┘
@@ -31,12 +35,19 @@
  * ├─ _createScoreCounter()     - Build UI elements for score display
  * ├─ _setupAutoUpdate()        - Initialize 100ms sync interval
  * ├─ _syncScoreDisplay()       - Sync display with game stats
- * ├─ _getCounterLabel()        - Get display label text
- * ├─ _getCounterVar()          - Get stat variable name (e.g., 'coinsCollected')
+ * ├─ _getCounterLabel()        - Get display label from pauseMenu
+ * ├─ _getCounterVar()          - Get stat variable name from pauseMenu
  * ├─ _extractGameName()        - Extract game name from URL or instance
  * ├─ _getLoggedInUser()        - Fetch authenticated user from API
  * ├─ _buildServerDto()         - Build data payload for backend
  * └─ _saveStatsToServer()      - POST stats to backend API
+ * 
+ * PAUSEMENU CONFIGURATION PROPERTIES:
+ * Set these on PauseMenu before creating ScoreFeature:
+ * - counterVar: stat variable to track (e.g., 'coinsCollected')
+ * - counterLabel: display label (e.g., 'Coins Collected')
+ * - counterLabelText: alternative label property
+ * - scoreVar: variable used for backend 'score' field (defaults to counterVar)
  * 
  * BACKEND INTEGRATION:
  * - Endpoint: /api/person/get (GET user info)
@@ -51,30 +62,33 @@
  *              saveScore() → _getLoggedInUser() → _buildServerDto() → Backend API
  * 
  * DEPENDENCIES:
- * - PauseMenu instance (trigger for save actions)
+ * - PauseMenu instance (provides game-specific configuration)
  * - GameControl instance (contains stats object with game data)
  * - /assets/js/api/config.js (provides javaURI and fetchOptions)
  * - Backend API (Java Spring server)
  * 
  * USAGE:
- * // Basic usage - works for any game
+ * // In Game.js (generic - works for all games)
+ * import PauseMenu from './PauseMenu.js';
+ * import ScoreFeature from '../scorefeature.js';
+ * 
+ * // Create PauseMenu with game-specific config
+ * const pauseMenu = new PauseMenu(gameControl, {});
+ * pauseMenu.counterVar = 'coinsCollected';  // Game-specific!
+ * pauseMenu.counterLabel = 'Coins Collected';
+ * pauseMenu.scoreVar = 'coinsCollected';
+ * 
+ * // Create ScoreFeature (generic component)
  * const scoreFeature = new ScoreFeature(pauseMenu);
  * scoreFeature.toggleScoreDisplay(); // Show counter
  * await scoreFeature.saveScore(buttonElement); // Save to backend
- * 
- * // Custom settings (optional)
- * const scoreFeature = new ScoreFeature(pauseMenu, {
- *   counterLabel: 'Coins Collected',
- *   counterVar: 'coinsCollected'
- * });
  */
 
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 export default class ScoreFeature {
-    constructor(pauseMenu, scoreSettings = null) {
+    constructor(pauseMenu) {
         this.pauseMenu = pauseMenu;
-        this.scoreSettings = scoreSettings || null;
         this.isVisible = false;            // track current visibility state
         this._createScoreCounter();
         this._setupAutoUpdate();
@@ -133,13 +147,10 @@ export default class ScoreFeature {
     }
 
     /**
-     * Get the counter label from settings or pauseMenu
+     * Get the counter label from pauseMenu
      */
     _getCounterLabel() {
-        if (this.scoreSettings && this.scoreSettings.counterLabel) {
-            return this.scoreSettings.counterLabel;
-        }
-        return this.pauseMenu.counterLabelText || 'Score';
+        return this.pauseMenu.counterLabelText || this.pauseMenu.counterLabel || 'Score';
     }
 
     /**
@@ -175,12 +186,9 @@ export default class ScoreFeature {
     }
 
     /**
-     * Get the counter variable name from settings or pauseMenu
+     * Get the counter variable name from pauseMenu
      */
     _getCounterVar() {
-        if (this.scoreSettings && this.scoreSettings.counterVar) {
-            return this.scoreSettings.counterVar;
-        }
         return this.pauseMenu.counterVar || 'levelsCompleted';
     }
 
@@ -255,9 +263,7 @@ export default class ScoreFeature {
         const counterVar = this._getCounterVar();
         
         // Get scoreVar - may be different from counterVar
-        const scoreVar = (this.scoreSettings && this.scoreSettings.scoreVar) 
-            || this.pauseMenu.scoreVar 
-            || counterVar; // fallback to counterVar if no scoreVar defined
+        const scoreVar = this.pauseMenu.scoreVar || counterVar; // fallback to counterVar if no scoreVar defined
         
         // Always ensure stats is synced with gameControl.stats
         if (this.pauseMenu.gameControl && this.pauseMenu.gameControl.stats) {
