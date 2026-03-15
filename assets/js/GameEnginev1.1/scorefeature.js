@@ -252,7 +252,12 @@ export default class ScoreFeature {
         // Always fetch logged-in user information
         const person = await this._getLoggedInUser();
         const uid = person ? person.uid : 'guest';
-        const varName = this._getCounterVar();
+        const counterVar = this._getCounterVar();
+        
+        // Get scoreVar - may be different from counterVar
+        const scoreVar = (this.scoreSettings && this.scoreSettings.scoreVar) 
+            || this.pauseMenu.scoreVar 
+            || counterVar; // fallback to counterVar if no scoreVar defined
         
         // Always ensure stats is synced with gameControl.stats
         if (this.pauseMenu.gameControl && this.pauseMenu.gameControl.stats) {
@@ -260,7 +265,8 @@ export default class ScoreFeature {
         }
         
         const stats = this.pauseMenu.gameControl.stats || {};
-        const levels = stats[varName] ? Number(stats[varName]) : 0;
+        const score = stats[scoreVar] ? Number(stats[scoreVar]) : 0;
+        const levelsCompleted = stats[counterVar] ? Number(stats[counterVar]) : 0;
         const sessionTime = stats.sessionTime || stats.elapsedMs || stats.timePlayed || 0;
         const gameName = this._extractGameName();
 
@@ -268,13 +274,13 @@ export default class ScoreFeature {
         const dto = {
             payload: {
                 user: uid,
-                score: stats[varName] ? Number(stats[varName]) : 0,
-                levelsCompleted: levels,
+                score: score,
+                levelsCompleted: levelsCompleted,
                 sessionTime: Number(sessionTime) || 0,
                 totalPowerUps: Number(stats.totalPowerUps) || 0,
                 status: 'PAUSED',
                 gameName: gameName,
-                variableName: varName
+                variableName: counterVar
             }
         };
         console.log('ScoreFeature: built DTO', dto);
