@@ -1,4 +1,70 @@
-// ScoreFeature.js (copied from GameEnginev2)
+/**
+ * ScoreFeature - Game Score Management and Backend Integration
+ * ============================================================
+ * 
+ * PURPOSE:
+ * Manages game score display, tracking, and persistence for game sessions.
+ * Integrates with backend API to save player progress and retrieve user information.
+ * 
+ * RESPONSIBILITIES:
+ * - Display real-time score counter overlay during gameplay
+ * - Sync score display with game state every 100ms
+ * - Save game statistics to backend server
+ * - Authenticate and retrieve logged-in user information
+ * - Load game-specific score settings dynamically
+ * 
+ * MAIN COMPONENTS:
+ * ┌─────────────────────────────────────────────────────────────┐
+ * │ Constructor                                                  │
+ * │  - Initializes with PauseMenu reference                     │
+ * │  - Loads game-specific settings (mansion, adventure, etc.)  │
+ * │  - Creates UI counter element                               │
+ * │  - Starts auto-update interval                              │
+ * └─────────────────────────────────────────────────────────────┘
+ * 
+ * PUBLIC METHODS:
+ * ├─ toggleScoreDisplay()     - Show/hide score counter
+ * ├─ updateScoreDisplay(value) - Update displayed score value
+ * ├─ saveScore(buttonEl)      - Save current score to backend
+ * └─ destroy()                - Clean up intervals and resources
+ * 
+ * PRIVATE METHODS (Internal):
+ * ├─ _loadScoreSettings()     - Load game-specific configuration
+ * ├─ _createScoreCounter()    - Build UI elements for score display
+ * ├─ _setupAutoUpdate()       - Initialize 100ms sync interval
+ * ├─ _syncScoreDisplay()      - Sync display with game stats
+ * ├─ _getCounterLabel()       - Get display label text
+ * ├─ _getCounterVar()         - Get stat variable name (e.g., 'coinsCollected')
+ * ├─ _getBackendBase()        - Determine backend URL
+ * ├─ _getFetchOptions()       - Build fetch request options
+ * ├─ _extractGameName()       - Extract game name from URL or instance
+ * ├─ _getLoggedInUser()       - Fetch authenticated user from API
+ * ├─ _buildServerDto()        - Build data payload for backend
+ * └─ _saveStatsToServer()     - POST stats to backend API
+ * 
+ * BACKEND INTEGRATION:
+ * - Endpoint: /api/person/get (GET user info)
+ * - Endpoint: /api/events/SCORE_COUNTER (POST score data)
+ * - Uses JWT authentication via cookies
+ * - Supports both localhost and production environments
+ * 
+ * DATA FLOW:
+ * Game Stats → gameControl.stats → _syncScoreDisplay() → UI Counter
+ *                                ↓
+ *                         _buildServerDto() → Backend API
+ * 
+ * DEPENDENCIES:
+ * - PauseMenu instance (provides game state access)
+ * - GameControl instance (contains stats object)
+ * - Backend API (Java Spring server)
+ * - Optional: Game-specific scoreSettings.js module
+ * 
+ * USAGE:
+ * const scoreFeature = new ScoreFeature(pauseMenu, optionalSettings);
+ * scoreFeature.toggleScoreDisplay(); // Show counter
+ * await scoreFeature.saveScore(buttonElement); // Save to backend
+ */
+
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 export default class ScoreFeature {
@@ -6,53 +72,12 @@ export default class ScoreFeature {
         this.pauseMenu = pauseMenu;
         this.scoreSettings = scoreSettings || null;
         this.isVisible = false;            // track current visibility state
-        this._loadScoreSettings();
         this._createScoreCounter();
         this._setupAutoUpdate();
 
         // if the pauseMenu has a gameControl, make it easier to toggle from elsewhere
         if (this.pauseMenu.gameControl) {
             this.pauseMenu.gameControl.toggleScoreDisplay = () => this.toggleScoreDisplay();
-        }
-    }
-
-    /**
-     * Load game-specific score settings if available
-     */
-    _loadScoreSettings() {
-        // If scoreSettings already provided, use it
-        if (this.scoreSettings) return;
-        
-        // Try to detect and load game-specific settings
-        try {
-            // Try mansion game settings
-            if (window.location.pathname.includes('mansion')) {
-                import('../mansionGame/scoreSettings.js')
-                    .then(mod => {
-                        this.scoreSettings = mod.default || mod.scoreSettings;
-                        console.log('ScoreFeature: loaded mansion game settings');
-                        if (this._scoreLabel) {
-                            this._scoreLabel.innerText = this._getCounterLabel();
-                        }
-                        this._syncScoreDisplay();
-                    })
-                    .catch(e => console.debug('Mansion settings not found:', e));
-            }
-            // Try adventure game settings
-            else if (window.location.pathname.includes('adventure') || window.location.pathname.includes('gamify')) {
-                import('./scoreSettings.js')
-                    .then(mod => {
-                        this.scoreSettings = mod.default || mod.scoreSettings;
-                        console.log('ScoreFeature: loaded adventure game settings');
-                        if (this._scoreLabel) {
-                            this._scoreLabel.innerText = this._getCounterLabel();
-                        }
-                        this._syncScoreDisplay();
-                    })
-                    .catch(e => console.debug('Adventure settings not found:', e));
-            }
-        } catch (e) {
-            console.debug('Could not load game-specific settings:', e);
         }
     }
 
