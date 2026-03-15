@@ -86,16 +86,13 @@ type: ccc
                 </p>
                 <details style="cursor: pointer;">
                     <summary style="color: #4ecdc4; font-weight: 600; font-size: 14px; margin-bottom: 10px;">View Code Example</summary>
-                    <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; margin: 10px 0 0 0; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5;"><span style="color: #c44569;">const</span> base =
-    window.javaBackendUrl ||
-    (location.hostname === <span style="color: #4ecdc4;">'localhost'</span> ? <span style="color: #4ecdc4;">'http://localhost:8585'</span> : javaURI);
+                    <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; margin: 10px 0 0 0; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5;"><span style="color: #888;">// Import javaURI and fetchOptions from config.js</span>
+<span style="color: #c44569;">import</span> { javaURI, fetchOptions } <span style="color: #c44569;">from</span> <span style="color: #4ecdc4;">'/assets/js/api/config.js'</span>;
 
+<span style="color: #888;">// GET request - fetchOptions includes authentication automatically</span>
 <span style="color: #c44569;">const</span> res = <span style="color: #c44569;">await</span> <span style="color: #a29bfe;">fetch</span>(
-    <span style="color: #4ecdc4;">`${base.replace(/\/$/, '')}/api/events/SCORE_COUNTER`</span>,
-    { 
-        ...fetchOptions, 
-        method: <span style="color: #4ecdc4;">'GET'</span>
-    }
+    <span style="color: #4ecdc4;">`${javaURI}/api/events/SCORE_COUNTER`</span>,
+    fetchOptions
 );</code></pre>
                 </details>
             </div>
@@ -118,15 +115,11 @@ type: ccc
                 </div>
                 <details style="cursor: pointer;">
                     <summary style="color: #00d4ff; font-weight: 600; font-size: 14px; margin-bottom: 10px;">View Code Example</summary>
-                    <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; margin: 10px 0 0 0; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5;"><span style="color: #c44569;">const</span> endpoint = <span style="color: #4ecdc4;">'/api/events/ELEMENTARY_LEADERBOARD'</span>;
-console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'POST endpoint:'</span>, endpoint);
+                    <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; margin: 10px 0 0 0; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5;"><span style="color: #888;">// Import javaURI and fetchOptions from config.js</span>
+<span style="color: #c44569;">import</span> { javaURI, fetchOptions } <span style="color: #c44569;">from</span> <span style="color: #4ecdc4;">'/assets/js/api/config.js'</span>;
 
-<span style="color: #c44569;">const</span> base =
-    window.javaBackendUrl ||
-    (location.hostname === <span style="color: #4ecdc4;">'localhost'</span> ? <span style="color: #4ecdc4;">'http://localhost:8585'</span> : javaURI);
-
-<span style="color: #c44569;">const</span> url = <span style="color: #4ecdc4;">`${base.replace(/\/$/, '')}${endpoint}`</span>;
-console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'Full URL:'</span>, url);
+<span style="color: #c44569;">const</span> endpoint = <span style="color: #4ecdc4;">'/api/events/ELEMENTARY_LEADERBOARD'</span>;
+<span style="color: #c44569;">const</span> url = <span style="color: #4ecdc4;">`${javaURI}${endpoint}`</span>;
 
 <span style="color: #888;">// Create payload matching Java backend AlgorithmicEvent structure</span>
 <span style="color: #c44569;">const</span> requestBody = {
@@ -136,18 +129,13 @@ console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'
         gameName: <span style="color: #c44569;">this</span>.gameName
     }
 };
-console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'Payload:'</span>, JSON.<span style="color: #a29bfe;">stringify</span>(requestBody));
 
-<span style="color: #888;">// POST to backend - using fetchOptions for proper authentication</span>
+<span style="color: #888;">// POST - only specify method and body, fetchOptions handles headers</span>
 <span style="color: #c44569;">const</span> res = <span style="color: #c44569;">await</span> <span style="color: #a29bfe;">fetch</span>(
     url,
     {
         ...fetchOptions,
         method: <span style="color: #4ecdc4;">'POST'</span>,
-        headers: {
-            ...fetchOptions?.headers,
-            <span style="color: #4ecdc4;">'Content-Type'</span>: <span style="color: #4ecdc4;">'application/json'</span>,
-        },
         body: JSON.<span style="color: #a29bfe;">stringify</span>(requestBody)
     }
 );</code></pre>
@@ -172,14 +160,12 @@ console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'
                 </div>
                 <details style="cursor: pointer;">
                     <summary style="color: #ff6b9d; font-weight: 600; font-size: 14px; margin-bottom: 10px;">View Code Example</summary>
-                    <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; margin: 10px 0 0 0; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5;"><span style="color: #c44569;">const</span> base =
-    window.javaBackendUrl ||
-    (location.hostname === <span style="color: #4ecdc4;">'localhost'</span> ? <span style="color: #4ecdc4;">'http://localhost:8585'</span> : javaURI);
+                    <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; margin: 10px 0 0 0; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5;"><span style="color: #888;">// Import javaURI and fetchOptions from config.js</span>
+<span style="color: #c44569;">import</span> { javaURI, fetchOptions } <span style="color: #c44569;">from</span> <span style="color: #4ecdc4;">'/assets/js/api/config.js'</span>;
 
-<span style="color: #c44569;">const</span> url = <span style="color: #4ecdc4;">`${base.replace(/\/$/, '')}/api/events/ELEMENTARY_LEADERBOARD/${id}`</span>;
-console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'DELETE URL:'</span>, url);
+<span style="color: #c44569;">const</span> url = <span style="color: #4ecdc4;">`${javaURI}/api/events/ELEMENTARY_LEADERBOARD/${id}`</span>;
 
-<span style="color: #888;">// DELETE from backend - using fetchOptions for proper authentication</span>
+<span style="color: #888;">// DELETE - only specify method, fetchOptions handles authentication</span>
 <span style="color: #c44569;">const</span> res = <span style="color: #c44569;">await</span> <span style="color: #a29bfe;">fetch</span>(
     url,
     {
@@ -191,282 +177,150 @@ console.<span style="color: #a29bfe;">log</span>(<span style="color: #4ecdc4;">'
             </div>
         </div>
         
-        <!-- Interactive HTTP Methods Game -->
-        <div style="margin-bottom: 30px;">
-            <h3 style="color: #ff6b9d; font-weight: 600; font-size: 20px; margin: 0 0 15px 0;">Interactive: API Restaurant Simulator</h3>
-            <p style="color: #aaa; font-size: 14px; margin-bottom: 20px;">You're a waiter at API Restaurant! Match each customer request to the correct HTTP method</p>
+        <!-- Integration Guide -->
+        <div style="background: linear-gradient(135deg, #1a2a3a 0%, #1a1a2e 100%); border: 2px solid #00d4ff; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+            <h3 style="color: #00d4ff; font-weight: 600; font-size: 20px; margin: 0 0 20px 0;">🎮 How to Add Leaderboard to Your Game</h3>
             
-            <canvas id="httpGame" width="860" height="400" style="border-radius: 8px; cursor: pointer;"></canvas>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 15px; background: #1a1a2e; border-radius: 8px;">
-                <div>
-                    <span style="color: #aaa; font-size: 14px;">Tips Earned: </span>
-                    <strong id="httpScore" style="color: #00d4ff; font-size: 20px;">$0</strong>
-                    <span style="color: #aaa; font-size: 14px;"> / </span>
-                    <span id="httpTotal" style="color: #aaa; font-size: 16px;">$5</span>
+            <!-- Architecture Flow (Text Description) -->
+            <div style="background: #0f0f1e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                <h4 style="color: #4ecdc4; font-weight: 600; font-size: 16px; margin: 0 0 15px 0;">Architecture Flow</h4>
+                <div style="background: #1a1a2e; padding: 15px; border-left: 4px solid #00d4ff; border-radius: 4px;">
+                    <p style="color: #aaa; margin: 0 0 10px 0; font-size: 14px; line-height: 1.8;">
+                        <span style="color: #ff6b9d; font-weight: 600;">1. Game Objects (Coin.js, NPC.js)</span> 
+                        <span style="color: #888;">→</span> write to 
+                        <span style="color: #00d4ff; font-weight: 600;">GameEnv.stats</span>
+                    </p>
+                    <p style="color: #aaa; margin: 0 0 10px 0; font-size: 14px; line-height: 1.8;">
+                        <span style="color: #00d4ff; font-weight: 600;">2. GameEnv.stats</span> 
+                        <span style="color: #888;">→</span> read by 
+                        <span style="color: #4ecdc4; font-weight: 600;">GameEnvScore</span> (Score Manager)
+                    </p>
+                    <p style="color: #aaa; margin: 0 0 10px 0; font-size: 14px; line-height: 1.8;">
+                        <span style="color: #4ecdc4; font-weight: 600;">3. GameEnvScore</span> 
+                        <span style="color: #888;">→</span> displays in 
+                        <span style="color: #a29bfe; font-weight: 600;">Score Counter UI</span>
+                    </p>
+                    <p style="color: #aaa; margin: 0 0 10px 0; font-size: 14px; line-height: 1.8;">
+                        <span style="color: #4ecdc4; font-weight: 600;">4. GameEnvScore</span> 
+                        <span style="color: #888;">→</span> saves via POST to 
+                        <span style="color: #fd79a8; font-weight: 600;">Backend API</span> 
+                        <span style="color: #888;">→</span> stores in 
+                        <span style="color: #fdcb6e; font-weight: 600;">Database</span>
+                    </p>
+                    <p style="color: #aaa; margin: 0; font-size: 14px; line-height: 1.8;">
+                        <span style="color: #00b894; font-weight: 600;">5. Leaderboard.js</span> 
+                        <span style="color: #888;">→</span> fetches via GET from 
+                        <span style="color: #fd79a8; font-weight: 600;">Backend API</span> 
+                        <span style="color: #888;">→</span> displays in 
+                        <span style="color: #6c5ce7; font-weight: 600;">Leaderboard UI</span>
+                    </p>
                 </div>
-                <button onclick="resetHTTPGame()" style="background: #ff6b9d; color: #1a1a2e; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;">New Shift</button>
+            </div>
+            
+            <!-- Step-by-Step Integration -->
+            <div style="background: #1a1a2e; border-radius: 8px; padding: 20px;">
+                <h4 style="color: #ff6b9d; font-weight: 600; font-size: 16px; margin: 0 0 15px 0;">Integration Steps</h4>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="background: #00d4ff; color: #1a1a2e; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px;">1</span>
+                        <strong style="color: #00d4ff; font-size: 15px;">Update GameEnv with Score Configuration</strong>
+                    </div>
+                    <pre style="background: #0f0f1e; padding: 12px; border-radius: 6px; margin-left: 40px; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 12px;"><span style="color: #888;">// In GameEnv constructor</span>
+<span style="color: #c44569;">this</span>.stats = { coinsCollected: <span style="color: #4ecdc4;">0</span>, levelsCompleted: <span style="color: #4ecdc4;">0</span> };
+<span style="color: #c44569;">this</span>.scoreConfig = {
+    counterVar: <span style="color: #4ecdc4;">'coinsCollected'</span>,
+    counterLabel: <span style="color: #4ecdc4;">'Coins Collected'</span>,
+    scoreVar: <span style="color: #4ecdc4;">'coinsCollected'</span>
+};
+<span style="color: #c44569;">this</span>.scoreManager = <span style="color: #c44569;">null</span>;</code></pre>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="background: #4ecdc4; color: #1a1a2e; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px;">2</span>
+                        <strong style="color: #4ecdc4; font-size: 15px;">Update Game Objects to Write to GameEnv.stats</strong>
+                    </div>
+                    <pre style="background: #0f0f1e; padding: 12px; border-radius: 6px; margin-left: 40px; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 12px;"><span style="color: #888;">// In Coin.js collect() method</span>
+<span style="color: #c44569;">this</span>.gameEnv.stats.coinsCollected++;</code></pre>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="background: #a29bfe; color: #1a1a2e; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px;">3</span>
+                        <strong style="color: #a29bfe; font-size: 15px;">Import Leaderboard in Your Game Initialization</strong>
+                    </div>
+                    <pre style="background: #0f0f1e; padding: 12px; border-radius: 6px; margin-left: 40px; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 12px;"><span style="color: #888;">// In Game.js or your main game file</span>
+<span style="color: #c44569;">import</span> Leaderboard <span style="color: #c44569;">from</span> <span style="color: #4ecdc4;">'../Leaderboard.js'</span>;
+
+<span style="color: #888;">// Create leaderboard instance (inside your game setup)</span>
+<span style="color: #c44569;">this</span>.leaderboardInstance = <span style="color: #c44569;">new</span> <span style="color: #a29bfe;">Leaderboard</span>(<span style="color: #c44569;">this</span>.gameControl, {
+    gameName: <span style="color: #4ecdc4;">'AdventureGame'</span>,
+    parentId: <span style="color: #4ecdc4;">'gameContainer'</span>,
+    initiallyHidden: <span style="color: #c44569;">false</span> <span style="color: #888;">// Set to true to hide on load</span>
+});</code></pre>
+                </div>
+                
+                <div>
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="background: #ff6b9d; color: #1a1a2e; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 12px;">4</span>
+                        <strong style="color: #ff6b9d; font-size: 15px;">Access Score and Leaderboard via Pause Menu</strong>
+                    </div>
+                    <p style="color: #aaa; margin: 0 0 10px 40px; font-size: 13px; line-height: 1.6;">
+                        Press <code style="background: #0f0f1e; padding: 2px 6px; border-radius: 3px; color: #00d4ff;">ESC</code> during gameplay to open the pause menu. This gives you access to:
+                    </p>
+                    <ul style="color: #888; margin: 0 0 0 60px; padding: 0; font-size: 13px; line-height: 1.8;">
+                        <li><strong style="color: #fff;">Toggle Score</strong> - Show/hide the score counter</li>
+                        <li><strong style="color: #fff;">Save Score</strong> - Submit your score to the backend</li>
+                        <li><strong style="color: #fff;">Toggle Leaderboard</strong> - Show/hide the leaderboard</li>
+                    </ul>
+                </div>
             </div>
         </div>
         
-        <!-- Quick Reference Table -->
-        <div style="background: #1a1a2e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-            <h4 style="color: #a29bfe; font-weight: 600; font-size: 16px; margin: 0 0 15px 0;">Quick Reference: CRUD Operations</h4>
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-                <thead>
-                    <tr style="background: #0f0f1e;">
-                        <th style="padding: 12px; text-align: left; color: #00d4ff; border-bottom: 2px solid #333;">Operation</th>
-                        <th style="padding: 12px; text-align: left; color: #00d4ff; border-bottom: 2px solid #333;">HTTP Method</th>
-                        <th style="padding: 12px; text-align: left; color: #00d4ff; border-bottom: 2px solid #333;">Purpose</th>
-                        <th style="padding: 12px; text-align: left; color: #00d4ff; border-bottom: 2px solid #333;">Example</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="padding: 12px; color: #4ecdc4; font-weight: 600; border-bottom: 1px solid #333;">Read</td>
-                        <td style="padding: 12px; color: #fff; border-bottom: 1px solid #333;">GET</td>
-                        <td style="padding: 12px; color: #aaa; border-bottom: 1px solid #333;">Retrieve data</td>
-                        <td style="padding: 12px; color: #888; font-size: 13px; border-bottom: 1px solid #333;">View leaderboard</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px; color: #00d4ff; font-weight: 600; border-bottom: 1px solid #333;">Create</td>
-                        <td style="padding: 12px; color: #fff; border-bottom: 1px solid #333;">POST</td>
-                        <td style="padding: 12px; color: #aaa; border-bottom: 1px solid #333;">Add new data</td>
-                        <td style="padding: 12px; color: #888; font-size: 13px; border-bottom: 1px solid #333;">Submit first score</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px; color: #a29bfe; font-weight: 600; border-bottom: 1px solid #333;">Update</td>
-                        <td style="padding: 12px; color: #fff; border-bottom: 1px solid #333;">PUT</td>
-                        <td style="padding: 12px; color: #aaa; border-bottom: 1px solid #333;">Modify existing</td>
-                        <td style="padding: 12px; color: #888; font-size: 13px; border-bottom: 1px solid #333;">Beat high score</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 12px; color: #ff6b9d; font-weight: 600;">Delete</td>
-                        <td style="padding: 12px; color: #fff;">DELETE</td>
-                        <td style="padding: 12px; color: #aaa;">Remove data</td>
-                        <td style="padding: 12px; color: #888; font-size: 13px;">Clear account</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- NEW SECTION: Enable by Default -->
+        <div style="background: linear-gradient(135deg, #2d1b3d 0%, #1a1a2e 100%); border: 2px solid #a29bfe; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+            <h3 style="color: #a29bfe; font-weight: 600; font-size: 20px; margin: 0 0 20px 0;">⚙️ Turn Score & Leaderboard On By Default</h3>
+            
+            <div style="background: #1a1a2e; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                <h4 style="color: #00d4ff; font-weight: 600; font-size: 16px; margin: 0 0 15px 0;">Option 1: Auto-Initialize Score Counter (Recommended)</h4>
+                <p style="color: #aaa; margin: 0 0 15px 0; font-size: 14px;">Add this to your Game.js constructor or initialization method:</p>
+                <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 12px;"><span style="color: #888;">// In Game.js constructor, after gameControl is created</span>
+<span style="color: #c44569;">if</span> (<span style="color: #c44569;">this</span>.gameControl?.gameEnv) {
+    <span style="color: #c44569;">this</span>.gameControl.gameEnv.<span style="color: #a29bfe;">initScoreManager</span>().<span style="color: #a29bfe;">then</span>(() => {
+        <span style="color: #888;">// Auto-show score counter on game start</span>
+        <span style="color: #c44569;">this</span>.gameControl.gameEnv.scoreManager.<span style="color: #a29bfe;">toggleScoreDisplay</span>();
+    });
+}</code></pre>
+            </div>
+            
+            <div style="background: #1a1a2e; border-radius: 8px; padding: 20px;">
+                <h4 style="color: #4ecdc4; font-weight: 600; font-size: 16px; margin: 0 0 15px 0;">Option 2: Show Leaderboard on Load</h4>
+                <p style="color: #aaa; margin: 0 0 15px 0; font-size: 14px;">Set <code style="background: #0f0f1e; padding: 2px 6px; border-radius: 3px; color: #ff6b9d;">initiallyHidden: false</code> when creating the leaderboard:</p>
+                <pre style="background: #0f0f1e; padding: 15px; border-radius: 6px; overflow-x: auto;"><code style="color: #ffffff; font-family: 'Courier New', monospace; font-size: 12px;"><span style="color: #888;">// In your game initialization</span>
+<span style="color: #c44569;">this</span>.leaderboardInstance = <span style="color: #c44569;">new</span> <span style="color: #a29bfe;">Leaderboard</span>(<span style="color: #c44569;">this</span>.gameControl, {
+    gameName: <span style="color: #4ecdc4;">'AdventureGame'</span>,
+    parentId: <span style="color: #4ecdc4;">'gameContainer'</span>,
+    initiallyHidden: <span style="color: #c44569;">false</span>  <span style="color: #888;">// ← Change to false to show on load</span>
+});
+
+<span style="color: #888;">// Optional: Force positioning for consistent display</span>
+<span style="color: #a29bfe;">setTimeout</span>(() => {
+    <span style="color: #c44569;">const</span> container = document.<span style="color: #a29bfe;">getElementById</span>(<span style="color: #4ecdc4;">'leaderboard-container'</span>);
+    <span style="color: #c44569;">if</span> (container) {
+        container.style.position = <span style="color: #4ecdc4;">'fixed'</span>;
+        container.style.top = <span style="color: #4ecdc4;">'80px'</span>;
+        container.style.right = <span style="color: #4ecdc4;">'20px'</span>;
+        container.style.zIndex = <span style="color: #4ecdc4;">'1000'</span>;
+    }
+}, <span style="color: #4ecdc4;">100</span>);</code></pre>
+            </div>
+            
+            <div style="background: #2d1b3d; border-left: 3px solid #a29bfe; padding: 15px; border-radius: 6px; margin-top: 20px;">
+                <strong style="color: #a29bfe;">💡 Pro Tip:</strong> 
+                <span style="color: #aaa; font-size: 13px;">You can combine both options to show score counter AND leaderboard on game start. This is great for competitive games where players want to see rankings immediately!</span>
+            </div>
         </div>
         
     </div>
 </div>
-
-<script>
-const canvas = document.getElementById('httpGame');
-const ctx = canvas.getContext('2d');
-
-let score = 0;
-let currentQuestion = 0;
-
-const scenarios = [
-    {
-        text: "'Can I see the menu please?'",
-        correct: "GET",
-        explanation: "Looking at the menu = GET (reading data without changing anything)"
-    },
-    {
-        text: "'I'd like to place a new order for a burger'",
-        correct: "POST",
-        explanation: "New order = POST (creating a new entry in the system)"
-    },
-    {
-        text: "'Actually, can I change my order to add fries?'",
-        correct: "PUT",
-        explanation: "Modifying existing order = PUT (updating existing data)"
-    },
-    {
-        text: "'Cancel my order please, I need to leave'",
-        correct: "DELETE",
-        explanation: "Canceling order = DELETE (removing the entry completely)"
-    },
-    {
-        text: "'Is my order ready yet? Can I check the status?'",
-        correct: "GET",
-        explanation: "Checking status = GET (retrieving current information)"
-    }
-];
-
-const methods = ["GET", "POST", "PUT", "DELETE"];
-const methodColors = { 
-    "GET": "#4ecdc4", 
-    "POST": "#00d4ff", 
-    "PUT": "#a29bfe",
-    "DELETE": "#ff6b9d" 
-};
-
-function drawHTTPGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    if (currentQuestion >= scenarios.length) {
-        // Game over
-        ctx.fillStyle = "#4ecdc4";
-        ctx.font = "700 24px Inter, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(`Shift Complete! Tips: $${score}`, 430, 150);
-        
-        ctx.fillStyle = "#aaa";
-        ctx.font = "500 16px Inter, sans-serif";
-        const percentage = (score / scenarios.length * 100).toFixed(0);
-        ctx.fillText(`${percentage}% customer satisfaction!`, 430, 190);
-        
-        ctx.fillStyle = "#888";
-        ctx.font = "400 14px Inter, sans-serif";
-        if (score === scenarios.length) {
-            ctx.fillText("Perfect service! You're an API master!", 430, 230);
-        } else if (score >= 3) {
-            ctx.fillText("Good work! Keep practicing those HTTP methods", 430, 230);
-        } else {
-            ctx.fillText("Click 'New Shift' to try again", 430, 230);
-        }
-        return;
-    }
-    
-    const scenario = scenarios[currentQuestion];
-    
-    // Question number
-    ctx.fillStyle = "#888";
-    ctx.font = "600 14px Inter, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText(`Customer ${currentQuestion + 1} of ${scenarios.length}`, 30, 30);
-    
-    // Restaurant badge
-    ctx.fillStyle = "#00d4ff";
-    ctx.fillRect(700, 15, 130, 25);
-    ctx.fillStyle = "#1a1a2e";
-    ctx.font = "600 12px Inter, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("API Restaurant", 765, 32);
-    
-    // Customer request
-    ctx.fillStyle = "#fff";
-    ctx.font = "600 18px Inter, sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("Customer says:", 30, 70);
-    
-    ctx.fillStyle = "#00d4ff";
-    ctx.font = "500 16px Inter, sans-serif";
-    wrapText(ctx, scenario.text, 30, 100, 800, 24);
-    
-    // Instruction
-    ctx.fillStyle = "#888";
-    ctx.font = "500 13px Inter, sans-serif";
-    ctx.fillText("Which HTTP method should you use?", 30, 150);
-    
-    // Method buttons (2x2 grid)
-    methods.forEach((method, index) => {
-        const col = index % 2;
-        const row = Math.floor(index / 2);
-        const x = 30 + col * 420;
-        const y = 180 + row * 100;
-        
-        // Shadow
-        ctx.shadowColor = 'rgba(0, 212, 255, 0.15)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 3;
-        
-        // Button
-        ctx.fillStyle = "#1a1a2e";
-        ctx.beginPath();
-        roundRect(ctx, x, y, 400, 80, 8);
-        ctx.fill();
-        
-        // Border
-        ctx.strokeStyle = methodColors[method];
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        roundRect(ctx, x, y, 400, 80, 8);
-        ctx.stroke();
-        
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
-        
-        // Method name
-        ctx.fillStyle = methodColors[method];
-        ctx.font = "700 20px Inter, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(method, x + 200, y + 35);
-        
-        // Description
-        ctx.fillStyle = "#888";
-        ctx.font = "400 12px Inter, sans-serif";
-        const desc = method === "GET" ? "Read/View" : 
-                     method === "POST" ? "Create/Add" : 
-                     method === "PUT" ? "Update/Change" : 
-                     "Remove/Cancel";
-        ctx.fillText(desc, x + 200, y + 58);
-    });
-}
-
-canvas.addEventListener('click', (e) => {
-    if (currentQuestion >= scenarios.length) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    methods.forEach((method, index) => {
-        const col = index % 2;
-        const row = Math.floor(index / 2);
-        const btnX = 30 + col * 420;
-        const btnY = 180 + row * 100;
-        
-        if (x >= btnX && x <= btnX + 400 && y >= btnY && y <= btnY + 80) {
-            const scenario = scenarios[currentQuestion];
-            
-            if (method === scenario.correct) {
-                score++;
-                alert(`Correct! +$1 tip\n\n${scenario.explanation}`);
-            } else {
-                alert(`Wrong method! No tip this time\n\nCorrect answer: ${scenario.correct}\n\n${scenario.explanation}`);
-            }
-            
-            currentQuestion++;
-            document.getElementById('httpScore').textContent = `$${score}`;
-            drawHTTPGame();
-        }
-    });
-});
-
-function resetHTTPGame() {
-    score = 0;
-    currentQuestion = 0;
-    document.getElementById('httpScore').textContent = '$0';
-    drawHTTPGame();
-}
-
-function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    let line = '';
-    
-    for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        const metrics = ctx.measureText(testLine);
-        const testWidth = metrics.width;
-        
-        if (testWidth > maxWidth && n > 0) {
-            ctx.fillText(line, x, y);
-            line = words[n] + ' ';
-            y += lineHeight;
-        } else {
-            line = testLine;
-        }
-    }
-    ctx.fillText(line, x, y);
-}
-
-function roundRect(ctx, x, y, width, height, radius) {
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-}
-
-drawHTTPGame();
-</script>
