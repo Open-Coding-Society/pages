@@ -283,14 +283,10 @@ export default class ScoreFeature {
 
     /**
      * Build the DTO for backend save - matches AlgorithmicEvent payload structure
+     * Always builds a complete DTO with user authentication
      */
     async _buildServerDto() {
-        // Use custom DTO builder if scoreSettings provided it
-        if (this.scoreSettings && typeof this.scoreSettings.buildDto === 'function') {
-            return this.scoreSettings.buildDto(this.pauseMenu);
-        }
-        
-        // Get logged-in user information from API
+        // Always fetch logged-in user information
         const person = await this._getLoggedInUser();
         const uid = person ? person.uid : 'guest';
         const varName = this._getCounterVar();
@@ -300,18 +296,19 @@ export default class ScoreFeature {
             this.pauseMenu.stats = this.pauseMenu.gameControl.stats;
         }
         
-        const levels = this.pauseMenu.stats && this.pauseMenu.stats[varName] ? Number(this.pauseMenu.stats[varName]) : 0;
-        const sessionTime = this.pauseMenu.stats && (this.pauseMenu.stats.sessionTime || this.pauseMenu.stats.elapsedMs || this.pauseMenu.stats.timePlayed || 0);
+        const stats = this.pauseMenu.gameControl.stats || {};
+        const levels = stats[varName] ? Number(stats[varName]) : 0;
+        const sessionTime = stats.sessionTime || stats.elapsedMs || stats.timePlayed || 0;
         const gameName = this._extractGameName();
 
         // Create payload matching AlgorithmicEvent structure
         const dto = {
             payload: {
                 user: uid,
-                score: this.pauseMenu.stats && this.pauseMenu.stats[this.pauseMenu.scoreVar] ? Number(this.pauseMenu.stats[this.pauseMenu.scoreVar]) : 0,
+                score: stats[varName] ? Number(stats[varName]) : 0,
                 levelsCompleted: levels,
                 sessionTime: Number(sessionTime) || 0,
-                totalPowerUps: (this.pauseMenu.stats && Number(this.pauseMenu.stats.totalPowerUps)) || 0,
+                totalPowerUps: Number(stats.totalPowerUps) || 0,
                 status: 'PAUSED',
                 gameName: gameName,
                 variableName: varName
