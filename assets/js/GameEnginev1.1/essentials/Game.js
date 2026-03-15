@@ -176,6 +176,12 @@ class GameCore {
                 const PauseMenu = mod.default;
                 // PauseMenu expects the gameControl instance directly
                 const pauseMenuInstance = new PauseMenu(this.gameControl, {});
+                
+                // Set game-specific score tracking properties
+                pauseMenuInstance.counterVar = 'coinsCollected';
+                pauseMenuInstance.counterLabel = 'Coins Collected';
+                pauseMenuInstance.scoreVar = 'coinsCollected';
+                
                 this.gameControl.pauseFeature = pauseMenuInstance;
 
                 // Also initialize ScoreFeature using the same pause menu instance.
