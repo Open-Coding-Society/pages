@@ -1,29 +1,22 @@
 /**
- * ScoreFeature - Game Score Management and Backend Integration
- * ============================================================
+ * GameEnvScore - Score Management and Backend Integration for GameEngine v1.1
+ * ===========================================================================
  * 
  * PURPOSE:
- * Generic, reusable score tracking component that works for any game.
- * Reads configuration from PauseMenu properties (set by each game).
- * Integrates with backend API to save player progress with authentication.
+ * Singleton score manager that tracks and persists game statistics across all levels.
+ * Integrates seamlessly with GameEnv's OOP architecture.
  * 
  * ARCHITECTURE:
- * - ScoreFeature: Generic engine component (DO NOT modify per game)
- * - PauseMenu: Game-specific configuration (override/customize per game)
+ * - GameEnv: Owns stats object and scoreConfig (persistent across levels)
+ * - GameEnvScore: Manages UI display and backend persistence
+ * - Game Objects (Coin, etc.): Write directly to gameEnv.stats
+ * - All Levels: Access via this.gameEnv.scoreManager
  * 
  * RESPONSIBILITIES:
  * - Display real-time score counter overlay during gameplay
- * - Sync score display with game state every 100ms
+ * - Sync score display with GameEnv.stats every 100ms
  * - Save game statistics to backend server with user authentication
  * - Build standardized DTOs for backend persistence
- * 
- * MAIN COMPONENTS:
- * ┌─────────────────────────────────────────────────────────────┐
- * │ Constructor                                                  │
- * │  - Accepts PauseMenu reference (contains game config)       │
- * │  - Creates UI counter element                               │
- * │  - Starts auto-update interval                              │
- * └─────────────────────────────────────────────────────────────┘
  * 
  * PUBLIC METHODS:
  * ├─ toggleScoreDisplay()      - Show/hide score counter
@@ -34,19 +27,18 @@
  * PRIVATE METHODS (Internal):
  * ├─ _createScoreCounter()     - Build UI elements for score display
  * ├─ _setupAutoUpdate()        - Initialize 100ms sync interval
- * ├─ _syncScoreDisplay()       - Sync display with game stats
- * ├─ _getCounterLabel()        - Get display label from pauseMenu
- * ├─ _getCounterVar()          - Get stat variable name from pauseMenu
+ * ├─ _syncScoreDisplay()       - Sync display with GameEnv.stats
+ * ├─ _getCounterLabel()        - Get display label from gameEnv.scoreConfig
+ * ├─ _getCounterVar()          - Get stat variable name from gameEnv.scoreConfig
  * ├─ _extractGameName()        - Extract game name from URL or instance
  * ├─ _getLoggedInUser()        - Fetch authenticated user from API
  * ├─ _buildServerDto()         - Build data payload for backend
  * └─ _saveStatsToServer()      - POST stats to backend API
  * 
- * PAUSEMENU CONFIGURATION PROPERTIES:
- * Set these on PauseMenu before creating ScoreFeature:
+ * GAMEENV CONFIGURATION:
+ * Set these in GameEnv.scoreConfig:
  * - counterVar: stat variable to track (e.g., 'coinsCollected')
  * - counterLabel: display label (e.g., 'Coins Collected')
- * - counterLabelText: alternative label property
  * - scoreVar: variable used for backend 'score' field (defaults to counterVar)
  * 
  * BACKEND INTEGRATION:
@@ -57,57 +49,52 @@
  * - Always fetches user before saving (no anonymous saves)
  * 
  * DATA FLOW:
- * gameControl.stats → _syncScoreDisplay() → UI Counter (every 100ms)
- *                   ↓
- *              saveScore() → _getLoggedInUser() → _buildServerDto() → Backend API
+ * Game Object → gameEnv.stats.coinsCollected++
+ *            ↓
+ * _syncScoreDisplay() reads gameEnv.stats → UI Counter (every 100ms)
+ *            ↓
+ * saveScore() → _getLoggedInUser() → _buildServerDto(gameEnv.stats) → Backend API
  * 
  * DEPENDENCIES:
- * - PauseMenu instance (provides game-specific configuration)
- * - GameControl instance (contains stats object with game data)
+ * - GameEnv instance (contains stats, scoreConfig, gameControl)
  * - /assets/js/api/config.js (provides javaURI and fetchOptions)
  * - Backend API (Java Spring server)
  * 
  * USAGE:
- * // In Game.js (generic - works for all games)
- * import PauseMenu from './PauseMenu.js';
- * import ScoreFeature from '../scorefeature.js';
+ * // Initialized automatically in GameEnv
+ * await gameEnv.initScoreManager();
  * 
- * // Create PauseMenu with game-specific config
- * const pauseMenu = new PauseMenu(gameControl, {});
- * pauseMenu.counterVar = 'coinsCollected';  // Game-specific!
- * pauseMenu.counterLabel = 'Coins Collected';
- * pauseMenu.scoreVar = 'coinsCollected';
+ * // Access from any level
+ * this.gameEnv.scoreManager.toggleScoreDisplay();
+ * await this.gameEnv.scoreManager.saveScore(buttonElement);
  * 
- * // Create ScoreFeature (generic component)
- * const scoreFeature = new ScoreFeature(pauseMenu);
- * scoreFeature.toggleScoreDisplay(); // Show counter
- * await scoreFeature.saveScore(buttonElement); // Save to backend
+ * // Game objects update stats directly
+ * this.gameEnv.stats.coinsCollected++;
  */
 
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
-export default class ScoreFeature {
-    constructor(pauseMenu) {
-        this.pauseMenu = pauseMenu;
-        this.isVisible = false;            // track current visibility state
+export default class GameEnvScore {
+    constructor(gameEnv) {
+        this.gameEnv = gameEnv;
+        this.isVisible = false; // track current visibility state
         this._createScoreCounter();
         this._setupAutoUpdate();
-
-        // if the pauseMenu has a gameControl, make it easier to toggle from elsewhere
-        if (this.pauseMenu.gameControl) {
-            this.pauseMenu.gameControl.toggleScoreDisplay = () => this.toggleScoreDisplay();
-        }
     }
 
     /**
-     * Create the score counter UI element below the buttons
+     * Create the score counter UI element
      */
     _createScoreCounter() {
-        if (!this.pauseMenu.gameControl) return;
+        // Clean up any existing score counters (from previous instances)
+        const existingCounters = document.querySelectorAll('.pause-score-counter');
+        existingCounters.forEach(counter => {
+            if (counter.parentNode) {
+                counter.parentNode.removeChild(counter);
+            }
+        });
         
-        const parent = (this.pauseMenu.gameControl && this.pauseMenu.gameControl.gameContainer) 
-            || document.getElementById(this.pauseMenu.options.parentId) 
-            || document.body;
+        const parent = this.gameEnv.gameContainer || document.getElementById('gameContainer') || document.body;
 
         const scoreCounter = document.createElement('div');
         scoreCounter.className = 'pause-score-counter';
@@ -143,36 +130,33 @@ export default class ScoreFeature {
         
         this._scoreValue = scoreValue;
         this._scoreLabel = scoreLabel;
-        this._scoreCounter = scoreCounter;   // keep reference for toggle
+        this._scoreCounter = scoreCounter;
+        
+        console.log('GameEnvScore: Score counter created and appended to', parent.tagName || parent.id || 'unknown parent');
     }
 
     /**
-     * Get the counter label from pauseMenu
+     * Get the counter label from GameEnv.scoreConfig
      */
     _getCounterLabel() {
-        return this.pauseMenu.counterLabelText || this.pauseMenu.counterLabel || 'Score';
+        return this.gameEnv.scoreConfig.counterLabel || 'Score';
     }
 
     /**
-     * Setup automatic score updates by polling gameControl stats
+     * Setup automatic score updates by polling GameEnv.stats
      */
     _setupAutoUpdate() {
-        // Update score display every 100ms to keep it in sync
         this._updateInterval = setInterval(() => {
             this._syncScoreDisplay();
         }, 100);
     }
 
     /**
-     * Sync the score display with current gameControl stats
+     * Sync the score display with current GameEnv.stats
      */
     _syncScoreDisplay() {
-        if (!this.pauseMenu.gameControl) return;
-        
         const varName = this._getCounterVar();
-        const stats = this.pauseMenu.gameControl.stats || this.pauseMenu.gameControl;
-        const currentValue = stats[varName] || this.pauseMenu.gameControl[varName] || 0;
-        
+        const currentValue = this.gameEnv.stats[varName] || 0;
         this.updateScoreDisplay(currentValue);
     }
 
@@ -180,16 +164,20 @@ export default class ScoreFeature {
      * Toggle visibility of the score counter
      */
     toggleScoreDisplay() {
-        if (!this._scoreCounter) return;
+        if (!this._scoreCounter) {
+            console.error('GameEnvScore: Cannot toggle - score counter element not found');
+            return;
+        }
         this.isVisible = !this.isVisible;
         this._scoreCounter.style.display = this.isVisible ? 'block' : 'none';
+        console.log('GameEnvScore: Score counter toggled to', this.isVisible ? 'visible' : 'hidden');
     }
 
     /**
-     * Get the counter variable name from pauseMenu
+     * Get the counter variable name from GameEnv.scoreConfig
      */
     _getCounterVar() {
-        return this.pauseMenu.counterVar || 'levelsCompleted';
+        return this.gameEnv.scoreConfig.counterVar || 'levelsCompleted';
     }
 
     /**
@@ -202,12 +190,15 @@ export default class ScoreFeature {
     }
 
     /**
-     * Cleanup when ScoreFeature is destroyed
+     * Cleanup when GameEnvScore is destroyed
      */
     destroy() {
         if (this._updateInterval) {
             clearInterval(this._updateInterval);
             this._updateInterval = null;
+        }
+        if (this._scoreCounter && this._scoreCounter.parentNode) {
+            this._scoreCounter.parentNode.removeChild(this._scoreCounter);
         }
     }
 
@@ -215,8 +206,8 @@ export default class ScoreFeature {
      * Extract game name from URL or game instance
      */
     _extractGameName() {
-        if (this.pauseMenu.gameControl && this.pauseMenu.gameControl.game && this.pauseMenu.gameControl.game.gameName) {
-            return this.pauseMenu.gameControl.game.gameName;
+        if (this.gameEnv.game && this.gameEnv.game.gameName) {
+            return this.gameEnv.game.gameName;
         }
         if (typeof window === 'undefined') return 'unknown';
         const pathname = window.location.pathname;
@@ -231,7 +222,7 @@ export default class ScoreFeature {
     async _getLoggedInUser() {
         try {
             if (!javaURI) {
-                console.debug('No backend configured for user fetch');
+                console.debug('GameEnvScore: No backend configured for user fetch');
                 return null;
             }
             
@@ -240,14 +231,14 @@ export default class ScoreFeature {
             
             if (resp.ok) {
                 const person = await resp.json();
-                console.log('ScoreFeature: logged-in user', person);
+                console.log('GameEnvScore: logged-in user', person);
                 return person;
             } else {
-                console.debug('User not authenticated, status:', resp.status);
+                console.debug('GameEnvScore: User not authenticated, status:', resp.status);
                 return null;
             }
         } catch (error) {
-            console.error('Error getting logged-in user:', error);
+            console.error('GameEnvScore: Error getting logged-in user:', error);
             return null;
         }
     }
@@ -263,14 +254,10 @@ export default class ScoreFeature {
         const counterVar = this._getCounterVar();
         
         // Get scoreVar - may be different from counterVar
-        const scoreVar = this.pauseMenu.scoreVar || counterVar; // fallback to counterVar if no scoreVar defined
+        const scoreVar = this.gameEnv.scoreConfig.scoreVar || counterVar;
         
-        // Always ensure stats is synced with gameControl.stats
-        if (this.pauseMenu.gameControl && this.pauseMenu.gameControl.stats) {
-            this.pauseMenu.stats = this.pauseMenu.gameControl.stats;
-        }
-        
-        const stats = this.pauseMenu.gameControl.stats || {};
+        // Read directly from GameEnv.stats
+        const stats = this.gameEnv.stats;
         const score = stats[scoreVar] ? Number(stats[scoreVar]) : 0;
         const levelsCompleted = stats[counterVar] ? Number(stats[counterVar]) : 0;
         const sessionTime = stats.sessionTime || stats.elapsedMs || stats.timePlayed || 0;
@@ -289,7 +276,7 @@ export default class ScoreFeature {
                 variableName: counterVar
             }
         };
-        console.log('ScoreFeature: built DTO', dto);
+        console.log('GameEnvScore: built DTO', dto);
         return dto;
     }
 
@@ -303,9 +290,7 @@ export default class ScoreFeature {
         const dto = await this._buildServerDto();
 
         try {
-            // For events API, we always POST (no PUT/update)
-            // The GenericEventController only has POST and GET endpoints
-            console.debug('ScoreFeature: POST', url, dto);
+            console.debug('GameEnvScore: POST', url, dto);
             const options = { ...fetchOptions, method: 'POST', body: JSON.stringify(dto) };
             const resp = await fetch(url, options);
             const text = await resp.text();
@@ -317,12 +302,12 @@ export default class ScoreFeature {
             }
             const ok = resp.ok && (!(body && body.success === false));
             if (!ok) {
-                console.error('ScoreFeature: server POST responded with status', resp.status, text);
+                console.error('GameEnvScore: server POST responded with status', resp.status, text);
                 throw new Error('Server POST failed: ' + resp.status);
             }
-            console.debug('ScoreFeature: server POST response', body);
-            if (body && body.id && this.pauseMenu.stats) {
-                this.pauseMenu.stats.serverId = body.id;
+            console.debug('GameEnvScore: server POST response', body);
+            if (body && body.id) {
+                this.gameEnv.stats.serverId = body.id;
             }
             return body;
         } catch (e) {
@@ -332,6 +317,7 @@ export default class ScoreFeature {
 
     /**
      * Save current counter/score to Java backend
+     * Can be called from PauseMenu or any UI trigger
      */
     async saveScore(buttonEl) {
         if (!buttonEl) return;
@@ -341,73 +327,35 @@ export default class ScoreFeature {
 
         try {
             const cv = this._getCounterVar();
-            
-            // Ensure stats object exists on gameControl
-            if (!this.pauseMenu.gameControl.stats) {
-                this.pauseMenu.gameControl.stats = {};
-            }
-            
-            // Always sync pauseMenu.stats to gameControl.stats (they should be the same object)
-            this.pauseMenu.stats = this.pauseMenu.gameControl.stats;
-            
-            // Get current score from stats using the counter variable name
-            const stats = this.pauseMenu.gameControl.stats || this.pauseMenu.gameControl;
-            const currentScore = stats[cv] || this.pauseMenu.gameControl[cv] || 0;
-            console.log(`ScoreFeature: ${cv} = ${currentScore}`, stats);
-            this.pauseMenu.stats[cv] = Number(currentScore);
+            const currentScore = this.gameEnv.stats[cv] || 0;
+            console.log(`GameEnvScore: ${cv} = ${currentScore}`, this.gameEnv.stats);
 
             // Attempt server save
             if (javaURI) {
                 try {
                     const resp = await this._saveStatsToServer();
-                    console.log('ScoreFeature: saved to backend', resp);
+                    console.log('GameEnvScore: saved to backend', resp);
                     alert('Saved to backend!');
-                    if (this.pauseMenu._saveStatusNode) {
-                        this.pauseMenu._saveStatusNode.innerText = 'Score saved to backend!';
-                    }
                 } catch (e) {
-                    console.error('ScoreFeature: save to backend failed', e);
-                    // Check for authentication errors (401 or 403 status)
+                    console.error('GameEnvScore: save to backend failed', e);
                     if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
                         alert('Please login to access this feature.');
-                        if (this.pauseMenu._saveStatusNode) {
-                            this.pauseMenu._saveStatusNode.innerText = 'Please login to access this feature.';
-                        }
                     } else {
                         alert('Save failed!');
-                        if (this.pauseMenu._saveStatusNode) {
-                            this.pauseMenu._saveStatusNode.innerText = 'Backend save failed';
-                        }
                     }
                 }
             } else {
-                console.warn('ScoreFeature: no backend configured');
+                console.warn('GameEnvScore: no backend configured');
                 alert('No backend configured');
-                if (this.pauseMenu._saveStatusNode) {
-                    this.pauseMenu._saveStatusNode.innerText = 'No backend configured';
-                }
             }
         } catch (e) {
-            console.error('ScoreFeature: save failed', e);
-            // Check for authentication errors (401 or 403 status)
+            console.error('GameEnvScore: save failed', e);
             if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
                 alert('Please login to access this feature.');
-                if (this.pauseMenu._saveStatusNode) {
-                    this.pauseMenu._saveStatusNode.innerText = 'Please login to access this feature.';
-                }
             } else {
                 alert('Save failed!');
-                if (this.pauseMenu._saveStatusNode) {
-                    this.pauseMenu._saveStatusNode.innerText = 'Save failed';
-                }
             }
         }
-
-        setTimeout(() => {
-            if (this.pauseMenu._saveStatusNode) {
-                this.pauseMenu._saveStatusNode.innerText = '';
-            }
-        }, 3000);
 
         buttonEl.disabled = false;
         buttonEl.innerText = prevText;
