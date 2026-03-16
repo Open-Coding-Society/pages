@@ -84,6 +84,13 @@
     flex-wrap: wrap;
   }
 
+  .top-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.5rem;
+  }
+
   .top-nav-item { position: relative; }
 
   .top-nav-item.has-submenu::after {
@@ -130,23 +137,35 @@
     color: var(--navy);
   }
 
+  .top-nav-link.btn-secondary {
+    border-color: rgba(200,168,75,0.5);
+  }
+
+  .top-nav-link.btn-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+    background: rgba(200,168,75,0.06);
+  }
+
   .top-nav-caret { font-size: 0.6rem; opacity: 0.7; }
 
   /* Dropdown */
   .top-nav-dropdown {
     display: none;
     position: absolute;
-    top: calc(100% + 4px);
+    top: calc(100% + 2px);
     left: 0;
     background: var(--navy-mid);
     border: 1px solid var(--border);
     border-radius: 3px;
     min-width: 200px;
-    z-index: 200;
+    z-index: 500;
     padding: 0.4rem 0;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   }
 
+  .top-nav-item.has-submenu:hover .top-nav-dropdown,
+  .top-nav-item.has-submenu:focus-within .top-nav-dropdown { display: block; }
   .top-nav-item.has-submenu:hover .top-nav-dropdown,
   .top-nav-item.has-submenu:focus-within .top-nav-dropdown { display: block; }
 
@@ -238,6 +257,34 @@
     justify-content: center;
     gap: 0.8rem;
     flex-wrap: wrap;
+  }
+
+  .hero-photo-shell {
+    max-width: 980px;
+    margin: 2.4rem auto 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(200,168,75,0.28);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.34);
+    position: relative;
+  }
+
+  .hero-photo-shell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(12,26,46,0.02) 0%, rgba(12,26,46,0.36) 100%);
+    pointer-events: none;
+  }
+
+  .hero-photo {
+    display: block;
+    width: 100%;
+    height: clamp(280px, 42vw, 480px);
+    object-fit: cover;
+    transform: translateY(var(--parallax-shift, 0px)) scale(1.02);
+    transition: transform 0.18s linear;
+    will-change: transform;
   }
 
   /* ── MATCHING GIFT BANNER ───────────────────────── */
@@ -343,6 +390,48 @@
     margin-top: 3rem;
   }
 
+  .motion-reveal {
+    opacity: 0;
+    transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+
+  .motion-fade {
+    transform: translateY(18px);
+  }
+
+  .motion-slide {
+    transform: translateX(-32px);
+  }
+
+  .motion-reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .section-photo {
+    display: block;
+    width: min(100%, 920px);
+    margin: 0 auto 2.2rem;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 34px rgba(0,0,0,0.22);
+  }
+
+  .section-photo img,
+  .concert-photo,
+  .news-photo,
+  .media-photo {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .section-photo img {
+    max-height: 420px;
+  }
+
   /* ── STATS ─────────────────────────────────────────── */
   .stats-band {
     background: var(--navy-mid);
@@ -421,6 +510,16 @@
     font-weight: 600;
     color: var(--white);
     margin-bottom: 0.35rem;
+  }
+
+  .concert-photo {
+    height: 220px;
+    border-radius: 4px;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(200,168,75,0.18);
+    transform: translateY(var(--parallax-shift, 0px)) scale(1.03);
+    transition: transform 0.18s linear;
+    will-change: transform;
   }
 
   .concert-date {
@@ -1154,6 +1253,41 @@
     color: var(--gold);
   }
 
+  .media-photo {
+    height: 300px;
+    border-radius: 4px;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(200,168,75,0.18);
+  }
+
+  @keyframes instrument-card-reveal {
+    from {
+      opacity: 0;
+      transform: perspective(1000px) rotateX(var(--card-tilt-x)) rotateY(var(--card-tilt-y)) translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+      transform: perspective(1000px) rotateX(var(--card-tilt-x)) rotateY(var(--card-tilt-y)) translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-reveal,
+    .instrument-card {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .hero-photo,
+    .concert-photo {
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
   .media-placeholder p {
     font-size: 1rem;
     color: rgba(250,246,239,0.65);
@@ -1190,6 +1324,11 @@
 
     .pso-topbar { padding: 0 1rem; }
     .pso-topbar-nav { gap: 0.1rem; }
+    .top-nav-actions {
+      width: 100%;
+      justify-content: flex-end;
+      margin-left: 0;
+    }
     .top-nav-link { padding: 0.4rem 0.5rem; font-size: 0.7rem; }
     .hero { padding: 3.5rem 1.2rem 3rem; }
     .section { padding: 3rem 1.2rem; }
@@ -1218,9 +1357,9 @@
       <div class="top-nav-item has-submenu">
         <a href="#about" class="top-nav-link">About <span class="top-nav-caret">&#9662;</span></a>
         <div class="top-nav-dropdown">
-          <a href="#about"       class="top-nav-dropdown-link">Our Mission</a>
-          <a href="#foundation"  class="top-nav-dropdown-link">Foundation</a>
-          <a href="#news"        class="top-nav-dropdown-link">News</a>
+          <a href="#about"      class="top-nav-dropdown-link">Our Story</a>
+          <a href="#conductor"  class="top-nav-dropdown-link">Conductor</a>
+          <a href="#musicians"  class="top-nav-dropdown-link">Musicians</a>
         </div>
       </div>
 
@@ -1236,7 +1375,8 @@
       <div class="top-nav-item has-submenu">
         <a href="#support" class="top-nav-link">Support <span class="top-nav-caret">&#9662;</span></a>
         <div class="top-nav-dropdown">
-          <a href="#donate"     class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Donor &amp; Sponsor Program</a>
+          <a href="#donate"     class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Donate</a>
+          <a href="#donate"     class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Sponsorship</a>
           <a href="#donate"     class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Volunteer</a>
         </div>
       </div>
@@ -1253,16 +1393,16 @@
         </div>
       </div>
 
-      <div class="top-nav-item">
-        <a href="#contact" class="top-nav-link">Contact</a>
-      </div>
-
-      <div class="top-nav-item">
-        <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="top-nav-link" data-allow-navigation="true">Sign In</a>
-      </div>
-
-      <div class="top-nav-item">
-        <a href="#donate" class="top-nav-link btn-primary cta-reveal" data-reveal="donate,contact">Donate</a>
+      <div class="top-nav-actions">
+        <div class="top-nav-item">
+          <a href="#tickets" class="top-nav-link btn-primary">Buy Tickets</a>
+        </div>
+        <div class="top-nav-item">
+          <a href="#donate" class="top-nav-link btn-secondary cta-reveal" data-reveal="donate,contact">Donate</a>
+        </div>
+        <div class="top-nav-item">
+          <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="top-nav-link btn-secondary" data-allow-navigation="true">Member Sign In</a>
+        </div>
       </div>
 
     </nav>
@@ -1291,6 +1431,9 @@
       <a href="#tickets"  class="btn btn-secondary">Buy Tickets</a>
       <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="btn btn-secondary" data-allow-navigation="true">Member Sign In</a>
       <a href="#donate"   class="btn btn-secondary cta-reveal" data-reveal="donate,contact">Donate</a>
+    </div>
+    <div class="hero-photo-shell">
+      <img src="/images/capstone/website_projects/orch.jpg" alt="Poway Symphony Orchestra performing on stage" class="hero-photo">
     </div>
   </section>
 
@@ -1334,6 +1477,9 @@
         Formed in 2004, the PSO has enriched the cultural and educational life of the
         region for over two decades.
       </p>
+      <figure class="section-photo">
+        <img src="/images/capstone/website_projects/orch6.jpg" alt="Poway Symphony Orchestra gathered on stage before a performance">
+      </figure>
       <div class="section-cta-row">
         <a href="#concerts"  class="btn btn-secondary">View This Season</a>
         <a href="#foundation" class="btn btn-secondary">Our Foundation</a>
@@ -1373,6 +1519,9 @@
         incorporated in Poway, established in 2015 with the sole purpose of supporting
         the orchestra. All donations to the Foundation are tax-deductible.
       </p>
+      <figure class="section-photo">
+        <img src="/images/capstone/website_projects/orch7.avif" alt="Poway Symphony Orchestra and supporters at a foundation-related event">
+      </figure>
       <div class="section-cta-row">
         <a href="#donate" class="btn btn-primary cta-reveal" data-reveal="donate,contact">Support the Foundation</a>
       </div>
@@ -1394,6 +1543,7 @@
         <!-- Concert 1 -->
         <div class="concert-card">
           <span class="concert-badge past">Past</span>
+          <img src="/images/capstone/website_projects/orch1.jpg" alt="Poway Symphony Orchestra in concert performance" class="concert-photo">
           <h3>Dvořák in America</h3>
           <p class="concert-date">Sunday, November 16, 2025 · 4:00 PM</p>
           <p>
@@ -1463,6 +1613,9 @@
         Season subscriptions for 2025–2026 are no longer available — watch for
         2026–2027 announcements later this year.
       </p>
+      <figure class="section-photo">
+        <img src="/images/capstone/website_projects/orch8.jpg" alt="Audience view inside the Poway Center for the Performing Arts">
+      </figure>
 
       <div class="ticket-grid">
         <div class="ticket-option">
@@ -1507,6 +1660,7 @@
         YouTube channel.
       </p>
       <div class="media-placeholder">
+        <img src="/images/capstone/website_projects/orch2.webp" alt="Orchestra rehearsal or performance view" class="media-photo">
         <div class="media-icon">▶</div>
         <p>Watch full concerts, highlights, and behind-the-scenes content on the
         Poway Symphony Orchestra YouTube channel.</p>
@@ -1533,6 +1687,9 @@
         contribution — large or small — directly supports our musicians, guest artists,
         and community outreach programs.
       </p>
+      <figure class="section-photo">
+        <img src="/images/capstone/website_projects/orch9.jpg" alt="Poway Symphony Orchestra community performance moment">
+      </figure>
 
       <div class="donate-tiers">
         <div class="donate-tier">
@@ -1589,6 +1746,9 @@
         performed at the highest artistic level. We are especially seeking additional
         string players in all sections.
       </p>
+      <figure class="section-photo">
+        <img src="/images/capstone/website_projects/orch3.jpg" alt="Poway Symphony Orchestra musicians rehearsing together">
+      </figure>
       <ul class="musicians-highlights">
         <li>Rehearsals: Monday evenings, 7:15–9:15 PM</li>
         <li>Performances: Sundays at 4:00 PM</li>
@@ -1779,6 +1939,7 @@
       </p>
       <div class="news-grid">
         <article class="news-card">
+          <img src="/images/capstone/website_projects/orch5.jpg" alt="Poway Symphony Orchestra event audience and stage view" class="news-photo">
           <p class="news-date">February 2026</p>
           <h3>Mendelssohn Classics — March 22, 2026</h3>
           <p>Violinist YuEun Gemma Kim joins the PSO for Mendelssohn's Symphony No. 5
@@ -1812,6 +1973,9 @@
     <div class="section">
       <h2>Contact Us</h2>
       <div class="section-divider"></div>
+      <figure class="section-photo">
+        <img src="/images/capstone/website_projects/orch10.jpg" alt="Poway Symphony Orchestra stage and venue contact section image">
+      </figure>
       <div class="contact-grid">
         <div class="contact-block">
           <h3>Venue &amp; Box Office</h3>
