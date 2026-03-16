@@ -16,11 +16,7 @@ export default class Leaderboard {
         // backend is unreachable so leaderboard can operate in offline/local mode.
         this.hasBackend = Boolean(javaURI);
 
-        try {
-            this.init();
-        } catch (error) {
-            console.error('[Leaderboard] Initialization error:', error);
-        }
+        this.init();
     }
 
     init() {
@@ -227,7 +223,7 @@ export default class Leaderboard {
         }
     }
 
-    async addElementaryScore() {
+    addElementaryScore() {
         console.log('=== ADD ELEMENTARY SCORE ===');
         const nameInput = document.getElementById('player-name');
         const scoreInput = document.getElementById('player-score');
@@ -258,63 +254,63 @@ export default class Leaderboard {
             // Clear inputs and refresh local display
             nameInput.value = '';
             scoreInput.value = '';
-            await this.fetchElementaryLeaderboard();
+            this.fetchElementaryLeaderboard();
             return;
         }
 
-        try {
-            const url = `${javaURI}${endpoint}`;
-            console.log('Full URL:', url);
+        const url = `${javaURI}${endpoint}`;
+        console.log('Full URL:', url);
 
-            // Create payload matching Java backend AlgorithmicEvent structure
-            const requestBody = {
-                payload: {
-                    user: name,
-                    score: score,
-                    gameName: this.gameName
-                }
-            };
-            console.log('Payload:', JSON.stringify(requestBody));
-
-            // POST to backend - using fetchOptions for proper authentication
-            const res = await fetch(
-                url,
-                {
-                    ...fetchOptions,
-                    method: 'POST',
-                    body: JSON.stringify(requestBody)
-                }
-            );
-
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error('Server error:', errorText);
-                throw new Error(`Failed to save score: ${res.status} - ${errorText}`);
+        // Create payload matching Java backend AlgorithmicEvent structure
+        const requestBody = {
+            payload: {
+                user: name,
+                score: score,
+                gameName: this.gameName
             }
+        };
+        console.log('Payload:', JSON.stringify(requestBody));
 
-            const savedEntry = await res.json();
-            console.log('Score saved successfully:', savedEntry);
-
-            // Clear inputs
-            nameInput.value = '';
-            scoreInput.value = '';
-
-            // Fetch updated leaderboard from backend
-            await this.fetchElementaryLeaderboard();
-        } catch (error) {
-            console.error('Error adding score:', error);
-            // Check for authentication errors (401 or 403 status)
-            if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
-                alert('Please login to access this feature.');
-            } else if (error.message && error.message.includes('Failed to fetch')) {
-                alert('Network error: Unable to connect to server. Please check if the backend is running.');
-            } else {
-                alert(`Failed to save score: ${error.message}`);
+        // POST to backend using API chaining pattern
+        fetch(
+            url,
+            {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify(requestBody)
             }
-        }
+        )
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(errorText => {
+                        console.error('Server error:', errorText);
+                        throw new Error(`Failed to save score: ${res.status} - ${errorText}`);
+                    });
+                }
+                return res.json();
+            })
+            .then(savedEntry => {
+                console.log('Score saved successfully:', savedEntry);
+                // Clear inputs
+                nameInput.value = '';
+                scoreInput.value = '';
+                // Fetch updated leaderboard from backend
+                return this.fetchElementaryLeaderboard();
+            })
+            .catch(error => {
+                console.error('Error adding score:', error);
+                // Check for authentication errors (401 or 403 status)
+                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                    alert('Please login to access this feature.');
+                } else if (error.message && error.message.includes('Failed to fetch')) {
+                    alert('Network error: Unable to connect to server. Please check if the backend is running.');
+                } else {
+                    alert(`Failed to save score: ${error.message}`);
+                }
+            });
     }
 
-    async deleteElementaryScore(id) {
+    deleteElementaryScore(id) {
         if (!confirm('Are you sure you want to delete this score?')) {
             return;
         }
@@ -322,105 +318,49 @@ export default class Leaderboard {
         console.log('=== DELETE SCORE ===');
         console.log('Deleting ID:', id);
 
-        try {
-            // If backend unavailable, delete from localStorage
-            if (!this.hasBackend) {
-                const storageKey = `elementary_leaderboard_${this.gameName}`;
-                const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                const filtered = stored.filter(e => e.id !== id);
-                localStorage.setItem(storageKey, JSON.stringify(filtered));
-                await this.fetchElementaryLeaderboard();
-                return;
-            }
-
-            const url = `${javaURI}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
-            console.log('DELETE URL:', url);
-
-            // DELETE from backend - using fetchOptions for proper authentication
-            const res = await fetch(
-                url,
-                {
-                    ...fetchOptions,
-                    method: 'DELETE'
-                }
-            );
-
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error('Delete failed:', res.status, errorText);
-                throw new Error(`Failed to delete: ${res.status} - ${errorText}`);
-            }
-
-            console.log('Score deleted successfully');
-
-            // Fetch updated leaderboard from backend
-            await this.fetchElementaryLeaderboard();
-
-        } catch (error) {
-            console.error('Error deleting score:', error);
-            alert(`Failed to delete score: ${error.message}`);
+        // If backend unavailable, delete from localStorage
+        if (!this.hasBackend) {
+            const storageKey = `elementary_leaderboard_${this.gameName}`;
+            const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const filtered = stored.filter(e => e.id !== id);
+            localStorage.setItem(storageKey, JSON.stringify(filtered));
+            this.fetchElementaryLeaderboard();
+            return;
         }
+
+        const url = `${javaURI}/api/events/ELEMENTARY_LEADERBOARD/${id}`;
+        console.log('DELETE URL:', url);
+
+        // DELETE from backend using API chaining pattern
+        fetch(
+            url,
+            {
+                ...fetchOptions,
+                method: 'DELETE'
+            }
+        )
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(errorText => {
+                        console.error('Delete failed:', res.status, errorText);
+                        throw new Error(`Failed to delete: ${res.status} - ${errorText}`);
+                    });
+                }
+                console.log('Score deleted successfully');
+                // Fetch updated leaderboard from backend
+                return this.fetchElementaryLeaderboard();
+            })
+            .catch(error => {
+                console.error('Error deleting score:', error);
+                alert(`Failed to delete score: ${error.message}`);
+            });
     }
 
-    async fetchElementaryLeaderboard() {
+    fetchElementaryLeaderboard() {
         console.log('=== FETCHING ELEMENTARY LEADERBOARD ===');
-        try {
-            // If backend unavailable, load from localStorage
-            if (!this.hasBackend) {
-                const storageKey = `elementary_leaderboard_${this.gameName}`;
-                const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                this.elementaryEntries = stored
-                    .map(event => ({
-                        id: event.id,
-                        user: event.payload?.user || 'Anonymous',
-                        score: event.payload?.score || 0,
-                        gameName: event.payload?.gameName || this.gameName,
-                        timestamp: event.timestamp
-                    }))
-                    .sort((a, b) => b.score - a.score);
-
-                this.displayElementaryLeaderboard();
-                return;
-            }
-
-            const url = `${javaURI}/api/events/ELEMENTARY_LEADERBOARD`;
-            console.log('Fetching from:', url);
-
-            const res = await fetch(url, fetchOptions);
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-            const data = await res.json();
-            
-            console.log('Received data:', data);
-            console.log('Number of entries:', data.length);
-            
-            // Transform backend data to frontend format
-            // Backend returns AlgorithmicEvent with payload field
-            this.elementaryEntries = data
-                .map(event => ({
-                    id: event.id,
-                    user: event.payload?.user || 'Anonymous',
-                    score: event.payload?.score || 0,
-                    gameName: event.payload?.gameName || this.gameName,
-                    timestamp: event.timestamp
-                }))
-                .sort((a, b) => b.score - a.score); // Sort by score descending
-            
-            console.log('Transformed elementaryEntries:', this.elementaryEntries);
-            
-            // Force display update
-            this.displayElementaryLeaderboard();
-        } catch (error) {
-            console.error('Error fetching leaderboard:', error);
-            // Check for authentication errors (401 or 403 status)
-            if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
-                const list = document.getElementById('leaderboard-list');
-                if (list) {
-                    list.innerHTML = '<p class="error">Please login to access this feature.</p>';
-                }
-                return;
-            }
-            // Fallback to local data if fetch fails
+        
+        // If backend unavailable, load from localStorage
+        if (!this.hasBackend) {
             const storageKey = `elementary_leaderboard_${this.gameName}`;
             const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
             this.elementaryEntries = stored
@@ -432,8 +372,64 @@ export default class Leaderboard {
                     timestamp: event.timestamp
                 }))
                 .sort((a, b) => b.score - a.score);
+
             this.displayElementaryLeaderboard();
+            return Promise.resolve();
         }
+
+        const url = `${javaURI}/api/events/ELEMENTARY_LEADERBOARD`;
+        console.log('Fetching from:', url);
+
+        return fetch(url, fetchOptions)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+                console.log('Number of entries:', data.length);
+                
+                // Transform backend data to frontend format
+                // Backend returns AlgorithmicEvent with payload field
+                this.elementaryEntries = data
+                    .map(event => ({
+                        id: event.id,
+                        user: event.payload?.user || 'Anonymous',
+                        score: event.payload?.score || 0,
+                        gameName: event.payload?.gameName || this.gameName,
+                        timestamp: event.timestamp
+                    }))
+                    .sort((a, b) => b.score - a.score); // Sort by score descending
+                
+                console.log('Transformed elementaryEntries:', this.elementaryEntries);
+                
+                // Force display update
+                this.displayElementaryLeaderboard();
+            })
+            .catch(error => {
+                console.error('Error fetching leaderboard:', error);
+                // Check for authentication errors (401 or 403 status)
+                if (error.message && (error.message.includes('401') || error.message.includes('403'))) {
+                    const list = document.getElementById('leaderboard-list');
+                    if (list) {
+                        list.innerHTML = '<p class="error">Please login to access this feature.</p>';
+                    }
+                    return;
+                }
+                // Fallback to local data if fetch fails
+                const storageKey = `elementary_leaderboard_${this.gameName}`;
+                const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                this.elementaryEntries = stored
+                    .map(event => ({
+                        id: event.id,
+                        user: event.payload?.user || 'Anonymous',
+                        score: event.payload?.score || 0,
+                        gameName: event.payload?.gameName || this.gameName,
+                        timestamp: event.timestamp
+                    }))
+                    .sort((a, b) => b.score - a.score);
+                this.displayElementaryLeaderboard();
+            });
     }
 
     displayElementaryLeaderboard() {
@@ -524,118 +520,119 @@ export default class Leaderboard {
         });
     }
 
-    async fetchLeaderboard() {
+    fetchLeaderboard() {
         if (this.mode !== 'dynamic') return;
 
         const list = document.getElementById('leaderboard-list');
         if (!list) return;
-        try {
-            // If backend unavailable, load local scores
-            if (!this.hasBackend) {
-                const storageKey = `score_counter_${this.gameName}`;
-                const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                const transformed = stored.map(e => ({
-                    id: e.id,
-                    payload: { user: e.payload.user, score: e.payload.score, gameName: e.payload.gameName },
-                    timestamp: e.timestamp
-                }));
-                this.displayLeaderboard(transformed);
-                return;
-            }
-
-            const res = await fetch(`${javaURI}/api/events/SCORE_COUNTER`, fetchOptions);
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-            const data = await res.json();
-            this.displayLeaderboard(data);
-        } catch (err) {
-            console.error('Error fetching dynamic leaderboard:', err);
-            // Check for authentication errors (401 or 403 status)
-            if (err.message && (err.message.includes('401') || err.message.includes('403'))) {
-                list.innerHTML = `<p class="error">Please login to access this feature.</p>`;
-            } else {
-                list.innerHTML = `<p class="error">Failed to load leaderboard</p>`;
-            }
+        
+        // If backend unavailable, load local scores
+        if (!this.hasBackend) {
+            const storageKey = `score_counter_${this.gameName}`;
+            const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const transformed = stored.map(e => ({
+                id: e.id,
+                payload: { user: e.payload.user, score: e.payload.score, gameName: e.payload.gameName },
+                timestamp: e.timestamp
+            }));
+            this.displayLeaderboard(transformed);
+            return;
         }
+
+        fetch(`${javaURI}/api/events/SCORE_COUNTER`, fetchOptions)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => {
+                this.displayLeaderboard(data);
+            })
+            .catch(err => {
+                console.error('Error fetching dynamic leaderboard:', err);
+                // Check for authentication errors (401 or 403 status)
+                if (err.message && (err.message.includes('401') || err.message.includes('403'))) {
+                    list.innerHTML = `<p class="error">Please login to access this feature.</p>`;
+                } else {
+                    list.innerHTML = `<p class="error">Failed to load leaderboard</p>`;
+                }
+            });
     }
 
     /**
      * Submit a score to the SCORE_COUNTER endpoint
+     * Uses API chaining pattern for elegant error handling
      * @param {string} username - Player username
      * @param {number} score - Player score
      * @param {string} gameName - Name of the game (optional, uses this.gameName if not provided)
      * @returns {Promise<Object>} The saved score entry
      */
-    async submitScore(username, score, gameName = null) {
+    submitScore(username, score, gameName = null) {
         console.log('=== SUBMIT SCORE TO SCORE_COUNTER ===');
         
         if (!username || isNaN(score)) {
-            throw new Error('Invalid username or score');
+            return Promise.reject(new Error('Invalid username or score'));
         }
 
         const endpoint = '/api/events/SCORE_COUNTER';
         console.log('POST endpoint:', endpoint);
 
-        try {
-            // If backend unavailable, store locally and update display
-            if (!this.hasBackend) {
-                const storageKey = `score_counter_${gameName || this.gameName}`;
-                const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                const entry = {
-                    id: `local-${Date.now()}`,
-                    payload: { user: username, score: score, gameName: gameName || this.gameName },
-                    timestamp: new Date().toISOString()
-                };
-                stored.push(entry);
-                localStorage.setItem(storageKey, JSON.stringify(stored));
-
-                if (this.mode === 'dynamic') await this.fetchLeaderboard();
-                return entry;
-            }
-
-            const url = `${javaURI}${endpoint}`;
-            console.log('Full URL:', url);
-
-            // Create payload matching Java backend AlgorithmicEvent structure
-            const requestBody = {
-                payload: {
-                    user: username,
-                    score: score,
-                    gameName: gameName || this.gameName
-                }
+        // If backend unavailable, store locally and update display
+        if (!this.hasBackend) {
+            const storageKey = `score_counter_${gameName || this.gameName}`;
+            const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const entry = {
+                id: `local-${Date.now()}`,
+                payload: { user: username, score: score, gameName: gameName || this.gameName },
+                timestamp: new Date().toISOString()
             };
-            console.log('Payload:', JSON.stringify(requestBody));
+            stored.push(entry);
+            localStorage.setItem(storageKey, JSON.stringify(stored));
 
-            // POST to backend - using fetchOptions for proper authentication
-            const res = await fetch(
-                url,
-                {
-                    ...fetchOptions,
-                    method: 'POST',
-                    body: JSON.stringify(requestBody)
-                }
-            );
-
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error('Server error:', errorText);
-                throw new Error(`Failed to save score: ${res.status} - ${errorText}`);
-            }
-
-            const savedEntry = await res.json();
-            console.log('Score saved successfully to SCORE_COUNTER:', savedEntry);
-
-            // Refresh leaderboard if we're in dynamic mode
-            if (this.mode === 'dynamic') {
-                await this.fetchLeaderboard();
-            }
-
-            return savedEntry;
-
-        } catch (error) {
-            console.error('Error submitting score:', error);
-            throw error;
+            if (this.mode === 'dynamic') this.fetchLeaderboard();
+            return Promise.resolve(entry);
         }
+
+        const url = `${javaURI}${endpoint}`;
+        console.log('Full URL:', url);
+
+        // Create payload matching Java backend AlgorithmicEvent structure
+        const requestBody = {
+            payload: {
+                user: username,
+                score: score,
+                gameName: gameName || this.gameName
+            }
+        };
+        console.log('Payload:', JSON.stringify(requestBody));
+
+        // POST to backend using API chaining pattern
+        return fetch(
+            url,
+            {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify(requestBody)
+            }
+        )
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(errorText => {
+                        console.error('Server error:', errorText);
+                        throw new Error(`Failed to save score: ${res.status} - ${errorText}`);
+                    });
+                }
+                return res.json();
+            })
+            .then(savedEntry => {
+                console.log('Score saved successfully to SCORE_COUNTER:', savedEntry);
+
+                // Refresh leaderboard if we're in dynamic mode
+                if (this.mode === 'dynamic') {
+                    return this.fetchLeaderboard().then(() => savedEntry);
+                }
+
+                return savedEntry;
+            });
     }
 
     displayLeaderboard(data) {

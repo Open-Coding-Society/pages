@@ -218,147 +218,153 @@ export default class GameEnvScore {
     /**
      * Get the logged-in user's information from the backend API
      * Returns the person data if authenticated, otherwise null
+     * Uses API chaining pattern for elegant error handling
      */
-    async _getLoggedInUser() {
-        try {
-            if (!javaURI) {
-                console.debug('GameEnvScore: No backend configured for user fetch');
-                return null;
-            }
-            
-            const url = `${javaURI}/api/person/get`;
-            const resp = await fetch(url, fetchOptions);
-            
-            if (resp.ok) {
-                const person = await resp.json();
-                console.log('GameEnvScore: logged-in user', person);
-                return person;
-            } else {
-                console.debug('GameEnvScore: User not authenticated, status:', resp.status);
-                return null;
-            }
-        } catch (error) {
-            console.error('GameEnvScore: Error getting logged-in user:', error);
-            return null;
+    _getLoggedInUser() {
+        if (!javaURI) {
+            console.debug('GameEnvScore: No backend configured for user fetch');
+            return Promise.resolve(null);
         }
+        
+        const url = `${javaURI}/api/person/get`;
+        return fetch(url, fetchOptions)
+            .then(resp => {
+                if (resp.ok) {
+                    return resp.json();
+                } else {
+                    console.debug('GameEnvScore: User not authenticated, status:', resp.status);
+                    return null;
+                }
+            })
+            .then(person => {
+                if (person) {
+                    console.log('GameEnvScore: logged-in user', person);
+                }
+                return person;
+            })
+            .catch(error => {
+                console.error('GameEnvScore: Error getting logged-in user:', error);
+                return null;
+            });
     }
 
     /**
      * Build the DTO for backend save - matches AlgorithmicEvent payload structure
      * Always builds a complete DTO with user authentication
+     * Uses API chaining pattern for sequential operations
      */
-    async _buildServerDto() {
+    _buildServerDto() {
         // Always fetch logged-in user information
-        const person = await this._getLoggedInUser();
-        // Use person.name for display, fallback to uid, then 'guest'
-        const username = person ? (person.name || person.uid) : 'guest';
-        const counterVar = this._getCounterVar();
-        
-        // Get scoreVar - may be different from counterVar
-        const scoreVar = this.gameEnv.scoreConfig.scoreVar || counterVar;
-        
-        // Read directly from GameEnv.stats
-        const stats = this.gameEnv.stats;
-        const score = stats[scoreVar] ? Number(stats[scoreVar]) : 0;
-        const levelsCompleted = stats[counterVar] ? Number(stats[counterVar]) : 0;
-        const sessionTime = stats.sessionTime || stats.elapsedMs || stats.timePlayed || 0;
-        const gameName = this._extractGameName();
+        return this._getLoggedInUser().then(person => {
+            // Use person.name for display, fallback to uid, then 'guest'
+            const username = person ? (person.name || person.uid) : 'guest';
+            const counterVar = this._getCounterVar();
+            
+            // Get scoreVar - may be different from counterVar
+            const scoreVar = this.gameEnv.scoreConfig.scoreVar || counterVar;
+            
+            // Read directly from GameEnv.stats
+            const stats = this.gameEnv.stats;
+            const score = stats[scoreVar] ? Number(stats[scoreVar]) : 0;
+            const levelsCompleted = stats[counterVar] ? Number(stats[counterVar]) : 0;
+            const sessionTime = stats.sessionTime || stats.elapsedMs || stats.timePlayed || 0;
+            const gameName = this._extractGameName();
 
-        // Create payload matching AlgorithmicEvent structure
-        const dto = {
-            payload: {
-                user: username,
-                score: score,
-                levelsCompleted: levelsCompleted,
-                sessionTime: Number(sessionTime) || 0,
-                totalPowerUps: Number(stats.totalPowerUps) || 0,
-                status: 'PAUSED',
-                gameName: gameName,
-                variableName: counterVar
-            }
-        };
-        console.log('GameEnvScore: built DTO', dto);
-        return dto;
+            // Create payload matching AlgorithmicEvent structure
+            const dto = {
+                payload: {
+                    user: username,
+                    score: score,
+                    levelsCompleted: levelsCompleted,
+                    sessionTime: Number(sessionTime) || 0,
+                    totalPowerUps: Number(stats.totalPowerUps) || 0,
+                    status: 'PAUSED',
+                    gameName: gameName,
+                    variableName: counterVar
+                }
+            };
+            console.log('GameEnvScore: built DTO', dto);
+            return dto;
+        });
     }
 
     /**
      * Save stats to the Java backend server
+     * Uses API chaining pattern with centralized error handling
      */
-    async _saveStatsToServer() {
+    _saveStatsToServer() {
         if (!javaURI) return Promise.reject(new Error('No backend configured'));
 
         const url = `${javaURI}/api/events/SCORE_COUNTER`;
-        const dto = await this._buildServerDto();
-
-        try {
-            console.debug('GameEnvScore: POST', url, dto);
-            const options = { ...fetchOptions, method: 'POST', body: JSON.stringify(dto) };
-            const resp = await fetch(url, options);
-            const text = await resp.text();
-            let body;
-            try {
-                body = text ? JSON.parse(text) : null;
-            } catch (e) {
-                body = text;
-            }
-            const ok = resp.ok && (!(body && body.success === false));
-            if (!ok) {
-                console.error('GameEnvScore: server POST responded with status', resp.status, text);
-                throw new Error('Server POST failed: ' + resp.status);
-            }
-            console.debug('GameEnvScore: server POST response', body);
-            if (body && body.id) {
-                this.gameEnv.stats.serverId = body.id;
-            }
-            return body;
-        } catch (e) {
-            return Promise.reject(e);
-        }
+        
+        return this._buildServerDto()
+            .then(dto => {
+                console.debug('GameEnvScore: POST', url, dto);
+                const options = { ...fetchOptions, method: 'POST', body: JSON.stringify(dto) };
+                return fetch(url, options);
+            })
+            .then(resp => {
+                return resp.text().then(text => ({ resp, text }));
+            })
+            .then(({ resp, text }) => {
+                let body;
+                try {
+                    body = text ? JSON.parse(text) : null;
+                } catch (e) {
+                    body = text;
+                }
+                const ok = resp.ok && (!(body && body.success === false));
+                if (!ok) {
+                    console.error('GameEnvScore: server POST responded with status', resp.status, text);
+                    throw new Error('Server POST failed: ' + resp.status);
+                }
+                console.debug('GameEnvScore: server POST response', body);
+                if (body && body.id) {
+                    this.gameEnv.stats.serverId = body.id;
+                }
+                return body;
+            });
     }
 
     /**
      * Save current counter/score to Java backend
      * Can be called from PauseMenu or any UI trigger
+     * Uses API chaining pattern for clean sequential operations
      */
-    async saveScore(buttonEl) {
+    saveScore(buttonEl) {
         if (!buttonEl) return;
         buttonEl.disabled = true;
         const prevText = buttonEl.innerText;
         buttonEl.innerText = 'Saving...';
 
-        try {
-            const cv = this._getCounterVar();
-            const currentScore = this.gameEnv.stats[cv] || 0;
-            console.log(`GameEnvScore: ${cv} = ${currentScore}`, this.gameEnv.stats);
+        const cv = this._getCounterVar();
+        const currentScore = this.gameEnv.stats[cv] || 0;
+        console.log(`GameEnvScore: ${cv} = ${currentScore}`, this.gameEnv.stats);
 
-            // Attempt server save
-            if (javaURI) {
-                try {
-                    const resp = await this._saveStatsToServer();
+        // Attempt server save using API chaining pattern
+        if (javaURI) {
+            this._saveStatsToServer()
+                .then(resp => {
                     console.log('GameEnvScore: saved to backend', resp);
-                    alert('Saved to backend!');
-                } catch (e) {
+                    // alert('Saved to backend!');
+                })
+                .catch(e => {
                     console.error('GameEnvScore: save to backend failed', e);
                     if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
                         alert('Please login to access this feature.');
                     } else {
                         alert('Save failed!');
                     }
-                }
-            } else {
-                console.warn('GameEnvScore: no backend configured');
-                alert('No backend configured');
-            }
-        } catch (e) {
-            console.error('GameEnvScore: save failed', e);
-            if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
-                alert('Please login to access this feature.');
-            } else {
-                alert('Save failed!');
-            }
+                })
+                .finally(() => {
+                    buttonEl.disabled = false;
+                    buttonEl.innerText = prevText;
+                });
+        } else {
+            console.warn('GameEnvScore: no backend configured');
+            alert('No backend configured');
+            buttonEl.disabled = false;
+            buttonEl.innerText = prevText;
         }
-
-        buttonEl.disabled = false;
-        buttonEl.innerText = prevText;
     }
 }
