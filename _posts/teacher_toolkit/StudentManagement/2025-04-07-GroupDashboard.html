@@ -16,15 +16,230 @@ comments: false
 <script type="module">
   import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
+  // ---------------------------------------------
+  // CONFIG: Constants + error catalog
+  // ---------------------------------------------
   const MEMBER_ANALYTICS_PAGE_SIZE = 5;
   const MEMBER_ANALYTICS_COLUMN_COUNT = 8;
-  let memberAnalyticsCurrentPage = 1;
+
+  const ERROR_TYPES = {
+    AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
+    INVALID_GROUP: 'INVALID_GROUP',
+    HTTP_ERROR: 'HTTP_ERROR',
+    NETWORK: 'NETWORK',
+    UNKNOWN: 'UNKNOWN'
+  };
+
+  const ERROR_MESSAGES = {
+    [ERROR_TYPES.AUTHENTICATION_REQUIRED]: 'Please sign in to view the group dashboard.',
+    [ERROR_TYPES.INVALID_GROUP]: 'Group not found. Please select a valid group.',
+    [ERROR_TYPES.HTTP_ERROR]: (status) => `Server error (${status}). Please try again.`,
+    [ERROR_TYPES.NETWORK]: 'Network request failed. Check your connection.',
+    [ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred. Please refresh the page.'
+  };
+
+  // ---------------------------------------------
+  // STATE (module-level)
+  // ---------------------------------------------
   let activeDashboardGroup = null;
+  let memberAnalyticsCurrentPage = 1;
   const memberAnalyticsCache = new Map();
   const memberSummaryCache = new Map();
 
-  function getDefaultMemberSummary() {
-    return {
+  // ---------------------------------------------
+  // UTILITIES
+  // ---------------------------------------------
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  function formatPercent(value) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return '0.0%';
+    return `${numericValue.toFixed(1)}%`;
+  }
+
+  function getInitials(name) {
+    if (!name) return '??';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
+  function getAvatarColor(id) {
+    const colors = [
+      'bg-indigo-600',
+      'bg-purple-600',
+      'bg-orange-600',
+      'bg-teal-600',
+      'bg-pink-600',
+      'bg-blue-600',
+      'bg-green-600',
+      'bg-red-600',
+      'bg-yellow-600'
+    ];
+    return colors[id % colors.length];
+  }
+
+  function buildErrorMessage(error) {
+    if (!error) return ERROR_MESSAGES[ERROR_TYPES.UNKNOWN];
+
+    if (error.type === ERROR_TYPES.HTTP_ERROR) {
+      return ERROR_MESSAGES[ERROR_TYPES.HTTP_ERROR](error.status);
+    }
+
+    return ERROR_MESSAGES[error.type] || ERROR_MESSAGES[ERROR_TYPES.UNKNOWN];
+  }
+
+  function showError(containerEl, message, colorClass = 'text-red-400') {
+    if (!containerEl) return;
+    containerEl.innerHTML = `<p class="${colorClass} text-center">${message}</p>`;
+  }
+
+  function createFetchError(type, status) {
+    const error = new Error(type);
+    error.type = type;
+    if (status !== undefined) error.status = status;
+    return error;
+  }
+
+  async function fetchJson(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw createFetchError(ERROR_TYPES.AUTHENTICATION_REQUIRED, 401);
+      }
+      throw createFetchError(ERROR_TYPES.HTTP_ERROR, response.status);
+    }
+    return response.json();
+  }
+
+  // ---------------------------------------------
+  // DATA FETCHING (single responsibility per function)
+  // ---------------------------------------------
+  async function fetchGroupByName(groupName) {
+    const encoded = encodeURIComponent(groupName);
+    const url = `${javaURI}/api/groups/search?name=${encoded}`;
+    const groups = await fetchJson(url, fetchOptions);
+
+    if (!groups) throw createFetchError(ERROR_TYPES.INVALID_GROUP);
+
+    if (Array.isArray(groups)) {
+      const found = groups.find(g => g.name?.toLowerCase() === groupName.toLowerCase());
+      return found || groups[0];
+    }
+
+    return groups;
+  }
+
+  async function fetchGroupChatAnalytics(personId) {
+    try {
+      const url = `${javaURI}/api/groups/chat/analytics/${personId}`;
+      return await fetchJson(url, fetchOptions);
+    } catch (error) {
+      if (error.type === ERROR_TYPES.HTTP_ERROR && error.status === 404) {
+        return null; // no analytics yet
+      }
+      throw error;
+    }
+  }
+
+  async function fetchGroupMessages(groupId) {
+    const url = `${javaURI}/api/groups/chat/${groupId}/messages`;
+    return await fetchJson(url, fetchOptions);
+  }
+
+  async function fetchMemberSummary(personId) {
+    try {
+      const url = `${javaURI}/api/ocs-analytics/admin/user/${personId}/summary`;
+      return await fetchJson(url, fetchOptions);
+    } catch (error) {
+      if (error.type === ERROR_TYPES.HTTP_ERROR && [401, 403, 404].includes(error.status)) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // ---------------------------------------------
+  // CACHE KEYS (pure functions)
+  // ---------------------------------------------
+  function memberAnalyticsCacheKey(groupId, personId) {
+    return `${groupId}:${personId}`;
+  }
+
+  function memberSummaryCacheKey(personId) {
+    return `${personId}`;
+  }
+
+  // ---------------------------------------------
+  // PAGINATION
+  // ---------------------------------------------
+  function getPageRange(total, page) {
+    if (total === 0) return { start: 0, end: 0 };
+    const start = (page - 1) * MEMBER_ANALYTICS_PAGE_SIZE + 1;
+    const end = Math.min(page * MEMBER_ANALYTICS_PAGE_SIZE, total);
+    return { start, end };
+  }
+
+  function updatePaginationControls(totalMembers, page) {
+    const info = document.getElementById('memberAnalyticsPaginationInfo');
+    const prevButton = document.getElementById('memberAnalyticsPrevButton');
+    const nextButton = document.getElementById('memberAnalyticsNextButton');
+    const totalPages = Math.max(1, Math.ceil(totalMembers / MEMBER_ANALYTICS_PAGE_SIZE));
+    const { start, end } = getPageRange(totalMembers, page);
+
+    info.textContent = `Showing ${start}-${end} of ${totalMembers}`;
+    prevButton.disabled = page <= 1 || totalMembers === 0;
+    nextButton.disabled = page >= totalPages || totalMembers === 0;
+  }
+
+  // ---------------------------------------------
+  // RENDERING
+  // ---------------------------------------------
+  function renderMemberRows(members) {
+    const tbody = document.getElementById('memberAnalyticsBody');
+
+    if (!members.length) {
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = members
+      .map(({ member, analytics, summary }) => {
+        const initials = getInitials(member.name || member.uid);
+        const color = getAvatarColor(member.id);
+
+        return `
+          <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
+            <td class="py-3 pr-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
+                <span>${member.name || member.uid}</span>
+              </div>
+            </td>
+            <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesSent}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesWithImages}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${summary.totalTimeFormatted}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsCompleted}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${summary.totalCodeExecutions}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${formatPercent(summary.interactionPercentage)}</td>
+            <td class="py-3 whitespace-nowrap">${formatPercent(summary.averageScrollDepth)}</td>
+          </tr>
+        `;
+      })
+      .join('');
+  }
+
+  // ---------------------------------------------
+  // DATA TRANSFORMATIONS
+  // ---------------------------------------------
+  function normalizeMemberSummary(rawSummary) {
+    const empty = {
       totalTimeFormatted: '0m',
       totalLessonsViewed: 0,
       totalLessonsCompleted: 0,
@@ -32,220 +247,49 @@ comments: false
       interactionPercentage: 0,
       averageScrollDepth: 0
     };
+    if (!rawSummary) return empty;
+
+    return {
+      totalTimeFormatted: rawSummary.totalTimeFormatted || empty.totalTimeFormatted,
+      totalLessonsViewed: rawSummary.totalLessonsViewed ?? empty.totalLessonsViewed,
+      totalLessonsCompleted: rawSummary.totalLessonsCompleted ?? empty.totalLessonsCompleted,
+      totalCodeExecutions: rawSummary.totalCodeExecutions ?? empty.totalCodeExecutions,
+      interactionPercentage: rawSummary.interactionPercentage ?? empty.interactionPercentage,
+      averageScrollDepth: rawSummary.averageScrollDepth ?? empty.averageScrollDepth
+    };
   }
 
-  // Extract group name from URL query parameter
-  function getGroupNameFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    const groupName = params.get('group');
-    if (groupName) {
-      return decodeURIComponent(groupName).replace(/-/g, ' ');
-    }
-    return null;
+  function normalizeMemberAnalytics(rawAnalytics, groupId) {
+    const empty = { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
+    if (!rawAnalytics) return empty;
+
+    const groupData = rawAnalytics.groupAnalytics?.find(g => g.groupId === groupId);
+    return {
+      messagesSent: groupData?.messagesSent ?? 0,
+      messagesWithImages: groupData?.messagesWithImages ?? 0,
+      sharedFilesCount: groupData?.sharedFilesCount ?? 0
+    };
   }
 
-  // Load group data based on name
-  async function loadGroupDashboard() {
-    const groupName = getGroupNameFromURL();
-    
-    if (!groupName) {
-      // Redirect to groups list if no group specified
-      window.location.href = '{{site.baseurl}}/student/groups';
-      return;
-    }
-
-    // Update page title
-    document.getElementById('dashboardGroupName').textContent = groupName;
-    document.title = `${groupName} - Dashboard`;
-
-    try {
-      // Try to fetch group data from API
-      const response = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(groupName)}`, fetchOptions);
-      
-      if (response.ok) {
-        const groups = await response.json();
-        const group = Array.isArray(groups) 
-          ? groups.find(g => g.name.toLowerCase() === groupName.toLowerCase()) || groups[0]
-          : groups;
-        
-        if (group && group.id) {
-          console.log('Loading dashboard for group:', group.name, 'ID:', group.id);
-          populateDashboard(group);
-        } else {
-          // Group not found - show placeholder data
-          console.log('Group not found or missing ID:', group);
-          document.getElementById('dashboardGroupMeta').textContent = 'Group data not available';
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load group data:', error);
-      // Show placeholder data on error
-      document.getElementById('dashboardGroupMeta').textContent = 'Unable to load group data';
-    }
-  }
-
-  // Fetch analytics data for a specific member in a specific group
-  async function fetchMemberAnalytics(personId, groupId) {
-    try {
-      const response = await fetch(`${javaURI}/api/groups/chat/analytics/${personId}`, fetchOptions);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          // Person has no analytics data yet
-          return { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
-        }
-        throw new Error(`Failed to fetch analytics: ${response.status}`);
-      }
-      
-      const analytics = await response.json();
-      
-      // Find the specific group's analytics from the groupAnalytics array
-      const groupData = analytics.groupAnalytics?.find(g => g.groupId === groupId);
-      
-      if (groupData) {
-        return {
-          messagesSent: groupData.messagesSent || 0,
-          messagesWithImages: groupData.messagesWithImages || 0,
-          sharedFilesCount: groupData.sharedFilesCount || 0
-        };
-      }
-      
-      // Member is in group but has no activity yet
-      console.log(`No activity found for person ${personId} in group ${groupId}`);
-      return { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
-      
-    } catch (error) {
-      console.warn(`Failed to fetch analytics for person ${personId}:`, error);
-      return { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
-    }
-  }
-
-  async function fetchMemberSummary(personId) {
-    try {
-      const response = await fetch(`${javaURI}/api/ocs-analytics/admin/user/${personId}/summary`, fetchOptions);
-
-      if (!response.ok) {
-        if ([401, 403, 404].includes(response.status)) {
-          return getDefaultMemberSummary();
-        }
-        throw new Error(`Failed to fetch member summary: ${response.status}`);
-      }
-
-      const summary = await response.json();
-      return {
-        totalTimeFormatted: summary?.totalTimeFormatted || '0m',
-        totalLessonsViewed: summary?.totalLessonsViewed || 0,
-        totalLessonsCompleted: summary?.totalLessonsCompleted || 0,
-        totalCodeExecutions: summary?.totalCodeExecutions || 0,
-        interactionPercentage: summary?.interactionPercentage || 0,
-        averageScrollDepth: summary?.averageScrollDepth || 0
-      };
-    } catch (error) {
-      console.warn(`Failed to fetch OCS summary for person ${personId}:`, error);
-      return getDefaultMemberSummary();
-    }
-  }
-
-  function getMemberAnalyticsCacheKey(groupId, personId) {
-    return `${groupId}:${personId}`;
-  }
-
-  function getMemberSummaryCacheKey(personId) {
-    return `${personId}`;
-  }
-
-  function getMemberAnalyticsPageRange(totalMembers, page) {
-    if (totalMembers === 0) {
-      return { start: 0, end: 0 };
-    }
-
-    const start = (page - 1) * MEMBER_ANALYTICS_PAGE_SIZE + 1;
-    const end = Math.min(page * MEMBER_ANALYTICS_PAGE_SIZE, totalMembers);
-    return { start, end };
-  }
-
-  function updateMemberAnalyticsPagination(totalMembers, page) {
-    const info = document.getElementById('memberAnalyticsPaginationInfo');
-    const prevButton = document.getElementById('memberAnalyticsPrevButton');
-    const nextButton = document.getElementById('memberAnalyticsNextButton');
-    const totalPages = Math.max(1, Math.ceil(totalMembers / MEMBER_ANALYTICS_PAGE_SIZE));
-    const { start, end } = getMemberAnalyticsPageRange(totalMembers, page);
-
-    info.textContent = `Showing ${start}-${end} of ${totalMembers}`;
-    prevButton.disabled = page <= 1 || totalMembers === 0;
-    nextButton.disabled = page >= totalPages || totalMembers === 0;
-  }
-
-  function renderMemberAnalyticsRows(membersWithAnalytics) {
-    const tbody = document.getElementById('memberAnalyticsBody');
-
-    if (!membersWithAnalytics.length) {
-      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = membersWithAnalytics.map(({ member, analytics, summary }) => {
-      const initials = getInitials(member.name || member.uid);
-      const color = getRandomColor(member.id);
-
-      return `
-        <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
-          <td class="py-3 pr-4 whitespace-nowrap">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
-              <span>${member.name || member.uid}</span>
-            </div>
-          </td>
-          <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesSent}</td>
-          <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesWithImages}</td>
-          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalTimeFormatted}</td>
-          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsCompleted}</td>
-          <td class="py-3 pr-4 whitespace-nowrap">${summary.totalCodeExecutions}</td>
-          <td class="py-3 pr-4 whitespace-nowrap">${formatPercent(summary.interactionPercentage)}</td>
-          <td class="py-3 whitespace-nowrap">${formatPercent(summary.averageScrollDepth)}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  function formatPercent(value) {
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) {
-      return '0.0%';
-    }
-    return `${numericValue.toFixed(1)}%`;
-  }
-
+  // ---------------------------------------------
+  // DATA LOADING
+  // ---------------------------------------------
   async function loadDashboardSummaryStats(group) {
-    const firstMember = group.members?.[0];
     const totalFilesEl = document.getElementById('statTotalFiles');
     const totalMessagesEl = document.getElementById('statTotalMessages');
 
     totalFilesEl.textContent = '0';
     totalMessagesEl.textContent = '0';
 
-    const requests = [];
+    const analyticsPromise = fetchGroupChatAnalytics(group.members?.[0]?.id);
+    const messagesPromise = fetchGroupMessages(group.id);
 
-    if (firstMember) {
-      requests.push(fetch(`${javaURI}/api/groups/chat/analytics/${firstMember.id}`, fetchOptions));
-    } else {
-      requests.push(Promise.resolve(null));
-    }
+    const [analytics, messages] = await Promise.all([analyticsPromise, messagesPromise]);
 
-    requests.push(fetch(`${javaURI}/api/groups/chat/${group.id}/messages`, fetchOptions));
+    const normalizedAnalytics = normalizeMemberAnalytics(analytics, group.id);
+    totalFilesEl.textContent = normalizedAnalytics.sharedFilesCount || 0;
 
-    const [analyticsResponse, messagesResponse] = await Promise.all(requests);
-
-    if (analyticsResponse?.ok) {
-      const analytics = await analyticsResponse.json();
-      const groupData = analytics.groupAnalytics?.find(g => g.groupId === group.id);
-      totalFilesEl.textContent = groupData?.sharedFilesCount || 0;
-    }
-
-    if (messagesResponse.ok) {
-      const messages = await messagesResponse.json();
-      totalMessagesEl.textContent = Array.isArray(messages) ? messages.length : 0;
-    }
+    totalMessagesEl.textContent = Array.isArray(messages) ? messages.length : 0;
   }
 
   async function loadMemberAnalyticsPage(page) {
@@ -255,116 +299,119 @@ comments: false
     const totalMembers = members.length;
     const totalPages = Math.max(1, Math.ceil(totalMembers / MEMBER_ANALYTICS_PAGE_SIZE));
     const safePage = Math.min(Math.max(page, 1), totalPages);
-    const tbody = document.getElementById('memberAnalyticsBody');
 
     memberAnalyticsCurrentPage = safePage;
-    updateMemberAnalyticsPagination(totalMembers, safePage);
+    updatePaginationControls(totalMembers, safePage);
 
     if (totalMembers === 0) {
-      renderMemberAnalyticsRows([]);
+      renderMemberRows([]);
       return;
     }
 
+    const tbody = document.getElementById('memberAnalyticsBody');
     tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>`;
 
     const startIndex = (safePage - 1) * MEMBER_ANALYTICS_PAGE_SIZE;
     const pageMembers = members.slice(startIndex, startIndex + MEMBER_ANALYTICS_PAGE_SIZE);
 
     try {
-      const membersWithAnalytics = await Promise.all(pageMembers.map(async member => {
-        const analyticsCacheKey = getMemberAnalyticsCacheKey(activeDashboardGroup.id, member.id);
-        const summaryCacheKey = getMemberSummaryCacheKey(member.id);
-        let analytics = memberAnalyticsCache.get(analyticsCacheKey);
-        let summary = memberSummaryCache.get(summaryCacheKey);
+      const membersWithAnalytics = await Promise.all(
+        pageMembers.map(async member => {
+          const analyticsKey = memberAnalyticsCacheKey(activeDashboardGroup.id, member.id);
+          const summaryKey = memberSummaryCacheKey(member.id);
 
-        if (!analytics || !summary) {
-          const requests = [
-            analytics ? Promise.resolve(analytics) : fetchMemberAnalytics(member.id, activeDashboardGroup.id),
-            summary ? Promise.resolve(summary) : fetchMemberSummary(member.id)
-          ];
-          const [resolvedAnalytics, resolvedSummary] = await Promise.all(requests);
-          analytics = resolvedAnalytics;
-          summary = resolvedSummary;
-          memberAnalyticsCache.set(analyticsCacheKey, analytics);
-          memberSummaryCache.set(summaryCacheKey, summary);
-        }
+          let analytics = memberAnalyticsCache.get(analyticsKey);
+          let summary = memberSummaryCache.get(summaryKey);
 
-        return { member, analytics, summary };
-      }));
+          if (!analytics || !summary) {
+            const [rawAnalytics, rawSummary] = await Promise.all([
+              analytics ? Promise.resolve(analytics) : fetchGroupChatAnalytics(member.id),
+              summary ? Promise.resolve(summary) : fetchMemberSummary(member.id)
+            ]);
 
-      renderMemberAnalyticsRows(membersWithAnalytics);
-      updateMemberAnalyticsPagination(totalMembers, safePage);
+            analytics = normalizeMemberAnalytics(rawAnalytics, activeDashboardGroup.id);
+            summary = normalizeMemberSummary(rawSummary);
+
+            memberAnalyticsCache.set(analyticsKey, analytics);
+            memberSummaryCache.set(summaryKey, summary);
+          }
+
+          return { member, analytics, summary };
+        })
+      );
+
+      renderMemberRows(membersWithAnalytics);
+      updatePaginationControls(totalMembers, safePage);
     } catch (error) {
       console.error('Failed to load member analytics page:', error);
+      const tbody = document.getElementById('memberAnalyticsBody');
       tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>`;
     }
   }
 
-  // Populate dashboard with group data
-  async function populateDashboard(group) {
+  // ---------------------------------------------
+  // PAGE INITIALIZATION / ORCHESTRATOR
+  // ---------------------------------------------
+  function redirectToGroupsList() {
+    window.location.href = '{{site.baseurl}}/student/groups';
+  }
+
+  function updateDashboardHeader(group) {
     const memberCount = (group.members || []).length;
-    const tbody = document.getElementById('memberAnalyticsBody');
-    
-    // Update header
+
     document.getElementById('dashboardGroupName').textContent = group.name;
-    document.getElementById('dashboardGroupMeta').textContent = 
+    document.title = `${group.name} - Dashboard`;
+
+    document.getElementById('dashboardGroupMeta').textContent =
       `Period ${group.period || 'N/A'} · ${group.course || 'N/A'} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
-    
-    // Set global group ID for shared files and chat functionality
-    window.currentDashboardGroupId = group.id;
-    activeDashboardGroup = group;
-    memberAnalyticsCurrentPage = 1;
 
-    // Update stats
     document.getElementById('statTotalMembers').textContent = memberCount;
-    updateMemberAnalyticsPagination(memberCount, memberAnalyticsCurrentPage);
+  }
 
-    // Update member analytics table if we have real members
-    if (group.members && group.members.length > 0) {
-      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>`;
-      
-      try {
-        await loadDashboardSummaryStats(group);
-        await loadMemberAnalyticsPage(1);
-      } catch (error) {
-        console.error('Failed to load member analytics:', error);
-        // Show error state
-        tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>`;
+  async function loadGroupDashboard() {
+    const rawGroupName = getQueryParam('group');
+    if (!rawGroupName) {
+      redirectToGroupsList();
+      return;
+    }
+
+    const groupName = decodeURIComponent(rawGroupName).replace(/-/g, ' ');
+
+    try {
+      const group = await fetchGroupByName(groupName);
+
+      if (!group || !group.id) {
+        throw createFetchError(ERROR_TYPES.INVALID_GROUP);
       }
-    } else {
-      // No members in group - show empty state and reset stats
-      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
-      document.getElementById('statTotalMessages').textContent = 0;
-      document.getElementById('statTotalFiles').textContent = 0;
+
+      activeDashboardGroup = group;
+      memberAnalyticsCurrentPage = 1;
+
+      updateDashboardHeader(group);
+
+      const tbody = document.getElementById('memberAnalyticsBody');
+      if (!group.members || group.members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
+        document.getElementById('statTotalMessages').textContent = 0;
+        document.getElementById('statTotalFiles').textContent = 0;
+        return;
+      }
+
+      await Promise.all([loadDashboardSummaryStats(group), loadMemberAnalyticsPage(1)]);
+
+      // Store group data for other dashboard scripts
+      window.currentDashboardGroupId = group.id;
+      window.currentGroupData = group;
+
+      if (typeof window.fetchDashboardSharedFiles === 'function') {
+        await window.fetchDashboardSharedFiles();
+      }
+    } catch (error) {
+      console.error('Failed to load group dashboard:', error);
+      const userMessage = buildErrorMessage(error);
+      const color = error.type === ERROR_TYPES.AUTHENTICATION_REQUIRED ? 'text-gray-400' : 'text-red-400';
+      showError(document.getElementById('dashboardGroupMeta'), userMessage, color);
     }
-
-    // Store group data for chat functionality
-    window.currentGroupData = group;
-    
-    // Fetch and display shared files for this group
-    if (typeof window.fetchDashboardSharedFiles === 'function') {
-      await window.fetchDashboardSharedFiles();
-    }
-  }
-
-  // Helper to get initials from name
-  function getInitials(name) {
-    if (!name) return '??';
-    return name.split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  }
-
-  // Helper to get a consistent color based on ID
-  function getRandomColor(id) {
-    const colors = [
-      'bg-indigo-600', 'bg-purple-600', 'bg-orange-600', 
-      'bg-teal-600', 'bg-pink-600', 'bg-blue-600', 
-      'bg-green-600', 'bg-red-600', 'bg-yellow-600'
-    ];
-    return colors[id % colors.length];
   }
 
   window.previousMemberAnalyticsPage = function () {
@@ -375,6 +422,5 @@ comments: false
     loadMemberAnalyticsPage(memberAnalyticsCurrentPage + 1);
   };
 
-  // Initialize on page load
   document.addEventListener('DOMContentLoaded', loadGroupDashboard);
 </script>
