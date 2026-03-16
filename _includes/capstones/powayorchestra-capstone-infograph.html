@@ -38,7 +38,6 @@
     margin-right: calc(50% - 46vw);
   }
 
-  /* ── TOPBAR ─────────────────────────────────────── */
   .pso-topbar {
     position: sticky;
     top: 0;
@@ -123,7 +122,6 @@
 
   .top-nav-caret { font-size: 0.6rem; opacity: 0.7; }
 
-  /* Dropdown */
   .top-nav-dropdown {
     display: none;
     position: absolute;
@@ -158,7 +156,6 @@
     color: var(--gold-light);
   }
 
-  /* ── HERO ─────────────────────────────────────────── */
   .hero {
     background: var(--navy);
     padding: 5rem 2rem 4rem;
@@ -230,7 +227,6 @@
     flex-wrap: wrap;
   }
 
-  /* ── MATCHING GIFT BANNER ───────────────────────── */
   .matching-banner {
     background: linear-gradient(135deg, var(--gold) 0%, #a8882a 100%);
     color: var(--navy);
@@ -247,7 +243,6 @@
   .matching-banner:hover { opacity: 0.92; }
   .matching-banner a { color: var(--navy); font-weight: 700; text-decoration: underline; cursor: pointer; }
 
-  /* ── BUTTONS ─────────────────────────────────────── */
   .btn {
     display: inline-block;
     font-family: 'Jost', sans-serif;
@@ -287,7 +282,6 @@
     background: rgba(200,168,75,0.06);
   }
 
-  /* ── SECTIONS ─────────────────────────────────────── */
   .section {
     padding: 4.5rem 2rem;
     max-width: 1380px;
@@ -333,7 +327,6 @@
     margin-top: 3rem;
   }
 
-  /* ── STATS ─────────────────────────────────────────── */
   .stats-band {
     background: var(--navy-mid);
     border-top: 1px solid var(--border);
@@ -367,7 +360,6 @@
     margin-top: 0.4rem;
   }
 
-  /* ── CONCERT CARDS ─────────────────────────────────── */
   .concert-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -444,7 +436,6 @@
     font-style: italic;
   }
 
-  /* ── TICKET OPTIONS ─────────────────────────────────── */
   .ticket-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -501,7 +492,6 @@
     color: var(--gold);
   }
 
-  /* ── DONATE ─────────────────────────────────────────── */
   .donate-section { background: var(--navy-mid); }
 
   .donate-tiers {
@@ -565,7 +555,6 @@
     line-height: 1.65;
   }
 
-  /* ── ABOUT / CONDUCTOR ─────────────────────────────── */
   .conductor-card {
     background: var(--navy-mid);
     border: 1px solid var(--border);
@@ -598,7 +587,6 @@
     line-height: 1.75;
   }
 
-  /* ── MUSICIANS ──────────────────────────────────────── */
   .musicians-highlights {
     list-style: none;
     padding: 0;
@@ -631,7 +619,6 @@
     margin-top: 1.5rem;
   }
 
-  /* ── NEWS ─────────────────────────────────────────── */
   .news-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -673,7 +660,6 @@
     margin-bottom: 1.2rem;
   }
 
-  /* ── INSTRUMENT SOUNDBOARD ─────────────────────────── */
   .instrument-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -767,16 +753,6 @@
     background: rgba(200,168,75,0.06);
   }
 
-  .soundboard-note {
-    max-width: 900px;
-    margin: 1.5rem auto 0;
-    padding: 1rem 1.2rem;
-    border-left: 3px solid var(--gold);
-    background: rgba(200,168,75,0.06);
-    color: rgba(250,246,239,0.78);
-  }
-
-  /* ── ORCHESTRA VIDEO CLIPS ─────────────────────────── */
   .video-shell {
     display: grid;
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
@@ -879,7 +855,6 @@
     line-height: 1.6;
   }
 
-  /* ── CONTACT ─────────────────────────────────────── */
   .contact-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -906,15 +881,6 @@
 
   .contact-block a:hover { color: var(--gold-light); }
 
-  .social-row {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 2rem;
-  }
-
-  /* ── MEDIA (video placeholder) ──────────────────── */
   .media-placeholder {
     background: var(--navy-mid);
     border: 1px solid var(--border);
@@ -937,7 +903,6 @@
     line-height: 1.7;
   }
 
-  /* ── FOOTER ─────────────────────────────────────── */
   .pso-footer {
     background: #060e1a;
     border-top: 1px solid var(--border);
@@ -954,10 +919,8 @@
 
   .pso-footer a { color: var(--gold); text-decoration: none; }
 
-  /* ── HIDDEN ─────────────────────────────────────── */
   .is-hidden { display: none !important; }
 
-  /* ── RESPONSIVE ─────────────────────────────────── */
   @media (max-width: 980px) {
     .video-shell {
       grid-template-columns: 1fr;
@@ -986,7 +949,6 @@
 
 <div class="pso-foundation">
 
-  <!-- TOPBAR -->
   <div class="pso-topbar">
     <button class="pso-home-trigger" type="button" aria-label="Go to home">
       <span class="pso-treble">𝄞</span>
@@ -997,27 +959,27 @@
       <div class="top-nav-item has-submenu">
         <a href="#about" class="top-nav-link">About <span class="top-nav-caret">&#9662;</span></a>
         <div class="top-nav-dropdown">
-          <a href="#about"       class="top-nav-dropdown-link">Our Mission</a>
-          <a href="#foundation"  class="top-nav-dropdown-link">Foundation</a>
-          <a href="#news"        class="top-nav-dropdown-link">News</a>
+          <a href="#about" class="top-nav-dropdown-link">Our Mission</a>
+          <a href="#foundation" class="top-nav-dropdown-link">Foundation</a>
+          <a href="#news" class="top-nav-dropdown-link">News</a>
         </div>
       </div>
 
       <div class="top-nav-item has-submenu">
         <a href="#concerts" class="top-nav-link">Concerts <span class="top-nav-caret">&#9662;</span></a>
         <div class="top-nav-dropdown">
-          <a href="#concerts"  class="top-nav-dropdown-link">2025–2026 Season</a>
-          <a href="#tickets"   class="top-nav-dropdown-link">Buy Tickets</a>
-          <a href="#media"     class="top-nav-dropdown-link">Videos &amp; Recordings</a>
-          <a href="#listen"    class="top-nav-dropdown-link">Hear the Orchestra</a>
+          <a href="#concerts" class="top-nav-dropdown-link">2025–2026 Season</a>
+          <a href="#tickets" class="top-nav-dropdown-link">Buy Tickets</a>
+          <a href="#media" class="top-nav-dropdown-link">Videos &amp; Recordings</a>
+          <a href="#listen" class="top-nav-dropdown-link">Hear the Orchestra</a>
         </div>
       </div>
 
       <div class="top-nav-item has-submenu">
         <a href="#support" class="top-nav-link">Support <span class="top-nav-caret">&#9662;</span></a>
         <div class="top-nav-dropdown">
-          <a href="#donate"     class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Donor &amp; Sponsor Program</a>
-          <a href="#donate"     class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Volunteer</a>
+          <a href="#donate" class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Donor &amp; Sponsor Program</a>
+          <a href="#donate" class="top-nav-dropdown-link cta-reveal" data-reveal="donate,contact">Volunteer</a>
         </div>
       </div>
 
@@ -1048,17 +1010,14 @@
       <div class="top-nav-item">
         <a href="#donate" class="top-nav-link btn-primary cta-reveal" data-reveal="donate,contact">Donate</a>
       </div>
-
     </nav>
   </div>
 
-  <!-- MATCHING GIFT BANNER (home only) -->
   <div class="matching-banner home-only" id="matching-banner">
-    🎶 <strong>Matching Gift Opportunity!</strong> A generous donor will match all gifts up to $25,000 — your support goes twice as far! &nbsp;
+    🎶 <strong>Matching Gift Opportunity!</strong> A generous donor will match all gifts up to $25,000. Your support goes twice as far! &nbsp;
     <a href="#donate" class="cta-reveal" data-reveal="donate,contact">Learn More or Donate Now →</a>
   </div>
 
-  <!-- ══ HERO ══════════════════════════════════════════════════════════ -->
   <section class="hero" id="home">
     <p class="hero-eyebrow">Poway Center for the Performing Arts · Est. 2004</p>
     <h1>Poway Symphony Orchestra</h1>
@@ -1072,17 +1031,15 @@
     </p>
     <div class="hero-actions">
       <a href="#concerts" class="btn btn-primary">2025–2026 Season</a>
-      <a href="#tickets"  class="btn btn-secondary">Buy Tickets</a>
-      <a href="#listen"   class="btn btn-secondary">Hear the Orchestra</a>
+      <a href="#tickets" class="btn btn-secondary">Buy Tickets</a>
+      <a href="#listen" class="btn btn-secondary">Hear the Orchestra</a>
       <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="btn btn-secondary" data-allow-navigation="true">Member Sign In</a>
-      <a href="#donate"   class="btn btn-secondary cta-reveal" data-reveal="donate,contact">Donate</a>
+      <a href="#donate" class="btn btn-secondary cta-reveal" data-reveal="donate,contact">Donate</a>
     </div>
   </section>
 
-  <!-- BLANK VIEW -->
   <section class="reveal-topic is-hidden" id="blank-view" aria-label="Content area"></section>
 
-  <!-- ══ STATS ═════════════════════════════════════════════════════════ -->
   <div class="stats-band home-only" id="stats-band">
     <div class="stats-grid">
       <div>
@@ -1108,7 +1065,6 @@
     </div>
   </div>
 
-  <!-- ══ ABOUT ══════════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="about">
     <div class="section">
       <h2>About the Orchestra</h2>
@@ -1120,14 +1076,13 @@
         region for over two decades.
       </p>
       <div class="section-cta-row">
-        <a href="#concerts"  class="btn btn-secondary">View This Season</a>
+        <a href="#concerts" class="btn btn-secondary">View This Season</a>
         <a href="#foundation" class="btn btn-secondary">Our Foundation</a>
-        <a href="#musicians"  class="btn btn-secondary">Join the Orchestra</a>
+        <a href="#musicians" class="btn btn-secondary">Join the Orchestra</a>
       </div>
     </div>
   </section>
 
-  <!-- ══ CONDUCTOR ═════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="conductor">
     <div class="section">
       <h2>Conductor &amp; Music Director</h2>
@@ -1148,7 +1103,6 @@
     </div>
   </section>
 
-  <!-- ══ FOUNDATION ════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="foundation">
     <div class="section">
       <h2>The PSO Foundation</h2>
@@ -1164,7 +1118,6 @@
     </div>
   </section>
 
-  <!-- ══ CONCERTS ══════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="concerts">
     <div class="section">
       <h2>2025–2026 Concert Season</h2>
@@ -1175,14 +1128,13 @@
       </p>
 
       <div class="concert-grid">
-
         <div class="concert-card">
           <span class="concert-badge past">Past</span>
           <h3>Dvořák in America</h3>
           <p class="concert-date">Sunday, November 16, 2025 · 4:00 PM</p>
           <p>
             An all-Dvořák celebration of melody, heart, and heritage. Symphony No. 9
-            captures the grandeur of American landscapes and Dvořák's Bohemian soul —
+            captures the grandeur of American landscapes and Dvořák's Bohemian soul,
             one of the most beloved symphonies in the repertoire.
           </p>
           <ul class="program-list">
@@ -1213,7 +1165,7 @@
           <p class="concert-date">Sunday, May 31, 2026 · 4:00 PM</p>
           <p>
             Celebrating the 250th anniversary of the United States with bold American
-            voices — Copland, Hovhaness, Gershwin, and Bernstein — with pianist Dan Yu
+            voices, Copland, Hovhaness, Gershwin, and Bernstein, with pianist Dan Yu
             as guest soloist.
           </p>
           <ul class="program-list">
@@ -1225,25 +1177,23 @@
           </ul>
           <a href="#tickets" class="btn btn-primary" style="margin-top:0.5rem">Buy Tickets</a>
         </div>
-
       </div>
 
       <div class="section-cta-row">
         <a href="#tickets" class="btn btn-primary">Ticket Information</a>
-        <a href="#media"   class="btn btn-secondary">Videos &amp; Recordings</a>
-        <a href="#listen"  class="btn btn-secondary">Hear the Orchestra</a>
+        <a href="#media" class="btn btn-secondary">Videos &amp; Recordings</a>
+        <a href="#listen" class="btn btn-secondary">Hear the Orchestra</a>
       </div>
     </div>
   </section>
 
-  <!-- ══ TICKETS ═══════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="tickets">
     <div class="section">
       <h2>Buy Tickets</h2>
       <div class="section-divider"></div>
       <p class="section-intro">
         Individual concert tickets are available for all upcoming performances.
-        Season subscriptions for 2025–2026 are no longer available — watch for
+        Season subscriptions for 2025–2026 are no longer available. Watch for
         2026–2027 announcements later this year.
       </p>
 
@@ -1268,18 +1218,17 @@
       <ul class="ticket-notes">
         <li>Discounts available for seniors, students, and children.</li>
         <li>Free parking at the venue.</li>
-        <li>All ticket sales are final — no refunds or exchanges.</li>
+        <li>All ticket sales are final. No refunds or exchanges.</li>
         <li>Prices include a $5 box office fee.</li>
       </ul>
 
       <div class="section-cta-row">
         <a href="#concerts" class="btn btn-secondary">View Full Season</a>
-        <a href="#donate"   class="btn btn-primary cta-reveal" data-reveal="donate,contact">Make a Donation</a>
+        <a href="#donate" class="btn btn-primary cta-reveal" data-reveal="donate,contact">Make a Donation</a>
       </div>
     </div>
   </section>
 
-  <!-- ══ MEDIA ══════════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="media">
     <div class="section">
       <h2>Videos &amp; Recordings</h2>
@@ -1302,7 +1251,6 @@
     </div>
   </section>
 
-  <!-- ══ HEAR THE ORCHESTRA ═══════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="listen">
     <div class="section">
       <h2>Hear the Orchestra</h2>
@@ -1319,7 +1267,7 @@
           <h3>Violin</h3>
           <p>Bright, singing, and agile. The violin often carries melody and shimmer across the orchestra.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="violin.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/violin.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1329,7 +1277,7 @@
           <h3>Viola</h3>
           <p>Warm and mellow. The viola deepens the middle texture and adds rich inner color.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="viola.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/viola.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1339,7 +1287,7 @@
           <h3>Cello</h3>
           <p>Resonant and expressive. The cello can sound noble, lyrical, intimate, or dramatic.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="cello.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/cello.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1349,7 +1297,7 @@
           <h3>Flute</h3>
           <p>Clear and floating. The flute brings air, light, and sparkle to the ensemble.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="flute.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/flute.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1359,7 +1307,7 @@
           <h3>Clarinet</h3>
           <p>Smooth and flexible. The clarinet can sound dark and velvety or light and playful.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="clarinet.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/clarinet.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1369,7 +1317,7 @@
           <h3>Trumpet</h3>
           <p>Brilliant and commanding. The trumpet adds brilliance, fanfare, and energy.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="trumpet.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/trumpet.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1379,7 +1327,7 @@
           <h3>French Horn</h3>
           <p>Round and noble. The horn bridges brass warmth with lyrical orchestral blend.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="french-horn.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/french-horn.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1389,7 +1337,7 @@
           <h3>Timpani</h3>
           <p>Deep and ceremonial. Timpani shape momentum and power in major symphonic moments.</p>
           <div class="instrument-actions">
-            <button class="play-sample-btn" type="button" data-audio="timpani.mp3">Play Sample</button>
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orcestra/timpani.mp3">Play Sample</button>
             <button class="stop-sample-btn" type="button">Stop</button>
           </div>
         </article>
@@ -1456,19 +1404,18 @@
     </div>
   </section>
 
-  <!-- ══ DONATE ══════════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden donate-section section-full" id="donate">
     <div class="section">
       <h2>Support the Music</h2>
       <div class="section-divider"></div>
 
       <div class="matching-banner" style="border-radius:4px; margin-bottom:2rem; max-width:660px; margin-left:auto; margin-right:auto;">
-        🎶 <strong>Matching Gift Opportunity!</strong> All gifts matched up to $25,000 — your donation goes twice as far!
+        🎶 <strong>Matching Gift Opportunity!</strong> All gifts matched up to $25,000. Your donation goes twice as far!
       </div>
 
       <p class="section-intro">
         Your gift keeps live orchestral music thriving in North County San Diego. Every
-        contribution — large or small — directly supports our musicians, guest artists,
+        contribution, large or small, directly supports our musicians, guest artists,
         and community outreach programs.
       </p>
 
@@ -1516,7 +1463,6 @@
     </div>
   </section>
 
-  <!-- ══ MUSICIANS ══════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="musicians">
     <div class="section">
       <h2>Join the Orchestra</h2>
@@ -1544,7 +1490,6 @@
     </div>
   </section>
 
-  <!-- ══ NEWS ══════════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="news">
     <div class="section">
       <h2>News &amp; Updates</h2>
@@ -1577,12 +1522,11 @@
       </div>
       <div class="section-cta-row">
         <a href="#concerts" class="btn btn-secondary">View Upcoming Concerts</a>
-        <a href="#donate"   class="btn btn-primary cta-reveal" data-reveal="donate,contact">Support the Orchestra</a>
+        <a href="#donate" class="btn btn-primary cta-reveal" data-reveal="donate,contact">Support the Orchestra</a>
       </div>
     </div>
   </section>
 
-  <!-- ══ CONTACT ════════════════════════════════════════════════════════ -->
   <section class="reveal-topic is-hidden" id="contact">
     <div class="section">
       <h2>Contact Us</h2>
@@ -1617,8 +1561,7 @@
   <footer class="pso-footer">
     <p>© 2025 Poway Symphony Orchestra Foundation · 501(c)(3) Non-Profit · 15498 Espola Road, Poway CA 92064</p>
   </footer>
-
-</div><!-- /.pso-foundation -->
+</div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
@@ -1626,11 +1569,11 @@
   var root = document.querySelector('.pso-foundation');
   if (!root) return;
 
-  var homeSection      = root.querySelector('#home');
+  var homeSection = root.querySelector('#home');
   var homeOnlySections = root.querySelectorAll('.home-only');
-  var homeButton       = root.querySelector('.pso-home-trigger');
-  var topicSections    = root.querySelectorAll('.reveal-topic');
-  var ctaButtons       = root.querySelectorAll('.cta-reveal');
+  var homeButton = root.querySelector('.pso-home-trigger');
+  var topicSections = root.querySelectorAll('.reveal-topic');
+  var ctaButtons = root.querySelectorAll('.cta-reveal');
 
   function hideAllTopics() {
     topicSections.forEach(function (s) { s.classList.add('is-hidden'); });
@@ -1690,7 +1633,11 @@
 
       if (/^https?:/i.test(href) || /^tel:/i.test(href) || /^mailto:/i.test(href)) return;
 
-      if (href === '#home') { e.preventDefault(); showHome(); return; }
+      if (href === '#home') {
+        e.preventDefault();
+        showHome();
+        return;
+      }
 
       if (href.charAt(0) === '#') {
         e.preventDefault();
@@ -1740,7 +1687,6 @@
   }
 })();
 
-/* ── INSTRUMENT SOUNDBOARD ───────────────────────── */
 (function () {
   var currentlyPlayingAudio = null;
   var currentlyPlayingButton = null;
@@ -1751,10 +1697,20 @@
       currentlyPlayingAudio.currentTime = 0;
       currentlyPlayingAudio = null;
     }
+
     if (currentlyPlayingButton) {
       currentlyPlayingButton.classList.remove('is-playing');
       currentlyPlayingButton.textContent = 'Play Sample';
       currentlyPlayingButton = null;
+    }
+  }
+
+  async function fileExists(url) {
+    try {
+      var response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -1763,7 +1719,7 @@
     var stopBtn = card.querySelector('.stop-sample-btn');
     if (!playBtn || !stopBtn) return;
 
-    playBtn.addEventListener('click', function () {
+    playBtn.addEventListener('click', async function () {
       var audioPath = playBtn.getAttribute('data-audio');
       if (!audioPath) return;
 
@@ -1774,15 +1730,23 @@
 
       stopCurrentAudio();
 
+      var exists = await fileExists(audioPath);
+      if (!exists) {
+        alert('Audio file not found at: ' + audioPath);
+        return;
+      }
+
       var audio = new Audio(audioPath);
       audio.preload = 'auto';
+
       audio.play().then(function () {
         currentlyPlayingAudio = audio;
         currentlyPlayingButton = playBtn;
         playBtn.classList.add('is-playing');
         playBtn.textContent = 'Playing';
-      }).catch(function () {
-        alert('Audio file not found yet. Add the sample file at: ' + audioPath);
+      }).catch(function (error) {
+        console.error('Audio playback error:', error);
+        alert('The file exists, but the browser could not play it: ' + audioPath);
       });
 
       audio.addEventListener('ended', function () {
@@ -1803,7 +1767,6 @@
   });
 })();
 
-/* ── YOUTUBE CLIP PLAYER ─────────────────────────── */
 var psoYouTubePlayer = null;
 var psoClipStopTimer = null;
 
