@@ -2,11 +2,10 @@
 toc: True
 layout: post
 title: Game API
-description: This post ensures that you know how to use the Game API to manage your stats within the game
+description: This guide help you understand how to use the Game API to manage your stats within the game
 permalink: /game/API
-author: Avika Prasad
-courses: {'csse': {'week': 9}}
-type: ccc 
+author: Avika Prasad, John Mortensen
+courses: {'csse': {'week': 15}}
 ---
 
 <div class="api-docs">
