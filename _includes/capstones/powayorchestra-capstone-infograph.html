@@ -673,6 +673,212 @@
     margin-bottom: 1.2rem;
   }
 
+  /* ── INSTRUMENT SOUNDBOARD ─────────────────────────── */
+  .instrument-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+    margin-top: 2rem;
+  }
+
+  .instrument-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .instrument-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .instrument-family {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .instrument-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--white);
+    margin-bottom: 0.45rem;
+  }
+
+  .instrument-card p {
+    font-size: 0.96rem;
+    color: rgba(250,246,239,0.72);
+    margin-bottom: 1rem;
+    line-height: 1.65;
+  }
+
+  .instrument-actions {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+
+  .play-sample-btn,
+  .stop-sample-btn {
+    appearance: none;
+    border: 1px solid transparent;
+    padding: 0.65rem 1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .play-sample-btn {
+    background: var(--gold);
+    color: var(--navy);
+    border-color: var(--gold);
+  }
+
+  .play-sample-btn:hover {
+    background: var(--gold-light);
+    border-color: var(--gold-light);
+  }
+
+  .play-sample-btn.is-playing {
+    background: #9fd89f;
+    border-color: #9fd89f;
+    color: #0d2710;
+  }
+
+  .stop-sample-btn {
+    background: transparent;
+    color: var(--cream);
+    border-color: rgba(200,168,75,0.45);
+  }
+
+  .stop-sample-btn:hover {
+    color: var(--gold-light);
+    border-color: var(--gold);
+    background: rgba(200,168,75,0.06);
+  }
+
+  .soundboard-note {
+    max-width: 900px;
+    margin: 1.5rem auto 0;
+    padding: 1rem 1.2rem;
+    border-left: 3px solid var(--gold);
+    background: rgba(200,168,75,0.06);
+    color: rgba(250,246,239,0.78);
+  }
+
+  /* ── ORCHESTRA VIDEO CLIPS ─────────────────────────── */
+  .video-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+    gap: 1.5rem;
+    align-items: start;
+    margin-top: 2rem;
+  }
+
+  .video-player-card,
+  .clip-list-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.3rem;
+  }
+
+  .video-frame-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #08111d;
+  }
+
+  .video-frame-wrap iframe,
+  .video-frame-wrap #pso-youtube-player {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .clip-list-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--white);
+    margin-bottom: 0.35rem;
+  }
+
+  .clip-list-copy {
+    font-size: 0.96rem;
+    color: rgba(250,246,239,0.72);
+    margin-bottom: 1rem;
+    line-height: 1.65;
+  }
+
+  .clip-list {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .clip-jump {
+    width: 100%;
+    text-align: left;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    color: var(--cream);
+  }
+
+  .clip-jump:hover {
+    border-color: var(--gold);
+    background: rgba(200,168,75,0.08);
+    transform: translateY(-1px);
+  }
+
+  .clip-time {
+    display: block;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+
+  .clip-label {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--white);
+    margin-bottom: 0.2rem;
+  }
+
+  .clip-description {
+    display: block;
+    font-size: 0.93rem;
+    color: rgba(250,246,239,0.72);
+    line-height: 1.55;
+  }
+
+  .clip-note {
+    margin-top: 1rem;
+    font-size: 0.88rem;
+    color: rgba(250,246,239,0.58);
+    line-height: 1.6;
+  }
+
   /* ── CONTACT ─────────────────────────────────────── */
   .contact-grid {
     display: grid;
@@ -752,6 +958,12 @@
   .is-hidden { display: none !important; }
 
   /* ── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 980px) {
+    .video-shell {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (max-width: 700px) {
     .pso-foundation {
       width: 100%;
@@ -766,6 +978,7 @@
     .section { padding: 3rem 1.2rem; }
     .section-full { padding: 3rem 1.2rem; }
     .concert-grid { grid-template-columns: 1fr; }
+    .instrument-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -796,6 +1009,7 @@
           <a href="#concerts"  class="top-nav-dropdown-link">2025–2026 Season</a>
           <a href="#tickets"   class="top-nav-dropdown-link">Buy Tickets</a>
           <a href="#media"     class="top-nav-dropdown-link">Videos &amp; Recordings</a>
+          <a href="#listen"    class="top-nav-dropdown-link">Hear the Orchestra</a>
         </div>
       </div>
 
@@ -817,6 +1031,10 @@
           <a href="#musicians" class="top-nav-dropdown-link">Join the Orchestra</a>
           <a href="#musicians" class="top-nav-dropdown-link">Musician Info</a>
         </div>
+      </div>
+
+      <div class="top-nav-item">
+        <a href="#listen" class="top-nav-link">Hear the Orchestra</a>
       </div>
 
       <div class="top-nav-item">
@@ -855,6 +1073,7 @@
     <div class="hero-actions">
       <a href="#concerts" class="btn btn-primary">2025–2026 Season</a>
       <a href="#tickets"  class="btn btn-secondary">Buy Tickets</a>
+      <a href="#listen"   class="btn btn-secondary">Hear the Orchestra</a>
       <a href="{{ '/capstone/powayorchestra/signin/' | relative_url }}" class="btn btn-secondary" data-allow-navigation="true">Member Sign In</a>
       <a href="#donate"   class="btn btn-secondary cta-reveal" data-reveal="donate,contact">Donate</a>
     </div>
@@ -957,7 +1176,6 @@
 
       <div class="concert-grid">
 
-        <!-- Concert 1 -->
         <div class="concert-card">
           <span class="concert-badge past">Past</span>
           <h3>Dvořák in America</h3>
@@ -973,7 +1191,6 @@
           </ul>
         </div>
 
-        <!-- Concert 2 -->
         <div class="concert-card upcoming">
           <span class="concert-badge upcoming">Upcoming</span>
           <h3>Mendelssohn Classics</h3>
@@ -990,7 +1207,6 @@
           <a href="#tickets" class="btn btn-primary" style="margin-top:0.5rem">Buy Tickets</a>
         </div>
 
-        <!-- Concert 3 -->
         <div class="concert-card upcoming">
           <span class="concert-badge upcoming">Upcoming</span>
           <h3>An American Celebration</h3>
@@ -1015,6 +1231,7 @@
       <div class="section-cta-row">
         <a href="#tickets" class="btn btn-primary">Ticket Information</a>
         <a href="#media"   class="btn btn-secondary">Videos &amp; Recordings</a>
+        <a href="#listen"  class="btn btn-secondary">Hear the Orchestra</a>
       </div>
     </div>
   </section>
@@ -1080,6 +1297,167 @@
       <div class="section-cta-row">
         <a href="https://youtube.com/channel/UCiqC2aUbjfNbMcLIr-oFifQ" class="btn btn-primary" target="_blank" rel="noopener">Watch on YouTube</a>
         <a href="#concerts" class="btn btn-secondary">Upcoming Concerts</a>
+        <a href="#listen" class="btn btn-secondary">Hear the Orchestra</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ HEAR THE ORCHESTRA ═══════════════════════════════════════════ -->
+  <section class="reveal-topic is-hidden" id="listen">
+    <div class="section">
+      <h2>Hear the Orchestra</h2>
+      <div class="section-divider"></div>
+      <p class="section-intro">
+        Explore instrument sounds and jump into featured moments from the orchestra’s
+        performance video. Visitors can sample instruments individually, then hear how
+        those colors come together in full symphonic performance.
+      </p>
+
+      <div class="instrument-grid">
+        <article class="instrument-card">
+          <p class="instrument-family">Strings</p>
+          <h3>Violin</h3>
+          <p>Bright, singing, and agile. The violin often carries melody and shimmer across the orchestra.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/violin.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Strings</p>
+          <h3>Viola</h3>
+          <p>Warm and mellow. The viola deepens the middle texture and adds rich inner color.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/viola.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Strings</p>
+          <h3>Cello</h3>
+          <p>Resonant and expressive. The cello can sound noble, lyrical, intimate, or dramatic.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/cello.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Woodwinds</p>
+          <h3>Flute</h3>
+          <p>Clear and floating. The flute brings air, light, and sparkle to the ensemble.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/flute.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Woodwinds</p>
+          <h3>Clarinet</h3>
+          <p>Smooth and flexible. The clarinet can sound dark and velvety or light and playful.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/clarinet.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Brass</p>
+          <h3>Trumpet</h3>
+          <p>Brilliant and commanding. The trumpet adds brilliance, fanfare, and energy.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/trumpet.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Brass</p>
+          <h3>French Horn</h3>
+          <p>Round and noble. The horn bridges brass warmth with lyrical orchestral blend.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/french-horn.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+
+        <article class="instrument-card">
+          <p class="instrument-family">Percussion</p>
+          <h3>Timpani</h3>
+          <p>Deep and ceremonial. Timpani shape momentum and power in major symphonic moments.</p>
+          <div class="instrument-actions">
+            <button class="play-sample-btn" type="button" data-audio="/assets/audio/poway-orchestra/timpani.mp3">Play Sample</button>
+            <button class="stop-sample-btn" type="button">Stop</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="soundboard-note">
+        <strong>Setup note:</strong> These buttons play real audio files from your website.
+        Add your MP3 files to <code>/assets/audio/poway-orchestra/</code> and keep the
+        filenames exactly the same as the <code>data-audio</code> values above.
+      </div>
+
+      <div class="video-shell">
+        <div class="video-player-card">
+          <div class="video-frame-wrap">
+            <div id="pso-youtube-player" data-video-id="T8CX-KSS6iA" aria-label="Poway Symphony Orchestra performance video"></div>
+          </div>
+        </div>
+
+        <div class="clip-list-card">
+          <h3 class="clip-list-title">Suggested Performance Clip Moments</h3>
+          <p class="clip-list-copy">
+            Click a cue to jump into the embedded performance. I set these up as editable
+            placeholders so you can fine-tune the exact start and end times after testing
+            the video on your site.
+          </p>
+
+          <div class="clip-list">
+            <button class="clip-jump" type="button" data-start="45" data-end="115">
+              <span class="clip-time">0:45–1:55</span>
+              <span class="clip-label">Full Orchestra Entrance</span>
+              <span class="clip-description">Use this for the first broad ensemble moment that shows the orchestra’s full sound and stage presence.</span>
+            </button>
+
+            <button class="clip-jump" type="button" data-start="150" data-end="215">
+              <span class="clip-time">2:30–3:35</span>
+              <span class="clip-label">Strings in Focus</span>
+              <span class="clip-description">Good spot for pairing with violin, viola, or cello instrument cards if the strings are carrying the musical line.</span>
+            </button>
+
+            <button class="clip-jump" type="button" data-start="275" data-end="340">
+              <span class="clip-time">4:35–5:40</span>
+              <span class="clip-label">Soloist Feature</span>
+              <span class="clip-description">Use this if you want a clear guest-artist spotlight connected to your season storytelling.</span>
+            </button>
+
+            <button class="clip-jump" type="button" data-start="420" data-end="490">
+              <span class="clip-time">7:00–8:10</span>
+              <span class="clip-label">Brass and Timpani Energy</span>
+              <span class="clip-description">Best for a dramatic section where visitors can hear how brass and percussion expand the full orchestral sound.</span>
+            </button>
+
+            <button class="clip-jump" type="button" data-start="560" data-end="650">
+              <span class="clip-time">9:20–10:50</span>
+              <span class="clip-label">Big Ensemble Climax</span>
+              <span class="clip-description">Ideal for a “hear everyone together” moment near a musical peak.</span>
+            </button>
+          </div>
+
+          <p class="clip-note">
+            To adjust any clip, change the <code>data-start</code> and <code>data-end</code>
+            values on that button. Times are measured in seconds.
+          </p>
+        </div>
+      </div>
+
+      <div class="section-cta-row">
+        <a href="#concerts" class="btn btn-secondary">View Concert Season</a>
+        <a href="#tickets" class="btn btn-primary">Buy Tickets</a>
       </div>
     </div>
   </section>
@@ -1242,13 +1620,13 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="pso-footer">
     <p>© 2025 Poway Symphony Orchestra Foundation · 501(c)(3) Non-Profit · 15498 Espola Road, Poway CA 92064</p>
   </footer>
 
 </div><!-- /.pso-foundation -->
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 (function () {
   var root = document.querySelector('.pso-foundation');
@@ -1292,7 +1670,10 @@
     homeOnlySections.forEach(function (s) { s.classList.add('is-hidden'); });
     if (homeSection) homeSection.classList.add('is-hidden');
     var blank = root.querySelector('#blank-view');
-    if (blank) { blank.classList.remove('is-hidden'); blank.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (blank) {
+      blank.classList.remove('is-hidden');
+      blank.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function showHomeAndScrollTo(target) {
@@ -1300,7 +1681,6 @@
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // CTA reveal buttons
   ctaButtons.forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -1308,14 +1688,12 @@
     });
   });
 
-  // All other links
   root.querySelectorAll('a:not(.cta-reveal)').forEach(function (link) {
     link.addEventListener('click', function (e) {
       if (link.dataset.allowNavigation === 'true') return;
       var href = (link.getAttribute('href') || '').trim();
       if (!href) return;
 
-      // Real external links — let them go
       if (/^https?:/i.test(href) || /^tel:/i.test(href) || /^mailto:/i.test(href)) return;
 
       if (href === '#home') { e.preventDefault(); showHome(); return; }
@@ -1334,25 +1712,153 @@
         return;
       }
 
-      if (href.charAt(0) === '/') { e.preventDefault(); showBlank(); }
+      if (href.charAt(0) === '/') {
+        e.preventDefault();
+        showBlank();
+      }
     });
   });
 
   if (homeButton) {
-    homeButton.addEventListener('click', function (e) { e.preventDefault(); showHome(); });
+    homeButton.addEventListener('click', function (e) {
+      e.preventDefault();
+      showHome();
+    });
   }
 
-  // Hash on load
   var hash = window.location.hash ? window.location.hash.replace('#', '') : '';
   if (hash) {
     var direct = root.querySelector('#' + hash);
-    if (direct && direct.classList.contains('reveal-topic')) { showTopics([hash]); return; }
-    var matchBtn = root.querySelector('.cta-reveal[href="#' + hash + '"]');
-    if (matchBtn) { showTopics((matchBtn.dataset.reveal || '').split(',').filter(Boolean)); }
-    else if (direct) { showHomeAndScrollTo(direct); }
-    else { showHome(); }
+    if (direct && direct.classList.contains('reveal-topic')) {
+      showTopics([hash]);
+    } else {
+      var matchBtn = root.querySelector('.cta-reveal[href="#' + hash + '"]');
+      if (matchBtn) {
+        showTopics((matchBtn.dataset.reveal || '').split(',').filter(Boolean));
+      } else if (direct) {
+        showHomeAndScrollTo(direct);
+      } else {
+        showHome();
+      }
+    }
   } else {
     showHome();
   }
 })();
+
+/* ── INSTRUMENT SOUNDBOARD ───────────────────────── */
+(function () {
+  var currentlyPlayingAudio = null;
+  var currentlyPlayingButton = null;
+
+  function stopCurrentAudio() {
+    if (currentlyPlayingAudio) {
+      currentlyPlayingAudio.pause();
+      currentlyPlayingAudio.currentTime = 0;
+      currentlyPlayingAudio = null;
+    }
+    if (currentlyPlayingButton) {
+      currentlyPlayingButton.classList.remove('is-playing');
+      currentlyPlayingButton.textContent = 'Play Sample';
+      currentlyPlayingButton = null;
+    }
+  }
+
+  document.querySelectorAll('.instrument-card').forEach(function (card) {
+    var playBtn = card.querySelector('.play-sample-btn');
+    var stopBtn = card.querySelector('.stop-sample-btn');
+    if (!playBtn || !stopBtn) return;
+
+    playBtn.addEventListener('click', function () {
+      var audioPath = playBtn.getAttribute('data-audio');
+      if (!audioPath) return;
+
+      if (currentlyPlayingButton === playBtn && currentlyPlayingAudio) {
+        stopCurrentAudio();
+        return;
+      }
+
+      stopCurrentAudio();
+
+      var audio = new Audio(audioPath);
+      audio.preload = 'auto';
+      audio.play().then(function () {
+        currentlyPlayingAudio = audio;
+        currentlyPlayingButton = playBtn;
+        playBtn.classList.add('is-playing');
+        playBtn.textContent = 'Playing';
+      }).catch(function () {
+        alert('Audio file not found yet. Add the sample file at: ' + audioPath);
+      });
+
+      audio.addEventListener('ended', function () {
+        if (currentlyPlayingButton === playBtn) {
+          playBtn.classList.remove('is-playing');
+          playBtn.textContent = 'Play Sample';
+          currentlyPlayingAudio = null;
+          currentlyPlayingButton = null;
+        }
+      });
+    });
+
+    stopBtn.addEventListener('click', function () {
+      if (currentlyPlayingButton === playBtn) {
+        stopCurrentAudio();
+      }
+    });
+  });
+})();
+
+/* ── YOUTUBE CLIP PLAYER ─────────────────────────── */
+var psoYouTubePlayer = null;
+var psoClipStopTimer = null;
+
+function onYouTubeIframeAPIReady() {
+  var playerMount = document.getElementById('pso-youtube-player');
+  if (!playerMount) return;
+
+  var videoId = playerMount.getAttribute('data-video-id') || 'T8CX-KSS6iA';
+
+  psoYouTubePlayer = new YT.Player('pso-youtube-player', {
+    videoId: videoId,
+    playerVars: {
+      rel: 0,
+      modestbranding: 1
+    }
+  });
+}
+
+(function () {
+  function jumpToClip(start, end) {
+    if (!psoYouTubePlayer || typeof psoYouTubePlayer.seekTo !== 'function') return;
+
+    if (psoClipStopTimer) {
+      clearTimeout(psoClipStopTimer);
+      psoClipStopTimer = null;
+    }
+
+    psoYouTubePlayer.seekTo(start, true);
+    psoYouTubePlayer.playVideo();
+
+    if (!isNaN(end) && end > start) {
+      psoClipStopTimer = setTimeout(function () {
+        if (psoYouTubePlayer && typeof psoYouTubePlayer.pauseVideo === 'function') {
+          psoYouTubePlayer.pauseVideo();
+        }
+      }, (end - start) * 1000);
+    }
+  }
+
+  document.addEventListener('click', function (event) {
+    var btn = event.target.closest('.clip-jump');
+    if (!btn) return;
+
+    var start = parseInt(btn.getAttribute('data-start'), 10);
+    var end = parseInt(btn.getAttribute('data-end'), 10);
+
+    if (isNaN(start)) return;
+    jumpToClip(start, end);
+  });
+})();
 </script>
+</body>
