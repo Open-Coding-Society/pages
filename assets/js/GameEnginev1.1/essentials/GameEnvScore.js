@@ -21,7 +21,7 @@
  * PUBLIC METHODS:
  * ├─ toggleScoreDisplay()      - Show/hide score counter
  * ├─ updateScoreDisplay(value) - Update displayed score value
- * ├─ saveScore(buttonEl)       - Save current score to backend
+ * ├─ saveScore(buttonEl)       - Save current score to backend (uses API chaining)
  * └─ destroy()                 - Clean up intervals and resources
  * 
  * PRIVATE METHODS (Internal):
@@ -31,9 +31,9 @@
  * ├─ _getCounterLabel()        - Get display label from gameEnv.scoreConfig
  * ├─ _getCounterVar()          - Get stat variable name from gameEnv.scoreConfig
  * ├─ _extractGameName()        - Extract game name from URL or instance
- * ├─ _getLoggedInUser()        - Fetch authenticated user from API
- * ├─ _buildServerDto()         - Build data payload for backend
- * └─ _saveStatsToServer()      - POST stats to backend API
+ * ├─ _getLoggedInUser()        - Fetch authenticated user from API (returns Promise)
+ * ├─ _buildServerDto()         - Build data payload for backend (returns Promise)
+ * └─ _saveStatsToServer()      - POST stats to backend API (returns Promise)
  * 
  * GAMEENV CONFIGURATION:
  * Set these in GameEnv.scoreConfig:
@@ -48,12 +48,22 @@
  * - JWT authentication via cookies (handled by fetchOptions)
  * - Always fetches user before saving (no anonymous saves)
  * 
+ * API CHAINING PATTERN:
+ * All backend methods use .then()/.catch() chaining for:
+ * - Clean sequential operations (_getLoggedInUser → _buildServerDto → _saveStatsToServer)
+ * - Centralized error handling with single .catch() block
+ * - Elegant promise composition without nested try-catch
+ * 
  * DATA FLOW:
  * Game Object → gameEnv.stats.coinsCollected++
  *            ↓
  * _syncScoreDisplay() reads gameEnv.stats → UI Counter (every 100ms)
  *            ↓
- * saveScore() → _getLoggedInUser() → _buildServerDto(gameEnv.stats) → Backend API
+ * saveScore() → _saveStatsToServer()
+ *            ↓
+ * _buildServerDto() → _getLoggedInUser() → fetch(user data)
+ *            ↓
+ * fetch(POST to backend) → .then(success) → .catch(error) → .finally(cleanup)
  * 
  * DEPENDENCIES:
  * - GameEnv instance (contains stats, scoreConfig, gameControl)
@@ -62,11 +72,11 @@
  * 
  * USAGE:
  * // Initialized automatically in GameEnv
- * await gameEnv.initScoreManager();
+ * gameEnv.initScoreManager();
  * 
  * // Access from any level
  * this.gameEnv.scoreManager.toggleScoreDisplay();
- * await this.gameEnv.scoreManager.saveScore(buttonElement);
+ * this.gameEnv.scoreManager.saveScore(buttonElement);
  * 
  * // Game objects update stats directly
  * this.gameEnv.stats.coinsCollected++;

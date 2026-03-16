@@ -1,3 +1,114 @@
+/**
+ * Leaderboard - Dual-Mode Leaderboard Widget for GameEngine v1.1
+ * ================================================================
+ * 
+ * PURPOSE:
+ * Provides a collapsible leaderboard widget with two modes:
+ * - Dynamic Mode: Real-time leaderboard from backend (SCORE_COUNTER events)
+ * - Elementary Mode: User-managed leaderboard with add/delete capabilities (ELEMENTARY_LEADERBOARD events)
+ * 
+ * ARCHITECTURE:
+ * - Standalone widget that mounts to document.body with fixed positioning
+ * - Offline-first design: Works without backend using localStorage fallback
+ * - Type selection UI allows switching between Dynamic and Elementary modes
+ * - Auto-refresh for Dynamic mode (30-second intervals)
+ * 
+ * RESPONSIBILITIES:
+ * - Mount collapsible leaderboard widget to page
+ * - Display top scores in table format with ranking
+ * - Fetch and sync leaderboard data from backend or localStorage
+ * - Handle user interactions (collapse/expand, mode selection, add/delete scores)
+ * - Provide public API for submitting scores programmatically
+ * 
+ * PUBLIC METHODS:
+ * ├─ constructor(gameControl, options)     - Initialize leaderboard with configuration
+ * ├─ toggle()                              - Collapse/expand leaderboard display
+ * ├─ submitScore(username, score, gameName) - Submit score to SCORE_COUNTER endpoint
+ * ├─ destroy()                             - Clean up intervals and remove DOM elements
+ * ├─ toggleVisibility()                    - Show/hide entire leaderboard widget
+ * └─ isVisible()                           - Check if leaderboard widget is visible
+ * 
+ * INTERNAL METHODS:
+ * ├─ init()                                - Initialize and mount on DOM ready
+ * ├─ mount()                               - Create and append leaderboard DOM structure
+ * ├─ goBack()                              - Return to type selection screen
+ * ├─ showTypeSelection()                   - Display Dynamic vs Elementary choice
+ * ├─ setupDynamicMode()                    - Initialize dynamic leaderboard with auto-refresh
+ * ├─ setupElementaryMode()                 - Initialize elementary leaderboard with form
+ * ├─ showElementaryForm()                  - Display add score form for elementary mode
+ * ├─ addElementaryScore()                  - Add new score to elementary leaderboard (uses API chaining)
+ * ├─ deleteElementaryScore(id)             - Delete score from elementary leaderboard (uses API chaining)
+ * ├─ fetchElementaryLeaderboard()          - Fetch elementary scores from backend or localStorage (uses API chaining)
+ * ├─ displayElementaryLeaderboard()        - Render elementary scores table with delete buttons
+ * ├─ fetchLeaderboard()                    - Fetch dynamic scores from backend or localStorage (uses API chaining)
+ * ├─ displayLeaderboard(data)              - Render dynamic scores table (read-only)
+ * └─ escape(str)                           - HTML entity escaping for XSS protection
+ * 
+ * CONSTRUCTOR OPTIONS:
+ * - gameControl: Reference to game control instance (optional)
+ * - gameName: Name of the game for filtering scores (default: 'Global')
+ * - parentId: Parent element ID for mounting (default: document.body)
+ * - initiallyHidden: Whether to hide widget on load (default: true)
+ * 
+ * BACKEND INTEGRATION:
+ * - Endpoint: /api/events/ELEMENTARY_LEADERBOARD (GET/POST/DELETE elementary scores)
+ * - Endpoint: /api/events/SCORE_COUNTER (GET/POST dynamic scores)
+ * - Uses shared javaURI and fetchOptions from /assets/js/api/config.js
+ * - JWT authentication via cookies (handled by fetchOptions)
+ * - Graceful fallback to localStorage when backend unavailable
+ * 
+ * API CHAINING PATTERN:
+ * All backend methods use .then()/.catch() chaining for:
+ * - Elegant sequential operations (fetch → transform → display)
+ * - Centralized error handling with single .catch() block
+ * - Clean promise composition without nested try-catch blocks
+ * - Authentication error detection (401/403) with user-friendly messages
+ * 
+ * DATA FLOW (Dynamic Mode):
+ * User clicks "Dynamic Leaderboard" → setupDynamicMode()
+ *                                   ↓
+ * fetchLeaderboard() → fetch(SCORE_COUNTER) → .then(transform) → displayLeaderboard()
+ *                   ↓
+ * Auto-refresh every 30 seconds
+ * 
+ * DATA FLOW (Elementary Mode):
+ * User clicks "Elementary Leaderboard" → setupElementaryMode()
+ *                                      ↓
+ * fetchElementaryLeaderboard() → fetch(ELEMENTARY_LEADERBOARD) → .then(transform) → displayElementaryLeaderboard()
+ *                              ↓
+ * User adds score → addElementaryScore() → fetch(POST) → .then(refresh) → .catch(error)
+ *                              ↓
+ * User deletes score → deleteElementaryScore(id) → fetch(DELETE) → .then(refresh) → .catch(error)
+ * 
+ * OFFLINE MODE:
+ * - When javaURI is unavailable or fetch fails, uses localStorage as fallback
+ * - Storage keys: `elementary_leaderboard_{gameName}` and `score_counter_{gameName}`
+ * - Provides full functionality without backend connection
+ * 
+ * DEPENDENCIES:
+ * - /assets/js/api/config.js (provides javaURI and fetchOptions)
+ * - Backend API (Java Spring server) - optional, uses localStorage fallback
+ * - Browser localStorage for offline mode
+ * 
+ * USAGE:
+ * // Create leaderboard widget
+ * const leaderboard = new Leaderboard(gameControl, {
+ *     gameName: 'MarioGame',
+ *     initiallyHidden: false
+ * });
+ * 
+ * // Submit score programmatically
+ * leaderboard.submitScore('PlayerName', 1000, 'MarioGame')
+ *     .then(entry => console.log('Score saved:', entry))
+ *     .catch(err => console.error('Save failed:', err));
+ * 
+ * // Toggle visibility
+ * leaderboard.toggleVisibility();
+ * 
+ * // Clean up when done
+ * leaderboard.destroy();
+ */
+
 import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 export default class Leaderboard {
