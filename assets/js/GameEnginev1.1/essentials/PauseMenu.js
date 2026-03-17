@@ -16,15 +16,29 @@ export default class PauseMenu {
     }
 
     /**
+     * Run an action with consistent error handling and optional status feedback
+     */
+    _runAction(actionName, action, statusMessage = null) {
+        try {
+            action();
+            return true;
+        } catch (error) {
+            console.error(`Error ${actionName}:`, error);
+            if (statusMessage) {
+                this._showStatusMessage(statusMessage);
+            }
+            return false;
+        }
+    }
+
+    /**
      * Initialize the pause menu by creating styles and UI elements
      */
     init() {
-        try {
+        this._runAction('initializing PauseMenu', () => {
             this.createStyles();
             this.createMenuUI();
-        } catch (error) {
-            console.error('Error initializing PauseMenu:', error);
-        }
+        });
     }
 
     /**
@@ -153,13 +167,11 @@ export default class PauseMenu {
      * Create the complete pause menu UI by assembling components
      */
     createMenuUI() {
-        try {
+        this._runAction('creating menu UI', () => {
             this._createOverlay();
             this._createContainer();
             this._attachEventListeners();
-        } catch (error) {
-            console.error('Error creating menu UI:', error);
-        }
+        });
     }
 
     /**
@@ -320,13 +332,18 @@ export default class PauseMenu {
     show() {
         if (this.isVisible) return;
 
-        try {
+        this._runAction('showing pause menu', () => {
             this._showMenuOverlay();
             this._pauseGame();
-            this.isVisible = true;
-        } catch (error) {
-            console.error('Error showing pause menu:', error);
-        }
+            this._setVisibility(true);
+        });
+    }
+
+    /**
+     * Set current menu visibility state
+     */
+    _setVisibility(isVisible) {
+        this.isVisible = isVisible;
     }
 
     /**
@@ -365,13 +382,11 @@ export default class PauseMenu {
     hide() {
         if (!this.isVisible) return;
 
-        try {
+        this._runAction('hiding pause menu', () => {
             this._hideMenuOverlay();
             this._resumeGame();
-            this.isVisible = false;
-        } catch (error) {
-            console.error('Error hiding pause menu:', error);
-        }
+            this._setVisibility(false);
+        });
     }
 
     /**
@@ -408,14 +423,29 @@ export default class PauseMenu {
      * Save the current score using the ScoreFeature instance
      */
     saveScore() {
-        try {
+        this._runAction(
+            'saving score',
+            () => {
             this._validateScoreFeatureAvailable();
-            const btn = document.getElementById('pause-menu-save-score-btn');
-            window.scoreFeature.saveScore(btn);
-        } catch (error) {
-            console.error('Error saving score:', error);
-            this._showStatusMessage('Error saving score. Please try again.');
-        }
+                const saveButton = this._getSaveScoreButton();
+                this._saveScoreWithFeature(saveButton);
+            },
+            'Error saving score. Please try again.'
+        );
+    }
+
+    /**
+     * Get save score button element
+     */
+    _getSaveScoreButton() {
+        return document.getElementById('pause-menu-save-score-btn');
+    }
+
+    /**
+     * Persist score using score feature
+     */
+    _saveScoreWithFeature(buttonElement) {
+        window.scoreFeature.saveScore(buttonElement);
     }
 
     /**
@@ -434,18 +464,19 @@ export default class PauseMenu {
      * Toggle the leaderboard section visibility
      */
     toggleLeaderboard() {
-        try {
+        this._runAction(
+            'toggling leaderboard',
+            () => {
             const isCurrentlyHidden = this.leaderboardContainer.style.display === 'none';
 
-            if (isCurrentlyHidden) {
-                this._showLeaderboard();
-            } else {
-                this._hideLeaderboard();
-            }
-        } catch (error) {
-            console.error('Error toggling leaderboard:', error);
-            this._showStatusMessage('Error toggling leaderboard.');
-        }
+                if (isCurrentlyHidden) {
+                    this._showLeaderboard();
+                } else {
+                    this._hideLeaderboard();
+                }
+            },
+            'Error toggling leaderboard.'
+        );
     }
 
     /**
@@ -453,20 +484,21 @@ export default class PauseMenu {
      */
     _showLeaderboard() {
         this.leaderboardContainer.style.display = 'block';
-
-        try {
-            if (window.leaderboardInstance && typeof window.leaderboardInstance.toggle === 'function') {
-                window.leaderboardInstance.toggle();
-            }
-        } catch (error) {
-            console.warn('Error toggling leaderboard instance:', error);
-        }
+        this._syncLeaderboardInstanceToggle();
     }
 
     /**
      * Hide the leaderboard section
      */
     _hideLeaderboard() {
+        this._syncLeaderboardInstanceToggle();
+        this.leaderboardContainer.style.display = 'none';
+    }
+
+    /**
+     * Toggle external leaderboard instance if available
+     */
+    _syncLeaderboardInstanceToggle() {
         try {
             if (window.leaderboardInstance && typeof window.leaderboardInstance.toggle === 'function') {
                 window.leaderboardInstance.toggle();
@@ -474,22 +506,35 @@ export default class PauseMenu {
         } catch (error) {
             console.warn('Error toggling leaderboard instance:', error);
         }
-
-        this.leaderboardContainer.style.display = 'none';
     }
 
     /**
      * End the current level and advance to the next one
      */
     skipLevel() {
-        try {
+        this._runAction(
+            'skipping level',
+            () => {
             this._validateGameControlAvailable();
-            this.hide();
-            this.gameControl.endLevel();
-        } catch (error) {
-            console.error('Error skipping level:', error);
-            this._showStatusMessage('Error skipping level. Please try again.');
-        }
+                this._closeMenuBeforeSkip();
+                this._endCurrentLevel();
+            },
+            'Error skipping level. Please try again.'
+        );
+    }
+
+    /**
+     * Close menu before skipping level
+     */
+    _closeMenuBeforeSkip() {
+        this.hide();
+    }
+
+    /**
+     * End current level through game control
+     */
+    _endCurrentLevel() {
+        this.gameControl.endLevel();
     }
 
     /**
