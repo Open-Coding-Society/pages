@@ -86,11 +86,52 @@ import { javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 export default class GameEnvScore {
     constructor(gameEnv) {
+        this.classId = 'GameEnvScore'; // Class identifier for logging
         this.gameEnv = gameEnv;
         this.isVisible = false; // track current visibility state
         this._createScoreCounter();
         this._setupAutoUpdate();
     }
+
+    // ERROR HANDLERS for backend operations
+    ERROR_HANDLERS = {
+        'BACKEND_NOT_CONFIGURED': {
+            message: 'No backend configured',
+            userMessage: 'No backend configured'
+        },
+        'AUTHENTICATION_REQUIRED': {
+            message: 'User authentication required',
+            userMessage: 'Please login to access this feature.'
+        },
+        'PERMISSION_DENIED': {
+            message: 'User lacks permission to save scores',
+            userMessage: 'You do not have permission to save scores. Contact your teacher.'
+        },
+        'SERVER_ERROR': {
+            message: (statusCode) => `Server error: ${statusCode}`,
+            userMessage: 'Save failed! Please try again.'
+        },
+        'FETCH_USER_ERROR': {
+            message: 'Error fetching user information',
+            userMessage: 'Unable to verify login. Please try again.'
+        },
+        'SCORE_COUNTER_NOT_FOUND': {
+            message: 'Score counter element not found',
+            userMessage: 'Display error'
+        },
+        'SAVE_FAILED': {
+            message: 'Save to backend failed',
+            userMessage: 'Save failed!'
+        },
+        'SAVE_SUCCESS': {
+            message: 'Score saved successfully',
+            userMessage: 'Saved to backend!'
+        },
+        'DEFAULT': {
+            message: 'Unknown error occurred',
+            userMessage: 'Save failed!'
+        }
+    };
 
     /**
      * Create the score counter UI element
@@ -142,7 +183,7 @@ export default class GameEnvScore {
         this._scoreLabel = scoreLabel;
         this._scoreCounter = scoreCounter;
         
-        console.log('GameEnvScore: Score counter created and appended to', parent.tagName || parent.id || 'unknown parent');
+        console.log(`${this.classId}: Score counter created and appended to`, parent.tagName || parent.id || 'unknown parent');
     }
 
     /**
@@ -175,12 +216,12 @@ export default class GameEnvScore {
      */
     toggleScoreDisplay() {
         if (!this._scoreCounter) {
-            console.error('GameEnvScore: Cannot toggle - score counter element not found');
+            console.error(`${this.classId}:`, this.ERROR_HANDLERS.SCORE_COUNTER_NOT_FOUND.message);
             return;
         }
         this.isVisible = !this.isVisible;
         this._scoreCounter.style.display = this.isVisible ? 'block' : 'none';
-        console.log('GameEnvScore: Score counter toggled to', this.isVisible ? 'visible' : 'hidden');
+        console.log(`${this.classId}: Score counter toggled to`, this.isVisible ? 'visible' : 'hidden');
     }
 
     /**
@@ -232,7 +273,7 @@ export default class GameEnvScore {
      */
     _getLoggedInUser() {
         if (!javaURI) {
-            console.debug('GameEnvScore: No backend configured for user fetch');
+            console.debug(`${this.classId}:`, this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message);
             return Promise.resolve(null);
         }
         
@@ -242,18 +283,18 @@ export default class GameEnvScore {
                 if (resp.ok) {
                     return resp.json();
                 } else {
-                    console.debug('GameEnvScore: User not authenticated, status:', resp.status);
+                    console.debug(`${this.classId}:`, this.ERROR_HANDLERS.AUTHENTICATION_REQUIRED.message, 'status:', resp.status);
                     return null;
                 }
             })
             .then(person => {
                 if (person) {
-                    console.log('GameEnvScore: logged-in user', person);
+                    console.log(`${this.classId}: logged-in user`, person);
                 }
                 return person;
             })
             .catch(error => {
-                console.error('GameEnvScore: Error getting logged-in user:', error);
+                console.error(`${this.classId}:`, this.ERROR_HANDLERS.FETCH_USER_ERROR.message, error);
                 return null;
             });
     }
@@ -293,7 +334,7 @@ export default class GameEnvScore {
                     variableName: counterVar
                 }
             };
-            console.log('GameEnvScore: built DTO', dto);
+            console.log(`${this.classId}: built DTO`, dto);
             return dto;
         });
     }
@@ -303,13 +344,15 @@ export default class GameEnvScore {
      * Uses API chaining pattern with centralized error handling
      */
     _saveStatsToServer() {
-        if (!javaURI) return Promise.reject(new Error('No backend configured'));
+        if (!javaURI) {
+            return Promise.reject(new Error(this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message));
+        }
 
         const url = `${javaURI}/api/events/SCORE_COUNTER`;
         
         return this._buildServerDto()
             .then(dto => {
-                console.debug('GameEnvScore: POST', url, dto);
+                console.debug(`${this.classId}: POST`, url, dto);
                 const options = { ...fetchOptions, method: 'POST', body: JSON.stringify(dto) };
                 return fetch(url, options);
             })
@@ -325,10 +368,22 @@ export default class GameEnvScore {
                 }
                 const ok = resp.ok && (!(body && body.success === false));
                 if (!ok) {
-                    console.error('GameEnvScore: server POST responded with status', resp.status, text);
-                    throw new Error('Server POST failed: ' + resp.status);
+                    // Handle specific error codes
+                    if (resp.status === 401) {
+                        console.error(`${this.classId}:`, this.ERROR_HANDLERS.AUTHENTICATION_REQUIRED.message);
+                        throw new Error(this.ERROR_HANDLERS.AUTHENTICATION_REQUIRED.userMessage);
+                    } else if (resp.status === 403) {
+                        console.error(`${this.classId}:`, this.ERROR_HANDLERS.PERMISSION_DENIED.message);
+                        throw new Error(this.ERROR_HANDLERS.PERMISSION_DENIED.userMessage);
+                    } else {
+                        const errorMsg = typeof this.ERROR_HANDLERS.SERVER_ERROR.message === 'function'
+                            ? this.ERROR_HANDLERS.SERVER_ERROR.message(resp.status)
+                            : this.ERROR_HANDLERS.SERVER_ERROR.message;
+                        console.error(`${this.classId}:`, errorMsg, text);
+                        throw new Error(this.ERROR_HANDLERS.SERVER_ERROR.userMessage);
+                    }
                 }
-                console.debug('GameEnvScore: server POST response', body);
+                console.debug(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_SUCCESS.message, body);
                 if (body && body.id) {
                     this.gameEnv.stats.serverId = body.id;
                 }
@@ -349,30 +404,27 @@ export default class GameEnvScore {
 
         const cv = this._getCounterVar();
         const currentScore = this.gameEnv.stats[cv] || 0;
-        console.log(`GameEnvScore: ${cv} = ${currentScore}`, this.gameEnv.stats);
+        console.log(`${this.classId}: ${cv} = ${currentScore}`, this.gameEnv.stats);
 
         // Attempt server save using API chaining pattern
         if (javaURI) {
             this._saveStatsToServer()
                 .then(resp => {
-                    console.log('GameEnvScore: saved to backend', resp);
-                    // alert('Saved to backend!');
+                    console.log(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_SUCCESS.message, resp);
+                    // alert(this.ERROR_HANDLERS.SAVE_SUCCESS.userMessage);
                 })
                 .catch(e => {
-                    console.error('GameEnvScore: save to backend failed', e);
-                    if (e.message && (e.message.includes('401') || e.message.includes('403'))) {
-                        alert('Please login to access this feature.');
-                    } else {
-                        alert('Save failed!');
-                    }
+                    console.error(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_FAILED.message, e);
+                    // Error messages are already set in _saveStatsToServer()
+                    alert(e.message || this.ERROR_HANDLERS.DEFAULT.userMessage);
                 })
                 .finally(() => {
                     buttonEl.disabled = false;
                     buttonEl.innerText = prevText;
                 });
         } else {
-            console.warn('GameEnvScore: no backend configured');
-            alert('No backend configured');
+            console.warn(`${this.classId}:`, this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message);
+            alert(this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.userMessage);
             buttonEl.disabled = false;
             buttonEl.innerText = prevText;
         }
