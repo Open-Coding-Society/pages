@@ -22,24 +22,34 @@ class GameObject {
         if (new.target === GameObject) {
             throw new TypeError("Cannot construct GameObject instances directly");
         }
+
+        this.spawnX = 0;
+        this.spawnY = 0;
+        this.x = 0;
+        this.y = 0;
+        this.xv = 0;
+        this.yv = 0;
+        this.speed = 0.4;
+        this.dir = 0;
+        this.friction = 0.9;
+
         this.gameEnv = gameEnv;
-        this.transform = new Transform();
         this._positionProxy = {};
         this._velocityProxy = {};
 
         Object.defineProperties(this._positionProxy, {
             x: {
                 enumerable: true,
-                get: () => this.transform.x,
+                get: () => this.x,
                 set: (value) => {
-                    this.transform.x = Number.isFinite(value) ? value : this.transform.x;
+                    this.x = Number.isFinite(value) ? value : this.x;
                 },
             },
             y: {
                 enumerable: true,
-                get: () => this.transform.y,
+                get: () => this.y,
                 set: (value) => {
-                    this.transform.y = Number.isFinite(value) ? value : this.transform.y;
+                    this.y = Number.isFinite(value) ? value : this.y;
                 },
             },
         });
@@ -47,31 +57,35 @@ class GameObject {
         Object.defineProperties(this._velocityProxy, {
             x: {
                 enumerable: true,
-                get: () => this.transform.xv,
+                get: () => this.xv,
                 set: (value) => {
-                    this.transform.xv = Number.isFinite(value) ? value : this.transform.xv;
+                    this.xv = Number.isFinite(value) ? value : this.xv;
                 },
             },
             y: {
                 enumerable: true,
-                get: () => this.transform.yv,
+                get: () => this.yv,
                 set: (value) => {
-                    this.transform.yv = Number.isFinite(value) ? value : this.transform.yv;
+                    this.yv = Number.isFinite(value) ? value : this.yv;
                 },
             },
         });
 
         Object.defineProperties(this, {
+            transform: {
+                enumerable: false,
+                get: () => this,
+            },
             position: {
                 enumerable: true,
                 get: () => this._positionProxy,
                 set: (value) => {
                     if (!value || typeof value !== 'object') return;
                     if (Number.isFinite(value.x)) {
-                        this.transform.x = value.x;
+                        this.x = value.x;
                     }
                     if (Number.isFinite(value.y)) {
-                        this.transform.y = value.y;
+                        this.y = value.y;
                     }
                 },
             },
@@ -81,25 +95,11 @@ class GameObject {
                 set: (value) => {
                     if (!value || typeof value !== 'object') return;
                     if (Number.isFinite(value.x)) {
-                        this.transform.xv = value.x;
+                        this.xv = value.x;
                     }
                     if (Number.isFinite(value.y)) {
-                        this.transform.yv = value.y;
+                        this.yv = value.y;
                     }
-                },
-            },
-            x: {
-                enumerable: true,
-                get: () => this.transform.x,
-                set: (value) => {
-                    this.transform.x = Number.isFinite(value) ? value : this.transform.x;
-                },
-            },
-            y: {
-                enumerable: true,
-                get: () => this.transform.y,
-                set: (value) => {
-                    this.transform.y = Number.isFinite(value) ? value : this.transform.y;
                 },
             },
         });
@@ -114,19 +114,55 @@ class GameObject {
         };
     }
 
-    syncTransform(spawnX = this.transform.spawnX, spawnY = this.transform.spawnY) {
-        this.transform.spawnX = spawnX;
-        this.transform.spawnY = spawnY;
-        this.transform.setPosition(this.transform.x, this.transform.y);
-        this.transform.setVelocity(this.transform.xv, this.transform.yv);
+    setPosition(x = this.x, y = this.y) {
+        this.x = Number.isFinite(x) ? x : this.x;
+        this.y = Number.isFinite(y) ? y : this.y;
     }
 
-    advanceTransform() {
-        if (!this.autoAdvanceTransform || !this.transform) {
+    setVelocity(xv = this.xv, yv = this.yv) {
+        this.xv = Number.isFinite(xv) ? xv : this.xv;
+        this.yv = Number.isFinite(yv) ? yv : this.yv;
+    }
+
+    move(dx = null, dy = null) {
+        if (Number.isFinite(dx) || Number.isFinite(dy)) {
+            this.xv += Number.isFinite(dx) ? dx : 0;
+            this.yv += Number.isFinite(dy) ? dy : 0;
             return;
         }
 
-        this.transform.updatePosition(this.transformFriction ?? 1);
+        const radians = (this.dir * Math.PI) / 180;
+        this.xv += this.speed * Math.sin(radians);
+        this.yv += this.speed * Math.cos(radians);
+    }
+
+    updatePosition(friction = this.friction) {
+        this.xv *= friction;
+        this.yv *= friction;
+        this.x += this.xv;
+        this.y += this.yv;
+    }
+
+    resetTransform() {
+        this.x = this.spawnX;
+        this.y = this.spawnY;
+        this.xv = 0;
+        this.yv = 0;
+    }
+
+    syncTransform(spawnX = this.spawnX, spawnY = this.spawnY) {
+        this.spawnX = spawnX;
+        this.spawnY = spawnY;
+        this.setPosition(this.x, this.y);
+        this.setVelocity(this.xv, this.yv);
+    }
+
+    advanceTransform() {
+        if (!this.autoAdvanceTransform) {
+            return;
+        }
+
+        this.updatePosition(this.transformFriction ?? 1);
     }
 
     /**
