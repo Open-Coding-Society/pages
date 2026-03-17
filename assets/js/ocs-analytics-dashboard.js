@@ -6,6 +6,19 @@
 export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions) {
     
     let currentUser = null;
+    let adminFilters = {
+        startDate: null,
+        endDate: null,
+        minSessions: 0,
+        maxSessions: Infinity,
+        minTimeSpent: 0,
+        maxTimeSpent: Infinity,
+        sortBy: 'time',
+        sortOrder: 'desc',
+        searchQuery: '',
+        viewMode: 'table' // 'table' or 'cards'
+    };
+    let allUsersData = null;
     
     // Get current user's Spring ID
     async function getUserIdSpring() {
@@ -38,6 +51,90 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
     function isAdmin() {
         if (!currentUser || !currentUser.roles) return false;
         return currentUser.roles.some(role => role.name === 'ROLE_ADMIN');
+    }
+    
+    /**
+     * Calculate engagement score (0-100)
+     */
+    function calculateEngagementScore(user) {
+        const weights = {
+            time: 0.25,
+            sessions: 0.2,
+            lessons: 0.2,
+            interaction: 0.2,
+            accuracy: 0.15
+        };
+        
+        // Normalize each metric (0-100)
+        const timeScore = Math.min((user.totalTimeSpentSeconds || 0) / 3600 * 10, 100);
+        const sessionScore = Math.min((user.totalSessions || 0) * 5, 100);
+        const lessonScore = Math.min((user.totalLessonsViewed || 0) * 3, 100);
+        const interactionScore = user.interactionPercentage || 0;
+        const accuracyScore = user.averageAccuracyPercentage || 0;
+        
+        return Math.round(
+            timeScore * weights.time +
+            sessionScore * weights.sessions +
+            lessonScore * weights.lessons +
+            interactionScore * weights.interaction +
+            accuracyScore * weights.accuracy
+        );
+    }
+    
+    /**
+     * Export users data to CSV
+     */
+    function exportToCSV(users, filename = 'analytics-export.csv') {
+        if (!users || users.length === 0) {
+            alert('No data to export');
+            return;
+        }
+        
+        const headers = ['Name', 'Email', 'UID', 'Sessions', 'Time Spent', 'Lessons', 'Code Runs', 'Engagement Score', 'Accuracy', 'Interaction'];
+        const rows = users.map(u => [
+            u.name || 'N/A',
+            u.email || 'N/A',
+            u.uid || 'N/A',
+            u.totalSessions || 0,
+            u.totalTimeFormatted || '0m',
+            u.totalLessonsViewed || 0,
+            u.totalCodeExecutions || 0,
+            calculateEngagementScore(u),
+            (u.averageAccuracyPercentage || 0).toFixed(1) + '%',
+            (u.interactionPercentage || 0).toFixed(1) + '%'
+        ]);
+        
+        const csv = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+    
+    /**
+     * Get trend indicator
+     */
+    function getTrendIndicator(value, avgValue) {
+        if (!value || !avgValue) return 'stable';
+        const percentDiff = ((value - avgValue) / avgValue) * 100;
+        if (percentDiff > 10) return 'up';
+        if (percentDiff < -10) return 'down';
+        return 'stable';
+    }
+    
+    /**
+     * Format date from ISO string
+     */
+    function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        return new Date(dateStr).toLocaleDateString();
     }
     
     /**
@@ -655,21 +752,237 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
     }
 
     /**
+     * Render filter panel for admin analytics
+     */
+    function renderFilterPanel() {
+        const today = new Date().toISOString().split('T')[0];
+        const thirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+        
+        return `
+            <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-white">Advanced Filters</h3>
+                    <div class="flex gap-2">
+                        <button id="view-toggle-table" class="view-toggle-btn px-3 py-1 bg-blue-600 text-white rounded text-sm transition active">Table View</button>
+                        <button id="view-toggle-cards" class="view-toggle-btn px-3 py-1 bg-neutral-700 text-white rounded text-sm transition">Card View</button>
+                        <button id="export-csv-btn" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition">Export CSV</button>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm text-neutral-300 mb-2">Search Users</label>
+                    <input type="text" id="filter-search" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm placeholder-neutral-400" placeholder="Search by name or email..." />
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">From Date</label>
+                        <input type="date" id="filter-start-date" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm" value="${thirtyDaysAgo}" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">To Date</label>
+                        <input type="date" id="filter-end-date" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm" value="${today}" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">Min Sessions</label>
+                        <input type="number" id="filter-min-sessions" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm" value="0" min="0" />
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">Sort By</label>
+                        <select id="filter-sort-by" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm">
+                            <option value="time">Time Spent</option>
+                            <option value="engagement">Engagement Score</option>
+                            <option value="sessions">Sessions</option>
+                            <option value="lessons">Lessons</option>
+                            <option value="accuracy">Accuracy</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-neutral-300 mb-2">Order</label>
+                        <select id="filter-sort-order" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 text-white rounded text-sm">
+                            <option value="desc">Highest First</option>
+                            <option value="asc">Lowest First</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex gap-2">
+                    <button id="apply-filters-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
+                        Apply Filters
+                    </button>
+                    <button id="reset-filters-btn" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Apply filters to users data
+     */
+    function applyUserFilters(users) {
+        if (!users) return [];
+        
+        let filtered = [...users];
+        
+        // Search filter
+        if (adminFilters.searchQuery) {
+            const query = adminFilters.searchQuery.toLowerCase();
+            filtered = filtered.filter(u => {
+                const name = (u.name || '').toLowerCase();
+                const email = (u.email || '').toLowerCase();
+                return name.includes(query) || email.includes(query);
+            });
+        }
+        
+        // Sessions filter
+        filtered = filtered.filter(u => {
+            const sessions = u.totalSessions || 0;
+            return sessions >= adminFilters.minSessions && sessions <= adminFilters.maxSessions;
+        });
+        
+        // Sort
+        filtered.sort((a, b) => {
+            let aVal, bVal;
+            
+            switch(adminFilters.sortBy) {
+                case 'time':
+                    aVal = a.totalTimeSpentSeconds || 0;
+                    bVal = b.totalTimeSpentSeconds || 0;
+                    break;
+                case 'engagement':
+                    aVal = calculateEngagementScore(a);
+                    bVal = calculateEngagementScore(b);
+                    break;
+                case 'sessions':
+                    aVal = a.totalSessions || 0;
+                    bVal = b.totalSessions || 0;
+                    break;
+                case 'lessons':
+                    aVal = a.totalLessonsViewed || 0;
+                    bVal = b.totalLessonsViewed || 0;
+                    break;
+                case 'accuracy':
+                    aVal = a.averageAccuracyPercentage || 0;
+                    bVal = b.averageAccuracyPercentage || 0;
+                    break;
+                default:
+                    aVal = a.totalTimeSpentSeconds || 0;
+                    bVal = b.totalTimeSpentSeconds || 0;
+            }
+            
+            return adminFilters.sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+        });
+        
+        return filtered;
+    }
+
+    /**
+     * Setup filter event listeners
+     */
+    function setupFilterListeners(onApply) {
+        const applyBtn = document.getElementById('apply-filters-btn');
+        const resetBtn = document.getElementById('reset-filters-btn');
+        const searchInput = document.getElementById('filter-search');
+        const exportBtn = document.getElementById('export-csv-btn');
+        const tableToggle = document.getElementById('view-toggle-table');
+        const cardsToggle = document.getElementById('view-toggle-cards');
+        
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                adminFilters.startDate = document.getElementById('filter-start-date').value;
+                adminFilters.endDate = document.getElementById('filter-end-date').value;
+                adminFilters.minSessions = parseInt(document.getElementById('filter-min-sessions').value) || 0;
+                adminFilters.sortBy = document.getElementById('filter-sort-by').value;
+                adminFilters.sortOrder = document.getElementById('filter-sort-order').value;
+                onApply();
+            });
+        }
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                adminFilters.searchQuery = e.target.value;
+                onApply();
+            });
+        }
+        
+        if (exportBtn && allUsersData) {
+            exportBtn.addEventListener('click', () => {
+                const filtered = applyUserFilters(allUsersData);
+                exportToCSV(filtered, `users-analytics-${new Date().toISOString().split('T')[0]}.csv`);
+            });
+        }
+        
+        if (tableToggle) {
+            tableToggle.addEventListener('click', () => {
+                adminFilters.viewMode = 'table';
+                tableToggle.classList.add('bg-blue-600');
+                tableToggle.classList.remove('bg-neutral-700');
+                cardsToggle?.classList.add('bg-neutral-700');
+                cardsToggle?.classList.remove('bg-blue-600');
+                onApply();
+            });
+        }
+        
+        if (cardsToggle) {
+            cardsToggle.addEventListener('click', () => {
+                adminFilters.viewMode = 'cards';
+                cardsToggle.classList.add('bg-blue-600');
+                cardsToggle.classList.remove('bg-neutral-700');
+                tableToggle?.classList.add('bg-neutral-700');
+                tableToggle?.classList.remove('bg-blue-600');
+                onApply();
+            });
+        }
+        
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                adminFilters = {
+                    startDate: null,
+                    endDate: null,
+                    minSessions: 0,
+                    maxSessions: Infinity,
+                    minTimeSpent: 0,
+                    maxTimeSpent: Infinity,
+                    sortBy: 'time',
+                    sortOrder: 'desc',
+                    searchQuery: '',
+                    viewMode: 'table'
+                };
+                const today = new Date().toISOString().split('T')[0];
+                const thirtyDaysAgo = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+                document.getElementById('filter-start-date').value = thirtyDaysAgo;
+                document.getElementById('filter-end-date').value = today;
+                document.getElementById('filter-min-sessions').value = '0';
+                document.getElementById('filter-sort-by').value = 'time';
+                document.getElementById('filter-sort-order').value = 'desc';
+                document.getElementById('filter-search').value = '';
+                onApply();
+            });
+        }
+    }
+
+    /**
      * Render admin overview
      */
     async function renderAdminOverview(container, stats) {
         const html = `
             <div class="space-y-6">
-                <!-- Admin Nav -->
-                <div class="flex gap-2 mb-6">
-                    <button id="admin-overview-btn" class="admin-nav-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition active">
-                        Overview
+                <!-- Admin Navigation -->
+                <div class="flex gap-2 mb-6 flex-wrap">
+                    <button id="admin-overview-btn" class="admin-nav-btn px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition active font-medium">
+                        Dashboard Overview
                     </button>
-                    <button id="admin-users-btn" class="admin-nav-btn px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded transition">
-                        All Users
+                    <button id="admin-users-btn" class="admin-nav-btn px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded transition font-medium">
+                        User Analytics
                     </button>
-                    <button id="admin-quests-btn" class="admin-nav-btn px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded transition">
-                        Quest Analytics
+                    <button id="admin-quests-btn" class="admin-nav-btn px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded transition font-medium">
+                        Quest Performance
                     </button>
                 </div>
 
@@ -854,48 +1167,149 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
             return;
         }
 
-        users.sort((a, b) => (b.totalTimeSpentSeconds || 0) - (a.totalTimeSpentSeconds || 0));
+        allUsersData = users;
+        const filteredUsers = applyUserFilters(users);
+        
+        // Calculate average metrics for trend comparison
+        const avgEngagement = users.reduce((sum, u) => sum + calculateEngagementScore(u), 0) / users.length;
 
         const html = `
-            <div class="space-y-4">
-                <h2 class="text-2xl font-bold text-white">All Users Analytics</h2>
-                <div class="bg-neutral-800 border border-neutral-700 rounded-lg overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-neutral-700 bg-neutral-900/50">
-                                    <th class="px-6 py-4 text-left text-neutral-300 font-semibold">User</th>
-                                    <th class="px-6 py-4 text-left text-neutral-300 font-semibold">Email</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Time Spent</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Lessons</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Code Runs</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Sessions</th>
-                                    <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Engagement</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${users.map(user => `
-                                    <tr class="border-b border-neutral-700 hover:bg-neutral-700/30 transition">
-                                        <td class="px-6 py-4 text-white font-medium">${user.name}</td>
-                                        <td class="px-6 py-4 text-neutral-400">${user.email}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalTimeFormatted || '0m'}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalLessonsViewed || 0}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalCodeExecutions || 0}</td>
-                                        <td class="px-6 py-4 text-center text-white">${user.totalSessions || 0}</td>
-                                        <td class="px-6 py-4 text-center">
-                                            <div class="w-20 bg-neutral-700 rounded-full h-2 mx-auto">
-                                                <div class="bg-blue-500 h-full rounded-full" style="width: ${Math.min(user.interactionPercentage || 0, 100)}%"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
+            <div class="space-y-6">
+                ${renderFilterPanel()}
+                
+                <div class="bg-neutral-900 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-neutral-400 text-sm">Showing <span class="text-white font-semibold">${filteredUsers.length}</span> of <span class="text-white font-semibold">${users.length}</span> users</p>
+                    </div>
+                    <div class="text-sm text-neutral-400">
+                        <span class="text-blue-400 font-semibold">${((filteredUsers.length / users.length) * 100).toFixed(1)}%</span> match filters
                     </div>
                 </div>
+
+                ${filteredUsers.length === 0 ? `<p class="text-neutral-400">No users match the current filters</p>` : (adminFilters.viewMode === 'table' ? renderUsersTableView(filteredUsers, avgEngagement) : renderUsersCardView(filteredUsers, avgEngagement))}
             </div>
         `;
         container.innerHTML = html;
+        setupFilterListeners(() => renderAdminUsersTable(container, users));
+    }
+    
+    /**
+     * Render users as table
+     */
+    function renderUsersTableView(users, avgEngagement) {
+        return `
+            <div class="bg-neutral-800 border border-neutral-700 rounded-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-neutral-700 bg-neutral-900/50">
+                                <th class="px-6 py-4 text-left text-neutral-300 font-semibold">User</th>
+                                <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Engagement</th>
+                                <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Sessions</th>
+                                <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Time Spent</th>
+                                <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Accuracy</th>
+                                <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Lessons</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => {
+                                const engScore = calculateEngagementScore(user);
+                                const trend = getTrendIndicator(engScore, avgEngagement);
+                                const trendSymbol = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
+                                const trendColor = trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-neutral-400';
+                                return `
+                                    <tr class="border-b border-neutral-700 hover:bg-neutral-700/30 transition">
+                                        <td class="px-6 py-4">
+                                            <div>
+                                                <p class="text-white font-medium">${user.name || 'N/A'}</p>
+                                                <p class="text-xs text-neutral-400">${user.email || 'N/A'}</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <span class="px-2 py-1 rounded text-xs font-bold bg-blue-900/40 text-blue-300">${engScore}/100</span>
+                                                <span class="${trendColor} font-bold">${trendSymbol}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-center text-white font-semibold">${user.totalSessions || 0}</td>
+                                        <td class="px-6 py-4 text-center text-white">${user.totalTimeFormatted || '0m'}</td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="px-2 py-1 rounded text-xs font-semibold" style="background: ${getAccuracyColor(user.averageAccuracyPercentage || 0)}20; color: ${getAccuracyColor(user.averageAccuracyPercentage || 0)}">
+                                                ${(user.averageAccuracyPercentage || 0).toFixed(1)}%
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-center text-white">${user.totalLessonsViewed || 0}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Render users as cards
+     */
+    function renderUsersCardView(users, avgEngagement) {
+        return `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${users.map(user => {
+                    const engScore = calculateEngagementScore(user);
+                    const trend = getTrendIndicator(engScore, avgEngagement);
+                    const trendSymbol = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
+                    const trendColor = trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-neutral-400';
+                    
+                    return `
+                        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-5 hover:border-neutral-600 transition">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h4 class="text-white font-semibold">${user.name || 'N/A'}</h4>
+                                    <p class="text-xs text-neutral-400">${user.email || 'N/A'}</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center gap-1 ${trendColor}">
+                                        <span class="font-bold text-lg">${engScore}</span>
+                                        <span class="font-bold">${trendSymbol}</span>
+                                    </div>
+                                    <p class="text-xs text-neutral-400">Score</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 pt-4 border-t border-neutral-700">
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-blue-300">${user.totalSessions || 0}</p>
+                                    <p class="text-xs text-neutral-400">Sessions</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-green-300">${user.totalTimeFormatted || '0m'}</p>
+                                    <p class="text-xs text-neutral-400">Time</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-orange-300">${user.totalLessonsViewed || 0}</p>
+                                    <p class="text-xs text-neutral-400">Lessons</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold" style="color: ${getAccuracyColor(user.averageAccuracyPercentage || 0)}">${(user.averageAccuracyPercentage || 0).toFixed(0)}%</p>
+                                    <p class="text-xs text-neutral-400">Accuracy</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+    
+    /**
+     * Get color based on accuracy percentage
+     */
+    function getAccuracyColor(accuracy) {
+        if (accuracy >= 80) return '#10b981'; // green
+        if (accuracy >= 60) return '#3b82f6'; // blue
+        if (accuracy >= 40) return '#f59e0b'; // amber
+        return '#ef4444'; // red
     }
 
     /**
@@ -907,38 +1321,107 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
             return;
         }
 
-        const questList = Object.entries(quests);
+        let questList = Object.entries(quests);
+        
+        questList.sort((a, b) => {
+            const aSessions = a[1].totalSessions || 0;
+            const bSessions = b[1].totalSessions || 0;
+            return bSessions - aSessions;
+        });
+
+        const totalSessions = questList.reduce((sum, [_, data]) => sum + (data.totalSessions || 0), 0);
+        const totalCompletions = questList.reduce((sum, [_, data]) => sum + (data.totalCompletions || 0), 0);
+        const avgCompletion = totalSessions > 0 ? (totalCompletions / totalSessions) * 100 : 0;
+        
         const html = `
             <div class="space-y-6">
-                <h2 class="text-2xl font-bold text-white">Quest Analytics</h2>
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Total Quests</h4>
+                        <div class="text-2xl font-bold text-blue-300">${questList.length}</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Total Sessions</h4>
+                        <div class="text-2xl font-bold text-green-300">${totalSessions}</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-900/40 to-purple-800/20 border border-purple-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Total Completions</h4>
+                        <div class="text-2xl font-bold text-purple-300">${totalCompletions}</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-900/40 to-orange-800/20 border border-orange-700/50 rounded-lg p-4">
+                        <h4 class="text-neutral-300 text-xs font-semibold mb-2">Platform Avg Completion</h4>
+                        <div class="text-2xl font-bold text-orange-300">${avgCompletion.toFixed(1)}%</div>
+                    </div>
+                </div>
+                
+                <!-- Quest Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    ${questList.map(([name, data]) => `
-                        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-white mb-4">${name}</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Sessions:</span>
-                                    <span class="text-white font-semibold">${data.totalSessions || 0}</span>
+                    ${questList.map(([name, data], idx) => {
+                        const completionRate = (data.totalSessions || 0) > 0 ? ((data.totalCompletions || 0) / (data.totalSessions || 0)) * 100 : 0;
+                        const avgTimePerSession = (data.totalSessions || 0) > 0 ? (data.totalTimeSpentSeconds || 0) / (data.totalSessions || 0) : 0;
+                        const avgLessonsPerSession = (data.totalSessions || 0) > 0 ? (data.totalLessonsViewed || 0) / (data.totalSessions || 0) : 0;
+                        
+                        // Difficulty assessment: higher completion = easier
+                        let difficulty = completionRate >= 80 ? 'Easy' : completionRate >= 50 ? 'Medium' : 'Challenging';
+                        let diffColor = completionRate >= 80 ? 'text-green-400' : completionRate >= 50 ? 'text-yellow-400' : 'text-red-400';
+                        
+                        return `
+                            <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6 hover:border-neutral-600 transition">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-white">${name}</h3>
+                                        <p class="text-xs text-neutral-400 mt-1">Quest ${idx + 1} of ${questList.length}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-2xl font-bold text-green-400">${completionRate.toFixed(1)}%</div>
+                                        <p class="text-xs text-neutral-400">Complete Rate</p>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Users:</span>
-                                    <span class="text-white font-semibold">${data.uniqueUsers || 0}</span>
+                                
+                                <div class="mb-4 pb-4 border-b border-neutral-700">
+                                    <div class="inline-block">
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${diffColor} bg-neutral-700/50">
+                                            Difficulty: ${difficulty}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Time Spent:</span>
-                                    <span class="text-white font-semibold">${data.totalTimeSpent || '0h'}</span>
+                                
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Sessions</span>
+                                        <span class="text-white font-semibold">${data.totalSessions || 0}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Unique Users</span>
+                                        <span class="text-white font-semibold">${data.uniqueUsers || 0}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Avg Time/Session</span>
+                                        <span class="text-white font-semibold">${Math.floor(avgTimePerSession / 60)}m</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Lessons Viewed</span>
+                                        <span class="text-white font-semibold">${data.totalLessonsViewed || 0}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-neutral-400">Avg Lessons/Session</span>
+                                        <span class="text-white font-semibold">${avgLessonsPerSession.toFixed(1)}</span>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-neutral-400">Lessons:</span>
-                                    <span class="text-white font-semibold">${data.totalLessonsViewed || 0}</span>
-                                </div>
-                                <div class="flex items-center justify-between pt-3 border-t border-neutral-700">
-                                    <span class="text-neutral-400">Completions:</span>
-                                    <span class="text-green-400 font-semibold">${data.totalCompletions || 0}</span>
+                                
+                                <div class="pt-4 border-t border-neutral-700 mt-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-neutral-400 text-sm">Completion Progress</span>
+                                        <span class="text-green-400 text-sm font-semibold">${data.totalCompletions || 0} / ${data.totalSessions || 0}</span>
+                                    </div>
+                                    <div class="w-full bg-neutral-700/50 rounded-full h-2 overflow-hidden">
+                                        <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-full" style="width: ${Math.min(completionRate, 100)}%"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;

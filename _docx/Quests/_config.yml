@@ -22,3 +22,8 @@ files:
     title: "Quest of Spook: Game Development"
     description: "Halloween-themed game development curriculum using JavaScript and OCS framework"
     permalink: "/quests/questofspook-game-dev/"
+  
+  GameBuilder-Capstone-Report:
+    title: "Game Development: Capstone Report"
+    description: "Educational game development curriculum study using JavaScript and OCS GameBuilder"
+    permalink: "/gamebuilder/capstone"

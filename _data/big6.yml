@@ -1,0 +1,150 @@
+# Big6 Capstone Infographic
+Title: "Big Six"
+Description: "Six interactive CS modules that take students from frontend to full-stack, through data visualization, resume building, AI usage, and a final mastery certificate — building real career-ready skills at every level."
+
+Topics:
+  - title: "Big Six"
+    image: "capstone/backend.png"
+    link: "/capstone/big6/"
+    alt: "Big Six — Interactive CS Learning Modules by Open Coding Society"
+    keyPoints:
+      - "C1: Build visually compelling blogs and projects with HTML, CSS, and JavaScript"
+      - "C2: Learn full-stack integration with Flask, Spring, and real database structures"
+      - "C3: Visualize and collate data from diverse sources for ML-ready representation"
+      - "C4: Write about CS projects for resumes in both technical and non-technical terms"
+      - "C5: Prompt AI tools to accelerate frontend, backend, data, and resume work"
+      - "C6: Integrate all modules and earn a verifiable Open Coding Society certificate"
+    subtitle: "From First Commit to Career-Ready — One Module at a Time"
+    description: "Understand how to ideate, develop, and describe computer science projects for future career success. Build critical project development skills and earn a certificate upon completion."
+    modules:
+      - id: "C1"
+        title: "Frontend Development"
+        genre: "Project Creation"
+        level: 1
+        description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
+        lessonCount: 6
+        lessonLink: "/bigsix/frontend_lesson"
+        image: "/images/cs-portfolio-quest/frontend/mainpage.png"
+        alt: "CS Portfolio Quest Frontend"
+        details:
+          - "Semantic HTML structure and accessibility"
+          - "CSS layouts with Flexbox and Grid"
+          - "JavaScript interactivity and DOM manipulation"
+          - "Responsive design for all screen sizes"
+          - "Build a real portfolio-ready project"
+        tech:
+          - "HTML"
+          - "CSS"
+          - "JavaScript"
+      - id: "C2"
+        title: "Backend Development"
+        genre: "Project Creation"
+        level: 2
+        description: "Learn about database structures, types, and integration with frontend for real-world full-stack development"
+        lessonCount: 6
+        lessonLink: "/bigsix/backend_lesson"
+        image: "/images/cs-portfolio-quest/backend/backendmain.png"
+        alt: "CS Portfolio Quest Backend"
+        details:
+          - "Backend APIs with Flask and Spring Boot"
+          - "Database design and SQL fundamentals"
+          - "Connecting frontend to backend endpoints"
+          - "Authentication and user sessions"
+          - "Deploy a full-stack application"
+        tech:
+          - "Flask"
+          - "Spring"
+          - "Databases"
+          - "Backend"
+      - id: "C3"
+        title: "Data Visualization"
+        genre: "Practice"
+        level: 3
+        description: "Learn about how to visualize data from various sources for effective representation and application, such as machine learning"
+        lessonCount: 2
+        lessonLink: "/bigsix/dataviz_lesson"
+        image: "/images/cs-portfolio-quest/datavisualization/data_visualization_main.png"
+        alt: "CS Portfolio Quest Data Visualization"
+        details:
+          - "Data collection and cleaning techniques"
+          - "Charts and visualizations with real datasets"
+          - "Introduction to machine learning concepts"
+          - "Feature engineering and data formatting"
+          - "Build an ML-ready data pipeline"
+        tech:
+          - "Visualization"
+          - "ML"
+          - "Collation"
+      - id: "C4"
+        title: "Resume Building"
+        genre: "Application"
+        level: 4
+        description: "Learn to write about your CS projects for inclusion on your resume, both in technical and non-technical terms"
+        lessonLink: "/bigsix/resume_lesson"
+        image: "/images/cs-portfolio-quest/resume/ModuleBackground.png"
+        alt: "CS Portfolio Quest Resume"
+        details:
+          - "Technical writing for developer blogs"
+          - "Resume bullet points that get noticed"
+          - "Explaining complex code to non-engineers"
+          - "LinkedIn and portfolio storytelling"
+          - "Write a full project case study"
+        tech:
+          - "CV"
+          - "Resume"
+          - "Blogging"
+      - id: "C5"
+        title: "AI Usage"
+        genre: "Assessment"
+        level: 5
+        description: "Learn to prompt AI to streamline frontend and backend development, data visualization, and resume building"
+        lessonCount: 4
+        lessonLink: "/bigsix/ai_lesson"
+        image: "/images/cs-portfolio-quest/ai/aimain.png"
+        alt: "CS Portfolio Quest AI"
+        details:
+          - "Prompting strategies for code generation"
+          - "AI-assisted debugging and refactoring"
+          - "Using Claude and ChatGPT for data work"
+          - "Vibe coding and rapid prototyping"
+          - "Build something 10x faster with AI"
+        tech:
+          - "ChatGPT"
+          - "Prompting"
+          - "Vibe Coding"
+      - id: "C6"
+        title: "Analytics and Mastery Certificate"
+        genre: "Integration"
+        level: 6
+        description: "Integrate all prior modules into a capstone analytics project and earn a verifiable mastery certificate"
+        lessonLink: "/bigsix/analytics_lesson"
+        image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
+        alt: "CS Portfolio Quest Mastery Certificate"
+        details:
+          - "Full-stack capstone analytics project"
+          - "Integrate C1 through C5 skills into one build"
+          - "Present and document your work"
+          - "Peer review and feedback session"
+          - "Earn your verifiable OCS mastery certificate"
+        tech:
+          - "Certificate"
+          - "Integration"
+          - "Achievement"
+    tech:
+      - "HTML / CSS / JavaScript (C1)"
+      - "Flask + Spring + Databases (C2)"
+      - "Data Visualization + ML Collation (C3)"
+      - "Resume Writing + Blogging (C4)"
+      - "ChatGPT + Claude Prompting / Vibe Coding (C5)"
+      - "Analytics + Certificate Integration (C6)"
+    impact:
+      - "Gives students a complete mental model of frontend and backend development"
+      - "Bridges technical skills with career communication (resume + blogging)"
+      - "Teaches responsible and effective AI usage across all project layers"
+      - "Provides a verifiable mastery certificate upon completing all six modules"
+      - "Interactive, hands-on modules build real portfolio artifacts at every level"
+    status: "Live"
+    team:
+      - "Alex"
+      - "Travis"
+      - "Kush"

@@ -68,3 +68,9 @@
 @import "capstone/quant-infograph";
 // D.A.D. Website Redesign
 @import "capstone/dad-redesign-infograph";
+// Capstone Infograph Styles (centralized)
+// All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
+@import "capstone/infograph";
+
+// RPN Calculator Lesson Interactives
+@import "nighthawk/rpn-interactive";
