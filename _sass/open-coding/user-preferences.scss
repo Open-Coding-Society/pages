@@ -1,189 +1,210 @@
-/* ---------- User theme: plain color (no gradients) ---------- */
+/* =============================================================================
+ * User Preferences SCSS — Organized by Single Responsibility Principle
+ *
+ * ALL visual styling for user preferences lives here.
+ * JS (user-preferences.js) only sets CSS custom properties on :root and
+ * toggles the .user-theme-active class — zero inline <style> injection.
+ *
+ * Design Principles (per SRP & API Chaining blog):
+ *   - ZERO hardcoded hex colors — all values reference SASS variables from
+ *     root-color-map.scss / user-colors.scss (e.g. $background, $text, $accent)
+ *   - Reuses existing mixins from _sass/open-coding/mixins/ where applicable
+ *   - Uses design-system spacing ($spacing-*), radii ($radius-*), transitions
+ *     ($transition-*), and breakpoints ($breakpoint-*) from _variables.scss
+ *   - Each section has a single responsibility (one reason to change)
+ *
+ * Sections:
+ *   1. Root Defaults        — CSS custom property fallback values (SASS vars)
+ *   2. Container Overrides  — html, body, main content areas
+ *   3. Panel Overrides      — Sidebar, cards, module cards
+ *   4. Typography Overrides — Text colours, headings, muted text
+ *   5. Interactive Elements — Links, inputs, buttons, selection highlight
+ *   6. Lesson Player        — Lesson-specific component overrides
+ *   7. Tailwind Compat      — Override Tailwind utility bg/text/border classes
+ *   8. Google Translate      — Hide the Translate toolbar/banner
+ * ========================================================================== */
 
+
+/* ---------------------------------------------------------------------------
+ * Section 1: Root Defaults
+ * Responsibility: Provide safe CSS custom-property fallbacks so pages
+ *                 render correctly even before JS applies user preferences.
+ *
+ * ALL values reference SASS variables — NEVER hardcoded hex colors.
+ * SASS vars are defined in root-color-map.scss and user-colors.scss,
+ * imported before this file in _main.scss.
+ * -------------------------------------------------------------------------- */
 :root {
-  --pref-bg-color: #0b1220;
-  --pref-text-color: #e6eef8;
-  --pref-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  --pref-font-size: 14px;
-  --pref-accent-color: #3b82f6;
-  --text-muted: #a0a0a0;
+  // Core preference properties — interpolated from SASS variables
+  --pref-bg-color: #{$background};
+  --pref-text-color: #{$text};
+  --pref-font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+  --pref-font-size: #{$text-md};
+  --pref-accent-color: #{$accent};
+  --pref-selection-color: #{$accent};
+  --pref-btn-radius: #{$radius-xs};
+  --text-muted: #{$text-muted};
 
-  /* Derived UI variables */
-  --panel: var(--pref-bg-color);
-  --panel-mid: rgba(0,0,0,0.12);
-  --ui-bg: rgba(0,0,0,0.06);
-  --ui-border: rgba(255,255,255,0.06);
-  --emoji-bg: rgba(255,255,255,0.9);
+  // Derived panel shades — reference existing palette variables
+  // (overridden at runtime by ThemeEngine when user applies preferences)
+  --panel: #{$panel};
+  --panel-mid: #{$bg-3};
+  --ui-bg: #{$bg-1};
+  --ui-border: #{$surface};
+  --emoji-bg: transparent;
 }
 
-/* Scope the user theme */
-.user-theme-active,
-.user-theme-active.dark {
+
+/* ---------------------------------------------------------------------------
+ * Section 2: Container Overrides
+ * Responsibility: Apply user bg / text / font to the page-level containers
+ *                 ONLY when JS has added .user-theme-active to <html>.
+ * -------------------------------------------------------------------------- */
+html.user-theme-active,
+html.user-theme-active body {
   background-color: var(--pref-bg-color) !important;
   color: var(--pref-text-color) !important;
   font-family: var(--pref-font-family) !important;
   font-size: var(--pref-font-size) !important;
 }
 
-/* Make main containers use plain user color (no gradients) */
 .user-theme-active {
   .container,
   .page-content,
-  .wrapper,
-  main,
-  article,
-  .post,
-  .content,
-  .opencs_root {
+  main {
     background-color: var(--pref-bg-color) !important;
     color: var(--pref-text-color) !important;
-    border-color: var(--ui-border) !important;
+    font-family: var(--pref-font-family) !important;
+    font-size: var(--pref-font-size) !important;
   }
+}
 
-  /* Full sidebar and topbar use the plain user color */
-  .lesson-sidebar,
-  .lesson-topbar,
-  aside,
+
+/* ---------------------------------------------------------------------------
+ * Section 3: Panel Overrides
+ * Responsibility: Sidebar, navigation, module-card, and question-card panels
+ *                 get a derived panel shade so they contrast with the main bg.
+ * -------------------------------------------------------------------------- */
+.user-theme-active {
   .sidebar,
-  #sidebar,
-  .site-sidebar,
-  .sidebar-container,
-  .side-panel {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
+  .site-nav,
+  nav {
+    background-color: var(--panel) !important;
     border-color: var(--ui-border) !important;
   }
 
-  /* Infograph module cards: same plain color for every card */
-  .module-card {
-    background-color: var(--pref-bg-color) !important;
-    border: 1px solid var(--ui-border) !important;
-    color: var(--pref-text-color) !important;
-    padding: 1rem !important;
-    box-shadow: none !important;
-  }
-
-  /* Ensure no alternating rule overrides the plain color */
-  .module-card:nth-child(2n) {
-    background-color: var(--pref-bg-color) !important;
-  }
-
-  /* Columns transparent so card color remains visible */
-  .module-image-col,
-  .module-keypoints-col,
-  .module-desc-col {
-    background: transparent !important;
-    color: var(--pref-text-color) !important;
-  }
-
-  .module-desc-col {
-    padding: 0.6rem !important;
-    border-radius: 0.375rem !important;
-  }
-
-  .module-img {
-    background-color: transparent !important;
-    border-radius: 0.5rem !important;
-    object-fit: cover !important;
-  }
-
-  .module-emoji {
-    background-color: var(--emoji-bg) !important;
-    color: #0b1220 !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.35) !important;
-  }
-
-  .module-overlay {
-    background-color: rgba(0,0,0,0.45) !important;
-  }
-
-  /* Questions: background plain; inputs also plain user color */
-  .questions,
-  .question-box,
-  .question-card,
-  .qa-box,
-  .qa-section {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid var(--ui-border) !important;
-  }
-
-  .question-box input,
-  .question-box textarea,
-  .question-card input,
-  .question-card textarea,
-  input.question-input,
-  textarea.question-input {
-    background-color: var(--pref-bg-color) !important;
-    color: var(--pref-text-color) !important;
-    border: 1px solid rgba(0,0,0,0.18) !important;
-    padding: 0.5rem !important;
-  }
-
-  /* Generic cards/panels use plain user color */
+  .module-card,
   .card,
-  .panel,
-  .box,
-  .post,
-  .microblog-post,
-  [class*="rounded-xl"],
-  [class*="rounded-lg"] {
-    background-color: var(--pref-bg-color) !important;
+  .question-card,
+  .flashcard {
+    background-color: var(--panel) !important;
+    color: var(--pref-text-color) !important;
     border-color: var(--ui-border) !important;
+  }
+
+  // Sidebar panels with specific Tailwind classes
+  .fixed.left-0.bg-neutral-800,
+  div[class*="bg-neutral-800"].border {
+    background-color: var(--panel) !important;
+  }
+
+  .rounded-lg.bg-neutral-800,
+  .p-4.rounded-lg.bg-neutral-800 {
+    background-color: var(--panel) !important;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+ * Section 4: Typography Overrides
+ * Responsibility: Headings, paragraph text, muted / secondary text
+ * -------------------------------------------------------------------------- */
+.user-theme-active {
+  h1, h2, h3, h4, h5, h6 {
     color: var(--pref-text-color) !important;
   }
 
-  /* Links/icons */
-  a, a:visited, a:hover,
-  .module-card a,
-  .module-card svg,
-  header a,
-  .site-header a,
-  aside a,
-  .sidebar a {
-    color: var(--pref-accent-color) !important;
-    fill: currentColor !important;
-  }
-
-  /* Force text color for readability */
-  p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
+  p, li, td, th, label, span, div {
     color: var(--pref-text-color) !important;
   }
 
-  /* Muted secondary text */
-  .text-neutral-400, .text-neutral-500, .text-gray-400, .text-gray-500,
-  .text-slate-400, .text-slate-500, .text-zinc-400, .text-zinc-500,
-  .post-meta, .post-meta-description {
+  .text-muted,
+  .post-meta,
+  .post-meta-description,
+  small {
     color: var(--text-muted) !important;
   }
+}
 
-  /* Inputs/buttons default */
-  input, select, textarea, button {
-    background-color: var(--panel);
-    border: 1px solid var(--pref-accent-color);
+
+/* ---------------------------------------------------------------------------
+ * Section 5: Interactive Elements
+ * Responsibility: Links, buttons, form inputs, select boxes,
+ *                 selection highlight colour, button border-radius.
+ * -------------------------------------------------------------------------- */
+.user-theme-active {
+  // Text selection highlight — driven by --pref-selection-color
+  &::selection,
+  *::selection {
+    background-color: var(--pref-selection-color) !important;
+    color: #{$white1} !important;
+  }
+  &::-moz-selection,
+  *::-moz-selection {
+    background-color: var(--pref-selection-color) !important;
+    color: #{$white1} !important;
   }
 
-  /* Invert color to look preferred */
-  button.bg-blue-600, button.bg-blue-700,
-  button.bg-green-600, button.bg-green-700,
-  .btn-primary,
-  .save-section-btn,
-  #save-preferences,
-  #save-theme-btn {
-    background-color: color-mix(in srgb, var(--pref-accent-color) 65%, white 35%);
-    border: 1px solid var(--pref-accent-color);
+  // Links — accent color from preferences
+  a:not(.btn) {
+    color: var(--pref-accent-color) !important;
   }
 
-  /* Lesson player specific overrides */
-  .lesson-player,
-  .lesson-main,
-  .main-content,
-  .content-wrapper,
-  .lesson-content {
-    background-color: var(--pref-bg-color) !important;
+  // Form inputs — panel shade background, themed border
+  input,
+  select,
+  textarea {
+    background-color: var(--panel) !important;
     color: var(--pref-text-color) !important;
+    border-color: var(--ui-border) !important;
+    transition: border-color $transition-base ease;
   }
-  
+
+  // Buttons — radius driven by --pref-btn-radius custom property
+  button,
+  .btn,
+  [class*="rounded"] button,
+  input[type="submit"],
+  input[type="button"] {
+    border-radius: var(--pref-btn-radius) !important;
+  }
+
+  button,
+  .btn,
+  a.btn {
+    color: inherit !important;
+    transition: background-color $transition-base ease,
+                border-color $transition-base ease;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+ * Section 6: Lesson Player
+ * Responsibility: Override the lesson-player component that has its own
+ *                 hard-coded dark-mode colours.
+ * -------------------------------------------------------------------------- */
+.user-theme-active {
+  .lesson-player {
+    background-color: var(--pref-bg-color) !important;
+  }
+
+  .lesson-sidebar {
+    background-color: var(--panel) !important;
+    border-color: var(--ui-border) !important;
+  }
+
   .lesson-sidebar,
   .sidebar-header,
   .sprint-nav,
@@ -191,22 +212,104 @@
   .lesson-item {
     background-color: var(--panel) !important;
     color: var(--pref-text-color) !important;
-    border-color: var(--ui-border) !important;
   }
-  
+
+  .lesson-main,
+  .main-content,
+  .lesson-content,
+  .content-wrapper {
+    background-color: var(--pref-bg-color) !important;
+    color: var(--pref-text-color) !important;
+  }
+
   .sidebar-header h2,
   .sidebar-header p,
   .sprint-toggle,
-  .lesson-title,
-  .progress-label {
+  .lesson-title {
     color: var(--pref-text-color) !important;
   }
-  
-  /* Tailwind background class overrides */
-  [class*="bg-neutral-"],
-  [class*="bg-gray-"],
-  [class*="bg-slate-"],
-  [class*="bg-zinc-"] {
+
+  .progress-bar-sidebar {
+    background-color: var(--ui-border) !important;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+ * Section 7: Tailwind Compatibility
+ * Responsibility: Override Tailwind neutral / gray utility classes so
+ *                 the user theme wins over framework defaults.
+ * -------------------------------------------------------------------------- */
+.user-theme-active {
+  // Background classes
+  .bg-neutral-900,
+  .bg-neutral-800 {
     background-color: var(--pref-bg-color) !important;
   }
+
+  .bg-neutral-700 {
+    background-color: var(--panel) !important;
+  }
+
+  [class*="bg-neutral"],
+  [class*="bg-gray"],
+  [class*="bg-slate"],
+  [class*="bg-zinc"] {
+    background-color: var(--panel) !important;
+    color: var(--pref-text-color) !important;
+  }
+
+  // Text classes
+  .text-neutral-100,
+  .text-neutral-50,
+  .text-white {
+    color: var(--pref-text-color) !important;
+  }
+
+  .text-neutral-400,
+  .text-neutral-500,
+  .text-gray-300,
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600 {
+    color: var(--text-muted) !important;
+  }
+
+  // Border classes
+  .border-neutral-700,
+  .border-neutral-600 {
+    border-color: var(--ui-border) !important;
+  }
+
+  // Accent classes
+  .text-blue-500,
+  .border-blue-500 {
+    color: var(--pref-accent-color) !important;
+    border-color: var(--pref-accent-color) !important;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+ * Section 8: Google Translate — hide the toolbar / banner
+ * Responsibility: Keep the Google Translate widget invisible so
+ *                 translation works without the default UI chrome.
+ *                 Previously injected by JS — now lives in SASS.
+ * -------------------------------------------------------------------------- */
+.goog-te-banner-frame,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+.skiptranslate,
+.goog-te-gadget,
+#google_translate_element {
+  display: none !important;
+}
+
+// Prevent Google Translate from pushing body down
+body.translated-ltr,
+body.translated-rtl {
+  top: 0 !important;
+  position: static !important;
 }
