@@ -392,7 +392,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
     <div>
         <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pvo-redesign-infographic %}">Poway Veterans Organization</a></h3>
         <p class="text-sm text-gray-700">A guided 'Need Help? Start Here' pathway for the Poway Veterans Organization — simplified assistance application, document checklist, and urgent resource directory for veterans and families.</p>
-        <p class="text-xs text-gray-500 mt-2">API Pirates (Alice, Brandon, Aryan)</p>
+        <p class="text-xs text-gray-500 mt-2">Team: API Pirates (Alice, Brandon, Aryan)</p>
     </div>
 
 
