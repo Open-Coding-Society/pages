@@ -22,22 +22,6 @@ comments: false
   const MEMBER_ANALYTICS_PAGE_SIZE = 5;
   const MEMBER_ANALYTICS_COLUMN_COUNT = 8;
 
-  const ERROR_TYPES = {
-    AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
-    INVALID_GROUP: 'INVALID_GROUP',
-    HTTP_ERROR: 'HTTP_ERROR',
-    NETWORK: 'NETWORK',
-    UNKNOWN: 'UNKNOWN'
-  };
-
-  const ERROR_MESSAGES = {
-    [ERROR_TYPES.AUTHENTICATION_REQUIRED]: 'Please sign in to view the group dashboard.',
-    [ERROR_TYPES.INVALID_GROUP]: 'Group not found. Please select a valid group.',
-    [ERROR_TYPES.HTTP_ERROR]: (status) => `Server error (${status}). Please try again.`,
-    [ERROR_TYPES.NETWORK]: 'Network request failed. Check your connection.',
-    [ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred. Please refresh the page.'
-  };
-
   // ---------------------------------------------
   // STATE (module-level)
   // ---------------------------------------------
@@ -46,20 +30,214 @@ comments: false
   const memberAnalyticsCache = new Map();
   const memberSummaryCache = new Map();
 
+  /**
+   * ═══════════════════════════════════════════════════════════════════════════
+   * ERROR HANDLING SYSTEM OVERVIEW
+   * ═══════════════════════════════════════════════════════════════════════════
+   * 
+   * Architecture Pattern: Centralized error configuration with typed errors
+   * 
+   * COMPONENTS:
+   * -----------
+   * 1. ERROR_TYPES (Enumeration)
+   *    - Defines error type constants as strings
+   *    - Single source of truth for all error type references
+   *    - Used throughout codebase for consistency
+   * 
+   * 2. ERROR_HANDLERS (Configuration Map)
+   *    - Maps error types to handler configurations
+   *    - Each handler contains: message, userMessage, color
+   *    - Supports static strings and dynamic functions
+   * 
+   * 3. createFetchError() (Error Factory)
+   *    - Creates typed Error objects with metadata
+   *    - Attaches type and status properties to Error
+   *    - Uses ERROR_HANDLERS for descriptive messages
+   * 
+   * 4. showError() (UI Renderer)
+   *    - Displays user-facing error messages in DOM
+   *    - Retrieves configuration from ERROR_HANDLERS
+   *    - Applies appropriate color styling
+   * 
+   */
+
+  /**
+   * ERROR_TYPES - Enumeration of all error type constants
+   * =====================================================
+   */
+  const ERROR_TYPES = {
+    AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
+    PERMISSION_DENIED: 'PERMISSION_DENIED',
+    INVALID_GROUP: 'INVALID_GROUP',
+    HTTP_ERROR: 'HTTP_ERROR',
+    NETWORK: 'NETWORK',
+    UNKNOWN: 'UNKNOWN'
+  };
+
+  /**
+   * ERROR_HANDLERS - Map of error configurations
+   * ============================================
+   */
+  const ERROR_HANDLERS = {
+    [ERROR_TYPES.AUTHENTICATION_REQUIRED]: {
+      message: 'Authentication required',
+      userMessage: 'Please sign in to view the group dashboard.',
+      color: 'text-gray-400'
+    },
+    [ERROR_TYPES.PERMISSION_DENIED]: {
+      message: 'User lacks permission to access this resource',
+      userMessage: 'You do not have permission to view this group. Contact your teacher.',
+      color: 'text-yellow-400'
+    },
+    [ERROR_TYPES.INVALID_GROUP]: {
+      message: 'Group not found',
+      userMessage: 'Group not found. Please select a valid group.',
+      color: 'text-red-400'
+    },
+    [ERROR_TYPES.HTTP_ERROR]: {
+      message: (status) => `HTTP error: ${status}`,
+      userMessage: (status) => `Server error (${status}). Please try again.`,
+      color: 'text-red-400'
+    },
+    [ERROR_TYPES.NETWORK]: {
+      message: 'Network request failed',
+      userMessage: 'Network request failed. Check your connection.',
+      color: 'text-red-400'
+    },
+    [ERROR_TYPES.UNKNOWN]: {
+      message: 'Unknown error',
+      userMessage: 'An unexpected error occurred. Please refresh the page.',
+      color: 'text-red-400'
+    }
+  };
+
+ 
+  /**
+   * createFetchError - Create structured error object for fetch operations
+   * ======================================================================
+   * 
+   * Purpose: Generate standardized Error objects with type and status metadata.
+   * Uses ERROR_HANDLERS to provide meaningful error messages for debugging.
+   * 
+   * @param {string} errorType - Error type from ERROR_TYPES enum
+   * @param {number} [status] - Optional HTTP status code
+   * @returns {Error} Error object with type and status properties
+   * 
+   * Return Structure:
+   *   {
+   *     message: string,        // From ERROR_HANDLERS[errorType].message
+   *     type: string,          // errorType parameter
+   *     status: number | undefined  // HTTP status if provided
+   *   }
+   * 
+   */
+  function createFetchError(errorType, status) {
+    const handler = ERROR_HANDLERS[errorType] || ERROR_HANDLERS[ERROR_TYPES.UNKNOWN];
+    const message = typeof handler.message === 'function' 
+      ? handler.message(status) 
+      : handler.message;
+    const error = new Error(message);
+    error.type = errorType;
+    if (status !== undefined) error.status = status;
+    return error;
+  }
+
+  /**
+   * showError - Display error message in UI container
+   * =================================================
+   * 
+   * Purpose: Render user-facing error messages with appropriate styling.
+   * Retrieves error configuration from ERROR_HANDLERS and injects HTML into container.
+   * 
+   * @param {HTMLElement} containerEl - DOM element to display error in
+   * @param {string} errorType - Error type from ERROR_TYPES enum
+   * @param {number} [status] - Optional HTTP status code for dynamic messages
+   * 
+   * Usage Examples:
+   *   showError(element, ERROR_TYPES.AUTHENTICATION_REQUIRED);
+   *   showError(element, ERROR_TYPES.HTTP_ERROR, 500);
+   *   showError(element, ERROR_TYPES.PERMISSION_DENIED, 403);
+   * 
+   * HTML Output:
+   *   <p class="text-red-400 text-center">Error message here</p>
+   */
+  function showError(containerEl, errorType, status) {
+    if (!containerEl) return;
+    const handler = ERROR_HANDLERS[errorType] || ERROR_HANDLERS[ERROR_TYPES.UNKNOWN];
+    const message = typeof handler.userMessage === 'function' 
+      ? handler.userMessage(status) 
+      : handler.userMessage;
+    const color = handler.color || 'text-red-400';
+    containerEl.innerHTML = `<p class="${color} text-center">${message}</p>`;
+  }
+
   // ---------------------------------------------
   // UTILITIES
   // ---------------------------------------------
+  /**
+   * ═══════════════════════════════════════════════════════════════════════════
+   * fetchJson - Fetch JSON data with standardized error handling
+   * ═══════════════════════════════════════════════════════════════════════════
+   * 
+   * Purpose: Wrapper for fetch API with automatic error categorization and throwing.
+   * Converts HTTP status codes into typed error objects for consistent handling.
+   * 
+   * @param {string} url - API endpoint URL
+   * @param {object} options - Fetch options (method, headers, body, etc.)
+   * @returns {Promise<object>} Parsed JSON response
+   * @throws {Error} Typed error with type and status properties
+   * 
+   * Behavior:
+   *   1. Execute fetch request
+   *   2. Check response.ok status
+   *   3. If not ok, categorize by status code
+   *   4. Throw typed error via createFetchError()
+   *   5. If ok, parse and return JSON
+   * 
+   * Usage:
+   *   const data = await fetchJson('/api/groups', fetchOptions);
+   * 
+   */
+  async function fetchJson(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw createFetchError(ERROR_TYPES.AUTHENTICATION_REQUIRED, 401);
+      }
+      if (response.status === 403) {
+        throw createFetchError(ERROR_TYPES.PERMISSION_DENIED, 403);
+      }
+      throw createFetchError(ERROR_TYPES.HTTP_ERROR, response.status);
+    }
+    return response.json();
+  }
+
+  /**
+   * Extract query parameter from URL
+   * @param {string} name - Parameter name to retrieve
+   * @returns {string|null} Parameter value or null if not found
+   */
   function getQueryParam(name) {
     const params = new URLSearchParams(window.location.search);
     return params.get(name);
   }
 
+  /**
+   * Format numeric value as percentage string
+   * @param {number} value - Numeric value to format
+   * @returns {string} Formatted percentage (e.g., "75.5%")
+   */
   function formatPercent(value) {
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) return '0.0%';
     return `${numericValue.toFixed(1)}%`;
   }
 
+  /**
+   * Extract initials from full name
+   * @param {string} name - Full name to extract initials from
+   * @returns {string} Up to 2 uppercase initials (e.g., "JD")
+   */
   function getInitials(name) {
     if (!name) return '??';
     return name
@@ -70,6 +248,11 @@ comments: false
       .slice(0, 2);
   }
 
+  /**
+   * Get consistent avatar background color for user ID
+   * @param {number} id - User ID to generate color for
+   * @returns {string} Tailwind CSS background color class
+   */
   function getAvatarColor(id) {
     const colors = [
       'bg-indigo-600',
@@ -83,39 +266,6 @@ comments: false
       'bg-yellow-600'
     ];
     return colors[id % colors.length];
-  }
-
-  function buildErrorMessage(error) {
-    if (!error) return ERROR_MESSAGES[ERROR_TYPES.UNKNOWN];
-
-    if (error.type === ERROR_TYPES.HTTP_ERROR) {
-      return ERROR_MESSAGES[ERROR_TYPES.HTTP_ERROR](error.status);
-    }
-
-    return ERROR_MESSAGES[error.type] || ERROR_MESSAGES[ERROR_TYPES.UNKNOWN];
-  }
-
-  function showError(containerEl, message, colorClass = 'text-red-400') {
-    if (!containerEl) return;
-    containerEl.innerHTML = `<p class="${colorClass} text-center">${message}</p>`;
-  }
-
-  function createFetchError(type, status) {
-    const error = new Error(type);
-    error.type = type;
-    if (status !== undefined) error.status = status;
-    return error;
-  }
-
-  async function fetchJson(url, options) {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw createFetchError(ERROR_TYPES.AUTHENTICATION_REQUIRED, 401);
-      }
-      throw createFetchError(ERROR_TYPES.HTTP_ERROR, response.status);
-    }
-    return response.json();
   }
 
   // ---------------------------------------------
@@ -352,10 +502,19 @@ comments: false
   // ---------------------------------------------
   // PAGE INITIALIZATION / ORCHESTRATOR
   // ---------------------------------------------
+  
+  /**
+   * Redirect user back to groups list page
+   * Used when no group parameter is provided in URL
+   */
   function redirectToGroupsList() {
     window.location.href = '{{site.baseurl}}/student/groups';
   }
 
+  /**
+   * Update dashboard header with group information
+   * Sets group name, page title, metadata text, and member count
+   */
   function updateDashboardHeader(group) {
     const memberCount = (group.members || []).length;
 
@@ -368,27 +527,44 @@ comments: false
     document.getElementById('statTotalMembers').textContent = memberCount;
   }
 
+  /**
+   * Main orchestrator function - loads and initializes entire dashboard
+   * Steps:
+   *   1. Extract and validate group name from URL
+   *   2. Fetch group data from API
+   *   3. Update header and set active group
+   *   4. Load summary stats and member analytics in parallel
+   *   5. Store group data globally for other scripts
+   *   6. Handle errors with user-friendly messages
+   */
   async function loadGroupDashboard() {
+    // Step 1: Get group name from URL query parameter
     const rawGroupName = getQueryParam('group');
     if (!rawGroupName) {
       redirectToGroupsList();
       return;
     }
 
+    // Step 2: Decode and normalize group name (replace hyphens with spaces)
     const groupName = decodeURIComponent(rawGroupName).replace(/-/g, ' ');
 
     try {
+      // Step 3: Fetch group data from backend
       const group = await fetchGroupByName(groupName);
 
+      // Step 4: Validate group exists
       if (!group || !group.id) {
         throw createFetchError(ERROR_TYPES.INVALID_GROUP);
       }
 
+      // Step 5: Set active group and reset pagination
       activeDashboardGroup = group;
       memberAnalyticsCurrentPage = 1;
 
+      // Step 6: Update page header with group info
       updateDashboardHeader(group);
 
+      // Step 7: Handle empty group case
       const tbody = document.getElementById('memberAnalyticsBody');
       if (!group.members || group.members.length === 0) {
         tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
@@ -397,30 +573,38 @@ comments: false
         return;
       }
 
+      // Step 8: Load summary stats and member analytics in parallel
       await Promise.all([loadDashboardSummaryStats(group), loadMemberAnalyticsPage(1)]);
 
-      // Store group data for other dashboard scripts
+      // Step 9: Store group data globally for other dashboard components
       window.currentDashboardGroupId = group.id;
       window.currentGroupData = group;
 
+      // Step 10: Load shared files if available
       if (typeof window.fetchDashboardSharedFiles === 'function') {
         await window.fetchDashboardSharedFiles();
       }
     } catch (error) {
+      // Step 11: Display error message to user
       console.error('Failed to load group dashboard:', error);
-      const userMessage = buildErrorMessage(error);
-      const color = error.type === ERROR_TYPES.AUTHENTICATION_REQUIRED ? 'text-gray-400' : 'text-red-400';
-      showError(document.getElementById('dashboardGroupMeta'), userMessage, color);
+      showError(document.getElementById('dashboardGroupMeta'), error.type, error.status);
     }
   }
 
+  /**
+   * Navigate to previous page of member analytics
+   */
   window.previousMemberAnalyticsPage = function () {
     loadMemberAnalyticsPage(memberAnalyticsCurrentPage - 1);
   };
 
+  /**
+   * Navigate to next page of member analytics
+   */
   window.nextMemberAnalyticsPage = function () {
     loadMemberAnalyticsPage(memberAnalyticsCurrentPage + 1);
   };
 
+  // Entry point: Load dashboard when page is ready
   document.addEventListener('DOMContentLoaded', loadGroupDashboard);
 </script>
