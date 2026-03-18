@@ -247,18 +247,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Palomar Capstone (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2025-03-05-palomar %}">
-           <img src="/images/capstone/palomar_logo.png" alt="Palomar" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2025-03-05-palomar %}">Palomar</a></h3>
-           <p class="text-sm text-gray-700">A donor-facing impact platform that connects philanthropic giving to real patient outcomes, keeps the foundation aligned with community needs, and gives healthcare supporters a 30-second pulse on every program — without feeling like a fundraising pitch.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Palomar Health Foundation</p>
-       </div>
-   </div>
-
    <!-- ACS Cancer Infograph (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-05-acs-cancer-infograph %}">
