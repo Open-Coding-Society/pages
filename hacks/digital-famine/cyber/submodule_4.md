@@ -6,7 +6,6 @@ permalink: /digital-famine/cybersecurity-game/submodule_4/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 4
-categories: [CSP, Submodule, Frontend]
 tags: [javascript, events, handling]
 author: "Aaryav, Dhyan, Aditya, Aarnav, Saathwik, West"
 date: 2025-10-21

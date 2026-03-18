@@ -1,4 +1,5 @@
 @import 'root-color-map.scss';
+@import "mixins/variables";
 @import "base/typography";
 @import "bathroom";
 @import "blogs";
@@ -7,6 +8,10 @@
 @import "forms/code-runner";
 @import "forms/ui-runner";
 @import "forms/game-runner";
+@import "forms/pause-modal";
+@import "forms/leaderboard";
+@import "forms/game-engine";
+@import "forms/game-builder";
 @import "hacks";
 @import "hacks_lxd";
 @import "hallpass";
@@ -14,8 +19,6 @@
 @import "grading";
 @import "navbar";
 @import "platformer-game";
-@import "game-engine";
-@import "game-builder";
 @import "quiz";
 @import "rps_lesson";
 @import "search";
@@ -27,6 +30,8 @@
 @import "timeline";
 @import "lesson-player";
 @import "documentation";
+@import "api-documentation";
+
 
 html,
 body,

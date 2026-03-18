@@ -60,48 +60,34 @@
     min-width: 120px;
   }
 
-  // Game-specific buttons
+  // Game-specific buttons - using element classes for semantic colors
   .pauseBtn,
   .stopBtn,
   .resetBtn {
     @include icon-button(38px, 0);
   }
 
-  // Pause button - yellow emphasis for attention
+  // Pause button - warning color (yellow) for attention
   .pauseBtn {
-    background: #eab308;
-    border-color: #eab308;
-    color: $panel-bg;
-
-    &:hover {
-      background: #eab308;
-      opacity: 0.85;
-    }
+    @extend .warning-button;
 
     &:disabled {
-      background: var(--pref-bg-color);
-      border-color: var(--ui-border);
-      color: var(--pref-text-color);
+      background: var(--pref-bg-color) !important;
+      border-color: var(--ui-border) !important;
+      color: var(--pref-text-color) !important;
       opacity: 0.5;
       cursor: not-allowed;
     }
   }
 
-  // Stop button - red emphasis
+  // Stop button - danger color (red) for critical action
   .stopBtn {
-    background: #dc2626;
-    border-color: #dc2626;
-    color: $panel-bg;
-
-    &:hover {
-      background: #dc2626;
-      opacity: 0.85;
-    }
+    @extend .danger-button;
 
     &:disabled {
-      background: var(--pref-bg-color);
-      border-color: var(--ui-border);
-      color: var(--pref-text-color);
+      background: var(--pref-bg-color) !important;
+      border-color: var(--ui-border) !important;
+      color: var(--pref-text-color) !important;
       opacity: 0.5;
       cursor: not-allowed;
     }
@@ -114,6 +100,45 @@
     .status-text {
       color: var(--pref-accent-color);
       font-weight: 600;
+    }
+  }
+
+  // Compact controls for hide_edit mode (mini-game experiences)
+  .compact-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    
+    .runBtn,
+    .stopBtn,
+    .resetBtn {
+      @include icon-button(38px, 0);
+    }
+    
+    .levelSelect {
+      @include select-control();
+      min-width: 120px;
+      flex: 1;
+      max-width: 200px;
+    }
+  }
+
+  // Hide-editor mode - cleaner experience for mini-games
+  &.hide-editor {
+    // Remove challenge box
+    .challenge-box {
+      display: none;
+    }
+    
+    // Make game output more prominent
+    .game-output {
+      border-radius: 8px;
+      border: 2px solid var(--pref-accent-color);
     }
   }
 }
