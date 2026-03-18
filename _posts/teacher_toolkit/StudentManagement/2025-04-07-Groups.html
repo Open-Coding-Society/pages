@@ -290,7 +290,7 @@ comments: false
                 <span class="text-lg">📅</span>
                 <div>
                   <div class="text-white text-sm font-medium">/calendar</div>
-                  <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+                  <div class="text-gray-400 text-xs">Add event: /calendar YYYY-MM-DD [HH:MM] Title | optional description</div>
                 </div>
               </div>
               <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
@@ -691,6 +691,9 @@ comments: false
   }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
 <script type="module">
 /* ================================
    CONFIG
@@ -712,11 +715,12 @@ let collapsedGroups = {}; // Track collapsed state per group ID
 // Chat state
 let activeChatGroupId = null;
 let activeChatGroupName = '';
-let chatPollTimer = null;
+let stompClient = null;
 let currentUser = null;
 let currentUserDisplayName = 'You';
 let pendingChatImageBase64 = null;
 let pendingChatImageMime = 'image/png';
+let renderedChatMessageKeys = new Set();
 
 /* ================================
    LOADING HELPERS
@@ -2074,10 +2078,81 @@ window.saveSmartGroups = async function() {
     }
   };
 
+  function getChatMessageKey(msg) {
+    return JSON.stringify([
+      msg?.name || '',
+      msg?.date || '',
+      msg?.message || '',
+      msg?.image || ''
+    ]);
+  }
+
+  function getChatImageSrc(image) {
+    if (!image) return null;
+    if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
+    return `data:image/png;base64,${image}`;
+  }
+
+  function appendSingleMessage(msg) {
+    const chatMessages = document.getElementById('chatMessages');
+    let emptyState = document.getElementById('chatEmptyState');
+    const messageKey = getChatMessageKey(msg);
+
+    if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
+      return;
+    }
+
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.id = 'chatEmptyState';
+      emptyState.className = 'text-center text-gray-500 text-sm py-6';
+      emptyState.textContent = 'No messages yet.';
+    }
+
+    emptyState.classList.add('hidden');
+
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'flex items-baseline gap-2 mb-1';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'text-white font-semibold text-sm';
+    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'text-gray-500 text-xs';
+    timeEl.textContent = formatTimestamp(msg.date);
+
+    header.appendChild(nameEl);
+    header.appendChild(timeEl);
+    wrapper.appendChild(header);
+
+    if (msg.message) {
+      const textEl = document.createElement('p');
+      textEl.className = 'text-gray-200 text-sm';
+      textEl.textContent = msg.message;
+      wrapper.appendChild(textEl);
+    }
+
+    if (msg.image) {
+      const img = document.createElement('img');
+      img.src = getChatImageSrc(msg.image);
+      img.alt = 'Shared image';
+      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+      wrapper.appendChild(img);
+    }
+
+    chatMessages.appendChild(wrapper);
+    renderedChatMessageKeys.add(messageKey);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
   function renderChatMessages(messages) {
     const chatMessages = document.getElementById('chatMessages');
     let emptyState = document.getElementById('chatEmptyState');
     chatMessages.innerHTML = '';
+    renderedChatMessageKeys = new Set();
 
     if (!emptyState) {
       emptyState = document.createElement('div');
@@ -2092,44 +2167,7 @@ window.saveSmartGroups = async function() {
       return;
     }
 
-    emptyState.classList.add('hidden');
-    messages.forEach(msg => {
-      const wrapper = document.createElement('div');
-
-      const header = document.createElement('div');
-      header.className = 'flex items-baseline gap-2 mb-1';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'text-white font-semibold text-sm';
-      nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-      const timeEl = document.createElement('span');
-      timeEl.className = 'text-gray-500 text-xs';
-      timeEl.textContent = formatTimestamp(msg.date);
-
-      header.appendChild(nameEl);
-      header.appendChild(timeEl);
-      wrapper.appendChild(header);
-
-      if (msg.message) {
-        const textEl = document.createElement('p');
-        textEl.className = 'text-gray-200 text-sm';
-        textEl.textContent = msg.message;
-        wrapper.appendChild(textEl);
-      }
-
-      if (msg.image) {
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64,${msg.image}`;
-        img.alt = 'Shared image';
-        img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-        wrapper.appendChild(img);
-      }
-
-      chatMessages.appendChild(wrapper);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    messages.forEach(appendSingleMessage);
   }
 
   async function fetchChatMessages() {
@@ -2144,6 +2182,101 @@ window.saveSmartGroups = async function() {
     }
   }
 
+  // helpers that mimic calendar page so slash-command code can call them
+  function handleAuthError(response) {
+    if (!response) return false;
+    if (response.status === 401 || response.status === 403) {
+      console.warn('Auth error', response.status);
+      alert('Please log in to perform this action.');
+      return true;
+    }
+    return false;
+  }
+  function handleFetchError(error) {
+    if (error instanceof TypeError && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
+      console.warn('Network/CORS error', error);
+      alert('Network error or session expired.');
+      return true;
+    }
+    return false;
+  }
+
+  // helper to parse and trigger calendar API when user types a slash command
+  function handleCalendarSlashCommand(rawText) {
+    // expected format: /calendar YYYY-MM-DD [HH:MM] Event title [| description]
+    const regex = /^\/calendar\s+(\d{4}-\d{2}-\d{2})(?:\s+(\d{1,2}:\d{2}))?\s+([^|]+)(?:\|(.+))?/i;
+    const m = rawText.match(regex);
+    if (!m) return false;
+    const dateStr = m[1];
+    const timeStr = m[2];
+    let title = m[3].trim();
+    const description = m[4] ? m[4].trim() : '';
+    if (timeStr) title = title + ` @ ${timeStr}`;
+
+    // derive period from group if possible (needed for backend validation)
+    let derivedPeriod = '';
+    if (activeChatGroupName && Array.isArray(allGroups)) {
+      const matched = allGroups.find(g => g.name === activeChatGroupName);
+      if (matched && matched.course) derivedPeriod = matched.course.toUpperCase();
+    }
+
+    if (!activeChatGroupName) {
+      alert('Open the group chat first; events must be tied to a group.');
+      return false;
+    }
+
+    // embed priority prefix like calendar page does
+    let titleToSave = title;
+    if (!/^\[P[0-3]\]/.test(titleToSave)) {
+      titleToSave = `[P2] ${titleToSave}`;
+    }
+
+    const currentUserName = (window.user && window.user.name) ? window.user.name : '';
+
+    const eventPayload = {
+      title: titleToSave,
+      description,
+      date: dateStr,
+      priority: 'P2',
+      groupName: activeChatGroupName,
+      period: derivedPeriod,
+      type: 'event',
+      individual: ''
+    };
+    console.log('calendar command payload', eventPayload);
+
+    // use the older '/add' endpoint in case migrations differ
+    fetch(`${javaURI}/api/calendar/add`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify(eventPayload)
+    })
+      .then(res => {
+        if (handleAuthError(res)) {
+          return null;
+        }
+        if (!res.ok) {
+          return res.text().then(t => {
+            throw new Error(`Calendar API error ${res.status}: ${t}`);
+          });
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data) {
+          alert('Calendar event created successfully');
+        }
+      })
+      .catch(err => {
+        if (!handleFetchError(err)) {
+          console.error('Calendar command failed', err);
+        }
+        alert('Failed to create calendar event');
+      });
+
+    return true;
+  }
+
   window.sendChatMessage = async function () {
     if (!activeChatGroupId) {
       console.warn('Chat group not resolved yet');
@@ -2152,6 +2285,20 @@ window.saveSmartGroups = async function() {
     const chatInput = document.getElementById('chatInput');
     const text = chatInput.value.trim();
     const image = pendingChatImageBase64 || null;
+
+    // intercept calendar slash command and try to handle it; if handled, don't send as chat
+    if (text.toLowerCase().startsWith('/calendar')) {
+      const handled = handleCalendarSlashCommand(text);
+      if (handled) {
+        chatInput.value = '';
+        clearChatImagePreview();
+        return;
+      } else {
+        // user typed /calendar but parsing failed
+        alert('Command format: /calendar YYYY-MM-DD [HH:MM] Title | optional description');
+        return;
+      }
+    }
 
     if (!text && !image) return;
 
@@ -2184,14 +2331,42 @@ window.saveSmartGroups = async function() {
   };
 
   function startChatPolling() {
-    if (chatPollTimer) clearInterval(chatPollTimer);
-    chatPollTimer = setInterval(fetchChatMessages, 4000);
+    if (!activeChatGroupId) return;
+
+    if (stompClient) {
+      stopChatPolling();
+    }
+
+    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+      console.error('SockJS/STOMP dependencies are not available');
+      return;
+    }
+
+    const socket = new SockJS(`${javaURI}/ws-chat`);
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+
+    stompClient.connect({}, () => {
+      if (!stompClient || !activeChatGroupId) return;
+
+      stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (message) => {
+        try {
+          const payload = JSON.parse(message.body);
+          appendSingleMessage(payload);
+        } catch (err) {
+          console.error('Failed to parse incoming chat message', err);
+        }
+      });
+    }, (err) => {
+      console.error('WebSocket connection failed', err);
+    });
   }
 
   function stopChatPolling() {
-    if (chatPollTimer) {
-      clearInterval(chatPollTimer);
-      chatPollTimer = null;
+    if (stompClient) {
+      const clientToDisconnect = stompClient;
+      stompClient = null;
+      clientToDisconnect.disconnect(() => {});
     }
   }
 
