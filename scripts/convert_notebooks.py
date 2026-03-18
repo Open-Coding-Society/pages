@@ -29,6 +29,9 @@ CODE_RUNNER_PATTERNS = {
 # UI_RUNNER pattern for HTML cells
 UI_RUNNER_PATTERN = r'^<!--\s*UI_RUNNER:\s*(.+)\s*-->$'
 
+# GAME_RUNNER pattern for GameEngine cells (JavaScript only)
+GAME_RUNNER_PATTERN = r'^//\s*GAME_RUNNER:\s*(.+)$'
+
 def error_cleanup(notebook_file):
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
     destination_path = os.path.join(destination_directory, destination_file)
@@ -207,6 +210,74 @@ def extract_ui_runner_metadata(cell_source):
     return None
 
 
+def extract_game_runner_metadata(cell_source):
+    """Extract GAME_RUNNER challenge and options from JavaScript cell comments
+    
+    Format: // GAME_RUNNER: challenge text | hide_edit: true
+    Returns: (challenge, options_dict)
+    """
+    lines = cell_source.split('\n')
+    
+    for line in lines:
+        match = re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
+        if match:
+            content = match.group(1).strip()
+            
+            # Parse options after pipe separator
+            if '|' in content:
+                parts = content.split('|', 1)
+                challenge = parts[0].strip()
+                options_str = parts[1].strip()
+                
+                # Parse options (format: key: value, key2: value2)
+                options = {}
+                for option in options_str.split(','):
+                    if ':' in option:
+                        key, value = option.split(':', 1)
+                        key = key.strip()
+                        value = value.strip().lower()
+                        # Convert string booleans to actual booleans
+                        if value == 'true':
+                            options[key] = True
+                        elif value == 'false':
+                            options[key] = False
+                        else:
+                            options[key] = value
+                
+                return (challenge, options)
+            else:
+                return (content, {})
+    
+    return None
+
+
+def clean_game_code(cell_source):
+    """Remove magic commands and GAME_RUNNER comments from game code"""
+    lines = cell_source.split('\n')
+    cleaned_lines = []
+    
+    for i, line in enumerate(lines):
+        # Skip %%js magic command (JavaScript first line)
+        if i == 0 and line.strip().startswith('%%js'):
+            continue
+        # Skip any other magic commands
+        if line.strip().startswith('%%'):
+            continue
+        # Skip GAME_RUNNER comment lines
+        if re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
+            continue
+        cleaned_lines.append(line)
+    
+    # Join lines and strip trailing whitespace
+    result = '\n'.join(cleaned_lines).rstrip()
+    
+    # Remove leading empty lines
+    while result.startswith('\n'):
+        result = result[1:]
+    
+    return result
+
+
 def clean_html_for_runner(cell_source, runner_index):
     """Clean HTML cell and make IDs unique"""
     lines = cell_source.split('\n')
@@ -275,6 +346,40 @@ def process_ui_runner_cells(notebook, permalink):
                     'script': script_content
                 }
                 runner_index += 1
+        
+        processed_cells.append(cell)
+    
+    notebook.cells = processed_cells
+    return notebook
+
+
+def process_game_runner_cells(notebook, permalink):
+    """Process notebook cells and add game-runner metadata"""
+    runner_index = 0
+    processed_cells = []
+    
+    for cell in notebook.cells:
+        if cell.cell_type == 'code':
+            # Check if it's a JavaScript cell with GAME_RUNNER
+            source = cell.get('source', '')
+            if source.strip().startswith('%%js'):
+                result = extract_game_runner_metadata(source)
+                
+                if result:
+                    challenge, options = result
+                    
+                    # Store metadata for later use
+                    cell['metadata']['game_runner'] = {
+                        'challenge': challenge,
+                        'runner_id': generate_runner_id(permalink, runner_index),
+                        'code': clean_game_code(source),
+                        'options': options
+                    }
+                    runner_index += 1
+                    
+                    # Clear outputs for cells with game-runner (outputs are redundant)
+                    cell['outputs'] = []
+                    cell['execution_count'] = None
         
         processed_cells.append(cell)
     
@@ -407,6 +512,32 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     result.append('%}')                
                     result.append('')
                     code_runner_count += 1
+                # Add game-runner if metadata exists
+                elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
+                    runner_data = code_cell['metadata']['game_runner']
+                    result.append('')
+                    # Add liquid captures and game-runner include
+                    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
+                    result.append(runner_data['challenge'])
+                    result.append('{% endcapture %}')
+                    result.append('')
+                    result.append('{% capture code' + str(code_runner_count) + ' %}')
+                    result.append(runner_data['code'])
+                    result.append('{% endcapture %}')
+                    result.append('')
+                    result.append('{% include game-runner.html')
+                    result.append('   runner_id="' + runner_data['runner_id'] + '"')
+                    result.append('   challenge=challenge' + str(code_runner_count))
+                    result.append('   code=code' + str(code_runner_count))
+                    
+                    # Add optional parameters
+                    options = runner_data.get('options', {})
+                    if options.get('hide_edit'):
+                        result.append('   hide_edit="true"')
+                    
+                    result.append('%}')                
+                    result.append('')
+                    code_runner_count += 1
                 else:
                     # Regular code block without code-runner
                     result.extend(code_block_content)                
@@ -445,6 +576,9 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         
         # Process ui runner cells before conversion
         notebook = process_ui_runner_cells(notebook, permalink)
+        
+        # Process game runner cells before conversion
+        notebook = process_game_runner_cells(notebook, permalink)
         
         process_mermaid_cells(notebook)
         exporter = MarkdownExporter()

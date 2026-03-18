@@ -63,8 +63,8 @@ class GameLevelDesert {
        id: 'coin',
        greeting: false,
        INIT_POSITION: { x: 0.6, y: 0.6 },  // 60% from left, 60% from top
-    width: 40,
-    height: 70,
+       width: 40,
+       height: 70,
        color: '#FFD700',
        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
        zIndex: 12,
@@ -900,7 +900,7 @@ class GameLevelDesert {
    this.classes = [
      { class: GamEnvBackground, data: image_data_desert },
      { class: Player, data: sprite_data_chillguy },
-         { class: Coin, data: sprite_data_coin },
+     { class: Coin, data: sprite_data_coin },
      { class: Npc, data: sprite_data_tux },
      { class: Npc, data: sprite_data_octocat },
      { class: Npc, data: sprite_data_robot },
