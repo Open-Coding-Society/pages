@@ -479,46 +479,35 @@ active_tab: dashboard
                 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
                 (function () {
-                    /* =================================================================
-                     * Dashboard Preferences Script — SRP Refactored
-                     *
-                     * Modules (each has ONE reason to change):
-                     *   A. DashboardConfig   — Constants & format converters
-                     *   B. PreferencesAPI     — Backend CRUD (fetch / save / delete)
-                     *   C. AuthService        — Login status check
-                     *   D. ThemeStorage       — Custom theme CRUD in localStorage
-                     *   E. FormManager        — Read / populate the preferences form
-                     *   F. StatusNotifier     — Show status messages to the user
-                     *   G. DashboardOrchestrator — Wires everything on DOMContentLoaded
-                     * ================================================================ */
-
-                    // Pull from the global SRP module (user-preferences.js)
-                    const SITE_DEFAULT = (window.SitePreferences && window.SitePreferences.PRESETS)
-                        ? window.SitePreferences.PRESETS['Site Default']
-                        : {
-                            bg: '#121212',
-                            text: '#F0F0F0',
-                            font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-                            size: 14,
-                            accent: '#4CAFEF'
-                          };
+                    // Site Default uses the website's native CSS colors (from user-colors.scss)
+                    const SITE_DEFAULT = {
+                        bg: '#121212',      // From user-colors.scss $background
+                        text: '#F0F0F0',    // From root-color-map.scss $text
+                        font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
+                        size: 14,
+                        accent: '#4CAFEF'   // From root-color-map.scss $accent
+                    };
                     
-                    const PRESETS = window.SitePreferences?.PRESETS || { 'Site Default': SITE_DEFAULT };
+                    const PRESETS = window.SitePreferences?.PRESETS || {
+                        'Site Default': SITE_DEFAULT,
+                        'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#3b82f6' },
+                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#2563eb' },
+                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#10b981' },
+                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, accent: '#b45309' },
+                        'Cyberpunk': { bg: '#0a0a0f', text: '#f0f0f0', font: "'Source Code Pro', monospace", size: 14, accent: '#f72585' },
+                        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' }
+                    };
 
-                    /* ---------------------------------------------------------
-                     * A. DashboardConfig — constants & format converters
-                     * Reason to change: backend field names change
-                     * -------------------------------------------------------- */
                     const MAX_CUSTOM = 10;
-                    const localStorageKey = 'sitePreferences';
-                    const localThemesKey = 'siteThemes';
+                    const localStorageKey = 'sitePreferences'; // Fallback for guests
+                    const localThemesKey = 'siteThemes'; // Fallback for guests
                     
                     // Track if user is logged in and if preferences exist in backend
                     let isLoggedIn = false;
                     let backendPrefsExist = false;
                     let cachedPrefs = null;
 
-                    /** Convert frontend prefs shape to backend API shape. */
+                    // Convert frontend prefs format to backend format
                     function toBackendFormat(prefs) {
                         return {
                             backgroundColor: prefs.bg,
