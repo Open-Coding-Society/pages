@@ -109,60 +109,82 @@ active_tab: profile
                 Add Class
             </button>
         </div>
-    
+
         <div id="classesContainer">
             <!-- Classes will be loaded here dynamically -->
             <p class="text-gray-400 text-center py-4">Loading classes...</p>
         </div>
     </div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Group Information</h2>
 
-    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
-            Loading group information...
-        </div>
-    </div>
-</div>
-
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <div class="flex items-start justify-between gap-4 mb-4">
-        <div>
-            <h2 class="text-xl font-semibold">Join a Group</h2>
-        </div>
-        <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4">
-        <div>
-            <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
-                Groups</label>
-            <div class="flex gap-2">
-                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    autocomplete="off">
-                <button id="groupSearchBtn" type="button"
-                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
-                    Search
-                </button>
+        <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-1 md:col-span-2 text-center text-gray-400">
+                Loading group information...
             </div>
         </div>
-        <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+    </div>
+
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">Join a Group</h2>
+            </div>
+            <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4">
+            <div>
+                <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
+                    Groups</label>
+                <div class="flex gap-2">
+                    <input id="groupSearchInput" type="text" placeholder="Enter a group name"
+                        class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        autocomplete="off">
+                    <button id="groupSearchBtn" type="button"
+                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div id="groupResultsList"
+                class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
+            </div>
         </div>
     </div>
-</div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
-    
-    <div id="personaSelectionContainer">
-        <p class="text-gray-400 text-center py-4">Loading personas...</p>
+    <!-- Face Registration Section -->
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Face Registration</h2>
+        <div class="flex flex-col items-center">
+            <div id="cameraContainer"
+                class="relative w-full max-w-md bg-black rounded-lg overflow-hidden border-2 border-neutral-700 mb-4"
+                style="aspect-ratio: 4/3;">
+                <video id="faceVideo" class="w-full h-full object-cover" autoplay playsinline></video>
+                <canvas id="faceCanvas" class="hidden"></canvas>
+                <div id="cameraOverlay"
+                    class="absolute inset-0 border-2 border-dashed border-indigo-500/50 pointer-events-none rounded-full"
+                    style="top: 10%; bottom: 10%; left: 15%; right: 15%;"></div>
+                <div id="cameraStatus" class="absolute top-2 left-2 px-2 py-1 bg-black/50 text-xs text-white rounded">
+                    Camera Off</div>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="button" id="startCameraBtn"
+                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                    Start Camera
+                </button>
+                <button type="button" id="captureFaceBtn"
+                    class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors hidden">
+                    Capture & Register Face
+                </button>
+            </div>
+            <div id="faceStatusMsg" class="mt-4 text-sm text-center"></div>
+        </div>
     </div>
-</div>
-
-
 </form>
+
 
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -185,7 +207,7 @@ active_tab: profile
         const groupSearchInput = document.getElementById('groupSearchInput');
         const groupResultsList = document.getElementById('groupResultsList');
         const joinGroupStatus = document.getElementById('joinGroupStatus');
-        
+
         // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
@@ -213,7 +235,7 @@ active_tab: profile
             })
             .then(personData => {
                 if (!personData) return null; // Chain was stopped
-                
+
                 // Cache user identity for reuse in join/leave operations
                 currentPersonId = personData.id;
                 currentUid = personData.uid;
@@ -227,10 +249,10 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
-           
+
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
-                
+
                 // Handle group fetch response
                 if (groupResp.ok) {
                     return groupResp.json();
@@ -252,7 +274,7 @@ active_tab: profile
             })
             .then(userGroups => {
                 if (!userGroups) return; // Chain was stopped
-                
+
                 const groups = Array.isArray(userGroups) ? userGroups : [];
 
                 // Build a Set of user's group IDs for O(1) lookup during search
@@ -305,7 +327,7 @@ active_tab: profile
             // Search function using server-side API
             const searchGroups = async (query) => {
                 const normalized = query.trim();
-                
+
                 if (!normalized) {
                     groupResultsList.classList.add('hidden');
                     return;
@@ -314,7 +336,7 @@ active_tab: profile
                 try {
                     const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
                     if (!searchResp.ok) throw new Error('Search failed');
-                    
+
                     const filtered = await searchResp.json();
 
                     if (filtered.length === 0) {
@@ -327,7 +349,7 @@ active_tab: profile
                         const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
                         const isAlreadyMember = userGroupIds.has(group.id);
                         const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                        const membersText = group.members?.length > 0 
+                        const membersText = group.members?.length > 0
                             ? group.members.map(m => m.name).join(', ')
                             : 'No members';
                         return `
@@ -376,20 +398,20 @@ active_tab: profile
                     ...fetchOptions,
                     method: 'POST',
                 })
-                .then(joinResp => {
-                    if (!joinResp.ok) {
-                        return joinResp.text().then(body => {
-                            throw new Error(body || 'Failed to join group');
-                        });
-                    }
-                    joinGroupStatus.textContent = 'Refreshing...';
-                    window.location.reload();
-                })
-                .catch(joinError => {
-                    console.error('Join group error:', joinError);
-                    joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
-                    groupSearchInput.disabled = false;
-                });
+                    .then(joinResp => {
+                        if (!joinResp.ok) {
+                            return joinResp.text().then(body => {
+                                throw new Error(body || 'Failed to join group');
+                            });
+                        }
+                        joinGroupStatus.textContent = 'Refreshing...';
+                        window.location.reload();
+                    })
+                    .catch(joinError => {
+                        console.error('Join group error:', joinError);
+                        joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
+                        groupSearchInput.disabled = false;
+                    });
             };
         }
     });
@@ -430,40 +452,40 @@ active_tab: profile
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         try {
             // Fetch all available personas
-            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions); 
+            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions);
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
-            
+
             console.log('📦 All personas loaded:', personas);
-            
+
             // Get user's personas
-            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
-            
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions);
+
             let selectedPersonas = {};
             let totalSelected = 0;
-            
+
             if (!userPersonasResp.ok) {
                 console.log('⚠️ No personas found for user or not authenticated');
                 showPersonaSelectionCards(personas, {});
                 return;
             }
-            
+
             const userPersonasData = await userPersonasResp.json();
             console.log('👤 User personas data:', userPersonasData);
-            
+
             selectedPersonas = userPersonasData.personas || {};
             totalSelected = userPersonasData.total_selected || 0;
-            
+
             console.log('✅ Selected personas:', selectedPersonas);
             console.log('📊 Total selected:', totalSelected);
-            
+
             // Store globally
             window.allPersonasData = personas;
             window.selectedPersonasData = selectedPersonas;
-            
+
             // If user has selected all 4 categories, show the completed view
             if (totalSelected === 4) {
                 console.log('🎉 All 4 selected! Showing completed view');
@@ -473,7 +495,7 @@ active_tab: profile
                 // Show selection interface - hide completed categories
                 showPersonaSelectionCards(personas, selectedPersonas);
             }
-            
+
         } catch (error) {
             console.error('❌ Error loading personas:', error);
             container.innerHTML = `
@@ -484,7 +506,7 @@ active_tab: profile
     }
     function editProfile() {
         console.log('📝 Edit profile clicked - showing all categories');
-        
+
         if (window.allPersonasData && window.selectedPersonasData) {
             showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData, true); // Pass true to force show all
         } else {
@@ -493,19 +515,19 @@ active_tab: profile
     }
     function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         console.log('🎨 Rendering selection cards');
         console.log('Total personas:', allPersonas.length);
         console.log('Selected:', selectedPersonas);
         console.log('Force show all:', forceShowAll);
-        
+
         if (allPersonas.length === 0) {
             container.innerHTML = `
                 <p class="text-gray-400 text-center py-4">No personas available.</p>
             `;
             return;
         }
-        
+
         // Group personas by category
         const grouped = allPersonas.reduce((acc, persona) => {
             const category = persona.category || 'other';
@@ -513,26 +535,26 @@ active_tab: profile
             acc[category].push(persona);
             return acc;
         }, {});
-        
+
         console.log('📂 Grouped by category:', grouped);
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryDescriptions = {
             'student': 'How you approach learning and teamwork',
             'social': 'Your hobbies and social interests',
             'achievement': 'What drives and motivates you',
             'fantasy': 'Your aspirational superpower'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
         const totalSelected = Object.keys(selectedPersonas).length;
-        
+
         container.innerHTML = `
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
@@ -546,19 +568,19 @@ active_tab: profile
             
             <div class="space-y-8">
                 ${categoryOrder.map(category => {
-                    const personas = grouped[category] || [];
-                    const selectedInCategory = selectedPersonas[category];
-                    
-                    // CHANGED: Only hide if NOT forcing show all AND category is selected
-                    if (!forceShowAll && selectedInCategory) {
-                        console.log(`✓ Category ${category} already selected, hiding it`);
-                        return '';
-                    }
-                    
-                    // Show the selection grid
-                    console.log(`🎯 Showing selection grid for ${category}`);
-                    
-                    return `
+            const personas = grouped[category] || [];
+            const selectedInCategory = selectedPersonas[category];
+
+            // CHANGED: Only hide if NOT forcing show all AND category is selected
+            if (!forceShowAll && selectedInCategory) {
+                console.log(`✓ Category ${category} already selected, hiding it`);
+                return '';
+            }
+
+            // Show the selection grid
+            console.log(`🎯 Showing selection grid for ${category}`);
+
+            return `
                         <div class="mb-8" id="category-${category}">
                             <div class="flex items-center justify-between mb-4">
                                 <div>
@@ -572,11 +594,11 @@ active_tab: profile
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="category-grid-${category}">
                                 ${personas.map(persona => {
-                                    const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                                    const description = persona.bio_map?.description || 'No description';
-                                    const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
-                                    
-                                    return `
+                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                const description = persona.bio_map?.description || 'No description';
+                const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+
+                return `
                                         <div 
                                             id="persona-card-${persona.id}"
                                             class="flex flex-col p-4 ${isCurrentlySelected ? 'bg-indigo-900 border-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'} border ${isCurrentlySelected ? 'border-indigo-400' : 'border-gray-700 hover:border-indigo-500'} rounded-lg cursor-pointer transition-all group h-full relative"
@@ -603,33 +625,33 @@ active_tab: profile
                                             </div>
                                         </div>
                                     `;
-                                }).join('')}
+            }).join('')}
                             </div>
                         </div>
                     `;
-                }).join('')}
+        }).join('')}
             </div>
         `;
     }
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryEmojis = {
             'student': '📚',
             'social': '🎉',
             'achievement': '🏆',
             'fantasy': '✨'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
-        
+
         container.innerHTML = `
             <div class="max-w-7xl mx-auto">
                 <!-- Header -->
@@ -651,17 +673,17 @@ active_tab: profile
                 <!-- 2x2 Grid of Selected Personas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${categoryOrder.map(category => {
-                        const personaData = selectedPersonas[category];
-                        if (!personaData) return '';
-                        
-                        const persona = allPersonas.find(p => p.id === personaData.persona_id);
-                        if (!persona) return '';
-                        
-                        const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                        const description = persona.bio_map?.description || 'No description';
-                        const empathyMap = persona.empathy_map || {};
-                        
-                        return `
+            const personaData = selectedPersonas[category];
+            if (!personaData) return '';
+
+            const persona = allPersonas.find(p => p.id === personaData.persona_id);
+            if (!persona) return '';
+
+            const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+            const description = persona.bio_map?.description || 'No description';
+            const empathyMap = persona.empathy_map || {};
+
+            return `
                             <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
                                 
                                 <div class="flex items-start gap-4 mb-4">
@@ -710,7 +732,7 @@ active_tab: profile
                                 ` : ''}
                             </div>
                         `;
-                    }).join('')}
+        }).join('')}
                 </div>
             </div>
         `;
@@ -719,7 +741,7 @@ active_tab: profile
         console.log('🎯 SELECT PERSONA CALLED');
         console.log('   Persona ID:', personaId);
         console.log('   Category:', category);
-        
+
         // Show loading state on the clicked card
         const card = document.getElementById(`persona-card-${personaId}`);
         if (card) {
@@ -731,34 +753,34 @@ active_tab: profile
             }
             card.style.pointerEvents = 'none';
         }
-        
+
         try {
             const url = `${pythonURI}/api/user/persona`;
             const body = { persona_id: personaId };
-            
+
             console.log('📤 Making POST request');
             console.log('   URL:', url);
             console.log('   Body:', body);
-            
+
             const response = await fetch(url, {
                 ...fetchOptions,
                 method: 'POST',
                 body: JSON.stringify(body)
             });
-            
+
             console.log('📥 Response received');
             console.log('   Status:', response.status);
             console.log('   OK:', response.ok);
-            
+
             const responseData = await response.json();
             console.log('   Response Data:', responseData);
-            
+
             if (!response.ok) {
                 throw new Error(responseData.message || `Server error: ${response.status}`);
             }
-            
+
             console.log('✅ Selection successful!');
-            
+
             // Show success animation
             if (card) {
                 const overlay = card.querySelector('.loading-overlay');
@@ -771,17 +793,17 @@ active_tab: profile
                     console.log('   ✅ Success checkmark shown');
                 }
             }
-            
+
             // Wait a moment then reload
             console.log('   ⏳ Waiting 600ms before reload...');
             setTimeout(() => {
                 console.log('   🔄 Reloading personas...');
                 loadPersonas();
             }, 600);
-            
+
         } catch (error) {
             console.error('❌ ERROR in selectPersona:', error);
-            
+
             // Hide loading overlay and restore interactivity
             if (card) {
                 const overlay = card.querySelector('.loading-overlay');
@@ -790,13 +812,13 @@ active_tab: profile
                 }
                 card.style.pointerEvents = 'auto';
             }
-            
+
             // Show error message
             const categorySection = document.getElementById(`category-${category}`);
             if (categorySection) {
                 const existingError = categorySection.querySelector('.error-message');
                 if (existingError) existingError.remove();
-                
+
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error-message bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4 flex items-start gap-3';
                 errorDiv.innerHTML = `
@@ -814,7 +836,7 @@ active_tab: profile
                     </button>
                 `;
                 categorySection.insertBefore(errorDiv, categorySection.querySelector(`#category-grid-${category}`));
-                
+
                 setTimeout(() => errorDiv.remove(), 5000);
             }
         }
@@ -972,10 +994,10 @@ active_tab: profile
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
         console.log('DOMContentLoaded fired'); // ADD THIS
-        
+
         // Store original values
         saveOriginalValues();
-        
+
         // Load user classes
         loadUserClasses();
 
@@ -987,7 +1009,7 @@ active_tab: profile
         const addClassBtn = document.getElementById('addClassBtn');
         console.log('Add Class Button:', addClassBtn); // ADD THIS
         if (addClassBtn) {
-            addClassBtn.addEventListener('click', function() {
+            addClassBtn.addEventListener('click', function () {
                 console.log('Add Class button clicked!'); // ADD THIS
                 addClass();
             });
@@ -1009,7 +1031,7 @@ active_tab: profile
             }
         });
     });
-    
+
     // Save original form values
     function saveOriginalValues() {
         const form = document.getElementById('profileSettingsForm');
@@ -1076,10 +1098,10 @@ active_tab: profile
             saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
         }
     }
-    
+
     async function loadUserClasses() {
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
             if (!response.ok) {
                 console.error('Failed to load classes');
                 return;
@@ -1096,7 +1118,7 @@ active_tab: profile
     // Render classes in the UI
     function renderClasses(classes) {
         const container = document.getElementById('classesContainer');
-        
+
         if (!container) return;
 
         if (!classes || classes.length === 0) {
@@ -1168,9 +1190,9 @@ active_tab: profile
             const response = await fetch(`${pythonURI}/api/user/class`, {
                 ...fetchOptions,
                 method: 'POST',
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     action: 'remove',
-                    class: classToRemove 
+                    class: classToRemove
                 })
             });
 
@@ -1222,14 +1244,14 @@ active_tab: profile
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
             }
 
             const data = await response.json();
             console.log('Grade Prediction Data:', data);
-            
+
             // Process and display the grade prediction data
             if (data && data.prediction) {
                 displayGradePrediction(data);
@@ -1248,7 +1270,7 @@ active_tab: profile
     // Display grade prediction results
     function displayGradePrediction(data) {
         console.log('Displaying grade prediction:', data);
-        
+
         // You can add UI elements here to display the prediction
         // For now, just log to console
         if (data.prediction) {
@@ -1475,7 +1497,7 @@ active_tab: profile
     window.displayGradePrediction = displayGradePrediction;
 
     // Leave group function
-    window.leaveGroup = async function(groupId, personId) {
+    window.leaveGroup = async function (groupId, personId) {
         if (!confirm('Are you sure you want to leave this group?')) {
             return;
         }
@@ -1497,4 +1519,107 @@ active_tab: profile
             alert(`Error leaving group: ${error.message}`);
         }
     };
+</script>
+
+<script type="module">
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const video = document.getElementById('faceVideo');
+        const canvas = document.getElementById('faceCanvas');
+        const startBtn = document.getElementById('startCameraBtn');
+        const captureBtn = document.getElementById('captureFaceBtn');
+        const statusMsg = document.getElementById('faceStatusMsg');
+        const cameraStatus = document.getElementById('cameraStatus');
+        let stream = null;
+
+        // Check if user already has face data
+        async function checkFaceStatus() {
+            try {
+                const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+                if (response.ok) {
+                    const person = await response.json();
+                    if (person.faceData) {
+                        statusMsg.innerHTML = '<span class="text-emerald-400">✓ Face data already registered.</span>';
+                        statusMsg.classList.add('text-emerald-400');
+                    } else {
+                        statusMsg.innerHTML = '<span class="text-amber-400">⚠ No face data registered yet.</span>';
+                    }
+                }
+            } catch (e) {
+                console.error("Error checking face status:", e);
+            }
+        }
+
+        checkFaceStatus();
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                if (stream) {
+                    // Stop stream
+                    stream.getLoops().forEach(track => track.stop());
+                    video.srcObject = null;
+                    stream = null;
+                    startBtn.textContent = 'Start Camera';
+                    captureBtn.classList.add('hidden');
+                    cameraStatus.textContent = 'Camera Off';
+                    return;
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                video.srcObject = stream;
+                startBtn.textContent = 'Stop Camera';
+                captureBtn.classList.remove('hidden');
+                cameraStatus.textContent = 'Camera On';
+            } catch (err) {
+                console.error("Camera error:", err);
+                statusMsg.textContent = "Camera access denied or not available.";
+                statusMsg.className = "mt-4 text-sm text-center text-red-400";
+            }
+        });
+
+        captureBtn.addEventListener('click', async () => {
+            if (!stream) return;
+
+            statusMsg.textContent = "Capturing...";
+            statusMsg.className = "mt-4 text-sm text-center text-indigo-400";
+
+            // Prepare canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert to Base64
+            const base64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+
+            try {
+                const response = await fetch(`${javaURI}/api/person/update`, {
+                    ...fetchOptions,
+                    method: 'POST',
+                    body: JSON.stringify({ faceData: base64Image })
+                });
+
+                if (response.ok) {
+                    statusMsg.textContent = "Face registered successfully!";
+                    statusMsg.className = "mt-4 text-sm text-center text-emerald-400";
+                    // Stop camera after success
+                    stream.getTracks().forEach(track => track.stop());
+                    video.srcObject = null;
+                    stream = null;
+                    startBtn.textContent = 'Start Camera';
+                    captureBtn.classList.add('hidden');
+                    cameraStatus.textContent = 'Camera Off';
+                } else {
+                    const err = await response.text();
+                    statusMsg.textContent = "Registration failed: " + err;
+                    statusMsg.className = "mt-4 text-sm text-center text-red-400";
+                }
+            } catch (err) {
+                console.error("API error:", err);
+                statusMsg.textContent = "Network error during registration.";
+                statusMsg.className = "mt-4 text-sm text-center text-red-400";
+            }
+        });
+    });
 </script>
