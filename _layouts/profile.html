@@ -117,43 +117,7 @@ active_tab: profile
     </div>
 
 <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
-
-    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
-            Loading group information...
-        </div>
-    </div>
-</div>
-
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <div class="flex items-start justify-between gap-4 mb-4">
-        <div>
-            <h2 class="text-xl font-semibold">Join a Group</h2>
-        </div>
-        <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4">
-        <div>
-            <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
-                Groups</label>
-            <div class="flex gap-2">
-                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    autocomplete="off">
-                <button id="groupSearchBtn" type="button"
-                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
-                    Search
-                </button>
-            </div>
-        </div>
-        <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
-        </div>
-    </div>
-</div>
-
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
     
     <div id="personaSelectionContainer">
         <p class="text-gray-400 text-center py-4">Loading personas...</p>
@@ -180,11 +144,6 @@ active_tab: profile
      */
 
     document.addEventListener("DOMContentLoaded", () => {
-        const springGroupInfo = document.getElementById('springGroupInfo');
-        const groupSearchInput = document.getElementById('groupSearchInput');
-        const groupResultsList = document.getElementById('groupResultsList');
-        const joinGroupStatus = document.getElementById('joinGroupStatus');
-        
         // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
@@ -201,8 +160,6 @@ active_tab: profile
             .then(response => {
                 // Handle authentication errors
                 if (response.status === 401) {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
-                    groupSearchInput.disabled = true;
                     return null; // Stop the chain
                 }
                 if (!response.ok) {
@@ -218,7 +175,6 @@ active_tab: profile
                 currentUid = personData.uid;
 
                 if (!currentPersonId || !currentUid) {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
                     return null;
                 }
 
@@ -258,139 +214,18 @@ active_tab: profile
                 groups.forEach(group => userGroupIds.add(group.id));
 
                 if (groups.length > 0) {
-                    springGroupInfo.innerHTML = groups.map(group => `
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Group Name</label>
-                        <input type="text" readonly
-                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
-                            value="${group.name}">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Period</label>
-                        <input type="text" readonly
-                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
-                            value="${group.period}">
-                    </div>
-                    <div class="col-span-1 md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Members & GitHub IDs</label>
-                        <div class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300">
-                            ${group.members.map(member => `${member.name} (${member.uid})`).join(', ')}
-                        </div>
-                    </div>
-                    <div class="col-span-1 md:col-span-2">
-                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${currentPersonId})">
-                            Leave Group
-                        </button>
-                    </div>
-                    `).join('');
+                    // Group display logic removed
                 } else {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
+                    // No groups message removed
                 }
 
                 // Set up search functionality (uses cached personId)
-                setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, currentPersonId);
+                // setupGroupSearch function removed
             })
             .catch(error => {
                 console.error("Error in API chain:", error);
-                springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
-                groupSearchInput.disabled = true;
+                // Group error handling removed
             });
-
-        /**
-         * Set up group search and join functionality
-         * Separated into a function to keep the main chain clean
-         */
-        function setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, personId) {
-            // Search function using server-side API
-            const searchGroups = async (query) => {
-                const normalized = query.trim();
-                
-                if (!normalized) {
-                    groupResultsList.classList.add('hidden');
-                    return;
-                }
-
-                try {
-                    const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
-                    if (!searchResp.ok) throw new Error('Search failed');
-                    
-                    const filtered = await searchResp.json();
-
-                    if (filtered.length === 0) {
-                        groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
-                        groupResultsList.classList.remove('hidden');
-                        return;
-                    }
-
-                    groupResultsList.innerHTML = filtered.map(group => {
-                        const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
-                        const isAlreadyMember = userGroupIds.has(group.id);
-                        const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                        const membersText = group.members?.length > 0 
-                            ? group.members.map(m => m.name).join(', ')
-                            : 'No members';
-                        return `
-                            <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
-                                onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
-                                <div class="font-medium">${label}</div>
-                                <div class="text-xs text-gray-500 mt-1">${membersText}</div>
-                                ${isAlreadyMember ? '<div class="text-xs text-gray-400 mt-1">Already a member</div>' : ''}
-                            </div>
-                        `;
-                    }).join('');
-                    groupResultsList.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Search error:', error);
-                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-red-400 text-sm">Search failed</div>`;
-                    groupResultsList.classList.remove('hidden');
-                }
-            };
-
-            // Search button click handler
-            document.getElementById('groupSearchBtn')?.addEventListener('click', () => {
-                searchGroups(groupSearchInput.value);
-            });
-
-            // Optimized join function - uses cached personId instead of fetching all people
-            // This demonstrates how the cached personId from the initial chain is reused
-            window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
-                if (isAlreadyMember) {
-                    joinGroupStatus.textContent = 'You are already a member of this group.';
-                    return;
-                }
-
-                groupSearchInput.disabled = true;
-                joinGroupStatus.textContent = 'Joining group...';
-                groupResultsList.classList.add('hidden');
-
-                // Use cached personId - no additional API call needed!
-                if (!personId) {
-                    joinGroupStatus.textContent = 'User ID not available. Please refresh the page.';
-                    groupSearchInput.disabled = false;
-                    return;
-                }
-
-                // Join group using the cached person ID from the initial chain
-                fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
-                    ...fetchOptions,
-                    method: 'POST',
-                })
-                .then(joinResp => {
-                    if (!joinResp.ok) {
-                        return joinResp.text().then(body => {
-                            throw new Error(body || 'Failed to join group');
-                        });
-                    }
-                    joinGroupStatus.textContent = 'Refreshing...';
-                    window.location.reload();
-                })
-                .catch(joinError => {
-                    console.error('Join group error:', joinError);
-                    joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
-                    groupSearchInput.disabled = false;
-                });
-            };
-        }
     });
 </script>
 
@@ -1623,28 +1458,4 @@ window.submitSkillSnapshot = submitSkillSnapshot;
     window.checkForChanges = checkForChanges;
     window.fetchGradePrediction = fetchGradePrediction;
     window.displayGradePrediction = displayGradePrediction;
-
-    // Leave group function
-    window.leaveGroup = async function(groupId, personId) {
-        if (!confirm('Are you sure you want to leave this group?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
-                ...fetchOptions,
-                method: 'DELETE',
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to leave group: ${response.statusText}`);
-            }
-
-            // alert('Successfully left the group.');
-            window.location.reload();
-        } catch (error) {
-            console.error('Error leaving group:', error);
-            alert(`Error leaving group: ${error.message}`);
-        }
-    };
 </script>
