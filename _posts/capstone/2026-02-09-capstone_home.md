@@ -191,6 +191,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- Poway Symphonic Orchestra Capstone -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
+           <img src="{{ '/images/capstone/powayorchestra.jpg' | relative_url }}" alt="Poway Symphonic Orchestra capstone project" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/powayorchestra/' | relative_url }}">Poway Symphonic Orchestra</a></h3>
+           <p class="text-sm text-gray-700">A performing-arts capstone experience highlighting concerts, musicians, ticketing, donor support, and community music enrichment for the Poway Symphonic Orchestra.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Wi-Fighters (Meryl, Kailyn, Hope, Laya)</p>
+       </div>
+   </div>
+
    <!-- Binary Beasts -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url 2026-03-06-pybl-capstone %}">
@@ -202,6 +214,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
        </div>
    </div>
+
    <!-- College Bound Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url 2026-02-06-college-bound-capstone %}">
@@ -238,18 +251,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Palomar Capstone (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2025-03-05-palomar %}">
-           <img src="/images/capstone/palomar_logo.png" alt="Palomar" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2025-03-05-palomar %}">Palomar</a></h3>
-           <p class="text-sm text-gray-700">A donor-facing impact platform that connects philanthropic giving to real patient outcomes, keeps the foundation aligned with community needs, and gives healthcare supporters a 30-second pulse on every program — without feeling like a fundraising pitch.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Palomar Health Foundation</p>
-       </div>
-   </div>
-
    <!-- ACS Cancer Infograph (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-05-acs-cancer-infograph %}">
@@ -262,17 +263,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- PUSD Foundation Capstone (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-05-pusd-capstone %}">
-           <img src="/images/capstone/pusd_foundation.svg" alt="PUSD Foundation logo — school building with graduation cap" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pusd-capstone %}">PUSD Foundation</a></h3>
-           <p class="text-sm text-gray-700">Funding, resources, and opportunities that expand and enrich the educational experiences of PUSD students across northern San Diego County.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
-       </div>
-   </div>
 
    <!-- Poway Woman's Club Capstone (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
@@ -310,18 +300,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Poway Symphony Orchestra (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-05-pso-infographic %}">
-           <img src="/images/pso_logo.png" alt="Poway Symphony Orchestra - Site Analysis" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-pso-infographic %}">Poway Symphony Orchestra</a></h3>
-           <p class="text-sm text-gray-700">We analyzed the Poway Symphony Orchestra website to identify UX gaps and design improvements that better serve concertgoers, donors, and prospective musicians.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
-       </div>
-   </div>
-
    <!-- Soroptimist International of Poway (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-08-sip-infograph %}">
@@ -345,18 +323,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
         </div>
     </div>
-   <!-- Friends of the Poway Library (CSP) -->
-   <!-- DSA Website Redesign (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
-           <img src="/images/capstone/dsa_redesign.svg" alt="DSA Website Redesign — Deputy Sheriffs' Association of San Diego County" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">DSA Website Redesign</a></h3>
-           <p class="text-sm text-gray-700">Redesign proposal for the Deputy Sheriffs' Association of San Diego County website — interactive dashboard, smart FAQ hub, and mega menu navigation.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
-       </div>
-   </div>
 
    <!-- D.A.D. Website Redesign (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
@@ -370,7 +336,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-
    <!-- RCR: Poway-Midland Railroad Project - ADD THIS ENTIRE BLOCK -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg">
        <a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">
@@ -383,8 +348,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-
-<!-- Poway Veteran's Organization-->
+    <!-- Poway Veteran's Organization-->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
     <a href="{% post_url 2026-03-06-pvo-redesign-infographic %}">
         <img src="/images/capstone/poway-veterans-logo.png" alt="Poway Veterans Organization" class="w-28 h-28 object-cover rounded" />
@@ -394,6 +358,5 @@ Below are the capstone infographic pages created by student groups. Click an ima
         <p class="text-sm text-gray-700">A guided 'Need Help? Start Here' pathway for the Poway Veterans Organization — simplified assistance application, document checklist, and urgent resource directory for veterans and families.</p>
         <p class="text-xs text-gray-500 mt-2">Team: API Pirates (Alice, Brandon, Aryan)</p>
     </div>
-
 
 </div>
