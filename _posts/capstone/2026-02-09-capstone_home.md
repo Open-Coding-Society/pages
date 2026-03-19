@@ -200,6 +200,10 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/powayorchestra/' | relative_url }}">Poway Symphonic Orchestra</a></h3>
            <p class="text-sm text-gray-700">A performing-arts capstone experience highlighting concerts, musicians, ticketing, donor support, and community music enrichment for the Poway Symphonic Orchestra.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Wi-Fighters</p>
+       </div>
+   </div>
+
+
    <!-- Binary Beasts -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url 2026-03-06-pybl-capstone %}">
