@@ -923,3 +923,707 @@ flowchart TD
 
    style E fill:#FF0000
 ```
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rock Paper Scissors — Console Debugging Lesson</title>
+<style>
+  .rps-lesson { max-width: 780px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* Game widget */
+  .rps-game-box {
+    border: 1px solid currentColor;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    text-align: center;
+    opacity: 0.95;
+  }
+  .rps-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .rps-btn {
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .rps-btn:hover { border-color: currentColor; transform: translateY(-3px); }
+  .rps-btn.selected { border-color: currentColor; opacity: 1; }
+  .rps-btn img { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; display: block; }
+  .rps-btn-label { font-size: 0.7rem; margin-top: 4px; opacity: 0.6; }
+
+  #battleCanvas {
+    display: block;
+    margin: 0 auto 1rem;
+    border-radius: 8px;
+    border: 1px solid currentColor;
+    max-width: 100%;
+    opacity: 0.9;
+  }
+
+  #resultBox {
+    font-family: monospace;
+    font-size: 0.9rem;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border: 1px dashed currentColor;
+    border-radius: 6px;
+    opacity: 0.85;
+    text-align: left;
+  }
+
+  /* Lesson sections */
+  .lesson-section { margin-bottom: 2.5rem; }
+  .lesson-section h2 { margin-bottom: 0.5rem; }
+  .lesson-section p  { margin-bottom: 0.75rem; }
+
+  /* Error cards */
+  .error-card {
+    border: 1px solid currentColor;
+    border-left: 4px solid #c0392b;
+    border-radius: 8px;
+    padding: 1.25rem 1.25rem 1rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+  }
+  .error-card h3 { margin: 0 0 0.75rem; font-family: monospace; font-size: 1rem; }
+
+  .error-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-family: monospace;
+    border: 1px solid currentColor;
+    border-radius: 20px;
+    padding: 1px 8px;
+    margin-bottom: 0.6rem;
+    opacity: 0.7;
+  }
+
+  /* RPS image row in error cards */
+  .rps-preview { display: flex; align-items: center; gap: 10px; margin: 0.5rem 0 0.75rem; }
+  .rps-preview img {
+    width: 48px; height: 48px; object-fit: cover;
+    border-radius: 6px; border: 1px solid currentColor; opacity: 0.3;
+  }
+  .rps-preview img.active { opacity: 1; }
+  .rps-preview p { margin: 0; font-size: 0.88rem; opacity: 0.75; }
+
+  /* Code blocks */
+  .code-block {
+    font-family: monospace;
+    font-size: 0.9rem;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    padding: 0.65rem 1rem;
+    margin: 0.4rem 0;
+    overflow-x: auto;
+    opacity: 0.9;
+  }
+  .code-block.bad  { border-left: 3px solid #c0392b; }
+  .code-block.good { border-left: 3px solid #27ae60; }
+  .code-err { color: #c0392b; }
+  .code-str { color: #e67e22; }
+  .code-fn  { font-weight: bold; }
+
+  .badge-bad  { font-size: 0.78rem; font-family: monospace; color: #c0392b; }
+  .badge-good { font-size: 0.78rem; font-family: monospace; color: #27ae60; }
+
+  /* Buttons */
+  .lesson-btn {
+    font-family: monospace;
+    font-size: 0.82rem;
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-top: 6px;
+    opacity: 0.8;
+    transition: opacity 0.15s;
+    color: inherit;
+  }
+  .lesson-btn:hover { opacity: 1; }
+  .lesson-btn.bad  { border-color: #c0392b; color: #c0392b; }
+  .lesson-btn.bad:hover  { background: #c0392b; color: white; }
+  .lesson-btn.good { border-color: #27ae60; color: #27ae60; }
+  .lesson-btn.good:hover { background: #27ae60; color: white; }
+
+  /* Inline mini console output */
+  .mini-console {
+    font-family: monospace;
+    font-size: 0.82rem;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    padding: 0.6rem 0.9rem;
+    margin-top: 8px;
+    display: none;
+    opacity: 0.85;
+    line-height: 1.6;
+  }
+  .mini-console.show { display: block; }
+  .mc-err { color: #c0392b; }
+  .mc-ok  { color: #27ae60; }
+  .mc-dim { opacity: 0.55; }
+
+  /* Steps list */
+  .steps ol { padding-left: 1.4rem; }
+  .steps li { margin-bottom: 0.4rem; }
+  .steps code {
+    font-family: monospace;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: 0.88rem;
+    opacity: 0.85;
+  }
+
+  /* Info boxes (challenge, checkpoint) */
+  .info-box {
+    border: 1px dashed currentColor;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    opacity: 0.9;
+  }
+  .info-box h3 { margin: 0 0 0.75rem; font-size: 1rem; }
+
+  /* Checkpoint */
+  .cp-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 0.75rem; }
+  .cp-input {
+    font-family: monospace;
+    font-size: 0.9rem;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    padding: 7px 10px;
+    flex: 1;
+    min-width: 200px;
+    background: transparent;
+    color: inherit;
+    outline: none;
+  }
+  .cp-input.correct { border-color: #27ae60; }
+  .cp-input.wrong   { border-color: #c0392b; }
+
+  .show-ans-btn {
+    font-family: monospace;
+    font-size: 0.78rem;
+    background: none;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    padding: 7px 10px;
+    cursor: pointer;
+    opacity: 0.5;
+    color: inherit;
+    transition: opacity 0.15s;
+  }
+  .show-ans-btn:hover { opacity: 1; }
+
+  .cp-feedback { font-family: monospace; font-size: 0.82rem; margin-top: 6px; }
+  .cp-feedback.ok  { color: #27ae60; }
+  .cp-feedback.bad { color: #c0392b; }
+
+  hr.divider { border: none; border-top: 1px solid currentColor; opacity: 0.15; margin: 2.5rem 0; }
+
+  kbd {
+    font-family: monospace;
+    border: 1px solid currentColor;
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+<div class="rps-lesson">
+
+  <h1>🎮 Debugging with Rock Paper Scissors</h1>
+  <p>Play the game by clicking the images — or open your browser console and type commands directly. Each section teaches a real debugging concept using the game.</p>
+
+  <!-- ── LIVE GAME ── -->
+  <div class="rps-game-box">
+    <h2 style="margin-bottom:1rem">▶ Play the Game</h2>
+    <div class="rps-btns">
+      <div>
+        <button class="rps-btn" id="btn-rock" onclick="clickPlay('rock')">
+          <img id="rock-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Rock-paper-scissors_%28rock%29.png/100px-Rock-paper-scissors_%28rock%29.png" alt="rock">
+        </button>
+        <div class="rps-btn-label">ROCK</div>
+      </div>
+      <div>
+        <button class="rps-btn" id="btn-paper" onclick="clickPlay('paper')">
+          <img id="paper-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Rock-paper-scissors_%28paper%29.png/100px-Rock-paper-scissors_%28paper%29.png" alt="paper">
+        </button>
+        <div class="rps-btn-label">PAPER</div>
+      </div>
+      <div>
+        <button class="rps-btn" id="btn-scissors" onclick="clickPlay('scissors')">
+          <img id="scissors-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Rock-paper-scissors_%28scissors%29.png/100px-Rock-paper-scissors_%28scissors%29.png" alt="scissors">
+        </button>
+        <div class="rps-btn-label">SCISSORS</div>
+      </div>
+    </div>
+
+    <canvas id="battleCanvas" width="360" height="160"></canvas>
+
+    <div id="resultBox">
+      Click an image above — or type <code>playRPS("rock")</code> in the console.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── LESSON 1 ── -->
+  <div class="lesson-section steps">
+    <h2>Lesson 1 — What Is the Console?</h2>
+    <p>The browser console lets you run JavaScript live — no file editing needed. This game is already loaded on the page, so you can control it directly from there.</p>
+    <ol>
+      <li>Press <kbd>F12</kbd> (or <kbd>Cmd+Option+I</kbd> on Mac) to open DevTools</li>
+      <li>Click the <strong>Console</strong> tab</li>
+      <li>Type <code>playRPS("rock")</code> and press Enter</li>
+      <li>Watch the battle animation above respond!</li>
+    </ol>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── LESSON 2 ── -->
+  <div class="lesson-section">
+    <h2>Lesson 2 — Finding &amp; Fixing Bugs</h2>
+    <p>Debugging means reading error messages and fixing the code. Click <strong>Run Broken</strong> to see the error output, then <strong>Run Fixed</strong> to play the game with the corrected code.</p>
+
+    <!-- Bug 1 -->
+    <div class="error-card" id="card1">
+      <div class="error-badge">Bug #1 — Missing Quotes</div>
+      <h3>playRPS(rock)</h3>
+      <div class="rps-preview">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Rock-paper-scissors_%28rock%29.png/100px-Rock-paper-scissors_%28rock%29.png" alt="rock" class="active">
+        <p>Without quotes, JavaScript thinks <code style="font-family:monospace">rock</code> is a variable name — but no variable by that name exists.</p>
+      </div>
+
+      <div class="badge-bad">❌ Broken</div>
+      <div class="code-block bad"><span class="code-fn">playRPS</span>(<span class="code-err">rock</span>)</div>
+      <button class="lesson-btn bad" onclick="runBroken1()">▶ Run Broken Code</button>
+      <div class="mini-console" id="con1"></div>
+
+      <div style="margin-top:1rem">
+        <div class="badge-good">✅ Fixed</div>
+        <div class="code-block good"><span class="code-fn">playRPS</span>(<span class="code-str">"rock"</span>)</div>
+        <button class="lesson-btn good" onclick="runFixed('rock','con1fix','card1')">▶ Run Fixed Code</button>
+        <div class="mini-console" id="con1fix"></div>
+      </div>
+
+      <p style="margin-top:0.75rem; font-size:0.88rem; opacity:0.7">
+        <strong>Why?</strong> String values need quotes. Without them, JS looks for a variable called <code style="font-family:monospace">rock</code> and throws a ReferenceError when it can't find one.
+      </p>
+    </div>
+
+    <!-- Bug 2 -->
+    <div class="error-card" id="card2">
+      <div class="error-badge">Bug #2 — Invalid Input</div>
+      <h3>playRPS("lizard")</h3>
+      <div class="rps-preview">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Rock-paper-scissors_%28rock%29.png/100px-Rock-paper-scissors_%28rock%29.png" alt="rock">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Rock-paper-scissors_%28paper%29.png/100px-Rock-paper-scissors_%28paper%29.png" alt="paper">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Rock-paper-scissors_%28scissors%29.png/100px-Rock-paper-scissors_%28scissors%29.png" alt="scissors">
+        <p>"lizard" isn't one of the three valid choices the game knows about.</p>
+      </div>
+
+      <div class="badge-bad">❌ Broken</div>
+      <div class="code-block bad"><span class="code-fn">playRPS</span>(<span class="code-str">"lizard"</span>)</div>
+      <button class="lesson-btn bad" onclick="runBroken2()">▶ Run Broken Code</button>
+      <div class="mini-console" id="con2"></div>
+
+      <div style="margin-top:1rem">
+        <div class="badge-good">✅ Fixed — use a valid choice</div>
+        <div class="code-block good"><span class="code-fn">playRPS</span>(<span class="code-str">"scissors"</span>)</div>
+        <button class="lesson-btn good" onclick="runFixed('scissors','con2fix','card2')">▶ Run Fixed Code</button>
+        <div class="mini-console" id="con2fix"></div>
+      </div>
+
+      <p style="margin-top:0.75rem; font-size:0.88rem; opacity:0.7">
+        <strong>Why?</strong> The game checks your input against <code style="font-family:monospace">["rock","paper","scissors"]</code>. "lizard" isn't in that array, so the function rejects it.
+      </p>
+    </div>
+
+    <!-- Bug 3 -->
+    <div class="error-card" id="card3">
+      <div class="error-badge">Bug #3 — Wrong Capitalization</div>
+      <h3>playRps("paper")</h3>
+      <div class="rps-preview">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Rock-paper-scissors_%28paper%29.png/100px-Rock-paper-scissors_%28paper%29.png" alt="paper" class="active">
+        <p>JavaScript is case-sensitive. <code style="font-family:monospace">playRps</code> and <code style="font-family:monospace">playRPS</code> are completely different names.</p>
+      </div>
+
+      <div class="badge-bad">❌ Broken</div>
+      <div class="code-block bad"><span class="code-err">playRps</span>(<span class="code-str">"paper"</span>)</div>
+      <button class="lesson-btn bad" onclick="runBroken3()">▶ Run Broken Code</button>
+      <div class="mini-console" id="con3"></div>
+
+      <div style="margin-top:1rem">
+        <div class="badge-good">✅ Fixed</div>
+        <div class="code-block good"><span class="code-fn">playRPS</span>(<span class="code-str">"paper"</span>)</div>
+        <button class="lesson-btn good" onclick="runFixed('paper','con3fix','card3')">▶ Run Fixed Code</button>
+        <div class="mini-console" id="con3fix"></div>
+      </div>
+
+      <p style="margin-top:0.75rem; font-size:0.88rem; opacity:0.7">
+        <strong>Why?</strong> JS treats every character as meaningful. <code style="font-family:monospace">playRps</code> doesn't exist as a function — only <code style="font-family:monospace">playRPS</code> does.
+      </p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── LESSON 3 ── -->
+  <div class="lesson-section steps">
+    <h2>Lesson 3 — The Debug Process</h2>
+    <ol>
+      <li><strong>Read the error message</strong> — it usually pinpoints the problem</li>
+      <li><strong>Check spelling &amp; capitalization</strong> — <code>playRPS</code> ≠ <code>playRps</code></li>
+      <li><strong>Check your inputs</strong> — strings need quotes, values must be valid</li>
+      <li><strong>Run the fix</strong> and verify it works</li>
+    </ol>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── CHALLENGE ── -->
+  <div class="info-box">
+    <h3>🏆 Challenge — Why Does This Work?</h3>
+    <p style="margin-bottom:0.75rem">Try this — it uses all caps but still plays correctly:</p>
+    <div class="code-block"><span class="code-fn">playRPS</span>(<span class="code-str">"ROCK"</span>)</div>
+    <button class="lesson-btn" onclick="runFixed('ROCK','conChallenge',null)" style="margin-bottom:0.5rem">▶ Try It</button>
+    <div class="mini-console" id="conChallenge"></div>
+    <p style="margin-top:0.75rem; font-size:0.88rem; opacity:0.7">
+      <strong>Hint:</strong> The game calls <code style="font-family:monospace">.toLowerCase()</code> on your input before checking it. So <code style="font-family:monospace">"ROCK"</code>, <code style="font-family:monospace">"Rock"</code>, and <code style="font-family:monospace">"rock"</code> all work. That's called <em>defensive programming</em>.
+    </p>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── CHECKPOINT ── -->
+  <div class="info-box">
+    <h3>✅ Checkpoint — Fix the Bug</h3>
+    <p>The code below has an error. Type the corrected version in the box:</p>
+    <div class="code-block bad" style="margin-top:0.5rem"><span class="code-err">playRPS(rock)</span></div>
+    <div class="cp-row">
+      <input class="cp-input" id="cp-input" type="text" placeholder='Type the fixed code…' autocomplete="off" spellcheck="false">
+      <button class="show-ans-btn" id="cp-show">Show Answer</button>
+    </div>
+    <div class="cp-feedback" id="cp-feedback"></div>
+    <div style="margin-top:0.75rem">
+      <button class="lesson-btn good" id="cp-run-btn" style="display:none" onclick="runCheckpointAnswer()">▶ Run Your Fix</button>
+      <div class="mini-console" id="cp-console"></div>
+    </div>
+  </div>
+
+</div><!-- /rps-lesson -->
+
+<script>
+// ── OOP CLASSES ──────────────────────────────────────────────
+
+class BattleSprite {
+  constructor(image, width, height, x, y) {
+    this.image = image;
+    this.width = width; this.height = height;
+    this.homeX = x; this.homeY = y;
+    this.x = x; this.y = y;
+    this.targetX = x; this.targetY = y;
+    this.opacity = 1; this.scale = 1; this.rotation = 0;
+    this.animating = false;
+  }
+  update() {
+    if (this.animating) {
+      this.x += (this.targetX - this.x) * 0.12;
+      this.y += (this.targetY - this.y) * 0.12;
+    } else {
+      this.x += (this.homeX - this.x) * 0.08;
+      this.y += (this.homeY - this.y) * 0.08;
+    }
+  }
+  draw(ctx) {
+    if (!this.image.complete || this.image.naturalWidth === 0) return;
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+    ctx.rotate(this.rotation);
+    ctx.scale(this.scale, this.scale);
+    ctx.drawImage(this.image, -this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.restore();
+  }
+  resetVisuals() { this.opacity = 1; this.scale = 1; this.rotation = 0; }
+}
+
+class GameObject {
+  constructor(id) { this.el = document.getElementById(id); }
+  rotate(deg)      { if(this.el) this.el.style.transform = `rotate(${deg}deg)`; return this; }
+  setBorder(style) { if(this.el) this.el.style.border = style; return this; }
+  setWidth(px)     { if(this.el) this.el.style.width = `${px}px`; return this; }
+  reset()          { if(this.el){ this.el.style.transform=''; this.el.style.border=''; this.el.style.width=''; } return this; }
+}
+class Rock     extends GameObject { constructor(){ super("rock-img"); } }
+class Paper    extends GameObject { constructor(){ super("paper-img"); } }
+class Scissors extends GameObject { constructor(){ super("scissors-img"); } }
+
+window.rock     = new Rock();
+window.paper    = new Paper();
+window.scissors = new Scissors();
+
+// ── CANVAS ───────────────────────────────────────────────────
+
+const canvas = document.getElementById('battleCanvas');
+const ctx    = canvas.getContext('2d');
+
+const rockImg     = document.getElementById('rock-img');
+const paperImg    = document.getElementById('paper-img');
+const scissorsImg = document.getElementById('scissors-img');
+
+const sprites = {
+  rock:     new BattleSprite(rockImg,     72, 72,  22, 44),
+  paper:    new BattleSprite(paperImg,    72, 72, 144, 44),
+  scissors: new BattleSprite(scissorsImg, 72, 72, 266, 44)
+};
+
+const battle = { active:false, winner:null, loser:null, frames:0, max:110, tie:null };
+
+function startBattle(winner, loser) {
+  battle.active=true; battle.tie=null; battle.winner=winner; battle.loser=loser; battle.frames=0;
+  sprites[winner].animating=true;
+  sprites[winner].targetX = sprites[loser].homeX;
+  sprites[winner].targetY = sprites[loser].homeY;
+  sprites[loser].animating=false;
+}
+function startTie(choice) {
+  battle.active=true; battle.tie=choice; battle.winner=null; battle.loser=null; battle.frames=0;
+  Object.values(sprites).forEach(s=>{ s.animating=false; });
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(128,128,128,0.07)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.font = "bold 8px monospace";
+  ctx.fillStyle = 'gray';
+  ctx.globalAlpha = 0.5;
+  ctx.textAlign = 'center';
+  ctx.fillText('ANIMATED BATTLE — OOP IN ACTION', canvas.width/2, 16);
+  ctx.restore();
+
+  if (battle.active) {
+    const t = battle.frames / battle.max;
+    if (battle.tie) {
+      sprites[battle.tie].rotation = Math.sin(battle.frames * 0.3) * 4 * Math.PI / 180;
+    } else {
+      const w = sprites[battle.winner];
+      const l = sprites[battle.loser];
+      const pulse = battle.frames < battle.max/2
+        ? 1 + (battle.frames/(battle.max/2)) * 0.2
+        : 1.2 - ((battle.frames - battle.max/2)/(battle.max/2)) * 0.2;
+      w.scale = pulse;
+      l.opacity = Math.max(0.1, 1 - t * 0.9);
+      l.scale   = Math.max(0.5, 1 - t * 0.5);
+      if(battle.winner==='rock'     && battle.loser==='scissors') l.rotation = -t*(Math.PI/4);
+      if(battle.winner==='paper'    && battle.loser==='rock')     { w.targetX=l.homeX-4; w.targetY=l.homeY-4; }
+      if(battle.winner==='scissors' && battle.loser==='paper')    { w.rotation=t*(Math.PI/10); l.rotation=-t*(Math.PI/10); }
+    }
+    battle.frames++;
+    if (battle.frames >= battle.max) {
+      battle.active = false;
+      Object.values(sprites).forEach(s=>{ s.resetVisuals(); s.animating=false; });
+    }
+  }
+
+  Object.values(sprites).forEach(s=>{ s.update(); s.draw(ctx); });
+
+  ctx.save();
+  ctx.font = "7px monospace";
+  ctx.globalAlpha = 0.35;
+  ctx.fillStyle = 'gray';
+  ctx.textAlign = 'center';
+  [['ROCK',58],['PAPER',180],['SCISSORS',302]].forEach(([label,x])=>{
+    ctx.fillText(label, x, 140);
+  });
+  ctx.restore();
+
+  requestAnimationFrame(render);
+}
+render();
+
+// ── GAME LOGIC ───────────────────────────────────────────────
+
+function highlightImage(choice) {
+  ['rock','paper','scissors'].forEach(c => {
+    document.getElementById('btn-'+c).classList.remove('selected');
+  });
+  document.getElementById('btn-'+choice).classList.add('selected');
+}
+
+function playRPSCore(playerChoice) {
+  const choices = ["rock","paper","scissors"];
+  playerChoice = playerChoice.toLowerCase();
+  if (!choices.includes(playerChoice)) return null;
+
+  const computerChoice = choices[Math.floor(Math.random()*choices.length)];
+  let resultText, winner=null, loser=null;
+
+  if (playerChoice === computerChoice) {
+    resultText="Tie!"; startTie(playerChoice);
+  } else if (
+    (playerChoice==="rock"     && computerChoice==="scissors") ||
+    (playerChoice==="paper"    && computerChoice==="rock")     ||
+    (playerChoice==="scissors" && computerChoice==="paper")
+  ) {
+    resultText="You Win!"; winner=playerChoice; loser=computerChoice;
+  } else {
+    resultText="You Lose!"; winner=computerChoice; loser=playerChoice;
+  }
+
+  document.getElementById("resultBox").innerHTML =
+    `You chose: <strong>${playerChoice.toUpperCase()}</strong> &nbsp;|&nbsp; ` +
+    `Computer chose: <strong>${computerChoice.toUpperCase()}</strong><br>` +
+    `<strong>${resultText}</strong>`;
+
+  if (winner && loser) startBattle(winner, loser);
+  return { player:playerChoice, computer:computerChoice, result:resultText };
+}
+
+window.playRPS = function(playerChoice) {
+  if (!playerChoice || typeof playerChoice !== 'string') {
+    console.error('Please provide a valid choice: "rock", "paper", or "scissors"');
+    return;
+  }
+  if (!["rock","paper","scissors"].includes(playerChoice.toLowerCase())) {
+    console.error('Invalid choice! Use "rock", "paper", or "scissors"');
+    return;
+  }
+  highlightImage(playerChoice.toLowerCase());
+  const result = playRPSCore(playerChoice);
+  if (result) {
+    console.log("You chose:", result.player.toUpperCase());
+    console.log("Computer chose:", result.computer.toUpperCase());
+    console.log("Result:", result.result);
+  }
+  return result;
+};
+
+function clickPlay(choice) {
+  highlightImage(choice);
+  const result = playRPSCore(choice);
+  if (result) {
+    console.log("You chose:", result.player.toUpperCase());
+    console.log("Computer chose:", result.computer.toUpperCase());
+    console.log("Result:", result.result);
+  }
+}
+
+// ── LESSON HELPERS ───────────────────────────────────────────
+
+function showConsole(id, lines) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('show');
+  el.innerHTML = lines.map(l => `<div class="${l.cls}">${l.text}</div>`).join('');
+}
+
+function runBroken1() {
+  showConsole('con1', [
+    {cls:'mc-err', text:'❌ ReferenceError: rock is not defined'},
+    {cls:'mc-dim', text:'   JS looked for a variable called rock — not found.'},
+    {cls:'mc-dim', text:'   Fix: add quotes → playRPS("rock")'}
+  ]);
+}
+function runBroken2() {
+  showConsole('con2', [
+    {cls:'mc-err', text:'❌ Invalid choice! Use "rock", "paper", or "scissors"'},
+    {cls:'mc-dim', text:'   choices = ["rock", "paper", "scissors"]'},
+    {cls:'mc-dim', text:'   "lizard" is not in that array.'}
+  ]);
+}
+function runBroken3() {
+  showConsole('con3', [
+    {cls:'mc-err', text:'❌ TypeError: playRps is not a function'},
+    {cls:'mc-dim', text:'   JS is case-sensitive. playRps ≠ playRPS'},
+    {cls:'mc-dim', text:'   Fix: playRPS("paper")  ← capital R, P, S'}
+  ]);
+}
+
+function runFixed(choice, consoleId, cardId) {
+  const normalized = choice.toLowerCase();
+  if (!["rock","paper","scissors"].includes(normalized)) {
+    showConsole(consoleId, [{cls:'mc-err', text:`❌ Invalid choice: "${choice}"`}]);
+    return;
+  }
+  highlightImage(normalized);
+  const result = playRPSCore(choice);
+  if (!result) return;
+  const rCls = result.result==="You Win!" ? 'mc-ok' : result.result==="You Lose!" ? 'mc-err' : '';
+  showConsole(consoleId, [
+    {cls:'mc-dim', text:`> playRPS("${choice}")`},
+    {cls:'',       text:`  You chose: ${result.player.toUpperCase()}`},
+    {cls:'',       text:`  Computer chose: ${result.computer.toUpperCase()}`},
+    {cls:rCls,     text:`  Result: ${result.result}`}
+  ]);
+  if (cardId) {
+    const card = document.getElementById(cardId);
+    card.style.borderLeftColor = '#27ae60';
+    const badge = card.querySelector('.error-badge');
+    if (badge) badge.textContent = '✓ Fixed!';
+  }
+}
+
+// ── CHECKPOINT ───────────────────────────────────────────────
+
+const cpInput    = document.getElementById('cp-input');
+const cpFeedback = document.getElementById('cp-feedback');
+const cpShow     = document.getElementById('cp-show');
+const cpRunBtn   = document.getElementById('cp-run-btn');
+
+const correctAnswers = [
+  'playRPS("rock")', "playRPS('rock')",
+  'playRPS("paper")', "playRPS('paper')",
+  'playRPS("scissors")', "playRPS('scissors')"
+];
+
+cpInput.addEventListener('input', function() {
+  const val = cpInput.value.trim();
+  if (!val) {
+    cpFeedback.textContent = '';
+    cpFeedback.className = 'cp-feedback';
+    cpInput.className = 'cp-input';
+    cpRunBtn.style.display = 'none';
+    return;
+  }
+  if (correctAnswers.includes(val)) {
+    cpInput.className = 'cp-input correct';
+    cpFeedback.textContent = '✅ Correct! The string is properly quoted.';
+    cpFeedback.className = 'cp-feedback ok';
+    cpShow.style.display = 'none';
+    cpRunBtn.style.display = 'inline-block';
+  } else {
+    cpInput.className = 'cp-input wrong';
+    cpFeedback.textContent = 'Not quite — check your quotes and spelling.';
+    cpFeedback.className = 'cp-feedback bad';
+    cpShow.style.display = 'inline-block';
+    cpRunBtn.style.display = 'none';
+  }
+});
+
+cpShow.onclick = function() {
+  cpInput.value = 'playRPS("rock")';
+  cpInput.dispatchEvent(new Event('input'));
+};
+
+function runCheckpointAnswer() {
+  const match = cpInput.value.trim().match(/playRPS\(["'](\w+)["']\)/i);
+  if (match) runFixed(match[1], 'cp-console', null);
+}
+</script>
+</body>
+</html>
