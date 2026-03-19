@@ -418,216 +418,391 @@ function checkInteraction(player, npc) {
 </div>
 
 <script>
-(function() {
-  var mdbOS = 'mac';
-  var mdbCorrect = 0, mdbErrors = 0, mdbFilled = 0, mdbCurrentPixel = null;
 
-  var mdbColors = {
-    1:'#ff6b6b', 2:'#4ecdc4', 3:'#ffe66d', 4:'#a8e6cf',
-    5:'#ff8b94', 6:'#c7ceea', 7:'#f7b731', 8:'#a29bfe',
-    9:'#fd79a8', 10:'#55efc4'
-  };
-
-  // 7x5 grid — 0 = black (no clue), numbers = color type
-  var mdbPattern = [
-    [1, 1, 0, 7, 0, 9, 9],
-    [2, 4, 4, 7, 8, 8, 3],
-    [2, 5, 5,10, 8, 3, 3],
-    [0, 0, 6,10, 0, 0, 0],
-    [0, 6, 6, 0,10, 0, 0]
-  ];
-
-  var mdbClues = [
-    { type:1, error:"make: command not found", question:"What is the solution?", answers:[
-      { text:"Install make using xcode-select --install or package manager", correct:true },
-      { text:"Delete the project", correct:false },
-      { text:"Rename the Makefile", correct:false }
-    ]},
-    { type:2, error:"make: *** No targets specified and no makefile found. Stop.", question:"What should you do?", answers:[
-      { text:"Navigate to the correct directory with cd", correct:true },
-      { text:"Reinstall make", correct:false },
-      { text:"Run sudo make", correct:false }
-    ]},
-    { type:3, error:"make: *** No rule to make target 'sever'. Stop.", question:"How do you fix this?", answers:[
-      { text:"Fix the typo — use 'make server' or 'make dev' for a faster build", correct:true },
-      { text:"Add a new sever target", correct:false },
-      { text:"Delete the Makefile", correct:false }
-    ]},
-    { type:4, error:"Makefile:5: *** missing separator. Stop.", question:"What is the problem?", answers:[
-      { text:"Replace spaces with TAB character before commands", correct:true },
-      { text:"Add more spaces", correct:false },
-      { text:"Add semicolons", correct:false }
-    ]},
-    { type:5, error:"make: ./script.sh: Permission denied", question:"How do you fix this?", answers:[
-      { text:"Run chmod +x script.sh to add execute permission", correct:true },
-      { text:"Delete and recreate the file", correct:false },
-      { text:"Always use sudo", correct:false }
-    ]},
-    { type:6, error:"make: *** [test] Error 127 - /bin/sh: python3: command not found", question:"What is the solution?", answers:[
-      { text:"Install python3 using brew or apt", correct:true },
-      { text:"Remove python from Makefile", correct:false },
-      { text:"Create a symbolic link", correct:false }
-    ]},
-    { type:7, error:"[Game] Player passes through walls — collision not working", question:"Which DevTools panel helps you debug a collision hitbox mismatch?", answers:[
-      { text:"Elements tab — hover over the DOM element to see its real bounding box on screen", correct:true },
-      { text:"Network tab — check if wall data loaded correctly", correct:false },
-      { text:"Application tab — clear localStorage and retry", correct:false }
-    ]},
-    { type:8, error:"[Game] Sprite is invisible on screen despite being in the DOM", question:"How do you find the CSS rule that is hiding the sprite?", answers:[
-      { text:"Elements → Styles panel — look for strikethrough rules being overridden by a higher-specificity selector", correct:true },
-      { text:"Network tab — the image must have failed to load", correct:false },
-      { text:"Console — run location.reload()", correct:false }
-    ]},
-    { type:9, error:"Access to fetch at 'https://api.example.com/npc-data' blocked by CORS policy", question:"Where in DevTools do you find the missing Access-Control-Allow-Origin header?", answers:[
-      { text:"Network tab — click the failing request (red) and inspect Response Headers", correct:true },
-      { text:"Console tab — the full header list is printed there automatically", correct:false },
-      { text:"Elements tab — check the meta tags in <head>", correct:false }
-    ]},
-    { type:10, error:"[Game] NPC does not react when player walks into trigger zone", question:"What is the best first step to debug the player/NPC interaction logic?", answers:[
-      { text:"Sources tab — set a breakpoint in the interaction function and step through variable values when triggered", correct:true },
-      { text:"Network tab — the NPC config file probably did not load", correct:false },
-      { text:"Application tab — the interaction state is stored in a cookie", correct:false }
-    ]}
-  ];
-
-  window.mdbSwitchOS = function(os) {
-    mdbOS = os;
-    document.querySelectorAll('.mdb .os-btn').forEach(function(b){ b.classList.remove('active'); });
-    document.querySelector('.mdb [data-os="'+os+'"]').classList.add('active');
-    document.querySelectorAll('.mdb .os-sp').forEach(function(el){ el.classList.remove('active'); });
-    var prefix = os === 'mac' ? 'mdb-mac-' : 'mdb-win-';
-    document.querySelectorAll('[id^="'+prefix+'"]').forEach(function(el){ el.classList.add('active'); });
-  };
-
-  window.mdbSwitchTab = function(tab, e) {
-    document.querySelectorAll('.mdb .tab').forEach(function(t){ t.classList.remove('active'); });
-    e.target.classList.add('active');
-    document.querySelectorAll('.mdb .tab-content').forEach(function(c){ c.classList.remove('active'); });
-    document.getElementById('mdb-'+tab).classList.add('active');
-    if (tab === 'practice') mdbInit();
-  };
-
-  function mdbInit() {
-    mdbCorrect = 0; mdbErrors = 0; mdbFilled = 0; mdbCurrentPixel = null;
-    mdbUpdateStats();
-    var grid = document.getElementById('mdb-pixelGrid');
-    grid.innerHTML = '';
-    for (var r = 0; r < 5; r++) {
-      for (var c = 0; c < 7; c++) {
-        (function(row, col) {
-          var p = document.createElement('div');
-          p.className = 'pixel';
-          p.dataset.row = row; p.dataset.col = col; p.dataset.color = mdbPattern[row][col];
-          if (mdbPattern[row][col] !== 0) {
-            p.textContent = mdbPattern[row][col];
-            p.onclick = function() { mdbSelectPixel(row, col); };
-          } else {
-            p.style.background = '#000';
-            p.classList.add('filled');
-          }
-          grid.appendChild(p);
-        })(r, c);
-      }
+// =============================================================================
+// MDB_DATA — stores all static game data (clues, colors, pixel pattern)
+// Only change this when clue text, colors, or the grid pattern needs updating
+// =============================================================================
+const MDB_DATA = {
+  colors: {
+    1: '#ff6b6b', 2: '#4ecdc4', 3: '#ffe66d', 4: '#a8e6cf',
+    5: '#ff8b94', 6: '#c7ceea', 7: '#f7b731', 8: '#a29bfe',
+    9: '#fd79a8', 10: '#55efc4'
+  },
+  pattern: [
+    [1, 1, 0,  7, 0,  9,  9],
+    [2, 4, 4,  7, 8,  8,  3],
+    [2, 5, 5, 10, 8,  3,  3],
+    [0, 0, 6, 10, 0,  0,  0],
+    [0, 6, 6,  0, 10, 0,  0]
+  ],
+  clues: [
+    {
+      type: 1,
+      error: "make: command not found",
+      question: "What is the solution?",
+      answers: [
+        { text: "Install make using xcode-select --install or package manager", correct: true },
+        { text: "Delete the project", correct: false },
+        { text: "Rename the Makefile", correct: false }
+      ]
+    },
+    {
+      type: 2,
+      error: "make: *** No targets specified and no makefile found. Stop.",
+      question: "What should you do?",
+      answers: [
+        { text: "Navigate to the correct directory with cd", correct: true },
+        { text: "Reinstall make", correct: false },
+        { text: "Run sudo make", correct: false }
+      ]
+    },
+    {
+      type: 3,
+      error: "make: *** No rule to make target 'sever'. Stop.",
+      question: "How do you fix this?",
+      answers: [
+        { text: "Fix the typo — use 'make server' or 'make dev' for a faster build", correct: true },
+        { text: "Add a new sever target", correct: false },
+        { text: "Delete the Makefile", correct: false }
+      ]
+    },
+    {
+      type: 4,
+      error: "Makefile:5: *** missing separator. Stop.",
+      question: "What is the problem?",
+      answers: [
+        { text: "Replace spaces with TAB character before commands", correct: true },
+        { text: "Add more spaces", correct: false },
+        { text: "Add semicolons", correct: false }
+      ]
+    },
+    {
+      type: 5,
+      error: "make: ./script.sh: Permission denied",
+      question: "How do you fix this?",
+      answers: [
+        { text: "Run chmod +x script.sh to add execute permission", correct: true },
+        { text: "Delete and recreate the file", correct: false },
+        { text: "Always use sudo", correct: false }
+      ]
+    },
+    {
+      type: 6,
+      error: "make: *** [test] Error 127 - /bin/sh: python3: command not found",
+      question: "What is the solution?",
+      answers: [
+        { text: "Install python3 using brew or apt", correct: true },
+        { text: "Remove python from Makefile", correct: false },
+        { text: "Create a symbolic link", correct: false }
+      ]
+    },
+    {
+      type: 7,
+      error: "[Game] Player passes through walls — collision not working",
+      question: "Which DevTools panel helps you debug a collision hitbox mismatch?",
+      answers: [
+        { text: "Elements tab — hover over the DOM element to see its real bounding box on screen", correct: true },
+        { text: "Network tab — check if wall data loaded correctly", correct: false },
+        { text: "Application tab — clear localStorage and retry", correct: false }
+      ]
+    },
+    {
+      type: 8,
+      error: "[Game] Sprite is invisible on screen despite being in the DOM",
+      question: "How do you find the CSS rule that is hiding the sprite?",
+      answers: [
+        { text: "Elements → Styles panel — look for strikethrough rules being overridden by a higher-specificity selector", correct: true },
+        { text: "Network tab — the image must have failed to load", correct: false },
+        { text: "Console — run location.reload()", correct: false }
+      ]
+    },
+    {
+      type: 9,
+      error: "Access to fetch at 'https://api.example.com/npc-data' blocked by CORS policy",
+      question: "Where in DevTools do you find the missing Access-Control-Allow-Origin header?",
+      answers: [
+        { text: "Network tab — click the failing request (red) and inspect Response Headers", correct: true },
+        { text: "Console tab — the full header list is printed there automatically", correct: false },
+        { text: "Elements tab — check the meta tags in head", correct: false }
+      ]
+    },
+    {
+      type: 10,
+      error: "[Game] NPC does not react when player walks into trigger zone",
+      question: "What is the best first step to debug the player/NPC interaction logic?",
+      answers: [
+        { text: "Sources tab — set a breakpoint in the interaction function and step through variable values when triggered", correct: true },
+        { text: "Network tab — the NPC config file probably did not load", correct: false },
+        { text: "Application tab — the interaction state is stored in a cookie", correct: false }
+      ]
     }
+  ]
+};
+
+// =============================================================================
+// MDBState — tracks all runtime game state
+// Only change this when the set of tracked values or reset logic changes
+// =============================================================================
+const MDBState = {
+  os: 'mac',
+  correct: 0,
+  errors: 0,
+  filled: 0,
+  currentPixel: null,
+
+  reset() {
+    this.correct = 0;
+    this.errors = 0;
+    this.filled = 0;
+    this.currentPixel = null;
+  },
+
+  getTotalPixels() {
+    return MDB_DATA.pattern.flat().filter(p => p !== 0).length;
+  },
+
+  calculateAccuracy() {
+    const total = this.correct + this.errors;
+    return total === 0 ? 0 : Math.round((this.correct / total) * 100);
+  }
+};
+
+// =============================================================================
+// MDBOSToggle — handles OS button switching
+// Only change this when the OS toggle UI or section IDs change
+// =============================================================================
+const MDBOSToggle = {
+  switch(os) {
+    MDBState.os = os;
+    this.renderButtons(os);
+    this.renderSections(os);
+  },
+
+  renderButtons(os) {
+    document.querySelectorAll('.mdb .os-btn')
+      .forEach(b => b.classList.remove('active'));
+    document.querySelector(`.mdb [data-os="${os}"]`)
+      .classList.add('active');
+  },
+
+  renderSections(os) {
+    document.querySelectorAll('.mdb .os-sp')
+      .forEach(el => el.classList.remove('active'));
+    const prefix = os === 'mac' ? 'mdb-mac-' : 'mdb-win-';
+    document.querySelectorAll(`[id^="${prefix}"]`)
+      .forEach(el => el.classList.add('active'));
+  }
+};
+
+// =============================================================================
+// MDBStatsTracker — updates the score display in the DOM
+// Only change this when the stats UI elements or their formatting changes
+// =============================================================================
+const MDBStatsTracker = {
+  update() {
+    const total = MDBState.getTotalPixels();
+    document.getElementById('mdb-progress').textContent = `${MDBState.filled}/${total}`;
+    document.getElementById('mdb-correct').textContent = MDBState.correct;
+    document.getElementById('mdb-errors').textContent = MDBState.errors;
+  }
+};
+
+// =============================================================================
+// MDBCompletionHandler — detects game over and renders the final screen
+// Only change this when end-game detection or the completion screen changes
+// =============================================================================
+const MDBCompletionHandler = {
+  check() {
+    if (MDBState.filled >= MDBState.getTotalPixels()) {
+      setTimeout(() => this.show(), 600);
+    }
+  },
+
+  show() {
+    document.getElementById('mdb-accuracy').textContent = `${MDBState.calculateAccuracy()}%`;
+    this.renderFinalGrid();
+    document.getElementById('mdb-completion').classList.add('show');
+  },
+
+  renderFinalGrid() {
+    const fg = document.getElementById('mdb-finalImage');
+    fg.innerHTML = '';
+    MDB_DATA.pattern.forEach(row => {
+      row.forEach(cell => {
+        const p = document.createElement('div');
+        p.className = 'pixel filled';
+        p.style.background = cell !== 0 ? MDB_DATA.colors[cell] : '#000';
+        fg.appendChild(p);
+      });
+    });
+  }
+};
+
+// =============================================================================
+// MDBAnswerChecker — validates answers and updates pixel/button feedback
+// Only change this when answer validation or correct/incorrect feedback changes
+// =============================================================================
+const MDBAnswerChecker = {
+  check(correct, colorType, e) {
+    this.disableButtons(true);
+    if (correct && MDBState.currentPixel) {
+      this.handleCorrect(colorType, e);
+    } else {
+      this.handleIncorrect(e);
+    }
+    MDBStatsTracker.update();
+  },
+
+  handleCorrect(colorType, e) {
+    MDBState.correct++;
+    MDBState.filled++;
+
+    const { row, col } = MDBState.currentPixel;
+    const pixel = document.querySelector(`.mdb [data-row="${row}"][data-col="${col}"]`);
+    pixel.style.background = MDB_DATA.colors[colorType];
+    pixel.classList.add('filled');
+    pixel.textContent = '';
+    pixel.style.boxShadow = '';
+    e.target.classList.add('correct');
+
+    setTimeout(() => {
+      MDBState.currentPixel = null;
+      document.getElementById('mdb-clueError').textContent = 'Great! Click another number.';
+      document.getElementById('mdb-clueQuestion').textContent = 'Keep going to reveal the image!';
+      document.getElementById('mdb-answerOptions').innerHTML = '';
+      MDBCompletionHandler.check();
+    }, 1000);
+  },
+
+  handleIncorrect(e) {
+    MDBState.errors++;
+    e.target.classList.add('incorrect');
+    setTimeout(() => {
+      this.disableButtons(false);
+      document.querySelectorAll('.mdb .answer-btn')
+        .forEach(b => b.classList.remove('incorrect'));
+    }, 600);
+  },
+
+  disableButtons(disabled) {
+    document.querySelectorAll('.mdb .answer-btn')
+      .forEach(b => b.disabled = disabled);
+  }
+};
+
+// =============================================================================
+// MDBClueManager — looks up clue data and renders it into the DOM
+// Only change this when clue lookup logic or the clue display UI changes
+// =============================================================================
+const MDBClueManager = {
+  getByType(type) {
+    return MDB_DATA.clues.find(c => c.type === type);
+  },
+
+  render(clue, type) {
+    const errorEl = document.getElementById('mdb-clueError');
+    errorEl.textContent = clue.error;
+    errorEl.className = type >= 7 ? 'clue-devtools' : 'clue-error';
+    document.getElementById('mdb-clueQuestion').textContent = clue.question;
+
+    const opts = document.getElementById('mdb-answerOptions');
+    opts.innerHTML = '';
+    clue.answers
+      .slice()
+      .sort(() => Math.random() - 0.5)
+      .forEach(answer => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer.text;
+        btn.onclick = (e) => MDBAnswerChecker.check(answer.correct, type, e);
+        opts.appendChild(btn);
+      });
+  },
+
+  load(type) {
+    const clue = this.getByType(type);
+    if (clue) this.render(clue, type);
+  }
+};
+
+// =============================================================================
+// MDBGridRenderer — builds the pixel grid DOM elements
+// Only change this when the grid layout or individual pixel structure changes
+// =============================================================================
+const MDBGridRenderer = {
+  render() {
+    const grid = document.getElementById('mdb-pixelGrid');
+    grid.innerHTML = '';
+    MDB_DATA.pattern.forEach((row, r) => {
+      row.forEach((cell, c) => {
+        const p = document.createElement('div');
+        p.className = 'pixel';
+        p.dataset.row = r;
+        p.dataset.col = c;
+        p.dataset.color = cell;
+
+        if (cell !== 0) {
+          p.textContent = cell;
+          p.onclick = () => MDBGame.selectPixel(r, c);
+        } else {
+          p.style.background = '#000';
+          p.classList.add('filled');
+        }
+        grid.appendChild(p);
+      });
+    });
+  }
+};
+
+// =============================================================================
+// MDBGame — coordinates overall game flow (init, reset, pixel selection)
+// Only change this when the sequence of game startup steps changes
+// =============================================================================
+const MDBGame = {
+  init() {
+    MDBState.reset();
+    MDBGridRenderer.render();
+    this.resetCluePanel();
     document.getElementById('mdb-completion').classList.remove('show');
+    MDBStatsTracker.update();
+  },
+
+  resetCluePanel() {
     document.getElementById('mdb-clueError').textContent = 'Click a numbered pixel above to start!';
     document.getElementById('mdb-clueQuestion').textContent = 'Select any pixel with a number to see its error.';
     document.getElementById('mdb-answerOptions').innerHTML = '';
-    var total = mdbPattern.flat().filter(function(p){ return p !== 0; }).length;
-    document.getElementById('mdb-progress').textContent = '0/' + total;
-  }
+  },
 
-  function mdbSelectPixel(row, col) {
-    var pixel = document.querySelector('.mdb [data-row="'+row+'"][data-col="'+col+'"]');
+  selectPixel(row, col) {
+    const pixel = document.querySelector(`.mdb [data-row="${row}"][data-col="${col}"]`);
     if (pixel.classList.contains('filled')) return;
-    mdbCurrentPixel = { row:row, col:col, color:mdbPattern[row][col] };
-    document.querySelectorAll('.mdb .pixel').forEach(function(p){ p.style.boxShadow = ''; });
+
+    MDBState.currentPixel = { row, col, color: MDB_DATA.pattern[row][col] };
+    document.querySelectorAll('.mdb .pixel').forEach(p => p.style.boxShadow = '');
     pixel.style.boxShadow = '0 0 16px #00ff9f';
-    mdbLoadClue(mdbPattern[row][col]);
+    MDBClueManager.load(MDB_DATA.pattern[row][col]);
   }
+};
 
-  function mdbLoadClue(type) {
-    var clue = mdbClues.find(function(c){ return c.type === type; });
-    if (!clue) return;
-    var errorEl = document.getElementById('mdb-clueError');
-    errorEl.textContent = clue.error;
-    errorEl.className = (type >= 7) ? 'clue-devtools' : 'clue-error';
-    document.getElementById('mdb-clueQuestion').textContent = clue.question;
-    var opts = document.getElementById('mdb-answerOptions');
-    opts.innerHTML = '';
-    clue.answers.slice().sort(function(){ return Math.random()-0.5; }).forEach(function(answer) {
-      var btn = document.createElement('button');
-      btn.className = 'answer-btn';
-      btn.textContent = answer.text;
-      btn.onclick = function(e) { mdbCheckAnswer(answer.correct, type, e); };
-      opts.appendChild(btn);
-    });
-  }
+// =============================================================================
+// Public API — wires module methods to HTML onclick attributes
+// =============================================================================
+window.mdbSwitchOS  = (os) => MDBOSToggle.switch(os);
+window.mdbSwitchTab = (tab, e) => {
+  document.querySelectorAll('.mdb .tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  document.querySelectorAll('.mdb .tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('mdb-' + tab).classList.add('active');
+  if (tab === 'practice') MDBGame.init();
+};
+window.mdbRestart = () => {
+  document.getElementById('mdb-completion').classList.remove('show');
+  MDBGame.init();
+};
 
-  function mdbCheckAnswer(correct, colorType, e) {
-    var buttons = document.querySelectorAll('.mdb .answer-btn');
-    buttons.forEach(function(b){ b.disabled = true; });
-    if (correct && mdbCurrentPixel) {
-      mdbCorrect++;
-      var pixel = document.querySelector('.mdb [data-row="'+mdbCurrentPixel.row+'"][data-col="'+mdbCurrentPixel.col+'"]');
-      pixel.style.background = mdbColors[colorType];
-      pixel.classList.add('filled');
-      pixel.textContent = '';
-      pixel.style.boxShadow = '';
-      mdbFilled++;
-      e.target.classList.add('correct');
-      setTimeout(function() {
-        mdbCurrentPixel = null;
-        document.getElementById('mdb-clueError').textContent = 'Great! Click another number.';
-        document.getElementById('mdb-clueQuestion').textContent = 'Keep going to reveal the image!';
-        document.getElementById('mdb-answerOptions').innerHTML = '';
-        mdbCheckCompletion();
-      }, 1000);
-    } else {
-      mdbErrors++;
-      e.target.classList.add('incorrect');
-      setTimeout(function() {
-        buttons.forEach(function(b){ b.disabled = false; b.classList.remove('incorrect'); });
-      }, 600);
-    }
-    mdbUpdateStats();
-  }
+MDBGame.init();
 
-  function mdbUpdateStats() {
-    var total = mdbPattern.flat().filter(function(p){ return p !== 0; }).length;
-    document.getElementById('mdb-progress').textContent = mdbFilled+'/'+total;
-    document.getElementById('mdb-correct').textContent = mdbCorrect;
-    document.getElementById('mdb-errors').textContent = mdbErrors;
-  }
-
-  function mdbCheckCompletion() {
-    var total = mdbPattern.flat().filter(function(p){ return p !== 0; }).length;
-    if (mdbFilled >= total) setTimeout(mdbShowCompletion, 600);
-  }
-
-  function mdbShowCompletion() {
-    var acc = Math.round((mdbCorrect/(mdbCorrect+mdbErrors))*100);
-    document.getElementById('mdb-accuracy').textContent = acc+'%';
-    var fg = document.getElementById('mdb-finalImage');
-    fg.innerHTML = '';
-    for (var r = 0; r < 5; r++) {
-      for (var c = 0; c < 7; c++) {
-        var p = document.createElement('div');
-        p.className = 'pixel filled';
-        p.style.background = mdbPattern[r][c] !== 0 ? mdbColors[mdbPattern[r][c]] : '#000';
-        fg.appendChild(p);
-      }
-    }
-    document.getElementById('mdb-completion').classList.add('show');
-  }
-
-  window.mdbRestart = function() {
-    document.getElementById('mdb-completion').classList.remove('show');
-    mdbInit();
-  };
-
-  mdbInit();
-})();
 </script>
 
 </div>
