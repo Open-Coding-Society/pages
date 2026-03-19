@@ -1493,171 +1493,262 @@ window.onClassAllChange = function (cb) {
 }
 
 /* ================================
-   SMART GROUP FORMATION
+   SMART GROUP FORMATION (SRP VERSION)
 ================================ */
 let generatedGroups = []; // Store generated groups before saving
 
-window.openSmartGroupFormation = function() {
-  document.getElementById('smartGroupModal').classList.remove('hidden');
-  document.getElementById('smartGroupResults').classList.add('hidden');
-  document.body.classList.add('modal-open');
+function readSmartGroupForm() {
+  return {
+    period: document.getElementById('smartGroupPeriod').value,
+    course: document.getElementById('smartGroupClass').value,
+    groupSize: parseInt(document.getElementById('smartGroupSize').value, 10),
+    prefix: document.getElementById('smartGroupPrefix').value.trim() || 'Team'
+  };
 }
 
-window.closeSmartGroupModal = function() {
-  document.getElementById('smartGroupModal').classList.add('hidden');
-  document.body.classList.remove('modal-open');
+function validateSmartGroupForm({ period, course, groupSize }) {
+  if (!period || !course) {
+    throw new Error('Please select both period and class');
+  }
+
+  if (groupSize < 2 || groupSize > 10) {
+    throw new Error('Group size must be between 2 and 10');
+  }
+}
+
+function resetSmartGroupForm() {
   document.getElementById('smartGroupPeriod').value = '';
   document.getElementById('smartGroupClass').value = '';
   document.getElementById('smartGroupSize').value = '4';
   document.getElementById('smartGroupPrefix').value = '';
   generatedGroups = [];
-  lockedGroups = new Set(); // ← add this line
+  lockedGroups = new Set();
 }
-window.generateSmartGroups = async function() {
-  const period = document.getElementById('smartGroupPeriod').value;
-  const course = document.getElementById('smartGroupClass').value;
-  const groupSize = parseInt(document.getElementById('smartGroupSize').value);
 
-  // Validation
-  if (!period || !course) {
-    alert('Please select both period and class');
-    return;
+function openSmartGroupModalUI() {
+  document.getElementById('smartGroupModal').classList.remove('hidden');
+  document.getElementById('smartGroupResults').classList.add('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeSmartGroupModalUI() {
+  document.getElementById('smartGroupModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
+function getStudentsInSelectedClass(period, course) {
+  const groupsInPeriod = allGroups.filter(g =>
+    String(g.period) === String(period) && g.course === course
+  );
+
+  const seenIds = new Set();
+  const studentsInClass = [];
+
+  groupsInPeriod.forEach(group => {
+    (group.members || []).forEach(member => {
+      if (!seenIds.has(member.id)) {
+        seenIds.add(member.id);
+        studentsInClass.push(member);
+      }
+    });
+  });
+
+  return studentsInClass;
+}
+
+function validateEnoughStudents(students, groupSize, period, course) {
+  if (students.length < groupSize) {
+    throw new Error(
+      `Not enough students in Period ${period} ${course}. Found ${students.length}, need at least ${groupSize}.`
+    );
+  }
+}
+
+function buildUserUids(students) {
+  return students.map(student => student.uid);
+}
+
+async function evaluatePersonaCoverage(user_uids, groupSize, totalStudents) {
+  try {
+    const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ user_uids })
+    });
+
+    if (!checkResp.ok) {
+      return { studentsWithPersonas: 0, useAI: false };
+    }
+
+    const checkResult = await checkResp.json();
+    const studentsWithPersonas = checkResult.members.filter(
+      m => m.personas && m.personas.length > 0
+    ).length;
+
+    const minRequired = Math.max(groupSize * 2, Math.ceil(totalStudents * 0.5));
+    const useAI = studentsWithPersonas >= minRequired;
+
+    return { studentsWithPersonas, useAI };
+  } catch (err) {
+    console.log('⚠️ Persona check failed, falling back to random:', err);
+    return { studentsWithPersonas: 0, useAI: false };
+  }
+}
+
+async function requestAIGroups(user_uids, groupSize, feedbackRows) {
+  const response = await fetch(`${pythonURI}/api/persona/form-groups`, {
+    ...fetchOptions,
+    method: 'POST',
+    body: JSON.stringify({
+      user_uids,
+      group_size: groupSize,
+      incorporate_prior_experiences: feedbackRows.length > 0,
+      feedback_rows: feedbackRows
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to form groups');
   }
 
-  if (groupSize < 2 || groupSize > 10) {
-    alert('Group size must be between 2 and 10');
-    return;
+  return response.json();
+}
+
+function buildRandomGroups(students, groupSize) {
+  const shuffled = [...students].sort(() => Math.random() - 0.5);
+  const randomGroups = [];
+
+  for (let i = 0; i < shuffled.length; i += groupSize) {
+    const groupMembers = shuffled.slice(i, i + groupSize);
+    randomGroups.push({
+      user_uids: groupMembers.map(p => p.uid),
+      team_score: null
+    });
   }
 
+  return {
+    groups: randomGroups,
+    average_score: null,
+    method: 'random'
+  };
+}
+
+function getMethodBadgeHTML(useAI) {
+  return useAI
+    ? '<span class="inline-flex px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
+    : '<span class="inline-flex px-3 py-1 bg-neutral-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+}
+
+function convertResultToGeneratedGroups(result, students, period, course, prefix) {
+  return result.groups.map((group, index) => {
+    const letter = String.fromCharCode(65 + index);
+    const members = group.user_uids.map(uid => {
+      const person = students.find(p => p.uid === uid);
+      return { id: person?.id, uid, name: person?.name || uid };
+    });
+
+    return {
+      name: `${prefix} ${letter}`,
+      period,
+      course,
+      team_score: group.team_score,
+      memberIds: members.map(m => m.id),
+      members
+    };
+  });
+}
+
+function renderSmartGroupMethodBadge(useAI) {
+  document.getElementById('stagingMethodBadge').innerHTML = getMethodBadgeHTML(useAI);
+}
+
+function showSmartGroupResults() {
+  document.getElementById('smartGroupResults').classList.remove('hidden');
+  document.getElementById('smartGroupResults').scrollIntoView({
+    behavior: 'smooth',
+    block: 'nearest'
+  });
+}
+
+function applySmartGroupResults(result, config, students, useAI) {
+  lockedGroups = new Set();
+
+  generatedGroups = convertResultToGeneratedGroups(
+    result,
+    students,
+    config.period,
+    config.course,
+    config.prefix
+  );
+
+  renderSmartGroupMethodBadge(useAI);
+  renderStagingGroups();
+  showSmartGroupResults();
+}
+
+async function buildSmartGroupResult(students, config, useAI) {
+  if (!useAI) {
+    console.log('🎲 Using random grouping');
+    showLoading('Creating random groups...');
+    return buildRandomGroups(students, config.groupSize);
+  }
+
+  console.log('✨ Using AI grouping');
+  showLoading('Using AI to create optimal groups...');
+
+  let feedbackRows = [];
+  try {
+    feedbackRows = collectFeedbackRowsForTraining();
+  } catch (e) {
+    throw new Error(`Prior experience input error: ${e.message}`);
+  }
+
+  return requestAIGroups(
+    buildUserUids(students),
+    config.groupSize,
+    feedbackRows
+  );
+}
+
+window.openSmartGroupFormation = function () {
+  openSmartGroupModalUI();
+};
+
+window.closeSmartGroupModal = function () {
+  closeSmartGroupModalUI();
+  resetSmartGroupForm();
+};
+
+window.generateSmartGroups = async function () {
   showLoading('Finding students and analyzing personas...');
 
   try {
-    // Step 1: Get all people from the selected period/class
-    const peopleResp = await fetch(`${javaURI}/api/people`, fetchOptions);
-    if (!peopleResp.ok) throw new Error('Failed to fetch people');
-    const allPeople = await peopleResp.json();
+    const config = readSmartGroupForm();
+    validateSmartGroupForm(config);
 
-    const groupsInPeriod = allGroups.filter(g =>
-      String(g.period) === String(period) && g.course === course
+    const students = getStudentsInSelectedClass(config.period, config.course);
+    validateEnoughStudents(students, config.groupSize, config.period, config.course);
+
+    const user_uids = buildUserUids(students);
+    const { studentsWithPersonas, useAI } = await evaluatePersonaCoverage(
+      user_uids,
+      config.groupSize,
+      students.length
     );
 
-    const seenIds = new Set();
-    const studentsInClass = [];
+    console.log(`Students with personas: ${studentsWithPersonas}`);
+    const result = await buildSmartGroupResult(students, config, useAI);
 
-    groupsInPeriod.forEach(g => {
-      (g.members || []).forEach(m => {
-        if (!seenIds.has(m.id)) {
-          seenIds.add(m.id);
-          studentsInClass.push(m);
-        }
-      });
-    });
-
-    if (studentsInClass.length < groupSize) {
-      alert(`Not enough students in Period ${period} ${course}. Found ${studentsInClass.length}, need at least ${groupSize}.`);
-      hideLoading();
-      return;
-    }
-
-    const user_uids = studentsInClass.map(p => p.uid);
-    
-    // Step 2: Check how many students have personas
-    let studentsWithPersonas = 0;
-    let useAI = false;
-    
-    try {
-      const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify({ user_uids: user_uids })
-      });
-
-      if (checkResp.ok) {
-        const checkResult = await checkResp.json();
-        studentsWithPersonas = checkResult.members.filter(m => m.personas && m.personas.length > 0).length;
-        
-        // Minimum threshold: need at least 50% of students OR at least 2 groups worth
-        const minRequired = Math.max(groupSize * 2, Math.ceil(studentsInClass.length * 0.5));
-        useAI = studentsWithPersonas >= minRequired;
-      }
-    } catch (err) {
-      console.log('⚠️ Persona check failed, falling back to random:', err);
-      useAI = false;
-    }
-
-    let result;
-
-    if (useAI) {
-      // AI-POWERED GROUPING
-      console.log(`✨ Using AI grouping (${studentsWithPersonas} students have personas)`);
-      
-      showLoading('Using AI to create optimal groups...');
-      
-      let feedbackRows = [];
-      try {
-        feedbackRows = collectFeedbackRowsForTraining(); // only non-empty if toggle ON
-      } catch (e) {
-        alert(`Prior experience input error: ${e.message}`);
-        hideLoading();
-        return;
-      }
-
-      const formGroupsResp = await fetch(`${pythonURI}/api/persona/form-groups`, {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify({
-          user_uids: user_uids,
-          group_size: groupSize,
-          incorporate_prior_experiences: (feedbackRows.length > 0),
-          feedback_rows: feedbackRows
-        })
-      });
-
-      if (!formGroupsResp.ok) {
-        const error = await formGroupsResp.json();
-        throw new Error(error.message || 'Failed to form groups');
-      }
-
-      result = await formGroupsResp.json();
-      console.log('✅ AI groups formed:', result);
-      
-    } else {
-      // RANDOM GROUPING FALLBACK
-      console.log(`🎲 Using random grouping (only ${studentsWithPersonas} students have personas)`);
-      
-      showLoading('Creating random groups...');
-      
-      // Fisher-Yates shuffle
-      const shuffled = [...studentsInClass].sort(() => Math.random() - 0.5);
-      const randomGroups = [];
-      
-      for (let i = 0; i < shuffled.length; i += groupSize) {
-        const groupMembers = shuffled.slice(i, i + groupSize);
-        randomGroups.push({
-          user_uids: groupMembers.map(p => p.uid),
-          team_score: null // null indicates random grouping
-        });
-      }
-      
-      result = {
-        groups: randomGroups,
-        average_score: null,
-        method: 'random' // Flag to show in UI
-      };
-      
-      console.log('✅ Random groups formed:', result);
-    }
-
-    // Step 3: Display results
-    displaySmartGroupResults(result, period, course, studentsInClass, useAI);
-
+    applySmartGroupResults(result, config, students, useAI);
   } catch (error) {
     console.error('❌ Error generating groups:', error);
-    alert(`Failed to generate groups: ${error.message}`);
+    alert(error.message || 'Failed to generate groups');
   } finally {
     hideLoading();
   }
-} 
+};
+
 /* ================================
    STAGING STATE
 ================================ */
