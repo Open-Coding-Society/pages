@@ -323,6 +323,30 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
         </div>
     </div>
+   
+   <!-- Friends of the Poway Library  (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-poway-library %}">
+           <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
+           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, donation flow, and impact dashboard to match the quality of their community mission.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
+       </div>
+   </div>
+
+   <!-- DSA Website Redesign (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
+           <img src="/images/capstone/dsa_redesign.svg" alt="DSA Website Redesign — Deputy Sheriffs' Association of San Diego County" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">DSA Website Redesign</a></h3>
+           <p class="text-sm text-gray-700">Redesign proposal for the Deputy Sheriffs' Association of San Diego County website — interactive dashboard, smart FAQ hub, and mega menu navigation.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
+       </div>
+   </div>
 
    <!-- D.A.D. Website Redesign (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
