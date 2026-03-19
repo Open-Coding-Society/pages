@@ -13,15 +13,21 @@ function applyStepVisibility(stepIndex) {
   });
 }
 
-// ── RESPONSIBILITY: Render the progress bar dots + step indicator ─────────────
+// ── RESPONSIBILITY: Render the progress bar dots only ────────────────────────
+// Note: does NOT inject #stepIndicator — that lives as a static span in nav-buttons
+// and is updated separately by renderStepIndicator().
 function renderProgressBar(stepIndex) {
   const bar = document.getElementById('progressBar');
   if (!bar) return;
-  bar.innerHTML =
-    STEPS.map((_, i) =>
-      `<div class="step ${i <= stepIndex ? 'active' : ''}" onclick="showStep(${i})"></div>`
-    ).join('') +
-    `<span id="stepIndicator">Step ${stepIndex + 1} / ${STEPS.length}</span>`;
+  bar.innerHTML = STEPS.map((_, i) =>
+    `<div class="step ${i <= stepIndex ? 'active' : ''}" onclick="showStep(${i})"></div>`
+  ).join('');
+}
+
+// ── RESPONSIBILITY: Update the step counter text ──────────────────────────────
+function renderStepIndicator(stepIndex) {
+  const el = document.getElementById('stepIndicator');
+  if (el) el.textContent = `Step ${stepIndex + 1} / ${STEPS.length}`;
 }
 
 // ── RESPONSIBILITY: Enable/disable prev & next buttons ───────────────────────
@@ -37,6 +43,7 @@ export function showStep(n) {
   currentStep = Math.max(0, Math.min(STEPS.length - 1, n));
   applyStepVisibility(currentStep);
   renderProgressBar(currentStep);
+  renderStepIndicator(currentStep);
   updateNavButtons(currentStep);
   persistState(currentStep);
   if (currentStep === STEPS.length - 1) markLessonComplete();
