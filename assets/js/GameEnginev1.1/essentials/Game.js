@@ -21,7 +21,7 @@
  * };
  * ```
  * 
- * Control buttons (Save Score, Skip Level, Toggle Leaderboard) appear by default.
+ * Control buttons (Save Score, Exit Level, Toggle Leaderboard) appear by default.
  * Press Escape key to pause/resume the game.
  */
 class GameCore {
@@ -65,23 +65,10 @@ class GameCore {
         this._createTopControls();
     }
 
-    // Add margin to game container to avoid collision with top menu
-    this._adjustGameContainerPosition();
-
-    // Try to dynamically load Scoreboard (for adventure game stats syncing)
-    import('../../adventureGame/Scoreboard.js')
-        .then(mod => {
-            try {
-                const Scoreboard = mod.default || mod.Scoreboard;
-                // Set gameControl reference so Scoreboard can update stats
-                Scoreboard.gameControl = this.gameControl;
-                console.log('Scoreboard gameControl reference set');
-            }
-            catch (e) { console.debug('Scoreboard init (optional):', e); }
-        })
-        .catch(() => {
-            // no-op: Scoreboard is optional
-        });
+    // Add margin to game container to avoid collision with top menu (unless disabled for embedded contexts)
+    if (!this.environment.disableContainerAdjustment) {
+        this._adjustGameContainerPosition();
+    }
 
     // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
     // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
@@ -103,8 +90,10 @@ class GameCore {
                 this._createTopControls();
             }
 
-            // Add margin to game container to avoid collision with top menu
-            this._adjustGameContainerPosition();
+            // Add margin to game container to avoid collision with top menu (unless disabled for embedded contexts)
+            if (!this.environment.disableContainerAdjustment) {
+                this._adjustGameContainerPosition();
+            }
 
             // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
             // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
@@ -174,13 +163,14 @@ class GameCore {
                 const pauseMenuInstance = new PauseMenu(this.gameControl, {});
                 this.gameControl.pauseFeature = pauseMenuInstance;
 
-                // Also initialize ScoreFeature using the same pause menu instance.
-                import('../scorefeature.js').then(scoreMod => {
-                    const ScoreFeature = scoreMod.default;
-                    this.gameControl.scoreFeature = new ScoreFeature(pauseMenuInstance);
-                }).catch(err => {
-                    console.warn('Failed to load ScoreFeature:', err);
-                });
+                // Initialize ScoreManager through GameEnv (proper OOP)
+                if (this.gameControl.gameEnv) {
+                    this.gameControl.gameEnv.initScoreManager().then(() => {
+                        console.log('ScoreManager initialized successfully');
+                    }).catch(err => {
+                        console.warn('Failed to initialize ScoreManager:', err);
+                    });
+                }
 
             }).catch(err => {
                 console.warn('Failed to load PauseMenu:', err);
@@ -219,106 +209,22 @@ class GameCore {
             ctrl.pauseFeature.show();
         }
         
-        // Create the modal
+        // Create the modal using CSS classes from pause-modal.scss
         const modal = document.createElement('div');
         modal.id = 'pauseModal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #000;
-            border: 1px solid #222;
-            border-radius: 12px;
-            padding: 24px;
-            z-index: 10000;
-            min-width: 300px;
-            box-shadow: none;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        `;
         
         modal.innerHTML = `
-            <h2 style="margin: 0 0 16px 0; color: #fff; text-align: center; font-size: 22px;">
-                Pause Menu
-            </h2>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button id="pause-toggle-score" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    background: #111;
-                    border: 1px solid #333;
-                    color: #fff;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Toggle Score</button>
-                
-                <button id="pause-save-score" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    background: #111;
-                    border: 1px solid #333;
-                    color: #fff;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Save Score</button>
-                
-                <button id="pause-skip-level" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    background: #111;
-                    border: 1px solid #333;
-                    color: #fff;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Skip Level</button>
-                
-                <button id="pause-toggle-leaderboard" class="pause-menu-btn" style="
-                    padding: 12px 16px;
-                    background: #111;
-                    border: 1px solid #333;
-                    color: #fff;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                ">Toggle Leaderboard</button>
-                
-                <button id="pause-resume" class="pause-menu-btn primary" style="
-                    padding: 12px 16px;
-                    background: #fff;
-                    border: 1px solid #ddd;
-                    color: #000;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    font-weight: 700;
-                    cursor: pointer;
-                    transition: all 0.15s;
-                    margin-top: 8px;
-                ">Resume</button>
+            <div class="pause-modal-content">
+                <h2 class="pause-modal-header">Pause Menu</h2>
+                <div class="pause-modal-buttons">
+                    <button id="pause-toggle-score" class="pause-menu-btn">Toggle Score</button>
+                    <button id="pause-save-score" class="pause-menu-btn">Save Score</button>
+                    <button id="pause-skip-level" class="pause-menu-btn">Exit Level</button>
+                    <button id="pause-toggle-leaderboard" class="pause-menu-btn">Toggle Leaderboard</button>
+                    <button id="pause-resume" class="pause-menu-btn primary">Resume</button>
+                </div>
             </div>
         `;
-        
-        // Add hover effects via JavaScript
-        setTimeout(() => {
-            const buttons = modal.querySelectorAll('.pause-menu-btn');
-            buttons.forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    btn.style.transform = 'translateY(-2px)';
-                    btn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.35)';
-                });
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.transform = 'translateY(0)';
-                    btn.style.boxShadow = 'none';
-                });
-            });
-        }, 0);
         
         // Add to document
         document.body.appendChild(modal);
@@ -334,7 +240,9 @@ class GameCore {
     /**
      * Handle Toggle Score option - shows/hides the score counter
      */
-    _handleToggleScore() {
+    async _handleToggleScore() {
+        console.log('Game: _handleToggleScore called');
+        
         // Close modal first
         const modal = document.getElementById('pauseModal');
         if (modal) {
@@ -357,42 +265,27 @@ class GameCore {
             }
         }
         
-        // If scoreFeature exists on the active control, delegate toggling to it.
-        // If a mini-game has set activeGameControl and it lacks the feature, fall
-        // back to the primary gameControl (which is where we originally attached
-        // the ScoreFeature during initialization).
-        let scoreCtrl = this.getActiveControl();
-        if ((!scoreCtrl || !scoreCtrl.scoreFeature) && this.gameControl && this.gameControl.scoreFeature) {
-            // debug info: active control didn't have feature, using root
-            console.debug('Active control missing scoreFeature – using root gameControl');
-            scoreCtrl = this.gameControl;
-        }
-
-        if (scoreCtrl && scoreCtrl.scoreFeature) {
-            // prefer feature method, fallback to direct DOM toggle for safety
-            if (typeof scoreCtrl.scoreFeature.toggleScoreDisplay === 'function') {
-                scoreCtrl.scoreFeature.toggleScoreDisplay();
+        // Access scoreManager from GameEnv (proper OOP) - gameEnv is on currentLevel
+        const gameEnv = ctrl?.currentLevel?.gameEnv;
+        console.log('Game: gameEnv exists?', !!gameEnv);
+        console.log('Game: scoreManager exists?', !!gameEnv?.scoreManager);
+        
+        if (gameEnv) {
+            // Auto-initialize scoreManager if not already initialized
+            if (!gameEnv.scoreManager) {
+                console.log('Game: Initializing scoreManager...');
+                await gameEnv.initScoreManager();
+                console.log('Game: After init, scoreManager exists?', !!gameEnv.scoreManager);
+            }
+            
+            if (gameEnv.scoreManager) {
+                console.log('Game: Calling toggleScoreDisplay...');
+                gameEnv.scoreManager.toggleScoreDisplay();
             } else {
-                const scoreCounter = document.querySelector('.pause-score-counter');
-                if (scoreCounter) {
-                    const isVisible = scoreCounter.style.display !== 'none';
-                    scoreCounter.style.display = isVisible ? 'none' : 'block';
-                }
+                console.error('Game: Failed to initialize scoreManager');
             }
         } else {
-            // if no feature yet, attempt to load it right now and toggle afterwards
-            console.warn('ScoreFeature missing; attempting to lazy‐load');
-            import('../scorefeature.js')
-                .then(scoreMod => {
-                    const ScoreFeature = scoreMod.default;
-                    const pauseMenuObj = { gameControl: this.gameControl, container: null, options: {} };
-                    this.gameControl.scoreFeature = new ScoreFeature(pauseMenuObj);
-                    // call toggle recursively now that it's available
-                    if (this.gameControl.scoreFeature && typeof this.gameControl.scoreFeature.toggleScoreDisplay === 'function') {
-                        this.gameControl.scoreFeature.toggleScoreDisplay();
-                    }
-                })
-                .catch(err => console.error('Lazy load of ScoreFeature failed:', err));
+            console.error('Game: gameEnv not found on active control');
         }
     }
 
@@ -422,24 +315,37 @@ class GameCore {
             }
         }
         
-        // If scoreFeature exists on the active control, save the score
-        const scoreCtrl = this.getActiveControl();
-        if (scoreCtrl && scoreCtrl.scoreFeature) {
-            try {
-                const buttonEl = document.createElement('button');
-                await scoreCtrl.scoreFeature.saveScore(buttonEl);
-            } catch (error) {
-                console.error('Failed to save score:', error);
-                alert('Failed to save score. Please try again.');
+        // Access scoreManager from GameEnv (proper OOP) - gameEnv is on currentLevel
+        const gameEnv = ctrl?.currentLevel?.gameEnv;
+        if (gameEnv) {
+            // Auto-initialize scoreManager if not already initialized
+            if (!gameEnv.scoreManager) {
+                await gameEnv.initScoreManager();
             }
-        } else {
-            console.warn('ScoreFeature not initialized on active control');
-            alert('Score feature not available');
+            
+            if (gameEnv.scoreManager) {
+                try {
+                    const buttonEl = document.createElement('button');
+                    await gameEnv.scoreManager.saveScore(buttonEl);
+                    
+                    // Refresh leaderboard to show the new score
+                    if (this.leaderboardInstance && typeof this.leaderboardInstance.fetchLeaderboard === 'function') {
+                        console.log('Game: Refreshing leaderboard after save');
+                        await this.leaderboardInstance.fetchLeaderboard();
+                    }
+                } catch (error) {
+                    console.error('Failed to save score:', error);
+                    alert('Failed to save score. Please try again.');
+                }
+            } else {
+                console.error('Failed to initialize scoreManager');
+                alert('Score feature not available');
+            }
         }
     }
 
     /**
-     * Handle Skip Level option - skips to the next level
+     * Handle Exit Level option - skips to the next level
      */
     _handleSkipLevel() {
         // Remove modal first
@@ -695,7 +601,7 @@ class GameCore {
     }
 
     /**
-     * Creates the pause control buttons (Save Score, Skip Level, Toggle Leaderboard).
+     * Creates the pause control buttons (Save Score, Exit Level, Toggle Leaderboard).
      * 
      * These buttons appear by default in the top-left corner.
      * Pause/Resume functionality is handled by the Escape key.
@@ -714,7 +620,7 @@ class GameCore {
      * 
      * The button bar will appear in the top-left corner with:
      * - Save Score button: Saves current score to backend
-     * - Skip Level button: Advances to the next level
+     * - Exit Level button: Advances to the next level
      * - Toggle Leaderboard button: Shows/hides the leaderboard
      * 
     /**

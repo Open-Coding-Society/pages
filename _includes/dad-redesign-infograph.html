@@ -1,0 +1,129 @@
+{% assign data = site.data.dad_redesign_infograph %}
+
+<div class="dad-infograph">
+  <!-- Header Section -->
+  <div class="dad-header">
+    <div class="dad-badge">Capstone Website Redesign</div>
+    <h1 class="dad-title">{{ data.Title }}</h1>
+    <div class="dad-team-badge">TheSprinters — Akhil, Neil, Moiz</div>
+    <p class="dad-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- About the Organization -->
+  <div class="dad-about-org">
+    <div class="dad-about-org-grid">
+      <div class="dad-about-org-text">
+        <h2 class="dad-about-org-title">About the Organization</h2>
+        <p class="dad-about-org-body"><strong>Doing Exceptional Deeds (D.A.D.)</strong> is a 501(c)(3) nonprofit organization based in San Marcos, CA. Their mission is to <strong>uplift individuals and strengthen communities across generations</strong> through character-first programs that build confidence, character, accountability, and purpose.</p>
+        <p class="dad-about-org-body">D.A.D. serves youth, young adults, student-athletes, and seniors through thoughtfully designed initiatives including youth athletics, mentorship, life-skills development, and community engagement. They also offer a <strong>community-based Student Success Advisory model</strong> for students from middle school through high school.</p>
+        <div class="dad-about-org-details">
+          <span class="dad-about-org-detail">📍 420 Station Road, San Marcos, CA 92078</span>
+          <span class="dad-about-org-detail">🏛 501(c)(3) Nonprofit — EIN #3302138</span>
+        </div>
+        <a href="https://www.doingexceptionaldeeds.org/" class="dad-about-org-link" target="_blank" rel="noopener noreferrer">Visit D.A.D. Website ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="dad-card">
+    <div class="dad-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="dad-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dad-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dad-image">
+          <div class="dad-overlay">
+            <span>View Details</span>
+          </div>
+        </a>
+        <div class="dad-status {% if topic.status == 'Main Feature' %}dad-status-main{% endif %}">{{ topic.status }}</div>
+        <div class="dad-team">
+          <span class="dad-team-label">Work Split</span>
+          {% for member in topic.team %}
+          <span class="dad-team-member">{{ member }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="dad-content">
+        <h2 class="dad-project-title">{{ topic.title }}</h2>
+        <p class="dad-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="dad-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="dad-keypoint">
+            <span class="dad-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="dad-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="dad-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="dad-details">
+        <h3 class="dad-section-title">About</h3>
+        <p class="dad-about">{{ topic.description }}</p>
+
+        <h3 class="dad-section-title">Impact</h3>
+        <div class="dad-impact-list">
+          {% for item in topic.impact %}
+          <div class="dad-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dad-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Team Distribution -->
+  <div class="dad-additional">
+    <h2 class="dad-additional-title">Team Work Distribution</h2>
+    <p class="dad-additional-desc">Every member rotates across different responsibilities — design, frontend, backend, content, and integration — ensuring well-rounded experience and balanced workload.</p>
+    <div class="dad-distribution">
+      <div class="dad-member-card">
+        <div class="dad-member-name">Akhil</div>
+        <div class="dad-member-roles">
+          <span class="dad-role-tag">UI/UX Design</span>
+          <span class="dad-role-tag">Content & Storytelling</span>
+          <span class="dad-role-tag">Registration Backend</span>
+        </div>
+      </div>
+      <div class="dad-member-card">
+        <div class="dad-member-name">Neil</div>
+        <div class="dad-member-roles">
+          <span class="dad-role-tag">Full-Stack Build</span>
+          <span class="dad-role-tag">Payment Integration</span>
+          <span class="dad-role-tag">Gallery & Templates</span>
+        </div>
+      </div>
+      <div class="dad-member-card">
+        <div class="dad-member-name">Moiz</div>
+        <div class="dad-member-roles">
+          <span class="dad-role-tag">Content Strategy & SEO</span>
+          <span class="dad-role-tag">UI Design & Frontend</span>
+          <span class="dad-role-tag">Content Gathering</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Website Link -->
+  <div class="dad-website-link">
+    <span class="dad-website-label">Official Website</span>
+    <a href="https://www.doingexceptionaldeeds.org/" class="dad-website-btn" target="_blank" rel="noopener noreferrer">
+      Visit doingexceptionaldeeds.org ↗
+    </a>
+  </div>
+</div>

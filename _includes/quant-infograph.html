@@ -1,0 +1,74 @@
+{% assign data = site.data.quant_infograph %}
+
+<div class="quant-infograph">
+
+  <!-- Header Section -->
+  <div class="quant-header">
+    <div class="quant-badge">Design-Based Research Capstone</div>
+    <h1 class="quant-title">{{ data.Title }}</h1>
+    <p class="quant-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="quant-card">
+    <div class="quant-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="quant-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="quant-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="quant-image">
+          <div class="quant-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+
+        <div class="quant-status">{{ topic.status }}</div>
+
+        <div class="quant-team">
+          <span class="quant-team-label">Project Leads</span>
+          <span class="quant-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="quant-content">
+        <h2 class="quant-project-title">{{ topic.title }}</h2>
+        <p class="quant-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="quant-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="quant-keypoint">
+            <span class="quant-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="quant-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="quant-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="quant-details">
+        <h3 class="quant-section-title">About</h3>
+        <p class="quant-about">{{ topic.description }}</p>
+
+        <h3 class="quant-section-title">Impact</h3>
+        <div class="quant-impact-list">
+          {% for item in topic.impact %}
+          <div class="quant-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="quant-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+</div>

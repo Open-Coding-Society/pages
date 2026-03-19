@@ -92,11 +92,33 @@
       </div>
     </div>
 
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Member Analytics Section (2 columns) -->
-      <div class="lg:col-span-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
+    <!-- Dashboard Summary Row -->
+    <div class="grid grid-cols-1 gap-6">
+      <!-- Quick Stats Sidebar -->
+      <div class="space-y-6">
+        <!-- Group Stats Card -->
+        <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4">
+          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Group Stats</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">Total Members</span>
+              <span id="statTotalMembers" class="text-white font-semibold">0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">Total Messages</span>
+              <span id="statTotalMessages" class="text-white font-semibold">0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">Files Shared</span>
+              <span id="statTotalFiles" class="text-white font-semibold">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Analytics Section -->
+    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
         <div class="p-4 border-b border-neutral-700">
           <h2 class="text-lg font-semibold text-white flex items-center gap-2">
             <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,118 +134,40 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="text-left text-gray-400 border-b border-neutral-700">
-                  <th class="pb-3 font-medium">Member</th>
-                  <th class="pb-3 font-medium">Messages</th>
-                  <th class="pb-3 font-medium">Files Shared</th>
-                  <th class="pb-3 font-medium">Last Active</th>
-                  <th class="pb-3 font-medium">Status</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Member</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Messages</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Images</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Time Spent</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Lessons Completed</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Code Runs</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Interaction %</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Scroll Depth %</th>
                 </tr>
               </thead>
               <tbody id="memberAnalyticsBody" class="text-gray-300">
-                <!-- Dummy data - will be populated dynamically -->
-                <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
-                  <td class="py-3">
-                    <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-medium">JD</div>
-                      <span>John Doe</span>
-                    </div>
+                <!-- Will be populated dynamically -->
+                <tr>
+                  <td colspan="8" class="py-8 text-center text-gray-400">
+                    No members in this group
                   </td>
-                  <td class="py-3">47</td>
-                  <td class="py-3">12</td>
-                  <td class="py-3">2 hours ago</td>
-                  <td class="py-3"><span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">Active</span></td>
-                </tr>
-                <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
-                  <td class="py-3">
-                    <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-medium">JS</div>
-                      <span>Jane Smith</span>
-                    </div>
-                  </td>
-                  <td class="py-3">32</td>
-                  <td class="py-3">8</td>
-                  <td class="py-3">5 hours ago</td>
-                  <td class="py-3"><span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">Active</span></td>
-                </tr>
-                <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
-                  <td class="py-3">
-                    <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white text-xs font-medium">MJ</div>
-                      <span>Mike Johnson</span>
-                    </div>
-                  </td>
-                  <td class="py-3">18</td>
-                  <td class="py-3">3</td>
-                  <td class="py-3">1 day ago</td>
-                  <td class="py-3"><span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs">Away</span></td>
-                </tr>
-                <tr class="hover:bg-neutral-700/30">
-                  <td class="py-3">
-                    <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center text-white text-xs font-medium">EW</div>
-                      <span>Emily Wilson</span>
-                    </div>
-                  </td>
-                  <td class="py-3">5</td>
-                  <td class="py-3">1</td>
-                  <td class="py-3">3 days ago</td>
-                  <td class="py-3"><span class="px-2 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs">Inactive</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
 
-      <!-- Quick Stats Sidebar -->
-      <div class="space-y-6">
-        <!-- Group Stats Card -->
-        <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Group Stats</h3>
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-400">Total Members</span>
-              <span id="statTotalMembers" class="text-white font-semibold">4</span>
+          <div class="mt-4 flex flex-col gap-3 border-t border-neutral-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p id="memberAnalyticsPaginationInfo" class="text-sm text-gray-400">Showing 0-0 of 0</p>
+            <div class="flex items-center gap-2">
+              <button id="memberAnalyticsPrevButton" onclick="previousMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Previous
+              </button>
+              <button id="memberAnalyticsNextButton" onclick="nextMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Next
+              </button>
             </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-400">Total Messages</span>
-              <span id="statTotalMessages" class="text-white font-semibold">102</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-400">Files Shared</span>
-              <span id="statTotalFiles" class="text-white font-semibold">24</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-400">Created</span>
-              <span id="statCreatedDate" class="text-white font-semibold">Jan 15, 2026</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Activity Chart Placeholder -->
-        <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Weekly Activity</h3>
-          <div class="h-32 flex items-end justify-between gap-1 px-2">
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 40%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 65%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 45%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 80%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 55%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 90%"></div>
-            <div class="flex-1 bg-indigo-600 rounded-t" style="height: 70%"></div>
-          </div>
-          <div class="flex justify-between text-xs text-gray-500 mt-2 px-1">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
           </div>
         </div>
       </div>
-    </div>
 
     <!-- Shared Files Section -->
     <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
@@ -249,59 +193,6 @@
       <div class="p-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="sharedFilesGrid">
           <!-- Populated by JavaScript -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Activity Timeline -->
-    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
-      <div class="p-4 border-b border-neutral-700">
-        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          Recent Activity
-        </h2>
-      </div>
-      
-      <div class="p-4">
-        <div class="space-y-4" id="activityTimeline">
-          <!-- Dummy activity items -->
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-medium">JD</div>
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-300 text-sm"><span class="text-white font-medium">John Doe</span> shared a file <span class="text-indigo-400">Project_Report.pdf</span></p>
-              <p class="text-gray-500 text-xs mt-1">2 hours ago</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-medium">JS</div>
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-300 text-sm"><span class="text-white font-medium">Jane Smith</span> sent a message in the group chat</p>
-              <p class="text-gray-500 text-xs mt-1">5 hours ago</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-300 text-sm"><span class="text-white font-medium">Emily Wilson</span> was added to the group</p>
-              <p class="text-gray-500 text-xs mt-1">1 day ago</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white text-xs font-medium">MJ</div>
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-300 text-sm"><span class="text-white font-medium">Mike Johnson</span> shared a file <span class="text-indigo-400">main.py</span></p>
-              <p class="text-gray-500 text-xs mt-1">2 days ago</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -538,6 +429,9 @@
   }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
   // Calendar state
@@ -549,18 +443,18 @@
   const dashboardGroupId = "{{ include.groupId | default: '' }}";
   let activeChatGroupId = dashboardGroupId ? Number(dashboardGroupId) : null;
   let activeChatGroupName = '';
-  let chatPollTimer = null;
+  let stompClient = null;
   let currentUser = null;
   let currentUserDisplayName = 'You';
   let pendingChatImageBase64 = null;
   let pendingChatImageMime = 'image/png';
+  let renderedChatMessageKeys = new Set();
   
   // Initialize calendar
   document.addEventListener('DOMContentLoaded', () => {
     renderCalendar();
     updateTodayEvents();
     initializeChatUser();
-    fetchDashboardSharedFiles();
   });
 
   async function initializeChatUser() {
@@ -846,10 +740,81 @@
     }
   };
 
+  function getChatMessageKey(msg) {
+    return JSON.stringify([
+      msg?.name || '',
+      msg?.date || '',
+      msg?.message || '',
+      msg?.image || ''
+    ]);
+  }
+
+  function getChatImageSrc(image) {
+    if (!image) return null;
+    if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
+    return `data:image/png;base64,${image}`;
+  }
+
+  function appendSingleMessage(msg) {
+    const chatMessages = document.getElementById('chatMessages');
+    let emptyState = document.getElementById('chatEmptyState');
+    const messageKey = getChatMessageKey(msg);
+
+    if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
+      return;
+    }
+
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.id = 'chatEmptyState';
+      emptyState.className = 'text-center text-gray-500 text-sm py-6';
+      emptyState.textContent = 'No messages yet.';
+    }
+
+    emptyState.classList.add('hidden');
+
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'flex items-baseline gap-2 mb-1';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'text-white font-semibold text-sm';
+    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'text-gray-500 text-xs';
+    timeEl.textContent = formatTimestamp(msg.date);
+
+    header.appendChild(nameEl);
+    header.appendChild(timeEl);
+    wrapper.appendChild(header);
+
+    if (msg.message) {
+      const textEl = document.createElement('p');
+      textEl.className = 'text-gray-200 text-sm';
+      textEl.textContent = msg.message;
+      wrapper.appendChild(textEl);
+    }
+
+    if (msg.image) {
+      const img = document.createElement('img');
+      img.src = getChatImageSrc(msg.image);
+      img.alt = 'Shared image';
+      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+      wrapper.appendChild(img);
+    }
+
+    chatMessages.appendChild(wrapper);
+    renderedChatMessageKeys.add(messageKey);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
   function renderChatMessages(messages) {
     const chatMessages = document.getElementById('chatMessages');
     let emptyState = document.getElementById('chatEmptyState');
     chatMessages.innerHTML = '';
+    renderedChatMessageKeys = new Set();
 
     if (!emptyState) {
       emptyState = document.createElement('div');
@@ -864,44 +829,7 @@
       return;
     }
 
-    emptyState.classList.add('hidden');
-    messages.forEach(msg => {
-      const wrapper = document.createElement('div');
-
-      const header = document.createElement('div');
-      header.className = 'flex items-baseline gap-2 mb-1';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'text-white font-semibold text-sm';
-      nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-      const timeEl = document.createElement('span');
-      timeEl.className = 'text-gray-500 text-xs';
-      timeEl.textContent = formatTimestamp(msg.date);
-
-      header.appendChild(nameEl);
-      header.appendChild(timeEl);
-      wrapper.appendChild(header);
-
-      if (msg.message) {
-        const textEl = document.createElement('p');
-        textEl.className = 'text-gray-200 text-sm';
-        textEl.textContent = msg.message;
-        wrapper.appendChild(textEl);
-      }
-
-      if (msg.image) {
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64,${msg.image}`;
-        img.alt = 'Shared image';
-        img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-        wrapper.appendChild(img);
-      }
-
-      chatMessages.appendChild(wrapper);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    messages.forEach(appendSingleMessage);
   }
 
   async function fetchChatMessages() {
@@ -956,14 +884,42 @@
   };
 
   function startChatPolling() {
-    if (chatPollTimer) clearInterval(chatPollTimer);
-    chatPollTimer = setInterval(fetchChatMessages, 4000);
+    if (!activeChatGroupId) return;
+
+    if (stompClient) {
+      stopChatPolling();
+    }
+
+    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+      console.error('SockJS/STOMP dependencies are not available');
+      return;
+    }
+
+    const socket = new SockJS(`${javaURI}/ws-chat`);
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+
+    stompClient.connect({}, () => {
+      if (!stompClient || !activeChatGroupId) return;
+
+      stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (message) => {
+        try {
+          const payload = JSON.parse(message.body);
+          appendSingleMessage(payload);
+        } catch (err) {
+          console.error('Failed to parse incoming chat message', err);
+        }
+      });
+    }, (err) => {
+      console.error('WebSocket connection failed', err);
+    });
   }
 
   function stopChatPolling() {
-    if (chatPollTimer) {
-      clearInterval(chatPollTimer);
-      chatPollTimer = null;
+    if (stompClient) {
+      const clientToDisconnect = stompClient;
+      stompClient = null;
+      clientToDisconnect.disconnect(() => {});
     }
   }
 
@@ -1267,6 +1223,7 @@
   window.refreshDashboard = refreshDashboard;
   window.downloadBase64File = downloadBase64File;
   window.handleSharedFileUpload = handleSharedFileUpload;
+  window.fetchDashboardSharedFiles = fetchDashboardSharedFiles;
 
   document.addEventListener('paste', function(event) {
     if (document.getElementById('chatModal').classList.contains('hidden')) return;
@@ -1279,20 +1236,20 @@
   // DASHBOARD SHARED FILES
   // ================================
   async function fetchDashboardSharedFiles() {
+    const groupId = window.currentDashboardGroupId || dashboardGroupId;
+    if (!groupId) {
+      console.warn('No group ID available for fetching shared files');
+      return;
+    }
+    
     try {
-      const groupName = document.getElementById('dashboardGroupName').textContent || '';
-      if (!groupName) {
-        console.warn('Group name not found for shared files fetch');
-        return;
-      }
-
-      const groupId = await resolveActiveGroupId(groupName);
       const res = await fetch(`${javaURI}/api/groups/chat/${groupId}/files`, fetchOptions);
       if (!res.ok) throw new Error('Failed to load shared files');
       const files = await res.json();
       renderDashboardSharedFiles(files);
     } catch (err) {
       console.error('Shared files fetch failed', err);
+      renderDashboardSharedFiles([]);
     }
   }
 
@@ -1359,15 +1316,13 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    try {
-      const groupName = document.getElementById('dashboardGroupName').textContent || '';
-      if (!groupName) {
-        alert('Error: Group name not found');
-        event.target.value = '';
-        return;
-      }
+    const groupId = window.currentDashboardGroupId || dashboardGroupId;
+    if (!groupId) {
+      alert('Group ID not available. Please reload the page.');
+      return;
+    }
 
-      const groupId = await resolveActiveGroupId(groupName);
+    try {
       const base64Data = await fileToBase64(file);
 
       const res = await fetch(`${javaURI}/api/groups/chat/${groupId}/files`, {
