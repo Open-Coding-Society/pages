@@ -29,6 +29,12 @@ active_tab: analytics
                         Grade Predictor
                     </a>
                 </li>
+                <li class="me-2">
+                    <a href="#" id="tab-skill-passport"
+                        class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:border-neutral-300 hover:text-neutral-300">
+                        Skill Passport
+                    </a>
+                </li>
             </ul>
             <!-- sliding underline indicator -->
             <div id="tab-underline"
@@ -262,6 +268,51 @@ score += gists * 0.5
                     </details>
                 </div>
             </div>
+
+            <div id="tab-content-skill-passport" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-100">Skill Passport</h2>
+                    <p class="text-sm text-neutral-400 mt-1">Your skill levels and growth across projects</p>
+                </div>
+            
+                <!-- empty state -->
+                <div id="passport-empty" class="hidden text-center py-16 text-neutral-400">
+                    <p class="text-lg">No snapshots yet.</p>
+                    <p class="text-sm mt-1">Go to your profile page and log your skills after completing a project.</p>
+                </div>
+            
+                <!-- loading state -->
+                <div id="passport-loading" class="flex items-center justify-center min-h-[400px]">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p class="text-neutral-300">Loading your passport...</p>
+                    </div>
+                </div>
+            
+                <!-- charts -->
+                <div id="passport-charts" class="hidden">
+                    <!-- current skills -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+                            <h3 class="text-sm font-medium text-neutral-400 uppercase mb-4">Current Skills</h3>
+                            <div id="chart-radar"></div>
+                        </div>
+            
+                        <!-- latest snapshot summary -->
+                        <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+                            <h3 class="text-sm font-medium text-neutral-400 uppercase mb-4">Latest Snapshot</h3>
+                            <div id="passport-latest" class="space-y-3"></div>
+                        </div>
+                    </div>
+            
+                    <!-- growth over time -->
+                    <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-neutral-400 uppercase mb-4">Growth Over Time</h3>
+                        <div id="chart-line"></div>
+                    </div>
+                </div>
+            </div>                
+
         </div>
     </div>
 </div>
@@ -559,7 +610,89 @@ score += gists * 0.5
         if (commitCount >= 5) return "75% (C)";
         return "55% (F)";
     }
+    async function loadSkillPassport() {
+        const loading = document.getElementById('passport-loading');
+        const empty = document.getElementById('passport-empty');
+        const charts = document.getElementById('passport-charts');
 
+        try {
+            const res = await fetch(`${pythonURI}/api/user/skill-passport`, fetchOptions);
+            if (!res.ok) throw new Error('Failed to fetch passport');
+            const data = await res.json();
+
+            const history = data.history || [];
+
+            loading.classList.add('hidden');
+
+            if (history.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            charts.classList.remove('hidden');
+
+            const latest = data.current_skills;
+            const skills = ['coding_ability', 'collaboration', 'problem_solving', 'initiative'];
+            const skillLabels = ['Coding Ability', 'Collaboration', 'Problem Solving', 'Initiative'];
+
+            // latest snapshot summary cards
+            const latestEl = document.getElementById('passport-latest');
+            latestEl.innerHTML = skills.map((s, i) => `
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-neutral-300">${skillLabels[i]}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-32 h-2 bg-neutral-700 rounded-full overflow-hidden">
+                            <div class="h-2 bg-indigo-500 rounded-full" style="width: ${(latest[s] / 6) * 100}%"></div>
+                        </div>
+                        <span class="text-sm font-semibold text-indigo-400">${latest[s]}/6</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // radar chart - current skills
+            const radarOptions = {
+                series: [{
+                    name: 'Current Skills',
+                    data: skills.map(s => latest[s])
+                }],
+                chart: { type: 'radar', height: 300, toolbar: { show: false }, background: 'transparent' },
+                colors: ['#6366f1'],
+                xaxis: { categories: skillLabels },
+                yaxis: { min: 0, max: 6, tickAmount: 6, show: false },
+                fill: { opacity: 0.2 },
+                stroke: { width: 2 },
+                markers: { size: 4 },
+                theme: { mode: 'dark' },
+                plotOptions: { radar: { polygons: { strokeColors: '#404040', fill: { colors: ['#262626', '#2a2a2a'] } } } }
+            };
+            new ApexCharts(document.getElementById('chart-radar'), radarOptions).render();
+
+            // line chart - growth over time
+            const projects = history.map(s => s.project_name);
+            const lineOptions = {
+                series: skills.map((s, i) => ({
+                    name: skillLabels[i],
+                    data: history.map(snap => snap[s])
+                })),
+                chart: { type: 'line', height: 320, toolbar: { show: false }, background: 'transparent' },
+                colors: ['#6366f1', '#22d3ee', '#f59e0b', '#10b981'],
+                xaxis: { categories: projects, labels: { style: { colors: '#9ca3af' } } },
+                yaxis: { min: 0, max: 6, tickAmount: 6, labels: { style: { colors: '#9ca3af' } } },
+                stroke: { width: 2, curve: 'smooth' },
+                markers: { size: 4 },
+                legend: { labels: { colors: '#d1d5db' } },
+                grid: { borderColor: '#374151' },
+                theme: { mode: 'dark' },
+                tooltip: { theme: 'dark' }
+            };
+            new ApexCharts(document.getElementById('chart-line'), lineOptions).render();
+
+        } catch (error) {
+            console.error('Passport error:', error);
+            loading.classList.add('hidden');
+            empty.classList.remove('hidden');
+        }
+    }
     // Modal code
     const dataModal = document.getElementById("dataModal");
     const modalData = document.getElementById("modalData");
@@ -682,6 +815,9 @@ score += gists * 0.5
                     await window.OCSAnalytics.loadAnalyticsSummary();
                 }
             }
+            if (targetId === "tab-content-skill-passport") {
+                await loadSkillPassport();
+}
         });
     });
 
