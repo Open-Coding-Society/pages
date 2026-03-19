@@ -9,64 +9,12 @@
 @import "lessonbase";
 @import "footer";
 
-// Hunger Heroes Capstone
-@import "capstone/hunger-heroes-infograph";
-
-// Wayfinding Pages Capstone
-@import "capstone/wayfinding-pages-infograph";
-
-// Slack Messaging Platform Capstone
-@import "capstone/slack-messaging-infograph";
-
-// Doing Exceptional Deeds Capstone
-@import "capstone/doing-exceptional-deeds";
-
-// Granolaa Capstone
-@import "capstone/granolaa-infograph";
-
-// Bud-E Capstone
-@import "capstone/bud-e-infograph";
-
-// NodCursor Capstone
-@import "capstone/nodcursor-infograph";
-
-// Educators Capstone
-@import "capstone/educators-infograph";
-// HawkHub Capstone
-@import "capstone/hawkhub-infograph";
-
-// College Bound Capstone
-@import "capstone/college-bound-infograph";
-
-// PYBL Capstone
-@import "capstone/pybl-infograph";
-
-// Poway NEC Capstone
-@import "capstone/powaynec-infograph";
-// DeFlock SD Capstone
-@import "capstone/deflock-infograph";
+// Capstone Infograph Styles (centralized)
+// All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
+@import "capstone/infograph";
 
 // RPN Calculator Lesson Interactives
 @import "nighthawk/rpn-interactive";
 
-// PUSD Foundation Capstone
-@import "capstone/pusd-infograph";
-
-// UESL Foundation Capstone
-@import "capstone/uesl-infograph";
-
-// DSA Website Redesign
-@import "capstone/dsa-redesign-infograph";
-
-// Soroptimist International of Poway Site Analysis
-@import "capstone/sip-infograph";
-
-@import "capstone/sentri-capstone";
-// Quant Bot
-@import "capstone/quant-infograph";
-// D.A.D. Website Redesign
-@import "capstone/dad-redesign-infograph";
-
-// Greppers Capstone
-@import "capstone/greppers-infograph";
-@import "capstone/greppers1-infograph";
+// FRQ Interactive Lesson Styles (popcorn hacks, drag-drop, visualizer, quiz, game)
+@import "nighthawk/frq-interactive";

@@ -70,21 +70,6 @@ class GameCore {
         this._adjustGameContainerPosition();
     }
 
-    // Try to dynamically load Scoreboard (for adventure game stats syncing)
-    import('../../adventureGame/Scoreboard.js')
-        .then(mod => {
-            try {
-                const Scoreboard = mod.default || mod.Scoreboard;
-                // Set gameControl reference so Scoreboard can update stats
-                Scoreboard.gameControl = this.gameControl;
-                console.log('Scoreboard gameControl reference set');
-            }
-            catch (e) { console.debug('Scoreboard init (optional):', e); }
-        })
-        .catch(() => {
-            // no-op: Scoreboard is optional
-        });
-
     // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
     // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
     }
@@ -178,13 +163,14 @@ class GameCore {
                 const pauseMenuInstance = new PauseMenu(this.gameControl, {});
                 this.gameControl.pauseFeature = pauseMenuInstance;
 
-                // Also initialize ScoreFeature using the same pause menu instance.
-                import('../scorefeature.js').then(scoreMod => {
-                    const ScoreFeature = scoreMod.default;
-                    this.gameControl.scoreFeature = new ScoreFeature(pauseMenuInstance);
-                }).catch(err => {
-                    console.warn('Failed to load ScoreFeature:', err);
-                });
+                // Initialize ScoreManager through GameEnv (proper OOP)
+                if (this.gameControl.gameEnv) {
+                    this.gameControl.gameEnv.initScoreManager().then(() => {
+                        console.log('ScoreManager initialized successfully');
+                    }).catch(err => {
+                        console.warn('Failed to initialize ScoreManager:', err);
+                    });
+                }
 
             }).catch(err => {
                 console.warn('Failed to load PauseMenu:', err);
@@ -254,7 +240,9 @@ class GameCore {
     /**
      * Handle Toggle Score option - shows/hides the score counter
      */
-    _handleToggleScore() {
+    async _handleToggleScore() {
+        console.log('Game: _handleToggleScore called');
+        
         // Close modal first
         const modal = document.getElementById('pauseModal');
         if (modal) {
@@ -277,42 +265,27 @@ class GameCore {
             }
         }
         
-        // If scoreFeature exists on the active control, delegate toggling to it.
-        // If a mini-game has set activeGameControl and it lacks the feature, fall
-        // back to the primary gameControl (which is where we originally attached
-        // the ScoreFeature during initialization).
-        let scoreCtrl = this.getActiveControl();
-        if ((!scoreCtrl || !scoreCtrl.scoreFeature) && this.gameControl && this.gameControl.scoreFeature) {
-            // debug info: active control didn't have feature, using root
-            console.debug('Active control missing scoreFeature – using root gameControl');
-            scoreCtrl = this.gameControl;
-        }
-
-        if (scoreCtrl && scoreCtrl.scoreFeature) {
-            // prefer feature method, fallback to direct DOM toggle for safety
-            if (typeof scoreCtrl.scoreFeature.toggleScoreDisplay === 'function') {
-                scoreCtrl.scoreFeature.toggleScoreDisplay();
+        // Access scoreManager from GameEnv (proper OOP) - gameEnv is on currentLevel
+        const gameEnv = ctrl?.currentLevel?.gameEnv;
+        console.log('Game: gameEnv exists?', !!gameEnv);
+        console.log('Game: scoreManager exists?', !!gameEnv?.scoreManager);
+        
+        if (gameEnv) {
+            // Auto-initialize scoreManager if not already initialized
+            if (!gameEnv.scoreManager) {
+                console.log('Game: Initializing scoreManager...');
+                await gameEnv.initScoreManager();
+                console.log('Game: After init, scoreManager exists?', !!gameEnv.scoreManager);
+            }
+            
+            if (gameEnv.scoreManager) {
+                console.log('Game: Calling toggleScoreDisplay...');
+                gameEnv.scoreManager.toggleScoreDisplay();
             } else {
-                const scoreCounter = document.querySelector('.pause-score-counter');
-                if (scoreCounter) {
-                    const isVisible = scoreCounter.style.display !== 'none';
-                    scoreCounter.style.display = isVisible ? 'none' : 'block';
-                }
+                console.error('Game: Failed to initialize scoreManager');
             }
         } else {
-            // if no feature yet, attempt to load it right now and toggle afterwards
-            console.warn('ScoreFeature missing; attempting to lazy‐load');
-            import('../scorefeature.js')
-                .then(scoreMod => {
-                    const ScoreFeature = scoreMod.default;
-                    const pauseMenuObj = { gameControl: this.gameControl, container: null, options: {} };
-                    this.gameControl.scoreFeature = new ScoreFeature(pauseMenuObj);
-                    // call toggle recursively now that it's available
-                    if (this.gameControl.scoreFeature && typeof this.gameControl.scoreFeature.toggleScoreDisplay === 'function') {
-                        this.gameControl.scoreFeature.toggleScoreDisplay();
-                    }
-                })
-                .catch(err => console.error('Lazy load of ScoreFeature failed:', err));
+            console.error('Game: gameEnv not found on active control');
         }
     }
 
@@ -342,19 +315,32 @@ class GameCore {
             }
         }
         
-        // If scoreFeature exists on the active control, save the score
-        const scoreCtrl = this.getActiveControl();
-        if (scoreCtrl && scoreCtrl.scoreFeature) {
-            try {
-                const buttonEl = document.createElement('button');
-                await scoreCtrl.scoreFeature.saveScore(buttonEl);
-            } catch (error) {
-                console.error('Failed to save score:', error);
-                alert('Failed to save score. Please try again.');
+        // Access scoreManager from GameEnv (proper OOP) - gameEnv is on currentLevel
+        const gameEnv = ctrl?.currentLevel?.gameEnv;
+        if (gameEnv) {
+            // Auto-initialize scoreManager if not already initialized
+            if (!gameEnv.scoreManager) {
+                await gameEnv.initScoreManager();
             }
-        } else {
-            console.warn('ScoreFeature not initialized on active control');
-            alert('Score feature not available');
+            
+            if (gameEnv.scoreManager) {
+                try {
+                    const buttonEl = document.createElement('button');
+                    await gameEnv.scoreManager.saveScore(buttonEl);
+                    
+                    // Refresh leaderboard to show the new score
+                    if (this.leaderboardInstance && typeof this.leaderboardInstance.fetchLeaderboard === 'function') {
+                        console.log('Game: Refreshing leaderboard after save');
+                        await this.leaderboardInstance.fetchLeaderboard();
+                    }
+                } catch (error) {
+                    console.error('Failed to save score:', error);
+                    alert('Failed to save score. Please try again.');
+                }
+            } else {
+                console.error('Failed to initialize scoreManager');
+                alert('Score feature not available');
+            }
         }
     }
 

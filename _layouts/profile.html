@@ -154,7 +154,6 @@ active_tab: profile
 </div>
 
 <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
     
     <div id="personaSelectionContainer">
         <p class="text-gray-400 text-center py-4">Loading personas...</p>
@@ -535,8 +534,7 @@ active_tab: profile
         
         container.innerHTML = `
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
-                <p class="text-gray-400">Select one persona from each category (${totalSelected}/4 selected)</p>
+                <h2 class="text-xl font-semibold text-gray-100">Persona Profile</h2>
                 <div class="mt-4 flex justify-center gap-2">
                     ${categoryOrder.map(cat => `
                         <div class="w-3 h-3 rounded-full ${selectedPersonas[cat] ? 'bg-indigo-500' : 'bg-gray-700'}"></div>
@@ -647,7 +645,117 @@ active_tab: profile
                         Change Personas
                     </button>
                 </div>
-                
+                <!-- Skill Snapshot Panel -->
+        <div id="skillSnapshotPanel" class="bg-neutral-800 border border-indigo-500/40 rounded-xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-100">Log Your Skills for This Project</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">This saves a snapshot to your Skill Passport</p>
+                </div>
+                <button 
+                    onclick="document.getElementById('skillSnapshotPanel').classList.toggle('hidden')"
+                    class="text-xs text-gray-500 hover:text-gray-300 transition">
+                    collapse
+                </button>
+            </div>
+        
+            <!-- Project Name -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Project Name</label>
+                <input 
+                    type="text" 
+                    id="snapshotProjectName"
+                    placeholder="e.g. Web App Sprint 1"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+            </div>
+            
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+    
+            <!-- Coding Ability -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Coding Ability</label>
+                    <span id="codingAbilityVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="codingAbility"
+                    oninput="document.getElementById('codingAbilityVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Beginner</span>
+                    <span>Expert</span>
+                </div>
+            </div>
+    
+            <!-- Collaboration -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Collaboration</label>
+                    <span id="collaborationVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="collaboration"
+                    oninput="document.getElementById('collaborationVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Solo</span>
+                    <span>Team player</span>
+                </div>
+            </div>
+    
+            <!-- Problem Solving -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Problem Solving</label>
+                    <span id="problemSolvingVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="problemSolving"
+                    oninput="document.getElementById('problemSolvingVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Developing</span>
+                    <span>Advanced</span>
+                </div>
+            </div>
+    
+            <!-- Initiative -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Initiative</label>
+                    <span id="initiativeVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="initiative"
+                    oninput="document.getElementById('initiativeVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Passive</span>
+                    <span>Self-starter</span>
+                </div>
+            </div>
+    
+        </div>
+    
+        <!-- Submit -->
+        <div class="flex items-center gap-4">
+            <button 
+                onclick="submitSkillSnapshot()"
+                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                Save Snapshot
+            </button>
+            <span id="snapshotStatus" class="text-sm text-gray-400"></span>
+        </div>
+    </div>
                 <!-- 2x2 Grid of Selected Personas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${categoryOrder.map(category => {
@@ -662,54 +770,19 @@ active_tab: profile
                         const empathyMap = persona.empathy_map || {};
                         
                         return `
-                            <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
-                                
-                                <div class="flex items-start gap-4 mb-4">
-                                    <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
-                                        ${categoryEmojis[category]}
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <span class="text-xs font-medium text-indigo-400 uppercase">${categoryLabels[category]}</span>
-                                        </div>
-                                        <h3 class="text-xl font-bold text-gray-100">${title}</h3>
-                                    </div>
+                        <div class="bg-neutral-800 border border-indigo-500/30 rounded-xl p-4 hover:border-indigo-500 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-base flex-shrink-0">
+                                    ${categoryEmojis[category]}
                                 </div>
-                                
-                                <p class="text-gray-300 text-sm leading-relaxed mb-4">${description}</p>
-                                
-                                ${empathyMap.says?.length || empathyMap.thinks?.length ? `
-                                    <div class="border-t border-gray-700 pt-4">
-                                        <div class="space-y-3">
-                                            ${empathyMap.says?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-blue-400 text-xs font-medium mt-0.5">💬</span>
-                                                    <p class="text-gray-400 text-xs italic flex-1">"${empathyMap.says[0]}"</p>
-                                                </div>
-                                            ` : ''}
-                                            ${empathyMap.thinks?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-purple-400 text-xs font-medium mt-0.5">💭</span>
-                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.thinks[0]}</p>
-                                                </div>
-                                            ` : ''}
-                                            ${empathyMap.does?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-green-400 text-xs font-medium mt-0.5">✋</span>
-                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.does[0]}</p>
-                                                </div>
-                                            ` : ''}
-                                            ${empathyMap.feels?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-pink-400 text-xs font-medium mt-0.5">❤️</span>
-                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.feels[0]}</p>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                ` : ''}
+                                <div>
+                                    <span class="text-xs font-medium text-indigo-400 uppercase">${categoryLabels[category]}</span>
+                                    <h3 class="text-sm font-bold text-gray-100">${title}</h3>
+                                </div>
                             </div>
-                        `;
+                            <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed">${description}</p>
+                        </div>
+                    `;
                     }).join('')}
                 </div>
             </div>
@@ -819,6 +892,83 @@ active_tab: profile
             }
         }
     }
+    async function submitSkillSnapshot() {
+        const projectName = document.getElementById('snapshotProjectName')?.value?.trim();
+        const codingAbility = parseInt(document.getElementById('codingAbility')?.value);
+        const collaboration = parseInt(document.getElementById('collaboration')?.value);
+        const problemSolving = parseInt(document.getElementById('problemSolving')?.value);
+        const initiative = parseInt(document.getElementById('initiative')?.value);
+        const statusEl = document.getElementById('snapshotStatus');
+    
+        if (!projectName) {
+            statusEl.textContent = 'Please enter a project name.';
+            statusEl.classList.add('text-red-400');
+            statusEl.classList.remove('text-green-400', 'text-gray-400');
+            return;
+        }
+    
+        statusEl.textContent = 'Saving...';
+        statusEl.classList.remove('text-red-400', 'text-green-400');
+        statusEl.classList.add('text-gray-400');
+    
+        try {
+            const response = await fetch(`${pythonURI}/api/user/skill-snapshot`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    project_name: projectName,
+                    coding_ability: codingAbility,
+                    collaboration: collaboration,
+                    problem_solving: problemSolving,
+                    initiative: initiative
+                })
+            });
+    
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.message || 'Failed to save snapshot');
+            }
+    
+            statusEl.textContent = 'Snapshot saved!';
+            statusEl.classList.add('text-green-400');
+            statusEl.classList.remove('text-red-400', 'text-gray-400');
+    
+            // reset form
+            document.getElementById('snapshotProjectName').value = '';
+            ['codingAbility', 'collaboration', 'problemSolving', 'initiative'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 3;
+            });
+            ['codingAbility', 'collaboration', 'problemSolving', 'initiative'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '3';
+            });
+    
+            // use existing toast if available
+            if (window.showToast) {
+                showToast({
+                    message: 'Skill snapshot saved to your Passport.',
+                    icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>`,
+                    duration: 3000
+                });
+            }
+    
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 3000);
+    
+        } catch (error) {
+            console.error('Snapshot error:', error);
+            statusEl.textContent = error.message || 'Something went wrong.';
+            statusEl.classList.add('text-red-400');
+            statusEl.classList.remove('text-green-400', 'text-gray-400');
+        }
+    }
+ 
+window.submitSkillSnapshot = submitSkillSnapshot;
+
     // Make functions globally accessible
     window.loadPersonas = loadPersonas;
     window.selectPersona = selectPersona;
