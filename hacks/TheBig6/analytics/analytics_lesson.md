@@ -235,8 +235,8 @@ date: 2025-12-02
 import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
 // ── SRP modules — each owns exactly one responsibility ────────
-import { restore, persist }          from '{{ site.baseurl }}/assets/js/bigsix/analytics/persistence.js';
-import { initNavigation, showStep }  from '{{ site.baseurl }}/assets/js/bigsix/analytics/navigation.js';
+import { restore, persist }          from '{{ site.baseurl }}/assets/js/bigsix/persistence.js';
+import { initNavigation, showStep }  from '{{ site.baseurl }}/assets/js/bigsix/navigation.js';
 import { loadAnalytics }             from '{{ site.baseurl }}/assets/js/bigsix/analytics/analytics.js';
 import { initCerts }                 from '{{ site.baseurl }}/assets/js/bigsix/analytics/certificates.js';
 import { initFRQ }                   from '{{ site.baseurl }}/assets/js/bigsix/analytics/frq.js';
