@@ -346,7 +346,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
         </div>
     </div>
    
-   <!-- Friends of the Poway Library (CSP) -->
+   <!-- Friends of the Poway Library  (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-09-poway-library %}">
            <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library" class="w-28 h-28 object-cover rounded" />
