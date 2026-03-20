@@ -2334,6 +2334,10 @@ window.saveSmartGroups = async function() {
       image: image
     };
 
+    // Clear UI immediately for responsive UX; rendering is handled by WebSocket broadcast.
+    chatInput.value = '';
+    clearChatImagePreview();
+
     try {
       const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
         ...fetchOptions,
@@ -2346,10 +2350,6 @@ window.saveSmartGroups = async function() {
       });
 
       if (!res.ok) throw new Error('Failed to send message');
-      const messages = await res.json();
-      renderChatMessages(messages);
-      chatInput.value = '';
-      clearChatImagePreview();
     } catch (err) {
       console.error('Send message failed', err);
     }
@@ -2367,15 +2367,21 @@ window.saveSmartGroups = async function() {
       return;
     }
 
+    console.log(`Attempting WebSocket connection to ${javaURI}/ws-chat`);
     const socket = new SockJS(`${javaURI}/ws-chat`);
     stompClient = Stomp.over(socket);
-    stompClient.debug = null;
+    stompClient.debug = console.log;
 
     stompClient.connect({}, () => {
       if (!stompClient || !activeChatGroupId) return;
 
-      stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (message) => {
+      console.log('WebSocket Connected Successfully!');
+      const topic = `/topic/group/${activeChatGroupId}`;
+      console.log(`Subscribing to topic: ${topic}`);
+
+      stompClient.subscribe(topic, (message) => {
         try {
+          console.log('Incoming WebSocket payload:', message.body);
           const payload = JSON.parse(message.body);
           appendSingleMessage(payload);
         } catch (err) {
