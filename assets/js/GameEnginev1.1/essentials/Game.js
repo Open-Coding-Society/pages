@@ -390,11 +390,11 @@ class GameCore {
                 leaderboardContainer.classList.remove('initially-hidden');
                 
                 // CRITICAL: Always use fixed positioning to avoid being affected by game container
-                leaderboardContainer.style.position = 'fixed';
-                leaderboardContainer.style.top = '80px';
-                leaderboardContainer.style.right = '20px';
-                leaderboardContainer.style.left = 'auto';
-                leaderboardContainer.style.zIndex = '1000';
+                    leaderboardContainer.style.position = 'fixed';
+                    leaderboardContainer.style.top = '80px';
+                    leaderboardContainer.style.left = '20px';
+                    leaderboardContainer.style.right = 'auto';
+                    leaderboardContainer.style.zIndex = '1000';
             } else {
                 leaderboardContainer.style.display = 'none';
             }
@@ -430,8 +430,8 @@ class GameCore {
                         if (container) {
                             container.style.position = 'fixed';
                             container.style.top = '80px';
-                            container.style.right = '20px';
-                            container.style.left = 'auto';
+                            container.style.left = '20px';
+                            container.style.right = 'auto';
                             container.style.zIndex = '1000';
                         }
                     }, 100);

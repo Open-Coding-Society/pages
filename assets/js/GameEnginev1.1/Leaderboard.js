@@ -152,7 +152,8 @@ export default class Leaderboard {
         // CRITICAL: Always use fixed positioning to avoid game container position affecting it
         container.style.position = 'fixed';
         container.style.top = '80px';
-        container.style.right = '20px';
+        container.style.left = '20px';
+        container.style.right = 'auto';
         container.style.zIndex = '1000';
         
         // Add the widget class for styling
