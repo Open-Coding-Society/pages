@@ -1,10 +1,10 @@
 ---
 toc: false
 layout: post
-title: Dynamic Event Calendar
-description: A capstone project for Safe Passage Heals — building an interactive event calendar that centralizes workshops, support groups, and community events for survivors of domestic violence, with popup details and direct registration links.
-permalink: /capstone/dynamic-event-calendar/
-sticky_rank: 2
+title: Dynamic Event Calendar Capstone
+description: A suite of interactive web tools for Safe Passage Heals — centralizing community events, estimating personal water usage, and delivering personalized water insights by location.
+permalink: /capstone/dynamiceventcalendar/
+sticky_rank: 1
 ---
 
 {% include dynamic-event-calendar-infograph.html %}
