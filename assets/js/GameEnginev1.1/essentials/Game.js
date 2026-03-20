@@ -173,6 +173,45 @@ class GameCore {
                 // PauseMenu expects the gameControl instance directly
                 const pauseMenuInstance = new PauseMenu(this.gameControl, {});
                 this.gameControl.pauseFeature = pauseMenuInstance;
+                // Prevent the PauseMenu from showing its own emoji-styled overlay.
+                // We still keep the instance so its skip/save APIs work, but
+                // override the visual show/hide so only the engine's modal is used.
+                try {
+                    const pm = pauseMenuInstance;
+                    if (pm) {
+                        // Preserve original methods if needed for debugging
+                        pm._originalShow = pm.show;
+                        pm._originalHide = pm.hide;
+
+                        // Override `show` to only pause the game control (no UI)
+                        pm.show = function() {
+                            try {
+                                if (typeof this._pauseGame === 'function') {
+                                    this._pauseGame();
+                                } else if (this.gameControl && typeof this.gameControl.pause === 'function') {
+                                    this.gameControl.pause();
+                                }
+                            } catch (e) {
+                                console.warn('Overridden pauseFeature.show failed:', e);
+                            }
+                        };
+
+                        // Override `hide` to only resume the game control (no UI)
+                        pm.hide = function() {
+                            try {
+                                if (typeof this._resumeGame === 'function') {
+                                    this._resumeGame();
+                                } else if (this.gameControl && typeof this.gameControl.resume === 'function') {
+                                    this.gameControl.resume();
+                                }
+                            } catch (e) {
+                                console.warn('Overridden pauseFeature.hide failed:', e);
+                            }
+                        };
+                    }
+                } catch (e) {
+                    console.warn('Failed to override PauseMenu show/hide:', e);
+                }
 
                 // Initialize ScoreManager on the active level's GameEnv first
                 this._ensureActiveScoreManager()
@@ -232,12 +271,18 @@ class GameCore {
             existingModal.remove();
         }
         
-        // Pause the game - MUST call gameControl.pause() to properly save handlers
+        // Prefer the PauseMenu instance when available (keeps UI/logic consistent)
         const ctrl = this.getActiveControl();
-        if (ctrl.pause) {
+        if (ctrl && ctrl.pauseFeature && typeof ctrl.pauseFeature.show === 'function') {
+            try {
+                ctrl.pauseFeature.show();
+            } catch (e) {
+                console.warn('pauseFeature.show() failed, falling back to ctrl.pause():', e);
+                if (typeof ctrl.pause === 'function') ctrl.pause();
+            }
+        } else if (ctrl && typeof ctrl.pause === 'function') {
+            // Fallback for controls that don't have a PauseMenu instance
             ctrl.pause();
-        } else if (ctrl.pauseFeature) {
-            ctrl.pauseFeature.show();
         }
         
         // Create the modal using CSS classes from pause-modal.scss
@@ -274,19 +319,30 @@ class GameCore {
             modal.remove();
         }
         
-        // Unpause the active control first - MUST call resume() to properly restore handlers
+        // Close the pause UI and delegate skip to PauseMenu if present,
+        // otherwise try known control methods to advance levels.
         const ctrl = this.getActiveControl();
         if (ctrl) {
-            ctrl.isPaused = false;
+            // If this control has a PauseMenu instance, let it handle the skip
+            if (ctrl.pauseFeature && typeof ctrl.pauseFeature.skipLevel === 'function') {
+                try {
+                    ctrl.pauseFeature.skipLevel();
+                    console.log('Skipped level via pauseFeature.skipLevel()');
+                    return;
+                } catch (e) {
+                    console.warn('pauseFeature.skipLevel() failed, falling back to control methods:', e);
+                }
+            }
 
+            // Ensure control is resumed so handlers are restored before transitioning
             if (typeof ctrl.resume === 'function') {
-                ctrl.resume();
+                try { ctrl.resume(); } catch (e) { console.warn('ctrl.resume() failed:', e); }
             } else {
                 if (typeof ctrl.restoreInteractionHandlers === 'function') {
-                    ctrl.restoreInteractionHandlers();
+                    try { ctrl.restoreInteractionHandlers(); } catch (e) { console.warn('restoreInteractionHandlers failed:', e); }
                 }
                 if (typeof ctrl.gameLoop === 'function') {
-                    ctrl.gameLoop();
+                    try { ctrl.gameLoop(); } catch (e) { console.warn('ctrl.gameLoop() failed:', e); }
                 }
             }
 
