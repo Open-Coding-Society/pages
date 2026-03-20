@@ -162,6 +162,8 @@ export default class Leaderboard {
                 <div>
                     <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
                     <span id="leaderboard-title">Leaderboard</span>
+                    <span id="leaderboard-current-score"
+                          style="font-size:16px;font-weight:700;margin-left:8px;display:inline;">Score: 0</span>
                     <span id="leaderboard-preview"
                           style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Collapse to choose a leaderboard</span>
                 </div>

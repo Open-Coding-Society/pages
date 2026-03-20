@@ -163,14 +163,14 @@ class GameCore {
                 const pauseMenuInstance = new PauseMenu(this.gameControl, {});
                 this.gameControl.pauseFeature = pauseMenuInstance;
 
-                // Initialize ScoreManager through GameEnv (proper OOP)
-                if (this.gameControl.gameEnv) {
-                    this.gameControl.gameEnv.initScoreManager().then(() => {
+                // Initialize ScoreManager on the active level's GameEnv first
+                this._ensureActiveScoreManager()
+                    .then(() => {
                         console.log('ScoreManager initialized successfully');
-                    }).catch(err => {
+                    })
+                    .catch(err => {
                         console.warn('Failed to initialize ScoreManager:', err);
                     });
-                }
 
             }).catch(err => {
                 console.warn('Failed to load PauseMenu:', err);
@@ -186,11 +186,32 @@ class GameCore {
     }
 
     /**
-     * Show the pause menu modal with 4 options:
-     * - Show Score: displays the score counter
+     * Ensure ScoreManager exists on the active level GameEnv and sync current value.
+     */
+    async _ensureActiveScoreManager() {
+        const ctrl = this.getActiveControl() || this.gameControl;
+        const activeGameEnv = ctrl?.currentLevel?.gameEnv || this.gameControl?.currentLevel?.gameEnv || this.gameControl?.gameEnv;
+        if (!activeGameEnv) return null;
+
+        if (!activeGameEnv.scoreManager) {
+            await activeGameEnv.initScoreManager();
+        }
+
+        const manager = activeGameEnv.scoreManager;
+        if (manager) {
+            const counterVar = activeGameEnv.scoreConfig?.counterVar || 'levelsCompleted';
+            const currentValue = activeGameEnv.stats?.[counterVar] || 0;
+            manager.updateScoreDisplay(currentValue);
+        }
+
+        return manager;
+    }
+
+    /**
+     * Show the pause menu modal options:
      * - Save Score: saves the score to backend
      * - Skip Level: skips to next level
-     * - Toggle Leaderboard: shows/hides the leaderboard
+     * - Toggle Leaderboard: shows/hides the leaderboard (including header score)
      */
     showPauseModal() {
         if (!this.getActiveControl()) return;
@@ -217,7 +238,6 @@ class GameCore {
             <div class="pause-modal-content">
                 <h2 class="pause-modal-header">Pause Menu</h2>
                 <div class="pause-modal-buttons">
-                    <button id="pause-toggle-score" class="pause-menu-btn">Toggle Score</button>
                     <button id="pause-save-score" class="pause-menu-btn">Save Score</button>
                     <button id="pause-skip-level" class="pause-menu-btn">Exit Level</button>
                     <button id="pause-toggle-leaderboard" class="pause-menu-btn">Toggle Leaderboard</button>
@@ -230,63 +250,10 @@ class GameCore {
         document.body.appendChild(modal);
         
         // Attach event listeners
-        document.getElementById('pause-toggle-score').addEventListener('click', () => this._handleToggleScore());
         document.getElementById('pause-save-score').addEventListener('click', () => this._handleSaveScore());
         document.getElementById('pause-skip-level').addEventListener('click', () => this._handleSkipLevel());
         document.getElementById('pause-toggle-leaderboard').addEventListener('click', () => this._handleToggleLeaderboard());
         document.getElementById('pause-resume').addEventListener('click', () => this._closePauseModal());
-    }
-
-    /**
-     * Handle Toggle Score option - shows/hides the score counter
-     */
-    async _handleToggleScore() {
-        console.log('Game: _handleToggleScore called');
-        
-        // Close modal first
-        const modal = document.getElementById('pauseModal');
-        if (modal) {
-            modal.remove();
-        }
-        
-        // Resume the game - MUST call gameControl.resume() to properly restore handlers
-        const ctrl = this.getActiveControl();
-        if (ctrl) {
-            ctrl.isPaused = false;
-            if (typeof ctrl.resume === 'function') {
-                ctrl.resume();
-            } else {
-                if (typeof ctrl.restoreInteractionHandlers === 'function') {
-                    ctrl.restoreInteractionHandlers();
-                }
-                if (typeof ctrl.gameLoop === 'function') {
-                    ctrl.gameLoop();
-                }
-            }
-        }
-        
-        // Access scoreManager from GameEnv (proper OOP) - gameEnv is on currentLevel
-        const gameEnv = ctrl?.currentLevel?.gameEnv;
-        console.log('Game: gameEnv exists?', !!gameEnv);
-        console.log('Game: scoreManager exists?', !!gameEnv?.scoreManager);
-        
-        if (gameEnv) {
-            // Auto-initialize scoreManager if not already initialized
-            if (!gameEnv.scoreManager) {
-                console.log('Game: Initializing scoreManager...');
-                await gameEnv.initScoreManager();
-                console.log('Game: After init, scoreManager exists?', !!gameEnv.scoreManager);
-            }
-            
-            if (gameEnv.scoreManager) {
-                console.log('Game: Calling toggleScoreDisplay...');
-                gameEnv.scoreManager.toggleScoreDisplay();
-            } else {
-                console.error('Game: Failed to initialize scoreManager');
-            }
-        } else {
-            console.error('Game: gameEnv not found on active control');
-        }
     }
 
     /**
@@ -454,6 +421,11 @@ class GameCore {
         // Get the game container element
         const gameContainer = this.gameContainer instanceof HTMLElement ? 
             this.gameContainer : document.getElementById('gameContainer');
+
+        // Keep score text synced to active game state from the moment leaderboard is used
+        this._ensureActiveScoreManager().catch(err => {
+            console.warn('Failed to sync active ScoreManager while toggling leaderboard:', err);
+        });
         
         // Try to find leaderboard container
         let leaderboardContainer = document.getElementById('leaderboard-container');
@@ -493,6 +465,10 @@ class GameCore {
                         gameName: 'AdventureGame',
                         parentId: parentId,
                         initiallyHidden: false
+                    });
+
+                    this._ensureActiveScoreManager().catch(err => {
+                        console.warn('Failed to sync active ScoreManager after leaderboard creation:', err);
                     });
 
                     // Force positioning after creation - use fixed positioning
