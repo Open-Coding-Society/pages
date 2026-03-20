@@ -273,6 +273,16 @@ class GameControl {
                 // transitionToLevel() would destroy and recreate the level, resetting player position
                 if (typeof this.parentControl.resume === 'function') {
                     this.parentControl.resume();
+                    // The parent may have had its canvases hidden when the nested
+                    // game started. Explicitly restore the parent's canvases so the
+                    // screen is visible again.
+                    try {
+                        if (typeof this.parentControl.showCanvasState === 'function') {
+                            this.parentControl.showCanvasState();
+                        }
+                    } catch (e) {
+                        console.warn('Failed to restore parent canvas state after nested game:', e);
+                    }
                 }
             } catch (e) {
                 console.warn('Failed to restore parent control after nested game ended:', e);
