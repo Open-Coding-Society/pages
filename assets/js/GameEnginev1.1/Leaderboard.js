@@ -116,12 +116,13 @@ export default class Leaderboard {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
         this.parentId = options.parentId || null;
-        this.isOpen = false;
+        // Default: visible unless explicitly requested hidden via options.initiallyHidden === true
+        this.initiallyHidden = options.initiallyHidden === true;
+        this.isOpen = !this.initiallyHidden;
         this.mounted = false;
         this.mode = null; // 'dynamic' or 'elementary'
         this.showingTypeSelection = true;
         this.elementaryEntries = []; // Store elementary entries locally
-        this.initiallyHidden = options.initiallyHidden !== false; // Default to hidden
 
         // Flag whether a backend URI is available; allow UI to mount even when
         // backend is unreachable so leaderboard can operate in offline/local mode.
@@ -178,6 +179,25 @@ export default class Leaderboard {
         `;
 
         appendTarget.appendChild(container);
+        // Apply initial open/closed state immediately to avoid needing a separate preload
+        const contentEl = container.querySelector('#leaderboard-content');
+        const toggleBtn = container.querySelector('#toggle-leaderboard');
+        const previewEl = container.querySelector('#leaderboard-preview');
+        const titleEl = container.querySelector('#leaderboard-title');
+
+        if (contentEl && toggleBtn) {
+            contentEl.classList.toggle('hidden', !this.isOpen);
+            toggleBtn.textContent = this.isOpen ? '−' : '+';
+            if (previewEl && titleEl) {
+                if (this.isOpen) {
+                    titleEl.style.display = 'inline';
+                    previewEl.style.display = 'none';
+                } else {
+                    titleEl.style.display = 'none';
+                    previewEl.style.display = 'inline';
+                }
+            }
+        }
         this.mounted = true;
 
         document

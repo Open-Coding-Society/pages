@@ -72,6 +72,12 @@ class GameCore {
 
     // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
     // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
+    // Immediately create and show the leaderboard so it's loaded in (doesn't shift canvas because it's fixed)
+    try {
+        this._handleToggleLeaderboard();
+    } catch (e) {
+        console.warn('Auto-show leaderboard failed (non-fatal):', e);
+    }
     }
 
     async _initializeGameControlAsync(gameLevelClasses) {
@@ -97,6 +103,11 @@ class GameCore {
 
             // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
             // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
+            try {
+                this._handleToggleLeaderboard();
+            } catch (e) {
+                console.warn('Auto-show leaderboard failed (non-fatal):', e);
+            }
         } catch (err) {
             console.error('Failed to initialize GameControl:', err);
         }
