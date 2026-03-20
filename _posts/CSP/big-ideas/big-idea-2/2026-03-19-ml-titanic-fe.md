@@ -2,8 +2,7 @@
 layout: post
 title: "ML | Titanic Survival Prediction"
 description: "Predicting Titanic survival using Machine Learning"
-categories: ['ML', 'Projects']
-permalink: /ml/titanic
+permalink: /ml/titanic/fe
 ---
 
 <!-- 引入样式 -->
