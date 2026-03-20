@@ -1,3 +1,5 @@
+import Transform from './Transform.js';
+
 /**
  * The GameObject class serves as a base class for all game objects.
  * It mimics an interface by defining abstract methods that must be implemented
@@ -21,6 +23,7 @@ class GameObject {
             throw new TypeError("Cannot construct GameObject instances directly");
         }
         this.gameEnv = gameEnv; 
+        this.transform = new Transform(0, 0);
         this.collisionWidth = 0;
         this.collisionHeight = 0;
         this.collisionData = {};
@@ -29,6 +32,66 @@ class GameObject {
             collisionEvents: [],
             movement: { up: true, down: true, left: true, right: true },
         };
+    }
+
+    get position() {
+        return this.transform.position;
+    }
+
+    set position(value) {
+        this.transform.position = value;
+    }
+
+    get velocity() {
+        return this.transform.velocity;
+    }
+
+    set velocity(value) {
+        this.transform.velocity = value;
+    }
+
+    get x() {
+        return this.transform.x;
+    }
+
+    set x(value) {
+        this.transform.x = value;
+    }
+
+    get y() {
+        return this.transform.y;
+    }
+
+    set y(value) {
+        this.transform.y = value;
+    }
+
+    get xv() {
+        return this.transform.xv;
+    }
+
+    set xv(value) {
+        this.transform.xv = value;
+    }
+
+    get yv() {
+        return this.transform.yv;
+    }
+
+    set yv(value) {
+        this.transform.yv = value;
+    }
+
+    setTransformPosition(x, y) {
+        this.transform.setPosition(x, y);
+    }
+
+    setTransformVelocity(x, y) {
+        this.transform.setVelocity(x, y);
+    }
+
+    resetTransformToSpawn() {
+        this.transform.resetToSpawn();
     }
 
     /**
