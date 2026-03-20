@@ -8,3 +8,9 @@ sticky_rank: 1
 ---
 
 {% include poway-library-infograph.html %}
+
+<p style="text-align:center; margin-top: 1rem;">
+  <a href="https://github.com/orgs/Boolean-Boyz/repositories" target="_blank" rel="noopener noreferrer">
+    Boolean-Boyz GitHub Organization
+  </a>
+</p>
