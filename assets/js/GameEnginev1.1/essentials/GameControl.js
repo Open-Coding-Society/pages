@@ -45,10 +45,28 @@ class GameControl {
 
     
     start() {
+        // If this is a nested control (game-in-game), hide/disable the parent
+        // control's canvases and handlers so the nested game renders cleanly.
+        if (this.isNested && this.parentControl) {
+            try {
+                // Save and hide parent canvases to avoid visual overlap
+                if (typeof this.parentControl.saveCanvasState === 'function') this.parentControl.saveCanvasState();
+                if (typeof this.parentControl.hideCanvasState === 'function') this.parentControl.hideCanvasState();
+                // Mark parent as paused and remove its exit listener
+                this.parentControl.isPaused = true;
+                try { this.parentControl.removeExitKeyListener(); } catch (e) {}
+                // Save parent interaction handlers for later restoration
+                try { this.parentControl.cleanupInteractionHandlers(true); } catch (e) {}
+            } catch (e) {
+                console.warn('Failed to prepare parent control for nested game:', e);
+            }
+        }
+
         // Mark this GameControl as the currently active control on the Game host
         try {
             if (this.game) this.game.activeGameControl = this;
         } catch (e) {}
+
         this.addExitKeyListener();
         this.transitionToLevel();
     }
@@ -292,7 +310,17 @@ class GameControl {
             if (this.isPaused) {
                 this.resume();
             } else {
-                this.pauseMenu();
+                // Prefer showing the host game's pause modal when available
+                try {
+                    if (this.game && typeof this.game.showPauseModal === 'function') {
+                        this.game.showPauseModal();
+                    } else if (typeof this.pause === 'function') {
+                        this.pause();
+                    }
+                } catch (e) {
+                    console.warn('Error invoking pause menu or pause():', e);
+                    if (typeof this.pause === 'function') this.pause();
+                }
             }
         }
     }
@@ -374,11 +402,17 @@ class GameControl {
         //     return;
         // }
         
-        console.log('Pause called');
+        console.log('Pause called on GameControl', {
+            isNested: this.isNested,
+            parentPresent: !!this.parentControl,
+            currentLevelIndex: this.currentLevelIndex,
+            canvasCount: document.querySelectorAll('canvas').length
+        });
         this.isPaused = true;
         this.removeExitKeyListener();
-        this.saveCanvasState();
-        //this.hideCanvasState();
+        // Do not save or hide canvas state on pause. Pausing should only
+        // freeze updates and remove input handlers; saving/restoring
+        // canvas image data can reintroduce stale layers and duplicate NPCs.
         
         // Save interaction handlers before cleaning up for game-in-game
         this.cleanupInteractionHandlers(true);
@@ -400,10 +434,17 @@ class GameControl {
       * 3. Start the game loop
       */
     resume() {
-        console.log('Resume called - restoring handlers');
+        console.log('Resume called on GameControl', {
+            isNested: this.isNested,
+            parentPresent: !!this.parentControl,
+            currentLevelIndex: this.currentLevelIndex,
+            canvasCount: document.querySelectorAll('canvas').length
+        });
         this.isPaused = false;
         this.addExitKeyListener();
-        this.showCanvasState();
+        // Do not restore saved canvas image data here. Resuming should
+        // only restore input handlers and let the existing rendering
+        // continue from the current canvas state.
         // Do NOT call gameLoop() here. The main loop continues to run while
         // paused (it skips updates when `isPaused` is true). Restarting the
         // loop here can create duplicate loops and speed up game objects.

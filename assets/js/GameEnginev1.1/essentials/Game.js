@@ -264,6 +264,11 @@ class GameCore {
      */
     showPauseModal() {
         if (!this.getActiveControl()) return;
+        console.log('GameCore.showPauseModal activeControl info', {
+            activeControl: this.getActiveControl() === this.gameControl ? 'root' : 'nested',
+            activeControlObj: this.getActiveControl(),
+            canvasCount: document.querySelectorAll('canvas').length
+        });
         
         // Remove existing modal if any
         const existingModal = document.getElementById('pauseModal');
@@ -322,6 +327,12 @@ class GameCore {
         // Close the pause UI and delegate skip to PauseMenu if present,
         // otherwise try known control methods to advance levels.
         const ctrl = this.getActiveControl();
+        console.log('GameCore._handleSkipLevel active control:', {
+            isNested: !!(ctrl && ctrl.isNested),
+            ctrl: ctrl,
+            currentLevelIndex: ctrl?.currentLevelIndex,
+            canvasCount: document.querySelectorAll('canvas').length
+        });
         if (ctrl) {
             // If this control has a PauseMenu instance, let it handle the skip
             if (ctrl.pauseFeature && typeof ctrl.pauseFeature.skipLevel === 'function') {
@@ -334,16 +345,13 @@ class GameCore {
                 }
             }
 
-            // Ensure control is resumed so handlers are restored before transitioning
-            if (typeof ctrl.resume === 'function') {
-                try { ctrl.resume(); } catch (e) { console.warn('ctrl.resume() failed:', e); }
-            } else {
-                if (typeof ctrl.restoreInteractionHandlers === 'function') {
-                    try { ctrl.restoreInteractionHandlers(); } catch (e) { console.warn('restoreInteractionHandlers failed:', e); }
-                }
-                if (typeof ctrl.gameLoop === 'function') {
-                    try { ctrl.gameLoop(); } catch (e) { console.warn('ctrl.gameLoop() failed:', e); }
-                }
+            // Do NOT call `resume()` here. Resuming a nested GameControl
+            // before ending it can cause the nested control to re-enter its
+            // loop or transition flow and produce black screens. Instead,
+            // restore any saved interaction handlers so skip/transition
+            // methods can run safely without reinitializing the level.
+            if (typeof ctrl.restoreInteractionHandlers === 'function') {
+                try { ctrl.restoreInteractionHandlers(); } catch (e) { console.warn('restoreInteractionHandlers failed:', e); }
             }
 
             // Try to find and call the correct method to skip level on the active control
@@ -552,16 +560,10 @@ class GameCore {
                 // If there's already a pause modal open, close it and resume
                 const existingModal = document.getElementById('pauseModal');
                     if (existingModal) {
-                        existingModal.remove();
-                        // Resume the active control - MUST call resume() to properly restore handlers
-                        const ctrl = this.getActiveControl();
-                        if (ctrl) {
-                            ctrl.isPaused = false;
-                            if (typeof ctrl.resume === 'function') {
-                                ctrl.resume();
-                            }
-                        }
-                    return;
+                        // Use the standard close path so PauseMenu and handlers
+                        // are consistently cleaned up.
+                        try { this._closePauseModal(); } catch (e) { existingModal.remove(); }
+                        return;
                 }
                 
                 // Show pause modal if method exists (adventure game)
