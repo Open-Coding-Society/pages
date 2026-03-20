@@ -160,21 +160,23 @@ export default class Leaderboard {
         container.className = 'leaderboard-widget' + (this.initiallyHidden ? ' initially-hidden' : '');
 
         container.innerHTML = `
-            <div class="leaderboard-header">
-                <div>
-                    <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
-                    <span id="leaderboard-title">Leaderboard</span>
-                    <span id="leaderboard-current-score"
-                          style="font-size:16px;font-weight:700;margin-left:8px;display:inline;">Score: 0</span>
-                    <span id="leaderboard-preview"
-                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Collapse to choose a leaderboard</span>
+            <div class="leaderboard-header" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
+                        <span id="leaderboard-title" style="font-size:20px;font-weight:800;">Leaderboard</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <span id="leaderboard-current-score" style="font-size:14px;font-weight:700;color:#ffffff;">Score: 0</span>
+                        <span id="leaderboard-preview" style="font-size:13px;color:#cfcfcf;display:none;">Collapse to choose a leaderboard</span>
+                    </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <button id="leaderboard-save-score" class="action-btn submit-btn" style="padding:8px 12px;font-size:12px;">Save Score</button>
-                    <button id="toggle-leaderboard" class="toggle-btn">+</button>
+                    <button id="toggle-leaderboard" class="toggle-btn" aria-label="Toggle leaderboard">+</button>
                 </div>
             </div>
-            <div class="leaderboard-content hidden" id="leaderboard-content">
+            <div class="leaderboard-content hidden" id="leaderboard-content" style="padding:12px 16px;">
                 <div id="leaderboard-list"></div>
             </div>
         `;
