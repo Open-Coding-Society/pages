@@ -1,6 +1,0 @@
-<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="256" height="256" rx="32" fill="#181C2A"/>
-  <rect x="72" y="72" width="112" height="112" rx="24" fill="#232946"/>
-  <path d="M100 140l24 24 32-40" stroke="#60A5FA" stroke-width="10" fill="none" stroke-linecap="round"/>
-  <text x="128" y="240" text-anchor="middle" fill="#60A5FA" font-size="20" font-family="Arial" font-weight="bold">Mastery Quiz</text>
-</svg>

@@ -1,0 +1,63 @@
+---
+layout: default
+title: Event Calendar
+permalink: /events/calendar/
+---
+
+<div id="calendar"></div>
+
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet"/>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+
+        initialView: 'dayGridMonth',
+
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+
+        navLinks: true,
+        selectable: true,
+        selectMirror: true,
+        dayMaxEvents: true,
+
+        // CONNECTS TO FLASK API
+        events: "http://localhost:5001/api/events",
+
+        eventClick: function(info) {
+
+            const e = info.event.extendedProps;
+
+            alert(
+                info.event.title + "\n\n" +
+                e.writeup + "\n\n" +
+                "Location: " + e.location
+            );
+
+        }
+
+    });
+
+    calendar.render();
+
+});
+</script>
+
+<style>
+  /* Optional: set a height and center the calendar */
+  #calendar {
+    max-width: 900px;
+    margin: 40px auto;
+  }
+</style>
