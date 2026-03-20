@@ -1,0 +1,74 @@
+{% assign data = site.data.dynamic-event-calendar-infograph %}
+
+
+<div class="dec-infograph">
+  <!-- Header Section -->
+  <div class="dec-header">
+    <div class="dec-badge">Design-Based Research Capstone</div>
+    <h1 class="dec-title">{{ data.Title }}</h1>
+    <p class="dec-description">{{ data.Description }}</p>
+  </div>
+
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="dec-card">
+    <div class="dec-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="dec-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dec-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dec-image">
+          <div class="dec-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="dec-status">{{ topic.status }}</div>
+        <div class="dec-team">
+          <span class="dec-team-label">Project Leads</span>
+          <span class="dec-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+
+      <!-- Center: Key Points -->
+      <div class="dec-content">
+        <h2 class="dec-project-title">{{ topic.title }}</h2>
+        <p class="dec-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="dec-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="dec-keypoint">
+            <span class="dec-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="dec-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="dec-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+
+      <!-- Right: Description & Impact -->
+      <div class="dec-details">
+        <h3 class="dec-section-title">About</h3>
+        <p class="dec-about">{{ topic.description }}</p>
+
+        <h3 class="dec-section-title">Impact</h3>
+        <div class="dec-impact-list">
+          {% for item in topic.impact %}
+          <div class="dec-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dec-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
