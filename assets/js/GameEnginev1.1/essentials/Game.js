@@ -209,7 +209,6 @@ class GameCore {
 
     /**
      * Show the pause menu modal options:
-     * - Save Score: saves the score to backend
      * - Skip Level: skips to next level
      * - Toggle Leaderboard: shows/hides the leaderboard (including header score)
      */
@@ -238,7 +237,6 @@ class GameCore {
             <div class="pause-modal-content">
                 <h2 class="pause-modal-header">Pause Menu</h2>
                 <div class="pause-modal-buttons">
-                    <button id="pause-save-score" class="pause-menu-btn">Save Score</button>
                     <button id="pause-skip-level" class="pause-menu-btn">Exit Level</button>
                     <button id="pause-toggle-leaderboard" class="pause-menu-btn">Toggle Leaderboard</button>
                     <button id="pause-resume" class="pause-menu-btn primary">Resume</button>
@@ -250,65 +248,9 @@ class GameCore {
         document.body.appendChild(modal);
         
         // Attach event listeners
-        document.getElementById('pause-save-score').addEventListener('click', () => this._handleSaveScore());
         document.getElementById('pause-skip-level').addEventListener('click', () => this._handleSkipLevel());
         document.getElementById('pause-toggle-leaderboard').addEventListener('click', () => this._handleToggleLeaderboard());
         document.getElementById('pause-resume').addEventListener('click', () => this._closePauseModal());
-    }
-
-    /**
-     * Handle Save Score option - saves the score to backend
-     */
-    async _handleSaveScore() {
-        // Close modal first
-        const modal = document.getElementById('pauseModal');
-        if (modal) {
-            modal.remove();
-        }
-        
-        // Resume the game first - MUST call gameControl.resume() to properly restore handlers
-        const ctrl = this.getActiveControl();
-        if (ctrl) {
-            ctrl.isPaused = false;
-            if (typeof ctrl.resume === 'function') {
-                ctrl.resume();
-            } else {
-                if (typeof ctrl.restoreInteractionHandlers === 'function') {
-                    ctrl.restoreInteractionHandlers();
-                }
-                if (typeof ctrl.gameLoop === 'function') {
-                    ctrl.gameLoop();
-                }
-            }
-        }
-        
-        // Access scoreManager from GameEnv (proper OOP) - gameEnv is on currentLevel
-        const gameEnv = ctrl?.currentLevel?.gameEnv;
-        if (gameEnv) {
-            // Auto-initialize scoreManager if not already initialized
-            if (!gameEnv.scoreManager) {
-                await gameEnv.initScoreManager();
-            }
-            
-            if (gameEnv.scoreManager) {
-                try {
-                    const buttonEl = document.createElement('button');
-                    await gameEnv.scoreManager.saveScore(buttonEl);
-                    
-                    // Refresh leaderboard to show the new score
-                    if (this.leaderboardInstance && typeof this.leaderboardInstance.fetchLeaderboard === 'function') {
-                        console.log('Game: Refreshing leaderboard after save');
-                        await this.leaderboardInstance.fetchLeaderboard();
-                    }
-                } catch (error) {
-                    console.error('Failed to save score:', error);
-                    alert('Failed to save score. Please try again.');
-                }
-            } else {
-                console.error('Failed to initialize scoreManager');
-                alert('Score feature not available');
-            }
-        }
     }
 
     /**

@@ -167,7 +167,10 @@ export default class Leaderboard {
                     <span id="leaderboard-preview"
                           style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Collapse to choose a leaderboard</span>
                 </div>
-                <button id="toggle-leaderboard" class="toggle-btn">+</button>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button id="leaderboard-save-score" class="action-btn submit-btn" style="padding:8px 12px;font-size:12px;">Save Score</button>
+                    <button id="toggle-leaderboard" class="toggle-btn">+</button>
+                </div>
             </div>
             <div class="leaderboard-content hidden" id="leaderboard-content">
                 <div id="leaderboard-list"></div>
@@ -185,7 +188,53 @@ export default class Leaderboard {
             .getElementById('back-btn')
             .addEventListener('click', () => this.goBack());
 
+        document
+            .getElementById('leaderboard-save-score')
+            .addEventListener('click', (e) => this.handleSaveScoreFromLeaderboard(e.currentTarget));
+
         this.showTypeSelection();
+    }
+
+    _getActiveGameEnv() {
+        const activeControl = this.gameControl?.game?.getActiveControl
+            ? this.gameControl.game.getActiveControl()
+            : this.gameControl;
+
+        return activeControl?.currentLevel?.gameEnv
+            || this.gameControl?.currentLevel?.gameEnv
+            || this.gameControl?.gameEnv
+            || null;
+    }
+
+    handleSaveScoreFromLeaderboard(buttonEl) {
+        const gameEnv = this._getActiveGameEnv();
+
+        if (!gameEnv) {
+            alert('Score feature not available');
+            return;
+        }
+
+        if (!gameEnv.scoreManager) {
+            gameEnv.initScoreManager()
+                .then(() => this.handleSaveScoreFromLeaderboard(buttonEl))
+                .catch(error => {
+                    console.error('Failed to initialize scoreManager:', error);
+                    alert('Score feature not available');
+                });
+            return;
+        }
+
+        const saveButton = buttonEl || document.getElementById('leaderboard-save-score');
+        gameEnv.scoreManager.saveScore(saveButton)
+            .then(() => {
+                if (this.mode === 'dynamic') {
+                    return this.fetchLeaderboard();
+                }
+            })
+            .catch(error => {
+                console.error('Failed to save score from leaderboard:', error);
+                alert('Failed to save score. Please try again.');
+            });
     }
 
     toggle() {
