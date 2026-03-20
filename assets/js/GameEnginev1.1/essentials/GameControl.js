@@ -49,14 +49,15 @@ class GameControl {
         // control's canvases and handlers so the nested game renders cleanly.
         if (this.isNested && this.parentControl) {
             try {
-                // Save and hide parent canvases to avoid visual overlap
-                if (typeof this.parentControl.saveCanvasState === 'function') this.parentControl.saveCanvasState();
-                if (typeof this.parentControl.hideCanvasState === 'function') this.parentControl.hideCanvasState();
-                // Mark parent as paused and remove its exit listener
-                this.parentControl.isPaused = true;
-                try { this.parentControl.removeExitKeyListener(); } catch (e) {}
-                // Save parent interaction handlers for later restoration
-                try { this.parentControl.cleanupInteractionHandlers(true); } catch (e) {}
+                // Only hide/save parent canvases once per nested session. The
+                // parent GameControl.pause() already saved/restored handlers,
+                // so avoid calling cleanupInteractionHandlers() here which would
+                // overwrite the saved handlers with an empty set.
+                if (!this.parentControl._nestedCanvasHidden) {
+                    if (typeof this.parentControl.saveCanvasState === 'function') this.parentControl.saveCanvasState();
+                    if (typeof this.parentControl.hideCanvasState === 'function') this.parentControl.hideCanvasState();
+                    this.parentControl._nestedCanvasHidden = true;
+                }
             } catch (e) {
                 console.warn('Failed to prepare parent control for nested game:', e);
             }
@@ -279,6 +280,8 @@ class GameControl {
                     try {
                         if (typeof this.parentControl.showCanvasState === 'function') {
                             this.parentControl.showCanvasState();
+                                // Clear nested-hidden flag so future nested games can hide again
+                                try { this.parentControl._nestedCanvasHidden = false; } catch (e) {}
                         }
                     } catch (e) {
                         console.warn('Failed to restore parent canvas state after nested game:', e);
