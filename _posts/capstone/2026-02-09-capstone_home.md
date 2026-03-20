@@ -384,3 +384,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
     </div>
 
 </div>
+  <!-- FOPS -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg">
+       <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
+           <img src="/images/capstone/fops.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
+           <p class="text-sm text-gray-700">Diet tracker for the elderly.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Nitya, Virginia, Ginny</p>
+       </div>
+   </div>
