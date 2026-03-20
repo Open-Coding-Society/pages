@@ -1,0 +1,122 @@
+---
+layout: opencs
+---
+{% include nav/toolkits/bathroom/menu.html %}
+
+<style>
+    table {
+        width: 50%;
+        margin: 20px auto;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f4f4f4;
+    }
+</style>
+
+<h1 style="text-align: center;">Bathroom Statistics</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Statistic</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Average Duration (minutes)</td>
+            <td id="avg-duration">5.2</td>
+        </tr>
+        <tr>
+            <td>Number of Times Gone</td>
+            <td id="num-times">12</td>
+        </tr>
+    </tbody>
+</table>
+
+<script type="module">
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    function calculateAverageDuration(timeIn) {
+        // Split the string by commas to separate each instance of bathroom time.
+        const visits = timeIn.split(',');
+        
+        let totalDuration = 0;
+        visits.forEach(visit => {
+            const [checkIn, checkOut] = visit.split('-');
+            const checkInTime = new Date('1970-01-01T' + checkIn + 'Z').getTime();
+            const checkOutTime = new Date('1970-01-01T' + checkOut + 'Z').getTime();
+            const duration = (checkOutTime - checkInTime) / 1000 / 60; // Convert to minutes
+            totalDuration += duration;
+        });
+
+        return totalDuration / visits.length; // Return the average duration in minutes
+    }
+
+    function getTinkle(personName) {
+        const tinkleURL = javaURI + `/api/tinkle/${personName}`;
+        console.log(tinkleURL);
+        
+        fetch(tinkleURL, fetchOptions)
+            .then(response => {
+                if (response.status !== 200) {
+                    console.error("HTTP status code: " + response.status);
+                    return null;
+                }
+                return response.json(); // Parse the response to JSON
+            })
+            .then(data => {
+                if (data === null) return null;
+
+                // Extract timeIn data
+                const timeIn = data.timeIn; // Assuming the timeIn field is like "11:12:05-11:13:06,12:15:10-12:19:12"
+                console.log("Time in data:", timeIn);
+
+                // Calculate number of times gone (by counting the commas, add 1)
+                const numVisits = timeIn.split(',').length;
+                document.getElementById('num-times').textContent = numVisits;
+
+                // Calculate average duration
+                const avgDuration = calculateAverageDuration(timeIn);
+                document.getElementById('avg-duration').textContent = avgDuration.toFixed(2);
+            })
+            .catch(err => {
+                console.error("Fetch error: ", err);
+            });
+    }
+
+    function getPerson() {
+        const personButton = document.getElementById("fetch_person");
+        const URL = javaURI + '/api/person/get';
+        
+        fetch(URL, fetchOptions)
+            .then(response => {
+                if (response.status !== 200) {
+                    console.error("HTTP status code: " + response.status);
+                    return null;
+                }
+                return response.json(); // Get the person data
+            })
+            .then(data => {
+                if (data === null) return null;
+                console.log("Person data:", data);
+                getTinkle(encodeURIComponent(data.name)); // Fetch tinkle data for the person
+            })
+            .catch(err => {
+                console.error("Fetch error: ", err);
+            });
+    }
+
+    window.onload = async function () {
+        getPerson(); // Fetch person data when the page loads
+    }
+
+</script>

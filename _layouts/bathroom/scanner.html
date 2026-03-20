@@ -1,0 +1,696 @@
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        transition: background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+        margin: 0;
+        padding: 0;
+    }
+    .top-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px; /* Increased padding for a taller bar */
+        font-size: 36px; /* Increased font size for larger text */
+        font-weight: bold;
+        width: 100%;
+        transition: background-color 0.5s ease-in-out;
+    }
+    .occupied {
+        background-color: #ff4d4d;
+        color: white;
+    }
+    .unoccupied {
+        background-color: #4dff4d;
+        color: white;
+    }
+    .occupied-glow {
+        background-color: #ffcccc;
+        box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.5);
+    }
+    .unoccupied-glow {
+        background-color: #ccffcc;
+        box-shadow: 0 0 20px 5px rgba(0, 255, 0, 0.5);
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin-top: 20px;
+        padding: 20px;
+    }
+    .info-box {
+        border: 2px solid #888;
+        padding: 20px;
+        width: 300px;
+        text-align: center;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        font-size: 20px; /* Increase overall text size */
+    }
+
+    .queue {
+        margin-top: 10px;
+        padding: 15px; /* Added more padding */
+        border: 1px solid #aaa;
+        background: #f9f9f9;
+        border-radius: 5px;
+        font-size: 22px; /* Make queue-specific text larger */
+        font-weight: bold; /* Make it stand out */
+    }
+
+    .queue strong {
+        font-size: 24px; /* Make section headers larger */
+    }
+
+    #queue-list li {
+        font-size: 20px; /* Increase the font size of items in the queue */
+    }
+
+    .map-container {
+        width: 400px;
+        height: 300px;
+        background-color: #eee;
+        margin-left: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .button {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: background-color 0.3s ease-in-out;
+    }
+    .button:hover {
+        background-color: #0056b3;
+    }
+
+    .map-container {
+        position: relative;
+        width: 800px;
+        height: 600px;
+    }
+    .map-container img {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    .location {
+        position: absolute;
+        cursor: pointer;
+    }
+    .location .info {
+        display: block;
+    }
+    .info {
+        display: none;
+        position: absolute;
+        bottom: 30px;
+        left: -50px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        padding: 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+        z-index: 10;
+    }
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Optional: Align items to center */
+        gap: 5px; /* Adjust spacing between items */
+    }
+    .qr-code-container {
+        display: flex;
+        position:absolute;
+        justify-content: center; /* Center horizontally */
+        padding-top:400px; /* Add space below the queue */
+        left:260px;
+        z-index:-99;
+    }
+    
+    .qr-code-container img {
+        width: 200px; /* Adjust size as needed */
+        height: 200px;
+    }
+    .button{
+        z-index:99;
+    }
+    .top-right-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 100;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.top-right-button:hover {
+    background-color: #0056b3;
+}
+
+</style>
+</head>
+<!-- <body class="occupied-glow"> -->
+<div id="status-bar" class="top-bar occupied">OCCUPIED</div>
+<div class="container">
+    <div class="info-box">
+        <p>Currently Away: <span id="current-away"></span>{{current_user}}</p>
+        <div class="queue">
+            <strong>Next-up:</strong>
+            <p id="next-up">{{next_up}}</p>
+            <strong>In Queue:</strong>
+            <ul id="queue-list"></ul>
+        </div>
+    </div>
+
+    <button id="flush" class="top-right-button">Flush Queue</button>
+
+    <div class="map-container">
+        <img src="{{site.baseurl}}/images/bathroom/map.png" alt="Map">
+    </div>
+    <input type="text" id="barcode-input" autofocus style="position:absolute; left:-9999px;">
+
+</div>
+
+
+
+<script type="module">
+import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+const fetchOptions2 = {
+    ...fetchOptions,
+    credentials: 'omit',
+}
+
+// Constants
+const REFRESH_INTERVAL = 60000; // 1 minute refresh interval
+let teacherEmail = localStorage.getItem('teacherEmail') || teacherName;
+const teacherName = teacherEmail;
+
+const tinkleURL = javaURI + '/api/tinkle/add';
+const deleteOptions = { ...fetchOptions2, method: 'POST' };
+
+// Load users from localStorage with proper structure
+function loadUsers() {
+    const storedUsers = localStorage.getItem('users');
+    return storedUsers ? JSON.parse(storedUsers) : {};
+}
+
+// Flush Queue
+document.getElementById('flush').addEventListener('click', async function() {
+    const currentAway = document.getElementById('current-away').textContent.trim();
+    
+    if (currentAway !== 'Nobody') {
+        // Remove current user from queue
+        await removeFromQueue();
+        removeUser(currentAway);
+        document.getElementById('current-away').innerHTML = 'Nobody';
+        checkStatusAndUpdateUI();
+    } else {
+        // Remove next person from queue
+        await removeFromQueue();
+    }
+});
+
+// Save users to localStorage
+function saveUsers() {
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+// Remove a user from storage
+function removeUser(student) {
+    if (!student || student === 'Nobody' || student === 'None') return false;
+    
+    delete users[student];
+    saveUsers();
+    return true;
+}
+
+// Get current time in HH:MM:SS format
+function getTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+}
+
+// Format time for database storage
+function formatTimeRange(timeOut, timeIn) {
+    return `${timeOut}-${timeIn}`;
+}
+
+// Initialize users from localStorage
+let users = loadUsers();
+console.log("Current users:", users);
+
+// Queue state management
+let queueState = {
+    currentAway: 'Nobody',
+    nextUp: 'None',
+    queueList: []
+};
+
+// Track if page just loaded to prevent automatic advancement
+let pageJustLoaded = true;
+let lastQueueUpdate = null;
+
+document.addEventListener("DOMContentLoaded", function() {
+    const barcodeInput = document.getElementById("barcode-input");
+    barcodeInput.focus();
+
+    // Always refocus barcode input when clicking anywhere
+    window.addEventListener('click', function() {
+        barcodeInput.focus();
+    });
+
+    // Initial data fetch with slight delay to ensure DOM is ready
+    setTimeout(() => {
+        fetchQueueData().then(() => {
+            pageJustLoaded = false;
+            checkStatusAndUpdateUI();
+        });
+    }, 500);
+
+    // Set up periodic refresh that doesn't disturb queue state
+    setInterval(() => {
+        fetchQueueData(true); // true flag indicates this is a background refresh
+    }, REFRESH_INTERVAL);
+
+    // Handle barcode scanning
+    barcodeInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            processBarcodeInput(barcodeInput.value.trim());
+            barcodeInput.value = "";
+        }
+    });
+});
+
+// Process scanned barcode
+async function processBarcodeInput(barcode) {
+    if (!barcode) {
+        console.log("Empty barcode, ignoring...");
+        return;
+    }
+    
+    // Get current state
+    const currentAway = document.getElementById('current-away').textContent.trim();
+    const nextUp = document.getElementById('next-up').textContent.trim();
+    
+    console.log("Scanned Barcode:", barcode);
+    console.log("Current Away:", currentAway);
+    console.log("Next Up:", nextUp);
+    
+    // Case 1: Returning user (currently away)
+    if (currentAway !== 'Nobody' && users[currentAway] === barcode) {
+        await handleReturningUser(currentAway);
+        return;
+    }
+    
+    // Case 2: Next up user checking in when bathroom is unoccupied
+    if (currentAway === 'Nobody' && nextUp !== 'None' && users[nextUp] === barcode) {
+        console.log("Next up user checking in");
+        // Don't need to call the server here, as the person is properly advancing in the queue
+        const timeOut = getTime();
+        localStorage.setItem("timeout", timeOut);
+        
+        // Refresh the queue data - the next up will automatically move to current
+        await fetchQueueData();
+        return;
+    }
+    
+    // Case 3: Duplicate user - already in queue somewhere
+    for (const key in users) {
+        if (barcode === users[key]) {
+            console.log('User already in queue:', key);
+            return;
+        }
+    }
+    
+    // Case 4: New user - get user info and add to queue
+    try {
+        await addNewUserToQueue(barcode);
+    } catch (error) {
+        console.error("Error adding new user:", error);
+    }
+}
+
+// Handle returning user logic
+async function handleReturningUser(currentAway) {
+    console.log("Handling return of:", currentAway);
+    
+    // Record time metrics
+    const timeIn = getTime();
+    const timeOut = localStorage.getItem("timeout") || "unknown";
+    const timeRange = formatTimeRange(timeOut, timeIn);
+    
+    try {
+        // Send usage time to database
+        const users = loadUsers();
+        const studentId = users[currentAway];
+        await recordBathroomUsage(studentId, timeRange);
+        
+        // Update UI immediately
+        document.getElementById('current-away').innerHTML = 'Nobody';
+        checkStatusAndUpdateUI();
+        
+        // Remove from queue on server
+        await removeFromQueue();
+        
+        // Remove from local storage
+        removeUser(currentAway);
+        console.log(currentAway, 'removed from queue');
+        localStorage.setItem("timeout", getTime());
+    } catch (error) {
+        console.error("Error handling returning user:", error);
+    }
+}
+
+// Record bathroom usage time in database
+async function recordBathroomUsage(studentEmail, timeRange) {
+    if (!studentEmail || studentEmail === 'Nobody' || studentEmail === 'None') return;
+    
+    const tinkleBody = {
+        sid: studentEmail,
+        timeIn: timeRange
+    };
+    
+    try {
+        const response = await fetch(tinkleURL, {
+            ...fetchOptions2,
+            method: 'POST',
+            body: JSON.stringify(tinkleBody),
+        });
+        
+        if (response.ok) {
+            console.log("Time added to database for", studentEmail);
+        } else {
+            console.log("Failed to add time to database for", studentEmail);
+        }
+    } catch (error) {
+        console.error("Error recording bathroom usage:", error);
+    }
+}
+
+// Add new user to the queue
+async function addNewUserToQueue(barcode) {
+    // Get user name from server
+    const name_by_sid_url = javaURI + `/api/${barcode}`;
+    
+    try {
+        const response = await fetch(name_by_sid_url, fetchOptions2);
+        const data = await response.text();
+        
+        if (data === 'Not a valid barcode') {
+            console.log('Invalid barcode, not adding to queue');
+            return;
+        }
+        
+        const name = data;
+        console.log("Valid user found:", name);
+        
+        // Add to local storage
+        users[name] = barcode;
+        saveUsers();
+        
+        // Add to server queue
+        await addToServerQueue(name);
+        
+        // Record timeout for later use
+        localStorage.setItem('timeout', getTime());
+        console.log('Timeout set at:', getTime());
+        
+        // Refresh queue data
+        await fetchQueueData();
+    } catch (error) {
+        console.error("Error adding new user to queue:", error);
+        throw error;
+    }
+}
+
+// Add user to server queue
+async function addToServerQueue(name) {
+    const queue_load = {
+        "studentName": name,
+        "teacherEmail": teacherEmail,
+        "uri": javaURI
+    };
+    
+    const queueOptions = {
+        ...fetchOptions2,
+        method: 'POST',
+        body: JSON.stringify(queue_load),
+    };
+    
+    try {
+        const response = await fetch(javaURI + "/api/queue/add", queueOptions);
+        
+        if (response.ok) {
+            console.log(name, "added to queue");
+            return true;
+        } else {
+            console.log("Failed to add to queue:", response);
+            return false;
+        }
+    } catch (error) {
+        console.error("Error adding to server queue:", error);
+        throw error;
+    }
+}
+
+// Remove front person from queue
+async function removeFromQueue() {
+    try {
+        const response = await fetch(javaURI + "/api/queue/removefront/" + teacherName, deleteOptions);
+        
+        if (response.ok) {
+            console.log('User removed from queue');
+            return true;
+        } else {
+            console.error("Failed to remove from queue");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error removing from queue:", error);
+        return false;
+    }
+}
+
+// Fetch queue data from server
+async function fetchQueueData(isBackgroundRefresh = false) {
+    try {
+        const QueueURI = javaURI + "/api/queue/all";
+        const response = await fetch(QueueURI, fetchOptions2);
+
+        if (response.status !== 200) {
+            console.error("Failed to fetch queue data.");
+            return false;
+        }
+        
+        const data = await response.json();
+        const mortensenQueue = data.find(queue => queue.teacherEmail === teacherName);
+
+        if (!mortensenQueue) {
+            console.error("No queue found for the teacher.");
+            return false;
+        }
+
+        // Save previous state for comparison
+        const previousState = { ...queueState };
+        
+        // Parse queue data
+        const queueArray = mortensenQueue.peopleQueue.split(",").filter(item => item.trim());
+        
+        // Update queue state with new data
+        queueState = {
+            currentAway: queueArray[0] || "Nobody",
+            nextUp: queueArray[1] || "None",
+            queueList: queueArray.slice(2)
+        };
+        
+        // If this is a background refresh and we're just loading the page,
+        // don't let it change the "Currently Away" person automatically
+        if (isBackgroundRefresh && pageJustLoaded && 
+            previousState.currentAway !== 'Nobody' && 
+            previousState.currentAway !== queueState.currentAway) {
+            console.log("Preventing automatic queue advancement during page refresh");
+            queueState.currentAway = previousState.currentAway;
+        }
+        
+        // Update UI with current queue state
+        updateQueueUI();
+        
+        // Set timeout if someone just became current
+        if (previousState.currentAway === 'Nobody' && queueState.currentAway !== 'Nobody') {
+            localStorage.setItem('timeout', getTime());
+            console.log(`New current user ${queueState.currentAway}, timeout set at ${getTime()}`);
+        }
+        
+        return true;
+    } catch (error) {
+        console.error("Error fetching queue data:", error);
+        return false;
+    }
+}
+
+// Update queue UI elements
+function updateQueueUI() {
+    document.getElementById("current-away").textContent = queueState.currentAway;
+    document.getElementById("next-up").textContent = queueState.nextUp;
+
+    const queueList = document.getElementById("queue-list");
+    queueList.innerHTML = "";
+    
+    queueState.queueList.forEach(person => {
+        const li = document.createElement("li");
+        li.textContent = person;
+        queueList.appendChild(li);
+    });
+    
+    checkStatusAndUpdateUI();
+}
+
+// Update UI based on occupancy status
+function checkStatusAndUpdateUI() {
+    const statusBar = document.getElementById("status-bar");
+    const isOccupied = document.getElementById('current-away').innerText.trim() !== "Nobody";
+    
+    // Update status bar text and classes
+    if (isOccupied) {
+        statusBar.textContent = "OCCUPIED";
+        statusBar.classList.add("occupied");
+        statusBar.classList.remove("unoccupied");
+        document.body.classList.add("occupied-glow");
+        document.body.classList.remove("unoccupied-glow");
+    } else {
+        statusBar.textContent = "UNOCCUPIED";
+        statusBar.classList.add("unoccupied");
+        statusBar.classList.remove("occupied");
+        document.body.classList.add("unoccupied-glow");
+        document.body.classList.remove("occupied-glow");
+    }
+}
+
+// Handle manual "leave now" button click
+window.addEventListener('click', function(event) {
+    if (event.target && event.target.id === 'leave-now') {
+        const currentAway = document.getElementById('current-away').textContent.trim();
+        
+        if (currentAway === 'Nobody') {
+            // Remove next person
+            removeFromQueue();
+        } else {
+            // Mark current person as returned
+            document.getElementById('current-away').innerHTML = 'Nobody';
+            checkStatusAndUpdateUI();
+            removeFromQueue();
+        }
+    }
+});
+
+// Load map locations
+async function fetchLocations() {
+    try {
+        const response = await fetch(javaURI + '/api/issue/issues', fetchOptions2);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const issues = await response.json();
+        const mapContainer = document.querySelector('.map-container');
+        
+        issues.forEach(issue => {
+            if (issue.count == 0) return;
+            
+            const locElement = document.createElement('div');
+            locElement.className = 'location';
+            locElement.style.position = 'absolute';
+            locElement.style.top = (issue.positionY * 100) + '%';
+            locElement.style.left = (issue.positionX * 100) + '%';
+
+            const icon = document.createElement('img');
+            icon.src = 'https://i.ibb.co/jPDbhG4H/marker.webp';
+            icon.alt = 'Location Icon';
+            icon.style.width = '48px';
+            icon.style.height = '48px';
+
+            const info = document.createElement('div');
+            info.className = 'info';
+            info.textContent = `${issue.bathroom} Bathroom: ${issue.issue}`;
+
+            locElement.appendChild(icon);
+            locElement.appendChild(info);
+            mapContainer.appendChild(locElement);
+        });
+    } catch (error) {
+        console.error('Error fetching issues:', error);
+    }
+}
+
+// Auto-cleanup abandoned queue entries
+function autoRemoveQueue() {
+    // Check if we need to clean up
+    const currentAway = document.getElementById('current-away').textContent.trim();
+    if (currentAway === 'Nobody') return;
+    
+    // Get timestamp info
+    const timeoutStr = localStorage.getItem('timeout');
+    if (!timeoutStr) return;
+    
+    // Parse timeout time 
+    const timeoutParts = timeoutStr.split(':').map(Number);
+    const timeoutDate = new Date();
+    timeoutDate.setHours(timeoutParts[0], timeoutParts[1], timeoutParts[2]);
+    
+    // Get current time
+    const now = new Date();
+    
+    // If more than 15 minutes elapsed, auto-return
+    const elapsedMinutes = (now - timeoutDate) / (1000 * 60);
+    if (elapsedMinutes > 15) {
+        console.log(`Auto-returning ${currentAway} after ${elapsedMinutes.toFixed(1)} minutes`);
+        
+        // Record time data
+        const timeOut = timeoutStr;
+        const timeIn = getTime();
+        const time = formatTimeRange(timeOut, timeIn);
+        
+        const users = loadUsers();
+        const studentId = users[currentAway];  
+        // Submit time data
+        recordBathroomUsage(studentId, time);
+        
+        // Clear user
+        removeUser(currentAway);
+        document.getElementById('current-away').innerHTML = 'Nobody';
+        checkStatusAndUpdateUI();
+        
+        // Remove from queue
+        removeFromQueue();
+    }
+}
+
+
+// Initialize page onload
+window.onload = function() {
+    fetchLocations();
+    
+    // Check for abandoned entries every minute
+    setInterval(autoRemoveQueue, 60000);
+
+};
+</script>

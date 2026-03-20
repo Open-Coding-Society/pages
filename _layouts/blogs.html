@@ -1,0 +1,51 @@
+---
+layout: opencs 
+---
+
+<!-- This inserts content from the page using this layout -->
+{{ content | markdownify }}
+
+<!-- Get all posts -->
+{% assign rawposts = site.posts %}
+
+<!-- Hide posts if front matter flag hide:true -->
+{% assign posts = '' | split:'' %}
+{% for post in rawposts %}
+  {% if post.hide != true %}
+    {% assign posts = posts | push: post %}
+  {% endif %}
+{% endfor %}
+
+<!-- Sort posts by rank, then date, put posts with "sticky_posts: 1" front matter at the top -->
+{% assign grouped_posts = posts | group_by: "sticky_rank" | sort: "name", "last" %}
+{% assign sticky_posts = '' | split:'' %}
+{% assign non_sticky_posts = '' | split:'' %}
+<!-- Split posts into sticky and non-sticky -->
+{% for gp in grouped_posts %}
+  {%- if gp.name == "" -%}
+    {% assign non_sticky_posts = gp.items | sort: "date" | reverse %}
+  {%- else %}
+    {% assign sticky_posts = sticky_posts | concat: gp.items %}
+  {%- endif %}
+{% endfor %}
+
+<!-- Generate Card for each Post -->
+{% assign sticky_posts = sticky_posts | sort: "sticky_rank", "last" %}
+{% assign posts = sticky_posts | concat: non_sticky_posts %}
+{%- if posts.size > 0 -%}
+  {%- if page.list_title -%}
+    <h2 class="post-list-heading">{{ page.list_title }}</h2>
+  {%- endif -%}
+  <ul class="post-list">
+    {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+    {% assign seen_ids = "" | split: "" %}
+    {%- for post in posts -%}
+      {% unless seen_ids contains post.canonical_id or post.title contains "_content" %}
+        <li>
+          {%- include post_list_image_card.html -%}
+        </li>
+        {% assign seen_ids = seen_ids | push: post.canonical_id %}
+      {% endunless %}
+    {%- endfor -%}
+  </ul>
+    {%- endif -%}

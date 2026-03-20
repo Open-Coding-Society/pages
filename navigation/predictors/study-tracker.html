@@ -1,0 +1,494 @@
+---
+layout: post 
+title: Study Tracker
+show_reading_time: false
+description: Exam predictor for the AP Test
+permalink: /studytracker
+---
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top" style="background-color: var(--card-bg);">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <i class="bi bi-journal-check text-primary me-2"></i>Study Tracker
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Topics</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Analytics</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Settings</a>
+        </li>
+        <li class="nav-item ms-3">
+          <span class="nav-link">
+            <i class="bi bi-person-circle me-1"></i>
+            <span id="user-display-name">Guest</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container py-5">
+  <!-- Stats Row -->
+  <div class="row mb-4 g-3">
+    <div class="col-md-3">
+      <div class="stat-card h-100">
+        <div class="d-flex align-items-center mb-2">
+          <i class="bi bi-lightning-charge fs-4" style="color: var(--primary-color)"></i>
+          <span class="ms-2" style="color: var(--text-primary); font-weight: 500;">Current Streak</span>
+        </div>
+        <div class="stat-number">7</div>
+        <div class="stat-label">days</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card h-100">
+        <div class="d-flex align-items-center mb-2">
+          <i class="bi bi-clock-history fs-4" style="color: var(--primary-color)"></i>
+          <span class="ms-2" style="color: var(--text-primary); font-weight: 500;">Total Time</span>
+        </div>
+        <div class="stat-number">24</div>
+        <div class="stat-label">hours</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card h-100">
+        <div class="d-flex align-items-center mb-2">
+          <i class="bi bi-check2-square fs-4" style="color: var(--primary-color)"></i>
+          <span class="ms-2" style="color: var(--text-primary); font-weight: 500;">Topics Completed</span>
+        </div>
+        <div class="stat-number">8</div>
+        <div class="stat-label">of 16</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card h-100">
+        <div class="d-flex align-items-center mb-2">
+          <i class="bi bi-calendar-check fs-4" style="color: var(--primary-color)"></i>
+          <span class="ms-2" style="color: var(--text-primary); font-weight: 500;">Exam Countdown</span>
+        </div>
+        <div class="stat-number">21</div>
+        <div class="stat-label">days left</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Topics List -->
+  <div class="row mt-5">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="topic-header">AP CSP Topics</h2>
+          <ul id="topics" class="list-group list-group-flush">
+            <!-- Topics will be generated dynamically -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global variables for user information
+  let currentUser = {
+    id: null,
+    name: ""
+  };
+
+  // Topic data structure with subtopics
+  const topicsData = [
+    {
+      title: "Big Idea 1: Creative Development",
+      subtopics: [
+        "1.1 Collaboration",
+        "1.2 Program Function and Purpose",
+        "1.3 Program Design and Development",
+        "1.4 Identifying and Correcting Errors"
+      ]
+    },
+    {
+      title: "Big Idea 2: Data",
+      subtopics: [
+        "2.1 Binary Numbers",
+        "2.2 Data Compression",
+        "2.3 Extracting Information from Data",
+        "2.4 Using Programs with Data"
+      ]
+    },
+    {
+      title: "Big Idea 3: Algorithms and Programming",
+      subtopics: [
+        "3.1 Variables and Assignments",
+        "3.2 Data Abstraction",
+        "3.3 Mathematical Expressions",
+        "3.4 Strings",
+        "3.5 Boolean Expressions",
+        "3.6 Conditionals",
+        "3.7 Nested Conditionals",
+        "3.8 Iteration",
+        "3.9 Developing Algorithms",
+        "3.10 Lists",
+        "3.11 Binary Search",
+        "3.12 Calling Procedures",
+        "3.13 Developing Procedures",
+        "3.14 Libraries",
+        "3.15 Random Values",
+        "3.16 Simulations",
+        "3.17 Algorithm Efficiency",
+        "3.18 Undecidable Problems"
+      ]
+    },
+    {
+      title: "Big Idea 4: Computer Systems and Networks",
+      subtopics: [
+        "4.1 The Internet",
+        "4.2 Fault Tolerance",
+        "4.3 Parallel and Distributed Computing"
+      ]
+    },
+    {
+      title: "Big Idea 5: Impact of Computing",
+      subtopics: [
+        "5.1 Beneficial and Harmful Effects",
+        "5.2 Digital Divide",
+        "5.3 Computing Bias",
+        "5.4 Crowdsourcing",
+        "5.5 Legal and Ethical Concerns",
+        "5.6 Safe Computing"
+      ]
+    }
+  ];
+
+  const topicsContainer = document.getElementById('topics');
+  
+  // Track progress across all subtopics
+  let totalSubtopics = 0;
+  topicsData.forEach(topic => totalSubtopics += topic.subtopics.length);
+  let completedSubtopics = 0;
+
+  // Update the stats based on completed subtopics
+  const updateStats = () => {
+    // Update the topics completed stat
+    const topicsCompletedElement = document.querySelector('.col-md-3:nth-child(3) .stat-number');
+    if (topicsCompletedElement) {
+      topicsCompletedElement.textContent = completedSubtopics;
+    }
+    
+    // Update the "of X" label
+    const topicsCompletedLabelElement = document.querySelector('.col-md-3:nth-child(3) .stat-label');
+    if (topicsCompletedLabelElement) {
+      topicsCompletedLabelElement.textContent = `of ${totalSubtopics}`;
+    }
+  };
+
+  // Call once to initialize
+  updateStats();
+
+  // Function to prompt for user name
+  const promptForUserName = () => {
+    // Check if we already have a name in localStorage
+    const savedName = localStorage.getItem('userName');
+    
+    if (savedName) {
+      currentUser.name = savedName;
+      document.getElementById('user-display-name').textContent = savedName;
+      return;
+    }
+    
+    // If no saved name, prompt the user
+    const userName = prompt('Please enter your name for the Study Tracker:', '');
+    
+    if (userName && userName.trim() !== '') {
+      currentUser.name = userName.trim();
+      localStorage.setItem('userName', userName.trim());
+      document.getElementById('user-display-name').textContent = userName.trim();
+    } else {
+      // If user cancels or enters empty name, use 'Guest'
+      currentUser.name = 'Guest';
+      document.getElementById('user-display-name').textContent = 'Guest';
+    }
+  };
+  
+  // Call when document is loaded
+  document.addEventListener('DOMContentLoaded', promptForUserName);
+
+  // Fetch existing study records on page load
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // Attempt to get records from the server
+      const response = await fetch('http://127.0.0.1:8101/api/study');
+      
+      if (response.ok) {
+        const studyRecords = await response.json();
+        
+        // Mark topics as completed based on existing records
+        studyRecords.forEach(record => {
+          if (record.studied) {
+            // Find the topic and subtopic in our data structure
+            const topicIndex = topicsData.findIndex(t => t.title === record.topic);
+            if (topicIndex !== -1) {
+              const subtopicIndex = topicsData[topicIndex].subtopics.indexOf(record.subtopic);
+              if (subtopicIndex !== -1) {
+                // Mark as completed (will be handled when rendering)
+                completedSubtopics++;
+              }
+            }
+          }
+        });
+        
+        // Update stats with the data from the server
+        updateStats();
+      } else {
+        console.warn("Could not load study records from server. Status:", response.status);
+        // Could add local storage fallback here if needed
+      }
+    } catch (error) {
+      console.error("Error loading study records:", error);
+      console.log("Using local storage as fallback");
+      
+      // Fallback to localStorage if available
+      try {
+        const savedRecords = localStorage.getItem('studyRecords');
+        if (savedRecords) {
+          const records = JSON.parse(savedRecords);
+          // Process local records similar to server records
+          // (Implementation would be similar to above)
+        }
+      } catch (localError) {
+        console.error("Local storage fallback failed:", localError);
+      }
+    }
+  });
+
+  topicsData.forEach((topic, topicIndex) => {
+    // Create main topic card
+    const topicCard = document.createElement('div');
+    topicCard.className = 'card mb-4';
+    
+    // Create card header
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header py-3 d-flex justify-content-between align-items-center';
+    
+    // Create topic title with collapsible control
+    const titleContainer = document.createElement('div');
+    titleContainer.className = 'd-flex align-items-center';
+    
+    const collapseButton = document.createElement('button');
+    collapseButton.className = 'btn btn-link text-decoration-none p-0 me-2';
+    collapseButton.style.color = 'var(--primary-color)';
+    collapseButton.innerHTML = '<i class="bi bi-chevron-down"></i>';
+    collapseButton.setAttribute('data-bs-toggle', 'collapse');
+    collapseButton.setAttribute('data-bs-target', `#topic-${topicIndex}-content`);
+    collapseButton.setAttribute('aria-expanded', 'true');
+    
+    const topicTitle = document.createElement('h5');
+    topicTitle.className = 'mb-0 fw-bold';
+    topicTitle.style.color = '#ffffff';
+    topicTitle.style.textShadow = '0 0 10px rgba(108, 99, 255, 0.3)';
+    topicTitle.style.letterSpacing = '0.5px';
+    topicTitle.textContent = topic.title;
+    
+    titleContainer.appendChild(collapseButton);
+    titleContainer.appendChild(topicTitle);
+    
+    // Create progress badge for this topic
+    const progressBadge = document.createElement('span');
+    progressBadge.className = 'badge';
+    progressBadge.id = `topic-${topicIndex}-progress`;
+    progressBadge.style.backgroundColor = 'var(--border-color)';
+    progressBadge.style.color = 'var(--primary-color)';
+    progressBadge.style.fontWeight = '600';
+    progressBadge.style.padding = '6px 10px';
+    progressBadge.textContent = `0/${topic.subtopics.length}`;
+    
+    cardHeader.appendChild(titleContainer);
+    cardHeader.appendChild(progressBadge);
+    
+    // Create collapsible content area
+    const collapseArea = document.createElement('div');
+    collapseArea.className = 'collapse show';
+    collapseArea.id = `topic-${topicIndex}-content`;
+    
+    // Create card body for subtopics
+    const cardBody = document.createElement('div');
+    cardBody.className = 'card-body';
+    
+    // Create subtopics list
+    const subtopicsList = document.createElement('ul');
+    subtopicsList.className = 'list-group list-group-flush';
+    
+    // Track completed subtopics for this main topic
+    let topicCompletedCount = 0;
+    
+    // Add each subtopic
+    topic.subtopics.forEach((subtopic, subtopicIndex) => {
+      const subtopicItem = document.createElement('li');
+      subtopicItem.className = 'list-group-item d-flex justify-content-between align-items-center py-3 border-0';
+      subtopicItem.style.backgroundColor = 'var(--card-bg)';
+      subtopicItem.style.color = 'var(--text-primary)';
+      subtopicItem.style.borderBottom = '1px solid var(--border-color)';
+      
+      // Create left side with subtopic icon and text
+      const subtopicContent = document.createElement('div');
+      subtopicContent.className = 'd-flex align-items-center';
+      
+      const subtopicIcon = document.createElement('div');
+      subtopicIcon.className = 'me-3';
+      subtopicIcon.style.color = 'var(--primary-color)';
+      subtopicIcon.innerHTML = '<i class="bi bi-file-text"></i>';
+      
+      const subtopicText = document.createElement('span');
+      subtopicText.textContent = subtopic;
+      subtopicText.style.fontWeight = '500';
+      
+      subtopicContent.appendChild(subtopicIcon);
+      subtopicContent.appendChild(subtopicText);
+      
+      // Create study button
+      const studyButton = document.createElement('button');
+      studyButton.textContent = 'Mark as Studied';
+      studyButton.className = 'btn btn-outline-primary btn-sm';
+      
+      // Handle study button click
+      studyButton.onclick = async () => {
+        // Create the record object once to use in both server and local storage
+        const studyRecord = {
+          topic: topic.title,
+          subtopic: subtopic,
+          userName: currentUser.name,
+          studied: true,
+          timestamp: new Date().toISOString()
+        };
+
+        // Function to update UI after successful completion
+        const markAsCompleted = () => {
+          // Update button state
+          studyButton.innerHTML = '<i class="bi bi-check-circle me-1"></i>Completed';
+          studyButton.disabled = true;
+          studyButton.classList.remove('btn-outline-primary');
+          studyButton.classList.add('btn-success');
+          
+          // Add completion class to list item
+          subtopicItem.classList.add('bg-dark');
+          
+          // Update completion counters
+          topicCompletedCount++;
+          completedSubtopics++;
+          
+          // Update topic progress badge
+          const badge = document.getElementById(`topic-${topicIndex}-progress`);
+          if (badge) {
+            badge.textContent = `${topicCompletedCount}/${topic.subtopics.length}`;
+            
+            // If all subtopics completed, update badge style
+            if (topicCompletedCount === topic.subtopics.length) {
+              badge.classList.remove('bg-light', 'text-primary');
+              badge.style.backgroundColor = 'var(--success-color)';
+              badge.style.color = '#121212';
+              badge.style.fontWeight = '600';
+            }
+          }
+          
+          // Update overall stats
+          updateStats();
+        };
+
+        // First try to send to server
+        try {
+          const res = await fetch('http://127.0.0.1:8101/api/study', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(studyRecord)
+          });
+
+          if (res.ok) {
+            // Server successful, update UI
+            markAsCompleted();
+          } else {
+            console.warn("Server returned error status:", res.status);
+            // Server error, try local storage fallback
+            try {
+              // Get existing records or initialize empty array
+              const existingRecords = JSON.parse(localStorage.getItem('studyRecords') || '[]');
+              // Add new record
+              existingRecords.push(studyRecord);
+              // Save back to localStorage
+              localStorage.setItem('studyRecords', JSON.stringify(existingRecords));
+              
+              // Update UI even though server failed
+              markAsCompleted();
+              console.log("Saved to localStorage instead of server");
+            } catch (localError) {
+              console.error("LocalStorage fallback failed:", localError);
+              alert("Could not save your progress. Please try again later.");
+            }
+          }
+        } catch (error) {
+          console.error("POST error:", error);
+          
+          // Network error, try local storage fallback
+          try {
+            // Get existing records or initialize empty array
+            const existingRecords = JSON.parse(localStorage.getItem('studyRecords') || '[]');
+            // Add new record
+            existingRecords.push(studyRecord);
+            // Save back to localStorage
+            localStorage.setItem('studyRecords', JSON.stringify(existingRecords));
+            
+            // Update UI even though server request failed
+            markAsCompleted();
+            console.log("Network request failed, saved to localStorage instead");
+          } catch (localError) {
+            console.error("LocalStorage fallback failed:", localError);
+            alert("Failed to send request and could not save locally.");
+          }
+        }
+      };
+      
+      // Assemble subtopic item
+      subtopicItem.appendChild(subtopicContent);
+      subtopicItem.appendChild(studyButton);
+      subtopicsList.appendChild(subtopicItem);
+    });
+    
+    // Assemble the card
+    cardBody.appendChild(subtopicsList);
+    collapseArea.appendChild(cardBody);
+    topicCard.appendChild(cardHeader);
+    topicCard.appendChild(collapseArea);
+    
+    // Add to container
+    topicsContainer.appendChild(topicCard);
+  });
+
+  // Initialize collapse functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add click event for the collapse icons to toggle between up/down
+    const collapseButtons = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    collapseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        if (icon.classList.contains('bi-chevron-down')) {
+          icon.classList.replace('bi-chevron-down', 'bi-chevron-right');
+        } else {
+          icon.classList.replace('bi-chevron-right', 'bi-chevron-down');
+        }
+      });
+    });
+  });
+</script>

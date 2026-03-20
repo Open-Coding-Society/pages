@@ -1,0 +1,422 @@
+---
+layout: post
+title: Exam Predictor
+show_reading_time: false
+description: Exam predictor for the AP Test
+hide: true
+permalink: /exam-predictor
+---
+
+<div class="container">
+    <!-- Practice-Based Prediction Section -->
+    <div class="section">
+        <h2>Practice Exam Tracker</h2>
+        
+        <div class="practice-grid">
+            <div class="practice-card">
+                <h3>2018 MCQ Practice</h3>
+                <div class="input-row">
+                    <label class="input-label">Score:</label>
+                    <input type="number" class="score-input" id="mcq2018" min="0" max="70" placeholder="0" oninput="calculatePrediction()">
+                    <span class="max-score">/ 70</span>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Time Spent (min):</label>
+                    <input type="number" class="score-input" id="time2018" min="0" placeholder="0" oninput="calculatePrediction()">
+                </div>
+            </div>
+            
+            <div class="practice-card">
+                <h3>2020 MCQ Practice</h3>
+                <div class="input-row">
+                    <label class="input-label">Score:</label>
+                    <input type="number" class="score-input" id="mcq2020" min="0" max="70" placeholder="0" oninput="calculatePrediction()">
+                    <span class="max-score">/ 70</span>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Time Spent (min):</label>
+                    <input type="number" class="score-input" id="time2020" min="0" placeholder="0" oninput="calculatePrediction()">
+                </div>
+            </div>
+            
+            <div class="practice-card">
+                <h3>2021 MCQ Practice</h3>
+                <div class="input-row">
+                    <label class="input-label">Score:</label>
+                    <input type="number" class="score-input" id="mcq2021" min="0" max="70" placeholder="0" oninput="calculatePrediction()">
+                    <span class="max-score">/ 70</span>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Time Spent (min):</label>
+                    <input type="number" class="score-input" id="time2021" min="0" placeholder="0" oninput="calculatePrediction()">
+                </div>
+            </div>
+            
+            <div class="practice-card">
+                <h3>Practice FRQ</h3>
+                <div class="input-row">
+                    <label class="input-label">Score:</label>
+                    <input type="number" class="score-input" id="practicefrq" min="0" max="6" placeholder="0" oninput="calculatePrediction()">
+                    <span class="max-score">/ 6</span>
+                </div>
+                <div class="input-row">
+                    <label class="input-label">Time Spent (min):</label>
+                    <input type="number" class="score-input" id="timeFRQ" min="0" placeholder="0" oninput="calculatePrediction()">
+                </div>
+            </div>
+        </div>
+        
+        <div class="prediction-section">
+          <div class="prediction-title">Predicted AP® Score</div>
+          <div class="predicted-score" id="practiceBasedScore">-</div>
+          <div class="score-interpretation" id="practiceInterpretation">Enter your practice scores above</div>
+          <div class="confidence-indicator" id="confidenceLevel">Confidence: Low</div>
+      
+          <div class="breakdown-grid">
+              <div class="breakdown-card">
+                  <h4>Average MCQ</h4>
+                  <div class="breakdown-value" id="avgMCQ">-</div>
+              </div>
+              <div class="breakdown-card">
+                  <h4>MCQ Percentage</h4>
+                  <div class="breakdown-value" id="mcqPercent">-</div>
+              </div>
+              <div class="breakdown-card">
+                  <h4>FRQ Score</h4>
+                  <div class="breakdown-value" id="frqScore">-</div>
+              </div>
+              <div class="breakdown-card">
+                  <h4>Overall Strength</h4>
+                  <div class="breakdown-value" id="overallStrength">-</div>
+              </div>
+          </div>
+      
+          <!-- 🔥 Add your button right here -->
+          <button id="savePredictionBtn" class="btn btn-primary" style="margin-top: 20px;">Save Prediction</button>
+      </div>
+      
+
+    <!-- Original Manual Score Predictor -->
+    <div class="section">
+        <h2>Manual Score Calculator</h2>
+        
+        <div class="input-group">
+          <label class="input-label-slider">Section I: Multiple-Choice Questions</label>
+          <div class="slider-container">
+            <input type="range" class="form-range" id="mcqScore" min="0" max="70" value="60" oninput="updateScores()">
+          </div>
+          <div class="flex-row">
+            <span style="color: #71717a; font-size: 0.9rem;">Score:</span>
+            <input type="number" id="mcqInput" min="0" max="70" value="60" class="number-input" oninput="syncSlider('mcq')">
+            <span style="color: #71717a; font-size: 0.9rem;">/ 70</span>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label-slider">Create Performance Task</label>
+          <div class="slider-container">
+            <input type="range" class="form-range" id="frqScore" min="0" max="6" value="6" oninput="updateScores()">
+          </div>
+          <div class="flex-row">
+            <span style="color: #71717a; font-size: 0.9rem;">Score:</span>
+            <input type="number" id="frqInput" min="0" max="6" value="6" class="number-input" oninput="syncSlider('frq')">
+            <span style="color: #71717a; font-size: 0.9rem;">/ 6</span>
+          </div>
+        </div>
+        
+        <div class="results-grid">
+          <div class="score-card">
+            <h3>Multiple Choice</h3>
+            <div class="score-value" id="mcqDisplay">60</div>
+            <div class="score-max">out of 70</div>
+          </div>
+          
+          <div class="score-card">
+            <h3>Performance Task</h3>
+            <div class="score-value" id="frqDisplay">30</div>
+            <div class="score-max">out of 30</div>
+          </div>
+          
+          <div class="score-card">
+            <h3>Composite Score</h3>
+            <div class="score-value" id="compositeDisplay">90</div>
+            <div class="score-max">out of 100</div>
+          </div>
+          
+          <div class="score-card final-score">
+            <h3>Predicted AP® Score</h3>
+            <div class="score-value" id="predictedScore">5</div>
+            <div class="score-interpretation" id="scoreInterpretation">Extremely well qualified</div>
+          </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  const interpretations = {
+    5: "Extremely well qualified",
+    4: "Well qualified", 
+    3: "Qualified",
+    2: "Possibly qualified",
+    1: "No recommendation"
+  };
+
+  // Practice-based prediction function
+  function calculatePrediction() {
+      const mcq2018 = parseInt(document.getElementById("mcq2018").value) || 0;
+      const mcq2020 = parseInt(document.getElementById("mcq2020").value) || 0;
+      const mcq2021 = parseInt(document.getElementById("mcq2021").value) || 0;
+      const practiceFRQ = parseInt(document.getElementById("practicefrq").value) || 0;
+
+      const time2018 = parseInt(document.getElementById("time2018").value) || 0;
+      const time2020 = parseInt(document.getElementById("time2020").value) || 0;
+      const time2021 = parseInt(document.getElementById("time2021").value) || 0;
+      const timeFRQ = parseInt(document.getElementById("timeFRQ").value) || 0;
+
+      // Adjust scores based on time spent (penalize if time exceeds 60 minutes per exam)
+      const adjustScore = (score, time) => {
+          if (time > 60) {
+              return score * (60 / time); // Scale down proportionally
+          }
+          return score;
+      };
+
+      const adjusted2018 = adjustScore(mcq2018, time2018);
+      const adjusted2020 = adjustScore(mcq2020, time2020);
+      const adjusted2021 = adjustScore(mcq2021, time2021);
+      const adjustedFRQ = adjustScore(practiceFRQ, timeFRQ);
+
+      // Count how many scores have been entered
+      const mcqCount = (adjusted2018 > 0 ? 1 : 0) + (adjusted2020 > 0 ? 1 : 0) + (adjusted2021 > 0 ? 1 : 0);
+      const frqCount = adjustedFRQ > 0 ? 1 : 0;
+      const totalInputs = mcqCount + frqCount;
+
+      if (totalInputs === 0) {
+          document.getElementById("practiceBasedScore").textContent = "-";
+          document.getElementById("practiceInterpretation").textContent = "Enter your practice scores above";
+          document.getElementById("confidenceLevel").textContent = "Confidence: Low";
+          document.getElementById("avgMCQ").textContent = "-";
+          document.getElementById("mcqPercent").textContent = "-";
+          document.getElementById("frqScore").textContent = "-";
+          document.getElementById("overallStrength").textContent = "-";
+          return;
+      }
+
+      // Calculate average MCQ score
+      let avgMCQ = 0;
+      if (mcqCount > 0) {
+          avgMCQ = (adjusted2018 + adjusted2020 + adjusted2021) / mcqCount;
+      }
+
+      // Convert to percentage
+      const mcqPercentage = (avgMCQ / 70) * 100;
+
+      // Weight the prediction: MCQ (70%) + FRQ (30%)
+      let compositeScore = 0;
+      if (mcqCount > 0 && frqCount > 0) {
+          compositeScore = (avgMCQ * 0.7) + (adjustedFRQ * 5 * 0.3);
+      } else if (mcqCount > 0) {
+          const estimatedFRQ = Math.max(0, Math.min(6, (avgMCQ / 70) * 6));
+          compositeScore = (avgMCQ * 0.7) + (estimatedFRQ * 5 * 0.3);
+      } else {
+          const estimatedMCQ = (adjustedFRQ / 6) * 70;
+          compositeScore = (estimatedMCQ * 0.7) + (adjustedFRQ * 5 * 0.3);
+      }
+
+      const scaledScore = (compositeScore / 65) * 100;
+
+      let apScore = 1;
+      if (scaledScore >= 90) apScore = 5;
+      else if (scaledScore >= 81) apScore = 4;
+      else if (scaledScore >= 42) apScore = 3;
+      else if (scaledScore >= 30) apScore = 2;
+
+      let confidence = "Low";
+      let strengthAssessment = "Developing";
+
+      if (totalInputs >= 3) {
+          confidence = "High";
+          if (mcqPercentage >= 85) strengthAssessment = "Excellent";
+          else if (mcqPercentage >= 75) strengthAssessment = "Strong";
+          else if (mcqPercentage >= 60) strengthAssessment = "Good";
+      } else if (totalInputs === 2) {
+          confidence = "Medium";
+          if (mcqPercentage >= 80) strengthAssessment = "Strong";
+          else if (mcqPercentage >= 65) strengthAssessment = "Good";
+      }
+
+      document.getElementById("practiceBasedScore").textContent = apScore;
+      document.getElementById("practiceInterpretation").textContent = interpretations[apScore];
+      document.getElementById("confidenceLevel").textContent = `Confidence: ${confidence}`;
+      document.getElementById("avgMCQ").textContent = mcqCount > 0 ? Math.round(avgMCQ) : "-";
+      document.getElementById("mcqPercent").textContent = mcqCount > 0 ? Math.round(mcqPercentage) + "%" : "-";
+      document.getElementById("frqScore").textContent = frqCount > 0 ? adjustedFRQ + "/6" : "-";
+      document.getElementById("overallStrength").textContent = strengthAssessment;
+  }
+
+  // Original manual calculator functions
+  function updateScores() {
+    const mcqRaw = parseInt(document.getElementById("mcqScore").value);
+    const frqRaw = parseInt(document.getElementById("frqScore").value);
+    
+    document.getElementById("mcqInput").value = mcqRaw;
+    document.getElementById("frqInput").value = frqRaw;
+    
+    const mcqScore = mcqRaw;
+    const frqScore = frqRaw * 5;
+    const total = mcqScore + frqScore;
+    
+    document.getElementById("mcqDisplay").textContent = mcqScore;
+    document.getElementById("frqDisplay").textContent = frqScore;
+    document.getElementById("compositeDisplay").textContent = total;
+    
+    let apScore = 1;
+    if (total >= 90) apScore = 5;
+    else if (total >= 81) apScore = 4;
+    else if (total >= 42) apScore = 3;
+    else if (total >= 30) apScore = 2;
+    
+    document.getElementById("predictedScore").textContent = apScore;
+    document.getElementById("scoreInterpretation").textContent = interpretations[apScore];
+  }
+
+  function syncSlider(type) {
+    if (type === 'mcq') {
+      const val = parseInt(document.getElementById("mcqInput").value);
+      if (val >= 0 && val <= 70) {
+        document.getElementById("mcqScore").value = val;
+      }
+    } else {
+      const val = parseInt(document.getElementById("frqInput").value);
+      if (val >= 0 && val <= 6) {
+        document.getElementById("frqScore").value = val;
+      }
+    }
+    updateScores();
+  }
+
+  // Make functions available globally for inline HTML event handlers
+  window.calculatePrediction = calculatePrediction;
+  window.updateScores = updateScores;
+  window.syncSlider = syncSlider;
+
+  // Initialize both calculators
+  updateScores();
+  calculatePrediction();
+</script>
+
+<script type="module">
+  import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const saveButton = document.getElementById('savePredictionBtn');
+    const practiceInputs = ['mcq2018', 'mcq2020', 'mcq2021', 'practicefrq'];
+    const manualInputs = ['mcqScore', 'frqScore'];
+    let currentUser = null;
+
+    // Fetch current user data
+    async function fetchCurrentUser() {
+      try {
+        const response = await fetch(`${pythonURI}/api/user`, fetchOptions);
+        if (response.ok) {
+          currentUser = await response.json();
+          console.log('Fetched current user:', currentUser);
+          loadUserData(currentUser);
+        } else {
+          console.warn('Could not fetch current user. Status:', response.status);
+          alert('You must be logged in to use this feature.');
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+        alert('An error occurred while fetching user info.');
+      }
+    }
+
+    // Load user data into the form
+    function loadUserData(user) {
+      if (user.ap_exam) {
+        const { practice_based, manual_calculator } = user.ap_exam.predicted_score || {};
+
+        // Load practice-based data
+        if (practice_based) {
+          document.getElementById('mcq2018').value = practice_based.mcq_2018 || 0;
+          document.getElementById('mcq2020').value = practice_based.mcq_2020 || 0;
+          document.getElementById('mcq2021').value = practice_based.mcq_2021 || 0;
+          document.getElementById('practicefrq').value = practice_based.practice_frq || 0;
+        }
+
+        // Load manual calculator data
+        if (manual_calculator) {
+          document.getElementById('mcqScore').value = manual_calculator.mcq_score || 0;
+          document.getElementById('frqScore').value = manual_calculator.frq_score || 0;
+        }
+
+        // Trigger calculations after loading data
+        calculatePrediction();
+        updateScores();
+      }
+    }
+
+    // Save user data to the backend
+    async function saveUserData() {
+      if (!currentUser) {
+        alert('You must be logged in to save your data.');
+        return;
+      }
+
+      // Collect practice-based prediction data
+      const practiceBased = {
+        mcq_2018: parseInt(document.getElementById('mcq2018').value) || 0,
+        mcq_2020: parseInt(document.getElementById('mcq2020').value) || 0,
+        mcq_2021: parseInt(document.getElementById('mcq2021').value) || 0,
+        practice_frq: parseInt(document.getElementById('practicefrq').value) || 0,
+        predicted_ap_score: parseInt(document.getElementById('practiceBasedScore').textContent) || 0,
+        confidence_level: document.getElementById('confidenceLevel').textContent.replace('Confidence: ', '') || 'Low',
+      };
+
+      // Collect manual calculator data
+      const manualCalculator = {
+        mcq_score: parseInt(document.getElementById('mcqScore').value) || 0,
+        frq_score: parseInt(document.getElementById('frqScore').value) || 0,
+        composite_score: parseInt(document.getElementById('compositeDisplay').textContent) || 0,
+        predicted_ap_score: parseInt(document.getElementById('predictedScore').textContent) || 0,
+      };
+
+      // Prepare the payload for the backend
+      const apExamData = {
+        predicted_score: {
+          practice_based: practiceBased,
+          manual_calculator: manualCalculator,
+        },
+        last_updated: new Date().toISOString().split('T')[0], // Add the current date
+      };
+
+      try {
+        // Send the PUT request to update the user data
+        const response = await fetch(`${pythonURI}/api/user`, {
+          ...fetchOptions,
+          method: 'PUT',
+          body: JSON.stringify({ ap_exam: apExamData }), // Send the ap_exam field
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('User data saved successfully:', result);
+          alert('Your data has been saved successfully!');
+        } else {
+          console.error('Failed to save user data. Status:', response.status);
+          alert('Failed to save your data. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error saving user data:', error);
+        alert('An error occurred while saving your data.');
+      }
+    }
+
+    // Attach event listener to the save button
+    saveButton.addEventListener('click', saveUserData);
+
+    // Fetch user data on page load
+    fetchCurrentUser();
+  });
+</script>
