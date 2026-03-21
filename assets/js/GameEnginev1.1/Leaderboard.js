@@ -118,7 +118,7 @@ export default class Leaderboard {
         this.parentId = options.parentId || null;
         // Default: visible unless explicitly requested hidden via options.initiallyHidden === true
         this.initiallyHidden = options.initiallyHidden === true;
-        this.isOpen = !this.initiallyHidden;
+        this.isOpen = false; // Always start collapsed
         this.mounted = false;
         this.mode = 'dynamic'; // Default to dynamic leaderboard
         this.showingTypeSelection = false;
@@ -358,20 +358,20 @@ export default class Leaderboard {
 
         list.innerHTML = '<p class="loading">Loading dynamic leaderboard…</p>';
         
-        // Show back button
+        // Show back button only if open
         const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.style.display = 'inline-block';
-        
+        if (backBtn) backBtn.style.display = (this.isOpen) ? 'inline-block' : 'none';
+
         // Start auto-updating
         this.fetchLeaderboard();
         this.refreshInterval = setInterval(() => this.fetchLeaderboard(), 30000);
     }
 
     setupElementaryMode() {
-        // Show back button
+        // Show back button only if open
         const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.style.display = 'inline-block';
-        
+        if (backBtn) backBtn.style.display = (this.isOpen) ? 'inline-block' : 'none';
+
         // Fetch existing data from backend
         this.fetchElementaryLeaderboard().then(() => {
             this.showElementaryForm();
