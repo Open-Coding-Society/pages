@@ -13,6 +13,16 @@
 //   5. calendar.js        — this orchestrator
 // ============================================
 
+// ─── Navigation helper (mockable in tests) ─────────────────────
+
+/**
+ * Navigate to a URL. Extracted so tests can override without touching window.location.
+ * @param {string} url
+ */
+function calendarNavigate(url) {
+  window.location.href = url;
+}
+
 // ─── Populate Sprint Date Preview ───────────────────────────────
 
 /**
@@ -112,7 +122,7 @@ async function executeSelectiveSync() {
     // Handle auth failure
     if (errorType === ERROR_TYPES.AUTH_EXPIRED) {
       alert(getErrorMessage(ERROR_TYPES.AUTH_EXPIRED));
-      window.location.href = SITE_BASEURL + '/login';
+      calendarNavigate(SITE_BASEURL + '/login');
       return;
     }
 
@@ -182,7 +192,7 @@ async function executeSelectiveRemove() {
     // Handle auth failure
     if (errorType === ERROR_TYPES.AUTH_EXPIRED) {
       alert(getErrorMessage(ERROR_TYPES.AUTH_EXPIRED));
-      window.location.href = SITE_BASEURL + '/login';
+      calendarNavigate(SITE_BASEURL + '/login');
       return;
     }
 
