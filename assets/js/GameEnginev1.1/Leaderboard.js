@@ -116,12 +116,13 @@ export default class Leaderboard {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
         this.parentId = options.parentId || null;
-        this.isOpen = false;
+        // Default: visible unless explicitly requested hidden via options.initiallyHidden === true
+        this.initiallyHidden = options.initiallyHidden === true;
+        this.isOpen = !this.initiallyHidden;
         this.mounted = false;
         this.mode = null; // 'dynamic' or 'elementary'
         this.showingTypeSelection = true;
         this.elementaryEntries = []; // Store elementary entries locally
-        this.initiallyHidden = options.initiallyHidden !== false; // Default to hidden
 
         // Flag whether a backend URI is available; allow UI to mount even when
         // backend is unreachable so leaderboard can operate in offline/local mode.
@@ -151,28 +152,55 @@ export default class Leaderboard {
         // CRITICAL: Always use fixed positioning to avoid game container position affecting it
         container.style.position = 'fixed';
         container.style.top = '80px';
-        container.style.right = '20px';
+        container.style.left = '20px';
+        container.style.right = 'auto';
         container.style.zIndex = '1000';
         
         // Add the widget class for styling
         container.className = 'leaderboard-widget' + (this.initiallyHidden ? ' initially-hidden' : '');
 
         container.innerHTML = `
-            <div class="leaderboard-header">
-                <div>
-                    <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
-                    <span id="leaderboard-title">Leaderboard</span>
-                    <span id="leaderboard-preview"
-                          style="font-size:16px;font-weight:700;margin-left:8px;display:none;">Collapse to choose a leaderboard</span>
+            <div class="leaderboard-header" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
+                        <span id="leaderboard-title" style="font-size:20px;font-weight:800;">Leaderboard</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <span id="leaderboard-current-score" style="font-size:14px;font-weight:700;color:#ffffff;">Score: 0</span>
+                        <span id="leaderboard-preview" style="font-size:13px;color:#cfcfcf;display:none;">Collapse to choose a leaderboard</span>
+                    </div>
                 </div>
-                <button id="toggle-leaderboard" class="toggle-btn">+</button>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button id="leaderboard-save-score" class="action-btn submit-btn" style="padding:8px 12px;font-size:12px;">Save Score</button>
+                    <button id="toggle-leaderboard" class="toggle-btn" aria-label="Toggle leaderboard">+</button>
+                </div>
             </div>
-            <div class="leaderboard-content hidden" id="leaderboard-content">
+            <div class="leaderboard-content hidden" id="leaderboard-content" style="padding:12px 16px;">
                 <div id="leaderboard-list"></div>
             </div>
         `;
 
         appendTarget.appendChild(container);
+        // Apply initial open/closed state immediately to avoid needing a separate preload
+        const contentEl = container.querySelector('#leaderboard-content');
+        const toggleBtn = container.querySelector('#toggle-leaderboard');
+        const previewEl = container.querySelector('#leaderboard-preview');
+        const titleEl = container.querySelector('#leaderboard-title');
+
+        if (contentEl && toggleBtn) {
+            contentEl.classList.toggle('hidden', !this.isOpen);
+            toggleBtn.textContent = this.isOpen ? '−' : '+';
+            if (previewEl && titleEl) {
+                if (this.isOpen) {
+                    titleEl.style.display = 'inline';
+                    previewEl.style.display = 'none';
+                } else {
+                    titleEl.style.display = 'none';
+                    previewEl.style.display = 'inline';
+                }
+            }
+        }
         this.mounted = true;
 
         document
@@ -183,7 +211,53 @@ export default class Leaderboard {
             .getElementById('back-btn')
             .addEventListener('click', () => this.goBack());
 
+        document
+            .getElementById('leaderboard-save-score')
+            .addEventListener('click', (e) => this.handleSaveScoreFromLeaderboard(e.currentTarget));
+
         this.showTypeSelection();
+    }
+
+    _getActiveGameEnv() {
+        const activeControl = this.gameControl?.game?.getActiveControl
+            ? this.gameControl.game.getActiveControl()
+            : this.gameControl;
+
+        return activeControl?.currentLevel?.gameEnv
+            || this.gameControl?.currentLevel?.gameEnv
+            || this.gameControl?.gameEnv
+            || null;
+    }
+
+    handleSaveScoreFromLeaderboard(buttonEl) {
+        const gameEnv = this._getActiveGameEnv();
+
+        if (!gameEnv) {
+            alert('Score feature not available');
+            return;
+        }
+
+        if (!gameEnv.scoreManager) {
+            gameEnv.initScoreManager()
+                .then(() => this.handleSaveScoreFromLeaderboard(buttonEl))
+                .catch(error => {
+                    console.error('Failed to initialize scoreManager:', error);
+                    alert('Score feature not available');
+                });
+            return;
+        }
+
+        const saveButton = buttonEl || document.getElementById('leaderboard-save-score');
+        gameEnv.scoreManager.saveScore(saveButton)
+            .then(() => {
+                if (this.mode === 'dynamic') {
+                    return this.fetchLeaderboard();
+                }
+            })
+            .catch(error => {
+                console.error('Failed to save score from leaderboard:', error);
+                alert('Failed to save score. Please try again.');
+            });
     }
 
     toggle() {
