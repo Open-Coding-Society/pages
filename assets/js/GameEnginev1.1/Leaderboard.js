@@ -163,7 +163,7 @@ export default class Leaderboard {
             <div class="leaderboard-header" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:6px;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
+                        <button id="back-btn" class="back-btn" style="display:none;" aria-label="Go back" title="Go back">←</button>
                         <span id="leaderboard-title" style="font-size:20px;font-weight:800;">Leaderboard</span>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:4px;">
@@ -172,8 +172,8 @@ export default class Leaderboard {
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <button id="leaderboard-save-score" class="action-btn submit-btn" style="padding:8px 12px;font-size:12px;">Save Score</button>
-                    <button id="toggle-leaderboard" class="toggle-btn" aria-label="Toggle leaderboard">+</button>
+                    <button id="leaderboard-save-score" class="save-score-btn" aria-label="Save score" title="Save score">💾</button>
+                    <button id="toggle-leaderboard" class="toggle-btn" aria-label="Toggle leaderboard" title="Toggle leaderboard">+</button>
                 </div>
             </div>
             <div class="leaderboard-content hidden" id="leaderboard-content" style="padding:12px 16px;">
