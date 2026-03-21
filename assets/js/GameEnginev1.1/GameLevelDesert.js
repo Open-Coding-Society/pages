@@ -12,8 +12,7 @@ import GameLevelEnd from './GameLevelEnd.js';
 import Coin from './Coin.js';
 import { pythonURI, fetchOptions } from '../api/config.js';
 
-// Import Background and PlatformerMini (game-in-game)
-import Background from './essentials/Background.js';
+// Import PlatformerMini (game-in-game)
 import PlatformerMini from './PlatformerMini.js';
 
 class GameLevelDesert {
