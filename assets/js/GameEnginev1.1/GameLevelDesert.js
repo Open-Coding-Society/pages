@@ -1032,6 +1032,15 @@ class GameLevelDesert {
 
           historyBtn.onclick = () => this.showChatHistory();
 
+          // Prevent ALL keyboard events from propagating to the game while typing
+          inputField.addEventListener('keydown', e => {
+              e.stopPropagation();
+          });
+          
+          inputField.addEventListener('keyup', e => {
+              e.stopPropagation();
+          });
+          
           inputField.onkeypress = e => {
               e.stopPropagation();
               if (e.key === 'Enter') {
@@ -1039,6 +1048,9 @@ class GameLevelDesert {
                   sendMessage();
               }
           };
+
+          // Auto-focus the input field for better UX
+          setTimeout(() => inputField.focus(), 100);
 
           buttonRow.appendChild(historyBtn);
           buttonContainer.appendChild(inputField);
