@@ -152,9 +152,156 @@
 .user-message {
   background: var(--pref-accent-color, rgba(74, 134, 232, 0.3));
   border-left: 3px solid var(--pref-accent-color, #4a86e8);
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 5px;
 }
 
 .ai-message {
   background: var(--panel, rgba(22, 33, 62, 0.5));
   border-left: 3px solid var(--ui-border, #333);
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+/**
+ * ===========================
+ * AI NPC Interaction Styles
+ * ===========================
+ * Chat UI elements appended to dialogue boxes
+ */
+
+/**
+ * AI NPC Container
+ * Main container for input, buttons, and response area
+ */
+.ai-npc-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/**
+ * AI NPC Input Field
+ * Text input for user messages
+ */
+.ai-npc-input {
+  @include text-button;
+  height: auto;
+  padding: 8px 12px;
+  font-family: var(--pref-font-family, system-ui, sans-serif);
+  font-size: 14px;
+  text-align: left;
+  
+  &::placeholder {
+    opacity: 0.6;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/**
+ * AI NPC Button Row
+ * Container for history button
+ */
+.ai-npc-button-row {
+  display: flex;
+  gap: 10px;
+}
+
+/**
+ * AI NPC History Button
+ * Button to show chat history modal
+ */
+.ai-npc-history-btn {
+  @include text-button;
+  flex: 1;
+  
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+  }
+}
+
+/**
+ * AI NPC Response Area
+ * Area displaying AI responses with typewriter effect
+ */
+.ai-npc-response-area {
+  min-height: 40px;
+  padding: 10px;
+  border-radius: 5px;
+  border-left: 3px solid var(--pref-accent-color, #4a86e8);
+  background: var(--panel-mid, rgba(0, 0, 0, 0.3));
+  color: var(--pref-text-color, #FFF);
+  font-style: italic;
+  
+  @media (max-width: 768px) {
+    min-height: 30px;
+    padding: 8px;
+  }
+}
+
+/**
+ * AI NPC Modal
+ * Chat history modal overlay
+ */
+.ai-npc-modal {
+  @include modal-container(300px, 500px, 20px);
+  
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 600px;
+  overflow-y: auto;
+  z-index: 10001;
+  
+  @media (max-width: 768px) {
+    max-width: 90%;
+    max-height: 80vh;
+  }
+}
+
+/**
+ * AI NPC Modal Title
+ * Title for chat history modal
+ */
+.ai-npc-modal-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--pref-accent-color, #4a86e8);
+  text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+}
+
+/**
+ * AI NPC Close Button
+ * Close button for chat history modal
+ */
+.ai-npc-close-btn {
+  @include text-button;
+  width: 100%;
+  margin-top: 10px;
+  background: var(--pref-accent-color, #3b82f6);
+  color: var(--pref-bg-color, #FFF);
+  border-color: var(--pref-accent-color, #3b82f6);
+  
+  &:hover {
+    opacity: 0.9;
+    background: var(--pref-accent-color, #3b82f6);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 }

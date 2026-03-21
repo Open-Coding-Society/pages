@@ -67,41 +67,23 @@ class AiNpc {
      */
     static createChatUI(spriteData) {
         const container = document.createElement('div');
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.gap = '10px';
-        container.style.marginTop = '15px';
+        container.className = 'ai-npc-container';
 
         const inputField = document.createElement('input');
         inputField.type = 'text';
+        inputField.className = 'ai-npc-input';
         inputField.placeholder = `Ask about ${spriteData.expertise}...`;
-        Object.assign(inputField.style, {
-            padding: '8px 12px',
-            borderRadius: '5px'
-        });
 
         const buttonRow = document.createElement('div');
-        buttonRow.style.display = 'flex';
-        buttonRow.style.gap = '10px';
+        buttonRow.className = 'ai-npc-button-row';
 
         const historyBtn = document.createElement('button');
-        historyBtn.textContent = '📋 History';
-        Object.assign(historyBtn.style, {
-            padding: '8px 15px',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            flex: '1'
-        });
+        historyBtn.textContent = '📋 Chat History';
+        historyBtn.className = 'ai-npc-history-btn';
 
         const responseArea = document.createElement('div');
-        Object.assign(responseArea.style, {
-            minHeight: '40px',
-            padding: '10px',
-            borderRadius: '5px',
-            fontStyle: 'italic',
-            display: 'none'
-        });
+        responseArea.className = 'ai-npc-response-area';
+        responseArea.style.display = 'none'; // Keep this one for show/hide logic
 
         buttonRow.appendChild(historyBtn);
         container.appendChild(inputField);
@@ -259,45 +241,23 @@ class AiNpc {
      */
     static showChatHistory(spriteData) {
         const modal = document.createElement('div');
-        Object.assign(modal.style, {
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            borderRadius: '10px',
-            padding: '20px',
-            maxWidth: '500px',
-            maxHeight: '600px',
-            overflowY: 'auto',
-            zIndex: '10001'
-        });
+        modal.className = 'ai-npc-modal';
 
         const title = document.createElement('h3');
         title.textContent = 'Chat History';
+        title.className = 'ai-npc-modal-title';
         modal.appendChild(title);
 
         spriteData.chatHistory.forEach(msg => {
             const div = document.createElement('div');
             div.className = msg.role === 'user' ? 'user-message' : 'ai-message';
-            Object.assign(div.style, {
-                marginBottom: '8px',
-                padding: '8px',
-                borderRadius: '5px'
-            });
             div.textContent = msg.message;
             modal.appendChild(div);
         });
 
         const closeBtn = document.createElement('button');
         closeBtn.textContent = 'Close';
-        Object.assign(closeBtn.style, {
-            width: '100%',
-            marginTop: '10px',
-            padding: '8px',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer'
-        });
+        closeBtn.className = 'ai-npc-close-btn';
         closeBtn.onclick = () => modal.remove();
 
         modal.appendChild(closeBtn);
