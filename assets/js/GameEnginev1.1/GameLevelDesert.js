@@ -4,6 +4,7 @@ import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 // Using v1.1 DialogueSystem for improved ID sanitization
 import DialogueSystem from './essentials/DialogueSystem.js';
+import AiNpc from './essentials/AiNpc.js';
 import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
@@ -835,6 +836,26 @@ class GameLevelDesert {
 
 
   // ===== CUSTOM AI NPCs =====
+  // AI NPCs use the AiNpc utility (essentials/AiNpc.js) for common behaviors
+  // Just define data + simple orchestrator methods, then call AiNpc.showInteraction()
+  /* 
+   * EXAMPLE: 
+   * 
+   * const sprite_data_wizard = {
+   *     id: "MerlinTheWizard",
+   *     src: path + "/images/gamify/wizard.png",
+   *     expertise: "magic",
+   *     chatHistory: [],
+   *     dialogues: ["Greetings, young apprentice!", "Seek magical wisdom?"],
+   *     knowledgeBase: { magic: [...spells and lore...] },
+   *     reaction: function() { ... },
+   *     interact: function() { AiNpc.showInteraction(this); }
+   * };
+   * 
+   * Then add to this.classes: { class: Npc, data: sprite_data_wizard }
+   */
+
+  
   const sprite_src_historian = path + "/images/gamify/historyProf.png";
   const sprite_greet_historian = "Hello! I'm an expert in history!";
   const sprite_data_historian = {
@@ -859,17 +880,17 @@ class GameLevelDesert {
       
       hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
       
-      // AI-specific properties
-      expertise: "history",
-      chatHistory: [],
-      dialogues: [
+      // AI-specific properties (required for AiNpc utility)
+      expertise: "history",              // Topic area for backend
+      chatHistory: [],                   // Conversation memory
+      dialogues: [                       // Random greetings
           "Ask me anything about history!",
           "I have knowledge about history...",
           "Want to learn about history?",
           "I'm an expert in history!",
           "Curious about history? Talk to me!"
       ],
-      knowledgeBase: {
+      knowledgeBase: {                   // Context hints for AI
           history: [
               {
                   question: "What is ancient Egypt?",
@@ -890,6 +911,7 @@ class GameLevelDesert {
           ]
       },
       
+      // Orchestrator: Handle collision/proximity reactions
       reaction: function() {
           if (this.dialogueSystem) {
               this.showReactionDialogue();
@@ -898,250 +920,13 @@ class GameLevelDesert {
           }
       },
       
-      // Helper: Create AI chat UI (input + buttons + response area)
-      createAIChatUI: function() {
-          const container = document.createElement('div');
-          container.style.display = 'flex';
-          container.style.flexDirection = 'column';
-          container.style.gap = '10px';
-          container.style.marginTop = '15px';
-
-          const inputField = document.createElement('input');
-          inputField.type = 'text';
-          inputField.placeholder = `Ask about ${this.expertise}...`;
-          Object.assign(inputField.style, {
-              padding: '8px 12px',
-              borderRadius: '5px',
-              border: '2px solid #4a86e8',
-              backgroundColor: '#16213e',
-              color: '#fff'
-          });
-
-          const buttonRow = document.createElement('div');
-          buttonRow.style.display = 'flex';
-          buttonRow.style.gap = '10px';
-
-          const historyBtn = document.createElement('button');
-          historyBtn.textContent = '📋 History';
-          Object.assign(historyBtn.style, {
-              padding: '8px 15px',
-              background: '#666',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              flex: '1'
-          });
-
-          const responseArea = document.createElement('div');
-          Object.assign(responseArea.style, {
-              minHeight: '40px',
-              padding: '10px',
-              backgroundColor: '#16213e',
-              borderRadius: '5px',
-              borderLeft: '3px solid #4a86e8',
-              color: '#4a86e8',
-              fontStyle: 'italic',
-              display: 'none'
-          });
-
-          buttonRow.appendChild(historyBtn);
-          container.appendChild(inputField);
-          container.appendChild(buttonRow);
-          container.appendChild(responseArea);
-
-          return { container, inputField, historyBtn, responseArea };
-      },
-
-      // Helper: Display response with typewriter effect
-      showResponse: function(text, element, speed = 30) {
-          element.textContent = '';
-          element.style.display = 'block';
-          let index = 0;
-          const type = () => {
-              if (index < text.length) {
-                  element.textContent += text.charAt(index++);
-                  setTimeout(type, speed);
-              }
-          };
-          type();
-      },
-
-      // Helper: Send message to backend API
-      sendPromptToBackend: async function(userMessage, responseArea) {
-          this.chatHistory.push({ role: 'user', message: userMessage });
-          
-          responseArea.textContent = 'Thinking...';
-          responseArea.style.display = 'block';
-
-          try {
-              // Build knowledge context
-              let knowledgeContext = '';
-              const topics = this.knowledgeBase?.[this.expertise] || [];
-              if (topics.length > 0) {
-                  knowledgeContext = 'Here are some example topics I can help with:\n';
-                  topics.slice(0, 3).forEach(t => {
-                      knowledgeContext += `- ${t.question}\n`;
-                  });
-                  knowledgeContext += '\n';
-              }
-
-              const sessionId = `player-${this.id}`;
-              const pythonURL = pythonURI + '/api/ainpc/prompt';
-              
-              const response = await fetch(pythonURL, {
-                  ...fetchOptions,
-                  method: 'POST',
-                  body: JSON.stringify({
-                      prompt: userMessage,
-                      session_id: sessionId,
-                      npc_type: this.expertise,
-                      expertise: this.expertise,
-                      knowledgeContext: knowledgeContext
-                  })
-              });
-
-              const data = await response.json();
-
-              if (data.status === 'error') {
-                  this.showResponse(
-                      data.message || "I'm having trouble thinking right now.",
-                      responseArea
-                  );
-                  return;
-              }
-
-              const aiResponse = data?.response || "I'm not sure how to answer that yet.";
-              this.chatHistory.push({ role: 'ai', message: aiResponse });
-              this.showResponse(aiResponse, responseArea);
-              
-          } catch (err) {
-              console.error('Frontend error:', err);
-              this.showResponse(
-                  "I'm having trouble reaching my brain right now.",
-                  responseArea
-              );
-          }
-      },
-
-      // Helper: Prevent keyboard events from propagating to game
-      preventGameInput: function(element) {
-          ['keydown', 'keyup', 'keypress'].forEach(eventType => {
-              element.addEventListener(eventType, e => e.stopPropagation());
-          });
-      },
-
+      // Orchestrator: Handle player interaction (E key press)
       interact: function() {
-          // Close any existing dialogue
-          if (this.dialogueSystem?.isDialogueOpen()) {
-              this.dialogueSystem.closeDialogue();
-          }
-
-          // Initialize DialogueSystem if needed
-          if (!this.dialogueSystem) {
-              this.dialogueSystem = new DialogueSystem();
-          }
-
-          // Show random greeting using DialogueSystem
-          let message = sprite_greet_historian;
-          if (this.spriteData.dialogues?.length > 0) {
-              const randomIndex = Math.floor(Math.random() * this.spriteData.dialogues.length);
-              message = this.spriteData.dialogues[randomIndex];
-          }
-          this.dialogueSystem.showDialogue(message, this.spriteData.id, this.spriteData.src);
-
-          // Create AI chat UI components
-          const { container, inputField, historyBtn, responseArea } = this.spriteData.createAIChatUI();
-
-          // Setup event handlers
-          historyBtn.onclick = () => this.spriteData.showChatHistory();
-          
-          const sendMessage = async () => {
-              const userMessage = inputField.value.trim();
-              if (!userMessage) return;
-              inputField.value = '';
-              await this.spriteData.sendPromptToBackend(userMessage, responseArea);
-          };
-
-          // Prevent game input while typing
-          this.spriteData.preventGameInput(inputField);
-          
-          // Handle Enter key for sending message
-          inputField.onkeypress = e => {
-              e.stopPropagation();
-              if (e.key === 'Enter') {
-                  e.preventDefault();
-                  sendMessage();
-              }
-          };
-
-          // Auto-focus input field
-          setTimeout(() => inputField.focus(), 100);
-
-          // Attach UI to dialogue box
-          const dialogueBox = document.getElementById('custom-dialogue-box-' + this.dialogueSystem.safeId);
-          if (dialogueBox) {
-              const closeBtn = dialogueBox.querySelector('button');
-              closeBtn
-                  ? dialogueBox.insertBefore(container, closeBtn)
-                  : dialogueBox.appendChild(container);
-          }
-      },
-      
-      // Helper: Show chat history in modal
-      showChatHistory: function() {
-          const modal = document.createElement('div');
-          Object.assign(modal.style, {
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: '#1a1a2e',
-              border: '2px solid #4a86e8',
-              borderRadius: '10px',
-              padding: '20px',
-              maxWidth: '500px',
-              maxHeight: '600px',
-              overflowY: 'auto',
-              zIndex: '10001',
-              color: '#fff'
-          });
-
-          const title = document.createElement('h3');
-          title.textContent = 'Chat History';
-          title.style.color = '#4a86e8';
-          modal.appendChild(title);
-
-          this.chatHistory.forEach(msg => {
-              const div = document.createElement('div');
-              Object.assign(div.style, {
-                  marginBottom: '8px',
-                  padding: '8px',
-                  borderRadius: '5px',
-                  background: msg.role === 'user' ? '#4a86e8' : '#16213e'
-              });
-              div.textContent = msg.message;
-              modal.appendChild(div);
-          });
-
-          const closeBtn = document.createElement('button');
-          closeBtn.textContent = 'Close';
-          Object.assign(closeBtn.style, {
-              width: '100%',
-              marginTop: '10px',
-              padding: '8px',
-              background: '#4a86e8',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-          });
-          closeBtn.onclick = () => modal.remove();
-
-          modal.appendChild(closeBtn);
-          document.body.appendChild(modal);
+          // Delegate to AiNpc utility for full AI conversation interface
+          AiNpc.showInteraction(this);
       }
   };
+
 
 
    // ===== PLATFORMER MINI GAME SETUP =====
