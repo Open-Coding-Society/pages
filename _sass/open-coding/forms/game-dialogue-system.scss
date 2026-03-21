@@ -150,19 +150,47 @@
  * Used in AiNpc.js chat history
  */
 .user-message {
-  background: var(--pref-accent-color, rgba(74, 134, 232, 0.3));
-  border-left: 3px solid var(--pref-accent-color, #4a86e8);
-  margin-bottom: 8px;
-  padding: 8px;
-  border-radius: 5px;
+  background: linear-gradient(
+    135deg, 
+    var(--pref-accent-color, rgba(74, 134, 232, 0.4)) 0%, 
+    var(--pref-accent-color, rgba(74, 134, 232, 0.2)) 100%
+  );
+  border-left: 4px solid var(--pref-accent-color, #4a86e8);
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  
+  &::before {
+    content: '👤';
+    position: absolute;
+    left: -25px;
+    top: 8px;
+    font-size: 16px;
+  }
 }
 
 .ai-message {
-  background: var(--panel, rgba(22, 33, 62, 0.5));
-  border-left: 3px solid var(--ui-border, #333);
-  margin-bottom: 8px;
-  padding: 8px;
-  border-radius: 5px;
+  background: linear-gradient(
+    135deg, 
+    var(--panel, rgba(22, 33, 62, 0.6)) 0%, 
+    var(--panel-mid, rgba(22, 33, 62, 0.4)) 100%
+  );
+  border-left: 4px solid var(--ui-border, #555);
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  
+  &::before {
+    content: '🤖';
+    position: absolute;
+    left: -25px;
+    top: 8px;
+    font-size: 16px;
+  }
 }
 
 /**
@@ -181,37 +209,73 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));
 }
 
 /**
  * AI NPC Input Field
- * Text input for user messages
+ * Textarea for multi-line user messages with wrapping
  */
 .ai-npc-input {
   @include text-button;
   height: auto;
-  padding: 8px 12px;
+  min-height: 50px;
+  max-height: 120px;
+  padding: 10px 12px;
   font-family: var(--pref-font-family, system-ui, sans-serif);
   font-size: 14px;
+  line-height: 1.4;
   text-align: left;
+  resize: vertical;
+  overflow-y: auto;
+  
+  // Visual enhancements
+  background: var(--panel, rgba(0, 0, 0, 0.4));
+  border: 2px solid var(--ui-border, #444);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
   
   &::placeholder {
     opacity: 0.6;
+    font-style: italic;
+  }
+  
+  &:focus {
+    border-color: var(--pref-accent-color, #4a86e8);
+    box-shadow: 0 0 0 2px rgba(74, 134, 232, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    background: var(--panel-mid, rgba(0, 0, 0, 0.5));
   }
   
   @media (max-width: 768px) {
-    padding: 10px 12px;
+    padding: 10px;
     font-size: 13px;
+    min-height: 44px;
   }
 }
 
 /**
  * AI NPC Button Row
- * Container for history button
+ * Container for history and send buttons
  */
 .ai-npc-button-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
+  align-items: stretch;
+  
+  // Add hint text above button row (appears below input field)
+  &::before {
+    content: 'Press Enter to send, Shift+Enter for new line';
+    display: block;
+    font-size: 10px;
+    opacity: 0.5;
+    text-align: center;
+    font-style: italic;
+    width: 100%;
+    order: -1;
+    margin-bottom: -5px;
+  }
 }
 
 /**
@@ -221,9 +285,18 @@
 .ai-npc-history-btn {
   @include text-button;
   flex: 1;
+  font-size: 13px;
+  background: var(--panel-mid, rgba(0, 0, 0, 0.3));
+  
+  &:hover {
+    background: var(--pref-accent-color, #4a86e8);
+    color: var(--pref-bg-color, #FFF);
+    transform: scale(1.02);
+  }
   
   @media (max-width: 768px) {
     padding: 10px 12px;
+    font-size: 12px;
   }
 }
 
@@ -233,16 +306,30 @@
  */
 .ai-npc-response-area {
   min-height: 40px;
-  padding: 10px;
-  border-radius: 5px;
-  border-left: 3px solid var(--pref-accent-color, #4a86e8);
-  background: var(--panel-mid, rgba(0, 0, 0, 0.3));
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--pref-accent-color, #4a86e8);
+  background: linear-gradient(
+    135deg, 
+    var(--panel, rgba(0, 0, 0, 0.4)) 0%, 
+    var(--panel-mid, rgba(0, 0, 0, 0.3)) 100%
+  );
   color: var(--pref-text-color, #FFF);
   font-style: italic;
+  line-height: 1.5;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  
+  // Visual indicator for thinking/typing
+  &:empty::before {
+    content: '💭';
+    opacity: 0.3;
+    margin-right: 8px;
+  }
   
   @media (max-width: 768px) {
     min-height: 30px;
-    padding: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
   }
 }
 
@@ -261,9 +348,14 @@
   overflow-y: auto;
   z-index: 10001;
   
+  // Add padding for message icons
+  padding-left: 40px;
+  padding-right: 20px;
+  
   @media (max-width: 768px) {
     max-width: 90%;
     max-height: 80vh;
+    padding-left: 35px;
   }
 }
 

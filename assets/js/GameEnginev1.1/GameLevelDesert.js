@@ -776,63 +776,6 @@ class GameLevelDesert {
   };
 
 
-  const sprite_src_minesweeper = path + "/images/gamify/robot.png";
-  const sprite_greet_minesweeper = "Want to play a game of Minesweeper? Right-click to flag mines!";
-  const sprite_data_minesweeper = {
-      id: 'Minesweeper',
-      greeting: sprite_greet_minesweeper,
-      src: sprite_src_minesweeper,
-      SCALE_FACTOR: 10,
-      ANIMATION_RATE: 100,
-      pixels: {height: 316, width: 627},
-      INIT_POSITION: { x: 0.67, y: 0.67 },  // 67% from left, 67% from top
-      orientation: {rows: 3, columns: 6},
-      down: {row: 1, start: 0, columns: 6},
-      hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-      // Add dialogues array for random messages
-      dialogues: [
-          "Minesweeper is all about logic and probability.",
-          "The numbers tell you how many mines are adjacent to that square.",
-          "Use right-click to flag squares you think contain mines.",
-          "The first click is always safe in modern Minesweeper.",
-          "Minesweeper was first included with Windows 3.1 in 1992.",
-          "The world record for expert Minesweeper is under 40 seconds!",
-          "Looking for patterns is key to solving Minesweeper efficiently.",
-          "Sometimes you have to make an educated guess - that's part of the game."
-      ],
-      reaction: function() {
-          // Use dialogue system instead of alert
-          if (this.dialogueSystem) {
-              this.showReactionDialogue();
-          } else {
-              console.log(sprite_greet_minesweeper);
-          }
-      },
-      interact: function() {
-          // KEEP ORIGINAL GAME-IN-GAME FUNCTIONALITY
-          let primaryGame = gameEnv.gameControl;
-          let levelArray = [GameLevelMinesweeper];
-            let gameInGame = new GameControl(gameEnv.game, levelArray, { parentControl: primaryGame });
-                    if (typeof primaryGame.pause === 'function') {
-                      primaryGame.pause();
-                    } else if (typeof primaryGame.pauseGame === 'function') {
-                      primaryGame.pauseGame();
-                    }
-                  // Hide the parent canvases so the nested Minesweeper can draw
-                  // cleanly on the main canvas without showing underlying NPCs.
-                  try {
-                    if (typeof primaryGame.hideCanvasState === 'function') {
-                      primaryGame.hideCanvasState();
-                    }
-                  } catch (e) {
-                    console.warn('Could not hide parent canvas state for nested Minesweeper', e);
-                  }
-          gameInGame.start();
-          gameInGame.gameOver = function() {
-              primaryGame.resume();
-          }
-      }
-  };
 
 
   // ===== CUSTOM AI NPCs =====
@@ -859,7 +802,7 @@ class GameLevelDesert {
   const sprite_src_historian = path + "/images/gamify/historyProf.png";
   const sprite_greet_historian = "Hello! I'm an expert in history!";
   const sprite_data_historian = {
-      id: "ProfessorHistory",
+      id: "Professor History",
       greeting: sprite_greet_historian,
       src: sprite_src_historian,
       SCALE_FACTOR: 5,
@@ -969,7 +912,6 @@ class GameLevelDesert {
      { class: Npc, data: sprite_data_r2d2 },
      { class: Npc, data: sprite_data_stocks },
      { class: Npc, data: sprite_data_crypto },
-     { class: Npc, data: sprite_data_minesweeper },
      { class: Npc, data: sprite_data_chickenj },
      { class: Npc, data: sprite_data_endportal },
      { class: Npc, data: sprite_data_historian },

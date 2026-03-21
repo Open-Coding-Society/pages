@@ -255,7 +255,7 @@ typewriteText(element, text, speed = this.typewriterSpeed) {
 
 
 // Show a specific dialogue message
-showDialogue(message, speaker = "", avatarSrc = null) {
+showDialogue(message, speaker = "", avatarSrc = null, spriteData = null) {
   // Clear any existing typewriter timeout
   if (this.typewriterTimeoutId) {
     clearTimeout(this.typewriterTimeoutId);
@@ -272,6 +272,51 @@ showDialogue(message, speaker = "", avatarSrc = null) {
     if (avatarSrc) {
       avatarElement.style.backgroundImage = `url('${avatarSrc}')`;
       avatarElement.style.display = "block";
+      
+      // If sprite data provided with orientation (sprite sheet), show only down row, column 0
+      if (spriteData && spriteData.orientation && spriteData.pixels && spriteData.down) {
+        const { rows, columns } = spriteData.orientation;
+        const { width, height } = spriteData.pixels;
+        const { row } = spriteData.down;
+        
+        // Calculate frame dimensions
+        const frameWidth = width / columns;
+        const frameHeight = height / rows;
+        
+        // Scale avatar to fit nicely (max 80px on longest side)
+        const maxAvatarSize = 80;
+        const aspectRatio = frameWidth / frameHeight;
+        let displayWidth, displayHeight;
+        
+        if (frameWidth > frameHeight) {
+          displayWidth = Math.min(maxAvatarSize, frameWidth);
+          displayHeight = displayWidth / aspectRatio;
+        } else {
+          displayHeight = Math.min(maxAvatarSize, frameHeight);
+          displayWidth = displayHeight * aspectRatio;
+        }
+        
+        // Calculate scale factor for background image
+        const scale = displayWidth / frameWidth;
+        const scaledSpriteWidth = width * scale;
+        const scaledSpriteHeight = height * scale;
+        
+        // Calculate background position to show down row, column 0
+        const bgPosX = 0; // Column 0
+        const bgPosY = -(row * frameHeight * scale); // Down row
+        
+        // Set styles to crop to single frame
+        avatarElement.style.width = `${displayWidth}px`;
+        avatarElement.style.height = `${displayHeight}px`;
+        avatarElement.style.backgroundSize = `${scaledSpriteWidth}px ${scaledSpriteHeight}px`;
+        avatarElement.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+      } else {
+        // No orientation data, show entire image
+        avatarElement.style.width = "50px";
+        avatarElement.style.height = "50px";
+        avatarElement.style.backgroundSize = "contain";
+        avatarElement.style.backgroundPosition = "center";
+      }
     } else {
       avatarElement.style.display = "none";
     }
@@ -310,7 +355,7 @@ showDialogue(message, speaker = "", avatarSrc = null) {
 
 
 // Show a random dialogue from the dialogues array
-showRandomDialogue(speaker = "", avatarSrc = null) {
+showRandomDialogue(speaker = "", avatarSrc = null, spriteData = null) {
   if (this.dialogues.length === 0) return;
    // Pick a random index that's different from the last one
   let randomIndex;
@@ -325,7 +370,7 @@ showRandomDialogue(speaker = "", avatarSrc = null) {
   this.lastShownIndex = randomIndex;
    // Show the dialogue
   const randomDialogue = this.dialogues[randomIndex];
-  return this.showDialogue(randomDialogue, speaker, avatarSrc);
+  return this.showDialogue(randomDialogue, speaker, avatarSrc, spriteData);
 }
 
 

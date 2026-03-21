@@ -39,7 +39,7 @@ class AiNpc {
 
         // Show random greeting
         const message = AiNpc.getRandomGreeting(data);
-        npc.dialogueSystem.showDialogue(message, data.id, data.src);
+        npc.dialogueSystem.showDialogue(message, data.id, data.src, data);
 
         // Create and attach AI chat UI
         const ui = AiNpc.createChatUI(data);
@@ -69,10 +69,10 @@ class AiNpc {
         const container = document.createElement('div');
         container.className = 'ai-npc-container';
 
-        const inputField = document.createElement('input');
-        inputField.type = 'text';
+        const inputField = document.createElement('textarea');
         inputField.className = 'ai-npc-input';
         inputField.placeholder = `Ask about ${spriteData.expertise}...`;
+        inputField.rows = 2;
 
         const buttonRow = document.createElement('div');
         buttonRow.className = 'ai-npc-button-row';
@@ -116,10 +116,10 @@ class AiNpc {
         // Prevent game input while typing
         AiNpc.preventGameInput(inputField);
 
-        // Handle Enter key
+        // Handle Enter key (Shift+Enter for new line, Enter to send)
         inputField.onkeypress = e => {
             e.stopPropagation();
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
